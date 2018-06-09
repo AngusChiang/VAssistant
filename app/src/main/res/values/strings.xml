@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">AccessibilityServiceDemo</string>
+        <string-array name="notification_mode">
+            <item>默认</item>
+            <item>仅熄屏</item>
+
+        </string-array>
+
+</resources>
