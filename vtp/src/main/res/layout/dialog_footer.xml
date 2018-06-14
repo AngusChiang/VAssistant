@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="10dp">
+
+    <TextView
+        android:id="@+id/dialog_button_neutral"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="?android:attr/selectableItemBackground"
+        android:gravity="center"
+        android:minWidth="60dp"
+        android:padding="10dp"
+        android:text="NEUTRAL"
+        android:textColor="?android:attr/colorAccent"
+        android:visibility="gone" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="end">
+
+        <TextView
+            android:id="@+id/dialog_button_positive"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="?android:attr/selectableItemBackground"
+            android:gravity="center"
+            android:minWidth="60dp"
+            android:padding="10dp"
+            android:text="POSITIVE"
+            android:textColor="?android:attr/colorAccent"
+            android:visibility="gone" />
+
+        <TextView
+            android:id="@+id/dialog_button_negative"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="?android:attr/selectableItemBackground"
+            android:gravity="center"
+            android:minWidth="60dp"
+            android:padding="10dp"
+            android:text="NEGATIVE"
+            android:textColor="?android:attr/colorAccent"
+            android:visibility="gone" />
+    </LinearLayout>
+</LinearLayout>

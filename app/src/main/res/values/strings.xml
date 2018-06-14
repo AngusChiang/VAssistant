@@ -1,9 +1,7 @@
 <resources>
     <string name="app_name">AccessibilityServiceDemo</string>
-        <string-array name="notification_mode">
-            <item>默认</item>
-            <item>仅熄屏</item>
-
-        </string-array>
-
+    <string name="test_script">openAppByName(\'QQ\')\n
+        var a= t.int()+1;
+        alert(a);
+        </string>
 </resources>

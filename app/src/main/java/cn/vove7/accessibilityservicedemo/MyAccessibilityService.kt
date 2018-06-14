@@ -1,10 +1,8 @@
 package cn.vove7.accessibilityservicedemo
 
 import android.accessibilityservice.AccessibilityService
-import android.annotation.TargetApi
 import android.content.Context
 import android.graphics.Rect
-import android.os.Build
 import android.util.Log
 import android.view.KeyEvent
 import android.view.ViewGroup
@@ -12,14 +10,17 @@ import android.view.accessibility.AccessibilityEvent
 import android.view.accessibility.AccessibilityEvent.TYPE_WINDOWS_CHANGED
 import android.view.accessibility.AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED
 import android.view.accessibility.AccessibilityNodeInfo
+import android.webkit.JavascriptInterface
 import android.widget.Toast
+import cn.vove7.accessibilityservicedemo.model.ViewNode
+import cn.vove7.vtp.log.Vog
 
 /**
  * Created by Vove on 2018/1/13.
  * cn.vove7
  */
 
-class MyAccessibilityService : AccessibilityService() {
+class MyAccessibilityService : AccessibilityService(), ViewOperation {
 
     var currentActivity: String = ""
     var currentApp: String = ""
@@ -41,7 +42,7 @@ class MyAccessibilityService : AccessibilityService() {
             currentApp = pkg
             currentActivity = classNameStr.substring(pkg.length)
         }
-        Log.wtf("Vove :", "class :$currentApp$currentActivity ----> " +
+        Vog.v(this, "class :$currentApp$currentActivity ----> " +
                 AccessibilityEvent.eventTypeToString(event.eventType))
         val eventType = event.eventType
         //根据事件回调类型进行处理
@@ -68,10 +69,13 @@ class MyAccessibilityService : AccessibilityService() {
         }
     }
 
+    val isTr = false
     private fun startTraverse(rootNode: AccessibilityNodeInfo?) {
-        val builder = StringBuilder("\n" + rootNode?.packageName + "\n")
-        traverseAllNode(builder, 0, rootNode)
-        Log.d("Vove :", "onAccessibilityEvent  ---->" + builder.toString() + " \n\n\n")
+        if (isTr) {
+            val builder = StringBuilder("\n" + rootNode?.packageName + "\n")
+            traverseAllNode(builder, 0, rootNode)
+            Vog.v(this, "onAccessibilityEvent  ---->" + builder.toString() + " \n\n\n")
+        }
     }
 
     /**
@@ -84,21 +88,29 @@ class MyAccessibilityService : AccessibilityService() {
      */
     private fun traverseAllNode(builder: StringBuilder, dep: Int, node: AccessibilityNodeInfo?) {
         if (node == null) return
-        val ispar = try {
-            val cls = Class.forName(node.className as String?) as Class
+
+        if (!outputPar) {
+            if (!isPar(node.className.toString())) {
+                builder.append(getT(dep)).append(nodeSummary(node))
+            }
+        } else if (node.isVisibleToUser)
+            builder.append(getT(dep)).append(nodeSummary(node))
+        (0 until node.childCount).forEach { i ->
+            val childNode = node.getChild(i)
+            traverseAllNode(builder, dep + 1, childNode)
+        }
+    }
+
+    private fun isPar(className: String): Boolean {
+        return try {
+            val cls = Class.forName(className as String?) as Class
             val co = cls.getDeclaredConstructor(Context::class.java)
             co.isAccessible = true
             co.newInstance(this) is ViewGroup
 
         } catch (e: Exception) {
             Log.e("Error :", "traverseAllNode  ----> ${e.message}")
-            inAbs(node.className as String)
-        }
-        if (outputPar || !ispar)
-            builder.append(getT(dep)).append(nodeSummary(node))
-        (0 until node.childCount).forEach { i ->
-            val childNode = node.getChild(i)
-            traverseAllNode(builder, dep + 1, childNode)
+            inAbs(className)
         }
     }
 
@@ -109,29 +121,20 @@ class MyAccessibilityService : AccessibilityService() {
         val id = node.viewIdResourceName
         val rect = Rect()
         node.getBoundsInScreen(rect)
-        return "{clsName:" + clsName.substring(clsName.lastIndexOf('.') + 1) +
-                ",description:" + node.contentDescription +
-                ",id:" + (id?.substring(id.lastIndexOf('/') + 1) ?: "null") +
-                ",text:" + node.text +
-                "," + rect + "}\n"
+        val cls = clsName.substring(clsName.lastIndexOf('.') + 1)
+        return String.format("[%s] [%s] [%s] [%s] [%s] %n",
+                cls, node.contentDescription,
+                (id?.substring(id.lastIndexOf('/') + 1) ?: "null"),
+                node.text, rect
+        )
     }
 
     private fun getT(d: Int): String {
         val builder = StringBuilder()
         for (i in 0..d)
-            builder.append("|\t")
-        builder.append("|-")
+            builder.append("|")
+        builder.append("|")
         return builder.toString()
-    }
-
-    @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
-    private fun simulationClick(event: AccessibilityEvent, text: String) {
-        val nodeInfoList = event.source.findAccessibilityNodeInfosByText(text)
-        for (node in nodeInfoList) {
-            if (node.isClickable && node.isEnabled) {
-                node.performAction(AccessibilityNodeInfo.ACTION_CLICK)
-            }
-        }
     }
 
     override fun onGesture(gestureId: Int): Boolean {
@@ -167,7 +170,49 @@ class MyAccessibilityService : AccessibilityService() {
         super.onDestroy()
     }
 
+    @JavascriptInterface
+    override fun findNodeById(id: String): List<ViewNode> {
+        val list = mutableListOf<ViewNode>()
+
+        val rootNode = rootInActiveWindow
+        val buildId = rootNode.packageName.toString() + ":id/" + id
+        Vog.d(this, "findNodeById  ----> $buildId")
+
+        for (node in rootNode.findAccessibilityNodeInfosByViewId(buildId)) {
+            list.add(ViewNode(node))
+        }
+        Vog.d(this, "size :${list.size}")
+        return list
+    }
+
+    @JavascriptInterface
+    override fun findFirstNodeById(id: String): ViewNode? {
+        val l = findNodeById(id)
+        return if (l.isNotEmpty()) l[0] else null
+    }
+
+    @JavascriptInterface
+    override fun findFirstNodeByText(text: String): ViewNode? {
+        val l = findNodeByText(text)
+        return if (l.isNotEmpty()) l[0] else null
+    }
+
+    @JavascriptInterface
+    override fun findNodeByText(text: String): List<ViewNode> {
+        val list = mutableListOf<ViewNode>()
+        val rootNode = rootInActiveWindow
+        for (node in rootNode.findAccessibilityNodeInfosByText(text)) {
+            list.add(ViewNode(node))
+        }
+        Vog.d(this, "size :${list.size}")
+        return list
+    }
+
     companion object {
+
+        fun isOk(): Boolean {
+            return accessibilityService != null
+        }
 
         var accessibilityService: MyAccessibilityService? = null
 
@@ -179,14 +224,26 @@ class MyAccessibilityService : AccessibilityService() {
             }
             return false
         }
+    }
 
-        fun findNodeById(id: String): List<AccessibilityNodeInfo>? {
-            if (accessibilityService == null) return null
-            val rootNode = accessibilityService!!.rootInActiveWindow
-            val buildId = rootNode.packageName.toString() + ":id/" + id
-            Log.d("Vove :", "findNodeById  ----> $buildId")
-            return rootNode.findAccessibilityNodeInfosByViewId(buildId)
-        }
+    @JavascriptInterface
+    override fun home(): Boolean {
+        return performGlobalAction(GLOBAL_ACTION_HOME)
+    }
+
+    @JavascriptInterface
+    override fun back(): Boolean {
+        return performGlobalAction(GLOBAL_ACTION_BACK)
+    }
+
+    @JavascriptInterface
+    override fun recentApp(): Boolean {
+        return performGlobalAction(GLOBAL_ACTION_RECENTS)
+    }
+
+    @JavascriptInterface
+    override fun showNotification(): Boolean {
+        return performGlobalAction(GLOBAL_ACTION_NOTIFICATIONS)
     }
     /*
     //根据文本,返回文本对应的View
@@ -202,3 +259,14 @@ class MyAccessibilityService : AccessibilityService() {
 
 }
 
+interface ViewOperation {
+    fun findFirstNodeById(id: String): ViewNode?
+    fun findNodeById(id: String): List<ViewNode>
+    fun findFirstNodeByText(text: String): ViewNode?
+    fun findNodeByText(text: String): List<ViewNode>
+
+    fun back(): Boolean
+    fun recentApp(): Boolean
+    fun home(): Boolean
+    fun showNotification(): Boolean
+}

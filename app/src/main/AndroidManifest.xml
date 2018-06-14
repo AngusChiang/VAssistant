@@ -1,17 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     package="cn.vove7.accessibilityservicedemo">
 
     <uses-permission android:name="android.permission.VIBRATE" />
+
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+
     <application
-        android:name=".MyApplication"
+        android:name=".App"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+        <meta-data android:name="com.baidu.speech.APP_ID" android:value="11389525" />
+        <meta-data
+            android:name="com.baidu.speech.API_KEY"
+            android:value="ILdLUepG75UwwQVa0rqiEUVa" />
+        <meta-data
+            android:name="com.baidu.speech.SECRET_KEY"
+            android:value="di6djKXGGELgnCCusiQUlCBYRxXVrr46" />
         <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -26,10 +39,22 @@
             <intent-filter>
                 <action android:name="android.accessibilityservice.AccessibilityService" />
             </intent-filter>
+
             <meta-data
                 android:name="android.accessibilityservice"
                 android:resource="@xml/accessibility_config" />
         </service>
+
+        <activity android:name=".ScriptTestActivity" />
+
+        <service
+            android:name=".speech.services.SpeechService"
+            android:enabled="true"
+            android:exported="true" />
+
+        <activity android:name=".VoiceTestActivity"/>
+        <service android:name="com.baidu.speech.VoiceRecognitionService" android:exported="false" />
+
     </application>
 
 </manifest>

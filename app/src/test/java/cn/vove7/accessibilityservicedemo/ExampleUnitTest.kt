@@ -11,9 +11,8 @@ import org.junit.Test
 class ExampleUnitTest {
     @Test
     fun addition_isCorrect() {
-        for (i in 0..0) {
-            Log.d("1",i.toString())
-        }
+
+
     }
 
 }
