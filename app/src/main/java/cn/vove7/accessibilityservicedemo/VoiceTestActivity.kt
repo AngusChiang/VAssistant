@@ -11,6 +11,8 @@ import cn.vove7.accessibilityservicedemo.utils.SpeechAction
 import cn.vove7.accessibilityservicedemo.utils.SpeechAction.Companion.ACTION_START
 import cn.vove7.accessibilityservicedemo.utils.SpeechAction.Companion.ACTION_STOP
 import cn.vove7.accessibilityservicedemo.utils.VoiceData
+import cn.vove7.parseengine.engine.ParseEngine
+import cn.vove7.vtp.log.Vog
 import cn.vove7.vtp.runtimepermission.PermissionUtils
 import cn.vove7.vtp.toast.VToast
 import kotlinx.android.synthetic.main.activity_voice.*
@@ -74,6 +76,20 @@ class VoiceTestActivity : AppCompatActivity() {
             }
             VoiceData.WHAT_VOL -> {
                 volume_per.progress = data.volumePercent
+            }
+            VoiceData.WHAT_FINISH -> {
+                val toast=VToast.with(this)
+                toast.showShort("parse start")
+                result_text.text = data.tempResult
+                val action = ParseEngine.parseAction(data.tempResult)
+                if (action.isNotEmpty()) {
+                    Vog.d(this,"parse success")
+                    toast.showShort("parse success")
+                } else {
+                    toast.showShort("parse failed")
+                    Vog.d(this,"parse failed")
+                }
+
             }
         }
     }

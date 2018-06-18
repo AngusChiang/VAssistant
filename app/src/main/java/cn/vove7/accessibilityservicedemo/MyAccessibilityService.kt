@@ -2,6 +2,7 @@ package cn.vove7.accessibilityservicedemo
 
 import android.accessibilityservice.AccessibilityService
 import android.content.Context
+import android.content.pm.PackageManager
 import android.graphics.Rect
 import android.util.Log
 import android.view.KeyEvent
@@ -13,6 +14,8 @@ import android.view.accessibility.AccessibilityNodeInfo
 import android.webkit.JavascriptInterface
 import android.widget.Toast
 import cn.vove7.accessibilityservicedemo.model.ViewNode
+import cn.vove7.parseengine.model.AppInfo
+import cn.vove7.vtp.app.AppUtil
 import cn.vove7.vtp.log.Vog
 
 /**
@@ -23,13 +26,24 @@ import cn.vove7.vtp.log.Vog
 class MyAccessibilityService : AccessibilityService(), ViewOperation {
 
     var currentActivity: String = ""
-    var currentApp: String = ""
+
+    var currentAppInfo: AppInfo? = null
+    private lateinit var pkgman: PackageManager
+
     override fun onServiceConnected() {
+        pkgman = packageManager
+        updateCurrentApp(packageName)
         Toast.makeText(this, "无障碍服务开启", Toast.LENGTH_SHORT).show()
         Log.d("Vove :", "无障碍服务开启")
         //代码配置
         accessibilityService = this
-        currentApp = packageName
+
+    }
+
+    private fun updateCurrentApp(pkg: String) {
+        val app = AppUtil.getAppInfo(pkg)
+        if (app != null)
+            currentAppInfo = AppInfo(app.loadLabel(pkgman).toString(), app.packageName, app.loadIcon(pkgman))
     }
 
     override fun onAccessibilityEvent(event: AccessibilityEvent?) {
@@ -39,10 +53,10 @@ class MyAccessibilityService : AccessibilityService(), ViewOperation {
         val classNameStr = event.className
         val pkg = event.packageName as String
         if (classNameStr.startsWith(pkg)) {
-            currentApp = pkg
+            updateCurrentApp(pkg)
             currentActivity = classNameStr.substring(pkg.length)
         }
-        Vog.v(this, "class :$currentApp$currentActivity ----> " +
+        Vog.v(this, "class :${currentAppInfo?.name} - $currentActivity " +
                 AccessibilityEvent.eventTypeToString(event.eventType))
         val eventType = event.eventType
         //根据事件回调类型进行处理

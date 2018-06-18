@@ -53,7 +53,7 @@ class MessageStatusRecogListener(private val handler: Handler) : StatusRecogList
             message += "；说话结束到识别结束耗时【" + diffTime + "ms】"
 
         }
-        Bus.postVoiceData(VoiceData(VoiceData.WHAT_TEMP, results[0]))
+        Bus.postVoiceData(VoiceData(VoiceData.WHAT_FINISH, results[0]))
         speechEndTime = 0
         sendMessage(message, status, true)
     }

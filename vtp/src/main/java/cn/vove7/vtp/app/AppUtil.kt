@@ -2,6 +2,7 @@ package cn.vove7.vtp.app
 
 import android.content.Context
 import android.content.Intent
+import android.content.pm.ApplicationInfo
 import android.net.Uri
 import android.provider.Settings
 
@@ -22,7 +23,14 @@ object AppUtil {
         intent.data = uri
         context.startActivity(intent)
     }
-    fun getAllInstallApp(){
 
+    fun getAppInfo(pkg: String): ApplicationInfo? {
+
+        return null
+    }
+
+    fun getAllInstallApp(context: Context): List<ApplicationInfo> {
+        val man = context.packageManager
+        return man.getInstalledApplications(0)
     }
 }

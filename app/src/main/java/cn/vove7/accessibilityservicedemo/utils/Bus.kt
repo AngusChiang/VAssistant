@@ -63,6 +63,7 @@ open class VoiceData(val what: Int, val tempResult: String = "", val volumePerce
     companion object {
         const val WHAT_TEMP = 1
         const val WHAT_VOL = 2
+        const val WHAT_FINISH = 3
     }
 }
 
