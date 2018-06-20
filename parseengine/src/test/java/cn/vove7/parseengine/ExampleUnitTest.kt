@@ -42,7 +42,7 @@ class ExampleUnitTest {
 
     }
 
-    fun clearUp(actions: PriorityQueue<Action>) {
+    private fun clearUp(actions: PriorityQueue<Action>) {
         var p: Action
         var index = 0
         while (actions.isNotEmpty()) {

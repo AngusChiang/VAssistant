@@ -12,11 +12,27 @@ class Action(
          * 执行优先级
          */
         private val priority: Int = 0,
+        /**
+         * 格式：
+         * openApp:$var
+         * clickText:$var
+         * clickId:$var
+         * back
+         * recent
+         * pullNotification
+         * call
+         *
+         */
+
         val actionScript: String,
         /**
          * 操作参数
          */
-        var param: Param? = null
+        var param: Param? = null,
+        /**
+         * 获取中途参数结果
+         */
+        var voiceOk: Boolean = true
 
 ) : Comparable<Action> {
     override fun compareTo(other: Action): Int {
@@ -27,7 +43,7 @@ class Action(
         /**
          * 启动App，其他
          */
-        const val ACTION_OPEN_APP = 1
+        const val ACTION_OPEN = 1
         /**
          * 拨打电话
          */

@@ -1,8 +1,13 @@
 package cn.vove7.accessibilityservicedemo.utils
 
 import org.greenrobot.eventbus.EventBus
+import java.io.Serializable
 
 object Bus {
+    fun post(data: Any) {
+        EventBus.getDefault().post(data)
+    }
+
     /**
      *
      */
@@ -56,16 +61,11 @@ open class SpeechAction(val action: Int) {
     override fun toString(): String {
         return "SpeechAction(action=$action)"
     }
-
 }
 
-open class VoiceData(val what: Int, val tempResult: String = "", val volumePercent: Int = 0) {
-    companion object {
-        const val WHAT_TEMP = 1
-        const val WHAT_VOL = 2
-        const val WHAT_FINISH = 3
-    }
-}
+open class VoiceData(val what: Int = 0, val tempResult: String? = null, val volumePercent: Int = 0)
+    : Serializable
+
 
 open class MessageEvent(val msg: String, val what: Int) {
     override fun toString(): String {
@@ -73,8 +73,8 @@ open class MessageEvent(val msg: String, val what: Int) {
     }
 
     companion object {
-        const val WHAT_INFO = 1
-        const val WHAT_ERR = 2
+        const val WHAT_MSG_INFO = 1
+        const val WHAT_MSG_ERR = 2
     }
 }
 

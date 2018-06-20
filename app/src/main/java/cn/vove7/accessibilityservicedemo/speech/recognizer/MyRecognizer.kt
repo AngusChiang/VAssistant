@@ -9,18 +9,19 @@ import com.baidu.speech.EventManagerFactory
 import com.baidu.speech.asr.SpeechConstant
 import org.json.JSONObject
 
-class MyRecognizer
 /**
  * 初始化 提供 EventManagerFactory需要的Context和EventListener
  *
  * @param context
  * @param eventListener
  */
-(context: Context,
- /**
-  * SDK 内部核心 事件回调类， 用于开发者写自己的识别回调逻辑
-  */
- private val eventListener: EventListener) {
+class MyRecognizer(
+        context: Context,
+        /**
+         * SDK 内部核心 事件回调类， 用于开发者写自己的识别回调逻辑
+         */
+        private val eventListener: EventListener
+) {
     /**
      * SDK 内部核心 EventManager 类
      */

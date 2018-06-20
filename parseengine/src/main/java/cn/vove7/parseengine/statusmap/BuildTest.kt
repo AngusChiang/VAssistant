@@ -27,7 +27,7 @@ object BuildTest {
         MapNodes[1] = MapNode(
                 id = 1,
                 regs = listOf(Reg("(用|打开|启动)%", PARAM_POS_END)),
-                action = Action(actionScript = ""),
+                action = Action(actionScript = "open\n"),
                 follows = listOf(3),
                 param = Param(desc = "应用名")
         )
@@ -58,7 +58,7 @@ object BuildTest {
                         Reg("打(电话)?给%", PARAM_POS_END),
                         Reg("给%打电话", PARAM_POS_1)
                 ),
-                action = Action(actionScript = ""),
+                action = Action(actionScript = "call"),
                 follows = listOf(),
                 param = Param(desc = "联系人姓名或手机号")
         )

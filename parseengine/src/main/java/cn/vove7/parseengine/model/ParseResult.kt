@@ -7,4 +7,4 @@ import java.util.*
  *
  * Created by Vove on 2018/6/18
  */
-class ParseResult(var isSuccess: Boolean = false, var actions: PriorityQueue<Action>)
+class ParseResult(var isSuccess: Boolean = false, var actionQueue: PriorityQueue<Action>)

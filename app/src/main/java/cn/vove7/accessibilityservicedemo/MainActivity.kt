@@ -4,17 +4,17 @@ import android.content.Intent
 import android.os.Bundle
 import android.provider.Settings
 import android.support.v7.app.AppCompatActivity
-import android.util.Log
 import android.view.KeyEvent
 import android.view.View
 import android.widget.Toast
+import cn.vove7.accessibilityservicedemo.services.MyAccessibilityService
+import cn.vove7.vtp.log.Vog
 import cn.vove7.vtp.runtimepermission.PermissionUtils.accessibilityServiceEnabled
 import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        App.instance.mainActivity = this
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
     }
@@ -56,7 +56,7 @@ class MainActivity : AppCompatActivity() {
             if (nodeInfos?.isNotEmpty() == true) {
                 Toast.makeText(this, "Found It findByID", Toast.LENGTH_SHORT).show()
                 for (nodeInfo in nodeInfos) {
-                    Log.d("Vove :", "findByID  ----> " + nodeInfo.node.describeContents())
+                    Vog.d(this, "findByID  ----> " + nodeInfo.node.describeContents())
                 }
             } else {
                 Toast.makeText(this, "404 Not Found", Toast.LENGTH_SHORT).show()
@@ -83,6 +83,7 @@ class MainActivity : AppCompatActivity() {
     fun go2Test(view: View) {
         startActivity(Intent(this, ScriptTestActivity::class.java))
     }
+
     fun go2Voice(view: View) {
         startActivity(Intent(this, VoiceTestActivity::class.java))
     }

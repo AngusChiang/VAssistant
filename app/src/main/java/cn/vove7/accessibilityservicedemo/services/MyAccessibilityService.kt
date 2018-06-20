@@ -1,6 +1,5 @@
-package cn.vove7.accessibilityservicedemo
+package cn.vove7.accessibilityservicedemo.services
 
-import android.accessibilityservice.AccessibilityService
 import android.content.Context
 import android.content.pm.PackageManager
 import android.graphics.Rect
@@ -11,10 +10,10 @@ import android.view.accessibility.AccessibilityEvent
 import android.view.accessibility.AccessibilityEvent.TYPE_WINDOWS_CHANGED
 import android.view.accessibility.AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED
 import android.view.accessibility.AccessibilityNodeInfo
-import android.webkit.JavascriptInterface
 import android.widget.Toast
-import cn.vove7.accessibilityservicedemo.model.ViewNode
-import cn.vove7.parseengine.model.AppInfo
+import cn.vove7.executorengine.bridge.AccessibilityBridge
+import cn.vove7.executorengine.model.ViewNode
+import cn.vove7.vtp.app.AppInfo
 import cn.vove7.vtp.app.AppUtil
 import cn.vove7.vtp.log.Vog
 
@@ -23,7 +22,7 @@ import cn.vove7.vtp.log.Vog
  * cn.vove7
  */
 
-class MyAccessibilityService : AccessibilityService(), ViewOperation {
+class MyAccessibilityService : AccessibilityBridge() {
 
     var currentActivity: String = ""
 
@@ -43,7 +42,10 @@ class MyAccessibilityService : AccessibilityService(), ViewOperation {
     private fun updateCurrentApp(pkg: String) {
         val app = AppUtil.getAppInfo(pkg)
         if (app != null)
-            currentAppInfo = AppInfo(app.loadLabel(pkgman).toString(), app.packageName, app.loadIcon(pkgman))
+            currentAppInfo = AppInfo(
+                    name = app.loadLabel(pkgman).toString(),
+                    packageName = app.packageName,
+                    icon = app.loadIcon(pkgman))
     }
 
     override fun onAccessibilityEvent(event: AccessibilityEvent?) {
@@ -184,7 +186,6 @@ class MyAccessibilityService : AccessibilityService(), ViewOperation {
         super.onDestroy()
     }
 
-    @JavascriptInterface
     override fun findNodeById(id: String): List<ViewNode> {
         val list = mutableListOf<ViewNode>()
 
@@ -199,19 +200,16 @@ class MyAccessibilityService : AccessibilityService(), ViewOperation {
         return list
     }
 
-    @JavascriptInterface
     override fun findFirstNodeById(id: String): ViewNode? {
         val l = findNodeById(id)
         return if (l.isNotEmpty()) l[0] else null
     }
 
-    @JavascriptInterface
     override fun findFirstNodeByText(text: String): ViewNode? {
         val l = findNodeByText(text)
         return if (l.isNotEmpty()) l[0] else null
     }
 
-    @JavascriptInterface
     override fun findNodeByText(text: String): List<ViewNode> {
         val list = mutableListOf<ViewNode>()
         val rootNode = rootInActiveWindow
@@ -228,7 +226,7 @@ class MyAccessibilityService : AccessibilityService(), ViewOperation {
             return accessibilityService != null
         }
 
-        var accessibilityService: MyAccessibilityService? = null
+        var accessibilityService: AccessibilityBridge? = null
 
         private val absCls = arrayOf("AbsListView", "ViewGroup")
         fun inAbs(n: String): Boolean {
@@ -240,22 +238,18 @@ class MyAccessibilityService : AccessibilityService(), ViewOperation {
         }
     }
 
-    @JavascriptInterface
     override fun home(): Boolean {
         return performGlobalAction(GLOBAL_ACTION_HOME)
     }
 
-    @JavascriptInterface
     override fun back(): Boolean {
         return performGlobalAction(GLOBAL_ACTION_BACK)
     }
 
-    @JavascriptInterface
     override fun recentApp(): Boolean {
         return performGlobalAction(GLOBAL_ACTION_RECENTS)
     }
 
-    @JavascriptInterface
     override fun showNotification(): Boolean {
         return performGlobalAction(GLOBAL_ACTION_NOTIFICATIONS)
     }
@@ -271,16 +265,4 @@ class MyAccessibilityService : AccessibilityService(), ViewOperation {
     //检测当前是那个界面,也是通过查找这个界面固有的文本信息,来判断;
     */
 
-}
-
-interface ViewOperation {
-    fun findFirstNodeById(id: String): ViewNode?
-    fun findNodeById(id: String): List<ViewNode>
-    fun findFirstNodeByText(text: String): ViewNode?
-    fun findNodeByText(text: String): List<ViewNode>
-
-    fun back(): Boolean
-    fun recentApp(): Boolean
-    fun home(): Boolean
-    fun showNotification(): Boolean
 }

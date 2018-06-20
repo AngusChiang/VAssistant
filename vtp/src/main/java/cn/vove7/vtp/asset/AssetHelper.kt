@@ -6,7 +6,7 @@ import java.io.IOException
 /**
  * Asset类
  */
-object AssetUtil {
+object AssetHelper {
 
     fun getStrFromAsset(context: Context, fileName: String): String? {
         return try {

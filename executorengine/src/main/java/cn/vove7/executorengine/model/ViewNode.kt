@@ -1,11 +1,10 @@
-package cn.vove7.accessibilityservicedemo.model
+package cn.vove7.executorengine.model
 
 import android.os.Bundle
 import android.view.accessibility.AccessibilityNodeInfo
-import cn.vove7.accessibilityservicedemo.utils.NormalOperation
 import cn.vove7.vtp.log.Vog
 
-class ViewNode(val node: AccessibilityNodeInfo) : NormalOperation {
+class ViewNode(val node: AccessibilityNodeInfo) : ViewOperation {
 
     override fun click(): Boolean {
         return node.performAction(AccessibilityNodeInfo.ACTION_CLICK)
@@ -45,4 +44,15 @@ class ViewNode(val node: AccessibilityNodeInfo) : NormalOperation {
     override fun focus(): Boolean {
         return node.performAction(AccessibilityNodeInfo.ACTION_FOCUS)
     }
+}
+
+interface ViewOperation {
+    fun click(): Boolean
+    fun longClick(): Boolean
+    fun select(): Boolean
+    fun scrollUp(): Boolean
+    fun scrollDown(): Boolean
+    fun setText(text: String): Boolean
+    fun getText(): String?
+    fun focus(): Boolean
 }

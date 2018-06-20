@@ -5,7 +5,7 @@ package cn.vove7.vtp.array
  *
  * Created by Vove on 2018/6/13
  */
-object ArrayUtil {
+object HelperUtil {
     fun strArr2IntArr(sArr: Array<String>): List<Int> {
         val izc = arrayListOf<Int>()
         var index = 0

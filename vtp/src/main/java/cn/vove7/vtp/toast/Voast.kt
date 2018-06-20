@@ -7,20 +7,24 @@ import android.view.LayoutInflater
 import android.widget.TextView
 import android.widget.Toast
 import cn.vove7.vtp.R
+import cn.vove7.vtp.log.Vog
 
 /**
  *
- * lateinit var toast: VToast
- * toast = VToast.with(context).top()
+ * lateinit var toast: Voast
+ * toast = Voast.with(context).top()
  */
-class VToast(val context: Context) {
+class Voast(
+        private val context: Context,
+        private val outDebug: Boolean
+) {
     private lateinit var msgView: TextView
     private val animations = -1
     private val isShow = false
     private lateinit var toast: Toast
     @SuppressLint("ShowToast")
 
-    fun init(): VToast {
+    fun init(): Voast {
         toast = Toast.makeText(context, "", Toast.LENGTH_SHORT)!!
         val inflate = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
         val v = inflate.inflate(R.layout.vtoast_layout, null)
@@ -35,17 +39,17 @@ class VToast(val context: Context) {
         show(msg, Toast.LENGTH_SHORT)
     }
 
-    fun top(xOffset: Int = 0, yOffset: Int = 40): VToast {
+    fun top(xOffset: Int = 0, yOffset: Int = 40): Voast {
         toast.setGravity(Gravity.TOP, xOffset, yOffset)
         return this
     }
 
-    fun bottom(xOffset: Int = 0, yOffset: Int = 0): VToast {
+    fun bottom(xOffset: Int = 0, yOffset: Int = 0): Voast {
         toast.setGravity(Gravity.BOTTOM, xOffset, yOffset)
         return this
     }
 
-    fun center(xOffset: Int = 0, yOffset: Int = 0): VToast {
+    fun center(xOffset: Int = 0, yOffset: Int = 0): Voast {
         toast.setGravity(Gravity.CENTER, xOffset, yOffset)
         return this
     }
@@ -56,15 +60,20 @@ class VToast(val context: Context) {
     }
 
     private fun show(msg: String, d: Int = Toast.LENGTH_SHORT) {
+        if (outDebug)
+            Vog.d(this, msg)
         toast.duration = d
-        msgView.text = msg
-
+        try {
+            msgView.text = msg
+        } catch (e: Exception) {
+            Vog.wtf(this, e.message?:"")
+        }
         toast.show()
     }
 
     companion object {
-        fun with(context: Context): VToast {
-            return VToast(context).init()
+        fun with(context: Context, outDebug: Boolean = false): Voast {
+            return Voast(context, outDebug).init()
         }
     }
 

@@ -2,9 +2,13 @@ package cn.vove7.accessibilityservicedemo.speech.listener
 
 import android.os.Handler
 import android.os.Message
+import cn.vove7.accessibilityservicedemo.services.MainService.Companion.WHAT_VOICE_RESULT
+import cn.vove7.accessibilityservicedemo.services.MainService.Companion.WHAT_VOICE_TEMP
+import cn.vove7.accessibilityservicedemo.services.MainService.Companion.WHAT_VOICE_VOL
 import cn.vove7.accessibilityservicedemo.speech.model.IStatus
 
 import cn.vove7.accessibilityservicedemo.speech.model.RecogResult
+import cn.vove7.accessibilityservicedemo.speech.services.SpeechService
 import cn.vove7.accessibilityservicedemo.utils.Bus
 import cn.vove7.accessibilityservicedemo.utils.VoiceData
 
@@ -34,14 +38,14 @@ class MessageStatusRecogListener(private val handler: Handler) : StatusRecogList
 
     override fun onAsrVolume(volumePercent: Int, volume: Int) {
         super.onAsrVolume(volumePercent, volume)
-        Bus.postVoiceData(VoiceData(VoiceData.WHAT_VOL, volumePercent = volumePercent))
+        Bus.postVoiceData(VoiceData(WHAT_VOICE_VOL, volumePercent = volumePercent))
     }
 
     override fun onAsrPartialResult(results: Array<String>?, recogResult: RecogResult) {
         sendStatusMessage("临时识别结果，结果是“" + results!![0] + "”；原始json：" + recogResult.originalJson)
         super.onAsrPartialResult(results, recogResult)
 
-        Bus.postVoiceData(VoiceData(VoiceData.WHAT_TEMP, results[0]))
+        Bus.postVoiceData(VoiceData(WHAT_VOICE_TEMP, results[0]))
     }
 
     override fun onAsrFinalResult(results: Array<String>?, recogResult: RecogResult) {
@@ -53,7 +57,7 @@ class MessageStatusRecogListener(private val handler: Handler) : StatusRecogList
             message += "；说话结束到识别结束耗时【" + diffTime + "ms】"
 
         }
-        Bus.postVoiceData(VoiceData(VoiceData.WHAT_FINISH, results[0]))
+        Bus.postVoiceData(VoiceData(WHAT_VOICE_RESULT, results[0]))
         speechEndTime = 0
         sendMessage(message, status, true)
     }

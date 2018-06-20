@@ -3,7 +3,7 @@ package cn.vove7.vtp.json
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 
-object JsonUtils {
+object JsonHelper {
     /**
      * @return json -> List<T>
      */

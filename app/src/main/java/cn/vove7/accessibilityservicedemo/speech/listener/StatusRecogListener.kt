@@ -13,7 +13,7 @@ open class StatusRecogListener : IRecogListener, IStatus {
     /**
      * 识别的引擎当前的状态
      */
-    protected var status = IStatus.STATUS_NONE
+    var status = IStatus.STATUS_NONE
 
     override fun onAsrReady() {
         status = IStatus.STATUS_READY
@@ -28,8 +28,6 @@ open class StatusRecogListener : IRecogListener, IStatus {
     }
 
     override fun onAsrPartialResult(results: Array<String>?, recogResult: RecogResult) {
-
-
     }
 
     override fun onAsrFinalResult(results: Array<String>?, recogResult: RecogResult) {

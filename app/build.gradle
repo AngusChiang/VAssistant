@@ -52,6 +52,7 @@ dependencies {
     implementation files('libs/bdasr_V3_20180320_9066860.jar')
     implementation project(':vtp')
     implementation project(':parseengine')
+    implementation project(':executorengine')
 }
 repositories {
     mavenCentral()
