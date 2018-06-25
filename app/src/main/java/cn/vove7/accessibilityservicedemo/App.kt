@@ -2,9 +2,12 @@ package cn.vove7.accessibilityservicedemo
 
 import android.app.Application
 import android.content.Intent
+import android.util.Log
 import cn.vove7.accessibilityservicedemo.services.MainService
 import cn.vove7.accessibilityservicedemo.speech.services.SpeechService
-import cn.vove7.accessibilityservicedemo.utils.MessageEvent
+import cn.vove7.appbus.MessageEvent
+import cn.vove7.datamanager.DAO
+import cn.vove7.datamanager.InitDbData
 import cn.vove7.vtp.log.Vog
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
@@ -18,10 +21,14 @@ class App : Application() {
         EventBus.getDefault().register(this)
         instance = this
         super.onCreate()
+        Vog.init(this, Log.DEBUG).log2Local(Log.DEBUG)
         voiceService = Intent(this, SpeechService::class.java)
         mainService = Intent(this, MainService::class.java)
         startService(voiceService)
         startService(mainService)
+        DAO.init(this)
+        if (BuildConfig.DEBUG)
+            InitDbData.init()
     }
 
 

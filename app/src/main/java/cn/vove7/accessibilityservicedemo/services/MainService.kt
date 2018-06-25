@@ -1,21 +1,29 @@
 package cn.vove7.accessibilityservicedemo.services
 
+import android.app.Dialog
 import android.app.Service
 import android.content.Intent
 import android.os.Binder
 import android.os.IBinder
 import android.os.Message
-import cn.vove7.accessibilityservicedemo.utils.Bus
-import cn.vove7.accessibilityservicedemo.utils.SpeechAction
-import cn.vove7.accessibilityservicedemo.utils.VoiceData
+import cn.vove7.accessibilityservicedemo.PermissionManagerActivity
+import cn.vove7.accessibilityservicedemo.dialog.MultiChoiceDialog
+import cn.vove7.accessibilityservicedemo.dialog.OnMultiSelectListener
+import cn.vove7.accessibilityservicedemo.dialog.OnSelectListener
+import cn.vove7.accessibilityservicedemo.dialog.SingleChoiceDialog
+import cn.vove7.appbus.Bus
+import cn.vove7.appbus.SpeechAction
+import cn.vove7.appbus.VoiceData
+import cn.vove7.datamanager.parse.model.Action
 import cn.vove7.executorengine.ActionExecutor
 import cn.vove7.executorengine.GetAccessibilityBridge
 import cn.vove7.executorengine.OnExecutorResult
 import cn.vove7.executorengine.bridge.AccessibilityBridge
-import cn.vove7.executorengine.bridge.SpeechBridge
-import cn.vove7.executorengine.bridge.SystemBridge
+import cn.vove7.executorengine.bridge.ChoiceData
+import cn.vove7.executorengine.bridge.ServiceBridge
+import cn.vove7.executorengine.bridge.ShowDialogEvent
+import cn.vove7.executorengine.model.RequestPermission
 import cn.vove7.parseengine.engine.ParseEngine
-import cn.vove7.parseengine.model.Action
 import cn.vove7.vtp.log.Vog
 import cn.vove7.vtp.toast.Voast
 import org.greenrobot.eventbus.Subscribe
@@ -25,13 +33,14 @@ import java.util.*
 /**
  * 主服务
  */
-class MainService : Service(), OnExecutorResult, GetAccessibilityBridge, SpeechBridge {
+class MainService : Service(), OnExecutorResult, GetAccessibilityBridge,
+        ServiceBridge, OnSelectListener, OnMultiSelectListener {
     lateinit var toast: Voast
 
     /**
-     * 执行中间参数
+     * 信使
      */
-    var paramAction: Action? = null
+    var messengerAction: Action? = null
     /**
      * 执行器
      */
@@ -45,20 +54,73 @@ class MainService : Service(), OnExecutorResult, GetAccessibilityBridge, SpeechB
     override fun onCreate() {
         super.onCreate()
         Bus.reg(this)
-
         actionExecutor = ActionExecutor(
-                this,
-                SystemBridge(this),
+                this, this,
+                cn.vove7.executorengine.bridge.SystemBridge(this),
                 this,
                 this
         )
-
-        toast = Voast.with(this).top()
+        toast = Voast.with(this, true).top()
     }
 
-    override fun getUnsetParam(action: Action) {
-        toast.showShort("获取临时参数")
-        paramAction = action
+    var currentDialog: Dialog? = null
+    fun hideDalog() {
+        if (currentDialog?.isShowing == true) {
+            currentDialog?.dismiss()
+            currentDialog = null
+        }
+    }
+
+    /**
+     * 选择对话框
+     */
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    override fun showChoiceDialog(event: ShowDialogEvent) {
+        messengerAction = event.action
+        currentDialog = when (event.whichDialog) {
+            ShowDialogEvent.WHICH_SINGLE -> {
+                SingleChoiceDialog(this, event.askTitle, event.choiceDataSet, this)
+            }
+            ShowDialogEvent.WHICH_MULTI -> {
+                MultiChoiceDialog(this, event.askTitle, event.choiceDataSet, this)
+            }
+            else -> return
+        }.show()
+    }
+
+    /**
+     * 单选回调
+     */
+
+    override fun onSingleSelect(pos: Int, data: ChoiceData?, msg: String) {
+        Vog.d(this, "单选回调 $data")
+        messengerAction?.responseResult = data != null
+        messengerAction?.responseBundle?.putSerializable("data", data)
+        messengerAction?.responseBundle?.putString("msg", msg)
+        hideDalog()
+        actionExecutor.notifySync()
+    }
+
+
+    /**
+     * 多选回调
+     */
+
+    override fun onMultiSelect(data: List<ChoiceData>?, msg: String) {
+        messengerAction?.responseResult = data != null
+        Vog.d(this, "多选回调 $data")
+//        messengerAction?.responseBundle?.putSerializable("data", data)
+        hideDalog()
+        actionExecutor.notifySync()
+    }
+
+    /**
+     * 中途获取未知参数
+     * @param action 执行动作
+     */
+    override fun getVoiceParam(action: Action) {
+        toast.showShort(action.param?.askText ?: "临时参数")
+        messengerAction = action
         mode = MODE_GET_PARAM
         Bus.postSpeechAction(SpeechAction(SpeechAction.ACTION_START))
     }
@@ -80,9 +142,8 @@ class MainService : Service(), OnExecutorResult, GetAccessibilityBridge, SpeechB
                         Bus.postVoiceData(VoiceData(msg.what, res))
                     }
                     MODE_GET_PARAM -> {
-                        Vog.d(this, "获取参数失败")
-                        paramAction?.voiceOk = false
-                        actionExecutor.resume()
+                        toast.showShort("获取参数失败")
+                        actionExecutor.onGetVoiceParam(null)
                         mode = MODE_VOICE
                     }
                 }
@@ -109,11 +170,10 @@ class MainService : Service(), OnExecutorResult, GetAccessibilityBridge, SpeechB
                         if (res == "") {//失败
                             //询问重新
 //                            return
-                            paramAction?.voiceOk = false
-                            actionExecutor.resume()
+                            messengerAction?.responseResult = false
+                            actionExecutor.onGetVoiceParam(null)
                         } else {//通知
-                            paramAction?.param?.value = res
-                            actionExecutor.resume()
+                            actionExecutor.onGetVoiceParam(res)
                         }
                         mode = MODE_VOICE
                     }
@@ -165,6 +225,16 @@ class MainService : Service(), OnExecutorResult, GetAccessibilityBridge, SpeechB
             else -> {
             }
         }
+    }
+
+    /**
+     * 请求权限
+     */
+    @Subscribe(threadMode = ThreadMode.POSTING)
+    fun onRequestPermission(r: RequestPermission) {
+        val intent = Intent(this, PermissionManagerActivity::class.java)
+        intent.putExtra("pName", r.permissionName)
+        startActivity(intent)
     }
 
     companion object {

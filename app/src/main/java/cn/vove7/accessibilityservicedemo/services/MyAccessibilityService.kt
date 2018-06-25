@@ -11,11 +11,13 @@ import android.view.accessibility.AccessibilityEvent.TYPE_WINDOWS_CHANGED
 import android.view.accessibility.AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED
 import android.view.accessibility.AccessibilityNodeInfo
 import android.widget.Toast
+import cn.vove7.accessibilityservicedemo.BuildConfig
 import cn.vove7.executorengine.bridge.AccessibilityBridge
 import cn.vove7.executorengine.model.ViewNode
 import cn.vove7.vtp.app.AppInfo
 import cn.vove7.vtp.app.AppUtil
 import cn.vove7.vtp.log.Vog
+import cn.vove7.vtp.text.TextHelper
 
 /**
  * Created by Vove on 2018/1/13.
@@ -40,12 +42,7 @@ class MyAccessibilityService : AccessibilityBridge() {
     }
 
     private fun updateCurrentApp(pkg: String) {
-        val app = AppUtil.getAppInfo(pkg)
-        if (app != null)
-            currentAppInfo = AppInfo(
-                    name = app.loadLabel(pkgman).toString(),
-                    packageName = app.packageName,
-                    icon = app.loadIcon(pkgman))
+        currentAppInfo = AppUtil.getAppInfo(this, "", pkg)
     }
 
     override fun onAccessibilityEvent(event: AccessibilityEvent?) {
@@ -85,9 +82,8 @@ class MyAccessibilityService : AccessibilityBridge() {
         }
     }
 
-    val isTr = false
     private fun startTraverse(rootNode: AccessibilityNodeInfo?) {
-        if (isTr) {
+        if (BuildConfig.DEBUG) {
             val builder = StringBuilder("\n" + rootNode?.packageName + "\n")
             traverseAllNode(builder, 0, rootNode)
             Vog.v(this, "onAccessibilityEvent  ---->" + builder.toString() + " \n\n\n")
@@ -214,8 +210,11 @@ class MyAccessibilityService : AccessibilityBridge() {
         val list = mutableListOf<ViewNode>()
         val rootNode = rootInActiveWindow
         for (node in rootNode.findAccessibilityNodeInfosByText(text)) {
-            list.add(ViewNode(node))
+            val newNode = ViewNode(node)
+            newNode.similarityText = TextHelper.compareSimilarity(text, node.text.toString())
+            list.add(newNode)
         }
+        list.sort()
         Vog.d(this, "size :${list.size}")
         return list
     }
@@ -246,7 +245,7 @@ class MyAccessibilityService : AccessibilityBridge() {
         return performGlobalAction(GLOBAL_ACTION_BACK)
     }
 
-    override fun recentApp(): Boolean {
+    override fun recentInterface(): Boolean {
         return performGlobalAction(GLOBAL_ACTION_RECENTS)
     }
 

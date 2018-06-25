@@ -1,6 +1,7 @@
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
+apply plugin: 'org.greenrobot.greendao'
 
 android {
     compileSdkVersion 27
@@ -47,12 +48,15 @@ dependencies {
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
     implementation 'com.google.code.gson:gson:2.8.5'
     implementation 'io.apisense:rhino-android:1.0'
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     implementation 'org.greenrobot:eventbus:3.1.1'
+    implementation "org.greenrobot:greendao:$greendao_version"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     implementation files('libs/bdasr_V3_20180320_9066860.jar')
     implementation project(':vtp')
     implementation project(':parseengine')
     implementation project(':executorengine')
+    implementation project(':appbus')
+    implementation project(':datamanager')
 }
 repositories {
     mavenCentral()

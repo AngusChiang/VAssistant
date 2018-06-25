@@ -7,5 +7,4 @@ package cn.vove7.executorengine.model
  */
 data class PartialResult(val isSuccess: Boolean,
                          val needTerminal: Boolean = false,
-                         val msg: String = "",
-                         val repeat: Boolean = false)
+                         val msg: String = "")

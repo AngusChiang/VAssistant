@@ -11,11 +11,11 @@ import cn.vove7.accessibilityservicedemo.speech.listener.SpeechStatusListener
 import cn.vove7.accessibilityservicedemo.speech.model.IStatus
 import cn.vove7.accessibilityservicedemo.speech.model.IStatus.Companion.STATUS_WAKEUP_EXIT
 import cn.vove7.accessibilityservicedemo.speech.recognizer.MyRecognizer
-import cn.vove7.accessibilityservicedemo.utils.Bus
-import cn.vove7.accessibilityservicedemo.utils.SpeechAction
-import cn.vove7.accessibilityservicedemo.utils.SpeechAction.Companion.ACTION_CANCEL
-import cn.vove7.accessibilityservicedemo.utils.SpeechAction.Companion.ACTION_START
-import cn.vove7.accessibilityservicedemo.utils.SpeechAction.Companion.ACTION_STOP
+import cn.vove7.appbus.Bus
+import cn.vove7.appbus.SpeechAction
+import cn.vove7.appbus.SpeechAction.Companion.ACTION_CANCEL
+import cn.vove7.appbus.SpeechAction.Companion.ACTION_START
+import cn.vove7.appbus.SpeechAction.Companion.ACTION_STOP
 import cn.vove7.vtp.log.Vog
 import cn.vove7.vtp.math.LogicOperators
 import cn.vove7.vtp.toast.Voast
@@ -44,7 +44,6 @@ class SpeechService : Service() {
                 Bus.post(msg)
             }
         }
-
     }
 
     override fun onBind(intent: Intent): IBinder {
@@ -99,7 +98,7 @@ class SpeechService : Service() {
 
     internal fun start() {
         if (LogicOperators.orEquals(listener.status,
-                        arrayOf(IStatus.STATUS_NONE, IStatus.STATUS_FINISHED,STATUS_WAKEUP_EXIT))) {
+                        arrayOf(IStatus.STATUS_NONE, IStatus.STATUS_FINISHED, STATUS_WAKEUP_EXIT))) {
             myRecognizer.start(params)
         } else {
             Vog.d(this, "启动失败，正在运行")

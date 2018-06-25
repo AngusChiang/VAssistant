@@ -3,8 +3,14 @@ package cn.vove7.executorengine.model
 import android.os.Bundle
 import android.view.accessibility.AccessibilityNodeInfo
 import cn.vove7.vtp.log.Vog
+import java.util.Comparator
 
-class ViewNode(val node: AccessibilityNodeInfo) : ViewOperation {
+class ViewNode(val node: AccessibilityNodeInfo) : ViewOperation,Comparable<ViewNode> {
+
+    /**
+     * 文本相似度
+     */
+    var similarityText: Float = 0f
 
     override fun click(): Boolean {
         return node.performAction(AccessibilityNodeInfo.ACTION_CLICK)
@@ -43,6 +49,10 @@ class ViewNode(val node: AccessibilityNodeInfo) : ViewOperation {
 
     override fun focus(): Boolean {
         return node.performAction(AccessibilityNodeInfo.ACTION_FOCUS)
+    }
+
+    override fun compareTo(other: ViewNode): Int {
+        return ((other.similarityText - similarityText) * 100).toInt()
     }
 }
 

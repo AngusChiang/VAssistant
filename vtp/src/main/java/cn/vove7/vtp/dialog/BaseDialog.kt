@@ -113,12 +113,18 @@ open class BaseDialog(context: Context) : Dialog(context), DialogInterface {
                 BUTTON_POSITIVE -> {
                     buttonPositive.text = it.text
                     buttonPositive.visibility = View.VISIBLE
-                    buttonPositive.setOnClickListener(it.lis)
+                    buttonPositive.setOnClickListener { v ->
+                        it.lis.onClick(v)
+                        dismiss()
+                    }
                 }
                 DialogInterface.BUTTON_NEGATIVE -> {
                     buttonNegative.text = it.text
                     buttonNegative.visibility = View.VISIBLE
-                    buttonNegative.setOnClickListener(it.lis)
+                    buttonNegative.setOnClickListener { v ->
+                        it.lis.onClick(v)
+                        dismiss()
+                    }
                 }
                 DialogInterface.BUTTON_NEUTRAL -> {
                     buttonNeutral.text = it.text

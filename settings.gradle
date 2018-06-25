@@ -1,1 +1,1 @@
-include ':app', ':vtp', ':parseengine', ':executorengine'
+include ':app', ':vtp', ':parseengine', ':executorengine', ':appbus', ':datamanager'

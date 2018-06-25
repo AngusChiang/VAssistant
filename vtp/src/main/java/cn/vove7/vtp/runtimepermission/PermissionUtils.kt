@@ -7,12 +7,17 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.net.Uri
+import android.os.Build
 import android.provider.Settings
+import android.support.annotation.RequiresApi
 import android.support.v4.app.ActivityCompat
+import android.support.v4.app.ActivityCompat.startActivityForResult
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import android.view.accessibility.AccessibilityManager
 import cn.vove7.vtp.log.Vog
+
 
 object PermissionUtils {
 
@@ -31,6 +36,14 @@ object PermissionUtils {
         }
 
         return false
+    }
+
+    /**
+     * 跳转至无障碍设置
+     */
+    fun gotoAccessibilitySetting(context: Context) {
+        val intent = Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS)
+        context.startActivity(intent)
     }
 
     /**
@@ -121,4 +134,23 @@ object PermissionUtils {
         }
         return true
     }
+
+    @RequiresApi(Build.VERSION_CODES.M)
+    fun canDrawOverlays(context: Context): Boolean {
+        return Settings.canDrawOverlays(context)
+    }
+
+    /**
+     * 请求悬浮窗
+     *
+     * <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+     * 复写onActivityResult
+     */
+    @RequiresApi(Build.VERSION_CODES.M)
+    fun requestDrawOverlays(activity: Activity, reqCode: Int) {
+        val intent = Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:" + activity.packageName))
+        startActivityForResult(activity, intent, reqCode, null)
+    }
+
+
 }

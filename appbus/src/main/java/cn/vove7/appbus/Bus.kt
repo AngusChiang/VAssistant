@@ -1,4 +1,4 @@
-package cn.vove7.accessibilityservicedemo.utils
+package cn.vove7.appbus
 
 import org.greenrobot.eventbus.EventBus
 import java.io.Serializable

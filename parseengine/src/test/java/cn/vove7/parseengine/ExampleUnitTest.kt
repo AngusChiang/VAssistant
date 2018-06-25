@@ -1,7 +1,7 @@
 package cn.vove7.parseengine
 
+import cn.vove7.datamanager.parse.model.Action
 import cn.vove7.parseengine.engine.ParseEngine
-import cn.vove7.parseengine.model.Action
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import java.util.*
@@ -37,7 +37,7 @@ class ExampleUnitTest {
         testDatas.forEach {
             val s = ParseEngine.parseAction(it.key)
             assertEquals(s.isSuccess, it.value)
-            clearUp(s.actions)
+            clearUp(s.actionQueue)
         }
 
     }

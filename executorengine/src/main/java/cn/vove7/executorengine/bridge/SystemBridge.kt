@@ -11,8 +11,9 @@ import cn.vove7.vtp.log.Vog
 
 
 class SystemBridge(private val context: Context) : SystemOperation {
+    val contactHelper = ContactHelper(context)
 
-    override fun openApp(pkg: String): Boolean {
+    override fun openAppByPkg(pkg: String): Boolean {
         return try {
             val launchIntent = context.packageManager
                     .getLaunchIntentForPackage(pkg)
@@ -39,7 +40,7 @@ class SystemBridge(private val context: Context) : SystemOperation {
         if (list.isNotEmpty()) {
             val info = list[0].data
             Vog.i(this, "打开应用：$appWord -> ${info.name}")
-            return openApp(info.packageName)
+            return openAppByPkg(info.packageName)
         }
 //        Bus.postInfo(MessageEvent("未找到应用:$appWord", WHAT_ERR))
         return false
@@ -60,10 +61,10 @@ class SystemBridge(private val context: Context) : SystemOperation {
 
     /**
      * 打电话
-     * 优先级： 通讯录 -> 官方提供
+     * 优先级：标记 -> 通讯录 -> 官方提供
      */
     override fun call(s: String): PartialResult {
-        val ph = getPhone(s) ?: return PartialResult(false, true, "未找到该联系人$s")
+        val ph = contactHelper.matchPhone(context, s) ?: return PartialResult(false, true, "未找到该联系人$s")
         val callIntent = Intent(Intent.ACTION_CALL, Uri.parse("tel://$ph"))
         return try {
             context.startActivity(callIntent)
@@ -71,13 +72,6 @@ class SystemBridge(private val context: Context) : SystemOperation {
         } catch (e: SecurityException) {
             PartialResult(false, msg = "无电话权限")
         }
-    }
-
-    /**
-     * 优先级：本地模糊匹配 -> 匹配提供
-     */
-    private fun getPhone(s: String): String? {
-        return ContactHelper.matchPhone(context, s)
     }
 
     /**
@@ -94,7 +88,7 @@ internal interface SystemOperation {
     /**
      * 通过包名打开App
      */
-    fun openApp(pkg: String): Boolean
+    fun openAppByPkg(pkg: String): Boolean
 
     /**
      * 通过通过关键字匹配

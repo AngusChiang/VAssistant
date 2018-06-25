@@ -87,4 +87,8 @@ class MainActivity : AppCompatActivity() {
     fun go2Voice(view: View) {
         startActivity(Intent(this, VoiceTestActivity::class.java))
     }
+
+    fun permissionMan(v: View) {
+        startActivity(Intent(this, PermissionManagerActivity::class.java))
+    }
 }

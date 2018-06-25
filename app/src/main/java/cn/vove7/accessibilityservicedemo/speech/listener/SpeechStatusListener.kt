@@ -7,7 +7,7 @@ import cn.vove7.accessibilityservicedemo.services.MainService.Companion.WHAT_VOI
 import cn.vove7.accessibilityservicedemo.services.MainService.Companion.WHAT_VOICE_VOL
 import cn.vove7.accessibilityservicedemo.speech.message.SpeechMessage
 import cn.vove7.accessibilityservicedemo.speech.model.RecogResult
-import cn.vove7.accessibilityservicedemo.utils.VoiceData
+import cn.vove7.appbus.VoiceData
 import cn.vove7.vtp.log.Vog
 
 /**
@@ -55,9 +55,9 @@ class SpeechStatusListener(private val handler: Handler) : StatusRecogListener()
 
     override fun onAsrExit() {
         super.onAsrExit()
-        if(!isSuccess){
-            Vog.d(this,"识别失败")
-            handler.sendMessage(SpeechMessage.buildMessage(WHAT_VOICE_ERR, "无结果"))
-        }
+//        if (!isSuccess) {
+//            Vog.d(this, "识别失败")
+//            handler.sendMessage(SpeechMessage.buildMessage(WHAT_VOICE_ERR, "无结果"))
+//        }
     }
 }

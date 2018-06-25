@@ -5,9 +5,8 @@ import android.support.v7.app.AppCompatActivity
 import android.view.View
 import android.widget.ScrollView
 import cn.vove7.accessibilityservicedemo.services.MyAccessibilityService
-import cn.vove7.accessibilityservicedemo.utils.Bus
-import cn.vove7.accessibilityservicedemo.utils.MessageEvent
-import cn.vove7.accessibilityservicedemo.utils.SpeechAction
+import cn.vove7.appbus.Bus
+import cn.vove7.appbus.MessageEvent
 import cn.vove7.executorengine.GetAccessibilityBridge
 import cn.vove7.executorengine.bridge.AccessibilityBridge
 import cn.vove7.parseengine.engine.ParseEngine

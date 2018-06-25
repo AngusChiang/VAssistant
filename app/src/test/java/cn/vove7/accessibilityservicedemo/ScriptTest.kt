@@ -6,8 +6,8 @@ import org.junit.Test
 class ScriptTest {
     @Test
     fun main() {
-        System.out.print("function openApp(s){\n" +
-                "    return window.at_api.openApp(s);\n" +
+        System.out.print("function openAppByPkg(s){\n" +
+                "    return window.at_api.openAppByPkg(s);\n" +
                 "}\n" +
                 "function openAppByWord(s){\n" +
                 "    return window.at_api.openAppByWord(s);\n" +

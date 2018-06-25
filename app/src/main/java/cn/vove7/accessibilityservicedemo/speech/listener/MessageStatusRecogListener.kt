@@ -9,8 +9,8 @@ import cn.vove7.accessibilityservicedemo.speech.model.IStatus
 
 import cn.vove7.accessibilityservicedemo.speech.model.RecogResult
 import cn.vove7.accessibilityservicedemo.speech.services.SpeechService
-import cn.vove7.accessibilityservicedemo.utils.Bus
-import cn.vove7.accessibilityservicedemo.utils.VoiceData
+import cn.vove7.appbus.Bus
+import cn.vove7.appbus.VoiceData
 
 
 class MessageStatusRecogListener(private val handler: Handler) : StatusRecogListener() {
@@ -37,7 +37,7 @@ class MessageStatusRecogListener(private val handler: Handler) : StatusRecogList
     }
 
     override fun onAsrVolume(volumePercent: Int, volume: Int) {
-        super.onAsrVolume(volumePercent, volume)
+        super.onAsrVolume(volumePercent, volume = volume)
         Bus.postVoiceData(VoiceData(WHAT_VOICE_VOL, volumePercent = volumePercent))
     }
 

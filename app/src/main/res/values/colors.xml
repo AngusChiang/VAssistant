@@ -2,7 +2,8 @@
 <resources>
     <color name="colorPrimary">#f2525f</color>
     <color name="colorPrimaryDark">#f51b59</color>
-    <color name="colorAccent">#1aef2c</color>
-    <color name="q">#474c4f</color>
+    <color name="colorAccent">#ff5622</color>
+    <color name="status_green">#13bd10</color>
+    <color name="normal">#333333</color>
     <!--ColorizationAfterglow-->
 </resources>

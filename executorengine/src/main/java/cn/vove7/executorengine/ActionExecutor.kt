@@ -1,10 +1,13 @@
 package cn.vove7.executorengine
 
+import android.content.Context
+import cn.vove7.appbus.Bus
+import cn.vove7.datamanager.parse.model.Action
 import cn.vove7.executorengine.bridge.AccessibilityBridge
-import cn.vove7.executorengine.bridge.SpeechBridge
+import cn.vove7.executorengine.bridge.ServiceBridge
 import cn.vove7.executorengine.bridge.SystemBridge
 import cn.vove7.executorengine.model.PartialResult
-import cn.vove7.parseengine.model.Action
+import cn.vove7.executorengine.model.RequestPermission
 import cn.vove7.vtp.log.Vog
 import java.util.*
 import kotlin.concurrent.thread
@@ -15,41 +18,43 @@ import kotlin.concurrent.thread
  * Created by Vove on 2018/6/18
  */
 class ActionExecutor(
+        context: Context,
         getAccessibilityBridge: GetAccessibilityBridge,
         private val systemBridge: SystemBridge,
-        private val speechBridge: SpeechBridge,
-        val onExecutorResult: OnExecutorResult
-) : Executor(getAccessibilityBridge, systemBridge, speechBridge) {
-    var bridge: AccessibilityBridge? = null
+        serviceBridge: ServiceBridge,
+        private val onExecutorResult: OnExecutorResult
+) : Executor(context, getAccessibilityBridge, systemBridge, serviceBridge) {
 
     private lateinit var actionQueue: PriorityQueue<Action>
     private var thread: Thread? = null
 
     private fun runnable() {
-        var result = "执行成功"
+        var execLog = ""
         while (actionQueue.isNotEmpty()) {
-            val action = actionQueue.poll()
-            val sin = Scanner(action.actionScript)
+            currentAction = actionQueue.poll()
+            val sin = Scanner(currentAction!!.actionScript)
             var line: String
             var partialResult: PartialResult
             while (sin.hasNext()) {
                 line = sin.nextLine()
-                partialResult = execAction(line, action)
+                partialResult = execAction(line, currentAction!!)
                 when {
                     partialResult.needTerminal -> {//出错
-                        val msg = "执行出错 on $line"
+                        val msg = "执行终止-- on $line ${partialResult.msg}"
                         Vog.d(this, msg)
+                        currentAction = null
                         onExecutorResult.onExecutorFailed(msg)
                         return
                     }
                     !partialResult.isSuccess -> {
-                        result = "中途执行失败"
-                        Vog.d(this, result)
+                        execLog += "失败-- on $line ${partialResult.msg}\n"
+                        Vog.d(this, execLog)
                     }
                 }
             }
         }
-        onExecutorResult.onExecutorSuccess(result)
+        currentAction = null
+        onExecutorResult.onExecutorSuccess("执行完毕 - $execLog")
     }
 
 
@@ -67,31 +72,22 @@ class ActionExecutor(
     fun interrupt() {
         if (thread != null) {
             thread!!.interrupt()
-            lock = null
         }
-    }
-
-    fun resume() {
-        if (lock != null)
-            synchronized(lock!!) {
-                lock!!.notify()
-            }
     }
 
     /**
      * 检查无障碍服务
      */
     private fun bridgeIsAvailable(): Boolean {
-        if (bridge == null) {
-            bridge = getAccessibilityBridge.getBridge()
-            return bridge != null
+        if (accessBridge == null) {
+            accessBridge = getAccessibilityBridge.getBridge()
+            return accessBridge != null
         }
         return true
-
     }
 
-
     /**
+     * 执行动作
      * @return 执行结果,
      */
     private fun execAction(cmd: String, action: Action): PartialResult {
@@ -107,46 +103,74 @@ class ActionExecutor(
 
         when (c) {
             ACTION_OPEN -> {//打开应用/其他额外
-                val res = openSomething(action, p)
-                return if (res.repeat)
-                    execAction(cmd, action)
-                else res
+                return if (checkParam(p)) openSomething(p!!)
+                else {
+                    if (waitForParam(action).isSuccess)
+                        execAction(cmd, action)
+                    else PartialResult(false, true, "无参数")
+                }
             }
             ACTION_CLICK_TEXT -> {//
-                if (!bridgeIsAvailable())
-                    return PartialResult(false, true, "无障碍未开启")
+                if (!checkAccessibilityService().isSuccess)
+                    return PartialResult(false, true, ACCESSIBILITY_DONT_OPEN)
 
-
+                return if (checkParam(p)) clickByText(p!!)
+                else {
+                    if (waitForParam(action).isSuccess)
+                        execAction(cmd, action)
+                    else PartialResult(false, true, "无参数")
+                }
             }
             ACTION_CLICK_ID -> {
-                if (!bridgeIsAvailable())
-                    return PartialResult(false, true, "无障碍未开启")
-
+                if (!checkAccessibilityService().isSuccess)
+                    return PartialResult(false, true, ACCESSIBILITY_DONT_OPEN)
+                return if (checkParam(p)) clickById(p!!)
+                else {
+                    if (waitForParam(action).isSuccess)
+                        execAction(cmd, action)
+                    else PartialResult(false, true, "无参数")
+                }
 
             }
             ACTION_BACK -> {
-                if (!bridgeIsAvailable())
-                    return PartialResult(false, true, "无障碍未开启")
-
-                getAccessibilityBridge.getBridge()?.back()
+                return if (!bridgeIsAvailable())
+                    PartialResult(false, true, ACCESSIBILITY_DONT_OPEN)
+                else PartialResult(pressBack())
+            }
+            ACTION_HOME -> {
+                return if (!bridgeIsAvailable())
+                    PartialResult(false, true, ACCESSIBILITY_DONT_OPEN)
+                else PartialResult(goHome())
             }
             ACTION_RECENT -> {
-                if (!bridgeIsAvailable())
-                    return PartialResult(false, true, "无障碍未开启")
-
-
+                return if (!bridgeIsAvailable())
+                    PartialResult(false, true, ACCESSIBILITY_DONT_OPEN)
+                else PartialResult(openRecent())
             }
             ACTION_PULL_NOTIFICATION -> {
-                if (!bridgeIsAvailable())
-                    return PartialResult(false, true, "无障碍未开启")
+                return if (!bridgeIsAvailable())
+                    PartialResult(false, true, ACCESSIBILITY_DONT_OPEN)
+                else PartialResult(accessBridge?.showNotification() ?: false)
             }
             ACTION_CALL -> {
-                if (p != null && p != "") {
-                    return systemBridge.call(p)
+                return if (checkParam(p)) callPhone(p!!)
+                else {
+                    if (waitForParam(action).isSuccess)
+                        execAction(cmd, action)
+                    else PartialResult(false, true, "无参数")
                 }
             }
         }
+        Vog.d(this, "未知操作")
+        //调用聊天
         return PartialResult(false)
+    }
+
+    private fun checkAccessibilityService(): PartialResult {
+        return if (!bridgeIsAvailable()) {
+            Bus.post(RequestPermission("无障碍服务"))
+            PartialResult(false, true, ACCESSIBILITY_DONT_OPEN)
+        } else PartialResult(true)
     }
 
     companion object {
@@ -154,9 +178,12 @@ class ActionExecutor(
         const val ACTION_CLICK_TEXT = "clickByText"
         const val ACTION_CLICK_ID = "clickById"
         const val ACTION_BACK = "back"
+        const val ACTION_HOME = "home"
         const val ACTION_RECENT = "recent"
         const val ACTION_PULL_NOTIFICATION = "pullNotification"
         const val ACTION_CALL = "call"
+        const val ACCESSIBILITY_DONT_OPEN = "无障碍未开启"
+
     }
 
 }

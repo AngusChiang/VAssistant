@@ -37,7 +37,9 @@ class ExampleUnitTest {
                 Pair("刘雪", "刘雪韬"),
                 Pair("你好", "您好"),
                 Pair("Qq", "qq"),
-                Pair("李本", "李严")
+                Pair("李本", "李严"),
+                Pair("点击RUN", "RUN")
+
 
         )
         tests.forEach {

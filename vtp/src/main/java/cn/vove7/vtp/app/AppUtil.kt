@@ -2,7 +2,6 @@ package cn.vove7.vtp.app
 
 import android.content.Context
 import android.content.Intent
-import android.content.pm.ApplicationInfo
 import android.net.Uri
 import android.provider.Settings
 
@@ -24,13 +23,37 @@ object AppUtil {
         context.startActivity(intent)
     }
 
-    fun getAppInfo(pkg: String): ApplicationInfo? {
-
+    fun getAppInfo(context: Context, name: String, pkg: String): AppInfo? {
+        val man = context.packageManager
+        val list = man.getInstalledApplications(0)
+        for (app in list) {
+            val appName = app.loadLabel(man).toString()
+            if (name == appName || pkg == app.packageName) {
+                return AppInfo(
+                        name = name,
+                        packageName = app.packageName,
+                        icon = app.loadIcon(man)
+                )
+            }
+        }
         return null
     }
 
-    fun getAllInstallApp(context: Context): List<ApplicationInfo> {
+    /**
+     * 获取所有已安装
+     */
+    fun getAllInstallApp(context: Context): List<AppInfo> {
         val man = context.packageManager
-        return man.getInstalledApplications(0)
+        val list = man.getInstalledApplications(0)
+        val appList = mutableListOf<AppInfo>()
+        for (app in list) {
+            val name = app.loadLabel(man).toString()
+            appList.add(AppInfo(
+                    name = name,
+                    packageName = app.packageName,
+                    icon = app.loadIcon(man)
+            ))
+        }
+        return appList
     }
 }

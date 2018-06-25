@@ -17,7 +17,7 @@ interface AccessibilityOperation {
     fun findNodeByText(text: String): List<ViewNode>
 
     fun back(): Boolean
-    fun recentApp(): Boolean
+    fun recentInterface(): Boolean
     fun home(): Boolean
     fun showNotification(): Boolean
 }
