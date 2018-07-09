@@ -9,4 +9,4 @@
     android:canRetrieveWindowContent="true"
     android:description="@string/app_name"
     android:notificationTimeout="0"
-    android:settingsActivity="cn.vove7.accessibilityservicedemo.MainActivity" />
+    android:settingsActivity="cn.vove7.vassistant.MainActivity" />

@@ -91,10 +91,10 @@ object Vog {
 
     val dateFormat = SimpleDateFormat("MM-dd hh-mm-ss", Locale.CHINA)
     private fun println(priority: Int, tag: String, msg: String) {
-        if (output_level >= priority) {
-            Log.println(priority, tag, msg + '\n')
+        if (output_level <= priority) {
+            Log.println(priority,"Vog: $tag" , msg + '\n')
         }
-        if (localLogLevel >= priority) {
+        if (localLogLevel <= priority) {
             val date = dateFormat.format(Date(System.currentTimeMillis()))
             log2File("$date: $tag: $msg")
         }

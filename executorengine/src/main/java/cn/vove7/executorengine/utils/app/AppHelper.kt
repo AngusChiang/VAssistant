@@ -24,13 +24,14 @@ class AppHelper(private val context: Context) {
 
     /**
      * appWord -> pkg
-     * 匹配机制：按匹配率排序，若无匹配，更新app列表再次匹配 -> 搜索历史匹配
+     * 匹配机制：标识 -> 按匹配率排序，若无匹配，更新app列表再次匹配 -> 搜索历史匹配
      */
     fun matchAppName(appWord: String, update: Boolean = true): List<MatchedData<AppInfo>> {
+
         val matchList = mutableListOf<MatchedData<AppInfo>>()
         appList.forEach {
-            val rate = when (appWord) {
-                it.name -> 1f
+            val rate = when {
+                appWord.startsWith(it.name) -> 1f
                 else -> TextHelper.compareSimilarityWithPinyin(appWord, it.name)
             }
             if (rate > limitRate) {

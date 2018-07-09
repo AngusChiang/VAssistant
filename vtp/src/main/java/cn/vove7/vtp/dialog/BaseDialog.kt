@@ -21,8 +21,10 @@ import cn.vove7.vtp.R
  * - 底部按钮: [NEUTRAL   POSITIVE NEGATIVE] 设置则显示
  *
  * - ensure include following layout in your dialog layout
- *  @layout#dialog_header
- *  @layout#dialog_footer
+ * - @layout [R.layout.dialog_header]
+ * - @layout [R.layout.dialog_footer]
+ *
+ * Created by Vove on 2018/6/21
  */
 open class BaseDialog(context: Context) : Dialog(context), DialogInterface {
 
@@ -146,6 +148,7 @@ open class BaseDialog(context: Context) : Dialog(context), DialogInterface {
         }
         onSetHeight()
         onSetWidth()
+        findViewById<TextView>(android.R.id.title).visibility = View.GONE
         window!!.setGravity(gravity)
     }
 

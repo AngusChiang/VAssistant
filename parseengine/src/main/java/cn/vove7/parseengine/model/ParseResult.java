@@ -9,31 +9,55 @@ import cn.vove7.datamanager.parse.model.Action;
  * Created by Vove on 2018/6/18
  */
 public class ParseResult {
-   private boolean isSuccess = false;
-   private PriorityQueue<Action> actionQueue;
+    private boolean isSuccess = false;
+    private PriorityQueue<Action> actionQueue;
 
-   public ParseResult(Boolean isSuccess) {
-      this.isSuccess = isSuccess;
-   }
+    private String msg;
+    private String openWithCmd;
 
-   public ParseResult(Boolean isSuccess, PriorityQueue<Action> actionQueue) {
-      this.isSuccess = isSuccess;
-      this.actionQueue = actionQueue;
-   }
+    public String getOpenWithCmd() {
+        return openWithCmd;
+    }
 
-   public boolean isSuccess() {
-      return isSuccess;
-   }
+    public void setOpenWithCmd(String openWithCmd) {
+        this.openWithCmd = openWithCmd;
+    }
 
-   public void setSuccess(boolean success) {
-      isSuccess = success;
-   }
+    public ParseResult(Boolean isSuccess) {
+        this.isSuccess = isSuccess;
+    }
 
-   public PriorityQueue<Action> getActionQueue() {
-      return actionQueue;
-   }
+    public String getMsg() {
+        return msg;
+    }
 
-   public void setActionQueue(PriorityQueue<Action> actionQueue) {
-      this.actionQueue = actionQueue;
-   }
+    public void setMsg(String msg) {
+        this.msg = msg;
+    }
+
+    public ParseResult(Boolean isSuccess, PriorityQueue<Action> actionQueue) {
+        this.isSuccess = isSuccess;
+        this.actionQueue = actionQueue;
+    }
+
+    public ParseResult(boolean isSuccess, String msg) {
+        this.isSuccess = isSuccess;
+        this.msg = msg;
+    }
+
+    public boolean isSuccess() {
+        return isSuccess;
+    }
+
+    public void setSuccess(boolean success) {
+        isSuccess = success;
+    }
+
+    public PriorityQueue<Action> getActionQueue() {
+        return actionQueue;
+    }
+
+    public void setActionQueue(PriorityQueue<Action> actionQueue) {
+        this.actionQueue = actionQueue;
+    }
 }

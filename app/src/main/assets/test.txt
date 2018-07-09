@@ -1,0 +1,12 @@
+open(QQ)
+waitForActivity(com.tencent.mobileqq,SplashActivity)
+clickById(et_search_keyword)
+sleep(500)
+setTextById(et_search_keyword,%)
+sleep
+clickByIdAndText(title,%)
+sleep
+setTextById(input,%)
+alert(确认发送?)
+sleep(500)
+clickById(fun_btn)

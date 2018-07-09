@@ -32,10 +32,11 @@ public class MapNodeDao extends AbstractDao<MapNode, Long> {
      */
     public static class Properties {
         public final static Property Id = new Property(0, Long.class, "id", true, "_id");
-        public final static Property ActionId = new Property(1, long.class, "actionId", false, "ACTION_ID");
-        public final static Property Follows = new Property(2, String.class, "follows", false, "FOLLOWS");
-        public final static Property ParamId = new Property(3, long.class, "paramId", false, "PARAM_ID");
-        public final static Property ScopeId = new Property(4, long.class, "scopeId", false, "SCOPE_ID");
+        public final static Property NodeType = new Property(1, int.class, "nodeType", false, "NODE_TYPE");
+        public final static Property ActionId = new Property(2, long.class, "actionId", false, "ACTION_ID");
+        public final static Property Follows = new Property(3, String.class, "follows", false, "FOLLOWS");
+        public final static Property ParamId = new Property(4, long.class, "paramId", false, "PARAM_ID");
+        public final static Property ScopeId = new Property(5, long.class, "scopeId", false, "SCOPE_ID");
     }
 
     private DaoSession daoSession;
@@ -55,10 +56,11 @@ public class MapNodeDao extends AbstractDao<MapNode, Long> {
         String constraint = ifNotExists? "IF NOT EXISTS ": "";
         db.execSQL("CREATE TABLE " + constraint + "\"MAP_NODE\" (" + //
                 "\"_id\" INTEGER PRIMARY KEY ," + // 0: id
-                "\"ACTION_ID\" INTEGER NOT NULL ," + // 1: actionId
-                "\"FOLLOWS\" TEXT NOT NULL ," + // 2: follows
-                "\"PARAM_ID\" INTEGER NOT NULL ," + // 3: paramId
-                "\"SCOPE_ID\" INTEGER NOT NULL );"); // 4: scopeId
+                "\"NODE_TYPE\" INTEGER NOT NULL ," + // 1: nodeType
+                "\"ACTION_ID\" INTEGER NOT NULL ," + // 2: actionId
+                "\"FOLLOWS\" TEXT NOT NULL ," + // 3: follows
+                "\"PARAM_ID\" INTEGER NOT NULL ," + // 4: paramId
+                "\"SCOPE_ID\" INTEGER NOT NULL );"); // 5: scopeId
     }
 
     /** Drops the underlying database table. */
@@ -75,10 +77,11 @@ public class MapNodeDao extends AbstractDao<MapNode, Long> {
         if (id != null) {
             stmt.bindLong(1, id);
         }
-        stmt.bindLong(2, entity.getActionId());
-        stmt.bindString(3, entity.getFollows());
-        stmt.bindLong(4, entity.getParamId());
-        stmt.bindLong(5, entity.getScopeId());
+        stmt.bindLong(2, entity.getNodeType());
+        stmt.bindLong(3, entity.getActionId());
+        stmt.bindString(4, entity.getFollows());
+        stmt.bindLong(5, entity.getParamId());
+        stmt.bindLong(6, entity.getScopeId());
     }
 
     @Override
@@ -89,10 +92,11 @@ public class MapNodeDao extends AbstractDao<MapNode, Long> {
         if (id != null) {
             stmt.bindLong(1, id);
         }
-        stmt.bindLong(2, entity.getActionId());
-        stmt.bindString(3, entity.getFollows());
-        stmt.bindLong(4, entity.getParamId());
-        stmt.bindLong(5, entity.getScopeId());
+        stmt.bindLong(2, entity.getNodeType());
+        stmt.bindLong(3, entity.getActionId());
+        stmt.bindString(4, entity.getFollows());
+        stmt.bindLong(5, entity.getParamId());
+        stmt.bindLong(6, entity.getScopeId());
     }
 
     @Override
@@ -110,10 +114,11 @@ public class MapNodeDao extends AbstractDao<MapNode, Long> {
     public MapNode readEntity(Cursor cursor, int offset) {
         MapNode entity = new MapNode( //
             cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0), // id
-            cursor.getLong(offset + 1), // actionId
-            cursor.getString(offset + 2), // follows
-            cursor.getLong(offset + 3), // paramId
-            cursor.getLong(offset + 4) // scopeId
+            cursor.getInt(offset + 1), // nodeType
+            cursor.getLong(offset + 2), // actionId
+            cursor.getString(offset + 3), // follows
+            cursor.getLong(offset + 4), // paramId
+            cursor.getLong(offset + 5) // scopeId
         );
         return entity;
     }
@@ -121,10 +126,11 @@ public class MapNodeDao extends AbstractDao<MapNode, Long> {
     @Override
     public void readEntity(Cursor cursor, MapNode entity, int offset) {
         entity.setId(cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0));
-        entity.setActionId(cursor.getLong(offset + 1));
-        entity.setFollows(cursor.getString(offset + 2));
-        entity.setParamId(cursor.getLong(offset + 3));
-        entity.setScopeId(cursor.getLong(offset + 4));
+        entity.setNodeType(cursor.getInt(offset + 1));
+        entity.setActionId(cursor.getLong(offset + 2));
+        entity.setFollows(cursor.getString(offset + 3));
+        entity.setParamId(cursor.getLong(offset + 4));
+        entity.setScopeId(cursor.getLong(offset + 5));
      }
     
     @Override

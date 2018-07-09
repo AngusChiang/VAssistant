@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="cn.vove7.accessibilityservicedemo">
+    package="cn.vove7.jarvis">
 
     <!--语音识别-->
     <uses-permission android:name="android.permission.VIBRATE" />

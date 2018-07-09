@@ -11,62 +11,77 @@ import org.greenrobot.greendao.annotation.Transient;
  */
 @Entity
 public class Param {
-   @Id
-   private Long id;
-   @Transient
-   private String value;
-   private String desc;
-   private String askText;
+    @Id
+    private Long id;
+    @Transient
+    private String value;
+    private String desc;
+    private String askText;
+    /**
+     * 参数何来
+     */
+    @Transient
+    private int paramType = TYPE_GET;
+    public static final int TYPE_WITH = 0;//自带
+    public static final int TYPE_GET = 1;//获取
 
-   @Generated(hash = 1996034722)
-   public Param(Long id, String desc, String askText) {
-       this.id = id;
-       this.desc = desc;
-       this.askText = askText;
-   }
+    @Generated(hash = 1996034722)
+    public Param(Long id, String desc, String askText) {
+        this.id = id;
+        this.desc = desc;
+        this.askText = askText;
+    }
 
-   public Param(String desc, String askText) {
-      this.desc = desc;
-      this.askText = askText;
-   }
+    public int getParamType() {
+        return paramType;
+    }
 
-   public Param(String askText) {
-      this.askText = askText;
-   }
+    public void setParamType(int paramType) {
+        this.paramType = paramType;
+    }
 
-   @Generated(hash = 2002329870)
-   public Param() {
-   }
+    public Param(String desc, String askText) {
+        this.desc = desc;
+        this.askText = askText;
+    }
 
-   public Long getId() {
-      return this.id;
-   }
+    public Param(String askText) {
+        this.askText = askText;
+    }
 
-   public void setId(Long id) {
-      this.id = id;
-   }
+    @Generated(hash = 2002329870)
+    public Param() {
+    }
 
-   public String getValue() {
-      return this.value;
-   }
+    public Long getId() {
+        return this.id;
+    }
 
-   public void setValue(String value) {
-      this.value = value;
-   }
+    public void setId(Long id) {
+        this.id = id;
+    }
 
-   public String getDesc() {
-      return this.desc;
-   }
+    public String getValue() {
+        return this.value;
+    }
 
-   public void setDesc(String desc) {
-      this.desc = desc;
-   }
+    public void setValue(String value) {
+        this.value = value;
+    }
 
-   public String getAskText() {
-      return this.askText;
-   }
+    public String getDesc() {
+        return this.desc;
+    }
 
-   public void setAskText(String askText) {
-      this.askText = askText;
-   }
+    public void setDesc(String desc) {
+        this.desc = desc;
+    }
+
+    public String getAskText() {
+        return this.askText;
+    }
+
+    public void setAskText(String askText) {
+        this.askText = askText;
+    }
 }

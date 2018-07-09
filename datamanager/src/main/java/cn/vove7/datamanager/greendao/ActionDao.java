@@ -25,11 +25,10 @@ public class ActionDao extends AbstractDao<Action, Long> {
      */
     public static class Properties {
         public final static Property Id = new Property(0, Long.class, "id", true, "_id");
-        public final static Property MatchWord = new Property(1, String.class, "matchWord", false, "MATCH_WORD");
-        public final static Property Priority = new Property(2, int.class, "priority", false, "PRIORITY");
-        public final static Property NodeId = new Property(3, long.class, "nodeId", false, "NODE_ID");
-        public final static Property ActionScript = new Property(4, String.class, "actionScript", false, "ACTION_SCRIPT");
-        public final static Property ResponseResult = new Property(5, Boolean.class, "responseResult", false, "RESPONSE_RESULT");
+        public final static Property Priority = new Property(1, int.class, "priority", false, "PRIORITY");
+        public final static Property NodeId = new Property(2, long.class, "nodeId", false, "NODE_ID");
+        public final static Property ActionScript = new Property(3, String.class, "actionScript", false, "ACTION_SCRIPT");
+        public final static Property ResponseResult = new Property(4, Boolean.class, "responseResult", false, "RESPONSE_RESULT");
     }
 
 
@@ -46,11 +45,10 @@ public class ActionDao extends AbstractDao<Action, Long> {
         String constraint = ifNotExists? "IF NOT EXISTS ": "";
         db.execSQL("CREATE TABLE " + constraint + "\"ACTION\" (" + //
                 "\"_id\" INTEGER PRIMARY KEY ," + // 0: id
-                "\"MATCH_WORD\" TEXT," + // 1: matchWord
-                "\"PRIORITY\" INTEGER NOT NULL ," + // 2: priority
-                "\"NODE_ID\" INTEGER NOT NULL ," + // 3: nodeId
-                "\"ACTION_SCRIPT\" TEXT," + // 4: actionScript
-                "\"RESPONSE_RESULT\" INTEGER);"); // 5: responseResult
+                "\"PRIORITY\" INTEGER NOT NULL ," + // 1: priority
+                "\"NODE_ID\" INTEGER NOT NULL ," + // 2: nodeId
+                "\"ACTION_SCRIPT\" TEXT," + // 3: actionScript
+                "\"RESPONSE_RESULT\" INTEGER);"); // 4: responseResult
     }
 
     /** Drops the underlying database table. */
@@ -67,22 +65,17 @@ public class ActionDao extends AbstractDao<Action, Long> {
         if (id != null) {
             stmt.bindLong(1, id);
         }
- 
-        String matchWord = entity.getMatchWord();
-        if (matchWord != null) {
-            stmt.bindString(2, matchWord);
-        }
-        stmt.bindLong(3, entity.getPriority());
-        stmt.bindLong(4, entity.getNodeId());
+        stmt.bindLong(2, entity.getPriority());
+        stmt.bindLong(3, entity.getNodeId());
  
         String actionScript = entity.getActionScript();
         if (actionScript != null) {
-            stmt.bindString(5, actionScript);
+            stmt.bindString(4, actionScript);
         }
  
         Boolean responseResult = entity.getResponseResult();
         if (responseResult != null) {
-            stmt.bindLong(6, responseResult ? 1L: 0L);
+            stmt.bindLong(5, responseResult ? 1L: 0L);
         }
     }
 
@@ -94,22 +87,17 @@ public class ActionDao extends AbstractDao<Action, Long> {
         if (id != null) {
             stmt.bindLong(1, id);
         }
- 
-        String matchWord = entity.getMatchWord();
-        if (matchWord != null) {
-            stmt.bindString(2, matchWord);
-        }
-        stmt.bindLong(3, entity.getPriority());
-        stmt.bindLong(4, entity.getNodeId());
+        stmt.bindLong(2, entity.getPriority());
+        stmt.bindLong(3, entity.getNodeId());
  
         String actionScript = entity.getActionScript();
         if (actionScript != null) {
-            stmt.bindString(5, actionScript);
+            stmt.bindString(4, actionScript);
         }
  
         Boolean responseResult = entity.getResponseResult();
         if (responseResult != null) {
-            stmt.bindLong(6, responseResult ? 1L: 0L);
+            stmt.bindLong(5, responseResult ? 1L: 0L);
         }
     }
 
@@ -122,11 +110,10 @@ public class ActionDao extends AbstractDao<Action, Long> {
     public Action readEntity(Cursor cursor, int offset) {
         Action entity = new Action( //
             cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0), // id
-            cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1), // matchWord
-            cursor.getInt(offset + 2), // priority
-            cursor.getLong(offset + 3), // nodeId
-            cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4), // actionScript
-            cursor.isNull(offset + 5) ? null : cursor.getShort(offset + 5) != 0 // responseResult
+            cursor.getInt(offset + 1), // priority
+            cursor.getLong(offset + 2), // nodeId
+            cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3), // actionScript
+            cursor.isNull(offset + 4) ? null : cursor.getShort(offset + 4) != 0 // responseResult
         );
         return entity;
     }
@@ -134,11 +121,10 @@ public class ActionDao extends AbstractDao<Action, Long> {
     @Override
     public void readEntity(Cursor cursor, Action entity, int offset) {
         entity.setId(cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0));
-        entity.setMatchWord(cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1));
-        entity.setPriority(cursor.getInt(offset + 2));
-        entity.setNodeId(cursor.getLong(offset + 3));
-        entity.setActionScript(cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4));
-        entity.setResponseResult(cursor.isNull(offset + 5) ? null : cursor.getShort(offset + 5) != 0);
+        entity.setPriority(cursor.getInt(offset + 1));
+        entity.setNodeId(cursor.getLong(offset + 2));
+        entity.setActionScript(cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3));
+        entity.setResponseResult(cursor.isNull(offset + 4) ? null : cursor.getShort(offset + 4) != 0);
      }
     
     @Override

@@ -1,12 +1,13 @@
 package cn.vove7.datamanager.parse.model;
 
 import android.os.Bundle;
+import android.support.annotation.Keep;
 import android.support.annotation.NonNull;
 
 import org.greenrobot.greendao.annotation.Entity;
+import org.greenrobot.greendao.annotation.Generated;
 import org.greenrobot.greendao.annotation.Id;
 import org.greenrobot.greendao.annotation.Transient;
-import org.greenrobot.greendao.annotation.Generated;
 
 /**
  * Action集合
@@ -14,148 +15,154 @@ import org.greenrobot.greendao.annotation.Generated;
  */
 @Entity
 public class Action implements Comparable<Action> {
-   @Id
-   private
-   Long id;
+    @Id
+    private
+    Long id;
 
-   private String matchWord;
-   /**
-    * 执行优先级
-    */
-   private int priority;
-   private long nodeId;
+    @Transient
+    private String matchWord;
+    /**
+     * 执行优先级
+     */
+    private int priority;
+    private long nodeId;
 
-   /**
-    * 格式：
-    * openApp:$var
-    * clickText:$var
-    * clickId:$var
-    * back
-    * recent
-    * pullNotification
-    * call
-    */
-   private String actionScript;
-   /**
-    * 操作参数
-    */
-   @Transient
-   private
-   Param param;
-   /**
-    * 请求结果
-    */
-   Boolean responseResult = true;
-   /**
-    * 返回数据
-    */
-   @Transient
-   Bundle responseBundle = new Bundle();
-   /**
-    * 启动App，其他
-    */
-   public static int ACTION_OPEN = 1;
-   /**
-    * 拨打电话
-    */
-   public static int ACTION_CALL = 2;
-   public static int ACTION_CLICK = 3;
+    /**
+     * 格式：
+     * openApp:$var
+     * clickText:$var
+     * clickId:$var
+     * back
+     * recent
+     * pullNotification
+     * call
+     */
+    private String actionScript;
+    /**
+     * 操作参数
+     */
+    @Transient
+    private
+    Param param;
+    /**
+     * 请求结果
+     */
+    Boolean responseResult = true;
+    /**
+     * 返回数据
+     */
+    @Transient
+    Bundle responseBundle = new Bundle();
+    /**
+     * 启动App，其他
+     */
+    public static int ACTION_OPEN = 1;
+    /**
+     * 拨打电话
+     */
+    public static int ACTION_CALL = 2;
+    public static int ACTION_CLICK = 3;
 
-   @Generated(hash = 1657105256)
-   public Action(Long id, String matchWord, int priority, long nodeId,
-           String actionScript, Boolean responseResult) {
-       this.id = id;
-       this.matchWord = matchWord;
-       this.priority = priority;
-       this.nodeId = nodeId;
-       this.actionScript = actionScript;
-       this.responseResult = responseResult;
-   }
+    @Generated(hash = 1049622041)
+    public Action(Long id, int priority, long nodeId, String actionScript,
+                  Boolean responseResult) {
+        this.id = id;
+        this.priority = priority;
+        this.nodeId = nodeId;
+        this.actionScript = actionScript;
+        this.responseResult = responseResult;
+    }
 
-   @Generated(hash = 2056262033)
-   public Action() {
-   }
+    @Generated(hash = 2056262033)
+    public Action() {
+    }
 
-   public Action(Long id, String actionScript) {
-      this.id = id;
-      this.actionScript = actionScript;
-   }
 
-   public Action(String actionScript) {
-      this.actionScript = actionScript;
-   }
+    public Action(Long id, String actionScript) {
+        this.id = id;
+        this.actionScript = actionScript;
+    }
 
-   public Action(int priority, String actionScript) {
-      this.priority = priority;
-      this.actionScript = actionScript;
-   }
+    @Keep
+    public Action(String actionScript) {
+        this.actionScript = actionScript;
+    }
 
-   public Param getParam() {
-      return param;
-   }
+    public Action(int priority, String actionScript) {
+        this.priority = priority;
+        this.actionScript = actionScript;
+    }
 
-   public void setParam(Param param) {
-      this.param = param;
-   }
+    public Param getParam() {
+        if (this.param == null) {
+            param = new Param();
+        }
+        return this.param;
+    }
 
-   public Bundle getResponseBundle() {
-      return responseBundle;
-   }
 
-   public void setResponseBundle(Bundle responseBundle) {
-      this.responseBundle = responseBundle;
-   }
+    public void setParam(Param param) {
+        this.param = param;
+    }
 
-   @Override
-   public int compareTo(@NonNull Action o) {
-      return priority - o.priority;
-   }
+    public Bundle getResponseBundle() {
+        return responseBundle;
+    }
 
-   public Long getId() {
-       return this.id;
-   }
+    public void setResponseBundle(Bundle responseBundle) {
+        this.responseBundle = responseBundle;
+    }
 
-   public void setId(Long id) {
-       this.id = id;
-   }
+    @Override
+    public int compareTo(@NonNull Action o) {
+        return priority - o.priority;
+    }
 
-   public String getMatchWord() {
-       return this.matchWord;
-   }
+    public Long getId() {
+        return this.id;
+    }
 
-   public void setMatchWord(String matchWord) {
-       this.matchWord = matchWord;
-   }
+    public void setId(Long id) {
+        this.id = id;
+    }
 
-   public int getPriority() {
-       return this.priority;
-   }
+    public String getMatchWord() {
+        return this.matchWord;
+    }
 
-   public void setPriority(int priority) {
-       this.priority = priority;
-   }
+    public void setMatchWord(String matchWord) {
+        this.matchWord = matchWord;
+    }
 
-   public long getNodeId() {
-       return this.nodeId;
-   }
+    public int getPriority() {
+        return this.priority;
+    }
 
-   public void setNodeId(long nodeId) {
-       this.nodeId = nodeId;
-   }
+    public void setPriority(int priority) {
+        this.priority = priority;
+    }
 
-   public String getActionScript() {
-       return this.actionScript;
-   }
+    public long getNodeId() {
+        return this.nodeId;
+    }
 
-   public void setActionScript(String actionScript) {
-       this.actionScript = actionScript;
-   }
+    public void setNodeId(long nodeId) {
+        this.nodeId = nodeId;
+    }
 
-   public Boolean getResponseResult() {
-       return this.responseResult;
-   }
+    public String getActionScript() {
+        return this.actionScript;
+    }
 
-   public void setResponseResult(Boolean responseResult) {
-       this.responseResult = responseResult;
-   }
+    public void setActionScript(String actionScript) {
+        this.actionScript = actionScript;
+    }
+
+    public Boolean getResponseResult() {
+        return this.responseResult;
+    }
+
+    public void setResponseResult(Boolean responseResult) {
+        this.responseResult = responseResult;
+    }
 }

@@ -14,6 +14,6 @@ open class AppInfo(
         var priority: Int = 0
 ) {
     override fun toString(): String {
-        return name
+        return "AppInfo(name='$name', packageName='$packageName')"
     }
 }

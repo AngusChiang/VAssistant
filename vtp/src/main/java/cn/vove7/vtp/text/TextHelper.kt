@@ -1,6 +1,5 @@
 package cn.vove7.vtp.text
 
-import cn.vove7.vtp.log.Vog
 import net.sourceforge.pinyin4j.PinyinHelper
 import net.sourceforge.pinyin4j.format.HanyuPinyinCaseType
 import net.sourceforge.pinyin4j.format.HanyuPinyinOutputFormat
@@ -19,7 +18,7 @@ object TextHelper {
      * 汉字转拼音
      * 一字多音？😔
      */
-    fun chineseStr2Pinyin(words: String): String {
+    fun chineseStr2Pinyin(words: String, onlyFirst: Boolean = false): String {
         var pinyinStr = ""
         val newChar = words.toCharArray()
         val defaultFormat = HanyuPinyinOutputFormat()
@@ -28,12 +27,13 @@ object TextHelper {
         for (c in newChar) {
             pinyinStr += if (c.toInt() > 128) {
                 try {
-                    PinyinHelper.toHanyuPinyinStringArray(c, defaultFormat)[0]
+                    val all = PinyinHelper.toHanyuPinyinStringArray(c, defaultFormat)[0]
+                    if (onlyFirst) "${all[0]}" else all
                 } catch (e: BadHanyuPinyinOutputFormatCombination) {
-                    Vog.wtf(this, e.message ?: e.toString())
+                    println(e.message ?: e.toString())
                     c
                 } catch (ne: NullPointerException) {
-                    Vog.wtf(this, ne.message ?: ne.toString())
+                    println(ne.message ?: ne.toString())
                     c
                 }
             } else {

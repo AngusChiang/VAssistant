@@ -1,7 +1,9 @@
 package cn.vove7.vtp.asset
 
 import android.content.Context
-import java.io.IOException
+import java.io.BufferedReader
+import java.io.InputStreamReader
+
 
 /**
  * Asset类
@@ -9,14 +11,13 @@ import java.io.IOException
 object AssetHelper {
 
     fun getStrFromAsset(context: Context, fileName: String): String? {
-        return try {
-            val inputStream = context.assets.open(fileName)
-            val bs = ByteArray(inputStream.available())
-            inputStream.read(bs)
-            bs.toString()
-        } catch (e: IOException) {
+        try {
+            val inputReader = InputStreamReader(context.assets.open(fileName))
+            val bufReader = BufferedReader(inputReader)
+            return bufReader.readText()
+        } catch (e: Exception) {
             e.printStackTrace()
-            null
         }
+        return null
     }
 }

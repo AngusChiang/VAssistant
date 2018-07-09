@@ -30,7 +30,7 @@ object AppUtil {
             val appName = app.loadLabel(man).toString()
             if (name == appName || pkg == app.packageName) {
                 return AppInfo(
-                        name = name,
+                        name = appName,
                         packageName = app.packageName,
                         icon = app.loadIcon(man)
                 )

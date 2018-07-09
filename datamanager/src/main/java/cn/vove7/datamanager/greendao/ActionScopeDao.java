@@ -25,7 +25,7 @@ public class ActionScopeDao extends AbstractDao<ActionScope, Long> {
      */
     public static class Properties {
         public final static Property Id = new Property(0, Long.class, "id", true, "_id");
-        public final static Property AppName = new Property(1, String.class, "appName", false, "APP_NAME");
+        public final static Property PackageName = new Property(1, String.class, "packageName", false, "PACKAGE_NAME");
         public final static Property Activity = new Property(2, String.class, "activity", false, "ACTIVITY");
     }
 
@@ -43,7 +43,7 @@ public class ActionScopeDao extends AbstractDao<ActionScope, Long> {
         String constraint = ifNotExists? "IF NOT EXISTS ": "";
         db.execSQL("CREATE TABLE " + constraint + "\"ACTION_SCOPE\" (" + //
                 "\"_id\" INTEGER PRIMARY KEY ," + // 0: id
-                "\"APP_NAME\" TEXT," + // 1: appName
+                "\"PACKAGE_NAME\" TEXT," + // 1: packageName
                 "\"ACTIVITY\" TEXT);"); // 2: activity
     }
 
@@ -62,9 +62,9 @@ public class ActionScopeDao extends AbstractDao<ActionScope, Long> {
             stmt.bindLong(1, id);
         }
  
-        String appName = entity.getAppName();
-        if (appName != null) {
-            stmt.bindString(2, appName);
+        String packageName = entity.getPackageName();
+        if (packageName != null) {
+            stmt.bindString(2, packageName);
         }
  
         String activity = entity.getActivity();
@@ -82,9 +82,9 @@ public class ActionScopeDao extends AbstractDao<ActionScope, Long> {
             stmt.bindLong(1, id);
         }
  
-        String appName = entity.getAppName();
-        if (appName != null) {
-            stmt.bindString(2, appName);
+        String packageName = entity.getPackageName();
+        if (packageName != null) {
+            stmt.bindString(2, packageName);
         }
  
         String activity = entity.getActivity();
@@ -102,7 +102,7 @@ public class ActionScopeDao extends AbstractDao<ActionScope, Long> {
     public ActionScope readEntity(Cursor cursor, int offset) {
         ActionScope entity = new ActionScope( //
             cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0), // id
-            cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1), // appName
+            cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1), // packageName
             cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2) // activity
         );
         return entity;
@@ -111,7 +111,7 @@ public class ActionScopeDao extends AbstractDao<ActionScope, Long> {
     @Override
     public void readEntity(Cursor cursor, ActionScope entity, int offset) {
         entity.setId(cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0));
-        entity.setAppName(cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1));
+        entity.setPackageName(cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1));
         entity.setActivity(cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2));
      }
     

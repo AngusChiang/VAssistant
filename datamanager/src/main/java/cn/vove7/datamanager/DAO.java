@@ -12,6 +12,6 @@ public class DAO {
    public static DaoSession daoSession;
 
    public static void init(Context context) {
-      daoSession = DaoMaster.newDevSession(context, "DataBase");
+      daoSession = DaoMaster.newDevSession(context, "DataBase.db");
    }
 }

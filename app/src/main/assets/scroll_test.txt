@@ -1,0 +1,4 @@
+open(设置)
+sleep
+scrollUp
+showPowerDialog

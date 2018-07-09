@@ -20,7 +20,17 @@ interface ServiceBridge {
      * 选择对话框
      */
     fun showChoiceDialog(event: ShowDialogEvent)
+
+    /**
+     * 取认对话框
+     */
+    fun showAlert(r: ShowAlertEvent)
 }
+
+class ShowAlertEvent(
+        val msg: String,
+        val action: Action
+)
 
 class ShowDialogEvent(
         val whichDialog: Int,

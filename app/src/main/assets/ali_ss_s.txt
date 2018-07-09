@@ -1,0 +1,3 @@
+open(支付宝)
+waitForId(saoyisao_tv)
+clickById(saoyisao_tv)

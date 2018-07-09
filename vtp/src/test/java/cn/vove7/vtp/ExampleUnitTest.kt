@@ -45,10 +45,20 @@ class ExampleUnitTest {
         tests.forEach {
             println("""${it.key} ${it.value}""")
             println(TextHelper.compareSimilarityWithPinyin(it.key, it.value))
-
             println()
-
         }
     }
+
+    @Test
+    fun testChinese2First() {
+        arrayOf(
+                "一二三",
+                "i我和欧文h",
+                "吗朦胧"
+        ).forEach {
+            println(TextHelper.chineseStr2Pinyin(it,true))
+        }
+    }
+
 
 }
