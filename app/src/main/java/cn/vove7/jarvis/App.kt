@@ -3,6 +3,7 @@ package cn.vove7.jarvis
 import android.app.Application
 import android.content.Intent
 import android.util.Log
+import cn.vove7.androlua.LuaApp
 import cn.vove7.jarvis.services.MainService
 import cn.vove7.jarvis.speech.services.SpeechService
 import cn.vove7.appbus.MessageEvent
@@ -13,14 +14,13 @@ import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
 
-class App : Application() {
+class App : LuaApp() {
 
     lateinit var voiceService: Intent
     lateinit var mainService: Intent
     override fun onCreate() {
-        EventBus.getDefault().register(this)
-        instance = this
         super.onCreate()
+        EventBus.getDefault().register(this)
         Vog.init(this, Log.VERBOSE).log2Local(Log.ERROR)
         voiceService = Intent(this, SpeechService::class.java)
         mainService = Intent(this, MainService::class.java)

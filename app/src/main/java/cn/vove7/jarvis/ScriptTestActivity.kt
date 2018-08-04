@@ -7,7 +7,7 @@ import cn.vove7.jarvis.services.MyAccessibilityService
 import cn.vove7.appbus.AppBus
 import cn.vove7.datamanager.parse.model.Action
 import cn.vove7.executorengine.GetAccessibilityBridge
-import cn.vove7.executorengine.bridge.AccessibilityBridge
+import cn.vove7.executorengine.bridges.AccessibilityApi
 import cn.vove7.parseengine.engine.ParseEngine
 import cn.vove7.vtp.asset.AssetHelper
 import cn.vove7.vtp.toast.Voast
@@ -16,14 +16,14 @@ import kotlinx.android.synthetic.main.activity_script_test.*
 class ScriptTestActivity : AppCompatActivity(), GetAccessibilityBridge {
 
     private val files = arrayOf(
-            "alipay_ss.txt"
-            , "ali_ss_s.txt"
-            , "qq_ss.txt"
-            , "voice_text.txt"
-            , "scroll_test.txt"
-            , "test.txt"
-            , "qq_send.txt"
-            , "qq_send_s.txt"
+            "s/alipay_ss.txt"
+            , "s/ali_ss_s.txt"
+            , "s/qq_ss.txt"
+            , "s/voice_text.txt"
+            , "s/scroll_test.txt"
+            , "s/test.txt"
+            , "s/qq_send.txt"
+            , "s/qq_send_s.txt"
     )
     var now = 0
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -32,7 +32,7 @@ class ScriptTestActivity : AppCompatActivity(), GetAccessibilityBridge {
         script_text.setText(AssetHelper.getStrFromAsset(this, files[now]))
     }
 
-    override fun getBridge(): AccessibilityBridge? {
+    override fun getBridge(): AccessibilityApi? {
         return MyAccessibilityService.accessibilityService
     }
 

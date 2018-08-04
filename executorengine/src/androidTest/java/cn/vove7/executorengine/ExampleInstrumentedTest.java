@@ -11,7 +11,7 @@ import cn.vove7.executorengine.greendao.DaoMaster;
 import cn.vove7.datamanager.executor.entity.MarkedOpen;
 import cn.vove7.executorengine.greendao.MarkedAppDao;
 import cn.vove7.vtp.app.AppInfo;
-import cn.vove7.vtp.app.AppUtil;
+import cn.vove7.vtp.app.AppHelper;
 
 import static org.junit.Assert.*;
 
@@ -32,7 +32,7 @@ public class ExampleInstrumentedTest {
       MarkedAppDao dao =DaoMaster.newDevSession(appContext,"test").getMarkedAppDao();
       MarkedOpen app= new MarkedOpen();
       app.setKey("微博");
-      AppInfo info = AppUtil.INSTANCE.getAppInfo(appContext, "Share", "");
+      AppInfo info = AppHelper.INSTANCE.getAppInfo(appContext, "Share", "");
       if(info!=null){
          app.setName(info.getName());
          app.setPackageName(info.getPackageName());

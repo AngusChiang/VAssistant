@@ -47,30 +47,21 @@ public class Action implements Comparable<Action> {
     /**
      * 请求结果
      */
+    @Transient
     Boolean responseResult = true;
     /**
      * 返回数据
      */
     @Transient
     Bundle responseBundle = new Bundle();
-    /**
-     * 启动App，其他
-     */
-    public static int ACTION_OPEN = 1;
-    /**
-     * 拨打电话
-     */
-    public static int ACTION_CALL = 2;
-    public static int ACTION_CLICK = 3;
 
-    @Generated(hash = 1049622041)
-    public Action(Long id, int priority, long nodeId, String actionScript,
-                  Boolean responseResult) {
+
+    @Generated(hash = 1674871007)
+    public Action(Long id, int priority, long nodeId, String actionScript) {
         this.id = id;
         this.priority = priority;
         this.nodeId = nodeId;
         this.actionScript = actionScript;
-        this.responseResult = responseResult;
     }
 
     @Generated(hash = 2056262033)

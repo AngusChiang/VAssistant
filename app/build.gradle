@@ -49,14 +49,16 @@ dependencies {
     implementation 'com.google.code.gson:gson:2.8.5'
     implementation 'io.apisense:rhino-android:1.0'
     implementation 'org.greenrobot:eventbus:3.1.1'
+    implementation 'com.android.support:cardview-v7:27.1.1'
     implementation "org.greenrobot:greendao:$greendao_version"
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+    implementation "com.github.Vove7:VTP:$vtp_version"
     implementation files('libs/bdasr_V3_20180320_9066860.jar')
-    implementation project(':vtp')
     implementation project(':parseengine')
     implementation project(':executorengine')
     implementation project(':appbus')
     implementation project(':datamanager')
+    implementation project(':androlua')
 }
 repositories {
     mavenCentral()

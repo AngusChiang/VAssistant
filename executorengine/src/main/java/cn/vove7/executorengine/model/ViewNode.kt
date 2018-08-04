@@ -9,6 +9,9 @@ import cn.vove7.vtp.log.Vog
 import cn.vove7.vtp.text.TextHelper
 import java.lang.Thread.sleep
 
+/**
+ * 视图节点
+ */
 class ViewNode(val node: AccessibilityNodeInfo) : ViewOperation, Comparable<ViewNode> {
 
     /**
@@ -21,7 +24,6 @@ class ViewNode(val node: AccessibilityNodeInfo) : ViewOperation, Comparable<View
     }
 
     override fun tryClick(): Boolean = tryOp(AccessibilityNodeInfo.ACTION_CLICK)
-
 
     /**
      * 尝试操作次数
@@ -121,7 +123,7 @@ class ViewNode(val node: AccessibilityNodeInfo) : ViewOperation, Comparable<View
     private fun transText(text: String, ep: String?): String {
         if (ep == null) return text
         return when (ep) {
-            "1" -> {
+            "1" -> {//转中文拼音首字母
                 TextHelper.chineseStr2Pinyin(text, true)
             }
             else -> {

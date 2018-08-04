@@ -65,13 +65,16 @@ class PermissionManagerActivity : AppCompatActivity() {
                 holder.open.setOnClickListener {
                     if (!item.isOpen) {
                         when {
-                            item.permissionName == "悬浮窗" -> PermissionUtils.requestDrawOverlays(this@PermissionManagerActivity, 0)
-                            item.permissionName == "无障碍" -> PermissionUtils.gotoAccessibilitySetting(this@PermissionManagerActivity)
-                            else -> ActivityCompat.requestPermissions(
-                                    this@PermissionManagerActivity,
-                                    arrayOf(item.permissionString),
-                                    pos
-                            )
+                            item.permissionName == "悬浮窗" ->
+                                PermissionUtils.requestDrawOverlays(this@PermissionManagerActivity, 0)
+                            item.permissionName == "无障碍" ->
+                                PermissionUtils.gotoAccessibilitySetting(this@PermissionManagerActivity)
+                            else ->
+                                ActivityCompat.requestPermissions(
+                                        this@PermissionManagerActivity,
+                                        arrayOf(item.permissionString),
+                                        pos
+                                )
                         }
                     }
                 }
@@ -96,6 +99,7 @@ class PermissionManagerActivity : AppCompatActivity() {
             adapter.notifyDataSetChanged()
         }
     }
+
     class Holder(view: View) : BaseListAdapter.ViewHolder(view) {
         val title = view.findViewById<TextView>(R.id.title)
         val subtitle = view.findViewById<TextView>(R.id.subtitle)
@@ -110,6 +114,8 @@ class PermissionManagerActivity : AppCompatActivity() {
     ) {
         companion object {
             private val permissions = listOf(
+                    PermissionStatus("android.permission.BIND_ACCESSIBILITY_SERVICE", "无障碍", "便于操作界面"),
+                    PermissionStatus("android.permission.SYSTEM_ALERT_WINDOW", "悬浮窗", "显示于其他界面之上"),
                     PermissionStatus("android.permission.VIBRATE", "震动", ""),
                     PermissionStatus("android.permission.READ_CONTACTS", "联系人", "用于检索联系人"),
                     PermissionStatus("android.permission.CALL_PHONE", "电话", "用于拨打电话"),
@@ -119,10 +125,7 @@ class PermissionManagerActivity : AppCompatActivity() {
                     PermissionStatus("android.permission.READ_PHONE_STATE", "读取设备状态", ""),
                     PermissionStatus("android.permission.WRITE_EXTERNAL_STORAGE", "写SD卡", ""),
                     PermissionStatus("android.permission.FLASHLIGHT", "闪光灯", "打开闪光灯"),
-                    PermissionStatus("android.permission.CAMERA", "相机", "打开闪光灯"),
-                    PermissionStatus("android.permission.SYSTEM_ALERT_WINDOW", "悬浮窗", "显示于其他界面之上"),
-
-                    PermissionStatus("android.permission.BIND_ACCESSIBILITY_SERVICE", "无障碍", "便于操作界面")
+                    PermissionStatus("android.permission.CAMERA", "相机", "打开闪光灯")
             )
 
             fun refreshStatus(context: Context): List<PermissionStatus> {

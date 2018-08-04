@@ -12,7 +12,7 @@ import android.view.accessibility.AccessibilityNodeInfo
 import android.widget.Toast
 import cn.vove7.datamanager.parse.model.ActionScope
 import cn.vove7.executorengine.Executor
-import cn.vove7.executorengine.bridge.AccessibilityBridge
+import cn.vove7.executorengine.bridges.AccessibilityApi
 import cn.vove7.executorengine.model.ViewNode
 import cn.vove7.jarvis.view.finder.ViewFinder
 import cn.vove7.jarvis.view.finder.ViewFinderByDesc
@@ -20,7 +20,7 @@ import cn.vove7.jarvis.view.finder.ViewFinderById
 import cn.vove7.jarvis.view.finder.ViewFinderByText
 import cn.vove7.jarvis.view.notifier.ViewShowNotifier
 import cn.vove7.vtp.app.AppInfo
-import cn.vove7.vtp.app.AppUtil
+import cn.vove7.vtp.app.AppHelper
 import cn.vove7.vtp.log.Vog
 import cn.vove7.vtp.text.TextHelper
 import java.lang.Thread.sleep
@@ -31,7 +31,7 @@ import kotlin.concurrent.thread
  * cn.vove7
  */
 
-class MyAccessibilityService : AccessibilityBridge() {
+class MyAccessibilityService : AccessibilityApi() {
     private var currentActivity: String = ""
 
     private var currentAppInfo: AppInfo? = null
@@ -48,7 +48,7 @@ class MyAccessibilityService : AccessibilityBridge() {
     }
 
     private fun updateCurrentApp(pkg: String) {
-        currentAppInfo = AppUtil.getAppInfo(this, "", pkg)
+        currentAppInfo = AppHelper.getAppInfo(this, "", pkg)
         currentScope.activity = currentActivity
         currentScope.packageName = pkg
         Vog.d(this, currentScope.toString())
@@ -428,7 +428,7 @@ class MyAccessibilityService : AccessibilityBridge() {
 
 
     companion object {
-        var accessibilityService: AccessibilityBridge? = null
+        var accessibilityService: AccessibilityApi? = null
 
         private val absCls = arrayOf("AbsListView", "ViewGroup", "CategoryPairLayout")
         fun inAbs(n: String): Boolean {

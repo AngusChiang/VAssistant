@@ -5,7 +5,11 @@ import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.view.KeyEvent
 import android.view.View
+import cn.vove7.androlua.LuaEditorActivity
+import cn.vove7.executorengine.helper.AppHelper
+import cn.vove7.executorengine.helper.ContactHelper
 import cn.vove7.executorengine.model.ScreenMetrics
+import kotlin.concurrent.thread
 
 class MainActivity : AppCompatActivity() {
 
@@ -14,6 +18,10 @@ class MainActivity : AppCompatActivity() {
 
         ScreenMetrics.initIfNeeded(this)
         setContentView(R.layout.activity_main)
+        thread {
+            ContactHelper(this).updateContactList()
+            AppHelper(this).updateAppList()
+        }
     }
 
     override fun onKeyDown(keyCode: Int, event: KeyEvent): Boolean {
@@ -30,6 +38,9 @@ class MainActivity : AppCompatActivity() {
 
     fun go2Test(view: View) {
         startActivity(Intent(this, ScriptTestActivity::class.java))
+    }
+    fun go2Lua(view: View) {
+        startActivity(Intent(this, LuaEditorActivity::class.java))
     }
 
     fun go2Voice(view: View) {

@@ -17,7 +17,7 @@ import cn.vove7.appbus.SpeechAction.Companion.ACTION_CANCEL
 import cn.vove7.appbus.SpeechAction.Companion.ACTION_START
 import cn.vove7.appbus.SpeechAction.Companion.ACTION_STOP
 import cn.vove7.vtp.log.Vog
-import cn.vove7.vtp.math.LogicOperators
+import cn.vove7.vtp.maths.LogicOperators
 import cn.vove7.vtp.toast.Voast
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode

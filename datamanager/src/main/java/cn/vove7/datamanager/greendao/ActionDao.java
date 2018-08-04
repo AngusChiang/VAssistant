@@ -28,7 +28,6 @@ public class ActionDao extends AbstractDao<Action, Long> {
         public final static Property Priority = new Property(1, int.class, "priority", false, "PRIORITY");
         public final static Property NodeId = new Property(2, long.class, "nodeId", false, "NODE_ID");
         public final static Property ActionScript = new Property(3, String.class, "actionScript", false, "ACTION_SCRIPT");
-        public final static Property ResponseResult = new Property(4, Boolean.class, "responseResult", false, "RESPONSE_RESULT");
     }
 
 
@@ -47,8 +46,7 @@ public class ActionDao extends AbstractDao<Action, Long> {
                 "\"_id\" INTEGER PRIMARY KEY ," + // 0: id
                 "\"PRIORITY\" INTEGER NOT NULL ," + // 1: priority
                 "\"NODE_ID\" INTEGER NOT NULL ," + // 2: nodeId
-                "\"ACTION_SCRIPT\" TEXT," + // 3: actionScript
-                "\"RESPONSE_RESULT\" INTEGER);"); // 4: responseResult
+                "\"ACTION_SCRIPT\" TEXT);"); // 3: actionScript
     }
 
     /** Drops the underlying database table. */
@@ -72,11 +70,6 @@ public class ActionDao extends AbstractDao<Action, Long> {
         if (actionScript != null) {
             stmt.bindString(4, actionScript);
         }
- 
-        Boolean responseResult = entity.getResponseResult();
-        if (responseResult != null) {
-            stmt.bindLong(5, responseResult ? 1L: 0L);
-        }
     }
 
     @Override
@@ -94,11 +87,6 @@ public class ActionDao extends AbstractDao<Action, Long> {
         if (actionScript != null) {
             stmt.bindString(4, actionScript);
         }
- 
-        Boolean responseResult = entity.getResponseResult();
-        if (responseResult != null) {
-            stmt.bindLong(5, responseResult ? 1L: 0L);
-        }
     }
 
     @Override
@@ -112,8 +100,7 @@ public class ActionDao extends AbstractDao<Action, Long> {
             cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0), // id
             cursor.getInt(offset + 1), // priority
             cursor.getLong(offset + 2), // nodeId
-            cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3), // actionScript
-            cursor.isNull(offset + 4) ? null : cursor.getShort(offset + 4) != 0 // responseResult
+            cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3) // actionScript
         );
         return entity;
     }
@@ -124,7 +111,6 @@ public class ActionDao extends AbstractDao<Action, Long> {
         entity.setPriority(cursor.getInt(offset + 1));
         entity.setNodeId(cursor.getLong(offset + 2));
         entity.setActionScript(cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3));
-        entity.setResponseResult(cursor.isNull(offset + 4) ? null : cursor.getShort(offset + 4) != 0);
      }
     
     @Override

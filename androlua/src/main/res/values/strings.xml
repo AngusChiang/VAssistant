@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">AndroLua</string>
+    <string name="l"><![CDATA[<]]></string>
+    <string name="r"><![CDATA[>]]></string>
+</resources>

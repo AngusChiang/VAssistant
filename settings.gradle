@@ -1,1 +1,1 @@
-include ':app', ':vtp', ':parseengine', ':executorengine', ':appbus', ':datamanager'
+include ':app', ':parseengine', ':executorengine', ':appbus', ':datamanager', ':androlua'
