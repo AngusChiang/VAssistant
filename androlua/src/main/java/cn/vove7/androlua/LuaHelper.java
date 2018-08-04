@@ -21,6 +21,7 @@ import java.util.regex.Pattern;
 import cn.vove7.androlua.luautils.LuaDexLoader;
 import cn.vove7.androlua.luautils.LuaManagerI;
 import cn.vove7.androlua.luautils.LuaPrinter;
+import cn.vove7.vtp.log.Vog;
 import dalvik.system.DexClassLoader;
 
 import static cn.vove7.androlua.luabridge.LuaUtil.errorReason;
@@ -37,7 +38,7 @@ public class LuaHelper implements LuaManagerI {
     private String libDir;
     private String jniLibsPath;
     private String luaDir;
-    private ArrayList<LuaGcable> gcList;
+    private final ArrayList<LuaGcable> gcList= new ArrayList<>();;
     private String luaRequireSearchPath;
     private LuaDexLoader mLuaDexLoader;
     private BridgeManager bridgeManager;
@@ -57,7 +58,7 @@ public class LuaHelper implements LuaManagerI {
     }
 
     private void init() {
-        gcList = new ArrayList<>();
+        gcList.clear();
         mLuaDexLoader = new LuaDexLoader(context);
         try {
             mLuaDexLoader.loadLibs();
@@ -69,7 +70,7 @@ public class LuaHelper implements LuaManagerI {
 
     private void initPath() {
         luaDir = context.getFilesDir().getAbsolutePath();
-        Log.d("Vove :", "initLua luaDir ----> " + luaDir);
+        Vog.d(this, "initLua luaDir ----> " + luaDir);
         libDir = context.getDir("lib", Context.MODE_PRIVATE).getAbsolutePath();
         jniLibsPath = context.getApplicationInfo().nativeLibraryDir + "/lib?.so" + ";" + libDir + "/lib?.so;";
 
@@ -81,7 +82,7 @@ public class LuaHelper implements LuaManagerI {
 
     @Override
     public void log(String log) {
-        Log.d("Vove :", "lua log  ----> " + log);
+        Vog.d(this, "lua log  ----> " + log);
     }
 
     private void initLua() {
@@ -195,7 +196,7 @@ public class LuaHelper implements LuaManagerI {
             evalString(src);
         } catch (LuaException e) {
             e.printStackTrace();
-            Log.d("Vove :", "safeEvalLua  ----> " + e.getMessage());
+            Vog.d(this, "safeEvalLua  ----> " + e.getMessage());
         }
     }
 
@@ -234,7 +235,7 @@ public class LuaHelper implements LuaManagerI {
 
 
     public void autoRun(String s, Object... args) throws LuaException {
-        Log.d("Vove :", "autoRun  ----> " + s);
+        Vog.d(this, "autoRun  ----> " + s);
         if (Pattern.matches("^\\w+$", s)) {
             execFromAsset(s + ".lua", args);
         } else if (Pattern.matches("^[\\w._/]+$", s)) {
@@ -295,7 +296,9 @@ public class LuaHelper implements LuaManagerI {
 
     @Override
     public void regGc(LuaGcable obj) {
-        gcList.add(obj);
+        synchronized (gcList) {
+            gcList.add(obj);
+        }
     }
 
 
@@ -322,11 +325,13 @@ public class LuaHelper implements LuaManagerI {
 
     private void gcAll() {
         //清空线程..
-        for (LuaGcable gcable : gcList) {
-            if (gcable != null)
-                gcable.gc();
+        synchronized (gcList) {
+            for (LuaGcable gcable : gcList) {
+                if (gcable != null)
+                    gcable.gc();
+            }
+            gcList.clear();
         }
-        gcList.clear();
     }
 
     @Override
