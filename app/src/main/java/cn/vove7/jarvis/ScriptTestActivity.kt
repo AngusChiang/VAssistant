@@ -3,17 +3,14 @@ package cn.vove7.jarvis
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.view.View
-import cn.vove7.jarvis.services.MyAccessibilityService
 import cn.vove7.appbus.AppBus
 import cn.vove7.datamanager.parse.model.Action
-import cn.vove7.executorengine.GetAccessibilityBridge
-import cn.vove7.executorengine.bridges.AccessibilityApi
 import cn.vove7.parseengine.engine.ParseEngine
 import cn.vove7.vtp.asset.AssetHelper
 import cn.vove7.vtp.toast.Voast
 import kotlinx.android.synthetic.main.activity_script_test.*
 
-class ScriptTestActivity : AppCompatActivity(), GetAccessibilityBridge {
+class ScriptTestActivity : AppCompatActivity() {
 
     private val files = arrayOf(
             "s/alipay_ss.txt"
@@ -30,10 +27,6 @@ class ScriptTestActivity : AppCompatActivity(), GetAccessibilityBridge {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_script_test)
         script_text.setText(AssetHelper.getStrFromAsset(this, files[now]))
-    }
-
-    override fun getBridge(): AccessibilityApi? {
-        return MyAccessibilityService.accessibilityService
     }
 
     fun last(view: View) {
@@ -68,6 +61,6 @@ class ScriptTestActivity : AppCompatActivity(), GetAccessibilityBridge {
     }
 
     fun stopScript(view: View) {
-        AppBus.post("stop exec")
+        AppBus.post("stop execQueue")
     }
 }

@@ -1,15 +1,9 @@
 package cn.vove7.androlua
 
 import android.app.Application
-import android.content.Context
-import android.util.Log
-import android.widget.Toast
 import cn.vove7.androlua.luabridge.LuaUtil
-import cn.vove7.androlua.luautils.LuaContext
-import com.luajava.LuaState
 import java.io.File
 import java.io.IOException
-import java.util.*
 
 
 /**
@@ -18,22 +12,14 @@ import java.util.*
  *
  * Created by Vove on 2018/7/31
  */
-open class LuaApp : Application(), LuaContext {
+open class LuaApp : Application() {
 
     private var luaDir: String? = null
-    lateinit var luaHelper: LuaHelper
-
-    override fun getLuaState(): LuaState {
-        return luaHelper.L
-    }
-
-    override fun getWidth(): Int {
-        return resources.displayMetrics.widthPixels
-    }
-
-    override fun getHeight(): Int {
-        return resources.displayMetrics.heightPixels
-    }
+//    lateinit var luaHelper: LuaHelper
+//
+//    override fun getLuaState(): LuaState {
+//        return luaHelper.L
+//    }
 
     override fun onCreate() {
         super.onCreate()
@@ -43,7 +29,7 @@ open class LuaApp : Application(), LuaContext {
         //crashHandler.init(getApplicationContext());
 
         luaDir = filesDir.absolutePath
-        luaHelper = LuaHelper(this)
+//        luaHelper = LuaHelper(this)
 
         RemoteDebugServer(this).start()
 
@@ -51,7 +37,8 @@ open class LuaApp : Application(), LuaContext {
     }
 
     private fun initAsset() {
-        arrayOf("import.lua","bridges.lua").forEach {
+        assets.list("").forEach {
+            if (assets.list(it).isNotEmpty()) return@forEach
             val fp = filesDir.absolutePath + '/' + it
             if (!File(fp).exists()) {
                 try {
@@ -63,39 +50,11 @@ open class LuaApp : Application(), LuaContext {
         }
     }
 
-    override fun call(name: String, args: Array<Any>) {}
-
-    override fun set(name: String, `object`: Any) {
-        data[name] = `object`
-    }
-
-
-    override fun getGlobalData(): Map<*, *> {
-        return data
-    }
-
-    override fun get(name: String): Any? {
-        return data[name]
-    }
-
-    override fun getContext(): Context {
-        return this
-    }
-
-    override fun sendMsg(msg: String) {
-        Log.i("Vove :", "sendMsg  ----> $msg")
-        Toast.makeText(this, msg, Toast.LENGTH_SHORT).show()
-    }
-
-    override fun sendError(title: String, msg: Exception) {
-
-    }
 
     companion object {
 
-        var instance: LuaApp? = null
+        lateinit var instance: LuaApp
             private set
-        private val data = HashMap<String, Any>()
     }
 
 

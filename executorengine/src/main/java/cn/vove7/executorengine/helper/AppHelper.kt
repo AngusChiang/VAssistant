@@ -1,7 +1,7 @@
 package cn.vove7.executorengine.helper
 
 import android.content.Context
-import cn.vove7.executorengine.model.MatchedData
+import cn.vove7.common.model.MatchedData
 import cn.vove7.vtp.app.AppInfo
 import cn.vove7.vtp.app.AppHelper
 import cn.vove7.vtp.log.Vog

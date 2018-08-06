@@ -1,38 +1,43 @@
 package cn.vove7.executorengine
 
 import android.content.Context
-import android.os.Build
 import android.os.Handler
 import android.os.Looper
 import cn.vove7.appbus.AppBus
+import cn.vove7.common.accessibility.AccessibilityApi
+import cn.vove7.common.bridges.*
+import cn.vove7.common.bridges.ShowDialogEvent.Companion.WHICH_SINGLE
+import cn.vove7.common.executor.CExecutorI
+import cn.vove7.common.executor.PartialResult
+import cn.vove7.common.model.RequestPermission
+import cn.vove7.common.view.finder.ViewFindBuilder
 import cn.vove7.datamanager.DAO
 import cn.vove7.datamanager.executor.entity.MarkedContact
 import cn.vove7.datamanager.executor.entity.MarkedOpen
 import cn.vove7.datamanager.executor.entity.MarkedOpen.*
 import cn.vove7.datamanager.greendao.MarkedOpenDao
 import cn.vove7.datamanager.parse.model.Action
-import cn.vove7.executorengine.bridges.*
-import cn.vove7.executorengine.bridges.ShowDialogEvent.Companion.WHICH_SINGLE
-import cn.vove7.executorengine.model.PartialResult
+import cn.vove7.executorengine.bridges.SystemBridge
 import cn.vove7.executorengine.helper.ContactHelper
+import cn.vove7.executorengine.v1.OnExecutorResult
+import cn.vove7.executorengine.v1.SimpleActionScriptExecutor
 import cn.vove7.parseengine.engine.ParseEngine
 import cn.vove7.vtp.contact.ContactInfo
 import cn.vove7.vtp.log.Vog
-import java.lang.Thread.sleep
 import java.util.*
 import kotlin.concurrent.thread
 
 /**
  *
- *
+ * 基础执行器
  * Created by Vove on 2018/6/20
  */
 abstract class AbsExecutorImpl(
         val context: Context,
-        val getAccessibilityBridge: GetAccessibilityBridge,
-        private val systemBridge: SystemBridge,
-        private val serviceBridge: ServiceBridge
-) : Executor {
+        val systemBridge: SystemBridge,
+        val serviceBridge: ServiceBridge,
+        val onExecutorResult: OnExecutorResult
+) : CExecutorI {
     var accessApi: AccessibilityApi? = null
     var lock = Object()
     var currentAction: Action? = null
@@ -41,12 +46,36 @@ abstract class AbsExecutorImpl(
     val globalAutomator = GlobalActionAutomator(Handler(Looper.myLooper()))
 
     lateinit var actionQueue: PriorityQueue<Action>
+
+
+    private var thread: Thread? = null
+    override fun execQueue(actionQueue: PriorityQueue<Action>) {
+        this.actionQueue = actionQueue
+        if (thread != null && thread!!.isAlive) {
+            thread!!.interrupt()
+        }
+        lock = Object()
+        thread = thread(start = true, isDaemon = true, priority = Thread.MAX_PRIORITY) {
+            pollActionQueue()
+            currentAction = null
+            onExecutorResult.onExecutorSuccess("执行完毕 ")
+        }
+    }
+
+    override fun stop() {
+        if (thread != null) {
+            thread!!.interrupt()
+        }
+    }
+
+    /**********Function*********/
+
     /**
      * 打开: 应用 -> 其他额外
      */
-    fun openSomething(data: String): PartialResult {
+    override fun openSomething(data: String): PartialResult {
         val pkg = systemBridge.openAppByWord(data)
-         if (pkg != null) {//打开App 解析跟随操作
+        if (pkg != null) {//打开App 解析跟随操作
             actionQueue = ParseEngine.matchAppAction(data, pkg)
             if (actionQueue.isNotEmpty()) Vog.d(this, "openSomething app内操作")
             else {
@@ -59,7 +88,7 @@ abstract class AbsExecutorImpl(
                 //等待App打开
                 val waitR = waitForApp(pkg)
                 if (!waitR.isSuccess) return waitR
-                runnable()
+                pollActionQueue()
                 PartialResult(true)
                 //解析App内操作
             } else
@@ -97,7 +126,7 @@ abstract class AbsExecutorImpl(
             MARKED_TYPE_SYS_FUN -> {
                 when (it.value) {
                     "openFlash" -> {//手电
-                        systemBridge.openFlashlight()
+                        PartialResult(systemBridge.openFlashlight())
                     }
                     else -> {
                         PartialResult(false)
@@ -114,13 +143,15 @@ abstract class AbsExecutorImpl(
         }
     }
 
-    /**
-     * 线程同步通知
-     */
+
+    override fun notifyShow() {
+        notifySync()
+//        accessApi?.removeAllNotifier(this)
+    }
+
     override fun notifySync() {
         synchronized(lock) {
             lock.notify()
-            accessApi?.removeAllNotifier(this)
         }
     }
 
@@ -140,11 +171,12 @@ abstract class AbsExecutorImpl(
         notifySync()
     }
 
+
     /**
      * 锁定线程
      * @return 解锁是否成功
      */
-    override fun waitFor(millis: Long): Boolean {
+    override fun waitForUnlock(millis: Long): Boolean {
         synchronized(lock) {
             Vog.d(this, "进入等待")
             //等待结果
@@ -160,48 +192,49 @@ abstract class AbsExecutorImpl(
         }
     }
 
-
     /**
      * 等待指定App出现，解锁
      */
     override fun waitForApp(pkg: String, activityName: String?): PartialResult {
         Vog.d(this, "waitForApp $pkg $activityName")
-        accessApi?.waitForActivity(this, pkg, activityName)
-        return if (waitFor())
-            PartialResult(true)
-        else PartialResult(false, true)
-    }
+        if (!checkAccessibilityService().isSuccess)
+            return PartialResult(false, true, SimpleActionScriptExecutor.ACCESSIBILITY_DONT_OPEN)
 
-    override fun waitForAppViewId(pkg: String, id: String): PartialResult {
-        Vog.d(this, "waitForAppViewId $id")
-        accessApi?.waitForAppViewId(this, pkg, id)
-        return if (waitFor())
+        accessApi?.waitForActivity(this, pkg, activityName)
+        return if (waitForUnlock())
             PartialResult(true)
-        else PartialResult(false, true)
+        else PartialResult(false, true, "被迫强行停止")
     }
 
     override fun waitForViewId(id: String): PartialResult {
         Vog.d(this, "waitForViewId $id")
-        accessApi?.waitForViewId(this, id)
-        return if (waitFor())
+        if (!checkAccessibilityService().isSuccess)
+            return PartialResult(false, true, SimpleActionScriptExecutor.ACCESSIBILITY_DONT_OPEN)
+
+
+        accessApi?.waitForView(this, ViewFindBuilder(this).id(id).viewFinderX)
+        return if (waitForUnlock())
             PartialResult(true)
-        else PartialResult(false, true)
+        else PartialResult(false, true, "被迫强行停止")
     }
 
-    override fun waitForViewDesc(desc: String): PartialResult {
-        Vog.d(this, "waitForViewDesc $desc")
-        accessApi?.waitForViewDesc(this, desc)
-        return if (waitFor())
+    override fun waitForDesc(desc: String): PartialResult {
+        Vog.d(this, "waitForDesc $desc")
+
+        accessApi?.waitForView(this, ViewFindBuilder(this).desc(desc).viewFinderX)
+        return if (waitForUnlock())
             PartialResult(true)
-        else PartialResult(false, true)
+        else PartialResult(false, true, "被迫强行停止")
     }
 
-    override fun waitForViewText(text: String): PartialResult {
-        Vog.d(this, "waitForViewText $text")
-        accessApi?.waitForViewText(this, text)
-        return if (waitFor())
+    override fun waitForText(text: String): PartialResult {
+        Vog.d(this, "waitForText $text")
+        if (!checkAccessibilityService().isSuccess)
+            return PartialResult(false, true, SimpleActionScriptExecutor.ACCESSIBILITY_DONT_OPEN)
+        accessApi?.waitForView(this, ViewFindBuilder(this).containsText(text).viewFinderX)
+        return if (waitForUnlock())
             PartialResult(true)
-        else PartialResult(false, true)
+        else PartialResult(false, true, "被迫强行停止")
     }
 
     /**
@@ -209,13 +242,13 @@ abstract class AbsExecutorImpl(
      */
     override fun waitForVoiceParam(action: Action): PartialResult {
         serviceBridge.getVoiceParam(action)
-        return if (waitFor())
+        return if (waitForUnlock())
         //得到结果 -> action.param
             if (!action.responseResult) {
-                PartialResult(false, true, msg = "获取语音参数失败")
+                PartialResult(false, true, "获取语音参数失败")
             } else
-                PartialResult(true, msg = "等到参数重新执行")//重复执行
-        else PartialResult(false, true)
+                PartialResult(true, "等到参数重新执行")//重复执行
+        else PartialResult(false, true, "被迫强行停止")
     }
 
     /**
@@ -225,7 +258,7 @@ abstract class AbsExecutorImpl(
     private fun waitForSingleChoice(askTitle: String, choiceData: List<ChoiceData>): Boolean {
         //通知显示单选框
         AppBus.post(ShowDialogEvent(WHICH_SINGLE, currentAction!!, askTitle, choiceData))
-        return if (waitFor())
+        return if (waitForUnlock())
             if (currentAction!!.responseResult) {
                 Vog.d(this, "结果： have data")
                 true
@@ -241,11 +274,11 @@ abstract class AbsExecutorImpl(
      * @param msg 提示信息
      */
     override fun waitForAlertResult(msg: String): PartialResult {
-        AppBus.post(ShowAlertEvent(msg, currentAction!!))
-        return if (waitFor()) {
+        AppBus.post(ShowAlertEvent("确认以继续",msg, currentAction !!))
+        return if (waitForUnlock()) {
             val r = currentAction!!.responseResult
             PartialResult(r, !r, "$msg -> $r")
-        } else PartialResult(false, true)
+        } else PartialResult(false, true, "被迫强行停止")
     }
 
     /**
@@ -265,79 +298,11 @@ abstract class AbsExecutorImpl(
 
 
     /**
-     * 操作View
-     * @param v (id,desc,)
-     * @param by `BY_ID BY_TEXT BY_DESC BY_ID_AND_TEXT`
-     * @param op OPERATION__
-     * @param ep 额外参数 such as [ViewNode.setText()]
-     * @param stopIfFail 失败是否终止
-     */
-    //TODO : SDK版本
-    fun operateViewOperation(v: String, by: Int, op: Int, v1: String = "",
-                             ep: String? = null, stopIfFail: Boolean = true): PartialResult {
-        val node = when (by) {
-            BY_ID -> accessApi?.findFirstNodeById(v)
-            BY_TEXT -> accessApi?.findFirstNodeByTextWhitFuzzy(v)
-            BY_DESC -> accessApi?.findFirstNodeByDesc(v)
-            BY_ID_AND_TEXT -> accessApi?.findFirstNodeByIdAndText(v, v1)//id/text
-
-            else -> null
-        }
-        return if (node != null) {
-            if (when (op) {
-                        OPERATION_CLICK -> node.tryClick()
-                        OPERATION_LONG_CLICK -> node.tryLongClick()
-                        OPERATION_SET_TEXT -> node.setText(v1, ep)
-                        OPERATION_FOCUS -> node.focus()
-                        OPERATION_DOUBLE_CLICK -> node.doubleClick()
-                        OPERATION_SCROLL_UP -> {
-                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                                node.scrollUp()
-                            } else {
-                                Vog.d(this, "operateViewOperation 版本M")
-                                false
-                            }
-                        }
-                        OPERATION_SCROLL_DOWN -> {
-                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                                node.scrollDown()
-                            } else {
-                                Vog.d(this, "operateViewOperation 版本M")
-                                false
-                            }
-                        }
-                        else -> false
-                    }) {
-                sleep(100)
-                PartialResult(true)
-
-            } else PartialResult(false, stopIfFail, "操作失败 - $op")
-        } else PartialResult(false, stopIfFail, "未找到View: $v")
-    }
-
-    /**
-     * @param op 滚动方向 [OPERATION_SCROLL_UP] / [OPERATION_SCROLL_DOWN]
-     */
-    fun scroll(op: Int): PartialResult {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            return if (when (op) {
-                        OPERATION_SCROLL_DOWN -> globalAutomator.scrollDown()
-                        OPERATION_SCROLL_UP -> globalAutomator.scrollUp()
-                        else -> false
-                    }
-            ) PartialResult(true)
-            else PartialResult(false, true, "Scroll失败")
-        } else {
-            return PartialResult(false, true, "需版本M")
-        }
-    }
-
-    /**
      * 拨打
      */
-    fun callPhone(s: String): PartialResult {
+    fun smartCallPhone(s: String): PartialResult {
         val result = systemBridge.call(s)
-        return if (!result.isSuccess) {
+        return if (result == null) {
             //标识联系人
             if (waitForSingleChoice("选择要标识的联系人", contactHelper.getChoiceData())) {
                 val bundle = currentAction!!.responseBundle
@@ -351,11 +316,12 @@ abstract class AbsExecutorImpl(
                     marked.phone = choiceData.subtitle
                     contactHelper.addMark(marked)//保存
                 }
-                systemBridge.call(choiceData.subtitle!!)
+                val s = systemBridge.call(choiceData.subtitle!!)
+                PartialResult(s == null, s ?: "")
             } else {
-                PartialResult(false, true, msg = "取消")
+                PartialResult(false, true, "取消")
             }
-        } else result
+        } else PartialResult(true)
     }
 
     companion object {
@@ -364,38 +330,54 @@ abstract class AbsExecutorImpl(
          */
         fun checkParam(p: String?): Boolean = (p != null && p.trim() != "")
 
-        const val BY_ID = 986
-        const val BY_TEXT = 345
-        const val BY_DESC = 227
-        const val BY_ID_AND_TEXT = 500
-        const val OPERATION_CLICK = 0
-        const val OPERATION_LONG_CLICK = 1
-        const val OPERATION_DOUBLE_CLICK = 110
-        const val OPERATION_SET_TEXT = 2
-        const val OPERATION_SCROLL_UP = 3
-        const val OPERATION_SCROLL_DOWN = 4
-        const val OPERATION_FOCUS = 5
-        const val OPERATION_SCROLL_LEFT = 6
-        const val OPERATION_SCROLL_RIGHT = 7
-
     }
-    abstract fun runnable()
-}
 
-interface Executor {
-    fun exec(actionQueue: PriorityQueue<Action>)
-    fun stop()
-    fun runScript(script: String): PartialResult
-    fun checkAccessibilityService(jump: Boolean = true): PartialResult
+    override fun sleep(millis: Long) {
+        try {
+            Thread.sleep(millis)
+        } catch (e: InterruptedException) {
 
-    fun waitForVoiceParam(action: Action): PartialResult
-    fun waitForAlertResult(msg: String): PartialResult
-    fun waitForApp(pkg: String, activityName: String? = null): PartialResult
-    fun waitForAppViewId(pkg: String, id: String): PartialResult
-    fun waitForViewId(id: String): PartialResult
-    fun waitForViewDesc(desc: String): PartialResult
-    fun waitForViewText(text: String): PartialResult
-    fun notifySync()
-    fun onGetVoiceParam(param: String?)
-    fun waitFor(millis: Long = -1): Boolean
+        }
+    }
+
+    /**
+     * 执行队列
+     */
+    private fun pollActionQueue() {
+        var r: PartialResult
+        while (actionQueue.isNotEmpty()) {
+            currentAction = actionQueue.poll()
+            r = runScript(currentAction!!.actionScript, currentAction!!.param.value)
+            when {
+                r.needTerminal -> {//出错
+                    currentAction = null
+                    onExecutorResult.onExecutorFailed(r.msg)
+                    return
+                }
+            }
+        }
+    }
+
+    override fun checkAccessibilityService(jump: Boolean): PartialResult {
+        return if (!bridgeIsAvailable()) {
+            if (jump)
+                AppBus.post(RequestPermission("无障碍服务"))
+            PartialResult(false, true, SimpleActionScriptExecutor.ACCESSIBILITY_DONT_OPEN)
+        } else PartialResult(true)
+    }
+
+    /**
+     * 检查无障碍服务
+     */
+    private fun bridgeIsAvailable(): Boolean {
+        if (accessApi == null) {
+            accessApi = AccessibilityApi.accessibilityService
+            return if (accessApi != null) {
+                globalAutomator.setService(accessApi!!.getService())
+
+                true
+            } else false
+        }
+        return true
+    }
 }

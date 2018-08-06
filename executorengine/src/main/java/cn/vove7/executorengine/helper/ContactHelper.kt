@@ -5,9 +5,9 @@ import cn.vove7.datamanager.DAO
 import cn.vove7.datamanager.executor.entity.MarkedContact
 import cn.vove7.datamanager.greendao.MarkedContactDao
 import cn.vove7.datamanager.greendao.ServerContactDao
-import cn.vove7.executorengine.bridges.ChoiceData
-import cn.vove7.executorengine.bridges.GenChoiceData
-import cn.vove7.executorengine.model.MatchedData
+import cn.vove7.common.bridges.ChoiceData
+import cn.vove7.common.bridges.GenChoiceData
+import cn.vove7.common.model.MatchedData
 import cn.vove7.vtp.contact.ContactHelper
 import cn.vove7.vtp.contact.ContactInfo
 import cn.vove7.vtp.log.Vog

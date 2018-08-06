@@ -515,7 +515,6 @@ public class LuaObject {
     }
 
     public Map asMap(LuaState L, Class<?> clazz, int idx) throws LuaException {
-        // TODO: Implement this method
         synchronized (L) {
             if (!isTable())
                 throw new LuaException("Invalid object. Not a table .");

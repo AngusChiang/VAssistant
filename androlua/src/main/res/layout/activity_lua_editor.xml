@@ -15,6 +15,11 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="stop" />
+    <EditText
+        android:id="@+id/lua_lalala"
+        android:layout_width="match_parent"
+        android:text="hello"
+        android:layout_height="wrap_content" />
 
     <cn.vove7.androlua.luautils.LuaEditor
         android:id="@+id/source"
@@ -49,8 +54,10 @@
         android:id="@+id/statusText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:maxLines="5"
+        android:maxLines="10"
+        android:minLines="4"
         android:scrollbars="vertical"
+        android:focusable="true"
         android:text="TextView"
         android:textColor="@android:color/secondary_text_dark_nodisable" />
 </LinearLayout>

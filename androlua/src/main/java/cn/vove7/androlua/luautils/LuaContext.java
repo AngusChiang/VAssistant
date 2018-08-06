@@ -25,6 +25,6 @@ public interface LuaContext {
 
     public Map getGlobalData();
 
-    LuaState getLuaState();
+    //LuaState getLuaState();
 
 }

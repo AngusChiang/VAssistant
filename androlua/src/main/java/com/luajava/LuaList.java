@@ -28,7 +28,6 @@ public class LuaList extends LuaObject implements List {
 
     @Override
     public boolean isEmpty() {
-        // TODO: Implement this method
         push();
         int len = L.rawLen(-1);
         L.pop(1);
@@ -37,13 +36,11 @@ public class LuaList extends LuaObject implements List {
 
     @Override
     public boolean remove(Object p1) {
-        // TODO: Implement this method
         return false;
     }
 
     @Override
     public int size() {
-        // TODO: Implement this method
         push();
         int len = L.rawLen(-1);
         L.pop(1);
@@ -52,12 +49,10 @@ public class LuaList extends LuaObject implements List {
 
     @Override
     public void add(int p1, Object p2) {
-        // TODO: Implement this method
     }
 
     @Override
     public boolean add(Object p1) {
-        // TODO: Implement this method
         push();
         int len = L.rawLen(-1);
         try {
@@ -73,25 +68,21 @@ public class LuaList extends LuaObject implements List {
 
     @Override
     public boolean addAll(int p1, Collection p2) {
-        // TODO: Implement this method
         return false;
     }
 
     @Override
     public boolean addAll(Collection p1) {
-        // TODO: Implement this method
         return false;
     }
 
     @Override
     public boolean contains(Object p1) {
-        // TODO: Implement this method
         return false;
     }
 
     @Override
     public boolean containsAll(Collection p1) {
-        // TODO: Implement this method
         return false;
     }
 

@@ -3,7 +3,7 @@ package cn.vove7.executorengine.bridges
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
-import cn.vove7.executorengine.model.PartialResult
+import cn.vove7.common.SystemOperation
 import cn.vove7.executorengine.helper.AppHelper
 import cn.vove7.executorengine.helper.ContactHelper
 import cn.vove7.vtp.hardware.HardwareHelper
@@ -18,7 +18,7 @@ class SystemBridge(private val context: Context) : SystemOperation {
             val launchIntent = context.packageManager
                     .getLaunchIntentForPackage(pkg)
             if (launchIntent == null) {
-                Vog.e(this,"openAppByPkg 启动失败(未找到此App[pkg:]):$pkg")
+                Vog.e(this, "openAppByPkg 启动失败(未找到此App: $pkg")
 //                Bus.postInfo(MessageEvent("启动失败(未找到此App[pkg:]):$pkg ", WHAT_ERR))
                 false
             } else {
@@ -36,24 +36,25 @@ class SystemBridge(private val context: Context) : SystemOperation {
 
     /**
      * openAppByWord
-     * @return packageName is success
+     * @return packageName if success
      */
-    override fun openAppByWord(appWord: String): String? {//TODO : appWord或跟随指令
+    override fun openAppByWord(appWord: String): String? {
         val list = AppHelper(context).matchAppName(appWord)
-        if (list.isNotEmpty()) {
+        return if (list.isNotEmpty()) {
             val info = list[0].data
             Vog.i(this, "打开应用：$appWord -> ${info.name}")
 
-            //TODO  检查是偶开启首页Activity
-            if(openAppByPkg(info.packageName)) return info.packageName
-            else null
+            if (openAppByPkg(info.packageName))
+                info.packageName
+            else
+                null
         }
 //        Bus.postInfo(MessageEvent("未找到应用:$appWord", WHAT_ERR))
-        return null
+        else null
     }
 
 
-    //TODO : Open App 启动对应首页Activity
+    // Open App 启动对应首页Activity
     fun startActivity(pkg: String, fullActivityName: String): Boolean {
         return try {
             val launchIntent = Intent()
@@ -69,43 +70,28 @@ class SystemBridge(private val context: Context) : SystemOperation {
 
     /**
      * 打电话
-     * 优先级：标记 -> 通讯录 -> 官方提供
+     * 优先级：标记 -> 通讯录 -> 服务提供
      */
-    override fun call(s: String): PartialResult {
+    override fun call(s: String): String? {
         val ph = contactHelper.matchPhone(context, s)
-                ?: return PartialResult(false, true, "未找到该联系人$s")
-        val callIntent = Intent(Intent.ACTION_CALL, Uri.parse("tel://$ph"))
+            ?: return "未找到该联系人$s"
+        val callIntent = Intent(Intent.ACTION_CALL, Uri.parse("tel:$ph"))
         return try {
             context.startActivity(callIntent)
-            PartialResult(true)
+            null
         } catch (e: SecurityException) {
-            PartialResult(false, msg = "无电话权限")
+            "无电话权限"
+        } catch (e: Exception) {
+            e.message ?: "ERROR: when call"
         }
     }
 
     /**
      * 手电
      */
-    fun openFlashlight(): PartialResult {
+    override fun openFlashlight(): Boolean {
         HardwareHelper.switchFlashlight(context, true)
-        return PartialResult(true)
+        return true
     }
 
-}
-
-internal interface SystemOperation {
-    /**
-     * 通过包名打开App
-     */
-    fun openAppByPkg(pkg: String): Boolean
-
-    /**
-     * 通过通过关键字匹配
-     */
-    fun openAppByWord(appWord: String): String?
-
-    /**
-     * 拨打
-     */
-    fun call(s: String): PartialResult
 }

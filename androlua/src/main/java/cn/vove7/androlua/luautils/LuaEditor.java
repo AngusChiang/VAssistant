@@ -30,6 +30,8 @@ import com.myopicmobile.textwarrior.common.ReadTask;
 
 import java.io.File;
 
+import cn.vove7.vtp.toast.Voast;
+
 public class LuaEditor extends FreeScrollingTextField {
 
     private Document _inputingDoc;
@@ -48,7 +50,6 @@ public class LuaEditor extends FreeScrollingTextField {
     private String mKeyword;
 
     private void initFont() {
-
         File df = new File(fontDir + "default.ttf");
         if (df.exists())
             setTypeface(Typeface.createFromFile(df));

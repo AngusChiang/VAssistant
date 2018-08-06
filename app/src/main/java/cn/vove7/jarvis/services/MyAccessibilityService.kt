@@ -1,25 +1,25 @@
 package cn.vove7.jarvis.services
 
+import android.accessibilityservice.AccessibilityService
 import android.content.Context
 import android.content.pm.PackageManager
 import android.graphics.Rect
-import android.util.Log
 import android.view.KeyEvent
 import android.view.ViewGroup
 import android.view.accessibility.AccessibilityEvent
 import android.view.accessibility.AccessibilityEvent.*
 import android.view.accessibility.AccessibilityNodeInfo
 import android.widget.Toast
+import cn.vove7.common.ShowListener
+import cn.vove7.common.accessibility.AccessibilityApi
+import cn.vove7.common.view.finder.ViewFinder
+import cn.vove7.common.view.finder.ViewShowListener
+import cn.vove7.common.viewnode.ViewNode
 import cn.vove7.datamanager.parse.model.ActionScope
-import cn.vove7.executorengine.Executor
-import cn.vove7.executorengine.bridges.AccessibilityApi
-import cn.vove7.executorengine.model.ViewNode
-import cn.vove7.jarvis.view.finder.ViewFinder
-import cn.vove7.jarvis.view.finder.ViewFinderByDesc
-import cn.vove7.jarvis.view.finder.ViewFinderById
-import cn.vove7.jarvis.view.finder.ViewFinderByText
-import cn.vove7.jarvis.view.notifier.ViewShowNotifier
-import cn.vove7.vtp.app.AppInfo
+import cn.vove7.common.view.finder.ViewFinderByDesc
+import cn.vove7.common.view.finder.ViewFinderById
+import cn.vove7.common.view.finder.ViewFinderByText
+import cn.vove7.jarvis.view.finder.ViewShowNotifier
 import cn.vove7.vtp.app.AppHelper
 import cn.vove7.vtp.log.Vog
 import cn.vove7.vtp.text.TextHelper
@@ -27,23 +27,21 @@ import java.lang.Thread.sleep
 import kotlin.concurrent.thread
 
 /**
+ * 基于
  * Created by Vove on 2018/1/13.
  * cn.vove7
  */
 
 class MyAccessibilityService : AccessibilityApi() {
-    private var currentActivity: String = ""
-
-    private var currentAppInfo: AppInfo? = null
     private lateinit var pkgman: PackageManager
 
     override fun onServiceConnected() {
+        accessibilityService = this
         pkgman = packageManager
         updateCurrentApp(packageName)
         Toast.makeText(this, "无障碍服务开启", Toast.LENGTH_SHORT).show()
         Vog.d("Vove :", "无障碍服务开启")
         //代码配置
-        accessibilityService = this
 
     }
 
@@ -56,14 +54,14 @@ class MyAccessibilityService : AccessibilityApi() {
 
     /**
      * # 等待Activity表
-     * - [Executor] 执行器
+     * - [CExecutorI] 执行器
      * - pair.first pkg
      * - pair.second activity
      */
-    private val locksWaitForActivity = mutableMapOf<Executor, Pair<String, String>>()
+    private val locksWaitForActivity = mutableMapOf<ViewShowListener, Pair<String, String>>()
 
-    override fun waitForActivity(executor: Executor, pkg: String, activityName: String?) {
-        locksWaitForActivity[executor] = Pair(pkg, "$activityName")
+    override fun waitForActivity(finderNotify: ViewShowListener, pkg: String, activityName: String?) {
+        locksWaitForActivity[finderNotify] = Pair(pkg, "$activityName")
         thread {
             sleep(200)
             activityNotifier.notifyIfShow()
@@ -71,72 +69,39 @@ class MyAccessibilityService : AccessibilityApi() {
     }
 
     /**
-     * id,desc,appPkg 共用
-     */
-    private val locksWaitForView = mutableMapOf<Executor, Pair<String, String>>()
-
-    /**
+     *
      * 等待界面出现指定ViewId
      * viewId 特殊标记
      */
-    override fun waitForAppViewId(executor: Executor, pkg: String, viewId: String) {
-        locksWaitForView[executor] = Pair(pkg, viewId)
-        thread {
-            sleep(200)
-            appAndIdNotifier.notifyIfShow()
-        }
-    }
+    private val locksWaitForView = mutableMapOf<ViewShowListener, ViewFinder>()
 
     /**
-     * 等待出现指定ViewId
-     * 特殊标记
+     * notify when view show
      */
-    override fun waitForViewId(executor: Executor, viewId: String) {
-        locksWaitForView[executor] = Pair("", viewId)
+    private val viewNotifier = ViewShowNotifier(locksWaitForView)
+
+    override fun waitForView(finderNotify: ViewShowListener, finder: ViewFinder) {
+        locksWaitForView[finderNotify] = finder
         thread {
             sleep(200)
-            viewIdNotifier.notifyIfShow()
+            viewNotifier.notifyShow()
         }
     }
 
-    /**
-     * 等待出现指定View Desc
-     */
-    override fun waitForViewDesc(executor: Executor, desc: String) {
-        locksWaitForView[executor] = Pair("", desc)
-        thread {
-            sleep(200)
-            viewDescNotifier.notifyIfShow()
-        }
-    }
-
-    /**
-     * 等待出现指定View Text
-     */
-    override fun waitForViewText(executor: Executor, text: String) {
-        locksWaitForView[executor] = Pair("", text)
-        thread {
-            sleep(200)
-            viewTextNotifier.notifyIfShow()
-        }
-    }
-
-    override fun removeAllNotifier(executor: Executor) {
+    override fun removeAllNotifier(finderNotify: ViewShowListener) {
         thread {
             synchronized(locksWaitForActivity) {
-                locksWaitForActivity.remove(executor)
+                locksWaitForActivity.remove(finderNotify)
             }
             synchronized(locksWaitForView) {
-                locksWaitForView.remove(executor)
+                locksWaitForView.remove(finderNotify)
             }
         }
     }
 
     private fun callAllNotifier() {
         thread {
-            appAndIdNotifier.notifyIfShow()
-            viewDescNotifier.notifyIfShow()
-            viewIdNotifier.notifyIfShow()
+            viewNotifier.notifyShow()
         }
         thread {
             activityNotifier.notifyIfShow()
@@ -158,10 +123,10 @@ class MyAccessibilityService : AccessibilityApi() {
         val eventType = event.eventType
         //根据事件回调类型进行处理
         when (eventType) {
-        //通知栏发生改变
+            //通知栏发生改变
             AccessibilityEvent.TYPE_NOTIFICATION_STATE_CHANGED -> {
             }
-        //窗口的状态发生改变
+            //窗口的状态发生改变
             AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED -> {//窗口切换
                 startTraverse(rootInActiveWindow)
                 callAllNotifier()
@@ -255,12 +220,12 @@ class MyAccessibilityService : AccessibilityApi() {
     }
 
     override fun onGesture(gestureId: Int): Boolean {
-        Log.d("Vove :", "onGesture  ----> $gestureId")
+        Vog.d(this, "onGesture  ----> $gestureId")
         return super.onGesture(gestureId)
     }
 
     override fun onKeyEvent(event: KeyEvent): Boolean {
-        Log.d("Vove :", "onKeyEvent  ----> " + event.toString())
+        Vog.d(this, "onKeyEvent  ----> " + event.toString())
         return super.onKeyEvent(event)
     }
 
@@ -275,6 +240,7 @@ class MyAccessibilityService : AccessibilityApi() {
         super.onDestroy()
     }
 
+    override fun getService(): AccessibilityService = this
     /**
      * 构建id
      */
@@ -286,13 +252,8 @@ class MyAccessibilityService : AccessibilityApi() {
      */
     override fun findNodeById(id: String): List<ViewNode> {
         val list = ViewFinderById(this, id).findAll()
-
-        val rList = mutableListOf<ViewNode>()
-        list.forEach {
-            rList.add(ViewNode(it))
-        }
-        Vog.d(this, "findNodeById size :${rList.size}")
-        return rList
+        Vog.d(this, "findNodeById size :${list.size}")
+        return list
     }
 
     //TODO :autoFindByText
@@ -331,15 +292,11 @@ class MyAccessibilityService : AccessibilityApi() {
     }
 
     override fun findFirstNodeById(id: String): ViewNode? {
-        val node = ViewFinderById(this, id).findFirst()
-        return if (node != null) ViewNode(node) else null
+        return ViewFinderById(this, id).findFirst()
     }
 
     override fun findFirstNodeByDesc(desc: String): ViewNode? {
-        val node = ViewFinderByDesc(this, desc).findFirst()
-        return if (node != null) {
-            ViewNode(node)
-        } else null
+        return ViewFinderByDesc(this, desc).findFirst()
     }
 
     override fun findFirstNodeByText(text: String): ViewNode? {
@@ -348,11 +305,8 @@ class MyAccessibilityService : AccessibilityApi() {
     }
 
     override fun findFirstNodeByTextWhitFuzzy(text: String): ViewNode? {
-        val node = ViewFinderByText(this,
-                ViewFinderByText.MATCH_TYPE_FUZZY_WITH_PINYIN, text).findFirst()
-        return if (node != null)
-            ViewNode(node)
-        else null
+        return ViewFinderByText(this,
+                ViewFinderByText.MATCH_MODE_FUZZY_WITH_PINYIN, text).findFirst()
     }
 
     override fun findNodeByText(text: String): List<ViewNode> {
@@ -372,63 +326,32 @@ class MyAccessibilityService : AccessibilityApi() {
     /**
      *  Notifier By [currentScope]
      */
-    private val activityNotifier = object : ViewShowNotifier(null, locksWaitForActivity) {
-        override fun filter(data: Pair<String, String>): Boolean {
+    private val activityNotifier = object : ShowListener {
+        fun fill(data: Pair<String, String>): Boolean {
             val s = ActionScope(data.first, data.second)
             Vog.v(this, "filter $currentScope - $s")
             return currentScope == s
         }
 
-        override fun logTag(): String = "ActivityNotifier"
-
-        override fun notifyCondition(data: Pair<String, String>): Boolean = true
-    }
-    /**
-     * Notifier By Desc
-     */
-    private val viewDescNotifier = object : ViewShowNotifier(ViewFinderByDesc(this), locksWaitForView) {
-        override fun logTag(): String = "DescNotifier"
-        override fun buildFinder(data: String): ViewFinder? {
-            (viewFinder as ViewFinderByDesc).desc = data
-            return viewFinder
-        }
-    }
-    /**
-     * Notifier By Text
-     */
-    private val viewTextNotifier = object : ViewShowNotifier(ViewFinderByText(this), locksWaitForView) {
-        override fun logTag(): String = "DescNotifier"
-        override fun buildFinder(data: String): ViewFinder? {
-            (viewFinder as ViewFinderByText).text = data
-            return viewFinder
-        }
-    }
-    private val viewIdNotifier = object : ViewShowNotifier(ViewFinderById(this), locksWaitForView) {
-        override fun logTag(): String = "IdNotifier"
-        override fun buildFinder(data: String): ViewFinder? {
-            (viewFinder as ViewFinderById).viewId = data
-            return viewFinder
-        }
-    }
-    /**
-     * Notifier By App&&ViewId
-     */
-    private val appAndIdNotifier = object : ViewShowNotifier(ViewFinderById(this), locksWaitForView) {
-        override fun filter(data: Pair<String, String>): Boolean {
-            return currentScope.packageName.startsWith(data.first)
-        }
-
-        override fun logTag(): String = "AppAndIdNotifier"
-
-        override fun buildFinder(data: String): ViewFinder? {
-            (viewFinder as ViewFinderById).viewId = data
-            return viewFinder
+        override fun notifyIfShow() {
+            synchronized(locksWaitForActivity) {
+                val removes = mutableListOf<ViewShowListener>()
+                locksWaitForActivity.forEach { it ->
+                    if (fill(it.value)) {
+                        it.key.notifyShow()
+                        removes.add(it.key)
+                    }
+                }
+                removes.forEach {
+                    locksWaitForActivity.remove(it)
+                }
+                removes.clear()
+            }
         }
     }
 
 
     companion object {
-        var accessibilityService: AccessibilityApi? = null
 
         private val absCls = arrayOf("AbsListView", "ViewGroup", "CategoryPairLayout")
         fun inAbs(n: String): Boolean {

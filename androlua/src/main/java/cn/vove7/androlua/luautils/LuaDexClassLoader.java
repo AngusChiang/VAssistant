@@ -20,7 +20,6 @@ public class LuaDexClassLoader extends DexClassLoader {
 
   @Override
   protected Class<?> findClass(String name) throws ClassNotFoundException {
-    // TODO: Implement this method
     Class<?> cls = classCache.get(name);
     if (cls == null) {
       cls = super.findClass(name);

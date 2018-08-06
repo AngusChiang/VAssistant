@@ -6,8 +6,8 @@ import android.os.Build
 import android.support.annotation.CallSuper
 import android.view.WindowManager
 import cn.vove7.appbus.AppBus
-import cn.vove7.executorengine.bridges.ChoiceData
-import cn.vove7.executorengine.model.RequestPermission
+import cn.vove7.common.bridges.ChoiceData
+import cn.vove7.common.model.RequestPermission
 import cn.vove7.vtp.dialog.DialogWithList
 import cn.vove7.vtp.easyadapter.BaseListAdapter
 import cn.vove7.vtp.runtimepermission.PermissionUtils

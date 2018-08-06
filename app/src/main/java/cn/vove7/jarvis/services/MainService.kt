@@ -3,19 +3,29 @@ package cn.vove7.jarvis.services
 import android.app.AlertDialog
 import android.app.Dialog
 import android.app.Service
+import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
-import android.os.*
+import android.os.Binder
+import android.os.IBinder
+import android.os.Message
+import android.util.Log
+import android.widget.Toast
+import cn.vove7.androlua.luautils.LuaContext
 import cn.vove7.appbus.AppBus
 import cn.vove7.appbus.SpeechAction
 import cn.vove7.appbus.VoiceData
+import cn.vove7.common.accessibility.AccessibilityApi
+import cn.vove7.common.bridges.ChoiceData
+import cn.vove7.common.bridges.ServiceBridge
+import cn.vove7.common.bridges.ShowAlertEvent
+import cn.vove7.common.bridges.ShowDialogEvent
+import cn.vove7.common.executor.CExecutorI
+import cn.vove7.common.model.RequestPermission
 import cn.vove7.datamanager.parse.model.Action
-import cn.vove7.executorengine.ActionScriptExecutor
-import cn.vove7.executorengine.AbsExecutorImpl
-import cn.vove7.executorengine.GetAccessibilityBridge
-import cn.vove7.executorengine.OnExecutorResult
-import cn.vove7.executorengine.bridges.*
-import cn.vove7.executorengine.model.RequestPermission
+import cn.vove7.executorengine.bridges.SystemBridge
+import cn.vove7.executorengine.luaexector.LuaExecutor
+import cn.vove7.executorengine.v1.OnExecutorResult
 import cn.vove7.jarvis.PermissionManagerActivity
 import cn.vove7.jarvis.utils.Utils.checkCancel
 import cn.vove7.jarvis.utils.Utils.checkConfirm
@@ -35,9 +45,9 @@ import java.util.*
 /**
  * 主服务
  */
-class MainService : Service(), OnExecutorResult, GetAccessibilityBridge,
-        ServiceBridge, OnSelectListener, OnMultiSelectListener {
-    lateinit var toast: Voast
+class MainService : Service(), OnExecutorResult,
+        ServiceBridge, OnSelectListener, OnMultiSelectListener, LuaContext {
+    private lateinit var toast: Voast
 
     /**
      * 悬浮窗
@@ -51,7 +61,7 @@ class MainService : Service(), OnExecutorResult, GetAccessibilityBridge,
     /**
      * 执行器
      */
-    private lateinit var actionScriptExecutor: AbsExecutorImpl
+    private lateinit var cExecutor: CExecutorI
 
     /**
      * 当前语音使用方式
@@ -61,9 +71,9 @@ class MainService : Service(), OnExecutorResult, GetAccessibilityBridge,
     override fun onCreate() {
         super.onCreate()
         AppBus.reg(this)
-        actionScriptExecutor = ActionScriptExecutor(
-                this, this,
-                cn.vove7.executorengine.bridges.SystemBridge(this),
+        cExecutor = LuaExecutor(
+                this,
+                SystemBridge(this),
                 this,
                 this
         )
@@ -81,7 +91,7 @@ class MainService : Service(), OnExecutorResult, GetAccessibilityBridge,
     @Subscribe(threadMode = ThreadMode.MAIN)
     override fun showAlert(r: ShowAlertEvent) {
         alertDialog = AlertDialog.Builder(this)
-                .setTitle("确认以继续")
+                .setTitle(r.title)
                 .setMessage(r.msg)
                 .setCancelable(false)
                 .setPositiveButton("继续") { _, _ ->
@@ -110,7 +120,7 @@ class MainService : Service(), OnExecutorResult, GetAccessibilityBridge,
     private fun notifyAlertResult() {
         AppBus.post(SpeechAction(SpeechAction.ACTION_STOP))
         voiceMode = MODE_VOICE
-        actionScriptExecutor.notifySync()
+        cExecutor.notifySync()
     }
 
     /**
@@ -151,7 +161,7 @@ class MainService : Service(), OnExecutorResult, GetAccessibilityBridge,
         messengerAction?.responseBundle?.putSerializable("data", data)
         messengerAction?.responseBundle?.putString("msg", msg)
         hideDialog()
-        actionScriptExecutor.notifySync()
+        cExecutor.notifySync()
     }
 
 
@@ -163,7 +173,7 @@ class MainService : Service(), OnExecutorResult, GetAccessibilityBridge,
         Vog.d(this, "多选回调 $data")
 //        messengerAction?.responseBundle?.putSerializable("data", data)
         hideDialog()
-        actionScriptExecutor.notifySync()
+        cExecutor.notifySync()
     }
 
     /**
@@ -195,7 +205,7 @@ class MainService : Service(), OnExecutorResult, GetAccessibilityBridge,
                     }
                     MODE_GET_PARAM -> {
                         toast.showShort("获取参数失败")
-                        actionScriptExecutor.onGetVoiceParam(null)
+                        cExecutor.onGetVoiceParam(null)
                         voiceMode = MODE_VOICE
                     }
                     MODE_ALERT -> {
@@ -215,11 +225,11 @@ class MainService : Service(), OnExecutorResult, GetAccessibilityBridge,
                         AppBus.postVoiceData(VoiceData(WHAT_VOICE_TEMP, voiceData))
                         toast.showShort("开始解析")
                         val parseResult = ParseEngine
-                                .parseGlobalAction(voiceData, getBridge()?.currentScope?.packageName
-                                        ?: "")
+                                .parseGlobalAction(voiceData, AccessibilityApi.accessibilityService?.currentScope?.packageName
+                                    ?: "")
                         if (parseResult.isSuccess) {
                             toast.showShort("解析成功")
-                            actionScriptExecutor.exec(parseResult.actionQueue)
+                            cExecutor.execQueue(parseResult.actionQueue)
                         } else {
                             toast.showShort("解析失败")
                         }
@@ -229,9 +239,9 @@ class MainService : Service(), OnExecutorResult, GetAccessibilityBridge,
                             //询问重新
 //                            return
                             messengerAction?.responseResult = false
-                            actionScriptExecutor.onGetVoiceParam(null)
+                            cExecutor.onGetVoiceParam(null)
                         } else {//通知
-                            actionScriptExecutor.onGetVoiceParam(voiceData)
+                            cExecutor.onGetVoiceParam(voiceData)
                         }
                         voiceMode = MODE_VOICE
                     }
@@ -258,12 +268,13 @@ class MainService : Service(), OnExecutorResult, GetAccessibilityBridge,
      */
     override fun onExecutorSuccess(result: String) {
         Vog.d(this, result)
-        toast.showShort(result)
+//        toast.showShort(result)
     }
 
     override fun onExecutorFailed(errMsg: String) {
-        Vog.d(this, errMsg)
-        toast.showShort(errMsg)
+        Vog.e(this, "onExecutorFailed" + errMsg)
+
+//        toast.showShort(errMsg)
     }
 
     override fun onDestroy() {
@@ -277,16 +288,12 @@ class MainService : Service(), OnExecutorResult, GetAccessibilityBridge,
         }
     }
 
-    override fun getBridge(): AccessibilityApi? {
-        return MyAccessibilityService.accessibilityService
-    }
-
     /**
      * 测试文本
      */
     @Subscribe(threadMode = ThreadMode.POSTING)
     fun runAction(que: PriorityQueue<Action>) {
-        actionScriptExecutor.exec(que)
+        cExecutor.execQueue(que)
     }
 
     /**
@@ -296,19 +303,19 @@ class MainService : Service(), OnExecutorResult, GetAccessibilityBridge,
     fun runScript(ac: Action) {
         val q = PriorityQueue<Action>()
         q.add(ac)
-        actionScriptExecutor.exec(q)
+        cExecutor.execQueue(q)
     }
 
     override fun toast(msg: String, showMillis: Int) {
-        toast.show(msg,showMillis)
+        toast.show(msg, showMillis)
     }
 
     @Subscribe(threadMode = ThreadMode.ASYNC)
     fun stopExecutor(order: String) {
         when (order) {
-            "stop exec" -> {
+            "stop execQueue" -> {
                 AppBus.postSpeechAction(SpeechAction(SpeechAction.ACTION_STOP))
-                actionScriptExecutor.stop()
+                cExecutor.stop()
             }
             else -> {
             }
@@ -346,7 +353,44 @@ class MainService : Service(), OnExecutorResult, GetAccessibilityBridge,
         const val WHAT_VOICE_VOL = 2 //音量数据
         const val WHAT_VOICE_ERR = 4 //出错
         const val WHAT_VOICE_RESULT = 3 //识别结果
+        private val data = HashMap<String, Any>()
     }
+
+    override fun getGlobalData(): Map<*, *> {
+        return data
+    }
+
+    override fun get(name: String): Any? {
+        return data[name]
+    }
+
+    override fun getContext(): Context {
+        return this
+    }
+
+    override fun sendMsg(msg: String) {
+        Log.i("Vove :", "sendMsg  ----> $msg")
+        Toast.makeText(this, msg, Toast.LENGTH_SHORT).show()
+    }
+
+    override fun call(name: String, args: Array<Any>) {}
+
+    override fun set(name: String, `object`: Any) {
+        data[name] = `object`
+    }
+
+    override fun getWidth(): Int {
+        return resources.displayMetrics.widthPixels
+    }
+
+    override fun getHeight(): Int {
+        return resources.displayMetrics.heightPixels
+    }
+
+    override fun sendError(title: String, msg: Exception) {
+        Vog.d(this, "sendError $title $msg")
+    }
+
 }
 
 

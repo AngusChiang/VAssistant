@@ -5,10 +5,10 @@ import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.view.KeyEvent
 import android.view.View
-import cn.vove7.androlua.LuaEditorActivity
 import cn.vove7.executorengine.helper.AppHelper
 import cn.vove7.executorengine.helper.ContactHelper
-import cn.vove7.executorengine.model.ScreenMetrics
+import cn.vove7.common.model.ScreenMetrics
+import cn.vove7.vtp.runtimepermission.PermissionUtils
 import kotlin.concurrent.thread
 
 class MainActivity : AppCompatActivity() {
@@ -19,7 +19,12 @@ class MainActivity : AppCompatActivity() {
         ScreenMetrics.initIfNeeded(this)
         setContentView(R.layout.activity_main)
         thread {
-            ContactHelper(this).updateContactList()
+            try {
+                if (PermissionUtils.isAllGranted(this@MainActivity, arrayOf("android.permission.READ_CONTACTS")))
+                    ContactHelper(this).updateContactList()
+            }catch (e:Exception){
+                e.printStackTrace()
+            }
             AppHelper(this).updateAppList()
         }
     }
@@ -39,6 +44,7 @@ class MainActivity : AppCompatActivity() {
     fun go2Test(view: View) {
         startActivity(Intent(this, ScriptTestActivity::class.java))
     }
+
     fun go2Lua(view: View) {
         startActivity(Intent(this, LuaEditorActivity::class.java))
     }

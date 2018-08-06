@@ -2,6 +2,6 @@
     package="cn.vove7.androlua" >
 
     <application>
-        <activity android:name=".LuaEditorActivity" />
+
     </application>
 </manifest>

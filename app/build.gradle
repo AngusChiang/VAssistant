@@ -29,11 +29,27 @@ android {
         release {
             v1SigningEnabled true
             v2SigningEnabled true
+            keyAlias 'Vove'
+            keyPassword 'Va713148271314!@'
+            storeFile file('F:/Project/AndroidProjects/Vove.keystore')
+            storePassword 'Va713148271314!@'
         }
     }
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
+    }
+    dexOptions {
+        //使用增量模式构建
+        incremental true
+        //最大堆内存
+        javaMaxHeapSize "4g"
+        //是否支持大工程模式
+        jumboMode = true
+        //预编译
+        preDexLibraries = true
+        //线程数
+        threadCount = 8
     }
 }
 
@@ -59,6 +75,7 @@ dependencies {
     implementation project(':appbus')
     implementation project(':datamanager')
     implementation project(':androlua')
+    implementation project(':Common')
 }
 repositories {
     mavenCentral()

@@ -350,7 +350,6 @@ public class Http {
 
 
         public boolean cancel() {
-            // TODO: Implement this method
             return super.cancel(true);
         }
 

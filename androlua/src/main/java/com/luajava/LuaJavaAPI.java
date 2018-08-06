@@ -1153,7 +1153,6 @@ public final class LuaJavaAPI {
 
 
     private static int createMap(LuaState L, Class<?> clazz) throws LuaException {
-        // TODO: Implement this method
         synchronized (L) {
             L.pushJavaObject(createMap(L, clazz, 2));
             return 1;
@@ -1161,7 +1160,6 @@ public final class LuaJavaAPI {
     }
 
     private static Object createMap(LuaState L, Class<?> clazz, int idx) throws LuaException {
-        // TODO: Implement this method
         synchronized (L) {
             try {
                 if (clazz.equals(Map_class))

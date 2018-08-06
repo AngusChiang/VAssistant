@@ -1063,21 +1063,21 @@ public class LuaState {
             pushNil();
         } else if (obj instanceof Boolean) {
             Boolean bool = (Boolean) obj;
-            pushBoolean(bool.booleanValue());
+            pushBoolean(bool);
         } else if (obj instanceof Long) {
-            pushInteger(((Long) obj).longValue());
+            pushInteger((Long) obj);
         } else if (obj instanceof Integer) {
-            pushInteger(((Integer) obj).intValue());
+            pushInteger((Integer) obj);
         } else if (obj instanceof Short) {
-            pushInteger(((Short) obj).shortValue());
+            pushInteger((Short) obj);
         } else if (obj instanceof Character) {
-            pushInteger(((Character) obj).charValue());
+            pushInteger((Character) obj);
         } else if (obj instanceof Byte) {
-            pushInteger(((Byte) obj).byteValue());
+            pushInteger((Byte) obj);
         } else if (obj instanceof Float) {
-            pushNumber(((Float) obj).floatValue());
+            pushNumber((Float) obj);
         } else if (obj instanceof Double) {
-            pushNumber(((Double) obj).doubleValue());
+            pushNumber((Double) obj);
         } else if (obj instanceof String) {
             pushString((String) obj);
         } else if (obj instanceof JavaFunction) {

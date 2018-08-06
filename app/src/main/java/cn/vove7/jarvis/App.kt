@@ -1,14 +1,14 @@
 package cn.vove7.jarvis
 
-import android.app.Application
 import android.content.Intent
 import android.util.Log
 import cn.vove7.androlua.LuaApp
-import cn.vove7.jarvis.services.MainService
-import cn.vove7.jarvis.speech.services.SpeechService
 import cn.vove7.appbus.MessageEvent
 import cn.vove7.datamanager.DAO
-import cn.vove7.datamanager.InitDbData
+import cn.vove7.datamanager.InitSimpleDbData
+import cn.vove7.jarvis.services.MainService
+import cn.vove7.jarvis.services.MyAccessibilityService
+import cn.vove7.jarvis.speech.services.SpeechService
 import cn.vove7.vtp.log.Vog
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
@@ -18,6 +18,7 @@ class App : LuaApp() {
 
     lateinit var voiceService: Intent
     lateinit var mainService: Intent
+
     override fun onCreate() {
         super.onCreate()
         EventBus.getDefault().register(this)
@@ -28,7 +29,7 @@ class App : LuaApp() {
         startService(mainService)
         DAO.init(this)
         if (BuildConfig.DEBUG)
-            InitDbData.init()
+            InitSimpleDbData.init()
     }
 
 
