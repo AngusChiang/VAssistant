@@ -1,8 +1,8 @@
 package cn.vove7.jarvis.view.finder
 
-import android.accessibilityservice.AccessibilityService
 import android.view.accessibility.AccessibilityNodeInfo
-import cn.vove7.vtp.log.Vog
+import cn.vove7.common.accessibility.AccessibilityApi
+import cn.vove7.common.view.finder.ViewFinder
 
 /**
  * # ViewFinderById
@@ -12,17 +12,16 @@ import cn.vove7.vtp.log.Vog
 class ViewFinderById : ViewFinder {
     lateinit var viewId: String
 
-    constructor(accessibilityService: AccessibilityService, id: String) : super(accessibilityService) {
+    constructor(accessibilityService: AccessibilityApi, id: String) : super(accessibilityService) {
         this.viewId = id
     }
 
-    constructor(accessibilityService: AccessibilityService) : super(accessibilityService)
+    constructor(accessibilityService: AccessibilityApi) : super(accessibilityService)
 
 
     override fun findCondition(node: AccessibilityNodeInfo): Boolean {
         return if (node.viewIdResourceName != null) {
             node.viewIdResourceName.endsWith("/$viewId")// :id/view_id
-        }
-        else false
+        } else false
     }
 }

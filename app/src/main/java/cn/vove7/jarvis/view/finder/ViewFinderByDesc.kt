@@ -1,7 +1,8 @@
 package cn.vove7.jarvis.view.finder
 
-import android.accessibilityservice.AccessibilityService
 import android.view.accessibility.AccessibilityNodeInfo
+import cn.vove7.common.accessibility.AccessibilityApi
+import cn.vove7.common.view.finder.ViewFinder
 
 /**
  *
@@ -12,11 +13,11 @@ class ViewFinderByDesc : ViewFinder {
 
     lateinit var desc: String
 
-    constructor(accessibilityService: AccessibilityService, desc: String) : super(accessibilityService) {
+    constructor(accessibilityService: AccessibilityApi, desc: String) : super(accessibilityService) {
         this.desc = desc
     }
 
-    constructor(accessibilityService: AccessibilityService) : super(accessibilityService)
+    constructor(accessibilityService: AccessibilityApi) : super(accessibilityService)
 
     override fun findCondition(node: AccessibilityNodeInfo): Boolean {
         val d = node.contentDescription ?: ""
