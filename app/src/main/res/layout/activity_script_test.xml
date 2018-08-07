@@ -19,7 +19,7 @@
         android:layout_weight="1"
         android:background="@null"
         android:gravity="top|start"
-        android:text="@string/test_script" />
+        android:text="@string/simple_test_script" />
 
     <LinearLayout
         android:layout_width="match_parent"

@@ -98,6 +98,7 @@ class ContactHelper(val context: Context) : GenChoiceData {
                 if (regex.matches(s))
                     return it.value
             }
+            Vog.d(this, "from server no one")
             null
         }
     }

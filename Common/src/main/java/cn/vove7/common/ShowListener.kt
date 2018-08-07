@@ -1,4 +1,5 @@
 package cn.vove7.common
-interface ShowListener{
+
+interface ShowListener {
     fun notifyIfShow()
 }

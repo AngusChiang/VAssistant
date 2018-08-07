@@ -335,8 +335,8 @@ end
 --        for n = 1, select("#", ...) do
 --            table.insert(buf, tostring(select(n, ...)))
 --        end
---        local msg = table.concat(buf, "\t\t")
---        app.sendMsg(msg)
+--        local errMsg = table.concat(buf, "\t\t")
+--        app.sendMsg(errMsg)
 --    end
 --end
 
@@ -414,9 +414,20 @@ end
 
 function task(src, ...)
     local args = { ... }
-    local callback = args[select("#", ...)]
-    args[select("#", ...)] = nil
-    local luaAsyncTask = LuaAsyncTask(luaman, src, callback)
+    local callback = args[#args]
+    local luaAsyncTask
+    args[#args] = nil
+    if (#args >= 1) then -- 剩余参数
+        local update = args[#args]
+        if (type(update) == 'function') then
+            args[#args] = nil
+            luaAsyncTask = LuaAsyncTask(luaman, src, update, callback)
+        else
+            luaAsyncTask = LuaAsyncTask(luaman, src, callback)
+        end
+    else
+        luaAsyncTask = LuaAsyncTask(luaman, src, callback)
+    end
     luaAsyncTask.execute(args)
 end
 

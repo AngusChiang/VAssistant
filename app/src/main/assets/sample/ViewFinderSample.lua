@@ -4,8 +4,9 @@
 -- ViewFinderSample.lua
 --
 
-require 'checkservice'
+require 'accessibility'
 
-a = ViewFinder().id('lua_lalala').findFirst()
-a.setText('lua_lalala')
-
+a = ViewFinder().id('lua_args').findFirst()
+a.setText('hello')
+-- 还可以
+-- ViewFinder().id('lua_args').setText('hello')

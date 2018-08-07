@@ -1,8 +1,8 @@
 package cn.vove7.common.viewnode
 
+import android.graphics.Rect
 import android.os.Build
 import android.os.Bundle
-import android.support.annotation.RequiresApi
 import android.view.ViewConfiguration
 import android.view.accessibility.AccessibilityNodeInfo
 import cn.vove7.vtp.log.Vog
@@ -44,9 +44,21 @@ class ViewNode(val node: AccessibilityNodeInfo) : ViewOperation, Comparable<View
         val b = i != tryNum
         Vog.d(this, "尝试->$i $b")
         return b
-
     }
 
+    /**
+     * @return node.childs
+     */
+    fun childs(): List<ViewNode> {
+        val cs = mutableListOf<ViewNode>()
+        for (i in 0 until node.childCount) {
+            val c = node.getChild(i)
+            if (c != null) {
+                cs.add(ViewNode(c))
+            }
+        }
+        return cs
+    }
 
     override fun click(): Boolean = node.performAction(AccessibilityNodeInfo.ACTION_CLICK)
 
@@ -73,34 +85,48 @@ class ViewNode(val node: AccessibilityNodeInfo) : ViewOperation, Comparable<View
         return tryOp(AccessibilityNodeInfo.ACTION_SELECT)
     }
 
-    @RequiresApi(Build.VERSION_CODES.M)
     override fun scrollUp(): Boolean {
-        return node.performAction(AccessibilityNodeInfo.AccessibilityAction.ACTION_SCROLL_UP.id)
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            node.performAction(AccessibilityNodeInfo.AccessibilityAction.ACTION_SCROLL_UP.id)
+        } else {
+            //TODO("VERSION.SDK_INT < M")
+            false
+        }
     }
 
-    @RequiresApi(Build.VERSION_CODES.M)
     override fun scrollDown(): Boolean {
-        return node.performAction(AccessibilityNodeInfo.AccessibilityAction.ACTION_SCROLL_DOWN.id)
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            node.performAction(AccessibilityNodeInfo.AccessibilityAction.ACTION_SCROLL_DOWN.id)
+        } else {
+            //TODO("VERSION.SDK_INT < M")
+            false
+        }
     }
 
-    @RequiresApi(Build.VERSION_CODES.M)
     override fun scrollForward(): Boolean {
         return node.performAction(AccessibilityNodeInfo.AccessibilityAction.ACTION_SCROLL_FORWARD.id)
     }
 
-    @RequiresApi(Build.VERSION_CODES.M)
     override fun scrollBackward(): Boolean {
         return node.performAction(AccessibilityNodeInfo.AccessibilityAction.ACTION_SCROLL_BACKWARD.id)
     }
 
-    @RequiresApi(Build.VERSION_CODES.M)
     override fun scrollLeft(): Boolean {
-        return node.performAction(AccessibilityNodeInfo.AccessibilityAction.ACTION_SCROLL_LEFT.id)
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            node.performAction(AccessibilityNodeInfo.AccessibilityAction.ACTION_SCROLL_LEFT.id)
+        } else {
+            //TODO("VERSION.SDK_INT < M")
+            false
+        }
     }
 
-    @RequiresApi(Build.VERSION_CODES.M)
     override fun scrollRight(): Boolean {
-        return node.performAction(AccessibilityNodeInfo.AccessibilityAction.ACTION_SCROLL_RIGHT.id)
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            node.performAction(AccessibilityNodeInfo.AccessibilityAction.ACTION_SCROLL_RIGHT.id)
+        } else {
+            //TODO("VERSION.SDK_INT < M")
+            false
+        }
     }
 
     override fun getText(): String? {
@@ -116,6 +142,10 @@ class ViewNode(val node: AccessibilityNodeInfo) : ViewOperation, Comparable<View
         val arg = Bundle()
         arg.putCharSequence(AccessibilityNodeInfo.ACTION_ARGUMENT_SET_TEXT_CHARSEQUENCE, transText(text, ep))
         return node.performAction(AccessibilityNodeInfo.ACTION_SET_TEXT, arg)
+    }
+
+    override fun setTextWithInitial(text: String): Boolean {
+        return setText(text, "1")
     }
 
     override fun setText(text: String): Boolean {
@@ -161,7 +191,21 @@ class ViewNode(val node: AccessibilityNodeInfo) : ViewOperation, Comparable<View
         return ((other.similarityText - similarityText) * 100).toInt()
     }
 
-    override fun await() {
-
+    override fun toString(): String {
+        return nodeSummary(node)
     }
+
+    private fun nodeSummary(node: AccessibilityNodeInfo?): String {
+        if (node == null) return "null\n"
+        val clsName = node.className
+        val id = node.viewIdResourceName
+        val rect = Rect()
+        node.getBoundsInScreen(rect)
+        val cls = clsName.substring(clsName.lastIndexOf('.') + 1)
+        return String.format("[%s] [%s] [%s] [%s] ",
+                cls, id?.substring(id.lastIndexOf('/') + 1) ?: "null",
+                node.contentDescription, node.text
+        )
+    }
+
 }

@@ -2,29 +2,39 @@ package cn.vove7.common.bridges
 
 import android.accessibilityservice.AccessibilityService
 import android.accessibilityservice.GestureDescription
+import android.content.Context
 import android.graphics.Path
 import android.os.Build
 import android.os.Handler
 import android.os.Looper
 import android.support.annotation.RequiresApi
 import android.view.ViewConfiguration
+import android.widget.Toast
 
 import cn.vove7.common.model.ResultBox
 import cn.vove7.common.model.ScreenMetrics
 import cn.vove7.vtp.log.Vog
+import cn.vove7.vtp.toast.Voast
 
 /**
  * 无障碍全局执行器
  */
 class GlobalActionAutomator : ActionAutomatorI {
 
+    val context: Context
     lateinit var mService: AccessibilityService
     private var mHandler: Handler? = null
     private val mScreenMetrics = ScreenMetrics()
+    private lateinit var toast: Voast
 
-    constructor(mService: AccessibilityService, mHandler: Handler) {
+    constructor(context: Context, mService: AccessibilityService, mHandler: Handler) : this(context, mHandler) {
         this.mService = mService
-        this.mHandler = mHandler
+    }
+
+    constructor(context: Context, handler: Handler?) {
+        this.context = context
+        mHandler = handler
+        toast = Voast.with(context, true).top()
     }
 
     override fun setService(mService: AccessibilityService) {
@@ -39,9 +49,6 @@ class GlobalActionAutomator : ActionAutomatorI {
         return performGlobalAction(AccessibilityService.GLOBAL_ACTION_HOME)
     }
 
-    constructor(handler: Handler?) {
-        mHandler = handler
-    }
 
     override fun powerDialog(): Boolean {
         return performGlobalAction(AccessibilityService.GLOBAL_ACTION_POWER_DIALOG)
@@ -50,6 +57,7 @@ class GlobalActionAutomator : ActionAutomatorI {
     override fun notifications(): Boolean {
         return performGlobalAction(AccessibilityService.GLOBAL_ACTION_NOTIFICATIONS)
     }
+
 
     override fun quickSettings(): Boolean {
         return performGlobalAction(AccessibilityService.GLOBAL_ACTION_QUICK_SETTINGS)
@@ -161,6 +169,14 @@ class GlobalActionAutomator : ActionAutomatorI {
         }
     }
 
+    override fun toast(msg: String, showMillis: Int) {
+        toast.show(msg, showMillis)
+    }
+
+    override fun toast(msg: String) {
+        toast.show(msg, Toast.LENGTH_SHORT)
+    }
+
     override fun click(x: Int, y: Int): Boolean {
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             press(x, y, ViewConfiguration.getTapTimeout() + 50)
@@ -195,7 +211,7 @@ class GlobalActionAutomator : ActionAutomatorI {
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             gesture(0, delay.toLong(), arrayOf(Pair(x1, y1), Pair(x2, y2)))
         } else {
-            Vog.d(this, "需SDK版本->N")
+            Vog.d(this, "需SDK版本 -> N")
             false
         }
     }
@@ -256,4 +272,14 @@ interface ActionAutomatorI {
 
     @RequiresApi(api = Build.VERSION_CODES.N)
     fun gesturesAsync(vararg strokes: GestureDescription.StrokeDescription)
+
+    /**
+     * 通知
+     */
+    fun toast(msg: String, showMillis: Int = Toast.LENGTH_SHORT)
+
+    /**
+     * 通知
+     */
+    fun toast(msg: String)
 }

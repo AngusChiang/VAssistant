@@ -15,7 +15,7 @@
         android:layout_marginBottom="8dp"
         android:layout_marginEnd="8dp"
         android:onClick="go2Test"
-        android:text="Script Test"
+        android:text="@string/simple_test_script"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
@@ -44,6 +44,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="11dp"
-        android:text="AndroLua" />
+        android:text="@string/text_androlua_test" />
     、
 </LinearLayout>

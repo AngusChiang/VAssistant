@@ -6,6 +6,10 @@ import org.greenrobot.greendao.annotation.Index;
 import org.greenrobot.greendao.annotation.Keep;
 import org.greenrobot.greendao.annotation.NotNull;
 import org.greenrobot.greendao.annotation.Generated;
+import org.greenrobot.greendao.annotation.Transient;
+
+import cn.vove7.vtp.log.Vog;
+import kotlin.text.Regex;
 
 /**
  * 打开事件
@@ -26,6 +30,8 @@ public class MarkedOpen {
      * key的正则
      */
     private String regStr;
+    @Transient
+    private Regex regex;
     private String value;//标识
 
     public String getType() {
@@ -51,6 +57,10 @@ public class MarkedOpen {
         this.key = key;
     }
 
+    public Regex getRegex() {
+        return regex;
+    }
+
     @Keep
     public MarkedOpen() {
     }
@@ -61,6 +71,15 @@ public class MarkedOpen {
         this.type = type;
         this.regStr = regStr;
         this.value = value;
+        buildRegex();
+    }
+    @Keep
+    private void buildRegex() {
+        //结尾加上% ， 防止有[后续节点操作]匹配失败
+        this.regStr = (!regStr.endsWith("%") ? regStr + "%" : regStr)
+                .replace("%", "([\\S]*)");
+        Vog.INSTANCE.v(this,regStr);
+        regex = new Regex(this.regStr);
     }
 
     @Keep
@@ -71,6 +90,7 @@ public class MarkedOpen {
         this.type = type;
         this.regStr = regStr;
         this.value = value;
+        buildRegex();
     }
 
     public Long getId() {

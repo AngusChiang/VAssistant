@@ -7,7 +7,7 @@ import java.io.Serializable
 
 /**
  *
- *
+ * 保留Java调用
  * Created by Vove on 2018/6/18
  */
 interface ServiceBridge {
@@ -26,11 +26,6 @@ interface ServiceBridge {
      * 取认对话框
      */
     fun showAlert(r: ShowAlertEvent)
-
-    /**
-     * 通知
-     */
-    fun toast(msg: String, showMillis: Int = Toast.LENGTH_SHORT)
 
 }
 

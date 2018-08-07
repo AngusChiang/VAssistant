@@ -11,6 +11,7 @@ import com.luajava.LuaException
 import com.luajava.LuaObject
 import com.luajava.LuaState
 
+//TODO fix @ tasksample
 class LuaAsyncTask : AsyncTask<Any, Any, Any>, LuaGcable {
 
     private var loadeds: Array<Any>? = null
@@ -173,9 +174,10 @@ class LuaAsyncTask : AsyncTask<Any, Any, Any>, LuaGcable {
         try {
             mUpdate?.call(*values)
         } catch (e: LuaException) {
+            e.printStackTrace()
             luaManager.handleMessage(LuaManagerI.E, "onProgressUpdate" + e.message)
         }
-        super.onProgressUpdate(*values)
+//        super.onProgressUpdate(*values)
     }
 
 }

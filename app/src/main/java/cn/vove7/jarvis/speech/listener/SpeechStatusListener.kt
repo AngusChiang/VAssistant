@@ -1,13 +1,15 @@
 package cn.vove7.jarvis.speech.listener
 
 import android.os.Handler
+import cn.vove7.appbus.AppBus
+import cn.vove7.appbus.VoiceData
+import cn.vove7.common.model.RequestPermission
 import cn.vove7.jarvis.services.MainService.Companion.WHAT_VOICE_ERR
 import cn.vove7.jarvis.services.MainService.Companion.WHAT_VOICE_RESULT
 import cn.vove7.jarvis.services.MainService.Companion.WHAT_VOICE_TEMP
 import cn.vove7.jarvis.services.MainService.Companion.WHAT_VOICE_VOL
 import cn.vove7.jarvis.speech.message.SpeechMessage
 import cn.vove7.jarvis.speech.model.RecogResult
-import cn.vove7.appbus.VoiceData
 import cn.vove7.vtp.log.Vog
 
 /**
@@ -40,7 +42,17 @@ class SpeechStatusListener(private val handler: Handler) : StatusRecogListener()
                                   recogResult: RecogResult) {
         super.onAsrFinishError(errorCode, subErrorCode, errorMessage, descMessage, recogResult)
         val message = "识别错误, 错误码：$errorCode,$subErrorCode"
-        handler.sendMessage(SpeechMessage.buildMessage(WHAT_VOICE_ERR, message))
+        when (errorCode) {
+            9 -> {
+                AppBus.post(RequestPermission("麦克风权限"))
+                handler.sendMessage(SpeechMessage.buildMessage(WHAT_VOICE_ERR, "需要麦克风权限"))
+            }
+            3 -> {
+                handler.sendMessage(SpeechMessage.buildMessage(WHAT_VOICE_ERR, "没有检测到用户说话"))
+            }
+            else ->
+                handler.sendMessage(SpeechMessage.buildMessage(WHAT_VOICE_ERR, message))
+        }
     }
 
     override fun onAsrVolume(volumePercent: Int, volume: Int) {

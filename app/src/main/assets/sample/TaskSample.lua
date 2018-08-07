@@ -7,17 +7,22 @@
 --
 function f()
     for i = 1, 9 do
-        print(i)
+        update(i)
     end
-    return { 1, "s", 1.1 }
+    return 1, "s", 1.1
 end
 
 function cb(...)
-    s = { ... }
+    local s = { ... }
+    print('返回参数: ')
     for i, v in ipairs(s) do
         print(i, v, type(v))
     end
     print('finished..')
 end
 
-task(f, cb)
+function update(p)
+    print(p)
+end
+
+task(f, update, cb)

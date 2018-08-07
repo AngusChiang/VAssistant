@@ -11,13 +11,9 @@ print(luaman)
 print(bridges)
 print(executor)
 print(automator)
+print(system)
 print('size of args :',#args)
 -- 输出
 for i,v in ipairs(args) do
     print(i, v, type(v))
 end
-
-require 'checkservice'
-
-a = ViewFindBuilder().id('stop').findFirst()
-a.tryClick()

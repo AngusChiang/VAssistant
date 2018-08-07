@@ -5,6 +5,7 @@ import android.util.Log
 import cn.vove7.androlua.LuaApp
 import cn.vove7.appbus.MessageEvent
 import cn.vove7.datamanager.DAO
+import cn.vove7.datamanager.InitLuaDbData
 import cn.vove7.datamanager.InitSimpleDbData
 import cn.vove7.jarvis.services.MainService
 import cn.vove7.jarvis.services.MyAccessibilityService
@@ -29,7 +30,7 @@ class App : LuaApp() {
         startService(mainService)
         DAO.init(this)
         if (BuildConfig.DEBUG)
-            InitSimpleDbData.init()
+            InitLuaDbData.init()
     }
 
 

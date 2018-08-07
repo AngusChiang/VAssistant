@@ -1,7 +1,8 @@
 <resources>
     <string name="app_name">Jarvis</string>
-    <string name="test_script">
-        </string>
+    <string name="simple_test_script">Simple Script Test</string>
     <string name="r" translatable="false"><![CDATA[>]]></string>
     <string name="l" translatable="false"><![CDATA[<]]></string>
+    <string name="text_permission_manager">Permission Manager</string>
+    <string name="text_androlua_test">AndroLua Test</string>
 </resources>

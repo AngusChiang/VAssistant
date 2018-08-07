@@ -418,7 +418,7 @@ static int db_traceback (lua_State *L) {
   int arg;
   lua_State *L1 = getthread(L, &arg);
   const char *msg = lua_tostring(L, arg + 1);
-  if (msg == NULL && !lua_isnoneornil(L, arg + 1))  /* non-string 'msg'? */
+  if (msg == NULL && !lua_isnoneornil(L, arg + 1))  /* non-string 'errMsg'? */
     lua_pushvalue(L, arg + 1);  /* return it untouched */
   else {
     int level = (int)luaL_optinteger(L, arg + 2, (L == L1) ? 1 : 0);

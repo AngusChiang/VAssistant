@@ -54,7 +54,6 @@ class MessageStatusRecogListener(private val handler: Handler) : StatusRecogList
         if (speechEndTime > 0) {
             val diffTime = System.currentTimeMillis() - speechEndTime
             message += "；说话结束到识别结束耗时【" + diffTime + "ms】"
-
         }
         AppBus.postVoiceData(VoiceData(WHAT_VOICE_RESULT, results[0]))
         speechEndTime = 0

@@ -4,6 +4,6 @@
 -- SwipeSample.lua
 --
 
-require 'checkservice'
+require 'accessibility'
 
-swipe(0, 0, 0, 500)
+swipe(0, 0, 0,500, 500)

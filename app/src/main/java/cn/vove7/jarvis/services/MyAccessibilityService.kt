@@ -12,13 +12,10 @@ import android.view.accessibility.AccessibilityNodeInfo
 import android.widget.Toast
 import cn.vove7.common.ShowListener
 import cn.vove7.common.accessibility.AccessibilityApi
-import cn.vove7.common.view.finder.ViewFinder
-import cn.vove7.common.view.finder.ViewShowListener
+import cn.vove7.common.executor.CExecutorI
+import cn.vove7.common.view.finder.*
 import cn.vove7.common.viewnode.ViewNode
 import cn.vove7.datamanager.parse.model.ActionScope
-import cn.vove7.common.view.finder.ViewFinderByDesc
-import cn.vove7.common.view.finder.ViewFinderById
-import cn.vove7.common.view.finder.ViewFinderByText
 import cn.vove7.jarvis.view.finder.ViewShowNotifier
 import cn.vove7.vtp.app.AppHelper
 import cn.vove7.vtp.log.Vog
@@ -52,16 +49,23 @@ class MyAccessibilityService : AccessibilityApi() {
         Vog.d(this, currentScope.toString())
     }
 
+    override fun getRootViewNode(): ViewNode? {
+        if (rootInActiveWindow == null) {
+            return null
+        }
+        return ViewNode(rootInActiveWindow)
+    }
+
     /**
      * # 等待Activity表
      * - [CExecutorI] 执行器
      * - pair.first pkg
      * - pair.second activity
      */
-    private val locksWaitForActivity = mutableMapOf<ViewShowListener, Pair<String, String>>()
+    private val locksWaitForActivity = mutableMapOf<ActivityShowListener, Pair<String, String>>()
 
-    override fun waitForActivity(finderNotify: ViewShowListener, pkg: String, activityName: String?) {
-        locksWaitForActivity[finderNotify] = Pair(pkg, "$activityName")
+    override fun waitForActivity(executor: CExecutorI, pkg: String, activityName: String?) {
+        locksWaitForActivity[executor] = Pair(pkg, "$activityName")
         thread {
             sleep(200)
             activityNotifier.notifyIfShow()
@@ -80,28 +84,30 @@ class MyAccessibilityService : AccessibilityApi() {
      */
     private val viewNotifier = ViewShowNotifier(locksWaitForView)
 
-    override fun waitForView(finderNotify: ViewShowListener, finder: ViewFinder) {
-        locksWaitForView[finderNotify] = finder
+    override fun waitForView(executor: CExecutorI, finder: ViewFinder) {
+        locksWaitForView[executor] = finder
         thread {
             sleep(200)
-            viewNotifier.notifyShow()
+            viewNotifier.notifyIfShow()
         }
     }
 
-    override fun removeAllNotifier(finderNotify: ViewShowListener) {
+    override fun removeAllNotifier(executor: CExecutorI) {
         thread {
             synchronized(locksWaitForActivity) {
-                locksWaitForActivity.remove(finderNotify)
+                val a = locksWaitForActivity.remove(executor)
+                Vog.d(this, "removeAllNotifier locksWaitForActivity ${a != null}")
             }
             synchronized(locksWaitForView) {
-                locksWaitForView.remove(finderNotify)
+                val a = locksWaitForView.remove(executor)
+                Vog.d(this, "removeAllNotifier locksWaitForView ${a != null}")
             }
         }
     }
 
     private fun callAllNotifier() {
         thread {
-            viewNotifier.notifyShow()
+            viewNotifier.notifyIfShow()
         }
         thread {
             activityNotifier.notifyIfShow()
@@ -335,10 +341,10 @@ class MyAccessibilityService : AccessibilityApi() {
 
         override fun notifyIfShow() {
             synchronized(locksWaitForActivity) {
-                val removes = mutableListOf<ViewShowListener>()
+                val removes = mutableListOf<ActivityShowListener>()
                 locksWaitForActivity.forEach { it ->
                     if (fill(it.value)) {
-                        it.key.notifyShow()
+                        it.key.notifyShow(currentScope)
                         removes.add(it.key)
                     }
                 }

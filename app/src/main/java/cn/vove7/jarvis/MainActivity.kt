@@ -1,20 +1,31 @@
 package cn.vove7.jarvis
 
+import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
-import android.support.v7.app.AppCompatActivity
 import android.view.KeyEvent
 import android.view.View
+import cn.vove7.common.model.ScreenMetrics
 import cn.vove7.executorengine.helper.AppHelper
 import cn.vove7.executorengine.helper.ContactHelper
-import cn.vove7.common.model.ScreenMetrics
 import cn.vove7.vtp.runtimepermission.PermissionUtils
 import kotlin.concurrent.thread
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : Activity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        PermissionUtils.autoRequestPermission(this, arrayOf(
+                "android.permission.RECORD_AUDIO",
+                "android.permission.INTERNET",
+                "android.permission.READ_PHONE_STATE",
+                "android.permission.WRITE_EXTERNAL_STORAGE",
+                "android.permission.FLASHLIGHT",
+                "android.permission.CAMERA",
+                "android.permission.CALL_PHONE",
+                "android.permission.READ_CONTACTS"
+        ))
 
         ScreenMetrics.initIfNeeded(this)
         setContentView(R.layout.activity_main)
@@ -22,7 +33,7 @@ class MainActivity : AppCompatActivity() {
             try {
                 if (PermissionUtils.isAllGranted(this@MainActivity, arrayOf("android.permission.READ_CONTACTS")))
                     ContactHelper(this).updateContactList()
-            }catch (e:Exception){
+            } catch (e: Exception) {
                 e.printStackTrace()
             }
             AppHelper(this).updateAppList()

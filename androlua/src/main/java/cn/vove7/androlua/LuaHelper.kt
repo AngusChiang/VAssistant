@@ -37,7 +37,7 @@ class LuaHelper : LuaManagerI {
         initPath()
         init()
 
-        Vog.d(this,"constructor $sBridgeManager")
+        Vog.d(this, "constructor $sBridgeManager")
     }
 
     override var bridgeManager: BridgeManager?
@@ -46,7 +46,7 @@ class LuaHelper : LuaManagerI {
     constructor(context: Context, b: BridgeManager) : this(context) {
         bridgeManager = b
         sBridgeManager = b
-        Vog.d(this,"constructor2 $sBridgeManager")
+        Vog.d(this, "constructor2 $sBridgeManager")
     }
 
     lateinit var L: LuaState
@@ -291,6 +291,7 @@ class LuaHelper : LuaManagerI {
     }
 
     override fun regGc(obj: LuaGcable) {
+        Vog.d(this, "regGc $obj")
         synchronized(gcList) {
             gcList.add(obj)
         }
@@ -332,6 +333,7 @@ class LuaHelper : LuaManagerI {
     }
 
     override fun stop() {
+        Vog.d(this, "stop by external")
         gcAll()
         L.gc(LUA_GCSTOP, 0)
         L.close()

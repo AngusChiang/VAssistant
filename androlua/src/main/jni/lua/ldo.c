@@ -87,7 +87,7 @@ struct lua_longjmp {
 static void seterrorobj(lua_State *L, int errcode, StkId oldtop) {
   switch (errcode) {
     case LUA_ERRMEM: {  /* memory error? */
-      setsvalue2s(L, oldtop, G(L)->memerrmsg); /* reuse preregistered msg. */
+      setsvalue2s(L, oldtop, G(L)->memerrmsg); /* reuse preregistered errMsg. */
       break;
     }
     case LUA_ERRERR: {
@@ -117,7 +117,7 @@ l_noret luaD_throw(lua_State *L, int errcode) {
       if (g->panic) {  /* panic function? */
         seterrorobj(L, errcode, L->top);  /* assume EXTRA_STACK */
         if (L->ci->top < L->top)
-          L->ci->top = L->top;  /* pushing msg. can break this invariant */
+          L->ci->top = L->top;  /* pushing errMsg. can break this invariant */
         lua_unlock(L);
         g->panic(L);  /* call panic function (last chance to jump out) */
       }

@@ -14,7 +14,7 @@ object SpeechMessage {
         val message = Message()
         message.what = what
         val data = Bundle()
-        data.putString("msg", msg)
+        data.putString("errMsg", msg)
         message.data = data
         return message
     }

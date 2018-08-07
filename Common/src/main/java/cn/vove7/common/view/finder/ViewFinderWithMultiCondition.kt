@@ -31,23 +31,23 @@ class ViewFinderWithMultiCondition(accessibilityService: AccessibilityApi) : Vie
                 }
                 ViewFinderByText.MATCH_MODE_FUZZY_WITH_PINYIN -> {
                     val f = TextHelper.compareSimilarityWithPinyin("${node.text}", viewText!!)
-                    Vog.d(this, "findCondition $f")
+                    Vog.v(this, "findCondition $f")
                     if (f < 0.9)
                         return false
                 }
                 ViewFinderByText.MATCH_MODE_FUZZY_WITHOUT_PINYIN -> {
                     val f = TextHelper.compareSimilarity("${node.text}", viewText!!)
-                    Vog.d(this, "findCondition $f")
-                    if (f < 0.9)
+                    Vog.v(this, "findCondition $f")
+                    if (f < 0.8)
                         return false
                 }
                 else -> {
-                    Vog.d(this, "findCondition 未知条件")
+                    Vog.v(this, "findCondition 未知条件")
                     return false
                 }
             }
         }
-        //could not remove "$.."
+        //could not remove "$.." prevent cause null
         if (viewId != null
                 && !"${node.viewIdResourceName}".endsWith("/$viewId"))// :id/view_id)
             return false

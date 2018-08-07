@@ -1,5 +1,7 @@
 package cn.vove7.common.view.finder
 
+import cn.vove7.common.viewnode.ViewNode
+
 /**
  * # ViewShowListener
  *
@@ -7,5 +9,6 @@ package cn.vove7.common.view.finder
  * 2018/8/4
  */
 interface ViewShowListener {
-    fun notifyShow()
+
+    fun notifyShow(node: ViewNode)
 }

@@ -1,4 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="text_permission_manager">权限管理</string>
+    <string name="app_name">Jarvis</string>
+    <string name="simple_test_script">简单顺序脚本测试</string>
+    <string name="text_androlua_test">AndroLua 测试</string>
 </resources>

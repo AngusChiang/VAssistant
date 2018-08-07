@@ -448,7 +448,7 @@ static const char *searchpath (lua_State *L, const char *name,
       return filename;  /* return that file name */
     lua_pushfstring(L, "\n\tno file '%s'", filename);
     lua_remove(L, -2);  /* remove file name */
-    luaL_addvalue(&msg);  /* concatenate error msg. entry */
+    luaL_addvalue(&msg);  /* concatenate error errMsg. entry */
   }
   luaL_pushresult(&msg);  /* create error message */
   return NULL;  /* not found */

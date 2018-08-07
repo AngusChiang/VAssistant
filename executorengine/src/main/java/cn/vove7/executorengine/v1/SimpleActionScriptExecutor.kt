@@ -3,6 +3,7 @@ package cn.vove7.executorengine.v1
 import android.content.Context
 import android.os.Build
 import cn.vove7.common.bridges.ServiceBridge
+import cn.vove7.common.executor.OnExecutorResult
 import cn.vove7.common.executor.PartialResult
 import cn.vove7.executorengine.AbsExecutorImpl
 import cn.vove7.executorengine.bridges.SystemBridge
@@ -21,7 +22,6 @@ class SimpleActionScriptExecutor(
         onExecutorResult: OnExecutorResult
 ) : AbsExecutorImpl(context, systemBridge, serviceBridge, onExecutorResult) {
 
-
     override fun runScript(script: String, voiceArg: String?): PartialResult {
 
         var execLog = ""
@@ -36,7 +36,7 @@ class SimpleActionScriptExecutor(
                     val msg = "执行终止-- on $line ${partialResult.msg}"
                     Vog.d(this, msg)
                     currentAction = null
-                    onExecutorResult.onExecutorFailed(msg)
+                    onExecutorResult.onExecuteFailed(msg)
                     return partialResult
                 }
                 !partialResult.isSuccess -> {
@@ -90,7 +90,7 @@ class SimpleActionScriptExecutor(
             ACTION_OPEN -> {//打开应用/其他额外
                 return if (checkParam(p)) openSomething(p)
                 else {
-                    if (waitForVoiceParam(action).isSuccess)
+                    if (waitForVoiceParam() != null)
                         execAction(cmd)
                     else PartialResult(false, true, "无参数")
                 }
@@ -98,7 +98,7 @@ class SimpleActionScriptExecutor(
             ACTION_CALL -> {
                 return if (checkParam(p)) smartCallPhone(p)
                 else {
-                    if (waitForVoiceParam(action).isSuccess)
+                    if (waitForVoiceParam() != null)
                         execAction(cmd)
                     else PartialResult(false, true, "无参数")
                 }
@@ -232,7 +232,7 @@ class SimpleActionScriptExecutor(
             if (needParamsAction.contains(c)) {
                 //检查参数
                 if (!checkParam(p)) {
-                    return if (waitForVoiceParam(action).isSuccess)
+                    return if (waitForVoiceParam() != null)
                         execAction(cmd)
                     else PartialResult(false, true, "无参数")
                 }
@@ -310,7 +310,8 @@ class SimpleActionScriptExecutor(
                     operateViewOperation(p, BY_ID, OPERATION_FOCUS, stopIfFail = needStop(ps, 1))
                 }
                 ACTION_ALERT -> {
-                    waitForAlertResult(p)
+                    val r = alert("确认以继续", p)
+                    PartialResult(r, !r, if (r) "" else "被迫停止")
                 }
                 ACTION_WAIT_FOR_ACTIVITY -> {
                     if (ps.size >= 2) waitForApp(p, ps[1])
@@ -321,13 +322,13 @@ class SimpleActionScriptExecutor(
 //                    else PartialResult(false, true, "参数数量应为2")
 //                }
                 ACTION_WAIT_FOR_VIEW_ID -> {
-                    waitForViewId(p)
+                    PartialResult(waitForViewId(p) != null)
                 }
                 ACTION_WAIT_FOR_VIEW_DESC -> {
-                    waitForDesc(p)
+                    PartialResult(waitForDesc(p) != null)
                 }
                 ACTION_WAIT_FOR_VIEW_Text -> {
-                    waitForText(p)
+                    PartialResult(waitForText(p) != null)
                 }
                 ACTION_SCROLL_UP_BY_ID -> {
                     operateViewOperation(p, BY_ID, OPERATION_SCROLL_UP, stopIfFail = needStop(ps, 1))
@@ -459,8 +460,3 @@ class SimpleActionScriptExecutor(
 
 }
 
-
-interface OnExecutorResult {
-    fun onExecutorSuccess(result: String)
-    fun onExecutorFailed(errMsg: String)
-}

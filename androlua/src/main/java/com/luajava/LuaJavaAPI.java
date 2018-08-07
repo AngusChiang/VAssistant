@@ -151,8 +151,8 @@ public final class LuaJavaAPI {
             // If method is null means there isn't one receiving the given arguments
             if (method == null) {
                 StringBuilder msgbuilder = new StringBuilder();
-                for (int i = 0; i < methods.length; i++) {
-                    msgbuilder.append(methods[i].toString());
+                for (Method method1 : methods) {
+                    msgbuilder.append(method1.toString());
                     msgbuilder.append("\n");
                 }
                 throw new LuaException("Invalid method call. Invalid Parameters.\n" + msgbuilder.toString());

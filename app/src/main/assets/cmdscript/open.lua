@@ -5,7 +5,9 @@
 --
 local args = { ... }
 if (#args >= 1) then
-    executor.openSomething(args[1])
+    if (openSomething(args[1])) then
+
+    end
 else
     print("打开什么鬼")
 end

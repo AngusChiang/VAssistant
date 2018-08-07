@@ -1,14 +1,8 @@
 --
 -- @author 17719
--- 2018/8/6 15:48
--- WaitSample.lua
+-- 2018/8/7 1:07
+-- alipay_scan.lua
 --
-require 'accessibility'
-
-openSomething("支付宝")
-openSomething("Alipay")
-waitForApp('com.eg.android.AlipayGphone')
-
 ViewFinder().equalsText('首页').id('tab_description').tryClick()
 ViewFinder().equalsText('Home').id('tab_description').tryClick()
 sacn = ViewFinder().id('saoyisao_tv')

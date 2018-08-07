@@ -1,8 +1,8 @@
 package cn.vove7.common.accessibility
 
 import android.accessibilityservice.AccessibilityService
+import cn.vove7.common.executor.CExecutorI
 import cn.vove7.common.view.finder.ViewFinder
-import cn.vove7.common.view.finder.ViewShowListener
 import cn.vove7.datamanager.parse.model.ActionScope
 import cn.vove7.vtp.app.AppInfo
 
@@ -33,13 +33,13 @@ interface AccessibilityListener {
      * 等待出现指定View  with /id/text/desc
      * 特殊标记
      */
-    fun waitForView(finderNotify: ViewShowListener, finder: ViewFinder)
+    fun waitForView(executor: CExecutorI, finder: ViewFinder)
 
-    fun waitForActivity(finderNotify: ViewShowListener, pkg: String, activityName: String?)
+    fun waitForActivity(executor: CExecutorI, pkg: String, activityName: String?)
     /**
      * remove all notifier when was interrupted
      */
-    fun removeAllNotifier(finderNotify: ViewShowListener)
+    fun removeAllNotifier(executor: CExecutorI)
 }
 
 

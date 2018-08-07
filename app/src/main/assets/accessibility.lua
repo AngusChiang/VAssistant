@@ -1,9 +1,9 @@
 --
 -- @author 17719
--- 2018/8/6 16:52
--- checkservice.lua
+-- 2018/8/8 1:51
+-- accessibility.lua
 --
 
-function checkservice()
+function accessibility()
     return executor.checkAccessibilityService(true).isSuccess
 end

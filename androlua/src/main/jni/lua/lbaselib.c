@@ -409,7 +409,7 @@ static int finishpcall (lua_State *L, int status, lua_KContext extra) {
   if (status != LUA_OK && status != LUA_YIELD) {  /* error? */
     lua_pushboolean(L, 0);  /* first result (false) */
     lua_pushvalue(L, -2);  /* error message */
-    return 2;  /* return false, msg */
+    return 2;  /* return false, errMsg */
   }
   else
     return lua_gettop(L) - (int)extra;  /* return all results */

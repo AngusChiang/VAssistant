@@ -1,10 +1,5 @@
 package cn.vove7.datamanager
 
-import android.util.Pair
-import cn.vove7.datamanager.executor.entity.MarkedOpen
-import cn.vove7.datamanager.executor.entity.MarkedOpen.MARKED_TYPE_APP
-import cn.vove7.datamanager.executor.entity.MarkedOpen.MARKED_TYPE_SYS_FUN
-import cn.vove7.datamanager.executor.entity.ServerContact
 import cn.vove7.datamanager.parse.model.Action
 import cn.vove7.datamanager.parse.model.ActionScope
 import cn.vove7.datamanager.parse.model.Param
@@ -17,23 +12,9 @@ import cn.vove7.vtp.log.Vog
  * 初始化服务数据/.
  * Created by Vove on 2018/6/23
  */
-object InitLuaDbData {
-    fun init() {
-        val serverContactDao = DAO.daoSession.serverContactDao
-        if (serverContactDao.queryBuilder().count() == 0L) {
-            arrayOf(
-                    Pair("中国移动", Pair("(中国)?移动(客服)?", "10086")),
-                    Pair("中国联通", Pair("(中国)?联通(客服)?", "10010")),
-                    Pair("中国电信", Pair("(中国)?电信(客服)?", "10000"))
-            ).forEach {
-                val data = ServerContact()
-                data.key = it.first
-                data.regexStr = it.second.first
-                data.value = it.second.second
-                serverContactDao.insert(data)
-            }
-        } else Vog.d(this, "存在数据")
-
+object InitLuaDbData : InitDbData() {
+    override fun init() {
+        super.init()
         val mapDao = DAO.daoSession.mapNodeDao
 
         if (mapDao.queryBuilder().count() <= 10L) {
@@ -49,36 +30,64 @@ object InitLuaDbData {
                     "if (#args >= 1) then\n" +
                     "    executor.openSomething(args[1])\n" +
                     "else\n" +
-                    "    print(\"打开什么鬼\")\n" +
+                    "    print(\"打开什么呦\")\n" +
                     "end\n" +
                     "\n")
-            val a3 = Action("clickByDesc(返回消息,ds)\n" +
-                    "waitForText(消息)\n" +
-                    "dClickByIdAndText(name,消息)\n" +
-                    "clickById(et_search_keyword)\n" +
-                    "sleep(100)\n" +
-                    "setTextById(et_search_keyword,%,1)\n" +
-                    "sleep(700)\n" +
-                    "clickByIdAndText(title,%)")
+            val a3 = Action(
+                            "require 'accessibility'\n" +
+                            "ViewFinder().desc('返回消息').tryClick()\n" +
+                            "msg = ViewFinder().id('name').equalsText('消息').await()\n" +
+                            "msg.doubleClick()\n" +
+                            "s = ViewFinder().id('et_search_keyword').findFirst()\n" +
+                            "s.tryClick()\n" +
+                            "sleep(110)\n" +
+                            "s.setText(args[1], '1')\n" +
+                            "a = ViewFinder().id('title').similaryText(args[1]).tryClick()\n" +
+                            "if (not a) then\n" +
+                            "    toast('没找到哦')\n" +
+                            "end")
+
             val a4 = Action(2,
-                    "waitForId(input)\n" +
-                    "setTextById(input,%)\n" +
-                    "alert(确认发送?)\n" +
-                    "sleep(500)\n" +
-                    "clickById(fun_btn)")
-            val a2 = Action("call")
+                    "require 'accessibility'\n" +
+                            "i = ViewFinder().id('input').waitFor()\n" +
+                            "i.setText(args[1])\n" +
+                            "alert('确认发送?', '')\n" +
+                            "sleep(500)\n" +
+                            "clickById('fun_btn')")
+            val a2 = Action("local args = { ... }\n" +
+                    "if (#args >= 1) then\n" +
+                    "    executor.smartCallPhone(args[1])\n" +
+                    "end\n")
 
             //操作
-            val a5 = Action("back")
-            val a6 = Action("home")
-            val a7 = Action("recent")
-            val a8 = Action("notifications")
+            val a5 = Action(
+                    "require 'accessibility'\n" + "back()")
+            val a6 = Action(
+                    "require 'accessibility'\n" + "home()")
+            val a7 = Action(
+                    "require 'accessibility'\n" + "recents()")
+            val a8 = Action(
+                    "require 'accessibility'\n" + "notifications()")
 
+            //TODO a9 a10
             val a9 = Action("clickByText")
             //脚本用
             val a10 = Action("clickById")
-            val a11 = Action("waitForDesc(快捷入口)\r\nclickByDesc(快捷入口)\r\nclickByDesc(扫一扫 按钮)")
-            val a12 = Action("waitForId(saoyisao_tv)\r\nclickById(saoyisao_tv)")
+
+            val a11 = Action(
+                            "require 'accessibility'\n" +
+                            "\n" +
+                            "k=waitForDesc('快捷入口')\n" +
+                            "k.tryClick()\n" +
+                            "s=waitForDesc('扫一扫 按钮')\n" +
+                            "s.tryClick()")
+            val a12 = Action(
+                    "require 'accessibility'\n" +
+                            "ViewFinder().equalsText('首页').id('tab_description').tryClick()\n" +
+                            "ViewFinder().equalsText('Home').id('tab_description').tryClick()\n" +
+                            "sacn = ViewFinder().id('saoyisao_tv')\n" +
+                            "\n" +
+                            "sacn.waitFor().tryClick()\n")
 
             arrayOf(a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12).forEach {
                 DAO.daoSession.actionDao.insert(it)
@@ -144,16 +153,7 @@ object InitLuaDbData {
             }
         } else Vog.d("mapDao", "mapDao存在数据")
 
-        val markedOpenDAO = DAO.daoSession.markedOpenDao
-        if (markedOpenDAO.queryBuilder().count() != 0L) {
-            arrayOf(
-                    MarkedOpen("手电", MARKED_TYPE_SYS_FUN, "((手电(筒)?)|(闪光灯)|(照明(灯)))", "openFlash")
-                    , MarkedOpen("网易云", MARKED_TYPE_APP, "网易云音乐", "com.netease.cloudmusic")
-            ).forEach {
-                markedOpenDAO.insert(it)
-            }
-        }
-        //openActivity(com.tencent.mobileqq,com.tencent.mobileqq.activity.SplashActivity)
+
     }
 
 }

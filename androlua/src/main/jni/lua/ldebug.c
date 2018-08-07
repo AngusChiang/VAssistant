@@ -624,7 +624,7 @@ l_noret luaG_ordererror (lua_State *L, const TValue *p1, const TValue *p2) {
 }
 
 
-/* add src:line information to 'msg' */
+/* add src:line information to 'errMsg' */
 const char *luaG_addinfo (lua_State *L, const char *msg, TString *src,
                                         int line) {
   char buff[LUA_IDSIZE];

@@ -9,6 +9,7 @@ import android.text.method.ScrollingMovementMethod
 import android.view.View
 import android.view.View.OnClickListener
 import android.widget.Button
+import android.widget.EditText
 import android.widget.TextView
 import cn.vove7.androlua.LuaHelper
 import cn.vove7.androlua.R
@@ -23,13 +24,13 @@ import cn.vove7.vtp.log.Vog
 import java.io.IOException
 import java.util.*
 
-
 class LuaEditorActivity : Activity(), OnClickListener {
 
     lateinit var execute: Button
 
     lateinit var source: LuaEditor
     lateinit var status: TextView
+    lateinit var luaArgs: EditText
 
     var nowIndex = 0
 
@@ -71,6 +72,7 @@ class LuaEditorActivity : Activity(), OnClickListener {
         execute.setOnClickListener(this)
 
         source = findViewById(R.id.source)
+        luaArgs = findViewById(R.id.lua_args)
 
         status = findViewById(R.id.statusText)
         status.movementMethod = ScrollingMovementMethod.getInstance()
@@ -113,7 +115,7 @@ class LuaEditorActivity : Activity(), OnClickListener {
                 status.scrollTo(0, 0)
                 val ac = Action(src)
                 ac.param = Param()
-                ac.param.value = "123"
+                ac.param.value = luaArgs.text.toString()
                 AppBus.post(ac)
             }
             R.id.r -> {

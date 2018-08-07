@@ -2,8 +2,8 @@ package cn.vove7.executorengine.helper
 
 import android.content.Context
 import cn.vove7.common.model.MatchedData
-import cn.vove7.vtp.app.AppInfo
 import cn.vove7.vtp.app.AppHelper
+import cn.vove7.vtp.app.AppInfo
 import cn.vove7.vtp.log.Vog
 import cn.vove7.vtp.text.TextHelper
 
@@ -32,7 +32,13 @@ class AppHelper(private val context: Context) {
         APP_LIST.forEach {
             val rate = when {
                 appWord.startsWith(it.name) -> 1f
-                else -> TextHelper.compareSimilarityWithPinyin(appWord, it.name)
+                else -> try {
+                    Vog.v(this, "matchAppName $appWord ${it.name}")
+                    TextHelper.compareSimilarityWithPinyin(appWord, it.name)
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                    0f
+                }
             }
             if (rate > limitRate) {
                 matchList.add(MatchedData(rate, it))

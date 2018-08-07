@@ -21,11 +21,11 @@ import cn.vove7.common.bridges.ServiceBridge
 import cn.vove7.common.bridges.ShowAlertEvent
 import cn.vove7.common.bridges.ShowDialogEvent
 import cn.vove7.common.executor.CExecutorI
+import cn.vove7.common.executor.OnExecutorResult
 import cn.vove7.common.model.RequestPermission
 import cn.vove7.datamanager.parse.model.Action
 import cn.vove7.executorengine.bridges.SystemBridge
 import cn.vove7.executorengine.luaexector.LuaExecutor
-import cn.vove7.executorengine.v1.OnExecutorResult
 import cn.vove7.jarvis.PermissionManagerActivity
 import cn.vove7.jarvis.utils.Utils.checkCancel
 import cn.vove7.jarvis.utils.Utils.checkConfirm
@@ -159,7 +159,7 @@ class MainService : Service(), OnExecutorResult,
         Vog.d(this, "单选回调 $data")
         messengerAction?.responseResult = data != null
         messengerAction?.responseBundle?.putSerializable("data", data)
-        messengerAction?.responseBundle?.putString("msg", msg)
+        messengerAction?.responseBundle?.putString("errMsg", msg)
         hideDialog()
         cExecutor.notifySync()
     }
@@ -194,11 +194,11 @@ class MainService : Service(), OnExecutorResult,
     fun onVoiceData(msg: Message?) {
         when (msg?.what) {
             WHAT_VOICE_TEMP -> {
-                val res = msg.data.getString("msg")
+                val res = msg.data.getString("errMsg")
                 AppBus.postVoiceData(VoiceData(msg.what, res))
             }
             WHAT_VOICE_ERR -> {
-                val res = msg.data.getString("msg")
+                val res = msg.data.getString("errMsg")
                 when (voiceMode) {
                     MODE_VOICE -> {
                         AppBus.postVoiceData(VoiceData(msg.what, res))
@@ -218,7 +218,7 @@ class MainService : Service(), OnExecutorResult,
                 AppBus.postVoiceData(msg.data.getSerializable("data") as VoiceData)
             }
             WHAT_VOICE_RESULT -> {
-                val voiceData = msg.data.getString("msg")
+                val voiceData = msg.data.getString("errMsg")
                 Vog.d(this, "结果 --------> $voiceData")
                 when (voiceMode) {
                     MODE_VOICE -> {
@@ -229,7 +229,7 @@ class MainService : Service(), OnExecutorResult,
                                     ?: "")
                         if (parseResult.isSuccess) {
                             toast.showShort("解析成功")
-                            cExecutor.execQueue(parseResult.actionQueue)
+                            cExecutor.execQueue(voiceData, parseResult.actionQueue)
                         } else {
                             toast.showShort("解析失败")
                         }
@@ -263,18 +263,21 @@ class MainService : Service(), OnExecutorResult,
         }
     }
 
+    override fun onExecuteStart(words: String) {
+        Vog.d(this, "开始执行 -> $words")
+    }
+
     /**
      * 执行结果回调
      */
-    override fun onExecutorSuccess(result: String) {
+    override fun onExecuteFinished(result: String) {
         Vog.d(this, result)
 //        toast.showShort(result)
     }
 
-    override fun onExecutorFailed(errMsg: String) {
-        Vog.e(this, "onExecutorFailed" + errMsg)
-
-//        toast.showShort(errMsg)
+    override fun onExecuteFailed(errMsg: String) {
+        Vog.e(this, "onExecuteFailed" + errMsg)
+        toast.showShort(errMsg)
     }
 
     override fun onDestroy() {
@@ -293,7 +296,7 @@ class MainService : Service(), OnExecutorResult,
      */
     @Subscribe(threadMode = ThreadMode.POSTING)
     fun runAction(que: PriorityQueue<Action>) {
-        cExecutor.execQueue(que)
+        cExecutor.execQueue("测试runAction", que)
     }
 
     /**
@@ -303,12 +306,9 @@ class MainService : Service(), OnExecutorResult,
     fun runScript(ac: Action) {
         val q = PriorityQueue<Action>()
         q.add(ac)
-        cExecutor.execQueue(q)
+        cExecutor.execQueue("测试runScript", q)
     }
 
-    override fun toast(msg: String, showMillis: Int) {
-        toast.show(msg, showMillis)
-    }
 
     @Subscribe(threadMode = ThreadMode.ASYNC)
     fun stopExecutor(order: String) {

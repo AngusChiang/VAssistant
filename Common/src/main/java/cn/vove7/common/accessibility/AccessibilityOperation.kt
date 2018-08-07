@@ -1,6 +1,5 @@
 package cn.vove7.common.accessibility
 
-import cn.vove7.common.view.finder.ViewShowListener
 import cn.vove7.common.viewnode.ViewNode
 
 interface AccessibilityOperation {
@@ -12,6 +11,8 @@ interface AccessibilityOperation {
     fun findFirstNodeByTextWhitFuzzy(text: String): ViewNode?
 
     fun findNodeByText(text: String): List<ViewNode>
+
+    fun getRootViewNode(): ViewNode?
 
     /**
      * 自动查找

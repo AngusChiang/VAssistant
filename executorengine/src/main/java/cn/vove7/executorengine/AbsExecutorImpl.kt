@@ -3,23 +3,26 @@ package cn.vove7.executorengine
 import android.content.Context
 import android.os.Handler
 import android.os.Looper
+import android.support.annotation.CallSuper
 import cn.vove7.appbus.AppBus
 import cn.vove7.common.accessibility.AccessibilityApi
 import cn.vove7.common.bridges.*
 import cn.vove7.common.bridges.ShowDialogEvent.Companion.WHICH_SINGLE
 import cn.vove7.common.executor.CExecutorI
+import cn.vove7.common.executor.OnExecutorResult
 import cn.vove7.common.executor.PartialResult
 import cn.vove7.common.model.RequestPermission
 import cn.vove7.common.view.finder.ViewFindBuilder
+import cn.vove7.common.viewnode.ViewNode
 import cn.vove7.datamanager.DAO
 import cn.vove7.datamanager.executor.entity.MarkedContact
 import cn.vove7.datamanager.executor.entity.MarkedOpen
 import cn.vove7.datamanager.executor.entity.MarkedOpen.*
 import cn.vove7.datamanager.greendao.MarkedOpenDao
 import cn.vove7.datamanager.parse.model.Action
+import cn.vove7.datamanager.parse.model.ActionScope
 import cn.vove7.executorengine.bridges.SystemBridge
 import cn.vove7.executorengine.helper.ContactHelper
-import cn.vove7.executorengine.v1.OnExecutorResult
 import cn.vove7.executorengine.v1.SimpleActionScriptExecutor
 import cn.vove7.parseengine.engine.ParseEngine
 import cn.vove7.vtp.contact.ContactInfo
@@ -39,33 +42,59 @@ abstract class AbsExecutorImpl(
         val onExecutorResult: OnExecutorResult
 ) : CExecutorI {
     var accessApi: AccessibilityApi? = null
-    var lock = Object()
+    private var lock = Object()
     var currentAction: Action? = null
     private val contactHelper = ContactHelper(context)
     private val markedOpenDao = DAO.daoSession.markedOpenDao
-    val globalAutomator = GlobalActionAutomator(Handler(Looper.myLooper()))
+    val globalAutomator = GlobalActionAutomator(context, Handler(Looper.myLooper()))
 
-    lateinit var actionQueue: PriorityQueue<Action>
-
+    private lateinit var actionQueue: PriorityQueue<Action>
 
     private var thread: Thread? = null
-    override fun execQueue(actionQueue: PriorityQueue<Action>) {
+    override fun execQueue(cmdWords: String, actionQueue: PriorityQueue<Action>) {
         this.actionQueue = actionQueue
         if (thread != null && thread!!.isAlive) {
             thread!!.interrupt()
         }
         lock = Object()
         thread = thread(start = true, isDaemon = true, priority = Thread.MAX_PRIORITY) {
+            onExecutorResult.onExecuteStart(cmdWords)
             pollActionQueue()
             currentAction = null
-            onExecutorResult.onExecutorSuccess("执行完毕 ")
+            onExecutorResult.onExecuteFinished("执行结束")
+            onFinish()
         }
     }
 
+    /**
+     * 执行队列
+     */
+    private fun pollActionQueue() {
+        var r: PartialResult
+        while (actionQueue.isNotEmpty()) {
+            currentAction = actionQueue.poll()
+            r = runScript(currentAction!!.actionScript, currentAction!!.param.value)
+            when {
+                r.needTerminal -> {//出错
+                    currentAction = null
+                    onExecutorResult.onExecuteFailed(r.msg)
+                    return
+                }
+            }
+        }
+    }
+
+    override fun onFinish() {
+        thread = null
+        stop()
+    }
+
+    @CallSuper
     override fun stop() {
         if (thread != null) {
             thread!!.interrupt()
         }
+        accessApi?.removeAllNotifier(this)
     }
 
     /**********Function*********/
@@ -74,9 +103,9 @@ abstract class AbsExecutorImpl(
      * 打开: 应用 -> 其他额外
      */
     override fun openSomething(data: String): PartialResult {
-        val pkg = systemBridge.openAppByWord(data)
-        if (pkg != null) {//打开App 解析跟随操作
-            actionQueue = ParseEngine.matchAppAction(data, pkg)
+        val o = systemBridge.openAppByWord(data)
+        if (o.ok) {//打开App 解析跟随操作
+            actionQueue = ParseEngine.matchAppAction(data, o.returnValue)
             if (actionQueue.isNotEmpty()) Vog.d(this, "openSomething app内操作")
             else {
                 Vog.d(this, "openSomething 无后续操作")
@@ -86,7 +115,7 @@ abstract class AbsExecutorImpl(
             val r = checkAccessibilityService()
             return if (r.isSuccess) {
                 //等待App打开
-                val waitR = waitForApp(pkg)
+                val waitR = waitForApp(o.returnValue)
                 if (!waitR.isSuccess) return waitR
                 pollActionQueue()
                 PartialResult(true)
@@ -111,7 +140,7 @@ abstract class AbsExecutorImpl(
                 if (it.regStr.toRegex().matches(p))
                     openByIdentifier(it)//执行
             }
-            PartialResult(false)
+            PartialResult(false, "未知操作: $p")
         }
     }
 
@@ -121,12 +150,13 @@ abstract class AbsExecutorImpl(
     private fun openByIdentifier(it: MarkedOpen): PartialResult {
         return when (it.type) {
             MARKED_TYPE_APP -> {
-                PartialResult(systemBridge.openAppByPkg(it.value))
+                val o = systemBridge.openAppByPkg(it.value)
+                PartialResult(o.ok)
             }
             MARKED_TYPE_SYS_FUN -> {
                 when (it.value) {
                     "openFlash" -> {//手电
-                        PartialResult(systemBridge.openFlashlight())
+                        PartialResult(systemBridge.openFlashlight().ok)
                     }
                     else -> {
                         PartialResult(false)
@@ -143,10 +173,22 @@ abstract class AbsExecutorImpl(
         }
     }
 
-
-    override fun notifyShow() {
+    private var waitNode: ViewNode? = null
+    override fun notifyShow(node: ViewNode) {
+        Vog.d(this, "notifyShow node: $node")
+        waitNode = node
         notifySync()
-//        accessApi?.removeAllNotifier(this)
+    }
+
+    override fun getViewNode(): ViewNode {
+        val n = waitNode!!
+        waitNode = null
+        return n
+    }
+
+    override fun notifyShow(scope: ActionScope) {
+        Vog.d(this, "notifyShow $scope")
+        notifySync()
     }
 
     override fun notifySync() {
@@ -186,6 +228,7 @@ abstract class AbsExecutorImpl(
                 true
             } catch (e: InterruptedException) {
                 Vog.d(this, "被迫强行停止")
+                onExecutorResult.onExecuteFailed("被迫强行停止")
                 accessApi?.removeAllNotifier(this)
                 false
             }
@@ -206,49 +249,52 @@ abstract class AbsExecutorImpl(
         else PartialResult(false, true, "被迫强行停止")
     }
 
-    override fun waitForViewId(id: String): PartialResult {
+    override fun waitForViewId(id: String): ViewNode? {
         Vog.d(this, "waitForViewId $id")
         if (!checkAccessibilityService().isSuccess)
-            return PartialResult(false, true, SimpleActionScriptExecutor.ACCESSIBILITY_DONT_OPEN)
+            return null
 
 
         accessApi?.waitForView(this, ViewFindBuilder(this).id(id).viewFinderX)
-        return if (waitForUnlock())
-            PartialResult(true)
-        else PartialResult(false, true, "被迫强行停止")
+        waitForUnlock()
+        return getViewNode()
+
     }
 
-    override fun waitForDesc(desc: String): PartialResult {
+    override fun waitForDesc(desc: String): ViewNode? {
         Vog.d(this, "waitForDesc $desc")
 
         accessApi?.waitForView(this, ViewFindBuilder(this).desc(desc).viewFinderX)
-        return if (waitForUnlock())
-            PartialResult(true)
-        else PartialResult(false, true, "被迫强行停止")
+        waitForUnlock()
+        return getViewNode()
     }
 
-    override fun waitForText(text: String): PartialResult {
+    override fun waitForText(text: String): ViewNode? {
         Vog.d(this, "waitForText $text")
         if (!checkAccessibilityService().isSuccess)
-            return PartialResult(false, true, SimpleActionScriptExecutor.ACCESSIBILITY_DONT_OPEN)
+            return null
         accessApi?.waitForView(this, ViewFindBuilder(this).containsText(text).viewFinderX)
-        return if (waitForUnlock())
-            PartialResult(true)
-        else PartialResult(false, true, "被迫强行停止")
+        waitForUnlock()
+        return getViewNode()
     }
 
     /**
      * 等待语音参数
      */
-    override fun waitForVoiceParam(action: Action): PartialResult {
-        serviceBridge.getVoiceParam(action)
+    override fun waitForVoiceParam(askWord: String?): String? {
+        if (askWord != null) {
+            currentAction?.param?.askText = askWord
+        }
+        serviceBridge.getVoiceParam(currentAction!!)
         return if (waitForUnlock())
         //得到结果 -> action.param
-            if (!action.responseResult) {
-                PartialResult(false, true, "获取语音参数失败")
+            if (!currentAction!!.responseResult) {
+                null
+//                PartialResult(false, true, "获取语音参数失败")
             } else
-                PartialResult(true, "等到参数重新执行")//重复执行
-        else PartialResult(false, true, "被迫强行停止")
+                currentAction!!.param.value
+        //PartialResult(true, "等到参数重新执行")//重复执行
+        else null//PartialResult(false, true, "被迫强行停止")
     }
 
     /**
@@ -273,12 +319,11 @@ abstract class AbsExecutorImpl(
      * 等待确认结果
      * @param msg 提示信息
      */
-    override fun waitForAlertResult(msg: String): PartialResult {
-        AppBus.post(ShowAlertEvent("确认以继续",msg, currentAction !!))
+    override fun alert(title: String, msg: String): Boolean {
+        AppBus.post(ShowAlertEvent("确认以继续", msg, currentAction!!))
         return if (waitForUnlock()) {
-            val r = currentAction!!.responseResult
-            PartialResult(r, !r, "$msg -> $r")
-        } else PartialResult(false, true, "被迫强行停止")
+            currentAction!!.responseResult
+        } else false
     }
 
     /**
@@ -296,13 +341,15 @@ abstract class AbsExecutorImpl(
      */
     fun goHome(): Boolean = globalAutomator.home()
 
-
     /**
      * 拨打
      */
     fun smartCallPhone(s: String): PartialResult {
         val result = systemBridge.call(s)
-        return if (result == null) {
+        return if (!result.ok) {
+            if (!alert("未找到该联系人", "选择是否标记联系人")) {
+                PartialResult(false)
+            }
             //标识联系人
             if (waitForSingleChoice("选择要标识的联系人", contactHelper.getChoiceData())) {
                 val bundle = currentAction!!.responseBundle
@@ -316,8 +363,8 @@ abstract class AbsExecutorImpl(
                     marked.phone = choiceData.subtitle
                     contactHelper.addMark(marked)//保存
                 }
-                val s = systemBridge.call(choiceData.subtitle!!)
-                PartialResult(s == null, s ?: "")
+                val sss = systemBridge.call(choiceData.subtitle!!)
+                PartialResult(sss.ok, if (!sss.ok) sss.errMsg else "")
             } else {
                 PartialResult(false, true, "取消")
             }
@@ -335,26 +382,8 @@ abstract class AbsExecutorImpl(
     override fun sleep(millis: Long) {
         try {
             Thread.sleep(millis)
-        } catch (e: InterruptedException) {
-
-        }
-    }
-
-    /**
-     * 执行队列
-     */
-    private fun pollActionQueue() {
-        var r: PartialResult
-        while (actionQueue.isNotEmpty()) {
-            currentAction = actionQueue.poll()
-            r = runScript(currentAction!!.actionScript, currentAction!!.param.value)
-            when {
-                r.needTerminal -> {//出错
-                    currentAction = null
-                    onExecutorResult.onExecutorFailed(r.msg)
-                    return
-                }
-            }
+        } catch (e: Exception) {
+            e.printStackTrace()
         }
     }
 
