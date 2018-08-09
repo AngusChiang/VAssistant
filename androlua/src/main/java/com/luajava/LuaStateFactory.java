@@ -49,7 +49,7 @@ public final class LuaStateFactory {
     }
 
     /**
-     * Method that creates a new instance of LuaState
+     * Method that creates a new APP of LuaState
      *
      * @return LuaState
      */

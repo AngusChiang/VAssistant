@@ -1,5 +1,6 @@
 package cn.vove7.jarvis
 
+import cn.vove7.appbus.utils.TextHelper
 import org.junit.Test
 
 /**
@@ -38,6 +39,17 @@ class ExampleUnitTest {
     @Test
     fun simpleTest() {
         println("123".startsWith(""))
+    }
+
+    @Test
+    fun testChinese2First() {
+        arrayOf(
+                "一二三",
+                "i我和欧文h",
+                "吗朦胧"
+        ).forEach {
+            println(TextHelper.chineseStr2Pinyin(it,true))
+        }
     }
 
 }

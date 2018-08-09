@@ -7,6 +7,6 @@
 require 'accessibility'
 
 a = ViewFinder().id('lua_args').findFirst()
-a.setText('hello')
--- 还可以
--- ViewFinder().id('lua_args').setText('hello')
+for i = 0, 9 do
+    a.setText('' .. i)
+end

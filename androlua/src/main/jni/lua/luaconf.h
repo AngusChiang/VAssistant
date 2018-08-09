@@ -22,7 +22,7 @@
 /*
 ** {====================================================================
 ** System Configuration: macros to adapt (if needed) Lua to some
-** particular platform, for instance compiling it with 32-bit numbers or
+** particular platform, for APP compiling it with 32-bit numbers or
 ** restricting it to C89.
 ** =====================================================================
 */

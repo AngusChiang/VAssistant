@@ -61,7 +61,6 @@ abstract class AbsExecutorImpl(
             onExecutorResult.onExecuteStart(cmdWords)
             pollActionQueue()
             currentAction = null
-            onExecutorResult.onExecuteFinished("执行结束")
             onFinish()
         }
     }
@@ -85,14 +84,18 @@ abstract class AbsExecutorImpl(
     }
 
     override fun onFinish() {
-        thread = null
-        stop()
+        onExecutorResult.onExecuteFinished("执行结束")
     }
 
     @CallSuper
-    override fun stop() {
+    override fun interrupt() {
         if (thread != null) {
-            thread!!.interrupt()
+            try {
+                thread!!.checkAccess()
+                thread!!.interrupt()
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
         }
         accessApi?.removeAllNotifier(this)
     }
@@ -243,7 +246,7 @@ abstract class AbsExecutorImpl(
         if (!checkAccessibilityService().isSuccess)
             return PartialResult(false, true, SimpleActionScriptExecutor.ACCESSIBILITY_DONT_OPEN)
 
-        accessApi?.waitForActivity(this, pkg, activityName)
+        accessApi?.waitForActivity(this, ActionScope(pkg, activityName))
         return if (waitForUnlock())
             PartialResult(true)
         else PartialResult(false, true, "被迫强行停止")
@@ -301,18 +304,19 @@ abstract class AbsExecutorImpl(
      * 等待单选结果
      * @return if 调用成功 true else false
      */
-    private fun waitForSingleChoice(askTitle: String, choiceData: List<ChoiceData>): Boolean {
+    override fun waitForSingleChoice(askTitle: String, choiceData: List<ChoiceData>): ChoiceData? {
         //通知显示单选框
         AppBus.post(ShowDialogEvent(WHICH_SINGLE, currentAction!!, askTitle, choiceData))
-        return if (waitForUnlock())
+        return (if (waitForUnlock())
             if (currentAction!!.responseResult) {
                 Vog.d(this, "结果： have data")
-                true
+                val bundle = currentAction!!.responseBundle
+                bundle.getSerializable("data") as ChoiceData
             } else {
                 Vog.d(this, "结果： 取消")
-                false
+                null
             }
-        else false
+        else null).also { Vog.d(this,"waitForSingleChoice result : $it") }
     }
 
     /**
@@ -321,9 +325,11 @@ abstract class AbsExecutorImpl(
      */
     override fun alert(title: String, msg: String): Boolean {
         AppBus.post(ShowAlertEvent("确认以继续", msg, currentAction!!))
-        return if (waitForUnlock()) {
+        return (if (waitForUnlock()) {
             currentAction!!.responseResult
-        } else false
+        } else false).also {
+            Vog.d(this,"alert result > $it")
+        }
     }
 
     /**
@@ -347,21 +353,22 @@ abstract class AbsExecutorImpl(
     fun smartCallPhone(s: String): PartialResult {
         val result = systemBridge.call(s)
         return if (!result.ok) {
-            if (!alert("未找到该联系人", "选择是否标记联系人")) {
-                PartialResult(false)
+            if (!alert("未识别该联系人", "选择是否标记该联系人: $s")) {
+                return PartialResult(false)
             }
             //标识联系人
-            if (waitForSingleChoice("选择要标识的联系人", contactHelper.getChoiceData())) {
-                val bundle = currentAction!!.responseBundle
-                val choiceData = bundle.getSerializable("data") as ChoiceData
+            val choiceData =
+                waitForSingleChoice("选择要标识的联系人", contactHelper.getChoiceData())
+            if (choiceData != null) {
                 //开启线程
                 thread {
+                    //保存标记
                     val data = choiceData.originalData as ContactInfo
                     val marked = MarkedContact()
                     marked.key = s
                     marked.contactName = data.contactName
                     marked.phone = choiceData.subtitle
-                    contactHelper.addMark(marked)//保存
+                    contactHelper.addMark(marked)
                 }
                 val sss = systemBridge.call(choiceData.subtitle!!)
                 PartialResult(sss.ok, if (!sss.ok) sss.errMsg else "")
@@ -384,6 +391,8 @@ abstract class AbsExecutorImpl(
             Thread.sleep(millis)
         } catch (e: Exception) {
             e.printStackTrace()
+            Thread.currentThread().interrupt()
+            Thread.currentThread().stop()
         }
     }
 

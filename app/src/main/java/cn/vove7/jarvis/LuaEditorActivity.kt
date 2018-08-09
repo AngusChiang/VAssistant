@@ -2,6 +2,7 @@ package cn.vove7.jarvis
 
 import android.annotation.SuppressLint
 import android.app.Activity
+import android.app.AlertDialog
 import android.os.Bundle
 import android.os.Handler
 import android.os.Message
@@ -35,6 +36,7 @@ class LuaEditorActivity : Activity(), OnClickListener {
     var nowIndex = 0
 
     var testFiles = arrayOfNulls<String>(0)
+    var scripts = ArrayList<String>()
 
     @SuppressLint("HandlerLeak")
     internal var handler: Handler = object : Handler() {
@@ -77,10 +79,13 @@ class LuaEditorActivity : Activity(), OnClickListener {
         status = findViewById(R.id.statusText)
         status.movementMethod = ScrollingMovementMethod.getInstance()
 
-//        luaHelper = LuaApp.instance.luaHelper
+//        luaHelper = LuaApp.APP.luaHelper
 
         try {
             testFiles = assets.list("sample")
+            testFiles.forEach {
+                scripts.add(it!!)
+            }
             Vog.d(this, "onCreate  ----> " + Arrays.toString(testFiles))
             if (testFiles.isNotEmpty()) {
                 source.setText(LuaUtil.getTextFromAsset(this, "sample/" + testFiles[0]))
@@ -127,6 +132,15 @@ class LuaEditorActivity : Activity(), OnClickListener {
                 source.setText(LuaUtil.getTextFromAsset(this, "sample/" + testFiles[nowIndex]))
             }
             R.id.stop -> AppBus.post("stop execQueue")
+            R.id.choose_script -> {//选择jio本
+                AlertDialog.Builder(this).setTitle("选择jio本").setItems(testFiles) { d, p ->
+                    nowIndex = p
+                    source.setText(LuaUtil.getTextFromAsset(this@LuaEditorActivity,
+                            "sample/" + testFiles[p]))
+                    d.dismiss()
+                }.show()
+            }
         }
     }
+
 }

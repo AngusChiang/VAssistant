@@ -84,7 +84,7 @@ public class ActionScope {
         if (o == null || getClass() != o.getClass()) return false;
         ActionScope that = (ActionScope) o;
         return packageName.startsWith(that.packageName) &&
-                (Objects.equals(that.activity, "null") || Objects.equals(activity, that.activity));
+                (that.activity == null || Objects.equals(activity, that.activity));
     }
 
     @Override

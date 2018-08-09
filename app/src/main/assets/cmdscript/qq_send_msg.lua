@@ -6,6 +6,7 @@
 
 i = ViewFinder().id('input').waitFor()
 i.setText(args[1])
-alert('确认发送?', '')
-sleep(500)
-clickById('fun_btn')
+if (alert('确认发送?', '')) then
+    sleep(300)
+    clickById('fun_btn')
+end

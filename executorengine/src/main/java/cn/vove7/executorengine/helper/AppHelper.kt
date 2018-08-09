@@ -34,7 +34,7 @@ class AppHelper(private val context: Context) {
                 appWord.startsWith(it.name) -> 1f
                 else -> try {
                     Vog.v(this, "matchAppName $appWord ${it.name}")
-                    TextHelper.compareSimilarityWithPinyin(appWord, it.name)
+                    TextHelper.compareSimilarityWithPinyin(context,appWord, it.name)
                 } catch (e: Exception) {
                     e.printStackTrace()
                     0f

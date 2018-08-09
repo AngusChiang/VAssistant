@@ -54,8 +54,8 @@ class LuaExecutor(
         }
     }
 
-    override fun stop() {
-        super.stop()
+    override fun interrupt() {
+        super.interrupt()
         luaHelper.stop()
     }
 }

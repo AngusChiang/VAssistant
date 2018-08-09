@@ -36,6 +36,7 @@ class LuaThread : Thread, LuaMetaTable, LuaGcable, LuaRunnableI {
         luaManager.regGc(this)
         this.luaManager = luaManager
         mSrc = src
+        isDaemon = true
         mIsLoop = isLoop
         if (arg != null)
             mArg = arg
@@ -56,6 +57,7 @@ class LuaThread : Thread, LuaMetaTable, LuaGcable, LuaRunnableI {
         mIsLoop = isLoop
         mBuffer = func.dump()
 
+        isDaemon = true
         luaHelper = LuaHelper(LuaApp.instance)
         L = luaHelper.L
         funHelper = LuaFunHelper(luaHelper, L)
@@ -141,6 +143,7 @@ class LuaThread : Thread, LuaMetaTable, LuaGcable, LuaRunnableI {
         if (isRun) {
             isRun = false
             tHandler!!.looper.quit()
+            stop()
         }
     }
 

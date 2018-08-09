@@ -5,7 +5,9 @@
 --
 
 
+require 'accessibility'
 ViewFinder().desc('返回消息').tryClick()
+sleep(110)
 msg = ViewFinder().id('name').equalsText('消息').await()
 msg.doubleClick()
 s = ViewFinder().id('et_search_keyword')

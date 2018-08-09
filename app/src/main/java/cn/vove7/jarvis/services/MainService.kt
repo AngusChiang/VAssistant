@@ -315,7 +315,7 @@ class MainService : Service(), OnExecutorResult,
         when (order) {
             "stop execQueue" -> {
                 AppBus.postSpeechAction(SpeechAction(SpeechAction.ACTION_STOP))
-                cExecutor.stop()
+                cExecutor.interrupt()
             }
             else -> {
             }

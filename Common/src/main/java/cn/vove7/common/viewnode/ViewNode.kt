@@ -5,8 +5,9 @@ import android.os.Build
 import android.os.Bundle
 import android.view.ViewConfiguration
 import android.view.accessibility.AccessibilityNodeInfo
+import cn.vove7.common.app.GlobalApp
 import cn.vove7.vtp.log.Vog
-import cn.vove7.vtp.text.TextHelper
+import cn.vove7.vtp.text.TextTransHelper
 import java.lang.Thread.sleep
 
 /**
@@ -161,11 +162,13 @@ class ViewNode(val node: AccessibilityNodeInfo) : ViewOperation, Comparable<View
         if (ep == null) return text
         return when (ep) {
             "1" -> {//转中文拼音首字母
-                TextHelper.chineseStr2Pinyin(text, true)
+                TextTransHelper(GlobalApp.APP!!).chineseStr2Pinyin(text, true)
             }
             else -> {
                 text
             }
+        }.also {
+            Vog.d(this, "transText $ep $it")
         }
     }
 

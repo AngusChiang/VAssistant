@@ -62,10 +62,11 @@ class MyAccessibilityService : AccessibilityApi() {
      * - pair.first pkg
      * - pair.second activity
      */
-    private val locksWaitForActivity = mutableMapOf<ActivityShowListener, Pair<String, String>>()
+    private val locksWaitForActivity
+            = mutableMapOf<ActivityShowListener, ActionScope>()
 
-    override fun waitForActivity(executor: CExecutorI, pkg: String, activityName: String?) {
-        locksWaitForActivity[executor] = Pair(pkg, "$activityName")
+    override fun waitForActivity(executor: CExecutorI, scope: ActionScope) {
+        locksWaitForActivity[executor] = scope
         thread {
             sleep(200)
             activityNotifier.notifyIfShow()
@@ -247,24 +248,20 @@ class MyAccessibilityService : AccessibilityApi() {
     }
 
     override fun getService(): AccessibilityService = this
-    /**
-     * 构建id
-     */
-    private fun buildId(id: String): String = rootInActiveWindow.packageName.toString() + ":viewId/" + id
 
 
     /**
      * 匹配  ***.***.***:id/view_id
      */
     override fun findNodeById(id: String): List<ViewNode> {
-        val list = ViewFinderById(this, id).findAll()
-        Vog.d(this, "findNodeById size :${list.size}")
-        return list
+        return ViewFindBuilder()
+                .id(id).find()
+                .also { Vog.d(this, "findNodeById size :${it.size}") }
     }
 
-    //TODO :autoFindByText
-    override fun autoFindByText() {
-    }
+//    //TODO :autoFindByText
+//    override fun autoFindByText() {
+//    }
 
     //TODO :utilFindById
     override fun utilFindById() {
@@ -285,24 +282,19 @@ class MyAccessibilityService : AccessibilityApi() {
     }
 
     override fun findFirstNodeByIdAndText(id: String, text: String): ViewNode? {
-        val l = findNodeByText(text)
-        l.forEach {
-            Vog.d(this, "findFirstNodeByIdAndText ${it.node.viewIdResourceName}")
-            if (it.node.viewIdResourceName != null && it.node.viewIdResourceName.endsWith("/$id")) {
-                Vog.d(this, "findFirstNodeByIdAndText find it")
-                return it
-            }
-        }
-        Vog.d(this, "findFirstNodeByIdAndText didn't find it")
-        return null
+        return ViewFindBuilder()
+                .containsText(text)
+                .id(id)
+                .findFirst()
+                .also { Vog.d(this, "findFirstNodeByIdAndText $it") }
     }
 
     override fun findFirstNodeById(id: String): ViewNode? {
-        return ViewFinderById(this, id).findFirst()
+        return ViewFindBuilder().id(id).findFirst()
     }
 
     override fun findFirstNodeByDesc(desc: String): ViewNode? {
-        return ViewFinderByDesc(this, desc).findFirst()
+        return ViewFindBuilder().desc(desc).findFirst()
     }
 
     override fun findFirstNodeByText(text: String): ViewNode? {
@@ -311,8 +303,7 @@ class MyAccessibilityService : AccessibilityApi() {
     }
 
     override fun findFirstNodeByTextWhitFuzzy(text: String): ViewNode? {
-        return ViewFinderByText(this,
-                ViewFinderByText.MATCH_MODE_FUZZY_WITH_PINYIN, text).findFirst()
+        return ViewFindBuilder().similaryText(text).findFirst()
     }
 
     override fun findNodeByText(text: String): List<ViewNode> {
@@ -333,10 +324,9 @@ class MyAccessibilityService : AccessibilityApi() {
      *  Notifier By [currentScope]
      */
     private val activityNotifier = object : ShowListener {
-        fun fill(data: Pair<String, String>): Boolean {
-            val s = ActionScope(data.first, data.second)
-            Vog.v(this, "filter $currentScope - $s")
-            return currentScope == s
+        fun fill(data: ActionScope): Boolean {
+            Vog.v(this, "filter $currentScope - $data")
+            return currentScope == data
         }
 
         override fun notifyIfShow() {

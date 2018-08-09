@@ -22,6 +22,16 @@ class SimpleActionScriptExecutor(
         onExecutorResult: OnExecutorResult
 ) : AbsExecutorImpl(context, systemBridge, serviceBridge, onExecutorResult) {
 
+    /**
+     * 格式：
+     * openApp:$var
+     * clickText:$var
+     * clickId:$var
+     * back
+     * recent
+     * pullNotification
+     * call
+     */
     override fun runScript(script: String, voiceArg: String?): PartialResult {
 
         var execLog = ""

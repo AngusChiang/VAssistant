@@ -21,21 +21,21 @@ class ViewFinderWithMultiCondition(accessibilityService: AccessibilityApi) : Vie
     override fun findCondition(node: AccessibilityNodeInfo): Boolean {
         if (viewText != null) {
             when (textMatchMode) {
-                ViewFinderByText.MATCH_MODE_EQUAL -> {
+                MATCH_MODE_EQUAL -> {
                     val b = node.text != null && node.text == viewText
                     if (!b) return false
                 }
-                ViewFinderByText.MATCH_MODE_CONTAIN -> {
+                MATCH_MODE_CONTAIN -> {
                     val b = node.text != null && node.text.contains(viewText!!)
                     if (!b) return false
                 }
-                ViewFinderByText.MATCH_MODE_FUZZY_WITH_PINYIN -> {
-                    val f = TextHelper.compareSimilarityWithPinyin("${node.text}", viewText!!)
+                MATCH_MODE_FUZZY_WITH_PINYIN -> {
+                    val f = TextHelper.compareSimilarityWithPinyin(accessibilityService, "${node.text}", viewText!!)
                     Vog.v(this, "findCondition $f")
                     if (f < 0.9)
                         return false
                 }
-                ViewFinderByText.MATCH_MODE_FUZZY_WITHOUT_PINYIN -> {
+                MATCH_MODE_FUZZY_WITHOUT_PINYIN -> {
                     val f = TextHelper.compareSimilarity("${node.text}", viewText!!)
                     Vog.v(this, "findCondition $f")
                     if (f < 0.8)
@@ -55,5 +55,11 @@ class ViewFinderWithMultiCondition(accessibilityService: AccessibilityApi) : Vie
         if (desc != null && "${node.contentDescription}" != desc)
             return false
         return true
+    }
+    companion object {
+        const val MATCH_MODE_EQUAL = 427
+        const val MATCH_MODE_CONTAIN = 426
+        const val MATCH_MODE_FUZZY_WITH_PINYIN = 100
+        const val MATCH_MODE_FUZZY_WITHOUT_PINYIN = 227
     }
 }

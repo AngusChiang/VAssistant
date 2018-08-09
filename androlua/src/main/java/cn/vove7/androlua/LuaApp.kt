@@ -1,7 +1,7 @@
 package cn.vove7.androlua
 
-import android.app.Application
 import cn.vove7.androlua.luabridge.LuaUtil
+import cn.vove7.common.app.GlobalApp
 import java.io.File
 import java.io.IOException
 
@@ -12,7 +12,7 @@ import java.io.IOException
  *
  * Created by Vove on 2018/7/31
  */
-open class LuaApp : Application() {
+open class LuaApp : GlobalApp() {
 
     private var luaDir: String? = null
 //    lateinit var luaHelper: LuaHelper
@@ -24,7 +24,7 @@ open class LuaApp : Application() {
     override fun onCreate() {
         super.onCreate()
         instance = this
-        //CrashHandler crashHandler = CrashHandler.getInstance();
+        //CrashHandler crashHandler = CrashHandler.getAPP();
         //// 注册crashHandler
         //crashHandler.init(getApplicationContext());
 

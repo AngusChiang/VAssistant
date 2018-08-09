@@ -11,6 +11,7 @@ import cn.vove7.appbus.VoiceData
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.services.MainService
 import cn.vove7.jarvis.speech.services.SpeechService
+import cn.vove7.jarvis.utils.ServiceChecker
 import cn.vove7.vtp.floatwindow.AbFloatWindow
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
@@ -36,13 +37,14 @@ class VoiceFloat(
         holder.voiceImage.setOnClickListener {
             if (SpeechService.instance.isListening()) {
                 AppBus.postSpeechAction(SpeechAction(SpeechAction.ACTION_STOP))
-            } else
+            } else {
+                ServiceChecker(context).checkService()
                 AppBus.postSpeechAction(SpeechAction(SpeechAction.ACTION_START))
+            }
         }
 
         return holder
     }
-
 
     override fun show() {
         AppBus.reg(this)

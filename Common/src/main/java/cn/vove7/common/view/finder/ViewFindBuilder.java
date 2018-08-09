@@ -14,6 +14,10 @@ import cn.vove7.common.viewnode.ViewNode;
 import cn.vove7.common.viewnode.ViewOperation;
 import cn.vove7.vtp.log.Vog;
 
+import static cn.vove7.common.view.finder.ViewFinderWithMultiCondition.MATCH_MODE_CONTAIN;
+import static cn.vove7.common.view.finder.ViewFinderWithMultiCondition.MATCH_MODE_EQUAL;
+import static cn.vove7.common.view.finder.ViewFinderWithMultiCondition.MATCH_MODE_FUZZY_WITH_PINYIN;
+
 
 /**
  * @author Vove
@@ -37,7 +41,7 @@ public class ViewFindBuilder implements ViewOperation {
         this.executor = executor;
     }
 
-    private ViewFindBuilder() {
+    public ViewFindBuilder() {
         accessibilityService =
                 AccessibilityApi.Companion.getAccessibilityService();
         if (accessibilityService == null) {//没有运行
@@ -48,9 +52,14 @@ public class ViewFindBuilder implements ViewOperation {
     }
 
     /**
+     * 需要CExecutorI
      * @return ViewNode which is returned until show in screen
      */
     public ViewNode waitFor() {
+        if (executor == null) {
+            Vog.INSTANCE.d(this, "执行器 null");
+            return null;
+        }
         if (accessibilityService != null) {
             accessibilityService.waitForView(executor, viewFinderX);
             executor.waitForUnlock(-1);
@@ -68,7 +77,7 @@ public class ViewFindBuilder implements ViewOperation {
      */
     public ViewFindBuilder containsText(String text) {
         viewFinderX.setViewText(text);
-        viewFinderX.setTextMatchMode(ViewFinderByText.MATCH_MODE_CONTAIN);
+        viewFinderX.setTextMatchMode(MATCH_MODE_CONTAIN);
         return this;
     }
 
@@ -79,7 +88,7 @@ public class ViewFindBuilder implements ViewOperation {
      */
     public ViewFindBuilder equalsText(String text) {
         viewFinderX.setViewText(text);
-        viewFinderX.setTextMatchMode(ViewFinderByText.MATCH_MODE_EQUAL);
+        viewFinderX.setTextMatchMode(MATCH_MODE_EQUAL);
         return this;
     }
 
@@ -91,7 +100,7 @@ public class ViewFindBuilder implements ViewOperation {
      */
     public ViewFindBuilder similaryText(String text) {
         viewFinderX.setViewText(text);
-        viewFinderX.setTextMatchMode(ViewFinderByText.MATCH_MODE_FUZZY_WITH_PINYIN);
+        viewFinderX.setTextMatchMode(MATCH_MODE_FUZZY_WITH_PINYIN);
         return this;
     }
 

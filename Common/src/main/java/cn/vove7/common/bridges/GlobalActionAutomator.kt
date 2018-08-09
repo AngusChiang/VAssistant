@@ -22,10 +22,10 @@ import cn.vove7.vtp.toast.Voast
 class GlobalActionAutomator : ActionAutomatorI {
 
     val context: Context
-    lateinit var mService: AccessibilityService
+    private lateinit var mService: AccessibilityService
     private var mHandler: Handler? = null
     private val mScreenMetrics = ScreenMetrics()
-    private lateinit var toast: Voast
+    private var toast: Voast
 
     constructor(context: Context, mService: AccessibilityService, mHandler: Handler) : this(context, mHandler) {
         this.mService = mService

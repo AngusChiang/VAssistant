@@ -34,18 +34,20 @@ object InitLuaDbData : InitDbData() {
                     "end\n" +
                     "\n")
             val a3 = Action(
-                            "require 'accessibility'\n" +
+                    "require 'accessibility'\n" +
                             "ViewFinder().desc('返回消息').tryClick()\n" +
+                            "sleep(110)\n" +
                             "msg = ViewFinder().id('name').equalsText('消息').await()\n" +
                             "msg.doubleClick()\n" +
-                            "s = ViewFinder().id('et_search_keyword').findFirst()\n" +
+                            "s = ViewFinder().id('et_search_keyword')\n" +
                             "s.tryClick()\n" +
                             "sleep(110)\n" +
-                            "s.setText(args[1], '1')\n" +
+                            "s.setTextWithInitial(args[1])\n" +
+                            "sleep(110)\n" +
                             "a = ViewFinder().id('title').similaryText(args[1]).tryClick()\n" +
                             "if (not a) then\n" +
                             "    toast('没找到哦')\n" +
-                            "end")
+                            "end\n")
 
             val a4 = Action(2,
                     "require 'accessibility'\n" +
@@ -75,7 +77,7 @@ object InitLuaDbData : InitDbData() {
             val a10 = Action("clickById")
 
             val a11 = Action(
-                            "require 'accessibility'\n" +
+                    "require 'accessibility'\n" +
                             "\n" +
                             "k=waitForDesc('快捷入口')\n" +
                             "k.tryClick()\n" +

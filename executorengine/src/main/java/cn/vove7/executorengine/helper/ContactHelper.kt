@@ -1,40 +1,35 @@
 package cn.vove7.executorengine.helper
 
 import android.content.Context
+import cn.vove7.common.app.GlobalApp
+import cn.vove7.common.bridges.ChoiceData
+import cn.vove7.common.bridges.GenChoiceData
+import cn.vove7.common.model.MatchedData
 import cn.vove7.datamanager.DAO
 import cn.vove7.datamanager.executor.entity.MarkedContact
 import cn.vove7.datamanager.greendao.MarkedContactDao
 import cn.vove7.datamanager.greendao.ServerContactDao
-import cn.vove7.common.bridges.ChoiceData
-import cn.vove7.common.bridges.GenChoiceData
-import cn.vove7.common.model.MatchedData
+import cn.vove7.executorengine.model.Markable
 import cn.vove7.vtp.contact.ContactHelper
 import cn.vove7.vtp.contact.ContactInfo
 import cn.vove7.vtp.log.Vog
 import cn.vove7.vtp.text.TextHelper
+import java.text.Collator
+import java.util.*
 
 /**
  * 联系人
  *
  * Created by Vove on 2018/6/19
  */
-class ContactHelper(val context: Context) : GenChoiceData {
+class ContactHelper(val context: Context) : GenChoiceData, Markable<MarkedContact> {
     //Dao
     private val markedContactDao = DAO.daoSession.markedContactDao
     private val serverContactDao = DAO.daoSession.serverContactDao
 
-    /**
-     * 服务提供的电话表
-     */
-//    var serverContact = hashMapOf(
-//            Pair("中国移动", Pair("(中国)?移动", "10086")),
-//            Pair("中国联通", Pair("(中国)?联通", "10010")),
-//            Pair("中国电信", Pair("(中国)?电信", "10000"))
-//    )
-
-    fun addMark(marked: MarkedContact) {
+    override fun addMark(data: MarkedContact) {
         //数据库
-        markedContactDao.insert(marked)
+        markedContactDao.insert(data)
     }
 
     private val allNum = "1[0-9]*".toRegex()
@@ -112,8 +107,8 @@ class ContactHelper(val context: Context) : GenChoiceData {
         list.forEach {
             val rate = when (s) {
                 it.contactName -> 1f
-            //转拼音比较
-                else -> TextHelper.compareSimilarityWithPinyin(s, it.contactName)
+                //转拼音比较
+                else -> TextHelper.compareSimilarityWithPinyin(GlobalApp.APP!!, s, it.contactName)
             }
             if (rate >= limitRate) {
                 Vog.d(this, "${it.contactName}: $rate")
@@ -123,6 +118,8 @@ class ContactHelper(val context: Context) : GenChoiceData {
         Vog.d(this, "模糊匹配联系人: ${matchList.size}")
         return matchList
     }
+
+    private val CHINA_COMPARE = Collator.getInstance(java.util.Locale.CHINA)
 
     /**
      * 获取标识列表

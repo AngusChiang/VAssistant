@@ -9,6 +9,7 @@ if (not openSomething('QQ')) then
     return
 end
 
+sleep(110)
 ViewFinder().desc('返回消息').tryClick()
 msg = ViewFinder().id('name').equalsText('消息').await()
 msg.doubleClick()

@@ -28,14 +28,7 @@ public class Action implements Comparable<Action> {
     private long nodeId;
 
     /**
-     * 格式：
-     * openApp:$var
-     * clickText:$var
-     * clickId:$var
-     * back
-     * recent
-     * pullNotification
-     * call
+     * 脚本
      */
     private String actionScript;
     /**

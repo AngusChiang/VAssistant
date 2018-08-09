@@ -17,7 +17,7 @@ interface AccessibilityOperation {
     /**
      * 自动查找
      */
-    fun autoFindByText()
+//    fun autoFindByText()
 
     /**
      * 直到找到

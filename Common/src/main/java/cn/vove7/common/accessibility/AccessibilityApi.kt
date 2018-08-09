@@ -35,7 +35,7 @@ interface AccessibilityListener {
      */
     fun waitForView(executor: CExecutorI, finder: ViewFinder)
 
-    fun waitForActivity(executor: CExecutorI, pkg: String, activityName: String?)
+    fun waitForActivity(executor: CExecutorI, scope: ActionScope)
     /**
      * remove all notifier when was interrupted
      */

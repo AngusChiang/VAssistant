@@ -1,9 +1,10 @@
 package cn.vove7.common.bridges
 
 import android.graphics.drawable.Drawable
-import android.widget.Toast
 import cn.vove7.datamanager.parse.model.Action
 import java.io.Serializable
+import java.text.Collator
+
 
 /**
  *
@@ -30,7 +31,7 @@ interface ServiceBridge {
 }
 
 class ShowAlertEvent(
-        val title:String,
+        val title: String,
         val msg: String,
         val action: Action
 )
@@ -53,13 +54,26 @@ open class ChoiceData(
         val subtitle: String? = null,
         val originalData: Any
 ) : Serializable, Comparable<ChoiceData> {
-    override fun compareTo(other: ChoiceData): Int {
-        return when {
-            title > other.title -> 1
-            title < other.title -> -1
-            else -> 0
-        }
+
+    companion object {
+        var CollChina = Collator.getInstance(java.util.Locale.CHINA)
     }
+
+    override fun compareTo(other: ChoiceData): Int {
+        var tt1 = CollChina.getCollationKey(this.title)
+        var tt2 = CollChina.getCollationKey(other.title)
+        val c = CollChina.compare(tt1.sourceString, tt2.sourceString)
+        return if (c == 0) {
+            tt1 = CollChina.getCollationKey(this.subtitle)
+            tt2 = CollChina.getCollationKey(other.subtitle)
+            CollChina.compare(tt1.sourceString, tt2.sourceString)
+        } else c
+    }
+
+    override fun toString(): String {
+        return "ChoiceData(title='$title', subtitle=$subtitle, originalData=$originalData)"
+    }
+
 }
 
 /**

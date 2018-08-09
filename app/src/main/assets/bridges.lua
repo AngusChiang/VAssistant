@@ -25,6 +25,17 @@ end
 --local serviceBridge = bridges.serviceBridge
 --local systemBridge = bridges.systemBridge
 
+function clickById(id)
+    ViewFinder().id(id).tryClick()
+end
+
+function clickText(text)
+    ViewFinder().equalsText(text).tryClick()
+end
+
+function clickByDesc(desc)
+    ViewFinder().desc(desc).tryClick()
+end
 
 function swipe(x, y1, x2, y2, delay)
     automator.swipe(x, y1, x2, y2, delay)
@@ -197,3 +208,11 @@ function rootView()
     end
 end
 
+import 'cn.vove7.vtp.text.TextTransHelper'
+function toPinyin(text)
+    return TextTransHelper(app).chineseStr2Pinyin(text, false)
+end
+
+function toFirstPinyin(text)
+    return TextTransHelper(app).chineseStr2Pinyin(text, true)
+end

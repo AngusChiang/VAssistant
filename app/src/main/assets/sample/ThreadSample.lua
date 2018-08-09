@@ -7,11 +7,11 @@
 --
 
 
--- a=0
+a = 0
 function f(s)
     for j = 0, 9 do
-        print(s ..'-->'.. j)
---        a=a+1 xian'chen   线程函数内不可访问外部变量
+        print(s .. '-->' .. j .. a)
+        a = a + 1 --  线程函数内不可访问外部变量
     end
 end
 

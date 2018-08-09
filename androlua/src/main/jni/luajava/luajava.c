@@ -920,7 +920,7 @@ int javaNew(lua_State *L) {
         }
     }
 
-        /* if arg is table create array or interface, else create calss instance. */
+        /* if arg is table create array or interface, else create calss APP. */
     else if (lua_type(L, 2) == LUA_TTABLE && top == 2) {
         ret = (*javaEnv)->CallStaticIntMethod(javaEnv, luajava_api_class,
                                               java_create_method, stateIndex,
@@ -1296,7 +1296,7 @@ int luaJavaFunctionCall(lua_State *L) {
     /* Gets the JNI Environment */
     javaEnv = checkEnv(L);
 
-    /* the Object must be an instance of the JavaFunction class */
+    /* the Object must be an APP of the JavaFunction class */
     if ((*javaEnv)->IsInstanceOf(javaEnv, *obj, java_function_class) ==
         JNI_FALSE) {
         fprintf(stderr, "Called Java object is not a JavaFunction\n");

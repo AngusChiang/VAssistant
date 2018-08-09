@@ -37,7 +37,7 @@ internal class RemoteDebugServer(private val context: Context) : Thread() {
                 while (!stopped) {
                     val data = inputStream.readUTF()
                     Vog.d(this, "run  ----> $data")
-                    luaHelper.safeEvalLua("require 'import'\n$data")
+                    luaHelper.safeEvalLua("require 'bridges'\n$data")
                     outputStream.writeUTF(buffer.toString())
                     buffer.setLength(0)
                     outputStream.flush()
