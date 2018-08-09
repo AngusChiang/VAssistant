@@ -3,6 +3,7 @@ package cn.vove7.androlua.luautils
 import android.content.Context
 import cn.vove7.common.BridgeManager
 import com.luajava.LuaException
+import com.luajava.LuaState
 import dalvik.system.DexClassLoader
 import java.util.*
 
@@ -15,7 +16,7 @@ import java.util.*
  */
 interface LuaManagerI {
     val librarys: HashMap<String, String>
-
+    val luaState: LuaState
     val classLoaders: ArrayList<ClassLoader>
 
     var bridgeManager: BridgeManager?
@@ -27,6 +28,7 @@ interface LuaManagerI {
     fun regGc(obj: LuaGcable)
 
     fun gc(obj: LuaGcable)
+    fun removeGc(obj: LuaGcable)
 
     fun stop()
 

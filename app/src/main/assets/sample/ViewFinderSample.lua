@@ -9,4 +9,5 @@ require 'accessibility'
 a = ViewFinder().id('lua_args').findFirst()
 for i = 0, 9 do
     a.setText('' .. i)
+    sleep(500)
 end

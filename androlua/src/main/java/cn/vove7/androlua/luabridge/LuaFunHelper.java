@@ -1,11 +1,11 @@
 package cn.vove7.androlua.luabridge;
 
 import com.luajava.LuaException;
+import com.luajava.LuaObject;
 import com.luajava.LuaState;
 
-import cn.vove7.androlua.LuaApp;
 import cn.vove7.androlua.LuaHelper;
-import cn.vove7.androlua.luautils.LuaManagerI;
+import cn.vove7.vtp.log.Vog;
 
 import static cn.vove7.androlua.luabridge.LuaUtil.errorReason;
 
@@ -26,6 +26,34 @@ public class LuaFunHelper {
 
     public void newLuaThread(String str, Object... args) throws LuaException {
         luaHelper.autoRun(str, args);
+    }
+
+    /**
+     * 复制运行时信息：require，imported
+     *
+     * @param from 源
+     */
+    public void copyRuntime(LuaState from) {
+        try {
+            Object[] loadeds;
+            LuaObject g = from.getLuaObject("luajava");
+            LuaObject loaded = g.getField("imported");
+            if (!loaded.isNil()) {
+                loadeds = loaded.asArray();
+            } else return;
+            if (loadeds != null) {
+                LuaObject require = L.getLuaObject("require");
+                //require "bridges"
+                require.call("bridges");
+                LuaObject _import = L.getLuaObject("import");
+                for (Object s : loadeds) {
+                    Vog.INSTANCE.v(this, "load -- " + s.toString());
+                    _import.call(s.toString());
+                }
+            }
+        } catch (LuaException e) {
+            e.printStackTrace();
+        }
     }
 
     public void newLuaThread(byte[] buf, Object... args) throws LuaException {

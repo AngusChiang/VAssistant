@@ -17,6 +17,8 @@ class ViewFinderWithMultiCondition(accessibilityService: AccessibilityApi) : Vie
     var textMatchMode: Int = 0
     var viewId: String? = null
     var desc: String? = null
+    var editable: Boolean? = null
+    var scrollable: Boolean? = null
 
     override fun findCondition(node: AccessibilityNodeInfo): Boolean {
         if (viewText != null) {
@@ -54,8 +56,18 @@ class ViewFinderWithMultiCondition(accessibilityService: AccessibilityApi) : Vie
 
         if (desc != null && "${node.contentDescription}" != desc)
             return false
+
+        if (scrollable != null && node.isScrollable != scrollable) {
+            return false
+        }
+
+        if (editable != null && node.isEditable != editable) {
+            return false
+        }
+        Vog.i(this,"findCondition  find it ")
         return true
     }
+
     companion object {
         const val MATCH_MODE_EQUAL = 427
         const val MATCH_MODE_CONTAIN = 426

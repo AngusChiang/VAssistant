@@ -5,17 +5,16 @@
 -- Time: 1:17
 -- TimerSample.lua
 --
-i = 0
+--i = 0
 function f()
-    print('f()'..i)
-    i = i + 1
+    print('f()')--..i)
+    --i = i + 1
 end
 
 print('begin')
 
 a = timer(f, 1000, 1000)
 
---a.quit()
 sleep(3500)
-a.stop()
+a.quit()
 print('end')

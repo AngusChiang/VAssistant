@@ -310,7 +310,7 @@ class MainService : Service(), OnExecutorResult,
     }
 
 
-    @Subscribe(threadMode = ThreadMode.ASYNC)
+    @Subscribe(threadMode = ThreadMode.MAIN)
     fun stopExecutor(order: String) {
         when (order) {
             "stop execQueue" -> {

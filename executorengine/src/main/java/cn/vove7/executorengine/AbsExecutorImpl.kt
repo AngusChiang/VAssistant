@@ -52,10 +52,10 @@ abstract class AbsExecutorImpl(
 
     private var thread: Thread? = null
     override fun execQueue(cmdWords: String, actionQueue: PriorityQueue<Action>) {
-        this.actionQueue = actionQueue
-        if (thread != null && thread!!.isAlive) {
+        if (thread?.isAlive == true) {
             thread!!.interrupt()
         }
+        this.actionQueue = actionQueue
         lock = Object()
         thread = thread(start = true, isDaemon = true, priority = Thread.MAX_PRIORITY) {
             onExecutorResult.onExecuteStart(cmdWords)
@@ -71,14 +71,21 @@ abstract class AbsExecutorImpl(
     private fun pollActionQueue() {
         var r: PartialResult
         while (actionQueue.isNotEmpty()) {
-            currentAction = actionQueue.poll()
-            r = runScript(currentAction!!.actionScript, currentAction!!.param.value)
-            when {
-                r.needTerminal -> {//出错
-                    currentAction = null
-                    onExecutorResult.onExecuteFailed(r.msg)
-                    return
+            if (Thread.currentThread().isInterrupted.not()) {
+                currentAction = actionQueue.poll()
+                r = runScript(currentAction!!.actionScript, currentAction!!.param.value)
+                when {
+                    r.needTerminal -> {//出错
+                        currentAction = null
+                        onExecutorResult.onExecuteFailed(r.msg)
+                        return
+                    }
                 }
+            } else {
+                Vog.i(this, "pollActionQueue 终止")
+                actionQueue.clear()
+                onExecutorResult.onExecuteFailed("强行终止")
+                break
             }
         }
     }
@@ -161,9 +168,7 @@ abstract class AbsExecutorImpl(
                     "openFlash" -> {//手电
                         PartialResult(systemBridge.openFlashlight().ok)
                     }
-                    else -> {
-                        PartialResult(false)
-                    }
+                    else -> PartialResult(false, "未知操作")
                 }
             }
             MARKED_TYPE_SCRIPT -> {
@@ -316,7 +321,7 @@ abstract class AbsExecutorImpl(
                 Vog.d(this, "结果： 取消")
                 null
             }
-        else null).also { Vog.d(this,"waitForSingleChoice result : $it") }
+        else null).also { Vog.d(this, "waitForSingleChoice result : $it") }
     }
 
     /**
@@ -328,7 +333,7 @@ abstract class AbsExecutorImpl(
         return (if (waitForUnlock()) {
             currentAction!!.responseResult
         } else false).also {
-            Vog.d(this,"alert result > $it")
+            Vog.d(this, "alert result > $it")
         }
     }
 
@@ -392,7 +397,7 @@ abstract class AbsExecutorImpl(
         } catch (e: Exception) {
             e.printStackTrace()
             Thread.currentThread().interrupt()
-            Thread.currentThread().stop()
+//            Thread.currentThread().stop()
         }
     }
 

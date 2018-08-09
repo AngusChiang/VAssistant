@@ -8,7 +8,7 @@ import cn.vove7.vtp.log.Vog
 /**
  * 查找符合条件的AccessibilityNodeInfo
  */
-abstract class ViewFinder(val accessibilityService: AccessibilityApi) {
+abstract class ViewFinder(var accessibilityService: AccessibilityApi) {
 
     var extraParams: Array<String> = arrayOf()
 

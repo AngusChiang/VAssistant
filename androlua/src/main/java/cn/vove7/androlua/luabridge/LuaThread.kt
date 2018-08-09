@@ -9,6 +9,7 @@ import cn.vove7.androlua.LuaHelper
 import cn.vove7.androlua.luautils.LuaGcable
 import cn.vove7.androlua.luautils.LuaManagerI
 import cn.vove7.androlua.luautils.LuaRunnableI
+import cn.vove7.vtp.log.Vog
 import com.luajava.LuaException
 import com.luajava.LuaMetaTable
 import com.luajava.LuaObject
@@ -20,7 +21,7 @@ import com.luajava.LuaState
 class LuaThread : Thread, LuaMetaTable, LuaGcable, LuaRunnableI {
 
     var isRun = false
-    var L: LuaState? = null
+    var L: LuaState
     private var tHandler: Handler? = null
     private var luaManager: LuaManagerI
     private var mIsLoop: Boolean = false
@@ -30,37 +31,40 @@ class LuaThread : Thread, LuaMetaTable, LuaGcable, LuaRunnableI {
     private var funHelper: LuaFunHelper
     private var luaHelper: LuaHelper
 
-    constructor(luaManager: LuaManagerI, src: String, arg: Array<Any>) : this(luaManager, src, false, arg) {}
+    constructor(luaManager: LuaManagerI, src: String, arg: Array<Any>)
+            : this(luaManager, src, false, arg)
 
-    @JvmOverloads constructor(luaManager: LuaManagerI, src: String, isLoop: Boolean = false, arg: Array<Any>? = null) {
-        luaManager.regGc(this)
-        this.luaManager = luaManager
+    @JvmOverloads constructor(luaManager: LuaManagerI, src: String, isLoop: Boolean = false,
+                              arg: Array<Any>? = null) : this(luaManager) {
         mSrc = src
-        isDaemon = true
         mIsLoop = isLoop
         if (arg != null)
             mArg = arg
-        luaHelper = LuaHelper(LuaApp.instance)
-        L = luaHelper.L
-        funHelper = LuaFunHelper(luaHelper, L)
     }
 
     @Throws(LuaException::class)
-    constructor(luaManager: LuaManagerI, func: LuaObject, arg: Array<Any>) : this(luaManager, func, false, arg)
+    constructor(luaManager: LuaManagerI, func: LuaObject, arg: Array<Any>)
+            : this(luaManager, func, false, arg)
 
     @Throws(LuaException::class)
-    @JvmOverloads constructor(luaManager: LuaManagerI, func: LuaObject, isLoop: Boolean = false, arg: Array<Any>? = null) {
-        luaManager.regGc(this)
-        this.luaManager = luaManager
+    @JvmOverloads constructor(luaManager: LuaManagerI, func: LuaObject, isLoop: Boolean = false,
+                              arg: Array<Any>? = null) : this(luaManager) {
         if (arg != null)
             mArg = arg
         mIsLoop = isLoop
         mBuffer = func.dump()
 
+    }
+
+    private constructor(luaManager: LuaManagerI) {
+        this.luaManager = luaManager
         isDaemon = true
+        luaManager.regGc(this)
         luaHelper = LuaHelper(LuaApp.instance)
         L = luaHelper.L
         funHelper = LuaFunHelper(luaHelper, L)
+
+        funHelper.copyRuntime(luaManager.luaState)
     }
 
     override fun gc() {
@@ -100,20 +104,23 @@ class LuaThread : Thread, LuaMetaTable, LuaGcable, LuaRunnableI {
                 Looper.prepare()
                 tHandler = LuaFunHandler(funHelper, luaManager)
                 isRun = true
-                L!!.getGlobal("run")
-                if (!L!!.isNil(-1)) {
-                    L!!.pop(1)
+                L.getGlobal("run")
+                if (!L.isNil(-1)) {
+                    L.pop(1)
                     funHelper.runFunc("run")
                 }
-                Looper.loop()
+//                Looper.loop()
             }
         } catch (e: LuaException) {
             luaManager.handleMessage(LuaManagerI.E, e.message ?: "")
             e.printStackTrace()
+        }finally {
+            isRun = false
+            if (!isInterrupted) {
+                quit()
+            }
         }
 
-        isRun = false
-        quit()
     }
 
     fun call(func: String) {
@@ -133,17 +140,20 @@ class LuaThread : Thread, LuaMetaTable, LuaGcable, LuaRunnableI {
 
     @Throws(LuaException::class)
     operator fun get(key: String): Any? {
-        L!!.getGlobal(key)
-        return L!!.toJavaObject(-1)
+        L.getGlobal(key)
+        return L.toJavaObject(-1)
     }
 
     override fun quit() {
-        L!!.gc(LuaState.LUA_GCCOLLECT, 1)
+        Vog.d(this,"quit $this")
+        luaManager.removeGc(this)
+        L.gc(LuaState.LUA_GCCOLLECT, 1)
+        L.close()
         System.gc()
         if (isRun) {
             isRun = false
             tHandler!!.looper.quit()
-            stop()
+            interrupt()
         }
     }
 

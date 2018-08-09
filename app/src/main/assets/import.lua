@@ -13,6 +13,7 @@ local bindClass = luajava.bindClass
 local loaders = {}
 local dexes = {}
 
+local luaman = luaman
 local luaapp = luaman -- or app
 dexes = luajava.astable(luaapp.getClassLoaders())
 local libs = luaapp.getLibrarys()
@@ -428,7 +429,11 @@ function task(src, ...)
     else
         luaAsyncTask = LuaAsyncTask(luaman, src, callback)
     end
-    luaAsyncTask.execute(args)
+    if (#args > 0) then
+        luaAsyncTask.execute(args)
+    else
+        luaAsyncTask.execute()
+    end
 end
 
 function timer(f, d, p, ...)

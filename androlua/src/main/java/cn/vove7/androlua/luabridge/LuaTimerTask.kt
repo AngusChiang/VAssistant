@@ -5,6 +5,7 @@ import cn.vove7.androlua.LuaHelper
 import cn.vove7.androlua.luautils.LuaManagerI
 import cn.vove7.androlua.luautils.LuaRunnableI
 import cn.vove7.androlua.luautils.TimerTaskX
+import cn.vove7.vtp.log.Vog
 import com.luajava.LuaException
 import com.luajava.LuaObject
 import com.luajava.LuaState
@@ -20,7 +21,6 @@ class LuaTimerTask : TimerTaskX, LuaRunnableI {
     private var funHelper: LuaFunHelper
     private var luaHelper: LuaHelper
 
-
     private var mArg = arrayOf<Any>(0)
 
     private var mEnabled = true
@@ -30,38 +30,43 @@ class LuaTimerTask : TimerTaskX, LuaRunnableI {
     val name: String
         get() = "TimerTask " + hashCode() + " "
 
-    @JvmOverloads constructor(luaManager: LuaManagerI, src: String, arg: Array<Any>? = null) {
-        this.luaManager = luaManager
+    @JvmOverloads constructor(luaManager: LuaManagerI, src: String, arg: Array<Any>? = null)
+            : this(luaManager, arg) {
         mSrc = src
         if (arg != null)
             mArg = arg
+    }
 
+    @Throws(LuaException::class)
+    @JvmOverloads constructor(luaManager: LuaManagerI, func: LuaObject, arg: Array<Any>? = null)
+            : this(luaManager, arg) {
+        mBuffer = func.dump()
+    }
+
+    @Throws(LuaException::class)
+    constructor(luaManager: LuaManagerI, arg: Array<Any>?) {
+        if (arg != null)
+            mArg = arg
+        this.luaManager = luaManager
         luaHelper = LuaHelper(LuaApp.instance)
         L = luaHelper.L
         funHelper = LuaFunHelper(luaHelper, L)
+
+        funHelper.copyRuntime(luaManager.luaState)
     }
 
     override fun quit() {
+        Vog.d(this, "quit $this")
         L.gc(LuaState.LUA_GCCOLLECT, 1)
+//        L.close()
         System.gc()
         if (isCancelled) {
             luaManager.handleMessage(LuaManagerI.W, "$name already canceled")
             return
         }
-        luaManager.log("$name quit")
         cancel()
     }
 
-    @Throws(LuaException::class)
-    @JvmOverloads constructor(luaManager: LuaManagerI, func: LuaObject, arg: Array<Any>? = null) {
-        this.luaManager = luaManager
-        if (arg != null)
-            mArg = arg
-        mBuffer = func.dump()
-        luaHelper = LuaHelper(LuaApp.instance)
-        L = luaHelper.L
-        funHelper = LuaFunHelper(luaHelper, L)
-    }
 
     override fun run() {
         if (!mEnabled) {

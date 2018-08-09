@@ -1,6 +1,7 @@
 package cn.vove7.androlua.luabridge;
 
 import cn.vove7.androlua.luautils.LuaGcable;
+import cn.vove7.androlua.luautils.LuaRunnableI;
 import cn.vove7.androlua.luautils.TimerX;
 import com.luajava.LuaException;
 import com.luajava.LuaObject;
@@ -10,16 +11,16 @@ import cn.vove7.androlua.luautils.LuaManagerI;
 /**
  * [定时器]任务
  */
-public class LuaTimer extends TimerX implements LuaGcable {
+public class LuaTimer extends TimerX implements LuaGcable,LuaRunnableI {
 
     private LuaTimerTask task;
     private LuaManagerI luaManager;
 
-    public LuaTimer(LuaManagerI luaManager, String src) throws LuaException {
+    public LuaTimer(LuaManagerI luaManager, String src) {
         this(luaManager, src, null);
     }
 
-    public LuaTimer(LuaManagerI luaManager, String src, Object[] arg) throws LuaException {
+    public LuaTimer(LuaManagerI luaManager, String src, Object[] arg) {
         super("LuaTimer");
         this.luaManager = luaManager;
         luaManager.regGc(this);
@@ -35,6 +36,12 @@ public class LuaTimer extends TimerX implements LuaGcable {
         this.luaManager = luaManager;
         luaManager.regGc(this);
         task = new LuaTimerTask(luaManager, func, arg);
+    }
+
+    @Override
+    public void quit() {
+        task.quit();
+        luaManager.removeGc(this);
     }
 
     @Override

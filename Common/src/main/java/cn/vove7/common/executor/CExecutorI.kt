@@ -1,8 +1,8 @@
 package cn.vove7.common.executor
 
 import cn.vove7.common.bridges.ChoiceData
-import cn.vove7.common.view.finder.ActivityShowListener
-import cn.vove7.common.view.finder.ViewShowListener
+import cn.vove7.common.view.notifier.ActivityShowListener
+import cn.vove7.common.view.notifier.ViewShowListener
 import cn.vove7.common.viewnode.ViewNode
 import cn.vove7.datamanager.parse.model.Action
 import java.util.*

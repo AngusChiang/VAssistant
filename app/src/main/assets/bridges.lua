@@ -8,6 +8,7 @@
 require 'import'
 import 'cn.vove7.androlua.androbridge.*'
 import 'cn.vove7.common.view.finder.ViewFindBuilder'
+--import 'cn.vove7.common.view.finder.ViewFinder'
 
 --
 bridges = luaman.getBridgeManager()
@@ -17,6 +18,10 @@ system = bridges.getSystemBridge()
 resultNotifier = bridges.getResultNotifier()
 
 function ViewFinder()
+    return ViewFindBuilder(executor)
+end
+
+function EditableViewFinder()
     return ViewFindBuilder(executor)
 end
 

@@ -1,17 +1,8 @@
 package cn.vove7.common.view.finder;
 
-import android.os.Build;
-import android.support.annotation.RequiresApi;
-
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.List;
-
 import cn.vove7.common.accessibility.AccessibilityApi;
 import cn.vove7.common.executor.CExecutorI;
 import cn.vove7.common.viewnode.ViewNode;
-import cn.vove7.common.viewnode.ViewOperation;
 import cn.vove7.vtp.log.Vog;
 
 import static cn.vove7.common.view.finder.ViewFinderWithMultiCondition.MATCH_MODE_CONTAIN;
@@ -21,12 +12,12 @@ import static cn.vove7.common.view.finder.ViewFinderWithMultiCondition.MATCH_MOD
 
 /**
  * @author Vove
- *
+ * <p>
  * 视图节点查找类
  * <p>
  * 2018/8/5
  */
-public class ViewFindBuilder implements ViewOperation {
+public class ViewFindBuilder extends FindBuilder {
     private ViewFinderWithMultiCondition viewFinderX;
 
     public ViewFinderWithMultiCondition getViewFinderX() {
@@ -49,10 +40,12 @@ public class ViewFindBuilder implements ViewOperation {
             return;
         }
         viewFinderX = new ViewFinderWithMultiCondition(accessibilityService);
+        setFinder(viewFinderX);
     }
 
     /**
      * 需要CExecutorI
+     *
      * @return ViewNode which is returned until show in screen
      */
     public ViewNode waitFor() {
@@ -72,6 +65,7 @@ public class ViewFindBuilder implements ViewOperation {
 
     /**
      * 包含文本
+     *
      * @param text text
      * @return this
      */
@@ -83,6 +77,7 @@ public class ViewFindBuilder implements ViewOperation {
 
     /**
      * 相同文本 不区分大小写
+     *
      * @param text text
      * @return this
      */
@@ -104,22 +99,6 @@ public class ViewFindBuilder implements ViewOperation {
         return this;
     }
 
-    /**
-     * 找到第一个
-     * @return ViewNode
-     */
-    public ViewNode findFirst() {
-        return viewFinderX.findFirst();
-    }
-
-    /**
-     *
-     * @return list
-     */
-    public List<ViewNode> find() {
-        return viewFinderX.findAll();
-    }
-
     public ViewFindBuilder id(String id) {
         viewFinderX.setViewId(id);
         return this;
@@ -130,131 +109,22 @@ public class ViewFindBuilder implements ViewOperation {
         return this;
     }
 
-    @Override
-    public boolean tryClick() {
-        ViewNode node = findFirst();
-        return node != null && node.tryClick();
+    public ViewFindBuilder editable() {
+        return editable(true);
     }
 
-    @Override
-    public boolean click() {
-        ViewNode node = findFirst();
-        return node != null && node.tryClick();
+    public ViewFindBuilder editable(boolean b) {
+        viewFinderX.setEditable(b);
+        return this;
     }
 
-    @Override
-    public boolean longClick() {
-        ViewNode node = findFirst();
-        return node != null && node.longClick();
+    public ViewFindBuilder scrollable() {
+        return scrollable(true);
     }
 
-    @Override
-    public boolean doubleClick() {
-        ViewNode node = findFirst();
-        return node != null && node.doubleClick();
-    }
-
-    @Override
-    public boolean tryLongClick() {
-        ViewNode node = findFirst();
-        return node != null && node.tryLongClick();
-    }
-
-    @Override
-    public boolean select() {
-        ViewNode node = findFirst();
-        return node != null && node.select();
-    }
-
-    @Override
-    public boolean trySelect() {
-        ViewNode node = findFirst();
-        return node != null && node.trySelect();
-    }
-
-    @RequiresApi(api = Build.VERSION_CODES.M)
-    @Override
-    public boolean scrollUp() {
-        ViewNode node = findFirst();
-        try {
-            return node != null && node.scrollUp();
-        } catch (Exception e) {
-            e.printStackTrace();
-            return false;
-        }
-    }
-
-    @RequiresApi(api = Build.VERSION_CODES.M)
-    @Override
-    public boolean scrollDown() {
-        ViewNode node = findFirst();
-        try {
-            return node != null && node.scrollDown();
-        } catch (Exception e) {
-            e.printStackTrace();
-            return false;
-        }
-    }
-
-    @Override
-    public boolean setText(@NotNull String text, @Nullable String ep) {
-        ViewNode node = findFirst();
-        return node != null && node.setText(text, ep);
-    }
-
-    @Override
-    public boolean setText(@NotNull String text) {
-        ViewNode node = findFirst();
-        return node != null && node.setText(text);
-    }
-
-    @Override
-    public boolean setTextWithInitial(@NotNull String text) {
-        ViewNode node = findFirst();
-        return node != null && node.setTextWithInitial(text);
-    }
-
-    @Override
-    public boolean trySetText(@NotNull String text) {
-        ViewNode node = findFirst();
-        return node != null && node.trySetText(text);
-    }
-
-    @Nullable
-    @Override
-    public String getText() {
-        ViewNode node = findFirst();
-        return node != null ? node.getText() : null;
-    }
-
-    @Override
-    public boolean focus() {
-        ViewNode node = findFirst();
-        return node != null && node.focus();
-    }
-
-    @Override
-    public boolean scrollForward() {
-        ViewNode node = findFirst();
-        return node != null && node.scrollForward();
-    }
-
-    @Override
-    public boolean scrollBackward() {
-        ViewNode node = findFirst();
-        return node != null && node.scrollBackward();
-    }
-
-    @Override
-    public boolean scrollLeft() {
-        ViewNode node = findFirst();
-        return node != null && node.tryClick();
-    }
-
-    @Override
-    public boolean scrollRight() {
-        ViewNode node = findFirst();
-        return node != null && node.tryClick();
+    public ViewFindBuilder scrollable(boolean b) {
+        viewFinderX.setScrollable(b);
+        return this;
     }
 
     public ViewNode await() {

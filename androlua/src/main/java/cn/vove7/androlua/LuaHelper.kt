@@ -20,6 +20,7 @@ import dalvik.system.DexClassLoader
 import java.io.IOException
 import java.util.*
 import java.util.regex.Pattern
+import kotlin.collections.HashSet
 
 /**
  * LuaHelper
@@ -33,7 +34,7 @@ class LuaHelper : LuaManagerI {
     constructor(context: Context) {
         this.context = context
         bridgeManager = sBridgeManager
-        this.gcList = ArrayList()
+        this.gcList = HashSet()
         initPath()
         init()
 
@@ -50,8 +51,10 @@ class LuaHelper : LuaManagerI {
     }
 
     lateinit var L: LuaState
+    override val luaState: LuaState
+        get() = L
 
-    private val gcList: ArrayList<LuaGcable>
+    private val gcList: HashSet<LuaGcable>
     private var luaRequireSearchPath: String? = null
     private var mLuaDexLoader: LuaDexLoader? = null
 
@@ -322,9 +325,18 @@ class LuaHelper : LuaManagerI {
         }
     }
 
+    override fun removeGc(obj: LuaGcable) {
+        synchronized(gcList) {
+            gcList.remove(obj).also {
+                Vog.d(this,"removeGc $obj $it")
+            }
+        }
+    }
+
     private fun gcAll() {
         //清空线程..
         synchronized(gcList) {
+            Vog.d(this, "gcAll ${gcList.size}")
             for (gcable in gcList) {
                 gcable.gc()
             }

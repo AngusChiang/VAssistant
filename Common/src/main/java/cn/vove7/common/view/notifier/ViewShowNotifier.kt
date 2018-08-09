@@ -1,8 +1,7 @@
-package cn.vove7.jarvis.view.finder
+package cn.vove7.common.view.notifier
 
 import cn.vove7.common.ShowListener
 import cn.vove7.common.view.finder.ViewFinder
-import cn.vove7.common.view.finder.ViewShowListener
 import cn.vove7.common.viewnode.ViewNode
 import cn.vove7.vtp.log.Vog
 import java.lang.Thread.sleep
