@@ -17,10 +17,9 @@ import java.util.*
  */
 class SimpleActionScriptExecutor(
         context: Context,
-        systemBridge: SystemBridge,
         serviceBridge: ServiceBridge,
         onExecutorResult: OnExecutorResult
-) : AbsExecutorImpl(context, systemBridge, serviceBridge, onExecutorResult) {
+) : AbsExecutorImpl(context, serviceBridge, onExecutorResult) {
 
     /**
      * 格式：

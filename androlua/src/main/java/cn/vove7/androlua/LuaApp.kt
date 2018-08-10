@@ -38,7 +38,7 @@ open class LuaApp : GlobalApp() {
 
     private fun initAsset() {
         assets.list("").forEach {
-            if (assets.list(it).isNotEmpty()) return@forEach
+            if (!it.endsWith(".lua")) return@forEach
             val fp = filesDir.absolutePath + '/' + it
             if (!File(fp).exists()) {
                 try {

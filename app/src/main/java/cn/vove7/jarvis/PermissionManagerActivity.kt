@@ -1,13 +1,11 @@
 package cn.vove7.jarvis
 
 import android.annotation.TargetApi
+import android.app.Activity
 import android.content.Context
-import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
 import android.support.annotation.RequiresApi
-import android.support.v4.app.ActivityCompat
-import android.support.v7.app.AppCompatActivity
 import android.view.View
 import android.widget.BaseAdapter
 import android.widget.Button
@@ -20,7 +18,7 @@ import kotlinx.android.synthetic.main.activity_permission_manager.*
 /**
  * 权限管理
  */
-class PermissionManagerActivity : AppCompatActivity() {
+class PermissionManagerActivity : Activity() {
 
     lateinit var permissionList: List<PermissionStatus>
     lateinit var toast: Voast
@@ -70,11 +68,9 @@ class PermissionManagerActivity : AppCompatActivity() {
                             item.permissionName == "无障碍" ->
                                 PermissionUtils.gotoAccessibilitySetting(this@PermissionManagerActivity)
                             else ->
-                                ActivityCompat.requestPermissions(
-                                        this@PermissionManagerActivity,
+                                PermissionUtils.autoRequestPermission(this@PermissionManagerActivity,
                                         arrayOf(item.permissionString),
-                                        pos
-                                )
+                                        pos)
                         }
                     }
                 }
@@ -114,7 +110,7 @@ class PermissionManagerActivity : AppCompatActivity() {
     ) {
         companion object {
             private val permissions = listOf(
-                    PermissionStatus("android.permission.BIND_ACCESSIBILITY_SERVICE", "无障碍", "便于操作界面"),
+                    PermissionStatus("android.permission.BIND_ACCESSIBILITY_SERVICE", "无障碍", "操作界面"),
                     PermissionStatus("android.permission.SYSTEM_ALERT_WINDOW", "悬浮窗", "显示于其他界面之上"),
                     PermissionStatus("android.permission.VIBRATE", "震动", ""),
                     PermissionStatus("android.permission.READ_CONTACTS", "联系人", "用于检索联系人"),
@@ -133,7 +129,7 @@ class PermissionManagerActivity : AppCompatActivity() {
                     it.isOpen = when {
                         it.permissionName == "悬浮窗" -> Build.VERSION.SDK_INT < Build.VERSION_CODES.M || PermissionUtils.canDrawOverlays(context)
                         it.permissionName == "无障碍" -> PermissionUtils.accessibilityServiceEnabled(context)
-                        else -> ActivityCompat.checkSelfPermission(context, it.permissionString) == PackageManager.PERMISSION_GRANTED
+                        else -> PermissionUtils.isAllGranted(context, arrayOf(it.permissionString))
                     }
                 }
                 return permissions

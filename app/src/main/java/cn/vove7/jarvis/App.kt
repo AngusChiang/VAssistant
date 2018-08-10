@@ -6,10 +6,9 @@ import cn.vove7.androlua.LuaApp
 import cn.vove7.appbus.MessageEvent
 import cn.vove7.datamanager.DAO
 import cn.vove7.datamanager.InitLuaDbData
-import cn.vove7.datamanager.InitSimpleDbData
 import cn.vove7.jarvis.services.MainService
-import cn.vove7.jarvis.services.MyAccessibilityService
-import cn.vove7.jarvis.speech.services.SpeechService
+import cn.vove7.jarvis.services.SpeechRecoService
+import cn.vove7.jarvis.services.SpeechSynService
 import cn.vove7.vtp.log.Vog
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
@@ -17,30 +16,36 @@ import org.greenrobot.eventbus.ThreadMode
 
 class App : LuaApp() {
 
-    lateinit var voiceService: Intent
-    lateinit var mainService: Intent
+    private lateinit var voiceService: Intent
+    private lateinit var mainService: Intent
+    private lateinit var synService: Intent
+    lateinit var services: Array<Intent>
 
     override fun onCreate() {
         super.onCreate()
         EventBus.getDefault().register(this)
         Vog.init(this, Log.VERBOSE).log2Local(Log.ERROR)
-        voiceService = Intent(this, SpeechService::class.java)
+        voiceService = Intent(this, SpeechRecoService::class.java)
         mainService = Intent(this, MainService::class.java)
-        startService(voiceService)
-        startService(mainService)
+        synService = Intent(this, SpeechSynService::class.java)
+        services = arrayOf(voiceService, synService, mainService)
+
+        startServices()
         DAO.init(this)
         if (BuildConfig.DEBUG)
             InitLuaDbData.init()
     }
 
-
-    companion object {
-        lateinit var instance: App
+    private fun startServices() {
+        services.forEach {
+            startService(it)
+        }
     }
 
     override fun onTerminate() {
-        stopService(voiceService)
-        stopService(mainService)
+        services.forEach {
+            stopService(it)
+        }
         super.onTerminate()
     }
 

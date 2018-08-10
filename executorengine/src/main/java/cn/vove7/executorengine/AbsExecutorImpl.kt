@@ -37,10 +37,10 @@ import kotlin.concurrent.thread
  */
 abstract class AbsExecutorImpl(
         val context: Context,
-        val systemBridge: SystemBridge,
         val serviceBridge: ServiceBridge,
         val onExecutorResult: OnExecutorResult
 ) : CExecutorI {
+    val systemBridge = SystemBridge(context)
     var accessApi: AccessibilityApi? = null
     private var lock = Object()
     var currentAction: Action? = null
@@ -188,8 +188,8 @@ abstract class AbsExecutorImpl(
         notifySync()
     }
 
-    override fun getViewNode(): ViewNode {
-        val n = waitNode!!
+    override fun getViewNode(): ViewNode? {
+        val n = waitNode
         waitNode = null
         return n
     }
@@ -235,9 +235,12 @@ abstract class AbsExecutorImpl(
                 Vog.d(this, "执行器-解锁")
                 true
             } catch (e: InterruptedException) {
+                //必须强行stop
                 Vog.d(this, "被迫强行停止")
                 onExecutorResult.onExecuteFailed("被迫强行停止")
                 accessApi?.removeAllNotifier(this)
+                Thread.currentThread().interrupt()
+                Thread.currentThread().stop()
                 false
             }
         }
@@ -261,7 +264,6 @@ abstract class AbsExecutorImpl(
         Vog.d(this, "waitForViewId $id")
         if (!checkAccessibilityService().isSuccess)
             return null
-
 
         accessApi?.waitForView(this, ViewFindBuilder(this).id(id).viewFinderX)
         waitForUnlock()
@@ -337,6 +339,28 @@ abstract class AbsExecutorImpl(
         }
     }
 
+    override fun speak(text: String) {
+        serviceBridge.speak(text)
+    }
+
+    override fun speakSync(text: String): Boolean {
+        serviceBridge.speakSync(text)
+        return if (waitForUnlock()) {
+            if (callbackVal == null) true
+            else {
+                Vog.d(this, "回调结果失败 speakSync $callbackVal")
+                false
+            }
+        } else false
+    }
+
+    private var callbackVal: Any? = null
+    override fun speakCallback(result: String?) {
+        callbackVal = result
+        notifySync()
+    }
+
+
     /**
      * 返回操作
      */
@@ -383,6 +407,7 @@ abstract class AbsExecutorImpl(
         } else PartialResult(true)
     }
 
+
     companion object {
         /**
          * @return 参数可用
@@ -394,9 +419,10 @@ abstract class AbsExecutorImpl(
     override fun sleep(millis: Long) {
         try {
             Thread.sleep(millis)
-        } catch (e: Exception) {
-            e.printStackTrace()
+        } catch (e: InterruptedException) {
+            //必须强行stop
             Thread.currentThread().interrupt()
+            Thread.currentThread().stop()
 //            Thread.currentThread().stop()
         }
     }

@@ -2,25 +2,25 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="cn.vove7.jarvis">
 
-    <!--语音识别-->
+    <!-- 语音识别 -->
     <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-    <!--闪光灯，相机-->
+    <!-- 闪光灯，相机 -->
     <uses-permission android:name="android.permission.FLASHLIGHT" />
     <uses-permission android:name="android.permission.CAMERA" />
+
     <uses-feature android:name="android.hardware.camera" />
     <uses-feature android:name="android.hardware.autofocus" />
     <!-- 悬浮窗 -->
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
-    <!--拨打电话-->
+    <!-- 拨打电话 -->
     <uses-permission android:name="android.permission.CALL_PHONE" />
-    <!--联系人-->
+    <!-- 联系人 -->
     <uses-permission android:name="android.permission.READ_CONTACTS" />
-
 
     <application
         android:name=".App"
@@ -32,13 +32,13 @@
         android:theme="@style/AppTheme">
         <meta-data
             android:name="com.baidu.speech.APP_ID"
-            android:value="11389525" />
+            android:value="10922901" />
         <meta-data
             android:name="com.baidu.speech.API_KEY"
-            android:value="ILdLUepG75UwwQVa0rqiEUVa" />
+            android:value="xwzlOfIIysRN7IDdcjA823ZS" />
         <meta-data
             android:name="com.baidu.speech.SECRET_KEY"
-            android:value="di6djKXGGELgnCCusiQUlCBYRxXVrr46" />
+            android:value="d9ef661698c5d8cd45978aa55e600e03" />
 
         <activity android:name=".MainActivity">
             <intent-filter>
@@ -63,7 +63,7 @@
         <activity android:name=".ScriptTestActivity" />
 
         <service
-            android:name=".speech.services.SpeechService"
+            android:name=".services.SpeechRecoService"
             android:enabled="true"
             android:exported="true" />
 
@@ -77,8 +77,14 @@
             android:enabled="true"
             android:exported="true" />
 
-        <activity android:name=".PermissionManagerActivity"/>
+        <activity android:name=".PermissionManagerActivity" />
         <activity android:name=".LuaEditorActivity" />
+
+        <service
+            android:name=".services.SpeechSynService"
+            android:enabled="true"
+            android:exported="true" />
+        <service android:name=".services.BusService" />
     </application>
 
 </manifest>

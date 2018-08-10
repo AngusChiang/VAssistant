@@ -2,7 +2,6 @@ package cn.vove7.jarvis.services
 
 import android.app.AlertDialog
 import android.app.Dialog
-import android.app.Service
 import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
@@ -12,9 +11,7 @@ import android.os.Message
 import android.util.Log
 import android.widget.Toast
 import cn.vove7.androlua.luautils.LuaContext
-import cn.vove7.appbus.AppBus
-import cn.vove7.appbus.SpeechAction
-import cn.vove7.appbus.VoiceData
+import cn.vove7.appbus.*
 import cn.vove7.common.accessibility.AccessibilityApi
 import cn.vove7.common.bridges.ChoiceData
 import cn.vove7.common.bridges.ServiceBridge
@@ -24,7 +21,6 @@ import cn.vove7.common.executor.CExecutorI
 import cn.vove7.common.executor.OnExecutorResult
 import cn.vove7.common.model.RequestPermission
 import cn.vove7.datamanager.parse.model.Action
-import cn.vove7.executorengine.bridges.SystemBridge
 import cn.vove7.executorengine.luaexector.LuaExecutor
 import cn.vove7.jarvis.PermissionManagerActivity
 import cn.vove7.jarvis.utils.Utils.checkCancel
@@ -45,7 +41,7 @@ import java.util.*
 /**
  * 主服务
  */
-class MainService : Service(), OnExecutorResult,
+class MainService : BusService(), OnExecutorResult,
         ServiceBridge, OnSelectListener, OnMultiSelectListener, LuaContext {
     private lateinit var toast: Voast
 
@@ -70,10 +66,8 @@ class MainService : Service(), OnExecutorResult,
 
     override fun onCreate() {
         super.onCreate()
-        AppBus.reg(this)
         cExecutor = LuaExecutor(
                 this,
-                SystemBridge(this),
                 this,
                 this
         )
@@ -81,7 +75,6 @@ class MainService : Service(), OnExecutorResult,
         floatVoice = VoiceFloat(this, 200, 200)
         floatVoice.show()
     }
-
 
     /**
      * 继续执行确认框
@@ -107,7 +100,7 @@ class MainService : Service(), OnExecutorResult,
             alertDialog?.show()
             //语音
             voiceMode = MODE_ALERT
-            AppBus.post(SpeechAction(SpeechAction.ACTION_START))
+            AppBus.postSpeechRecoAction(BaseAction.ACTION_START)
         } catch (e: Exception) {
             onRequestPermission(RequestPermission("悬浮窗权限"))
         }
@@ -118,7 +111,7 @@ class MainService : Service(), OnExecutorResult,
      * 停止语音
      */
     private fun notifyAlertResult() {
-        AppBus.post(SpeechAction(SpeechAction.ACTION_STOP))
+        AppBus.postSpeechRecoAction(BaseAction.ACTION_STOP)
         voiceMode = MODE_VOICE
         cExecutor.notifySync()
     }
@@ -184,12 +177,13 @@ class MainService : Service(), OnExecutorResult,
         toast.showShort(action.param?.askText ?: "临时参数")
         messengerAction = action
         voiceMode = MODE_GET_PARAM
-        AppBus.postSpeechAction(SpeechAction(SpeechAction.ACTION_START))
+        AppBus.postSpeechRecoAction(BaseAction.ACTION_START)
     }
 
     /**
      * 语音事件
      */
+    //TODO 错误处理
     @Subscribe(threadMode = ThreadMode.MAIN)
     fun onVoiceData(msg: Message?) {
         when (msg?.what) {
@@ -210,7 +204,7 @@ class MainService : Service(), OnExecutorResult,
                     }
                     MODE_ALERT -> {
                         toast.showShort("没有听懂")
-                        AppBus.post(SpeechAction(SpeechAction.ACTION_START))  //继续????
+                        AppBus.postSpeechRecoAction(BaseAction.ACTION_START)  //继续????
                     }
                 }
             }
@@ -255,13 +249,48 @@ class MainService : Service(), OnExecutorResult,
                                 alertDialog?.getButton(DialogInterface.BUTTON_NEGATIVE)?.performClick()
                                 voiceMode = MODE_VOICE
                             }
-                            else -> AppBus.post(SpeechAction(SpeechAction.ACTION_START))  //继续????
+                            else -> AppBus.postSpeechRecoAction(BaseAction.ACTION_START)  //继续????
                         }
                     }
                 }
             }
         }
     }
+
+    var speakSync = false
+    override fun speak(text: String) {
+        speakSync = false
+        AppBus.post(SpeechSynAction(BaseAction.ACTION_START, text))
+    }
+
+    override fun speakSync(text: String) {
+        speakSync = true
+        AppBus.post(SpeechSynAction(BaseAction.ACTION_START, text))
+    }
+
+    @Subscribe(threadMode = ThreadMode.POSTING)
+    fun onSynData(data: SpeechSynData) {
+        when (data.status) {
+            SpeechSynData.SYN_STATUS_PREPARE -> {
+                Vog.d(this, "onSynData 准备")
+            }
+            SpeechSynData.SYN_STATUS_START -> {
+                Vog.d(this, "onSynData 开始")
+            }
+            SpeechSynData.SYN_STATUS_PROCESS -> {
+                Vog.d(this, "onSynData 进度")
+            }
+            SpeechSynData.SYN_STATUS_FINISH -> {
+                Vog.d(this, "onSynData 结束")
+                if (speakSync) cExecutor.speakCallback()
+            }
+            SpeechSynData.SYN_STATUS_ERROR -> {
+                Vog.d(this, "onSynData 出错 ${data.errMsg}")
+                if (speakSync) cExecutor.speakCallback(data.errMsg)
+            }
+        }
+    }
+
 
     override fun onExecuteStart(words: String) {
         Vog.d(this, "开始执行 -> $words")
@@ -278,11 +307,6 @@ class MainService : Service(), OnExecutorResult,
     override fun onExecuteFailed(errMsg: String) {
         Vog.e(this, "onExecuteFailed" + errMsg)
         toast.showShort(errMsg)
-    }
-
-    override fun onDestroy() {
-        AppBus.unreg(this)
-        super.onDestroy()
     }
 
     override fun onBind(intent: Intent): IBinder {
@@ -314,7 +338,7 @@ class MainService : Service(), OnExecutorResult,
     fun stopExecutor(order: String) {
         when (order) {
             "stop execQueue" -> {
-                AppBus.postSpeechAction(SpeechAction(SpeechAction.ACTION_STOP))
+                AppBus.postSpeechRecoAction(BaseAction.ACTION_STOP)
                 cExecutor.interrupt()
             }
             else -> {
@@ -338,11 +362,11 @@ class MainService : Service(), OnExecutorResult,
          */
         const val MODE_VOICE = 858
         /**
-         * 执行期间获取"参数"
+         * 执行期间获取"语音参数"
          */
         const val MODE_GET_PARAM = 72
         /**
-         * 确认对话框模式
+         * 确认对话框语音模式
          */
         const val MODE_ALERT = 27
 

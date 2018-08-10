@@ -8,7 +8,6 @@
 require 'import'
 import 'cn.vove7.androlua.androbridge.*'
 import 'cn.vove7.common.view.finder.ViewFindBuilder'
---import 'cn.vove7.common.view.finder.ViewFinder'
 
 --
 bridges = luaman.getBridgeManager()
@@ -17,6 +16,9 @@ automator = bridges.getAutomator()
 system = bridges.getSystemBridge()
 resultNotifier = bridges.getResultNotifier()
 
+--[[
+--视图节点查找器
+ ]]
 function ViewFinder()
     return ViewFindBuilder(executor)
 end
@@ -98,6 +100,21 @@ end
 
 function toast(msg)
     automator.toast(msg)
+end
+
+--  语音合成同步 ，说完再向下执行
+-- @param text
+-- @return booleam 是否成功
+----
+function speakSync(text)
+    return executor.speakSync(text)
+end
+
+--
+-- 语音合成
+--
+function speak(text)
+    executor.speak(text)
 end
 
 

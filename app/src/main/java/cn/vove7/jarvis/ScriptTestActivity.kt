@@ -1,7 +1,7 @@
 package cn.vove7.jarvis
 
+import android.app.Activity
 import android.os.Bundle
-import android.support.v7.app.AppCompatActivity
 import android.view.View
 import cn.vove7.appbus.AppBus
 import cn.vove7.datamanager.parse.model.Action
@@ -10,7 +10,7 @@ import cn.vove7.vtp.asset.AssetHelper
 import cn.vove7.vtp.toast.Voast
 import kotlinx.android.synthetic.main.activity_script_test.*
 
-class ScriptTestActivity : AppCompatActivity() {
+class ScriptTestActivity : Activity() {
 
     private val files = arrayOf(
             "s/alipay_ss.txt"

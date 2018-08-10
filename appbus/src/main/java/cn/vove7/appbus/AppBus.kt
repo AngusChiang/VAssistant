@@ -18,8 +18,8 @@ object AppBus {
     /**
      * 控制语音
      */
-    fun postSpeechAction(ac: SpeechAction) {
-        EventBus.getDefault().post(ac)
+    fun postSpeechRecoAction(action: Int) {
+        EventBus.getDefault().post(SpeechRecoAction(action))
     }
 
     /**
@@ -51,25 +51,72 @@ open class LogMessage(val level: Int, val msg: String) {
     }
 }
 
-open class SpeechAction(val action: Int) {
+interface BaseAction {
     companion object {
         const val ACTION_START = 1
         const val ACTION_STOP = 2
         const val ACTION_CANCEL = 3
     }
+}
+
+/**
+ * 语音识别控制消息
+ */
+data class SpeechRecoAction(val action: Int) : BaseAction {
 
     override fun toString(): String {
-        return "SpeechAction(action=$action)"
+        return "SpeechRecoAction(action=$action)"
     }
 }
 
-open class VoiceData(val what: Int = 0, val tempResult: String? = null, val volumePercent: Int = 0)
+/**
+ * 语音识别数据
+ */
+data class VoiceData(val what: Int = 0, val tempResult: String? = null, val volumePercent: Int = 0)
     : Serializable
 
+/**
+ * 语音合成数据
+ */
+class SpeechSynData {
+    var status: Int = SYN_STATUS_START
+    var errMsg: String? = null
 
+
+    constructor(msg: String?) {
+        this.status = SYN_STATUS_ERROR
+        this.errMsg = msg
+    }
+
+    constructor(status: Int) {
+        this.status = status
+    }
+
+    companion object {
+        const val SYN_STATUS_PREPARE = 0
+        const val SYN_STATUS_START = 1
+        const val SYN_STATUS_PROCESS = 2
+        const val SYN_STATUS_FINISH = 3
+        const val SYN_STATUS_ERROR = -1
+    }
+}
+
+data class SpeechSynAction(
+        val action: Int, val text: String? = null
+) : Serializable, BaseAction {
+    companion object {
+        const val ACTION_PAUSE = 100
+        const val ACTION_RESUME = 101
+    }
+}
+
+
+/**
+ * Log消息
+ */
 open class MessageEvent(val msg: String, val what: Int) {
     override fun toString(): String {
-        return "MessageEvent(msg='$msg', what=$what)"
+        return "MessageEvent(errMsg='$msg', what=$what)"
     }
 
     companion object {

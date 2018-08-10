@@ -6,11 +6,11 @@ import android.view.WindowManager
 import android.widget.ImageButton
 import android.widget.TextView
 import cn.vove7.appbus.AppBus
-import cn.vove7.appbus.SpeechAction
+import cn.vove7.appbus.BaseAction
 import cn.vove7.appbus.VoiceData
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.services.MainService
-import cn.vove7.jarvis.speech.services.SpeechService
+import cn.vove7.jarvis.services.SpeechRecoService
 import cn.vove7.jarvis.utils.ServiceChecker
 import cn.vove7.vtp.floatwindow.AbFloatWindow
 import org.greenrobot.eventbus.Subscribe
@@ -35,11 +35,11 @@ class VoiceFloat(
     override fun onCreateViewHolder(view: View): Holder {
         val holder = Holder(view)
         holder.voiceImage.setOnClickListener {
-            if (SpeechService.instance.isListening()) {
-                AppBus.postSpeechAction(SpeechAction(SpeechAction.ACTION_STOP))
+            if (SpeechRecoService.instance.isListening()) {
+                AppBus.postSpeechRecoAction(BaseAction.ACTION_STOP)
             } else {
                 ServiceChecker(context).checkService()
-                AppBus.postSpeechAction(SpeechAction(SpeechAction.ACTION_START))
+                AppBus.postSpeechRecoAction(BaseAction.ACTION_START)
             }
         }
 

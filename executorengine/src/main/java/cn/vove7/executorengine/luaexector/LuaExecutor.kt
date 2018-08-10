@@ -18,10 +18,9 @@ import cn.vove7.vtp.log.Vog
  */
 class LuaExecutor(
         context: Context,
-        systemBridge: SystemBridge,
         serviceBridge: ServiceBridge,
         onExecutorResult: OnExecutorResult
-) : AbsExecutorImpl(context, systemBridge, serviceBridge, onExecutorResult) {
+) : AbsExecutorImpl(context, serviceBridge, onExecutorResult) {
     private val luaHelper = LuaHelper(context, BridgeManager(this, globalAutomator, systemBridge, onExecutorResult))
 //    private val luaFunHelper = LuaFunHelper(luaHelper, luaHelper.L)
 

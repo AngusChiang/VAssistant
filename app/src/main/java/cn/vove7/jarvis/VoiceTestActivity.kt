@@ -1,26 +1,24 @@
 package cn.vove7.jarvis
 
+import android.app.Activity
 import android.os.Bundle
-import android.support.v7.app.AppCompatActivity
 import android.view.View
 import android.widget.ScrollView
 import android.widget.TextView
+import cn.vove7.appbus.AppBus
+import cn.vove7.appbus.BaseAction
+import cn.vove7.appbus.LogMessage
+import cn.vove7.appbus.VoiceData
 import cn.vove7.jarvis.services.MainService.Companion.WHAT_VOICE_ERR
 import cn.vove7.jarvis.services.MainService.Companion.WHAT_VOICE_TEMP
 import cn.vove7.jarvis.services.MainService.Companion.WHAT_VOICE_VOL
-import cn.vove7.appbus.AppBus
-import cn.vove7.appbus.LogMessage
-import cn.vove7.appbus.SpeechAction
-import cn.vove7.appbus.SpeechAction.Companion.ACTION_START
-import cn.vove7.appbus.SpeechAction.Companion.ACTION_STOP
-import cn.vove7.appbus.VoiceData
 import cn.vove7.vtp.runtimepermission.PermissionUtils
 import cn.vove7.vtp.toast.Voast
 import kotlinx.android.synthetic.main.activity_voice.*
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
 
-class VoiceTestActivity : AppCompatActivity() {
+class VoiceTestActivity : Activity() {
 
 
     private val requirePermission = arrayOf(
@@ -88,10 +86,10 @@ class VoiceTestActivity : AppCompatActivity() {
     }
 
     fun stop(v: View) {
-        AppBus.postSpeechAction(SpeechAction(ACTION_STOP))
+        AppBus.postSpeechRecoAction(BaseAction.ACTION_STOP)
     }
 
     fun start(v: View) {
-        AppBus.postSpeechAction(SpeechAction(ACTION_START))
+        AppBus.postSpeechRecoAction(BaseAction.ACTION_START)
     }
 }

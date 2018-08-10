@@ -18,28 +18,38 @@ interface CExecutorI : ViewShowListener, ActivityShowListener {
 
     fun checkAccessibilityService(jump: Boolean = true): PartialResult
 
-    fun getViewNode(): ViewNode
     fun alert(title: String, msg: String): Boolean
-    /**
-     * 等待语音参数
-     * @return 语音参数 ,null if failed
-     */
-    fun waitForVoiceParam(askWord: String? = null): String?
-
     /**
      * 等待单选结果
      * @return if 调用成功 ChoiceData else null
      */
     fun waitForSingleChoice(askTitle: String, choiceData: List<ChoiceData>): ChoiceData?
 
+    /**
+     * 等待语音参数
+     * @return 语音参数 ,null if failed
+     */
+    fun waitForVoiceParam(askWord: String? = null): String?
+
+    fun onGetVoiceParam(param: String?)
+
     fun waitForApp(pkg: String, activityName: String? = null): PartialResult
     fun waitForViewId(id: String): ViewNode?
     fun waitForDesc(desc: String): ViewNode?
     fun waitForText(text: String): ViewNode?
-    fun openSomething(data: String): PartialResult
+    fun getViewNode(): ViewNode?
+
+    fun waitForUnlock(millis: Long = -1): Boolean
     fun notifySync()
     fun sleep(millis: Long)
-    fun onGetVoiceParam(param: String?)
-    fun waitForUnlock(millis: Long = -1): Boolean
     fun onFinish()
+
+    fun openSomething(data: String): PartialResult
+    /**
+     * 语音合成
+     */
+    fun speak(text: String)
+
+    fun speakSync(text: String): Boolean
+    fun speakCallback(result: String? = null)
 }

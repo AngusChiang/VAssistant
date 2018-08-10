@@ -22,6 +22,7 @@ import cn.vove7.appbus.AppBus
 import cn.vove7.datamanager.parse.model.Action
 import cn.vove7.datamanager.parse.model.Param
 import cn.vove7.vtp.log.Vog
+import cn.vove7.vtp.view.span.ColourTextClickableSpan
 import java.io.IOException
 import java.util.*
 
@@ -41,11 +42,22 @@ class LuaEditorActivity : Activity(), OnClickListener {
     @SuppressLint("HandlerLeak")
     internal var handler: Handler = object : Handler() {
         override fun handleMessage(msg: Message) {
+            var color = cn.vove7.vtp.R.color.default_text_color
             when (msg.what) {
-                LuaManagerI.E -> status.append("E: ")
-                LuaManagerI.W -> status.append("W: ")
+                LuaManagerI.E -> {
+                    color = cn.vove7.vtp.R.color.red_500
+                    val v = ColourTextClickableSpan(this@LuaEditorActivity, "E: ", colorId = color, listener = null)
+                    status.append(v.spanStr)
+                }
+                LuaManagerI.W -> {
+                    color = cn.vove7.vtp.R.color.orange_700
+                    val v = ColourTextClickableSpan(this@LuaEditorActivity, "W: ", colorId = color, listener = null)
+                    status.append(v.spanStr)
+                }
             }
-            status.append(msg.data.getString("data"))
+
+            val v = ColourTextClickableSpan(this@LuaEditorActivity, msg.data.getString("data"), colorId = color, listener = null)
+            status.append(v.spanStr)
             if (!status.isFocused) {
                 val offset = status.lineCount * status.lineHeight
                 if (offset > status.height) {

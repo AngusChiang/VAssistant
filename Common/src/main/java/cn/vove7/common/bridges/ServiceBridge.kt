@@ -1,6 +1,7 @@
 package cn.vove7.common.bridges
 
 import android.graphics.drawable.Drawable
+import cn.vove7.common.executor.CExecutorI
 import cn.vove7.datamanager.parse.model.Action
 import java.io.Serializable
 import java.text.Collator
@@ -28,6 +29,8 @@ interface ServiceBridge {
      */
     fun showAlert(r: ShowAlertEvent)
 
+    fun speak(text: String)
+    fun speakSync(text: String)
 }
 
 class ShowAlertEvent(

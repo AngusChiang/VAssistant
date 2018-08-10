@@ -234,7 +234,10 @@ class LuaHelper : LuaManagerI {
         } else {
             val e = errorReason(ok) + ": " + L.toString(-1)
             Log.e("Vove :", "evalString  ----> $e")
-            notifyOutput(LuaManagerI.E, e)
+            if (e.contains("java.lang.UnsupportedOperationException"))
+                notifyOutput(LuaManagerI.W, "强制终止")
+            else
+                notifyOutput(LuaManagerI.E, e)
             return
         }
     }
@@ -328,7 +331,7 @@ class LuaHelper : LuaManagerI {
     override fun removeGc(obj: LuaGcable) {
         synchronized(gcList) {
             gcList.remove(obj).also {
-                Vog.d(this,"removeGc $obj $it")
+                Vog.d(this, "removeGc $obj $it")
             }
         }
     }
