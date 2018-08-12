@@ -1,4 +1,4 @@
-package cn.vove7.jarvis
+package cn.vove7.jarvis.activityies
 
 import android.annotation.TargetApi
 import android.app.Activity
@@ -10,6 +10,7 @@ import android.view.View
 import android.widget.BaseAdapter
 import android.widget.Button
 import android.widget.TextView
+import cn.vove7.jarvis.R
 import cn.vove7.vtp.easyadapter.BaseListAdapter
 import cn.vove7.vtp.runtimepermission.PermissionUtils
 import cn.vove7.vtp.toast.Voast

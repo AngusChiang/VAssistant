@@ -22,7 +22,7 @@ import cn.vove7.common.executor.OnExecutorResult
 import cn.vove7.common.model.RequestPermission
 import cn.vove7.datamanager.parse.model.Action
 import cn.vove7.executorengine.luaexector.LuaExecutor
-import cn.vove7.jarvis.PermissionManagerActivity
+import cn.vove7.jarvis.activityies.PermissionManagerActivity
 import cn.vove7.jarvis.utils.Utils.checkCancel
 import cn.vove7.jarvis.utils.Utils.checkConfirm
 import cn.vove7.jarvis.view.dialog.MultiChoiceDialog

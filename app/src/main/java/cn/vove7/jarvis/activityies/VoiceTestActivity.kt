@@ -1,4 +1,4 @@
-package cn.vove7.jarvis
+package cn.vove7.jarvis.activityies
 
 import android.animation.Animator
 import android.app.Activity
@@ -11,6 +11,7 @@ import cn.vove7.appbus.AppBus
 import cn.vove7.appbus.BaseAction
 import cn.vove7.appbus.LogMessage
 import cn.vove7.appbus.VoiceData
+import cn.vove7.jarvis.R
 import cn.vove7.jarvis.services.MainService.Companion.WHAT_VOICE_ERR
 import cn.vove7.jarvis.services.MainService.Companion.WHAT_VOICE_TEMP
 import cn.vove7.jarvis.services.MainService.Companion.WHAT_VOICE_VOL

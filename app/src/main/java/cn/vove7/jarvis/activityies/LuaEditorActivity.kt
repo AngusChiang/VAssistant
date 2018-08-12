@@ -1,4 +1,4 @@
-package cn.vove7.jarvis
+package cn.vove7.jarvis.activityies
 
 import android.annotation.SuppressLint
 import android.app.Activity

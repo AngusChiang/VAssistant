@@ -40,7 +40,7 @@
             android:name="com.baidu.speech.SECRET_KEY"
             android:value="d9ef661698c5d8cd45978aa55e600e03" />
 
-        <activity android:name=".MainActivity">
+        <activity android:name=".activityies.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -60,14 +60,14 @@
                 android:resource="@xml/accessibility_config" />
         </service>
 
-        <activity android:name=".ScriptTestActivity" />
+        <activity android:name=".activityies.ScriptTestActivity" />
 
         <service
             android:name=".services.SpeechRecoService"
             android:enabled="true"
             android:exported="true" />
 
-        <activity android:name=".VoiceTestActivity" />
+        <activity android:name=".activityies.VoiceTestActivity" />
 
         <service
             android:name="com.baidu.speech.VoiceRecognitionService"
@@ -77,8 +77,8 @@
             android:enabled="true"
             android:exported="true" />
 
-        <activity android:name=".PermissionManagerActivity" />
-        <activity android:name=".LuaEditorActivity" />
+        <activity android:name=".activityies.PermissionManagerActivity" />
+        <activity android:name=".activityies.LuaEditorActivity" />
 
         <service
             android:name=".services.SpeechSynService"

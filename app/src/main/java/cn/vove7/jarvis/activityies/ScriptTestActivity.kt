@@ -1,10 +1,11 @@
-package cn.vove7.jarvis
+package cn.vove7.jarvis.activityies
 
 import android.app.Activity
 import android.os.Bundle
 import android.view.View
 import cn.vove7.appbus.AppBus
 import cn.vove7.datamanager.parse.model.Action
+import cn.vove7.jarvis.R
 import cn.vove7.parseengine.engine.ParseEngine
 import cn.vove7.vtp.asset.AssetHelper
 import cn.vove7.vtp.toast.Voast

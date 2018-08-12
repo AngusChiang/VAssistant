@@ -1,4 +1,4 @@
-package cn.vove7.jarvis
+package cn.vove7.jarvis.activityies
 
 import android.app.Activity
 import android.content.Intent
@@ -8,6 +8,7 @@ import android.view.View
 import cn.vove7.common.model.ScreenMetrics
 import cn.vove7.executorengine.helper.AppHelper
 import cn.vove7.executorengine.helper.ContactHelper
+import cn.vove7.jarvis.R
 import cn.vove7.vtp.runtimepermission.PermissionUtils
 import kotlin.concurrent.thread
 
