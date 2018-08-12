@@ -5,20 +5,23 @@ import android.content.Context
 import android.content.pm.PackageManager
 import android.graphics.Rect
 import android.view.KeyEvent
+import android.view.KeyEvent.KEYCODE_VOLUME_DOWN
 import android.view.ViewGroup
 import android.view.accessibility.AccessibilityEvent
 import android.view.accessibility.AccessibilityEvent.*
 import android.view.accessibility.AccessibilityNodeInfo
 import android.widget.Toast
+import cn.vove7.appbus.AppBus
 import cn.vove7.common.ShowListener
 import cn.vove7.common.accessibility.AccessibilityApi
 import cn.vove7.common.executor.CExecutorI
-import cn.vove7.common.view.finder.*
+import cn.vove7.common.view.finder.ViewFindBuilder
+import cn.vove7.common.view.finder.ViewFinder
 import cn.vove7.common.view.notifier.ActivityShowListener
 import cn.vove7.common.view.notifier.ViewShowListener
+import cn.vove7.common.view.notifier.ViewShowNotifier
 import cn.vove7.common.viewnode.ViewNode
 import cn.vove7.datamanager.parse.model.ActionScope
-import cn.vove7.common.view.notifier.ViewShowNotifier
 import cn.vove7.vtp.app.AppHelper
 import cn.vove7.vtp.log.Vog
 import cn.vove7.vtp.text.TextHelper
@@ -64,8 +67,7 @@ class MyAccessibilityService : AccessibilityApi() {
      * - pair.first pkg
      * - pair.second activity
      */
-    private val locksWaitForActivity
-            = mutableMapOf<ActivityShowListener, ActionScope>()
+    private val locksWaitForActivity = mutableMapOf<ActivityShowListener, ActionScope>()
 
     override fun waitForActivity(executor: CExecutorI, scope: ActionScope) {
         locksWaitForActivity[executor] = scope
@@ -233,8 +235,17 @@ class MyAccessibilityService : AccessibilityApi() {
         return super.onGesture(gestureId)
     }
 
+    var lastDownTime = 0L
     override fun onKeyEvent(event: KeyEvent): Boolean {
         Vog.d(this, "onKeyEvent  ----> " + event.toString())
+        if (event.action == KeyEvent.ACTION_DOWN && event.keyCode == KEYCODE_VOLUME_DOWN) {
+            if (event.eventTime - lastDownTime < 500) {
+                AppBus.post("stop execQueue")
+                return true
+            }else
+                lastDownTime=event.eventTime
+        }
+
         return super.onKeyEvent(event)
     }
 

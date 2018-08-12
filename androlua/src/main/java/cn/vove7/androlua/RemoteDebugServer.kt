@@ -5,6 +5,9 @@ import android.os.Handler
 import android.os.Looper
 import android.widget.Toast
 import cn.vove7.androlua.luautils.LuaPrinter
+import cn.vove7.appbus.AppBus
+import cn.vove7.datamanager.parse.model.Action
+import cn.vove7.datamanager.parse.model.Param
 import cn.vove7.vtp.log.Vog
 import java.io.BufferedInputStream
 import java.io.BufferedOutputStream
@@ -14,7 +17,6 @@ import java.net.ServerSocket
 
 internal class RemoteDebugServer(private val context: Context) : Thread() {
     var stopped: Boolean = false
-    private val luaHelper: LuaHelper = LuaHelper(context)
 
 
     override fun run() {
@@ -37,7 +39,8 @@ internal class RemoteDebugServer(private val context: Context) : Thread() {
                 while (!stopped) {
                     val data = inputStream.readUTF()
                     Vog.d(this, "run  ----> $data")
-                    luaHelper.safeEvalLua("require 'bridges'\n$data")
+//                    luaHelper.safeEvalLua("require 'bridges'\n$data")
+                    post(data)
                     outputStream.writeUTF(buffer.toString())
                     buffer.setLength(0)
                     outputStream.flush()
@@ -50,6 +53,12 @@ internal class RemoteDebugServer(private val context: Context) : Thread() {
         } finally {
             LuaHelper.unRegPrint(print!!)
         }
+    }
+
+    fun post(src: String) {
+        val ac = Action(src)
+        ac.param = Param()
+        AppBus.post(ac)
     }
 
     private fun show(s: String) {

@@ -21,7 +21,6 @@ import java.io.IOException
 import java.util.*
 import java.util.concurrent.ConcurrentSkipListSet
 import java.util.regex.Pattern
-import kotlin.collections.HashSet
 
 /**
  * LuaHelper
@@ -54,7 +53,7 @@ class LuaHelper : LuaManagerI {
     override val luaState: LuaState
         get() = L
 
-    private val gcList= ConcurrentSkipListSet<LuaGcable>()
+    private val gcList = ConcurrentSkipListSet<LuaGcable>()
     private var luaRequireSearchPath: String? = null
     private var mLuaDexLoader: LuaDexLoader? = null
 
@@ -83,7 +82,7 @@ class LuaHelper : LuaManagerI {
     }
 
     private fun init() {
-        synchronized(gcList){
+        synchronized(gcList) {
             gcList.clear()
         }
         mLuaDexLoader = LuaDexLoader(context)
@@ -243,7 +242,8 @@ class LuaHelper : LuaManagerI {
     fun checkErr(r: Int) {
         val e = errorReason(r) + ": " + L.toString(-1)
         Log.e("Vove :", "evalString  ----> $e")
-        if (e.contains("java.lang.UnsupportedOperationException"))
+        if (e.contains("java.lang.UnsupportedOperationException") ||
+                e.contains("java.lang.InterruptedException"))
             handleMessage(LuaManagerI.W, "强制终止")
         else
             handleMessage(LuaManagerI.E, e)
@@ -265,7 +265,7 @@ class LuaHelper : LuaManagerI {
             eBuilder.appendln("\t Suppressed :$se")
 
         eBuilder.appendln("\t Cause By :${e.cause}")
-        notifyOutput(LuaManagerI.E,eBuilder.toString())
+        notifyOutput(LuaManagerI.E, eBuilder.toString())
         Vog.e(this, eBuilder)
     }
 
@@ -336,9 +336,9 @@ class LuaHelper : LuaManagerI {
         }
     }
 
-    override fun removeGc(obj: LuaGcable):Boolean {
+    override fun removeGc(obj: LuaGcable): Boolean {
         synchronized(gcList) {
-           return gcList.remove(obj).also {
+            return gcList.remove(obj).also {
                 Vog.d(this, "removeGc $obj $it")
             }
         }

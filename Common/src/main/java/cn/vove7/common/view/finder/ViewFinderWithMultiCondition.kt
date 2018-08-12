@@ -44,7 +44,7 @@ class ViewFinderWithMultiCondition(accessibilityService: AccessibilityApi) : Vie
                         return false
                 }
                 else -> {
-                    Vog.v(this, "findCondition 未知条件")
+                    Vog.v(this, "findCondition equal text 未知条件")
                     return false
                 }
             }
@@ -54,7 +54,7 @@ class ViewFinderWithMultiCondition(accessibilityService: AccessibilityApi) : Vie
                 && !"${node.viewIdResourceName}".endsWith("/$viewId"))// :id/view_id)
             return false
 
-        if (desc != null && "${node.contentDescription}".equals(desc, ignoreCase = true))
+        if (desc != null && !"${node.contentDescription}".equals(desc, ignoreCase = true))
             return false
 
         if (scrollable != null && node.isScrollable != scrollable) {

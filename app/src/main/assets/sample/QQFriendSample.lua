@@ -14,7 +14,11 @@ ViewFinder().desc('返回消息').tryClick()
 msg = ViewFinder().id('name').equalsText('消息').await()
 msg.doubleClick()
 s = ViewFinder().id('et_search_keyword') -- s: ViewFinder类型
+while (not s.findFirst()) do
+    scrollDown()
+end
 s.tryClick() --执行try 会搜索当前界面 并执行
+
 sleep(110)
 
 -- 注意此处 界面发生变化 需要重新搜索界面
