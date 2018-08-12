@@ -18,7 +18,11 @@ import com.luajava.LuaState
 /**
  * 线程
  */
-class LuaThread : Thread, LuaMetaTable, LuaGcable, LuaRunnableI {
+class LuaThread : Thread, LuaMetaTable, LuaGcable, LuaRunnableI, Comparable<LuaThread> {
+
+    override operator fun compareTo(other: LuaThread): Int {
+        return this.hashCode() - other.hashCode()
+    }
 
     var isRun = false
     var L: LuaState
@@ -64,11 +68,15 @@ class LuaThread : Thread, LuaMetaTable, LuaGcable, LuaRunnableI {
         L = luaHelper.L
         funHelper = LuaFunHelper(luaHelper, L)
 
-        funHelper.copyRuntime(luaManager.luaState)
+        funHelper.copyRuntimeFrom(luaManager.luaState)
+    }
+
+    override fun quit() {
+        quit(true)
     }
 
     override fun gc() {
-        quit()
+        quit(false)
     }
 
     override fun __call(arg: Array<Any>): Any? {
@@ -114,10 +122,10 @@ class LuaThread : Thread, LuaMetaTable, LuaGcable, LuaRunnableI {
         } catch (e: LuaException) {
             luaManager.handleMessage(LuaManagerI.E, e.message ?: "")
             e.printStackTrace()
-        }finally {
+        } finally {
             isRun = false
             if (!isInterrupted) {
-                quit()
+                quit(true)
             }
         }
 
@@ -144,16 +152,19 @@ class LuaThread : Thread, LuaMetaTable, LuaGcable, LuaRunnableI {
         return L.toJavaObject(-1)
     }
 
-    override fun quit() {
-        Vog.d(this,"quit $this")
-        luaManager.removeGc(this)
-        L.gc(LuaState.LUA_GCCOLLECT, 1)
-        L.close()
-        System.gc()
-        if (isRun) {
-            isRun = false
-            tHandler!!.looper.quit()
+    override fun quit(self: Boolean) {
+        synchronized(this) {
+            Vog.d(this, "quit $this $self")
             interrupt()
+            L.gc(LuaState.LUA_GCCOLLECT, 1)
+//            L.close()
+            if (luaManager.removeGc(this).not()) return
+            System.gc()
+            if (isRun) {
+                isRun = false
+                tHandler!!.looper.quit()
+
+            }
         }
     }
 
