@@ -430,10 +430,11 @@ function task(src, ...)
         luaAsyncTask = LuaAsyncTask(luaman, src, callback)
     end
     if (#args > 0) then
-        luaAsyncTask.execute(args)
+        luaAsyncTask.exec(args)
     else
-        luaAsyncTask.execute()
+        luaAsyncTask.exec()
     end
+    return luaAsyncTask
 end
 
 function timer(f, d, p, ...)

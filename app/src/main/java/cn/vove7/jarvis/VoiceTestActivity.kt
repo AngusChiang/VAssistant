@@ -1,9 +1,11 @@
 package cn.vove7.jarvis
 
+import android.animation.Animator
 import android.app.Activity
 import android.os.Bundle
 import android.view.View
-import android.widget.ScrollView
+import android.view.ViewAnimationUtils
+import android.view.animation.AccelerateDecelerateInterpolator
 import android.widget.TextView
 import cn.vove7.appbus.AppBus
 import cn.vove7.appbus.BaseAction
@@ -17,6 +19,7 @@ import cn.vove7.vtp.toast.Voast
 import kotlinx.android.synthetic.main.activity_voice.*
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
+
 
 class VoiceTestActivity : Activity() {
 
@@ -36,15 +39,15 @@ class VoiceTestActivity : Activity() {
             "android.permission.WRITE_EXTERNAL_STORAGE"
     )
     lateinit var logText: TextView
-    lateinit var scr: ScrollView
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         setContentView(R.layout.activity_voice)
-        logText = findViewById(R.id.textView3)
-        scr = findViewById(R.id.scrollView)
+        logText = findViewById(R.id.log)
         PermissionUtils.autoRequestPermission(this, requirePermission, 9)
+        voice_bkg.visibility = View.GONE
     }
+
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
         if (!PermissionUtils.isAllGranted(this, mustPermission)) {
@@ -66,21 +69,23 @@ class VoiceTestActivity : Activity() {
     @Subscribe(threadMode = ThreadMode.MAIN)
     fun log(log: LogMessage) {
         logText.append(log.msg + "\n")
-        scr.fullScroll(View.FOCUS_DOWN)
     }
 
+    var op = 0
     @Subscribe(threadMode = ThreadMode.MAIN)
     fun showResult(data: VoiceData) {
         when (data.what) {
             WHAT_VOICE_TEMP -> {
-                result_text.text = data.tempResult
-                logText.append(data.tempResult + "\n")
+                result_text.text = data.data
+                logText.append(data.data + "\n")
             }
             WHAT_VOICE_VOL -> {
                 volume_per.progress = data.volumePercent
+                updateCircle(op, data.volumePercent)
+                op = data.volumePercent
             }
             WHAT_VOICE_ERR -> {
-                logText.append("识别出错")
+                logText.append("识别失败\n")
             }
         }
     }
@@ -91,5 +96,21 @@ class VoiceTestActivity : Activity() {
 
     fun start(v: View) {
         AppBus.postSpeechRecoAction(BaseAction.ACTION_START)
+    }
+
+    var c: Animator? = null
+    private fun updateCircle(op: Int, np: Int) {
+        val oldR = (op.toFloat() / 100) * voice_bkg.width / 2
+        val newR = (np.toFloat() / 100) * voice_bkg.width / 2
+
+        voice_bkg.visibility = View.VISIBLE
+        c?.cancel()
+        c = ViewAnimationUtils.createCircularReveal(
+                voice_bkg, voice_bkg.width / 2,
+                voice_bkg.height / 2, oldR, newR
+        )
+        c!!.duration = 200
+        c!!.interpolator = AccelerateDecelerateInterpolator()
+        c!!.start()
     }
 }

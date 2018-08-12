@@ -28,7 +28,7 @@ interface LuaManagerI {
     fun regGc(obj: LuaGcable)
 
     fun gc(obj: LuaGcable)
-    fun removeGc(obj: LuaGcable)
+    fun removeGc(obj: LuaGcable) :Boolean
 
     fun stop()
 

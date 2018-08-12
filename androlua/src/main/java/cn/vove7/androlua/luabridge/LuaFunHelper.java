@@ -33,7 +33,7 @@ public class LuaFunHelper {
      *
      * @param from 源
      */
-    public void copyRuntime(LuaState from) {
+    public void copyRuntimeFrom(LuaState from) {
         try {
             Object[] loadeds;
             LuaObject g = from.getLuaObject("luajava");
@@ -56,7 +56,7 @@ public class LuaFunHelper {
         }
     }
 
-    public void newLuaThread(byte[] buf, Object... args) throws LuaException {
+    public void newLuaThread(byte[] buf, Object... args) {
         L.setTop(0);
         int ok = L.LloadBuffer(buf, "Thread");
         if (ok == 0) {
@@ -66,18 +66,21 @@ public class LuaFunHelper {
             L.insert(-2);
             int l = args.length;
             for (Object arg : args) {
-                L.pushObjectValue(arg);
+                try {
+                    L.pushObjectValue(arg);
+                } catch (LuaException e) {
+                    luaHelper.handleError(e);
+                }
             }
             ok = L.pcall(l, 0, -2 - l);
             if (ok == 0) {
                 return;
-            }
+            } else luaHelper.checkErr(ok);
         }
-        throw new LuaException(errorReason(ok) + ": " + L.toString(-1));
     }
 
 
-    public void runFunc(String funcName, Object... args) throws LuaException {
+    public void runFunc(String funcName, Object... args)  {
         L.setTop(0);
         L.getGlobal(funcName);
         if (L.isFunction(-1)) {
@@ -88,14 +91,17 @@ public class LuaFunHelper {
 
             int l = args.length;
             for (Object arg : args) {
-                L.pushObjectValue(arg);
+                try {
+                    L.pushObjectValue(arg);
+                } catch (LuaException e) {
+                    luaHelper.handleError(e);
+                }
             }
 
             int ok = L.pcall(l, 1, -2 - l);
             if (ok == 0) {
                 return;
-            }
-            throw new LuaException(errorReason(ok) + ": " + L.toString(-1));
+            }else luaHelper.checkErr(ok);
         }
     }
 

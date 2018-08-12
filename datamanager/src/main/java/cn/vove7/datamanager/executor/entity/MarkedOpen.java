@@ -116,4 +116,15 @@ public class MarkedOpen {
     public void setRegStr(String regStr) {
         this.regStr = regStr;
     }
+
+    @Override
+    public String toString() {
+        return "MarkedOpen{" +
+                "key='" + key + '\'' +
+                ", type='" + type + '\'' +
+                ", regStr='" + regStr + '\'' +
+                ", regex=" + regex +
+                ", value='" + value + '\'' +
+                '}';
+    }
 }

@@ -3,7 +3,6 @@ apply plugin: 'kotlin-android'
 
 android {
     compileSdkVersion 27
-
     defaultConfig {
         minSdkVersion 21
         targetSdkVersion 27
@@ -11,10 +10,9 @@ android {
         versionName "1.0"
 
         ndk {
-            abiFilters 'armeabi-v7a'
+            abiFilters 'armeabi-v7a'//, 'arm64-v8a'
         }
     }
-
     buildTypes {
         release {
             minifyEnabled false
@@ -26,10 +24,11 @@ android {
             path 'src/main/jni/Android.mk'
         }
     }
-
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
+    }
+    productFlavors {
     }
 }
 

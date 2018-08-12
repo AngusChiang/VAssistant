@@ -24,4 +24,8 @@ public class PartialResult {
         this.needTerminal = needTerminal;
         this.msg = msg;
     }
+    public PartialResult(boolean isSuccess, boolean needTerminal) {
+        this.isSuccess = isSuccess;
+        this.needTerminal = needTerminal;
+    }
 }

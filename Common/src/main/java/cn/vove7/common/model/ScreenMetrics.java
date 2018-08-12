@@ -11,8 +11,8 @@ import android.view.Display;
 
 public class ScreenMetrics {
 
-    private static int deviceScreenHeight ;
-    private static int deviceScreenWidth ;
+    public static int deviceScreenHeight ;
+    public static int deviceScreenWidth ;
     private static boolean initialized = false;
     private static int deviceScreenDensity;
     private static Display display;

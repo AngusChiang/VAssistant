@@ -24,17 +24,17 @@ class ViewFinderWithMultiCondition(accessibilityService: AccessibilityApi) : Vie
         if (viewText != null) {
             when (textMatchMode) {
                 MATCH_MODE_EQUAL -> {
-                    val b = node.text != null && node.text == viewText
+                    val b = node.text != null && "${node.text}".equals(viewText, ignoreCase = true)
                     if (!b) return false
                 }
                 MATCH_MODE_CONTAIN -> {
-                    val b = node.text != null && node.text.contains(viewText!!)
+                    val b = node.text != null && node.text.contains(viewText!!, ignoreCase = true)
                     if (!b) return false
                 }
                 MATCH_MODE_FUZZY_WITH_PINYIN -> {
                     val f = TextHelper.compareSimilarityWithPinyin(accessibilityService, "${node.text}", viewText!!)
                     Vog.v(this, "findCondition $f")
-                    if (f < 0.9)
+                    if (f < 0.8)
                         return false
                 }
                 MATCH_MODE_FUZZY_WITHOUT_PINYIN -> {
@@ -54,7 +54,7 @@ class ViewFinderWithMultiCondition(accessibilityService: AccessibilityApi) : Vie
                 && !"${node.viewIdResourceName}".endsWith("/$viewId"))// :id/view_id)
             return false
 
-        if (desc != null && "${node.contentDescription}" != desc)
+        if (desc != null && "${node.contentDescription}".equals(desc, ignoreCase = true))
             return false
 
         if (scrollable != null && node.isScrollable != scrollable) {
@@ -64,7 +64,7 @@ class ViewFinderWithMultiCondition(accessibilityService: AccessibilityApi) : Vie
         if (editable != null && node.isEditable != editable) {
             return false
         }
-        Vog.i(this,"findCondition  find it ")
+        Vog.i(this, "findCondition  find it ")
         return true
     }
 

@@ -14,7 +14,6 @@ import cn.vove7.appbus.SpeechRecoAction
 import cn.vove7.jarvis.speech.recognition.OfflineRecogParams
 import cn.vove7.jarvis.speech.recognition.listener.SpeechStatusListener
 import cn.vove7.jarvis.speech.recognition.model.IStatus
-import cn.vove7.jarvis.speech.recognition.model.IStatus.Companion.STATUS_WAKEUP_EXIT
 import cn.vove7.jarvis.speech.recognition.recognizer.MyRecognizer
 import cn.vove7.vtp.log.Vog
 import cn.vove7.vtp.maths.LogicOperators
@@ -122,7 +121,7 @@ class SpeechRecoService : BusService() {
 
     fun isListening(): Boolean {
         return !LogicOperators.orEquals(listener.status,
-                arrayOf(IStatus.STATUS_NONE, IStatus.STATUS_FINISHED, STATUS_WAKEUP_EXIT))
+                arrayOf(IStatus.STATUS_NONE, IStatus.STATUS_FINISHED, IStatus.STATUS_WAKEUP_EXIT))
     }
 
 

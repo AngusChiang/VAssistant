@@ -28,7 +28,7 @@ object InitLuaDbData : InitDbData() {
              */
             val a1 = Action(0, "local args = { ... }\n" +
                     "if (#args >= 1) then\n" +
-                    "    executor.openSomething(args[1])\n" +
+                    "    smartOpen(args[1])\n" +
                     "else\n" +
                     "    print(\"打开什么呦\")\n" +
                     "end\n" +
@@ -72,9 +72,9 @@ object InitLuaDbData : InitDbData() {
                     "require 'accessibility'\n" + "notifications()")
 
             //TODO a9 a10
-            val a9 = Action("clickByText")
+            val a9 = Action("clickByText(args[1])")
             //脚本用
-            val a10 = Action("clickById")
+//            val a10 = Action("clickById(args[1])")
 
             val a11 = Action(
                     "require 'accessibility'\n" +
@@ -91,7 +91,7 @@ object InitLuaDbData : InitDbData() {
                             "\n" +
                             "sacn.waitFor().tryClick()\n")
 
-            arrayOf(a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12).forEach {
+            arrayOf(a1, a2, a3, a4, a5, a6, a7, a8, a9, a11, a12).forEach {
                 DAO.daoSession.actionDao.insert(it)
             }
 
@@ -154,8 +154,6 @@ object InitLuaDbData : InitDbData() {
                 mapDao.insert(it)
             }
         } else Vog.d("mapDao", "mapDao存在数据")
-
-
     }
 
 }

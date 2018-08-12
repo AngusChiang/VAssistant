@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.view.ViewConfiguration
 import android.view.accessibility.AccessibilityNodeInfo
 import cn.vove7.common.app.GlobalApp
+import cn.vove7.common.app.GlobalLog
 import cn.vove7.vtp.log.Vog
 import cn.vove7.vtp.text.TextTransHelper
 import java.lang.Thread.sleep
@@ -90,7 +91,7 @@ class ViewNode(val node: AccessibilityNodeInfo) : ViewOperation, Comparable<View
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             node.performAction(AccessibilityNodeInfo.AccessibilityAction.ACTION_SCROLL_UP.id)
         } else {
-            //TODO("VERSION.SDK_INT < M")
+            GlobalLog.err("scrollUp need SDK M")
             false
         }
     }
@@ -99,7 +100,7 @@ class ViewNode(val node: AccessibilityNodeInfo) : ViewOperation, Comparable<View
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             node.performAction(AccessibilityNodeInfo.AccessibilityAction.ACTION_SCROLL_DOWN.id)
         } else {
-            //TODO("VERSION.SDK_INT < M")
+            GlobalLog.err("scrollDown need SDK M")
             false
         }
     }
@@ -116,7 +117,7 @@ class ViewNode(val node: AccessibilityNodeInfo) : ViewOperation, Comparable<View
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             node.performAction(AccessibilityNodeInfo.AccessibilityAction.ACTION_SCROLL_LEFT.id)
         } else {
-            //TODO("VERSION.SDK_INT < M")
+            GlobalLog.err("scrollLeft need SDK M")
             false
         }
     }
@@ -125,7 +126,7 @@ class ViewNode(val node: AccessibilityNodeInfo) : ViewOperation, Comparable<View
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             node.performAction(AccessibilityNodeInfo.AccessibilityAction.ACTION_SCROLL_RIGHT.id)
         } else {
-            //TODO("VERSION.SDK_INT < M")
+            GlobalLog.err("scrollRight need SDK M")
             false
         }
     }

@@ -20,7 +20,6 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
-
     signingConfigs {
         debug {
             v1SigningEnabled true
@@ -50,6 +49,8 @@ android {
         preDexLibraries = true
         //线程数
         threadCount = 8
+    }
+    productFlavors {
     }
 }
 

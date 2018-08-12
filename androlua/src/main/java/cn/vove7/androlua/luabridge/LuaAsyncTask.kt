@@ -3,7 +3,6 @@ package cn.vove7.androlua.luabridge
 import android.os.AsyncTask
 import cn.vove7.androlua.LuaApp
 import cn.vove7.androlua.LuaHelper
-import cn.vove7.androlua.luabridge.LuaUtil.errorReason
 import cn.vove7.androlua.luautils.LuaGcable
 import cn.vove7.androlua.luautils.LuaManagerI
 import cn.vove7.androlua.luautils.LuaRunnableI
@@ -13,8 +12,9 @@ import com.luajava.LuaException
 import com.luajava.LuaObject
 import com.luajava.LuaState
 
-//TODO fix @ tasksample
-class LuaAsyncTask : AsyncTask<Any, Any, Any>, LuaGcable,LuaRunnableI {
+
+class LuaAsyncTask : AsyncTask<Any, Any, Any>, LuaGcable, LuaRunnableI, Comparable<LuaAsyncTask> {
+    override fun compareTo(other: LuaAsyncTask): Int = hashCode() - other.hashCode()
     private var L: LuaState
 
     private var luaManager: LuaManagerI
@@ -25,30 +25,31 @@ class LuaAsyncTask : AsyncTask<Any, Any, Any>, LuaGcable,LuaRunnableI {
 
     private var funHelper: LuaFunHelper
     private var luaHelper: LuaHelper
+
     @Throws(LuaException::class)
-    constructor(luaManager: LuaManagerI, delay: Long, callback: LuaObject):this(luaManager, callback) {
+    constructor(luaManager: LuaManagerI, delay: Long, callback: LuaObject) : this(luaManager, callback) {
         mDelay = delay
     }
 
     @Throws(LuaException::class)
-    constructor(luaManager: LuaManagerI, src: String, callback: LuaObject):this(luaManager, callback) {
+    constructor(luaManager: LuaManagerI, src: String, callback: LuaObject) : this(luaManager, callback) {
         mBuffer = src.toByteArray()
     }
 
     @Throws(LuaException::class)
-    constructor(luaManager: LuaManagerI, func: LuaObject, callback: LuaObject):this(luaManager, callback) {
+    constructor(luaManager: LuaManagerI, func: LuaObject, callback: LuaObject) : this(luaManager, callback) {
         mBuffer = func.dump()
     }
 
 
     @Throws(LuaException::class)
     constructor(luaManager: LuaManagerI, func: LuaObject, update: LuaObject,
-                callback: LuaObject):this(luaManager, callback) {
+                callback: LuaObject) : this(luaManager, callback) {
         mBuffer = func.dump()
         mUpdate = update
     }
 
-    constructor(luaManager: LuaManagerI, callback: LuaObject){
+    constructor(luaManager: LuaManagerI, callback: LuaObject) {
         this.luaManager = luaManager
         luaManager.regGc(this)
         mCallback = callback
@@ -57,26 +58,42 @@ class LuaAsyncTask : AsyncTask<Any, Any, Any>, LuaGcable,LuaRunnableI {
         L = luaHelper.L
         funHelper = LuaFunHelper(luaHelper, L)
 
-        funHelper.copyRuntime(luaManager.luaState)
+        funHelper.copyRuntimeFrom(luaManager.luaState)
     }
 
     override fun quit() {
-        Vog.d(this,"quit $this")
+        quit(false)
+    }
+
+    override fun quit(self: Boolean) {
+        Vog.d(this, "quit $this $self")
         luaManager.removeGc(this)
         L.gc(LuaState.LUA_GCCOLLECT, 1)
         System.gc()
 //        L.close()
-        if (status == AsyncTask.Status.RUNNING)
+        if (status == AsyncTask.Status.RUNNING) {
+            Vog.d(this, "cancel")
             cancel(true)
+        }
     }
 
     override fun gc() {
-        quit()
+        quit(false)
     }
 
     @Throws(IllegalArgumentException::class, ArrayIndexOutOfBoundsException::class, LuaException::class)
-    fun execute() {
+    fun exec() {
         super.execute()
+    }
+
+    fun cancel() {
+        quit()
+        cancel(true)
+    }
+
+    fun exec(args: Array<Any>) {
+        Vog.d(this, "exec $args")
+        super.execute(*args)
     }
 
 
@@ -118,32 +135,26 @@ class LuaAsyncTask : AsyncTask<Any, Any, Any>, LuaGcable,LuaRunnableI {
             e.printStackTrace()
             luaManager.log("AsyncTask" + e.message)
         }
-        try {
-            L.top = 0
-            var ok = L.LloadBuffer(mBuffer, "LuaAsyncTask")
+        L.top = 0
+        var ok = L.LloadBuffer(mBuffer, "LuaAsyncTask")
 
-            if (ok == 0) {
-                L.getGlobal("debug")
-                L.getField(-1, "traceback")
-                L.remove(-2)
-                L.insert(-2)
-                val l = args.size
-                for (arg in args) {
-                    L.pushObjectValue(arg)
-                }
-                ok = L.pcall(l, LuaState.LUA_MULTRET, -2 - l)
-                if (ok == 0) {
-                    val n = L.top - 1
-                    val ret = arrayOfNulls<Any>(n)
-                    for (i in 0 until n)
-                        ret[i] = L.toJavaObject(i + 2)
-                    return ret
-                }
+        if (ok == 0) {
+            L.getGlobal("debug")
+            L.getField(-1, "traceback")
+            L.remove(-2)
+            L.insert(-2)
+            val l = args.size
+            for (arg in args) {
+                L.pushObjectValue(arg)
             }
-            throw LuaException(errorReason(ok) + ": " + L.toString(-1))
-        } catch (e: LuaException) {
-            e.printStackTrace()
-            luaManager.handleMessage(LuaManagerI.E, "doInBackground$e")
+            ok = L.pcall(l, LuaState.LUA_MULTRET, -2 - l)
+            if (ok == 0) {
+                val n = L.top - 1
+                val ret = arrayOfNulls<Any>(n)
+                for (i in 0 until n)
+                    ret[i] = L.toJavaObject(i + 2)
+                return ret
+            } else luaHelper.checkErr(ok)
         }
         return null
     }
@@ -158,7 +169,7 @@ class LuaAsyncTask : AsyncTask<Any, Any, Any>, LuaGcable,LuaRunnableI {
             luaManager.handleMessage(LuaManagerI.E, "onPostExecute" + e.toString())
         }
         super.onPostExecute(result)
-        quit()
+        quit(true)
     }
 
     protected override fun onProgressUpdate(values: Array<Any>) {

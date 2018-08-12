@@ -6,7 +6,6 @@ import cn.vove7.common.bridges.ServiceBridge
 import cn.vove7.common.executor.OnExecutorResult
 import cn.vove7.common.executor.PartialResult
 import cn.vove7.executorengine.AbsExecutorImpl
-import cn.vove7.executorengine.bridges.SystemBridge
 import cn.vove7.vtp.log.Vog
 import java.util.*
 
@@ -97,8 +96,10 @@ class SimpleActionScriptExecutor(
         val p = ps[0]
         when (c) {
             ACTION_OPEN -> {//打开应用/其他额外
-                return if (checkParam(p)) openSomething(p)
-                else {
+                return if (checkParam(p)) {
+                    val r = smartOpen(p)
+                    PartialResult(r, !r)
+                } else {
                     if (waitForVoiceParam() != null)
                         execAction(cmd)
                     else PartialResult(false, true, "无参数")
@@ -211,7 +212,7 @@ class SimpleActionScriptExecutor(
 
         if (needAccess.contains(c)) {
             //需无障碍服务
-            if (!checkAccessibilityService().isSuccess)
+            if (!checkAccessibilityService())
                 return PartialResult(false, true, ACCESSIBILITY_DONT_OPEN)
             //不需要检查参数
             when (c) {
@@ -323,8 +324,10 @@ class SimpleActionScriptExecutor(
                     PartialResult(r, !r, if (r) "" else "被迫停止")
                 }
                 ACTION_WAIT_FOR_ACTIVITY -> {
-                    if (ps.size >= 2) waitForApp(p, ps[1])
-                    else PartialResult(false, true, "参数数量应为2")
+                    if (ps.size >= 2) {
+                        val r = waitForApp(p, ps[1])
+                        PartialResult(r, !r)
+                    } else PartialResult(false, true, "参数数量应为2")
                 }
 //                ACTION_WAIT_FOR_APP_VIEW_ID -> {
 //                    if (ps.size >= 2) waitForAppViewId(ps[0], ps[1])

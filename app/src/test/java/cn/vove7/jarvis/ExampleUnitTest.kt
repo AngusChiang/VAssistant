@@ -1,6 +1,5 @@
 package cn.vove7.jarvis
 
-import cn.vove7.appbus.utils.TextHelper
 import org.junit.Test
 
 /**
@@ -42,14 +41,14 @@ class ExampleUnitTest {
     }
 
     @Test
-    fun testChinese2First() {
-        arrayOf(
-                "一二三",
-                "i我和欧文h",
-                "吗朦胧"
+    fun regTest() {
+        //匹配包名 至少一个.
+        val r = "[a-zA-Z]+[0-9a-zA-Z_]*(\\.[a-zA-Z]+[0-9a-zA-Z_]*)+".toRegex()
+        mapOf(
+                Pair("cn.vove7.ok", true),
+                Pair("Alipay", false)
         ).forEach {
-            println(TextHelper.chineseStr2Pinyin(it,true))
+            println(r.matches(it.key) == it.value)
         }
     }
-
 }

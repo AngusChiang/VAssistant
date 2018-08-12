@@ -1,6 +1,7 @@
 package cn.vove7.androlua.luautils
 
 import android.util.Log
+import cn.vove7.vtp.log.Vog
 
 import com.luajava.JavaFunction
 import com.luajava.LuaException
@@ -51,7 +52,7 @@ class LuaPrinter @JvmOverloads constructor(Ls: LuaState, private val print: OnPr
         }
         output.append('\n')
         print?.onPrint(LuaManagerI.L, output.toString())
-        Log.i("Vove :", "execute  ----> $output")
+        Vog.i("Vove :", "execute  ----> $output")
         output.setLength(0)
         return 0
     }

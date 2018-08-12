@@ -19,6 +19,7 @@ import com.luajava.LuaStateFactory
 import dalvik.system.DexClassLoader
 import java.io.IOException
 import java.util.*
+import java.util.concurrent.ConcurrentSkipListSet
 import java.util.regex.Pattern
 import kotlin.collections.HashSet
 
@@ -34,7 +35,6 @@ class LuaHelper : LuaManagerI {
     constructor(context: Context) {
         this.context = context
         bridgeManager = sBridgeManager
-        this.gcList = HashSet()
         initPath()
         init()
 
@@ -54,7 +54,7 @@ class LuaHelper : LuaManagerI {
     override val luaState: LuaState
         get() = L
 
-    private val gcList: HashSet<LuaGcable>
+    private val gcList= ConcurrentSkipListSet<LuaGcable>()
     private var luaRequireSearchPath: String? = null
     private var mLuaDexLoader: LuaDexLoader? = null
 
@@ -83,7 +83,9 @@ class LuaHelper : LuaManagerI {
     }
 
     private fun init() {
-        gcList.clear()
+        synchronized(gcList){
+            gcList.clear()
+        }
         mLuaDexLoader = LuaDexLoader(context)
         try {
             mLuaDexLoader!!.loadLibs()
@@ -114,6 +116,7 @@ class LuaHelper : LuaManagerI {
         L = LuaStateFactory.newLuaState()
         L.openLibs()
         L.pushJavaObject(this)
+
         L.setGlobal("luaman")
         L.getGlobal("luaman")
         L.pushContext(context)
@@ -232,14 +235,18 @@ class LuaHelper : LuaManagerI {
         if (ok == 0) {
             return
         } else {
-            val e = errorReason(ok) + ": " + L.toString(-1)
-            Log.e("Vove :", "evalString  ----> $e")
-            if (e.contains("java.lang.UnsupportedOperationException"))
-                notifyOutput(LuaManagerI.W, "强制终止")
-            else
-                notifyOutput(LuaManagerI.E, e)
+            checkErr(ok)
             return
         }
+    }
+
+    fun checkErr(r: Int) {
+        val e = errorReason(r) + ": " + L.toString(-1)
+        Log.e("Vove :", "evalString  ----> $e")
+        if (e.contains("java.lang.UnsupportedOperationException"))
+            handleMessage(LuaManagerI.W, "强制终止")
+        else
+            handleMessage(LuaManagerI.E, e)
     }
 
     override fun handleError(err: String) {
@@ -258,6 +265,7 @@ class LuaHelper : LuaManagerI {
             eBuilder.appendln("\t Suppressed :$se")
 
         eBuilder.appendln("\t Cause By :${e.cause}")
+        notifyOutput(LuaManagerI.E,eBuilder.toString())
         Vog.e(this, eBuilder)
     }
 
@@ -328,9 +336,9 @@ class LuaHelper : LuaManagerI {
         }
     }
 
-    override fun removeGc(obj: LuaGcable) {
+    override fun removeGc(obj: LuaGcable):Boolean {
         synchronized(gcList) {
-            gcList.remove(obj).also {
+           return gcList.remove(obj).also {
                 Vog.d(this, "removeGc $obj $it")
             }
         }

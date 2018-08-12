@@ -31,7 +31,6 @@ abstract class ViewFinder(var accessibilityService: AccessibilityApi) {
     /**
      * 深搜遍历
      */
-    // TODO: QQ/id:mame 搜索失败
     private fun traverseAllNode(node: AccessibilityNodeInfo?, all: Boolean = false): ViewNode? {
         if (node == null) return null
         (0 until node.childCount).forEach { index ->

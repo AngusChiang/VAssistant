@@ -1,5 +1,7 @@
 package cn.vove7.androlua.luabridge;
 
+import android.support.annotation.NonNull;
+
 import cn.vove7.androlua.luautils.LuaGcable;
 import cn.vove7.androlua.luautils.LuaRunnableI;
 import cn.vove7.androlua.luautils.TimerX;
@@ -11,8 +13,11 @@ import cn.vove7.androlua.luautils.LuaManagerI;
 /**
  * [定时器]任务
  */
-public class LuaTimer extends TimerX implements LuaGcable,LuaRunnableI {
-
+public class LuaTimer extends TimerX implements LuaGcable,LuaRunnableI,Comparable<LuaTimer> {
+    @Override
+    public int compareTo(@NonNull LuaTimer o) {
+        return hashCode()-o.hashCode();
+    }
     private LuaTimerTask task;
     private LuaManagerI luaManager;
 
@@ -40,13 +45,18 @@ public class LuaTimer extends TimerX implements LuaGcable,LuaRunnableI {
 
     @Override
     public void quit() {
-        task.quit();
+        quit(false);
+    }
+
+    @Override
+    public void quit(boolean self) {
+        task.quit(self);
         luaManager.removeGc(this);
     }
 
     @Override
     public void gc() {
-        task.quit();
+        task.quit(false);
     }
 
     public void start(long delay, long period) {

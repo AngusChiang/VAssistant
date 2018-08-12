@@ -31,7 +31,7 @@ class AppHelper(private val context: Context) {
         val matchList = mutableListOf<MatchedData<AppInfo>>()
         APP_LIST.forEach {
             val rate = when {
-                appWord.startsWith(it.name) -> 1f
+                appWord.startsWith(it.name,ignoreCase = true) -> 1f
                 else -> try {
                     Vog.v(this, "matchAppName $appWord ${it.name}")
                     TextHelper.compareSimilarityWithPinyin(context,appWord, it.name)

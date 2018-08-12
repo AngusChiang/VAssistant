@@ -5,5 +5,5 @@
 --
 
 function accessibility()
-    return executor.checkAccessibilityService(true).isSuccess
+    return executor.checkAccessibilityService(true)
 end

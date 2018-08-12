@@ -170,7 +170,7 @@ function waitForApp(pkg)
 end
 
 --
---
+-- pkg, activity
 -- return boolean
 function waitForActivity(pkg, activity)
     return executor.waitForApp(pkg, activity)
@@ -198,10 +198,10 @@ function waitForText(text)
 end
 
 --[[
--- smart openSomething
+-- smart smartOpen
  ]]
-function openSomething(s)
-    return executor.openSomething(s)
+function smartOpen(s)
+    return executor.smartOpen(s)
 end
 
 function sleep(m)
@@ -218,7 +218,7 @@ function UserSdkVersion()
 end
 
 function checkService()
-    return executor.checkAccessibilityService(false).isSuccess
+    return executor.checkAccessibilityService(false)
 end
 
 import 'cn.vove7.common.accessibility.AccessibilityApi'

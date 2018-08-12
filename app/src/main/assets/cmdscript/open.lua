@@ -5,7 +5,7 @@
 --
 local args = { ... }
 if (#args >= 1) then
-    if (openSomething(args[1])) then
+    if (smartOpen(args[1])) then
 
     end
 else

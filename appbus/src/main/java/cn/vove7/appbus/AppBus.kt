@@ -72,7 +72,7 @@ data class SpeechRecoAction(val action: Int) : BaseAction {
 /**
  * 语音识别数据
  */
-data class VoiceData(val what: Int = 0, val tempResult: String? = null, val volumePercent: Int = 0)
+data class VoiceData(val what: Int = 0, val data: String? = null, val volumePercent: Int = 0)
     : Serializable
 
 /**

@@ -4,7 +4,7 @@
 -- QQFriendSample.lua
 --
 require 'accessibility'
-if (not openSomething('QQ')) then
+if (not smartOpen('QQ')) then
     toast('没安装QQ哦')
     return
 end

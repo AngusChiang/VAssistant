@@ -6,6 +6,7 @@ import android.os.Looper
 import android.support.annotation.CallSuper
 import cn.vove7.appbus.AppBus
 import cn.vove7.common.accessibility.AccessibilityApi
+import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.bridges.*
 import cn.vove7.common.bridges.ShowDialogEvent.Companion.WHICH_SINGLE
 import cn.vove7.common.executor.CExecutorI
@@ -18,12 +19,10 @@ import cn.vove7.datamanager.DAO
 import cn.vove7.datamanager.executor.entity.MarkedContact
 import cn.vove7.datamanager.executor.entity.MarkedOpen
 import cn.vove7.datamanager.executor.entity.MarkedOpen.*
-import cn.vove7.datamanager.greendao.MarkedOpenDao
 import cn.vove7.datamanager.parse.model.Action
 import cn.vove7.datamanager.parse.model.ActionScope
 import cn.vove7.executorengine.bridges.SystemBridge
 import cn.vove7.executorengine.helper.ContactHelper
-import cn.vove7.executorengine.v1.SimpleActionScriptExecutor
 import cn.vove7.parseengine.engine.ParseEngine
 import cn.vove7.vtp.contact.ContactInfo
 import cn.vove7.vtp.log.Vog
@@ -107,76 +106,95 @@ abstract class AbsExecutorImpl(
         accessApi?.removeAllNotifier(this)
     }
 
-    /**********Function*********/
-
     /**
-     * 打开: 应用 -> 其他额外
+     * 跟随打开解析App内操作
      */
-    override fun openSomething(data: String): PartialResult {
-        val o = systemBridge.openAppByWord(data)
-        if (o.ok) {//打开App 解析跟随操作
-            actionQueue = ParseEngine.matchAppAction(data, o.returnValue)
-            if (actionQueue.isNotEmpty()) Vog.d(this, "openSomething app内操作")
-            else {
-                Vog.d(this, "openSomething 无后续操作")
-                return PartialResult(true)
-            }
+    fun parseAppInnerOperation(cmd: String, pkg: String): Boolean {
+        actionQueue = ParseEngine.matchAppAction(cmd, pkg)
+        if (actionQueue.isNotEmpty()) Vog.d(this, "smartOpen app内操作")
+        else {
+            Vog.d(this, "smartOpen 无后续操作")
+            return true
+        }
 
-            val r = checkAccessibilityService()
-            return if (r.isSuccess) {
-                //等待App打开
-                val waitR = waitForApp(o.returnValue)
-                if (!waitR.isSuccess) return waitR
-                pollActionQueue()
-                PartialResult(true)
-                //解析App内操作
-            } else
-                r
+        val r = checkAccessibilityService()
+        return if (r) {
+            //等待App打开
+            val waitR = waitForApp(pkg)
+            if (!waitR) return false
+            pollActionQueue()
+            true
+            //解析App内操作
+        } else
+            false
+
+    }
+
+    override fun smartOpen(data: String): Boolean {
+        return smartOpen(data, "")
+    }
+
+    private fun smartOpen(data: String, follow: String): Boolean {
+        Vog.d(this, "smartOpen pkg:$data follow:$follow")
+        //包名
+        if (PACKAGE_REGEX.matches(data)) {
+            if (systemBridge.openAppByPkg(data).ok) {
+                return parseAppInnerOperation(follow, data)
+            }
+        }
+        //By App Name
+        val o = systemBridge.openAppByWord(data)
+        return if (o.ok) {//打开App 解析跟随操作
+            parseAppInnerOperation(data, o.returnValue)
         } else {//其他操作,打开网络,手电，网页
-            return parseOpenAction(data)
+            parseOpenAction(data)
         }
     }
 
     /**
      * 解析打开动作
      */
-    private fun parseOpenAction(p: String): PartialResult {
-        val marked = markedOpenDao.queryBuilder()
+    private fun parseOpenAction(p: String): Boolean {
+        /*val marked = markedOpenDao.queryBuilder()
                 .where(MarkedOpenDao.Properties.Key.like(p)).unique()
-        return if (marked != null) {//通过Key查询到
-            openByIdentifier(marked)
-        } else {
-            markedOpenDao.loadAll().forEach {
-                if (it.regStr.toRegex().matches(p))
-                    openByIdentifier(it)//执行
+         if (marked != null) {//通过Key查询到
+            //处理follow命令
+            p.indexOf()
+           return openByIdentifier(marked)
+        } else {*/
+        markedOpenDao.loadAll().forEach {
+            val result = it.regex.matchEntire(p)
+            if (result != null) {
+                return openByIdentifier(it, ParseEngine.getLastParam(result.groups))//执行
             }
-            PartialResult(false, "未知操作: $p")
         }
+        GlobalLog.err("parseOpenAction 未知操作: $p")
+        return false
+//        }
     }
 
     /**
      * 解析标识符
      */
-    private fun openByIdentifier(it: MarkedOpen): PartialResult {
+    private fun openByIdentifier(it: MarkedOpen, follow: String): Boolean {
         return when (it.type) {
             MARKED_TYPE_APP -> {
-                val o = systemBridge.openAppByPkg(it.value)
-                PartialResult(o.ok)
+                smartOpen(it.value, follow)
             }
             MARKED_TYPE_SYS_FUN -> {
                 when (it.value) {
                     "openFlash" -> {//手电
-                        PartialResult(systemBridge.openFlashlight().ok)
+                        systemBridge.openFlashlight().ok
                     }
-                    else -> PartialResult(false, "未知操作")
+                    else -> false
                 }
             }
             MARKED_TYPE_SCRIPT -> {
-                runScript(it.value)
+                runScript(it.value).isSuccess
             }
             else -> {
-                Vog.d(this, "parseOpenAction -> 未知Type")
-                PartialResult(false)
+                GlobalLog.err("openByIdentifier -> 未知Type $it")
+                false
             }
         }
     }
@@ -224,16 +242,14 @@ abstract class AbsExecutorImpl(
 
     /**
      * 锁定线程
-     * @return 解锁是否成功
      */
-    override fun waitForUnlock(millis: Long): Boolean {
+    override fun waitForUnlock(millis: Long) {
         synchronized(lock) {
             Vog.d(this, "进入等待")
             //等待结果
-            return try {
+            try {
                 if (millis < 0) lock.wait() else lock.wait(millis)
                 Vog.d(this, "执行器-解锁")
-                true
             } catch (e: InterruptedException) {
                 //必须强行stop
                 Vog.d(this, "被迫强行停止")
@@ -241,7 +257,6 @@ abstract class AbsExecutorImpl(
                 accessApi?.removeAllNotifier(this)
                 Thread.currentThread().interrupt()
                 Thread.currentThread().stop()
-                false
             }
         }
     }
@@ -249,20 +264,19 @@ abstract class AbsExecutorImpl(
     /**
      * 等待指定App出现，解锁
      */
-    override fun waitForApp(pkg: String, activityName: String?): PartialResult {
+    override fun waitForApp(pkg: String, activityName: String?): Boolean {
         Vog.d(this, "waitForApp $pkg $activityName")
-        if (!checkAccessibilityService().isSuccess)
-            return PartialResult(false, true, SimpleActionScriptExecutor.ACCESSIBILITY_DONT_OPEN)
+        if (!checkAccessibilityService())
+            return false
 
         accessApi?.waitForActivity(this, ActionScope(pkg, activityName))
-        return if (waitForUnlock())
-            PartialResult(true)
-        else PartialResult(false, true, "被迫强行停止")
+        waitForUnlock()
+        return true
     }
 
     override fun waitForViewId(id: String): ViewNode? {
         Vog.d(this, "waitForViewId $id")
-        if (!checkAccessibilityService().isSuccess)
+        if (!checkAccessibilityService())
             return null
 
         accessApi?.waitForView(this, ViewFindBuilder(this).id(id).viewFinderX)
@@ -281,7 +295,7 @@ abstract class AbsExecutorImpl(
 
     override fun waitForText(text: String): ViewNode? {
         Vog.d(this, "waitForText $text")
-        if (!checkAccessibilityService().isSuccess)
+        if (!checkAccessibilityService())
             return null
         accessApi?.waitForView(this, ViewFindBuilder(this).containsText(text).viewFinderX)
         waitForUnlock()
@@ -296,15 +310,14 @@ abstract class AbsExecutorImpl(
             currentAction?.param?.askText = askWord
         }
         serviceBridge.getVoiceParam(currentAction!!)
-        return if (waitForUnlock())
+        waitForUnlock()
         //得到结果 -> action.param
-            if (!currentAction!!.responseResult) {
-                null
+        return if (!currentAction!!.responseResult) {
+            null
 //                PartialResult(false, true, "获取语音参数失败")
-            } else
-                currentAction!!.param.value
-        //PartialResult(true, "等到参数重新执行")//重复执行
-        else null//PartialResult(false, true, "被迫强行停止")
+        } else
+            currentAction!!.param.value
+
     }
 
     /**
@@ -314,16 +327,15 @@ abstract class AbsExecutorImpl(
     override fun waitForSingleChoice(askTitle: String, choiceData: List<ChoiceData>): ChoiceData? {
         //通知显示单选框
         AppBus.post(ShowDialogEvent(WHICH_SINGLE, currentAction!!, askTitle, choiceData))
-        return (if (waitForUnlock())
-            if (currentAction!!.responseResult) {
-                Vog.d(this, "结果： have data")
-                val bundle = currentAction!!.responseBundle
-                bundle.getSerializable("data") as ChoiceData
-            } else {
-                Vog.d(this, "结果： 取消")
-                null
-            }
-        else null).also { Vog.d(this, "waitForSingleChoice result : $it") }
+        waitForUnlock()
+        return if (currentAction!!.responseResult) {
+            Vog.d(this, "结果： have data")
+            val bundle = currentAction!!.responseBundle
+            bundle.getSerializable("data") as ChoiceData
+        } else {
+            Vog.d(this, "结果： 取消")
+            null
+        }.also { Vog.d(this, "waitForSingleChoice result : $it") }
     }
 
     /**
@@ -332,9 +344,8 @@ abstract class AbsExecutorImpl(
      */
     override fun alert(title: String, msg: String): Boolean {
         AppBus.post(ShowAlertEvent("确认以继续", msg, currentAction!!))
-        return (if (waitForUnlock()) {
-            currentAction!!.responseResult
-        } else false).also {
+        waitForUnlock()
+        return currentAction!!.responseResult.also {
             Vog.d(this, "alert result > $it")
         }
     }
@@ -345,13 +356,12 @@ abstract class AbsExecutorImpl(
 
     override fun speakSync(text: String): Boolean {
         serviceBridge.speakSync(text)
-        return if (waitForUnlock()) {
-            if (callbackVal == null) true
-            else {
-                Vog.d(this, "回调结果失败 speakSync $callbackVal")
-                false
-            }
-        } else false
+        waitForUnlock()
+        return if (callbackVal == null) true
+        else {
+            Vog.d(this, "回调结果失败 speakSync $callbackVal")
+            false
+        }
     }
 
     private var callbackVal: Any? = null
@@ -414,6 +424,12 @@ abstract class AbsExecutorImpl(
          */
         fun checkParam(p: String?): Boolean = (p != null && p.trim() != "")
 
+        /**
+         * 打开: 应用 -> 其他额外
+         */
+
+        val PACKAGE_REGEX = "[a-zA-Z]+[0-9a-zA-Z_]*(\\.[a-zA-Z]+[0-9a-zA-Z_]*)+".toRegex()
+
     }
 
     override fun sleep(millis: Long) {
@@ -427,12 +443,12 @@ abstract class AbsExecutorImpl(
         }
     }
 
-    override fun checkAccessibilityService(jump: Boolean): PartialResult {
+    override fun checkAccessibilityService(jump: Boolean): Boolean {
         return if (!bridgeIsAvailable()) {
             if (jump)
                 AppBus.post(RequestPermission("无障碍服务"))
-            PartialResult(false, true, SimpleActionScriptExecutor.ACCESSIBILITY_DONT_OPEN)
-        } else PartialResult(true)
+            false
+        } else true
     }
 
     /**

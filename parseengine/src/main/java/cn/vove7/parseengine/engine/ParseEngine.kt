@@ -162,13 +162,22 @@ object ParseEngine {
         if (param != null) {//设置参数
             when (reg.paramPos) {
                 PARAM_POS_END -> {
-                    param.value = result.groups[result.groups.size - 1]?.value
+                    param.value = getLastParam(result.groups)
                 }
                 PARAM_POS_1, PARAM_POS_2, PARAM_POS_3 ->
                     param.value = result.groups[reg.paramPos]?.value
             }
             it.param = param
         }
+    }
+
+    fun getLastParam(colls: MatchGroupCollection): String {
+        colls.reversed().forEach {
+            if (it != null && it.value != "") {
+                return it.value
+            }
+        }
+        return ""
     }
 
 }

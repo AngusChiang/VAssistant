@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import cn.vove7.common.SystemOperation
+import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.model.ExResult
 import cn.vove7.executorengine.helper.AppHelper
 import cn.vove7.executorengine.helper.ContactHelper
@@ -19,6 +20,7 @@ class SystemBridge(private val context: Context) : SystemOperation {
             val launchIntent = context.packageManager
                     .getLaunchIntentForPackage(pkg)
             if (launchIntent == null) {
+                GlobalLog.err("openAppByPkg 启动失败(未找到此App: $pkg")
                 Vog.e(this, "openAppByPkg 启动失败(未找到此App: $pkg")
 //                Bus.postInfo(MessageEvent("启动失败(未找到此App[pkg:]):$pkg ", WHAT_ERR))
                 ExResult(null, "未找到此App: $pkg")
@@ -27,9 +29,10 @@ class SystemBridge(private val context: Context) : SystemOperation {
                 context.startActivity(launchIntent)
                 ExResult()
             }
-        } catch (e: Throwable) {
+        } catch (e: Exception) {
             e.printStackTrace()
             Vog.wtf(this, "${e.message}")
+            GlobalLog.err(e.message ?: "未知错误")
 //            Bus.postInfo(MessageEvent("启动失败:$pkg  errMsg:${e.message}", WHAT_ERR))
             ExResult(e.message, "未知错误")
         }

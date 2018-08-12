@@ -52,11 +52,14 @@ class LuaTimerTask : TimerTaskX, LuaRunnableI {
         L = luaHelper.L
         funHelper = LuaFunHelper(luaHelper, L)
 
-        funHelper.copyRuntime(luaManager.luaState)
+        funHelper.copyRuntimeFrom(luaManager.luaState)
     }
 
     override fun quit() {
-        Vog.d(this, "quit $this")
+        quit(false)
+    }
+    override fun quit(self:Boolean) {
+        Vog.d(this, "quit $this $self")
         L.gc(LuaState.LUA_GCCOLLECT, 1)
 //        L.close()
         System.gc()

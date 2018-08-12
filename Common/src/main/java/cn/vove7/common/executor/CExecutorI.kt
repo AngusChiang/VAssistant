@@ -16,7 +16,7 @@ interface CExecutorI : ViewShowListener, ActivityShowListener {
     fun interrupt()
     fun runScript(script: String, voiceArg: String? = null): PartialResult
 
-    fun checkAccessibilityService(jump: Boolean = true): PartialResult
+    fun checkAccessibilityService(jump: Boolean = true): Boolean
 
     fun alert(title: String, msg: String): Boolean
     /**
@@ -33,18 +33,18 @@ interface CExecutorI : ViewShowListener, ActivityShowListener {
 
     fun onGetVoiceParam(param: String?)
 
-    fun waitForApp(pkg: String, activityName: String? = null): PartialResult
+    fun waitForApp(pkg: String, activityName: String? = null): Boolean
     fun waitForViewId(id: String): ViewNode?
     fun waitForDesc(desc: String): ViewNode?
     fun waitForText(text: String): ViewNode?
     fun getViewNode(): ViewNode?
 
-    fun waitForUnlock(millis: Long = -1): Boolean
+    fun waitForUnlock(millis: Long = -1)
     fun notifySync()
     fun sleep(millis: Long)
     fun onFinish()
 
-    fun openSomething(data: String): PartialResult
+    fun smartOpen(data: String): Boolean
     /**
      * 语音合成
      */

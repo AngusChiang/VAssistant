@@ -72,7 +72,7 @@ class MainService : BusService(), OnExecutorResult,
                 this
         )
         toast = Voast.with(this, true).top()
-        floatVoice = VoiceFloat(this, 200, 200)
+        floatVoice = VoiceFloat(this)
         floatVoice.show()
     }
 
@@ -174,7 +174,7 @@ class MainService : BusService(), OnExecutorResult,
      * @param action 执行动作
      */
     override fun getVoiceParam(action: Action) {
-        toast.showShort(action.param?.askText ?: "临时参数")
+        toast.showShort(action.param?.askText ?: "???")
         messengerAction = action
         voiceMode = MODE_GET_PARAM
         AppBus.postSpeechRecoAction(BaseAction.ACTION_START)
@@ -214,9 +214,9 @@ class MainService : BusService(), OnExecutorResult,
             WHAT_VOICE_RESULT -> {
                 val voiceData = msg.data.getString("errMsg")
                 Vog.d(this, "结果 --------> $voiceData")
+                AppBus.postVoiceData(VoiceData(WHAT_VOICE_RESULT, voiceData))
                 when (voiceMode) {
                     MODE_VOICE -> {
-                        AppBus.postVoiceData(VoiceData(WHAT_VOICE_TEMP, voiceData))
                         toast.showShort("开始解析")
                         val parseResult = ParseEngine
                                 .parseGlobalAction(voiceData, AccessibilityApi.accessibilityService?.currentScope?.packageName
@@ -334,7 +334,7 @@ class MainService : BusService(), OnExecutorResult,
     }
 
 
-    @Subscribe(threadMode = ThreadMode.MAIN)
+    @Subscribe(threadMode = ThreadMode.BACKGROUND)
     fun stopExecutor(order: String) {
         when (order) {
             "stop execQueue" -> {
