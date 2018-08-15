@@ -16,6 +16,6 @@ open class GlobalApp : Application() {
     }
 
     companion object {
-        var APP: Application? = null
+        lateinit var APP: Application
     }
 }

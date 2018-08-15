@@ -37,6 +37,7 @@ public class MapNodeDao extends AbstractDao<MapNode, Long> {
         public final static Property Follows = new Property(3, String.class, "follows", false, "FOLLOWS");
         public final static Property ParamId = new Property(4, long.class, "paramId", false, "PARAM_ID");
         public final static Property ScopeId = new Property(5, long.class, "scopeId", false, "SCOPE_ID");
+        public final static Property DescTitle = new Property(6, String.class, "descTitle", false, "DESC_TITLE");
     }
 
     private DaoSession daoSession;
@@ -60,7 +61,8 @@ public class MapNodeDao extends AbstractDao<MapNode, Long> {
                 "\"ACTION_ID\" INTEGER NOT NULL ," + // 2: actionId
                 "\"FOLLOWS\" TEXT NOT NULL ," + // 3: follows
                 "\"PARAM_ID\" INTEGER NOT NULL ," + // 4: paramId
-                "\"SCOPE_ID\" INTEGER NOT NULL );"); // 5: scopeId
+                "\"SCOPE_ID\" INTEGER NOT NULL ," + // 5: scopeId
+                "\"DESC_TITLE\" TEXT);"); // 6: descTitle
     }
 
     /** Drops the underlying database table. */
@@ -82,6 +84,11 @@ public class MapNodeDao extends AbstractDao<MapNode, Long> {
         stmt.bindString(4, entity.getFollows());
         stmt.bindLong(5, entity.getParamId());
         stmt.bindLong(6, entity.getScopeId());
+ 
+        String descTitle = entity.getDescTitle();
+        if (descTitle != null) {
+            stmt.bindString(7, descTitle);
+        }
     }
 
     @Override
@@ -97,6 +104,11 @@ public class MapNodeDao extends AbstractDao<MapNode, Long> {
         stmt.bindString(4, entity.getFollows());
         stmt.bindLong(5, entity.getParamId());
         stmt.bindLong(6, entity.getScopeId());
+ 
+        String descTitle = entity.getDescTitle();
+        if (descTitle != null) {
+            stmt.bindString(7, descTitle);
+        }
     }
 
     @Override
@@ -118,7 +130,8 @@ public class MapNodeDao extends AbstractDao<MapNode, Long> {
             cursor.getLong(offset + 2), // actionId
             cursor.getString(offset + 3), // follows
             cursor.getLong(offset + 4), // paramId
-            cursor.getLong(offset + 5) // scopeId
+            cursor.getLong(offset + 5), // scopeId
+            cursor.isNull(offset + 6) ? null : cursor.getString(offset + 6) // descTitle
         );
         return entity;
     }
@@ -131,6 +144,7 @@ public class MapNodeDao extends AbstractDao<MapNode, Long> {
         entity.setFollows(cursor.getString(offset + 3));
         entity.setParamId(cursor.getLong(offset + 4));
         entity.setScopeId(cursor.getLong(offset + 5));
+        entity.setDescTitle(cursor.isNull(offset + 6) ? null : cursor.getString(offset + 6));
      }
     
     @Override

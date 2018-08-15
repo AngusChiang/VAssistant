@@ -83,6 +83,8 @@ public class MapNode {
     @Generated(hash = 1119678907)
     private transient Long actionScope__resolvedKey;
 
+    private String descTitle;
+
     @Keep
     public MapNode(Long id, String follows, int type) {
         this.id = id;
@@ -110,36 +112,48 @@ public class MapNode {
     }
 
     @Keep
-    public MapNode(Long id, long actionId, long paramId, long scopeId,int type) {
+    public MapNode(String descTitle,Long id, long actionId, long paramId, long scopeId,int type) {
         this.id = id;
         this.actionId = actionId;
         this.paramId = paramId;
         this.scopeId = scopeId;
         this.nodeType = type;
+        this.descTitle = descTitle;
     }
     @Keep
-    public MapNode(Long id, long actionId, long paramId, long scopeId,String f,int type) {
+    public MapNode(String descTitle,Long id, long actionId, long paramId, long scopeId,String f,int type) {
         this.id = id;
         this.actionId = actionId;
         this.paramId = paramId;
         this.scopeId = scopeId;
         this.follows=f;
         this.nodeType = type;
+        this.descTitle = descTitle;
     }
 
     @Keep
-    public MapNode(Long id, long actionId, long paramId,int type) {
+    public MapNode(String descTitle,Long id, long actionId, long paramId,int type) {
         this.id = id;
         this.actionId = actionId;
         this.paramId = paramId;
         this.nodeType = type;
+        this.descTitle = descTitle;
     }
 
     @Keep
-    public MapNode(Long id, long actionId,int type) {
+    public MapNode(String descTitle,Long id, long actionId,int type) {
         this.id = id;
         this.actionId = actionId;
         this.nodeType = type;
+        this.descTitle = descTitle;
+    }
+
+    public String getDescTitle() {
+        return descTitle;
+    }
+
+    public void setDescTitle(String descTitle) {
+        this.descTitle = descTitle;
     }
 
     public long getActionId() {
@@ -162,15 +176,16 @@ public class MapNode {
     public MapNode() {
     }
 
-    @Generated(hash = 2106960859)
-    public MapNode(Long id, int nodeType, long actionId, @NotNull String follows, long paramId,
-            long scopeId) {
+    @Generated(hash = 1601296698)
+    public MapNode(Long id, int nodeType, long actionId, @NotNull String follows, long paramId, long scopeId,
+            String descTitle) {
         this.id = id;
         this.nodeType = nodeType;
         this.actionId = actionId;
         this.follows = follows;
         this.paramId = paramId;
         this.scopeId = scopeId;
+        this.descTitle = descTitle;
     }
 
     public long getParamId() {
@@ -394,5 +409,8 @@ public class MapNode {
         this.nodeType = nodeType;
     }
 
-
+    @Override
+    public String toString() {
+        return descTitle;
+    }
 }

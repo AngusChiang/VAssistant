@@ -71,7 +71,7 @@ object InitLuaDbData : InitDbData() {
             val a8 = Action(
                     "require 'accessibility'\n" + "notifications()")
 
-            //TODO a9 a10
+
             val a9 = Action("clickByText(args[1])")
             //脚本用
 //            val a10 = Action("clickById(args[1])")
@@ -137,19 +137,19 @@ object InitLuaDbData : InitDbData() {
                 DAO.daoSession.actionScopeDao.insert(it)
             }
             arrayOf(
-                    MapNode(1L, a1.id, p1.id, NODE_TYPE_GLOBAL)//打开
-                    , MapNode(3L, a3.id, p3.id, scrope_qq.id, "4", NODE_TYPE_IN_APP)//聊天人
-                    , MapNode(4L, a4.id, p4.id, NODE_TYPE_IN_APP_2)//内容
+                    MapNode("打开...", 1L, a1.id, p1.id, NODE_TYPE_GLOBAL)//打开
+                    , MapNode("QQ选择聊天人", 3L, a3.id, p3.id, scrope_qq.id, "4", NODE_TYPE_IN_APP)//QQ选择聊天人
+                    , MapNode("QQ消息内容", 4L, a4.id, p4.id, NODE_TYPE_IN_APP_2)//QQ消息内容
 
-                    , MapNode(2L, a2.id, p2.id, NODE_TYPE_GLOBAL)//电话
-                    , MapNode(5L, a5.id, NODE_TYPE_GLOBAL)//返回
-                    , MapNode(6L, a6.id, NODE_TYPE_GLOBAL)//主页
-                    , MapNode(7L, a7.id, NODE_TYPE_GLOBAL)//通知
-                    , MapNode(8L, a8.id, NODE_TYPE_GLOBAL)
-                    , MapNode(9L, a9.id, p9.id, NODE_TYPE_GLOBAL)
+                    , MapNode("拨打电话", 2L, a2.id, p2.id, NODE_TYPE_GLOBAL)//电话
+                    , MapNode("返回", 5L, a5.id, NODE_TYPE_GLOBAL)//返回
+                    , MapNode("主页", 6L, a6.id, NODE_TYPE_GLOBAL)//主页
+                    , MapNode("最近任务", 7L, a7.id, NODE_TYPE_GLOBAL)//最近任务
+                    , MapNode("通知栏", 8L, a8.id, NODE_TYPE_GLOBAL)//通知栏
+                    , MapNode("点击文本", 9L, a9.id, p9.id, NODE_TYPE_GLOBAL)//点击文本
 
-                    , MapNode(11L, a11.id, 0, scrope_qq.id, NODE_TYPE_IN_APP)//QQ扫一扫
-                    , MapNode(12L, a12.id, 0, scrope_alipay.id, NODE_TYPE_IN_APP)//支付宝扫一扫
+                    , MapNode("QQ扫一扫", 11L, a11.id, 0, scrope_qq.id, NODE_TYPE_IN_APP)//QQ扫一扫
+                    , MapNode("支付宝扫一扫", 12L, a12.id, 0, scrope_alipay.id, NODE_TYPE_IN_APP)//支付宝扫一扫
             ).forEach {
                 mapDao.insert(it)
             }

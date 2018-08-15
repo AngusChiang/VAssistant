@@ -10,6 +10,8 @@ import cn.vove7.executorengine.helper.AppHelper
 import cn.vove7.executorengine.helper.ContactHelper
 import cn.vove7.vtp.hardware.HardwareHelper
 import cn.vove7.vtp.log.Vog
+import cn.vove7.vtp.system.DeviceInfo
+import cn.vove7.vtp.system.SystemHelper
 
 
 class SystemBridge(private val context: Context) : SystemOperation {
@@ -101,4 +103,11 @@ class SystemBridge(private val context: Context) : SystemOperation {
         return ExResult()
     }
 
+    override fun getDeviceInfo(): DeviceInfo {
+        return SystemHelper.getDeviceInfo(context)
+    }
+
+    override fun openUrl(url: String) {
+        SystemHelper.openLink(context, url)
+    }
 }

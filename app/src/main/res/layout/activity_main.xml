@@ -5,15 +5,13 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".activityies.MainActivity">
+    tools:context=".activities.MainActivity">
 
 
     <Button
         android:id="@+id/button4"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
-        android:layout_marginEnd="8dp"
         android:onClick="go2Test"
         android:text="@string/simple_test_script"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -24,7 +22,6 @@
         android:id="@+id/button10"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="11dp"
         android:onClick="permissionMan"
         android:text="@string/text_permission_manager" />
 
@@ -39,7 +36,12 @@
         android:id="@+id/button100"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="11dp"
         android:onClick="go2Lua"
         android:text="@string/text_androlua_test" />
+    <Button
+        android:id="@+id/button1000"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:onClick="go2InstList"
+        android:text="@string/instru_management" />
 </LinearLayout>

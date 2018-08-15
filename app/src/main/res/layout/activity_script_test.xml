@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".activityies.ScriptTestActivity"
+    tools:context=".activities.ScriptTestActivity"
     tools:layout_editor_absoluteY="81dp">
 
     <EditText

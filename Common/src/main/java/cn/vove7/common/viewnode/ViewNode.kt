@@ -163,7 +163,7 @@ class ViewNode(val node: AccessibilityNodeInfo) : ViewOperation, Comparable<View
         if (ep == null) return text
         return when (ep) {
             "1" -> {//转中文拼音首字母
-                TextTransHelper(GlobalApp.APP!!).chineseStr2Pinyin(text, true)
+                TextTransHelper(GlobalApp.APP).chineseStr2Pinyin(text, true)
             }
             else -> {
                 text

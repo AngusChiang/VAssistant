@@ -10,6 +10,7 @@ import cn.vove7.androlua.luautils.LuaGcable
 import cn.vove7.androlua.luautils.LuaManagerI
 import cn.vove7.androlua.luautils.LuaPrinter
 import cn.vove7.common.BridgeManager
+import cn.vove7.common.app.GlobalApp
 import cn.vove7.vtp.log.Vog
 import com.luajava.JavaFunction
 import com.luajava.LuaException
@@ -91,7 +92,6 @@ class LuaHelper : LuaManagerI {
         } catch (e: LuaException) {
             e.printStackTrace()
         }
-
         initLua()
     }
 
@@ -107,7 +107,7 @@ class LuaHelper : LuaManagerI {
         luaRequireSearchPath += jniLibsPath ?: "" /*+ assetInclude*/
     }
 
-    override fun log(log: String) {
+    override fun log(log: Any?) {
         Vog.d(this, "lua log  ----> $log")
     }
 
@@ -146,17 +146,14 @@ class LuaHelper : LuaManagerI {
         })
 
         val set = object : JavaFunction(L) {
-            @Throws(LuaException::class)
             override fun execute(): Int {
                 val thread = L.toJavaObject(2) as LuaThread
-
                 thread[L.toString(3)] = L.toJavaObject(4)
                 return 0
             }
         }
 
         val call = object : JavaFunction(L) {
-            @Throws(LuaException::class)
             override fun execute(): Int {
                 val thread = L.toJavaObject(2) as LuaThread
 
@@ -212,13 +209,13 @@ class LuaHelper : LuaManagerI {
         return L.LloadFile(fileName)
     }
 
-    @Throws(LuaException::class)
+
     fun evalString(src: String, args: Array<Any> = arrayOf()) {
         var r = 1
         if (loadString(src).also { r = it } == 0) {
             loadAfterExec(args)
         } else
-            throw LuaException(errorReason(r) + ": " + L.toString(-1))
+            checkErr(r)
     }
 
     private fun loadAfterExec(args: Array<Any>) {
@@ -244,7 +241,7 @@ class LuaHelper : LuaManagerI {
         Log.e("Vove :", "evalString  ----> $e")
         if (e.contains("java.lang.UnsupportedOperationException") ||
                 e.contains("java.lang.InterruptedException"))
-            handleMessage(LuaManagerI.W, "强制终止")
+            handleMessage(LuaManagerI.W, "强制终止\n")
         else
             handleMessage(LuaManagerI.E, e)
     }
@@ -270,7 +267,6 @@ class LuaHelper : LuaManagerI {
     }
 
 
-    @Throws(LuaException::class)
     fun autoRun(s: String, args: Array<Any>) {
         Vog.d(this, "autoRun  ----> $s")
         when {
@@ -280,28 +276,29 @@ class LuaHelper : LuaManagerI {
         }
     }
 
-    @Throws(LuaException::class)
     fun execFromFile(filePath: String, args: Array<Any>) {
         var r = 1
         if (loadFile(filePath).also { r = it } == 0) {
             loadAfterExec(args)
         } else
-            throw LuaException(errorReason(r) + ": " + L.toString(-1))
+            checkErr(r)
     }
 
-    @Throws(LuaException::class)
+
     fun execFromAsset(name: String, args: Array<Any>) {
         val bytes: ByteArray
         try {
             bytes = LuaUtil.readAsset(context, name)
         } catch (e: IOException) {
-            throw LuaException(e.message)
+            e.printStackTrace()
+            handleError(e)
+            return
         }
         L.top = 0
         val ok = L.LloadBuffer(bytes, name)
         if (ok == 0) {
             loadAfterExec(args)
-        } else throw LuaException(errorReason(ok) + ": " + L.toString(-1))
+        } else checkErr(ok)
     }
 
     override fun regGc(obj: LuaGcable) {
@@ -314,19 +311,20 @@ class LuaHelper : LuaManagerI {
     override val librarys: HashMap<String, String>
         get() = mLuaDexLoader!!.librarys
 
-    //            override fun getLibrarys(): HashMap<String, String> {
-//        return
-//    }
+
     override val classLoaders: ArrayList<ClassLoader>
         get() = mLuaDexLoader!!.classLoaders
 
-//    override fun getClassLoaders(): ArrayList<ClassLoader> {
-//        return
-//    }
 
-    @Throws(LuaException::class)
-    override fun loadDex(path: String): DexClassLoader {
-        return mLuaDexLoader!!.loadDex(path)
+    override fun loadDex(path: String): DexClassLoader? {
+        var r: DexClassLoader? = null
+        try {
+            r = mLuaDexLoader!!.loadDex(path)
+        } catch (e: Exception) {
+            e.printStackTrace()
+            handleError(e)
+        }
+        return r
     }
 
     override fun gc(obj: LuaGcable) {
@@ -368,10 +366,6 @@ class LuaHelper : LuaManagerI {
     }
 
     override val app: Context
-        get() = context
-
-//            override fun getApp(): Context {
-//        return
-//    }
+        get() = GlobalApp.APP
 
 }

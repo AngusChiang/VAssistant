@@ -108,7 +108,7 @@ class ContactHelper(val context: Context) : GenChoiceData, Markable<MarkedContac
             val rate = when (s) {
                 it.contactName -> 1f
                 //转拼音比较
-                else -> TextHelper.compareSimilarityWithPinyin(GlobalApp.APP!!, s, it.contactName)
+                else -> TextHelper.compareSimilarityWithPinyin(GlobalApp.APP, s, it.contactName)
             }
             if (rate >= limitRate) {
                 Vog.d(this, "${it.contactName}: $rate")

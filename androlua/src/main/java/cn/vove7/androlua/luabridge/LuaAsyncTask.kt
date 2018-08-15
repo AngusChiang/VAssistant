@@ -133,7 +133,7 @@ class LuaAsyncTask : AsyncTask<Any, Any, Any>, LuaGcable, LuaRunnableI, Comparab
             update.register("update")
         } catch (e: LuaException) {
             e.printStackTrace()
-            luaManager.log("AsyncTask" + e.message)
+            luaManager.handleError(e)
         }
         L.top = 0
         var ok = L.LloadBuffer(mBuffer, "LuaAsyncTask")

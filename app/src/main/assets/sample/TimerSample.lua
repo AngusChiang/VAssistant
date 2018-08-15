@@ -5,10 +5,9 @@
 -- Time: 1:17
 -- TimerSample.lua
 --
---i = 0
+--
 function f()
-    print('f()')--..i)
-    --i = i + 1
+    print('do something')--..i)
 end
 
 print('begin')

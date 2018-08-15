@@ -23,7 +23,7 @@ interface LuaManagerI {
     val app: Context
 
     @Throws(LuaException::class)
-    fun loadDex(path: String): DexClassLoader
+    fun loadDex(path: String): DexClassLoader?
 
     fun regGc(obj: LuaGcable)
 
@@ -38,12 +38,13 @@ interface LuaManagerI {
 
     fun handleMessage(l: Int, msg: String)
 
-    fun log(log: String)
+    fun log(log: Any?)
 
     companion object {
 
         const val L = 0
         const val W = 1//Prompt
-        const val E = 2
+        const val I = 2
+        const val E = 3
     }
 }

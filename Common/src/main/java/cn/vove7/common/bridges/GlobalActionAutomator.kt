@@ -10,11 +10,10 @@ import android.os.Looper
 import android.support.annotation.RequiresApi
 import android.view.ViewConfiguration
 import android.widget.Toast
-
 import cn.vove7.common.model.ResultBox
-import cn.vove7.common.model.ScreenMetrics
 import cn.vove7.vtp.log.Vog
 import cn.vove7.vtp.toast.Voast
+import android.util.Pair
 
 /**
  * 无障碍全局执行器
@@ -24,7 +23,6 @@ class GlobalActionAutomator : ActionAutomatorI {
     val context: Context
     private lateinit var mService: AccessibilityService
     private var mHandler: Handler? = null
-    private val mScreenMetrics = ScreenMetrics()
     private var toast: Voast
 
     constructor(context: Context, mService: AccessibilityService, mHandler: Handler) : this(context, mHandler) {
@@ -76,6 +74,7 @@ class GlobalActionAutomator : ActionAutomatorI {
         return performGlobalAction(AccessibilityService.GLOBAL_ACTION_TOGGLE_SPLIT_SCREEN)
     }
 
+
     override fun gesture(start: Long, duration: Long, points: Array<Pair<Int, Int>>): Boolean {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
             return false
@@ -105,11 +104,12 @@ class GlobalActionAutomator : ActionAutomatorI {
 
     private fun pointsToPath(points: Array<Pair<Int, Int>>): Path {
         val path = Path()
-        path.moveTo(scaleX(points[0].first).toFloat(), scaleY(points[0].second).toFloat())
+        if (points.isEmpty()) return path
+        path.moveTo(points[0].first.toFloat(), points[0].second.toFloat())
 
         for (i in 1 until points.size) {
             val point = points[i]
-            path.lineTo(scaleX(point.first).toFloat(), scaleY(point.second).toFloat())
+            path.lineTo((point.first).toFloat(), (point.second).toFloat())
         }
         return path
     }
@@ -199,13 +199,6 @@ class GlobalActionAutomator : ActionAutomatorI {
         }
     }
 
-    private fun scaleX(x: Int): Int {
-        return mScreenMetrics.scaleX(x)
-    }
-
-    private fun scaleY(y: Int): Int {
-        return mScreenMetrics.scaleY(y)
-    }
 
     override fun swipe(x1: Int, y1: Int, x2: Int, y2: Int, delay: Int): Boolean {
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {

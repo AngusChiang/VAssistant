@@ -1,5 +1,8 @@
 package cn.vove7.common;
 
+import java.util.Arrays;
+import java.util.Collections;
+
 import cn.vove7.common.bridges.GlobalActionAutomator;
 import cn.vove7.common.executor.CExecutorI;
 import cn.vove7.common.executor.OnExecutorResult;
@@ -14,8 +17,6 @@ public class BridgeManager {
     private GlobalActionAutomator automator;
     private SystemOperation systemBridge;
     private OnExecutorResult resultNotifier;
-    // TODO: 2018/8/6 other bridge
-
 
 
     public BridgeManager(CExecutorI executor, GlobalActionAutomator automator, SystemOperation systemBridge, OnExecutorResult resultNotifer) {
@@ -23,7 +24,6 @@ public class BridgeManager {
         this.automator = automator;
         this.systemBridge = systemBridge;
         this.resultNotifier = resultNotifer;
-
     }
 
     public OnExecutorResult getResultNotifier() {

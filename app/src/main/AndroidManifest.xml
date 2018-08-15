@@ -40,7 +40,7 @@
             android:name="com.baidu.speech.SECRET_KEY"
             android:value="d9ef661698c5d8cd45978aa55e600e03" />
 
-        <activity android:name=".activityies.MainActivity">
+        <activity android:name=".activities.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -60,14 +60,14 @@
                 android:resource="@xml/accessibility_config" />
         </service>
 
-        <activity android:name=".activityies.ScriptTestActivity" />
+        <activity android:name=".activities.ScriptTestActivity" />
 
         <service
             android:name=".services.SpeechRecoService"
             android:enabled="true"
             android:exported="true" />
 
-        <activity android:name=".activityies.VoiceTestActivity" />
+        <activity android:name=".activities.VoiceTestActivity" />
 
         <service
             android:name="com.baidu.speech.VoiceRecognitionService"
@@ -77,14 +77,21 @@
             android:enabled="true"
             android:exported="true" />
 
-        <activity android:name=".activityies.PermissionManagerActivity" />
-        <activity android:name=".activityies.LuaEditorActivity" />
+        <activity android:name=".activities.PermissionManagerActivity" />
+        <activity android:name=".activities.LuaEditorActivity" />
 
         <service
             android:name=".services.SpeechSynService"
             android:enabled="true"
             android:exported="true" />
         <service android:name=".services.BusService" />
+
+        <activity
+            android:name=".activities.InstManagerActivity"
+            android:theme="@style/NoActionBar" />
+        <activity
+            android:name=".activities.MarkedManageActivity"
+            android:theme="@style/NoActionBar" />
     </application>
 
 </manifest>

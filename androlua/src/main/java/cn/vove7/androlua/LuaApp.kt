@@ -4,6 +4,7 @@ import cn.vove7.androlua.luabridge.LuaUtil
 import cn.vove7.common.app.GlobalApp
 import java.io.File
 import java.io.IOException
+import kotlin.concurrent.thread
 
 
 /**
@@ -24,30 +25,26 @@ open class LuaApp : GlobalApp() {
     override fun onCreate() {
         super.onCreate()
         instance = this
-        //CrashHandler crashHandler = CrashHandler.getAPP();
-        //// 注册crashHandler
-        //crashHandler.init(getApplicationContext());
 
         luaDir = filesDir.absolutePath
-//        luaHelper = LuaHelper(this)
-
-        RemoteDebugServer(this).start()
-
-        initAsset()
+        thread {
+            initAsset()
+        }
     }
 
     private fun initAsset() {
-        assets.list("").forEach {
-            if (!it.endsWith(".lua")) return@forEach
-            val fp = filesDir.absolutePath + '/' + it
-            if (!File(fp).exists()) {
-                try {
-                    LuaUtil.assetsToSD(this, it, fp)
-                } catch (e: IOException) {
-                    e.printStackTrace()
+        assets.list("lua_requires")
+                .filter { it.endsWith(".lua") }
+                .forEach {
+                    val fp = filesDir.absolutePath + '/' + it
+//                    if (!File(fp).exists()) {
+                        try {
+                            LuaUtil.assetsToSD(this, "lua_requires/$it", fp)
+                        } catch (e: IOException) {
+                            e.printStackTrace()
+                        }
+//                    }
                 }
-            }
-        }
     }
 
 

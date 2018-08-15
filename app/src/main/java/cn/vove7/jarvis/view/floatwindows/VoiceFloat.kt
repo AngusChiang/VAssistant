@@ -1,8 +1,6 @@
 package cn.vove7.jarvis.view.floatwindows
 
 import android.content.Context
-import android.graphics.Point
-import android.view.MotionEvent
 import android.view.View
 import android.view.WindowManager
 import android.widget.ImageButton
@@ -10,13 +8,12 @@ import android.widget.TextView
 import cn.vove7.appbus.AppBus
 import cn.vove7.appbus.BaseAction
 import cn.vove7.appbus.VoiceData
-import cn.vove7.common.model.ScreenMetrics
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.services.MainService
 import cn.vove7.jarvis.services.SpeechRecoService
 import cn.vove7.jarvis.utils.ServiceChecker
 import cn.vove7.vtp.floatwindow.AbFloatWindow
-import cn.vove7.vtp.log.Vog
+import cn.vove7.vtp.system.DeviceInfo
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
 
@@ -27,13 +24,11 @@ import org.greenrobot.eventbus.ThreadMode
  */
 class VoiceFloat(
         context: Context,
-        posX: Int = 1920
-
-        ,
+        posX: Int = 500,
         posY: Int = 500,
         mParams: WindowManager.LayoutParams? = null
 ) : AbFloatWindow<VoiceFloat.Holder>(context, mParams, posX, posY) {
-    val screenSize: Point = Point(ScreenMetrics.deviceScreenWidth, ScreenMetrics.deviceScreenHeight)
+    val screenInfo = DeviceInfo.getInfo(context).screenInfo
 
     override fun layoutResId(): Int = R.layout.float_voice
 
@@ -46,27 +41,27 @@ class VoiceFloat(
         var isClick = false
 
         val h = Holder(view)
-        h.floatView.setOnTouchListener(View.OnTouchListener { v, event ->
-            Vog.d(this, "OnTouchListener $event")
-            when (event.action) {
-                MotionEvent.ACTION_UP -> {
-                    if (isClick) {
-                        onClick()
-                    } else {
-                    }
-                    isClick = false
-                }
-                MotionEvent.ACTION_MOVE -> {
-                    updatePoint(event.rawX.toInt(), event.rawY.toInt())
-                    isClick = false
-                }
-                MotionEvent.ACTION_DOWN -> {
-                    isClick = true
-                }
-            }
-            return@OnTouchListener true
-        })
-
+//        h.floatView.setOnTouchListener(View.OnTouchListener { v, event ->
+//            Vog.d(this, "OnTouchListener $event")
+//            when (event.action) {
+//                MotionEvent.ACTION_UP -> {
+//                    if (isClick) {
+//                        onClick()
+//                    } else {
+//                    }
+//                    isClick = false
+//                }
+//                MotionEvent.ACTION_MOVE -> {
+//                    updatePoint(event.rawX.toInt(), event.rawY.toInt())
+//                    isClick = false
+//                }
+//                MotionEvent.ACTION_DOWN -> {
+//                    isClick = true
+//                }
+//            }
+//            return@OnTouchListener true
+//        })
+        h.floatView.setOnClickListener { onClick() }
         return h
     }
 
@@ -108,7 +103,7 @@ class VoiceFloat(
             MainService.WHAT_VOICE_VOL -> {
 
             }
-            MainService.WHAT_VOICE_ERR -> {//TODO
+            MainService.WHAT_VOICE_ERR -> {
                 holder.result.text = "识别失败"
             }
             MainService.WHAT_VOICE_RESULT -> {

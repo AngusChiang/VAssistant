@@ -5,4 +5,9 @@
     <string name="l" translatable="false"><![CDATA[<]]></string>
     <string name="text_permission_manager">Permission Manager</string>
     <string name="text_androlua_test">AndroLua Test</string>
+    <string name="no_net_refresh">have no network,try pull to refresh</string>
+    <string name="image_loading">loading</string>
+    <string name="no_net_tapme">network err</string>
+    <string name="no_resources">already load all</string>
+    <string name="instru_management">Instru Management</string>
 </resources>

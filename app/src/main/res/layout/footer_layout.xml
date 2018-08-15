@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/load_layout"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:paddingBottom="12dip"
+    android:paddingTop="12dip"
+    android:visibility="gone">
+    <!--加载时显示的布局-->
+    <LinearLayout
+        android:id="@+id/ll_footer_loading"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:visibility="gone">
+
+        <ProgressBar
+            style="?android:attr/progressBarStyleSmall"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            android:id="@+id/more_data_msg"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:text="@string/image_loading" />
+    </LinearLayout>
+    <!--错误时显示的布局-->
+    <LinearLayout
+        android:id="@+id/ll_footer_error"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:clickable="true"
+        android:focusable="true"
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:visibility="gone">
+
+        <TextView
+            android:id="@+id/error_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/no_net_tapme" />
+    </LinearLayout>
+    <!--全部加载完毕显示的布局-->
+    <LinearLayout
+        android:id="@+id/ll_footer_all_loaded"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:visibility="gone">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/no_resources" />
+    </LinearLayout>
+
+</LinearLayout>

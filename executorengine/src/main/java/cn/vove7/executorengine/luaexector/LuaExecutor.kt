@@ -2,6 +2,7 @@ package cn.vove7.executorengine.luaexector
 
 import android.content.Context
 import cn.vove7.androlua.LuaHelper
+import cn.vove7.androlua.luautils.LuaManagerI
 import cn.vove7.common.BridgeManager
 import cn.vove7.common.bridges.ServiceBridge
 import cn.vove7.common.executor.OnExecutorResult
@@ -37,6 +38,7 @@ class LuaExecutor(
             } else
                 luaHelper.evalString(script)
 
+            luaHelper.handleMessage(LuaManagerI.I,"主线程执行完毕\n")
             PartialResult(true)
         } catch (e: Exception) {
             e.printStackTrace()
