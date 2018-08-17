@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.TextView
 import cn.vove7.jarvis.R
+import cn.vove7.vtp.log.Vog
 
 /**
  *
@@ -73,6 +74,7 @@ abstract class RecAdapterWithFooter<V : RecAdapterWithFooter.RecViewHolder> : Re
     private lateinit var llLoadedAll: LinearLayout // 加载全部view
     private lateinit var errorTextOfFooter: TextView
     fun hideFooterView() {
+        Vog.d(this, "hideFooterView footerView: ${footerView != null}")
         footerView?.visibility = View.GONE
     }
 

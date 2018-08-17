@@ -32,7 +32,6 @@ import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -42,8 +41,8 @@ import java.util.Map;
  * @author Thiago Ponte
  */
 public final class LuaJavaAPI {
-    public static HashMap<String, Method[]> methodsMap = new HashMap<String, Method[]>();
-    public static HashMap<String, Method[]> methodCache = new HashMap<String, Method[]>();
+    public static HashMap<String, Method[]> methodsMap = new HashMap<>();
+    public static HashMap<String, Method[]> methodCache = new HashMap<>();
 
     private static Class<?> LuaState_class = LuaState.class;
 
@@ -52,6 +51,8 @@ public final class LuaJavaAPI {
     private static Class<?> List_class = List.class;
 
     private static Class<?> ArrayList_class = ArrayList.class;
+
+    private static Class<?> Boolean_class = Boolean.class; // add by Vove
 
     private static Class<?> HashMap_class = HashMap.class;
 
@@ -116,19 +117,16 @@ public final class LuaJavaAPI {
     public static int callMethod(long luaState, Object obj, String cacheName)
             throws LuaException {
         LuaState L = LuaStateFactory.getExistingState(luaState);
-
         synchronized (L) {
             Method[] methods = methodCache.get(cacheName);
             int top = L.getTop();
             Object[] objs = new Object[top];
             Method method = null;
             // gets method and arguments
-            for (int i = 0; i < methods.length; i++) {
-
-                Class[] parameters = methods[i].getParameterTypes();
+            for (Method method2 : methods) {
+                Class[] parameters = method2.getParameterTypes();
                 if (parameters.length != top)
                     continue;
-
                 boolean okMethod = true;
 
                 for (int j = 0; j < parameters.length; j++) {
@@ -140,18 +138,15 @@ public final class LuaJavaAPI {
                         break;
                     }
                 }
-
                 if (okMethod) {
-                    method = methods[i];
+                    method = method2;
                     break;
                 }
-
             }
-
             // If method is null means there isn't one receiving the given arguments
             if (method == null) {
                 StringBuilder msgbuilder = new StringBuilder();
-                for (Method method1 : methods) {
+                for (Method method1 : methods) {//没有匹配到函数 -> 所有函数
                     msgbuilder.append(method1.toString());
                     msgbuilder.append("\n");
                 }
@@ -162,19 +157,15 @@ public final class LuaJavaAPI {
             try {
                 if (!Modifier.isPublic(method.getModifiers()))
                     method.setAccessible(true);
-
-                ret = method.invoke(obj, objs);
+                ret = method.invoke(obj, objs); //函数调用
             } catch (Exception e) {
                 throw new LuaException(e);
             }
-
             // Void function returns null
             if (ret == null && method.getReturnType().equals(Void.TYPE))
                 return 0;
-
             // push result
             L.pushObjectValue(ret);
-
             return 1;
         }
     }
@@ -225,21 +216,15 @@ public final class LuaJavaAPI {
             }
 
             try {
-                field = objClass.getField(fieldName);
+                //field = objClass.getField(fieldName);
+                field = objClass.getDeclaredField(fieldName); //changed by Vove
+                field.setAccessible(true);
             } catch (NoSuchFieldException e) {
-				/*try
-				 {
-				 field = objClass.getDeclaredField(fieldName);
-				 }
-				 catch (Exception e2)
-				 */
-                {
-                    return 0;
-                }
+                return 0;
             }
 
-            if (field == null)
-                return 0;
+            //if (field == null)
+            //    return 0;
             if (isClass && !Modifier.isStatic(field.getModifiers()))
                 return 0;
             Class type = field.getType();
@@ -253,15 +238,13 @@ public final class LuaJavaAPI {
             } catch (Exception e) {
                 throw new LuaException(e);
             }
-
             return 1;
         }
     }
 
     private static String argError(LuaState L, String name, int idx, Class type) throws LuaException {
-
-        throw new LuaException("bad argument to '" + name + "' (" + type.getName() + " expected, got " + typeName(L, 3) + " value)");
-
+        throw new LuaException("bad argument to '" + name + "' (" + type.getName() +
+                " expected, got " + typeName(L, 3) + " value)");
     }
 
     private static String typeName(LuaState L, int idx) throws LuaException {
@@ -339,9 +322,7 @@ public final class LuaJavaAPI {
 
     public static int asTable(long luaState, Object obj) throws LuaException {
         LuaState L = LuaStateFactory.getExistingState(luaState);
-
         synchronized (L) {
-
             try {
                 L.newTable();
                 if (obj.getClass().isArray()) {
@@ -359,9 +340,8 @@ public final class LuaJavaAPI {
                     }
                 } else if (obj instanceof Map) {
                     Map map = (Map) obj;
-                    Iterator itor = map.entrySet().iterator();
-                    while (itor.hasNext()) {
-                        Map.Entry entry = (Map.Entry) itor.next();
+                    for (Object o : map.entrySet()) {
+                        Map.Entry entry = (Map.Entry) o;
                         L.pushObjectValue(entry.getKey());
                         L.pushObjectValue(entry.getValue());
                         L.setTable(-3);
@@ -419,24 +399,34 @@ public final class LuaJavaAPI {
         try {
             clazz = Class.forName(className);
         } catch (Exception e) {
-            if (className.equals("boolean"))
-                clazz = Boolean.TYPE;
-            else if (className.equals("byte"))
-                clazz = Byte.TYPE;
-            else if (className.equals("char"))
-                clazz = Character.TYPE;
-            else if (className.equals("short"))
-                clazz = Short.TYPE;
-            else if (className.equals("int"))
-                clazz = Integer.TYPE;
-            else if (className.equals("long"))
-                clazz = Long.TYPE;
-            else if (className.equals("float"))
-                clazz = Float.TYPE;
-            else if (className.equals("double"))
-                clazz = Double.TYPE;
-            else
-                throw new LuaException("Class not found: " + className);
+            switch (className) {
+                case "boolean":
+                    clazz = Boolean.TYPE;
+                    break;
+                case "byte":
+                    clazz = Byte.TYPE;
+                    break;
+                case "char":
+                    clazz = Character.TYPE;
+                    break;
+                case "short":
+                    clazz = Short.TYPE;
+                    break;
+                case "int":
+                    clazz = Integer.TYPE;
+                    break;
+                case "long":
+                    clazz = Long.TYPE;
+                    break;
+                case "float":
+                    clazz = Float.TYPE;
+                    break;
+                case "double":
+                    clazz = Double.TYPE;
+                    break;
+                default:
+                    throw new LuaException("Class not found: " + className);
+            }
         }
         return clazz;
     }
@@ -753,13 +743,17 @@ public final class LuaJavaAPI {
             }
 
             try {
-                field = objClass.getField(fieldName);
+                //field = objClass.getField(fieldName);
+                field = objClass.getDeclaredField(fieldName);//changed by Vove
+                if (!field.isAccessible()) {
+                    field.setAccessible(true);
+                }
             } catch (NoSuchFieldException e) {
                 return 0;
             }
 
-            if (field == null)
-                return 0;
+            //if (field == null)
+            //    return 0;
 
             if (isClass && !Modifier.isStatic(field.getModifiers()))
                 return 0;
@@ -811,23 +805,22 @@ public final class LuaJavaAPI {
                 }
                 ArrayList<Method> list = new ArrayList<Method>();
 
-                for (int i = 0; i < methods.length; i++) {
-                    if (methods[i].getName().equals(methodName)) {
-                        if (isClass && !Modifier.isStatic(methods[i].getModifiers()))
+                for (Method method1 : methods) {
+                    if (method1.getName().equals(methodName)) {
+                        if (isClass && !Modifier.isStatic(method1.getModifiers()))
                             continue;
-                        list.add(methods[i]);
+                        list.add(method1);
                     }
                 }
 
                 if (list.isEmpty() && isClass) {
                     methods = clazz.getClass().getMethods();
-                    for (int i = 0; i < methods.length; i++) {
-                        if (methods[i].getName().equals(methodName))
-                            list.add(methods[i]);
+                    for (Method method : methods) {
+                        if (method.getName().equals(methodName))
+                            list.add(method);
                     }
 
                 }
-
                 mlist = new Method[list.size()];
                 list.toArray(mlist);
                 methodCache.put(cacheName, mlist);
@@ -849,18 +842,15 @@ public final class LuaJavaAPI {
     public static int checkClass(LuaState L, Object obj, String className) throws LuaException {
         synchronized (L) {
             Class clazz;
-
             if (obj instanceof Class) {
                 clazz = (Class) obj;
             } else {
                 return 0;
             }
-
             Class[] clazzes = clazz.getClasses();
-
-            for (int i = 0; i < clazzes.length; i++) {
-                if (clazzes[i].getSimpleName().equals(className)) {
-                    L.pushJavaObject(clazzes[i]);
+            for (Class clazze : clazzes) {
+                if (clazze.getSimpleName().equals(className)) {
+                    L.pushJavaObject(clazze);
                     return 3;
                 }
             }
@@ -890,7 +880,6 @@ public final class LuaJavaAPI {
             } catch (NoSuchMethodException e) {
                 return 0;
             }
-
             if (isClass && !Modifier.isStatic(method.getModifiers()))
                 return 0;
 
@@ -1177,6 +1166,9 @@ public final class LuaJavaAPI {
         }
     }
 
+    private static final String[] types = new String[]{
+            "nil", "Boolean", "Number", "String", "Table", "Function", "Userdata"
+    };
 
     private static Object compareTypes(LuaState L, Class<?> parameter, int idx)
             throws LuaException {
@@ -1184,20 +1176,19 @@ public final class LuaJavaAPI {
         Object obj = null;
         int type = L.type(idx);
         switch (type) {
-            case 1: //boolean
-            {
+            case 1: {//boolean
                 if (parameter.isPrimitive()) {
                     if (parameter != Boolean.TYPE) {
                         okType = false;
                     }
-                } else if (!parameter.isAssignableFrom(Boolean.TYPE)) {
+                    //} else if (!parameter.isAssignableFrom(Boolean.TYPE)) {
+                } else if (!parameter.isAssignableFrom(Boolean_class)) { // changed by Vove (fixed
                     okType = false;
                 }
                 obj = L.toBoolean(idx);
             }
             break;
-            case 4: //string
-            {
+            case 4: { //string
                 if (!parameter.isAssignableFrom(String_class)) {
                     okType = false;
                 } else {
@@ -1205,8 +1196,7 @@ public final class LuaJavaAPI {
                 }
             }
             break;
-            case 6: //function
-            {
+            case 6: { //function
                 if (!parameter.isAssignableFrom(LuaFunction_class)) {
                     okType = false;
                 } else {
@@ -1214,8 +1204,7 @@ public final class LuaJavaAPI {
                 }
             }
             break;
-            case 5: //table
-            {
+            case 5: { //table
                 if (parameter.isAssignableFrom(LuaTable_class)) {
                     obj = L.getLuaObject(idx);
                 } else if (parameter.isArray()) {
@@ -1229,13 +1218,13 @@ public final class LuaJavaAPI {
                 }
             }
             break;
-            case 3: //number
-            {
+            case 3: { //number
+
                 if (L.isInteger(idx)) {
-                    Long lg = new Long(L.toInteger(idx));
+                    Long lg = L.toInteger(idx);
                     obj = LuaState.convertLuaNumber(lg, parameter);
                 } else {
-                    Double db = new Double(L.toNumber(idx));
+                    Double db = L.toNumber(idx);
                     obj = LuaState.convertLuaNumber(db, parameter);
                 }
                 if (obj == null) {
@@ -1243,13 +1232,13 @@ public final class LuaJavaAPI {
                 }
             }
             break;
-            case 7: //userdata
-            {
+            case 7: {//userdata
                 if (L.isObject(idx)) {
                     Object userObj = L.getObjectFromUserdata(idx);
                     if (userObj == null) {
                         obj = null;
-                    } else if (parameter.isPrimitive() && (Number_class.isAssignableFrom(userObj.getClass()) || Character_class.isAssignableFrom(userObj.getClass()))) {
+                    } else if (parameter.isPrimitive() && (Number_class.isAssignableFrom(userObj.getClass())
+                            || Character_class.isAssignableFrom(userObj.getClass()))) {
                         obj = userObj;
                     } else if (parameter.isAssignableFrom(userObj.getClass())) {
                         obj = userObj;
@@ -1265,18 +1254,18 @@ public final class LuaJavaAPI {
                 }
             }
             break;
-            case 0: //nil
-            {
+            case 0: { //nil
                 obj = null;
             }
             break;
             default: //other
             {
-                throw new LuaException("Invalid Parameters.");
+                throw new LuaException("Invalid Parameters. UnKnown Type");
             }
         }
         if (!okType) {
-            throw new LuaException("Invalid Parameter.");
+            throw new LuaException("Invalid Parameter. Type is not assignable from " + types[type] + " to "
+                    + parameter.getSimpleName());
         }
 
         return obj;

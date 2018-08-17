@@ -100,7 +100,7 @@ class MainService : BusService(), OnExecutorResult,
             alertDialog?.show()
             //语音
             voiceMode = MODE_ALERT
-            AppBus.postSpeechRecoAction(BaseAction.ACTION_START)
+            AppBus.postSpeechRecoAction(SpeechRecoAction.ActionCode.ACTION_START_RECO)
         } catch (e: Exception) {
             onRequestPermission(RequestPermission("悬浮窗权限"))
         }
@@ -111,7 +111,7 @@ class MainService : BusService(), OnExecutorResult,
      * 停止语音
      */
     private fun notifyAlertResult() {
-        AppBus.postSpeechRecoAction(BaseAction.ACTION_STOP)
+        AppBus.postSpeechRecoAction(SpeechRecoAction.ActionCode.ACTION_STOP_RECO)
         voiceMode = MODE_VOICE
         cExecutor.notifySync()
     }
@@ -177,7 +177,7 @@ class MainService : BusService(), OnExecutorResult,
         toast.showShort(action.param?.askText ?: "???")
         messengerAction = action
         voiceMode = MODE_GET_PARAM
-        AppBus.postSpeechRecoAction(BaseAction.ACTION_START)
+        AppBus.postSpeechRecoAction(SpeechRecoAction.ActionCode.ACTION_START_RECO)
     }
 
     /**
@@ -203,8 +203,9 @@ class MainService : BusService(), OnExecutorResult,
                         voiceMode = MODE_VOICE
                     }
                     MODE_ALERT -> {
-                        toast.showShort("没有听懂")
-                        AppBus.postSpeechRecoAction(BaseAction.ACTION_START)  //继续????
+//                        toast.showShort("重新说")
+//                        speakSync("reSay")
+                        AppBus.postSpeechRecoAction(SpeechRecoAction.ActionCode.ACTION_START_RECO)  //继续????
                     }
                 }
             }
@@ -249,7 +250,7 @@ class MainService : BusService(), OnExecutorResult,
                                 alertDialog?.getButton(DialogInterface.BUTTON_NEGATIVE)?.performClick()
                                 voiceMode = MODE_VOICE
                             }
-                            else -> AppBus.postSpeechRecoAction(BaseAction.ACTION_START)  //继续????
+                            else -> AppBus.postSpeechRecoAction(SpeechRecoAction.ActionCode.ACTION_START_RECO)  //继续????
                         }
                     }
                 }
@@ -338,7 +339,7 @@ class MainService : BusService(), OnExecutorResult,
     fun stopExecutor(order: String) {
         when (order) {
             "stop execQueue" -> {
-                AppBus.postSpeechRecoAction(BaseAction.ACTION_STOP)
+                AppBus.postSpeechRecoAction(SpeechRecoAction.ActionCode.ACTION_STOP_RECO)
                 cExecutor.interrupt()
             }
             else -> {

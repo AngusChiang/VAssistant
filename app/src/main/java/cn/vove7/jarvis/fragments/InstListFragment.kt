@@ -13,6 +13,7 @@ import cn.vove7.jarvis.R
 import cn.vove7.jarvis.adapters.RecAdapterWithFooter
 import cn.vove7.jarvis.utils.BundleBuilder
 import cn.vove7.vtp.log.Vog
+import cn.vove7.vtp.toast.Voast
 
 /**
  *
@@ -23,6 +24,11 @@ import cn.vove7.vtp.log.Vog
 class InstListFragment : VListFragment() {
 
     private var instType: Int = 0
+
+    override var floatClickListener: View.OnClickListener? = View.OnClickListener {
+        Voast.with(context!!).showLong("add")
+    }
+
 
     companion object {
         const val INST_TYPE_GLOBAL = 0
@@ -73,7 +79,6 @@ class InstListFragment : VListFragment() {
         override fun itemCount(): Int = globalActionNodes.size
         override fun onBindView(holder: VHolder, position: Int) {
             holder.title?.text = globalActionNodes[position].descTitle
-            Vog.d(this, "onBindView ${holder.title?.text}")
         }
 
         override fun onCreateHolder(parent: ViewGroup, viewType: Int): VHolder {

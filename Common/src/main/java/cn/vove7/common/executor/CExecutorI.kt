@@ -25,11 +25,16 @@ interface CExecutorI : ViewShowListener, ActivityShowListener {
      */
     fun waitForSingleChoice(askTitle: String, choiceData: List<ChoiceData>): ChoiceData?
 
+    //Api使用
+    fun singleChoiceDialog(askTitle: String, choiceData: Array<String>): String?
+//    fun multiChoiceDialog(askTitle: String, choiceData: Array<String>)
+
     /**
      * 等待语音参数
      * @return 语音参数 ,null if failed
      */
     fun waitForVoiceParam(askWord: String? = null): String?
+
 
     fun onGetVoiceParam(param: String?)
 
@@ -47,9 +52,12 @@ interface CExecutorI : ViewShowListener, ActivityShowListener {
     fun smartOpen(data: String): Boolean
     /**
      * 语音合成
+     * 异步
      */
     fun speak(text: String)
 
+    //同步
     fun speakSync(text: String): Boolean
+
     fun speakCallback(result: String? = null)
 }

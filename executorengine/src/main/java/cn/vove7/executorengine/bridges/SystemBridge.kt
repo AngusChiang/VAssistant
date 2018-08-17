@@ -4,17 +4,20 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import cn.vove7.common.SystemOperation
+import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.model.ExResult
-import cn.vove7.executorengine.helper.AppHelper
 import cn.vove7.executorengine.helper.ContactHelper
+import cn.vove7.vtp.app.AppHelper
+import cn.vove7.vtp.app.AppInfo
 import cn.vove7.vtp.hardware.HardwareHelper
 import cn.vove7.vtp.log.Vog
 import cn.vove7.vtp.system.DeviceInfo
 import cn.vove7.vtp.system.SystemHelper
 
 
-class SystemBridge(private val context: Context) : SystemOperation {
+class SystemBridge : SystemOperation {
+    private val context: Context = GlobalApp.APP
     private val contactHelper = ContactHelper(context)
 
     override fun openAppByPkg(pkg: String): ExResult<String> {
@@ -45,7 +48,7 @@ class SystemBridge(private val context: Context) : SystemOperation {
      * @return packageName if success
      */
     override fun openAppByWord(appWord: String): ExResult<String> {
-        val list = AppHelper(context).matchAppName(appWord)
+        val list = cn.vove7.executorengine.helper.AppHelper(context).matchAppName(appWord)
         return if (list.isNotEmpty()) {
             val info = list[0].data
             Vog.i(this, "打开应用：$appWord -> ${info.name}")
@@ -109,5 +112,13 @@ class SystemBridge(private val context: Context) : SystemOperation {
 
     override fun openUrl(url: String) {
         SystemHelper.openLink(context, url)
+    }
+
+    /**
+     * 获取App信息
+     * @param s 包名 或 App 名
+     */
+    override fun getAppInfo(s: String): AppInfo? {
+        return AppHelper.getAppInfo(context, s, s)
     }
 }

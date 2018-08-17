@@ -39,7 +39,7 @@ abstract class InitDbData {
         if (markedOpenDAO.queryBuilder().count() == 0L) {
             arrayOf(
                     MarkedOpen("手电", MarkedOpen.MARKED_TYPE_SYS_FUN, "((手电(筒)?)|(闪光灯)|(照明(灯)))", "openFlash")
-                    , MarkedOpen("网易云", MarkedOpen.MARKED_TYPE_APP, "网易云音乐", "com.netease.cloudmusic")
+                    , MarkedOpen("网易云", MarkedOpen.MARKED_TYPE_APP, "网易云(音乐)?", "com.netease.cloudmusic")
                     , MarkedOpen("支付宝", MarkedOpen.MARKED_TYPE_APP, "(Alipay)|(支付宝)", "com.eg.android.AlipayGphone")
             ).forEach {
                 markedOpenDAO.insert(it)

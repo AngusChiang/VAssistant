@@ -2,43 +2,46 @@ package cn.vove7.jarvis.view.floatwindows
 
 import android.content.Context
 import android.view.View
-import android.view.WindowManager
 import android.widget.ImageButton
+import android.widget.ImageView
 import android.widget.TextView
 import cn.vove7.appbus.AppBus
-import cn.vove7.appbus.BaseAction
+import cn.vove7.appbus.SpeechRecoAction
 import cn.vove7.appbus.VoiceData
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.services.MainService
 import cn.vove7.jarvis.services.SpeechRecoService
 import cn.vove7.jarvis.utils.ServiceChecker
 import cn.vove7.vtp.floatwindow.AbFloatWindow
+import cn.vove7.vtp.log.Vog
 import cn.vove7.vtp.system.DeviceInfo
+import cn.vove7.vtp.system.ScreenInfo
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
+import java.util.logging.Handler
 
 /**
  * 语音悬浮窗
  *
  * Created by Vove on 2018/7/1
  */
-class VoiceFloat(
-        context: Context,
-        posX: Int = 500,
-        posY: Int = 500,
-        mParams: WindowManager.LayoutParams? = null
-) : AbFloatWindow<VoiceFloat.Holder>(context, mParams, posX, posY) {
-    val screenInfo = DeviceInfo.getInfo(context).screenInfo
+class VoiceFloat : AbFloatWindow<VoiceFloat.Holder> {
+
+    override var posX: Int = 500
+    override var posY: Int = 500
+
+    constructor(context: Context) : super(context) {
+        this.screenInfo = DeviceInfo.getInfo(context).screenInfo
+        posX = screenInfo.width - contentView.width
+        posY = (screenInfo.height * 0.8).toInt()
+        Vog.d(this," $posX $posY")
+    }
+
+    val screenInfo: ScreenInfo
 
     override fun layoutResId(): Int = R.layout.float_voice
 
     override fun onCreateViewHolder(view: View): Holder {
-
-        var downX = 0.0
-        var downY = 0.0
-        var lastX = 0.0
-        var lastY = 0.0
-        var isClick = false
 
         val h = Holder(view)
 //        h.floatView.setOnTouchListener(View.OnTouchListener { v, event ->
@@ -67,10 +70,10 @@ class VoiceFloat(
 
     fun onClick() {
         if (SpeechRecoService.instance.isListening()) {
-            AppBus.postSpeechRecoAction(BaseAction.ACTION_STOP)
+            AppBus.postSpeechRecoAction(SpeechRecoAction.ActionCode.ACTION_STOP_RECO)
         } else {
             ServiceChecker(context).checkService()
-            AppBus.postSpeechRecoAction(BaseAction.ACTION_START)
+            AppBus.postSpeechRecoAction(SpeechRecoAction.ActionCode.ACTION_START_RECO)
         }
     }
 
@@ -89,7 +92,7 @@ class VoiceFloat(
     }
 
     class Holder(view: View) : AbFloatWindow.ViewHolder(view) {
-        val voiceImage = view.findViewById<ImageButton>(R.id.voice)!!
+        val voiceImage = view.findViewById<ImageView>(R.id.voice)!!
         val result = view.findViewById<TextView>(R.id.result)!!
     }
 

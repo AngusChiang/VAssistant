@@ -5,8 +5,8 @@
     <string name="simple_test_script">简单顺序脚本测试</string>
     <string name="text_androlua_test">AndroLua 测试</string>
     <string name="no_net_refresh">没有网络，下拉刷新试试</string>
-    <string name="no_resources">已加载全部</string>
     <string name="image_loading">正在加载…</string>
     <string name="no_net_tapme">网络错误，点击重试</string>
     <string name="instru_management">指令管理</string>
+    <string name="text_settings">设置</string>
 </resources>

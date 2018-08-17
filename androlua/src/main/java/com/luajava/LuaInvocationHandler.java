@@ -67,7 +67,6 @@ public class LuaInvocationHandler implements InvocationHandler {
                 else
                     return null;
             }
-
             Object ret = null;
             try {
                 // Checks if returned type is void. if it is returns null.

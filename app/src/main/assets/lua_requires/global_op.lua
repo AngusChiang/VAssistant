@@ -5,8 +5,8 @@
 --
 
 local deviceInfo = system.getDeviceInfo()
-local mHeight = deviceInfo.screenInfo.getHeight()
-local mWidth = deviceInfo.screenInfo.getWidth()
+local mHeight = deviceInfo.screenInfo.height
+local mWidth = deviceInfo.screenInfo.width
 
 -- 相对度量
 local relHeight = mHeight

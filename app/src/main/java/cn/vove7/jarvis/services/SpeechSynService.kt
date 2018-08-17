@@ -1,6 +1,7 @@
 package cn.vove7.jarvis.services
 
 import android.annotation.SuppressLint
+import android.content.pm.PackageManager
 import cn.vove7.appbus.AppBus
 import cn.vove7.appbus.BaseAction.Companion.ACTION_START
 import cn.vove7.appbus.BaseAction.Companion.ACTION_STOP
@@ -27,9 +28,9 @@ import java.util.*
  */
 class SpeechSynService : BusService(), SpeechSynthesizerListener {
 
-    private var appId = "10922901"
-    private var appKey = "xwzlOfIIysRN7IDdcjA823ZS"
-    private var secretKey = "d9ef661698c5d8cd45978aa55e600e03"
+    private lateinit var appId: String
+    private lateinit var appKey: String
+    private lateinit var secretKey: String
 
     // TtsMode.MIX; 离在线融合，在线优先； TtsMode.ONLINE 纯在线； 没有纯离线
     protected var ttsMode = TtsMode.MIX
@@ -46,6 +47,11 @@ class SpeechSynService : BusService(), SpeechSynthesizerListener {
 
     override fun onCreate() {
         super.onCreate()
+        val appInfo = packageManager.getApplicationInfo(packageName, PackageManager.GET_META_DATA)
+        appId = appInfo.metaData.get("com.baidu.speech.APP_ID").toString()
+        appKey = appInfo.metaData.getString("com.baidu.speech.API_KEY")
+        secretKey = appInfo.metaData.getString("com.baidu.speech.SECRET_KEY")
+
 
         initialTts() // 初始化TTS引擎
     }

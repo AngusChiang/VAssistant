@@ -44,4 +44,10 @@
         android:layout_height="wrap_content"
         android:onClick="go2InstList"
         android:text="@string/instru_management" />
+    <Button
+        android:id="@+id/button110"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:onClick="go2Setting"
+        android:text="@string/text_settings" />
 </LinearLayout>

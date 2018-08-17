@@ -27,7 +27,14 @@ function openFlashlight()
     return system.openFlashlight()
 end
 
-
+--[[
+--获取App信息
+--s : 包名或App名
+-- App名可能随系统语言变化  不建议使用App名查找
+ ]]
+function getAppInfo(s)
+    return system.getAppInfo(s)
+end
 
 
 

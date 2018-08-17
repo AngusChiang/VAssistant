@@ -7,9 +7,9 @@
 info = system.getDeviceInfo()
 
 print('屏幕信息', info.screenInfo)
-print("屏幕高度",info.screenInfo.getHeight())
-print("屏幕宽度",info.screenInfo.getWidth())
-print("密度",info.screenInfo.getDensity())
+print("屏幕高度", info.screenInfo.height)
+print("屏幕宽度", info.screenInfo.width)
+print("密度", info.screenInfo.density)
 print('厂商名', info.manufacturerName)
 print('产品名', info.productName)
 print('品牌', info.brandName)

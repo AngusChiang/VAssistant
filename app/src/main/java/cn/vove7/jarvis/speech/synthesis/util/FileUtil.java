@@ -45,12 +45,13 @@ public class FileUtil {
     public static void copyFromAssets(AssetManager assets, String source, String dest, boolean isCover)
             throws IOException {
         File file = new File(dest);
-        if (isCover || (!isCover && !file.exists())) {
+        if (isCover || (!file.exists())) {
             InputStream is = null;
             FileOutputStream fos = null;
             try {
                 is = assets.open(source);
                 String path = dest;
+                new File(path).createNewFile();
                 fos = new FileOutputStream(path);
                 byte[] buffer = new byte[1024];
                 int size = 0;

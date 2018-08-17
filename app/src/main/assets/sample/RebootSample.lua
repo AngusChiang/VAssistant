@@ -4,6 +4,7 @@
 -- RebootSample.lua
 --
 
+require 'accessibility'
 powerDialog()
 sleep(1000)
 

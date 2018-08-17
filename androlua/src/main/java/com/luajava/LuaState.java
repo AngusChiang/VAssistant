@@ -149,7 +149,7 @@ public class LuaState {
             } else if (retType == Float.TYPE) {
                 return db.floatValue();
             } else if (retType == Double.TYPE) {
-                return db.doubleValue();
+                return db;
             } else if (retType == Byte.TYPE) {
                 return db.byteValue();
             } else if (retType == Short.TYPE) {
@@ -157,18 +157,20 @@ public class LuaState {
             }
         } else if (retType.isAssignableFrom(Number_class)) {
             // Checks all possibilities of number types
-            if (retType.isAssignableFrom(Integer_class)) {
-                return new Integer(db.intValue());
-            } else if (retType.isAssignableFrom(Long_class)) {
-                return new Long(db.longValue());
-            } else if (retType.isAssignableFrom(Float_class)) {
-                return new Float(db.floatValue());
+
+            //Vove : changed it's order
+            if (retType.isAssignableFrom(Float_class)) {
+                return db.floatValue();
             } else if (retType.isAssignableFrom(Double_class)) {
                 return db;
-            } else if (retType.isAssignableFrom(Byte_class)) {
-                return new Byte(db.byteValue());
+            } else if (retType.isAssignableFrom(Integer_class)) {
+                return db.intValue();
+            } else if (retType.isAssignableFrom(Long_class)) {
+                return db.longValue();
+            } else  if (retType.isAssignableFrom(Byte_class)) {
+                return db.byteValue();
             } else if (retType.isAssignableFrom(Short_class)) {
-                return new Short(db.shortValue());
+                return db.shortValue();
             }
         }
 
@@ -195,17 +197,17 @@ public class LuaState {
         } else if (retType.isAssignableFrom(Number_class)) {
             // Checks all possibilities of number types
             if (retType.isAssignableFrom(Integer_class)) {
-                return new Integer(lg.intValue());
+                return lg.intValue();
             } else if (retType.isAssignableFrom(Long_class)) {
-                return new Long(lg.longValue());
+                return lg.longValue();
             } else if (retType.isAssignableFrom(Float_class)) {
-                return new Float(lg.floatValue());
+                return lg.floatValue();
             } else if (retType.isAssignableFrom(Double_class)) {
                 return lg;
             } else if (retType.isAssignableFrom(Byte_class)) {
-                return new Byte(lg.byteValue());
+                return lg.byteValue();
             } else if (retType.isAssignableFrom(Short_class)) {
-                return new Short(lg.shortValue());
+                return lg.shortValue();
             }
         }
 

@@ -6,7 +6,9 @@ import android.support.v4.app.FragmentManager
 import android.support.v4.app.FragmentPagerAdapter
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.Toolbar
+import android.view.MenuItem
 import cn.vove7.jarvis.R
+import cn.vove7.vtp.log.Vog
 import kotlinx.android.synthetic.main.activity_base_view_pager.*
 
 /**
@@ -23,10 +25,9 @@ abstract class BaseActivityWithViewPager : AppCompatActivity() {
 
         //设置ToolBar
         val toolbar = findViewById<Toolbar>(R.id.toolbar)
-
-        toolbar.setNavigationIcon(R.drawable.ic_arrow_back_white_24dp)
-
         setSupportActionBar(toolbar)
+//        toolbar.setTitleTextColor(resources.getColor(android.R.color.white))
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
         view_pager.adapter = FragmentAdapter(supportFragmentManager)
         tab_layout.setupWithViewPager(view_pager)
     }
@@ -35,6 +36,15 @@ abstract class BaseActivityWithViewPager : AppCompatActivity() {
     abstract val fragments: Array<Fragment>
 
     abstract var titles: Array<String>
+
+    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
+        Vog.d(this, "onOptionsItemSelected ${item?.itemId}")
+        if (item?.itemId == android.R.id.home) {
+            finish()
+            return true
+        }
+        return super.onOptionsItemSelected(item)
+    }
 
     inner class FragmentAdapter(fm: FragmentManager) : FragmentPagerAdapter(fm) {
 

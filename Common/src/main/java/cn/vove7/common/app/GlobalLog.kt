@@ -12,10 +12,12 @@ object GlobalLog {
 
     private val logList = mutableListOf<Pair<Int, String>>()
     fun log(msg: String) {
+        Vog.d(this, "log $msg")
         write(LEVEL_INFO, msg)
     }
 
     fun err(msg: String) {
+        Vog.e(this, "err $msg")
         write(LEVEL_ERROR, msg)
     }
 
@@ -25,7 +27,6 @@ object GlobalLog {
 
     private fun write(level: Int, msg: String) {
         synchronized<Unit>(logList) {
-            Vog.d(this, "write $level $msg")
             logList.add(Pair(level, msg))
         }
     }

@@ -39,7 +39,7 @@ abstract class AbsExecutorImpl(
         val serviceBridge: ServiceBridge,
         val onExecutorResult: OnExecutorResult
 ) : CExecutorI {
-    val systemBridge = SystemBridge(context)
+    val systemBridge = SystemBridge()
     var accessApi: AccessibilityApi? = null
     private var lock = Object()
     var currentAction: Action? = null
@@ -338,12 +338,25 @@ abstract class AbsExecutorImpl(
         }.also { Vog.d(this, "waitForSingleChoice result : $it") }
     }
 
+    override fun singleChoiceDialog(askTitle: String, choiceData: Array<String>): String? {
+        return waitForSingleChoice(askTitle, array2ChoiceData(choiceData))?.title
+    }
+
+    private fun array2ChoiceData(arr: Array<String>): List<ChoiceData> {
+        val l = mutableListOf<ChoiceData>()
+        arr.forEach {
+            l.add(ChoiceData(title = it, originalData = it))
+        }
+        return l
+    }
+
+
     /**
      * 等待确认结果
      * @param msg 提示信息
      */
     override fun alert(title: String, msg: String): Boolean {
-        AppBus.post(ShowAlertEvent("确认以继续", msg, currentAction!!))
+        AppBus.post(ShowAlertEvent(title, msg, currentAction!!))
         waitForUnlock()
         return currentAction!!.responseResult.also {
             Vog.d(this, "alert result > $it")

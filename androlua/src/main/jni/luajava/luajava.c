@@ -140,7 +140,7 @@ static jmethodID throwable_tostring_method = NULL;
 static jclass java_function_class = NULL;
 static jmethodID java_function_method = NULL;
 
-static jclass luajava_api_class = NULL;
+static jclass luajava_api_class = NULL; // class: LuaJavaApi
 static jclass java_lang_class = NULL;
 static jclass java_string_class = NULL;
 

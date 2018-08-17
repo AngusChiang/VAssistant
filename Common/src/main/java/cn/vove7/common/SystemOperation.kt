@@ -1,6 +1,7 @@
 package cn.vove7.common
 
 import cn.vove7.common.model.ExResult
+import cn.vove7.vtp.app.AppInfo
 import cn.vove7.vtp.system.DeviceInfo
 
 interface SystemOperation {
@@ -29,6 +30,13 @@ interface SystemOperation {
      * 获取手机信息
      */
     fun getDeviceInfo(): DeviceInfo
+
+    /**
+     * 获取App信息
+     * @param s 包名 或 App 名
+     */
+    fun getAppInfo(s:String): AppInfo?
+
 
     /**
      * 打开链接

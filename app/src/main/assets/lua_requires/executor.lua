@@ -35,6 +35,12 @@ end
 function alert(t, m)
     return executor.alert(t, m)
 end
+--
+--
+-- return String?
+function singleChoiceDialog(title, choices)
+    return executor.singleChoiceDialog(title, choices)
+end
 
 --
 --

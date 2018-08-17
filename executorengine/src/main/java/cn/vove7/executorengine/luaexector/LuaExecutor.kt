@@ -8,7 +8,6 @@ import cn.vove7.common.bridges.ServiceBridge
 import cn.vove7.common.executor.OnExecutorResult
 import cn.vove7.common.executor.PartialResult
 import cn.vove7.executorengine.AbsExecutorImpl
-import cn.vove7.executorengine.bridges.SystemBridge
 import cn.vove7.vtp.log.Vog
 
 /**
@@ -38,7 +37,7 @@ class LuaExecutor(
             } else
                 luaHelper.evalString(script)
 
-            luaHelper.handleMessage(LuaManagerI.I,"主线程执行完毕\n")
+            luaHelper.handleMessage(LuaManagerI.I, "主线程执行完毕\n")
             PartialResult(true)
         } catch (e: Exception) {
             e.printStackTrace()

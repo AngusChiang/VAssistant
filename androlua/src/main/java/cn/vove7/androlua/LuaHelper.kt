@@ -121,7 +121,7 @@ class LuaHelper : LuaManagerI {
         L.pushContext(context)
         //L.setGlobal("app");
 
-        L.getGlobal("luajava")
+//        L.getGlobal("luajava")
 
         //L.pushString(luaDir);
         //L.setField(-2, "luaextdir");
@@ -252,16 +252,16 @@ class LuaHelper : LuaManagerI {
 
     override fun handleError(e: Exception) {
         e.printStackTrace()
-        val eBuilder = StringBuilder()
-        eBuilder.appendln(this)
+        val eBuilder = StringBuilder(e.message)
+        eBuilder.appendln()
         val trace = e.stackTrace
         for (traceElement in trace)
             eBuilder.appendln("\tat $traceElement")
 
         for (se in e.suppressed)
             eBuilder.appendln("\t Suppressed :$se")
-
-        eBuilder.appendln("\t Cause By :${e.cause}")
+        if (e.cause != null)
+            eBuilder.appendln("\t Cause By :${e.cause}")
         notifyOutput(LuaManagerI.E, eBuilder.toString())
         Vog.e(this, eBuilder)
     }

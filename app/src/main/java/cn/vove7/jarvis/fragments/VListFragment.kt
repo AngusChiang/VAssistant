@@ -3,15 +3,18 @@ package cn.vove7.jarvis.fragments
 import android.os.Bundle
 import android.os.Handler
 import android.support.annotation.CallSuper
+import android.support.design.widget.FloatingActionButton
 import android.support.v4.app.Fragment
 import android.support.v4.widget.SwipeRefreshLayout
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
+import android.view.View.GONE
 import android.view.ViewGroup
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.adapters.RecAdapterWithFooter
+import cn.vove7.vtp.log.Vog
 
 /**
  * # VListFragment
@@ -29,6 +32,9 @@ abstract class VListFragment : Fragment(), ListStatusListener {
     var onRefreshing = false//下拉正在刷新标志
 
     var allLoadFlag = false//全部加载标志
+
+    lateinit var floatButton: FloatingActionButton
+    open var floatClickListener: View.OnClickListener? = null
 
     /**
      * 自由x`控制
@@ -56,12 +62,20 @@ abstract class VListFragment : Fragment(), ListStatusListener {
                 if (netErrView == null) defaultErrView
                 else netErrView
         )
+        if (floatClickListener == null) {
+            floatButton.visibility = GONE
+        } else {
+            floatButton.visibility = View.VISIBLE
+            floatButton.setOnClickListener(floatClickListener)
+        }
     }
 
     abstract fun clearDataSet()
 
     @CallSuper
     override fun onGetData(pageIndex: Int) {
+        onRefreshing = true
+        Vog.d(this, "onGetData $pageIndex")
         if (pageIndex == 0) {
             clearDataSet()
             notifyDataSetChanged()
@@ -70,7 +84,7 @@ abstract class VListFragment : Fragment(), ListStatusListener {
 
     private fun initSelfView() {
         recyclerView = f(R.id.recycle_view)
-
+        floatButton = f(R.id.fab)
         swipeRefreshLayout = f(R.id.swipe_refresh)
         netErrViewContainer = f(R.id.net_error_layout)
         swipeRefreshLayout.setOnRefreshListener {
@@ -83,14 +97,12 @@ abstract class VListFragment : Fragment(), ListStatusListener {
             //上拉加载
             override fun onScrolled(recyclerView: RecyclerView?, dx: Int, dy: Int) {
                 super.onScrolled(recyclerView, dx, dy)
-
                 if (!allLoadFlag && isSlideToBottom() && !onRefreshing) {//上拉加载,
+                    if (pageIndex != 0)
+                        adapter.setFooter(RecAdapterWithFooter.STATUS_LOADING)
                     Handler().postDelayed({
                         if (isSlideToBottom()) {
-                            onRefreshing = true
                             loadMore()
-                            if (pageIndex != 0)
-                                adapter.setFooter(RecAdapterWithFooter.STATUS_LOADING)
                         }
                     }, 500)//延时
                 }
@@ -120,12 +132,14 @@ abstract class VListFragment : Fragment(), ListStatusListener {
     }
 
     protected fun isSlideToBottom(): Boolean {
-        return recyclerView.computeVerticalScrollExtent() +
-                recyclerView.computeVerticalScrollOffset() >= recyclerView.computeVerticalScrollRange()
+
+        return recyclerView.computeVerticalScrollExtent() + recyclerView.computeVerticalScrollOffset() >=
+                recyclerView.computeVerticalScrollRange()
 
     }
 
     fun refresh() {
+        Vog.d(this, "refresh ")
         allLoadFlag = false
         swipeRefreshLayout.isRefreshing = true
         pageIndex = 0
@@ -133,6 +147,7 @@ abstract class VListFragment : Fragment(), ListStatusListener {
     }
 
     fun loadMore() {
+        Vog.d(this, "loadMore $pageIndex")
         onGetData(pageIndex)
     }
 

@@ -26,6 +26,7 @@ class OfflineResource(context: Context, voiceType: String) {
         this.assets = context.applicationContext.assets
         this.destPath = FileUtil.createTmpDir(context)
         setOfflineVoiceType(voiceType)
+
     }
 
     fun setOfflineVoiceType(voiceType: String) {

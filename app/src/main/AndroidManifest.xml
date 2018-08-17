@@ -92,6 +92,9 @@
         <activity
             android:name=".activities.MarkedManageActivity"
             android:theme="@style/NoActionBar" />
+        <activity
+            android:name=".activities.SettingsActivity"
+            android:label="@string/title_activity_settings"></activity>
     </application>
 
 </manifest>

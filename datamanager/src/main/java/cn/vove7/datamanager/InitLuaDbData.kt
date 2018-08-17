@@ -111,7 +111,7 @@ object InitLuaDbData : InitDbData() {
              * 正则
              */
             arrayOf(//App操作 正则前加%  -> %扫一扫
-                    Reg("(用|打开|启动)%", Reg.PARAM_POS_END, 1)
+                    Reg("%(用|打开|启动)%", Reg.PARAM_POS_END, 1)
                     , Reg("打(电话)?给%", Reg.PARAM_POS_END, 2)
                     , Reg("给%打电话", Reg.PARAM_POS_1, 2)
                     , Reg("%给%发消息", Reg.PARAM_POS_2, 3)

@@ -58,10 +58,10 @@ class AppHelper(private val context: Context) {
     }
 
     fun updateAppList() {
-        Vog.d(this, "更新App列表")
+        Vog.v(this, "更新App列表")
         APP_LIST.clear()
         APP_LIST.addAll(AppHelper.getAllInstallApp(context))
-        Vog.d(this, "更新后 size: ${APP_LIST.size}")
+        Vog.v(this, "更新后 size: ${APP_LIST.size}")
     }
 
 }

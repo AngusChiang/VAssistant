@@ -6,6 +6,7 @@
 
 require 'import'
 import 'cn.vove7.vtp.text.TextTransHelper'
+import 'cn.vove7.vtp.builder.*'
 
 function toPinyin(text)
     return TextTransHelper(app).chineseStr2Pinyin(text, false)

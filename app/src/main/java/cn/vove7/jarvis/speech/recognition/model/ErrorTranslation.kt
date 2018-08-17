@@ -26,6 +26,7 @@ object ErrorTranslation {
             2 -> "网络请求发生错误"
             3 -> "服务器数据解析错误"
             4 -> "网络不可用"
+
             else -> "未知错误:$errorCode"
         }
     }

@@ -73,6 +73,10 @@ public class LuaUtil {
     //复制asset文件到sd卡
     public static void assetsToSD(Context context, String InFileName, String OutFileName) throws IOException {
         InputStream myInput;
+        File p = new File(OutFileName).getParentFile();
+        if (!p.exists()) {
+            p.mkdirs();
+        }
         OutputStream myOutput = new FileOutputStream(OutFileName);
         myInput = context.getAssets().open(InFileName);
         byte[] buffer = new byte[8192];

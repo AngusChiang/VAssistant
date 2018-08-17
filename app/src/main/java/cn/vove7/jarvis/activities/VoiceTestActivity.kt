@@ -7,10 +7,7 @@ import android.view.View
 import android.view.ViewAnimationUtils
 import android.view.animation.AccelerateDecelerateInterpolator
 import android.widget.TextView
-import cn.vove7.appbus.AppBus
-import cn.vove7.appbus.BaseAction
-import cn.vove7.appbus.LogMessage
-import cn.vove7.appbus.VoiceData
+import cn.vove7.appbus.*
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.services.MainService.Companion.WHAT_VOICE_ERR
 import cn.vove7.jarvis.services.MainService.Companion.WHAT_VOICE_TEMP
@@ -92,11 +89,11 @@ class VoiceTestActivity : Activity() {
     }
 
     fun stop(v: View) {
-        AppBus.postSpeechRecoAction(BaseAction.ACTION_STOP)
+        AppBus.postSpeechRecoAction(SpeechRecoAction.ActionCode.ACTION_STOP_RECO)
     }
 
     fun start(v: View) {
-        AppBus.postSpeechRecoAction(BaseAction.ACTION_START)
+        AppBus.postSpeechRecoAction(SpeechRecoAction.ActionCode.ACTION_START_RECO)
     }
 
     var c: Animator? = null

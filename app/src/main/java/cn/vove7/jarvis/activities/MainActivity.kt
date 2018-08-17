@@ -71,4 +71,8 @@ class MainActivity : Activity() {
     fun permissionMan(v: View) {
         startActivity(Intent(this, PermissionManagerActivity::class.java))
     }
+
+    fun go2Setting(v: View) {
+        startActivity(Intent(this, SettingsActivity::class.java))
+    }
 }

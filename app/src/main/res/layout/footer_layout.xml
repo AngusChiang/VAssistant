@@ -6,20 +6,23 @@
     android:orientation="vertical"
     android:paddingBottom="12dip"
     android:paddingTop="12dip"
-    android:visibility="gone">
+    >
+    <!--android:visibility="gone"-->
+
     <!--加载时显示的布局-->
     <LinearLayout
         android:id="@+id/ll_footer_loading"
         android:layout_width="match_parent"
-        android:layout_height="40dp"
+        android:layout_height="wrap_content"
         android:gravity="center"
         android:orientation="horizontal"
-        android:visibility="gone">
+        >
+    <!--android:visibility="gone"-->
 
         <ProgressBar
-            style="?android:attr/progressBarStyleSmall"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            style="?android:attr/progressBarStyle"
+            android:layout_width="30dp"
+            android:layout_height="30dp" />
 
         <TextView
             android:id="@+id/more_data_msg"
