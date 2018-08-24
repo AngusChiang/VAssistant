@@ -194,12 +194,12 @@ public class LuaState {
             } else if (retType == Short.TYPE) {
                 return lg.shortValue();
             }
-        } else if (retType.isAssignableFrom(Number_class)) {
+        }// else if (retType.isAssignableFrom(Number_class)) { changed by vove
             // Checks all possibilities of number types
             if (retType.isAssignableFrom(Integer_class)) {
                 return lg.intValue();
             } else if (retType.isAssignableFrom(Long_class)) {
-                return lg.longValue();
+                return lg;
             } else if (retType.isAssignableFrom(Float_class)) {
                 return lg.floatValue();
             } else if (retType.isAssignableFrom(Double_class)) {
@@ -209,7 +209,7 @@ public class LuaState {
             } else if (retType.isAssignableFrom(Short_class)) {
                 return lg.shortValue();
             }
-        }
+        //}
 
         // if all checks fail, return null
         return null;
@@ -1097,7 +1097,7 @@ public class LuaState {
     }
 
     /**
-     * Function that returns a Java Object equivalent to the one in the given
+     * Function tha t returns a Java Object equivalent to the one in thegiven
      * position of the Lua Stack.
      *
      * @param idx Index in the Lua Stack

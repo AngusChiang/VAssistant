@@ -5,7 +5,6 @@ import org.greenrobot.greendao.annotation.Id;
 import org.greenrobot.greendao.annotation.Index;
 import org.greenrobot.greendao.annotation.Keep;
 import org.greenrobot.greendao.annotation.NotNull;
-import org.greenrobot.greendao.annotation.Generated;
 import org.greenrobot.greendao.annotation.Transient;
 
 import cn.vove7.vtp.log.Vog;
@@ -20,6 +19,8 @@ public class MarkedOpen {
     public static final String MARKED_TYPE_APP = "app";//应用 value -> pkg
     public static final String MARKED_TYPE_SYS_FUN = "sys_fun";//系统功能 value: fun_key
     public static final String MARKED_TYPE_SCRIPT = "script";
+    public static final String MARKED_TYPE_SCRIPT_LUA = "script_lua";
+    public static final String MARKED_TYPE_SCRIPT_JS = "script_js";
 
     @Id
     private Long id;
@@ -73,12 +74,13 @@ public class MarkedOpen {
         this.value = value;
         buildRegex();
     }
+
     @Keep
     private void buildRegex() {
         //结尾加上% ， 防止有[后续节点操作]匹配失败
         this.regStr = (!regStr.endsWith("%") ? regStr + "%" : regStr)
-                .replace("%", "([\\S]*)");
-        Vog.INSTANCE.v(this,regStr);
+                .replace("%", "([\\S\\s]*)");
+        Vog.INSTANCE.v(this, regStr);
         regex = new Regex(this.regStr);
     }
 

@@ -10,7 +10,7 @@
     <string name="no_net_tapme">network err</string>
     <string name="no_resources" translatable="false">一 END 一</string>
     <string name="instru_management">Instru Management</string>
-    <string name="title_activity_settings">设置</string>
+    <string name="title_activity_settings">Setting</string>
 
     <!-- Strings related to Settings -->
 
@@ -63,6 +63,13 @@
         <item>Entry 2</item>
         <item>Entry 3</item>
     </string-array>
+    <string-array name="list_pos_of_regex_param">
+        <item>无</item>
+        <item>第一个</item>
+        <item>第二个</item>
+        <item>第三个</item>
+        <item>最后一个</item>
+    </string-array>
 
     <string-array name="list_preference_entry_values">
         <item>1</item>
@@ -84,4 +91,49 @@
 
     <string name="pref_title_vibrate">Vibrate</string>
     <string name="text_settings">Settings</string>
+    <string name="text_search">Search</string>
+    <string name="text_select_application">Select App</string>
+    <string name="text_refresh">Refresh</string>
+    <string name="title_new_inst">New Instruction</string>
+    <string name="activity_name">Activity Name(Optional)</string>
+    <string name="text_choose_file">Choose File</string>
+    <string name="text_operation_need_permission">This operation needs %s</string>
+    <string name="text_opened">Opened</string>
+    <string name="text_to_open">Open</string>
+    <string name="text_regular_expression">Regular Expressions</string>
+    <string name="text_add">Add</string>
+    <string name="text_test">Test</string>
+    <string name="text_pos_of_param">The position of param:</string>
+    <string name="text_regex">Regex</string>
+    <string name="text_input_to_test">Input to test</string>
+    <string name="text_parse">Parse</string>
+    <string name="test_tooltips_of_input_test_text">Enter TestText</string>
+    <string name="text_description">Description</string>
+    <string name="text_purpose">Purpose</string>
+    <string name="text_test_output">Test output</string>
+    <string name="text_parse_result_placeholder">March Word: %s  Param: %s</string>
+    <string name="text_test_failed">Test failed</string>
+    <string name="text_test_passed">Test passed</string>
+    <string name="text_none">None</string>
+    <string name="text_enter_at_last_one_regex">Enter at least one regular Expression</string>
+    <string name="text_home">Home</string>
+    <string name="title_activity_real_main">RealMainActivity</string>
+    <string name="text_store">Store</string>
+    <string name="text_me">Me</string>
+    <string name="test_set_script">Set Script</string>
+    <string name="text_confirm">Confirm</string>
+    <string name="text_cancel">Cancel</string>
+    <string name="text_from_file">From file</string>
+    <string name="text_open_failed">Open failed</string>
+    <string name="text_cannot_open_file_manager">Unable to open file manager</string>
+    <string name="text_tooltips_select_script">Set script file:)</string>
+    <string name="text_tooltips_select_app">Select App</string>
+    <string name="text_save_success">Save success</string>
+    <string name="text_save_failed">Save failed</string>
+    <string name="text_not_installed">Not installed</string>
+    <string name="text_at_last_one_regex">At last one regex</string>
+    <string name="text_confirm_to_exit">Confirm exit?</string>
+    <string name="text_error_occurred">An error occurred</string>
+    <string name="text_cmd_in_app">In-App Command</string>
+    <string name="text_edit">Edit</string>
 </resources>

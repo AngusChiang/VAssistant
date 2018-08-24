@@ -9,12 +9,15 @@ import org.greenrobot.greendao.annotation.Generated;
 import org.greenrobot.greendao.annotation.Id;
 import org.greenrobot.greendao.annotation.Transient;
 
+import java.io.Serializable;
+
 /**
- * Action集合
+ * Action 执行动作
  * Created by Vove on 2018/6/18
  */
 @Entity
-public class Action implements Comparable<Action> {
+public class Action implements Comparable<Action>, Serializable {
+    public static final long serialVersionUID = 1L;
     @Id
     private
     Long id;
@@ -31,30 +34,45 @@ public class Action implements Comparable<Action> {
      * 脚本
      */
     private String actionScript;
+
+    private String scriptType;//脚本语言
+
+    public String getScriptType() {
+        return scriptType;
+    }
+
+    public void setScriptType(String scriptType) {
+        this.scriptType = scriptType;
+    }
+
     /**
      * 操作参数
      */
     @Transient
     private
-    Param param;
+    ActionParam param;
     /**
      * 请求结果
      */
     @Transient
+    private
     Boolean responseResult = true;
     /**
      * 返回数据
      */
     @Transient
+    private
     Bundle responseBundle = new Bundle();
 
 
-    @Generated(hash = 1674871007)
-    public Action(Long id, int priority, long nodeId, String actionScript) {
+    @Generated(hash = 404781010)
+    public Action(Long id, int priority, long nodeId, String actionScript,
+                  String scriptType) {
         this.id = id;
         this.priority = priority;
         this.nodeId = nodeId;
         this.actionScript = actionScript;
+        this.scriptType = scriptType;
     }
 
     @Generated(hash = 2056262033)
@@ -62,30 +80,32 @@ public class Action implements Comparable<Action> {
     }
 
 
-    public Action(Long id, String actionScript) {
+    public Action(Long id, String actionScript, String scriptType) {
+        this(actionScript, scriptType);
         this.id = id;
-        this.actionScript = actionScript;
     }
 
     @Keep
-    public Action(String actionScript) {
+    public Action(String actionScript, String scriptType) {
         this.actionScript = actionScript;
+        this.scriptType = scriptType;
     }
 
-    public Action(int priority, String actionScript) {
+    @Keep
+    public Action(int priority, String actionScript, String scriptType) {
+        this(actionScript, scriptType);
         this.priority = priority;
-        this.actionScript = actionScript;
     }
 
-    public Param getParam() {
+    public ActionParam getParam() {
         if (this.param == null) {
-            param = new Param();
+            param = new ActionParam();
         }
         return this.param;
     }
 
 
-    public void setParam(Param param) {
+    public void setParam(ActionParam param) {
         this.param = param;
     }
 

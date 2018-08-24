@@ -7,6 +7,7 @@ import android.support.v4.app.FragmentPagerAdapter
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.Toolbar
 import android.view.MenuItem
+import android.view.View
 import cn.vove7.jarvis.R
 import cn.vove7.vtp.log.Vog
 import kotlinx.android.synthetic.main.activity_base_view_pager.*
@@ -23,17 +24,35 @@ abstract class BaseActivityWithViewPager : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_base_view_pager)
 
+        beforeSetViewPager()
         //设置ToolBar
         val toolbar = findViewById<Toolbar>(R.id.toolbar)
         setSupportActionBar(toolbar)
 //        toolbar.setTitleTextColor(resources.getColor(android.R.color.white))
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         view_pager.adapter = FragmentAdapter(supportFragmentManager)
-        tab_layout.setupWithViewPager(view_pager)
+        if (fragments.size == 1)
+            tab_layout.visibility = View.GONE
+        else
+            tab_layout.setupWithViewPager(view_pager)
+        if (titleInit != null) {
+            this.title = titleInit
+        }
+
     }
 
+    /**
+     * 仅用来初始化
+     * 其他时间使用无作用（无法设置标题
+     */
+    open var titleInit: String? = null
 
-    abstract val fragments: Array<Fragment>
+    /**
+     * 可用来初始化Fragment
+     */
+    open fun beforeSetViewPager() {}
+
+    abstract var fragments: Array<Fragment>
 
     abstract var titles: Array<String>
 

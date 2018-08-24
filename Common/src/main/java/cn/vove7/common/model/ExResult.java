@@ -5,10 +5,9 @@ package cn.vove7.common.model;
  * <p>
  * 2018/8/7
  */
-public class ExResult <ReturnType> {
+public class ExResult<ReturnType> {
     public boolean ok = true;
     public String errMsg;
-    public String readableMsg;
     public ReturnType returnValue;
 
     public ExResult() {
@@ -16,15 +15,16 @@ public class ExResult <ReturnType> {
 
     /**
      * 失败
+     *
      * @param errMsg 失败信息
      */
-    public ExResult(String errMsg, String readableMsg) {
+    public ExResult(String errMsg) {
         ok = false;
         this.errMsg = errMsg;
-        this.readableMsg = readableMsg;
     }
 
-    public ExResult(ReturnType returnValue) {
+    public ExResult<ReturnType> with(ReturnType returnValue) {
         this.returnValue = returnValue;
+        return this;
     }
 }

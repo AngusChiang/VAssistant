@@ -10,7 +10,7 @@ import cn.vove7.jarvis.activities.base.BaseActivityWithViewPager
  * 2018/8/14
  */
 class MarkedManageActivity : BaseActivityWithViewPager() {
-    override val fragments: Array<Fragment> = arrayOf(
+    override var fragments: Array<Fragment> = arrayOf(
 
     )
     override var titles: Array<String> = arrayOf("联系人", "应用")

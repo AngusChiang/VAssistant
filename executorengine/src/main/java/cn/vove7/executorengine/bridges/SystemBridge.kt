@@ -1,5 +1,6 @@
 package cn.vove7.executorengine.bridges
 
+import android.app.Instrumentation
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
@@ -28,7 +29,7 @@ class SystemBridge : SystemOperation {
                 GlobalLog.err("openAppByPkg 启动失败(未找到此App: $pkg")
                 Vog.e(this, "openAppByPkg 启动失败(未找到此App: $pkg")
 //                Bus.postInfo(MessageEvent("启动失败(未找到此App[pkg:]):$pkg ", WHAT_ERR))
-                ExResult(null, "未找到此App: $pkg")
+                ExResult("未找到此App: $pkg")
             } else {
                 launchIntent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP //清空activity栈
                 context.startActivity(launchIntent)
@@ -39,7 +40,7 @@ class SystemBridge : SystemOperation {
             Vog.wtf(this, "${e.message}")
             GlobalLog.err(e.message ?: "未知错误")
 //            Bus.postInfo(MessageEvent("启动失败:$pkg  errMsg:${e.message}", WHAT_ERR))
-            ExResult(e.message, "未知错误")
+            ExResult(e.message)
         }
     }
 
@@ -55,12 +56,11 @@ class SystemBridge : SystemOperation {
 
             val o = openAppByPkg(info.packageName)
             if (o.ok)
-                ExResult(info.packageName)
-            else
-                o
+                ExResult<String>().with(info.packageName)
+            else o
         }
 //        Bus.postInfo(MessageEvent("未找到应用:$appWord", WHAT_ERR))
-        else ExResult(null, "未找到应用:$appWord")
+        else ExResult("未找到应用:$appWord")
     }
 
 
@@ -84,14 +84,14 @@ class SystemBridge : SystemOperation {
      */
     override fun call(s: String): ExResult<String> {
         val ph = contactHelper.matchPhone(context, s)
-            ?: return ExResult("未找到该联系人$s", "未找到该联系人$s")// "未找到该联系人$s"
+            ?: return ExResult("未找到该联系人$s")// "未找到该联系人$s"
         val callIntent = Intent(Intent.ACTION_CALL, Uri.parse("tel:$ph"))
         return try {
             context.startActivity(callIntent)
             ExResult()
         } catch (e: SecurityException) {
 
-            ExResult("无电话权限", "无电话权限")
+            ExResult("无电话权限")
         } catch (e: Exception) {
             val m = e.message ?: "ERROR: UNKNOWN"
             ExResult(m)
@@ -120,5 +120,11 @@ class SystemBridge : SystemOperation {
      */
     override fun getAppInfo(s: String): AppInfo? {
         return AppHelper.getAppInfo(context, s, s)
+    }
+
+    override fun sendKey(keyCode:Int) {
+
+//        val inst = Instrumentation()
+//        inst.sendKeyDownUpSync(keyCode)
     }
 }

@@ -28,6 +28,8 @@ import java.util.*
  */
 class SpeechSynService : BusService(), SpeechSynthesizerListener {
 
+    override val serviceId: Int
+        get() = 1227
     private lateinit var appId: String
     private lateinit var appKey: String
     private lateinit var secretKey: String

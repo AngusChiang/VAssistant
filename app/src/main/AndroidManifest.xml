@@ -78,13 +78,15 @@
             android:exported="true" />
 
         <activity android:name=".activities.PermissionManagerActivity" />
-        <activity android:name=".activities.LuaEditorActivity" />
+        <activity android:name=".activities.RegexParseTestActivity" />
+        <activity
+            android:name=".activities.LuaEditorActivity"
+            android:windowSoftInputMode="adjustPan" />
 
         <service
             android:name=".services.SpeechSynService"
             android:enabled="true"
             android:exported="true" />
-        <service android:name=".services.BusService" />
 
         <activity
             android:name=".activities.InstManagerActivity"
@@ -94,7 +96,18 @@
             android:theme="@style/NoActionBar" />
         <activity
             android:name=".activities.SettingsActivity"
-            android:label="@string/title_activity_settings"></activity>
+            android:label="@string/title_activity_settings" />
+        <activity
+            android:name=".activities.InAppInstActivity"
+            android:label="@string/text_cmd_in_app"
+            android:theme="@style/NoActionBar" />
+        <activity
+            android:name=".activities.NewInstActivity"
+            android:theme="@style/NoActionBar"
+            android:windowSoftInputMode="adjustPan" />
+        <activity
+            android:name=".activities.RealMainActivity"
+            android:theme="@style/NoActionBar" />
     </application>
 
 </manifest>

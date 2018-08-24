@@ -7,16 +7,18 @@ import org.greenrobot.greendao.annotation.Keep;
 import org.greenrobot.greendao.annotation.NotNull;
 import org.greenrobot.greendao.annotation.Transient;
 
-import cn.vove7.vtp.log.Vog;
+import java.io.Serializable;
+
 import kotlin.text.Regex;
 
 /**
  * 次节点以%开始
- * % -> [\S]*
+ * % -> ([\S\s]*)
  * Created by Vove on 2018/6/23
  */
 @Entity
-public class Reg {
+public class Reg implements Serializable {
+    public static final long serialVersionUID = 1L;
     @Id
     private Long id;
     /**
@@ -24,7 +26,7 @@ public class Reg {
      */
     @NotNull
     private String regStr;
-    private int paramPos = PARAM_POS_END;
+    private int paramPos = PARAM_NO;
     @Transient
     private Regex regex;
     private long nodeId;
@@ -37,11 +39,24 @@ public class Reg {
     }
 
     @Keep
+    public Reg(String regStr, int paramPos) {//Test need
+        this.regStr = regStr;
+        this.paramPos = paramPos;
+    }
+
+    @Override
+    public String toString() {
+        return "Reg{" +
+                "regStr='" + regStr + '\'' +
+                '}';
+    }
+
+    @Keep
     private void buildRegex() {
         //结尾加上% ， 防止有[后续节点操作]匹配失败
         this.regStr = (!regStr.endsWith("%") ? regStr + "%" : regStr)
-                .replace("%", "([\\S]*)");
-        Vog.INSTANCE.v(this,regStr);
+                .replace("%", "([\\S\\s]*)");
+        //Vog.INSTANCE.v(this, regStr);
         regex = new Regex(this.regStr);
     }
 
@@ -59,21 +74,6 @@ public class Reg {
         this.regex = regex;
     }
 
-    public static int getParamPosEnd() {
-        return PARAM_POS_END;
-    }
-
-    public static int getParamPos1() {
-        return PARAM_POS_1;
-    }
-
-    public static int getParamPos2() {
-        return PARAM_POS_2;
-    }
-
-    public static int getParamPos3() {
-        return PARAM_POS_3;
-    }
 
     @Generated(hash = 526783767)
     public Reg(Long id, @NotNull String regStr, int paramPos, long nodeId) {
@@ -118,8 +118,9 @@ public class Reg {
     /**
      * 参数位置，提取参数用
      */
-    public static final int PARAM_NO = -1;
-    public static final int PARAM_POS_END = 0;
+    public static final int PARAM_NO = -999;
+    public static final int PARAM_POS_END = -1;
+    public static final int PARAM_POS_0 = 0;
     public static final int PARAM_POS_1 = 1;
     public static final int PARAM_POS_2 = 2;
     public static final int PARAM_POS_3 = 3;

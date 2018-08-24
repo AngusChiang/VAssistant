@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="text_acc_service_not_running">AccessibilityService is not running.</string>
+</resources>

@@ -45,7 +45,6 @@ class MyRecognizer(
         asr.registerListener(eventListener)
     }
 
-
     /**
      * @param params
      */
@@ -61,7 +60,6 @@ class MyRecognizer(
         val json = JSONObject(params).toString()
         asr.send(SpeechConstant.ASR_START, json, null, 0, 0)
     }
-
 
     fun start(json: String) {
         Vog.i(this, "asr params(反馈请带上此行日志):$json")
@@ -86,7 +84,6 @@ class MyRecognizer(
         asr.send(SpeechConstant.ASR_CANCEL, "{}", null, 0, 0)
     }
 
-
     fun release() {
         cancel()
         if (isOfflineEngineLoaded) {
@@ -99,10 +96,7 @@ class MyRecognizer(
     }
 
     companion object {
-
         private var isOfflineEngineLoaded = false
-
         private var isInited = false
-
     }
 }

@@ -1,6 +1,7 @@
 package cn.vove7.jarvis.speech.wakeup
 
 import android.os.Handler
+import android.os.Message
 
 import cn.vove7.jarvis.speech.recognition.model.IStatus
 import cn.vove7.vtp.builder.BundleBuilder
@@ -14,7 +15,9 @@ class RecogWakeupListener(private val handler: Handler) : SimpleWakeupListener()
 
     override fun onSuccess(word: String?, result: WakeUpResult) {
         super.onSuccess(word, result)
-
-        handler.sendEmptyMessage(IStatus.STATUS_WAKEUP_SUCCESS)
+        val m = Message()
+        m.what = IStatus.STATUS_WAKEUP_SUCCESS
+        m.data = BundleBuilder().put("word", word ?: "").build()
+        handler.sendMessage(m)
     }
 }

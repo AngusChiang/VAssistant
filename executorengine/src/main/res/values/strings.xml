@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">ExecutorEngine</string>
+    <string name="text_app_not_install">The app isn\'t install</string>
 </resources>

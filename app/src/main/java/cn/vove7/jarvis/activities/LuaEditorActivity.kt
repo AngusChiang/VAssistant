@@ -20,7 +20,7 @@ import cn.vove7.androlua.luautils.LuaManagerI
 import cn.vove7.androlua.luautils.LuaPrinter
 import cn.vove7.appbus.AppBus
 import cn.vove7.datamanager.parse.model.Action
-import cn.vove7.datamanager.parse.model.Param
+import cn.vove7.datamanager.parse.model.ActionParam
 import cn.vove7.vtp.log.Vog
 import cn.vove7.vtp.view.span.ColourTextClickableSpan
 import java.io.IOException
@@ -82,6 +82,11 @@ class LuaEditorActivity : Activity(), OnClickListener {
         }
     }
 
+    //TODO
+    override fun onBackPressed() {
+        super.onBackPressed()
+    }
+
     @SuppressLint("HandlerLeak")
     public override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -135,8 +140,8 @@ class LuaEditorActivity : Activity(), OnClickListener {
                 val src = source.text.toString()
                 status.text = ""
                 status.scrollTo(0, 0)
-                val ac = Action(src)
-                ac.param = Param()
+                val ac = Action(src, "lua")
+                ac.param = ActionParam()
                 ac.param.value = luaArgs.text.toString()
                 AppBus.post(ac)
             }

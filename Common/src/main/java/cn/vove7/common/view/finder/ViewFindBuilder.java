@@ -1,6 +1,11 @@
 package cn.vove7.common.view.finder;
 
+import java.util.Arrays;
+
+import cn.vove7.common.R;
 import cn.vove7.common.accessibility.AccessibilityApi;
+import cn.vove7.common.app.GlobalApp;
+import cn.vove7.common.app.GlobalLog;
 import cn.vove7.common.executor.CExecutorI;
 import cn.vove7.common.viewnode.ViewNode;
 import cn.vove7.vtp.log.Vog;
@@ -43,22 +48,27 @@ public class ViewFindBuilder extends FindBuilder {
         setFinder(viewFinderX);
     }
 
+    public ViewNode waitFor() {
+        return waitFor(-1L);
+    }
+
     /**
      * 需要CExecutorI
      *
+     * @param m 时限
      * @return ViewNode which is returned until show in screen
      */
-    public ViewNode waitFor() {
+    public ViewNode waitFor(Long m) {
         if (executor == null) {
             Vog.INSTANCE.d(this, "执行器 null");
             return null;
         }
         if (accessibilityService != null) {
             accessibilityService.waitForView(executor, viewFinderX);
-            executor.waitForUnlock(-1);
+            executor.waitForUnlock(m);
             return executor.getViewNode();
         } else {
-            Vog.INSTANCE.d(this, "AccessibilityService is not running.");
+            GlobalLog.INSTANCE.err(GlobalApp.APP.getString(R.string.text_acc_service_not_running));
             return null;
         }
     }
@@ -69,8 +79,13 @@ public class ViewFindBuilder extends FindBuilder {
      * @param text text
      * @return this
      */
+    public ViewFindBuilder containsText(String... text) {
+        viewFinderX.getViewText().addAll(Arrays.asList(text));
+        viewFinderX.setTextMatchMode(MATCH_MODE_CONTAIN);
+        return this;
+    }
     public ViewFindBuilder containsText(String text) {
-        viewFinderX.setViewText(text);
+        viewFinderX.getViewText().add(text);
         viewFinderX.setTextMatchMode(MATCH_MODE_CONTAIN);
         return this;
     }
@@ -81,8 +96,13 @@ public class ViewFindBuilder extends FindBuilder {
      * @param text text
      * @return this
      */
+    public ViewFindBuilder equalsText(String... text) {
+        viewFinderX.getViewText().addAll(Arrays.asList(text));
+        viewFinderX.setTextMatchMode(MATCH_MODE_EQUAL);
+        return this;
+    }
     public ViewFindBuilder equalsText(String text) {
-        viewFinderX.setViewText(text);
+        viewFinderX.getViewText().add(text);
         viewFinderX.setTextMatchMode(MATCH_MODE_EQUAL);
         return this;
     }
@@ -93,8 +113,14 @@ public class ViewFindBuilder extends FindBuilder {
      * @param text 文本内容
      * @return this
      */
+    public ViewFindBuilder similaryText(String... text) {
+        viewFinderX.getViewText().addAll(Arrays.asList(text));
+        viewFinderX.setTextMatchMode(MATCH_MODE_FUZZY_WITH_PINYIN);
+        return this;
+    }
+
     public ViewFindBuilder similaryText(String text) {
-        viewFinderX.setViewText(text);
+        viewFinderX.getViewText().add(text);
         viewFinderX.setTextMatchMode(MATCH_MODE_FUZZY_WITH_PINYIN);
         return this;
     }
@@ -104,8 +130,12 @@ public class ViewFindBuilder extends FindBuilder {
         return this;
     }
 
+    public ViewFindBuilder desc(String... desc) {
+        viewFinderX.getDesc().addAll(Arrays.asList(desc));
+        return this;
+    }
     public ViewFindBuilder desc(String desc) {
-        viewFinderX.setDesc(desc);
+        viewFinderX.getDesc().add(desc);
         return this;
     }
 
@@ -129,6 +159,9 @@ public class ViewFindBuilder extends FindBuilder {
 
     public ViewNode await() {
         return waitFor();
+    }
+    public ViewNode await(long l) {
+        return waitFor(l);
     }
 
 }

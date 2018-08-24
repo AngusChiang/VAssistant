@@ -35,7 +35,7 @@ interface SystemOperation {
      * 获取App信息
      * @param s 包名 或 App 名
      */
-    fun getAppInfo(s:String): AppInfo?
+    fun getAppInfo(s: String): AppInfo?
 
 
     /**
@@ -43,4 +43,6 @@ interface SystemOperation {
      */
     fun openUrl(url: String)
 
+    //TODO
+    fun sendKey(keyCode: Int)
 }

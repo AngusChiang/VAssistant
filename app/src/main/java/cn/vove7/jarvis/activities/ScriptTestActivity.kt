@@ -15,13 +15,13 @@ class ScriptTestActivity : Activity() {
 
     private val files = arrayOf(
             "s/alipay_ss.txt"
-            , "s/ali_ss_s.txt"
+//            , "s/ali_ss_s.txt"
             , "s/qq_ss.txt"
             , "s/voice_text.txt"
-            , "s/scroll_test.txt"
-            , "s/test.txt"
+//            , "s/scroll_test.txt"
+//            , "s/test.txt"
             , "s/qq_send.txt"
-            , "s/qq_send_s.txt"
+//            , "s/qq_send_s.txt"
     )
     var now = 0
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -45,17 +45,13 @@ class ScriptTestActivity : Activity() {
         when (view.id) {
             R.id.button3 -> {
                 toast.showShort("开始解析")
-                val parseResult = ParseEngine.parseGlobalAction(script_text.text.toString(), "")
+                val parseResult = ParseEngine.parseAction(script_text.text.toString(), "")
                 if (parseResult.isSuccess) {
                     toast.showShort("解析成功")
                     AppBus.post(parseResult.actionQueue)
                 } else {
                     toast.showShort("解析失败")
                 }
-            }
-            R.id.button11 -> {
-                val ac = Action(script_text.text.toString())
-                AppBus.post(ac)
             }
         }
 

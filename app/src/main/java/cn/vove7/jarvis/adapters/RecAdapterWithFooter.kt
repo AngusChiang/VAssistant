@@ -20,12 +20,13 @@ abstract class RecAdapterWithFooter<V : RecAdapterWithFooter.RecViewHolder> : Re
         return itemCount() + 1
     }
 
+    abstract fun getItem(pos: Int): Any?
 
     abstract fun itemCount(): Int
     override fun onBindViewHolder(holder: RecAdapterWithFooter.RecViewHolder, position: Int) {
         when (getItemViewType(position)) {
             TYPE_ITEM -> {
-                onBindView(holder as V, position)
+                onBindView(holder as V, position, getItem(position))
             }
             TYPE_FOOTER -> {
 
@@ -66,7 +67,7 @@ abstract class RecAdapterWithFooter<V : RecAdapterWithFooter.RecViewHolder> : Re
         val STATUS_ALL_LOAD = 2
     }
 
-    abstract fun onBindView(holder: V, position: Int)
+    abstract fun onBindView(holder: V, position: Int, item: Any?)
 
     private var footerView: View? = null
     private lateinit var llLoading: LinearLayout  // 正在加载view
@@ -79,6 +80,8 @@ abstract class RecAdapterWithFooter<V : RecAdapterWithFooter.RecViewHolder> : Re
     }
 
     fun setFooter(status: Int) {
+        if (footerView == null)
+            return
         footerView?.visibility = View.VISIBLE
         when (status) {
             STATUS_LOADING -> {

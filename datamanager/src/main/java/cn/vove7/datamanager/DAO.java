@@ -6,12 +6,13 @@ import cn.vove7.datamanager.greendao.DaoMaster;
 import cn.vove7.datamanager.greendao.DaoSession;
 
 /**
+ * DAO 管理
  * Created by Vove on 2018/6/23
  */
 public class DAO {
-   public static DaoSession daoSession;
+    public static DaoSession daoSession;
 
-   public static void init(Context context) {
-      daoSession = DaoMaster.newDevSession(context, "DataBase.db");
-   }
+    public static void init(Context context) {
+        daoSession = DaoMaster.newDevSession(context, "DataBase.db");
+    }
 }

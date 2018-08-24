@@ -24,6 +24,7 @@ open class ViewShowNotifier(private val locks: MutableMap<ViewShowListener, View
     /**
      * 检查列表
      */
+    @Synchronized
     override fun notifyIfShow() {
         val removeList = mutableListOf<ViewShowListener>()
         sleep(500)

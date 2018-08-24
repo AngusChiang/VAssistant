@@ -30,7 +30,7 @@ public class ActionScope {
     /**
      * Activity页面
      */
-    private String activity;
+    private String activity = "";
 
     @Keep
     public ActionScope(Long id, String packageName, String activity) {

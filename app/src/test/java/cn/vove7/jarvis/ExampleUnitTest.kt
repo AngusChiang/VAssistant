@@ -1,6 +1,8 @@
 package cn.vove7.jarvis
 
 import org.junit.Test
+import java.lang.Thread.sleep
+import kotlin.concurrent.thread
 
 /**
  * Example local unit test, which will execute on the development machine (host).
@@ -50,5 +52,31 @@ class ExampleUnitTest {
         ).forEach {
             println(r.matches(it.key) == it.value)
         }
+    }
+
+    @Test
+    fun waitTest() {
+        val millis = 2000L
+        val lock = Object()
+        val t = thread {
+            val begin = System.currentTimeMillis()
+            if (millis < 0) {
+                lock.wait()
+                println("执行器-解锁")
+            } else {
+                var end: Long = 0
+                synchronized(lock) {
+                    lock.wait(millis)
+                    end = System.currentTimeMillis()
+                    println("$begin -- $end")
+                }
+                println("执行器-解锁")
+
+                if (end - begin >= millis) {//自动超时 终止执行
+                    println("自动解锁")
+                }
+            }
+        }
+        while (t.isAlive) sleep(1000)
     }
 }

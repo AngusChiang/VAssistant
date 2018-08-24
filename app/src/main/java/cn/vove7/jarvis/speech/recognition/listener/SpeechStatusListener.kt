@@ -2,6 +2,7 @@ package cn.vove7.jarvis.speech.recognition.listener
 
 import android.os.Handler
 import cn.vove7.appbus.AppBus
+import cn.vove7.appbus.SpeechRecoAction
 import cn.vove7.appbus.VoiceData
 import cn.vove7.common.model.RequestPermission
 import cn.vove7.jarvis.services.MainService.Companion.WHAT_VOICE_ERR
@@ -38,6 +39,14 @@ class SpeechStatusListener(private val handler: Handler) : StatusRecogListener()
         handler.sendMessage(SpeechMessage.buildMessage(WHAT_VOICE_RESULT, tmp))
     }
 
+    var endFinish = true
+    override fun onAsrEnd() {
+        super.onAsrEnd()
+        //立即停止识别 ，检测结果
+        AppBus.postSpeechRecoAction(SpeechRecoAction.ActionCode.ACTION_STOP_RECO)
+
+    }
+
     override fun onAsrFinishError(errorCode: Int, subErrorCode: Int, errorMessage: String?, descMessage: String?,
                                   recogResult: RecogResult) {
         super.onAsrFinishError(errorCode, subErrorCode, errorMessage, descMessage, recogResult)
@@ -56,7 +65,7 @@ class SpeechStatusListener(private val handler: Handler) : StatusRecogListener()
     }
 
     override fun onAsrVolume(volumePercent: Int, volume: Int) {
-        Vog.i(this, "音量百分比$volumePercent ; 音量$volume")
+        Vog.v(this, "音量百分比$volumePercent ; 音量$volume")
         handler.sendMessage(
                 SpeechMessage.buildMessage(
                         WHAT_VOICE_VOL,

@@ -3,8 +3,6 @@ package cn.vove7.jarvis.speech.wakeup
 import android.content.Context
 import android.content.pm.PackageManager
 import cn.vove7.androlua.luabridge.LuaUtil
-import cn.vove7.jarvis.speech.synthesis.util.FileUtil
-import cn.vove7.vtp.file.FileHelper
 import cn.vove7.vtp.log.Vog
 import com.baidu.speech.EventListener
 import com.baidu.speech.EventManager
@@ -28,8 +26,10 @@ class MyWakeup {
     constructor(context: Context, eventListener: EventListener) {
         if (isInited) {
             Vog.e(this, "还未调用release()，请勿新建一个新类")
-            throw RuntimeException("还未调用release()，请勿新建一个新类")
+//            throw RuntimeException("还未调用release()，请勿新建一个新类")
+            instances?.release()
         }
+        instances = this
         isInited = true
         this.eventListener = eventListener
         wp = EventManagerFactory.create(context, "wp")
@@ -41,7 +41,7 @@ class MyWakeup {
         appKey = appInfo.metaData.getString("com.baidu.speech.API_KEY")
         secretKey = appInfo.metaData.getString("com.baidu.speech.SECRET_KEY")
 
-        LuaUtil.assetsToSD(context,"bd/WakeUp.bin",
+        LuaUtil.assetsToSD(context, "bd/WakeUp.bin",
                 context.filesDir.absolutePath + "/bd/WakeUp.bin")
     }
 
@@ -82,5 +82,6 @@ class MyWakeup {
 
     companion object {
         private var isInited = false
+        var instances: MyWakeup? = null
     }
 }

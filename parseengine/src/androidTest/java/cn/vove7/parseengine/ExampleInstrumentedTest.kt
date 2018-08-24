@@ -49,16 +49,16 @@ class ExampleInstrumentedTest {
                 Pair("打开微博", true)
         )
         testDatas.forEach {
-            val s = ParseEngine.parseGlobalAction(it.key, "")
-            clearUp(s.actionQueue)
+            val s = ParseEngine.parseAction(it.key, "")
+            poll(s.actionQueue)
             val q = ParseEngine.matchAppAction("", "com.tentcnt.mobileqq")
-            clearUp(q)
+            poll(q)
 
         }
 
     }
 
-    private fun clearUp(actions: PriorityQueue<Action>) {
+    private fun poll(actions: PriorityQueue<Action>) {
         var p: Action
         var index = 0
         while (actions.isNotEmpty()) {

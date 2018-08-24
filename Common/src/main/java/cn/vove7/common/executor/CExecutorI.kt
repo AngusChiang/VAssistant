@@ -5,6 +5,7 @@ import cn.vove7.common.view.notifier.ActivityShowListener
 import cn.vove7.common.view.notifier.ViewShowListener
 import cn.vove7.common.viewnode.ViewNode
 import cn.vove7.datamanager.parse.model.Action
+import cn.vove7.datamanager.parse.model.ActionScope
 import java.util.*
 
 /**
@@ -12,6 +13,13 @@ import java.util.*
  *
  */
 interface CExecutorI : ViewShowListener, ActivityShowListener {
+    //Runtime
+    var currentActionIndex: Int
+    var actionCount: Int
+
+    val currentScope : ActionScope?
+    var currentActivity: String
+
     fun execQueue(cmdWords: String, actionQueue: PriorityQueue<Action>)
     fun interrupt()
     fun runScript(script: String, voiceArg: String? = null): PartialResult
@@ -38,13 +46,17 @@ interface CExecutorI : ViewShowListener, ActivityShowListener {
 
     fun onGetVoiceParam(param: String?)
 
-    fun waitForApp(pkg: String, activityName: String? = null): Boolean
-    fun waitForViewId(id: String): ViewNode?
-    fun waitForDesc(desc: String): ViewNode?
-    fun waitForText(text: String): ViewNode?
+    fun waitForApp(pkg: String, activityName: String? = null, m: Long = -1): Boolean
+    fun waitForViewId(id: String, m: Long = -1): ViewNode?
+    fun waitForDesc(desc: String, m: Long = -1): ViewNode?
+    fun waitForText(text: String, m: Long = -1): ViewNode?
     fun getViewNode(): ViewNode?
 
-    fun waitForUnlock(millis: Long = -1)
+    /**
+     * @return true 等待成功 ; false 失败(超时,停止
+     */
+    fun waitForUnlock(millis: Long = -1): Boolean
+
     fun notifySync()
     fun sleep(millis: Long)
     fun onFinish()

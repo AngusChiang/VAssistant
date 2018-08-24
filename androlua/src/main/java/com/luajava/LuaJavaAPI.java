@@ -875,10 +875,17 @@ public final class LuaJavaAPI {
                 clazz = obj.getClass();
             }
 
+            String postfix = (methodName.charAt(0) + "")
+                    .toUpperCase() + methodName.substring(1);
             try {
-                method = clazz.getMethod("get" + methodName);
+                method = clazz.getMethod("get" + postfix);
             } catch (NoSuchMethodException e) {
-                return 0;
+                try {
+                    method = clazz.getMethod("is" + postfix);
+                } catch (Exception e1) {
+                    e1.printStackTrace();
+                    return 0;
+                }
             }
             if (isClass && !Modifier.isStatic(method.getModifiers()))
                 return 0;

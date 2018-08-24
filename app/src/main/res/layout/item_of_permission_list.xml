@@ -3,6 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="?android:attr/selectableItemBackground"
+    android:elevation="6dp"
     android:gravity="center_vertical"
     android:orientation="horizontal">
 
@@ -20,7 +21,6 @@
             android:id="@+id/title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="相机"
             android:textSize="18sp" />
 
         <TextView
@@ -28,16 +28,13 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="2dp"
-            android:text="用于打开闪光灯、"
+            android:textColor="@color/secondary_text"
             android:textSize="14sp" />
     </LinearLayout>
 
-    <Button
+    <TextView
         android:id="@+id/open"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:background="?android:attr/selectableItemBackground"
-        android:text="开启"
-        android:textColor="@color/colorAccent" />
-
+        android:padding="10dp" />
 </LinearLayout>

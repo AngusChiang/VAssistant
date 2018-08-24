@@ -30,15 +30,23 @@ end
 --快捷操作
  ]]
 function clickById(id)
-    ViewFinder().id(id).tryClick()
+    return ViewFinder().id(id).tryClick()
 end
 
 function clickText(text)
-    ViewFinder().equalsText(text).tryClick()
+    return ViewFinder().equalsText(text).tryClick()
 end
 
 function clickByDesc(desc)
-    ViewFinder().desc(desc).tryClick()
+    return ViewFinder().desc(desc).tryClick()
 end
 
+function printAllChild(node)
+    print(node)
+    local cs = node.childs()
+    for i = 0, #cs - 1 do
+        local child_i = cs[i]
+        print(i, child_i)
+    end
+end
 

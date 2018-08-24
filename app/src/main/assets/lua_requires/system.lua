@@ -3,6 +3,7 @@
 -- 2018/8/16 0:50
 -- system.lua
 --
+import 'android.view.KeyEvent'
 
 --*
 --通过包名打开App
@@ -36,5 +37,7 @@ function getAppInfo(s)
     return system.getAppInfo(s)
 end
 
-
+function sendKey(key)
+    system.sendKey(key)
+end
 

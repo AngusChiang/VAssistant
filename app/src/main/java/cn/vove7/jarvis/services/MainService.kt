@@ -23,6 +23,7 @@ import cn.vove7.common.model.RequestPermission
 import cn.vove7.datamanager.parse.model.Action
 import cn.vove7.executorengine.luaexector.LuaExecutor
 import cn.vove7.jarvis.activities.PermissionManagerActivity
+import cn.vove7.jarvis.speech.recognition.model.IStatus
 import cn.vove7.jarvis.utils.Utils.checkCancel
 import cn.vove7.jarvis.utils.Utils.checkConfirm
 import cn.vove7.jarvis.view.dialog.MultiChoiceDialog
@@ -45,6 +46,8 @@ class MainService : BusService(), OnExecutorResult,
         ServiceBridge, OnSelectListener, OnMultiSelectListener, LuaContext {
     private lateinit var toast: Voast
 
+    override val serviceId: Int
+        get() = 127
     /**
      * 悬浮窗
      */
@@ -111,7 +114,7 @@ class MainService : BusService(), OnExecutorResult,
      * 停止语音
      */
     private fun notifyAlertResult() {
-        AppBus.postSpeechRecoAction(SpeechRecoAction.ActionCode.ACTION_STOP_RECO)
+        AppBus.postSpeechRecoAction(SpeechRecoAction.ActionCode.ACTION_CANCEL_RECO)
         voiceMode = MODE_VOICE
         cExecutor.notifySync()
     }
@@ -127,6 +130,7 @@ class MainService : BusService(), OnExecutorResult,
             choiceDialog = null
         }
     }
+
 
     /**
      * 选择对话框
@@ -174,7 +178,7 @@ class MainService : BusService(), OnExecutorResult,
      * @param action 执行动作
      */
     override fun getVoiceParam(action: Action) {
-        toast.showShort(action.param?.askText ?: "???")
+//        toast.showShort(action.param?.askText ?: "???")
         messengerAction = action
         voiceMode = MODE_GET_PARAM
         AppBus.postSpeechRecoAction(SpeechRecoAction.ActionCode.ACTION_START_RECO)
@@ -185,14 +189,17 @@ class MainService : BusService(), OnExecutorResult,
      */
     //TODO 错误处理
     @Subscribe(threadMode = ThreadMode.MAIN)
-    fun onVoiceData(msg: Message?) {
+    fun onVoiceData(msg: Message?) { // ->Float -> Executor
         when (msg?.what) {
+            IStatus.STATUS_WAKEUP_SUCCESS -> {//唤醒
+                AppBus.postVoiceData(VoiceData(msg.what, msg.data.getString("word")))
+            }
             WHAT_VOICE_TEMP -> {
-                val res = msg.data.getString("errMsg")
+                val res = msg.data.getString("data")
                 AppBus.postVoiceData(VoiceData(msg.what, res))
             }
             WHAT_VOICE_ERR -> {
-                val res = msg.data.getString("errMsg")
+                val res = msg.data.getString("data")
                 when (voiceMode) {
                     MODE_VOICE -> {
                         AppBus.postVoiceData(VoiceData(msg.what, res))
@@ -213,15 +220,15 @@ class MainService : BusService(), OnExecutorResult,
                 AppBus.postVoiceData(msg.data.getSerializable("data") as VoiceData)
             }
             WHAT_VOICE_RESULT -> {
-                val voiceData = msg.data.getString("errMsg")
+                val voiceData = msg.data.getString("data")
                 Vog.d(this, "结果 --------> $voiceData")
                 AppBus.postVoiceData(VoiceData(WHAT_VOICE_RESULT, voiceData))
                 when (voiceMode) {
                     MODE_VOICE -> {
                         toast.showShort("开始解析")
                         val parseResult = ParseEngine
-                                .parseGlobalAction(voiceData, AccessibilityApi.accessibilityService?.currentScope?.packageName
-                                    ?: "")
+                                .parseAction(voiceData, AccessibilityApi.accessibilityService?.currentScope?.packageName
+                                        ?: "")
                         if (parseResult.isSuccess) {
                             toast.showShort("解析成功")
                             cExecutor.execQueue(voiceData, parseResult.actionQueue)
@@ -339,7 +346,7 @@ class MainService : BusService(), OnExecutorResult,
     fun stopExecutor(order: String) {
         when (order) {
             "stop execQueue" -> {
-                AppBus.postSpeechRecoAction(SpeechRecoAction.ActionCode.ACTION_STOP_RECO)
+                AppBus.postSpeechRecoAction(SpeechRecoAction.ActionCode.ACTION_CANCEL_RECO)
                 cExecutor.interrupt()
             }
             else -> {
@@ -374,6 +381,7 @@ class MainService : BusService(), OnExecutorResult,
         /**
          * 语音事件数据类型
          */
+        const val WHAT_VOICE_WAKEUP = 0 //唤醒成功
         const val WHAT_VOICE_TEMP = 1 //临时结果
         const val WHAT_VOICE_VOL = 2 //音量数据
         const val WHAT_VOICE_ERR = 4 //出错

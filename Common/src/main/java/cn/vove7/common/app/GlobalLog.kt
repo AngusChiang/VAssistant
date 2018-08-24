@@ -16,7 +16,7 @@ object GlobalLog {
         write(LEVEL_INFO, msg)
     }
 
-    fun err(msg: String) {
+    fun err(msg: String?) {
         Vog.e(this, "err $msg")
         write(LEVEL_ERROR, msg)
     }
@@ -25,9 +25,9 @@ object GlobalLog {
         logList.clear()
     }
 
-    private fun write(level: Int, msg: String) {
+    private fun write(level: Int, msg: String?) {
         synchronized<Unit>(logList) {
-            logList.add(Pair(level, msg))
+            logList.add(Pair(level, msg ?: "null"))
         }
     }
 

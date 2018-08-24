@@ -27,7 +27,7 @@ ViewFinder().id('et_search_keyword').setTextWithInitial(args[1])
 --  由于之前保存过s 可以使用 ：s.setTextWithInitial(args[1])
 
 sleep(110)
-a = ViewFinder().id('title').similaryText(args[1]).tryClick()
+a = ViewFinder().id('titleInit').similaryText(args[1]).tryClick()
 if (not a) then
     toast('没找到哦')
 end

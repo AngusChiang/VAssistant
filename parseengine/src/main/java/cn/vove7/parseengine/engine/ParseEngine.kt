@@ -2,10 +2,10 @@ package cn.vove7.parseengine.engine
 
 import android.util.Log
 import cn.vove7.datamanager.DAO
-import cn.vove7.datamanager.greendao.MapNodeDao
+import cn.vove7.datamanager.greendao.ActionNodeDao
 import cn.vove7.datamanager.parse.model.Action
-import cn.vove7.datamanager.parse.statusmap.MapNode
-import cn.vove7.datamanager.parse.statusmap.MapNode.*
+import cn.vove7.datamanager.parse.statusmap.ActionNode
+import cn.vove7.datamanager.parse.statusmap.ActionNode.*
 import cn.vove7.datamanager.parse.statusmap.Reg
 import cn.vove7.datamanager.parse.statusmap.Reg.*
 import cn.vove7.parseengine.model.ParseResult
@@ -18,9 +18,9 @@ import java.util.*
  * Created by Vove on 2018/6/15
  */
 object ParseEngine {
-    var GlobalActionNodes: List<MapNode>? = null
-    var AppActionNodes: List<MapNode>? = null
-    fun getById(nodes: List<MapNode>, id: Long): MapNode? {
+    var GlobalActionNodes: List<ActionNode>? = null
+    var AppActionNodes: List<ActionNode>? = null
+    private fun getNodeById(nodes: List<ActionNode>, id: Long): ActionNode? {
         nodes.forEach {
             if (it.id == id)
                 return it
@@ -41,12 +41,11 @@ object ParseEngine {
      * App内   ↓ 二级命令
      *
      */
-    fun parseGlobalAction(cmdWord: String, pkg: String): ParseResult {
+    fun parseAction(cmdWord: String, pkg: String): ParseResult {
         i = 0
         val actionQueue = PriorityQueue<Action>()
-        val action = globalActionMatch(cmdWord)
-        return if (action != null) {
-            actionQueue.add(action)
+        actionQueue.addAll(globalActionMatch(cmdWord))
+        return if (actionQueue.isNotEmpty()) {
             ParseResult(true, actionQueue)
         } else {
             println("globalAction--无匹配")
@@ -63,26 +62,46 @@ object ParseEngine {
      * 一级匹配
      * 全局不存在follows
      */
-    private fun globalActionMatch(cmd: String): Action? {
+    private fun globalActionMatch(cmd: String): PriorityQueue<Action> {
+        val actionQueue = PriorityQueue<Action>()
         if (GlobalActionNodes == null)
-            GlobalActionNodes = DAO.daoSession.mapNodeDao.queryBuilder()
-                    .where(MapNodeDao.Properties.NodeType.eq(NODE_TYPE_GLOBAL)).list()
+            GlobalActionNodes = DAO.daoSession.actionNodeDao.queryBuilder()
+                    .where(ActionNodeDao.Properties.NodeType.`in`(NODE_TYPE_GLOBAL, NODE_TYPE_GLOBAL_2))
+                    .orderDesc(ActionNodeDao.Properties.Priority).list()
         GlobalActionNodes?.forEach {
-            it.regs.forEach { reg ->
-                val result = reg.regex.matchEntire(cmd)
-                if (result != null && result.groups.isNotEmpty()) {//匹配成功
-                    val action = it.action
-                    extractParam(action, reg, result)
-                    return action
-                }
-            }
+
+            val r = search(cmd, it, actionQueue, GlobalActionNodes!!)
+            if (r) return actionQueue
+//
+//            it.regs.forEach { reg ->
+//                val result = reg.regex.matchEntire(cmd)
+//                if (result != null) {
+//                    it.action.param = it.param
+//                    extractParam(it.action, reg, result)//提取参数
+//                    it.action.matchWord = result.groupValues[0]
+//                    actionQueue.add(it.action)
+//                    //深搜命令
+//                    actionDsMatch(actionQueue, it, result.groupValues[result.groups.size - 1], it)
+//                    return actionQueue
+//                }
+//            }
+
+//            it.regs.forEach { reg ->
+//                val result = reg.regex.matchEntire(cmd)
+//                if (result != null && result.groups.isNotEmpty()) {//匹配成功
+//                    val action = it.action
+//                    extractParam(action, reg, result)
+//                    return action
+//                }
+//            }
         }
-        return null
+        return actionQueue
     }
 
     /**
      * 全局命令解析失败
      * 或在执行打开应用后，解析跟随指令
+     * eg:
      * 网易云 音乐 播放
      * QQ扫一扫
      * App内指令
@@ -91,8 +110,9 @@ object ParseEngine {
     fun matchAppAction(cmd: String, currentAppPkg: String): PriorityQueue<Action> {
         Log.d("Debug :", "matchAppAction  ----> $currentAppPkg")
         if (AppActionNodes == null) {
-            AppActionNodes = DAO.daoSession.mapNodeDao.queryBuilder()
-                    .where(MapNodeDao.Properties.NodeType.`in`(NODE_TYPE_IN_APP, NODE_TYPE_IN_APP_2))
+            AppActionNodes = DAO.daoSession.actionNodeDao.queryBuilder()
+                    .where(ActionNodeDao.Properties.NodeType.`in`(NODE_TYPE_IN_APP, NODE_TYPE_IN_APP_2))
+                    .orderDesc(ActionNodeDao.Properties.Priority)
                     .list()
         }
         val actionQueue = PriorityQueue<Action>()
@@ -101,58 +121,82 @@ object ParseEngine {
             it.actionScope != null && it.actionScope.packageName.startsWith(currentAppPkg)
                     && it.nodeType == NODE_TYPE_IN_APP
         }?.forEach {
-            it.regs.forEach { reg ->
-                val result = reg.regex.matchEntire(cmd)
-                if (result != null) {
-                    it.action.param = it.param
-                    extractParam(it.action, reg, result)//提取参数
-                    it.action.matchWord = result.groupValues[0]
-                    actionQueue.add(it.action)
-                    appActionDsMatch(actionQueue, it, result.groupValues[result.groups.size - 1], it)
-                    return actionQueue
-                }
-            }
+            val r = search(cmd, it, actionQueue, AppActionNodes!!)
+            if (r) return actionQueue
+//
+//            it.regs.forEach { reg ->
+//                val result = reg.regex.matchEntire(cmd)
+//                if (result != null) {
+//                    it.action.param = it.param
+//                    extractParam(it.action, reg, result)//提取参数
+//                    it.action.matchWord = result.groupValues[0]
+//                    actionQueue.add(it.action)
+//                    //深搜命令
+//                    actionDsMatch(actionQueue, it, result.groupValues[result.groups.size - 1], it)
+//                    return actionQueue
+//                }
+//            }
         }
         return actionQueue
     }
 
+    //提取公共搜索函数
+    private fun search(cmd: String, it: ActionNode, actionQueue: PriorityQueue<Action>, allNodes: List<ActionNode>): Boolean {
+        it.regs.forEach { reg ->
+            val result = reg.regex.matchEntire(cmd)
+            if (result != null) {
+                val ac = it.action// 防止重复执行getAction
+                ac.param = it.param
+                extractParam(ac, reg, result)//提取参数
+                ac.matchWord = result.groupValues[0]
+                actionQueue.add(ac)
+                //深搜命令
+                actionDsMatch(actionQueue, it, result.groupValues[result.groups.size - 1], ac, allNodes)
+                return true
+            }
+        }
+        return false
+    }
+
     /**
-     * App内指令
-     * 深度搜索
+     * 指令深度搜索
+     * 沿follows路径搜索
      */
-    private fun appActionDsMatch(actionQueue: PriorityQueue<Action>, node: MapNode,
-                                 sufWord: String, preNode: MapNode? = null): Boolean {
+    private fun actionDsMatch(actionQueue: PriorityQueue<Action>, node: ActionNode,
+                              sufWord: String, preAction: Action? = null, actionNodes: List<ActionNode>): Boolean {
         if (sufWord.isEmpty()) return true
 //        println("${i++}. 匹配：$sufWord")
         node.follows.split(',').filter { it.trim() != "" }.forEach { fs ->
-            val it = getById(AppActionNodes!!, fs.toLong())
+            val it = getNodeById(actionNodes, fs.toLong())
             it?.regs?.forEach { reg ->
                 val result = reg.regex.matchEntire(sufWord)
                 if (result != null && result.groups.isNotEmpty()) {//深搜
 //                    println("--匹配成功")
                     //匹配成功
-                    if (preNode != null) {//修剪上一个匹配结果参数,第一个%即为上一个参数
-                        if (result.groupValues[0].startsWith(preNode.param?.value ?: "--")) {
-                            val preParamLen = if (preNode.param != null) result.groupValues[1].length else 0
+                    if (preAction != null) {//修剪上一个匹配结果参数,第一个%即为上一个参数
+                        if (result.groupValues[0].startsWith(preAction.param?.value ?: "--")) {
+                            val preParamLen = if (preAction.param != null) result.groupValues[1].length else 0
                             val thisMatchLen = result.groupValues[0].length
-                            preNode.param?.value = preNode.param?.value?.substring(0, preParamLen)
-                            val allLen = preNode.action.matchWord.length
-                            preNode.action.matchWord = preNode.action.matchWord
+                            preAction.param?.value = preAction.param?.value?.substring(0, preParamLen)
+                            val allLen = preAction.matchWord.length
+                            preAction.matchWord = preAction.matchWord
                                     .substring(0, allLen - (thisMatchLen - preParamLen))
                         }
                     }
-                    extractParam(it.action, reg, result)//提取参数
+                    val itsAction = it.action
+                    extractParam(itsAction, reg, result)//提取参数
                     //println("--临时提取参数：$param -${it.param!!.desc}")
-                    it.action.matchWord = result.groupValues[0]
-                            .substring(preNode?.param?.value?.length ?: 0)//
-                    actionQueue.add(it.action)
+
+                    itsAction.matchWord = result.groupValues[0]
+                            .substring(preAction?.param?.value?.length ?: 0)//
+                    actionQueue.add(itsAction)
                     return if (it.follows.isNotEmpty()) {//不空
-                        appActionDsMatch(actionQueue, it, result.groupValues[result.groupValues.size - 1], it)//递归匹配
+                        actionDsMatch(actionQueue, it, result.groupValues[result.groupValues.size - 1], itsAction, actionNodes)//递归匹配
                     } else true
                 }
             }
         }
-        return preNode?.param != null
+        return preAction?.param != null
     }
 
 
@@ -180,10 +224,27 @@ object ParseEngine {
         return ""
     }
 
+
+    /**
+     * 解析测试
+     * @param testWord String
+     * @param nodes List<ActionNode> 默认第一个节点为
+     * @return ParseResult
+     */
+    fun testParse(testWord: String, nodes: List<ActionNode>): ParseResult {
+        val actionQueue = PriorityQueue<Action>()
+        nodes.forEach {
+            val r = search(testWord, it, actionQueue, nodes)
+            if (r) return ParseResult(true, actionQueue)
+        }
+        return ParseResult(actionQueue.isNotEmpty(), actionQueue)
+    }
+
+
 }
 
 
-// val GlobalActionNodes = hashMapOf<Int, MapNode>()
+// val GlobalActionNodes = hashMapOf<Int, ActionNode>()
 //        println("${i++}. 匹配：$sufWord")
 //        startNode.follows.split(',').forEach { fs ->
 //            val it = GlobalActionNodes[fs.toInt()]

@@ -25,6 +25,26 @@ class ViewNode(val node: AccessibilityNodeInfo) : ViewOperation, Comparable<View
         const val tryNum = 10
     }
 
+    fun getBoundsInParent(): Rect {
+        val out = Rect()
+        node.getBoundsInParent(out)
+        return out
+    }
+
+    fun getBounds(): Rect {
+        val out = Rect()
+        node.getBoundsInScreen(out)
+        return out
+    }
+
+    fun getParent(): ViewNode? {
+        val it = node.parent
+        return if (it != null) {
+            ViewNode(it)
+        } else
+            null
+    }
+
     override fun tryClick(): Boolean = tryOp(AccessibilityNodeInfo.ACTION_CLICK)
 
     /**
@@ -206,9 +226,9 @@ class ViewNode(val node: AccessibilityNodeInfo) : ViewOperation, Comparable<View
         val rect = Rect()
         node.getBoundsInScreen(rect)
         val cls = clsName.substring(clsName.lastIndexOf('.') + 1)
-        return String.format("[%s] [%s] [%s] [%s] ",
+        return String.format("[cls: %s] [id: %s] [desc: %s] [text: %s] [%s]",
                 cls, id?.substring(id.lastIndexOf('/') + 1) ?: "null",
-                node.contentDescription, node.text
+                node.contentDescription, node.text, getBounds()
         )
     }
 

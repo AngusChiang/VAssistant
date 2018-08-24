@@ -1,14 +1,13 @@
 package cn.vove7.jarvis.activities
 
 import android.annotation.TargetApi
-import android.app.Activity
 import android.content.Context
 import android.os.Build
 import android.os.Bundle
 import android.support.annotation.RequiresApi
+import android.support.v7.app.AppCompatActivity
 import android.view.View
 import android.widget.BaseAdapter
-import android.widget.Button
 import android.widget.TextView
 import cn.vove7.jarvis.R
 import cn.vove7.vtp.easyadapter.BaseListAdapter
@@ -19,7 +18,7 @@ import kotlinx.android.synthetic.main.activity_permission_manager.*
 /**
  * 权限管理
  */
-class PermissionManagerActivity : Activity() {
+class PermissionManagerActivity : AppCompatActivity() {
 
     lateinit var permissionList: List<PermissionStatus>
     lateinit var toast: Voast
@@ -31,7 +30,9 @@ class PermissionManagerActivity : Activity() {
         toast = Voast.with(this).top()
         //执行时消息
         if (intent.hasExtra("pName")) {
-            toast.showShort("此操作需要${intent.getStringExtra("pName")}")
+            toast.showShort(String.format(getString(R.string.text_operation_need_permission)
+                    , intent.getStringExtra("pName")))
+
         }
 
         permissionList = PermissionStatus.refreshStatus(this)
@@ -51,17 +52,17 @@ class PermissionManagerActivity : Activity() {
                 holder.subtitle.text = item.desc
                 when (item.isOpen) {
                     true -> {
-                        holder.open.text = "已开启"
+                        holder.open.text = getString(R.string.text_opened)
                         holder.open.setTextColor(resources.getColor(R.color.status_green))
-                        holder.title.setTextColor(resources.getColor(R.color.normal))
+                        holder.title.setTextColor(resources.getColor(R.color.primary_text))
                     }
                     else -> {
-                        holder.open.text = "去开启"
-                        holder.open.setTextColor(resources.getColor(R.color.colorAccent))
-                        holder.title.setTextColor(resources.getColor(android.R.color.holo_red_dark))
+                        holder.open.text = getString(R.string.text_to_open)
+                        holder.open.setTextColor(resources.getColor(R.color.red_500))
+                        holder.title.setTextColor(resources.getColor(R.color.red_500))
                     }
                 }
-                holder.open.setOnClickListener {
+                holder.itemView.setOnClickListener {
                     if (!item.isOpen) {
                         when {
                             item.permissionName == "悬浮窗" ->
@@ -100,7 +101,7 @@ class PermissionManagerActivity : Activity() {
     class Holder(view: View) : BaseListAdapter.ViewHolder(view) {
         val title = view.findViewById<TextView>(R.id.title)
         val subtitle = view.findViewById<TextView>(R.id.subtitle)
-        val open = view.findViewById<Button>(R.id.open)
+        val open = view.findViewById<TextView>(R.id.open)
     }
 
     data class PermissionStatus(
@@ -113,7 +114,7 @@ class PermissionManagerActivity : Activity() {
             private val permissions = listOf(
                     PermissionStatus("android.permission.BIND_ACCESSIBILITY_SERVICE", "无障碍", "操作界面"),
                     PermissionStatus("android.permission.SYSTEM_ALERT_WINDOW", "悬浮窗", "显示于其他界面之上"),
-                    PermissionStatus("android.permission.VIBRATE", "震动", ""),
+//                    PermissionStatus("android.permission.VIBRATE", "震动", ""),
                     PermissionStatus("android.permission.READ_CONTACTS", "联系人", "用于检索联系人"),
                     PermissionStatus("android.permission.CALL_PHONE", "电话", "用于拨打电话"),
                     PermissionStatus("android.permission.RECORD_AUDIO", "录音", "用于语音识别"),

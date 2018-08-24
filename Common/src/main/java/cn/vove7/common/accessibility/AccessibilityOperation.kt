@@ -14,24 +14,4 @@ interface AccessibilityOperation {
 
     fun getRootViewNode(): ViewNode?
 
-    /**
-     * 自动查找
-     */
-//    fun autoFindByText()
-
-    /**
-     * 直到找到
-     */
-    fun utilFindById()
-
-    /**
-     * 一直返回，直到这个Activity
-     */
-    fun backUtilActivity()
-
-    /**
-     * 一直上滑，直到出现
-     */
-    fun scrollUpUtilFind()
-//    fun removeAllNotifier(finderNotify: ViewShowListener)
 }

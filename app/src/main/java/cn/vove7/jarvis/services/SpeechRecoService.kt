@@ -13,7 +13,6 @@ import cn.vove7.jarvis.speech.recognition.listener.SpeechStatusListener
 import cn.vove7.jarvis.speech.recognition.model.IStatus
 import cn.vove7.jarvis.speech.recognition.model.IStatus.Companion.STATUS_WAKEUP_SUCCESS
 import cn.vove7.jarvis.speech.recognition.recognizer.MyRecognizer
-import cn.vove7.jarvis.speech.recognition.util.PidBuilder
 import cn.vove7.jarvis.speech.wakeup.MyWakeup
 import cn.vove7.jarvis.speech.wakeup.RecogWakeupListener
 import cn.vove7.vtp.log.Vog
@@ -22,15 +21,14 @@ import cn.vove7.vtp.toast.Voast
 import com.baidu.speech.asr.SpeechConstant
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
-import java.util.LinkedHashMap
-import kotlin.collections.HashMap
-import kotlin.collections.set
 
 /**
  * 语音识别服务
  */
 class SpeechRecoService : BusService() {
 
+    override val serviceId: Int
+        get() = 527
     /**
      * 识别控制器，使用MyRecognizer控制识别的流程
      */
@@ -53,17 +51,18 @@ class SpeechRecoService : BusService() {
         override fun handleMessage(msg: Message?) {
             if (msg?.what == STATUS_WAKEUP_SUCCESS) {//唤醒
                 // 此处 开始正常识别流程
-                val params = LinkedHashMap<String, Any>()
-                params[SpeechConstant.ACCEPT_AUDIO_VOLUME] = false
-                params[SpeechConstant.VAD] = SpeechConstant.VAD_DNN
-                val pid = PidBuilder.create().model(PidBuilder.INPUT).toPId()
-                // 如识别短句，不需要需要逗号，将PidBuilder.INPUT改为搜索模型PidBuilder.SEARCH
-                params[SpeechConstant.PID] = pid
-                if (backTrackInMs > 0) { // 方案1， 唤醒词说完后，直接接句子，中间没有停顿。
-                    params[SpeechConstant.AUDIO_MILLS] = System.currentTimeMillis() - backTrackInMs
-                }
+//                val params = LinkedHashMap<String, Any>()
+//                params[SpeechConstant.ACCEPT_AUDIO_VOLUME] = false
+//                params[SpeechConstant.VAD] = SpeechConstant.VAD_DNN
+//                val pid = PidBuilder.create().model(PidBuilder.SEARCH).toPId()
+//                // 如识别短句，不需要需要逗号，将PidBuilder.INPUT改为搜索模型PidBuilder.SEARCH
+//                params[SpeechConstant.PID] = pid
+//                if (backTrackInMs > 0) { // 方案1， 唤醒词说完后，直接接句子，中间没有停顿。
+//                    params[SpeechConstant.AUDIO_MILLS] = System.currentTimeMillis() - backTrackInMs
+//                }
                 myRecognizer.cancel()
-                myRecognizer.start(params)
+                startRecog()
+//                myRecognizer.start(params)
             }
 
             if (msg != null) {// -> MainService
@@ -124,7 +123,7 @@ class SpeechRecoService : BusService() {
             Pair(SpeechConstant.ACCEPT_AUDIO_DATA, false),
             Pair(SpeechConstant.DISABLE_PUNCTUATION, false),//标点符号
             Pair(SpeechConstant.ACCEPT_AUDIO_VOLUME, true),
-            Pair("pid", 15361)
+            Pair(SpeechConstant.PID, 15361)
     )
 
     internal fun startRecog() {
@@ -161,7 +160,7 @@ class SpeechRecoService : BusService() {
     }
 
     companion object {
-        lateinit var instance: SpeechRecoService
+        var instance: SpeechRecoService? = null
     }
 
 }

@@ -24,12 +24,12 @@ class SingleChoiceDialog(context: Context, title: String, list: List<ChoiceData>
         } catch (e: Exception) {
             listener.onSingleSelect(0, null, "无悬浮窗权限")
         }
-        dialog.setOnDismissListener{
+        dialog.setOnCancelListener{// fixed
             listener.onSingleSelect(0, null)
         }
         dialog.setButton(DialogInterface.BUTTON_POSITIVE, "取消", View.OnClickListener {
             listener.onSingleSelect(0, null)
-            dialog.dismiss()
+            dialog.cancel()
         })
         dialog.setWidth(0.9)
         dialog.show()

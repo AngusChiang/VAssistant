@@ -49,6 +49,28 @@ abstract class AbsExecutorImpl(
 
     private lateinit var actionQueue: PriorityQueue<Action>
 
+    override var actionCount: Int = 0
+
+    override var currentActionIndex: Int = 0
+
+    override val currentScope: ActionScope?
+        get() {
+            val r = checkAccessibilityService(false)
+            return if (r) {
+                accessApi?.currentScope
+            } else null
+        }
+
+    override var currentActivity: String = ""
+        get() {
+            val r = checkAccessibilityService(false)
+            return if (r) {
+                accessApi?.currentActivity ?: ""
+            } else {
+                ""
+            }
+        }
+
     private var thread: Thread? = null
     override fun execQueue(cmdWords: String, actionQueue: PriorityQueue<Action>) {
         if (thread?.isAlive == true) {
@@ -58,6 +80,8 @@ abstract class AbsExecutorImpl(
         lock = Object()
         thread = thread(start = true, isDaemon = true, priority = Thread.MAX_PRIORITY) {
             onExecutorResult.onExecuteStart(cmdWords)
+            actionCount = actionQueue.size
+            currentActionIndex = 0
             pollActionQueue()
             currentAction = null
             onFinish()
@@ -70,6 +94,7 @@ abstract class AbsExecutorImpl(
     private fun pollActionQueue() {
         var r: PartialResult
         while (actionQueue.isNotEmpty()) {
+            currentActionIndex++
             if (Thread.currentThread().isInterrupted.not()) {
                 currentAction = actionQueue.poll()
                 r = runScript(currentAction!!.actionScript, currentAction!!.param.value)
@@ -109,7 +134,7 @@ abstract class AbsExecutorImpl(
     /**
      * 跟随打开解析App内操作
      */
-    fun parseAppInnerOperation(cmd: String, pkg: String): Boolean {
+    private fun parseAppInnerOperation(cmd: String, pkg: String): Boolean {
         actionQueue = ParseEngine.matchAppAction(cmd, pkg)
         if (actionQueue.isNotEmpty()) Vog.d(this, "smartOpen app内操作")
         else {
@@ -138,14 +163,19 @@ abstract class AbsExecutorImpl(
         Vog.d(this, "smartOpen pkg:$data follow:$follow")
         //包名
         if (PACKAGE_REGEX.matches(data)) {
-            if (systemBridge.openAppByPkg(data).ok) {
-                return parseAppInnerOperation(follow, data)
+            systemBridge.openAppByPkg(data).also {
+                return if (it.ok)
+                    parseAppInnerOperation(follow, data)
+                else{
+                    globalAutomator.toast(context.getString(R.string.text_app_not_install))
+                    false
+                }
             }
         }
         //By App Name
         val o = systemBridge.openAppByWord(data)
         return if (o.ok) {//打开App 解析跟随操作
-            parseAppInnerOperation(data, o.returnValue)
+            parseAppInnerOperation(data, o.returnValue!!)
         } else {//其他操作,打开网络,手电，网页
             parseOpenAction(data)
         }
@@ -239,24 +269,41 @@ abstract class AbsExecutorImpl(
         notifySync()
     }
 
-
     /**
      * 锁定线程
+     * @param millis 等待时限 -1 无限
      */
-    override fun waitForUnlock(millis: Long) {
+    override fun waitForUnlock(millis: Long): Boolean {
         synchronized(lock) {
-            Vog.d(this, "进入等待")
+            val begin = System.currentTimeMillis() // 开始等待时间
+            Vog.d(this, "执行器-等待 time: $millis   begin: $begin")
+
             //等待结果
             try {
-                if (millis < 0) lock.wait() else lock.wait(millis)
-                Vog.d(this, "执行器-解锁")
+                if (millis < 0) {
+                    lock.wait()
+                    Vog.d(this, "执行器-解锁")
+                    return true
+                } else {
+                    lock.wait(millis)
+                    val end = System.currentTimeMillis()
+                    Vog.d(this, "执行器-解锁")
+                    if (end - begin >= millis) {//自动超时 终止执行
+//                        onExecutorResult.onExecuteFailed("等待超时")
+                        accessApi?.removeAllNotifier(this)//移除监听器
+                        return false
+                    }
+                    return true
+                }
             } catch (e: InterruptedException) {
+                e.printStackTrace()
                 //必须强行stop
                 Vog.d(this, "被迫强行停止")
-                onExecutorResult.onExecuteFailed("被迫强行停止")
+                onExecutorResult.onExecuteFailed("终止执行")
                 accessApi?.removeAllNotifier(this)
                 Thread.currentThread().interrupt()
                 Thread.currentThread().stop()
+                return false
             }
         }
     }
@@ -264,41 +311,40 @@ abstract class AbsExecutorImpl(
     /**
      * 等待指定App出现，解锁
      */
-    override fun waitForApp(pkg: String, activityName: String?): Boolean {
+    override fun waitForApp(pkg: String, activityName: String?, m: Long): Boolean {
         Vog.d(this, "waitForApp $pkg $activityName")
         if (!checkAccessibilityService())
             return false
 
         accessApi?.waitForActivity(this, ActionScope(pkg, activityName))
-        waitForUnlock()
-        return true
+        return waitForUnlock(m)
     }
 
-    override fun waitForViewId(id: String): ViewNode? {
+    override fun waitForViewId(id: String, m: Long): ViewNode? {
         Vog.d(this, "waitForViewId $id")
         if (!checkAccessibilityService())
             return null
 
         accessApi?.waitForView(this, ViewFindBuilder(this).id(id).viewFinderX)
-        waitForUnlock()
+        waitForUnlock(m)
         return getViewNode()
 
     }
 
-    override fun waitForDesc(desc: String): ViewNode? {
+    override fun waitForDesc(desc: String, m: Long): ViewNode? {
         Vog.d(this, "waitForDesc $desc")
 
         accessApi?.waitForView(this, ViewFindBuilder(this).desc(desc).viewFinderX)
-        waitForUnlock()
+        waitForUnlock(m)
         return getViewNode()
     }
 
-    override fun waitForText(text: String): ViewNode? {
+    override fun waitForText(text: String, m: Long): ViewNode? {
         Vog.d(this, "waitForText $text")
         if (!checkAccessibilityService())
             return null
         accessApi?.waitForView(this, ViewFindBuilder(this).containsText(text).viewFinderX)
-        waitForUnlock()
+        waitForUnlock(m)
         return getViewNode()
     }
 
@@ -306,9 +352,7 @@ abstract class AbsExecutorImpl(
      * 等待语音参数
      */
     override fun waitForVoiceParam(askWord: String?): String? {
-        if (askWord != null) {
-            currentAction?.param?.askText = askWord
-        }
+
         serviceBridge.getVoiceParam(currentAction!!)
         waitForUnlock()
         //得到结果 -> action.param
@@ -403,6 +447,7 @@ abstract class AbsExecutorImpl(
      * 拨打
      */
     fun smartCallPhone(s: String): PartialResult {
+        Vog.d(this, "smartCallPhone $s")
         val result = systemBridge.call(s)
         return if (!result.ok) {
             if (!alert("未识别该联系人", "选择是否标记该联系人: $s")) {
@@ -438,9 +483,8 @@ abstract class AbsExecutorImpl(
         fun checkParam(p: String?): Boolean = (p != null && p.trim() != "")
 
         /**
-         * 打开: 应用 -> 其他额外
+         * 检测包名正则
          */
-
         val PACKAGE_REGEX = "[a-zA-Z]+[0-9a-zA-Z_]*(\\.[a-zA-Z]+[0-9a-zA-Z_]*)+".toRegex()
 
     }
@@ -472,9 +516,11 @@ abstract class AbsExecutorImpl(
             accessApi = AccessibilityApi.accessibilityService
             return if (accessApi != null) {
                 globalAutomator.setService(accessApi!!.getService())
-
                 true
-            } else false
+            } else {
+                GlobalLog.log(context.getString(R.string.text_acc_service_not_running))
+                false
+            }
         }
         return true
     }

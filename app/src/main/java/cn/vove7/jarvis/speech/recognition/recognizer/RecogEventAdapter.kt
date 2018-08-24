@@ -18,8 +18,7 @@ class RecogEventAdapter(private val listener: IRecogListener) : EventListener {
         currentJson = params
         val logMessage = "name:$name; params:$params"
 
-        // logcat 中 搜索RecogEventAdapter，即可以看见下面一行的日志
-        Vog.i(this, logMessage)
+        Vog.v(this, logMessage)
 
         if (name == SpeechConstant.CALLBACK_EVENT_ASR_LOADED) {
             listener.onOfflineLoaded()

@@ -138,6 +138,9 @@ class LuaHelper : LuaManagerI {
         L.setField(-2, "cpath")
         L.pop(1)
 
+//        L.getGlobal("require")
+//        L.pushString("bridges")
+//        L.call(1, 0)
         LuaPrinter(L, object : LuaPrinter.OnPrint {
 
             override fun onPrint(l: Int, output: String) {

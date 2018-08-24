@@ -7,7 +7,7 @@ require 'accessibility'
 
 smartOpen("支付宝")
 smartOpen("Alipay")
-waitForApp('com.eg.android.AlipayGphone')
+--waitForApp('com.eg.android.AlipayGphone')
 
 ViewFinder().equalsText('首页').id('tab_description').tryClick()
 ViewFinder().equalsText('Home').id('tab_description').tryClick()

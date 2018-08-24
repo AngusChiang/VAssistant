@@ -12,6 +12,8 @@ print(bridges)
 print(executor)
 print(automator)
 print(system)
+print(runtime.currentScope)
+print(runtime.currentActivity)
 print('size of args :',#args)
 -- 输出
 for i,v in ipairs(args) do

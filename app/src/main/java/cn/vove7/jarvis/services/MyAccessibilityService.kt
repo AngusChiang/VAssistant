@@ -61,6 +61,7 @@ class MyAccessibilityService : AccessibilityApi() {
         return ViewNode(rootInActiveWindow)
     }
 
+
     /**
      * # 等待Activity表
      * - [CExecutorI] 执行器
@@ -129,8 +130,8 @@ class MyAccessibilityService : AccessibilityApi() {
             currentActivity = classNameStr.substring(classNameStr.lastIndexOf('.') + 1)
             updateCurrentApp(pkg)
         }
-        Vog.v(this, "class :${currentAppInfo?.name} - ${currentAppInfo?.packageName} - $currentActivity " +
-                AccessibilityEvent.eventTypeToString(event.eventType))
+//        Vog.v(this, "class :${currentAppInfo?.name} - ${currentAppInfo?.packageName} - $currentActivity " +
+//                AccessibilityEvent.eventTypeToString(event.eventType))
         val eventType = event.eventType
         //根据事件回调类型进行处理
         when (eventType) {
@@ -270,28 +271,6 @@ class MyAccessibilityService : AccessibilityApi() {
         return ViewFindBuilder()
                 .id(id).find()
                 .also { Vog.d(this, "findNodeById size :${it.size}") }
-    }
-
-//    //TODO :autoFindByText
-//    override fun autoFindByText() {
-//    }
-
-    //TODO :utilFindById
-    override fun utilFindById() {
-    }
-
-    /**
-     * 一直返回，直到这个Activity
-     */
-//TODO :backUtilActivity
-    override fun backUtilActivity() {
-    }
-
-    /**
-     * 一直上滑，直到出现
-     */
-//TODO :scrollUpUtilFind
-    override fun scrollUpUtilFind() {
     }
 
     override fun findFirstNodeByIdAndText(id: String, text: String): ViewNode? {

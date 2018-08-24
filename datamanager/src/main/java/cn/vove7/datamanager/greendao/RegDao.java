@@ -33,7 +33,7 @@ public class RegDao extends AbstractDao<Reg, Long> {
         public final static Property NodeId = new Property(3, long.class, "nodeId", false, "NODE_ID");
     }
 
-    private Query<Reg> mapNode_RegsQuery;
+    private Query<Reg> actionNode_RegsQuery;
 
     public RegDao(DaoConfig config) {
         super(config);
@@ -134,16 +134,16 @@ public class RegDao extends AbstractDao<Reg, Long> {
         return true;
     }
     
-    /** Internal query to resolve the "regs" to-many relationship of MapNode. */
-    public List<Reg> _queryMapNode_Regs(long nodeId) {
+    /** Internal query to resolve the "regs" to-many relationship of ActionNode. */
+    public List<Reg> _queryActionNode_Regs(long nodeId) {
         synchronized (this) {
-            if (mapNode_RegsQuery == null) {
+            if (actionNode_RegsQuery == null) {
                 QueryBuilder<Reg> queryBuilder = queryBuilder();
                 queryBuilder.where(Properties.NodeId.eq(null));
-                mapNode_RegsQuery = queryBuilder.build();
+                actionNode_RegsQuery = queryBuilder.build();
             }
         }
-        Query<Reg> query = mapNode_RegsQuery.forCurrentThread();
+        Query<Reg> query = actionNode_RegsQuery.forCurrentThread();
         query.setParameter(0, nodeId);
         return query.list();
     }

@@ -62,6 +62,7 @@
         android:layout_height="wrap_content"
         android:onClick="runScript"
         android:text="run script"
+        android:visibility="gone"
         app:layout_constraintBottom_toTopOf="@+id/button5"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
