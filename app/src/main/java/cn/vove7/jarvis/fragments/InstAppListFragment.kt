@@ -3,8 +3,8 @@ package cn.vove7.jarvis.fragments
 import android.content.Intent
 import android.view.View
 import cn.vove7.common.app.GlobalApp
-import cn.vove7.datamanager.DAO
-import cn.vove7.datamanager.parse.model.ActionScope
+import cn.vove7.common.datamanager.DAO
+import cn.vove7.common.datamanager.parse.model.ActionScope
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.activities.InAppInstActivity
 import cn.vove7.jarvis.activities.NewInstActivity

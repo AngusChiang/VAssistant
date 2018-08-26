@@ -32,7 +32,7 @@ dependencies {
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     implementation "com.github.Vove7:VTP:$vtp_version"
-    implementation project(':datamanager')
+    implementation project(path: ':Common')
 }
 repositories {
     mavenCentral()

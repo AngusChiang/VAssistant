@@ -11,8 +11,8 @@ import android.support.design.widget.CollapsingToolbarLayout
 import android.support.v7.widget.Toolbar
 import android.view.View
 import android.widget.ImageView
-import cn.vove7.datamanager.parse.DataFrom
-import cn.vove7.datamanager.parse.statusmap.ActionNode
+import cn.vove7.common.datamanager.parse.DataFrom
+import cn.vove7.common.datamanager.parse.statusmap.ActionNode
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.activities.NewInstActivity
 

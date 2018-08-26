@@ -2,6 +2,7 @@ package cn.vove7.common.view.finder
 
 import android.view.accessibility.AccessibilityNodeInfo
 import cn.vove7.common.accessibility.AccessibilityApi
+import cn.vove7.common.utils.RegUtils.dealRawReg
 import cn.vove7.vtp.log.Vog
 import cn.vove7.vtp.text.TextHelper
 
@@ -51,6 +52,17 @@ class ViewFinderWithMultiCondition(accessibilityService: AccessibilityApi) : Vie
                                 "${node.text}", it)
                         Vog.v(this, "findCondition $f")
                         if (f > 0.8) {
+                            Vog.d(this,"find WITH_PINYIN $it")
+                            ok = true
+                            break
+                        }
+                    }
+                    if (!ok) return false
+                }
+                MATCH_MODE_MATCHES -> {
+                    for (it in viewText) {
+                        if(dealRawReg(it).matches("${node.text}")){
+                            Vog.d(this,"find MATCHS $it")
                             ok = true
                             break
                         }
@@ -116,6 +128,7 @@ class ViewFinderWithMultiCondition(accessibilityService: AccessibilityApi) : Vie
 
     companion object {
         const val MATCH_MODE_EQUAL = 427
+        const val MATCH_MODE_MATCHES = 527
         const val MATCH_MODE_CONTAIN = 426
         const val MATCH_MODE_FUZZY_WITH_PINYIN = 100
         const val MATCH_MODE_FUZZY_WITHOUT_PINYIN = 227

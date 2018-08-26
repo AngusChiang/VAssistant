@@ -79,9 +79,6 @@
 
         <activity android:name=".activities.PermissionManagerActivity" />
         <activity android:name=".activities.RegexParseTestActivity" />
-        <activity
-            android:name=".activities.LuaEditorActivity"
-            android:windowSoftInputMode="adjustPan" />
 
         <service
             android:name=".services.SpeechSynService"

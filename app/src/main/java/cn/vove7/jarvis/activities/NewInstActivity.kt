@@ -16,14 +16,14 @@ import android.view.KeyEvent
 import android.view.MenuItem
 import android.view.View
 import android.widget.*
-import cn.vove7.datamanager.DAO
-import cn.vove7.datamanager.greendao.ActionNodeDao
-import cn.vove7.datamanager.greendao.ActionScopeDao
-import cn.vove7.datamanager.parse.model.Action
-import cn.vove7.datamanager.parse.model.ActionScope
-import cn.vove7.datamanager.parse.statusmap.ActionNode
-import cn.vove7.datamanager.parse.statusmap.ActionNode.*
-import cn.vove7.datamanager.parse.statusmap.Reg
+import cn.vove7.common.datamanager.DAO
+import cn.vove7.common.datamanager.greendao.ActionNodeDao
+import cn.vove7.common.datamanager.greendao.ActionScopeDao
+import cn.vove7.common.datamanager.parse.model.Action
+import cn.vove7.common.datamanager.parse.model.ActionScope
+import cn.vove7.common.datamanager.parse.statusmap.ActionNode
+import cn.vove7.common.datamanager.parse.statusmap.ActionNode.*
+import cn.vove7.common.datamanager.parse.statusmap.Reg
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.adapters.SimpleListAdapter
 import cn.vove7.jarvis.adapters.ViewModel
@@ -110,6 +110,9 @@ class NewInstActivity : AppCompatActivity(), View.OnClickListener {
 
         isReedit = intent.getBooleanExtra("reedit", false)
 
+        val arr = resources.getStringArray(R.array.list_pos_of_regex_param)
+        posData = arrayListOf()
+        posData.addAll(arr)
         if (isReedit) {
             val id = intent.getLongExtra("nodeId", 0L)
             actionNode = DAO.daoSession.actionNodeDao.queryBuilder().where(ActionNodeDao.Properties.Id.eq(id)).unique()
@@ -532,9 +535,6 @@ class NewInstActivity : AppCompatActivity(), View.OnClickListener {
     private var inputDialog: Dialog? = null
     private fun showInputRegDialog(reg: String? = null, pos: String? = null) {
         if (inputDialog == null) {
-            val arr = resources.getStringArray(R.array.list_pos_of_regex_param)
-            posData = arrayListOf()
-            posData.addAll(arr)
             val dialogView = layoutInflater.inflate(R.layout.dialog_add_new_regex, null, false)
 
             regEditText = dialogView.findViewById(R.id.text_regex)

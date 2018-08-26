@@ -5,10 +5,10 @@ import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.bridges.ChoiceData
 import cn.vove7.common.bridges.GenChoiceData
 import cn.vove7.common.model.MatchedData
-import cn.vove7.datamanager.DAO
-import cn.vove7.datamanager.executor.entity.MarkedContact
-import cn.vove7.datamanager.greendao.MarkedContactDao
-import cn.vove7.datamanager.greendao.ServerContactDao
+import cn.vove7.common.datamanager.DAO
+import cn.vove7.common.datamanager.executor.entity.MarkedContact
+import cn.vove7.common.datamanager.greendao.MarkedContactDao
+import cn.vove7.common.datamanager.greendao.ServerContactDao
 import cn.vove7.executorengine.model.Markable
 import cn.vove7.vtp.contact.ContactHelper
 import cn.vove7.vtp.contact.ContactInfo

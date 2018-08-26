@@ -3,9 +3,9 @@ package cn.vove7.jarvis.fragments
 import android.content.Intent
 import android.os.Handler
 import android.view.View
-import cn.vove7.datamanager.DAO
-import cn.vove7.datamanager.greendao.ActionNodeDao
-import cn.vove7.datamanager.parse.statusmap.ActionNode
+import cn.vove7.common.datamanager.DAO
+import cn.vove7.common.datamanager.greendao.ActionNodeDao
+import cn.vove7.common.datamanager.parse.statusmap.ActionNode
 import cn.vove7.jarvis.activities.NewInstActivity
 import cn.vove7.jarvis.adapters.SimpleListAdapter
 import cn.vove7.jarvis.adapters.ViewModel

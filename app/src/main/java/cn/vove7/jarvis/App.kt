@@ -5,12 +5,11 @@ import android.os.Build
 import android.util.Log
 import cn.vove7.androlua.LuaApp
 import cn.vove7.appbus.MessageEvent
-import cn.vove7.datamanager.DAO
-import cn.vove7.datamanager.InitLuaDbData
-import cn.vove7.jarvis.debugserver.LuaDebugServer
+import cn.vove7.common.datamanager.DAO
+import cn.vove7.common.datamanager.InitLuaDbData
+import cn.vove7.androlua.debugserver.LuaDebugServer
 import cn.vove7.jarvis.services.MainService
 import cn.vove7.jarvis.services.SpeechRecoService
-import cn.vove7.jarvis.services.SpeechSynService
 import cn.vove7.vtp.log.Vog
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe

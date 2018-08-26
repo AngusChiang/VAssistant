@@ -20,12 +20,12 @@ import cn.vove7.common.bridges.ShowDialogEvent
 import cn.vove7.common.executor.CExecutorI
 import cn.vove7.common.executor.OnExecutorResult
 import cn.vove7.common.model.RequestPermission
-import cn.vove7.datamanager.parse.model.Action
+import cn.vove7.common.datamanager.parse.model.Action
 import cn.vove7.executorengine.luaexector.LuaExecutor
 import cn.vove7.jarvis.activities.PermissionManagerActivity
 import cn.vove7.jarvis.speech.recognition.model.IStatus
-import cn.vove7.jarvis.utils.Utils.checkCancel
-import cn.vove7.jarvis.utils.Utils.checkConfirm
+import cn.vove7.common.utils.RegUtils.checkCancel
+import cn.vove7.common.utils.RegUtils.checkConfirm
 import cn.vove7.jarvis.view.dialog.MultiChoiceDialog
 import cn.vove7.jarvis.view.dialog.OnMultiSelectListener
 import cn.vove7.jarvis.view.dialog.OnSelectListener

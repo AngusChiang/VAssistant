@@ -1,6 +1,6 @@
 package cn.vove7.common.view.notifier
 
-import cn.vove7.datamanager.parse.model.ActionScope
+import cn.vove7.common.datamanager.parse.model.ActionScope
 
 /**
  * # ActivityShowListener

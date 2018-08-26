@@ -3,8 +3,8 @@ package cn.vove7.parseengine
 import android.content.Context
 import android.support.test.InstrumentationRegistry
 import android.support.test.runner.AndroidJUnit4
-import cn.vove7.datamanager.DAO
-import cn.vove7.datamanager.parse.model.Action
+import cn.vove7.common.datamanager.DAO
+import cn.vove7.common.parse.model.Action
 import cn.vove7.parseengine.engine.ParseEngine
 import org.junit.Assert.assertEquals
 import org.junit.Test
@@ -35,7 +35,7 @@ class ExampleInstrumentedTest {
      */
     @Test
     fun parseTest() {
-        DAO.init(getContext())
+        cn.vove7.common.datamanager.DAO.init(getContext())
         val testDatas = mapOf(
 //                Pair("打电话给abc", true),
 //                Pair("打给abc", true),

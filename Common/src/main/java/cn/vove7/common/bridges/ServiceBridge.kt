@@ -1,8 +1,7 @@
 package cn.vove7.common.bridges
 
 import android.graphics.drawable.Drawable
-import cn.vove7.common.executor.CExecutorI
-import cn.vove7.datamanager.parse.model.Action
+import cn.vove7.common.datamanager.parse.model.Action
 import java.io.Serializable
 import java.text.Collator
 

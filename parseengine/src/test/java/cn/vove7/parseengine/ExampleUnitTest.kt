@@ -1,8 +1,8 @@
 package cn.vove7.parseengine
 
-import cn.vove7.datamanager.parse.model.Action
-import cn.vove7.datamanager.parse.statusmap.ActionNode
-import cn.vove7.datamanager.parse.statusmap.Reg
+import cn.vove7.common.parse.model.Action
+import cn.vove7.common.parse.statusmap.ActionNode
+import cn.vove7.common.parse.statusmap.Reg
 import cn.vove7.parseengine.engine.ParseEngine
 import cn.vove7.parseengine.model.ParseResult
 import org.junit.Assert.assertEquals

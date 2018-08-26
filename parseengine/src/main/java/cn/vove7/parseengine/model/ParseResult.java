@@ -2,7 +2,7 @@ package cn.vove7.parseengine.model;
 
 import java.util.PriorityQueue;
 
-import cn.vove7.datamanager.parse.model.Action;
+import cn.vove7.common.datamanager.parse.model.Action;
 
 /**
  * 解析结果

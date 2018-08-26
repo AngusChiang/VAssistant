@@ -3,7 +3,7 @@ package cn.vove7.common.accessibility
 import android.accessibilityservice.AccessibilityService
 import cn.vove7.common.executor.CExecutorI
 import cn.vove7.common.view.finder.ViewFinder
-import cn.vove7.datamanager.parse.model.ActionScope
+import cn.vove7.common.datamanager.parse.model.ActionScope
 import cn.vove7.vtp.app.AppInfo
 
 /**

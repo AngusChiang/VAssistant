@@ -1,13 +1,12 @@
 package cn.vove7.parseengine.engine
 
 import android.util.Log
-import cn.vove7.datamanager.DAO
-import cn.vove7.datamanager.greendao.ActionNodeDao
-import cn.vove7.datamanager.parse.model.Action
-import cn.vove7.datamanager.parse.statusmap.ActionNode
-import cn.vove7.datamanager.parse.statusmap.ActionNode.*
-import cn.vove7.datamanager.parse.statusmap.Reg
-import cn.vove7.datamanager.parse.statusmap.Reg.*
+import cn.vove7.common.datamanager.greendao.ActionNodeDao
+import cn.vove7.common.datamanager.parse.model.Action
+import cn.vove7.common.datamanager.parse.statusmap.ActionNode
+import cn.vove7.common.datamanager.parse.statusmap.ActionNode.*
+import cn.vove7.common.datamanager.parse.statusmap.Reg
+import cn.vove7.common.datamanager.parse.statusmap.Reg.*
 import cn.vove7.parseengine.model.ParseResult
 import java.util.*
 
@@ -65,9 +64,9 @@ object ParseEngine {
     private fun globalActionMatch(cmd: String): PriorityQueue<Action> {
         val actionQueue = PriorityQueue<Action>()
         if (GlobalActionNodes == null)
-            GlobalActionNodes = DAO.daoSession.actionNodeDao.queryBuilder()
-                    .where(ActionNodeDao.Properties.NodeType.`in`(NODE_TYPE_GLOBAL, NODE_TYPE_GLOBAL_2))
-                    .orderDesc(ActionNodeDao.Properties.Priority).list()
+            GlobalActionNodes = cn.vove7.common.datamanager.DAO.daoSession.actionNodeDao.queryBuilder()
+                    .where(cn.vove7.common.datamanager.greendao.ActionNodeDao.Properties.NodeType.`in`(NODE_TYPE_GLOBAL, NODE_TYPE_GLOBAL_2))
+                    .orderDesc(cn.vove7.common.datamanager.greendao.ActionNodeDao.Properties.Priority).list()
         GlobalActionNodes?.forEach {
 
             val r = search(cmd, it, actionQueue, GlobalActionNodes!!)
@@ -110,9 +109,9 @@ object ParseEngine {
     fun matchAppAction(cmd: String, currentAppPkg: String): PriorityQueue<Action> {
         Log.d("Debug :", "matchAppAction  ----> $currentAppPkg")
         if (AppActionNodes == null) {
-            AppActionNodes = DAO.daoSession.actionNodeDao.queryBuilder()
-                    .where(ActionNodeDao.Properties.NodeType.`in`(NODE_TYPE_IN_APP, NODE_TYPE_IN_APP_2))
-                    .orderDesc(ActionNodeDao.Properties.Priority)
+            AppActionNodes = cn.vove7.common.datamanager.DAO.daoSession.actionNodeDao.queryBuilder()
+                    .where(cn.vove7.common.datamanager.greendao.ActionNodeDao.Properties.NodeType.`in`(NODE_TYPE_IN_APP, NODE_TYPE_IN_APP_2))
+                    .orderDesc(cn.vove7.common.datamanager.greendao.ActionNodeDao.Properties.Priority)
                     .list()
         }
         val actionQueue = PriorityQueue<Action>()

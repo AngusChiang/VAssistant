@@ -3,5 +3,8 @@
 
     <application>
 
+        <activity
+            android:name="cn.vove7.androlua.LuaEditorActivity"
+            android:windowSoftInputMode="adjustPan" />
     </application>
 </manifest>

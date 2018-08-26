@@ -13,6 +13,7 @@ import cn.vove7.vtp.log.Vog;
 import static cn.vove7.common.view.finder.ViewFinderWithMultiCondition.MATCH_MODE_CONTAIN;
 import static cn.vove7.common.view.finder.ViewFinderWithMultiCondition.MATCH_MODE_EQUAL;
 import static cn.vove7.common.view.finder.ViewFinderWithMultiCondition.MATCH_MODE_FUZZY_WITH_PINYIN;
+import static cn.vove7.common.view.finder.ViewFinderWithMultiCondition.MATCH_MODE_MATCHES;
 
 
 /**
@@ -84,11 +85,31 @@ public class ViewFindBuilder extends FindBuilder {
         viewFinderX.setTextMatchMode(MATCH_MODE_CONTAIN);
         return this;
     }
+
     public ViewFindBuilder containsText(String text) {
         viewFinderX.getViewText().add(text);
         viewFinderX.setTextMatchMode(MATCH_MODE_CONTAIN);
         return this;
     }
+
+    /**
+     * 正则匹配
+     *
+     * @param regs 表达式 %消息%
+     * @return this
+     */
+    public ViewFindBuilder matchesText(String... regs) {
+        viewFinderX.getViewText().addAll(Arrays.asList(regs));
+        viewFinderX.setTextMatchMode(MATCH_MODE_MATCHES);
+        return this;
+    }
+
+    public ViewFindBuilder matchesText(String regs) {
+        viewFinderX.getViewText().add(regs);
+        viewFinderX.setTextMatchMode(MATCH_MODE_MATCHES);
+        return this;
+    }
+
 
     /**
      * 相同文本 不区分大小写
@@ -101,6 +122,7 @@ public class ViewFindBuilder extends FindBuilder {
         viewFinderX.setTextMatchMode(MATCH_MODE_EQUAL);
         return this;
     }
+
     public ViewFindBuilder equalsText(String text) {
         viewFinderX.getViewText().add(text);
         viewFinderX.setTextMatchMode(MATCH_MODE_EQUAL);
@@ -134,6 +156,7 @@ public class ViewFindBuilder extends FindBuilder {
         viewFinderX.getDesc().addAll(Arrays.asList(desc));
         return this;
     }
+
     public ViewFindBuilder desc(String desc) {
         viewFinderX.getDesc().add(desc);
         return this;
@@ -160,6 +183,7 @@ public class ViewFindBuilder extends FindBuilder {
     public ViewNode await() {
         return waitFor();
     }
+
     public ViewNode await(long l) {
         return waitFor(l);
     }

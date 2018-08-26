@@ -4,8 +4,8 @@ import cn.vove7.common.bridges.ChoiceData
 import cn.vove7.common.view.notifier.ActivityShowListener
 import cn.vove7.common.view.notifier.ViewShowListener
 import cn.vove7.common.viewnode.ViewNode
-import cn.vove7.datamanager.parse.model.Action
-import cn.vove7.datamanager.parse.model.ActionScope
+import cn.vove7.common.datamanager.parse.model.Action
+import cn.vove7.common.datamanager.parse.model.ActionScope
 import java.util.*
 
 /**
