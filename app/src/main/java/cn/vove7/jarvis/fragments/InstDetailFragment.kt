@@ -11,6 +11,7 @@ import android.support.design.widget.CollapsingToolbarLayout
 import android.support.v7.widget.Toolbar
 import android.view.View
 import android.widget.ImageView
+import cn.vove7.datamanager.parse.DataFrom
 import cn.vove7.datamanager.parse.statusmap.ActionNode
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.activities.NewInstActivity
@@ -19,7 +20,7 @@ import cn.vove7.jarvis.activities.NewInstActivity
 @SuppressLint("ValidFragment")
 /**
  * # InstDetailFragment
- *
+ * 指令详情BSDialog
  * @author 17719247306
  * 2018/8/24
  */
@@ -52,12 +53,20 @@ class InstDetailFragment : BottomSheetDialogFragment() {
         setData()
     }
 
-    private fun setData() {// TODO 检查可编辑
-        if (true) {
-            toolbar.menu.findItem(R.id.menu_edit).isVisible = true
-        } else
-            toolbar.menu.findItem(R.id.menu_edit).isVisible = false
+    private fun setData() {
+        when (node.from) {//编辑
+            DataFrom.FROM_SERVICE, DataFrom.FROM_SHARED -> {
+                val editMenu = toolbar.menu.findItem(R.id.menu_edit)
+                editMenu.isEnabled = false
+                editMenu.title = getString(R.string.text_not_editable)
+
+            }
+            DataFrom.FROM_USER -> {
+                toolbar.menu.findItem(R.id.menu_edit).isEnabled = true
+            }
+        }
         contentView.post {
+            //标题
             collapsingColl.title = node.descTitle
         }
     }
@@ -71,13 +80,13 @@ class InstDetailFragment : BottomSheetDialogFragment() {
             when (it.itemId) {
                 R.id.menu_edit -> {//修改
                     val editIntent = Intent(context, NewInstActivity::class.java)
-                    editIntent.putExtra("node", node)
+                    editIntent.putExtra("nodeId", node.id)
                     editIntent.putExtra("type", node.nodeType)
                     editIntent.putExtra("pkg", node.actionScope.packageName)
-                    editIntent.putExtra("reedit",true)
+                    editIntent.putExtra("reedit", true)
                     startActivity(editIntent)
                 }
-                else -> {
+                R.id.menu_delete -> {//删除
 
                 }
             }

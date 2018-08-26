@@ -133,7 +133,9 @@
     <string name="text_not_installed">Not installed</string>
     <string name="text_at_last_one_regex">At last one regex</string>
     <string name="text_confirm_to_exit">Confirm exit?</string>
-    <string name="text_error_occurred">An error occurred</string>
+    <string name="text_error_occurred">An error occurred.</string>
     <string name="text_cmd_in_app">In-App Command</string>
     <string name="text_edit">Edit</string>
+    <string name="text_delete">Delete</string>
+    <string name="text_not_editable">Not editable</string>
 </resources>

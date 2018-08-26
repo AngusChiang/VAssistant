@@ -17,8 +17,8 @@ import android.view.MenuItem
 import android.view.View
 import android.widget.*
 import cn.vove7.datamanager.DAO
-import cn.vove7.datamanager.greendao.ActionScopeDao
 import cn.vove7.datamanager.greendao.ActionNodeDao
+import cn.vove7.datamanager.greendao.ActionScopeDao
 import cn.vove7.datamanager.parse.model.Action
 import cn.vove7.datamanager.parse.model.ActionScope
 import cn.vove7.datamanager.parse.statusmap.ActionNode
@@ -54,6 +54,7 @@ class NewInstActivity : AppCompatActivity(), View.OnClickListener {
     var parentId: Long? = null//上级命令MapNodeId
     private lateinit var TYPE: String
 
+    private var actionNode: ActionNode? = null
     private var isReedit = false
 
     private lateinit var searchView: SearchView
@@ -108,6 +109,19 @@ class NewInstActivity : AppCompatActivity(), View.OnClickListener {
         }
 
         isReedit = intent.getBooleanExtra("reedit", false)
+
+        if (isReedit) {
+            val id = intent.getLongExtra("nodeId", 0L)
+            actionNode = DAO.daoSession.actionNodeDao.queryBuilder().where(ActionNodeDao.Properties.Id.eq(id)).unique()
+            if (actionNode == null) {
+                voast.showShort(getString(R.string.text_error_occurred) + " code :n117")
+            } else {//展示信息
+                activity_name.setText(actionNode?.actionScope?.activity)
+                actionNode?.regs?.forEach {
+                    regs.add(Pair(it.regStr, posData[posArr.indexOf(it.paramPos)]))
+                }
+            }
+        }
 
     }
 
@@ -271,6 +285,7 @@ class NewInstActivity : AppCompatActivity(), View.OnClickListener {
 
         if (newNode.id != null) {
             voast.showShort(getString(R.string.text_save_success))
+            finish()
         } else {
             voast.showShort(getString(R.string.text_save_failed))
         }
@@ -315,6 +330,9 @@ class NewInstActivity : AppCompatActivity(), View.OnClickListener {
         if (selScriptDialog == null) {
             val dView = layoutInflater.inflate(R.layout.dialog_sel_script, null, false)
             scriptTextView = dView.findViewById(R.id.script_text)
+            if (isReedit) {
+                scriptTextView.setText(actionNode?.action?.actionScript)
+            }
             selScriptDialog = AlertDialog.Builder(this)
                     .setView(dView)
                     .setPositiveButton(R.string.text_confirm) { i, _ ->
@@ -342,7 +360,7 @@ class NewInstActivity : AppCompatActivity(), View.OnClickListener {
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        if (resultCode == Activity.RESULT_OK) {
+        if (resultCode == Activity.RESULT_OK) {//选择文件回调
             when (requestCode) {
                 1 -> {
                     val uri = data?.data
@@ -451,11 +469,11 @@ class NewInstActivity : AppCompatActivity(), View.OnClickListener {
     //第三个
     //最后一个
 
-    private val posArr = arrayOf(Reg.PARAM_NO, Reg.PARAM_POS_0, Reg.PARAM_POS_1, Reg.PARAM_POS_2, Reg.PARAM_POS_END)
+    private val posArr = arrayListOf(Reg.PARAM_NO, Reg.PARAM_POS_0, Reg.PARAM_POS_1, Reg.PARAM_POS_2, Reg.PARAM_POS_END)
     private val regs = mutableListOf<Pair<String, String>>()
     /**
      * 转换测试MapNode List
-     * @return List<ActionNode>
+     * @return regs:List<Pair<String,String>> -> List<ActionNode>
      */
     private fun wrapMapNodes(): List<ActionNode> {
         val list = mutableListOf<ActionNode>()

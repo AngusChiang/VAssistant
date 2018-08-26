@@ -54,4 +54,6 @@
     <string name="text_error_occurred">发生错误</string>
     <string name="text_cmd_in_app">应用内命令</string>
     <string name="text_edit">编辑</string>
+    <string name="text_delete">删除</string>
+    <string name="text_not_editable">不可编辑</string>
 </resources>

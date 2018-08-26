@@ -4,7 +4,6 @@ import android.app.Activity
 import android.os.Bundle
 import android.view.View
 import cn.vove7.appbus.AppBus
-import cn.vove7.datamanager.parse.model.Action
 import cn.vove7.jarvis.R
 import cn.vove7.parseengine.engine.ParseEngine
 import cn.vove7.vtp.asset.AssetHelper
@@ -14,13 +13,13 @@ import kotlinx.android.synthetic.main.activity_script_test.*
 class ScriptTestActivity : Activity() {
 
     private val files = arrayOf(
-            "s/alipay_ss.txt"
+            "sim_script/alipay_ss.txt"
 //            , "s/ali_ss_s.txt"
-            , "s/qq_ss.txt"
-            , "s/voice_text.txt"
+            , "sim_script/qq_ss.txt"
+            , "sim_script/voice_text.txt"
 //            , "s/scroll_test.txt"
 //            , "s/test.txt"
-            , "s/qq_send.txt"
+            , "sim_script/qq_send.txt"
 //            , "s/qq_send_s.txt"
     )
     var now = 0
