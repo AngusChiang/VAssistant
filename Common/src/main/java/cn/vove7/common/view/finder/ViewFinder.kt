@@ -2,7 +2,7 @@ package cn.vove7.common.view.finder
 
 import android.view.accessibility.AccessibilityNodeInfo
 import cn.vove7.common.accessibility.AccessibilityApi
-import cn.vove7.common.viewnode.ViewNode
+import cn.vove7.common.accessibility.viewnode.ViewNode
 import cn.vove7.vtp.log.Vog
 
 /**

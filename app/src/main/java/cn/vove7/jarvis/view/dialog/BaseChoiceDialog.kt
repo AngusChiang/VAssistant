@@ -5,7 +5,7 @@ import android.content.Context
 import android.os.Build
 import android.support.annotation.CallSuper
 import android.view.WindowManager
-import cn.vove7.appbus.AppBus
+import cn.vove7.common.appbus.AppBus
 import cn.vove7.common.bridges.ChoiceData
 import cn.vove7.common.model.RequestPermission
 import cn.vove7.vtp.dialog.DialogWithList

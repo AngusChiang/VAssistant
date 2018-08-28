@@ -1,9 +1,9 @@
 package cn.vove7.jarvis.speech.recognition.listener
 
 import android.os.Handler
-import cn.vove7.appbus.AppBus
-import cn.vove7.appbus.SpeechRecoAction
-import cn.vove7.appbus.VoiceData
+import cn.vove7.common.appbus.AppBus
+import cn.vove7.common.appbus.SpeechRecoAction
+import cn.vove7.common.appbus.VoiceData
 import cn.vove7.common.model.RequestPermission
 import cn.vove7.jarvis.services.MainService.Companion.WHAT_VOICE_ERR
 import cn.vove7.jarvis.services.MainService.Companion.WHAT_VOICE_RESULT

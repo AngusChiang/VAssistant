@@ -14,11 +14,10 @@ import android.widget.EditText
 import android.widget.TextView
 import cn.vove7.androlua.luabridge.LuaUtil
 import cn.vove7.androlua.luautils.LuaEditor
-import cn.vove7.androlua.luautils.LuaManagerI
-import cn.vove7.androlua.luautils.LuaPrinter
-import cn.vove7.appbus.AppBus
+import cn.vove7.common.appbus.AppBus
 import cn.vove7.common.datamanager.parse.model.Action
 import cn.vove7.common.datamanager.parse.model.ActionParam
+import cn.vove7.common.executor.OnPrint
 import cn.vove7.vtp.log.Vog
 import cn.vove7.vtp.view.span.ColourTextClickableSpan
 import java.io.IOException
@@ -40,26 +39,24 @@ class LuaEditorActivity : Activity(), OnClickListener {
     @SuppressLint("HandlerLeak")
     internal var handler: Handler = object : Handler() {
         override fun handleMessage(msg: Message) {
-            var color = cn.vove7.vtp.R.color.default_text_color
-            when (msg.what) {
-                LuaManagerI.E -> {
-                    color = cn.vove7.vtp.R.color.red_500
-                    val v = ColourTextClickableSpan(this@LuaEditorActivity, "E: ", colorId = color, listener = null)
-                    status.append(v.spanStr)
+            val pair = when (msg.what) {
+                OnPrint.ERROR -> {
+                    Pair(cn.vove7.vtp.R.color.red_500, "ERROR: ")
                 }
-                LuaManagerI.W -> {
-                    color = cn.vove7.vtp.R.color.orange_700
-                    val v = ColourTextClickableSpan(this@LuaEditorActivity, "W: ", colorId = color, listener = null)
-                    status.append(v.spanStr)
+                OnPrint.WARN -> {
+                    Pair(cn.vove7.vtp.R.color.orange_700, "WARN: ")
                 }
-                LuaManagerI.I -> {
-                    color = cn.vove7.vtp.R.color.green_700
-                    val v = ColourTextClickableSpan(this@LuaEditorActivity, "I: ", colorId = color, listener = null)
-                    status.append(v.spanStr)
+                OnPrint.INFO -> {
+                    Pair(cn.vove7.vtp.R.color.orange_700, "INFO: ")
+                }
+                else -> {
+                    Pair(cn.vove7.vtp.R.color.default_text_color, "")
                 }
             }
+            val i = ColourTextClickableSpan(this@LuaEditorActivity, pair.second, colorId = pair.first, listener = null)
+            status.append(i.spanStr)
 
-            val v = ColourTextClickableSpan(this@LuaEditorActivity, msg.data.getString("data"), colorId = color, listener = null)
+            val v = ColourTextClickableSpan(this@LuaEditorActivity, msg.data.getString("data"), colorId = pair.first, listener = null)
             status.append(v.spanStr)
             if (!status.isFocused) {
                 val offset = status.lineCount * status.lineHeight
@@ -69,7 +66,7 @@ class LuaEditorActivity : Activity(), OnClickListener {
             }
         }
     }
-    internal var print: LuaPrinter.OnPrint = object : LuaPrinter.OnPrint {
+    internal var print: OnPrint = object : OnPrint {
         override fun onPrint(l: Int, output: String) {
             val m = Message()
             val b = Bundle()
@@ -102,13 +99,13 @@ class LuaEditorActivity : Activity(), OnClickListener {
 //        luaHelper = LuaApp.APP.luaHelper
 
         try {
-            testFiles = assets.list("sample")
+            testFiles = assets.list("lua_sample")
             testFiles.forEach {
                 scripts.add(it!!)
             }
             Vog.d(this, "onCreate  ----> " + Arrays.toString(testFiles))
             if (testFiles.isNotEmpty()) {
-                source.setText(LuaUtil.getTextFromAsset(this, "sample/" + testFiles[0]))
+                source.setText(LuaUtil.getTextFromAsset(this, "lua_sample/" + testFiles[0]))
             }
 
         } catch (e: IOException) {
@@ -138,25 +135,25 @@ class LuaEditorActivity : Activity(), OnClickListener {
                 val src = source.text.toString()
                 status.text = ""
                 status.scrollTo(0, 0)
-                val ac = Action(src, "lua")
+                val ac = Action(src, Action.SCRIPT_TYPE_LUA)
                 ac.param = ActionParam()
                 ac.param.value = luaArgs.text.toString()
                 AppBus.post(ac)
             }
             R.id.r -> {
                 nowIndex = ++nowIndex % len
-                source.setText(LuaUtil.getTextFromAsset(this, "sample/" + testFiles[nowIndex]))
+                source.setText(LuaUtil.getTextFromAsset(this, "lua_sample/" + testFiles[nowIndex]))
             }
             R.id.l -> {
                 nowIndex = (--nowIndex + len) % len
-                source.setText(LuaUtil.getTextFromAsset(this, "sample/" + testFiles[nowIndex]))
+                source.setText(LuaUtil.getTextFromAsset(this, "lua_sample/" + testFiles[nowIndex]))
             }
             R.id.stop -> AppBus.post("stop execQueue")
             R.id.choose_script -> {//选择jio本
-                AlertDialog.Builder(this).setTitle("选择jio本").setItems(testFiles) { d, p ->
+                AlertDialog.Builder(this).setTitle(R.string.text_select_script).setItems(testFiles) { d, p ->
                     nowIndex = p
                     source.setText(LuaUtil.getTextFromAsset(this@LuaEditorActivity,
-                            "sample/" + testFiles[p]))
+                            "lua_sample/" + testFiles[p]))
                     d.dismiss()
                 }.show()
             }

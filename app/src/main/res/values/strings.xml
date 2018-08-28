@@ -138,4 +138,5 @@
     <string name="text_edit">Edit</string>
     <string name="text_delete">Delete</string>
     <string name="text_not_editable">Not editable</string>
+    <string name="text_javascript_test">JavaScript Test</string>
 </resources>

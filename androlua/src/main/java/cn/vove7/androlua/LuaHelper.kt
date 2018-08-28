@@ -11,6 +11,7 @@ import cn.vove7.androlua.luautils.LuaManagerI
 import cn.vove7.androlua.luautils.LuaPrinter
 import cn.vove7.common.BridgeManager
 import cn.vove7.common.app.GlobalApp
+import cn.vove7.common.executor.OnPrint
 import cn.vove7.vtp.log.Vog
 import com.luajava.JavaFunction
 import com.luajava.LuaException
@@ -22,6 +23,7 @@ import java.io.IOException
 import java.util.*
 import java.util.concurrent.ConcurrentSkipListSet
 import java.util.regex.Pattern
+import kotlin.collections.HashSet
 
 /**
  * LuaHelper
@@ -66,16 +68,16 @@ class LuaHelper : LuaManagerI {
         private var libDir: String? = null
         private var jniLibsPath: String? = null
         private var luaDir: String? = null
-        private val printList = ArrayList<LuaPrinter.OnPrint>()
+        private val printList = HashSet<OnPrint>()
         private var sBridgeManager: BridgeManager? = null
 
-        fun regPrint(print: LuaPrinter.OnPrint) {
+        fun regPrint(print: OnPrint) {
             synchronized(printList) {
                 printList.add(print)
             }
         }
 
-        fun unRegPrint(print: LuaPrinter.OnPrint) {
+        fun unRegPrint(print: OnPrint) {
             synchronized(printList) {
                 printList.remove(print)
             }
@@ -141,7 +143,7 @@ class LuaHelper : LuaManagerI {
 //        L.getGlobal("require")
 //        L.pushString("bridges")
 //        L.call(1, 0)
-        LuaPrinter(L, object : LuaPrinter.OnPrint {
+        LuaPrinter(L, object : OnPrint {
 
             override fun onPrint(l: Int, output: String) {
                 notifyOutput(l, output)
@@ -244,9 +246,9 @@ class LuaHelper : LuaManagerI {
         Log.e("Vove :", "evalString  ----> $e")
         if (e.contains("java.lang.UnsupportedOperationException") ||
                 e.contains("java.lang.InterruptedException"))
-            handleMessage(LuaManagerI.W, "强制终止\n")
+            handleMessage(OnPrint.WARN, "强制终止\n")
         else
-            handleMessage(LuaManagerI.E, e)
+            handleMessage(OnPrint.ERROR, e)
     }
 
     override fun handleError(err: String) {
@@ -265,7 +267,7 @@ class LuaHelper : LuaManagerI {
             eBuilder.appendln("\t Suppressed :$se")
         if (e.cause != null)
             eBuilder.appendln("\t Cause By :${e.cause}")
-        notifyOutput(LuaManagerI.E, eBuilder.toString())
+        notifyOutput(OnPrint.ERROR, eBuilder.toString())
         Vog.e(this, eBuilder)
     }
 
@@ -286,7 +288,6 @@ class LuaHelper : LuaManagerI {
         } else
             checkErr(r)
     }
-
 
     fun execFromAsset(name: String, args: Array<Any>) {
         val bytes: ByteArray

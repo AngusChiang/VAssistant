@@ -1,4 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="text_acc_service_not_running">AccessibilityService is not running.</string>
+    <string name="l" translatable="false"><![CDATA[<]]></string>
+    <string name="r" translatable="false"><![CDATA[>]]></string>
+    <string name="text_select_script">Select Script</string>
+    <string name="text_stop">Stop</string>
+    <string name="text_run">Run</string>
 </resources>

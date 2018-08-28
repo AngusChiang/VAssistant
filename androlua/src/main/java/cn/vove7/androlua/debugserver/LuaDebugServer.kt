@@ -1,7 +1,7 @@
 package cn.vove7.androlua.debugserver
 
 import android.content.Context
-import cn.vove7.appbus.AppBus
+import cn.vove7.common.appbus.AppBus
 import cn.vove7.common.datamanager.parse.model.Action
 import cn.vove7.common.datamanager.parse.model.ActionParam
 import cn.vove7.common.debugserver.RemoteDebugServer

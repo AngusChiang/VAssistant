@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="text_acc_service_not_running">无障碍服务未运行</string>
+    <string name="text_select_script">选择脚本</string>
+    <string name="text_stop">停止</string>
+    <string name="text_run">运行</string>
+</resources>

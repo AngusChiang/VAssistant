@@ -11,7 +11,7 @@ import android.os.Message
 import android.util.Log
 import android.widget.Toast
 import cn.vove7.androlua.luautils.LuaContext
-import cn.vove7.appbus.*
+import cn.vove7.common.appbus.*
 import cn.vove7.common.accessibility.AccessibilityApi
 import cn.vove7.common.bridges.ChoiceData
 import cn.vove7.common.bridges.ServiceBridge
@@ -21,11 +21,11 @@ import cn.vove7.common.executor.CExecutorI
 import cn.vove7.common.executor.OnExecutorResult
 import cn.vove7.common.model.RequestPermission
 import cn.vove7.common.datamanager.parse.model.Action
-import cn.vove7.executorengine.luaexector.LuaExecutor
 import cn.vove7.jarvis.activities.PermissionManagerActivity
 import cn.vove7.jarvis.speech.recognition.model.IStatus
 import cn.vove7.common.utils.RegUtils.checkCancel
 import cn.vove7.common.utils.RegUtils.checkConfirm
+import cn.vove7.executorengine.exector.MultiExecutorEngine
 import cn.vove7.jarvis.view.dialog.MultiChoiceDialog
 import cn.vove7.jarvis.view.dialog.OnMultiSelectListener
 import cn.vove7.jarvis.view.dialog.OnSelectListener
@@ -69,7 +69,7 @@ class MainService : BusService(), OnExecutorResult,
 
     override fun onCreate() {
         super.onCreate()
-        cExecutor = LuaExecutor(
+        cExecutor = MultiExecutorEngine(
                 this,
                 this,
                 this

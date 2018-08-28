@@ -5,6 +5,7 @@ import cn.vove7.androlua.LuaHelper
 import cn.vove7.androlua.luautils.LuaManagerI
 import cn.vove7.androlua.luautils.LuaRunnableI
 import cn.vove7.androlua.luautils.TimerTaskX
+import cn.vove7.common.executor.OnPrint
 import cn.vove7.vtp.log.Vog
 import com.luajava.LuaException
 import com.luajava.LuaObject
@@ -64,7 +65,7 @@ class LuaTimerTask : TimerTaskX, LuaRunnableI {
 //        L.close()
         System.gc()
         if (isCancelled) {
-            luaManager.handleMessage(LuaManagerI.W, "$name already canceled")
+            luaManager.handleMessage(OnPrint.WARN, "$name already canceled")
             return
         }
         cancel()
@@ -87,7 +88,7 @@ class LuaTimerTask : TimerTaskX, LuaRunnableI {
                     funHelper.newLuaThread(mSrc, *mArg)
             }
         } catch (e: LuaException) {
-            luaManager.handleMessage(LuaManagerI.E, e.message ?: "")
+            luaManager.handleMessage(OnPrint.ERROR, e.message ?: "")
             e.printStackTrace()
             quit()
         }

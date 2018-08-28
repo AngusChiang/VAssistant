@@ -11,7 +11,7 @@ import android.os.Build
 import android.os.IBinder
 import android.provider.Settings
 import android.support.annotation.RequiresApi
-import cn.vove7.appbus.AppBus
+import cn.vove7.common.appbus.AppBus
 import cn.vove7.vtp.log.Vog
 
 

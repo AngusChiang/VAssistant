@@ -11,9 +11,9 @@ import android.view.View
 import android.view.animation.AccelerateDecelerateInterpolator
 import android.widget.ImageView
 import android.widget.TextView
-import cn.vove7.appbus.AppBus
-import cn.vove7.appbus.SpeechRecoAction
-import cn.vove7.appbus.VoiceData
+import cn.vove7.common.appbus.AppBus
+import cn.vove7.common.appbus.SpeechRecoAction
+import cn.vove7.common.appbus.VoiceData
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.services.MainService
 import cn.vove7.jarvis.services.SpeechRecoService
@@ -42,8 +42,11 @@ class VoiceFloat : AbFloatWindow<VoiceFloat.Holder> {
 
     constructor(context: Context) : super(context) {
         this.screenInfo = DeviceInfo.getInfo(context).screenInfo
-        posX = screenInfo.width - contentView.width
+        posX = screenInfo.width
         posY = (screenInfo.height * 0.6).toInt()
+        contentView.post {
+            posX = screenInfo.width - contentView.width
+        }
         Vog.d(this, " $posX $posY")
     }
 

@@ -8,8 +8,8 @@ import cn.vove7.jarvis.services.MainService.Companion.WHAT_VOICE_VOL
 import cn.vove7.jarvis.speech.recognition.model.IStatus
 
 import cn.vove7.jarvis.speech.recognition.model.RecogResult
-import cn.vove7.appbus.AppBus
-import cn.vove7.appbus.VoiceData
+import cn.vove7.common.appbus.AppBus
+import cn.vove7.common.appbus.VoiceData
 
 
 class MessageStatusRecogListener(private val handler: Handler) : StatusRecogListener() {

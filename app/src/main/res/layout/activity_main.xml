@@ -50,4 +50,10 @@
         android:layout_height="wrap_content"
         android:onClick="go2Setting"
         android:text="@string/text_settings" />
+    <Button
+        android:id="@+id/button1110"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:onClick="go2Js"
+        android:text="@string/text_javascript_test" />
 </LinearLayout>

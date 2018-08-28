@@ -1,6 +1,7 @@
 package cn.vove7.androlua.luautils
 
 import android.util.Log
+import cn.vove7.common.executor.OnPrint
 import cn.vove7.vtp.log.Vog
 
 import com.luajava.JavaFunction
@@ -51,14 +52,10 @@ class LuaPrinter @JvmOverloads constructor(Ls: LuaState, private val print: OnPr
             output.append("\t")
         }
         output.append('\n')
-        print?.onPrint(LuaManagerI.L, output.toString())
+        print?.onPrint(OnPrint.LOG, output.toString())
         Vog.i("Vove :", "execute  ----> $output")
         output.setLength(0)
         return 0
-    }
-
-    interface OnPrint {
-        fun onPrint(l: Int, output: String)
     }
 
 }

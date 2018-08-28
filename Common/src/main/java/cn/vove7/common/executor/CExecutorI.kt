@@ -3,7 +3,7 @@ package cn.vove7.common.executor
 import cn.vove7.common.bridges.ChoiceData
 import cn.vove7.common.view.notifier.ActivityShowListener
 import cn.vove7.common.view.notifier.ViewShowListener
-import cn.vove7.common.viewnode.ViewNode
+import cn.vove7.common.accessibility.viewnode.ViewNode
 import cn.vove7.common.datamanager.parse.model.Action
 import cn.vove7.common.datamanager.parse.model.ActionScope
 import java.util.*
@@ -22,7 +22,7 @@ interface CExecutorI : ViewShowListener, ActivityShowListener {
 
     fun execQueue(cmdWords: String, actionQueue: PriorityQueue<Action>)
     fun interrupt()
-    fun runScript(script: String, voiceArg: String? = null): PartialResult
+    fun runScript(script: String, arg: String? = null): PartialResult
 
     fun checkAccessibilityService(jump: Boolean = true): Boolean
 

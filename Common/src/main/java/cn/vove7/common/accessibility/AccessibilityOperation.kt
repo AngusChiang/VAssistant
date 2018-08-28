@@ -1,6 +1,6 @@
 package cn.vove7.common.accessibility
 
-import cn.vove7.common.viewnode.ViewNode
+import cn.vove7.common.accessibility.viewnode.ViewNode
 
 interface AccessibilityOperation {
     fun findFirstNodeById(id: String): ViewNode?

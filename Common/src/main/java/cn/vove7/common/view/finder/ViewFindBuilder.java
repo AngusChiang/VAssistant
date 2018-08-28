@@ -7,7 +7,7 @@ import cn.vove7.common.accessibility.AccessibilityApi;
 import cn.vove7.common.app.GlobalApp;
 import cn.vove7.common.app.GlobalLog;
 import cn.vove7.common.executor.CExecutorI;
-import cn.vove7.common.viewnode.ViewNode;
+import cn.vove7.common.accessibility.viewnode.ViewNode;
 import cn.vove7.vtp.log.Vog;
 
 import static cn.vove7.common.view.finder.ViewFinderWithMultiCondition.MATCH_MODE_CONTAIN;

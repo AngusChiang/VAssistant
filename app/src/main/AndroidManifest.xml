@@ -60,7 +60,7 @@
                 android:resource="@xml/accessibility_config" />
         </service>
 
-        <activity android:name=".activities.ScriptTestActivity" />
+        <activity android:name=".activities.CommandTestActivity" />
 
         <service
             android:name=".services.SpeechRecoService"

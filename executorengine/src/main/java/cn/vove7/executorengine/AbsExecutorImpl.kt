@@ -4,23 +4,25 @@ import android.content.Context
 import android.os.Handler
 import android.os.Looper
 import android.support.annotation.CallSuper
-import cn.vove7.appbus.AppBus
+import cn.vove7.common.appbus.AppBus
 import cn.vove7.common.accessibility.AccessibilityApi
+import cn.vove7.common.accessibility.viewnode.ViewNode
 import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.bridges.*
 import cn.vove7.common.bridges.ShowDialogEvent.Companion.WHICH_SINGLE
-import cn.vove7.common.executor.CExecutorI
-import cn.vove7.common.executor.OnExecutorResult
-import cn.vove7.common.executor.PartialResult
-import cn.vove7.common.model.RequestPermission
-import cn.vove7.common.view.finder.ViewFindBuilder
-import cn.vove7.common.viewnode.ViewNode
 import cn.vove7.common.datamanager.DAO
 import cn.vove7.common.datamanager.executor.entity.MarkedContact
 import cn.vove7.common.datamanager.executor.entity.MarkedOpen
 import cn.vove7.common.datamanager.executor.entity.MarkedOpen.*
 import cn.vove7.common.datamanager.parse.model.Action
+import cn.vove7.common.datamanager.parse.model.Action.SCRIPT_TYPE_JS
+import cn.vove7.common.datamanager.parse.model.Action.SCRIPT_TYPE_LUA
 import cn.vove7.common.datamanager.parse.model.ActionScope
+import cn.vove7.common.executor.CExecutorI
+import cn.vove7.common.executor.OnExecutorResult
+import cn.vove7.common.executor.PartialResult
+import cn.vove7.common.model.RequestPermission
+import cn.vove7.common.view.finder.ViewFindBuilder
 import cn.vove7.executorengine.bridges.SystemBridge
 import cn.vove7.executorengine.helper.ContactHelper
 import cn.vove7.parseengine.engine.ParseEngine
@@ -101,6 +103,7 @@ abstract class AbsExecutorImpl(
                 when {
                     r.needTerminal -> {//出错
                         currentAction = null
+                        actionQueue.clear()
                         onExecutorResult.onExecuteFailed(r.msg)
                         return
                     }
@@ -113,6 +116,28 @@ abstract class AbsExecutorImpl(
             }
         }
     }
+
+    override fun runScript(script: String, arg: String?): PartialResult {
+        return when (currentAction?.scriptType) {
+            SCRIPT_TYPE_LUA -> {
+                onLuaExec(script, arg)
+            }
+            SCRIPT_TYPE_JS -> {
+                onRhinoExec(script, arg)
+            }
+            else ->
+                PartialResult.fatal("未知脚本类型: "+currentAction?.scriptType)
+        }
+    }
+
+    open fun onLuaExec(script: String, arg: String? = null): PartialResult {
+        return PartialResult.fatal("not implement onLuaExec")
+    }
+
+    open fun onRhinoExec(script: String, arg: String? = null): PartialResult {
+        return PartialResult.fatal("not implement onRhinoExec")
+    }
+
 
     override fun onFinish() {
         onExecutorResult.onExecuteFinished("执行结束")
@@ -164,9 +189,9 @@ abstract class AbsExecutorImpl(
         //包名
         if (PACKAGE_REGEX.matches(data)) {
             systemBridge.openAppByPkg(data).also {
-                return if (it.ok)
+                return if (it.ok) {
                     parseAppInnerOperation(follow, data)
-                else{
+                } else {
                     globalAutomator.toast(context.getString(R.string.text_app_not_install))
                     false
                 }
@@ -313,8 +338,9 @@ abstract class AbsExecutorImpl(
      */
     override fun waitForApp(pkg: String, activityName: String?, m: Long): Boolean {
         Vog.d(this, "waitForApp $pkg $activityName")
-        if (!checkAccessibilityService())
+        if (!checkAccessibilityService()) {
             return false
+        }
 
         accessApi?.waitForActivity(this, ActionScope(pkg, activityName))
         return waitForUnlock(m)
@@ -322,13 +348,12 @@ abstract class AbsExecutorImpl(
 
     override fun waitForViewId(id: String, m: Long): ViewNode? {
         Vog.d(this, "waitForViewId $id")
-        if (!checkAccessibilityService())
+        if (!checkAccessibilityService()) {
             return null
-
+        }
         accessApi?.waitForView(this, ViewFindBuilder(this).id(id).viewFinderX)
         waitForUnlock(m)
         return getViewNode()
-
     }
 
     override fun waitForDesc(desc: String, m: Long): ViewNode? {
@@ -341,8 +366,9 @@ abstract class AbsExecutorImpl(
 
     override fun waitForText(text: String, m: Long): ViewNode? {
         Vog.d(this, "waitForText $text")
-        if (!checkAccessibilityService())
+        if (!checkAccessibilityService()) {
             return null
+        }
         accessApi?.waitForView(this, ViewFindBuilder(this).containsText(text).viewFinderX)
         waitForUnlock(m)
         return getViewNode()
@@ -358,10 +384,10 @@ abstract class AbsExecutorImpl(
         //得到结果 -> action.param
         return if (!currentAction!!.responseResult) {
             null
-//                PartialResult(false, true, "获取语音参数失败")
-        } else
+//                PartialResult.fatal("获取语音参数失败")
+        } else {
             currentAction!!.param.value
-
+        }
     }
 
     /**
@@ -373,9 +399,11 @@ abstract class AbsExecutorImpl(
         AppBus.post(ShowDialogEvent(WHICH_SINGLE, currentAction!!, askTitle, choiceData))
         waitForUnlock()
         return if (currentAction!!.responseResult) {
-            Vog.d(this, "结果： have data")
+
             val bundle = currentAction!!.responseBundle
-            bundle.getSerializable("data") as ChoiceData
+            (bundle.getSerializable("data") as ChoiceData).also {
+                Vog.d(this, "结果： ${it.title}")
+            }
         } else {
             Vog.d(this, "结果： 取消")
             null
@@ -451,11 +479,11 @@ abstract class AbsExecutorImpl(
         val result = systemBridge.call(s)
         return if (!result.ok) {
             if (!alert("未识别该联系人", "选择是否标记该联系人: $s")) {
-                return PartialResult(false)
+                return PartialResult.failed()
             }
             //标识联系人
             val choiceData =
-                waitForSingleChoice("选择要标识的联系人", contactHelper.getChoiceData())
+                    waitForSingleChoice("选择要标识的联系人", contactHelper.getChoiceData())
             if (choiceData != null) {
                 //开启线程
                 thread {
@@ -470,9 +498,9 @@ abstract class AbsExecutorImpl(
                 val sss = systemBridge.call(choiceData.subtitle!!)
                 PartialResult(sss.ok, if (!sss.ok) sss.errMsg else "")
             } else {
-                PartialResult(false, true, "取消")
+                PartialResult(false, "取消")
             }
-        } else PartialResult(true)
+        } else PartialResult.success()
     }
 
 
@@ -502,8 +530,9 @@ abstract class AbsExecutorImpl(
 
     override fun checkAccessibilityService(jump: Boolean): Boolean {
         return if (!bridgeIsAvailable()) {
-            if (jump)
+            if (jump) {
                 AppBus.post(RequestPermission("无障碍服务"))
+            }
             false
         } else true
     }

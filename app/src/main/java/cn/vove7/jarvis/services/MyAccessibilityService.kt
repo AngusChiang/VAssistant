@@ -11,7 +11,7 @@ import android.view.accessibility.AccessibilityEvent
 import android.view.accessibility.AccessibilityEvent.*
 import android.view.accessibility.AccessibilityNodeInfo
 import android.widget.Toast
-import cn.vove7.appbus.AppBus
+import cn.vove7.common.appbus.AppBus
 import cn.vove7.common.ShowListener
 import cn.vove7.common.accessibility.AccessibilityApi
 import cn.vove7.common.executor.CExecutorI
@@ -20,7 +20,7 @@ import cn.vove7.common.view.finder.ViewFinder
 import cn.vove7.common.view.notifier.ActivityShowListener
 import cn.vove7.common.view.notifier.ViewShowListener
 import cn.vove7.common.view.notifier.ViewShowNotifier
-import cn.vove7.common.viewnode.ViewNode
+import cn.vove7.common.accessibility.viewnode.ViewNode
 import cn.vove7.common.datamanager.parse.model.ActionScope
 import cn.vove7.vtp.app.AppHelper
 import cn.vove7.vtp.log.Vog

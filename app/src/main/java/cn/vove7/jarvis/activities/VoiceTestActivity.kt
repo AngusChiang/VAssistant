@@ -9,10 +9,10 @@ import android.view.View
 import android.view.ViewAnimationUtils
 import android.view.animation.AccelerateDecelerateInterpolator
 import android.widget.TextView
-import cn.vove7.appbus.AppBus
-import cn.vove7.appbus.LogMessage
-import cn.vove7.appbus.SpeechRecoAction
-import cn.vove7.appbus.VoiceData
+import cn.vove7.common.appbus.AppBus
+import cn.vove7.common.appbus.LogMessage
+import cn.vove7.common.appbus.SpeechRecoAction
+import cn.vove7.common.appbus.VoiceData
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.services.MainService.Companion.WHAT_VOICE_ERR
 import cn.vove7.jarvis.services.MainService.Companion.WHAT_VOICE_TEMP

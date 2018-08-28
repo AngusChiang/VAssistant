@@ -6,6 +6,7 @@ import cn.vove7.androlua.LuaHelper
 import cn.vove7.androlua.luautils.LuaGcable
 import cn.vove7.androlua.luautils.LuaManagerI
 import cn.vove7.androlua.luautils.LuaRunnableI
+import cn.vove7.common.executor.OnPrint
 import cn.vove7.vtp.log.Vog
 import com.luajava.JavaFunction
 import com.luajava.LuaException
@@ -166,7 +167,7 @@ class LuaAsyncTask : AsyncTask<Any, Any, Any>, LuaGcable, LuaRunnableI, Comparab
             if (mCallback != null)
                 mCallback!!.call(*result as Array<Any>)
         } catch (e: LuaException) {
-            luaManager.handleMessage(LuaManagerI.E, "onPostExecute" + e.toString())
+            luaManager.handleMessage(OnPrint.ERROR, "onPostExecute" + e.toString())
         }
         super.onPostExecute(result)
         quit(true)
@@ -177,7 +178,7 @@ class LuaAsyncTask : AsyncTask<Any, Any, Any>, LuaGcable, LuaRunnableI, Comparab
             mUpdate?.call(*values)
         } catch (e: LuaException) {
             e.printStackTrace()
-            luaManager.handleMessage(LuaManagerI.E, "onProgressUpdate" + e.message)
+            luaManager.handleMessage(OnPrint.ERROR, "onProgressUpdate" + e.message)
         }
 //        super.onProgressUpdate(*values)
     }

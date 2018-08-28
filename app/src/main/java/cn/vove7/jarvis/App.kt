@@ -4,7 +4,7 @@ import android.content.Intent
 import android.os.Build
 import android.util.Log
 import cn.vove7.androlua.LuaApp
-import cn.vove7.appbus.MessageEvent
+import cn.vove7.common.appbus.MessageEvent
 import cn.vove7.common.datamanager.DAO
 import cn.vove7.common.datamanager.InitLuaDbData
 import cn.vove7.androlua.debugserver.LuaDebugServer

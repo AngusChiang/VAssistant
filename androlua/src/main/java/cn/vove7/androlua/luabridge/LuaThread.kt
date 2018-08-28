@@ -9,6 +9,7 @@ import cn.vove7.androlua.LuaHelper
 import cn.vove7.androlua.luautils.LuaGcable
 import cn.vove7.androlua.luautils.LuaManagerI
 import cn.vove7.androlua.luautils.LuaRunnableI
+import cn.vove7.common.executor.OnPrint
 import cn.vove7.vtp.log.Vog
 import com.luajava.LuaException
 import com.luajava.LuaMetaTable
@@ -120,7 +121,7 @@ class LuaThread : Thread, LuaMetaTable, LuaGcable, LuaRunnableI, Comparable<LuaT
 //                Looper.loop()
             }
         } catch (e: LuaException) {
-            luaManager.handleMessage(LuaManagerI.E, e.message ?: "")
+            luaManager.handleMessage(OnPrint.ERROR, e.message ?: "")
             e.printStackTrace()
         } finally {
             isRun = false
@@ -170,7 +171,7 @@ class LuaThread : Thread, LuaMetaTable, LuaGcable, LuaRunnableI, Comparable<LuaT
 
     fun push(what: Int, s: String) {
         if (!isRun) {
-            luaManager.handleMessage(LuaManagerI.L, "thread is not running")
+            luaManager.handleMessage(OnPrint.LOG, "thread is not running")
             return
         }
         val message = Message()
@@ -185,7 +186,7 @@ class LuaThread : Thread, LuaMetaTable, LuaGcable, LuaRunnableI, Comparable<LuaT
 
     fun push(what: Int, s: String, args: Array<Any>) {
         if (!isRun) {
-            luaManager.handleMessage(LuaManagerI.L, "thread is not running")
+            luaManager.handleMessage(OnPrint.LOG, "thread is not running")
             return
         }
 
@@ -214,7 +215,7 @@ class LuaThread : Thread, LuaMetaTable, LuaGcable, LuaRunnableI, Comparable<LuaT
                     4 -> funHelper.setField(data.getString("data"), (data.getSerializable("args") as Array<Any>)[0])
                 }
             } catch (e: LuaException) {
-                luaManager.handleMessage(LuaManagerI.E, e.message ?: "")
+                luaManager.handleMessage(OnPrint.ERROR, e.message ?: "")
                 e.printStackTrace()
             }
 

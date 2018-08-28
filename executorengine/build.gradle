@@ -33,9 +33,9 @@ dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     implementation "com.github.Vove7:VTP:$vtp_version"
     implementation project(':parseengine')
-    implementation project(':appbus')
     implementation project(':Common')
     implementation project(':androlua')
+    implementation project(path: ':rhino-android')
 }
 repositories {
     mavenCentral()

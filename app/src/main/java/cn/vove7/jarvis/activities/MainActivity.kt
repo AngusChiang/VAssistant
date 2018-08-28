@@ -9,6 +9,7 @@ import cn.vove7.androlua.LuaEditorActivity
 import cn.vove7.executorengine.helper.AppHelper
 import cn.vove7.executorengine.helper.ContactHelper
 import cn.vove7.jarvis.R
+import cn.vove7.rhino.RhinoActivity
 import cn.vove7.vtp.runtimepermission.PermissionUtils
 import kotlin.concurrent.thread
 
@@ -53,7 +54,7 @@ class MainActivity : Activity() {
 
 
     fun go2Test(view: View) {
-        startActivity(Intent(this, ScriptTestActivity::class.java))
+        startActivity(Intent(this, CommandTestActivity::class.java))
     }
 
     fun go2Lua(view: View) {
@@ -75,5 +76,9 @@ class MainActivity : Activity() {
 
     fun go2Setting(v: View) {
         startActivity(Intent(this, SettingsActivity::class.java))
+    }
+
+    fun go2Js(v: View) {
+        startActivity(Intent(this, RhinoActivity::class.java))
     }
 }

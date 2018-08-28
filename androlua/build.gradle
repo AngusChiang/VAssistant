@@ -10,7 +10,7 @@ android {
         versionName "1.0"
 
         ndk {
-            abiFilters 'armeabi-v7a'//, 'arm64-v8a', 'x86', 'x86_64'
+            abiFilters 'armeabi-v7a', 'arm64-v8a'//, 'x86', 'x86_64'
         }
     }
     buildTypes {
@@ -39,7 +39,6 @@ dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     implementation "com.github.Vove7:VTP:$vtp_version"
     implementation project(':Common')
-    implementation project(path: ':appbus')
 }
 repositories {
     mavenCentral()

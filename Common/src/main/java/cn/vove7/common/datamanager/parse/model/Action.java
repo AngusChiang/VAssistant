@@ -37,6 +37,10 @@ public class Action implements Comparable<Action>, Serializable {
 
     private String scriptType;//脚本语言
 
+
+    public static final String SCRIPT_TYPE_LUA = "lua";
+    public static final String SCRIPT_TYPE_JS = "js";
+
     public String getScriptType() {
         return scriptType;
     }

@@ -1,6 +1,3 @@
 <resources>
     <string name="app_name">AndroLua</string>
-    <string name="l"><![CDATA[<]]></string>
-    <string name="r"><![CDATA[>]]></string>
-    <string name="text_select_script">Select Script</string>
 </resources>

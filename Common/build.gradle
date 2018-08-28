@@ -21,8 +21,8 @@ android {
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
-    implementation "com.github.Vove7:VTP:$vtp_version"
+    api "com.github.Vove7:VTP:$vtp_version"
+    api 'org.greenrobot:eventbus:3.1.1'
     api "org.greenrobot:greendao:$greendao_version"
     implementation 'com.android.support:support-annotations:27.1.1'
-    implementation project(':appbus')
 }

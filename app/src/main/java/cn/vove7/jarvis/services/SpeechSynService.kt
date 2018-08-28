@@ -2,13 +2,13 @@ package cn.vove7.jarvis.services
 
 import android.annotation.SuppressLint
 import android.content.pm.PackageManager
-import cn.vove7.appbus.AppBus
-import cn.vove7.appbus.BaseAction.Companion.ACTION_START
-import cn.vove7.appbus.BaseAction.Companion.ACTION_STOP
-import cn.vove7.appbus.SpeechSynAction
-import cn.vove7.appbus.SpeechSynAction.Companion.ACTION_PAUSE
-import cn.vove7.appbus.SpeechSynAction.Companion.ACTION_RESUME
-import cn.vove7.appbus.SpeechSynData
+import cn.vove7.common.appbus.AppBus
+import cn.vove7.common.appbus.BaseAction.Companion.ACTION_START
+import cn.vove7.common.appbus.BaseAction.Companion.ACTION_STOP
+import cn.vove7.common.appbus.SpeechSynAction
+import cn.vove7.common.appbus.SpeechSynAction.Companion.ACTION_PAUSE
+import cn.vove7.common.appbus.SpeechSynAction.Companion.ACTION_RESUME
+import cn.vove7.common.appbus.SpeechSynData
 import cn.vove7.jarvis.speech.synthesis.control.InitConfig
 import cn.vove7.jarvis.speech.synthesis.control.MySyntherizer
 import cn.vove7.jarvis.speech.synthesis.control.NonBlockSyntherizer

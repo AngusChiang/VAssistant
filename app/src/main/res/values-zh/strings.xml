@@ -56,4 +56,5 @@
     <string name="text_edit">编辑</string>
     <string name="text_delete">删除</string>
     <string name="text_not_editable">不可编辑</string>
+    <string name="text_javascript_test">JavaScript 测试</string>
 </resources>

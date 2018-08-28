@@ -6,8 +6,8 @@ import android.os.Binder
 import android.os.Handler
 import android.os.IBinder
 import android.os.Message
-import cn.vove7.appbus.AppBus
-import cn.vove7.appbus.SpeechRecoAction
+import cn.vove7.common.appbus.AppBus
+import cn.vove7.common.appbus.SpeechRecoAction
 import cn.vove7.jarvis.speech.recognition.OfflineRecogParams
 import cn.vove7.jarvis.speech.recognition.listener.SpeechStatusListener
 import cn.vove7.jarvis.speech.recognition.model.IStatus

@@ -15,7 +15,7 @@ object InitLuaDbData : InitDbData() {
     override fun init() {
         super.init()
         val mapDao = DAO.daoSession.actionNodeDao
-        val scripyType = "lua"
+        val scripyType = Action.SCRIPT_TYPE_LUA
 
         if (mapDao.queryBuilder().count() <= 10L) {
             Vog.d(this, "更新数据")

@@ -1,6 +1,6 @@
 package cn.vove7.common.view.notifier
 
-import cn.vove7.common.viewnode.ViewNode
+import cn.vove7.common.accessibility.viewnode.ViewNode
 
 /**
  * # ViewShowListener
