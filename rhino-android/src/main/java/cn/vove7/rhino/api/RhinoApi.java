@@ -92,16 +92,14 @@ public class RhinoApi extends AbsApi {
     }
 
     @JSFunction
-    public static void print(Context cx, Scriptable thisObj,
+    public synchronized static void print(Context cx, Scriptable thisObj,
                              Object[] args, Function funObj) {
-        StringBuilder builder = new StringBuilder("==> ");
+        StringBuilder builder = new StringBuilder();
         for (int i = 0; i < args.length; i++) {
             if (i > 0)
                 builder.append(' ');
-
             // Convert the arbitrary JavaScript value into a string form.
             String s = Context.toString(args[i]);
-
             builder.append(s);
         }
         builder.append("\n");
@@ -111,6 +109,5 @@ public class RhinoApi extends AbsApi {
 
     public static void doLog(String m) {
         notifyOutput(OnPrint.LOG,  m);
-
     }
 }

@@ -7,9 +7,9 @@ import cn.vove7.androlua.LuaApp
 import cn.vove7.common.appbus.MessageEvent
 import cn.vove7.common.datamanager.DAO
 import cn.vove7.common.datamanager.InitLuaDbData
-import cn.vove7.androlua.debugserver.LuaDebugServer
 import cn.vove7.jarvis.services.MainService
 import cn.vove7.jarvis.services.SpeechRecoService
+import cn.vove7.jarvis.utils.debugserver.RemoteDebugServer
 import cn.vove7.vtp.log.Vog
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
@@ -32,7 +32,7 @@ class App : LuaApp() {
 //        synService = Intent(this, SpeechSynService::class.java)
         services = arrayOf(mainService, voiceService)//, synService)
 
-        LuaDebugServer(this).start()
+        RemoteDebugServer.start()
         startServices()
         DAO.init(this)
         if (BuildConfig.DEBUG)

@@ -4,10 +4,10 @@ import android.content.Context
 import android.os.Handler
 import android.os.Looper
 import android.support.annotation.CallSuper
-import cn.vove7.common.appbus.AppBus
 import cn.vove7.common.accessibility.AccessibilityApi
 import cn.vove7.common.accessibility.viewnode.ViewNode
 import cn.vove7.common.app.GlobalLog
+import cn.vove7.common.appbus.AppBus
 import cn.vove7.common.bridges.*
 import cn.vove7.common.bridges.ShowDialogEvent.Companion.WHICH_SINGLE
 import cn.vove7.common.datamanager.DAO
@@ -18,6 +18,7 @@ import cn.vove7.common.datamanager.parse.model.Action
 import cn.vove7.common.datamanager.parse.model.Action.SCRIPT_TYPE_JS
 import cn.vove7.common.datamanager.parse.model.Action.SCRIPT_TYPE_LUA
 import cn.vove7.common.datamanager.parse.model.ActionScope
+import cn.vove7.common.datamanager.parse.statusmap.ActionNode
 import cn.vove7.common.executor.CExecutorI
 import cn.vove7.common.executor.OnExecutorResult
 import cn.vove7.common.executor.PartialResult
@@ -51,17 +52,20 @@ abstract class AbsExecutorImpl(
 
     private lateinit var actionQueue: PriorityQueue<Action>
 
-    override var actionCount: Int = 0
+    override var actionCount: Int = -1
 
-    override var currentActionIndex: Int = 0
+    override var currentActionIndex: Int = -1
+    override var actionScope: Int? = null
 
-    override val currentScope: ActionScope?
+    override val currentApp: ActionScope?
         get() {
             val r = checkAccessibilityService(false)
             return if (r) {
                 accessApi?.currentScope
             } else null
         }
+
+    override fun isGlobal(): Boolean = globalScopeType.contains(actionScope)
 
     override var currentActivity: String = ""
         get() {
@@ -99,6 +103,8 @@ abstract class AbsExecutorImpl(
             currentActionIndex++
             if (Thread.currentThread().isInterrupted.not()) {
                 currentAction = actionQueue.poll()
+                actionScope = currentAction?.actionScopeType
+                Vog.d(this, "pollActionQueue ---> $actionScope")
                 r = runScript(currentAction!!.actionScript, currentAction!!.param.value)
                 when {
                     r.needTerminal -> {//出错
@@ -126,7 +132,7 @@ abstract class AbsExecutorImpl(
                 onRhinoExec(script, arg)
             }
             else ->
-                PartialResult.fatal("未知脚本类型: "+currentAction?.scriptType)
+                PartialResult.fatal("未知脚本类型: " + currentAction?.scriptType)
         }
     }
 
@@ -181,16 +187,16 @@ abstract class AbsExecutorImpl(
     }
 
     override fun smartOpen(data: String): Boolean {
-        return smartOpen(data, "")
+        return smartOpen(data, null)
     }
 
-    private fun smartOpen(data: String, follow: String): Boolean {
+    private fun smartOpen(data: String, follow: String?): Boolean {
         Vog.d(this, "smartOpen pkg:$data follow:$follow")
         //包名
         if (PACKAGE_REGEX.matches(data)) {
             systemBridge.openAppByPkg(data).also {
                 return if (it.ok) {
-                    parseAppInnerOperation(follow, data)
+                    follow == null || parseAppInnerOperation(follow, data)
                 } else {
                     globalAutomator.toast(context.getString(R.string.text_app_not_install))
                     false
@@ -231,7 +237,7 @@ abstract class AbsExecutorImpl(
     /**
      * 解析标识符
      */
-    private fun openByIdentifier(it: MarkedOpen, follow: String): Boolean {
+    private fun openByIdentifier(it: MarkedOpen, follow: String?): Boolean {
         return when (it.type) {
             MARKED_TYPE_APP -> {
                 smartOpen(it.value, follow)
@@ -483,7 +489,7 @@ abstract class AbsExecutorImpl(
             }
             //标识联系人
             val choiceData =
-                    waitForSingleChoice("选择要标识的联系人", contactHelper.getChoiceData())
+                waitForSingleChoice("选择要标识的联系人", contactHelper.getChoiceData())
             if (choiceData != null) {
                 //开启线程
                 thread {
@@ -514,6 +520,7 @@ abstract class AbsExecutorImpl(
          * 检测包名正则
          */
         val PACKAGE_REGEX = "[a-zA-Z]+[0-9a-zA-Z_]*(\\.[a-zA-Z]+[0-9a-zA-Z_]*)+".toRegex()
+        private val globalScopeType = arrayListOf(ActionNode.NODE_SCOPE_ALL, ActionNode.NODE_SCOPE_GLOBAL, ActionNode.NODE_SCOPE_GLOBAL_2)
 
     }
 
@@ -523,7 +530,6 @@ abstract class AbsExecutorImpl(
         } catch (e: InterruptedException) {
             //必须强行stop
             Thread.currentThread().interrupt()
-            Thread.currentThread().stop()
 //            Thread.currentThread().stop()
         }
     }

@@ -47,8 +47,7 @@ class MultiExecutorEngine(
         if (currentActionIndex == 1) {
             rhinoHelper = RhinoHelper(bridgeManager)
         }
-        rhinoHelper!!.setArgs(arg)
-        rhinoHelper!!.evalString(script)
+        rhinoHelper!!.evalString(script, arg)
         RhinoApi.doLog("主线程执行完毕\n")
 //        }
         return PartialResult.success()
@@ -64,10 +63,11 @@ class MultiExecutorEngine(
         private const val rHeader = "require 'bridges'\nlocal args = { ... }\n"
     }
 
+    //可提取ExecutorHelper 接口 handleMessage
     override fun onLuaExec(src: String, arg: String?): PartialResult {
-        if (luaHelper == null) {
+//        if (luaHelper == null) {
             luaHelper = LuaHelper(context, bridgeManager)
-        }
+//        }
         val script = preRun(src)
         return try {
             if (arg != null) {

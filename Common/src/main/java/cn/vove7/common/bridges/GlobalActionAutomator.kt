@@ -8,12 +8,13 @@ import android.os.Build
 import android.os.Handler
 import android.os.Looper
 import android.support.annotation.RequiresApi
+import android.util.Pair
 import android.view.ViewConfiguration
 import android.widget.Toast
+import cn.vove7.common.accessibility.AccessibilityApi
 import cn.vove7.common.model.ResultBox
 import cn.vove7.vtp.log.Vog
 import cn.vove7.vtp.toast.Voast
-import android.util.Pair
 
 /**
  * 无障碍全局执行器
@@ -21,7 +22,7 @@ import android.util.Pair
 class GlobalActionAutomator : ActionAutomatorI {
 
     val context: Context
-    private lateinit var mService: AccessibilityService
+    private var mService: AccessibilityService? = null
     private var mHandler: Handler? = null
     private var toast: Voast
 
@@ -62,7 +63,11 @@ class GlobalActionAutomator : ActionAutomatorI {
     }
 
     private fun performGlobalAction(globalAction: Int): Boolean {
-        return mService.performGlobalAction(globalAction)
+        if (mService == null) {
+            mService = AccessibilityApi.accessibilityService
+            if (mService == null) return false
+        }
+        return mService?.performGlobalAction(globalAction) == true
     }
 
     override fun recents(): Boolean {
@@ -78,6 +83,10 @@ class GlobalActionAutomator : ActionAutomatorI {
     override fun gesture(start: Long, duration: Long, points: Array<Pair<Int, Int>>): Boolean {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
             return false
+        }
+        if (mService == null) {
+            mService = AccessibilityApi.accessibilityService
+            if (mService == null) return false
         }
         val path = pointsToPath(points)
         return gestures(GestureDescription.StrokeDescription(path, start, duration))
@@ -116,8 +125,12 @@ class GlobalActionAutomator : ActionAutomatorI {
 
     @RequiresApi(api = Build.VERSION_CODES.N)
     private fun gesturesWithHandler(description: GestureDescription): Boolean {
+        if (mService == null) {
+            mService = AccessibilityApi.accessibilityService
+            if (mService == null) return false
+        }
         val result = ResultBox<Boolean>()
-        mService.dispatchGesture(description, object : AccessibilityService.GestureResultCallback() {
+        mService?.dispatchGesture(description, object : AccessibilityService.GestureResultCallback() {
             override fun onCompleted(gestureDescription: GestureDescription) {
                 result.setAndNotify(true)
             }
@@ -131,10 +144,14 @@ class GlobalActionAutomator : ActionAutomatorI {
 
     @RequiresApi(api = Build.VERSION_CODES.N)
     private fun gesturesWithoutHandler(description: GestureDescription): Boolean {
+        if (mService == null) {
+            mService = AccessibilityApi.accessibilityService
+            if (mService == null) return false
+        }
         prepareLooperIfNeeded()
         val result = ResultBox(false)
         val handler = Handler(Looper.myLooper())
-        mService.dispatchGesture(description, object : AccessibilityService.GestureResultCallback() {
+        mService!!.dispatchGesture(description, object : AccessibilityService.GestureResultCallback() {
             override fun onCompleted(gestureDescription: GestureDescription) {
                 result.set(true)
                 quitLoop()
@@ -151,11 +168,14 @@ class GlobalActionAutomator : ActionAutomatorI {
 
     @RequiresApi(api = Build.VERSION_CODES.N)
     override fun gesturesAsync(vararg strokes: GestureDescription.StrokeDescription) {
+        if (mService == null) {
+            mService = AccessibilityApi.accessibilityService
+        }
         val builder = GestureDescription.Builder()
         for (stroke in strokes) {
             builder.addStroke(stroke)
         }
-        mService.dispatchGesture(builder.build(), null, null)
+        mService?.dispatchGesture(builder.build(), null, null)
     }
 
     private fun quitLoop() {

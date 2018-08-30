@@ -82,7 +82,7 @@ public class ActionNodeDao extends AbstractDao<ActionNode, Long> {
         if (id != null) {
             stmt.bindLong(1, id);
         }
-        stmt.bindLong(2, entity.getNodeType());
+        stmt.bindLong(2, entity.getActionScopeType());
         stmt.bindLong(3, entity.getActionId());
         stmt.bindString(4, entity.getFollows());
         stmt.bindLong(5, entity.getScopeId());
@@ -112,7 +112,7 @@ public class ActionNodeDao extends AbstractDao<ActionNode, Long> {
         if (id != null) {
             stmt.bindLong(1, id);
         }
-        stmt.bindLong(2, entity.getNodeType());
+        stmt.bindLong(2, entity.getActionScopeType());
         stmt.bindLong(3, entity.getActionId());
         stmt.bindString(4, entity.getFollows());
         stmt.bindLong(5, entity.getScopeId());
@@ -164,7 +164,7 @@ public class ActionNodeDao extends AbstractDao<ActionNode, Long> {
     @Override
     public void readEntity(Cursor cursor, ActionNode entity, int offset) {
         entity.setId(cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0));
-        entity.setNodeType(cursor.getInt(offset + 1));
+        entity.setActionScopeType(cursor.getInt(offset + 1));
         entity.setActionId(cursor.getLong(offset + 2));
         entity.setFollows(cursor.getString(offset + 3));
         entity.setScopeId(cursor.getLong(offset + 4));

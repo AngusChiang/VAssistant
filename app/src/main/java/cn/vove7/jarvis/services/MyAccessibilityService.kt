@@ -11,17 +11,17 @@ import android.view.accessibility.AccessibilityEvent
 import android.view.accessibility.AccessibilityEvent.*
 import android.view.accessibility.AccessibilityNodeInfo
 import android.widget.Toast
-import cn.vove7.common.appbus.AppBus
 import cn.vove7.common.ShowListener
 import cn.vove7.common.accessibility.AccessibilityApi
+import cn.vove7.common.accessibility.viewnode.ViewNode
+import cn.vove7.common.appbus.AppBus
+import cn.vove7.common.datamanager.parse.model.ActionScope
 import cn.vove7.common.executor.CExecutorI
 import cn.vove7.common.view.finder.ViewFindBuilder
 import cn.vove7.common.view.finder.ViewFinder
 import cn.vove7.common.view.notifier.ActivityShowListener
 import cn.vove7.common.view.notifier.ViewShowListener
 import cn.vove7.common.view.notifier.ViewShowNotifier
-import cn.vove7.common.accessibility.viewnode.ViewNode
-import cn.vove7.common.datamanager.parse.model.ActionScope
 import cn.vove7.vtp.app.AppHelper
 import cn.vove7.vtp.log.Vog
 import cn.vove7.vtp.text.TextHelper
@@ -111,11 +111,18 @@ class MyAccessibilityService : AccessibilityApi() {
         }
     }
 
+    var viewNotifierThread: Thread? = null
+    var activityNotifierThread: Thread? = null
+
     private fun callAllNotifier() {
-        thread {
+//        if (viewNotifierThread?.isAlive == true) {
+        viewNotifierThread?.interrupt()
+//        }
+        activityNotifierThread?.interrupt()
+        viewNotifierThread = thread {
             viewNotifier.notifyIfShow()
         }
-        thread {
+        activityNotifierThread = thread {
             activityNotifier.notifyIfShow()
         }
     }
@@ -243,8 +250,8 @@ class MyAccessibilityService : AccessibilityApi() {
             if (event.eventTime - lastDownTime < 500) {
                 AppBus.post("stop execQueue")
                 return true
-            }else
-                lastDownTime=event.eventTime
+            } else
+                lastDownTime = event.eventTime
         }
 
         return super.onKeyEvent(event)
@@ -324,10 +331,16 @@ class MyAccessibilityService : AccessibilityApi() {
         override fun notifyIfShow() {
             synchronized(locksWaitForActivity) {
                 val removes = mutableListOf<ActivityShowListener>()
-                locksWaitForActivity.forEach { it ->
-                    if (fill(it.value)) {
-                        it.key.notifyShow(currentScope)
-                        removes.add(it.key)
+                kotlin.run out@{
+                    locksWaitForActivity.forEach { it ->
+                        if (fill(it.value)) {
+                            it.key.notifyShow(currentScope)
+                            removes.add(it.key)
+                        }
+                        if (Thread.currentThread().isInterrupted) {
+                            Vog.d(this, "activityNotifier 线程关闭")
+                            return@out
+                        }
                     }
                 }
                 removes.forEach {
@@ -335,6 +348,7 @@ class MyAccessibilityService : AccessibilityApi() {
                 }
                 removes.clear()
             }
+
         }
     }
 

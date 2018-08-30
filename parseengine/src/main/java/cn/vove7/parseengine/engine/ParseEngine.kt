@@ -1,6 +1,7 @@
 package cn.vove7.parseengine.engine
 
 import android.util.Log
+import cn.vove7.common.datamanager.DAO
 import cn.vove7.common.datamanager.greendao.ActionNodeDao
 import cn.vove7.common.datamanager.parse.model.Action
 import cn.vove7.common.datamanager.parse.statusmap.ActionNode
@@ -8,6 +9,7 @@ import cn.vove7.common.datamanager.parse.statusmap.ActionNode.*
 import cn.vove7.common.datamanager.parse.statusmap.Reg
 import cn.vove7.common.datamanager.parse.statusmap.Reg.*
 import cn.vove7.parseengine.model.ParseResult
+import cn.vove7.vtp.log.Vog
 import java.util.*
 
 /**
@@ -30,7 +32,7 @@ object ParseEngine {
     var i = 0
 
     /**
-     * 根据匹配 ，返回操作
+     * 匹配 ，返回操作
      * @return @see [ParseResult]
      * 语音命令转执行步骤顺序问题，方便排序
      * 0>1>..>9
@@ -64,9 +66,11 @@ object ParseEngine {
     private fun globalActionMatch(cmd: String): PriorityQueue<Action> {
         val actionQueue = PriorityQueue<Action>()
         if (GlobalActionNodes == null)
-            GlobalActionNodes = cn.vove7.common.datamanager.DAO.daoSession.actionNodeDao.queryBuilder()
-                    .where(cn.vove7.common.datamanager.greendao.ActionNodeDao.Properties.NodeType.`in`(NODE_TYPE_GLOBAL, NODE_TYPE_GLOBAL_2))
-                    .orderDesc(cn.vove7.common.datamanager.greendao.ActionNodeDao.Properties.Priority).list()
+            GlobalActionNodes = DAO.daoSession.actionNodeDao.queryBuilder()
+                    .where(ActionNodeDao.Properties.NodeType
+                            .`in`(NODE_SCOPE_ALL, NODE_SCOPE_GLOBAL, NODE_SCOPE_GLOBAL_2))
+                    .orderDesc(ActionNodeDao.Properties.Priority)
+                    .list()
         GlobalActionNodes?.forEach {
 
             val r = search(cmd, it, actionQueue, GlobalActionNodes!!)
@@ -84,7 +88,6 @@ object ParseEngine {
 //                    return actionQueue
 //                }
 //            }
-
 //            it.regs.forEach { reg ->
 //                val result = reg.regex.matchEntire(cmd)
 //                if (result != null && result.groups.isNotEmpty()) {//匹配成功
@@ -109,16 +112,17 @@ object ParseEngine {
     fun matchAppAction(cmd: String, currentAppPkg: String): PriorityQueue<Action> {
         Log.d("Debug :", "matchAppAction  ----> $currentAppPkg")
         if (AppActionNodes == null) {
-            AppActionNodes = cn.vove7.common.datamanager.DAO.daoSession.actionNodeDao.queryBuilder()
-                    .where(cn.vove7.common.datamanager.greendao.ActionNodeDao.Properties.NodeType.`in`(NODE_TYPE_IN_APP, NODE_TYPE_IN_APP_2))
-                    .orderDesc(cn.vove7.common.datamanager.greendao.ActionNodeDao.Properties.Priority)
+            AppActionNodes = DAO.daoSession.actionNodeDao.queryBuilder()
+                    .where(ActionNodeDao.Properties.NodeType
+                            .`in`(NODE_SCOPE_ALL, NODE_SCOPE_IN_APP, NODE_SCOPE_IN_APP_2))
+                    .orderDesc(ActionNodeDao.Properties.Priority)
                     .list()
         }
         val actionQueue = PriorityQueue<Action>()
         AppActionNodes?.filter {
             //筛选当前App
             it.actionScope != null && it.actionScope.packageName.startsWith(currentAppPkg)
-                    && it.nodeType == NODE_TYPE_IN_APP
+                    && it.actionScopeType == NODE_SCOPE_IN_APP
         }?.forEach {
             val r = search(cmd, it, actionQueue, AppActionNodes!!)
             if (r) return actionQueue
@@ -211,16 +215,17 @@ object ParseEngine {
                     param.value = result.groups[reg.paramPos]?.value
             }
             it.param = param
+            Vog.d(this,"extractParam $param")
         }
     }
 
-    fun getLastParam(colls: MatchGroupCollection): String {
+    fun getLastParam(colls: MatchGroupCollection): String? {
         colls.reversed().forEach {
             if (it != null && it.value != "") {
                 return it.value
             }
         }
-        return ""
+        return null
     }
 
 

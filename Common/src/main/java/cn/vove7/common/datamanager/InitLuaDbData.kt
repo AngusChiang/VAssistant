@@ -137,19 +137,19 @@ object InitLuaDbData : InitDbData() {
                 DAO.daoSession.actionScopeDao.insert(it)
             }
             arrayOf(
-                    ActionNode("打开...", 1L, a1.id, NODE_TYPE_GLOBAL)//打开
-                    , ActionNode("QQ选择聊天人", 3L, a3.id, scrope_qq.id, "4", NODE_TYPE_IN_APP)//QQ选择聊天人
-                    , ActionNode("QQ消息内容", 4L, a4.id, NODE_TYPE_IN_APP_2, 3L)//QQ消息内容
+                    ActionNode("打开...", 1L, a1.id, NODE_SCOPE_GLOBAL)//打开
+                    , ActionNode("QQ选择聊天人", 3L, a3.id, scrope_qq.id, "4", NODE_SCOPE_IN_APP)//QQ选择聊天人
+                    , ActionNode("QQ消息内容", 4L, a4.id, NODE_SCOPE_IN_APP_2, 3L)//QQ消息内容
 
-                    , ActionNode("拨打电话", 2L, a2.id, NODE_TYPE_GLOBAL)//电话
-                    , ActionNode("返回", 5L, a5.id, NODE_TYPE_GLOBAL)//返回
-                    , ActionNode("主页", 6L, a6.id, NODE_TYPE_GLOBAL)//主页
-                    , ActionNode("最近任务", 7L, a7.id, NODE_TYPE_GLOBAL)//最近任务
-                    , ActionNode("通知栏", 8L, a8.id, NODE_TYPE_GLOBAL)//通知栏
-                    , ActionNode("点击文本", 9L, a9.id, NODE_TYPE_GLOBAL)//点击文本
+                    , ActionNode("拨打电话", 2L, a2.id, NODE_SCOPE_GLOBAL)//电话
+                    , ActionNode("返回", 5L, a5.id, NODE_SCOPE_GLOBAL)//返回
+                    , ActionNode("主页", 6L, a6.id, NODE_SCOPE_GLOBAL)//主页
+                    , ActionNode("最近任务", 7L, a7.id, NODE_SCOPE_GLOBAL)//最近任务
+                    , ActionNode("通知栏", 8L, a8.id, NODE_SCOPE_GLOBAL)//通知栏
+                    , ActionNode("点击文本", 9L, a9.id, NODE_SCOPE_GLOBAL)//点击文本
 
-                    , ActionNode("QQ扫一扫", 11L, a11.id, scrope_qq.id, NODE_TYPE_IN_APP)//QQ扫一扫
-                    , ActionNode("支付宝扫一扫", 12L, a12.id, scrope_alipay.id, NODE_TYPE_IN_APP)//支付宝扫一扫
+                    , ActionNode("QQ扫一扫", 11L, a11.id, scrope_qq.id, NODE_SCOPE_IN_APP)//QQ扫一扫
+                    , ActionNode("支付宝扫一扫", 12L, a12.id, scrope_alipay.id, NODE_SCOPE_IN_APP)//支付宝扫一扫
             ).forEach {
                 mapDao.insert(it)
             }

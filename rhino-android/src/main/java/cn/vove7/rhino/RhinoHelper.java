@@ -30,6 +30,7 @@ import cn.vove7.rhino.api.UtilsApi;
 import cn.vove7.rhino.common.AndroidContextFactory;
 import cn.vove7.rhino.common.GcCollector;
 import cn.vove7.rhino.common.RhinoAndroidHelper;
+import cn.vove7.vtp.log.Vog;
 
 import static cn.vove7.rhino.api.RhinoApi.quit;
 
@@ -59,6 +60,7 @@ public class RhinoHelper extends ScriptableObject {
 
     public RhinoHelper(BridgeManager bridgeManager) {
         putProperty("executor", bridgeManager.getExecutor());
+        putProperty("runtime", bridgeManager.getExecutor());
         putProperty("system", bridgeManager.getSystemBridge());
         putProperty("automator", bridgeManager.getAutomator());
         putProperty("resultNotifier", bridgeManager.getResultNotifier());
@@ -138,6 +140,7 @@ public class RhinoHelper extends ScriptableObject {
 
 
     public void setArgs(String... args) {
+        Vog.INSTANCE.d(this, "args" + Arrays.toString(args));
         Object[] array = new Object[args.length];
         System.arraycopy(args, 0, array, 0, args.length);
         Scriptable argsObj = rhinoContext.newArray(global, array);

@@ -66,7 +66,7 @@ class InAppInstListFragment : SimpleListFragment<ActionNode>() {
             Vog.d(this, "getInstList sIds: $sIds")
 
             return DAO.daoSession.actionNodeDao.queryBuilder()
-                    .where(ActionNodeDao.Properties.NodeType.`in`(ActionNode.NODE_TYPE_IN_APP, ActionNode.NODE_TYPE_IN_APP_2))
+                    .where(ActionNodeDao.Properties.NodeType.`in`(ActionNode.NODE_SCOPE_IN_APP, ActionNode.NODE_SCOPE_IN_APP_2))
                     .where(ActionNodeDao.Properties.ScopeId.`in`(sIds))
                     .list()
 //                    .filter { it.actionScope.packageName == pkg }

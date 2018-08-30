@@ -7,20 +7,21 @@
 
 require 'accessibility'
 
-print(actionCount)
-print(currentActionIndex)
-
 smartOpen('com.netease.cloudmusic')
 search = ViewFinder().desc({ '搜索', 'Search' }).await()
 search.tryClick()
 
-ViewFinder().id('search_src_text').await().setText(args[1])
+s = ViewFinder().id('search_src_text').await()
+s.setText(args[1])
 
--- fixme
-a = ViewFinder().containsText({ '"' .. args[1] .. '"', '“' .. args[1] .. '”' }).await()
-a.tryClick()
+bounds = s.getBounds() --(154, 87 - 1055, 185)[1920x1080]
+x = (bounds.left + bounds.right) / 2
+y = bounds.bottom + 100 --276
+sleep(2000)
+click(x, y)
+
 sleep(2000) -- TODO  show
-s = ViewFinder().id('a02').findFirst()
-s.tryClick()
-
-
+if (runtime.currentActionIndex == runtime.actionCount) then --无后续操作
+    s = ViewFinder().id('a02').findFirst()
+    s.tryClick()
+end

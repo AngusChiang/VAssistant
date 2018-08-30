@@ -33,6 +33,10 @@ public class ViewFindBuilder extends FindBuilder {
     private AccessibilityApi accessibilityService;
     private CExecutorI executor;
 
+    /**
+     * wait使用
+     * @param executor CExecutorI
+     */
     public ViewFindBuilder(CExecutorI executor) {
         this();
         this.executor = executor;

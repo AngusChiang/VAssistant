@@ -56,4 +56,26 @@
         android:layout_height="wrap_content"
         android:onClick="go2Js"
         android:text="@string/text_javascript_test" />
+    <Button
+        android:id="@+id/button010"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:onClick="go2Welcome"
+        android:text="Welcome" />
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <Button
+            android:id="@+id/start_debug"
+            android:text="start debug"
+            android:onClick="onClick"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+        <Button
+            android:id="@+id/stop_debug"
+            android:text="stop debug"
+            android:onClick="onClick"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+    </LinearLayout>
 </LinearLayout>

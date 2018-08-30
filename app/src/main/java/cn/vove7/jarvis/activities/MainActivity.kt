@@ -9,6 +9,7 @@ import cn.vove7.androlua.LuaEditorActivity
 import cn.vove7.executorengine.helper.AppHelper
 import cn.vove7.executorengine.helper.ContactHelper
 import cn.vove7.jarvis.R
+import cn.vove7.jarvis.utils.debugserver.RemoteDebugServer
 import cn.vove7.rhino.RhinoActivity
 import cn.vove7.vtp.runtimepermission.PermissionUtils
 import kotlin.concurrent.thread
@@ -80,5 +81,20 @@ class MainActivity : Activity() {
 
     fun go2Js(v: View) {
         startActivity(Intent(this, RhinoActivity::class.java))
+    }
+    fun go2Welcome(v: View) {
+        startActivity(Intent(this, WelcomeActivity::class.java))
+    }
+    fun onClick(v: View) {
+
+        when (v.id) {
+            R.id.start_debug -> {
+                RemoteDebugServer.start()
+            }
+            R.id.stop_debug -> {
+                RemoteDebugServer.stop()
+            }
+        }
+
     }
 }

@@ -35,13 +35,14 @@ public class ActionNode implements Serializable, DataFrom {
     /**
      * 一个操作对应多种"说法"
      */
+    //指令作用范围
+    private int actionScopeType = -1;
 
-    private int nodeType = -1;
-
-    public static final int NODE_TYPE_GLOBAL = 1;
-    public static final int NODE_TYPE_GLOBAL_2 = 4;
-    public static final int NODE_TYPE_IN_APP = 2;
-    public static final int NODE_TYPE_IN_APP_2 = 3;//2后操作
+    public static final int NODE_SCOPE_ALL = 0x0;//
+    public static final int NODE_SCOPE_GLOBAL = 0x1;
+    public static final int NODE_SCOPE_GLOBAL_2 = 0x4;
+    public static final int NODE_SCOPE_IN_APP = 0x2;
+    public static final int NODE_SCOPE_IN_APP_2 = 0x3;//2后操作
 
     @ToMany(referencedJoinProperty = "nodeId")//一对多 reg 表 nodeId为外键
     private List<Reg> regs;
@@ -118,7 +119,7 @@ public class ActionNode implements Serializable, DataFrom {
     public ActionNode(Long id, String follows, int type) {
         this.id = id;
         this.follows = follows;
-        this.nodeType = type;
+        this.actionScopeType = type;
     }
 
     @Keep
@@ -126,7 +127,7 @@ public class ActionNode implements Serializable, DataFrom {
         this.id = id;
         this.actionId = actionId;
         this.follows = follows;
-        this.nodeType = type;
+        this.actionScopeType = type;
     }
 
     @Keep
@@ -135,14 +136,14 @@ public class ActionNode implements Serializable, DataFrom {
         this.actionId = actionId;
         this.follows = follows;
         this.scopeId = scopeId;
-        this.nodeType = type;
+        this.actionScopeType = type;
     }
 
     public ActionNode(String descTitle, Long id, long actionId, long scopeId, int type) {
         this.id = id;
         this.actionId = actionId;
         this.scopeId = scopeId;
-        this.nodeType = type;
+        this.actionScopeType = type;
         this.descTitle = descTitle;
     }
 
@@ -153,7 +154,7 @@ public class ActionNode implements Serializable, DataFrom {
         this.actionId = actionId;
         this.scopeId = scopeId;
         this.follows = f;
-        this.nodeType = type;
+        this.actionScopeType = type;
         this.descTitle = descTitle;
     }
 
@@ -162,7 +163,7 @@ public class ActionNode implements Serializable, DataFrom {
     public ActionNode(String descTitle, Long id, long actionId, int type, long parentId) {
         this.id = id;
         this.actionId = actionId;
-        this.nodeType = type;
+        this.actionScopeType = type;
         this.descTitle = descTitle;
         this.parentId = parentId;
     }
@@ -171,7 +172,7 @@ public class ActionNode implements Serializable, DataFrom {
     public ActionNode(String descTitle, Long id, long actionId, int type) {
         this.id = id;
         this.actionId = actionId;
-        this.nodeType = type;
+        this.actionScopeType = type;
         this.descTitle = descTitle;
     }
 
@@ -204,10 +205,10 @@ public class ActionNode implements Serializable, DataFrom {
     }
 
     @Keep
-    public ActionNode(Long id, int nodeType, long actionId, @NotNull String follows, long scopeId,
+    public ActionNode(Long id, int actionScopeType, long actionId, @NotNull String follows, long scopeId,
                       String descTitle, Long parentId, int priority) {
         this.id = id;
-        this.nodeType = nodeType;
+        this.actionScopeType = actionScopeType;
         this.actionId = actionId;
         this.follows = follows;
         this.scopeId = scopeId;
@@ -217,10 +218,10 @@ public class ActionNode implements Serializable, DataFrom {
     }
 
     @Generated(hash = 2128942264)
-    public ActionNode(Long id, int nodeType, long actionId, @NotNull String follows, long scopeId,
+    public ActionNode(Long id, int actionScopeType, long actionId, @NotNull String follows, long scopeId,
                       String descTitle, Long parentId, String from, int priority) {
         this.id = id;
-        this.nodeType = nodeType;
+        this.actionScopeType = actionScopeType;
         this.actionId = actionId;
         this.follows = follows;
         this.scopeId = scopeId;
@@ -266,6 +267,7 @@ public class ActionNode implements Serializable, DataFrom {
             }
             ActionDao targetDao = daoSession.getActionDao();
             Action actionNew = targetDao.load(__key);
+            actionNew.setActionScopeType(this.actionScopeType);//同步
             synchronized (this) {
                 action = actionNew;
                 action__resolvedKey = __key;
@@ -422,12 +424,12 @@ public class ActionNode implements Serializable, DataFrom {
         myDao = daoSession != null ? daoSession.getActionNodeDao() : null;
     }
 
-    public int getNodeType() {
-        return this.nodeType;
+    public int getActionScopeType() {
+        return this.actionScopeType;
     }
 
-    public void setNodeType(int nodeType) {
-        this.nodeType = nodeType;
+    public void setActionScopeType(int actionScopeType) {
+        this.actionScopeType = actionScopeType;
     }
 
     @Override

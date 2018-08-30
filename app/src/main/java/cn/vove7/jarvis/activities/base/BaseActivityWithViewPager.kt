@@ -28,7 +28,6 @@ abstract class BaseActivityWithViewPager : AppCompatActivity() {
         //设置ToolBar
         val toolbar = findViewById<Toolbar>(R.id.toolbar)
         setSupportActionBar(toolbar)
-//        toolbar.setTitleTextColor(resources.getColor(android.R.color.white))
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         view_pager.adapter = FragmentAdapter(supportFragmentManager)
         if (fragments.size == 1)

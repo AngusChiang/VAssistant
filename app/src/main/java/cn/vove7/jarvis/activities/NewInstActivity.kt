@@ -63,7 +63,7 @@ class NewInstActivity : AppCompatActivity(), View.OnClickListener {
     companion object {
         const val TYPE_GLOBAL = "global"
         const val TYPE_INNER_APP = "app_inner"
-        const val TYPE_WITH_PARENT = "with_parent"//TODO 全局 用处？
+        const val TYPE_WITH_PARENT = "follow_parent"//TODO 全局 用处？
     }
 
     lateinit var toolbar: Toolbar
@@ -272,10 +272,10 @@ class NewInstActivity : AppCompatActivity(), View.OnClickListener {
         newNode.descTitle = desc
         newNode.actionId = action.id
         newNode.scopeId = sid
-        newNode.nodeType = when (TYPE) {
-            TYPE_INNER_APP -> NODE_TYPE_IN_APP
-            TYPE_WITH_PARENT -> NODE_TYPE_IN_APP_2
-            else -> NODE_TYPE_GLOBAL
+        newNode.actionScopeType = when (TYPE) {
+            TYPE_INNER_APP -> NODE_SCOPE_IN_APP
+            TYPE_WITH_PARENT -> NODE_SCOPE_IN_APP_2
+            else -> NODE_SCOPE_GLOBAL
         }
 
         DAO.daoSession.actionNodeDao.insert(newNode)
@@ -496,8 +496,8 @@ class NewInstActivity : AppCompatActivity(), View.OnClickListener {
 
         //TODO 参数描述? no no no
         val type = if (TYPE == TYPE_GLOBAL) {
-            ActionNode.NODE_TYPE_GLOBAL
-        } else ActionNode.NODE_TYPE_IN_APP
+            ActionNode.NODE_SCOPE_GLOBAL
+        } else ActionNode.NODE_SCOPE_IN_APP
         val testNode = ActionNode(desc_text.text.toString(), testId, 0L, type, parentId
             ?: 0)
 

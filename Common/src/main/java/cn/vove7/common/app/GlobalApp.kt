@@ -1,6 +1,7 @@
 package cn.vove7.common.app
 
 import android.app.Application
+import android.support.annotation.StringRes
 
 /**
  * # GlobalApp
@@ -17,5 +18,6 @@ open class GlobalApp : Application() {
 
     companion object {
         lateinit var APP: Application
+        fun getString(@StringRes id: Int): String = APP.getString(id)
     }
 }

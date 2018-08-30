@@ -16,13 +16,13 @@ function setScreenSize(width, height){
 
 function scaleX(x){
     var sx = x / relWidth * mWidth
-    log('x: ' .. sx)
+    log('x: ' + sx)
     return sx
 }
 
 function scaleY(y){
     var sy = y / relHeight * mHeight
-    log('y: ' .. sy)
+    log('y: ' + sy)
     return sy
 }
 //

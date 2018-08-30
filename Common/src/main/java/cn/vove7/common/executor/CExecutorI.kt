@@ -1,25 +1,18 @@
 package cn.vove7.common.executor
 
-import cn.vove7.common.bridges.ChoiceData
-import cn.vove7.common.view.notifier.ActivityShowListener
-import cn.vove7.common.view.notifier.ViewShowListener
 import cn.vove7.common.accessibility.viewnode.ViewNode
+import cn.vove7.common.bridges.ChoiceData
 import cn.vove7.common.datamanager.parse.model.Action
 import cn.vove7.common.datamanager.parse.model.ActionScope
+import cn.vove7.common.view.notifier.ActivityShowListener
+import cn.vove7.common.view.notifier.ViewShowListener
 import java.util.*
 
 /**
  *
  *
  */
-interface CExecutorI : ViewShowListener, ActivityShowListener {
-    //Runtime
-    var currentActionIndex: Int
-    var actionCount: Int
-
-    val currentScope : ActionScope?
-    var currentActivity: String
-
+interface CExecutorI : ViewShowListener, ActivityShowListener, RuntimeArgs {
     fun execQueue(cmdWords: String, actionQueue: PriorityQueue<Action>)
     fun interrupt()
     fun runScript(script: String, arg: String? = null): PartialResult
@@ -72,4 +65,18 @@ interface CExecutorI : ViewShowListener, ActivityShowListener {
     fun speakSync(text: String): Boolean
 
     fun speakCallback(result: String? = null)
+}
+
+interface RuntimeArgs {
+
+    //Runtime
+    var currentActionIndex: Int
+    var actionCount: Int
+
+    val currentApp: ActionScope?
+    var currentActivity: String
+
+    var actionScope: Int?
+
+    fun isGlobal():Boolean
 }

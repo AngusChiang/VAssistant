@@ -1,7 +1,7 @@
 
 importClass(Packages.cn.vove7.common.view.finder.ViewFindBuilder)
 ViewFinder = function(){
-	return new ViewFindBuilder();
+	return new ViewFindBuilder(executor);
 }
 
 importClass(Packages.cn.vove7.common.accessibility.AccessibilityApi)	

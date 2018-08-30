@@ -28,6 +28,7 @@ public class ResultBox<T> {
         }
     }
 
+    //等待结果
     public T blockedGet() {
         synchronized (this) {
             try {

@@ -11,6 +11,8 @@ import org.greenrobot.greendao.annotation.Transient;
 
 import java.io.Serializable;
 
+import cn.vove7.common.datamanager.parse.statusmap.ActionNode;
+
 /**
  * Action 执行动作
  * Created by Vove on 2018/6/18
@@ -29,6 +31,12 @@ public class Action implements Comparable<Action>, Serializable {
      */
     private int priority;
     private long nodeId;
+
+    /**
+     * same to {@link ActionNode#actionScopeType}
+     */
+    @Transient
+    private int actionScopeType = -1;
 
     /**
      * 脚本
@@ -108,6 +116,13 @@ public class Action implements Comparable<Action>, Serializable {
         return this.param;
     }
 
+    public int getActionScopeType() {
+        return actionScopeType;
+    }
+
+    public void setActionScopeType(int actionScopeType) {
+        this.actionScopeType = actionScopeType;
+    }
 
     public void setParam(ActionParam param) {
         this.param = param;

@@ -147,8 +147,9 @@ public final class LuaJavaAPI {
             if (method == null) {
                 StringBuilder msgbuilder = new StringBuilder();
                 for (Method method1 : methods) {//没有匹配到函数 -> 所有函数
-                    msgbuilder.append(method1.toString());
-                    msgbuilder.append("\n");
+                    msgbuilder.append(method1.getName())
+                            .append(buildParamTypes(method1.getParameterTypes()))//changed by vove
+                            .append("\n");
                 }
                 throw new LuaException("Invalid method call. Invalid Parameters.\n" + msgbuilder.toString());
             }
@@ -170,6 +171,17 @@ public final class LuaJavaAPI {
         }
     }
 
+    private static String buildParamTypes(Class[] css) {
+        StringBuilder builder = new StringBuilder("(");
+        boolean f = true;
+        for (Class aClass : css) {
+            if (!f) builder.append(',');
+            else f = false;
+            builder.append(aClass.getName());
+        }
+        return builder.append(')').toString();
+
+    }
 
     /**
      * Java implementation of the metamethod __newindex
