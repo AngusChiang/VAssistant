@@ -41,3 +41,19 @@ function sendKey(key)
     system.sendKey(key)
 end
 
+function isMediaPlaying()
+    return system.isMediaPlaying()
+end
+
+function mediaPause()
+    system.mediaPause()
+end
+function mediaStart()
+    system.mediaStart()
+end
+function mediaResume()
+    system.mediaResume()
+end
+function mediaStop()
+    system.mediaStop()
+end

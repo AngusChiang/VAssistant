@@ -11,21 +11,22 @@ import android.os.Message
 import android.util.Log
 import android.widget.Toast
 import cn.vove7.androlua.luautils.LuaContext
-import cn.vove7.common.appbus.*
 import cn.vove7.common.accessibility.AccessibilityApi
+import cn.vove7.common.appbus.*
 import cn.vove7.common.bridges.ChoiceData
 import cn.vove7.common.bridges.ServiceBridge
 import cn.vove7.common.bridges.ShowAlertEvent
 import cn.vove7.common.bridges.ShowDialogEvent
+import cn.vove7.common.datamanager.parse.model.Action
 import cn.vove7.common.executor.CExecutorI
 import cn.vove7.common.executor.OnExecutorResult
 import cn.vove7.common.model.RequestPermission
-import cn.vove7.common.datamanager.parse.model.Action
-import cn.vove7.jarvis.activities.PermissionManagerActivity
-import cn.vove7.jarvis.speech.recognition.model.IStatus
 import cn.vove7.common.utils.RegUtils.checkCancel
 import cn.vove7.common.utils.RegUtils.checkConfirm
+import cn.vove7.executorengine.bridges.SystemBridge
 import cn.vove7.executorengine.exector.MultiExecutorEngine
+import cn.vove7.jarvis.activities.PermissionManagerActivity
+import cn.vove7.jarvis.speech.recognition.model.IStatus
 import cn.vove7.jarvis.view.dialog.MultiChoiceDialog
 import cn.vove7.jarvis.view.dialog.OnMultiSelectListener
 import cn.vove7.jarvis.view.dialog.OnSelectListener
@@ -184,6 +185,7 @@ class MainService : BusService(), OnExecutorResult,
         AppBus.postSpeechRecoAction(SpeechRecoAction.ActionCode.ACTION_START_RECO)
     }
 
+
     /**
      * 语音事件
      */
@@ -199,6 +201,7 @@ class MainService : BusService(), OnExecutorResult,
                 AppBus.postVoiceData(VoiceData(msg.what, res))
             }
             WHAT_VOICE_ERR -> {
+                resumeMusicIf()
                 val res = msg.data.getString("data")
                 when (voiceMode) {
                     MODE_VOICE -> {
@@ -223,12 +226,13 @@ class MainService : BusService(), OnExecutorResult,
                 val voiceData = msg.data.getString("data")
                 Vog.d(this, "结果 --------> $voiceData")
                 AppBus.postVoiceData(VoiceData(WHAT_VOICE_RESULT, voiceData))
+                resumeMusicIf()
                 when (voiceMode) {
                     MODE_VOICE -> {
                         toast.showShort("开始解析")
                         val parseResult = ParseEngine
                                 .parseAction(voiceData, AccessibilityApi.accessibilityService?.currentScope?.packageName
-                                        ?: "")
+                                    ?: "")
                         if (parseResult.isSuccess) {
                             toast.showShort("解析成功")
                             cExecutor.execQueue(voiceData, parseResult.actionQueue)
@@ -284,6 +288,10 @@ class MainService : BusService(), OnExecutorResult,
             }
             SpeechSynData.SYN_STATUS_START -> {
                 Vog.d(this, "onSynData 开始")
+                if (SystemBridge().isMediaPlaying()) {
+                    SystemBridge().mediaPause()
+                    haveMusicPlay = true
+                }
             }
             SpeechSynData.SYN_STATUS_PROCESS -> {
                 Vog.d(this, "onSynData 进度")
@@ -291,14 +299,15 @@ class MainService : BusService(), OnExecutorResult,
             SpeechSynData.SYN_STATUS_FINISH -> {
                 Vog.d(this, "onSynData 结束")
                 if (speakSync) cExecutor.speakCallback()
+                resumeMusicIf()
             }
             SpeechSynData.SYN_STATUS_ERROR -> {
                 Vog.d(this, "onSynData 出错 ${data.errMsg}")
                 if (speakSync) cExecutor.speakCallback(data.errMsg)
+                resumeMusicIf()
             }
         }
     }
-
 
     override fun onExecuteStart(words: String) {
         Vog.d(this, "开始执行 -> $words")
@@ -387,6 +396,18 @@ class MainService : BusService(), OnExecutorResult,
         const val WHAT_VOICE_ERR = 4 //出错
         const val WHAT_VOICE_RESULT = 3 //识别结果
         private val data = HashMap<String, Any>()
+
+        //识别前是否有音乐播放
+        var haveMusicPlay = false
+
+        fun resumeMusicIf() {
+            synchronized(haveMusicPlay) {
+                if (haveMusicPlay) {
+                    SystemBridge().mediaResume()
+                    haveMusicPlay = false
+                }
+            }
+        }
     }
 
     override fun getGlobalData(): Map<*, *> {

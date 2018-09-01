@@ -36,9 +36,25 @@ getAppInfo=function (s){
     return system.getAppInfo(s)
 }
 //
-//useless TODO 
+//useless TODO media control
 sendKey=function (key){
     system.sendKey(key)
 }
 //
 
+isMediaPlaying = function(){
+    return system.isMediaPlaying()
+}
+
+function mediaPause(){
+    system.mediaPause()
+}
+function mediaStart(){
+    system.mediaStart()
+}
+function mediaResume(){
+    system.mediaResume()
+}
+function mediaStop(){
+    system.mediaStop()
+}

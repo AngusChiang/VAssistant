@@ -4,11 +4,11 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.os.Message
-import cn.vove7.androlua.LuaApp
 import cn.vove7.androlua.LuaHelper
 import cn.vove7.androlua.luautils.LuaGcable
 import cn.vove7.androlua.luautils.LuaManagerI
 import cn.vove7.androlua.luautils.LuaRunnableI
+import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.executor.OnPrint
 import cn.vove7.vtp.log.Vog
 import com.luajava.LuaException
@@ -65,7 +65,7 @@ class LuaThread : Thread, LuaMetaTable, LuaGcable, LuaRunnableI, Comparable<LuaT
         this.luaManager = luaManager
         isDaemon = true
         luaManager.regGc(this)
-        luaHelper = LuaHelper(LuaApp.instance)
+        luaHelper = LuaHelper(GlobalApp.APP)
         L = luaHelper.L
         funHelper = LuaFunHelper(luaHelper, L)
 

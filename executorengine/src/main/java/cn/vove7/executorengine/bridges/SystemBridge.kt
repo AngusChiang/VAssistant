@@ -1,9 +1,10 @@
 package cn.vove7.executorengine.bridges
 
-import android.app.Instrumentation
 import android.content.Context
 import android.content.Intent
+import android.media.AudioManager
 import android.net.Uri
+import android.view.KeyEvent
 import cn.vove7.common.SystemOperation
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.app.GlobalLog
@@ -122,9 +123,46 @@ class SystemBridge : SystemOperation {
         return AppHelper.getAppInfo(context, s, s)
     }
 
-    override fun sendKey(keyCode:Int) {
+    override fun sendKey(keyCode: Int) {
+        sendKeyEvent(keyCode)
+    }
 
-//        val inst = Instrumentation()
-//        inst.sendKeyDownUpSync(keyCode)
+    override fun mediaPause() {
+        sendKeyEvent(KeyEvent.KEYCODE_MEDIA_PAUSE)
+    }
+
+    override fun mediaStart() {
+        mediaResume()
+    }
+
+
+    private fun sendKeyEvent(keyCode: Int) {
+        var ke = KeyEvent(KeyEvent.ACTION_DOWN, keyCode)
+        val intent = Intent(Intent.ACTION_MEDIA_BUTTON)
+        intent.addFlags(Intent.FLAG_RECEIVER_FOREGROUND)
+
+        intent.putExtra(Intent.EXTRA_KEY_EVENT, ke)
+        GlobalApp.APP.sendBroadcast(intent)
+
+        ke = KeyEvent(KeyEvent.ACTION_UP, keyCode)
+        intent.putExtra(Intent.EXTRA_KEY_EVENT, ke)
+        GlobalApp.APP.sendBroadcast(intent)
+    }
+
+    override fun mediaResume() {
+        sendKeyEvent(KeyEvent.KEYCODE_MEDIA_PLAY)
+    }
+
+    override fun mediaStop() {
+        sendKeyEvent(KeyEvent.KEYCODE_MEDIA_STOP)
+    }
+
+    override fun isMediaPlaying(): Boolean {
+        val am = GlobalApp.APP.getSystemService(Context.AUDIO_SERVICE) as AudioManager?
+        if (am == null) {
+            Vog.e(this, "isMusicActive：无法获取AudioManager引用")
+            return false
+        }
+        return am.isMusicActive
     }
 }

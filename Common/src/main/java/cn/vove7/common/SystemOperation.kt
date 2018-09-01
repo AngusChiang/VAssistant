@@ -45,4 +45,11 @@ interface SystemOperation {
 
     //TODO
     fun sendKey(keyCode: Int)
+
+    fun mediaPause()
+    fun mediaStart()
+    fun mediaResume()
+    fun mediaStop()
+
+    fun isMediaPlaying():Boolean
 }

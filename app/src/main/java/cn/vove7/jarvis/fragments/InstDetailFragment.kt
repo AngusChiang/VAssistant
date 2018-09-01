@@ -82,7 +82,9 @@ class InstDetailFragment : BottomSheetDialogFragment() {
                     val editIntent = Intent(context, NewInstActivity::class.java)
                     editIntent.putExtra("nodeId", node.id)
                     editIntent.putExtra("type", node.actionScopeType)
-                    editIntent.putExtra("pkg", node.actionScope.packageName)
+                    val scope = node.actionScope
+                    if (scope != null)
+                        editIntent.putExtra("pkg", node.actionScope.packageName)
                     editIntent.putExtra("reedit", true)
                     startActivity(editIntent)
                 }

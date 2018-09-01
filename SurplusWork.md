@@ -4,7 +4,7 @@
 
 ## FixMe
 - [x] lua call java getter setter 
-- [] 
+- [] Rhino efficiency
 
 ## Lua API
 
@@ -29,6 +29,9 @@
  
  - 多参数支持
  - 在线解析?
+ 
+ - 语音唤醒冲突
+ 
  
  ## Marked
  

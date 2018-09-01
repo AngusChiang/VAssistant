@@ -8,6 +8,8 @@ import android.os.IBinder
 import android.os.Message
 import cn.vove7.common.appbus.AppBus
 import cn.vove7.common.appbus.SpeechRecoAction
+import cn.vove7.executorengine.bridges.SystemBridge
+import cn.vove7.jarvis.services.MainService.Companion.haveMusicPlay
 import cn.vove7.jarvis.speech.recognition.OfflineRecogParams
 import cn.vove7.jarvis.speech.recognition.listener.SpeechStatusListener
 import cn.vove7.jarvis.speech.recognition.model.IStatus
@@ -127,6 +129,11 @@ class SpeechRecoService : BusService() {
     )
 
     internal fun startRecog() {
+
+        if (SystemBridge().isMediaPlaying()) {
+            SystemBridge().mediaPause()
+            haveMusicPlay = true
+        }
         if (!isListening()) {
             myRecognizer.start(params)
         } else {
@@ -139,6 +146,7 @@ class SpeechRecoService : BusService() {
      */
     private fun stopRecog() {
         myRecognizer.stop()
+        MainService.resumeMusicIf()
     }
 
     /**
@@ -146,6 +154,7 @@ class SpeechRecoService : BusService() {
      */
     private fun cancelRecog() {
         myRecognizer.cancel()
+        MainService.resumeMusicIf()
     }
 
     fun isListening(): Boolean {

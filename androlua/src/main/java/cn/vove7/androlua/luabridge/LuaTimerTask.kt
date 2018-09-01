@@ -1,10 +1,10 @@
 package cn.vove7.androlua.luabridge
 
-import cn.vove7.androlua.LuaApp
 import cn.vove7.androlua.LuaHelper
 import cn.vove7.androlua.luautils.LuaManagerI
 import cn.vove7.androlua.luautils.LuaRunnableI
 import cn.vove7.androlua.luautils.TimerTaskX
+import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.executor.OnPrint
 import cn.vove7.vtp.log.Vog
 import com.luajava.LuaException
@@ -49,7 +49,7 @@ class LuaTimerTask : TimerTaskX, LuaRunnableI {
         if (arg != null)
             mArg = arg
         this.luaManager = luaManager
-        luaHelper = LuaHelper(LuaApp.instance)
+        luaHelper = LuaHelper(GlobalApp.APP)
         L = luaHelper.L
         funHelper = LuaFunHelper(luaHelper, L)
 
@@ -59,7 +59,8 @@ class LuaTimerTask : TimerTaskX, LuaRunnableI {
     override fun quit() {
         quit(false)
     }
-    override fun quit(self:Boolean) {
+
+    override fun quit(self: Boolean) {
         Vog.d(this, "quit $this $self")
         L.gc(LuaState.LUA_GCCOLLECT, 1)
 //        L.close()

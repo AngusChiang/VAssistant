@@ -1,11 +1,11 @@
 package cn.vove7.androlua.luabridge
 
 import android.os.AsyncTask
-import cn.vove7.androlua.LuaApp
 import cn.vove7.androlua.LuaHelper
 import cn.vove7.androlua.luautils.LuaGcable
 import cn.vove7.androlua.luautils.LuaManagerI
 import cn.vove7.androlua.luautils.LuaRunnableI
+import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.executor.OnPrint
 import cn.vove7.vtp.log.Vog
 import com.luajava.JavaFunction
@@ -55,7 +55,7 @@ class LuaAsyncTask : AsyncTask<Any, Any, Any>, LuaGcable, LuaRunnableI, Comparab
         luaManager.regGc(this)
         mCallback = callback
 
-        luaHelper = LuaHelper(LuaApp.instance)
+        luaHelper = LuaHelper(GlobalApp.APP)
         L = luaHelper.L
         funHelper = LuaFunHelper(luaHelper, L)
 

@@ -1,5 +1,6 @@
 package cn.vove7.androlua.luautils;
 
+import android.app.Application;
 import android.content.Context;
 import android.content.res.AssetManager;
 import android.content.res.Resources;
@@ -11,8 +12,8 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import cn.vove7.androlua.LuaApp;
 import cn.vove7.androlua.luabridge.LuaUtil;
+import cn.vove7.common.app.GlobalApp;
 import dalvik.system.DexClassLoader;
 
 public class LuaDexLoader {
@@ -33,7 +34,7 @@ public class LuaDexLoader {
     private String odexDir;
 
     public LuaDexLoader(Context context) {
-        LuaApp app = LuaApp.Companion.getInstance();
+        Application app = GlobalApp.APP;//.Companion.getInstance();
         mContext = context;
         luaDir = app.getFilesDir().getAbsolutePath();
         //localDir = app.getLocalDir();
@@ -94,7 +95,7 @@ public class LuaDexLoader {
                     path += ".jar";
                 else
                     throw new LuaException(path + " not found");
-            dex = new LuaDexClassLoader(path, odexDir, LuaApp.Companion.getInstance().getApplicationInfo().nativeLibraryDir, mContext.getClassLoader());
+            dex = new LuaDexClassLoader(path, odexDir, GlobalApp.APP.getApplicationInfo().nativeLibraryDir, mContext.getClassLoader());
             dexCache.put(name, dex);
         }
 
