@@ -2,7 +2,7 @@ package cn.vove7.jarvis.speech.recognition.listener
 
 import android.os.Handler
 import cn.vove7.common.appbus.AppBus
-import cn.vove7.common.appbus.SpeechRecoAction
+import cn.vove7.common.appbus.SpeechAction
 import cn.vove7.common.appbus.VoiceData
 import cn.vove7.common.model.RequestPermission
 import cn.vove7.jarvis.services.MainService.Companion.WHAT_VOICE_ERR
@@ -43,7 +43,7 @@ class SpeechStatusListener(private val handler: Handler) : StatusRecogListener()
     override fun onAsrEnd() {
         super.onAsrEnd()
         //立即停止识别 ，检测结果
-        AppBus.postSpeechRecoAction(SpeechRecoAction.ActionCode.ACTION_STOP_RECO)
+        AppBus.postSpeechAction(SpeechAction.ActionCode.ACTION_STOP_RECO)
 
     }
 

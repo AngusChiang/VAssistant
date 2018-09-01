@@ -6,6 +6,8 @@ import android.os.Bundle
 import android.view.KeyEvent
 import android.view.View
 import cn.vove7.androlua.LuaEditorActivity
+import cn.vove7.common.appbus.AppBus
+import cn.vove7.common.appbus.SpeechAction
 import cn.vove7.executorengine.helper.AppHelper
 import cn.vove7.executorengine.helper.ContactHelper
 import cn.vove7.jarvis.R
@@ -93,6 +95,9 @@ class MainActivity : Activity() {
             }
             R.id.stop_debug -> {
                 RemoteDebugServer.stop()
+            }
+            R.id.stop_wakeup -> {
+                AppBus.postSpeechAction(SpeechAction.ActionCode.ACTION_STOP_WAKEUP)
             }
         }
 

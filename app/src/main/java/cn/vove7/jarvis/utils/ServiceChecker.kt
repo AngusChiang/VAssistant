@@ -22,8 +22,8 @@ class ServiceChecker(val context: Context) {
         var b = false
         arrayOf(
                 MainService::class.java,
-//                SpeechRecoService::class.java,
-//                SpeechSynService::class.java,
+                SpeechRecoService::class.java,
+                SpeechSynService::class.java,
                 MyAccessibilityService::class.java
         ).forEach {
             Vog.i(this, "checkService ${it::class.java.simpleName}")

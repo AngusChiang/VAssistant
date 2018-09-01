@@ -4,6 +4,10 @@ import android.content.Context
 import android.content.Intent
 import android.media.AudioManager
 import android.net.Uri
+import android.os.Build
+import android.os.Handler
+import android.os.VibrationEffect
+import android.os.Vibrator
 import android.view.KeyEvent
 import cn.vove7.common.SystemOperation
 import cn.vove7.common.app.GlobalApp
@@ -170,12 +174,12 @@ class SystemBridge : SystemOperation {
      */
     override fun volumeMute() {
         val mAudioManager = GlobalApp.APP.getSystemService(Context.AUDIO_SERVICE) as AudioManager
-        mAudioManager.setStreamMute(AudioManager.USE_DEFAULT_STREAM_TYPE,true)
+        mAudioManager.setStreamMute(AudioManager.USE_DEFAULT_STREAM_TYPE, true)
     }
 
     override fun volumeUnmute() {
         val mAudioManager = GlobalApp.APP.getSystemService(Context.AUDIO_SERVICE) as AudioManager
-        mAudioManager.setStreamMute(AudioManager.USE_DEFAULT_STREAM_TYPE,false)
+        mAudioManager.setStreamMute(AudioManager.USE_DEFAULT_STREAM_TYPE, false)
     }
 
     override fun volumeUp() {
@@ -193,11 +197,14 @@ class SystemBridge : SystemOperation {
     fun switchVolume(up: Boolean) {
         val mAudioManager = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
         if (up) {
-            mAudioManager.adjustVolume(AudioManager.ADJUST_RAISE,AudioManager.FX_FOCUS_NAVIGATION_UP)
+            mAudioManager.adjustVolume(AudioManager.ADJUST_RAISE, AudioManager.FX_FOCUS_NAVIGATION_UP)
         } else {
             mAudioManager.adjustVolume(AudioManager.ADJUST_LOWER,
                     AudioManager.FX_FOCUS_NAVIGATION_UP)
         }
+        Handler().postDelayed({
+            mAudioManager.adjustVolume(AudioManager.ADJUST_SAME, 0)
+        }, 1000)
     }
 
     override var musicMaxVolume: Int = -1
@@ -211,17 +218,17 @@ class SystemBridge : SystemOperation {
             return mAudioManager.getStreamVolume(AudioManager.STREAM_MUSIC)
         }
 
-    override fun setMusicVolume(index:Int) {
+    override fun setMusicVolume(index: Int) {
         val mAudioManager = GlobalApp.APP.getSystemService(Context.AUDIO_SERVICE) as AudioManager
         mAudioManager.setStreamVolume(AudioManager.STREAM_MUSIC, index, 0)
     }
 
-    override fun setAlarmVolume(index:Int) {
+    override fun setAlarmVolume(index: Int) {
         val mAudioManager = GlobalApp.APP.getSystemService(Context.AUDIO_SERVICE) as AudioManager
         mAudioManager.setStreamVolume(AudioManager.STREAM_ALARM, index, 0)
     }
 
-    override fun setNotificationVolume(index:Int) {
+    override fun setNotificationVolume(index: Int) {
         val mAudioManager = GlobalApp.APP.getSystemService(Context.AUDIO_SERVICE) as AudioManager
         mAudioManager.setStreamVolume(AudioManager.STREAM_NOTIFICATION, index, 0)
     }
@@ -233,5 +240,33 @@ class SystemBridge : SystemOperation {
             return false
         }
         return am.isMusicActive
+    }
+
+    override fun vibrate(millis: Long): Boolean {
+
+        val vibrateMan = context.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
+        if (vibrateMan.hasVibrator()) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                vibrateMan.vibrate(VibrationEffect.createOneShot(millis, VibrationEffect.DEFAULT_AMPLITUDE))
+            } else {
+                vibrateMan.vibrate(millis)
+            }
+        }
+        return true
+    }
+
+    override fun vibrate(arr: Array<Long>): Boolean {
+        val vibrateMan = context.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
+        if (vibrateMan.hasVibrator()) {
+            val l = LongArray(arr.size)
+            var i = 0
+            arr.forEach { l[i++] = it }
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                vibrateMan.vibrate(VibrationEffect.createWaveform(l, -1))
+            } else {
+                vibrateMan.vibrate(l, -1)
+            }
+        }
+        return true
     }
 }

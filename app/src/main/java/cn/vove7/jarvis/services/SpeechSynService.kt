@@ -157,7 +157,7 @@ class SpeechSynService : BusService(), SpeechSynthesizerListener {
         // 设置合成的音量，0-9 ，默认 5
         params[SpeechSynthesizer.PARAM_VOLUME] = "9"
         // 设置合成的语速，0-9 ，默认 5
-        params[SpeechSynthesizer.PARAM_SPEED] = "7"
+        params[SpeechSynthesizer.PARAM_SPEED] = "5"
         // 设置合成的语调，0-9 ，默认 5
         params[SpeechSynthesizer.PARAM_PITCH] = "5"
 

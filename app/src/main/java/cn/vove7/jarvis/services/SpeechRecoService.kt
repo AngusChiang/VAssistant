@@ -7,7 +7,7 @@ import android.os.Handler
 import android.os.IBinder
 import android.os.Message
 import cn.vove7.common.appbus.AppBus
-import cn.vove7.common.appbus.SpeechRecoAction
+import cn.vove7.common.appbus.SpeechAction
 import cn.vove7.executorengine.bridges.SystemBridge
 import cn.vove7.jarvis.services.MainService.Companion.haveMusicPlay
 import cn.vove7.jarvis.speech.recognition.OfflineRecogParams
@@ -23,6 +23,7 @@ import cn.vove7.vtp.toast.Voast
 import com.baidu.speech.asr.SpeechConstant
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
+import java.lang.Thread.sleep
 
 /**
  * 语音识别服务
@@ -83,13 +84,13 @@ class SpeechRecoService : BusService() {
      * onAction
      */
     @Subscribe(threadMode = ThreadMode.BACKGROUND)
-    fun onAction(sAction: SpeechRecoAction) {
+    fun onAction(sAction: SpeechAction) {
         when (sAction.action) {
-            SpeechRecoAction.ActionCode.ACTION_START_RECO -> startRecog()
-            SpeechRecoAction.ActionCode.ACTION_STOP_RECO -> stopRecog()
-            SpeechRecoAction.ActionCode.ACTION_CANCEL_RECO -> cancelRecog()
-            SpeechRecoAction.ActionCode.ACTION_START_WAKEUP -> wakeuper.start()
-            SpeechRecoAction.ActionCode.ACTION_STOP_WAKEUP -> wakeuper.stop()
+            SpeechAction.ActionCode.ACTION_START_RECO -> startRecog()
+            SpeechAction.ActionCode.ACTION_STOP_RECO -> stopRecog()
+            SpeechAction.ActionCode.ACTION_CANCEL_RECO -> cancelRecog()
+            SpeechAction.ActionCode.ACTION_START_WAKEUP -> wakeuper.start()
+            SpeechAction.ActionCode.ACTION_STOP_WAKEUP -> wakeuper.stop()
             else -> {
                 Vog.e(this, sAction)
             }
@@ -129,11 +130,14 @@ class SpeechRecoService : BusService() {
     )
 
     internal fun startRecog() {
+        //震动 音效
+        SystemBridge().vibrate(80L)
 
         if (SystemBridge().isMediaPlaying()) {
             SystemBridge().mediaPause()
             haveMusicPlay = true
         }
+        sleep(100)
         if (!isListening()) {
             myRecognizer.start(params)
         } else {
@@ -158,8 +162,7 @@ class SpeechRecoService : BusService() {
     }
 
     fun isListening(): Boolean {
-        return !LogicOperators.orEquals(listener.status,
-                arrayOf(IStatus.STATUS_NONE, IStatus.STATUS_FINISHED, IStatus.STATUS_WAKEUP_EXIT))
+        return !arrayOf(IStatus.STATUS_NONE, IStatus.STATUS_FINISHED, IStatus.STATUS_WAKEUP_EXIT).contains(listener.status)
     }
 
 

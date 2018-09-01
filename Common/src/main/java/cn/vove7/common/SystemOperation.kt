@@ -1,6 +1,5 @@
 package cn.vove7.common
 
-import android.media.AudioManager
 import cn.vove7.common.model.ExResult
 import cn.vove7.vtp.app.AppInfo
 import cn.vove7.vtp.system.DeviceInfo
@@ -46,8 +45,10 @@ interface SystemOperation {
 
     //TODO
     fun sendKey(keyCode: Int)
-//Media control
+
+    //Media control
     fun mediaPause()
+
     fun mediaStart()
     fun mediaResume()
     fun mediaStop()
@@ -57,13 +58,16 @@ interface SystemOperation {
     fun volumeUnmute()
     fun volumeUp()
     fun volumeDown()
-    fun setMusicVolume(index:Int)
-    fun setAlarmVolume(index:Int)
-    fun setNotificationVolume(index:Int)
-    fun isMediaPlaying():Boolean
+    fun setMusicVolume(index: Int)
+    fun setAlarmVolume(index: Int)
+    fun setNotificationVolume(index: Int)
+    fun isMediaPlaying(): Boolean
 
     //最大音量
-    var musicMaxVolume :Int
+    var musicMaxVolume: Int
     //当前音量
-    var musicCurrentVolume : Int
+    var musicCurrentVolume: Int
+
+    fun vibrate(millis: Long): Boolean
+    fun vibrate(arr: Array<Long>): Boolean
 }

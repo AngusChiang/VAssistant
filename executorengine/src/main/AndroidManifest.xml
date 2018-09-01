@@ -2,4 +2,5 @@
     package="cn.vove7.executorengine" >
 
     <uses-permission android:name="android.permission.CALL_PHONE" />
+    <uses-permission android:name="android.permission.VIBRATE" />
 </manifest>

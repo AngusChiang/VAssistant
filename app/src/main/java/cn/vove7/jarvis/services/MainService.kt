@@ -104,7 +104,7 @@ class MainService : BusService(), OnExecutorResult,
             alertDialog?.show()
             //语音
             voiceMode = MODE_ALERT
-            AppBus.postSpeechRecoAction(SpeechRecoAction.ActionCode.ACTION_START_RECO)
+            AppBus.postSpeechAction(SpeechAction.ActionCode.ACTION_START_RECO)
         } catch (e: Exception) {
             onRequestPermission(RequestPermission("悬浮窗权限"))
         }
@@ -115,7 +115,7 @@ class MainService : BusService(), OnExecutorResult,
      * 停止语音
      */
     private fun notifyAlertResult() {
-        AppBus.postSpeechRecoAction(SpeechRecoAction.ActionCode.ACTION_CANCEL_RECO)
+        AppBus.postSpeechAction(SpeechAction.ActionCode.ACTION_CANCEL_RECO)
         voiceMode = MODE_VOICE
         cExecutor.notifySync()
     }
@@ -182,7 +182,7 @@ class MainService : BusService(), OnExecutorResult,
 //        toast.showShort(action.param?.askText ?: "???")
         messengerAction = action
         voiceMode = MODE_GET_PARAM
-        AppBus.postSpeechRecoAction(SpeechRecoAction.ActionCode.ACTION_START_RECO)
+        AppBus.postSpeechAction(SpeechAction.ActionCode.ACTION_START_RECO)
     }
 
 
@@ -215,7 +215,7 @@ class MainService : BusService(), OnExecutorResult,
                     MODE_ALERT -> {
 //                        toast.showShort("重新说")
 //                        speakSync("reSay")
-                        AppBus.postSpeechRecoAction(SpeechRecoAction.ActionCode.ACTION_START_RECO)  //继续????
+                        AppBus.postSpeechAction(SpeechAction.ActionCode.ACTION_START_RECO)  //继续????
                     }
                 }
             }
@@ -261,7 +261,7 @@ class MainService : BusService(), OnExecutorResult,
                                 alertDialog?.getButton(DialogInterface.BUTTON_NEGATIVE)?.performClick()
                                 voiceMode = MODE_VOICE
                             }
-                            else -> AppBus.postSpeechRecoAction(SpeechRecoAction.ActionCode.ACTION_START_RECO)  //继续????
+                            else -> AppBus.postSpeechAction(SpeechAction.ActionCode.ACTION_START_RECO)  //继续????
                         }
                     }
                 }
@@ -355,7 +355,7 @@ class MainService : BusService(), OnExecutorResult,
     fun stopExecutor(order: String) {
         when (order) {
             "stop execQueue" -> {
-                AppBus.postSpeechRecoAction(SpeechRecoAction.ActionCode.ACTION_CANCEL_RECO)
+                AppBus.postSpeechAction(SpeechAction.ActionCode.ACTION_CANCEL_RECO)
                 cExecutor.interrupt()
             }
             else -> {

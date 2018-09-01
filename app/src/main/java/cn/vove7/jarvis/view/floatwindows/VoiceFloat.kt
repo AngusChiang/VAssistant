@@ -12,7 +12,7 @@ import android.view.animation.AccelerateDecelerateInterpolator
 import android.widget.ImageView
 import android.widget.TextView
 import cn.vove7.common.appbus.AppBus
-import cn.vove7.common.appbus.SpeechRecoAction
+import cn.vove7.common.appbus.SpeechAction
 import cn.vove7.common.appbus.VoiceData
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.services.MainService
@@ -85,7 +85,6 @@ class VoiceFloat : AbFloatWindow<VoiceFloat.Holder> {
                         return@OnTouchListener false
                     posX = event.rawX.toInt() - dx
                     posY = event.rawY.toInt() - dy
-                    Vog.d(this, "onCreateViewHolder move")
                     updatePoint(posX, posY)
                     onMoving = true
                     isClick = false
@@ -148,12 +147,13 @@ class VoiceFloat : AbFloatWindow<VoiceFloat.Holder> {
 
     // TODO 效果
     fun onClick() {
-        holder.result.text = "begin"
         if (SpeechRecoService.instance?.isListening() == true) {
-            AppBus.postSpeechRecoAction(SpeechRecoAction.ActionCode.ACTION_CANCEL_RECO)
+            holder.result.text = "stop"
+            AppBus.postSpeechAction(SpeechAction.ActionCode.ACTION_CANCEL_RECO)
         } else {
             ServiceChecker(context).checkService()
-            AppBus.postSpeechRecoAction(SpeechRecoAction.ActionCode.ACTION_START_RECO)
+            holder.result.text = "begin"
+            AppBus.postSpeechAction(SpeechAction.ActionCode.ACTION_START_RECO)
         }
     }
 

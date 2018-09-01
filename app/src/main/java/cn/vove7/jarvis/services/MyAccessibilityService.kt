@@ -4,8 +4,9 @@ import android.accessibilityservice.AccessibilityService
 import android.content.Context
 import android.content.pm.PackageManager
 import android.graphics.Rect
+import android.os.Handler
 import android.view.KeyEvent
-import android.view.KeyEvent.KEYCODE_VOLUME_DOWN
+import android.view.KeyEvent.*
 import android.view.ViewGroup
 import android.view.accessibility.AccessibilityEvent
 import android.view.accessibility.AccessibilityEvent.*
@@ -15,6 +16,7 @@ import cn.vove7.common.ShowListener
 import cn.vove7.common.accessibility.AccessibilityApi
 import cn.vove7.common.accessibility.viewnode.ViewNode
 import cn.vove7.common.appbus.AppBus
+import cn.vove7.common.appbus.SpeechAction
 import cn.vove7.common.datamanager.parse.model.ActionScope
 import cn.vove7.common.executor.CExecutorI
 import cn.vove7.common.view.finder.ViewFindBuilder
@@ -22,6 +24,7 @@ import cn.vove7.common.view.finder.ViewFinder
 import cn.vove7.common.view.notifier.ActivityShowListener
 import cn.vove7.common.view.notifier.ViewShowListener
 import cn.vove7.common.view.notifier.ViewShowNotifier
+import cn.vove7.executorengine.bridges.SystemBridge
 import cn.vove7.vtp.app.AppHelper
 import cn.vove7.vtp.log.Vog
 import cn.vove7.vtp.text.TextHelper
@@ -243,18 +246,51 @@ class MyAccessibilityService : AccessibilityApi() {
         return super.onGesture(gestureId)
     }
 
-    var lastDownTime = 0L
+    private val delayHandler = Handler()
+    private var startupRunner: Runnable = Runnable { AppBus.postSpeechAction(SpeechAction.ActionCode.ACTION_START_RECO) }
+    var stopRunner: Runnable = Runnable { AppBus.post("stop execQueue") }
+    var delayUp = 800L
     override fun onKeyEvent(event: KeyEvent): Boolean {
         Vog.d(this, "onKeyEvent  ----> " + event.toString())
-        if (event.action == KeyEvent.ACTION_DOWN && event.keyCode == KEYCODE_VOLUME_DOWN) {
-            if (event.eventTime - lastDownTime < 500) {
-                AppBus.post("stop execQueue")
-                return true
-            } else
-                lastDownTime = event.eventTime
-        }
 
+        when (event.action) {
+            KeyEvent.ACTION_DOWN -> when (event.keyCode) {
+                KEYCODE_VOLUME_DOWN -> {
+                    postLongDelay(stopRunner)
+                    return true
+                }
+                KEYCODE_VOLUME_UP, KEYCODE_HOME, KEYCODE_APP_SWITCH -> {
+                    postLongDelay(startupRunner)
+                    return true
+                }
+            }
+            KeyEvent.ACTION_UP -> {
+                when (event.keyCode) {
+                    KEYCODE_VOLUME_UP, KEYCODE_HOME, KEYCODE_APP_SWITCH ->
+                        removeDelayIfInterrupt(event, startupRunner) || super.onKeyEvent(event)
+                    KEYCODE_VOLUME_DOWN ->
+                        removeDelayIfInterrupt(event, stopRunner) || super.onKeyEvent(event)
+                }
+            }
+        }
         return super.onKeyEvent(event)
+
+    }
+
+    private fun postLongDelay(runnable: Runnable) {
+        delayHandler.postDelayed(runnable, delayUp)
+    }
+
+    private fun removeDelayIfInterrupt(event: KeyEvent, runnable: Runnable): Boolean {
+        if ((event.eventTime - event.downTime) < (delayUp - 100)) {//时间短 移除runner 调节音量
+            delayHandler.removeCallbacks(runnable)
+            when (event.keyCode) {
+                KEYCODE_VOLUME_UP -> SystemBridge().volumeDown()
+                KEYCODE_VOLUME_DOWN -> SystemBridge().volumeUp()
+                else -> return false
+            } //其他按键
+        }
+        return true
     }
 
 

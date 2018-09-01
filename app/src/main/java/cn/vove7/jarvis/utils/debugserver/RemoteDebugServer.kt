@@ -9,12 +9,10 @@ import cn.vove7.common.executor.OnPrint
 import cn.vove7.jarvis.R
 import cn.vove7.rhino.api.RhinoApi
 import cn.vove7.vtp.log.Vog
-import java.io.BufferedInputStream
-import java.io.BufferedOutputStream
-import java.io.DataInputStream
-import java.io.DataOutputStream
+import java.io.*
 import java.net.ServerSocket
 import java.net.Socket
+import java.nio.charset.Charset
 import kotlin.concurrent.thread
 
 class RemoteDebugServer : Runnable {
@@ -38,9 +36,11 @@ class RemoteDebugServer : Runnable {
         fun stop() {
             stopped = true
             server?.close()
+            client?.close()
+            outputStream?.close()
             thread?.interrupt()
-        }
 
+        }
     }
 
     override fun run() {
@@ -48,22 +48,21 @@ class RemoteDebugServer : Runnable {
         server = ServerSocket(LISTEN_PORT)
         RhinoApi.regPrint(print)
         LuaHelper.regPrint(print)
-        show("Debug Server started on port $LISTEN_PORT")
-        stopped = false
+        GlobalApp.toastShort("Debug Server started on port $LISTEN_PORT")
         server.use {
-            try {
-                while (!stopped) {
+            while (!stopped) {
+                try {
                     client = server!!.accept()//等待
-                    val inputStream = DataInputStream(BufferedInputStream(client!!.getInputStream()))
+                    val inputStream = BufferedReader(InputStreamReader(client!!.getInputStream(), "UTF-8"))
                     outputStream = DataOutputStream(BufferedOutputStream(client!!.getOutputStream()))
                     GlobalApp.toastShort(String.format(GlobalApp.getString(R.string.text_establish_connection), client?.inetAddress
                         ?: "none"))
                     print.onPrint(0, "连接成功 ${client!!.inetAddress}")
                     //type -> script -> arg
                     thread {
+                        val pThread = Thread.currentThread()
                         try {
-                            val pThread = Thread.currentThread()
-                            while (!stopped) {
+                            while (true) {
                                 val action = inputStream.readLine()
                                 when (action) {
                                     "stop" -> {
@@ -75,21 +74,21 @@ class RemoteDebugServer : Runnable {
                                         val data = inputStream.readLine()
                                         if (type == null) {
                                             Vog.d(this, "run ---> disconnect: ${client?.inetAddress}")
+                                            onFinish()
                                             pThread.interrupt()
                                         } else
                                             onPostAction(type, data.replace("##", "\n"), arg)
                                     }
                                 }
-
                             }
-                        } catch (e: Exception) {
+                        } catch (e: Exception) {//client断开连接
                             e.printStackTrace()
                             show("err: ${e.message}")
                         }
                     }
+                } catch (e: Exception) {
+                    GlobalApp.toastShort(GlobalApp.getString(R.string.text_disconnect_with_debugger))
                 }
-            } catch (e: Exception) {
-                GlobalApp.toastShort(GlobalApp.getString(R.string.text_disconnect_with_debugger))
             }
         }
         show("RemoteDebug finished!")
@@ -109,8 +108,12 @@ class RemoteDebugServer : Runnable {
             Vog.d(this, "onPrint ---> $output")
 
             val end = if (output.endsWith('\n')) "" else "\n"
-            outputStream?.writeUTF("((($output$end)))")//C# 粘包问题 消息格式(((msg)))
-            outputStream?.flush()
+            try {
+                outputStream?.writeUTF("((($output$end)))")//C# 粘包问题 消息格式(((msg)))
+                outputStream?.flush()
+            } catch (e: Exception) {
+                onFinish()
+            }
         }
     }
 

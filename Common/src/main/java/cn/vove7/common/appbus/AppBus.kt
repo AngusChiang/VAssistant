@@ -18,8 +18,8 @@ object AppBus {
     /**
      * 控制语音
      */
-    fun postSpeechRecoAction(action: SpeechRecoAction.ActionCode) {
-        EventBus.getDefault().post(SpeechRecoAction(action))
+    fun postSpeechAction(action: SpeechAction.ActionCode) {
+        EventBus.getDefault().post(SpeechAction(action))
     }
 
     /**
@@ -62,10 +62,10 @@ interface BaseAction {
 /**
  * 语音识别控制消息
  */
-data class SpeechRecoAction(val action: ActionCode) {
+data class SpeechAction(val action: ActionCode) {
 
     override fun toString(): String {
-        return "SpeechRecoAction(action=$action)"
+        return "SpeechAction(action=$action)"
     }
     enum class ActionCode{
         ACTION_START_RECO,
