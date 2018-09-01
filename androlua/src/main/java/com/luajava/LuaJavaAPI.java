@@ -92,13 +92,13 @@ public final class LuaJavaAPI {
                 if (checkMethod(L, obj, searchName) != 0)
                     return 2;
 
+            if (type == 0 || type == 4)//优先getter函数
+                if (javaGetter(L, obj, searchName) != 0)
+                    return 4;
+
             if (type == 0 || type == 1 || type == 5)
                 if ((ret = checkField(L, obj, searchName)) != 0)
                     return ret;
-
-            if (type == 0 || type == 4)
-                if (javaGetter(L, obj, searchName) != 0)
-                    return 4;
 
             if (type == 0 || type == 3)
                 if (checkClass(L, obj, searchName) != 0)
@@ -895,7 +895,7 @@ public final class LuaJavaAPI {
                 try {
                     method = clazz.getMethod("is" + postfix);
                 } catch (Exception e1) {
-                    e1.printStackTrace();
+                    //e1.printStackTrace();
                     return 0;
                 }
             }

@@ -124,11 +124,11 @@ class SystemBridge : SystemOperation {
     }
 
     override fun sendKey(keyCode: Int) {
-        sendKeyEvent(keyCode)
+        sendMediaKey(keyCode)
     }
 
     override fun mediaPause() {
-        sendKeyEvent(KeyEvent.KEYCODE_MEDIA_PAUSE)
+        sendMediaKey(KeyEvent.KEYCODE_MEDIA_PAUSE)
     }
 
     override fun mediaStart() {
@@ -136,7 +136,7 @@ class SystemBridge : SystemOperation {
     }
 
 
-    private fun sendKeyEvent(keyCode: Int) {
+    private fun sendMediaKey(keyCode: Int) {
         var ke = KeyEvent(KeyEvent.ACTION_DOWN, keyCode)
         val intent = Intent(Intent.ACTION_MEDIA_BUTTON)
         intent.addFlags(Intent.FLAG_RECEIVER_FOREGROUND)
@@ -150,11 +150,80 @@ class SystemBridge : SystemOperation {
     }
 
     override fun mediaResume() {
-        sendKeyEvent(KeyEvent.KEYCODE_MEDIA_PLAY)
+        sendMediaKey(KeyEvent.KEYCODE_MEDIA_PLAY)
     }
 
     override fun mediaStop() {
-        sendKeyEvent(KeyEvent.KEYCODE_MEDIA_STOP)
+        sendMediaKey(KeyEvent.KEYCODE_MEDIA_STOP)
+    }
+
+    override fun mediaNext() {
+        sendMediaKey(KeyEvent.KEYCODE_MEDIA_NEXT)
+    }
+
+    override fun mediaPre() {
+        sendMediaKey(KeyEvent.KEYCODE_MEDIA_PREVIOUS)
+    }
+
+    /**
+     * 当前音量静音
+     */
+    override fun volumeMute() {
+        val mAudioManager = GlobalApp.APP.getSystemService(Context.AUDIO_SERVICE) as AudioManager
+        mAudioManager.setStreamMute(AudioManager.USE_DEFAULT_STREAM_TYPE,true)
+    }
+
+    override fun volumeUnmute() {
+        val mAudioManager = GlobalApp.APP.getSystemService(Context.AUDIO_SERVICE) as AudioManager
+        mAudioManager.setStreamMute(AudioManager.USE_DEFAULT_STREAM_TYPE,false)
+    }
+
+    override fun volumeUp() {
+        switchVolume(true)
+    }
+
+    override fun volumeDown() {
+        switchVolume(false)
+    }
+
+    /**
+     * @see []
+     * @param up Boolean
+     */
+    fun switchVolume(up: Boolean) {
+        val mAudioManager = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
+        if (up) {
+            mAudioManager.adjustVolume(AudioManager.ADJUST_RAISE,AudioManager.FX_FOCUS_NAVIGATION_UP)
+        } else {
+            mAudioManager.adjustVolume(AudioManager.ADJUST_LOWER,
+                    AudioManager.FX_FOCUS_NAVIGATION_UP)
+        }
+    }
+
+    override var musicMaxVolume: Int = -1
+        get() {
+            val mAudioManager = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
+            return mAudioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC)
+        }
+    override var musicCurrentVolume: Int = -1
+        get() {
+            val mAudioManager = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
+            return mAudioManager.getStreamVolume(AudioManager.STREAM_MUSIC)
+        }
+
+    override fun setMusicVolume(index:Int) {
+        val mAudioManager = GlobalApp.APP.getSystemService(Context.AUDIO_SERVICE) as AudioManager
+        mAudioManager.setStreamVolume(AudioManager.STREAM_MUSIC, index, 0)
+    }
+
+    override fun setAlarmVolume(index:Int) {
+        val mAudioManager = GlobalApp.APP.getSystemService(Context.AUDIO_SERVICE) as AudioManager
+        mAudioManager.setStreamVolume(AudioManager.STREAM_ALARM, index, 0)
+    }
+
+    override fun setNotificationVolume(index:Int) {
+        val mAudioManager = GlobalApp.APP.getSystemService(Context.AUDIO_SERVICE) as AudioManager
+        mAudioManager.setStreamVolume(AudioManager.STREAM_NOTIFICATION, index, 0)
     }
 
     override fun isMediaPlaying(): Boolean {

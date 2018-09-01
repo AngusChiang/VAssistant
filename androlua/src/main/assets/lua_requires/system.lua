@@ -48,12 +48,51 @@ end
 function mediaPause()
     system.mediaPause()
 end
+
 function mediaStart()
     system.mediaStart()
 end
+
 function mediaResume()
     system.mediaResume()
 end
+
 function mediaStop()
     system.mediaStop()
+end
+
+function mediaNext()
+    system.mediaNext()
+end
+
+function mediaPre()
+    system.mediaPre()
+end
+
+function volumeMute()
+    system.volumeMute()
+end
+
+function volumeUnmute()
+    system.volumeUnmute()
+end
+
+function volumeUp()
+    system.volumeUp()
+end
+
+function volumeDown()
+    system.volumeDown()
+end
+
+function setMusicVolume(index)
+    system.setMusicVolume(index)
+end
+
+function setAlarmVolume(index)
+    system.setAlarmVolume(index)
+end
+
+function setNotificationVolume(index)
+    system.setNotificationVolume(index)
 end

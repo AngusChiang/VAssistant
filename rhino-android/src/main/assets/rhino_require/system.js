@@ -58,3 +58,36 @@ function mediaResume(){
 function mediaStop(){
     system.mediaStop()
 }
+
+function mediaNext(){
+    system.mediaNext()
+}
+
+function mediaPre(){
+    system.mediaPre()
+}
+
+function volumeMute(){
+    system.volumeMute()
+}
+
+function volumeUnmute(){
+    system.volumeUnmute()
+}
+
+function volumeUp(){
+    system.volumeUp()
+}
+
+function volumeDown(){
+    system.volumeDown()
+}
+function setMusicVolume(index){
+    system.setMusicVolume(index)
+}
+function setAlarmVolume(index){
+    system.setAlarmVolume(index)
+}
+function setNotificationVolume(index){
+    system.setNotificationVolume(index)
+}
