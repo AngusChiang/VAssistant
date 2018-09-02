@@ -476,14 +476,7 @@ class NewInstActivity : AppCompatActivity(), View.OnClickListener {
         val testId = Int.MAX_VALUE.toLong()
         if (parentId != null) {
             val parentNode = DAO.daoSession.actionNodeDao.queryBuilder().where(ActionNodeDao.Properties.Id.eq(parentId)).unique()
-            parentNode.follows.also {
-                //追加followsNode
-                if (it == "") {
-                    parentNode.follows = "$testId"
-                } else {
-                    parentNode.follows = ",$testId"
-                }
-            }
+
             list.add(parentNode)
         }
 
