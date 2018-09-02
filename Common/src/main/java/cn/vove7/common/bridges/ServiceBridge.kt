@@ -28,8 +28,8 @@ interface ServiceBridge {
      */
     fun showAlert(r: ShowAlertEvent)
 
-    fun speak(text: String)
-    fun speakSync(text: String)
+    fun speak(text: String?)
+    fun speakSync(text: String?)
 }
 
 class ShowAlertEvent(

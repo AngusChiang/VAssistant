@@ -248,11 +248,16 @@ class MyAccessibilityService : AccessibilityApi() {
 
     private val delayHandler = Handler()
     private var startupRunner: Runnable = Runnable { AppBus.postSpeechAction(SpeechAction.ActionCode.ACTION_START_RECO) }
-    var stopRunner: Runnable = Runnable { AppBus.post("stop execQueue") }
+    var stopRunner: Runnable = Runnable { AppBus.post(MainService.ORDER_STOP_EXEC) }
     var delayUp = 800L
+
+    /**
+     * 按键监听
+     * @param event KeyEvent
+     * @return Boolean
+     */
     override fun onKeyEvent(event: KeyEvent): Boolean {
         Vog.d(this, "onKeyEvent  ----> " + event.toString())
-
         when (event.action) {
             KeyEvent.ACTION_DOWN -> when (event.keyCode) {
                 KEYCODE_VOLUME_DOWN -> {
@@ -285,8 +290,8 @@ class MyAccessibilityService : AccessibilityApi() {
         if ((event.eventTime - event.downTime) < (delayUp - 100)) {//时间短 移除runner 调节音量
             delayHandler.removeCallbacks(runnable)
             when (event.keyCode) {
-                KEYCODE_VOLUME_UP -> SystemBridge().volumeDown()
-                KEYCODE_VOLUME_DOWN -> SystemBridge().volumeUp()
+                KEYCODE_VOLUME_UP -> SystemBridge().volumeUp()
+                KEYCODE_VOLUME_DOWN -> SystemBridge().volumeDown()
                 else -> return false
             } //其他按键
         }

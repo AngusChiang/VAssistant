@@ -14,9 +14,10 @@ import cn.vove7.common.appbus.LogMessage
 import cn.vove7.common.appbus.SpeechAction
 import cn.vove7.common.appbus.VoiceData
 import cn.vove7.jarvis.R
-import cn.vove7.jarvis.services.MainService.Companion.WHAT_VOICE_ERR
-import cn.vove7.jarvis.services.MainService.Companion.WHAT_VOICE_TEMP
-import cn.vove7.jarvis.services.MainService.Companion.WHAT_VOICE_VOL
+import cn.vove7.jarvis.speech.recognition.model.IStatus.Companion.CODE_VOICE_ERR
+import cn.vove7.jarvis.speech.recognition.model.IStatus.Companion.CODE_VOICE_TEMP
+import cn.vove7.jarvis.speech.recognition.model.IStatus.Companion.CODE_VOICE_VOL
+
 import cn.vove7.vtp.log.Vog
 import cn.vove7.vtp.runtimepermission.PermissionUtils
 import cn.vove7.vtp.toast.Voast
@@ -79,14 +80,14 @@ class VoiceTestActivity : Activity() {
     @Subscribe(threadMode = ThreadMode.MAIN)
     fun showResult(data: VoiceData) {
         when (data.what) {
-            WHAT_VOICE_TEMP -> {
+            CODE_VOICE_TEMP -> {
                 result_text.text = data.data
                 logText.append(data.data + "\n")
             }
-            WHAT_VOICE_VOL -> {
+            CODE_VOICE_VOL -> {
                 handle.sendMessage(handle.obtainMessage(0, data.volumePercent, 0))
             }
-            WHAT_VOICE_ERR -> {
+            CODE_VOICE_ERR -> {
                 logText.append("识别失败\n")
             }
         }

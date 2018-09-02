@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.View
 import cn.vove7.common.appbus.AppBus
 import cn.vove7.jarvis.R
+import cn.vove7.jarvis.services.MainService
 import cn.vove7.parseengine.engine.ParseEngine
 import cn.vove7.vtp.asset.AssetHelper
 import cn.vove7.vtp.toast.Voast
@@ -57,6 +58,6 @@ class CommandTestActivity : Activity() {
     }
 
     fun stopScript(view: View) {
-        AppBus.post("stop execQueue")
+        AppBus.post(MainService.ORDER_STOP_EXEC)
     }
 }

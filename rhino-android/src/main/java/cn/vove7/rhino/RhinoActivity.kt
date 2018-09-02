@@ -89,7 +89,7 @@ class RhinoActivity : AppCompatActivity() {
             AppBus.post(ac)
         }
         stop_js.setOnClickListener {
-            AppBus.post("stop execQueue")
+            AppBus.post("stop_execQueue")
         }
 
         try {

@@ -15,10 +15,6 @@ public interface LuaContext {
 
     public Context getContext();
 
-    public void sendMsg(String msg);
-
-    public void sendError(String title, Exception msg);
-
     public int getWidth();
 
     public int getHeight();

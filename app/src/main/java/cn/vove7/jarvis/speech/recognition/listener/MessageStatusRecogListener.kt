@@ -2,14 +2,14 @@ package cn.vove7.jarvis.speech.recognition.listener
 
 import android.os.Handler
 import android.os.Message
-import cn.vove7.jarvis.services.MainService.Companion.WHAT_VOICE_RESULT
-import cn.vove7.jarvis.services.MainService.Companion.WHAT_VOICE_TEMP
-import cn.vove7.jarvis.services.MainService.Companion.WHAT_VOICE_VOL
 import cn.vove7.jarvis.speech.recognition.model.IStatus
 
 import cn.vove7.jarvis.speech.recognition.model.RecogResult
 import cn.vove7.common.appbus.AppBus
 import cn.vove7.common.appbus.VoiceData
+import cn.vove7.jarvis.speech.recognition.model.IStatus.Companion.CODE_VOICE_RESULT
+import cn.vove7.jarvis.speech.recognition.model.IStatus.Companion.CODE_VOICE_TEMP
+import cn.vove7.jarvis.speech.recognition.model.IStatus.Companion.CODE_VOICE_VOL
 
 
 class MessageStatusRecogListener(private val handler: Handler) : StatusRecogListener() {
@@ -37,14 +37,14 @@ class MessageStatusRecogListener(private val handler: Handler) : StatusRecogList
 
     override fun onAsrVolume(volumePercent: Int, volume: Int) {
         super.onAsrVolume(volumePercent, volume = volume)
-        AppBus.postVoiceData(VoiceData(WHAT_VOICE_VOL, volumePercent = volumePercent))
+        AppBus.postVoiceData(VoiceData(CODE_VOICE_VOL, volumePercent = volumePercent))
     }
 
     override fun onAsrPartialResult(results: Array<String>?, recogResult: RecogResult) {
         sendStatusMessage("临时识别结果，结果是“" + results!![0] + "”；原始json：" + recogResult.originalJson)
         super.onAsrPartialResult(results, recogResult)
 
-        AppBus.postVoiceData(VoiceData(WHAT_VOICE_TEMP, results[0]))
+        AppBus.postVoiceData(VoiceData(CODE_VOICE_TEMP, results[0]))
     }
 
     override fun onAsrFinalResult(results: Array<String>?, recogResult: RecogResult) {
@@ -55,7 +55,7 @@ class MessageStatusRecogListener(private val handler: Handler) : StatusRecogList
             val diffTime = System.currentTimeMillis() - speechEndTime
             message += "；说话结束到识别结束耗时【" + diffTime + "ms】"
         }
-        AppBus.postVoiceData(VoiceData(WHAT_VOICE_RESULT, results[0]))
+        AppBus.postVoiceData(VoiceData(CODE_VOICE_RESULT, results[0]))
         speechEndTime = 0
         sendMessage(message, status, true)
     }

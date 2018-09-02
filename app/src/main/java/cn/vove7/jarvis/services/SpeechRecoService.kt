@@ -1,37 +1,37 @@
 package cn.vove7.jarvis.services
 
 import android.annotation.SuppressLint
-import android.content.Intent
-import android.os.Binder
+import android.content.Context
 import android.os.Handler
-import android.os.IBinder
 import android.os.Message
+import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.appbus.AppBus
-import cn.vove7.common.appbus.SpeechAction
+import cn.vove7.common.appbus.VoiceData
 import cn.vove7.executorengine.bridges.SystemBridge
 import cn.vove7.jarvis.services.MainService.Companion.haveMusicPlay
 import cn.vove7.jarvis.speech.recognition.OfflineRecogParams
 import cn.vove7.jarvis.speech.recognition.listener.SpeechStatusListener
 import cn.vove7.jarvis.speech.recognition.model.IStatus
-import cn.vove7.jarvis.speech.recognition.model.IStatus.Companion.STATUS_WAKEUP_SUCCESS
+import cn.vove7.jarvis.speech.recognition.model.IStatus.Companion.CODE_VOICE_ERR
+import cn.vove7.jarvis.speech.recognition.model.IStatus.Companion.CODE_VOICE_RESULT
+import cn.vove7.jarvis.speech.recognition.model.IStatus.Companion.CODE_VOICE_TEMP
+import cn.vove7.jarvis.speech.recognition.model.IStatus.Companion.CODE_VOICE_VOL
+import cn.vove7.jarvis.speech.recognition.model.IStatus.Companion.CODE_WAKEUP_SUCCESS
 import cn.vove7.jarvis.speech.recognition.recognizer.MyRecognizer
 import cn.vove7.jarvis.speech.wakeup.MyWakeup
 import cn.vove7.jarvis.speech.wakeup.RecogWakeupListener
 import cn.vove7.vtp.log.Vog
-import cn.vove7.vtp.maths.LogicOperators
+import cn.vove7.vtp.sharedpreference.SpHelper
 import cn.vove7.vtp.toast.Voast
 import com.baidu.speech.asr.SpeechConstant
-import org.greenrobot.eventbus.Subscribe
-import org.greenrobot.eventbus.ThreadMode
 import java.lang.Thread.sleep
+import kotlin.concurrent.thread
 
 /**
  * 语音识别服务
  */
-class SpeechRecoService : BusService() {
+class SpeechRecoService(val event: SpeechEvent) {
 
-    override val serviceId: Int
-        get() = 527
     /**
      * 识别控制器，使用MyRecognizer控制识别的流程
      */
@@ -49,73 +49,65 @@ class SpeechRecoService : BusService() {
 
     private val backTrackInMs = 1500
 
+    /**
+     * 分发事件
+     */
     private val handler = @SuppressLint("HandlerLeak")
     object : Handler() {
         override fun handleMessage(msg: Message?) {
-            if (msg?.what == STATUS_WAKEUP_SUCCESS) {//唤醒
-                // 此处 开始正常识别流程
-//                val params = LinkedHashMap<String, Any>()
-//                params[SpeechConstant.ACCEPT_AUDIO_VOLUME] = false
-//                params[SpeechConstant.VAD] = SpeechConstant.VAD_DNN
-//                val pid = PidBuilder.create().model(PidBuilder.SEARCH).toPId()
-//                // 如识别短句，不需要需要逗号，将PidBuilder.INPUT改为搜索模型PidBuilder.SEARCH
-//                params[SpeechConstant.PID] = pid
-//                if (backTrackInMs > 0) { // 方案1， 唤醒词说完后，直接接句子，中间没有停顿。
-//                    params[SpeechConstant.AUDIO_MILLS] = System.currentTimeMillis() - backTrackInMs
-//                }
-                myRecognizer.cancel()
-                startRecog()
-//                myRecognizer.start(params)
-            }
-
-            if (msg != null) {// -> MainService
-                AppBus.post(msg)
-            }
-        }
-    }
-
-    override fun onBind(intent: Intent): IBinder {
-        return object : Binder() {
-
-        }
-    }
-
-    /**
-     * onAction
-     */
-    @Subscribe(threadMode = ThreadMode.BACKGROUND)
-    fun onAction(sAction: SpeechAction) {
-        when (sAction.action) {
-            SpeechAction.ActionCode.ACTION_START_RECO -> startRecog()
-            SpeechAction.ActionCode.ACTION_STOP_RECO -> stopRecog()
-            SpeechAction.ActionCode.ACTION_CANCEL_RECO -> cancelRecog()
-            SpeechAction.ActionCode.ACTION_START_WAKEUP -> wakeuper.start()
-            SpeechAction.ActionCode.ACTION_STOP_WAKEUP -> wakeuper.stop()
-            else -> {
-                Vog.e(this, sAction)
+            when (msg?.what) {
+                CODE_WAKEUP_SUCCESS -> {//唤醒
+                    val word = msg.data.getString("data")
+                    event.onWakeup(word)
+                    AppBus.postVoiceData(VoiceData(msg.what, word))
+                    myRecognizer.cancel()
+                    startRecog()
+                    return
+                }
+                CODE_VOICE_TEMP -> {//中间结果
+                    val res = msg.data.getString("data")
+                    event.onTempResult(res)
+                    AppBus.postVoiceData(VoiceData(msg.what, res))
+                }
+                CODE_VOICE_ERR -> {//出错
+                    val res = msg.data.getString("data")
+                    event.onFailed(res)
+                    AppBus.postVoiceData(VoiceData(msg.what, res))
+                }
+                CODE_VOICE_VOL -> {//音量反馈
+                    val data = msg.data.getSerializable("data") as VoiceData
+                    event.onVolume(data)
+                    AppBus.postVoiceData(data)
+                }
+                CODE_VOICE_RESULT -> {//结果
+                    val result = msg.data.getString("data")
+                    event.onResult(result)
+                    AppBus.postVoiceData(VoiceData(msg.what, result))
+                }
             }
         }
     }
 
-    override fun onCreate() {
-        super.onCreate()
-        instance = this
-        toast = Voast.with(this@SpeechRecoService, true).top()
-        initRecog()
-        wakeuper.start()
+    init {
+        thread {
+            initRecog()
+            if (SpHelper(GlobalApp.APP).getBoolean("wakeup"))
+                wakeuper.start()
+        }
     }
 
 
     /**
      * 在onCreate中调用。初始化识别控制类MyRecognizer
      */
-    val listener = SpeechStatusListener(handler)
 
-    protected fun initRecog() {
-        myRecognizer = MyRecognizer(this, listener)
+    val listener = SpeechStatusListener(handler)
+    private fun initRecog() {
+        val context: Context = GlobalApp.APP
+        myRecognizer = MyRecognizer(context, listener)
 
         val wakeLis = RecogWakeupListener(handler)
-        wakeuper = MyWakeup(this, wakeLis)
+        wakeuper = MyWakeup(context, wakeLis)
 
         if (enableOffline) {
             myRecognizer.loadOfflineEngine(OfflineRecogParams.fetchOfflineParams())
@@ -131,6 +123,7 @@ class SpeechRecoService : BusService() {
 
     internal fun startRecog() {
         //震动 音效
+        event.onStartRecog()
         SystemBridge().vibrate(80L)
 
         if (SystemBridge().isMediaPlaying()) {
@@ -148,7 +141,7 @@ class SpeechRecoService : BusService() {
     /**
      * 开始录音后，手动停止录音。SDK会识别在此过程中的录音。点击“停止”按钮后调用。
      */
-    private fun stopRecog() {
+    fun stopRecog() {
         myRecognizer.stop()
         MainService.resumeMusicIf()
     }
@@ -156,24 +149,26 @@ class SpeechRecoService : BusService() {
     /**
      * 开始录音后，取消这次录音。SDK会取消本次识别，回到原始状态。点击“取消”按钮后调用。
      */
-    private fun cancelRecog() {
+    fun cancelRecog() {
         myRecognizer.cancel()
         MainService.resumeMusicIf()
     }
 
     fun isListening(): Boolean {
-        return !arrayOf(IStatus.STATUS_NONE, IStatus.STATUS_FINISHED, IStatus.STATUS_WAKEUP_EXIT).contains(listener.status)
+        return !arrayOf(IStatus.STATUS_NONE, IStatus.STATUS_FINISHED, IStatus.CODE_WAKEUP_EXIT)
+                .contains(listener.status)
     }
 
-
-    override fun onDestroy() {
+    fun release() {
         myRecognizer.release()
-        super.onDestroy()
     }
-
-    companion object {
-        var instance: SpeechRecoService? = null
-    }
-
 }
 
+interface SpeechEvent {
+    fun onWakeup(word: String?)
+    fun onStartRecog()
+    fun onResult(result: String)
+    fun onTempResult(temp: String)
+    fun onFailed(err: String)
+    fun onVolume(data: VoiceData)
+}

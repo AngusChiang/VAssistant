@@ -1,14 +1,9 @@
 package cn.vove7.jarvis.services
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.content.pm.PackageManager
-import cn.vove7.common.appbus.AppBus
-import cn.vove7.common.appbus.BaseAction.Companion.ACTION_START
-import cn.vove7.common.appbus.BaseAction.Companion.ACTION_STOP
-import cn.vove7.common.appbus.SpeechSynAction
-import cn.vove7.common.appbus.SpeechSynAction.Companion.ACTION_PAUSE
-import cn.vove7.common.appbus.SpeechSynAction.Companion.ACTION_RESUME
-import cn.vove7.common.appbus.SpeechSynData
+import cn.vove7.common.app.GlobalApp
 import cn.vove7.jarvis.speech.synthesis.control.InitConfig
 import cn.vove7.jarvis.speech.synthesis.control.MySyntherizer
 import cn.vove7.jarvis.speech.synthesis.control.NonBlockSyntherizer
@@ -19,20 +14,16 @@ import com.baidu.tts.client.SpeechError
 import com.baidu.tts.client.SpeechSynthesizer
 import com.baidu.tts.client.SpeechSynthesizerListener
 import com.baidu.tts.client.TtsMode
-import org.greenrobot.eventbus.Subscribe
-import org.greenrobot.eventbus.ThreadMode
 import java.util.*
 
 /**
  * 语音合成服务
  */
-class SpeechSynService : BusService(), SpeechSynthesizerListener {
+class SpeechSynService(private val event: SyncEvent) : SpeechSynthesizerListener {
 
-    override val serviceId: Int
-        get() = 1227
-    private lateinit var appId: String
-    private lateinit var appKey: String
-    private lateinit var secretKey: String
+    private var appId: String
+    private var appKey: String
+    private var secretKey: String
 
     // TtsMode.MIX; 离在线融合，在线优先； TtsMode.ONLINE 纯在线； 没有纯离线
     protected var ttsMode = TtsMode.MIX
@@ -47,38 +38,28 @@ class SpeechSynService : BusService(), SpeechSynthesizerListener {
     // 主控制类，所有合成控制方法从这个类开始
     protected lateinit var synthesizer: MySyntherizer
 
-    override fun onCreate() {
-        super.onCreate()
-        val appInfo = packageManager.getApplicationInfo(packageName, PackageManager.GET_META_DATA)
+    private val context: Context = GlobalApp.APP
+
+    init {
+        val appInfo = context.packageManager.getApplicationInfo(context.packageName,
+                PackageManager.GET_META_DATA)
         appId = appInfo.metaData.get("com.baidu.speech.APP_ID").toString()
         appKey = appInfo.metaData.getString("com.baidu.speech.API_KEY")
         secretKey = appInfo.metaData.getString("com.baidu.speech.SECRET_KEY")
 
-
         initialTts() // 初始化TTS引擎
     }
 
-    @Subscribe(threadMode = ThreadMode.BACKGROUND)
-    fun onGetAction(action: SpeechSynAction) {
-        when (action.action) {
-            ACTION_START -> {
-                if (action.text != null)
-                    speak(action.text!!)
-                else
-                    AppBus.post(SpeechSynData("文本空"))
-            }
-            ACTION_STOP -> stop()
-            ACTION_PAUSE -> pause()
-            ACTION_RESUME -> resume()
+    // 需要合成的文本text的长度不能超过1024个GBK字节。
+    // 合成前可以修改参数：
+    // Map<String, String> params = getParams();
+    // synthesizer.setParams(params);
+    public fun speak(text: String?) {
+        if(text==null) {
+            event.onError("文本空")
+            return
         }
-    }
 
-    private fun speak(text: String) {
-        // 需要合成的文本text的长度不能超过1024个GBK字节。
-
-        // 合成前可以修改参数：
-        // Map<String, String> params = getParams();
-        // synthesizer.setParams(params);
         val result = synthesizer.speak(text)
         checkResult(result, "speak")
     }
@@ -86,7 +67,7 @@ class SpeechSynService : BusService(), SpeechSynthesizerListener {
     /**
      * 暂停播放。仅调用speak后生效
      */
-    private fun pause() {
+    public fun pause() {
         val result = synthesizer.pause()
         checkResult(result, "pause")
     }
@@ -94,15 +75,13 @@ class SpeechSynService : BusService(), SpeechSynthesizerListener {
     /**
      * 继续播放。仅调用speak后生效，调用pause生效
      */
-    private fun resume() {
+    public fun resume() {
         val result = synthesizer.resume()
         checkResult(result, "resume")
     }
 
-    override fun onDestroy() {
+    fun release() {
         synthesizer.release()
-        Vog.d(this, "onDestroy 释放资源成功")
-        super.onDestroy()
     }
 
     /**
@@ -121,27 +100,10 @@ class SpeechSynService : BusService(), SpeechSynthesizerListener {
 
         val params = getParams()
 
-
-        // appId appKey secretKey 网站上您申请的应用获取
-        // 。注意使用离线合成功能的话，需要应用中填写您app的包名。包名在build.gradle中获取。
         val initConfig = InitConfig(appId, appKey, secretKey, ttsMode, params, this)
 
-        // 如果您集成中出错，请将下面一段代码放在和demo中相同的位置，并复制InitConfig 和 AutoCheck到您的项目中
-        // 上线时请删除AutoCheck的调用
-//        AutoCheck.getInstance(applicationContext).check(initConfig, object : Handler() {
-//            override fun handleMessage(errMsg: Message) {
-//                if (errMsg.what == 100) {
-//                    val autoCheck = errMsg.obj as AutoCheck
-//                    synchronized(autoCheck) {
-//                        val message = autoCheck.obtainDebugMessage()
-//                        Vog.d(this, "handleMessage $message")
-//                    }
-//                }
-//            }
-//
-//        })
-        synthesizer = NonBlockSyntherizer(this, initConfig)
-        // 此处可以改为MySyntherizer 了解调用过程
+        synthesizer = NonBlockSyntherizer(context, initConfig)
+
     }
 
     /**
@@ -169,7 +131,7 @@ class SpeechSynService : BusService(), SpeechSynthesizerListener {
         // MIX_MODE_HIGH_SPEED_SYNTHESIZE, 2G 3G 4G wifi状态下使用在线，其它状态离线。在线状态下，请求超时1.2s自动转离线
 
         // 离线资源文件， 从assets目录中复制到临时目录，需要在initTTs方法前完成
-        val offlineResource = OfflineResource(this, offlineVoice)
+        val offlineResource = OfflineResource(context, offlineVoice)
         try {// 声学模型文件路径 (离线引擎使用), 请确认下面两个文件存在
             params[SpeechSynthesizer.PARAM_TTS_TEXT_MODEL_FILE] = offlineResource.textFilename!!
             params[SpeechSynthesizer.PARAM_TTS_SPEECH_MODEL_FILE] = offlineResource.modelFilename!!
@@ -182,9 +144,9 @@ class SpeechSynService : BusService(), SpeechSynthesizerListener {
     /**
      * 切换离线发音。注意需要添加额外的判断：引擎在合成时该方法不能调用
      */
-    private fun reLoadVoiceModel(mode: String) {
+    public fun reLoadVoiceModel(mode: String) {
         offlineVoice = mode
-        val offlineResource = OfflineResource(this, offlineVoice)
+        val offlineResource = OfflineResource(context, offlineVoice)
         Vog.d(this, "reLoadVoiceModel 切换离线语音：" + offlineResource.modelFilename)
 
         val result = synthesizer.loadVoiceModel(offlineResource.modelFilename,
@@ -200,7 +162,6 @@ class SpeechSynService : BusService(), SpeechSynthesizerListener {
 
     override fun onSynthesizeStart(p0: String?) {
         Vog.d(this, "onSynthesizeStart 准备开始合成,序列号:$p0")
-        AppBus.post(SpeechSynData(SpeechSynData.SYN_STATUS_PREPARE))
     }
 
     override fun onSynthesizeDataArrived(p0: String?, p1: ByteArray?, p2: Int) {
@@ -213,22 +174,29 @@ class SpeechSynService : BusService(), SpeechSynthesizerListener {
 
     override fun onSpeechStart(p0: String?) {
         Vog.d(this, "onSpeechStart 播放开始回调, 序列号:$p0")
-        AppBus.post(SpeechSynData(SpeechSynData.SYN_STATUS_START))
+        event.onStart()
     }
 
     override fun onSpeechProgressChanged(p0: String?, p1: Int) {
-        AppBus.post(SpeechSynData(SpeechSynData.SYN_STATUS_PROCESS))
         Vog.d(this, "播放进度回调,序列号: $p0 progress：$p1   ")
     }
 
     override fun onSpeechFinish(p0: String?) {
         Vog.d(this, "onSpeechFinish 播放结束回调 $p0")
-        AppBus.post(SpeechSynData(SpeechSynData.SYN_STATUS_FINISH))
+//        AppBus.post(SpeechSynData(SpeechSynData.SYN_STATUS_FINISH))
+        event.onFinish()
     }
 
     override fun onError(p0: String?, p1: SpeechError?) {
         val e = "错误发生：${p1?.description} ，错误编码: $p1?.code} 序列号: $p0 "
-        AppBus.post(SpeechSynData(e))
+//        AppBus.post(SpeechSynData(e))
+        event.onError(e)
         Vog.d(this, e)
     }
+}
+
+interface SyncEvent {
+    fun onError(err: String)
+    fun onFinish()
+    fun onStart()
 }

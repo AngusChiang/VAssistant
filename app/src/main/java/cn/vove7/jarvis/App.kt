@@ -19,7 +19,6 @@ import kotlin.concurrent.thread
 
 class App : LuaApp() {
 
-    private lateinit var voiceService: Intent
     private lateinit var mainService: Intent
     private lateinit var synService: Intent
     lateinit var services: Array<Intent>
@@ -29,9 +28,7 @@ class App : LuaApp() {
         EventBus.getDefault().register(this)
         Vog.init(this, Log.VERBOSE).log2Local(Log.ERROR)
         mainService = Intent(this, MainService::class.java)
-        voiceService = Intent(this, SpeechRecoService::class.java)
-        synService = Intent(this, SpeechSynService::class.java)
-        services = arrayOf(mainService, voiceService, synService)
+        services = arrayOf(mainService)
 
         RemoteDebugServer.start()
         startServices()

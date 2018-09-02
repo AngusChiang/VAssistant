@@ -9,24 +9,10 @@ object AppBus {
     }
 
     /**
-     *
-     */
-    fun postInfo(ev: MessageEvent) {
-        EventBus.getDefault().post(ev)
-    }
-
-    /**
      * 控制语音
      */
     fun postSpeechAction(action: SpeechAction.ActionCode) {
         EventBus.getDefault().post(SpeechAction(action))
-    }
-
-    /**
-     *
-     */
-    fun postLog(log: LogMessage) {
-        EventBus.getDefault().post(log)
     }
 
     fun postVoiceData(data: VoiceData) {
@@ -51,13 +37,6 @@ open class LogMessage(val level: Int, val msg: String) {
     }
 }
 
-interface BaseAction {
-    companion object {
-        const val ACTION_START = 1
-        const val ACTION_STOP = 2
-        const val ACTION_CANCEL = 3
-    }
-}
 
 /**
  * 语音识别控制消息
@@ -81,41 +60,6 @@ data class SpeechAction(val action: ActionCode) {
  */
 data class VoiceData(val what: Int = 0, val data: String? = null, val volumePercent: Int = 0)
     : Serializable
-
-/**
- * 语音合成数据
- */
-class SpeechSynData {
-    var status: Int = SYN_STATUS_START
-    var errMsg: String? = null
-
-
-    constructor(msg: String?) {
-        this.status = SYN_STATUS_ERROR
-        this.errMsg = msg
-    }
-
-    constructor(status: Int) {
-        this.status = status
-    }
-
-    companion object {
-        const val SYN_STATUS_PREPARE = 0
-        const val SYN_STATUS_START = 1
-        const val SYN_STATUS_PROCESS = 2
-        const val SYN_STATUS_FINISH = 3
-        const val SYN_STATUS_ERROR = -1
-    }
-}
-
-data class SpeechSynAction(
-        val action: Int, val text: String? = null
-) : Serializable, BaseAction {
-    companion object {
-        const val ACTION_PAUSE = 100
-        const val ACTION_RESUME = 101
-    }
-}
 
 
 /**

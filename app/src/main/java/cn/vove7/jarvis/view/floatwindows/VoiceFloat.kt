@@ -15,9 +15,11 @@ import cn.vove7.common.appbus.AppBus
 import cn.vove7.common.appbus.SpeechAction
 import cn.vove7.common.appbus.VoiceData
 import cn.vove7.jarvis.R
-import cn.vove7.jarvis.services.MainService
-import cn.vove7.jarvis.services.SpeechRecoService
-import cn.vove7.jarvis.speech.recognition.model.IStatus
+import cn.vove7.jarvis.speech.recognition.model.IStatus.Companion.CODE_VOICE_ERR
+import cn.vove7.jarvis.speech.recognition.model.IStatus.Companion.CODE_VOICE_RESULT
+import cn.vove7.jarvis.speech.recognition.model.IStatus.Companion.CODE_VOICE_TEMP
+import cn.vove7.jarvis.speech.recognition.model.IStatus.Companion.CODE_VOICE_VOL
+import cn.vove7.jarvis.speech.recognition.model.IStatus.Companion.CODE_WAKEUP_SUCCESS
 import cn.vove7.jarvis.utils.ServiceChecker
 import cn.vove7.vtp.floatwindow.AbFloatWindow
 import cn.vove7.vtp.log.Vog
@@ -144,17 +146,16 @@ class VoiceFloat : AbFloatWindow<VoiceFloat.Holder> {
         smallImgMoveToEdgeAnim?.start()
     }
 
-
     // TODO 效果
     fun onClick() {
-        if (SpeechRecoService.instance?.isListening() == true) {
-            holder.result.text = "stop"
-            AppBus.postSpeechAction(SpeechAction.ActionCode.ACTION_CANCEL_RECO)
-        } else {
+//        if (MainService.instance?.isListening() == true) {
+//            holder.result.text = "stop"
+//            AppBus.postSpeechAction(SpeechAction.ActionCode.ACTION_CANCEL_RECO)
+//        } else {
             ServiceChecker(context).checkService()
             holder.result.text = "begin"
             AppBus.postSpeechAction(SpeechAction.ActionCode.ACTION_START_RECO)
-        }
+//        }
     }
 
 
@@ -179,19 +180,19 @@ class VoiceFloat : AbFloatWindow<VoiceFloat.Holder> {
     @Subscribe(threadMode = ThreadMode.MAIN)
     fun showResult(data: VoiceData) {
         when (data.what) {
-            IStatus.STATUS_WAKEUP_SUCCESS -> {
+            CODE_WAKEUP_SUCCESS -> {
                 holder.result.text = "唤醒成功"
             }
-            MainService.WHAT_VOICE_TEMP -> {
+            CODE_VOICE_TEMP -> {
                 holder.result.text = data.data
             }
-            MainService.WHAT_VOICE_VOL -> {
+            CODE_VOICE_VOL -> {
 
             }
-            MainService.WHAT_VOICE_ERR -> {
+            CODE_VOICE_ERR -> {
                 holder.result.text = "识别失败"
             }
-            MainService.WHAT_VOICE_RESULT -> {
+            CODE_VOICE_RESULT -> {
                 holder.result.text = "result: ${data.data}"
             }
         }

@@ -148,7 +148,7 @@ class LuaEditorActivity : Activity(), OnClickListener {
                 nowIndex = (--nowIndex + len) % len
                 source.setText(LuaUtil.getTextFromAsset(this, "lua_sample/" + testFiles[nowIndex]))
             }
-            R.id.stop -> AppBus.post("stop execQueue")
+            R.id.stop -> AppBus.post("stop_execQueue")
             R.id.choose_script -> {//选择jio本
                 AlertDialog.Builder(this).setTitle(R.string.text_select_script).setItems(testFiles) { d, p ->
                     nowIndex = p

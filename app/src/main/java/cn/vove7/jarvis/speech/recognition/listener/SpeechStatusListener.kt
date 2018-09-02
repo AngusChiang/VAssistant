@@ -5,11 +5,11 @@ import cn.vove7.common.appbus.AppBus
 import cn.vove7.common.appbus.SpeechAction
 import cn.vove7.common.appbus.VoiceData
 import cn.vove7.common.model.RequestPermission
-import cn.vove7.jarvis.services.MainService.Companion.WHAT_VOICE_ERR
-import cn.vove7.jarvis.services.MainService.Companion.WHAT_VOICE_RESULT
-import cn.vove7.jarvis.services.MainService.Companion.WHAT_VOICE_TEMP
-import cn.vove7.jarvis.services.MainService.Companion.WHAT_VOICE_VOL
 import cn.vove7.jarvis.speech.recognition.message.SpeechMessage
+import cn.vove7.jarvis.speech.recognition.model.IStatus.Companion.CODE_VOICE_ERR
+import cn.vove7.jarvis.speech.recognition.model.IStatus.Companion.CODE_VOICE_RESULT
+import cn.vove7.jarvis.speech.recognition.model.IStatus.Companion.CODE_VOICE_TEMP
+import cn.vove7.jarvis.speech.recognition.model.IStatus.Companion.CODE_VOICE_VOL
 import cn.vove7.jarvis.speech.recognition.model.RecogResult
 import cn.vove7.vtp.log.Vog
 
@@ -29,14 +29,14 @@ class SpeechStatusListener(private val handler: Handler) : StatusRecogListener()
     override fun onAsrPartialResult(results: Array<String>?, recogResult: RecogResult) {
         super.onAsrPartialResult(results, recogResult)
         val tmp = results?.get(0) ?: ""
-        handler.sendMessage(SpeechMessage.buildMessage(WHAT_VOICE_TEMP, tmp))
+        handler.sendMessage(SpeechMessage.buildMessage(CODE_VOICE_TEMP, tmp))
     }
 
     override fun onAsrFinalResult(results: Array<String>?, recogResult: RecogResult) {
         super.onAsrFinalResult(results, recogResult)
         isSuccess = true
         val tmp = results?.get(0) ?: ""
-        handler.sendMessage(SpeechMessage.buildMessage(WHAT_VOICE_RESULT, tmp))
+        handler.sendMessage(SpeechMessage.buildMessage(CODE_VOICE_RESULT, tmp))
     }
 
     var endFinish = true
@@ -54,13 +54,13 @@ class SpeechStatusListener(private val handler: Handler) : StatusRecogListener()
         when (errorCode) {
             9 -> {
                 AppBus.post(RequestPermission("麦克风权限"))
-                handler.sendMessage(SpeechMessage.buildMessage(WHAT_VOICE_ERR, "需要麦克风权限"))
+                handler.sendMessage(SpeechMessage.buildMessage(CODE_VOICE_ERR, "需要麦克风权限"))
             }
             3 -> {
-                handler.sendMessage(SpeechMessage.buildMessage(WHAT_VOICE_ERR, "没有检测到用户说话"))
+                handler.sendMessage(SpeechMessage.buildMessage(CODE_VOICE_ERR, "没有检测到用户说话"))
             }
             else ->
-                handler.sendMessage(SpeechMessage.buildMessage(WHAT_VOICE_ERR, message))
+                handler.sendMessage(SpeechMessage.buildMessage(CODE_VOICE_ERR, message))
         }
     }
 
@@ -68,8 +68,8 @@ class SpeechStatusListener(private val handler: Handler) : StatusRecogListener()
         Vog.v(this, "音量百分比$volumePercent ; 音量$volume")
         handler.sendMessage(
                 SpeechMessage.buildMessage(
-                        WHAT_VOICE_VOL,
-                        VoiceData(WHAT_VOICE_VOL, volumePercent = volumePercent)
+                        CODE_VOICE_VOL,
+                        VoiceData(CODE_VOICE_VOL, volumePercent = volumePercent)
                 )
         )
     }

@@ -7,6 +7,7 @@ import cn.vove7.common.datamanager.parse.model.Action
 import cn.vove7.common.datamanager.parse.model.ActionParam
 import cn.vove7.common.executor.OnPrint
 import cn.vove7.jarvis.R
+import cn.vove7.jarvis.services.MainService
 import cn.vove7.rhino.api.RhinoApi
 import cn.vove7.vtp.log.Vog
 import java.io.*
@@ -66,7 +67,7 @@ class RemoteDebugServer : Runnable {
                                 val action = inputStream.readLine()
                                 when (action) {
                                     "stop" -> {
-                                        AppBus.post("stop execQueue")
+                                        AppBus.post(MainService.ORDER_STOP_EXEC)
                                     }
                                     "exec" -> {
                                         val type = inputStream.readLine()

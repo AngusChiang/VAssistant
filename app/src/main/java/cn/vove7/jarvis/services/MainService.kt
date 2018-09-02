@@ -7,12 +7,11 @@ import android.content.DialogInterface
 import android.content.Intent
 import android.os.Binder
 import android.os.IBinder
-import android.os.Message
-import android.util.Log
-import android.widget.Toast
 import cn.vove7.androlua.luautils.LuaContext
 import cn.vove7.common.accessibility.AccessibilityApi
-import cn.vove7.common.appbus.*
+import cn.vove7.common.appbus.AppBus
+import cn.vove7.common.appbus.SpeechAction
+import cn.vove7.common.appbus.VoiceData
 import cn.vove7.common.bridges.ChoiceData
 import cn.vove7.common.bridges.ServiceBridge
 import cn.vove7.common.bridges.ShowAlertEvent
@@ -26,12 +25,12 @@ import cn.vove7.common.utils.RegUtils.checkConfirm
 import cn.vove7.executorengine.bridges.SystemBridge
 import cn.vove7.executorengine.exector.MultiExecutorEngine
 import cn.vove7.jarvis.activities.PermissionManagerActivity
-import cn.vove7.jarvis.speech.recognition.model.IStatus
 import cn.vove7.jarvis.view.dialog.MultiChoiceDialog
 import cn.vove7.jarvis.view.dialog.OnMultiSelectListener
 import cn.vove7.jarvis.view.dialog.OnSelectListener
 import cn.vove7.jarvis.view.dialog.SingleChoiceDialog
 import cn.vove7.jarvis.view.floatwindows.VoiceFloat
+import cn.vove7.jarvis.view.statusbar.StatusVoiceIconAnimation
 import cn.vove7.parseengine.engine.ParseEngine
 import cn.vove7.vtp.dialog.DialogUtil
 import cn.vove7.vtp.log.Vog
@@ -63,21 +62,28 @@ class MainService : BusService(), OnExecutorResult,
      */
     private lateinit var cExecutor: CExecutorI
 
+    private val speechRecoService = SpeechRecoService(RecgEventListener())
+    private val speechSncService = SpeechSynService(SyncEventListener())
+
     /**
      * 当前语音使用方式
      */
     private var voiceMode = MODE_VOICE
+    //识别过程动画
+    private lateinit var statusVoiceAni: StatusVoiceIconAnimation
 
     override fun onCreate() {
         super.onCreate()
+        statusVoiceAni = StatusVoiceIconAnimation(this)
+        instance = this
         cExecutor = MultiExecutorEngine(
                 this,
                 this,
                 this
         )
         toast = Voast.with(this, true).top()
-        floatVoice = VoiceFloat(this)
-        floatVoice.show()
+//        floatVoice = VoiceFloat(this)
+//        floatVoice.show()
     }
 
     /**
@@ -185,143 +191,30 @@ class MainService : BusService(), OnExecutorResult,
         AppBus.postSpeechAction(SpeechAction.ActionCode.ACTION_START_RECO)
     }
 
-
-    /**
-     * 语音事件
-     */
-    //TODO 错误处理
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    fun onVoiceData(msg: Message?) { // ->Float -> Executor
-        when (msg?.what) {
-            IStatus.STATUS_WAKEUP_SUCCESS -> {//唤醒
-                AppBus.postVoiceData(VoiceData(msg.what, msg.data.getString("word")))
-            }
-            WHAT_VOICE_TEMP -> {
-                val res = msg.data.getString("data")
-                AppBus.postVoiceData(VoiceData(msg.what, res))
-            }
-            WHAT_VOICE_ERR -> {
-                resumeMusicIf()
-                val res = msg.data.getString("data")
-                when (voiceMode) {
-                    MODE_VOICE -> {
-                        AppBus.postVoiceData(VoiceData(msg.what, res))
-                    }
-                    MODE_GET_PARAM -> {
-//                        toast.showShort("获取参数失败")
-                        cExecutor.onGetVoiceParam(null)
-                        voiceMode = MODE_VOICE
-                    }
-                    MODE_ALERT -> {
-//                        toast.showShort("重新说")
-//                        speakSync("reSay")
-                        AppBus.postSpeechAction(SpeechAction.ActionCode.ACTION_START_RECO)  //继续????
-                    }
-                }
-            }
-            WHAT_VOICE_VOL -> {
-                AppBus.postVoiceData(msg.data.getSerializable("data") as VoiceData)
-            }
-            WHAT_VOICE_RESULT -> {
-                val voiceData = msg.data.getString("data")
-                Vog.d(this, "结果 --------> $voiceData")
-                AppBus.postVoiceData(VoiceData(WHAT_VOICE_RESULT, voiceData))
-                resumeMusicIf()
-                when (voiceMode) {
-                    MODE_VOICE -> {
-                        toast.showShort("开始解析")
-                        val parseResult = ParseEngine
-                                .parseAction(voiceData, AccessibilityApi.accessibilityService?.currentScope?.packageName
-                                    ?: "")
-                        if (parseResult.isSuccess) {
-                            toast.showShort("解析成功")
-                            cExecutor.execQueue(voiceData, parseResult.actionQueue)
-                        } else {
-                            toast.showShort("解析失败")
-                        }
-                    }
-                    MODE_GET_PARAM -> {//中途参数
-                        if (voiceData == "") {//失败
-                            //询问重新
-//                            return
-                            messengerAction?.responseResult = false
-                            cExecutor.onGetVoiceParam(null)
-                        } else {//通知
-                            cExecutor.onGetVoiceParam(voiceData)
-                        }
-                        voiceMode = MODE_VOICE
-                    }
-                    MODE_ALERT -> {
-                        when {
-                            checkConfirm(voiceData) -> {
-                                alertDialog?.getButton(DialogInterface.BUTTON_POSITIVE)?.performClick()
-                                voiceMode = MODE_VOICE
-                            }
-                            checkCancel(voiceData) -> {
-                                alertDialog?.getButton(DialogInterface.BUTTON_NEGATIVE)?.performClick()
-                                voiceMode = MODE_VOICE
-                            }
-                            else -> AppBus.postSpeechAction(SpeechAction.ActionCode.ACTION_START_RECO)  //继续????
-                        }
-                    }
-                }
-            }
-        }
-    }
-
     var speakSync = false
-    override fun speak(text: String) {
+    override fun speak(text: String?) {
         speakSync = false
-        AppBus.post(SpeechSynAction(BaseAction.ACTION_START, text))
+        speechSncService.speak(text)
     }
 
-    override fun speakSync(text: String) {
+    override fun speakSync(text: String?) {
         speakSync = true
-        AppBus.post(SpeechSynAction(BaseAction.ACTION_START, text))
+        speechSncService.speak(text)
     }
 
-    @Subscribe(threadMode = ThreadMode.POSTING)
-    fun onSynData(data: SpeechSynData) {
-        when (data.status) {
-            SpeechSynData.SYN_STATUS_PREPARE -> {
-                Vog.d(this, "onSynData 准备")
-            }
-            SpeechSynData.SYN_STATUS_START -> {
-                Vog.d(this, "onSynData 开始")
-                if (SystemBridge().isMediaPlaying()) {
-                    SystemBridge().mediaPause()
-                    haveMusicPlay = true
-                }
-            }
-            SpeechSynData.SYN_STATUS_PROCESS -> {
-                Vog.d(this, "onSynData 进度")
-            }
-            SpeechSynData.SYN_STATUS_FINISH -> {
-                Vog.d(this, "onSynData 结束")
-                if (speakSync) cExecutor.speakCallback()
-                resumeMusicIf()
-            }
-            SpeechSynData.SYN_STATUS_ERROR -> {
-                Vog.d(this, "onSynData 出错 ${data.errMsg}")
-                if (speakSync) cExecutor.speakCallback(data.errMsg)
-                resumeMusicIf()
-            }
-        }
-    }
-
-    override fun onExecuteStart(words: String) {
+    override fun onExecuteStart(words: String) {//
         Vog.d(this, "开始执行 -> $words")
     }
 
     /**
      * 执行结果回调
      */
-    override fun onExecuteFinished(result: String) {
+    override fun onExecuteFinished(result: String) {//
         Vog.d(this, result)
 //        toast.showShort(result)
     }
 
-    override fun onExecuteFailed(errMsg: String) {
+    override fun onExecuteFailed(errMsg: String) {//
         Vog.e(this, "onExecuteFailed: $errMsg")
         toast.showShort(errMsg)
     }
@@ -329,6 +222,23 @@ class MainService : BusService(), OnExecutorResult,
     override fun onBind(intent: Intent): IBinder {
         return object : Binder() {
 
+        }
+    }
+
+    /**
+     * onSpeechAction
+     */
+    @Subscribe(threadMode = ThreadMode.BACKGROUND)
+    fun onAction(sAction: SpeechAction) {
+        when (sAction.action) {
+            SpeechAction.ActionCode.ACTION_START_RECO -> speechRecoService.startRecog()
+            SpeechAction.ActionCode.ACTION_STOP_RECO -> speechRecoService.stopRecog()
+            SpeechAction.ActionCode.ACTION_CANCEL_RECO -> speechRecoService.cancelRecog()
+            SpeechAction.ActionCode.ACTION_START_WAKEUP -> speechRecoService.wakeuper.start()
+            SpeechAction.ActionCode.ACTION_STOP_WAKEUP -> speechRecoService.wakeuper.stop()
+            else -> {
+                Vog.e(this, sAction)
+            }
         }
     }
 
@@ -354,7 +264,7 @@ class MainService : BusService(), OnExecutorResult,
     @Subscribe(threadMode = ThreadMode.BACKGROUND)
     fun stopExecutor(order: String) {
         when (order) {
-            "stop execQueue" -> {
+            ORDER_STOP_EXEC -> {
                 AppBus.postSpeechAction(SpeechAction.ActionCode.ACTION_CANCEL_RECO)
                 cExecutor.interrupt()
             }
@@ -373,6 +283,12 @@ class MainService : BusService(), OnExecutorResult,
         startActivity(intent)
     }
 
+    override fun onDestroy() {
+        speechRecoService.release()
+        speechSncService.release()
+        super.onDestroy()
+    }
+
     companion object {
         /**
          * 正常语音模式
@@ -387,15 +303,14 @@ class MainService : BusService(), OnExecutorResult,
          */
         const val MODE_ALERT = 27
 
+        const val ORDER_STOP_EXEC = "stop_exec"
+
         /**
          * 语音事件数据类型
          */
-        const val WHAT_VOICE_WAKEUP = 0 //唤醒成功
-        const val WHAT_VOICE_TEMP = 1 //临时结果
-        const val WHAT_VOICE_VOL = 2 //音量数据
-        const val WHAT_VOICE_ERR = 4 //出错
-        const val WHAT_VOICE_RESULT = 3 //识别结果
+
         private val data = HashMap<String, Any>()
+        var instance: MainService? = null
 
         //识别前是否有音乐播放
         var haveMusicPlay = false
@@ -422,11 +337,6 @@ class MainService : BusService(), OnExecutorResult,
         return this
     }
 
-    override fun sendMsg(msg: String) {
-        Log.i("Vove :", "sendMsg  ----> $msg")
-        Toast.makeText(this, msg, Toast.LENGTH_SHORT).show()
-    }
-
     override fun call(name: String, args: Array<Any>) {}
 
     override fun set(name: String, `object`: Any) {
@@ -441,10 +351,113 @@ class MainService : BusService(), OnExecutorResult,
         return resources.displayMetrics.heightPixels
     }
 
-    override fun sendError(title: String, msg: Exception) {
-        Vog.d(this, "sendError $title $msg")
+
+    /**
+     * 语音识别事件监听
+     */
+    inner class RecgEventListener : SpeechEvent {
+        override fun onWakeup(word: String?) {
+        }
+
+        override fun onStartRecog() {
+            statusVoiceAni.begin()
+        }
+
+        override fun onResult(result: String) {
+            statusVoiceAni.hide()
+            Vog.d(this, "结果 --------> $result")
+            resumeMusicIf()
+            when (voiceMode) {
+                MODE_VOICE -> {
+                    toast.showShort("开始解析")
+                    val parseResult = ParseEngine
+                            .parseAction(result, AccessibilityApi.accessibilityService?.currentScope?.packageName
+                                ?: "")
+                    if (parseResult.isSuccess) {
+                        toast.showShort("解析成功")
+                        cExecutor.execQueue(result, parseResult.actionQueue)
+                    } else {
+                        toast.showShort("解析失败")
+                    }
+                }
+                MODE_GET_PARAM -> {//中途参数
+                    if (result == "") {//失败
+                        //询问重新
+//                            return
+                        messengerAction?.responseResult = false
+                        cExecutor.onGetVoiceParam(null)
+                    } else {//通知
+                        cExecutor.onGetVoiceParam(result)
+                    }
+                    voiceMode = MODE_VOICE
+                }
+                MODE_ALERT -> {
+                    when {
+                        checkConfirm(result) -> {
+                            alertDialog?.getButton(DialogInterface.BUTTON_POSITIVE)?.performClick()
+                            voiceMode = MODE_VOICE
+                        }
+                        checkCancel(result) -> {
+                            alertDialog?.getButton(DialogInterface.BUTTON_NEGATIVE)?.performClick()
+                            voiceMode = MODE_VOICE
+                        }
+                        else -> AppBus.postSpeechAction(SpeechAction.ActionCode.ACTION_START_RECO)  //继续????
+                    }
+                }
+            }
+        }
+
+        override fun onTempResult(temp: String) {
+
+        }
+
+        override fun onFailed(err: String) {
+            resumeMusicIf()
+            statusVoiceAni.faied()
+            when (voiceMode) {
+                MODE_VOICE -> {
+                }
+                MODE_GET_PARAM -> {
+//                        toast.showShort("获取参数失败")
+                    cExecutor.onGetVoiceParam(null)
+                    voiceMode = MODE_VOICE
+                }
+                MODE_ALERT -> {
+//                        toast.showShort("重新说")
+//                        speakSync("reSay")
+                    AppBus.postSpeechAction(SpeechAction.ActionCode.ACTION_START_RECO)  //继续????
+                }
+            }
+        }
+
+        override fun onVolume(data: VoiceData) {
+        }
     }
 
-}
+    /**
+     * 语音合成事件监听
+     */
+    inner class SyncEventListener : SyncEvent {
 
+        override fun onError(err: String) {
+            Vog.d(this, err)
+            if (speakSync) cExecutor.speakCallback(err)
+            resumeMusicIf()
+        }
+
+        override fun onFinish() {
+            Vog.d(this, "onSynData 结束")
+            if (speakSync) cExecutor.speakCallback()
+            resumeMusicIf()
+        }
+
+        override fun onStart() {
+            Vog.d(this, "onSynData 开始")
+            if (SystemBridge().isMediaPlaying()) {
+                SystemBridge().mediaPause()
+                haveMusicPlay = true
+            }
+        }
+    }
+}
 

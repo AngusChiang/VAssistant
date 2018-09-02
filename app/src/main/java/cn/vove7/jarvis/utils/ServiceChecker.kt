@@ -21,10 +21,7 @@ class ServiceChecker(val context: Context) {
     fun checkService() {
         var b = false
         arrayOf(
-                MainService::class.java,
-                SpeechRecoService::class.java,
-                SpeechSynService::class.java,
-                MyAccessibilityService::class.java
+                MainService::class.java
         ).forEach {
             Vog.i(this, "checkService ${it::class.java.simpleName}")
             if (ServiceHelper.isServiceRunning(context, it)) {

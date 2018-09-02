@@ -16,8 +16,8 @@ class RecogWakeupListener(private val handler: Handler) : SimpleWakeupListener()
     override fun onSuccess(word: String?, result: WakeUpResult) {
         super.onSuccess(word, result)
         val m = Message()
-        m.what = IStatus.STATUS_WAKEUP_SUCCESS
-        m.data = BundleBuilder().put("word", word ?: "").build()
+        m.what = IStatus.CODE_WAKEUP_SUCCESS
+        m.data = BundleBuilder().put("data", word ?: "").build()
         handler.sendMessage(m)
     }
 }
