@@ -55,15 +55,6 @@ android {
     productFlavors {
     }
 }
-//greendao {
-//    //数据库的schema版本，也可以理解为数据库版本号
-//    schemaVersion 1
-//    //设置DaoMaster、DaoSession、Dao包名，也就是要放置这些类的包的全路径。
-//    daoPackage 'cn.vove7.common.datamanager.greendao'
-//    //设置DaoMaster、DaoSession、Dao目录
-//    targetGenDir 'src/main/java'
-//}
-
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation 'com.simplecityapps:recyclerview-fastscroll:1.0.18'

@@ -55,14 +55,12 @@ class NewInstActivity : AppCompatActivity(), View.OnClickListener {
     private var instType: Int = NODE_SCOPE_GLOBAL
 
     private var actionNode: ActionNode? = null
+    private var parentNode: ActionNode? = null
     private var isReedit = false
 
     private lateinit var searchView: SearchView
     private var enterTime = 0L
 
-    companion object {
-
-    }
 
     lateinit var toolbar: Toolbar
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -90,39 +88,51 @@ class NewInstActivity : AppCompatActivity(), View.OnClickListener {
 
     private fun initData() {
         initBottom()
-        instType = intent.getIntExtra("type", NODE_SCOPE_GLOBAL)
-        if (instType == NODE_SCOPE_GLOBAL) {//隐藏sel App
-            sel_app.visibility = View.GONE
-        } else {
-            btn_sel_app.setOnClickListener(this)
-            pkg = intent.getStringExtra("pkg")
-            if (pkg != null) {
-                val app = AppHelper.getAppInfo(this, pkg!!, pkg!!)
-                if (app != null) {
-                    btn_sel_app.text = app.name
-                }
-            }
-            getAppList()
-        }
-
         isReedit = intent.getBooleanExtra("reedit", false)
 
         val arr = resources.getStringArray(R.array.list_pos_of_regex_param)
         posData = arrayListOf()
         posData.addAll(arr)
-        if (isReedit) {
+        if (isReedit) {//重新编辑
             val id = intent.getLongExtra("nodeId", 0L)
             actionNode = DAO.daoSession.actionNodeDao.queryBuilder().where(ActionNodeDao.Properties.Id.eq(id)).unique()
             if (actionNode == null) {
                 voast.showShort(getString(R.string.text_error_occurred) + " code :n117")
             } else {//展示信息
                 activity_name.setText(actionNode?.actionScope?.activity)
+                desc_text.setText(actionNode?.descTitle)
                 actionNode?.regs?.forEach {
                     regs.add(Pair(it.regStr, posData[posArr.indexOf(it.paramPos)]))
                 }
             }
         }
+        instType = intent.getIntExtra("type", NODE_SCOPE_GLOBAL)
+        when (instType) {
+            NODE_SCOPE_GLOBAL -> {//隐藏sel App
+                sel_app.visibility = View.GONE
+            }
+            NODE_SCOPE_IN_APP -> {
+                btn_sel_app.setOnClickListener(this)
+                pkg = intent.getStringExtra("pkg")
+                if (pkg != null) {
+                    val app = AppHelper.getAppInfo(this, pkg!!, pkg!!)
+                    if (app != null) {
+                        btn_sel_app.text = app.name
+                    }
+                }
+                getAppList()
+            }
+            else -> {
+                sel_app.visibility = View.GONE
+                if (!isReedit) {//add follow
+                    parentId = intent.getLongExtra("nodeId", 0)
+                    parentNode = DAO.daoSession.actionNodeDao.queryBuilder().where(ActionNodeDao.Properties.Id.eq(parentId)).unique()
 
+                    parent_lay.visibility = View.VISIBLE
+                    parent_title.text = intent.getStringExtra("parent_title")
+                }
+            }
+        }
     }
 
     // TODO 分页
@@ -419,7 +429,7 @@ class NewInstActivity : AppCompatActivity(), View.OnClickListener {
                     return@setOnClickListener
                 }
                 //TODO 联合parentNode
-                val result = ParseEngine.testParse(testText, wrapMapNodes())
+                val result = ParseEngine.testParse(testText, wrapTestNode())
                 outputParseResult(result)
 
                 if (!hisList.contains(testText)) {
@@ -471,21 +481,20 @@ class NewInstActivity : AppCompatActivity(), View.OnClickListener {
      * 转换测试MapNode List
      * @return regs:List<Pair<String,String>> -> List<ActionNode>
      */
-    private fun wrapMapNodes(): List<ActionNode> {
-        val list = mutableListOf<ActionNode>()
+    private fun wrapTestNode(): ActionNode {
         val testId = Int.MAX_VALUE.toLong()
-        if (parentId != null) {
-            val parentNode = DAO.daoSession.actionNodeDao.queryBuilder().where(ActionNodeDao.Properties.Id.eq(parentId)).unique()
-
-            list.add(parentNode)
-        }
 
         val testNode = ActionNode(desc_text.text.toString(), testId, 0L, instType, parentId
             ?: 0)
-
+        testNode.follows = emptyList()
         testNode.regs = wrapRegs()
-        list.add(testNode)
-        return list
+        if (parentNode != null) {
+            val fs = parentNode!!.follows
+            fs.add(testNode)
+            return parentNode!!
+        }
+
+        return testNode
     }
 
     private fun wrapRegs(): List<Reg> {

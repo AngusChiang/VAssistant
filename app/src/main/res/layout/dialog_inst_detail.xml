@@ -36,6 +36,7 @@
                 app:layout_collapseMode="pin"
                 app:navigationIcon="@drawable/ic_close_white_24dp"
                 app:title=""
+                app:popupTheme="@style/Theme.AppCompat.Light.DarkActionBar"
                 app:titleTextColor="#fff" />
 
         </android.support.design.widget.CollapsingToolbarLayout>

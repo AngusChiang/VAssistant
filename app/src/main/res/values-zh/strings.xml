@@ -59,4 +59,6 @@
     <string name="text_javascript_test">JavaScript 测试</string>
     <string name="text_establish_connection">与%s建立连接</string>
     <string name="text_disconnect_with_debugger">与远程调试器断开连接</string>
+    <string name="text_add_follow_action">添加跟随操作</string>
+    <string name="text_parent_action">上级操作</string>
 </resources>

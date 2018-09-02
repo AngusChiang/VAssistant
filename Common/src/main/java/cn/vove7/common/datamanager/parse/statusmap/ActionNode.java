@@ -11,6 +11,7 @@ import org.greenrobot.greendao.annotation.ToOne;
 import org.greenrobot.greendao.annotation.Transient;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 import cn.vove7.common.datamanager.greendao.ActionDao;
@@ -30,6 +31,7 @@ import cn.vove7.common.datamanager.parse.model.ActionScope;
  */
 @Entity
 public class ActionNode implements Serializable, DataFrom {
+    public static final long serialVersionUID = 1210203;
     @Id
     private Long id;
     /**
@@ -56,11 +58,12 @@ public class ActionNode implements Serializable, DataFrom {
     /**
      * 后续节点id format: nodeId1,nodeId2,..
      */
-    @NotNull
-    private String follows = "";
+    //@NotNull
+    //private String follows = "";
     //
-    //@ToMany(referencedJoinProperty = "parentId")
-    //private List<ActionNode> follows;
+    @ToMany(referencedJoinProperty = "parentId")
+    private List<ActionNode> follows;
+    private Long parentId;
     /**
      * 操作参数
      */
@@ -76,7 +79,6 @@ public class ActionNode implements Serializable, DataFrom {
     ActionScope actionScope;
     private long scopeId;
     private String descTitle;
-    private Long parentId;
 
     private int priority;//优先级 大者优先; 相对于同一级 :(全局命令下: 返回主页>返回) (同一界面下)
 
@@ -90,6 +92,11 @@ public class ActionNode implements Serializable, DataFrom {
         this.from = from;
     }
 
+
+    @Generated(hash = 462335395)
+    private transient Long action__resolvedKey;
+    @Generated(hash = 1119678907)
+    private transient Long actionScope__resolvedKey;
     /**
      * Used to resolve relations
      */
@@ -100,10 +107,6 @@ public class ActionNode implements Serializable, DataFrom {
      */
     @Generated(hash = 1336300321)
     private transient ActionNodeDao myDao;
-    @Generated(hash = 462335395)
-    private transient Long action__resolvedKey;
-    @Generated(hash = 1119678907)
-    private transient Long actionScope__resolvedKey;
 
     public Long getParentId() {
         return parentId;
@@ -118,25 +121,22 @@ public class ActionNode implements Serializable, DataFrom {
     }
 
     @Keep
-    public ActionNode(Long id, String follows, int type) {
+    public ActionNode(Long id, int type) {
         this.id = id;
-        this.follows = follows;
         this.actionScopeType = type;
     }
 
     @Keep
-    public ActionNode(Long id, long actionId, String follows, int type) {
+    public ActionNode(Long id, long actionId, int type) {
         this.id = id;
         this.actionId = actionId;
-        this.follows = follows;
         this.actionScopeType = type;
     }
 
     @Keep
-    public ActionNode(Long id, long actionId, String follows, long scopeId, int type) {
+    public ActionNode(Long id, long actionId, long scopeId, int type) {
         this.id = id;
         this.actionId = actionId;
-        this.follows = follows;
         this.scopeId = scopeId;
         this.actionScopeType = type;
     }
@@ -148,14 +148,10 @@ public class ActionNode implements Serializable, DataFrom {
         this.actionScopeType = type;
         this.descTitle = descTitle;
     }
-
-
-    @Keep
-    public ActionNode(String descTitle, Long id, long actionId, long scopeId, String f, int type) {
+    public ActionNode(String descTitle, Long id, int type) {
         this.id = id;
         this.actionId = actionId;
         this.scopeId = scopeId;
-        this.follows = f;
         this.actionScopeType = type;
         this.descTitle = descTitle;
     }
@@ -207,25 +203,23 @@ public class ActionNode implements Serializable, DataFrom {
     }
 
     @Keep
-    public ActionNode(Long id, int actionScopeType, long actionId, @NotNull String follows, long scopeId,
+    public ActionNode(Long id, int actionScopeType, long actionId, long scopeId,
                       String descTitle, Long parentId, int priority) {
         this.id = id;
         this.actionScopeType = actionScopeType;
         this.actionId = actionId;
-        this.follows = follows;
         this.scopeId = scopeId;
         this.descTitle = descTitle;
         this.parentId = parentId;
         this.priority = priority;
     }
 
-    @Generated(hash = 2128942264)
-    public ActionNode(Long id, int actionScopeType, long actionId, @NotNull String follows, long scopeId,
+    @Keep
+    public ActionNode(Long id, int actionScopeType, long actionId, long scopeId,
                       String descTitle, Long parentId, String from, int priority) {
         this.id = id;
         this.actionScopeType = actionScopeType;
         this.actionId = actionId;
-        this.follows = follows;
         this.scopeId = scopeId;
         this.descTitle = descTitle;
         this.parentId = parentId;
@@ -241,13 +235,6 @@ public class ActionNode implements Serializable, DataFrom {
         this.id = id;
     }
 
-    public String getFollows() {
-        return this.follows;
-    }
-
-    public void setFollows(String follows) {
-        this.follows = follows;
-    }
 
     /**
      * To-one relationship, resolved on first access.
@@ -314,26 +301,6 @@ public class ActionNode implements Serializable, DataFrom {
         this.param = param;
     }
 
-    /**
-     * To-one relationship, resolved on first access.
-     */
-    @Keep
-    public ActionScope getActionScope() {
-        long __key = this.scopeId;
-        if (actionScope__resolvedKey == null || !actionScope__resolvedKey.equals(__key)) {
-            final DaoSession daoSession = this.daoSession;
-            if (daoSession == null) {
-                throw new DaoException("Entity is detached from DAO context");
-            }
-            ActionScopeDao targetDao = daoSession.getActionScopeDao();
-            ActionScope actionScopeNew = targetDao.load(__key);
-            synchronized (this) {
-                actionScope = actionScopeNew;
-                actionScope__resolvedKey = __key;
-            }
-        }
-        return actionScope;
-    }
 
     /**
      * called by internal mechanisms, do not call yourself.
@@ -349,6 +316,60 @@ public class ActionNode implements Serializable, DataFrom {
             scopeId = actionScope.getId();
             actionScope__resolvedKey = scopeId;
         }
+    }
+
+
+    /**
+     * Resets a to-many relationship, making the next get call to query for a fresh result.
+     */
+    @Generated(hash = 1320822772)
+    public synchronized void resetRegs() {
+        regs = null;
+    }
+
+
+    public int getActionScopeType() {
+        return this.actionScopeType;
+    }
+
+    public void setActionScopeType(int actionScopeType) {
+        this.actionScopeType = actionScopeType;
+    }
+
+    @Override
+    public String toString() {
+        return descTitle;
+    }
+
+    public int getPriority() {
+        return this.priority;
+    }
+
+    public void setPriority(int priority) {
+        this.priority = priority;
+    }
+
+
+    /**
+     * To-one relationship, resolved on first access.
+     */
+    @Keep
+    public ActionScope getActionScope() {
+        if (actionScope != null) return actionScope;
+        long __key = this.scopeId;
+        if (actionScope__resolvedKey == null || !actionScope__resolvedKey.equals(__key)) {
+            final DaoSession daoSession = this.daoSession;
+            if (daoSession == null) {
+                throw new DaoException("Entity is detached from DAO context");
+            }
+            ActionScopeDao targetDao = daoSession.getActionScopeDao();
+            ActionScope actionScopeNew = targetDao.load(__key);
+            synchronized (this) {
+                actionScope = actionScopeNew;
+                actionScope__resolvedKey = __key;
+            }
+        }
+        return actionScope;
     }
 
     /**
@@ -374,11 +395,40 @@ public class ActionNode implements Serializable, DataFrom {
     }
 
     /**
+     * To-many relationship, resolved on first access (and after reset).
+     * Changes to to-many relations are not persisted, make changes to the target entity.
+     */
+    @Keep
+    public List<ActionNode> getFollows() {
+        if (follows == null) {
+            final DaoSession daoSession = this.daoSession;
+            if (daoSession == null) {
+                follows = new ArrayList<>();
+                return follows;
+                //throw new DaoException("Entity is detached from DAO context");
+            }
+            ActionNodeDao targetDao = daoSession.getActionNodeDao();
+            List<ActionNode> followsNew = targetDao._queryActionNode_Follows(id);
+            synchronized (this) {
+                if (follows == null) {
+                    follows = followsNew;
+                }
+            }
+        }
+        return follows;
+    }
+
+
+    /**
      * Resets a to-many relationship, making the next get call to query for a fresh result.
      */
-    @Generated(hash = 1320822772)
-    public synchronized void resetRegs() {
-        regs = null;
+    @Generated(hash = 880764975)
+    public synchronized void resetFollows() {
+        follows = null;
+    }
+
+    public void setFollows(List<ActionNode> follows) {
+        this.follows = follows;
     }
 
     /**
@@ -424,26 +474,5 @@ public class ActionNode implements Serializable, DataFrom {
     public void __setDaoSession(DaoSession daoSession) {
         this.daoSession = daoSession;
         myDao = daoSession != null ? daoSession.getActionNodeDao() : null;
-    }
-
-    public int getActionScopeType() {
-        return this.actionScopeType;
-    }
-
-    public void setActionScopeType(int actionScopeType) {
-        this.actionScopeType = actionScopeType;
-    }
-
-    @Override
-    public String toString() {
-        return descTitle;
-    }
-
-    public int getPriority() {
-        return this.priority;
-    }
-
-    public void setPriority(int priority) {
-        this.priority = priority;
     }
 }

@@ -57,7 +57,7 @@ class GlobalInstListFragment : SimpleListFragment<ActionNode>() {
         super.onGetData(pageIndex)
         thread {
             val offsetDatas = DAO.daoSession.actionNodeDao.queryBuilder()
-                    .where(ActionNodeDao.Properties.NodeType.eq(ActionNode.NODE_SCOPE_GLOBAL))
+                    .where(ActionNodeDao.Properties.ActionScopeType.eq(ActionNode.NODE_SCOPE_GLOBAL))
                     .offset(pageIndex * pageSizeLimit)
                     .limit(pageSizeLimit).list()
             Vog.d(this, "onGetData $offsetDatas")

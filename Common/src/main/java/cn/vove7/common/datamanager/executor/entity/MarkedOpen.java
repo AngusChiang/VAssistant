@@ -10,6 +10,7 @@ import org.greenrobot.greendao.annotation.Transient;
 import cn.vove7.common.utils.RegUtils;
 import cn.vove7.vtp.log.Vog;
 import kotlin.text.Regex;
+import org.greenrobot.greendao.annotation.Generated;
 
 /**
  * 打开事件

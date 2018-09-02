@@ -257,7 +257,7 @@ class MyAccessibilityService : AccessibilityApi() {
      * @return Boolean
      */
     override fun onKeyEvent(event: KeyEvent): Boolean {
-        Vog.d(this, "onKeyEvent  ----> " + event.toString())
+//        Vog.d(this, "onKeyEvent  ----> " + event.toString())
         when (event.action) {
             KeyEvent.ACTION_DOWN -> when (event.keyCode) {
                 KEYCODE_VOLUME_DOWN -> {

@@ -141,4 +141,6 @@
     <string name="text_javascript_test">JavaScript Test</string>
     <string name="text_establish_connection">Establish connection with %s</string>
     <string name="text_disconnect_with_debugger">Disconnect remote debugger</string>
+    <string name="text_add_follow_action">Add follow action</string>
+    <string name="text_parent_action">Parent action:</string>
 </resources>
