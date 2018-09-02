@@ -6,6 +6,7 @@ import android.view.View
 import cn.vove7.common.datamanager.DAO
 import cn.vove7.common.datamanager.greendao.ActionNodeDao
 import cn.vove7.common.datamanager.parse.statusmap.ActionNode
+import cn.vove7.common.datamanager.parse.statusmap.ActionNode.NODE_SCOPE_GLOBAL
 import cn.vove7.jarvis.activities.NewInstActivity
 import cn.vove7.jarvis.adapters.SimpleListAdapter
 import cn.vove7.jarvis.adapters.ViewModel
@@ -23,7 +24,7 @@ class GlobalInstListFragment : SimpleListFragment<ActionNode>() {
     var instDetailFragment = InstDetailFragment()
     override var floatClickListener: View.OnClickListener? = View.OnClickListener {
         val intent = Intent(context, NewInstActivity::class.java)
-        intent.putExtra("type", NewInstActivity.TYPE_GLOBAL)
+        intent.putExtra("type", NODE_SCOPE_GLOBAL)
         startActivity(intent)
     }
     override val itemClickListener: SimpleListAdapter.OnItemClickListener =

@@ -23,13 +23,14 @@
             <size
                 android:width="10dp"
                 android:height="10dp" />
-            <gradient
-                android:centerX="0.5"
-                android:centerY="0.5"
-                android:startColor="#fff"
-                android:endColor="#000"
-                android:gradientRadius="10dp"
-                android:type="radial"/>
+            <solid android:color="#87f4ab97"/>
+            <!--<gradient-->
+                <!--android:centerX="0.5"-->
+                <!--android:centerY="0.5"-->
+                <!--android:startColor="#fff"-->
+                <!--android:endColor="@color/cyan_500"-->
+                <!--android:gradientRadius="10dp"-->
+                <!--android:type="radial"/>-->
         </shape>
     </item>
 </layer-list>

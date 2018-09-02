@@ -68,34 +68,12 @@ object ParseEngine {
         if (GlobalActionNodes == null)
             GlobalActionNodes = DAO.daoSession.actionNodeDao.queryBuilder()
                     .where(ActionNodeDao.Properties.NodeType
-                            .`in`(NODE_SCOPE_ALL, NODE_SCOPE_GLOBAL, NODE_SCOPE_GLOBAL_2))
+                            .`in`(NODE_SCOPE_GLOBAL, NODE_SCOPE_GLOBAL_2))
                     .orderDesc(ActionNodeDao.Properties.Priority)
                     .list()
         GlobalActionNodes?.forEach {
-
             val r = search(cmd, it, actionQueue, GlobalActionNodes!!)
             if (r) return actionQueue
-//
-//            it.regs.forEach { reg ->
-//                val result = reg.regex.matchEntire(cmd)
-//                if (result != null) {
-//                    it.action.param = it.param
-//                    extractParam(it.action, reg, result)//提取参数
-//                    it.action.matchWord = result.groupValues[0]
-//                    actionQueue.add(it.action)
-//                    //深搜命令
-//                    actionDsMatch(actionQueue, it, result.groupValues[result.groups.size - 1], it)
-//                    return actionQueue
-//                }
-//            }
-//            it.regs.forEach { reg ->
-//                val result = reg.regex.matchEntire(cmd)
-//                if (result != null && result.groups.isNotEmpty()) {//匹配成功
-//                    val action = it.action
-//                    extractParam(action, reg, result)
-//                    return action
-//                }
-//            }
         }
         return actionQueue
     }
@@ -114,7 +92,7 @@ object ParseEngine {
         if (AppActionNodes == null) {
             AppActionNodes = DAO.daoSession.actionNodeDao.queryBuilder()
                     .where(ActionNodeDao.Properties.NodeType
-                            .`in`(NODE_SCOPE_ALL, NODE_SCOPE_IN_APP, NODE_SCOPE_IN_APP_2))
+                            .`in`(NODE_SCOPE_IN_APP, NODE_SCOPE_IN_APP_2))
                     .orderDesc(ActionNodeDao.Properties.Priority)
                     .list()
         }
@@ -126,19 +104,7 @@ object ParseEngine {
         }?.forEach {
             val r = search(cmd, it, actionQueue, AppActionNodes!!)
             if (r) return actionQueue
-//
-//            it.regs.forEach { reg ->
-//                val result = reg.regex.matchEntire(cmd)
-//                if (result != null) {
-//                    it.action.param = it.param
-//                    extractParam(it.action, reg, result)//提取参数
-//                    it.action.matchWord = result.groupValues[0]
-//                    actionQueue.add(it.action)
-//                    //深搜命令
-//                    actionDsMatch(actionQueue, it, result.groupValues[result.groups.size - 1], it)
-//                    return actionQueue
-//                }
-//            }
+
         }
         return actionQueue
     }
@@ -165,8 +131,8 @@ object ParseEngine {
      * 指令深度搜索
      * 沿follows路径搜索
      */
-    private fun actionDsMatch(actionQueue: PriorityQueue<Action>, node: ActionNode,
-                              sufWord: String, preAction: Action? = null, actionNodes: List<ActionNode>): Boolean {
+    private fun actionDsMatch(actionQueue: PriorityQueue<Action>, node: ActionNode, sufWord: String,
+                              preAction: Action? = null, actionNodes: List<ActionNode>): Boolean {
         if (sufWord.isEmpty()) return true
 //        println("${i++}. 匹配：$sufWord")
         node.follows.split(',').filter { it.trim() != "" }.forEach { fs ->

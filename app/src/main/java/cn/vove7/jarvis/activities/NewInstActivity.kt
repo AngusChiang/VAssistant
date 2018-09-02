@@ -52,18 +52,16 @@ class NewInstActivity : AppCompatActivity(), View.OnClickListener {
     var bsController: BottomSheetController? = null
     var pkg: String? = null
     var parentId: Long? = null//上级命令MapNodeId
-    private lateinit var TYPE: String
+    private var instType: Int = NODE_SCOPE_GLOBAL
 
     private var actionNode: ActionNode? = null
     private var isReedit = false
 
     private lateinit var searchView: SearchView
-    var enterTime = 0L
+    private var enterTime = 0L
 
     companion object {
-        const val TYPE_GLOBAL = "global"
-        const val TYPE_INNER_APP = "app_inner"
-        const val TYPE_WITH_PARENT = "follow_parent"//TODO 全局 用处？
+
     }
 
     lateinit var toolbar: Toolbar
@@ -76,7 +74,6 @@ class NewInstActivity : AppCompatActivity(), View.OnClickListener {
         toolbar = findViewById(R.id.toolbar)
         setSupportActionBar(toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
-
         initData()
 
         fab.setOnClickListener(this)
@@ -93,8 +90,8 @@ class NewInstActivity : AppCompatActivity(), View.OnClickListener {
 
     private fun initData() {
         initBottom()
-        TYPE = intent.getStringExtra("type") ?: TYPE_GLOBAL
-        if (TYPE == TYPE_GLOBAL) {//隐藏sel App
+        instType = intent.getIntExtra("type", NODE_SCOPE_GLOBAL)
+        if (instType == NODE_SCOPE_GLOBAL) {//隐藏sel App
             sel_app.visibility = View.GONE
         } else {
             btn_sel_app.setOnClickListener(this)
@@ -244,7 +241,7 @@ class NewInstActivity : AppCompatActivity(), View.OnClickListener {
             voast.showShort(getString(R.string.text_tooltips_select_script))
             return
         }
-        if (TYPE == TYPE_INNER_APP && pkg == null) {//type
+        if (arrayOf(NODE_SCOPE_IN_APP, NODE_SCOPE_IN_APP_2).contains(instType) && pkg == null) {//type
             voast.showShort(getString(R.string.text_tooltips_select_app))
             return
         }
@@ -272,11 +269,7 @@ class NewInstActivity : AppCompatActivity(), View.OnClickListener {
         newNode.descTitle = desc
         newNode.actionId = action.id
         newNode.scopeId = sid
-        newNode.actionScopeType = when (TYPE) {
-            TYPE_INNER_APP -> NODE_SCOPE_IN_APP
-            TYPE_WITH_PARENT -> NODE_SCOPE_IN_APP_2
-            else -> NODE_SCOPE_GLOBAL
-        }
+        newNode.actionScopeType = instType
 
         DAO.daoSession.actionNodeDao.insert(newNode)
         Vog.d(this, "save nodeId: ${newNode.id}")
@@ -494,11 +487,7 @@ class NewInstActivity : AppCompatActivity(), View.OnClickListener {
             list.add(parentNode)
         }
 
-        //TODO 参数描述? no no no
-        val type = if (TYPE == TYPE_GLOBAL) {
-            ActionNode.NODE_SCOPE_GLOBAL
-        } else ActionNode.NODE_SCOPE_IN_APP
-        val testNode = ActionNode(desc_text.text.toString(), testId, 0L, type, parentId
+        val testNode = ActionNode(desc_text.text.toString(), testId, 0L, instType, parentId
             ?: 0)
 
         testNode.regs = wrapRegs()
@@ -506,7 +495,7 @@ class NewInstActivity : AppCompatActivity(), View.OnClickListener {
         return list
     }
 
-    fun wrapRegs(): List<Reg> {
+    private fun wrapRegs(): List<Reg> {
         val tregs = mutableListOf<Reg>()
         regs.forEach {
             val p = posArr[posData.indexOf(it.second)]

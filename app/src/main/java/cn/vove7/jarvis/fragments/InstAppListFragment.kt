@@ -5,6 +5,7 @@ import android.view.View
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.datamanager.DAO
 import cn.vove7.common.datamanager.parse.model.ActionScope
+import cn.vove7.common.datamanager.parse.statusmap.ActionNode.NODE_SCOPE_IN_APP
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.activities.InAppInstActivity
 import cn.vove7.jarvis.activities.NewInstActivity
@@ -21,7 +22,7 @@ import cn.vove7.vtp.app.AppHelper
 class InstAppListFragment : SimpleListFragment<ActionScope>() {
     override var floatClickListener: View.OnClickListener? = View.OnClickListener {
         val intent = Intent(context, NewInstActivity::class.java)
-        intent.putExtra("type", NewInstActivity.TYPE_INNER_APP)
+        intent.putExtra("type", NODE_SCOPE_IN_APP)
 
         startActivity(intent)
     }

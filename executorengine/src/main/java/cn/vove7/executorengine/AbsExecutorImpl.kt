@@ -520,7 +520,7 @@ abstract class AbsExecutorImpl(
          * 检测包名正则
          */
         val PACKAGE_REGEX = "[a-zA-Z]+[0-9a-zA-Z_]*(\\.[a-zA-Z]+[0-9a-zA-Z_]*)+".toRegex()
-        private val globalScopeType = arrayListOf(ActionNode.NODE_SCOPE_ALL, ActionNode.NODE_SCOPE_GLOBAL, ActionNode.NODE_SCOPE_GLOBAL_2)
+        private val globalScopeType = arrayListOf(ActionNode.NODE_SCOPE_GLOBAL, ActionNode.NODE_SCOPE_GLOBAL_2)
 
     }
 

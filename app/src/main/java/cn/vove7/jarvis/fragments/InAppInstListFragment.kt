@@ -4,9 +4,10 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import cn.vove7.common.datamanager.DAO
-import cn.vove7.common.datamanager.greendao.ActionScopeDao
 import cn.vove7.common.datamanager.greendao.ActionNodeDao
+import cn.vove7.common.datamanager.greendao.ActionScopeDao
 import cn.vove7.common.datamanager.parse.statusmap.ActionNode
+import cn.vove7.common.datamanager.parse.statusmap.ActionNode.NODE_SCOPE_IN_APP
 import cn.vove7.jarvis.activities.NewInstActivity
 import cn.vove7.jarvis.adapters.SimpleListAdapter
 import cn.vove7.jarvis.adapters.ViewModel
@@ -26,7 +27,7 @@ class InAppInstListFragment : SimpleListFragment<ActionNode>() {
 
     override var floatClickListener: View.OnClickListener? = View.OnClickListener {
         val intent = Intent(context, NewInstActivity::class.java)
-        intent.putExtra("type", NewInstActivity.TYPE_INNER_APP)
+        intent.putExtra("type", NODE_SCOPE_IN_APP)
         intent.putExtra("pkg", pkg)
         startActivity(intent)
     }
@@ -88,7 +89,7 @@ class InAppInstListFragment : SimpleListFragment<ActionNode>() {
     override fun transData(nodes: List<ActionNode>): List<ViewModel> {
         val tmp = mutableListOf<ViewModel>()
         nodes.forEach {
-            tmp.add(ViewModel((it).descTitle, it.actionScope.activity,extra = it))
+            tmp.add(ViewModel((it).descTitle, it.actionScope.activity, extra = it))
         }
         return tmp
     }

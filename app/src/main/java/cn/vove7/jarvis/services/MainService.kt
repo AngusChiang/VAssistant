@@ -110,7 +110,7 @@ class MainService : BusService(), OnExecutorResult,
             alertDialog?.show()
             //语音
             voiceMode = MODE_ALERT
-            AppBus.postSpeechAction(SpeechAction.ActionCode.ACTION_START_RECO)
+            speechRecoService.startRecog()
         } catch (e: Exception) {
             onRequestPermission(RequestPermission("悬浮窗权限"))
         }
@@ -121,7 +121,7 @@ class MainService : BusService(), OnExecutorResult,
      * 停止语音
      */
     private fun notifyAlertResult() {
-        AppBus.postSpeechAction(SpeechAction.ActionCode.ACTION_CANCEL_RECO)
+        speechRecoService.cancelRecog()
         voiceMode = MODE_VOICE
         cExecutor.notifySync()
     }
@@ -132,6 +132,7 @@ class MainService : BusService(), OnExecutorResult,
     private var choiceDialog: Dialog? = null
 
     private fun hideDialog() {
+        statusVoiceAni.hide()
         if (choiceDialog?.isShowing == true) {
             choiceDialog?.dismiss()
             choiceDialog = null
@@ -181,14 +182,14 @@ class MainService : BusService(), OnExecutorResult,
     }
 
     /**
-     * 中途获取未知参数
+     * 中途获取参数
      * @param action 执行动作
      */
     override fun getVoiceParam(action: Action) {
 //        toast.showShort(action.param?.askText ?: "???")
         messengerAction = action
         voiceMode = MODE_GET_PARAM
-        AppBus.postSpeechAction(SpeechAction.ActionCode.ACTION_START_RECO)
+        speechRecoService.startRecog()
     }
 
     var speakSync = false
@@ -312,15 +313,16 @@ class MainService : BusService(), OnExecutorResult,
         private val data = HashMap<String, Any>()
         var instance: MainService? = null
 
-        //识别前是否有音乐播放
-        var haveMusicPlay = false
+    }
 
-        fun resumeMusicIf() {
-            synchronized(haveMusicPlay) {
-                if (haveMusicPlay) {
-                    SystemBridge().mediaResume()
-                    haveMusicPlay = false
-                }
+    //识别前是否有音乐播放
+    var haveMusicPlay = false
+
+    fun resumeMusicIf() {
+        synchronized(haveMusicPlay) {
+            if (haveMusicPlay) {
+                SystemBridge().mediaResume()
+                haveMusicPlay = false
             }
         }
     }
@@ -360,7 +362,14 @@ class MainService : BusService(), OnExecutorResult,
         }
 
         override fun onStartRecog() {
-            statusVoiceAni.begin()
+            statusVoiceAni.begin()//
+
+            SystemBridge().vibrate(80L)
+
+            if (SystemBridge().isMediaPlaying()) {
+                SystemBridge().mediaPause()
+                haveMusicPlay = true
+            }
         }
 
         override fun onResult(result: String) {
@@ -411,11 +420,20 @@ class MainService : BusService(), OnExecutorResult,
 
         }
 
+        override fun onStop() {
+            resumeMusicIf()
+        }
+
+        override fun onCancel() {
+            resumeMusicIf()
+            statusVoiceAni.hide()
+        }
+
         override fun onFailed(err: String) {
             resumeMusicIf()
             statusVoiceAni.faied()
             when (voiceMode) {
-                MODE_VOICE -> {
+                MODE_VOICE -> {//TODO effect
                 }
                 MODE_GET_PARAM -> {
 //                        toast.showShort("获取参数失败")

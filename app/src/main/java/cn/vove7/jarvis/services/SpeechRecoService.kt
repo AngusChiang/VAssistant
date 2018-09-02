@@ -7,8 +7,6 @@ import android.os.Message
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.appbus.AppBus
 import cn.vove7.common.appbus.VoiceData
-import cn.vove7.executorengine.bridges.SystemBridge
-import cn.vove7.jarvis.services.MainService.Companion.haveMusicPlay
 import cn.vove7.jarvis.speech.recognition.OfflineRecogParams
 import cn.vove7.jarvis.speech.recognition.listener.SpeechStatusListener
 import cn.vove7.jarvis.speech.recognition.model.IStatus
@@ -36,18 +34,16 @@ class SpeechRecoService(val event: SpeechEvent) {
      * 识别控制器，使用MyRecognizer控制识别的流程
      */
     private lateinit var myRecognizer: MyRecognizer
+
     /**
      * 唤醒器
      */
     lateinit var wakeuper: MyWakeup
 
-    lateinit var toast: Voast
     /*
      * 本Activity中是否需要调用离线命令词功能。根据此参数，判断是否需要调用SDK的ASR_KWS_LOAD_ENGINE事件
      */
     var enableOffline = false
-
-    private val backTrackInMs = 1500
 
     /**
      * 分发事件
@@ -102,6 +98,7 @@ class SpeechRecoService(val event: SpeechEvent) {
      */
 
     val listener = SpeechStatusListener(handler)
+
     private fun initRecog() {
         val context: Context = GlobalApp.APP
         myRecognizer = MyRecognizer(context, listener)
@@ -124,12 +121,6 @@ class SpeechRecoService(val event: SpeechEvent) {
     internal fun startRecog() {
         //震动 音效
         event.onStartRecog()
-        SystemBridge().vibrate(80L)
-
-        if (SystemBridge().isMediaPlaying()) {
-            SystemBridge().mediaPause()
-            haveMusicPlay = true
-        }
         sleep(100)
         if (!isListening()) {
             myRecognizer.start(params)
@@ -143,7 +134,7 @@ class SpeechRecoService(val event: SpeechEvent) {
      */
     fun stopRecog() {
         myRecognizer.stop()
-        MainService.resumeMusicIf()
+        event.onStop()
     }
 
     /**
@@ -151,7 +142,7 @@ class SpeechRecoService(val event: SpeechEvent) {
      */
     fun cancelRecog() {
         myRecognizer.cancel()
-        MainService.resumeMusicIf()
+        event.onCancel()
     }
 
     fun isListening(): Boolean {
@@ -171,4 +162,6 @@ interface SpeechEvent {
     fun onTempResult(temp: String)
     fun onFailed(err: String)
     fun onVolume(data: VoiceData)
+    fun onStop()
+    fun onCancel()
 }

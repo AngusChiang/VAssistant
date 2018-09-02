@@ -38,9 +38,8 @@ public class ActionNode implements Serializable, DataFrom {
     //指令作用范围
     private int actionScopeType = -1;
 
-    public static final int NODE_SCOPE_ALL = 0x0;//
     public static final int NODE_SCOPE_GLOBAL = 0x1;
-    public static final int NODE_SCOPE_GLOBAL_2 = 0x4;
+    public static final int NODE_SCOPE_GLOBAL_2 = 0x4;//follows
     public static final int NODE_SCOPE_IN_APP = 0x2;
     public static final int NODE_SCOPE_IN_APP_2 = 0x3;//2后操作
 
@@ -59,6 +58,9 @@ public class ActionNode implements Serializable, DataFrom {
      */
     @NotNull
     private String follows = "";
+    //
+    //@ToMany(referencedJoinProperty = "parentId")
+    //private List<ActionNode> follows;
     /**
      * 操作参数
      */

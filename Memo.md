@@ -30,6 +30,11 @@
 - actionScope: Int?
 - isGlobal():Boolean
 
+## App内命令提升至全局
+
+> 将ActionNode复制一条 修改actionScopeType类型
+
+
 ## Lua 与 js 区别
 
 |                    | lua                          | js                       | 注意               |
