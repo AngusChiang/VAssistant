@@ -7,6 +7,7 @@ import cn.vove7.androlua.LuaApp
 import cn.vove7.common.appbus.MessageEvent
 import cn.vove7.common.datamanager.DAO
 import cn.vove7.common.datamanager.InitLuaDbData
+import cn.vove7.jarvis.services.AdBlockService
 import cn.vove7.jarvis.services.MainService
 import cn.vove7.jarvis.services.SpeechRecoService
 import cn.vove7.jarvis.services.SpeechSynService
@@ -46,6 +47,7 @@ class App : LuaApp() {
                     startService(it)
                 }
             }
+            AdBlockService.bindServer()//广告服务
         }
     }
 

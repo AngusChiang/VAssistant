@@ -38,13 +38,6 @@ class GlobalInstListFragment : SimpleListFragment<ActionNode>() {
         }
 
 
-    companion object {
-
-        fun newInstance(): GlobalInstListFragment {
-            return GlobalInstListFragment()
-        }
-    }
-
     override fun transData(nodes: List<ActionNode>): List<ViewModel> {
         val tmp = mutableListOf<ViewModel>()
         nodes.forEach {

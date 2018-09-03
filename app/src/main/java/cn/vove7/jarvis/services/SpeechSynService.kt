@@ -32,7 +32,7 @@ class SpeechSynService(private val event: SyncEvent) : SpeechSynthesizerListener
     // assets目录下bd_etts_common_speech_m15_mand_eng_high_am-mix_v3.0.0_20170505.dat为离线男声模型；
     // assets目录下bd_etts_common_speech_f7_mand_eng_high_am-mix_v3.0.0_20170512.dat为离线女声模型
     //TODO sp配置
-    protected var offlineVoice = OfflineResource.VOICE_MALE
+    protected var offlineVoice = OfflineResource.VOICE_DUXY
 
 
     // 主控制类，所有合成控制方法从这个类开始

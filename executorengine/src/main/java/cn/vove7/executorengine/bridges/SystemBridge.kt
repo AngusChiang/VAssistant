@@ -13,6 +13,7 @@ import cn.vove7.common.SystemOperation
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.model.ExResult
+import cn.vove7.executorengine.helper.AdvanAppHelper
 import cn.vove7.executorengine.helper.ContactHelper
 import cn.vove7.vtp.app.AppHelper
 import cn.vove7.vtp.app.AppInfo
@@ -36,7 +37,9 @@ class SystemBridge : SystemOperation {
 //                Bus.postInfo(MessageEvent("启动失败(未找到此App[pkg:]):$pkg ", WHAT_ERR))
                 ExResult("未找到此App: $pkg")
             } else {
-                launchIntent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP //清空activity栈
+                launchIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP) //清空activity栈
+                launchIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK)
+
                 context.startActivity(launchIntent)
                 ExResult()
             }
@@ -54,7 +57,7 @@ class SystemBridge : SystemOperation {
      * @return packageName if success
      */
     override fun openAppByWord(appWord: String): ExResult<String> {
-        val list = cn.vove7.executorengine.helper.AppHelper(context).matchAppName(appWord)
+        val list = AdvanAppHelper.matchAppName(appWord)
         return if (list.isNotEmpty()) {
             val info = list[0].data
             Vog.i(this, "打开应用：$appWord -> ${info.name}")

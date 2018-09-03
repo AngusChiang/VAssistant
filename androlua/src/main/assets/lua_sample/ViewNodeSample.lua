@@ -7,21 +7,21 @@
 require 'accessibility'
 root = rootView() --List
 
-print(#root.childs())
+print(#root.childs)
 
 function dd(d)
     local s = ''
     for i = 0, d do
-        s = s .. '\t'
+        s = s .. ' '
     end
     return s
 end
 
 function t(d, node)
     print(dd(d), node)
-    local cs = node.childs()
+    local cs = node.childs
     for i = 0, #cs - 1 do
-        local child_i = cs.get(i)
+        local child_i = cs[i]
         t(d + 1, child_i)
     end
 end

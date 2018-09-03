@@ -14,7 +14,7 @@ class InstManagerActivity : BaseActivityWithViewPager() {
         get() = "命令管理"
         set(value) {}
     override var fragments: Array<Fragment> = arrayOf(
-            GlobalInstListFragment.newInstance(),
+            GlobalInstListFragment(),
             InstAppListFragment()
     )
     override var titles: Array<String> = arrayOf("全局命令", "应用内命令")

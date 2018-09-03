@@ -19,12 +19,12 @@
   - 解析动画： 解析过程 -> 结果
   - 执行动画： 执行过程 -> 结果
  
- - 自定义命令[-]
-   - 命令创建 (desc|regex|script|app pkg)[-]
-   - 命令详情页
+ - 自定义命令[x]
+   - 命令创建 (desc|regex|script|app pkg)[x]
+   - 命令详情页[]
  - 设置[]
  - 语音唤醒[x]
- - 跳过广告[]
+ - 跳过广告[x]
  
  - 商店
  - Dashboard
@@ -41,4 +41,4 @@
  ## Marked
  
  - 打开MarkedOpen
- - Marked
+ - Marked -联系人 -App -广告id

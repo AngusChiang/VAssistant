@@ -15,7 +15,7 @@ object InitLuaDbData : InitDbData() {
     override fun init() {
         super.init()
         val mapDao = DAO.daoSession.actionNodeDao
-        val scripyType = Action.SCRIPT_TYPE_LUA
+        val scriptType = Action.SCRIPT_TYPE_LUA
 
         if (mapDao.queryBuilder().count() <= 10L) {
             Vog.d(this, "更新数据")
@@ -29,9 +29,9 @@ object InitLuaDbData : InitDbData() {
                     "if (#args >= 1) then\n" +
                     "    smartOpen(args[1])\n" +
                     "else\n" +
-                    "    print(\"打开什么呦\")\n" +
+                    "    speak(\"打开什么呦\")\n" +
                     "end\n" +
-                    "\n", scripyType)
+                    "\n", scriptType)
             val a3 = Action(
                     "require 'accessibility'\n" +
                             "ViewFinder().desc('返回消息').tryClick()\n" +
@@ -46,7 +46,7 @@ object InitLuaDbData : InitDbData() {
                             "a = ViewFinder().id('title').similaryText(args[1]).tryClick()\n" +
                             "if (not a) then\n" +
                             "    toast('没找到哦')\n" +
-                            "end\n", scripyType)
+                            "end\n", scriptType)
 
             val a4 = Action(2,
                     "require 'accessibility'\n" +
@@ -55,24 +55,24 @@ object InitLuaDbData : InitDbData() {
                             "if (alert('确认发送?', '')) then\n" +
                             "    sleep(300)\n" +
                             "    clickById('fun_btn')\n" +
-                            "end", scripyType)
+                            "end", scriptType)
             val a2 = Action("local args = { ... }\n" +
                     "if (#args >= 1) then\n" +
                     "    executor.smartCallPhone(args[1])\n" +
-                    "end\n", scripyType)
+                    "end\n", scriptType)
 
             //操作
             val a5 = Action(
-                    "require 'accessibility'\n" + "back()", scripyType)
+                    "require 'accessibility'\n" + "back()", scriptType)
             val a6 = Action(
-                    "require 'accessibility'\n" + "home()", scripyType)
+                    "require 'accessibility'\n" + "home()", scriptType)
             val a7 = Action(
-                    "require 'accessibility'\n" + "recents()", scripyType)
+                    "require 'accessibility'\n" + "recents()", scriptType)
             val a8 = Action(
-                    "require 'accessibility'\n" + "notifications()", scripyType)
+                    "require 'accessibility'\n" + "notifications()", scriptType)
 
 
-            val a9 = Action("require 'accessibility'\n" + "clickText(args[1])", scripyType)
+            val a9 = Action("require 'accessibility'\n" + "clickText(args[1])", scriptType)
             //脚本用
 //            val a10 = Action("clickById(args[1])")
 
@@ -82,14 +82,14 @@ object InitLuaDbData : InitDbData() {
                             "k=waitForDesc('快捷入口')\n" +
                             "k.tryClick()\n" +
                             "s=waitForDesc('扫一扫 按钮')\n" +
-                            "s.tryClick()", scripyType)
+                            "s.tryClick()", scriptType)
             val a12 = Action(
                     "require 'accessibility'\n" +
                             "ViewFinder().equalsText('首页').id('tab_description').tryClick()\n" +
                             "ViewFinder().equalsText('Home').id('tab_description').tryClick()\n" +
                             "sacn = ViewFinder().id('saoyisao_tv')\n" +
                             "\n" +
-                            "sacn.waitFor().tryClick()\n", scripyType)
+                            "sacn.waitFor().tryClick()\n", scriptType)
 
             arrayOf(a1, a2, a3, a4, a5, a6, a7, a8, a9, a11, a12).forEach {
                 DAO.daoSession.actionDao.insert(it)

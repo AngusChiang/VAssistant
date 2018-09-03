@@ -30,7 +30,7 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme"
+        android:theme="@style/NoActionBar"
         tools:ignore="GoogleAppIndexingWarning">
         <meta-data
             android:name="com.baidu.speech.APP_ID"
@@ -64,11 +64,6 @@
 
         <activity android:name=".activities.CommandTestActivity" />
 
-        <service
-            android:name=".services.SpeechRecoService"
-            android:enabled="true"
-            android:exported="true" />
-
         <activity android:name=".activities.VoiceTestActivity" />
 
         <service
@@ -82,33 +77,22 @@
         <activity android:name=".activities.PermissionManagerActivity" />
         <activity android:name=".activities.RegexParseTestActivity" />
 
-        <service
-            android:name=".services.SpeechSynService"
-            android:enabled="true"
-            android:exported="true" />
-
         <activity
-            android:name=".activities.InstManagerActivity"
-            android:theme="@style/NoActionBar" />
-        <activity
-            android:name=".activities.MarkedManageActivity"
-            android:theme="@style/NoActionBar" />
+            android:name=".activities.InstManagerActivity"/>
         <activity
             android:name=".activities.SettingsActivity"
+            android:theme="@style/AppTheme"
             android:label="@string/title_activity_settings" />
         <activity
             android:name=".activities.InAppInstActivity"
-            android:label="@string/text_cmd_in_app"
-            android:theme="@style/NoActionBar" />
+            android:label="@string/text_cmd_in_app" />
         <activity
             android:name=".activities.NewInstActivity"
-            android:theme="@style/NoActionBar"
             android:windowSoftInputMode="adjustPan" />
         <activity
-            android:name=".activities.RealMainActivity"
-            android:theme="@style/NoActionBar" />
-        <activity android:name=".activities.WelcomeActivity"
-            android:theme="@style/NoActionBar"/>
+            android:name=".activities.RealMainActivity"/>
+        <activity android:name=".activities.WelcomeActivity"/>
+        <activity android:name=".activities.MarkedManagerActivity" />
     </application>
 
 </manifest>

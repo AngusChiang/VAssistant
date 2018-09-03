@@ -71,6 +71,11 @@
         <item>最后一个</item>
     </string-array>
 
+    <string-array name="list_script_type">
+        <item>lua</item>
+        <item>js</item>
+    </string-array>
+
     <string-array name="list_preference_entry_values">
         <item>1</item>
         <item>2</item>
@@ -126,7 +131,8 @@
     <string name="text_from_file">From file</string>
     <string name="text_open_failed">Open failed</string>
     <string name="text_cannot_open_file_manager">Unable to open file manager</string>
-    <string name="text_tooltips_select_script">Set script file:)</string>
+    <string name="text_tooltips_select_script">Set the script file:)</string>
+    <string name="text_tooltips_select_script_type">Set the script type:)</string>
     <string name="text_tooltips_select_app">Select App</string>
     <string name="text_save_success">Save success</string>
     <string name="text_save_failed">Save failed</string>
@@ -143,4 +149,5 @@
     <string name="text_disconnect_with_debugger">Disconnect remote debugger</string>
     <string name="text_add_follow_action">Add follow action</string>
     <string name="text_parent_action">Parent action:</string>
+    <string name="key_audio_speak" translatable="false">audio_speak</string>
 </resources>

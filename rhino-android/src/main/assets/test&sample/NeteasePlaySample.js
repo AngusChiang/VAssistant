@@ -15,11 +15,12 @@ click(x,y)
 // --a.tryClick()  
 //sleep(2000) // TODO  show
 
-s = ViewFinder().id('a02').await(6000)
-if(s == null){
+s = ViewFinder().type('listview').await(6000)
+c=s.childs()[0]
+if(c == null){
 	toast("搜索失败")
 }else {
-	s.tryClick()	
+	c.tryClick()
 }
 
 

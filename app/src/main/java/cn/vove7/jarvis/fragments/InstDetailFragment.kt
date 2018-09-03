@@ -30,7 +30,7 @@ import cn.vove7.jarvis.activities.NewInstActivity
  */
 class InstDetailFragment : BottomSheetDialogFragment() {
 
-    private lateinit var node: ActionNode
+    private var node: ActionNode?=null
     private lateinit var mBehavior: BottomSheetBehavior<*>
     lateinit var contentView: View
     private lateinit var toolbarImg: ImageView
@@ -58,7 +58,7 @@ class InstDetailFragment : BottomSheetDialogFragment() {
     }
 
     private fun setData() {
-        when (node.from) {//编辑
+        when (node?.from) {//编辑
             DataFrom.FROM_SERVICE, DataFrom.FROM_SHARED -> {
                 val editMenu = toolbar.menu.findItem(R.id.menu_edit)
                 editMenu.isEnabled = false
@@ -70,11 +70,16 @@ class InstDetailFragment : BottomSheetDialogFragment() {
         }
         contentView.post {
             //标题
-            collapsingColl.title = node.descTitle
+            collapsingColl.title = node?.descTitle
         }
     }
 
     private fun initView() {
+        if(node==null){
+            hide()
+            return
+        }
+        val node=node!!
         collapsingColl = contentView.findViewById(R.id.collapsing_coll)
         toolbar = contentView.findViewById(R.id.toolbar)
         toolbar.inflateMenu(R.menu.menu_inst_detail)

@@ -21,6 +21,8 @@ class ViewNode(val node: AccessibilityNodeInfo) : ViewOperation, Comparable<View
      */
     var similarityText: Float = 0f
 
+    private var childss: Array<ViewNode>? = null
+
     companion object {
         const val tryNum = 10
     }
@@ -68,18 +70,49 @@ class ViewNode(val node: AccessibilityNodeInfo) : ViewOperation, Comparable<View
         return b
     }
 
+    private var lastGetChildTime = 0L
     /**
      * @return node.childs
      */
-    fun childs(): List<ViewNode> {
-        val cs = mutableListOf<ViewNode>()
-        for (i in 0 until node.childCount) {
-            val c = node.getChild(i)
-            if (c != null) {
-                cs.add(ViewNode(c))
+    fun getChilds(): Array<ViewNode> {
+        synchronized(lastGetChildTime) {
+            val now = System.currentTimeMillis()
+            if (childss != null && now - lastGetChildTime < 10000L) {//10s有效期
+                return childss!!
             }
+            lastGetChildTime = now
+            val cs = mutableListOf<ViewNode>()
+            for (i in 0 until node.childCount) {
+                val c = node.getChild(i)
+                if (c != null) {
+                    cs.add(ViewNode(c))
+                }
+            }
+            childss = cs.toTypedArray()
+            return childss!!
         }
-        return cs
+    }
+
+
+//    fun childCount(): Int {
+//        return node.childCount
+//    }
+
+    fun getChildCount(): Int = node.childCount
+
+
+    fun childAt(i: Int): ViewNode? {
+        val cn = node.getChild(i)
+        if (cn != null) {
+            return ViewNode(cn)
+        }
+        return null
+//        val cs = getChilds()
+//        if (i < 0 || i >= cs.size) {
+//            GlobalLog.err("索引超出范围 $i [0 - ${cs.size}]")
+//            return null
+//        }
+//        return cs[i]
     }
 
     override fun click(): Boolean = node.performAction(AccessibilityNodeInfo.ACTION_CLICK)
@@ -219,16 +252,15 @@ class ViewNode(val node: AccessibilityNodeInfo) : ViewOperation, Comparable<View
         return nodeSummary(node)
     }
 
-    private fun nodeSummary(node: AccessibilityNodeInfo?): String {
-        if (node == null) return "null\n"
+    private fun nodeSummary(node: AccessibilityNodeInfo): String {
         val clsName = node.className
         val id = node.viewIdResourceName
         val rect = Rect()
         node.getBoundsInScreen(rect)
         val cls = clsName.substring(clsName.lastIndexOf('.') + 1)
-        return String.format("[cls: %s] [id: %s] [desc: %s] [text: %s] [%s]",
+        return String.format("[cls: %s] [id: %s] [desc: %s] [text: %s] [%s] [childCount: %d]",
                 cls, id?.substring(id.lastIndexOf('/') + 1) ?: "null",
-                node.contentDescription, node.text, getBounds()
+                node.contentDescription, node.text, getBounds(), getChildCount()
         )
     }
 

@@ -22,8 +22,8 @@ import cn.vove7.common.executor.CExecutorI
 import cn.vove7.common.view.finder.ViewFindBuilder
 import cn.vove7.common.view.finder.ViewFinder
 import cn.vove7.common.view.notifier.ActivityShowListener
+import cn.vove7.common.view.notifier.UiViewShowNotifier
 import cn.vove7.common.view.notifier.ViewShowListener
-import cn.vove7.common.view.notifier.ViewShowNotifier
 import cn.vove7.executorengine.bridges.SystemBridge
 import cn.vove7.vtp.app.AppHelper
 import cn.vove7.vtp.log.Vog
@@ -40,6 +40,7 @@ import kotlin.concurrent.thread
 class MyAccessibilityService : AccessibilityApi() {
     private lateinit var pkgman: PackageManager
 
+
     override fun onServiceConnected() {
         accessibilityService = this
         pkgman = packageManager
@@ -55,6 +56,7 @@ class MyAccessibilityService : AccessibilityApi() {
         currentScope.activity = currentActivity
         currentScope.packageName = pkg
         Vog.d(this, currentScope.toString())
+        dispatchPluginsEvent(ON_APP_CHANGED, currentScope)
     }
 
     override fun getRootViewNode(): ViewNode? {
@@ -75,7 +77,8 @@ class MyAccessibilityService : AccessibilityApi() {
 
     override fun waitForActivity(executor: CExecutorI, scope: ActionScope) {
         locksWaitForActivity[executor] = scope
-        thread {
+        activityNotifierThread?.interrupt()
+        activityNotifierThread = thread {
             sleep(200)
             activityNotifier.notifyIfShow()
         }
@@ -86,16 +89,17 @@ class MyAccessibilityService : AccessibilityApi() {
      * 等待界面出现指定ViewId
      * viewId 特殊标记
      */
-    private val locksWaitForView = mutableMapOf<ViewShowListener, ViewFinder>()
+    private val locksWaitForView = hashMapOf<ViewFinder, ViewShowListener>()
 
     /**
      * notify when view show
      */
-    private val viewNotifier = ViewShowNotifier(locksWaitForView)
+    private val viewNotifier = UiViewShowNotifier(locksWaitForView)
 
     override fun waitForView(executor: CExecutorI, finder: ViewFinder) {
-        locksWaitForView[executor] = finder
-        thread {
+        locksWaitForView[finder] = executor
+        viewNotifierThread?.interrupt()
+        viewNotifierThread = thread {
             sleep(200)
             viewNotifier.notifyIfShow()
         }
@@ -108,8 +112,14 @@ class MyAccessibilityService : AccessibilityApi() {
                 Vog.d(this, "removeAllNotifier locksWaitForActivity ${a != null}")
             }
             synchronized(locksWaitForView) {
-                val a = locksWaitForView.remove(executor)
-                Vog.d(this, "removeAllNotifier locksWaitForView ${a != null}")
+                val values = locksWaitForView.values
+                var success = false
+                var a = true
+                while (values.contains(executor) && a) {
+                    a = values.remove(executor)
+                    if (a) success = true
+                }
+                Vog.d(this, "removeAllNotifier locksWaitForView $success")
             }
         }
     }
@@ -118,25 +128,25 @@ class MyAccessibilityService : AccessibilityApi() {
     var activityNotifierThread: Thread? = null
 
     private fun callAllNotifier() {
-//        if (viewNotifierThread?.isAlive == true) {
         viewNotifierThread?.interrupt()
-//        }
-        activityNotifierThread?.interrupt()
         viewNotifierThread = thread {
             viewNotifier.notifyIfShow()
         }
+        activityNotifierThread?.interrupt()
         activityNotifierThread = thread {
             activityNotifier.notifyIfShow()
         }
     }
 
+
     override fun onAccessibilityEvent(event: AccessibilityEvent?) {
         if (null == event || null == event.source) {
             return
         }
+        dispatchPluginsEvent(ON_UI_UPDATE, rootInActiveWindow)
         val classNameStr = event.className
         val pkg = event.packageName as String
-        if (classNameStr.startsWith(pkg)) {
+        if (classNameStr.startsWith(pkg)) {//解析当前App Activity
             currentActivity = classNameStr.substring(classNameStr.lastIndexOf('.') + 1)
             updateCurrentApp(pkg)
         }
@@ -147,6 +157,7 @@ class MyAccessibilityService : AccessibilityApi() {
         when (eventType) {
             //通知栏发生改变
             AccessibilityEvent.TYPE_NOTIFICATION_STATE_CHANGED -> {
+                callAllNotifier()
             }
             //窗口的状态发生改变
             AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED -> {//窗口切换
@@ -164,12 +175,12 @@ class MyAccessibilityService : AccessibilityApi() {
                 startTraverse(rootInActiveWindow)
                 callAllNotifier()
             }
+            TYPE_VIEW_SCROLLED -> {
+                callAllNotifier()
+            }
             TYPE_WINDOW_CONTENT_CHANGED -> {//"帧"刷新
                 val node = event.source
                 startTraverse(node)
-                callAllNotifier()
-            }
-            TYPE_VIEW_SCROLLED -> {
                 callAllNotifier()
             }
 
@@ -404,18 +415,53 @@ class MyAccessibilityService : AccessibilityApi() {
             }
             return false
         }
-    }
-/*
-//根据文本,返回文本对应的View
-AccessibilityNodeInfo source = event.getSource();
-AccessibilityNodeInfo listNode = source.getChild(0).getChild(1);
-List<AccessibilityNodeInfo> itemList = listNode.findAccessibilityNodeInfosByText("文本");
-//通常需要配合getParent(),或者getChild(),方法一起使用;
-//拿到View之后,就可以调用"单击事件","滚动事件",等所有支持的事件了
-//info.performAction(AccessibilityNodeInfo.ACTION_CLICK);
-//listNode.performAction(AccessibilityNodeInfo.ACTION_SCROLL_FORWARD);
-//检测当前是那个界面,也是通过查找这个界面固有的文本信息,来判断;
-*/
 
+        private const val ON_UI_UPDATE = 0
+        private const val ON_APP_CHANGED = 1
+
+        /**
+         * 注册放于静态变量，只用于通知事件。
+         */
+        private val pluginsServices = mutableSetOf<OnAccessibilityEvent>()
+
+        public fun registerEvent(e: OnAccessibilityEvent) {
+            synchronized(pluginsServices) {
+                pluginsServices.add(e)
+            }
+        }
+
+        public fun unregisterEvent(e: OnAccessibilityEvent) {
+            synchronized(pluginsServices) {
+                pluginsServices.remove(e)
+            }
+        }
+
+        /**
+         * 分发事件
+         * @param what Int
+         * @param data Any?
+         */
+        private fun dispatchPluginsEvent(what: Int, data: Any? = null) {
+            thread {
+                synchronized(pluginsServices) {
+                    when (what) {
+                        ON_UI_UPDATE -> {
+                            pluginsServices.forEach {
+                                it.onUiUpdate(data as AccessibilityNodeInfo?)
+                            }
+                        }
+                        ON_APP_CHANGED -> {
+                            pluginsServices.forEach {
+                                it.onAppChanged(data as ActionScope)
+                            }
+                        }
+                        else -> {
+
+                        }
+                    }
+                }
+            }
+        }
+    }
 
 }

@@ -9,6 +9,7 @@ import android.os.Binder
 import android.os.IBinder
 import cn.vove7.androlua.luautils.LuaContext
 import cn.vove7.common.accessibility.AccessibilityApi
+import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.appbus.AppBus
 import cn.vove7.common.appbus.SpeechAction
 import cn.vove7.common.appbus.VoiceData
@@ -24,6 +25,7 @@ import cn.vove7.common.utils.RegUtils.checkCancel
 import cn.vove7.common.utils.RegUtils.checkConfirm
 import cn.vove7.executorengine.bridges.SystemBridge
 import cn.vove7.executorengine.exector.MultiExecutorEngine
+import cn.vove7.jarvis.R
 import cn.vove7.jarvis.activities.PermissionManagerActivity
 import cn.vove7.jarvis.view.dialog.MultiChoiceDialog
 import cn.vove7.jarvis.view.dialog.OnMultiSelectListener
@@ -34,6 +36,7 @@ import cn.vove7.jarvis.view.statusbar.StatusVoiceIconAnimation
 import cn.vove7.parseengine.engine.ParseEngine
 import cn.vove7.vtp.dialog.DialogUtil
 import cn.vove7.vtp.log.Vog
+import cn.vove7.vtp.sharedpreference.SpHelper
 import cn.vove7.vtp.toast.Voast
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
@@ -194,13 +197,23 @@ class MainService : BusService(), OnExecutorResult,
 
     var speakSync = false
     override fun speak(text: String?) {
-        speakSync = false
-        speechSncService.speak(text)
+        //关闭语音播报 toast
+        if (SpHelper(this).getBoolean(getString(R.string.key_audio_speak), true)) {
+            speakSync = false
+            speechSncService.speak(text)
+        } else {
+            GlobalApp.toastShort(text ?: "null")
+        }
     }
 
     override fun speakSync(text: String?) {
-        speakSync = true
-        speechSncService.speak(text)
+        if (SpHelper(this).getBoolean(getString(R.string.key_audio_speak), true)) {
+            speakSync = true
+            speechSncService.speak(text)
+        } else {
+            GlobalApp.toastShort(text ?: "null")
+            cExecutor.speakCallback()
+        }
     }
 
     override fun onExecuteStart(words: String) {//
@@ -221,9 +234,7 @@ class MainService : BusService(), OnExecutorResult,
     }
 
     override fun onBind(intent: Intent): IBinder {
-        return object : Binder() {
-
-        }
+        return object : Binder() {}
     }
 
     /**

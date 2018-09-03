@@ -20,7 +20,7 @@ class ViewFinderWithMultiCondition(accessibilityService: AccessibilityApi) : Vie
     var desc: MutableList<String> = mutableListOf()
     var editable: Boolean? = null
     var scrollable: Boolean? = null
-
+    var typeNames: MutableList<String> = mutableListOf()
 
     override fun findCondition(node: AccessibilityNodeInfo): Boolean {
         if (viewText.isNotEmpty()) {
@@ -52,7 +52,7 @@ class ViewFinderWithMultiCondition(accessibilityService: AccessibilityApi) : Vie
                                 "${node.text}", it)
                         Vog.v(this, "findCondition $f")
                         if (f > 0.8) {
-                            Vog.d(this,"find WITH_PINYIN $it")
+                            Vog.d(this, "find WITH_PINYIN $it")
                             ok = true
                             break
                         }
@@ -61,8 +61,8 @@ class ViewFinderWithMultiCondition(accessibilityService: AccessibilityApi) : Vie
                 }
                 MATCH_MODE_MATCHES -> {
                     for (it in viewText) {
-                        if(dealRawReg(it).matches("${node.text}")){
-                            Vog.d(this,"find MATCHS $it")
+                        if (dealRawReg(it).matches("${node.text}")) {
+                            Vog.d(this, "find MATCHS $it")
                             ok = true
                             break
                         }
@@ -99,6 +99,19 @@ class ViewFinderWithMultiCondition(accessibilityService: AccessibilityApi) : Vie
                 val v = "${node.contentDescription}".equals(it, ignoreCase = true)
                 if (v) {
                     ok = true
+                    break
+                }
+            }
+            if (!ok) return false
+        }
+
+        if (typeNames.isNotEmpty()) {
+            var ok = false
+            for (it in typeNames) {
+                val v = "${node.className}".contains(it, ignoreCase = true)
+                if (v) {
+                    ok = true
+                    Vog.d(this, "findCondition --->className contains $it")
                     break
                 }
             }

@@ -29,5 +29,6 @@ class WelcomeActivity : BaseActivityWithViewPager() {
         super.onCreate(savedInstanceState, persistentState)
         tab_layout.visibility = View.GONE
         app_bar.visibility = View.GONE
+        supportActionBar?.hide()
     }
 }

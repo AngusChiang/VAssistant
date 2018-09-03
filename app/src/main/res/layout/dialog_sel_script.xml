@@ -13,4 +13,9 @@
         android:gravity="start|top"
         android:minLines="15" />
 
+    <Spinner
+        android:id="@+id/script_type_spinner"
+        android:layout_width="wrap_content"
+        android:entries="@array/list_script_type"
+        android:layout_height="wrap_content" />
 </LinearLayout>

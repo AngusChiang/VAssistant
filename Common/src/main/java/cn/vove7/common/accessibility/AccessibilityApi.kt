@@ -1,6 +1,7 @@
 package cn.vove7.common.accessibility
 
 import android.accessibilityservice.AccessibilityService
+import android.view.accessibility.AccessibilityEvent
 import cn.vove7.common.executor.CExecutorI
 import cn.vove7.common.view.finder.ViewFinder
 import cn.vove7.common.datamanager.parse.model.ActionScope

@@ -80,10 +80,9 @@ public class MarkedOpen {
     @Keep
     private void buildRegex() {
         //结尾加上% ， 防止有[后续节点操作]匹配失败
-        this.regStr = (!regStr.endsWith("%") ? regStr + "%" : regStr)
+        String s = (!regStr.endsWith("%") ? regStr + "%" : regStr)
                 .replace("%", RegUtils.INSTANCE.getREG_ALL_CHAR());
-        Vog.INSTANCE.v(this, regStr);
-        regex = new Regex(this.regStr);
+        regex = new Regex(s);
     }
 
     @Keep

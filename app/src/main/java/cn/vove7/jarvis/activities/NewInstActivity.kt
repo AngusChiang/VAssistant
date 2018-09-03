@@ -24,6 +24,7 @@ import cn.vove7.common.datamanager.parse.model.ActionScope
 import cn.vove7.common.datamanager.parse.statusmap.ActionNode
 import cn.vove7.common.datamanager.parse.statusmap.ActionNode.*
 import cn.vove7.common.datamanager.parse.statusmap.Reg
+import cn.vove7.executorengine.helper.AdvanAppHelper
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.adapters.SimpleListAdapter
 import cn.vove7.jarvis.adapters.ViewModel
@@ -54,7 +55,7 @@ class NewInstActivity : AppCompatActivity(), View.OnClickListener {
     var parentId: Long? = null//上级命令MapNodeId
     private var instType: Int = NODE_SCOPE_GLOBAL
 
-    private var actionNode: ActionNode? = null
+    private var editNode: ActionNode? = null//修改
     private var parentNode: ActionNode? = null
     private var isReedit = false
 
@@ -95,13 +96,15 @@ class NewInstActivity : AppCompatActivity(), View.OnClickListener {
         posData.addAll(arr)
         if (isReedit) {//重新编辑
             val id = intent.getLongExtra("nodeId", 0L)
-            actionNode = DAO.daoSession.actionNodeDao.queryBuilder().where(ActionNodeDao.Properties.Id.eq(id)).unique()
-            if (actionNode == null) {
+            editNode = DAO.daoSession.actionNodeDao.queryBuilder().where(ActionNodeDao.Properties.Id.eq(id)).unique()
+            scriptText = editNode?.action?.actionScript
+            scriptType = editNode!!.action.scriptType
+            if (editNode == null) {
                 voast.showShort(getString(R.string.text_error_occurred) + " code :n117")
             } else {//展示信息
-                activity_name.setText(actionNode?.actionScope?.activity)
-                desc_text.setText(actionNode?.descTitle)
-                actionNode?.regs?.forEach {
+                activity_name.setText(editNode?.actionScope?.activity)
+                desc_text.setText(editNode?.descTitle)
+                editNode?.regs?.forEach {
                     regs.add(Pair(it.regStr, posData[posArr.indexOf(it.paramPos)]))
                 }
             }
@@ -115,7 +118,7 @@ class NewInstActivity : AppCompatActivity(), View.OnClickListener {
                 btn_sel_app.setOnClickListener(this)
                 pkg = intent.getStringExtra("pkg")
                 if (pkg != null) {
-                    val app = AppHelper.getAppInfo(this, pkg!!, pkg!!)
+                    val app = AdvanAppHelper.getAppInfo(pkg!!)
                     if (app != null) {
                         btn_sel_app.text = app.name
                     }
@@ -251,6 +254,10 @@ class NewInstActivity : AppCompatActivity(), View.OnClickListener {
             voast.showShort(getString(R.string.text_tooltips_select_script))
             return
         }
+        if ((scriptType ?: "") == "") {//scriptType
+            voast.showShort(getString(R.string.text_tooltips_select_script_type))
+            return
+        }
         if (arrayOf(NODE_SCOPE_IN_APP, NODE_SCOPE_IN_APP_2).contains(instType) && pkg == null) {//type
             voast.showShort(getString(R.string.text_tooltips_select_app))
             return
@@ -259,41 +266,63 @@ class NewInstActivity : AppCompatActivity(), View.OnClickListener {
             voast.showShort(getString(R.string.text_at_last_one_regex))
         }
 
+        if (isReedit) {//保存编辑
+            if (editNode == null) {
+                voast.showShort(getString(R.string.text_error_occurred) + "code: na264")
+                return
+            }
+            val ac = editNode?.action!!
+            ac.scriptType = scriptType
+            ac.actionScript = scriptText
+            DAO.daoSession.actionDao.update(ac)
+            editNode?.descTitle = desc
 
-        val scope = ActionScope(pkg, activity_name.text.toString().trim())
-
-        val s = DAO.daoSession.actionScopeDao.queryBuilder()
-                .where(ActionScopeDao.Properties.PackageName.eq(scope.packageName))
-                .where(ActionScopeDao.Properties.Activity.eq(scope.activity))
-                .unique()
-        val sid =
-            if (s == null) {
-                DAO.daoSession.actionScopeDao.insert(scope)
-                scope.id
-            } else s.id
-
-        val action = Action(scriptText, "lua")
-        DAO.daoSession.actionDao.insert(action)
-        Vog.d(this, "save sid: $sid")
-        val newNode = ActionNode()
-        newNode.descTitle = desc
-        newNode.actionId = action.id
-        newNode.scopeId = sid
-        newNode.actionScopeType = instType
-
-        DAO.daoSession.actionNodeDao.insert(newNode)
-        Vog.d(this, "save nodeId: ${newNode.id}")
-
-        wrapRegs().forEach {
-            it.nodeId = newNode.id
-            DAO.daoSession.regDao.insert(it)
-        }
-
-        if (newNode.id != null) {
+            editNode!!.regs.forEach { DAO.daoSession.delete(it) }
+            wrapRegs().forEach {
+                it.nodeId = editNode!!.id
+                DAO.daoSession.regDao.insert(it)
+            }
+            DAO.daoSession.actionNodeDao.update(editNode)
             voast.showShort(getString(R.string.text_save_success))
             finish()
+
         } else {
-            voast.showShort(getString(R.string.text_save_failed))
+
+            val scope = ActionScope(pkg, activity_name.text.toString().trim())
+
+            val s = DAO.daoSession.actionScopeDao.queryBuilder()
+                    .where(ActionScopeDao.Properties.PackageName.eq(scope.packageName))
+                    .where(ActionScopeDao.Properties.Activity.eq(scope.activity))
+                    .unique()
+            val sid =
+                if (s == null) {
+                    DAO.daoSession.actionScopeDao.insert(scope)
+                    scope.id
+                } else s.id
+
+            val action = Action(scriptText, scriptType)
+            DAO.daoSession.actionDao.insert(action)
+            Vog.d(this, "save sid: $sid")
+            val newNode = ActionNode()
+            newNode.descTitle = desc
+            newNode.actionId = action.id
+            newNode.scopeId = sid
+            newNode.actionScopeType = instType
+
+            DAO.daoSession.actionNodeDao.insert(newNode)
+            Vog.d(this, "save nodeId: ${newNode.id}")
+
+            wrapRegs().forEach {
+                it.nodeId = newNode.id
+                DAO.daoSession.regDao.insert(it)
+            }
+
+            if (newNode.id != null) {
+                voast.showShort(getString(R.string.text_save_success))
+                finish()
+            } else {
+                voast.showShort(getString(R.string.text_save_failed))
+            }
         }
     }
 
@@ -331,20 +360,41 @@ class NewInstActivity : AppCompatActivity(), View.OnClickListener {
     private var selScriptDialog: AlertDialog? = null
     lateinit var scriptTextView: EditText
     private var scriptText: String? = null
+    private var scriptType: String? = null
 
     private fun showSelScriptDialog() {
         if (selScriptDialog == null) {
             val dView = layoutInflater.inflate(R.layout.dialog_sel_script, null, false)
             scriptTextView = dView.findViewById(R.id.script_text)
+            val typeArr = resources.getStringArray(R.array.list_script_type)
+            dView.findViewById<Spinner>(R.id.script_type_spinner).also {
+                it.setSelection(
+                        when (scriptType) {
+                            null -> 0
+                            Action.SCRIPT_TYPE_LUA -> 0
+                            Action.SCRIPT_TYPE_JS -> 1
+                            else -> 0
+                        }
+                )
+            }.onItemSelectedListener = (object : AdapterView.OnItemSelectedListener {
+                override fun onNothingSelected(parent: AdapterView<*>?) {
+                    scriptType = null
+                }
+
+                override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                    scriptType = typeArr[position]
+                }
+            })
             if (isReedit) {
-                scriptTextView.setText(actionNode?.action?.actionScript)
+                scriptTextView.setText(editNode?.action?.actionScript)
+                scriptText = editNode?.action?.actionScript
+                scriptType = editNode!!.action.scriptType
             }
             selScriptDialog = AlertDialog.Builder(this)
                     .setView(dView)
                     .setPositiveButton(R.string.text_confirm) { i, _ ->
                         scriptText = scriptTextView.text.toString()
                     }
-                    .setNegativeButton(R.string.text_cancel, null)
                     .setNeutralButton(R.string.text_from_file, null)
                     .create()
             selScriptDialog?.setOnShowListener { i ->

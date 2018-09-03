@@ -4,10 +4,10 @@ import java.util.Arrays;
 
 import cn.vove7.common.R;
 import cn.vove7.common.accessibility.AccessibilityApi;
+import cn.vove7.common.accessibility.viewnode.ViewNode;
 import cn.vove7.common.app.GlobalApp;
 import cn.vove7.common.app.GlobalLog;
 import cn.vove7.common.executor.CExecutorI;
-import cn.vove7.common.accessibility.viewnode.ViewNode;
 import cn.vove7.vtp.log.Vog;
 
 import static cn.vove7.common.view.finder.ViewFinderWithMultiCondition.MATCH_MODE_CONTAIN;
@@ -35,6 +35,7 @@ public class ViewFindBuilder extends FindBuilder {
 
     /**
      * wait使用
+     *
      * @param executor CExecutorI
      */
     public ViewFindBuilder(CExecutorI executor) {
@@ -181,6 +182,16 @@ public class ViewFindBuilder extends FindBuilder {
 
     public ViewFindBuilder scrollable(boolean b) {
         viewFinderX.setScrollable(b);
+        return this;
+    }
+
+    public ViewFindBuilder type(String type) {
+        viewFinderX.getTypeNames().add(type);
+        return this;
+    }
+
+    public ViewFindBuilder types(String... types) {
+        viewFinderX.getTypeNames().addAll(Arrays.asList(types));
         return this;
     }
 

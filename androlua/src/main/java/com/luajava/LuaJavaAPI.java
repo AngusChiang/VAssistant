@@ -88,13 +88,14 @@ public final class LuaJavaAPI {
         synchronized (L) {
 
             int ret = 0;
-            if (type == 0)
-                if (checkMethod(L, obj, searchName) != 0)
-                    return 2;
 
-            if (type == 0 || type == 4)//优先getter函数
+            if (type == 0 || type == 4)//优先getter,checkMethod函数
                 if (javaGetter(L, obj, searchName) != 0)
                     return 4;
+
+            if (type == 0)// 变量名 call method ?????
+                if (checkMethod(L, obj, searchName) != 0)
+                    return 2;
 
             if (type == 0 || type == 1 || type == 5)
                 if ((ret = checkField(L, obj, searchName)) != 0)

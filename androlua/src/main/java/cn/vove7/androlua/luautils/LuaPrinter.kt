@@ -47,9 +47,9 @@ class LuaPrinter @JvmOverloads constructor(Ls: LuaState, private val print: OnPr
             }
             if (`val` == null)
                 `val` = stype
-            output.append("\t")
             output.append(`val`)
-            output.append("\t")
+            output.append("  ")
+//            output.append("\t")
         }
         output.append('\n')
         print?.onPrint(OnPrint.LOG, output.toString())

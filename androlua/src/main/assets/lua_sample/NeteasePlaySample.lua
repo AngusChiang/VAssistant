@@ -22,6 +22,6 @@ click(x, y)
 
 sleep(2000) -- TODO  show
 if (runtime.currentActionIndex == runtime.actionCount) then --无后续操作
-    s = ViewFinder().id('a02').findFirst()
+    s = ViewFinder().similaryText(args[1]).findFirst()
     s.tryClick()
 end

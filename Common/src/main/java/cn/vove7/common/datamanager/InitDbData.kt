@@ -14,11 +14,20 @@ import cn.vove7.vtp.log.Vog
  */
 abstract class InitDbData {
     @CallSuper
-    open fun init(){
+    open fun init() {
         initCommonData()
     }
 
     private fun initCommonData() {
+        val appAdInfoDao = DAO.daoSession.appAdInfoDao
+        if (appAdInfoDao.queryBuilder().count() == 0L) {
+            arrayOf(
+                    AppAdInfo("网易云首屏广告", "com.netease.cloudmusic", "LoadingActivity", "Skip###跳过")
+
+            ).forEach {
+                appAdInfoDao.insert(it)
+            }
+        }
 
         val serverContactDao = DAO.daoSession.serverContactDao
         if (serverContactDao.queryBuilder().count() == 0L) {
