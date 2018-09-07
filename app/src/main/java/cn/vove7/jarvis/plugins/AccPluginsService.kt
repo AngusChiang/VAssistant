@@ -1,4 +1,7 @@
-package cn.vove7.jarvis.services
+package cn.vove7.jarvis.plugins
+
+import cn.vove7.jarvis.services.MyAccessibilityService
+import cn.vove7.jarvis.services.OnAccessibilityEvent
 
 /**
  * # AccPluginsService

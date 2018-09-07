@@ -1,14 +1,12 @@
 package cn.vove7.executorengine.exector
 
 import android.content.Context
-import android.os.HandlerThread
 import cn.vove7.androlua.LuaHelper
 import cn.vove7.common.BridgeManager
 import cn.vove7.common.bridges.ServiceBridge
-import cn.vove7.common.executor.OnExecutorResult
 import cn.vove7.common.executor.OnPrint
 import cn.vove7.common.executor.PartialResult
-import cn.vove7.executorengine.AbsExecutorImpl
+import cn.vove7.executorengine.ExecutorImpl
 import cn.vove7.rhino.RhinoHelper
 import cn.vove7.rhino.api.RhinoApi
 import cn.vove7.vtp.log.Vog
@@ -21,20 +19,19 @@ import cn.vove7.vtp.log.Vog
  */
 class MultiExecutorEngine(
         context: Context,
-        serviceBridge: ServiceBridge,
-        onExecutorResult: OnExecutorResult
-) : AbsExecutorImpl(context, serviceBridge, onExecutorResult) {
-    private val bridgeManager = BridgeManager(this, globalAutomator, systemBridge, onExecutorResult)
+        serviceBridge: ServiceBridge
+) : ExecutorImpl(context, serviceBridge) {
+    private val bridgeManager = BridgeManager(this, globalActionExecutor, systemBridge, serviceBridge)
 
     /**
      * Rhino impl
      */
-    private var tHandler: HandlerThread? = null
+//    private var tHandler: HandlerThread? = null
     private var rhinoHelper: RhinoHelper? = null
     override fun onRhinoExec(script: String, arg: String?): PartialResult {
-        if (tHandler?.isAlive == true) {
-            tHandler!!.interrupt()
-        }
+//        if (tHandler?.isAlive == true) {
+//            tHandler!!.interrupt()
+//        }
 
 //        tHandler = HandlerThread("run")
 //        tHandler!!.start()
@@ -66,7 +63,7 @@ class MultiExecutorEngine(
     //可提取ExecutorHelper 接口 handleMessage
     override fun onLuaExec(src: String, arg: String?): PartialResult {
 //        if (luaHelper == null) {
-            luaHelper = LuaHelper(context, bridgeManager)
+        luaHelper = LuaHelper(context, bridgeManager)
 //        }
         val script = preRun(src)
         return try {

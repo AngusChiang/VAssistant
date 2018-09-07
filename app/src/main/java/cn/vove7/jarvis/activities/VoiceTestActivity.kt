@@ -100,7 +100,7 @@ class VoiceTestActivity : Activity() {
     }
 
     fun stop(v: View) {
-        AppBus.postSpeechAction(SpeechAction.ActionCode.ACTION_CANCEL_RECO)
+        AppBus.postSpeechAction(SpeechAction.ActionCode.ACTION_STOP_RECO)
     }
 
     fun start(v: View) {

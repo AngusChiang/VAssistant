@@ -7,6 +7,7 @@ import android.view.ViewConfiguration
 import android.view.accessibility.AccessibilityNodeInfo
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.app.GlobalLog
+import cn.vove7.common.bridges.GlobalActionExecutor
 import cn.vove7.vtp.log.Vog
 import cn.vove7.vtp.text.TextTransHelper
 import java.lang.Thread.sleep
@@ -240,6 +241,15 @@ class ViewNode(val node: AccessibilityNodeInfo) : ViewOperation, Comparable<View
         return b
     }
 
+    override fun swipe(dx: Int, dy: Int, delay: Int): Boolean {
+        val rect = getBounds()
+
+        val x = (rect.left + rect.right) / 2
+        val y = (rect.top + rect.bottom) / 2
+
+        return GlobalActionExecutor().swipe(x, y, x + dx, y + dy, delay)
+    }
+
     override fun focus(): Boolean {
         return node.performAction(AccessibilityNodeInfo.ACTION_FOCUS)
     }
@@ -255,13 +265,14 @@ class ViewNode(val node: AccessibilityNodeInfo) : ViewOperation, Comparable<View
     private fun nodeSummary(node: AccessibilityNodeInfo): String {
         val clsName = node.className
         val id = node.viewIdResourceName
-        val rect = Rect()
-        node.getBoundsInScreen(rect)
         val cls = clsName.substring(clsName.lastIndexOf('.') + 1)
-        return String.format("[cls: %s] [id: %s] [desc: %s] [text: %s] [%s] [childCount: %d]",
-                cls, id?.substring(id.lastIndexOf('/') + 1) ?: "null",
-                node.contentDescription, node.text, getBounds(), getChildCount()
-        )
+        val desc = node.contentDescription
+
+        return "{class: " + cls +
+                (if (id == null) "" else ", id: " + id.substring(id.lastIndexOf('/') + 1)) +
+                (if (node.text == null) "" else ", text: ${node.text}") +
+                (if (desc == null) "" else ", desc: $desc") +
+                (", bounds: ${getBounds()}" + ", childCount: ${getChildCount()}") + '}'
     }
 
 }

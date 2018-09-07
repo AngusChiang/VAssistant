@@ -30,7 +30,10 @@ class SimpleListAdapter(private val dataset: MutableList<ViewModel>
         } else
             holder.subtitle?.visibility = View.GONE
         holder.itemView.setOnClickListener {
-            itemClickListener?.onItemClick(holder, position, item)
+            itemClickListener?.onClick(holder, position, item)
+        }
+        holder.itemView.setOnLongClickListener {
+            itemClickListener?.onLongClick(holder, position, item) == true
         }
 
     }
@@ -39,11 +42,6 @@ class SimpleListAdapter(private val dataset: MutableList<ViewModel>
         val view = LayoutInflater.from(parent.context).inflate(R.layout.item_normal_icon_title, parent, false)
         return VHolder(view)
     }
-
-    interface OnItemClickListener {
-        fun onItemClick(holder: VHolder?, pos: Int, item: ViewModel)
-    }
-
 
     class VHolder(v: View, adapter: RecAdapterWithFooter<RecAdapterWithFooter.RecViewHolder>? = null)
         : RecAdapterWithFooter.RecViewHolder(v, adapter) {
@@ -60,6 +58,12 @@ class SimpleListAdapter(private val dataset: MutableList<ViewModel>
         }
 
     }
+
+    interface OnItemClickListener {
+        fun onClick(holder: VHolder?, pos: Int, item: ViewModel)
+        fun onLongClick(holder: VHolder?, pos: Int, item: ViewModel): Boolean = false
+    }
+
 }
 
 class ViewModel(

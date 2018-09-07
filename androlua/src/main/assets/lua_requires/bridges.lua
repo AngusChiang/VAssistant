@@ -10,12 +10,12 @@ import 'cn.vove7.androlua.androbridge.*'
 --
 bridges = luaman.getBridgeManager()
 executor = bridges.getExecutor()
-resultNotifier = bridges.getResultNotifier()
+serviceBridge = bridges.getServiceBridge()
 system = bridges.getSystemBridge()
 automator = bridges.getAutomator()
 
 function notifyFailed(s)
-    resultNotifier.onExecuteFailed(s)
+    serviceBridge.onExecuteFailed(s)
 end
 
 function log(msg)

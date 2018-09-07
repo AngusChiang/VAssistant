@@ -16,6 +16,7 @@ interface CExecutorI : ViewShowListener, ActivityShowListener, RuntimeArgs {
     fun execQueue(cmdWords: String, actionQueue: PriorityQueue<Action>)
     fun interrupt()
     fun runScript(script: String, arg: String? = null): PartialResult
+    fun setScreenSize(width: Int, height: Int)
 
     fun checkAccessibilityService(jump: Boolean = true): Boolean
 
@@ -78,5 +79,5 @@ interface RuntimeArgs {
 
     var actionScope: Int?
 
-    fun isGlobal():Boolean
+    fun isGlobal(): Boolean
 }

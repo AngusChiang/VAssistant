@@ -1,11 +1,8 @@
 package cn.vove7.common;
 
-import java.util.Arrays;
-import java.util.Collections;
-
-import cn.vove7.common.bridges.GlobalActionAutomator;
+import cn.vove7.common.bridges.GlobalActionExecutor;
+import cn.vove7.common.bridges.ServiceBridge;
 import cn.vove7.common.executor.CExecutorI;
-import cn.vove7.common.executor.OnExecutorResult;
 
 /**
  * @author 17719
@@ -14,24 +11,24 @@ import cn.vove7.common.executor.OnExecutorResult;
  */
 public class BridgeManager {
     private CExecutorI executor;
-    private GlobalActionAutomator automator;
+    private GlobalActionExecutor automator;
     private SystemOperation systemBridge;
-    private OnExecutorResult resultNotifier;
+    private ServiceBridge serviceBridge;
 
 
-    public BridgeManager(CExecutorI executor, GlobalActionAutomator automator, SystemOperation systemBridge, OnExecutorResult resultNotifer) {
+    public BridgeManager(CExecutorI executor, GlobalActionExecutor automator, SystemOperation systemBridge, ServiceBridge serviceBridge) {
         this.executor = executor;
         this.automator = automator;
         this.systemBridge = systemBridge;
-        this.resultNotifier = resultNotifer;
+        this.serviceBridge = serviceBridge;
     }
 
-    public OnExecutorResult getResultNotifier() {
-        return resultNotifier;
+    public ServiceBridge getServiceBridge() {
+        return serviceBridge;
     }
 
-    public void setResultNotifier(OnExecutorResult resultNotifier) {
-        this.resultNotifier = resultNotifier;
+    public void setResultNotifier(ServiceBridge serviceBridge) {
+        this.serviceBridge = serviceBridge;
     }
 
     public SystemOperation getSystemBridge() {
@@ -42,11 +39,11 @@ public class BridgeManager {
         this.systemBridge = systemBridge;
     }
 
-    public GlobalActionAutomator getAutomator() {
+    public GlobalActionExecutor getAutomator() {
         return automator;
     }
 
-    public void setAutomator(GlobalActionAutomator automator) {
+    public void setAutomator(GlobalActionExecutor automator) {
         this.automator = automator;
     }
 

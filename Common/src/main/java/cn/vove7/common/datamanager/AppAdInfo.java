@@ -4,11 +4,14 @@ import org.greenrobot.greendao.annotation.Entity;
 import org.greenrobot.greendao.annotation.Generated;
 import org.greenrobot.greendao.annotation.Id;
 
+import java.io.Serializable;
+
 /**
  * Created by 17719247306 on 2018/9/3
  */
 @Entity
-public class AppAdInfo {
+public class AppAdInfo implements Serializable {
+    static final long serialVersionUID = 111L;
     @Id
     private Long id;
     private String descTitle;
@@ -27,6 +30,8 @@ public class AppAdInfo {
      * desc s split with ###
      */
     private String descs;
+    private String depths;
+    private String type;
 
     private Integer versionCode;//? 不需要 找不到就是找不到 . 消耗资源?
 
@@ -42,10 +47,18 @@ public class AppAdInfo {
     public AppAdInfo() {
     }
 
-    public AppAdInfo(String pkg, String activity, String descs) {
+    public AppAdInfo(String descTitle, String pkg, String activity, String depths, String type) {
+        this.descTitle = descTitle;
         this.pkg = pkg;
         this.activity = activity;
-        this.descs = descs;
+        this.depths = depths;
+        this.type = type;
+    }
+
+    public AppAdInfo(String descTitle, String pkg, String activity) {
+        this.descTitle = descTitle;
+        this.pkg = pkg;
+        this.activity = activity;
     }
 
     public AppAdInfo(String descTitle, String pkg, String activity, String texts) {
@@ -55,9 +68,9 @@ public class AppAdInfo {
         this.texts = texts;
     }
 
-    @Generated(hash = 1639516284)
-    public AppAdInfo(Long id, String descTitle, String pkg, String activity,
-            String texts, String viewId, String descs, Integer versionCode) {
+    @Generated(hash = 515818356)
+    public AppAdInfo(Long id, String descTitle, String pkg, String activity, String texts,
+                     String viewId, String descs, String depths, String type, Integer versionCode) {
         this.id = id;
         this.descTitle = descTitle;
         this.pkg = pkg;
@@ -65,9 +78,10 @@ public class AppAdInfo {
         this.texts = texts;
         this.viewId = viewId;
         this.descs = descs;
+        this.depths = depths;
+        this.type = type;
         this.versionCode = versionCode;
     }
-
 
     public String getPkg() {
         return pkg;
@@ -97,16 +111,18 @@ public class AppAdInfo {
         return viewId;
     }
 
-    public void setViewId(String viewId) {
+    public AppAdInfo setViewId(String viewId) {
         this.viewId = viewId;
+        return this;
     }
 
     public String getDescs() {
         return descs;
     }
 
-    public void setDescs(String descs) {
+    public AppAdInfo setDescs(String descs) {
         this.descs = descs;
+        return this;
     }
 
     public Integer getVersionCode() {
@@ -123,5 +139,23 @@ public class AppAdInfo {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public String getDepths() {
+        return this.depths;
+    }
+
+    public AppAdInfo setDepths(String depths) {
+        this.depths = depths;
+        return this;
+    }
+
+    public String getType() {
+        return this.type;
+    }
+
+    public AppAdInfo setType(String type) {
+        this.type = type;
+        return this;
     }
 }

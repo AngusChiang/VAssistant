@@ -236,7 +236,7 @@ class NewInstActivity : AppCompatActivity(), View.OnClickListener {
     }
 
     private val onSelAppItemClick = object : SimpleListAdapter.OnItemClickListener {
-        override fun onItemClick(holder: SimpleListAdapter.VHolder?, pos: Int, item: ViewModel) {
+        override fun onClick(holder: SimpleListAdapter.VHolder?, pos: Int, item: ViewModel) {
             val app = item.extra as AppInfo
             btn_sel_app.text = app.name
             pkg = app.packageName

@@ -10,9 +10,7 @@ import cn.vove7.vtp.log.Vog
  */
 abstract class ViewFinder(var accessibilityService: AccessibilityApi) {
 
-    var extraParams: Array<String> = arrayOf()
-
-    fun findFirst(): ViewNode? {
+    open fun findFirst(): ViewNode? {
         val r = traverseAllNode(accessibilityService.rootInActiveWindow)
         Vog.i(this, "findFirst ${r != null}")
         return r
@@ -30,6 +28,10 @@ abstract class ViewFinder(var accessibilityService: AccessibilityApi) {
 
     /**
      * 深搜遍历
+     *
+     * @param node AccessibilityNodeInfo?
+     * @param all Boolean true 搜索全部返回list else return first
+     * @return ViewNode?
      */
     private fun traverseAllNode(node: AccessibilityNodeInfo?, all: Boolean = false): ViewNode? {
         if (node == null) return null

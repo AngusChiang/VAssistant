@@ -23,7 +23,6 @@ public class DaoMaster extends AbstractDaoMaster {
     public static void createAllTables(Database db, boolean ifNotExists) {
         MarkedContactDao.createTable(db, ifNotExists);
         MarkedOpenDao.createTable(db, ifNotExists);
-        ServerContactDao.createTable(db, ifNotExists);
         ActionDao.createTable(db, ifNotExists);
         ActionScopeDao.createTable(db, ifNotExists);
         ActionNodeDao.createTable(db, ifNotExists);
@@ -35,7 +34,6 @@ public class DaoMaster extends AbstractDaoMaster {
     public static void dropAllTables(Database db, boolean ifExists) {
         MarkedContactDao.dropTable(db, ifExists);
         MarkedOpenDao.dropTable(db, ifExists);
-        ServerContactDao.dropTable(db, ifExists);
         ActionDao.dropTable(db, ifExists);
         ActionScopeDao.dropTable(db, ifExists);
         ActionNodeDao.dropTable(db, ifExists);
@@ -61,7 +59,6 @@ public class DaoMaster extends AbstractDaoMaster {
         super(db, SCHEMA_VERSION);
         registerDaoClass(MarkedContactDao.class);
         registerDaoClass(MarkedOpenDao.class);
-        registerDaoClass(ServerContactDao.class);
         registerDaoClass(ActionDao.class);
         registerDaoClass(ActionScopeDao.class);
         registerDaoClass(ActionNodeDao.class);

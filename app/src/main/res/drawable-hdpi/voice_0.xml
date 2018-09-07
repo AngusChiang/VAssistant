@@ -23,7 +23,7 @@
             <size
                 android:width="10dp"
                 android:height="10dp" />
-            <solid android:color="#87f4ab97"/>
+            <solid android:color="#c34bddf7"/>
             <!--<gradient-->
                 <!--android:centerX="0.5"-->
                 <!--android:centerY="0.5"-->

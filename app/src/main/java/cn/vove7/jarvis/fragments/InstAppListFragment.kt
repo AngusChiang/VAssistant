@@ -28,7 +28,7 @@ class InstAppListFragment : SimpleListFragment<ActionScope>() {
     }
 
     override val itemClickListener: SimpleListAdapter.OnItemClickListener = object : SimpleListAdapter.OnItemClickListener {
-        override fun onItemClick(holder: SimpleListAdapter.VHolder?, pos: Int, item: ViewModel) {
+        override fun onClick(holder: SimpleListAdapter.VHolder?, pos: Int, item: ViewModel) {
             val intent = Intent(context, InAppInstActivity::class.java)
             intent.putExtra("pkg", item.extra as String)
             intent.putExtra("title", item.title)
@@ -72,7 +72,6 @@ class InstAppListFragment : SimpleListFragment<ActionScope>() {
      * 获取支持App列表
      */
     override fun onGetData(pageIndex: Int) {
-        super.onGetData(pageIndex)
         val list = DAO.daoSession.actionScopeDao
                 .queryBuilder()
                 .offset(pageSizeLimit * pageIndex)

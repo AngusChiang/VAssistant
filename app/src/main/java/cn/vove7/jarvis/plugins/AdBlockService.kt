@@ -1,4 +1,4 @@
-package cn.vove7.jarvis.services
+package cn.vove7.jarvis.plugins
 
 import android.view.accessibility.AccessibilityNodeInfo
 import cn.vove7.common.datamanager.DAO
@@ -10,6 +10,7 @@ import cn.vove7.common.view.notifier.AppAdBlockNotifier
 import cn.vove7.executorengine.helper.AdvanAppHelper
 import cn.vove7.vtp.app.AppInfo
 import cn.vove7.vtp.log.Vog
+import java.lang.Thread.sleep
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.concurrent.thread
 
@@ -24,20 +25,46 @@ import kotlin.concurrent.thread
  * @author 17719247306
  * 2018/9/3
  */
-object AdBlockService : AccPluginsService() {
+object AdBlockService : AccPluginsService() {//TODO 猪八戒ad
     /**
      * 缓存
      */
     private val finderCaches = ConcurrentHashMap<ActionScope, MutableSet<ViewFinder>>()
 
-    private var searchThread: Thread? = null
-    override fun onUiUpdate(root: AccessibilityNodeInfo?) {
-        searchThread?.interrupt()
-        searchThread = Thread.currentThread()
-        if (finders.isNotEmpty()) {
-            val s = AppAdBlockNotifier(appInfo, finders)
-            s.notifyIfShow()
+    var locked = false
+
+    var changedTime = 0L
+
+    /**
+     * 只允许一个线程操作
+     * @param root AccessibilityNodeInfo?
+     */
+    override fun onUiUpdate(root: AccessibilityNodeInfo?) {// 浪费资源..
+        val now = System.currentTimeMillis()
+        if (now - changedTime > 7000) return //7s等待时间
+        if (locked) {
+            Vog.v(this, "onUiUpdate ---> locked")
+            return
         }
+        locked = true
+        if (finders?.isNotEmpty() == true) {
+            val s = AppAdBlockNotifier(appInfo, finders!!)
+            val b = s.notifyIfShow()
+            if (b == 0) Vog.d(this, "onUiUpdate ---> 寻找广告失败")
+            else finders = null
+        }
+        try {
+            sleep(1000)
+        } catch (e: Exception) {
+        }
+        locked = false
+    }
+
+    /**
+     * 更新数剧库时，清空缓存
+     */
+    fun clearCache() {
+        finderCaches.clear()
     }
 
     private fun gcIfNeed() {
@@ -47,14 +74,19 @@ object AdBlockService : AccPluginsService() {
                 finderCaches.remove(finderCaches.keys.first())
     }
 
-    private var finders = mutableSetOf<ViewFinder>()
+    private var finders: MutableSet<ViewFinder>? = null
     private var appInfo: AppInfo? = null
+
     override fun onAppChanged(appScope: ActionScope) {
+        locked = false
+        changedTime = System.currentTimeMillis()
         appInfo = AdvanAppHelper.getAppInfo(appScope.packageName)
 
         finders = if (finderCaches.containsKey(appScope)) {
             finderCaches[appScope]!!
         } else buildAdFinders(appInfo, appScope)
+
+        Vog.d(this, "当前界面广告数--->${finders?.size} $appScope $finders")
 
         thread { gcIfNeed() }
 
@@ -91,12 +123,7 @@ object AdBlockService : AccPluginsService() {
             }
             finders.add(finderBuilder.viewFinderX)
         }
-        if (finders.isNotEmpty())
-            finderCaches[appScope] = finders
-
-        Vog.d(this, "当前界面广告数---> $appScope $finders")
-
-
+        finderCaches[appScope] = finders
         return finders
     }
 }

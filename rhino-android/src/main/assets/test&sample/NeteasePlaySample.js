@@ -16,7 +16,7 @@ click(x,y)
 //sleep(2000) // TODO  show
 
 s = ViewFinder().type('listview').await(6000)
-c=s.childs()[0]
+c=s.childs[0]
 if(c == null){
 	toast("搜索失败")
 }else {

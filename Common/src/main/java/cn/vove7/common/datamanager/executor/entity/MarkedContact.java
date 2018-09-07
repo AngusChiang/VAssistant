@@ -21,6 +21,8 @@ public class MarkedContact implements DataFrom {
     @NotNull
     private String key;
 
+    private String regexStr;
+
     private String contactName;
     @NotNull
     private
@@ -50,16 +52,32 @@ public class MarkedContact implements DataFrom {
     public MarkedContact() {
     }
 
-    @Generated(hash = 1839013724)
-    public MarkedContact(Long id, @NotNull String key, String contactName,
-            @NotNull String phone, String from) {
-        this.id = id;
+    public String getRegexStr() {
+        return regexStr;
+    }
+
+    public void setRegexStr(String regexStr) {
+        this.regexStr = regexStr;
+    }
+
+    public MarkedContact(String key, String regexStr, String contactName, String phone, String from) {
         this.key = key;
+        this.regexStr = regexStr;
         this.contactName = contactName;
         this.phone = phone;
         this.from = from;
     }
 
+    @Generated(hash = 931656327)
+    public MarkedContact(Long id, @NotNull String key, String regexStr, String contactName,
+            @NotNull String phone, String from) {
+        this.id = id;
+        this.key = key;
+        this.regexStr = regexStr;
+        this.contactName = contactName;
+        this.phone = phone;
+        this.from = from;
+    }
 
     public Long getId() {
         return this.id;

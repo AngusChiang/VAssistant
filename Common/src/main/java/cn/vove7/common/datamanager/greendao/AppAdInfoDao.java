@@ -31,7 +31,9 @@ public class AppAdInfoDao extends AbstractDao<AppAdInfo, Long> {
         public final static Property Texts = new Property(4, String.class, "texts", false, "TEXTS");
         public final static Property ViewId = new Property(5, String.class, "viewId", false, "VIEW_ID");
         public final static Property Descs = new Property(6, String.class, "descs", false, "DESCS");
-        public final static Property VersionCode = new Property(7, Integer.class, "versionCode", false, "VERSION_CODE");
+        public final static Property Depths = new Property(7, String.class, "depths", false, "DEPTHS");
+        public final static Property Type = new Property(8, String.class, "type", false, "TYPE");
+        public final static Property VersionCode = new Property(9, Integer.class, "versionCode", false, "VERSION_CODE");
     }
 
 
@@ -54,7 +56,9 @@ public class AppAdInfoDao extends AbstractDao<AppAdInfo, Long> {
                 "\"TEXTS\" TEXT," + // 4: texts
                 "\"VIEW_ID\" TEXT," + // 5: viewId
                 "\"DESCS\" TEXT," + // 6: descs
-                "\"VERSION_CODE\" INTEGER);"); // 7: versionCode
+                "\"DEPTHS\" TEXT," + // 7: depths
+                "\"TYPE\" TEXT," + // 8: type
+                "\"VERSION_CODE\" INTEGER);"); // 9: versionCode
     }
 
     /** Drops the underlying database table. */
@@ -102,9 +106,19 @@ public class AppAdInfoDao extends AbstractDao<AppAdInfo, Long> {
             stmt.bindString(7, descs);
         }
  
+        String depths = entity.getDepths();
+        if (depths != null) {
+            stmt.bindString(8, depths);
+        }
+ 
+        String type = entity.getType();
+        if (type != null) {
+            stmt.bindString(9, type);
+        }
+ 
         Integer versionCode = entity.getVersionCode();
         if (versionCode != null) {
-            stmt.bindLong(8, versionCode);
+            stmt.bindLong(10, versionCode);
         }
     }
 
@@ -147,9 +161,19 @@ public class AppAdInfoDao extends AbstractDao<AppAdInfo, Long> {
             stmt.bindString(7, descs);
         }
  
+        String depths = entity.getDepths();
+        if (depths != null) {
+            stmt.bindString(8, depths);
+        }
+ 
+        String type = entity.getType();
+        if (type != null) {
+            stmt.bindString(9, type);
+        }
+ 
         Integer versionCode = entity.getVersionCode();
         if (versionCode != null) {
-            stmt.bindLong(8, versionCode);
+            stmt.bindLong(10, versionCode);
         }
     }
 
@@ -168,7 +192,9 @@ public class AppAdInfoDao extends AbstractDao<AppAdInfo, Long> {
             cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4), // texts
             cursor.isNull(offset + 5) ? null : cursor.getString(offset + 5), // viewId
             cursor.isNull(offset + 6) ? null : cursor.getString(offset + 6), // descs
-            cursor.isNull(offset + 7) ? null : cursor.getInt(offset + 7) // versionCode
+            cursor.isNull(offset + 7) ? null : cursor.getString(offset + 7), // depths
+            cursor.isNull(offset + 8) ? null : cursor.getString(offset + 8), // type
+            cursor.isNull(offset + 9) ? null : cursor.getInt(offset + 9) // versionCode
         );
         return entity;
     }
@@ -182,7 +208,9 @@ public class AppAdInfoDao extends AbstractDao<AppAdInfo, Long> {
         entity.setTexts(cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4));
         entity.setViewId(cursor.isNull(offset + 5) ? null : cursor.getString(offset + 5));
         entity.setDescs(cursor.isNull(offset + 6) ? null : cursor.getString(offset + 6));
-        entity.setVersionCode(cursor.isNull(offset + 7) ? null : cursor.getInt(offset + 7));
+        entity.setDepths(cursor.isNull(offset + 7) ? null : cursor.getString(offset + 7));
+        entity.setType(cursor.isNull(offset + 8) ? null : cursor.getString(offset + 8));
+        entity.setVersionCode(cursor.isNull(offset + 9) ? null : cursor.getInt(offset + 9));
      }
     
     @Override

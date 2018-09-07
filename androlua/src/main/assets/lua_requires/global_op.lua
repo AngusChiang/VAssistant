@@ -4,45 +4,44 @@
 -- global_op.lua
 --
 
-local deviceInfo = system.getDeviceInfo()
-local mHeight = deviceInfo.screenInfo.height
-local mWidth = deviceInfo.screenInfo.width
-
--- 相对度量
-local relHeight = mHeight
-local relWidth = mWidth
+--local deviceInfo = system.getDeviceInfo()
+--local mHeight = deviceInfo.screenInfo.height
+--local mWidth = deviceInfo.screenInfo.width
+--
+---- 相对度量
+--local relHeight = mHeight
+--local relWidth = mWidth
 
 function setScreenSize(width, height)
-    relHeight = height
-    relWidth = width
+    runtime.setScreenSize(width, height)
 end
 
-local function scaleX(x)
-    local sx = x / relWidth * mWidth
-    log('x: ' .. sx)
-    return sx
-end
-
-local function scaleY(y)
-    local sy = y / relHeight * mHeight
-    log('y: ' .. sy)
-    return sy
-end
+--local function (x)
+--    local sx = x / relWidth * mWidth
+--    log('x: ' .. sx)
+--    return sx
+--end
+--
+--local function (y)
+--    local sy = y / relHeight * mHeight
+--    log('y: ' .. sy)
+--    return sy
+--end
 
 --[[
 --全局操作
  ]]
 function swipe(x1, y1, x2, y2, delay)
-    return automator.swipe(scaleX(x1), scaleY(y1), scaleX(x2), scaleY(y2), delay)
+    return automator.swipe(x1, y1, x2, y2, delay)
 end
 
 function press(x, y, delay)
-    return automator.press(scaleX(x), scaleY(y), delay)
+    return automator.press(x, y, delay)
 end
 
 
 function longClick(x, y)
-    return automator.longClick(scaleX(x), scaleY(y))
+    return automator.longClick(x, y)
 end
 
 function scrollDown()
@@ -50,7 +49,7 @@ function scrollDown()
 end
 
 function click(x, y)
-    return automator.click(scaleX(x), scaleY(y))
+    return automator.click(x, y)
 end
 
 
@@ -71,22 +70,22 @@ function splitScreen()
 end
 
 function gesture(durtion, points)
-    return automator.gesture(0, durtion, scaleTable(points))
+    return automator.gesture(0, durtion, points)
 end
-
-function scaleTable(points)
-    log('points size: ' .. #points)
-    local ps = {}
-    for i, v in ipairs(points) do
-        local x = scaleX(v.first)
-        local y = scaleY(v.second)
-        ps[i] = Pair(x, y)
-    end
-    return ps
-end
+--
+--function scaleTable(points)
+--    log('points size: ' .. #points)
+--    local ps = {}
+--    for i, v in ipairs(points) do
+--        local x = (v.first)
+--        local y = (v.second)
+--        ps[i] = Pair(x, y)
+--    end
+--    return ps
+--end
 
 function gestureAsync(durtion, points)
-    return automator.gestureAsync(0, durtion, scaleTable(points))
+    return automator.gestureAsync(0, durtion, points)
 end
 
 function powerDialog()
@@ -103,11 +102,6 @@ end
 
 function recents()
     return automator.recents()
-end
-
-
-function toast(msg, l)
-    automator.toast(msg, l)
 end
 
 function toast(msg)

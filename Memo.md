@@ -46,3 +46,9 @@
 
 - 数组索引: lua 从1开始(args[1])，js从0开始(args[0]) ,影响到外部参数
 - js:` ViewFinder().desc('搜索', 'Search')`   lua:`ViewFinder().desc({ '搜索', 'Search' })`
+
+
+
+## cmd 批量重命名 
+
+> `for /f "tokens=2 delims=-." %i in ('dir frame-*.gif /b') do ren  frame-%i.gif listening_%i.gif`

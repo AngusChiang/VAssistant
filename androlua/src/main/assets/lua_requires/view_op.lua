@@ -6,8 +6,6 @@
 import 'cn.vove7.common.view.finder.ViewFindBuilder'
 local ViewFindBuilder = luajava.bindClass('cn.vove7.common.view.finder.ViewFindBuilder')
 
---local bridges = luaman.getBridgeManager()
-
 --[[
 --视图节点查找器
  ]]
@@ -43,10 +41,32 @@ end
 
 function printAllChild(node)
     print(node)
-    local cs = node.childs()
+    local cs = node.childs
+    if (#cs == 0) then return end
     for i = 0, #cs - 1 do
-        local child_i = cs[i]
-        print(i, child_i)
+        print(i, cs[i])
     end
 end
 
+
+function dd(d, i)
+    local s = '-'
+    for i = 0, d do
+        s = s .. '-'
+    end
+    s = s .. i .. ' '
+    return s
+end
+
+
+local function traversingNode(index, d, node)
+    print(dd(d, index), node)
+    local cs = node.childs
+    for i = 0, #cs - 1 do
+        traversingNode(i, d + 1, cs[i])
+    end
+end
+
+function traversing(node)
+    traversingNode(0, 0, node)
+end

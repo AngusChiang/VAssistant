@@ -100,20 +100,6 @@ open class MySyntherizer protected constructor(protected var context: Context) {
     }
 
     /**
-     * 只合成不播放
-     *
-     * @param text
-     * @return
-     */
-    fun synthesize(text: String): Int {
-        return mSpeechSynthesizer!!.synthesize(text)
-    }
-
-    fun synthesize(text: String, utteranceId: String): Int {
-        return mSpeechSynthesizer!!.synthesize(text, utteranceId)
-    }
-
-    /**
      * 批量合成
      *
      * @param texts 文本s first 文本 second 序列号

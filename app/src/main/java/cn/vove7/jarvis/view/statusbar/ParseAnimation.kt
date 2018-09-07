@@ -1,6 +1,6 @@
 package cn.vove7.jarvis.view.statusbar
 
-import android.content.Context
+import cn.vove7.common.app.GlobalApp
 import cn.vove7.jarvis.R
 
 /**
@@ -9,12 +9,9 @@ import cn.vove7.jarvis.R
  * @author 17719247306
  * 2018/9/2
  */
-class ParseAnimation(context: Context) : StatusAnimation(context) {
-    override val title: String
-        get() = "解析中"
-    override val beginAniId: Int
-        get() = R.drawable.voice_animation
+class ParseAnimation : StatusAnimation() {
+    override var title: String = GlobalApp.getString(R.string.text_parsing)
+    override var beginAniId: Int = R.drawable.parsing_animation
 
-    override val failedAniId: Int
-        get() =R.drawable.voice
+    override var failedAniId: Int = R.drawable.voice
 }

@@ -2,6 +2,7 @@ package cn.vove7.common.view.finder
 
 import android.view.accessibility.AccessibilityNodeInfo
 import cn.vove7.common.accessibility.AccessibilityApi
+import cn.vove7.common.accessibility.viewnode.ViewNode
 import cn.vove7.common.utils.RegUtils.dealRawReg
 import cn.vove7.vtp.log.Vog
 import cn.vove7.vtp.text.TextHelper
@@ -21,6 +22,50 @@ class ViewFinderWithMultiCondition(accessibilityService: AccessibilityApi) : Vie
     var editable: Boolean? = null
     var scrollable: Boolean? = null
     var typeNames: MutableList<String> = mutableListOf()
+    var depths: Array<Int> = arrayOf()
+        set(value) {
+            findBy = BY_DEPTHS
+            field = value
+        }
+
+    //    var extraParams: Array<String> = arrayOf()
+    var findBy: Int = BY_PROPERTY
+
+    override fun findFirst(): ViewNode? {
+        return when (findBy) {
+            BY_DEPTHS -> {
+                findByDepths()
+            }
+            //            BY_PROPERTY
+            else -> {
+                super.findFirst()
+            }
+        }
+    }
+
+    /**
+     * 使用深度搜索  TODO api
+     * @param depths Array<Int>
+     * @return ViewNode?
+     */
+    fun findByDepths(): ViewNode? {
+        var p = accessibilityService.rootInActiveWindow
+        depths.forEach {
+            p = p.getChild(it)
+            if (p == null) {
+                Vog.d(this, "findByDepths ---> null")
+                return null
+            }
+        }
+        return if (typeNames.isNotEmpty()) {
+            if ("${p.className}".contains(typeNames[0], ignoreCase = true))
+                ViewNode(p)
+            else {
+                Vog.e(this, "findByDepths ---> typeNames not match")
+                null
+            }
+        } else ViewNode(p)
+    }
 
     override fun findCondition(node: AccessibilityNodeInfo): Boolean {
         if (viewText.isNotEmpty()) {
@@ -130,13 +175,13 @@ class ViewFinderWithMultiCondition(accessibilityService: AccessibilityApi) : Vie
     }
 
     override fun toString(): String {
-        return "ViewFinderWithMultiCondition(" +
+        return "Condition(" +
                 (if (viewText.isNotEmpty()) "viewText=$viewText" else "") +
                 ", textMatchMode=$textMatchMode" +
                 (if (viewId != null) ", viewId=$viewId" else "") +
                 (if (desc.isNotEmpty()) ", desc=$desc" else "") +
                 (if (editable == true) ", editable=$editable" else "") +
-                (if (scrollable == true) ", scrollable=$scrollable)" else "")
+                (if (scrollable == true) ", scrollable=$scrollable)" else "") + ")"
     }
 
     companion object {
@@ -145,5 +190,9 @@ class ViewFinderWithMultiCondition(accessibilityService: AccessibilityApi) : Vie
         const val MATCH_MODE_CONTAIN = 426
         const val MATCH_MODE_FUZZY_WITH_PINYIN = 100
         const val MATCH_MODE_FUZZY_WITHOUT_PINYIN = 227
+
+
+        const val BY_PROPERTY = 0
+        const val BY_DEPTHS = 1
     }
 }

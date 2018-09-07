@@ -3,6 +3,7 @@ package cn.vove7.jarvis.fragments
 import android.annotation.SuppressLint
 import android.app.AlertDialog
 import android.app.Dialog
+import android.content.DialogInterface
 import android.content.Intent
 import android.os.Bundle
 import android.support.design.widget.BottomSheetBehavior
@@ -14,11 +15,16 @@ import android.view.View
 import android.widget.ImageView
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.app.GlobalLog
+import cn.vove7.common.appbus.AppBus
 import cn.vove7.common.datamanager.DaoHelper
 import cn.vove7.common.datamanager.parse.DataFrom
+import cn.vove7.common.datamanager.parse.model.Action
 import cn.vove7.common.datamanager.parse.statusmap.ActionNode
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.activities.NewInstActivity
+import cn.vove7.jarvis.adapters.ExecuteQueueAdapter
+import cn.vove7.vtp.dialog.DialogWithList
+import java.util.*
 
 
 @SuppressLint("ValidFragment")
@@ -30,7 +36,7 @@ import cn.vove7.jarvis.activities.NewInstActivity
  */
 class InstDetailFragment : BottomSheetDialogFragment() {
 
-    private var node: ActionNode?=null
+    private var node: ActionNode? = null
     private lateinit var mBehavior: BottomSheetBehavior<*>
     lateinit var contentView: View
     private lateinit var toolbarImg: ImageView
@@ -75,16 +81,16 @@ class InstDetailFragment : BottomSheetDialogFragment() {
     }
 
     private fun initView() {
-        if(node==null){
+        if (node == null) {
             hide()
             return
         }
-        val node=node!!
+        val node = node!!
         collapsingColl = contentView.findViewById(R.id.collapsing_coll)
         toolbar = contentView.findViewById(R.id.toolbar)
         toolbar.inflateMenu(R.menu.menu_inst_detail)
         toolbar.setNavigationOnClickListener { hide() }
-        toolbar.setOnMenuItemClickListener {
+        toolbar.setOnMenuItemClickListener { it ->
             when (it.itemId) {
                 R.id.menu_edit -> {//修改
                     val editIntent = Intent(context, NewInstActivity::class.java)
@@ -107,10 +113,8 @@ class InstDetailFragment : BottomSheetDialogFragment() {
                 R.id.menu_add_follow -> {
                     val editIntent = Intent(context, NewInstActivity::class.java)
                     val type = when {
-                        arrayListOf(ActionNode.NODE_SCOPE_GLOBAL, ActionNode.NODE_SCOPE_GLOBAL_2)
-                                .contains(node.actionScopeType) -> ActionNode.NODE_SCOPE_GLOBAL_2
-                        arrayListOf(ActionNode.NODE_SCOPE_IN_APP, ActionNode.NODE_SCOPE_IN_APP_2)
-                                .contains(node.actionScopeType) -> ActionNode.NODE_SCOPE_IN_APP_2
+                        ActionNode.belongGlobal(node.actionScopeType) -> ActionNode.NODE_SCOPE_GLOBAL_2
+                        ActionNode.belongInApp(node.actionScopeType) -> ActionNode.NODE_SCOPE_IN_APP_2
                         else -> {
                             GlobalLog.log("maybe error")
                             GlobalApp.toastShort("maybe error")
@@ -125,6 +129,34 @@ class InstDetailFragment : BottomSheetDialogFragment() {
                         editIntent.putExtra("pkg", node.actionScope.packageName)
                     editIntent.putExtra("reedit", false)
                     startActivity(editIntent)
+                }
+                R.id.menu_run -> {// .. -> it.parent -> it
+                    var p: ActionNode? = node
+                    val execQueue = mutableListOf<ActionNode>()
+                    while (p != null) {
+                        p.action.param.value = null
+                        execQueue.add(0, p)
+                        p = p.parent
+                    }
+                    if (ActionNode.belongInApp(node.actionScopeType)) {
+                        val pkg = node.actionScope.packageName
+                        execQueue.add(0, ActionNode("打开App",
+                                Action("smartOpen('$pkg')\n" +
+                                        "waitForApp('$pkg')", Action.SCRIPT_TYPE_LUA)))
+
+                    }
+                    val d = DialogWithList(context!!, ExecuteQueueAdapter(context!!, execQueue))
+
+                            .setButton(DialogInterface.BUTTON_POSITIVE, R.string.text_run, View.OnClickListener { v ->
+                                val que = PriorityQueue<Action>()
+                                execQueue.forEach {
+                                    que.add(it.action)
+                                }
+                                AppBus.post(que)
+                            })
+                            .setButton(DialogInterface.BUTTON_NEGATIVE, R.string.text_cancel, View.OnClickListener { v -> })
+                    d.setTitle("执行队列")
+                    d.show()
                 }
             }
             return@setOnMenuItemClickListener true

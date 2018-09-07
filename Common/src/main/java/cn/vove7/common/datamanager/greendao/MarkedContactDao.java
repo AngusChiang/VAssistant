@@ -26,9 +26,10 @@ public class MarkedContactDao extends AbstractDao<MarkedContact, Long> {
     public static class Properties {
         public final static Property Id = new Property(0, Long.class, "id", true, "_id");
         public final static Property Key = new Property(1, String.class, "key", false, "KEY");
-        public final static Property ContactName = new Property(2, String.class, "contactName", false, "CONTACT_NAME");
-        public final static Property Phone = new Property(3, String.class, "phone", false, "PHONE");
-        public final static Property From = new Property(4, String.class, "from", false, "FROM");
+        public final static Property RegexStr = new Property(2, String.class, "regexStr", false, "REGEX_STR");
+        public final static Property ContactName = new Property(3, String.class, "contactName", false, "CONTACT_NAME");
+        public final static Property Phone = new Property(4, String.class, "phone", false, "PHONE");
+        public final static Property From = new Property(5, String.class, "from", false, "FROM");
     }
 
 
@@ -46,9 +47,10 @@ public class MarkedContactDao extends AbstractDao<MarkedContact, Long> {
         db.execSQL("CREATE TABLE " + constraint + "\"MARKED_CONTACT\" (" + //
                 "\"_id\" INTEGER PRIMARY KEY ," + // 0: id
                 "\"KEY\" TEXT NOT NULL ," + // 1: key
-                "\"CONTACT_NAME\" TEXT," + // 2: contactName
-                "\"PHONE\" TEXT NOT NULL ," + // 3: phone
-                "\"FROM\" TEXT);"); // 4: from
+                "\"REGEX_STR\" TEXT," + // 2: regexStr
+                "\"CONTACT_NAME\" TEXT," + // 3: contactName
+                "\"PHONE\" TEXT NOT NULL ," + // 4: phone
+                "\"FROM\" TEXT);"); // 5: from
         // Add Indexes
         db.execSQL("CREATE INDEX " + constraint + "IDX_MARKED_CONTACT_KEY ON \"MARKED_CONTACT\"" +
                 " (\"KEY\" ASC);");
@@ -70,15 +72,20 @@ public class MarkedContactDao extends AbstractDao<MarkedContact, Long> {
         }
         stmt.bindString(2, entity.getKey());
  
+        String regexStr = entity.getRegexStr();
+        if (regexStr != null) {
+            stmt.bindString(3, regexStr);
+        }
+ 
         String contactName = entity.getContactName();
         if (contactName != null) {
-            stmt.bindString(3, contactName);
+            stmt.bindString(4, contactName);
         }
-        stmt.bindString(4, entity.getPhone());
+        stmt.bindString(5, entity.getPhone());
  
         String from = entity.getFrom();
         if (from != null) {
-            stmt.bindString(5, from);
+            stmt.bindString(6, from);
         }
     }
 
@@ -92,15 +99,20 @@ public class MarkedContactDao extends AbstractDao<MarkedContact, Long> {
         }
         stmt.bindString(2, entity.getKey());
  
+        String regexStr = entity.getRegexStr();
+        if (regexStr != null) {
+            stmt.bindString(3, regexStr);
+        }
+ 
         String contactName = entity.getContactName();
         if (contactName != null) {
-            stmt.bindString(3, contactName);
+            stmt.bindString(4, contactName);
         }
-        stmt.bindString(4, entity.getPhone());
+        stmt.bindString(5, entity.getPhone());
  
         String from = entity.getFrom();
         if (from != null) {
-            stmt.bindString(5, from);
+            stmt.bindString(6, from);
         }
     }
 
@@ -114,9 +126,10 @@ public class MarkedContactDao extends AbstractDao<MarkedContact, Long> {
         MarkedContact entity = new MarkedContact( //
             cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0), // id
             cursor.getString(offset + 1), // key
-            cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2), // contactName
-            cursor.getString(offset + 3), // phone
-            cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4) // from
+            cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2), // regexStr
+            cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3), // contactName
+            cursor.getString(offset + 4), // phone
+            cursor.isNull(offset + 5) ? null : cursor.getString(offset + 5) // from
         );
         return entity;
     }
@@ -125,9 +138,10 @@ public class MarkedContactDao extends AbstractDao<MarkedContact, Long> {
     public void readEntity(Cursor cursor, MarkedContact entity, int offset) {
         entity.setId(cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0));
         entity.setKey(cursor.getString(offset + 1));
-        entity.setContactName(cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2));
-        entity.setPhone(cursor.getString(offset + 3));
-        entity.setFrom(cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4));
+        entity.setRegexStr(cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2));
+        entity.setContactName(cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3));
+        entity.setPhone(cursor.getString(offset + 4));
+        entity.setFrom(cursor.isNull(offset + 5) ? null : cursor.getString(offset + 5));
      }
     
     @Override

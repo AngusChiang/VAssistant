@@ -45,6 +45,14 @@ public class ActionNode implements Serializable, DataFrom {
     public static final int NODE_SCOPE_IN_APP = 0x2;
     public static final int NODE_SCOPE_IN_APP_2 = 0x3;//2后操作
 
+    public static boolean belongInApp(int type) {
+        return type == NODE_SCOPE_IN_APP || type == NODE_SCOPE_IN_APP_2;
+    }
+
+    public static boolean belongGlobal(int type) {
+        return type == NODE_SCOPE_GLOBAL || type == NODE_SCOPE_GLOBAL_2;
+    }
+
     @ToMany(referencedJoinProperty = "nodeId")//一对多 reg 表 nodeId为外键
     private List<Reg> regs;
 
@@ -64,6 +72,9 @@ public class ActionNode implements Serializable, DataFrom {
     @ToMany(referencedJoinProperty = "parentId")
     private List<ActionNode> follows;
     private Long parentId;
+
+    @ToOne(joinProperty = "parentId")
+    private ActionNode parent;
     /**
      * 操作参数
      */
@@ -107,6 +118,8 @@ public class ActionNode implements Serializable, DataFrom {
      */
     @Generated(hash = 1336300321)
     private transient ActionNodeDao myDao;
+    @Generated(hash = 1293412156)
+    private transient Long parent__resolvedKey;
 
     public Long getParentId() {
         return parentId;
@@ -148,10 +161,14 @@ public class ActionNode implements Serializable, DataFrom {
         this.actionScopeType = type;
         this.descTitle = descTitle;
     }
+
+    public ActionNode(String descTitle, Action action) {
+        this.descTitle = descTitle;
+        this.action = action;
+    }
+
     public ActionNode(String descTitle, Long id, int type) {
         this.id = id;
-        this.actionId = actionId;
-        this.scopeId = scopeId;
         this.actionScopeType = type;
         this.descTitle = descTitle;
     }
@@ -474,5 +491,38 @@ public class ActionNode implements Serializable, DataFrom {
     public void __setDaoSession(DaoSession daoSession) {
         this.daoSession = daoSession;
         myDao = daoSession != null ? daoSession.getActionNodeDao() : null;
+    }
+
+    /**
+     * To-one relationship, resolved on first access.
+     */
+    @Generated(hash = 356998130)
+    public ActionNode getParent() {
+        Long __key = this.parentId;
+        if (parent__resolvedKey == null || !parent__resolvedKey.equals(__key)) {
+            final DaoSession daoSession = this.daoSession;
+            if (daoSession == null) {
+                throw new DaoException("Entity is detached from DAO context");
+            }
+            ActionNodeDao targetDao = daoSession.getActionNodeDao();
+            ActionNode parentNew = targetDao.load(__key);
+            synchronized (this) {
+                parent = parentNew;
+                parent__resolvedKey = __key;
+            }
+        }
+        return parent;
+    }
+
+    /**
+     * called by internal mechanisms, do not call yourself.
+     */
+    @Generated(hash = 55088872)
+    public void setParent(ActionNode parent) {
+        synchronized (this) {
+            this.parent = parent;
+            parentId = parent == null ? null : parent.getId();
+            parent__resolvedKey = parentId;
+        }
     }
 }

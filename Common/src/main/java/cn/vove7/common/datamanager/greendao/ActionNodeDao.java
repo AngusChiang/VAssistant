@@ -16,6 +16,7 @@ import org.greenrobot.greendao.query.QueryBuilder;
 
 import cn.vove7.common.datamanager.parse.model.Action;
 import cn.vove7.common.datamanager.parse.model.ActionScope;
+import cn.vove7.common.datamanager.parse.statusmap.ActionNode;
 
 import cn.vove7.common.datamanager.parse.statusmap.ActionNode;
 
@@ -219,10 +220,13 @@ public class ActionNodeDao extends AbstractDao<ActionNode, Long> {
             builder.append(',');
             SqlUtils.appendColumns(builder, "T0", daoSession.getActionDao().getAllColumns());
             builder.append(',');
-            SqlUtils.appendColumns(builder, "T1", daoSession.getActionScopeDao().getAllColumns());
+            SqlUtils.appendColumns(builder, "T1", daoSession.getActionNodeDao().getAllColumns());
+            builder.append(',');
+            SqlUtils.appendColumns(builder, "T2", daoSession.getActionScopeDao().getAllColumns());
             builder.append(" FROM ACTION_NODE T");
             builder.append(" LEFT JOIN ACTION T0 ON T.\"ACTION_ID\"=T0.\"_id\"");
-            builder.append(" LEFT JOIN ACTION_SCOPE T1 ON T.\"SCOPE_ID\"=T1.\"_id\"");
+            builder.append(" LEFT JOIN ACTION_NODE T1 ON T.\"PARENT_ID\"=T1.\"_id\"");
+            builder.append(" LEFT JOIN ACTION_SCOPE T2 ON T.\"SCOPE_ID\"=T2.\"_id\"");
             builder.append(' ');
             selectDeep = builder.toString();
         }
@@ -238,6 +242,10 @@ public class ActionNodeDao extends AbstractDao<ActionNode, Long> {
             entity.setAction(action);
         }
         offset += daoSession.getActionDao().getAllColumns().length;
+
+        ActionNode parent = loadCurrentOther(daoSession.getActionNodeDao(), cursor, offset);
+        entity.setParent(parent);
+        offset += daoSession.getActionNodeDao().getAllColumns().length;
 
         ActionScope actionScope = loadCurrentOther(daoSession.getActionScopeDao(), cursor, offset);
          if(actionScope != null) {

@@ -34,6 +34,8 @@ class SpeechSynService(private val event: SyncEvent) : SpeechSynthesizerListener
     //TODO sp配置
     protected var offlineVoice = OfflineResource.VOICE_DUXY
 
+    var speaking = false
+
 
     // 主控制类，所有合成控制方法从这个类开始
     protected lateinit var synthesizer: MySyntherizer
@@ -55,7 +57,7 @@ class SpeechSynService(private val event: SyncEvent) : SpeechSynthesizerListener
     // Map<String, String> params = getParams();
     // synthesizer.setParams(params);
     public fun speak(text: String?) {
-        if(text==null) {
+        if (text == null) {
             event.onError("文本空")
             return
         }
@@ -87,7 +89,7 @@ class SpeechSynService(private val event: SyncEvent) : SpeechSynthesizerListener
     /**
      * 停止合成引擎。即停止播放，合成，清空内部合成队列。
      */
-    private fun stop() {
+    fun stop() {
         val result = synthesizer.stop()
         checkResult(result, "stop")
     }
@@ -173,6 +175,7 @@ class SpeechSynService(private val event: SyncEvent) : SpeechSynthesizerListener
     }
 
     override fun onSpeechStart(p0: String?) {
+        speaking = true
         Vog.d(this, "onSpeechStart 播放开始回调, 序列号:$p0")
         event.onStart()
     }
@@ -183,6 +186,7 @@ class SpeechSynService(private val event: SyncEvent) : SpeechSynthesizerListener
 
     override fun onSpeechFinish(p0: String?) {
         Vog.d(this, "onSpeechFinish 播放结束回调 $p0")
+        speaking = false
 //        AppBus.post(SpeechSynData(SpeechSynData.SYN_STATUS_FINISH))
         event.onFinish()
     }
@@ -190,6 +194,7 @@ class SpeechSynService(private val event: SyncEvent) : SpeechSynthesizerListener
     override fun onError(p0: String?, p1: SpeechError?) {
         val e = "错误发生：${p1?.description} ，错误编码: $p1?.code} 序列号: $p0 "
 //        AppBus.post(SpeechSynData(e))
+        speaking = false
         event.onError(e)
         Vog.d(this, e)
     }

@@ -4,11 +4,10 @@ import android.content.Context
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.bridges.ChoiceData
 import cn.vove7.common.bridges.GenChoiceData
-import cn.vove7.common.model.MatchedData
 import cn.vove7.common.datamanager.DAO
 import cn.vove7.common.datamanager.executor.entity.MarkedContact
 import cn.vove7.common.datamanager.greendao.MarkedContactDao
-import cn.vove7.common.datamanager.greendao.ServerContactDao
+import cn.vove7.common.model.MatchedData
 import cn.vove7.executorengine.model.Markable
 import cn.vove7.vtp.contact.ContactHelper
 import cn.vove7.vtp.contact.ContactInfo
@@ -25,7 +24,6 @@ import java.util.*
 class ContactHelper(val context: Context) : GenChoiceData, Markable<MarkedContact> {
     //Dao
     private val markedContactDao = DAO.daoSession.markedContactDao
-    private val serverContactDao = DAO.daoSession.serverContactDao
 
     override fun addMark(data: MarkedContact) {
         //数据库
@@ -62,9 +60,10 @@ class ContactHelper(val context: Context) : GenChoiceData, Markable<MarkedContac
         if (allNum.matches(s)) {//数字
             return s
         }
-        val markedData = markedContactDao.queryBuilder().where(MarkedContactDao.Properties.Key.eq(s)).unique()
+        val markedData = markedContactDao.queryBuilder()//by key
+                .where(MarkedContactDao.Properties.Key.eq(s)).unique()
         if (markedData != null) {
-            Vog.d(this, "Matched from MarkedData")
+            Vog.d(this, "Matched from MarkedData by key $s")
             return markedData.phone
         }
         //本地匹配
@@ -82,16 +81,14 @@ class ContactHelper(val context: Context) : GenChoiceData, Markable<MarkedContac
         return if (matchedList.isNotEmpty()) {
             matchedList[0].data.phones[0]
         } else {//匹配提供
-            Vog.d(this, "匹配 from server")
-            //通过key查找
-            serverContactDao.queryBuilder().where(ServerContactDao.Properties.Key.eq(s)).unique()?.value
+            Vog.d(this, "match by regex")
 
             //正则匹配
-            val list = serverContactDao.loadAll()
+            val list = markedContactDao.loadAll()
             list.forEach {
                 val regex = it.regexStr.toRegex()
                 if (regex.matches(s))
-                    return it.value
+                    return it.phone
             }
             Vog.d(this, "from server no one")
             null

@@ -79,6 +79,11 @@ public class ViewFindBuilder extends FindBuilder {
         }
     }
 
+    public ViewFindBuilder depths(Integer[] ds){
+        viewFinderX.setDepths(ds);
+        return this;
+    }
+
     /**
      * 包含文本
      *

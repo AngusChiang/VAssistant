@@ -85,11 +85,11 @@ open class FindBuilder : ViewOperation {
 
     override fun scrollDown(): Boolean {
         val node = findFirst()
-        try {
-            return node?.scrollDown() == true
+        return try {
+            node?.scrollDown() == true
         } catch (e: Exception) {
             e.printStackTrace()
-            return false
+            false
         }
 
     }
@@ -138,6 +138,11 @@ open class FindBuilder : ViewOperation {
     override fun scrollLeft(): Boolean {
         val node = findFirst()
         return node?.tryClick() == true
+    }
+
+    override fun swipe(dx: Int, dy: Int, delay: Int): Boolean {
+        val node = findFirst()
+        return node?.swipe(dx, dy, delay) == true
     }
 
     override fun scrollRight(): Boolean {

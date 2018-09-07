@@ -23,6 +23,15 @@
     <!-- 联系人 -->
     <uses-permission android:name="android.permission.READ_CONTACTS" />
 
+    <uses-permission android:name="android.permission.BLUETOOTH" />
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+
+    <uses-feature
+        android:name="android.hardware.bluetooth_le"
+        android:required="true" />
+
     <application
         android:name=".App"
         android:allowBackup="true"
@@ -74,15 +83,16 @@
             android:enabled="true"
             android:exported="true" />
 
-        <activity android:name=".activities.PermissionManagerActivity" />
+        <activity
+            android:name=".activities.PermissionManagerActivity"
+            android:label="@string/text_permission_manager" />
         <activity android:name=".activities.RegexParseTestActivity" />
 
-        <activity
-            android:name=".activities.InstManagerActivity"/>
+        <activity android:name=".activities.InstManagerActivity" />
         <activity
             android:name=".activities.SettingsActivity"
-            android:theme="@style/AppTheme"
-            android:label="@string/title_activity_settings" />
+            android:label="@string/title_activity_settings"
+            android:theme="@style/AppTheme" />
         <activity
             android:name=".activities.InAppInstActivity"
             android:label="@string/text_cmd_in_app" />
@@ -90,9 +100,11 @@
             android:name=".activities.NewInstActivity"
             android:windowSoftInputMode="adjustPan" />
         <activity
-            android:name=".activities.RealMainActivity"/>
-        <activity android:name=".activities.WelcomeActivity"/>
+            android:name=".activities.RealMainActivity"
+            android:theme="@style/TranslucentStatus.NoActionBar" />
+        <activity android:name=".activities.WelcomeActivity" />
         <activity android:name=".activities.MarkedManagerActivity" />
+        <activity android:name=".activities.AppAdListActivity" />
     </application>
 
 </manifest>

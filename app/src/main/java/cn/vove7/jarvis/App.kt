@@ -7,10 +7,8 @@ import cn.vove7.androlua.LuaApp
 import cn.vove7.common.appbus.MessageEvent
 import cn.vove7.common.datamanager.DAO
 import cn.vove7.common.datamanager.InitLuaDbData
-import cn.vove7.jarvis.services.AdBlockService
+import cn.vove7.jarvis.plugins.AdBlockService
 import cn.vove7.jarvis.services.MainService
-import cn.vove7.jarvis.services.SpeechRecoService
-import cn.vove7.jarvis.services.SpeechSynService
 import cn.vove7.jarvis.utils.debugserver.RemoteDebugServer
 import cn.vove7.vtp.log.Vog
 import org.greenrobot.eventbus.EventBus

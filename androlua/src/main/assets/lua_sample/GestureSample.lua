@@ -5,11 +5,11 @@
 --
 require 'accessibility'
 local path = { Pair(100, 100), Pair(200, 100), Pair(200, 200), Pair(100, 200), Pair(100, 100) }
-toast('开启 开发者模式/指针位置 才能看出效果')
+toast('开启 开发者模式/指针位置 才能看出效果哦')
 --gesture(4000, path)
 local deviceInfo = system.getDeviceInfo()
-local mHeight = deviceInfo.screenInfo.getHeight()
-local mWidth = deviceInfo.screenInfo.getWidth()
+local mHeight = deviceInfo.screenInfo.height
+local mWidth = deviceInfo.screenInfo.width
 
 --ρ=a(1-sinθ)
 function heartLinePoints()
@@ -20,8 +20,8 @@ function heartLinePoints()
     for s = 0, 360 do
         local ss = math.rad(s)
         local p = (1 + math.sin(ss)) * a
-        local x = p * math.cos(ss) + dx
-        local y = p * math.sin(ss) + dy
+        local x = Integer(p * math.cos(ss) + dx)
+        local y = Integer(p * math.sin(ss) + dy)
         ps[s] = Pair(x, y)
     end
     return ps

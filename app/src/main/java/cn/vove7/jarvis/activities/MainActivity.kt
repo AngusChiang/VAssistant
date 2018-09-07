@@ -106,7 +106,9 @@ class MainActivity : Activity() {
             }
             R.id.button_mark -> {
                 startActivity(Intent(this, MarkedManagerActivity::class.java))
-
+            }
+            R.id.button_main -> {
+                startActivity(Intent(this, RealMainActivity::class.java))
             }
 
         }

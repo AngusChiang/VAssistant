@@ -7,7 +7,7 @@ package cn.vove7.common.datamanager.parse;
  */
 public interface DataFrom {
 
-    public static final String FROM_USER = "from_user";
-    public static final String FROM_SHARED = "from_shared";
-    public static final String FROM_SERVICE = "from_service";
+    String FROM_USER = "from_user";
+    String FROM_SHARED = "from_shared";
+    String FROM_SERVICE = "from_service";
 }

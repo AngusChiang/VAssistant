@@ -20,7 +20,7 @@ class BottomListAdapter(val context: Context, items: MutableList<ViewModel>,
     }
 
     override fun onBindView(holder: VHolder, pos: Int, item: ViewModel) {
-        holder.itemView.setOnClickListener { _ -> listener.onItemClick(null, pos, getItem(pos)) }
+        holder.itemView.setOnClickListener { _ -> listener.onClick(null, pos, getItem(pos)) }
         holder.title.text = item.title
         if (item.icon != null) {
             holder.icon.visibility = View.VISIBLE
@@ -33,7 +33,7 @@ class BottomListAdapter(val context: Context, items: MutableList<ViewModel>,
         } else
             holder.subtitle.visibility = View.GONE
         holder.itemView.setOnClickListener {
-            listener.onItemClick(null, pos, item)
+            listener.onClick(null, pos, item)
         }
 
     }

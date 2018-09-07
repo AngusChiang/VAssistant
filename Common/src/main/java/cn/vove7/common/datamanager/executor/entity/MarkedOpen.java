@@ -19,8 +19,8 @@ import org.greenrobot.greendao.annotation.Generated;
 @Entity(indexes = {@Index(value = "key")})
 public class MarkedOpen {
     public static final String MARKED_TYPE_APP = "app";//应用 value -> pkg
-    public static final String MARKED_TYPE_SYS_FUN = "sys_fun";//系统功能 value: fun_key
-    public static final String MARKED_TYPE_SCRIPT = "script";
+    //public static final String MARKED_TYPE_SYS_FUN = "sys_fun";//系统功能 value: fun_key
+    //public static final String MARKED_TYPE_SCRIPT = "script";
     public static final String MARKED_TYPE_SCRIPT_LUA = "script_lua";
     public static final String MARKED_TYPE_SCRIPT_JS = "script_js";
 
@@ -74,12 +74,10 @@ public class MarkedOpen {
         this.type = type;
         this.regStr = regStr;
         this.value = value;
-        buildRegex();
     }
 
     @Keep
     private void buildRegex() {
-        //结尾加上% ， 防止有[后续节点操作]匹配失败
         String s = (!regStr.endsWith("%") ? regStr + "%" : regStr)
                 .replace("%", RegUtils.INSTANCE.getREG_ALL_CHAR());
         regex = new Regex(s);

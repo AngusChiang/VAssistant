@@ -1,18 +1,23 @@
 package cn.vove7.executorengine.bridges
 
+import android.Manifest
+import android.bluetooth.BluetoothAdapter
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.media.AudioManager
 import android.net.Uri
 import android.os.Build
-import android.os.Handler
 import android.os.VibrationEffect
 import android.os.Vibrator
+import android.support.v4.content.ContextCompat
 import android.view.KeyEvent
 import cn.vove7.common.SystemOperation
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.app.GlobalLog
+import cn.vove7.common.appbus.AppBus
 import cn.vove7.common.model.ExResult
+import cn.vove7.common.model.RequestPermission
 import cn.vove7.executorengine.helper.AdvanAppHelper
 import cn.vove7.executorengine.helper.ContactHelper
 import cn.vove7.vtp.app.AppHelper
@@ -138,6 +143,9 @@ class SystemBridge : SystemOperation {
         sendMediaKey(KeyEvent.KEYCODE_MEDIA_PAUSE)
     }
 
+    /**
+     * [mediaResume]
+     */
     override fun mediaStart() {
         mediaResume()
     }
@@ -186,28 +194,21 @@ class SystemBridge : SystemOperation {
     }
 
     override fun volumeUp() {
-        switchVolume(true)
+        switchVolume(AudioManager.ADJUST_RAISE)
     }
 
     override fun volumeDown() {
-        switchVolume(false)
+        switchVolume(AudioManager.ADJUST_LOWER)
     }
 
     /**
      * @see []
-     * @param up Boolean
+     * @param direction Int [AudioManager.ADJUST_RAISE] [AudioManager.ADJUST_LOWER]
      */
-    fun switchVolume(up: Boolean) {
+    private fun switchVolume(direction: Int) {
         val mAudioManager = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
-        if (up) {
-            mAudioManager.adjustVolume(AudioManager.ADJUST_RAISE, AudioManager.FX_FOCUS_NAVIGATION_UP)
-        } else {
-            mAudioManager.adjustVolume(AudioManager.ADJUST_LOWER,
-                    AudioManager.FX_FOCUS_NAVIGATION_UP)
-        }
-        Handler().postDelayed({
-            mAudioManager.adjustVolume(AudioManager.ADJUST_SAME, 0)
-        }, 1000)
+        mAudioManager.adjustVolume(direction, AudioManager.FLAG_SHOW_UI)
+
     }
 
     override var musicMaxVolume: Int = -1
@@ -271,5 +272,35 @@ class SystemBridge : SystemOperation {
             }
         }
         return true
+    }
+
+    override fun openBluetooth(): Boolean {
+
+        if (Build.VERSION.SDK_INT >= 23) {
+            //检测当前app是否拥有某个权限
+            val checkCallPhonePermission = ContextCompat.checkSelfPermission(context,
+                    Manifest.permission.ACCESS_COARSE_LOCATION)
+            if (checkCallPhonePermission != PackageManager.PERMISSION_GRANTED) {
+                AppBus.post(RequestPermission("蓝牙权限"))
+                return false
+            }
+        }
+        try {
+            val mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter()
+            if (!mBluetoothAdapter.isEnabled)
+                mBluetoothAdapter.enable() //开启
+        } catch (e: Exception) {
+            GlobalLog.err(e.message + " code: ob295")
+            return false
+        }
+        return true
+    }
+
+    override fun openWlan(): Boolean {//TODO
+        return false
+    }
+
+    override fun openWifiAp(): Boolean {
+        return false
     }
 }

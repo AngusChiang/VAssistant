@@ -6,6 +6,7 @@ import android.support.v7.app.AppCompatActivity
 import cn.vove7.jarvis.R
 import kotlinx.android.synthetic.main.activity_real_main.*
 
+
 class RealMainActivity : AppCompatActivity() {
 
     private val mOnNavigationItemSelectedListener

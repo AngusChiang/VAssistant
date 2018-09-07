@@ -12,7 +12,6 @@ import android.view.accessibility.AccessibilityEvent
 import android.view.accessibility.AccessibilityEvent.*
 import android.view.accessibility.AccessibilityNodeInfo
 import android.widget.Toast
-import cn.vove7.common.ShowListener
 import cn.vove7.common.accessibility.AccessibilityApi
 import cn.vove7.common.accessibility.viewnode.ViewNode
 import cn.vove7.common.appbus.AppBus
@@ -25,6 +24,7 @@ import cn.vove7.common.view.notifier.ActivityShowListener
 import cn.vove7.common.view.notifier.UiViewShowNotifier
 import cn.vove7.common.view.notifier.ViewShowListener
 import cn.vove7.executorengine.bridges.SystemBridge
+import cn.vove7.jarvis.plugins.AccPluginsService
 import cn.vove7.vtp.app.AppHelper
 import cn.vove7.vtp.log.Vog
 import cn.vove7.vtp.text.TextHelper
@@ -48,6 +48,7 @@ class MyAccessibilityService : AccessibilityApi() {
         Toast.makeText(this, "无障碍服务开启", Toast.LENGTH_SHORT).show()
         Vog.d("Vove :", "无障碍服务开启")
         //代码配置
+        registerEvent(activityNotifier)
 
     }
 
@@ -77,10 +78,9 @@ class MyAccessibilityService : AccessibilityApi() {
 
     override fun waitForActivity(executor: CExecutorI, scope: ActionScope) {
         locksWaitForActivity[executor] = scope
-        activityNotifierThread?.interrupt()
-        activityNotifierThread = thread {
+        thread {
             sleep(200)
-            activityNotifier.notifyIfShow()
+            activityNotifier.onAppChanged(currentScope)
         }
     }
 
@@ -100,7 +100,11 @@ class MyAccessibilityService : AccessibilityApi() {
         locksWaitForView[finder] = executor
         viewNotifierThread?.interrupt()
         viewNotifierThread = thread {
-            sleep(200)
+            try {
+                sleep(200)
+            } catch (e: InterruptedException) {
+                return@thread
+            }
             viewNotifier.notifyIfShow()
         }
     }
@@ -125,17 +129,13 @@ class MyAccessibilityService : AccessibilityApi() {
     }
 
     var viewNotifierThread: Thread? = null
-    var activityNotifierThread: Thread? = null
 
     private fun callAllNotifier() {
         viewNotifierThread?.interrupt()
         viewNotifierThread = thread {
             viewNotifier.notifyIfShow()
         }
-        activityNotifierThread?.interrupt()
-        activityNotifierThread = thread {
-            activityNotifier.notifyIfShow()
-        }
+        dispatchPluginsEvent(ON_UI_UPDATE, rootInActiveWindow)
     }
 
 
@@ -143,21 +143,20 @@ class MyAccessibilityService : AccessibilityApi() {
         if (null == event || null == event.source) {
             return
         }
-        dispatchPluginsEvent(ON_UI_UPDATE, rootInActiveWindow)
         val classNameStr = event.className
         val pkg = event.packageName as String
         if (classNameStr.startsWith(pkg)) {//解析当前App Activity
             currentActivity = classNameStr.substring(classNameStr.lastIndexOf('.') + 1)
             updateCurrentApp(pkg)
         }
-//        Vog.v(this, "class :${currentAppInfo?.name} - ${currentAppInfo?.packageName} - $currentActivity " +
-//                AccessibilityEvent.eventTypeToString(event.eventType))
+        Vog.v(this, "class :${currentAppInfo?.name} - ${currentAppInfo?.packageName} - $currentActivity \n" +
+                AccessibilityEvent.eventTypeToString(event.eventType))
         val eventType = event.eventType
         //根据事件回调类型进行处理
         when (eventType) {
             //通知栏发生改变
             AccessibilityEvent.TYPE_NOTIFICATION_STATE_CHANGED -> {
-                callAllNotifier()
+//                callAllNotifier()
             }
             //窗口的状态发生改变
             AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED -> {//窗口切换
@@ -167,20 +166,20 @@ class MyAccessibilityService : AccessibilityApi() {
             TYPE_WINDOWS_CHANGED -> {
                 callAllNotifier()
             }
-            AccessibilityEvent.TYPE_VIEW_HOVER_ENTER -> {
-                startTraverse(rootInActiveWindow)
-                callAllNotifier()
-            }
-            AccessibilityEvent.TYPE_VIEW_HOVER_EXIT -> {
-                startTraverse(rootInActiveWindow)
-                callAllNotifier()
-            }
-            TYPE_VIEW_SCROLLED -> {
-                callAllNotifier()
-            }
             TYPE_WINDOW_CONTENT_CHANGED -> {//"帧"刷新
                 val node = event.source
                 startTraverse(node)
+                callAllNotifier()
+            }
+            AccessibilityEvent.TYPE_VIEW_HOVER_ENTER -> {
+                startTraverse(rootInActiveWindow)
+//                callAllNotifier()
+            }
+            AccessibilityEvent.TYPE_VIEW_HOVER_EXIT -> {
+                startTraverse(rootInActiveWindow)
+//                callAllNotifier()
+            }
+            TYPE_VIEW_SCROLLED -> {
                 callAllNotifier()
             }
 
@@ -199,7 +198,7 @@ class MyAccessibilityService : AccessibilityApi() {
     /**
      * is output ViewGroup
      */
-    val outputPar = false
+    private val outputPar = false
 
     /**
      * 遍历AccessibilityEvent
@@ -260,8 +259,9 @@ class MyAccessibilityService : AccessibilityApi() {
     private val delayHandler = Handler()
     private var startupRunner: Runnable = Runnable { AppBus.postSpeechAction(SpeechAction.ActionCode.ACTION_START_RECO) }
     var stopRunner: Runnable = Runnable { AppBus.post(MainService.ORDER_STOP_EXEC) }
-    var delayUp = 800L
+    var delayUp = 600L
 
+    var v2 = false
     /**
      * 按键监听
      * @param event KeyEvent
@@ -272,10 +272,25 @@ class MyAccessibilityService : AccessibilityApi() {
         when (event.action) {
             KeyEvent.ACTION_DOWN -> when (event.keyCode) {
                 KEYCODE_VOLUME_DOWN -> {
-                    postLongDelay(stopRunner)
+                    if (MainService.recoIsListening) {//下键取消聆听
+                        v2 = true
+                        MainService.instance?.onCommand(MainService.ORDER_CANCEL_RECO)//up speed
+                    } else {
+                        postLongDelay(stopRunner)
+                    }
                     return true
                 }
-                KEYCODE_VOLUME_UP, KEYCODE_HOME, KEYCODE_APP_SWITCH -> {
+                KEYCODE_VOLUME_UP -> {
+                    if (MainService.recoIsListening) {//按下停止聆听
+                        v2 = true
+                        MainService.instance?.onCommand(MainService.ORDER_STOP_EXEC)
+                    } else {
+                        postLongDelay(startupRunner)
+                    }
+                    return true
+
+                }
+                KEYCODE_HOME -> {
                     postLongDelay(startupRunner)
                     return true
                 }
@@ -283,14 +298,13 @@ class MyAccessibilityService : AccessibilityApi() {
             KeyEvent.ACTION_UP -> {
                 when (event.keyCode) {
                     KEYCODE_VOLUME_UP, KEYCODE_HOME, KEYCODE_APP_SWITCH ->
-                        removeDelayIfInterrupt(event, startupRunner) || super.onKeyEvent(event)
+                        return removeDelayIfInterrupt(event, startupRunner) || super.onKeyEvent(event)
                     KEYCODE_VOLUME_DOWN ->
-                        removeDelayIfInterrupt(event, stopRunner) || super.onKeyEvent(event)
+                        return removeDelayIfInterrupt(event, stopRunner) || super.onKeyEvent(event)
                 }
             }
         }
         return super.onKeyEvent(event)
-
     }
 
     private fun postLongDelay(runnable: Runnable) {
@@ -298,6 +312,10 @@ class MyAccessibilityService : AccessibilityApi() {
     }
 
     private fun removeDelayIfInterrupt(event: KeyEvent, runnable: Runnable): Boolean {
+        if (v2) {//防止弹出音量调节
+            v2 = false
+            return true
+        }
         if ((event.eventTime - event.downTime) < (delayUp - 100)) {//时间短 移除runner 调节音量
             delayHandler.removeCallbacks(runnable)
             when (event.keyCode) {
@@ -305,6 +323,12 @@ class MyAccessibilityService : AccessibilityApi() {
                 KEYCODE_VOLUME_DOWN -> SystemBridge().volumeDown()
                 else -> return false
             } //其他按键
+        } else {
+//            if (event.keyCode == KEYCODE_VOLUME_UP && event.eventTime - event.downTime > 3000) {//长按松下,结束聆听
+//                //
+//                MainService.instance?.onCommand(MainService.ORDER_STOP_EXEC)
+//                return true
+//            }
         }
         return true
     }
@@ -374,13 +398,17 @@ class MyAccessibilityService : AccessibilityApi() {
     /**
      *  Notifier By [currentScope]
      */
-    private val activityNotifier = object : ShowListener {
+    private val activityNotifier = object : AccPluginsService() {
+        override fun onUiUpdate(root: AccessibilityNodeInfo?) {
+//            onAppChanged(currentScope)//...
+        }
+
         fun fill(data: ActionScope): Boolean {
             Vog.v(this, "filter $currentScope - $data")
             return currentScope == data
         }
 
-        override fun notifyIfShow() {
+        override fun onAppChanged(appScope: ActionScope) {
             synchronized(locksWaitForActivity) {
                 val removes = mutableListOf<ActivityShowListener>()
                 kotlin.run out@{
@@ -395,14 +423,40 @@ class MyAccessibilityService : AccessibilityApi() {
                         }
                     }
                 }
-                removes.forEach {
-                    locksWaitForActivity.remove(it)
-                }
+                removes.forEach { locksWaitForActivity.remove(it) }
                 removes.clear()
             }
-
         }
     }
+//    private val activityNotifier = object : ShowListener {
+//        fun fill(data: ActionScope): Boolean {
+//            Vog.v(this, "filter $currentScope - $data")
+//            return currentScope == data
+//        }
+//
+//        override fun notifyIfShow(): Int {
+//            synchronized(locksWaitForActivity) {
+//                val removes = mutableListOf<ActivityShowListener>()
+//                kotlin.run out@{
+//                    locksWaitForActivity.forEach { it ->
+//                        if (fill(it.value)) {
+//                            it.key.notifyShow(currentScope)
+//                            removes.add(it.key)
+//                        }
+//                        if (Thread.currentThread().isInterrupted) {
+//                            Vog.d(this, "activityNotifier 线程关闭")
+//                            return@out
+//                        }
+//                    }
+//                }
+//                removes.forEach { locksWaitForActivity.remove(it) }
+//                val count = removes.size
+//                removes.clear()
+//                return count
+//            }
+//
+//        }
+//    }
 
 
     companion object {
@@ -442,22 +496,19 @@ class MyAccessibilityService : AccessibilityApi() {
          * @param data Any?
          */
         private fun dispatchPluginsEvent(what: Int, data: Any? = null) {
-            thread {
-                synchronized(pluginsServices) {
-                    when (what) {
-                        ON_UI_UPDATE -> {
-                            pluginsServices.forEach {
-                                it.onUiUpdate(data as AccessibilityNodeInfo?)
-                            }
+            synchronized(pluginsServices) {
+                when (what) {
+                    ON_UI_UPDATE -> {
+                        pluginsServices.forEach {
+                            thread { it.onUiUpdate(data as AccessibilityNodeInfo?) }
                         }
-                        ON_APP_CHANGED -> {
-                            pluginsServices.forEach {
-                                it.onAppChanged(data as ActionScope)
-                            }
+                    }
+                    ON_APP_CHANGED -> {
+                        pluginsServices.forEach {
+                            thread { it.onAppChanged(data as ActionScope) }
                         }
-                        else -> {
-
-                        }
+                    }
+                    else -> {
                     }
                 }
             }

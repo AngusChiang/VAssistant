@@ -150,4 +150,9 @@
     <string name="text_add_follow_action">Add follow action</string>
     <string name="text_parent_action">Parent action:</string>
     <string name="key_audio_speak" translatable="false">audio_speak</string>
+    <string name="text_executing">Executing</string>
+    <string name="text_parsing">In parsing</string>
+    <string name="text_listening">Listening</string>
+    <string name="text_run">Run</string>
+    <string name="text_optional">Optional</string>
 </resources>

@@ -2,6 +2,7 @@ package cn.vove7.common.bridges
 
 import android.graphics.drawable.Drawable
 import cn.vove7.common.datamanager.parse.model.Action
+import cn.vove7.common.executor.OnExecutorResult
 import java.io.Serializable
 import java.text.Collator
 
@@ -11,7 +12,7 @@ import java.text.Collator
  * 保留Java调用
  * Created by Vove on 2018/6/18
  */
-interface ServiceBridge {
+interface ServiceBridge : OnExecutorResult {
     /**
      * 中途获取未知参数
      * @param action 执行动作

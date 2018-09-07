@@ -33,7 +33,7 @@ class InAppInstListFragment : SimpleListFragment<ActionNode>() {
     }
 
     override val itemClickListener = object : SimpleListAdapter.OnItemClickListener {
-        override fun onItemClick(holder: SimpleListAdapter.VHolder?, pos: Int, item: ViewModel) {
+        override fun onClick(holder: SimpleListAdapter.VHolder?, pos: Int, item: ViewModel) {
 
             val node = item.extra as ActionNode
             instDetailFragment.setInst(node)
@@ -95,7 +95,6 @@ class InAppInstListFragment : SimpleListFragment<ActionNode>() {
     }
 
     override fun onGetData(pageIndex: Int) {
-        super.onGetData(pageIndex)
         val offsetDatas = getInstList(pkg)
         Vog.d(this, "onGetData $offsetDatas")
         dataSet.addAll(transData(offsetDatas))

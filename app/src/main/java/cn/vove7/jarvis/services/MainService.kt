@@ -19,7 +19,6 @@ import cn.vove7.common.bridges.ShowAlertEvent
 import cn.vove7.common.bridges.ShowDialogEvent
 import cn.vove7.common.datamanager.parse.model.Action
 import cn.vove7.common.executor.CExecutorI
-import cn.vove7.common.executor.OnExecutorResult
 import cn.vove7.common.model.RequestPermission
 import cn.vove7.common.utils.RegUtils.checkCancel
 import cn.vove7.common.utils.RegUtils.checkConfirm
@@ -31,8 +30,9 @@ import cn.vove7.jarvis.view.dialog.MultiChoiceDialog
 import cn.vove7.jarvis.view.dialog.OnMultiSelectListener
 import cn.vove7.jarvis.view.dialog.OnSelectListener
 import cn.vove7.jarvis.view.dialog.SingleChoiceDialog
-import cn.vove7.jarvis.view.floatwindows.VoiceFloat
-import cn.vove7.jarvis.view.statusbar.StatusVoiceIconAnimation
+import cn.vove7.jarvis.view.statusbar.ExecuteAnimation
+import cn.vove7.jarvis.view.statusbar.ListeningAnimation
+import cn.vove7.jarvis.view.statusbar.ParseAnimation
 import cn.vove7.parseengine.engine.ParseEngine
 import cn.vove7.vtp.dialog.DialogUtil
 import cn.vove7.vtp.log.Vog
@@ -45,7 +45,7 @@ import java.util.*
 /**
  * 主服务
  */
-class MainService : BusService(), OnExecutorResult,
+class MainService : BusService(),
         ServiceBridge, OnSelectListener, OnMultiSelectListener, LuaContext {
     private lateinit var toast: Voast
 
@@ -54,7 +54,7 @@ class MainService : BusService(), OnExecutorResult,
     /**
      * 悬浮窗
      */
-    private lateinit var floatVoice: VoiceFloat
+//    private lateinit var floatVoice: VoiceFloat
 
     /**
      * 信使
@@ -66,21 +66,21 @@ class MainService : BusService(), OnExecutorResult,
     private lateinit var cExecutor: CExecutorI
 
     private val speechRecoService = SpeechRecoService(RecgEventListener())
-    private val speechSncService = SpeechSynService(SyncEventListener())
+    private val speechSynService = SpeechSynService(SyncEventListener())
 
     /**
      * 当前语音使用方式
      */
     private var voiceMode = MODE_VOICE
     //识别过程动画
-    private lateinit var statusVoiceAni: StatusVoiceIconAnimation
+    private var listeningAni = ListeningAnimation()
+    private var parseAnimation = ParseAnimation()
+    private var executeAnimation = ExecuteAnimation()
 
     override fun onCreate() {
         super.onCreate()
-        statusVoiceAni = StatusVoiceIconAnimation(this)
         instance = this
         cExecutor = MultiExecutorEngine(
-                this,
                 this,
                 this
         )
@@ -135,7 +135,7 @@ class MainService : BusService(), OnExecutorResult,
     private var choiceDialog: Dialog? = null
 
     private fun hideDialog() {
-        statusVoiceAni.hide()
+        listeningAni.hide()
         if (choiceDialog?.isShowing == true) {
             choiceDialog?.dismiss()
             choiceDialog = null
@@ -195,12 +195,13 @@ class MainService : BusService(), OnExecutorResult,
         speechRecoService.startRecog()
     }
 
-    var speakSync = false
+    private var speakSync = false
     override fun speak(text: String?) {
         //关闭语音播报 toast
-        if (SpHelper(this).getBoolean(getString(R.string.key_audio_speak), true)) {
+        if (SpHelper(this).getBoolean(getString(R.string.key_audio_speak), true)
+                && SystemBridge().musicCurrentVolume != 0) {
             speakSync = false
-            speechSncService.speak(text)
+            speechSynService.speak(text)
         } else {
             GlobalApp.toastShort(text ?: "null")
         }
@@ -209,15 +210,16 @@ class MainService : BusService(), OnExecutorResult,
     override fun speakSync(text: String?) {
         if (SpHelper(this).getBoolean(getString(R.string.key_audio_speak), true)) {
             speakSync = true
-            speechSncService.speak(text)
+            speechSynService.speak(text)
         } else {
             GlobalApp.toastShort(text ?: "null")
             cExecutor.speakCallback()
         }
     }
 
-    override fun onExecuteStart(words: String) {//
-        Vog.d(this, "开始执行 -> $words")
+    override fun onExecuteStart(tag: String) {//
+        Vog.d(this, "开始执行 -> $tag")
+        executeAnimation.begin()
     }
 
     /**
@@ -225,11 +227,14 @@ class MainService : BusService(), OnExecutorResult,
      */
     override fun onExecuteFinished(result: String) {//
         Vog.d(this, result)
+        executeAnimation.hide()
 //        toast.showShort(result)
+
     }
 
     override fun onExecuteFailed(errMsg: String) {//
         Vog.e(this, "onExecuteFailed: $errMsg")
+        executeAnimation.failed()
         toast.showShort(errMsg)
     }
 
@@ -241,7 +246,7 @@ class MainService : BusService(), OnExecutorResult,
      * onSpeechAction
      */
     @Subscribe(threadMode = ThreadMode.BACKGROUND)
-    fun onAction(sAction: SpeechAction) {
+    fun onSpeechAction(sAction: SpeechAction) {
         when (sAction.action) {
             SpeechAction.ActionCode.ACTION_START_RECO -> speechRecoService.startRecog()
             SpeechAction.ActionCode.ACTION_STOP_RECO -> speechRecoService.stopRecog()
@@ -274,12 +279,20 @@ class MainService : BusService(), OnExecutorResult,
 
 
     @Subscribe(threadMode = ThreadMode.BACKGROUND)
-    fun stopExecutor(order: String) {
+    fun onCommand(order: String) {
         when (order) {
             ORDER_STOP_EXEC -> {
-                AppBus.postSpeechAction(SpeechAction.ActionCode.ACTION_CANCEL_RECO)
+                speechRecoService.cancelRecog()
+                speechSynService.stop()
                 cExecutor.interrupt()
             }
+            ORDER_STOP_RECO -> {
+                speechRecoService.stopRecog()
+            }
+            ORDER_CANCEL_RECO -> {
+                speechRecoService.cancelRecog()
+            }
+
             else -> {
             }
         }
@@ -297,7 +310,7 @@ class MainService : BusService(), OnExecutorResult,
 
     override fun onDestroy() {
         speechRecoService.release()
-        speechSncService.release()
+        speechSynService.release()
         super.onDestroy()
     }
 
@@ -316,6 +329,8 @@ class MainService : BusService(), OnExecutorResult,
         const val MODE_ALERT = 27
 
         const val ORDER_STOP_EXEC = "stop_exec"
+        const val ORDER_STOP_RECO = "stop_reco"
+        const val ORDER_CANCEL_RECO = "cancel_reco"
 
         /**
          * 语音事件数据类型
@@ -323,6 +338,17 @@ class MainService : BusService(), OnExecutorResult,
 
         private val data = HashMap<String, Any>()
         var instance: MainService? = null
+
+        val recoIsListening: Boolean
+            get() {
+                return (if (instance == null) {
+                    Vog.i(this, "instance ---> null")
+                    false
+                } else instance!!.speechRecoService.isListening()
+                        ).also {
+                    Vog.i(this, "recoIsListening ---> $it")
+                }
+            }
 
     }
 
@@ -373,34 +399,37 @@ class MainService : BusService(), OnExecutorResult,
         }
 
         override fun onStartRecog() {
-            statusVoiceAni.begin()//
+            listeningAni.begin()//
 
             SystemBridge().vibrate(80L)
 
-            if (SystemBridge().isMediaPlaying()) {
+            if (SystemBridge().isMediaPlaying() && !speechSynService.speaking) {//防止误判合成服务播报
                 SystemBridge().mediaPause()
                 haveMusicPlay = true
             }
         }
 
-        override fun onResult(result: String) {
-            statusVoiceAni.hide()
+        override fun onResult(result: String) {//解析完成再 resumeMusicIf()?
+            listeningAni.hide()
             Vog.d(this, "结果 --------> $result")
-            resumeMusicIf()
             when (voiceMode) {
                 MODE_VOICE -> {
-                    toast.showShort("开始解析")
+//                    toast.showShort("开始解析")
+                    parseAnimation.begin()
                     val parseResult = ParseEngine
                             .parseAction(result, AccessibilityApi.accessibilityService?.currentScope?.packageName
                                 ?: "")
+                    resumeMusicIf()
                     if (parseResult.isSuccess) {
-                        toast.showShort("解析成功")
+//                        toast.showShort("解析成功")
                         cExecutor.execQueue(result, parseResult.actionQueue)
                     } else {
-                        toast.showShort("解析失败")
+//                        toast.showShort("解析失败")
+                        parseAnimation.failed()
                     }
                 }
                 MODE_GET_PARAM -> {//中途参数
+                    resumeMusicIf()
                     if (result == "") {//失败
                         //询问重新
 //                            return
@@ -414,12 +443,16 @@ class MainService : BusService(), OnExecutorResult,
                 MODE_ALERT -> {
                     when {
                         checkConfirm(result) -> {
+                            resumeMusicIf()
                             alertDialog?.getButton(DialogInterface.BUTTON_POSITIVE)?.performClick()
                             voiceMode = MODE_VOICE
+                            executeAnimation.begin()//继续显示执行
                         }
                         checkCancel(result) -> {
+                            resumeMusicIf()
                             alertDialog?.getButton(DialogInterface.BUTTON_NEGATIVE)?.performClick()
                             voiceMode = MODE_VOICE
+                            executeAnimation.begin()
                         }
                         else -> AppBus.postSpeechAction(SpeechAction.ActionCode.ACTION_START_RECO)  //继续????
                     }
@@ -433,16 +466,17 @@ class MainService : BusService(), OnExecutorResult,
 
         override fun onStop() {
             resumeMusicIf()
+            parseAnimation.begin()
         }
 
         override fun onCancel() {
             resumeMusicIf()
-            statusVoiceAni.hide()
+            listeningAni.hide()
         }
 
         override fun onFailed(err: String) {
             resumeMusicIf()
-            statusVoiceAni.faied()
+            listeningAni.failed()
             when (voiceMode) {
                 MODE_VOICE -> {//TODO effect
                 }
@@ -450,6 +484,7 @@ class MainService : BusService(), OnExecutorResult,
 //                        toast.showShort("获取参数失败")
                     cExecutor.onGetVoiceParam(null)
                     voiceMode = MODE_VOICE
+                    executeAnimation.begin()
                 }
                 MODE_ALERT -> {
 //                        toast.showShort("重新说")

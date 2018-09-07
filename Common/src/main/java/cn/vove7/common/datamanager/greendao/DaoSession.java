@@ -10,7 +10,6 @@ import org.greenrobot.greendao.internal.DaoConfig;
 
 import cn.vove7.common.datamanager.executor.entity.MarkedContact;
 import cn.vove7.common.datamanager.executor.entity.MarkedOpen;
-import cn.vove7.common.datamanager.executor.entity.ServerContact;
 import cn.vove7.common.datamanager.parse.model.Action;
 import cn.vove7.common.datamanager.parse.model.ActionScope;
 import cn.vove7.common.datamanager.parse.statusmap.ActionNode;
@@ -19,7 +18,6 @@ import cn.vove7.common.datamanager.AppAdInfo;
 
 import cn.vove7.common.datamanager.greendao.MarkedContactDao;
 import cn.vove7.common.datamanager.greendao.MarkedOpenDao;
-import cn.vove7.common.datamanager.greendao.ServerContactDao;
 import cn.vove7.common.datamanager.greendao.ActionDao;
 import cn.vove7.common.datamanager.greendao.ActionScopeDao;
 import cn.vove7.common.datamanager.greendao.ActionNodeDao;
@@ -37,7 +35,6 @@ public class DaoSession extends AbstractDaoSession {
 
     private final DaoConfig markedContactDaoConfig;
     private final DaoConfig markedOpenDaoConfig;
-    private final DaoConfig serverContactDaoConfig;
     private final DaoConfig actionDaoConfig;
     private final DaoConfig actionScopeDaoConfig;
     private final DaoConfig actionNodeDaoConfig;
@@ -46,7 +43,6 @@ public class DaoSession extends AbstractDaoSession {
 
     private final MarkedContactDao markedContactDao;
     private final MarkedOpenDao markedOpenDao;
-    private final ServerContactDao serverContactDao;
     private final ActionDao actionDao;
     private final ActionScopeDao actionScopeDao;
     private final ActionNodeDao actionNodeDao;
@@ -62,9 +58,6 @@ public class DaoSession extends AbstractDaoSession {
 
         markedOpenDaoConfig = daoConfigMap.get(MarkedOpenDao.class).clone();
         markedOpenDaoConfig.initIdentityScope(type);
-
-        serverContactDaoConfig = daoConfigMap.get(ServerContactDao.class).clone();
-        serverContactDaoConfig.initIdentityScope(type);
 
         actionDaoConfig = daoConfigMap.get(ActionDao.class).clone();
         actionDaoConfig.initIdentityScope(type);
@@ -83,7 +76,6 @@ public class DaoSession extends AbstractDaoSession {
 
         markedContactDao = new MarkedContactDao(markedContactDaoConfig, this);
         markedOpenDao = new MarkedOpenDao(markedOpenDaoConfig, this);
-        serverContactDao = new ServerContactDao(serverContactDaoConfig, this);
         actionDao = new ActionDao(actionDaoConfig, this);
         actionScopeDao = new ActionScopeDao(actionScopeDaoConfig, this);
         actionNodeDao = new ActionNodeDao(actionNodeDaoConfig, this);
@@ -92,7 +84,6 @@ public class DaoSession extends AbstractDaoSession {
 
         registerDao(MarkedContact.class, markedContactDao);
         registerDao(MarkedOpen.class, markedOpenDao);
-        registerDao(ServerContact.class, serverContactDao);
         registerDao(Action.class, actionDao);
         registerDao(ActionScope.class, actionScopeDao);
         registerDao(ActionNode.class, actionNodeDao);
@@ -103,7 +94,6 @@ public class DaoSession extends AbstractDaoSession {
     public void clear() {
         markedContactDaoConfig.clearIdentityScope();
         markedOpenDaoConfig.clearIdentityScope();
-        serverContactDaoConfig.clearIdentityScope();
         actionDaoConfig.clearIdentityScope();
         actionScopeDaoConfig.clearIdentityScope();
         actionNodeDaoConfig.clearIdentityScope();
@@ -117,10 +107,6 @@ public class DaoSession extends AbstractDaoSession {
 
     public MarkedOpenDao getMarkedOpenDao() {
         return markedOpenDao;
-    }
-
-    public ServerContactDao getServerContactDao() {
-        return serverContactDao;
     }
 
     public ActionDao getActionDao() {

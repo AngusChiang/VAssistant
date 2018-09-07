@@ -29,7 +29,7 @@ class GlobalInstListFragment : SimpleListFragment<ActionNode>() {
     }
     override val itemClickListener: SimpleListAdapter.OnItemClickListener =
         object : SimpleListAdapter.OnItemClickListener {
-            override fun onItemClick(holder: SimpleListAdapter.VHolder?, pos: Int, item: ViewModel) {
+            override fun onClick(holder: SimpleListAdapter.VHolder?, pos: Int, item: ViewModel) {
                 //显示详情
                 val node = item.extra as ActionNode
                 instDetailFragment.setInst(node)
@@ -47,7 +47,6 @@ class GlobalInstListFragment : SimpleListFragment<ActionNode>() {
     }
 
     override fun onGetData(pageIndex: Int) {
-        super.onGetData(pageIndex)
         thread {
             val offsetDatas = DAO.daoSession.actionNodeDao.queryBuilder()
                     .where(ActionNodeDao.Properties.ActionScopeType.eq(ActionNode.NODE_SCOPE_GLOBAL))

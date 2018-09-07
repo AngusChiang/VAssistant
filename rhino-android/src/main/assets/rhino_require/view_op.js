@@ -22,11 +22,29 @@ clickByDesc=function(desc){
 	return ViewFinder().desc(desc).tryClick()
 }
 
-function printAllChild(node){
-	print(node)
-	var cs = node.childs()
-	for (var i = 0;i< cs.size();i++) {
-		var child_i = cs[i]
-		print(i, child_i)
-	}
+printAllChild = function(node){
+	print('this', node)
+	var cs = node.childs
+	if(cs != undefined)
+        cs.forEach(function(e,i){
+            print(i, e)
+        })
+}
+
+function dd(d,index){
+    s = '-'
+    for (i=0;i<d ;i++)
+        s = s + '-'
+    s+=''+index+' '
+    return s
+}
+traversingNode = function(index,d, node){
+	print(dd(d,index), node)
+	var cs = node.childs
+	cs.forEach(function(e,ii){
+		traversingNode(ii,i+1,e)
+	})
+}
+traversing = function(node){
+    traversingNode(0,0, node)
 }

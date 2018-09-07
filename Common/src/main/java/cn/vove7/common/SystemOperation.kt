@@ -70,4 +70,10 @@ interface SystemOperation {
 
     fun vibrate(millis: Long): Boolean
     fun vibrate(arr: Array<Long>): Boolean
+
+    fun openBluetooth():Boolean
+    fun openWlan():Boolean
+    fun openWifiAp():Boolean
+
+
 }

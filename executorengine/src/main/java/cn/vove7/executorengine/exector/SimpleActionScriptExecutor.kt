@@ -3,9 +3,8 @@ package cn.vove7.executorengine.exector
 import android.content.Context
 import android.os.Build
 import cn.vove7.common.bridges.ServiceBridge
-import cn.vove7.common.executor.OnExecutorResult
 import cn.vove7.common.executor.PartialResult
-import cn.vove7.executorengine.AbsExecutorImpl
+import cn.vove7.executorengine.ExecutorImpl
 import cn.vove7.vtp.log.Vog
 import java.util.*
 
@@ -17,9 +16,8 @@ import java.util.*
 @Deprecated("useless",ReplaceWith("[MultiExecutorEngine]"))
 class SimpleActionScriptExecutor(
         context: Context,
-        serviceBridge: ServiceBridge,
-        onExecutorResult: OnExecutorResult
-) : AbsExecutorImpl(context, serviceBridge, onExecutorResult) {
+        serviceBridge: ServiceBridge
+) : ExecutorImpl(context, serviceBridge) {
 
     /**
      * 格式：
@@ -45,7 +43,7 @@ class SimpleActionScriptExecutor(
                     val msg = "执行终止-- on $line ${partialResult.msg}"
                     Vog.d(this, msg)
                     currentAction = null
-                    onExecutorResult.onExecuteFailed(msg)
+                    serviceBridge.onExecuteFailed(msg)
                     return partialResult
                 }
                 !partialResult.isSuccess -> {
@@ -126,7 +124,7 @@ class SimpleActionScriptExecutor(
             ACTION_SWIPE -> {
                 return try {
                     if (ps.size >= 5) {
-                        if (globalAutomator.swipe(ps[0].toInt(), ps[1].toInt(), ps[2].toInt(), ps[3].toInt(), ps[4].toInt())) {
+                        if (globalActionExecutor.swipe(ps[0].toInt(), ps[1].toInt(), ps[2].toInt(), ps[3].toInt(), ps[4].toInt())) {
                             PartialResult.success()
                         } else
                             PartialResult.failed()
@@ -200,8 +198,8 @@ class SimpleActionScriptExecutor(
         fun scroll(op: Int): PartialResult {
             return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                 if (when (op) {
-                            OPERATION_SCROLL_DOWN -> globalAutomator.scrollDown()
-                            OPERATION_SCROLL_UP -> globalAutomator.scrollUp()
+                            OPERATION_SCROLL_DOWN -> globalActionExecutor.scrollDown()
+                            OPERATION_SCROLL_UP -> globalActionExecutor.scrollUp()
                             else -> false
                         }
                 ) PartialResult.success()
@@ -230,13 +228,13 @@ class SimpleActionScriptExecutor(
                     return PartialResult(goHome())
                 }
                 ACTION_POWER_DIALOG -> {
-                    return PartialResult(globalAutomator.powerDialog())
+                    return PartialResult(globalActionExecutor.powerDialog())
                 }
                 ACTION_RECENT -> {
                     return PartialResult(openRecent())
                 }
                 ACTION_PULL_NOTIFICATION -> {
-                    return PartialResult(globalAutomator.notifications())
+                    return PartialResult(globalActionExecutor.notifications())
                 }
             }
 
@@ -256,12 +254,12 @@ class SimpleActionScriptExecutor(
             return when (c) {
                 ACTION_CLICK -> {
                     if (ps.size >= 2) {
-                        PartialResult(globalAutomator.click(ps[0].toInt(), ps[1].toInt()))
+                        PartialResult(globalActionExecutor.click(ps[0].toInt(), ps[1].toInt()))
                     } else PartialResult.fatal("参数数量应为2")
                 }
                 ACTION_LONG_CLICK -> {
                     if (ps.size >= 2) {
-                        PartialResult(globalAutomator.longClick(ps[0].toInt(), ps[1].toInt()))
+                        PartialResult(globalActionExecutor.longClick(ps[0].toInt(), ps[1].toInt()))
                     } else PartialResult.fatal("参数数量应为2")
                 }
 

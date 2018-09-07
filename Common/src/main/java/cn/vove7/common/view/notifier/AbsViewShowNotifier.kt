@@ -12,21 +12,17 @@ import cn.vove7.vtp.log.Vog
  */
 abstract class AbsViewShowNotifier(private val finders: MutableSet<ViewFinder>) : ShowListener {
 
-    private fun find(finder: ViewFinder): ViewNode? {
-        val r = finder.findFirst()
-        if (r != null) Vog.i(this, " find it")
-        return r
-    }
-
     /**
      * 检查列表
+     *
+     * @return Int the count of was notified
      */
-    @Synchronized
-    override fun notifyIfShow() {
+//    @Synchronized
+    override fun notifyIfShow(): Int {
         val removeList = mutableListOf<ViewFinder>()
         if (finders.isNotEmpty())
             Vog.d(this, "search View: ${finders.size}")
-        else return
+        else return 0
 //        sleep(500)
         synchronized(finders) {
             kotlin.run out@{
@@ -37,15 +33,21 @@ abstract class AbsViewShowNotifier(private val finders: MutableSet<ViewFinder>) 
                         return@out
                     }
                     Vog.d(this, " $it")
-                    val node = find(it)
+                    val node = it.findFirst()
+                    if (Thread.currentThread().isInterrupted) {
+                        Vog.d(this, "AbsViewShowNotifier isInterrupted")
+                        return@out
+                    }
                     if (node != null) {
-                        Vog.i(this, "$it successful")
-                        onShow(it,node)
+                        Vog.i(this, "find $it successful")
+                        onShow(it, node)
                         removeList.add(it)
                     }
                 }
             }
+            val num = removeList.size
             onFinish(removeList)
+            return num
         }
     }
 

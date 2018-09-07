@@ -5,14 +5,14 @@
 --
 
 require 'accessibility'
-root = rootView() --List
+root = rootView() --Array
 
 print(#root.childs)
 
 function dd(d)
-    local s = ''
+    local s = '-'
     for i = 0, d do
-        s = s .. ' '
+        s = s .. '-'
     end
     return s
 end
