@@ -13,8 +13,9 @@ import cn.vove7.vtp.log.Vog
 class UiViewShowNotifier(private val locks: MutableMap<ViewFinder, ViewShowListener>)
     : AbsViewShowNotifier(locks.keys) {
 
-    override fun onShow(finder: ViewFinder, node: ViewNode) {
+    override fun onShow(finder: ViewFinder, node: ViewNode): Boolean {
         locks[finder]?.notifyShow(node)
+        return true
     }
 
     override fun onFinish(removeList: MutableList<ViewFinder>) {

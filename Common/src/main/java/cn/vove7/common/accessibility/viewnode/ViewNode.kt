@@ -272,7 +272,8 @@ class ViewNode(val node: AccessibilityNodeInfo) : ViewOperation, Comparable<View
                 (if (id == null) "" else ", id: " + id.substring(id.lastIndexOf('/') + 1)) +
                 (if (node.text == null) "" else ", text: ${node.text}") +
                 (if (desc == null) "" else ", desc: $desc") +
-                (", bounds: ${getBounds()}" + ", childCount: ${getChildCount()}") + '}'
+                (", bounds: ${getBounds()}" + ", childCount: ${getChildCount()}") +
+                (if (node.isClickable) ", Clickable" else "") + '}'
     }
 
 }

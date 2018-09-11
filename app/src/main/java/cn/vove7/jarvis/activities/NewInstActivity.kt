@@ -386,15 +386,15 @@ class NewInstActivity : AppCompatActivity(), View.OnClickListener {
                 }
             })
             if (isReedit) {
-                scriptTextView.setText(editNode?.action?.actionScript)
                 scriptText = editNode?.action?.actionScript
                 scriptType = editNode!!.action.scriptType
             }
             selScriptDialog = AlertDialog.Builder(this)
                     .setView(dView)
-                    .setPositiveButton(R.string.text_confirm) { i, _ ->
+                    .setPositiveButton(R.string.text_confirm) { _, _ ->
                         scriptText = scriptTextView.text.toString()
                     }
+                    .setNegativeButton(R.string.text_cancel, null)
                     .setNeutralButton(R.string.text_from_file, null)
                     .create()
             selScriptDialog?.setOnShowListener { i ->
@@ -412,6 +412,7 @@ class NewInstActivity : AppCompatActivity(), View.OnClickListener {
                 }
             }
         }
+        scriptTextView.setText(scriptText)
         selScriptDialog?.show()
     }
 

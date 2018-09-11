@@ -20,10 +20,6 @@ public class NonBlockSyntherizer extends MySyntherizer {
     private HandlerThread hThread;
     private Handler tHandler;
 
-
-    private static final String TAG = "NonBlockSyntherizer";
-
-
     public NonBlockSyntherizer(Context context, InitConfig initConfig) {
         super(context);
         initThread();

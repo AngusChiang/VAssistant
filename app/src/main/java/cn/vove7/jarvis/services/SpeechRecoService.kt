@@ -7,6 +7,7 @@ import android.os.Message
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.appbus.AppBus
 import cn.vove7.common.appbus.VoiceData
+import cn.vove7.jarvis.R
 import cn.vove7.jarvis.speech.recognition.OfflineRecogParams
 import cn.vove7.jarvis.speech.recognition.listener.SpeechStatusListener
 import cn.vove7.jarvis.speech.recognition.model.IStatus
@@ -20,7 +21,6 @@ import cn.vove7.jarvis.speech.wakeup.MyWakeup
 import cn.vove7.jarvis.speech.wakeup.RecogWakeupListener
 import cn.vove7.vtp.log.Vog
 import cn.vove7.vtp.sharedpreference.SpHelper
-import cn.vove7.vtp.toast.Voast
 import com.baidu.speech.asr.SpeechConstant
 import java.lang.Thread.sleep
 import kotlin.concurrent.thread
@@ -61,12 +61,12 @@ class SpeechRecoService(val event: SpeechEvent) {
                     return
                 }
                 CODE_VOICE_TEMP -> {//中间结果
-                    val res = msg.data.getString("data")
+                    val res = msg.data.getString("data") ?: "null"
                     event.onTempResult(res)
                     AppBus.postVoiceData(VoiceData(msg.what, res))
                 }
                 CODE_VOICE_ERR -> {//出错
-                    val res = msg.data.getString("data")
+                    val res = msg.data.getString("data") ?: "null"
                     event.onFailed(res)
                     AppBus.postVoiceData(VoiceData(msg.what, res))
                 }
@@ -76,7 +76,7 @@ class SpeechRecoService(val event: SpeechEvent) {
                     AppBus.postVoiceData(data)
                 }
                 CODE_VOICE_RESULT -> {//结果
-                    val result = msg.data.getString("data")
+                    val result = msg.data.getString("data") ?: "null"
                     event.onResult(result)
                     AppBus.postVoiceData(VoiceData(msg.what, result))
                 }
@@ -87,19 +87,18 @@ class SpeechRecoService(val event: SpeechEvent) {
     init {
         thread {
             initRecog()
-            if (SpHelper(GlobalApp.APP).getBoolean("wakeup"))
+            //初始化唤醒器
+            if (SpHelper(GlobalApp.APP).getBoolean(R.string.key_open_voice_wakeup))
                 wakeuper.start()
         }
     }
 
-
+    lateinit var listener: SpeechStatusListener
     /**
      * 在onCreate中调用。初始化识别控制类MyRecognizer
      */
-
-    val listener = SpeechStatusListener(handler)
-
     private fun initRecog() {
+        listener = SpeechStatusListener(handler)
         val context: Context = GlobalApp.APP
         myRecognizer = MyRecognizer(context, listener)
 

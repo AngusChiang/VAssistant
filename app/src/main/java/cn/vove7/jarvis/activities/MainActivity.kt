@@ -92,18 +92,6 @@ class MainActivity : Activity() {
     fun onClick(v: View) {
 
         when (v.id) {
-            R.id.start_debug -> {
-                RemoteDebugServer.start()
-            }
-            R.id.stop_debug -> {
-                RemoteDebugServer.stop()
-            }
-            R.id.stop_wakeup -> {
-                AppBus.postSpeechAction(SpeechAction.ActionCode.ACTION_STOP_WAKEUP)
-            }
-            R.id.start_wakeup -> {
-                AppBus.postSpeechAction(SpeechAction.ActionCode.ACTION_START_WAKEUP)
-            }
             R.id.button_mark -> {
                 startActivity(Intent(this, MarkedManagerActivity::class.java))
             }

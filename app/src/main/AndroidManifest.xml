@@ -51,11 +51,30 @@
             android:name="com.baidu.speech.SECRET_KEY"
             android:value="d9ef661698c5d8cd45978aa55e600e03" />
 
-        <activity android:name=".activities.MainActivity">
+        <activity
+            android:name=".activities.VoiceTestActivity"/>
+        <activity
+            android:name=".activities.RealMainActivity"
+            android:excludeFromRecents="true"
+            android:theme="@style/TranslucentStatus.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity android:name=".activities.MainActivity" />
+
+        <activity
+            android:name=".activities.base.VoiceAssistActivity"
+            android:theme="@style/TransparentBackground"
+            android:launchMode="singleInstance">
+            <intent-filter>
+                <action android:name="android.intent.action.ASSIST" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VOICE_COMMAND" />
+                <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
 
@@ -73,15 +92,13 @@
 
         <activity android:name=".activities.CommandTestActivity" />
 
-        <activity android:name=".activities.VoiceTestActivity" />
-
         <service
             android:name="com.baidu.speech.VoiceRecognitionService"
             android:exported="false" />
         <service
             android:name=".services.MainService"
             android:enabled="true"
-            android:exported="true" />
+            android:exported="false" />
 
         <activity
             android:name=".activities.PermissionManagerActivity"
@@ -99,12 +116,13 @@
         <activity
             android:name=".activities.NewInstActivity"
             android:windowSoftInputMode="adjustPan" />
-        <activity
-            android:name=".activities.RealMainActivity"
-            android:theme="@style/TranslucentStatus.NoActionBar" />
         <activity android:name=".activities.WelcomeActivity" />
         <activity android:name=".activities.MarkedManagerActivity" />
         <activity android:name=".activities.AppAdListActivity" />
+        <activity
+            android:name=".activities.AdvancedSettingActivity"
+            android:label="@string/title_advanced_settings"
+            android:theme="@style/AppTheme" />
     </application>
 
 </manifest>

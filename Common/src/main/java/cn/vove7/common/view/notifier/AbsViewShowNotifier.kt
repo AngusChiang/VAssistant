@@ -15,14 +15,15 @@ abstract class AbsViewShowNotifier(private val finders: MutableSet<ViewFinder>) 
     /**
      * 检查列表
      *
-     * @return Int the count of was notified
+     * @return firstly Int the count of was notified secondly Int was count of notified success
      */
 //    @Synchronized
-    override fun notifyIfShow(): Int {
+    override fun notifyIfShow(): Pair<Int, Int> {
         val removeList = mutableListOf<ViewFinder>()
         if (finders.isNotEmpty())
             Vog.d(this, "search View: ${finders.size}")
-        else return 0
+        else return Pair(0, 0)
+        var succ = 0
 //        sleep(500)
         synchronized(finders) {
             kotlin.run out@{
@@ -40,18 +41,18 @@ abstract class AbsViewShowNotifier(private val finders: MutableSet<ViewFinder>) 
                     }
                     if (node != null) {
                         Vog.i(this, "find $it successful")
-                        onShow(it, node)
+                        if (onShow(it, node)) succ++
                         removeList.add(it)
                     }
                 }
             }
             val num = removeList.size
             onFinish(removeList)
-            return num
+            return Pair(num, succ)
         }
     }
 
-    abstract fun onShow(finder: ViewFinder, node: ViewNode)
+    abstract fun onShow(finder: ViewFinder, node: ViewNode): Boolean
 
     abstract fun onFinish(removeList: MutableList<ViewFinder>)
 }

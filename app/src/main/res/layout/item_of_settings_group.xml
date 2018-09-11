@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:background="@color/app_foround"
+        android:orientation="vertical">
+
+        <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="?attr/selectableItemBackground"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingTop="10dp"
+            android:paddingEnd="10dp"
+            android:paddingBottom="10dp">
+
+            <View
+                android:id="@+id/line"
+                android:layout_width="4dp"
+                android:layout_height="25dp"
+                android:layout_gravity="center_vertical"
+                android:layout_marginEnd="20dp"
+                android:background="@color/google_blue" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:padding="5dp">
+
+                <TextView
+                    android:id="@+id/title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Sample"
+                    android:textColor="@color/primary_text"
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:clickable="false"
+                    android:gravity="end">
+
+                    <ImageView
+                        android:id="@+id/down_icon"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:src="@drawable/ic_keyboard_arrow_down_black_24dp" />
+                </LinearLayout>
+
+            </LinearLayout>
+
+        </LinearLayout>
+    </LinearLayout>
+</LinearLayout>

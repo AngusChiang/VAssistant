@@ -4,11 +4,13 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.pm.PackageManager
 import cn.vove7.common.app.GlobalApp
+import cn.vove7.jarvis.R
 import cn.vove7.jarvis.speech.synthesis.control.InitConfig
 import cn.vove7.jarvis.speech.synthesis.control.MySyntherizer
 import cn.vove7.jarvis.speech.synthesis.control.NonBlockSyntherizer
 import cn.vove7.jarvis.speech.synthesis.util.OfflineResource
 import cn.vove7.vtp.log.Vog
+import cn.vove7.vtp.sharedpreference.SpHelper
 import com.baidu.tts.chainofresponsibility.logger.LoggerProxy
 import com.baidu.tts.client.SpeechError
 import com.baidu.tts.client.SpeechSynthesizer
@@ -32,7 +34,8 @@ class SpeechSynService(private val event: SyncEvent) : SpeechSynthesizerListener
     // assets目录下bd_etts_common_speech_m15_mand_eng_high_am-mix_v3.0.0_20170505.dat为离线男声模型；
     // assets目录下bd_etts_common_speech_f7_mand_eng_high_am-mix_v3.0.0_20170512.dat为离线女声模型
     //TODO sp配置
-    protected var offlineVoice = OfflineResource.VOICE_DUXY
+    protected var voiceModel = OfflineResource.VOICE_FEMALE
+    protected var voiceSpeed = "6"
 
     var speaking = false
 
@@ -41,6 +44,12 @@ class SpeechSynService(private val event: SyncEvent) : SpeechSynthesizerListener
     protected lateinit var synthesizer: MySyntherizer
 
     private val context: Context = GlobalApp.APP
+
+    fun reLoad() {
+        Vog.d(this,"reLoad ---> ")
+        release()
+        initialTts() // 初始化TTS引擎
+    }
 
     init {
         val appInfo = context.packageManager.getApplicationInfo(context.packageName,
@@ -56,12 +65,11 @@ class SpeechSynService(private val event: SyncEvent) : SpeechSynthesizerListener
     // 合成前可以修改参数：
     // Map<String, String> params = getParams();
     // synthesizer.setParams(params);
-    public fun speak(text: String?) {
+    fun speak(text: String?) {
         if (text == null) {
             event.onError("文本空")
             return
         }
-
         val result = synthesizer.speak(text)
         checkResult(result, "speak")
     }
@@ -69,7 +77,7 @@ class SpeechSynService(private val event: SyncEvent) : SpeechSynthesizerListener
     /**
      * 暂停播放。仅调用speak后生效
      */
-    public fun pause() {
+    fun pause() {
         val result = synthesizer.pause()
         checkResult(result, "pause")
     }
@@ -77,7 +85,7 @@ class SpeechSynService(private val event: SyncEvent) : SpeechSynthesizerListener
     /**
      * 继续播放。仅调用speak后生效，调用pause生效
      */
-    public fun resume() {
+    fun resume() {
         val result = synthesizer.resume()
         checkResult(result, "resume")
     }
@@ -96,16 +104,18 @@ class SpeechSynService(private val event: SyncEvent) : SpeechSynthesizerListener
 
     @SuppressLint("HandlerLeak")
     protected fun initialTts() {
-        LoggerProxy.printable(true) // 日志打印在logcat中
-        // 设置初始化参数
-        // 此处可以改为 含有您业务逻辑的SpeechSynthesizerListener的实现类
+
+        val sp = SpHelper(context)
+        voiceModel = sp.getString(R.string.key_voice_syn_model) ?: OfflineResource.VOICE_FEMALE
+        var eed = sp.getInt(R.string.key_voice_syn_speed)
+        if (eed == -1) eed = 5
+        voiceSpeed = eed.toString()
+
+        LoggerProxy.printable(false) // 日志打印在logcat中
 
         val params = getParams()
-
         val initConfig = InitConfig(appId, appKey, secretKey, ttsMode, params, this)
-
         synthesizer = NonBlockSyntherizer(context, initConfig)
-
     }
 
     /**
@@ -117,15 +127,16 @@ class SpeechSynService(private val event: SyncEvent) : SpeechSynthesizerListener
         val params = HashMap<String, String>()
         // 以下参数均为选填
         // 设置在线发声音人： 0 普通女声（默认） 1 普通男声 2 特别男声 3 情感男声<度逍遥> 4 情感儿童声<度丫丫>
-        params[SpeechSynthesizer.PARAM_SPEAKER] = "0"
+
+        params[SpeechSynthesizer.PARAM_SPEAKER] = voiceModel
         // 设置合成的音量，0-9 ，默认 5
         params[SpeechSynthesizer.PARAM_VOLUME] = "9"
         // 设置合成的语速，0-9 ，默认 5
-        params[SpeechSynthesizer.PARAM_SPEED] = "5"
+        params[SpeechSynthesizer.PARAM_SPEED] = voiceSpeed
         // 设置合成的语调，0-9 ，默认 5
         params[SpeechSynthesizer.PARAM_PITCH] = "5"
 
-        params[SpeechSynthesizer.PARAM_MIX_MODE] = SpeechSynthesizer.MIX_MODE_DEFAULT
+        params[SpeechSynthesizer.PARAM_MIX_MODE] = SpeechSynthesizer.MIX_MODE_HIGH_SPEED_SYNTHESIZE
         // 该参数设置为TtsMode.MIX生效。即纯在线模式不生效。
         // MIX_MODE_DEFAULT 默认 ，wifi状态下使用在线，非wifi离线。在线状态下，请求超时6s自动转离线
         // MIX_MODE_HIGH_SPEED_SYNTHESIZE_WIFI wifi状态下使用在线，非wifi离线。在线状态下， 请求超时1.2s自动转离线
@@ -133,7 +144,7 @@ class SpeechSynService(private val event: SyncEvent) : SpeechSynthesizerListener
         // MIX_MODE_HIGH_SPEED_SYNTHESIZE, 2G 3G 4G wifi状态下使用在线，其它状态离线。在线状态下，请求超时1.2s自动转离线
 
         // 离线资源文件， 从assets目录中复制到临时目录，需要在initTTs方法前完成
-        val offlineResource = OfflineResource(context, offlineVoice)
+        val offlineResource = OfflineResource(context, voiceModel)
         try {// 声学模型文件路径 (离线引擎使用), 请确认下面两个文件存在
             params[SpeechSynthesizer.PARAM_TTS_TEXT_MODEL_FILE] = offlineResource.textFilename!!
             params[SpeechSynthesizer.PARAM_TTS_SPEECH_MODEL_FILE] = offlineResource.modelFilename!!
@@ -147,8 +158,8 @@ class SpeechSynService(private val event: SyncEvent) : SpeechSynthesizerListener
      * 切换离线发音。注意需要添加额外的判断：引擎在合成时该方法不能调用
      */
     public fun reLoadVoiceModel(mode: String) {
-        offlineVoice = mode
-        val offlineResource = OfflineResource(context, offlineVoice)
+        voiceModel = mode
+        val offlineResource = OfflineResource(context, voiceModel)
         Vog.d(this, "reLoadVoiceModel 切换离线语音：" + offlineResource.modelFilename)
 
         val result = synthesizer.loadVoiceModel(offlineResource.modelFilename,

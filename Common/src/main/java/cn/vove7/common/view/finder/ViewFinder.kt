@@ -39,6 +39,9 @@ abstract class ViewFinder(var accessibilityService: AccessibilityApi) {
             Vog.v(this, "traverseAllNode ${node.className} $index/${node.childCount}")
             val childNode = node.getChild(index)
             if (childNode != null) {
+                if (!childNode.isVisibleToUser) {//TODO check it
+                    return@forEach
+                }
                 if (findCondition(childNode)) {
                     if (all) {
                         list.add(ViewNode(childNode))

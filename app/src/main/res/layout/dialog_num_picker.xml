@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingStart="20dp"
+    android:paddingEnd="20dp"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:gravity="center">
+
+    <TextView
+        android:id="@+id/min_value_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="" />
+
+    <org.adw.library.widgets.discreteseekbar.DiscreteSeekBar
+        android:id="@+id/seekbar"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        app:dsb_progressColor="?android:attr/colorAccent"
+        app:dsb_rippleColor="?android:attr/colorAccent"
+        app:dsb_trackColor="?android:attr/colorAccent"
+        app:dsb_indicatorColor="?android:attr/colorAccent"
+        android:paddingBottom="20dp"
+        android:paddingTop="20dp" />
+
+    <TextView
+        android:id="@+id/max_value_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:text="" />
+
+</LinearLayout>

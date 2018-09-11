@@ -50,17 +50,17 @@ end
 
 
 function dd(d, i)
-    local s = '-'
-    for i = 0, d do
-        s = s .. '-'
+    local s = ''
+    for i = 1, d do
+        s = s .. '  '
     end
-    s = s .. i .. ' '
+    s = s .. '|-' .. i
     return s
 end
 
 
 local function traversingNode(index, d, node)
-    print(dd(d, index), node)
+    print(dd(d, index) .. ' ' .. node.toString())
     local cs = node.childs
     for i = 0, #cs - 1 do
         traversingNode(i, d + 1, cs[i])

@@ -1,12 +1,16 @@
 package cn.vove7.jarvis.view.statusbar
 
 import android.annotation.SuppressLint
-import android.os.Handler
+import android.app.NotificationManager
+import android.content.Context
 import android.support.v4.app.NotificationManagerCompat
 import cn.vove7.common.app.GlobalApp
+import cn.vove7.vtp.log.Vog
 import cn.vove7.vtp.notification.ChannelBuilder
 import cn.vove7.vtp.notification.NotificationHelper
 import cn.vove7.vtp.notification.NotificationIcons
+import java.lang.Thread.sleep
+import kotlin.concurrent.thread
 
 /**
  * # StatusAnimation
@@ -14,6 +18,8 @@ import cn.vove7.vtp.notification.NotificationIcons
  * @author 17719247306
  * 2018/9/2
  */
+private val nId = 127
+
 abstract class StatusAnimation {
 
     @SuppressLint("NewApi")
@@ -27,7 +33,8 @@ abstract class StatusAnimation {
     private val notifier = NotificationHelper(GlobalApp.APP, c)
 
     fun begin() {
-        notifier.showNotification(127, title, "", NotificationIcons(beginAniId))
+        hideThread?.interrupt()
+        notifier.showNotification(nId, title, "", NotificationIcons(beginAniId))
     }
 
     /**
@@ -36,23 +43,32 @@ abstract class StatusAnimation {
     open fun onFailed() {}
 
     fun failed() {
-        notifier.showNotification(127, title, "", NotificationIcons(failedAniId))
+        hideThread?.interrupt()
+        notifier.showNotification(nId, title, "", NotificationIcons(failedAniId))
         onFailed()
-        Handler().postDelayed({
-            hide()
-        }, 2000)
+        hideDelay(1000)
     }
 
     open fun finish() {
-        if(finishId==null) return
-        notifier.showNotification(127, title, "", NotificationIcons(finishId!!))
-        Handler().postDelayed({
-            hide()
-        }, 2000)
+        if (finishId == null) return
+        hideThread?.interrupt()
+        notifier.showNotification(nId, title, "", NotificationIcons(finishId!!))
+        hideDelay(1000)
     }
 
-
-    fun hide() {
-        notifier.removeAll()
+    var hideThread: Thread? = null
+    fun hideDelay(delay: Long = 900) {
+        Vog.d(this, "hideDelay ---> $delay")
+        hideThread = thread {
+            try {
+                sleep(delay)
+                (GlobalApp.APP.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager)
+                        .cancel(nId)
+            } catch (e: Exception) {
+            }finally {
+                hideThread = null
+            }
+        }
     }
+
 }

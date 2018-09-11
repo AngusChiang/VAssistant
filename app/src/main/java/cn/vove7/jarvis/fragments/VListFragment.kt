@@ -118,9 +118,9 @@ abstract class VListFragment : Fragment() {
                 else netErrView
         )
         if (floatClickListener == null) {
-            floatButton.visibility = GONE
+            floatButton.hide()
         } else {
-            floatButton.visibility = View.VISIBLE
+            floatButton.show()
             floatButton.setOnClickListener(floatClickListener)
         }
     }
@@ -148,7 +148,7 @@ abstract class VListFragment : Fragment() {
         }
         recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             //上拉加载
-            override fun onScrolled(recyclerView: RecyclerView?, dx: Int, dy: Int) {
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                 super.onScrolled(recyclerView, dx, dy)
                 if (!allLoadFlag && isSlideToBottom() && !swipeRefreshLayout.isRefreshing) {//上拉加载,
                     if (pageIndex != 0)
@@ -181,7 +181,7 @@ abstract class VListFragment : Fragment() {
     }
 
     fun notifyDataSetChanged() {
-        recyclerView.adapter.notifyDataSetChanged()
+        recyclerView.adapter?.notifyDataSetChanged()
     }
 
     protected fun isSlideToBottom(): Boolean {

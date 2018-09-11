@@ -3,6 +3,7 @@ package cn.vove7.common.datamanager.parse.model;
 import android.os.Bundle;
 import android.support.annotation.Keep;
 import android.support.annotation.NonNull;
+import android.text.TextUtils;
 
 import org.greenrobot.greendao.annotation.Entity;
 import org.greenrobot.greendao.annotation.Generated;
@@ -55,6 +56,10 @@ public class Action implements Comparable<Action>, Serializable {
 
     public void setScriptType(String scriptType) {
         this.scriptType = scriptType;
+    }
+
+    public boolean isNull() {
+        return TextUtils.isEmpty(actionScript) && TextUtils.isEmpty(scriptType);
     }
 
     /**

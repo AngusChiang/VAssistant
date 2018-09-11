@@ -3,6 +3,8 @@ package cn.vove7.jarvis.fragments
 import android.annotation.SuppressLint
 import android.app.AlertDialog
 import android.app.Dialog
+import android.app.ProgressDialog
+import android.content.ActivityNotFoundException
 import android.content.DialogInterface
 import android.content.Intent
 import android.os.Bundle
@@ -20,11 +22,13 @@ import cn.vove7.common.datamanager.DaoHelper
 import cn.vove7.common.datamanager.parse.DataFrom
 import cn.vove7.common.datamanager.parse.model.Action
 import cn.vove7.common.datamanager.parse.statusmap.ActionNode
+import cn.vove7.executorengine.bridges.SystemBridge
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.activities.NewInstActivity
 import cn.vove7.jarvis.adapters.ExecuteQueueAdapter
 import cn.vove7.vtp.dialog.DialogWithList
 import java.util.*
+import kotlin.concurrent.thread
 
 
 @SuppressLint("ValidFragment")
@@ -103,9 +107,28 @@ class InstDetailFragment : BottomSheetDialogFragment() {
                     startActivity(editIntent)
                 }
                 R.id.menu_delete -> {//删除
-                    AlertDialog.Builder(context).setTitle("确认删除操作: " + node.descTitle + " ?")
+                    AlertDialog.Builder(context).setTitle(getString(R.string.text_confirm_2_del) + ": ${node.descTitle} ?")
+                            .setNeutralButton(getString(R.string.text_help)) { _, _ ->
+                                try {
+                                    SystemBridge().openUrl("http://baidu.com")// TODO
+                                } catch (e: ActivityNotFoundException) {
+                                    GlobalApp.toastShort("无可用浏览器")
+                                }
+                            }
+                            .setMessage(getString(R.string.text_msg_delete_action_node))
                             .setPositiveButton(R.string.text_confirm) { _, _ ->
-                                DaoHelper.delectActionNode(node.id)
+                                val p = ProgressDialog(context)
+                                p.setProgressStyle(android.R.style.Widget_DeviceDefault_Light_ProgressBar_Horizontal)
+                                p.isIndeterminate = true
+                                p.setCancelable(false)
+                                p.show()
+                                thread {
+                                    p.cancel()
+                                    val b = DaoHelper.deleteActionNode(node.id)
+                                    GlobalApp.toastShort(
+                                            if (b) "删除成功" else "删除失败，可至帮助进行反馈"
+                                    )
+                                }
                             }
                             .setNegativeButton(R.string.text_cancel, null)
                             .show()

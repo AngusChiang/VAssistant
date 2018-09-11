@@ -13,12 +13,19 @@
     <style name="TranslucentStatus" parent="AppTheme">
         <item name="android:windowTranslucentStatus">true</item>
         <item name="android:windowDrawsSystemBarBackgrounds">false</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:windowSharedElementsUseOverlay">false</item>
     </style>
     <style name="TranslucentStatus.NoActionBar" parent="NoActionBar">
         <item name="android:windowTranslucentStatus">true</item>
         <item name="android:windowDrawsSystemBarBackgrounds">false</item>
     </style>
 
+    <!--防止白色启动背景-->
+    <style name="TransparentBackground">
+        <item name="android:windowBackground">@color/transparent</item>
+        <item name="android:windowContentOverlay">@null</item>
+    </style>
     <style name="NoActionBar" parent="AppTheme">
         <item name="windowNoTitle">true</item>
         <item name="windowActionBar">false</item>

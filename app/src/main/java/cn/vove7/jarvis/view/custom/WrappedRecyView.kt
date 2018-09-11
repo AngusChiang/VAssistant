@@ -13,7 +13,7 @@ import android.view.View
  */
 class WrappedRecyView : RecyclerView {
     constructor(context: Context) : super(context)
-    constructor(context: Context?, attrs: AttributeSet?) : super(context, attrs)
+    constructor(context: Context, attrs: AttributeSet?) : super(context, attrs)
 
     public override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         val mExpandSpec = View.MeasureSpec.makeMeasureSpec(Integer.MAX_VALUE shr 2, View.MeasureSpec.AT_MOST)

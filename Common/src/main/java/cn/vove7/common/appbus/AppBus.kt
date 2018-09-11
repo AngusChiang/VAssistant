@@ -11,8 +11,8 @@ object AppBus {
     /**
      * 控制语音
      */
-    fun postSpeechAction(action: SpeechAction.ActionCode) {
-        EventBus.getDefault().post(SpeechAction(action))
+    fun postSpeechAction(actionCode: SpeechAction.ActionCode) {
+        EventBus.getDefault().post(SpeechAction(actionCode))
     }
 
     fun postVoiceData(data: VoiceData) {
@@ -51,6 +51,7 @@ data class SpeechAction(val action: ActionCode) {
         ACTION_START_WAKEUP,
         ACTION_STOP_WAKEUP,
         ACTION_STOP_RECO,
+        ACTION_RELOAD_SYN_CONF,
         ACTION_CANCEL_RECO
     }
 }

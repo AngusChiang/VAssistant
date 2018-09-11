@@ -7,10 +7,11 @@ import cn.vove7.androlua.LuaApp
 import cn.vove7.common.appbus.MessageEvent
 import cn.vove7.common.datamanager.DAO
 import cn.vove7.common.datamanager.InitLuaDbData
-import cn.vove7.jarvis.plugins.AdBlockService
+import cn.vove7.jarvis.plugins.AdKillerService
 import cn.vove7.jarvis.services.MainService
 import cn.vove7.jarvis.utils.debugserver.RemoteDebugServer
 import cn.vove7.vtp.log.Vog
+import cn.vove7.vtp.sharedpreference.SpHelper
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
@@ -29,7 +30,8 @@ class App : LuaApp() {
         mainService = Intent(this, MainService::class.java)
         services = arrayOf(mainService)
 
-        RemoteDebugServer.start()
+        if (BuildConfig.DEBUG)
+            RemoteDebugServer.start()
         startServices()
         DAO.init(this)
         if (BuildConfig.DEBUG)
@@ -45,7 +47,8 @@ class App : LuaApp() {
                     startService(it)
                 }
             }
-            AdBlockService.bindServer()//广告服务
+            if (SpHelper(this).getBoolean(R.string.key_open_ad_block, true))
+                AdKillerService.bindServer()//广告服务
         }
     }
 

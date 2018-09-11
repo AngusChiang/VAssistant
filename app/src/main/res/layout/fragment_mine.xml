@@ -1,0 +1,66 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/app_background"
+    android:fitsSystemWindows="true"
+    android:orientation="vertical"
+    android:padding="10dp"
+    android:paddingTop="10dp"
+    tools:context="cn.vove7.jarvis.fragments.MineFragment">
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="127dp"
+        android:layout_marginBottom="20dp"
+        android:background="@color/app_foround"
+        android:baselineAligned="false"
+        android:elevation="6dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:padding="20dp">
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="未登录"
+                android:textSize="22sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="" />
+
+        </LinearLayout>
+
+        <RelativeLayout
+            android:id="@+id/header_view_lay"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+
+            <cn.vove7.jarvis.view.custom.IconView
+                android:layout_width="wrap_content"
+                android:src="@drawable/ic_home_black_24dp"
+                android:layout_height="wrap_content" />
+        </RelativeLayout>
+
+    </LinearLayout>
+
+
+    <ListView
+        android:id="@+id/list_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:divider="@color/app_background"
+        android:dividerHeight="10dp"
+        tools:listitem="@layout/item_mine_features" />
+
+</LinearLayout>

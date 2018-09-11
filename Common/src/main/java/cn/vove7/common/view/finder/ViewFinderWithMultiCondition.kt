@@ -6,6 +6,7 @@ import cn.vove7.common.accessibility.viewnode.ViewNode
 import cn.vove7.common.utils.RegUtils.dealRawReg
 import cn.vove7.vtp.log.Vog
 import cn.vove7.vtp.text.TextHelper
+import java.util.*
 
 /**
  * # ViewFinderWithMultiCondition
@@ -51,9 +52,13 @@ class ViewFinderWithMultiCondition(accessibilityService: AccessibilityApi) : Vie
     fun findByDepths(): ViewNode? {
         var p = accessibilityService.rootInActiveWindow
         depths.forEach {
-            p = p.getChild(it)
+            try {
+                p = p.getChild(it)
+            } catch (e: ArrayIndexOutOfBoundsException) {
+                Vog.d(this, "findByDepths ---> ArrayIndexOutOfBounds null")
+                return null
+            }
             if (p == null) {
-                Vog.d(this, "findByDepths ---> null")
                 return null
             }
         }
@@ -180,6 +185,8 @@ class ViewFinderWithMultiCondition(accessibilityService: AccessibilityApi) : Vie
                 ", textMatchMode=$textMatchMode" +
                 (if (viewId != null) ", viewId=$viewId" else "") +
                 (if (desc.isNotEmpty()) ", desc=$desc" else "") +
+                (if (typeNames.isNotEmpty()) ", typeNames=$typeNames" else "") +
+                (if (depths.isNotEmpty()) ", depths=${Arrays.toString(depths)}" else "") +
                 (if (editable == true) ", editable=$editable" else "") +
                 (if (scrollable == true) ", scrollable=$scrollable)" else "") + ")"
     }

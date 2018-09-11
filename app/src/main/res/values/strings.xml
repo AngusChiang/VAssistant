@@ -11,21 +11,8 @@
     <string name="no_resources" translatable="false">一 END 一</string>
     <string name="instru_management">Instru Management</string>
     <string name="title_activity_settings">Setting</string>
+    <string name="title_advanced_settings">Advanced Setting</string>
 
-    <!-- Strings related to Settings -->
-
-    <!-- Example General settings -->
-    <string name="pref_header_general">General</string>
-
-    <string name="pref_title_social_recommendations">Enable social recommendations</string>
-    <string name="pref_description_social_recommendations">Recommendations for people to contact
-        based on your message history
-    </string>
-
-    <string name="pref_title_display_name">Display name</string>
-    <string name="pref_default_display_name">John Smith</string>
-
-    <string name="pref_title_add_friends_to_messages">Add friends to messages</string>
     <string-array name="pref_example_list_titles">
         <item>Always</item>
         <item>When possible</item>
@@ -37,10 +24,7 @@
         <item>-1</item>
     </string-array>
 
-    <!-- Example settings for Data & Sync -->
-    <string name="pref_header_data_sync">Data &amp; sync</string>
 
-    <string name="pref_title_sync_frequency">Sync frequency</string>
     <string-array name="pref_sync_frequency_titles">
         <item>15 minutes</item>
         <item>30 minutes</item>
@@ -71,6 +55,22 @@
         <item>最后一个</item>
     </string-array>
 
+    <string-array name="voice_model_entities">
+        <item>普通女声</item>
+        <item>普通男声</item>
+        <!--<item>特别男声</item>-->
+        <item>度逍遥</item>
+        <item>度丫丫</item>
+    </string-array>
+    <string name="default_voice_model" translatable="false">0</string>
+    <string-array name="voice_model_values">
+        <item>0</item>
+        <item>1</item>
+        <!--<item>2</item>-->
+        <item>3</item>
+        <item>4</item>
+    </string-array>
+
     <string-array name="list_script_type">
         <item>lua</item>
         <item>js</item>
@@ -84,17 +84,6 @@
 
     <string-array name="multi_select_list_preference_default_value" />
 
-    <string name="pref_title_system_sync_settings">System sync settings</string>
-
-    <!-- Example settings for Notifications -->
-    <string name="pref_header_notifications">Notifications</string>
-
-    <string name="pref_title_new_message_notifications">New message notifications</string>
-
-    <string name="pref_title_ringtone">Ringtone</string>
-    <string name="pref_ringtone_silent">Silent</string>
-
-    <string name="pref_title_vibrate">Vibrate</string>
     <string name="text_settings">Settings</string>
     <string name="text_search">Search</string>
     <string name="text_select_application">Select App</string>
@@ -122,7 +111,6 @@
     <string name="text_none">None</string>
     <string name="text_enter_at_last_one_regex">Enter at least one regular Expression</string>
     <string name="text_home">Home</string>
-    <string name="title_activity_real_main">RealMainActivity</string>
     <string name="text_store">Store</string>
     <string name="text_me">Me</string>
     <string name="test_set_script">Set Script</string>
@@ -155,4 +143,29 @@
     <string name="text_listening">Listening</string>
     <string name="text_run">Run</string>
     <string name="text_optional">Optional</string>
+    <string name="text_help">Help</string>
+    <string name="text_msg_delete_action_node">此操作会同时删除此操作的跟随操作</string>
+    <string name="text_confirm_2_del">确认删除</string>
+    <string name="text_about">About</string>
+    <string name="text_advanced_features">Advanced Features</string>
+    <string name="text_show_toast_when_remove_ad">去除广告时显示通知</string>
+    <string name="text_sound_model">声音模型</string>
+    <string name="text_volume">音量</string>
+    <string name="text_speak_speed">Speed of Speak</string>
+    <string name="key_show_toast_when_remove_ad" translatable="false">show_toast_when_remove_ad</string>
+    <string name="key_voice_syn_model" translatable="false">voice_syn_model</string>
+    <string name="key_open_ad_block" translatable="false">open_ad_block</string>
+    <string name="key_voice_control_dialog" translatable="false">voice_control_dialog</string>
+    <string name="key_open_voice_wakeup" translatable="false">open_voice_wakeup</string>
+    <string name="key_voice_syn_speed" translatable="false">voice_syn_speed</string>
+    <string name="key_voice_syn_volume" translatable="false">voice_syn_volume</string>
+    <string name="text_open_ad_killer_service">AdKiller service</string>
+    <string name="text_remote_debug">远程调试</string>
+    <string name="text_open_voice_wakeup">Voice wakeup</string>
+    <string name="text_play_voice_message">Play voice message</string>
+    <string name="text_debug_code">Debug code</string>
+    <string name="text_voice_control">Voice control</string>
+    <string name="text_voice_control_dialog">控制对话框</string>
+    <string name="text_mark_management">Mark management</string>
+
 </resources>

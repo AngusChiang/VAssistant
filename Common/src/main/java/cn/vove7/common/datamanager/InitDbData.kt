@@ -21,12 +21,12 @@ abstract class InitDbData {
 
     private fun initCommonData() {
         val appAdInfoDao = DAO.daoSession.appAdInfoDao
-        if (appAdInfoDao.queryBuilder().count() <= 5L) {
+//        if (appAdInfoDao.queryBuilder().count() <= 5L) {
             appAdInfoDao.deleteAll()
             arrayOf(//TODO test depths
                     AppAdInfo("网易云首屏广告", "com.netease.cloudmusic", "LoadingActivity", "Skip###跳过")
                     , AppAdInfo("网易云Resume广告", "com.netease.cloudmusic", "LoadingAdActivity", "Skip###跳过")
-                    , AppAdInfo("租八戒首屏广告", "com.rentpig.customer", "WelcomeActivity", "Skip###跳过")
+                    , AppAdInfo("租八戒首屏广告", "com.rentpig.customer", "WelcomeActivity").setDepths("0,0,0,0,0,1,1,0,2,0,1").setType("ImageView")
                     , AppAdInfo("Turbo VPN 弹框广告1", "free.vpn.unblock.proxy.turbovpn", "VpnMainActivity").setDescs("Interstitial close button")
                     , AppAdInfo("Turbo VPN 弹框广告2", "free.vpn.unblock.proxy.turbovpn", "VpnMainActivity").setViewId("cancelImageView")
                     , AppAdInfo("Turbo VPN 弹框广告3", "free.vpn.unblock.proxy.turbovpn", "VpnMainActivity").setViewId("close_button_image")
@@ -35,7 +35,7 @@ abstract class InitDbData {
             ).forEach {
                 appAdInfoDao.insert(it)
             }
-        }
+//        }
 
         val markedContactDao = DAO.daoSession.markedContactDao
         if (markedContactDao.queryBuilder().count() == 0L) {

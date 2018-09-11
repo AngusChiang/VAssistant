@@ -1,6 +1,7 @@
 package cn.vove7.jarvis.activities
 
 import android.support.v4.app.Fragment
+import cn.vove7.jarvis.R
 import cn.vove7.jarvis.activities.base.BaseActivityWithViewPager
 import cn.vove7.jarvis.fragments.*
 
@@ -13,7 +14,7 @@ import cn.vove7.jarvis.fragments.*
 class MarkedManagerActivity : BaseActivityWithViewPager() {
 
     override var titleInit: String?
-        get() = "标记管理"
+        get() = getString(R.string.text_mark_management)
         set(_) {}
     override var fragments: Array<Fragment> = arrayOf(
             MarkedContractFragment(),

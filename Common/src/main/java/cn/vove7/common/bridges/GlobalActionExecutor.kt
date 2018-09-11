@@ -14,6 +14,7 @@ import cn.vove7.common.accessibility.AccessibilityApi
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.model.ResultBox
 import cn.vove7.common.utils.ScreenAdapter
+import cn.vove7.common.view.toast.ColorfulToast
 import cn.vove7.vtp.log.Vog
 import java.util.*
 
@@ -164,9 +165,14 @@ class GlobalActionExecutor : GlobalActionExecutorI {
         }
     }
 
+    /**
+     * 名称避免和函数名同名
+     */
+    private val voast = ColorfulToast(GlobalApp.APP).yellow()
 
     override fun toast(msg: String) {
-        GlobalApp.toastShort(msg)
+        voast.showShort(msg)
+
     }
 
     override fun click(x: Int, y: Int): Boolean {

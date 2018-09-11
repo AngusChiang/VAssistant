@@ -32,14 +32,14 @@ printAllChild = function(node){
 }
 
 function dd(d,index){
-    s = '-'
+    s = ''
     for (i=0;i<d ;i++)
-        s = s + '-'
-    s+=''+index+' '
+        s = s + '  '
+    s+='|-'+index+' '
     return s
 }
 traversingNode = function(index,d, node){
-	print(dd(d,index), node)
+	print(dd(d,index) + node.toString())
 	var cs = node.childs
 	cs.forEach(function(e,ii){
 		traversingNode(ii,i+1,e)

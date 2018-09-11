@@ -1,21 +1,25 @@
 package cn.vove7.jarvis.plugins
 
 import android.view.accessibility.AccessibilityNodeInfo
+import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.datamanager.DAO
 import cn.vove7.common.datamanager.greendao.AppAdInfoDao
 import cn.vove7.common.datamanager.parse.model.ActionScope
 import cn.vove7.common.view.finder.ViewFindBuilder
 import cn.vove7.common.view.finder.ViewFinder
 import cn.vove7.common.view.notifier.AppAdBlockNotifier
+import cn.vove7.common.view.toast.ColorfulToast
 import cn.vove7.executorengine.helper.AdvanAppHelper
+import cn.vove7.jarvis.R
 import cn.vove7.vtp.app.AppInfo
 import cn.vove7.vtp.log.Vog
+import cn.vove7.vtp.sharedpreference.SpHelper
 import java.lang.Thread.sleep
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.concurrent.thread
 
 /**
- * # AdBlockService
+ * # AdKillerService
  * 去广告服务
  *
  * pkg Activity
@@ -25,7 +29,7 @@ import kotlin.concurrent.thread
  * @author 17719247306
  * 2018/9/3
  */
-object AdBlockService : AccPluginsService() {//TODO 猪八戒ad
+object AdKillerService : AccPluginsService() {//TO-DO fixed 猪八戒ad
     /**
      * 缓存
      */
@@ -50,8 +54,16 @@ object AdBlockService : AccPluginsService() {//TODO 猪八戒ad
         if (finders?.isNotEmpty() == true) {
             val s = AppAdBlockNotifier(appInfo, finders!!)
             val b = s.notifyIfShow()
-            if (b == 0) Vog.d(this, "onUiUpdate ---> 寻找广告失败")
-            else finders = null
+            when {
+                b.first == 0 -> Vog.d(this, "onUiUpdate ---> 未发现广告")
+                b.second == 0 -> Vog.d(this, "onUiUpdate ---> 发现广告，清除失败")
+                else -> {
+                    Vog.d(this, "onUiUpdate ---> 发现广告，清除成功")
+                    if (SpHelper(GlobalApp.APP).getBoolean(R.string.key_show_toast_when_remove_ad, true))
+                        GlobalApp.toastShort("已为你关闭广告")
+                    finders = null
+                }
+            }
         }
         try {
             sleep(1000)
@@ -110,12 +122,24 @@ object AdBlockService : AccPluginsService() {//TODO 猪八戒ad
                 )
                 ).list()
         appAdInfos.forEach {
+
+
             if (it.versionCode != null && appInfo != null && it.versionCode != appInfo.versionCode)
                 return@forEach//continue
 
             val finderBuilder = ViewFindBuilder()
-            if (it.descs != null)
+            if (it.type != null)
+                finderBuilder.types(it.type)//TODO check it
+            val des = it.depthArr
+            if (des != null) {
+                finderBuilder.depths(des)
+                finders.add(finderBuilder.viewFinderX)
+                return@forEach//continue
+            }
+
+            if (it.descs != null) {
                 finderBuilder.desc(*it.descs.split("###").toTypedArray())
+            }
             if (it.viewId != null)
                 finderBuilder.id(it.viewId!!)
             if (it.texts != null) {

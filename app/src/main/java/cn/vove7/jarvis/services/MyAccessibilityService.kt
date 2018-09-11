@@ -11,11 +11,9 @@ import android.view.ViewGroup
 import android.view.accessibility.AccessibilityEvent
 import android.view.accessibility.AccessibilityEvent.*
 import android.view.accessibility.AccessibilityNodeInfo
-import android.widget.Toast
 import cn.vove7.common.accessibility.AccessibilityApi
 import cn.vove7.common.accessibility.viewnode.ViewNode
 import cn.vove7.common.appbus.AppBus
-import cn.vove7.common.appbus.SpeechAction
 import cn.vove7.common.datamanager.parse.model.ActionScope
 import cn.vove7.common.executor.CExecutorI
 import cn.vove7.common.view.finder.ViewFindBuilder
@@ -23,6 +21,7 @@ import cn.vove7.common.view.finder.ViewFinder
 import cn.vove7.common.view.notifier.ActivityShowListener
 import cn.vove7.common.view.notifier.UiViewShowNotifier
 import cn.vove7.common.view.notifier.ViewShowListener
+import cn.vove7.common.view.toast.ColorfulToast
 import cn.vove7.executorengine.bridges.SystemBridge
 import cn.vove7.jarvis.plugins.AccPluginsService
 import cn.vove7.vtp.app.AppHelper
@@ -36,17 +35,15 @@ import kotlin.concurrent.thread
  * Created by Vove on 2018/1/13.
  * cn.vove7
  */
-
 class MyAccessibilityService : AccessibilityApi() {
     private lateinit var pkgman: PackageManager
-
 
     override fun onServiceConnected() {
         accessibilityService = this
         pkgman = packageManager
         updateCurrentApp(packageName)
-        Toast.makeText(this, "无障碍服务开启", Toast.LENGTH_SHORT).show()
-        Vog.d("Vove :", "无障碍服务开启")
+        ColorfulToast(this).yellow().showShort("无障碍服务开启")
+
         //代码配置
         registerEvent(activityNotifier)
 
@@ -257,7 +254,9 @@ class MyAccessibilityService : AccessibilityApi() {
     }
 
     private val delayHandler = Handler()
-    private var startupRunner: Runnable = Runnable { AppBus.postSpeechAction(SpeechAction.ActionCode.ACTION_START_RECO) }
+    private var startupRunner: Runnable = Runnable {
+        MainService.instance?.onCommand(MainService.ORDER_SATRT_RECO)
+    }
     var stopRunner: Runnable = Runnable { AppBus.post(MainService.ORDER_STOP_EXEC) }
     var delayUp = 600L
 
@@ -283,21 +282,21 @@ class MyAccessibilityService : AccessibilityApi() {
                 KEYCODE_VOLUME_UP -> {
                     if (MainService.recoIsListening) {//按下停止聆听
                         v2 = true
-                        MainService.instance?.onCommand(MainService.ORDER_STOP_EXEC)
+                        MainService.instance?.onCommand(MainService.ORDER_STOP_RECO)
                     } else {
                         postLongDelay(startupRunner)
                     }
                     return true
 
                 }
-                KEYCODE_HOME -> {
-                    postLongDelay(startupRunner)
-                    return true
-                }
+//                KEYCODE_HOME -> {
+//                    postLongDelay(startupRunner)
+//                    return true
+//                }
             }
             KeyEvent.ACTION_UP -> {
                 when (event.keyCode) {
-                    KEYCODE_VOLUME_UP, KEYCODE_HOME, KEYCODE_APP_SWITCH ->
+                    KEYCODE_VOLUME_UP, KEYCODE_APP_SWITCH ->
                         return removeDelayIfInterrupt(event, startupRunner) || super.onKeyEvent(event)
                     KEYCODE_VOLUME_DOWN ->
                         return removeDelayIfInterrupt(event, stopRunner) || super.onKeyEvent(event)
@@ -428,36 +427,6 @@ class MyAccessibilityService : AccessibilityApi() {
             }
         }
     }
-//    private val activityNotifier = object : ShowListener {
-//        fun fill(data: ActionScope): Boolean {
-//            Vog.v(this, "filter $currentScope - $data")
-//            return currentScope == data
-//        }
-//
-//        override fun notifyIfShow(): Int {
-//            synchronized(locksWaitForActivity) {
-//                val removes = mutableListOf<ActivityShowListener>()
-//                kotlin.run out@{
-//                    locksWaitForActivity.forEach { it ->
-//                        if (fill(it.value)) {
-//                            it.key.notifyShow(currentScope)
-//                            removes.add(it.key)
-//                        }
-//                        if (Thread.currentThread().isInterrupted) {
-//                            Vog.d(this, "activityNotifier 线程关闭")
-//                            return@out
-//                        }
-//                    }
-//                }
-//                removes.forEach { locksWaitForActivity.remove(it) }
-//                val count = removes.size
-//                removes.clear()
-//                return count
-//            }
-//
-//        }
-//    }
-
 
     companion object {
 

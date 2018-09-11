@@ -13,12 +13,11 @@
     <color name="secondary_text">#757575</color>
     <color name="icons">#FFFFFF</color>
     <color name="divider">#BDBDBD</color>
-    <color name="app_background">#fdfdfe</color>
+    <color name="app_background">#f4f4f4</color>
+    <color name="app_foround">#fdfdfe</color>
 
     <color name="status_green">#13bd10</color>
 
-    <color name="google_blue">#0085f4</color>
-    <color name="google_red">#fd3322</color>
-    <color name="google_yellow">#fdb701</color>
-    <color name="google_green">#00a95a</color>
+    <color name="transparent">#00000000</color>
+
 </resources>

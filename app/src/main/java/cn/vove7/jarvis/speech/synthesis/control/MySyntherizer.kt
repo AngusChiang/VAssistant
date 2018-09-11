@@ -3,6 +3,7 @@ package cn.vove7.jarvis.speech.synthesis.control
 import android.content.Context
 import android.util.Log
 import android.util.Pair
+import cn.vove7.common.app.GlobalLog
 import cn.vove7.vtp.log.Vog
 
 import com.baidu.tts.client.SpeechSynthesizeBag
@@ -43,7 +44,7 @@ open class MySyntherizer protected constructor(protected var context: Context) {
      */
     protected fun init(config: InitConfig): Boolean {
 
-        sendToUiThread("初始化开始")
+        Vog.d(this,"init ---> 初始化开始")
         val isMix = config.ttsMode == TtsMode.MIX
         mSpeechSynthesizer = SpeechSynthesizer.getInstance()
         mSpeechSynthesizer!!.setContext(context)
@@ -60,17 +61,17 @@ open class MySyntherizer protected constructor(protected var context: Context) {
             if (!authInfo.isSuccess) {
                 // 离线授权需要网站上的应用填写包名。本demo的包名是com.baidu.tts.sample，定义在build.gradle中
                 val errorMsg = authInfo.ttsError.detailMessage
-                sendToUiThread("鉴权失败 =$errorMsg")
+                GlobalLog.err("鉴权失败 =$errorMsg")
                 return false
             } else {
-                sendToUiThread("验证通过，离线正式授权文件存在。")
+                Vog.d(this,"init ---> 验证通过，离线正式授权文件存在。")
             }
         }
         setParams(config.params)
         // 初始化tts
         val result = mSpeechSynthesizer!!.initTts(config.ttsMode)
         if (result != 0) {
-            sendToUiThread("【error】initTts 初始化失败 + errorCode：$result")
+            GlobalLog.err("[error] initTts 初始化失败 + errorCode：$result")
             return false
         }
         // 此时可以调用 speak和synthesize方法

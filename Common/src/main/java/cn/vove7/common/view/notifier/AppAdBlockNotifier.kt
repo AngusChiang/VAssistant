@@ -14,10 +14,11 @@ import cn.vove7.vtp.log.Vog
 class AppAdBlockNotifier(private val app: AppInfo?, finders: MutableSet<ViewFinder>)
     : AbsViewShowNotifier(finders) {
 
-    override fun onShow(finder: ViewFinder, node: ViewNode) {
+    override fun onShow(finder: ViewFinder, node: ViewNode):Boolean {
         Vog.i(this, " ${Thread.currentThread()} 发现广告 ---> ${app?.name} ${app?.versionCode} $finder")
-        val r = node.tryClick()
-        Vog.i(this, "Ad click ---> $r")
+        return node.tryClick().also {
+            Vog.i(this, "Ad click ---> $it")
+        }
     }
 
     override fun onFinish(removeList: MutableList<ViewFinder>) {

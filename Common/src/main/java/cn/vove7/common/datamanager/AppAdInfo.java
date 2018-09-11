@@ -140,9 +140,19 @@ public class AppAdInfo implements Serializable {
     public void setId(Long id) {
         this.id = id;
     }
-
     public String getDepths() {
-        return this.depths;
+        return depths;
+    }
+
+    public Integer[] getDepthArr() {
+        if (depths == null) return null;
+        String[] is = depths.split(",");
+        Integer[] si = new Integer[is.length];
+        int i = 0;
+        for (String s : is) {
+            si[i++] = Integer.valueOf(s);
+        }
+        return si;
     }
 
     public AppAdInfo setDepths(String depths) {

@@ -147,15 +147,15 @@ abstract class RecAdapterWithFooter<V : RecAdapterWithFooter.RecViewHolder>
 
         if (position > lastAnimatedPosition) {
             lastAnimatedPosition = position
-            view.translationY = 100f//相对于原始位置下方100
+            view.translationY = 50f//相对于原始位置下方dy
             view.alpha = 0f//完全透明
             //每个item项两个动画，从透明到不透明，从下方移动到原来的位置
             //并且根据item的位置设置延迟的时间，达到一个接着一个的效果
             view.animate()
-                    .translationY(0f).alpha(1f)//设置最终效果为完全不透明，并且在原来的位置
-                    .setStartDelay((if (delayEnterAnimation) 50 * position else 0).toLong())//根据item的位置设置延迟时间，达到依次动画一个接一个进行的效果
+                    .translationY(0.5f).alpha(1f)//设置最终效果为完全不透明，并且在原来的位置
+                    .setStartDelay((10 * position).toLong())//根据item的位置设置延迟时间，达到依次动画一个接一个进行的效果
                     .setInterpolator(DecelerateInterpolator(0.5f))//设置动画效果为在动画开始的地方快然后慢
-                    .setDuration(150)
+                    .setDuration(300)
                     .setListener(object : AnimatorListenerAdapter() {
                         override fun onAnimationEnd(animation: Animator) {
                             animationsLocked = true//确保仅屏幕一开始能够显示的item项才开启动画，也就是说屏幕下方还没有显示的item项滑动时是没有动画效果

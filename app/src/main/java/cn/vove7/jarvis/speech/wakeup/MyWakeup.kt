@@ -45,7 +45,8 @@ class MyWakeup {
                 context.filesDir.absolutePath + "/bd/WakeUp.bin")
     }
 
-    constructor(context: Context, eventListener: IWakeupListener) : this(context, WakeupEventAdapter(eventListener)) {}
+    constructor(context: Context, eventListener: IWakeupListener) :
+            this(context, WakeupEventAdapter(eventListener))
 
     fun start() {
 
@@ -61,7 +62,6 @@ class MyWakeup {
         start(params)
     }
 
-
     fun start(params: Map<String, Any>) {
         val json = JSONObject(params).toString()
         Vog.i(this, "wakeup params(反馈请带上此行日志):$json")
@@ -69,7 +69,6 @@ class MyWakeup {
     }
 
     fun stop() {
-        Vog.i(this, "唤醒结束")
         wp!!.send(SpeechConstant.WAKEUP_STOP, null, null, 0, 0)
     }
 

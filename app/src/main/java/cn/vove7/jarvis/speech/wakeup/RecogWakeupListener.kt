@@ -2,6 +2,7 @@ package cn.vove7.jarvis.speech.wakeup
 
 import android.os.Handler
 import android.os.Message
+import cn.vove7.common.app.GlobalApp
 
 import cn.vove7.jarvis.speech.recognition.model.IStatus
 import cn.vove7.vtp.builder.BundleBuilder
@@ -19,5 +20,10 @@ class RecogWakeupListener(private val handler: Handler) : SimpleWakeupListener()
         m.what = IStatus.CODE_WAKEUP_SUCCESS
         m.data = BundleBuilder().put("data", word ?: "").build()
         handler.sendMessage(m)
+    }
+
+    override fun onStop() {
+        super.onStop()
+        GlobalApp.toastShort("语音唤醒已关闭")
     }
 }
