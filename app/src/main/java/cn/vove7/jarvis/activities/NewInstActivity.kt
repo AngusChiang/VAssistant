@@ -16,15 +16,20 @@ import android.view.KeyEvent
 import android.view.MenuItem
 import android.view.View
 import android.widget.*
+import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.datamanager.DAO
 import cn.vove7.common.datamanager.greendao.ActionNodeDao
 import cn.vove7.common.datamanager.greendao.ActionScopeDao
+import cn.vove7.common.datamanager.parse.DataFrom
 import cn.vove7.common.datamanager.parse.model.Action
 import cn.vove7.common.datamanager.parse.model.ActionScope
 import cn.vove7.common.datamanager.parse.statusmap.ActionNode
-import cn.vove7.common.datamanager.parse.statusmap.ActionNode.*
+import cn.vove7.common.datamanager.parse.statusmap.ActionNode.NODE_SCOPE_GLOBAL
+import cn.vove7.common.datamanager.parse.statusmap.ActionNode.NODE_SCOPE_IN_APP
 import cn.vove7.common.datamanager.parse.statusmap.Reg
+import cn.vove7.common.model.UserInfo
 import cn.vove7.executorengine.helper.AdvanAppHelper
+import cn.vove7.jarvis.BuildConfig
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.adapters.SimpleListAdapter
 import cn.vove7.jarvis.adapters.ViewModel
@@ -245,6 +250,8 @@ class NewInstActivity : AppCompatActivity(), View.OnClickListener {
     }
 
     private fun save() {
+        val inApp = ActionNode.belongInApp(instType)
+
         val desc = desc_text.text.toString().trim()
         if (desc == "") {//descTitle
             desc_input_lay.error = "..."
@@ -258,7 +265,7 @@ class NewInstActivity : AppCompatActivity(), View.OnClickListener {
             voast.showShort(getString(R.string.text_tooltips_select_script_type))
             return
         }
-        if (arrayOf(NODE_SCOPE_IN_APP, NODE_SCOPE_IN_APP_2).contains(instType) && pkg == null) {//type
+        if (ActionNode.belongInApp(instType) && pkg == null) {//type
             voast.showShort(getString(R.string.text_tooltips_select_app))
             return
         }
@@ -268,7 +275,8 @@ class NewInstActivity : AppCompatActivity(), View.OnClickListener {
 
         if (isReedit) {//保存编辑
             if (editNode == null) {
-                voast.showShort(getString(R.string.text_error_occurred) + "code: na264")
+                voast.showShort(getString(R.string.text_error_occurred))
+                GlobalLog.err(getString(R.string.text_error_occurred) + "code: na264")
                 return
             }
             val ac = editNode?.action!!
@@ -286,27 +294,32 @@ class NewInstActivity : AppCompatActivity(), View.OnClickListener {
             voast.showShort(getString(R.string.text_save_success))
             finish()
 
-        } else {
-
-            val scope = ActionScope(pkg, activity_name.text.toString().trim())
-
-            val s = DAO.daoSession.actionScopeDao.queryBuilder()
-                    .where(ActionScopeDao.Properties.PackageName.eq(scope.packageName))
-                    .where(ActionScopeDao.Properties.Activity.eq(scope.activity))
-                    .unique()
-            val sid =
-                if (s == null) {
+        } else {//新发布
+            var newScopeId: Long = -1
+            if (inApp) {
+                val scope = ActionScope(pkg, activity_name.text.toString().trim())
+                val s = DAO.daoSession.actionScopeDao.queryBuilder()
+                        .where(ActionScopeDao.Properties.PackageName.eq(scope.packageName))
+                        .where(ActionScopeDao.Properties.Activity.eq(scope.activity))
+                        .unique()
+                newScopeId = if (s == null) {
                     DAO.daoSession.actionScopeDao.insert(scope)
                     scope.id
                 } else s.id
+            }
 
             val action = Action(scriptText, scriptType)
             DAO.daoSession.actionDao.insert(action)
-            Vog.d(this, "save sid: $sid")
+            Vog.d(this, "save sid: $newScopeId")
             val newNode = ActionNode()
             newNode.descTitle = desc
             newNode.actionId = action.id
-            newNode.scopeId = sid
+            if (inApp)//scope
+                newNode.scopeId = newScopeId
+            newNode.from = DataFrom.FROM_USER
+            if (UserInfo.isLogin || !BuildConfig.DEBUG) {
+                newNode.publishUserId = UserInfo.userId
+            }
             newNode.actionScopeType = instType
 
             DAO.daoSession.actionNodeDao.insert(newNode)
@@ -364,7 +377,7 @@ class NewInstActivity : AppCompatActivity(), View.OnClickListener {
 
     private fun showSelScriptDialog() {
         if (selScriptDialog == null) {
-            val dView = layoutInflater.inflate(R.layout.dialog_sel_script, null, false)
+            val dView = layoutInflater.inflate(R.layout.dialog_sel_script, null)
             scriptTextView = dView.findViewById(R.id.script_text)
             val typeArr = resources.getStringArray(R.array.list_script_type)
             dView.findViewById<Spinner>(R.id.script_type_spinner).also {
@@ -462,7 +475,7 @@ class NewInstActivity : AppCompatActivity(), View.OnClickListener {
             historyListAdapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, hisList)
             historyTestListView.adapter = historyListAdapter
             testInputView = dView.findViewById(R.id.test_text)
-            testInputView.setOnKeyListener { v, keyCode, event ->
+            testInputView.setOnKeyListener { _, keyCode, event ->
                 if (keyCode == KeyEvent.KEYCODE_ENTER || keyCode == KeyEvent.KEYCODE_NUMPAD_ENTER) {
                     Vog.d(this, "showTestParseDialog click")
                     if (event.action == KeyEvent.ACTION_UP)
@@ -577,7 +590,7 @@ class NewInstActivity : AppCompatActivity(), View.OnClickListener {
     private var inputDialog: Dialog? = null
     private fun showInputRegDialog(reg: String? = null, pos: String? = null) {
         if (inputDialog == null) {
-            val dialogView = layoutInflater.inflate(R.layout.dialog_add_new_regex, null, false)
+            val dialogView = layoutInflater.inflate(R.layout.dialog_add_new_regex, null)
 
             regEditText = dialogView.findViewById(R.id.text_regex)
             spinner = dialogView.findViewById(R.id.pos_of_param_spinner)

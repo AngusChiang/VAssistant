@@ -10,15 +10,18 @@ import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.ListView
 import android.widget.TextView
+import cn.vove7.common.model.UserInfo
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.activities.AdvancedSettingActivity
 import cn.vove7.jarvis.activities.PermissionManagerActivity
 import cn.vove7.jarvis.activities.SettingsActivity
+import cn.vove7.jarvis.view.dialog.LoginDialog
 import cn.vove7.vtp.easyadapter.BaseListAdapter
+import android.media.MediaRecorder
+
 
 
 class MineFragment : Fragment(), AdapterView.OnItemClickListener {
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -28,10 +31,17 @@ class MineFragment : Fragment(), AdapterView.OnItemClickListener {
     }
 
     lateinit var listView: ListView
+    lateinit var loginView: View
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
-
         val view = inflater.inflate(R.layout.fragment_mine, container, false)
+
+        loginView = view.findViewById(R.id.text_login)
+        loginView.setOnClickListener {
+            LoginDialog(context!!) {
+                loadUserInfo()
+            }
+        }
         listView = view.findViewById(R.id.list_view)
         listView.adapter = object : BaseListAdapter<ItemHolder, Pair<Int, Int>>(context!!, listOf(
                 Pair(R.color.google_blue, R.string.text_settings),
@@ -46,11 +56,16 @@ class MineFragment : Fragment(), AdapterView.OnItemClickListener {
                 holder.leftLine.setBackgroundResource(item.first)
                 holder.textView.setText(item.second)
             }
-
             override fun onCreateViewHolder(view: View): ItemHolder = ItemHolder(view)
         }
         listView.onItemClickListener = this
         return view
+    }
+
+    fun loadUserInfo() {
+        if (UserInfo.isLogin) {
+
+        }
     }
 
     override fun onItemClick(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {

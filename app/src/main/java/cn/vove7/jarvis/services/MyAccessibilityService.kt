@@ -26,6 +26,7 @@ import cn.vove7.executorengine.bridges.SystemBridge
 import cn.vove7.jarvis.plugins.AccPluginsService
 import cn.vove7.vtp.app.AppHelper
 import cn.vove7.vtp.log.Vog
+import cn.vove7.vtp.system.SystemHelper
 import cn.vove7.vtp.text.TextHelper
 import java.lang.Thread.sleep
 import kotlin.concurrent.thread
@@ -127,6 +128,9 @@ class MyAccessibilityService : AccessibilityApi() {
 
     var viewNotifierThread: Thread? = null
 
+    /**
+     *
+     */
     private fun callAllNotifier() {
         viewNotifierThread?.interrupt()
         viewNotifierThread = thread {
@@ -136,7 +140,13 @@ class MyAccessibilityService : AccessibilityApi() {
     }
 
 
+    /**
+     *
+     * @param event AccessibilityEvent?
+     */
     override fun onAccessibilityEvent(event: AccessibilityEvent?) {
+        if (!SystemHelper.isScreenOn(this))//(火)?息屏下
+            return
         if (null == event || null == event.source) {
             return
         }
@@ -157,7 +167,7 @@ class MyAccessibilityService : AccessibilityApi() {
             }
             //窗口的状态发生改变
             AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED -> {//窗口切换
-                startTraverse(rootInActiveWindow)
+//                startTraverse(rootInActiveWindow)
                 callAllNotifier()
             }
             TYPE_WINDOWS_CHANGED -> {
@@ -165,15 +175,15 @@ class MyAccessibilityService : AccessibilityApi() {
             }
             TYPE_WINDOW_CONTENT_CHANGED -> {//"帧"刷新
                 val node = event.source
-                startTraverse(node)
+//                startTraverse(node)
                 callAllNotifier()
             }
             AccessibilityEvent.TYPE_VIEW_HOVER_ENTER -> {
-                startTraverse(rootInActiveWindow)
+//                startTraverse(rootInActiveWindow)
 //                callAllNotifier()
             }
             AccessibilityEvent.TYPE_VIEW_HOVER_EXIT -> {
-                startTraverse(rootInActiveWindow)
+//                startTraverse(rootInActiveWindow)
 //                callAllNotifier()
             }
             TYPE_VIEW_SCROLLED -> {
@@ -255,7 +265,7 @@ class MyAccessibilityService : AccessibilityApi() {
 
     private val delayHandler = Handler()
     private var startupRunner: Runnable = Runnable {
-        MainService.instance?.onCommand(MainService.ORDER_SATRT_RECO)
+        MainService.instance?.onCommand(MainService.ORDER_START_RECO)
     }
     var stopRunner: Runnable = Runnable { AppBus.post(MainService.ORDER_STOP_EXEC) }
     var delayUp = 600L
@@ -267,7 +277,9 @@ class MyAccessibilityService : AccessibilityApi() {
      * @return Boolean
      */
     override fun onKeyEvent(event: KeyEvent): Boolean {
-//        Vog.d(this, "onKeyEvent  ----> " + event.toString())
+        if (!SystemHelper.isScreenOn(this))//(火)?息屏下
+            return super.onKeyEvent(event)
+        Vog.v(this, "onKeyEvent  ----> " + event.toString())
         when (event.action) {
             KeyEvent.ACTION_DOWN -> when (event.keyCode) {
                 KEYCODE_VOLUME_DOWN -> {
@@ -287,7 +299,6 @@ class MyAccessibilityService : AccessibilityApi() {
                         postLongDelay(startupRunner)
                     }
                     return true
-
                 }
 //                KEYCODE_HOME -> {
 //                    postLongDelay(startupRunner)

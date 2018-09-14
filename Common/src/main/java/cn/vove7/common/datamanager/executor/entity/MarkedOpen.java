@@ -23,6 +23,7 @@ public class MarkedOpen {
     //public static final String MARKED_TYPE_SCRIPT = "script";
     public static final String MARKED_TYPE_SCRIPT_LUA = "script_lua";
     public static final String MARKED_TYPE_SCRIPT_JS = "script_js";
+    public static final String MARKED_TYPE_CONTACT = "contact";
 
     @Id
     private Long id;

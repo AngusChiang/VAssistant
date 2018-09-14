@@ -167,5 +167,18 @@
     <string name="text_voice_control">Voice control</string>
     <string name="text_voice_control_dialog">控制对话框</string>
     <string name="text_mark_management">Mark management</string>
+    <string name="text_click_to_login">Sign in</string>
+    <string name="hint_username_email">UserName/Email</string>
+    <string name="text_login">Sign in</string>
+    <string name="text_email_format_err">Incorrect Email Address</string>
+    <string name="text_retrieve_password">Retrieve password</string>
+    <string name="text_not_empty">Shouldn\'t empty</string>
+    <string name="text_sign_up">Sign up</string>
+    <string name="text_password">Password</string>
+    <string name="text_confirm_pswd">Confirm password</string>
+    <string name="text_pass_not_same">Two passwords are different</string>
+    <string name="text_ver_code">VerificationCode</string>
+    <string name="text_get_ver_code">Get</string>
+    <string name="text_email">EmailAddress</string>
 
 </resources>

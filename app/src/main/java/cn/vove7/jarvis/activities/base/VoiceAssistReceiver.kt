@@ -15,7 +15,7 @@ class VoiceAssistActivity : Activity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         Vog.d(this,"onCreate ---> ASSIST wakeup")
-        MainService.instance?.onCommand(MainService.ORDER_SATRT_RECO)
+        MainService.instance?.onCommand(MainService.ORDER_START_RECO)
         finish()
     }
 }

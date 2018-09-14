@@ -30,7 +30,7 @@ import cn.vove7.vtp.system.SystemHelper
 
 class SystemBridge : SystemOperation {
     private val context: Context = GlobalApp.APP
-    private val contactHelper = ContactHelper(context)
+    private val contactHelper: ContactHelper  by lazy { ContactHelper(context) }
 
     override fun openAppByPkg(pkg: String): ExResult<String> {
         return try {
@@ -274,26 +274,23 @@ class SystemBridge : SystemOperation {
         return true
     }
 
-    override fun openBluetooth(): Boolean {
+    override fun openBluetooth(): Boolean = opBT(true)
 
+    override fun closeBluetooth(): Boolean = opBT(false)
+
+    private fun opBT(enable: Boolean): Boolean {
         if (Build.VERSION.SDK_INT >= 23) {
             //检测当前app是否拥有某个权限
             val checkCallPhonePermission = ContextCompat.checkSelfPermission(context,
-                    Manifest.permission.ACCESS_COARSE_LOCATION)
+                    Manifest.permission.BLUETOOTH_ADMIN)
             if (checkCallPhonePermission != PackageManager.PERMISSION_GRANTED) {
                 AppBus.post(RequestPermission("蓝牙权限"))
                 return false
             }
         }
-        try {
-            val mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter()
-            if (!mBluetoothAdapter.isEnabled)
-                mBluetoothAdapter.enable() //开启
-        } catch (e: Exception) {
-            GlobalLog.err(e.message + " code: ob295")
-            return false
-        }
-        return true
+        val mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter()
+        return if (enable) mBluetoothAdapter.enable() //开启
+        else mBluetoothAdapter.disable() //关闭
     }
 
     override fun openWlan(): Boolean {//TODO
@@ -302,5 +299,9 @@ class SystemBridge : SystemOperation {
 
     override fun openWifiAp(): Boolean {
         return false
+    }
+
+    override fun isScreenOn(): Boolean {
+        return SystemHelper.isScreenOn(context)
     }
 }

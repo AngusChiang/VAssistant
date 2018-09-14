@@ -75,6 +75,7 @@ public class ActionNode implements Serializable, DataFrom {
 
     @ToOne(joinProperty = "parentId")
     private ActionNode parent;
+
     /**
      * 操作参数
      */
@@ -82,6 +83,7 @@ public class ActionNode implements Serializable, DataFrom {
     @Transient
     private ActionParam param;
     //private long paramId;
+
     /**
      * APP作用域
      */
@@ -91,7 +93,12 @@ public class ActionNode implements Serializable, DataFrom {
     private long scopeId;
     private String descTitle;
 
-    private int priority;//优先级 大者优先; 相对于同一级 :(全局命令下: 返回主页>返回) (同一界面下)
+    private String tagId;//与服务器数据匹配标志
+    private int versionCode = 0;
+
+    private Long publishUserId;//发布者
+
+    private int priority;//优先级 bigger优先; 相对于action chain :(全局命令下: 返回主页>返回) (同一界面下)
 
     private String from = null;
 
@@ -103,6 +110,21 @@ public class ActionNode implements Serializable, DataFrom {
         this.from = from;
     }
 
+    public String getTagId() {
+        return tagId;
+    }
+
+    public void setTagId(String tagId) {
+        this.tagId = tagId;
+    }
+
+    public Long getPublishUserId() {
+        return publishUserId;
+    }
+
+    public void setPublishUserId(Long publishUserId) {
+        this.publishUserId = publishUserId;
+    }
 
     @Generated(hash = 462335395)
     private transient Long action__resolvedKey;
@@ -244,6 +266,21 @@ public class ActionNode implements Serializable, DataFrom {
         this.priority = priority;
     }
 
+    @Generated(hash = 1239043208)
+    public ActionNode(Long id, int actionScopeType, long actionId, Long parentId, long scopeId,
+                      String descTitle, String tagId, Long publishUserId, int priority, String from) {
+        this.id = id;
+        this.actionScopeType = actionScopeType;
+        this.actionId = actionId;
+        this.parentId = parentId;
+        this.scopeId = scopeId;
+        this.descTitle = descTitle;
+        this.tagId = tagId;
+        this.publishUserId = publishUserId;
+        this.priority = priority;
+        this.from = from;
+    }
+
     public Long getId() {
         return this.id;
     }
@@ -280,6 +317,14 @@ public class ActionNode implements Serializable, DataFrom {
             }
         }
         return action;
+    }
+
+    public int getVersionCode() {
+        return versionCode;
+    }
+
+    public void setVersionCode(int versionCode) {
+        this.versionCode = versionCode;
     }
 
     /**

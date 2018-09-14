@@ -304,7 +304,7 @@ class MainService : BusService(),
             ORDER_CANCEL_RECO -> {
                 speechRecoService.cancelRecog()
             }
-            ORDER_SATRT_RECO -> {
+            ORDER_START_RECO -> {
                 speechRecoService.startRecog()
             }
 
@@ -346,7 +346,8 @@ class MainService : BusService(),
         const val ORDER_STOP_EXEC = "stop_exec"
         const val ORDER_STOP_RECO = "stop_reco"
         const val ORDER_CANCEL_RECO = "cancel_reco"
-        const val ORDER_SATRT_RECO = "start_reco"
+        const val ORDER_START_RECO = "start_reco"
+        const val ORDER_STOP_DEBUG = "stop_debug"
 
         /**
          * 语音事件数据类型

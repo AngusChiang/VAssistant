@@ -13,8 +13,8 @@ import cn.vove7.common.view.toast.ColorfulToast
 
 open class GlobalApp : Application() {
     override fun onCreate() {
-        super.onCreate()
         APP = this
+        super.onCreate()
         colorfulToast = ColorfulToast(this).blue()
 //        toastHandler = ToastHandler(colorfulToast)
     }

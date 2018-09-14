@@ -16,11 +16,15 @@ class NewT {
         //new A() by reflect
 
         val b = B()
+
         val s = "sss"
 
-        A<B>("").insB()
+        A<C>("").insB()
     }
 
+    class C : B() {
+        val s = ""
+    }
 
     class A<T : B>(val s: String) {
         var d: T? = null
@@ -30,7 +34,7 @@ class NewT {
         }
     }
 
-    class B {
+    open class B {
         val data = "sss"
 
     }

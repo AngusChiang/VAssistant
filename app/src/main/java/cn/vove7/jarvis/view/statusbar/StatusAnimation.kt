@@ -46,18 +46,18 @@ abstract class StatusAnimation {
         hideThread?.interrupt()
         notifier.showNotification(nId, title, "", NotificationIcons(failedAniId))
         onFailed()
-        hideDelay(1000)
+        hideDelay()
     }
 
     open fun finish() {
         if (finishId == null) return
         hideThread?.interrupt()
         notifier.showNotification(nId, title, "", NotificationIcons(finishId!!))
-        hideDelay(1000)
+        hideDelay()
     }
 
     var hideThread: Thread? = null
-    fun hideDelay(delay: Long = 900) {
+    fun hideDelay(delay: Long = 500) {
         Vog.d(this, "hideDelay ---> $delay")
         hideThread = thread {
             try {

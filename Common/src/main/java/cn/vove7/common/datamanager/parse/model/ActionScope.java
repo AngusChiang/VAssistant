@@ -9,14 +9,11 @@ import java.util.Objects;
 
 /**
  * #ActionScope
+ * 指令作用域
  *
  * @see Action
  * <p>
  * Created by Vove on 2018/6/18
- */
-
-/**
- * 指令作用域
  */
 @Entity()
 public class ActionScope {

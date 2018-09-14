@@ -1,5 +1,6 @@
 package cn.vove7.jarvis.activities
 
+import android.Manifest
 import android.os.Build
 import android.os.Bundle
 import android.support.v4.app.Fragment
@@ -30,7 +31,7 @@ class PermissionManagerActivity : OneFragmentActivity() {
     }
 
     class ManageFragment : VListFragment() {
-//        lateinit var permissionList: List<PermissionStatus>
+        //        lateinit var permissionList: List<PermissionStatus>
         //        lateinit var adapter: BaseAdapter
         override fun clearDataSet() {
         }
@@ -146,8 +147,8 @@ class PermissionManagerActivity : OneFragmentActivity() {
                         PermissionStatus(arrayOf("android.permission.READ_PHONE_STATE"), "读取设备状态", ""),
                         PermissionStatus(arrayOf("android.permission.WRITE_EXTERNAL_STORAGE"), "写SD卡", ""),
                         PermissionStatus(arrayOf("android.permission.FLASHLIGHT"), "闪光灯", "打开闪光灯"),
-                        PermissionStatus(arrayOf("android.permission.BLUETOOTH", "android.permission.BLUETOOTH_ADMIN"),
-                                "蓝牙", "打开蓝牙"),
+//                        PermissionStatus(arrayOf("android.permission.BLUETOOTH", "android.permission.BLUETOOTH_ADMIN"),
+//                                "蓝牙", "打开蓝牙"),
                         PermissionStatus(arrayOf("android.permission.CAMERA"), "相机", "打开闪光灯")
                         //                    PermissionStatus("android.permission.VIBRATE", "震动", ""),
                 )

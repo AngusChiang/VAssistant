@@ -32,6 +32,7 @@ class SettingsActivity : AppCompatActivity() {
             expand_list.expandGroup(0)
             expand_list.expandGroup(1)
             expand_list.expandGroup(2)
+            expand_list.expandGroup(3)
         }
     }
 

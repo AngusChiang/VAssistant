@@ -99,9 +99,15 @@ object InitLuaDbData : InitDbData() {
         val a18 = Action("system.mediaResume()", scriptType)
         val a19 = Action("system.mediaStop()", scriptType)
 
+        val a20 = Action("\n" +
+                "local weeks = { '日', '一', '二', '三', '四', '五', '六' }\n" +
+                "local c = Calendar.getInstance()\n" +
+                "local w = c.get(Calendar.DAY_OF_WEEK)\n" +
+                "\n" +
+                "speak('今天是星期' .. weeks[w])", scriptType)
 
         arrayOf(a1, a2, a3, a4, a5, a6, a7, a8, a9,
-                a11, a12, a13, a14, a15, a16, a17, a18, a19).forEach {
+                a11, a12, a13, a14, a15, a16, a17, a18, a19, a20).forEach {
             DAO.daoSession.actionDao.insert(it)
         }
 
@@ -132,6 +138,7 @@ object InitLuaDbData : InitDbData() {
                 , Reg("暂停(播放)?", Reg.PARAM_NO, 17)
                 , Reg("继续(播放)?", Reg.PARAM_NO, 18)
                 , Reg("停止(播放)?", Reg.PARAM_NO, 19)
+                , Reg("(今天)?是?(星期|周)几(了)?", Reg.PARAM_NO, 20)
         ).forEach {
             DAO.daoSession.regDao.insert(it)
         }
@@ -166,6 +173,7 @@ object InitLuaDbData : InitDbData() {
 
                 , ActionNode("QQ扫一扫", 11L, a11.id, scrope_qq.id, NODE_SCOPE_IN_APP)//QQ扫一扫
                 , ActionNode("支付宝扫一扫", 12L, a12.id, scrope_alipay.id, NODE_SCOPE_IN_APP)//支付宝扫一扫
+                , ActionNode("今天星期几", 20L, a20.id, NODE_SCOPE_GLOBAL)
         ).forEach {
             mapDao.insert(it)
         }

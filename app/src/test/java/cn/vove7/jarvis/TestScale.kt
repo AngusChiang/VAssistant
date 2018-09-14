@@ -1,6 +1,7 @@
 package cn.vove7.jarvis
 
 import org.junit.Test
+import java.util.*
 
 /**
  * @author 17719247306
@@ -21,5 +22,11 @@ class TestScale {
         println(fy)
         println(fx * w)
         println(fy * h)
+    }
+
+    @Test
+    fun calendar() {
+        val c = Calendar.getInstance()
+        print(c.get(Calendar.DAY_OF_WEEK) - 1)
     }
 }

@@ -85,4 +85,17 @@
     <string name="text_voice_control">语音控制</string>
     <string name="text_voice_control_dialog">控制对话框</string>
     <string name="text_mark_management">标记管理</string>
+    <string name="text_click_to_login">点击登录</string>
+    <string name="hint_username_email">用户名/邮箱</string>
+    <string name="text_login">登录</string>
+    <string name="text_email_format_err">邮箱格式错误</string>
+    <string name="text_retrieve_password">找回密码</string>
+    <string name="text_not_empty">不可空</string>
+    <string name="text_sign_up">注册</string>
+    <string name="text_password">密码</string>
+    <string name="text_confirm_pswd">确认密码</string>
+    <string name="text_pass_not_same">两次密码不一致</string>
+    <string name="text_ver_code">验证码</string>
+    <string name="text_get_ver_code">获取验证码</string>
+    <string name="text_email">邮箱</string>
 </resources>

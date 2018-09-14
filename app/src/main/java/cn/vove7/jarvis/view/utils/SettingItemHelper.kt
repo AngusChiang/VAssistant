@@ -267,8 +267,3 @@ class SettingItemHelper(val context: Context) {
 
     open class CompoundItemHolder(v: View, val compoundWight: CompoundButton) : ChildItemHolder(v)
 }
-
-interface Callback<T> {
-    fun back(data: T)
-}
-
