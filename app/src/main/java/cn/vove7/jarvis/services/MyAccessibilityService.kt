@@ -13,6 +13,7 @@ import android.view.accessibility.AccessibilityEvent.*
 import android.view.accessibility.AccessibilityNodeInfo
 import cn.vove7.common.accessibility.AccessibilityApi
 import cn.vove7.common.accessibility.viewnode.ViewNode
+import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.appbus.AppBus
 import cn.vove7.common.datamanager.parse.model.ActionScope
 import cn.vove7.common.executor.CExecutorI
@@ -23,9 +24,12 @@ import cn.vove7.common.view.notifier.UiViewShowNotifier
 import cn.vove7.common.view.notifier.ViewShowListener
 import cn.vove7.common.view.toast.ColorfulToast
 import cn.vove7.executorengine.bridges.SystemBridge
+import cn.vove7.jarvis.R
 import cn.vove7.jarvis.plugins.AccPluginsService
+import cn.vove7.jarvis.plugins.AdKillerService
 import cn.vove7.vtp.app.AppHelper
 import cn.vove7.vtp.log.Vog
+import cn.vove7.vtp.sharedpreference.SpHelper
 import cn.vove7.vtp.system.SystemHelper
 import cn.vove7.vtp.text.TextHelper
 import java.lang.Thread.sleep
@@ -45,9 +49,11 @@ class MyAccessibilityService : AccessibilityApi() {
         updateCurrentApp(packageName)
         ColorfulToast(this).yellow().showShort("无障碍服务开启")
 
-        //代码配置
-        registerEvent(activityNotifier)
-
+        thread {
+            registerEvent(activityNotifier)
+            if (SpHelper(GlobalApp.APP).getBoolean(R.string.key_open_ad_block, true))
+                AdKillerService.bindServer()//广告服务
+        }
     }
 
     private fun updateCurrentApp(pkg: String) {
@@ -152,7 +158,7 @@ class MyAccessibilityService : AccessibilityApi() {
         }
         val classNameStr = event.className
         val pkg = event.packageName as String
-        if (classNameStr.startsWith(pkg)) {//解析当前App Activity
+        if (classNameStr.startsWith(pkg)) {//解析当前App Activity todo check
             currentActivity = classNameStr.substring(classNameStr.lastIndexOf('.') + 1)
             updateCurrentApp(pkg)
         }

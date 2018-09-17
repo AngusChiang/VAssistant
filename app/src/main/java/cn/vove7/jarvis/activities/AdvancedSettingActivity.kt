@@ -53,7 +53,7 @@ class AdvancedSettingActivity : AppCompatActivity() {
                             if (it as Boolean) RemoteDebugServer.start()
                             else RemoteDebugServer.stop()
                         }),
-                        IntentItem(R.string.text_debug_code, null, onClick = { _, _ ->
+                        IntentItem(R.string.text_test_code, null, onClick = { _, _ ->
                             startActivity(Intent(this, LuaEditorActivity::class.java))
                         })
                 ))

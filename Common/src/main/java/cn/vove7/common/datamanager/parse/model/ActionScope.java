@@ -28,12 +28,19 @@ public class ActionScope {
      * Activity页面
      */
     private String activity = "";
+    private Integer hashCode;
+
 
     @Keep
     public ActionScope(Long id, String packageName, String activity) {
         this.id = id;
         this.packageName = packageName;
         this.activity = activity;
+    }
+
+    public int genHashCode() {
+        hashCode = Objects.hash(packageName, activity);
+        return hashCode;
     }
 
     @Keep
@@ -44,6 +51,15 @@ public class ActionScope {
 
     @Generated(hash = 1143247331)
     public ActionScope() {
+    }
+
+    @Generated(hash = 432106659)
+    public ActionScope(Long id, String packageName, String activity,
+            Integer hashCode) {
+        this.id = id;
+        this.packageName = packageName;
+        this.activity = activity;
+        this.hashCode = hashCode;
     }
 
     public Long getId() {
@@ -68,6 +84,14 @@ public class ActionScope {
 
     public void setActivity(String activity) {
         this.activity = activity;
+    }
+
+    public Integer getHashCode() {
+        return hashCode;
+    }
+
+    public void setHashCode(Integer hashCode) {
+        this.hashCode = hashCode;
     }
 
     @Override

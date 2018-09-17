@@ -1,29 +1,33 @@
 package cn.vove7.common.datamanager.executor.entity;
 
 import org.greenrobot.greendao.annotation.Entity;
+import org.greenrobot.greendao.annotation.Generated;
 import org.greenrobot.greendao.annotation.Id;
 import org.greenrobot.greendao.annotation.Index;
 import org.greenrobot.greendao.annotation.Keep;
 import org.greenrobot.greendao.annotation.NotNull;
 import org.greenrobot.greendao.annotation.Transient;
 
+import cn.vove7.common.datamanager.parse.DataFrom;
+import cn.vove7.common.interfaces.Markable;
+import cn.vove7.common.netacc.tool.SignHelper;
 import cn.vove7.common.utils.RegUtils;
-import cn.vove7.vtp.log.Vog;
 import kotlin.text.Regex;
-import org.greenrobot.greendao.annotation.Generated;
 
 /**
- * 打开事件
+ * 标记数据
  * Created by Vove on 2018/6/23
  */
 @Entity(indexes = {@Index(value = "key")})
-public class MarkedOpen {
-    public static final String MARKED_TYPE_APP = "app";//应用 value -> pkg
-    //public static final String MARKED_TYPE_SYS_FUN = "sys_fun";//系统功能 value: fun_key
-    //public static final String MARKED_TYPE_SCRIPT = "script";
-    public static final String MARKED_TYPE_SCRIPT_LUA = "script_lua";
-    public static final String MARKED_TYPE_SCRIPT_JS = "script_js";
+public class MarkedData implements DataFrom, Markable {
+
+    //打开/关闭...
+    public static final String MARKED_TYPE_APP = "open_app";//应用 value -> pkg
+    public static final String MARKED_TYPE_SCRIPT_LUA = "open_script_lua";
+    public static final String MARKED_TYPE_SCRIPT_JS = "open_script_js";
+    //通讯录
     public static final String MARKED_TYPE_CONTACT = "contact";
+
 
     @Id
     private Long id;
@@ -37,6 +41,15 @@ public class MarkedOpen {
     @Transient
     private Regex regex;
     private String value;//标识
+
+    private String from = null;
+
+    private String tagId;
+
+    @Override
+    public void sign() {
+        setTagId(SignHelper.MD5(key, type, from, regStr, value));
+    }
 
     public String getType() {
         return type;
@@ -56,25 +69,36 @@ public class MarkedOpen {
 
     //AppInfo data;
     @Keep
-    public MarkedOpen(Long id, @NotNull String key) {
+    public MarkedData(Long id, @NotNull String key) {
         this.id = id;
         this.key = key;
     }
 
     public Regex getRegex() {
+        if (regex == null) buildRegex();
         return regex;
     }
 
     @Keep
-    public MarkedOpen() {
+    public MarkedData() {
     }
 
     @Keep
-    public MarkedOpen(String key, String type, String regStr, String value) {
+    public MarkedData(String key, String type, String regStr, String value, String from) {
         this.key = key;
         this.type = type;
         this.regStr = regStr;
         this.value = value;
+        this.from = from;
+    }
+
+    @Keep
+    public MarkedData(String key, String type, String regStr, String value) {
+        this.key = key;
+        this.type = type;
+        this.regStr = regStr;
+        this.value = value;
+        this.from = DataFrom.FROM_SERVICE;
     }
 
     @Keep
@@ -84,8 +108,16 @@ public class MarkedOpen {
         regex = new Regex(s);
     }
 
+    public String getTagId() {
+        return tagId;
+    }
+
+    public void setTagId(String tagId) {
+        this.tagId = tagId;
+    }
+
     @Keep
-    public MarkedOpen(Long id, @NotNull String key, String type, String regStr,
+    public MarkedData(Long id, @NotNull String key, String type, String regStr,
                       String value) {
         this.id = id;
         this.key = key;
@@ -93,6 +125,18 @@ public class MarkedOpen {
         this.regStr = regStr;
         this.value = value;
         buildRegex();
+    }
+
+    @Generated(hash = 1495649276)
+    public MarkedData(Long id, @NotNull String key, String type, String regStr, String value,
+            String from, String tagId) {
+        this.id = id;
+        this.key = key;
+        this.type = type;
+        this.regStr = regStr;
+        this.value = value;
+        this.from = from;
+        this.tagId = tagId;
     }
 
     public Long getId() {
@@ -121,12 +165,20 @@ public class MarkedOpen {
 
     @Override
     public String toString() {
-        return "MarkedOpen{" +
+        return "MarkedData{" +
                 "key='" + key + '\'' +
                 ", type='" + type + '\'' +
                 ", regStr='" + regStr + '\'' +
                 ", regex=" + regex +
                 ", value='" + value + '\'' +
                 '}';
+    }
+
+    public String getFrom() {
+        return this.from;
+    }
+
+    public void setFrom(String from) {
+        this.from = from;
     }
 }

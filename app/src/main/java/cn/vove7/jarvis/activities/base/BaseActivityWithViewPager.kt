@@ -20,16 +20,20 @@ import kotlinx.android.synthetic.main.activity_base_view_pager.*
  */
 abstract class BaseActivityWithViewPager : AppCompatActivity() {
 
+    lateinit var toolbar: Toolbar
+    lateinit var fragmentAdapter: FragmentAdapter
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_base_view_pager)
-
-        beforeSetViewPager()
+        toolbar = findViewById(R.id.toolbar)
         //设置ToolBar
-        val toolbar = findViewById<Toolbar>(R.id.toolbar)
         setSupportActionBar(toolbar)
+        beforeSetViewPager()
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        view_pager.adapter = FragmentAdapter(supportFragmentManager)
+        FragmentAdapter(supportFragmentManager).also {
+            fragmentAdapter = it
+            view_pager.adapter = it
+        }
         if (fragments.size == 1)
             tab_layout.visibility = View.GONE
         else

@@ -60,7 +60,6 @@ class InstDetailFragment : BottomSheetDialogFragment() {
         return dialog
     }
 
-
     fun setInst(node: ActionNode) {
         this.node = node
         if (!load) return
@@ -69,13 +68,13 @@ class InstDetailFragment : BottomSheetDialogFragment() {
 
     private fun setData() {
         when (node?.from) {//编辑
-            DataFrom.FROM_SERVICE, DataFrom.FROM_SHARED -> {
-                val editMenu = toolbar.menu.findItem(R.id.menu_edit)
-                editMenu.isEnabled = false
-                editMenu.title = getString(R.string.text_not_editable)
-            }
             DataFrom.FROM_USER -> {
-                toolbar.menu.findItem(R.id.menu_edit).isEnabled = true
+                toolbar.menu.findItem(R.id.menu_edit).isVisible = true
+                toolbar.menu.findItem(R.id.menu_share).isVisible = true
+            }
+            else -> {
+                toolbar.menu.findItem(R.id.menu_edit).isVisible = false
+                toolbar.menu.findItem(R.id.menu_share).isVisible = false
             }
         }
         contentView.post {
@@ -180,6 +179,9 @@ class InstDetailFragment : BottomSheetDialogFragment() {
                             .setButton(DialogInterface.BUTTON_NEGATIVE, R.string.text_cancel, View.OnClickListener { v -> })
                     d.setTitle("执行队列")
                     d.show()
+                }
+                R.id.menu_share -> {//todo 发布界面
+
                 }
             }
             return@setOnMenuItemClickListener true

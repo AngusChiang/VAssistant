@@ -9,10 +9,8 @@ import cn.vove7.common.appbus.AppBus
 import cn.vove7.common.bridges.*
 import cn.vove7.common.bridges.ShowDialogEvent.Companion.WHICH_SINGLE
 import cn.vove7.common.datamanager.DAO
-import cn.vove7.common.datamanager.executor.entity.MarkedContact
-import cn.vove7.common.datamanager.executor.entity.MarkedOpen
-import cn.vove7.common.datamanager.executor.entity.MarkedOpen.*
-import cn.vove7.common.datamanager.parse.DataFrom
+import cn.vove7.common.datamanager.executor.entity.MarkedData
+import cn.vove7.common.datamanager.executor.entity.MarkedData.*
 import cn.vove7.common.datamanager.parse.model.Action
 import cn.vove7.common.datamanager.parse.model.Action.SCRIPT_TYPE_JS
 import cn.vove7.common.datamanager.parse.model.Action.SCRIPT_TYPE_LUA
@@ -45,7 +43,7 @@ open class ExecutorImpl(
     private var lock = Object()
     var currentAction: Action? = null
     private val contactHelper = ContactHelper(context)
-    private val markedOpenDao = DAO.daoSession.markedOpenDao
+    private val markedOpenDao = DAO.daoSession.markedDataDao
     val globalActionExecutor = GlobalActionExecutor()
 
     init {
@@ -178,7 +176,7 @@ open class ExecutorImpl(
         val r = checkAccessibilityService()
         return if (r) {
             //等待App打开
-            val waitR = waitForApp(pkg)
+            val waitR = waitForApp(pkg, null, 5000)
             if (!waitR) return false
             pollActionQueue()
             true
@@ -239,7 +237,7 @@ open class ExecutorImpl(
     /**
      * 解析标识符
      */
-    private fun openByIdentifier(it: MarkedOpen, follow: String?): Boolean {
+    private fun openByIdentifier(it: MarkedData, follow: String?): Boolean {
         return when (it.type) {
             MARKED_TYPE_APP -> {
                 smartOpen(it.value, follow)
@@ -500,13 +498,12 @@ open class ExecutorImpl(
                 thread {
                     //保存标记
                     val data = choiceData.originalData as ContactInfo
-                    val marked = MarkedContact()
-                    marked.key = s
-                    marked.contactName = data.contactName
-                    marked.regexStr = data.contactName
-
-                    marked.phone = choiceData.subtitle
-                    marked.from = DataFrom.FROM_USER
+                    val marked = MarkedData(s, MarkedData.MARKED_TYPE_CONTACT, s, choiceData.subtitle)
+//                    marked.key = s
+//                    marked.regStr = s
+//                    marked.value = choiceData.subtitle
+//                    marked.from = DataFrom.FROM_USER
+//                    marked.type = MarkedData.MARKED_TYPE_CONTACT
                     contactHelper.addMark(marked)
                 }
                 val sss = systemBridge.call(choiceData.subtitle!!)

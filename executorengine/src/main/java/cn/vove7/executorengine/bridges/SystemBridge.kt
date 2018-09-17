@@ -12,7 +12,7 @@ import android.os.VibrationEffect
 import android.os.Vibrator
 import android.support.v4.content.ContextCompat
 import android.view.KeyEvent
-import cn.vove7.common.SystemOperation
+import cn.vove7.common.bridges.SystemOperation
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.appbus.AppBus

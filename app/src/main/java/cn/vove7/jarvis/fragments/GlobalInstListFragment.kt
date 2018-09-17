@@ -18,7 +18,6 @@ import kotlin.concurrent.thread
  * 指令管理列表
  * Created by 17719 on 2018/8/13
  */
-
 class GlobalInstListFragment : SimpleListFragment<ActionNode>() {
 
     var instDetailFragment = InstDetailFragment()
@@ -36,6 +35,7 @@ class GlobalInstListFragment : SimpleListFragment<ActionNode>() {
                 instDetailFragment.show(activity?.supportFragmentManager, "inst_detail")
             }
         }
+
 
 
     override fun transData(nodes: List<ActionNode>): List<ViewModel> {

@@ -26,6 +26,7 @@ import cn.vove7.executorengine.bridges.SystemBridge
 import cn.vove7.executorengine.exector.MultiExecutorEngine
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.activities.PermissionManagerActivity
+import cn.vove7.jarvis.utils.RuntimeConfig
 import cn.vove7.jarvis.view.dialog.MultiChoiceDialog
 import cn.vove7.jarvis.view.dialog.OnMultiSelectListener
 import cn.vove7.jarvis.view.dialog.OnSelectListener
@@ -422,8 +423,9 @@ class MainService : BusService(),
         override fun onStartRecog() {
             listeningAni.begin()//
             listeningToast.show("开始聆听")
-
-            SystemBridge().vibrate(80L)
+            if (RuntimeConfig.vibrateWhenStartReco) {
+                SystemBridge().vibrate(80L)
+            }
 
             if (SystemBridge().isMediaPlaying() && !speechSynService.speaking) {//防止误判合成服务播报
                 SystemBridge().mediaPause()

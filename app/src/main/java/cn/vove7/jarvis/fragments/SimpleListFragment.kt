@@ -14,6 +14,7 @@ abstract class SimpleListFragment<DataType> : VListFragment() {
 
     open val itemClickListener: SimpleListAdapter.OnItemClickListener? = null
 
+
     val dataSet = mutableListOf<ViewModel>()
     override fun clearDataSet() {
         dataSet.clear()

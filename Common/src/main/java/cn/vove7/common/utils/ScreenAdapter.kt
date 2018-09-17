@@ -1,8 +1,7 @@
 package cn.vove7.common.utils
 
-import android.util.Log
 import android.util.Pair
-import cn.vove7.common.SystemOperation
+import cn.vove7.common.bridges.SystemOperation
 
 /**
  * # ScreenAdapter

@@ -3,9 +3,6 @@ package cn.vove7.common.netacc.tool;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.util.Map;
-import java.util.TreeMap;
-
-import cn.vove7.vtp.log.Vog;
 
 /**
  * Created by IntelliJ IDEA.
@@ -17,27 +14,28 @@ public class SignHelper {
     private static final String SECRET_KEY = "vove777";
 
     /**
-     * 给param签名
+     * 统一请求签名
      *
      * @param params TreeMap 默认 通过key排序
      */
-    public static void signParam(TreeMap<String, String> params) {
-        StringBuilder builder = new StringBuilder();
+    public static void signParam(Map<String, String> params) {
+        //StringBuilder builder = new StringBuilder();
+        //for (Map.Entry<String, String> p : params.entrySet()) {
+        //    if (p.getValue() == null) {
+        //        String e = "参数错误 - s" + p.getKey();
+        //        builder.append(p.getKey()).append("null");
+        //        //return null;
+        //    }
+        //    if (!p.getKey().equalsIgnoreCase("sign"))
+        //        builder.append(p.getKey()).append(p.getValue());
+        //}
+        //String r = builder.toString();
+        //Vog.INSTANCE.v(new Object(), "参数连接 -> " + r);
 
-        for (Map.Entry<String, String> p : params.entrySet()) {
-            if (p.getValue() == null) {
-                String e = "参数错误 - s" + p.getKey();
-                builder.append(p.getKey()).append("null");
-                //return null;
-            }
-            if (!p.getKey().equalsIgnoreCase("sign"))
-                builder.append(p.getKey()).append(p.getValue());
-        }
-        String r = builder.toString();
+        if (!params.containsKey("timestamp"))
+            params.put("timestamp", String.valueOf((int) (System.currentTimeMillis() / 1000)));
 
-        Vog.INSTANCE.v(new Object(), "参数连接 -> " + r);
-
-        params.put("sign", MD5(r + SECRET_KEY));
+        params.put("sign", MD5(params.get("timestamp") + SECRET_KEY));
     }
 
 
@@ -49,6 +47,14 @@ public class SignHelper {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public static String MD5(String... ss) {
+        StringBuilder bu = new StringBuilder();
+        for (String s : ss) {
+            bu.append(s);
+        }
+        return MD5(bu.toString());
     }
 
     private static final char[] HEX_DIGITS = "0123456789ABCDEF".toCharArray();

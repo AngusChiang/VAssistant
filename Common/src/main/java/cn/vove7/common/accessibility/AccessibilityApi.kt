@@ -1,10 +1,9 @@
 package cn.vove7.common.accessibility
 
 import android.accessibilityservice.AccessibilityService
-import android.view.accessibility.AccessibilityEvent
+import cn.vove7.common.datamanager.parse.model.ActionScope
 import cn.vove7.common.executor.CExecutorI
 import cn.vove7.common.view.finder.ViewFinder
-import cn.vove7.common.datamanager.parse.model.ActionScope
 import cn.vove7.vtp.app.AppInfo
 
 /**
@@ -26,6 +25,9 @@ abstract class AccessibilityApi : AccessibilityService(),
 
     companion object {
         var accessibilityService: AccessibilityApi? = null
+        fun isOpen(): Boolean {
+            return accessibilityService != null
+        }
     }
 }
 

@@ -13,10 +13,16 @@ object ApiUrls {
     else "http://115.159.155.25:8080/"
 
     private val ACCOUNT = SERVER_IP + "account/"
+    private val MARKED = SERVER_IP + "marked/"
     val LOGIN = ACCOUNT + "loginVerify"
 
     val REGISTER_BY_EMAIL = ACCOUNT + "registerByEmail"
 
     val SEND_EMAIL_VER_CODE = ACCOUNT + "sendEmailCode"
+
+    val SYNC_MARKED = MARKED + "sync"
+    val SYNC_APP_AD = MARKED + "syncAppAd"
+
+
 
 }

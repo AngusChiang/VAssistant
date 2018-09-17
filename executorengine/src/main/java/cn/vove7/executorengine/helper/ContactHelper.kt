@@ -5,8 +5,8 @@ import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.bridges.ChoiceData
 import cn.vove7.common.bridges.GenChoiceData
 import cn.vove7.common.datamanager.DAO
-import cn.vove7.common.datamanager.executor.entity.MarkedContact
-import cn.vove7.common.datamanager.greendao.MarkedContactDao
+import cn.vove7.common.datamanager.executor.entity.MarkedData
+import cn.vove7.common.datamanager.greendao.MarkedDataDao
 import cn.vove7.common.model.MatchedData
 import cn.vove7.executorengine.model.Markable
 import cn.vove7.vtp.contact.ContactHelper
@@ -21,16 +21,16 @@ import java.util.*
  *
  * Created by Vove on 2018/6/19
  */
-class ContactHelper(val context: Context) : GenChoiceData, Markable<MarkedContact> {
+class ContactHelper(val context: Context) : GenChoiceData, Markable {
     //Dao
-    private val markedContactDao = DAO.daoSession.markedContactDao
+    private val markedContactDao = DAO.daoSession.markedDataDao
 
-    override fun addMark(data: MarkedContact) {
+    override fun addMark(data: MarkedData) {
         //数据库
         markedContactDao.insert(data)
     }
 
-    private val allNum = "1[0-9]*".toRegex()
+    private val phoneNum = "[\\s\\-0-9]*".toRegex()
 
     private var lastUpdateTime = 0L
 
@@ -57,14 +57,14 @@ class ContactHelper(val context: Context) : GenChoiceData, Markable<MarkedContac
      * 纯数字 -> 标记 -> 模糊匹配 -> 匹配提供
      */
     fun matchPhone(context: Context, s: String, update: Boolean = true): String? {
-        if (allNum.matches(s)) {//数字
+        if (phoneNum.matches(s)) {//数字
             return s
         }
         val markedData = markedContactDao.queryBuilder()//by key
-                .where(MarkedContactDao.Properties.Key.eq(s)).unique()
+                .where(MarkedDataDao.Properties.Key.eq(s), MarkedDataDao.Properties.Type.eq(MarkedData.MARKED_TYPE_CONTACT)).unique()
         if (markedData != null) {
             Vog.d(this, "Matched from MarkedData by key $s")
-            return markedData.phone
+            return markedData.value
         }
         //本地匹配
         val localMatched = LOCAL_CONTACT_LIST[s]
@@ -84,11 +84,12 @@ class ContactHelper(val context: Context) : GenChoiceData, Markable<MarkedContac
             Vog.d(this, "match by regex")
 
             //正则匹配
-            val list = markedContactDao.loadAll()
+            val list = markedContactDao.queryBuilder()
+                    .where(MarkedDataDao.Properties.Type.eq(MarkedData.MARKED_TYPE_CONTACT)).list()
             list.forEach {
-                val regex = it.regexStr.toRegex()
+                val regex = it.regex
                 if (regex.matches(s))
-                    return it.phone
+                    return it.value
             }
             Vog.d(this, "from server no one")
             null

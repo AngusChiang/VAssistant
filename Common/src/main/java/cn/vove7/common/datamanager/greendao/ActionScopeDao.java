@@ -27,6 +27,7 @@ public class ActionScopeDao extends AbstractDao<ActionScope, Long> {
         public final static Property Id = new Property(0, Long.class, "id", true, "_id");
         public final static Property PackageName = new Property(1, String.class, "packageName", false, "PACKAGE_NAME");
         public final static Property Activity = new Property(2, String.class, "activity", false, "ACTIVITY");
+        public final static Property HashCode = new Property(3, Integer.class, "hashCode", false, "HASH_CODE");
     }
 
 
@@ -44,7 +45,8 @@ public class ActionScopeDao extends AbstractDao<ActionScope, Long> {
         db.execSQL("CREATE TABLE " + constraint + "\"ACTION_SCOPE\" (" + //
                 "\"_id\" INTEGER PRIMARY KEY ," + // 0: id
                 "\"PACKAGE_NAME\" TEXT," + // 1: packageName
-                "\"ACTIVITY\" TEXT);"); // 2: activity
+                "\"ACTIVITY\" TEXT," + // 2: activity
+                "\"HASH_CODE\" INTEGER);"); // 3: hashCode
     }
 
     /** Drops the underlying database table. */
@@ -71,6 +73,11 @@ public class ActionScopeDao extends AbstractDao<ActionScope, Long> {
         if (activity != null) {
             stmt.bindString(3, activity);
         }
+ 
+        Integer hashCode = entity.getHashCode();
+        if (hashCode != null) {
+            stmt.bindLong(4, hashCode);
+        }
     }
 
     @Override
@@ -91,6 +98,11 @@ public class ActionScopeDao extends AbstractDao<ActionScope, Long> {
         if (activity != null) {
             stmt.bindString(3, activity);
         }
+ 
+        Integer hashCode = entity.getHashCode();
+        if (hashCode != null) {
+            stmt.bindLong(4, hashCode);
+        }
     }
 
     @Override
@@ -103,7 +115,8 @@ public class ActionScopeDao extends AbstractDao<ActionScope, Long> {
         ActionScope entity = new ActionScope( //
             cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0), // id
             cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1), // packageName
-            cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2) // activity
+            cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2), // activity
+            cursor.isNull(offset + 3) ? null : cursor.getInt(offset + 3) // hashCode
         );
         return entity;
     }
@@ -113,6 +126,7 @@ public class ActionScopeDao extends AbstractDao<ActionScope, Long> {
         entity.setId(cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0));
         entity.setPackageName(cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1));
         entity.setActivity(cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2));
+        entity.setHashCode(cursor.isNull(offset + 3) ? null : cursor.getInt(offset + 3));
      }
     
     @Override

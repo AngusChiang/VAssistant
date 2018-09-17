@@ -11,11 +11,12 @@ import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
-import android.view.View.GONE
 import android.view.ViewGroup
 import android.widget.CompoundButton
+import android.widget.ProgressBar
 import android.widget.Switch
 import android.widget.TextView
+import cn.vove7.common.view.toast.ColorfulToast
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.adapters.RecAdapterWithFooter
 import cn.vove7.vtp.log.Vog
@@ -31,6 +32,7 @@ import kotlinx.android.synthetic.main.fragment_base_list.*
 abstract class VListFragment : Fragment() {
 
     private lateinit var contentView: View
+    lateinit var progressBar: ProgressBar
     private lateinit var netErrViewContainer: ViewGroup
     private var netErrView: View? = null
     private lateinit var swipeRefreshLayout: SwipeRefreshLayout//TODO pullDown
@@ -42,9 +44,10 @@ abstract class VListFragment : Fragment() {
 
     lateinit var floatButton: FloatingActionButton
     open var floatClickListener: View.OnClickListener? = null
+    lateinit var toast: ColorfulToast
 
     /**
-     * 自由x`控制
+     * 页码
      */
     var pageIndex = 0
     lateinit var recyclerView: FastScrollRecyclerView
@@ -52,6 +55,7 @@ abstract class VListFragment : Fragment() {
     var layManager: RecyclerView.LayoutManager? = null
     lateinit var adapter: RecAdapterWithFooter<*>
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        toast = ColorfulToast(context!!)
         contentView = inflater.inflate(R.layout.fragment_base_list, container, false)
         initSelfView()
         initView(contentView)
@@ -142,6 +146,7 @@ abstract class VListFragment : Fragment() {
         floatButton = f(R.id.fab)
         swipeRefreshLayout = f(R.id.swipe_refresh)
         netErrViewContainer = f(R.id.net_error_layout)
+        progressBar = f(R.id.progress_bar)
         swipeRefreshLayout.setOnRefreshListener {
             //下拉刷新
             refresh()
@@ -269,4 +274,12 @@ abstract class VListFragment : Fragment() {
     abstract fun initView(contentView: View)
     private fun <V : View> f(id: Int): V = contentView.findViewById(id) as V
 
+
+    fun showProgressBar() {
+        progressBar.visibility = View.VISIBLE
+    }
+
+    fun hideProgressBar() {
+        progressBar.visibility = View.GONE
+    }
 }

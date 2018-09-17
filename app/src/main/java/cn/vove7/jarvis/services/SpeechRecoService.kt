@@ -88,7 +88,7 @@ class SpeechRecoService(val event: SpeechEvent) {
         thread {
             initRecog()
             //初始化唤醒器
-            if (SpHelper(GlobalApp.APP).getBoolean(R.string.key_open_voice_wakeup))
+            if (SpHelper(GlobalApp.APP).getBoolean(R.string.key_open_voice_wakeup,false))
                 wakeuper.start()
         }
     }

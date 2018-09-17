@@ -2,6 +2,7 @@ package cn.vove7.common;
 
 import cn.vove7.common.bridges.GlobalActionExecutor;
 import cn.vove7.common.bridges.ServiceBridge;
+import cn.vove7.common.bridges.SystemOperation;
 import cn.vove7.common.executor.CExecutorI;
 
 /**

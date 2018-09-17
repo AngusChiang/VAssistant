@@ -72,7 +72,7 @@
     <string name="text_msg_delete_action_node">此操作会同时删除此操作的跟随操作</string>
     <string name="text_confirm_2_del">确认删除</string>
     <string name="text_about">关于</string>
-    <string name="text_advanced_features">高级功能</string>
+    <string name="text_advanced_features">高级</string>
     <string name="text_show_toast_when_remove_ad">去除广告时显示通知</string>
     <string name="text_sound_model">声音模型</string>
     <string name="text_volume">音量</string>
@@ -81,7 +81,7 @@
     <string name="text_remote_debug">远程调试</string>
     <string name="text_open_voice_wakeup">开启语音唤醒</string>
     <string name="text_play_voice_message">播放语音消息</string>
-    <string name="text_debug_code">代码调试</string>
+    <string name="text_test_code">代码测试</string>
     <string name="text_voice_control">语音控制</string>
     <string name="text_voice_control_dialog">控制对话框</string>
     <string name="text_mark_management">标记管理</string>
@@ -98,4 +98,7 @@
     <string name="text_ver_code">验证码</string>
     <string name="text_get_ver_code">获取验证码</string>
     <string name="text_email">邮箱</string>
+    <string name="text_share">分享</string>
+    <string name="text_sync">同步</string>
+    <string name="text_vibrate_reco_begin">开始识别时震动</string>
 </resources>

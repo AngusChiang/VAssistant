@@ -1,4 +1,4 @@
-package cn.vove7.common.model
+package cn.vove7.common.netacc.model
 
 /**
  * User: Vove
@@ -8,7 +8,7 @@ package cn.vove7.common.model
 open class ResponseMessage<T> {
     var code: Int = -1
 
-    var message: String? = null
+    var message: String = "null"
 
     var err: String? = null
     var data: T? = null
@@ -22,7 +22,7 @@ open class ResponseMessage<T> {
         return "{code=$code, message=$message, err=$err, data=$data}"
     }
 
-    constructor(code: Int, message: String?) {
+    constructor(code: Int, message: String) {
         this.code = code
         this.message = message
     }
@@ -35,8 +35,9 @@ open class ResponseMessage<T> {
         val CODE_FAILED = 1//失败
         val CODE_SERVER_ERR = 2//出错
 
-        fun<T> error(err:String?): ResponseMessage<T> {
-            return ResponseMessage(CODE_FAILED, err)
+        fun <T> error(err: String?): ResponseMessage<T> {
+            return ResponseMessage(CODE_FAILED, err
+                ?: "null")
         }
     }
 

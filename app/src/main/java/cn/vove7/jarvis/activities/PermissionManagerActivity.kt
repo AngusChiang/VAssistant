@@ -68,9 +68,9 @@ class PermissionManagerActivity : OneFragmentActivity() {
 
                     holder.title.text = item.permissionName
                     if (item.desc == "") {
-//                        holder.subtitle.visibility = View.GONE
+                        holder.subtitle.visibility = View.GONE
                     } else {
-//                        holder.subtitle.visibility = View.VISIBLE
+                        holder.subtitle.visibility = View.VISIBLE
                         holder.subtitle.text = item.desc
                     }
                     when (item.isOpen) {

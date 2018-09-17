@@ -52,3 +52,23 @@
 ## cmd 批量重命名 
 
 > `for /f "tokens=2 delims=-." %i in ('dir frame-*.gif /b') do ren  frame-%i.gif listening_%i.gif`
+
+## Marked.. 
+
+- 只显示已安装，只获取本机已安装
+
+## Rule
+
+- 服务器数据不可修改
+
+- 备份 ：备份用户自己的 DataFrom.from_user
+
+- 同步
+  - Action同步
+    - 全局同步
+    - App内搜索 / 一键同步 
+    - ActionNode.parent 数据根据tagid 获取id 指定parentId
+    
+  - Marked同步
+    - contact...app..open
+    - ad只显示已安装，只获取本机已安装

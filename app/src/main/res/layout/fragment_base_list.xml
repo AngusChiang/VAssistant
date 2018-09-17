@@ -23,11 +23,19 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="?attr/selectableItemBackground"
-                app:cardElevation="4dp"
                 android:orientation="vertical"
-                android:visibility="visible">
+                android:visibility="visible"
+                app:cardElevation="4dp">
 
             </android.support.v7.widget.CardView>
+
+            <ProgressBar
+                android:id="@+id/progress_bar"
+                style="@style/Base.Widget.AppCompat.ProgressBar.Horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:indeterminate="true"
+                android:visibility="gone" />
 
             <RelativeLayout
                 android:id="@+id/contentView"
@@ -48,10 +56,10 @@
                     app:bubbleColor="#00bb00"
                     app:bubbleTextColor="#ffffff"
                     app:handleColor="@color/colorAccent"
-                    app:trackColor="#bbbbbb"
                     app:hideScrollbar="false"
+                    app:layout_behavior="@string/appbar_scrolling_view_behavior"
                     app:showTrack="false"
-                    app:layout_behavior="@string/appbar_scrolling_view_behavior" />
+                    app:trackColor="#bbbbbb" />
             </RelativeLayout>
         </LinearLayout>
 

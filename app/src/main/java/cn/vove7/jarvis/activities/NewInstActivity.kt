@@ -28,6 +28,7 @@ import cn.vove7.common.datamanager.parse.statusmap.ActionNode.NODE_SCOPE_GLOBAL
 import cn.vove7.common.datamanager.parse.statusmap.ActionNode.NODE_SCOPE_IN_APP
 import cn.vove7.common.datamanager.parse.statusmap.Reg
 import cn.vove7.common.model.UserInfo
+import cn.vove7.common.view.toast.ColorfulToast
 import cn.vove7.executorengine.helper.AdvanAppHelper
 import cn.vove7.jarvis.BuildConfig
 import cn.vove7.jarvis.R
@@ -41,7 +42,6 @@ import cn.vove7.vtp.app.AppHelper
 import cn.vove7.vtp.app.AppInfo
 import cn.vove7.vtp.easyadapter.BaseListAdapter
 import cn.vove7.vtp.log.Vog
-import cn.vove7.vtp.toast.Voast
 import cn.vove7.vtp.view.span.ColourTextClickableSpan
 import kotlinx.android.synthetic.main.activity_new_inst.*
 import java.io.File
@@ -73,8 +73,8 @@ class NewInstActivity : AppCompatActivity(), View.OnClickListener {
         enterTime = System.currentTimeMillis()
         super.onCreate(savedInstanceState)
 
+        voast = ColorfulToast(this)
         setContentView(R.layout.activity_new_inst)
-        voast = Voast.with(this).top()
         toolbar = findViewById(R.id.toolbar)
         setSupportActionBar(toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
@@ -201,15 +201,14 @@ class NewInstActivity : AppCompatActivity(), View.OnClickListener {
                 getAppList()
             }
         }
-
         return super.onOptionsItemSelected(item)
     }
 
-    lateinit var voast: Voast
+    private lateinit var voast: ColorfulToast
 
     private fun getInstalledApp(): MutableList<ViewModel> {
         val list = mutableListOf<ViewModel>()
-        AppHelper.getAllInstallApp(this, false).forEach {
+        AdvanAppHelper.APP_LIST.values.forEach {
             list.add(ViewModel(it.name, icon = it.icon, extra = it))
         }
         return list
@@ -298,9 +297,9 @@ class NewInstActivity : AppCompatActivity(), View.OnClickListener {
             var newScopeId: Long = -1
             if (inApp) {
                 val scope = ActionScope(pkg, activity_name.text.toString().trim())
+                val sCode = scope.genHashCode()
                 val s = DAO.daoSession.actionScopeDao.queryBuilder()
-                        .where(ActionScopeDao.Properties.PackageName.eq(scope.packageName))
-                        .where(ActionScopeDao.Properties.Activity.eq(scope.activity))
+                        .where(ActionScopeDao.Properties.HashCode.eq(sCode))
                         .unique()
                 newScopeId = if (s == null) {
                     DAO.daoSession.actionScopeDao.insert(scope)
@@ -313,9 +312,9 @@ class NewInstActivity : AppCompatActivity(), View.OnClickListener {
             Vog.d(this, "save sid: $newScopeId")
             val newNode = ActionNode()
             newNode.descTitle = desc
-            newNode.actionId = action.id
+            newNode.setActionId(action.id)
             if (inApp)//scope
-                newNode.scopeId = newScopeId
+                newNode.setScopeId(newScopeId)
             newNode.from = DataFrom.FROM_USER
             if (UserInfo.isLogin || !BuildConfig.DEBUG) {
                 newNode.publishUserId = UserInfo.userId

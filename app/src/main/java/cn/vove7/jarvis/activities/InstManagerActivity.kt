@@ -10,12 +10,12 @@ import cn.vove7.jarvis.fragments.InstAppListFragment
  */
 class InstManagerActivity : BaseActivityWithViewPager() {
 
-    override var titleInit: String?
-        get() = "命令管理"
-        set(value) {}
+    override var titleInit: String? = "命令管理"
+
     override var fragments: Array<Fragment> = arrayOf(
             GlobalInstListFragment(),
             InstAppListFragment()
     )
+
     override var titles: Array<String> = arrayOf("全局命令", "应用内命令")
 }

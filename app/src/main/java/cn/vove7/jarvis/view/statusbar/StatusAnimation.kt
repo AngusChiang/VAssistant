@@ -1,8 +1,8 @@
 package cn.vove7.jarvis.view.statusbar
 
-import android.annotation.SuppressLint
 import android.app.NotificationManager
 import android.content.Context
+import android.os.Build
 import android.support.v4.app.NotificationManagerCompat
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.vtp.log.Vog
@@ -22,8 +22,9 @@ private val nId = 127
 
 abstract class StatusAnimation {
 
-    @SuppressLint("NewApi")
-    val c = ChannelBuilder.with("StatusBarIcon", "IconAnimation", NotificationManagerCompat.IMPORTANCE_LOW).build()
+    val c = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+        ChannelBuilder.with("StatusBarIcon", "IconAnimation", NotificationManagerCompat.IMPORTANCE_LOW).build()
+    } else null
 
     abstract var title: String
     abstract var beginAniId: Int
@@ -65,7 +66,7 @@ abstract class StatusAnimation {
                 (GlobalApp.APP.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager)
                         .cancel(nId)
             } catch (e: Exception) {
-            }finally {
+            } finally {
                 hideThread = null
             }
         }

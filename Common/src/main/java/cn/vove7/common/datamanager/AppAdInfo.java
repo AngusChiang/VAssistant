@@ -3,14 +3,18 @@ package cn.vove7.common.datamanager;
 import org.greenrobot.greendao.annotation.Entity;
 import org.greenrobot.greendao.annotation.Generated;
 import org.greenrobot.greendao.annotation.Id;
+import org.greenrobot.greendao.annotation.Keep;
 
 import java.io.Serializable;
+
+import cn.vove7.common.interfaces.Markable;
+import cn.vove7.common.netacc.tool.SignHelper;
 
 /**
  * Created by 17719247306 on 2018/9/3
  */
 @Entity
-public class AppAdInfo implements Serializable {
+public class AppAdInfo  implements Serializable, Markable{
     static final long serialVersionUID = 111L;
     @Id
     private Long id;
@@ -31,7 +35,20 @@ public class AppAdInfo implements Serializable {
      */
     private String descs;
     private String depths;
-    private String type;
+    private String type;//class name
+
+    private String tagId;
+    public String getTagId() {
+        return tagId;
+    }
+
+    public void setTagId(String tagId) {
+        this.tagId = tagId;
+    }
+    @Override
+    public void sign() {
+        setTagId(SignHelper.MD5(descTitle, pkg, activity, viewId, type, String.valueOf(versionCode), texts, descs, depths));
+    }
 
     private Integer versionCode;//? 不需要 找不到就是找不到 . 消耗资源?
 
@@ -68,9 +85,10 @@ public class AppAdInfo implements Serializable {
         this.texts = texts;
     }
 
-    @Generated(hash = 515818356)
+    @Keep
     public AppAdInfo(Long id, String descTitle, String pkg, String activity, String texts,
-                     String viewId, String descs, String depths, String type, Integer versionCode) {
+            String viewId, String descs, String depths, String type, String tagId,
+            Integer versionCode) {
         this.id = id;
         this.descTitle = descTitle;
         this.pkg = pkg;
@@ -80,6 +98,7 @@ public class AppAdInfo implements Serializable {
         this.descs = descs;
         this.depths = depths;
         this.type = type;
+        setTagId(tagId);
         this.versionCode = versionCode;
     }
 
@@ -140,6 +159,7 @@ public class AppAdInfo implements Serializable {
     public void setId(Long id) {
         this.id = id;
     }
+
     public String getDepths() {
         return depths;
     }

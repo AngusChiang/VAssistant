@@ -8,10 +8,11 @@ import android.view.View
 import android.widget.Button
 import android.widget.ProgressBar
 import cn.vove7.common.app.GlobalApp
-import cn.vove7.common.model.ResponseMessage
 import cn.vove7.common.model.UserInfo
 import cn.vove7.common.netacc.ApiUrls
 import cn.vove7.common.netacc.NetHelper
+import cn.vove7.common.netacc.model.BaseRequestModel
+import cn.vove7.common.netacc.model.ResponseMessage
 import cn.vove7.common.netacc.tool.SignHelper
 import cn.vove7.common.view.toast.ColorfulToast
 import cn.vove7.jarvis.R
@@ -20,7 +21,6 @@ import cn.vove7.vtp.log.Vog
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.customview.customView
 import com.google.gson.reflect.TypeToken
-import java.util.*
 
 /**
  * # LoginDialog
@@ -58,7 +58,8 @@ class LoginDialog(val context: Context, initEmail: String? = null,
         loginBtn.setOnClickListener {
             userAccountView.error = ""
             userPassView.error = ""
-            val params = TreeMap<String, String>()
+//            val params = TreeMap<String, String>()
+            val userInfo = UserInfo()
             val loginId = userAccountView.editText?.text.toString()
             val userPass = userPassView.editText?.text.toString()
             if (TextUtils.isEmpty(loginId)) {
@@ -71,15 +72,14 @@ class LoginDialog(val context: Context, initEmail: String? = null,
             }
 
             if (TextHelper.isEmail(loginId)) {
-                params["email"] = loginId
-            } else params["userName"] = loginId
+                userInfo.email = loginId
+            } else userInfo.userName = loginId
 
-            params["userPass"] = SignHelper.MD5(userPass)
-            SignHelper.signParam(params)
+            userInfo.userPass = SignHelper.MD5(userPass)
 
             loadBar.visibility = View.VISIBLE
             //post
-            NetHelper.post<UserInfo>(ApiUrls.LOGIN, params, type = object
+            NetHelper.postJson<UserInfo>(ApiUrls.LOGIN, BaseRequestModel(userInfo), type = object
                 : TypeToken<ResponseMessage<UserInfo>>() {}.type, callback = { _, bean ->
                 //泛型
                 Vog.d(this, "onResponse ---> $bean")
@@ -90,13 +90,13 @@ class LoginDialog(val context: Context, initEmail: String? = null,
                             bean.data!!.success()
                         } catch (e: Exception) {
                             toast.showShort("code: ld82")
-                            return@post
+                            return@postJson
                         }
                         toast.showShort("登录成功")
                         r.invoke()
                         dialog.dismiss()
                     } else {
-                        toast.showShort(bean.message ?: "null")
+                        toast.showShort(bean.message)
                     }
                 } else {
                     toast.showShort("出错")

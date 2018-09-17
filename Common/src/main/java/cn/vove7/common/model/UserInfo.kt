@@ -1,5 +1,7 @@
 package cn.vove7.common.model
 
+import com.google.gson.annotations.SerializedName
+import java.io.Serializable
 import java.util.*
 
 /**
@@ -8,11 +10,13 @@ import java.util.*
  * @author 17719247306
  * 2018/9/11
  */
-class UserInfo {
+class UserInfo : Serializable {
+    @SerializedName("userId")
     val userId: Long = -1
-    val userName: String? = null
-    val email: String? = null
-//    val userPass: String? = null
+    @SerializedName("userName")
+    var userName: String? = null
+    var email: String? = null
+    var userPass: String? = null
     val regTime: Date? = null
     val userToken: String? = null
 

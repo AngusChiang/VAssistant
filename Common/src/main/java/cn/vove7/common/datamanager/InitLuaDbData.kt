@@ -12,8 +12,7 @@ import cn.vove7.vtp.log.Vog
  * Created by Vove on 2018/6/23
  */
 object InitLuaDbData : InitDbData() {
-    override fun init() {
-        super.init()
+    override fun initSelf() {
         val mapDao = DAO.daoSession.actionNodeDao
         val scriptType = Action.SCRIPT_TYPE_LUA
 
@@ -89,7 +88,6 @@ object InitLuaDbData : InitDbData() {
                         "ViewFinder().equalsText('首页').id('tab_description').tryClick()\n" +
                         "ViewFinder().equalsText('Home').id('tab_description').tryClick()\n" +
                         "sacn = ViewFinder().id('saoyisao_tv')\n" +
-                        "\n" +
                         "sacn.waitFor().tryClick()\n", scriptType)
         val a13 = Action("system.volumeUp()", scriptType)
         val a14 = Action("system.volumeDown()", scriptType)
@@ -121,7 +119,7 @@ object InitLuaDbData : InitDbData() {
                 , Reg("%给%打电话", Reg.PARAM_POS_2, 2)
                 , Reg("%给%发消息", Reg.PARAM_POS_2, 3)
                 , Reg("%发消息给%", Reg.PARAM_POS_END, 3)
-                , Reg("(内容)?(为|是)?%", Reg.PARAM_POS_END, 4)
+                    , Reg("(内容)?(为|是)?%", Reg.PARAM_POS_END, 4)
                 , Reg("%返回", Reg.PARAM_NO, 5)
                 , Reg("(返回|回)?(到)?主页", Reg.PARAM_NO, 6)
                 , Reg("(显示)?最近(应用|任务)?", Reg.PARAM_NO, 7)
@@ -156,7 +154,6 @@ object InitLuaDbData : InitDbData() {
                 ActionNode("打开...", 1L, a1.id, NODE_SCOPE_GLOBAL)//打开
                 , ActionNode("QQ选择聊天人", 3L, a3.id, scrope_qq.id, NODE_SCOPE_IN_APP)//QQ选择聊天人
                 , ActionNode("QQ消息内容", 4L, a4.id, NODE_SCOPE_IN_APP_2, 3L)//QQ消息内容
-
                 , ActionNode("拨打电话", 2L, a2.id, NODE_SCOPE_GLOBAL)//电话
                 , ActionNode("返回", 5L, a5.id, NODE_SCOPE_GLOBAL)//返回
                 , ActionNode("主页", 6L, a6.id, NODE_SCOPE_GLOBAL)//主页
@@ -170,7 +167,6 @@ object InitLuaDbData : InitDbData() {
                 , ActionNode("暂停播放", 17L, a17.id, NODE_SCOPE_GLOBAL)
                 , ActionNode("继续播放", 18L, a18.id, NODE_SCOPE_GLOBAL)
                 , ActionNode("停止播放", 19L, a19.id, NODE_SCOPE_GLOBAL)
-
                 , ActionNode("QQ扫一扫", 11L, a11.id, scrope_qq.id, NODE_SCOPE_IN_APP)//QQ扫一扫
                 , ActionNode("支付宝扫一扫", 12L, a12.id, scrope_alipay.id, NODE_SCOPE_IN_APP)//支付宝扫一扫
                 , ActionNode("今天星期几", 20L, a20.id, NODE_SCOPE_GLOBAL)

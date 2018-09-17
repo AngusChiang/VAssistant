@@ -15,8 +15,10 @@ import cn.vove7.vtp.text.TextHelper
 object AdvanAppHelper {
     //    companion object {
     //记录 pkg -> AppInfo
-    private val APP_LIST = hashMapOf<String, AppInfo>()
+    val APP_LIST = hashMapOf<String, AppInfo>()
     private var limitRate = 0.8f
+
+    private
 
     var lastUpdateTime = 0L
     const val updateInterval = 30 * 60 * 1000
@@ -67,14 +69,27 @@ object AdvanAppHelper {
         }
     }
 
+    /**
+     * 更新AppList
+     */
     fun updateAppList() {
         val context = GlobalApp.APP
         Vog.v(this, "更新App列表")
         APP_LIST.clear()
-        AppHelper.getAllInstallApp(context).forEach {
+        AppHelper.getAllInstallApp(context).filter {
+            context.packageManager.getLaunchIntentForPackage(it.packageName) != null
+        }.forEach {
             APP_LIST[it.packageName] = it
         }
         Vog.v(this, "更新后 size: ${APP_LIST.size}")
+    }
+
+    fun getPkgList(): List<String> {
+        val li = mutableListOf<String>()
+        APP_LIST.forEach {
+            li.add(it.value.packageName)
+        }
+        return li
     }
 
 }

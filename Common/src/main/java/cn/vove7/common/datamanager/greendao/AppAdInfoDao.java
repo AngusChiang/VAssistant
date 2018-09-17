@@ -33,7 +33,8 @@ public class AppAdInfoDao extends AbstractDao<AppAdInfo, Long> {
         public final static Property Descs = new Property(6, String.class, "descs", false, "DESCS");
         public final static Property Depths = new Property(7, String.class, "depths", false, "DEPTHS");
         public final static Property Type = new Property(8, String.class, "type", false, "TYPE");
-        public final static Property VersionCode = new Property(9, Integer.class, "versionCode", false, "VERSION_CODE");
+        public final static Property TagId = new Property(9, String.class, "tagId", false, "TAG_ID");
+        public final static Property VersionCode = new Property(10, Integer.class, "versionCode", false, "VERSION_CODE");
     }
 
 
@@ -58,7 +59,8 @@ public class AppAdInfoDao extends AbstractDao<AppAdInfo, Long> {
                 "\"DESCS\" TEXT," + // 6: descs
                 "\"DEPTHS\" TEXT," + // 7: depths
                 "\"TYPE\" TEXT," + // 8: type
-                "\"VERSION_CODE\" INTEGER);"); // 9: versionCode
+                "\"TAG_ID\" TEXT," + // 9: tagId
+                "\"VERSION_CODE\" INTEGER);"); // 10: versionCode
     }
 
     /** Drops the underlying database table. */
@@ -116,9 +118,14 @@ public class AppAdInfoDao extends AbstractDao<AppAdInfo, Long> {
             stmt.bindString(9, type);
         }
  
+        String tagId = entity.getTagId();
+        if (tagId != null) {
+            stmt.bindString(10, tagId);
+        }
+ 
         Integer versionCode = entity.getVersionCode();
         if (versionCode != null) {
-            stmt.bindLong(10, versionCode);
+            stmt.bindLong(11, versionCode);
         }
     }
 
@@ -171,9 +178,14 @@ public class AppAdInfoDao extends AbstractDao<AppAdInfo, Long> {
             stmt.bindString(9, type);
         }
  
+        String tagId = entity.getTagId();
+        if (tagId != null) {
+            stmt.bindString(10, tagId);
+        }
+ 
         Integer versionCode = entity.getVersionCode();
         if (versionCode != null) {
-            stmt.bindLong(10, versionCode);
+            stmt.bindLong(11, versionCode);
         }
     }
 
@@ -194,7 +206,8 @@ public class AppAdInfoDao extends AbstractDao<AppAdInfo, Long> {
             cursor.isNull(offset + 6) ? null : cursor.getString(offset + 6), // descs
             cursor.isNull(offset + 7) ? null : cursor.getString(offset + 7), // depths
             cursor.isNull(offset + 8) ? null : cursor.getString(offset + 8), // type
-            cursor.isNull(offset + 9) ? null : cursor.getInt(offset + 9) // versionCode
+            cursor.isNull(offset + 9) ? null : cursor.getString(offset + 9), // tagId
+            cursor.isNull(offset + 10) ? null : cursor.getInt(offset + 10) // versionCode
         );
         return entity;
     }
@@ -210,7 +223,8 @@ public class AppAdInfoDao extends AbstractDao<AppAdInfo, Long> {
         entity.setDescs(cursor.isNull(offset + 6) ? null : cursor.getString(offset + 6));
         entity.setDepths(cursor.isNull(offset + 7) ? null : cursor.getString(offset + 7));
         entity.setType(cursor.isNull(offset + 8) ? null : cursor.getString(offset + 8));
-        entity.setVersionCode(cursor.isNull(offset + 9) ? null : cursor.getInt(offset + 9));
+        entity.setTagId(cursor.isNull(offset + 9) ? null : cursor.getString(offset + 9));
+        entity.setVersionCode(cursor.isNull(offset + 10) ? null : cursor.getInt(offset + 10));
      }
     
     @Override

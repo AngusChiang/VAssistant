@@ -4,12 +4,13 @@ import android.os.Bundle
 import android.view.View
 import android.widget.CompoundButton
 import cn.vove7.common.datamanager.DAO
-import cn.vove7.common.datamanager.executor.entity.MarkedOpen
-import cn.vove7.common.datamanager.executor.entity.MarkedOpen.MARKED_TYPE_APP
-import cn.vove7.common.datamanager.greendao.MarkedOpenDao
+import cn.vove7.common.datamanager.executor.entity.MarkedData
+import cn.vove7.common.datamanager.executor.entity.MarkedData.MARKED_TYPE_APP
+import cn.vove7.common.datamanager.greendao.MarkedDataDao
 import cn.vove7.executorengine.bridges.SystemBridge
 import cn.vove7.jarvis.adapters.SimpleListAdapter
 import cn.vove7.jarvis.adapters.ViewModel
+import cn.vove7.jarvis.fragments.base.BaseMarkedFragment
 import kotlin.concurrent.thread
 
 /**
@@ -18,7 +19,9 @@ import kotlin.concurrent.thread
  * @author 17719247306
  * 2018/9/7
  */
-class MarkedAppFragment : SimpleListFragment<MarkedOpen>() {
+class MarkedAppFragment : BaseMarkedFragment<MarkedData>() {
+
+    override val types: Array<String> = arrayOf(MarkedData.MARKED_TYPE_APP)
 
     var showUninstall = false
     override val itemClickListener = object : SimpleListAdapter.OnItemClickListener {
@@ -33,7 +36,6 @@ class MarkedAppFragment : SimpleListFragment<MarkedOpen>() {
         }
     }
 
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         buildHeader("显示未安装应用", lis = CompoundButton.OnCheckedChangeListener { buttonView, isChecked ->
@@ -42,7 +44,7 @@ class MarkedAppFragment : SimpleListFragment<MarkedOpen>() {
         })
     }
 
-    override fun transData(nodes: List<MarkedOpen>): List<ViewModel> {
+    override fun transData(nodes: List<MarkedData>): List<ViewModel> {
         val ss = mutableListOf<ViewModel>()
         val sss = mutableListOf<ViewModel>()
         nodes.forEach {
@@ -58,9 +60,9 @@ class MarkedAppFragment : SimpleListFragment<MarkedOpen>() {
 
     override fun onGetData(pageIndex: Int) {
         thread {
-            val builder = DAO.daoSession.markedOpenDao
+            val builder = DAO.daoSession.markedDataDao
                     .queryBuilder()
-                    .where(MarkedOpenDao.Properties.Type.eq(MARKED_TYPE_APP))
+                    .where(MarkedDataDao.Properties.Type.eq(MARKED_TYPE_APP))
                     .offset(pageSizeLimit * pageIndex)
                     .limit(pageSizeLimit)
 

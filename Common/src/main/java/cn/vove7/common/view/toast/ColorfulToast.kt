@@ -21,8 +21,8 @@ import cn.vove7.common.R
 class ColorfulToast(context: Context, textColor: Int = R.color.fff) {
     var toast: Toast = Toast(context)
 
-    lateinit var toastView: View
-    lateinit var textView: TextView
+    var toastView: View
+    var textView: TextView
     private val lHandler: ToastHandler
 
     init {

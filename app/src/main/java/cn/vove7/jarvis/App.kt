@@ -5,10 +5,11 @@ import android.os.Build
 import android.util.Log
 import cn.vove7.androlua.LuaApp
 import cn.vove7.common.appbus.MessageEvent
-import cn.vove7.common.datamanager.DAO
 import cn.vove7.common.datamanager.InitLuaDbData
+import cn.vove7.executorengine.helper.AdvanAppHelper
 import cn.vove7.jarvis.plugins.AdKillerService
 import cn.vove7.jarvis.services.MainService
+import cn.vove7.jarvis.utils.RuntimeConfig
 import cn.vove7.jarvis.utils.debugserver.RemoteDebugServer
 import cn.vove7.vtp.log.Vog
 import cn.vove7.vtp.sharedpreference.SpHelper
@@ -20,7 +21,6 @@ import kotlin.concurrent.thread
 class App : LuaApp() {
 
     private lateinit var mainService: Intent
-    private lateinit var synService: Intent
     lateinit var services: Array<Intent>
 
     override fun onCreate() {
@@ -33,9 +33,13 @@ class App : LuaApp() {
         if (BuildConfig.DEBUG)
             RemoteDebugServer.start()
         startServices()
-        DAO.init(this)
+//        DAO.init(this)
         if (BuildConfig.DEBUG)
             InitLuaDbData.init()
+        RuntimeConfig.init()
+        thread {
+            AdvanAppHelper.updateAppList()
+        }
     }
 
     private fun startServices() {
@@ -47,8 +51,6 @@ class App : LuaApp() {
                     startService(it)
                 }
             }
-            if (SpHelper(this).getBoolean(R.string.key_open_ad_block, true))
-                AdKillerService.bindServer()//广告服务
         }
     }
 

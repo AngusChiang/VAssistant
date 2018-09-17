@@ -38,11 +38,13 @@ class SettingsActivity : AppCompatActivity() {
 
     lateinit var groupItems: List<SettingGroupItem>
 
-    fun initData() {//TODO 震动
+    private fun initData() {//TODO 震动
         groupItems = listOf(
                 SettingGroupItem(R.color.google_green, "通知", childItems = listOf(
                         SwitchItem(R.string.text_show_toast_when_remove_ad,
-                                keyId = R.string.key_show_toast_when_remove_ad, defaultValue = { true })
+                                keyId = R.string.key_show_toast_when_remove_ad, defaultValue = { true }),
+                        SwitchItem(R.string.text_vibrate_reco_begin,
+                                keyId = R.string.key_vibrate_reco_begin, defaultValue = { true })
                 )),
                 SettingGroupItem(R.color.google_yellow, "语音合成", childItems = listOf(
                         SwitchItem(R.string.text_play_voice_message, "关闭后以弹窗形式提醒",
@@ -64,7 +66,7 @@ class SettingsActivity : AppCompatActivity() {
                                 true -> AppBus.postSpeechAction(SpeechAction.ActionCode.ACTION_START_WAKEUP)
                                 false -> AppBus.postSpeechAction(SpeechAction.ActionCode.ACTION_STOP_WAKEUP)
                             }
-                        }, defaultValue = { true }),
+                        }, defaultValue = { false }),
                         CheckBoxItem(R.string.text_voice_control_dialog, "使用语言命令控制对话框",
                                 R.string.key_voice_control_dialog, defaultValue = { true })
                 )),

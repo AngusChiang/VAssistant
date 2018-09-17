@@ -153,6 +153,7 @@
     <string name="text_volume">音量</string>
     <string name="text_speak_speed">Speed of Speak</string>
     <string name="key_show_toast_when_remove_ad" translatable="false">show_toast_when_remove_ad</string>
+    <string name="key_vibrate_reco_begin" translatable="false">vibrate_reco_begin</string>
     <string name="key_voice_syn_model" translatable="false">voice_syn_model</string>
     <string name="key_open_ad_block" translatable="false">open_ad_block</string>
     <string name="key_voice_control_dialog" translatable="false">voice_control_dialog</string>
@@ -163,7 +164,7 @@
     <string name="text_remote_debug">远程调试</string>
     <string name="text_open_voice_wakeup">Voice wakeup</string>
     <string name="text_play_voice_message">Play voice message</string>
-    <string name="text_debug_code">Debug code</string>
+    <string name="text_test_code">Test code</string>
     <string name="text_voice_control">Voice control</string>
     <string name="text_voice_control_dialog">控制对话框</string>
     <string name="text_mark_management">Mark management</string>
@@ -180,5 +181,8 @@
     <string name="text_ver_code">VerificationCode</string>
     <string name="text_get_ver_code">Get</string>
     <string name="text_email">EmailAddress</string>
+    <string name="text_share">Share</string>
+    <string name="text_sync">同步</string>
+    <string name="text_vibrate_reco_begin">开始识别时震动</string>
 
 </resources>

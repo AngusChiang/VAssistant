@@ -19,4 +19,14 @@ object TextHelper {
         if (s == null) return false
         return userRegex.matches(s)
     }
+
+    fun arr2String(ss: Array<String>, separator: String = ","): String {
+        return buildString {
+            ss.withIndex().forEach {
+                if (it.index == 0) append(ss[0])
+                else
+                    append(separator + ss[it.index])
+            }
+        }
+    }
 }

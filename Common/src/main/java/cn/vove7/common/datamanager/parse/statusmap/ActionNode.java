@@ -21,8 +21,10 @@ import cn.vove7.common.datamanager.greendao.DaoSession;
 import cn.vove7.common.datamanager.greendao.RegDao;
 import cn.vove7.common.datamanager.parse.DataFrom;
 import cn.vove7.common.datamanager.parse.model.Action;
+import cn.vove7.common.datamanager.parse.model.ActionDesc;
 import cn.vove7.common.datamanager.parse.model.ActionParam;
 import cn.vove7.common.datamanager.parse.model.ActionScope;
+import cn.vove7.common.datamanager.greendao.ActionDescDao;
 
 /**
  * 状态图节点
@@ -61,7 +63,7 @@ public class ActionNode implements Serializable, DataFrom {
      */
     @ToOne(joinProperty = "actionId")//一对一,actionId外键
     private Action action;
-    private long actionId;
+    private Long actionId;
 
     /**
      * 后续节点id format: nodeId1,nodeId2,..
@@ -87,10 +89,16 @@ public class ActionNode implements Serializable, DataFrom {
     /**
      * APP作用域
      */
+    private Long scopeId;
     @ToOne(joinProperty = "scopeId")
     private
     ActionScope actionScope;
-    private long scopeId;
+
+    private Long descId;
+
+    @ToOne(joinProperty = "descId")
+    private ActionDesc desc;
+
     private String descTitle;
 
     private String tagId;//与服务器数据匹配标志
@@ -98,7 +106,15 @@ public class ActionNode implements Serializable, DataFrom {
 
     private Long publishUserId;//发布者
 
-    private int priority;//优先级 bigger优先; 相对于action chain :(全局命令下: 返回主页>返回) (同一界面下)
+    /**
+     * 服务器返回字段方便寻找parentId
+     * 插入顺序：parent > id > this
+     * 使用队列
+     */
+    private String parentTagId;//
+
+
+    private int priority;//匹配优先级 bigger优先; 相对于action chain :(全局命令下: 返回主页>返回) (同一界面下)
 
     private String from = null;
 
@@ -142,6 +158,8 @@ public class ActionNode implements Serializable, DataFrom {
     private transient ActionNodeDao myDao;
     @Generated(hash = 1293412156)
     private transient Long parent__resolvedKey;
+    @Generated(hash = 1157301878)
+    private transient Long desc__resolvedKey;
 
     public Long getParentId() {
         return parentId;
@@ -266,17 +284,21 @@ public class ActionNode implements Serializable, DataFrom {
         this.priority = priority;
     }
 
-    @Generated(hash = 1239043208)
-    public ActionNode(Long id, int actionScopeType, long actionId, Long parentId, long scopeId,
-                      String descTitle, String tagId, Long publishUserId, int priority, String from) {
+    @Generated(hash = 646051730)
+    public ActionNode(Long id, int actionScopeType, Long actionId, Long parentId, Long scopeId,
+            Long descId, String descTitle, String tagId, int versionCode, Long publishUserId,
+            String parentTagId, int priority, String from) {
         this.id = id;
         this.actionScopeType = actionScopeType;
         this.actionId = actionId;
         this.parentId = parentId;
         this.scopeId = scopeId;
+        this.descId = descId;
         this.descTitle = descTitle;
         this.tagId = tagId;
+        this.versionCode = versionCode;
         this.publishUserId = publishUserId;
+        this.parentTagId = parentTagId;
         this.priority = priority;
         this.from = from;
     }
@@ -327,18 +349,12 @@ public class ActionNode implements Serializable, DataFrom {
         this.versionCode = versionCode;
     }
 
-    /**
-     * called by internal mechanisms, do not call yourself.
-     */
-    @Generated(hash = 474548544)
-    public void setAction(@NotNull Action action) {
-        if (action == null) {
-            throw new DaoException(
-                    "To-one property 'actionId' has not-null constraint; cannot set to-one to null");
-        }
+    /** called by internal mechanisms, do not call yourself. */
+    @Generated(hash = 2057391106)
+    public void setAction(Action action) {
         synchronized (this) {
             this.action = action;
-            actionId = action.getId();
+            actionId = action == null ? null : action.getId();
             action__resolvedKey = actionId;
         }
     }
@@ -364,22 +380,15 @@ public class ActionNode implements Serializable, DataFrom {
     }
 
 
-    /**
-     * called by internal mechanisms, do not call yourself.
-     */
-    @Generated(hash = 1856235649)
-    public void setActionScope(@NotNull ActionScope actionScope) {
-        if (actionScope == null) {
-            throw new DaoException(
-                    "To-one property 'scopeId' has not-null constraint; cannot set to-one to null");
-        }
+    /** called by internal mechanisms, do not call yourself. */
+    @Generated(hash = 1845482996)
+    public void setActionScope(ActionScope actionScope) {
         synchronized (this) {
             this.actionScope = actionScope;
-            scopeId = actionScope.getId();
+            scopeId = actionScope == null ? null : actionScope.getId();
             actionScope__resolvedKey = scopeId;
         }
     }
-
 
     /**
      * Resets a to-many relationship, making the next get call to query for a fresh result.
@@ -569,5 +578,58 @@ public class ActionNode implements Serializable, DataFrom {
             parentId = parent == null ? null : parent.getId();
             parent__resolvedKey = parentId;
         }
+    }
+
+    public Long getDescId() {
+        return descId;
+    }
+
+    public void setDescId(Long descId) {
+        this.descId = descId;
+    }
+
+    public String getParentTagId() {
+        return parentTagId;
+    }
+
+    public void setParentTagId(String parentTagId) {
+        this.parentTagId = parentTagId;
+    }
+
+    public void setScopeId(Long scopeId) {
+        this.scopeId = scopeId;
+    }
+
+    /** To-one relationship, resolved on first access. */
+    @Generated(hash = 785936297)
+    public ActionDesc getDesc() {
+        Long __key = this.descId;
+        if (desc__resolvedKey == null || !desc__resolvedKey.equals(__key)) {
+            final DaoSession daoSession = this.daoSession;
+            if (daoSession == null) {
+                throw new DaoException("Entity is detached from DAO context");
+            }
+            ActionDescDao targetDao = daoSession.getActionDescDao();
+            ActionDesc descNew = targetDao.load(__key);
+            synchronized (this) {
+                desc = descNew;
+                desc__resolvedKey = __key;
+            }
+        }
+        return desc;
+    }
+
+    /** called by internal mechanisms, do not call yourself. */
+    @Generated(hash = 1849761388)
+    public void setDesc(ActionDesc desc) {
+        synchronized (this) {
+            this.desc = desc;
+            descId = desc == null ? null : desc.getId();
+            desc__resolvedKey = descId;
+        }
+    }
+
+    public void setActionId(Long actionId) {
+        this.actionId = actionId;
     }
 }

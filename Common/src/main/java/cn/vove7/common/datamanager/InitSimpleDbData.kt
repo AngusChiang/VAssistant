@@ -12,8 +12,7 @@ import cn.vove7.vtp.log.Vog
  * Created by Vove on 2018/6/23
  */
 object InitSimpleDbData : InitDbData() {
-    override fun init() {
-        super.init()
+    override fun initSelf() {
         val mapDao = DAO.daoSession.actionNodeDao
 
         val scriptType = "simple"

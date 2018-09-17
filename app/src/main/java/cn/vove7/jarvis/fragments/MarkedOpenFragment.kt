@@ -1,10 +1,12 @@
 package cn.vove7.jarvis.fragments
 
 import cn.vove7.common.datamanager.DAO
-import cn.vove7.common.datamanager.executor.entity.MarkedOpen
-import cn.vove7.common.datamanager.greendao.MarkedOpenDao
+import cn.vove7.common.datamanager.executor.entity.MarkedData
+import cn.vove7.common.datamanager.executor.entity.MarkedData.MARKED_TYPE_CONTACT
+import cn.vove7.common.datamanager.greendao.MarkedDataDao
 import cn.vove7.jarvis.adapters.SimpleListAdapter
 import cn.vove7.jarvis.adapters.ViewModel
+import cn.vove7.jarvis.fragments.base.BaseMarkedFragment
 import kotlin.concurrent.thread
 
 /**
@@ -13,7 +15,8 @@ import kotlin.concurrent.thread
  * @author 17719247306
  * 2018/9/7
  */
-class MarkedOpenFragment : SimpleListFragment<MarkedOpen>() {
+class MarkedOpenFragment : BaseMarkedFragment<MarkedData>() {
+    override val types: Array<String> = arrayOf(MarkedData.MARKED_TYPE_SCRIPT_JS, MarkedData.MARKED_TYPE_SCRIPT_LUA)
 
     override val itemClickListener = object : SimpleListAdapter.OnItemClickListener {
         override fun onClick(holder: SimpleListAdapter.VHolder?, pos: Int, item: ViewModel) {
@@ -27,8 +30,7 @@ class MarkedOpenFragment : SimpleListFragment<MarkedOpen>() {
         }
     }
 
-
-    override fun transData(nodes: List<MarkedOpen>): List<ViewModel> {
+    override fun transData(nodes: List<MarkedData>): List<ViewModel> {
         val ss = mutableListOf<ViewModel>()
         nodes.forEach {
             ss.add(ViewModel(it.key, null, extra = it))
@@ -38,9 +40,9 @@ class MarkedOpenFragment : SimpleListFragment<MarkedOpen>() {
 
     override fun onGetData(pageIndex: Int) {
         thread {
-            val builder = DAO.daoSession.markedOpenDao
+            val builder = DAO.daoSession.markedDataDao
                     .queryBuilder()
-                    .where(MarkedOpenDao.Properties.Type.notIn(MarkedOpen.MARKED_TYPE_APP))
+                    .where(MarkedDataDao.Properties.Type.notIn(MarkedData.MARKED_TYPE_APP, MARKED_TYPE_CONTACT))
                     .offset(pageSizeLimit * pageIndex)
                     .limit(pageSizeLimit)
 

@@ -1,7 +1,6 @@
 package cn.vove7.common.netacc.tool
 
-import cn.vove7.common.model.ResponseMessage
-import com.google.gson.Gson
+import cn.vove7.common.netacc.model.ResponseMessage
 import com.google.gson.GsonBuilder
 import java.lang.reflect.Type
 
