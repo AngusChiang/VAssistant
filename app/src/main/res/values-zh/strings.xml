@@ -101,4 +101,5 @@
     <string name="text_share">分享</string>
     <string name="text_sync">同步</string>
     <string name="text_vibrate_reco_begin">开始识别时震动</string>
+    <string name="text_net_err">网络错误</string>
 </resources>

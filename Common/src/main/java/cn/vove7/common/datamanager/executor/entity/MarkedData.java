@@ -98,7 +98,7 @@ public class MarkedData implements DataFrom, Markable {
         this.type = type;
         this.regStr = regStr;
         this.value = value;
-        this.from = DataFrom.FROM_SERVICE;
+        this.from = DataFrom.FROM_SERVER;
     }
 
     @Keep

@@ -48,7 +48,7 @@ abstract class InitDbData {
             data.regStr = it.second.first
             data.value = it.second.second
             data.type = MarkedData.MARKED_TYPE_CONTACT
-            data.from = DataFrom.FROM_SERVICE
+            data.from = DataFrom.FROM_SERVER
             markedDataDao.insert(data)
         }
 

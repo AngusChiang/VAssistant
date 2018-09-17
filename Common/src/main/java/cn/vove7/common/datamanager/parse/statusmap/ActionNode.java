@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import cn.vove7.common.datamanager.greendao.ActionDao;
+import cn.vove7.common.datamanager.greendao.ActionDescDao;
 import cn.vove7.common.datamanager.greendao.ActionNodeDao;
 import cn.vove7.common.datamanager.greendao.ActionScopeDao;
 import cn.vove7.common.datamanager.greendao.DaoSession;
@@ -24,7 +25,6 @@ import cn.vove7.common.datamanager.parse.model.Action;
 import cn.vove7.common.datamanager.parse.model.ActionDesc;
 import cn.vove7.common.datamanager.parse.model.ActionParam;
 import cn.vove7.common.datamanager.parse.model.ActionScope;
-import cn.vove7.common.datamanager.greendao.ActionDescDao;
 
 /**
  * 状态图节点
@@ -247,7 +247,7 @@ public class ActionNode implements Serializable, DataFrom {
         this.actionId = actionId;
     }
 
-    public long getScopeId() {
+    public Long getScopeId() {
         return scopeId;
     }
 
@@ -286,8 +286,8 @@ public class ActionNode implements Serializable, DataFrom {
 
     @Generated(hash = 646051730)
     public ActionNode(Long id, int actionScopeType, Long actionId, Long parentId, Long scopeId,
-            Long descId, String descTitle, String tagId, int versionCode, Long publishUserId,
-            String parentTagId, int priority, String from) {
+                      Long descId, String descTitle, String tagId, int versionCode, Long publishUserId,
+                      String parentTagId, int priority, String from) {
         this.id = id;
         this.actionScopeType = actionScopeType;
         this.actionId = actionId;
@@ -317,6 +317,7 @@ public class ActionNode implements Serializable, DataFrom {
      */
     @Keep
     public Action getAction() {
+        if (daoSession == null) return action;
         if (action != null) {
             return action;
         }
@@ -349,7 +350,9 @@ public class ActionNode implements Serializable, DataFrom {
         this.versionCode = versionCode;
     }
 
-    /** called by internal mechanisms, do not call yourself. */
+    /**
+     * called by internal mechanisms, do not call yourself.
+     */
     @Generated(hash = 2057391106)
     public void setAction(Action action) {
         synchronized (this) {
@@ -380,7 +383,9 @@ public class ActionNode implements Serializable, DataFrom {
     }
 
 
-    /** called by internal mechanisms, do not call yourself. */
+    /**
+     * called by internal mechanisms, do not call yourself.
+     */
     @Generated(hash = 1845482996)
     public void setActionScope(ActionScope actionScope) {
         synchronized (this) {
@@ -426,8 +431,9 @@ public class ActionNode implements Serializable, DataFrom {
      */
     @Keep
     public ActionScope getActionScope() {
+        if (daoSession == null) return actionScope;
         if (actionScope != null) return actionScope;
-        long __key = this.scopeId;
+        Long __key = this.scopeId;
         if (actionScope__resolvedKey == null || !actionScope__resolvedKey.equals(__key)) {
             final DaoSession daoSession = this.daoSession;
             if (daoSession == null) {
@@ -447,8 +453,10 @@ public class ActionNode implements Serializable, DataFrom {
      * To-many relationship, resolved on first access (and after reset).
      * Changes to to-many relations are not persisted, make changes to the target entity.
      */
-    @Generated(hash = 576232639)
+    @Keep
     public List<Reg> getRegs() {
+        if (daoSession == null)
+            return regs;
         if (regs == null) {
             final DaoSession daoSession = this.daoSession;
             if (daoSession == null) {
@@ -600,10 +608,13 @@ public class ActionNode implements Serializable, DataFrom {
         this.scopeId = scopeId;
     }
 
-    /** To-one relationship, resolved on first access. */
-    @Generated(hash = 785936297)
+    /**
+     * To-one relationship, resolved on first access.
+     */
+    @Keep
     public ActionDesc getDesc() {
-        Long __key = this.descId;
+        if (daoSession == null) return desc;
+            Long __key = this.descId;
         if (desc__resolvedKey == null || !desc__resolvedKey.equals(__key)) {
             final DaoSession daoSession = this.daoSession;
             if (daoSession == null) {
@@ -619,7 +630,9 @@ public class ActionNode implements Serializable, DataFrom {
         return desc;
     }
 
-    /** called by internal mechanisms, do not call yourself. */
+    /**
+     * called by internal mechanisms, do not call yourself.
+     */
     @Generated(hash = 1849761388)
     public void setDesc(ActionDesc desc) {
         synchronized (this) {

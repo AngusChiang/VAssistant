@@ -1,8 +1,5 @@
 package cn.vove7.jarvis.fragments.base
 
-import android.view.Menu
-import android.view.MenuInflater
-import android.view.MenuItem
 import android.view.View
 import cn.vove7.common.datamanager.DaoHelper
 import cn.vove7.common.datamanager.executor.entity.MarkedData
@@ -15,6 +12,7 @@ import cn.vove7.jarvis.R
 import cn.vove7.jarvis.fragments.SimpleListFragment
 import cn.vove7.jarvis.view.utils.TextHelper
 import com.google.gson.reflect.TypeToken
+import kotlinx.android.synthetic.main.fragment_base_list.view.*
 
 /**
  * # BaseMarkedFragment
@@ -22,26 +20,9 @@ import com.google.gson.reflect.TypeToken
  * @author Administrator
  * 2018/9/16
  */
-abstract class BaseMarkedFragment<T> : SimpleListFragment<T>(), OnSyncClick {
-    abstract val types: Array<String>
+abstract class BaseMarkedFragment<T> : SimpleListFragment<T>(), OnSyncMarked {
     override var floatClickListener: View.OnClickListener? = View.OnClickListener {
 //        onSync(types)
-    }
-
-    override fun onCreateOptionsMenu(menu: Menu?, inflater: MenuInflater?) {
-        inflater?.inflate(R.menu.menu_sync,menu)
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
-        when (item?.itemId) {
-            R.id.menu_item_sync -> {
-                onSync(types)
-            }
-            else -> {
-            }
-        }
-
-        return super.onOptionsItemSelected(item)
     }
 
     override fun onSync(types: Array<String>) {
@@ -60,15 +41,13 @@ abstract class BaseMarkedFragment<T> : SimpleListFragment<T>(), OnSyncClick {
                 } else {
                     toast.showShort(bean.message)
                 }
-            } else {
-                toast.showShort("出错")
-            }
+            } else toast.showShort(R.string.text_net_err)
             hideProgressBar()
         }
     }
 
 }
 
-interface OnSyncClick {
+interface OnSyncMarked {
     fun onSync(types: Array<String>)
 }

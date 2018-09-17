@@ -3,14 +3,23 @@ package cn.vove7.jarvis.fragments
 import android.content.Intent
 import android.os.Handler
 import android.view.View
+import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.datamanager.DAO
+import cn.vove7.common.datamanager.DaoHelper
 import cn.vove7.common.datamanager.greendao.ActionNodeDao
 import cn.vove7.common.datamanager.parse.statusmap.ActionNode
 import cn.vove7.common.datamanager.parse.statusmap.ActionNode.NODE_SCOPE_GLOBAL
+import cn.vove7.common.netacc.ApiUrls
+import cn.vove7.common.netacc.NetHelper
+import cn.vove7.common.netacc.model.BaseRequestModel
+import cn.vove7.common.netacc.model.ResponseMessage
+import cn.vove7.jarvis.R
 import cn.vove7.jarvis.activities.NewInstActivity
+import cn.vove7.jarvis.activities.OnSyncInst
 import cn.vove7.jarvis.adapters.SimpleListAdapter
 import cn.vove7.jarvis.adapters.ViewModel
 import cn.vove7.vtp.log.Vog
+import com.google.gson.reflect.TypeToken
 import kotlin.concurrent.thread
 
 /**
@@ -18,7 +27,7 @@ import kotlin.concurrent.thread
  * 指令管理列表
  * Created by 17719 on 2018/8/13
  */
-class GlobalInstListFragment : SimpleListFragment<ActionNode>() {
+class GlobalInstListFragment : SimpleListFragment<ActionNode>(), OnSyncInst {
 
     var instDetailFragment = InstDetailFragment()
     override var floatClickListener: View.OnClickListener? = View.OnClickListener {
@@ -36,7 +45,32 @@ class GlobalInstListFragment : SimpleListFragment<ActionNode>() {
             }
         }
 
+    override fun onSync() {
+        showProgressBar()
+        NetHelper.postJson<List<ActionNode>>(ApiUrls.SYNC_GLOBAL_INST, BaseRequestModel(""),
+                type = object : TypeToken<ResponseMessage<List<ActionNode>>>() {}.type) { _, bean ->
+            if (bean != null) {
+                if (bean.isOk()) {
+                    val list = bean.data
+                    if (list != null) {
+                        DaoHelper.updateGlobalInst(list).also {
+                            if(it)
+                                refresh()
+                            else toast.showShort("同步失败")
+                        }
 
+                    } else {
+                        GlobalLog.err("code: GI57")
+                        toast.showShort(R.string.text_error_occurred)
+                    }
+                } else toast.showShort(R.string.text_net_err)
+
+            } else toast.showShort(R.string.text_net_err)
+
+            hideProgressBar()
+        }
+
+    }
 
     override fun transData(nodes: List<ActionNode>): List<ViewModel> {
         val tmp = mutableListOf<ViewModel>()

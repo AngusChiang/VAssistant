@@ -23,7 +23,6 @@ import kotlin.concurrent.thread
  * 2018/9/4
  */
 class MarkedContractFragment : BaseMarkedFragment<MarkedData>() {
-    override val types: Array<String> = arrayOf(MarkedData.MARKED_TYPE_CONTACT)
 
     var showServer = false
     override val itemClickListener = object : SimpleListAdapter.OnItemClickListener {

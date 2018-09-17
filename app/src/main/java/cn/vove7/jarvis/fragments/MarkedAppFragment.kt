@@ -21,8 +21,6 @@ import kotlin.concurrent.thread
  */
 class MarkedAppFragment : BaseMarkedFragment<MarkedData>() {
 
-    override val types: Array<String> = arrayOf(MarkedData.MARKED_TYPE_APP)
-
     var showUninstall = false
     override val itemClickListener = object : SimpleListAdapter.OnItemClickListener {
         override fun onClick(holder: SimpleListAdapter.VHolder?, pos: Int, item: ViewModel) {

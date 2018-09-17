@@ -4,6 +4,7 @@ import android.content.Context
 import android.os.Handler
 import android.os.Looper
 import android.os.Message
+import android.support.annotation.StringRes
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
@@ -18,7 +19,7 @@ import cn.vove7.common.R
  * 2018/9/9
  */
 
-class ColorfulToast(context: Context, textColor: Int = R.color.fff) {
+class ColorfulToast(val context: Context, textColor: Int = R.color.fff) {
     var toast: Toast = Toast(context)
 
     var toastView: View
@@ -69,6 +70,9 @@ class ColorfulToast(context: Context, textColor: Int = R.color.fff) {
         return this
     }
 
+    fun showShort(@StringRes textId: Int) {
+        showShort(context.getString(textId))
+    }
     fun showShort(text: String) {
         lHandler.sendMessage(lHandler.obtainMessage(SHOW_SHORT, text))
     }

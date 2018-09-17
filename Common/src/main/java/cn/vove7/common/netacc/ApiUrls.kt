@@ -14,6 +14,7 @@ object ApiUrls {
 
     private val ACCOUNT = SERVER_IP + "account/"
     private val MARKED = SERVER_IP + "marked/"
+    private val ACTION = SERVER_IP + "action/"
     val LOGIN = ACCOUNT + "loginVerify"
 
     val REGISTER_BY_EMAIL = ACCOUNT + "registerByEmail"
@@ -23,6 +24,7 @@ object ApiUrls {
     val SYNC_MARKED = MARKED + "sync"
     val SYNC_APP_AD = MARKED + "syncAppAd"
 
+    val SYNC_GLOBAL_INST = ACTION + "syncGlobal"
 
 
 }

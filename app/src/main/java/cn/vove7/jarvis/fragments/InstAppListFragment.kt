@@ -9,8 +9,10 @@ import cn.vove7.common.datamanager.parse.statusmap.ActionNode.NODE_SCOPE_IN_APP
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.activities.InAppInstActivity
 import cn.vove7.jarvis.activities.NewInstActivity
+import cn.vove7.jarvis.activities.OnSyncInst
 import cn.vove7.jarvis.adapters.SimpleListAdapter
 import cn.vove7.jarvis.adapters.ViewModel
+import cn.vove7.jarvis.fragments.base.OnSyncMarked
 import cn.vove7.vtp.app.AppHelper
 
 /**
@@ -19,7 +21,7 @@ import cn.vove7.vtp.app.AppHelper
  * @author 17719247306
  * 2018/8/18
  */
-class InstAppListFragment : SimpleListFragment<ActionScope>() {
+class InstAppListFragment : SimpleListFragment<ActionScope>(), OnSyncInst {
     override var floatClickListener: View.OnClickListener? = View.OnClickListener {
         val intent = Intent(context, NewInstActivity::class.java)
         intent.putExtra("type", NODE_SCOPE_IN_APP)
@@ -34,6 +36,10 @@ class InstAppListFragment : SimpleListFragment<ActionScope>() {
             intent.putExtra("title", item.title)
             startActivity(intent)
         }
+    }
+
+    override fun onSync() {
+
     }
 
     /**

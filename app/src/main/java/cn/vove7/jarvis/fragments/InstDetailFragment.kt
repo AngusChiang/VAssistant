@@ -123,7 +123,7 @@ class InstDetailFragment : BottomSheetDialogFragment() {
                                 p.show()
                                 thread {
                                     p.cancel()
-                                    val b = DaoHelper.deleteActionNode(node.id)
+                                    val b = DaoHelper.deleteActionNodeInTX(node.id)
                                     GlobalApp.toastShort(
                                             if (b) "删除成功" else "删除失败，可至帮助进行反馈"
                                     )

@@ -30,7 +30,6 @@ import kotlin.concurrent.thread
  */
 class MarkedAdFragment : BaseMarkedFragment<Map<String, ArrayList<AppAdInfo>>>() {
 
-    override val types: Array<String> = arrayOf()
     override val itemClickListener: SimpleListAdapter.OnItemClickListener
         get() = object : SimpleListAdapter.OnItemClickListener {
             override fun onClick(holder: SimpleListAdapter.VHolder?, pos: Int, item: ViewModel) {

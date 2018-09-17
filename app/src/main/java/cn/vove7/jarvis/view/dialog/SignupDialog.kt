@@ -31,7 +31,6 @@ import com.google.gson.reflect.TypeToken
  * 2018/9/14
  */
 
-
 class SignupDialog(context: Context, val r: OnLoginSuccess) : View.OnClickListener {
     val dialog: MaterialDialog = MaterialDialog(context)
     val lastBit = 6

@@ -18,8 +18,8 @@ import android.view.View
 import android.widget.*
 import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.datamanager.DAO
+import cn.vove7.common.datamanager.DaoHelper
 import cn.vove7.common.datamanager.greendao.ActionNodeDao
-import cn.vove7.common.datamanager.greendao.ActionScopeDao
 import cn.vove7.common.datamanager.parse.DataFrom
 import cn.vove7.common.datamanager.parse.model.Action
 import cn.vove7.common.datamanager.parse.model.ActionScope
@@ -38,7 +38,6 @@ import cn.vove7.jarvis.utils.UriUtils.getPathFromUri
 import cn.vove7.jarvis.view.BottomSheetController
 import cn.vove7.parseengine.engine.ParseEngine
 import cn.vove7.parseengine.model.ParseResult
-import cn.vove7.vtp.app.AppHelper
 import cn.vove7.vtp.app.AppInfo
 import cn.vove7.vtp.easyadapter.BaseListAdapter
 import cn.vove7.vtp.log.Vog
@@ -293,43 +292,26 @@ class NewInstActivity : AppCompatActivity(), View.OnClickListener {
             voast.showShort(getString(R.string.text_save_success))
             finish()
 
-        } else {//新发布
-            var newScopeId: Long = -1
+        } else {//新发布 构造newNode
+            val newNode = ActionNode()
             if (inApp) {
                 val scope = ActionScope(pkg, activity_name.text.toString().trim())
-                val sCode = scope.genHashCode()
-                val s = DAO.daoSession.actionScopeDao.queryBuilder()
-                        .where(ActionScopeDao.Properties.HashCode.eq(sCode))
-                        .unique()
-                newScopeId = if (s == null) {
-                    DAO.daoSession.actionScopeDao.insert(scope)
-                    scope.id
-                } else s.id
+                newNode.actionScope = scope
             }
 
             val action = Action(scriptText, scriptType)
-            DAO.daoSession.actionDao.insert(action)
-            Vog.d(this, "save sid: $newScopeId")
-            val newNode = ActionNode()
+            newNode.action = action
             newNode.descTitle = desc
-            newNode.setActionId(action.id)
-            if (inApp)//scope
-                newNode.setScopeId(newScopeId)
+
             newNode.from = DataFrom.FROM_USER
             if (UserInfo.isLogin || !BuildConfig.DEBUG) {
                 newNode.publishUserId = UserInfo.userId
             }
             newNode.actionScopeType = instType
 
-            DAO.daoSession.actionNodeDao.insert(newNode)
-            Vog.d(this, "save nodeId: ${newNode.id}")
+            newNode.regs = wrapRegs()
 
-            wrapRegs().forEach {
-                it.nodeId = newNode.id
-                DAO.daoSession.regDao.insert(it)
-            }
-
-            if (newNode.id != null) {
+            if (DaoHelper.insertNewActionNode(newNode) != null) {
                 voast.showShort(getString(R.string.text_save_success))
                 finish()
             } else {

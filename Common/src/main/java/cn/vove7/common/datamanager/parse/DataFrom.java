@@ -9,5 +9,5 @@ public interface DataFrom {
     String FROM_USER = "from_user";
     //unuse
     String FROM_SHARED = "from_shared";
-    String FROM_SERVICE = "from_server";
+    String FROM_SERVER = "from_server";
 }

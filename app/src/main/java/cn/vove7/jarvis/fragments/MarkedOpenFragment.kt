@@ -16,7 +16,6 @@ import kotlin.concurrent.thread
  * 2018/9/7
  */
 class MarkedOpenFragment : BaseMarkedFragment<MarkedData>() {
-    override val types: Array<String> = arrayOf(MarkedData.MARKED_TYPE_SCRIPT_JS, MarkedData.MARKED_TYPE_SCRIPT_LUA)
 
     override val itemClickListener = object : SimpleListAdapter.OnItemClickListener {
         override fun onClick(holder: SimpleListAdapter.VHolder?, pos: Int, item: ViewModel) {
