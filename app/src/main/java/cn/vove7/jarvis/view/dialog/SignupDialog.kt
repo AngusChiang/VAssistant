@@ -13,7 +13,7 @@ import cn.vove7.common.netacc.ApiUrls
 import cn.vove7.common.netacc.NetHelper
 import cn.vove7.common.netacc.model.BaseRequestModel
 import cn.vove7.common.netacc.model.ResponseMessage
-import cn.vove7.common.netacc.tool.SignHelper
+import cn.vove7.common.netacc.tool.SecureHelper
 import cn.vove7.common.view.toast.ColorfulToast
 import cn.vove7.jarvis.BuildConfig
 import cn.vove7.jarvis.R
@@ -106,8 +106,9 @@ class SignupDialog(context: Context, val r: OnLoginSuccess) : View.OnClickListen
                 return@setOnClickListener
             }
             if (TextHelper.isEmail(userEmail)) {//邮箱
-                userInfo.email = userEmail
-                userInfo.userName = userEmail
+                userInfo.setEmail(userEmail)
+                userInfo.setUserName(userEmail)
+
             } else {
                 userEmailView.error = GlobalApp.getString(R.string.text_email_format_err)
                 return@setOnClickListener
@@ -124,7 +125,7 @@ class SignupDialog(context: Context, val r: OnLoginSuccess) : View.OnClickListen
                 confirmPassView.error = GlobalApp.getString(R.string.text_pass_not_same)
                 return@setOnClickListener
             }
-            userInfo.userPass = SignHelper.MD5(userPass)
+            userInfo.userPass = SecureHelper.MD5(userPass)
             if (TextUtils.isEmpty(verCode)) {//验证码
                 verCodeView.error = GlobalApp.getString(R.string.text_not_empty)
                 return@setOnClickListener

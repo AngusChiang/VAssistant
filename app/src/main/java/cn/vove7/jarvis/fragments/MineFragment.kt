@@ -16,10 +16,9 @@ import cn.vove7.jarvis.activities.AdvancedSettingActivity
 import cn.vove7.jarvis.activities.PermissionManagerActivity
 import cn.vove7.jarvis.activities.SettingsActivity
 import cn.vove7.jarvis.view.dialog.LoginDialog
+import cn.vove7.jarvis.view.dialog.UserInfoDialog
 import cn.vove7.vtp.easyadapter.BaseListAdapter
-import android.media.MediaRecorder
-
-
+import kotlinx.android.synthetic.main.fragment_mine.*
 
 class MineFragment : Fragment(), AdapterView.OnItemClickListener {
 
@@ -37,6 +36,11 @@ class MineFragment : Fragment(), AdapterView.OnItemClickListener {
         val view = inflater.inflate(R.layout.fragment_mine, container, false)
 
         loginView = view.findViewById(R.id.text_login)
+        view.findViewById<View>(R.id.user_name_text).setOnClickListener {
+            UserInfoDialog(activity!!) {
+                loadUserInfo()
+            }
+        }
         loginView.setOnClickListener {
             LoginDialog(context!!) {
                 loadUserInfo()
@@ -56,15 +60,31 @@ class MineFragment : Fragment(), AdapterView.OnItemClickListener {
                 holder.leftLine.setBackgroundResource(item.first)
                 holder.textView.setText(item.second)
             }
+
             override fun onCreateViewHolder(view: View): ItemHolder = ItemHolder(view)
         }
         listView.onItemClickListener = this
         return view
     }
 
-    fun loadUserInfo() {
-        if (UserInfo.isLogin) {
+    override fun onResume() {
+        super.onResume()
+        loadUserInfo()
+    }
 
+    private fun loadUserInfo() {
+        if (UserInfo.isLogin()) {
+            login_lay.visibility = View.GONE
+            user_info_lay.visibility = View.VISIBLE
+            user_name_text.text = UserInfo.getUserName()
+            user_vip_text.text = if (UserInfo.isVip()) {
+                "高级用户"
+            } else {
+                ""
+            }
+        } else {
+            login_lay.visibility = View.VISIBLE
+            user_info_lay.visibility = View.GONE
         }
     }
 

@@ -10,7 +10,7 @@ import org.greenrobot.greendao.annotation.Transient;
 
 import cn.vove7.common.datamanager.parse.DataFrom;
 import cn.vove7.common.interfaces.Markable;
-import cn.vove7.common.netacc.tool.SignHelper;
+import cn.vove7.common.netacc.tool.SecureHelper;
 import cn.vove7.common.utils.RegUtils;
 import kotlin.text.Regex;
 
@@ -48,7 +48,7 @@ public class MarkedData implements DataFrom, Markable {
 
     @Override
     public void sign() {
-        setTagId(SignHelper.MD5(key, type, from, regStr, value));
+        setTagId(SecureHelper.MD5(key, type, from, regStr, value));
     }
 
     public String getType() {

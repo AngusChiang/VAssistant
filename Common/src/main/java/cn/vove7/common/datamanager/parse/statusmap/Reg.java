@@ -1,5 +1,7 @@
 package cn.vove7.common.datamanager.parse.statusmap;
 
+import com.google.gson.annotations.Expose;
+
 import org.greenrobot.greendao.annotation.Entity;
 import org.greenrobot.greendao.annotation.Generated;
 import org.greenrobot.greendao.annotation.Id;
@@ -20,6 +22,7 @@ import kotlin.text.Regex;
 @Entity
 public class Reg implements Serializable {
     public static final long serialVersionUID = 1L;
+    @Expose(serialize = false)
     @Id
     private Long id;
     /**
@@ -29,6 +32,7 @@ public class Reg implements Serializable {
     private String regStr;
     private int paramPos = PARAM_NO;
     @Transient
+    @Expose(serialize = false)
     private Regex regex;
     private long nodeId;
 

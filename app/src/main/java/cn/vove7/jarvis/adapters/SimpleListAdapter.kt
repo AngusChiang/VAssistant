@@ -67,7 +67,7 @@ class SimpleListAdapter(private val dataset: MutableList<ViewModel>
 }
 
 class ViewModel(
-        val title: String,
+        val title: String?,
         val subTitle: String? = null,
         val icon: Drawable? = null,
         val extra: Any? = null

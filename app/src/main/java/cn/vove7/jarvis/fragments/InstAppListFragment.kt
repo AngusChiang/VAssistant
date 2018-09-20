@@ -3,16 +3,22 @@ package cn.vove7.jarvis.fragments
 import android.content.Intent
 import android.view.View
 import cn.vove7.common.app.GlobalApp
+import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.datamanager.DAO
+import cn.vove7.common.datamanager.DaoHelper
 import cn.vove7.common.datamanager.parse.model.ActionScope
+import cn.vove7.common.datamanager.parse.statusmap.ActionNode
 import cn.vove7.common.datamanager.parse.statusmap.ActionNode.NODE_SCOPE_IN_APP
+import cn.vove7.common.netacc.ApiUrls
+import cn.vove7.common.netacc.NetHelper
+import cn.vove7.common.netacc.model.BaseRequestModel
+import cn.vove7.executorengine.helper.AdvanAppHelper
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.activities.InAppInstActivity
 import cn.vove7.jarvis.activities.NewInstActivity
 import cn.vove7.jarvis.activities.OnSyncInst
 import cn.vove7.jarvis.adapters.SimpleListAdapter
 import cn.vove7.jarvis.adapters.ViewModel
-import cn.vove7.jarvis.fragments.base.OnSyncMarked
 import cn.vove7.vtp.app.AppHelper
 
 /**
@@ -39,7 +45,30 @@ class InstAppListFragment : SimpleListFragment<ActionScope>(), OnSyncInst {
     }
 
     override fun onSync() {
+        showProgressBar()
+        NetHelper.postJson<List<ActionNode>>(ApiUrls.SYNC_IN_APP_INST,
+                BaseRequestModel(AdvanAppHelper.getPkgList()),
+                type = NetHelper.ActionNodeListType) { _, bean ->
+            if (bean != null) {
+                if (bean.isOk()) {
+                    val list = bean.data
+                    if (list != null) {
+                        DaoHelper.updateInAppInst(list).also {
+                            if (it) {
+                                toast.showShort("同步完成")
+                                refresh()
+                            } else toast.showShort("同步失败")
+                        }
 
+                    } else {
+                        GlobalLog.err("code: GI57")
+                        toast.showShort(R.string.text_error_occurred)
+                    }
+                } else toast.showShort(R.string.text_net_err)
+
+            } else toast.showShort(R.string.text_net_err)
+            hideProgressBar()
+        }
     }
 
     /**

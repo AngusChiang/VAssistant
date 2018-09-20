@@ -5,18 +5,19 @@ import android.os.Build
 import android.util.Log
 import cn.vove7.androlua.LuaApp
 import cn.vove7.common.appbus.MessageEvent
-import cn.vove7.common.datamanager.InitLuaDbData
 import cn.vove7.executorengine.helper.AdvanAppHelper
-import cn.vove7.jarvis.plugins.AdKillerService
 import cn.vove7.jarvis.services.MainService
-import cn.vove7.jarvis.utils.RuntimeConfig
+import cn.vove7.jarvis.utils.AppConfig
 import cn.vove7.jarvis.utils.debugserver.RemoteDebugServer
 import cn.vove7.vtp.log.Vog
-import cn.vove7.vtp.sharedpreference.SpHelper
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
 import kotlin.concurrent.thread
+import devliving.online.securedpreferencestore.DefaultRecoveryHandler
+import devliving.online.securedpreferencestore.SecuredPreferenceStore
+
+
 
 class App : LuaApp() {
 
@@ -34,10 +35,15 @@ class App : LuaApp() {
             RemoteDebugServer.start()
         startServices()
 //        DAO.init(this)
-        if (BuildConfig.DEBUG)
-            InitLuaDbData.init()
-        RuntimeConfig.init()
+//        if (BuildConfig.DEBUG)
+//            InitLuaDbData.init()
         thread {
+            //not mandatory, can be null too
+            val storeFileName = "wdasfd"
+            val keyPrefix = ""
+            val seedKey = "fddfouafpiua".toByteArray()
+            SecuredPreferenceStore.init(applicationContext, storeFileName, keyPrefix, seedKey, DefaultRecoveryHandler())
+            AppConfig.init()
             AdvanAppHelper.updateAppList()
         }
     }

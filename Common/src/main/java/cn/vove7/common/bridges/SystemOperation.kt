@@ -77,4 +77,8 @@ interface SystemOperation {
     fun openWifiAp(): Boolean
 
     fun isScreenOn(): Boolean
+
+    fun getClipText(): String?
+    fun setClipText(text: String?)
+
 }

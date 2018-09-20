@@ -10,7 +10,7 @@ import cn.vove7.common.view.finder.ViewFindBuilder
 import cn.vove7.common.view.finder.ViewFinder
 import cn.vove7.common.view.notifier.AppAdBlockNotifier
 import cn.vove7.executorengine.helper.AdvanAppHelper
-import cn.vove7.jarvis.utils.RuntimeConfig
+import cn.vove7.jarvis.utils.AppConfig
 import cn.vove7.vtp.app.AppInfo
 import cn.vove7.vtp.log.Vog
 import java.lang.Thread.sleep
@@ -76,7 +76,7 @@ object AdKillerService : AccPluginsService() {//TO-DO fixed 猪八戒ad
                 b.second == 0 -> Vog.d(this, "onUiUpdate ---> 发现广告，清除失败")
                 else -> {
                     Vog.d(this, "onUiUpdate ---> 发现广告，清除成功")
-                    if (RuntimeConfig.isToastWhenRemoveAd)
+                    if (AppConfig.isToastWhenRemoveAd)
                         GlobalApp.toastShort("已为你关闭广告")
                     finders = null
                 }
@@ -112,13 +112,22 @@ object AdKillerService : AccPluginsService() {//TO-DO fixed 猪八戒ad
         changedTime = System.currentTimeMillis()
         appInfo = AdvanAppHelper.getAppInfo(appScope.packageName)
 
-        finders = if (finderCaches.containsKey(appScope)) {
-            finderCaches[appScope]!!
-        } else null /*else buildAdFinders(appInfo, appScope)*/
+//        finders = if (finderCaches.containsKey(appScope)) {
+//            finderCaches[appScope]!!
+//        } else null /*else buildAdFinders(appInfo, appScope)*/
+        finders = null
+        kotlin.run {
+            finderCaches.forEach {
+                if (appScope == it.key) {
+                    finders = it.value
+                    return@run
+                }
+            }
+        }
 
         Vog.d(this, "当前界面广告数--->${finders?.size} $appScope $finders")
 
-        thread { gcIfNeed() }
+//        thread { gcIfNeed() }
 
         onUiUpdate(null)
     }

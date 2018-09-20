@@ -1,5 +1,8 @@
 package cn.vove7.common.datamanager.parse.statusmap;
 
+import com.google.gson.annotations.Expose;
+import com.google.gson.annotations.SerializedName;
+
 import org.greenrobot.greendao.DaoException;
 import org.greenrobot.greendao.annotation.Entity;
 import org.greenrobot.greendao.annotation.Generated;
@@ -25,6 +28,8 @@ import cn.vove7.common.datamanager.parse.model.Action;
 import cn.vove7.common.datamanager.parse.model.ActionDesc;
 import cn.vove7.common.datamanager.parse.model.ActionParam;
 import cn.vove7.common.datamanager.parse.model.ActionScope;
+import cn.vove7.common.model.UserInfo;
+import cn.vove7.vtp.log.Vog;
 
 /**
  * 状态图节点
@@ -34,6 +39,7 @@ import cn.vove7.common.datamanager.parse.model.ActionScope;
 @Entity
 public class ActionNode implements Serializable, DataFrom {
     public static final long serialVersionUID = 1210203;
+    @Expose(serialize = false)
     @Id
     private Long id;
     /**
@@ -43,16 +49,23 @@ public class ActionNode implements Serializable, DataFrom {
     private int actionScopeType = -1;
 
     public static final int NODE_SCOPE_GLOBAL = 0x1;
+    @Deprecated
     public static final int NODE_SCOPE_GLOBAL_2 = 0x4;//follows
     public static final int NODE_SCOPE_IN_APP = 0x2;
+    @Deprecated
     public static final int NODE_SCOPE_IN_APP_2 = 0x3;//2后操作
 
-    public static boolean belongInApp(int type) {
-        return type == NODE_SCOPE_IN_APP || type == NODE_SCOPE_IN_APP_2;
+    public boolean belongInApp() {
+        return actionScopeType == NODE_SCOPE_IN_APP;
+    }
+
+    public static boolean belongInApp(Integer type) {
+        if (type == null) return false;
+        return type == NODE_SCOPE_IN_APP /*|| type == NODE_SCOPE_IN_APP_2*/;
     }
 
     public static boolean belongGlobal(int type) {
-        return type == NODE_SCOPE_GLOBAL || type == NODE_SCOPE_GLOBAL_2;
+        return type == NODE_SCOPE_GLOBAL /*|| type == NODE_SCOPE_GLOBAL_2*/;
     }
 
     @ToMany(referencedJoinProperty = "nodeId")//一对多 reg 表 nodeId为外键
@@ -63,7 +76,7 @@ public class ActionNode implements Serializable, DataFrom {
      */
     @ToOne(joinProperty = "actionId")//一对一,actionId外键
     private Action action;
-    private Long actionId;
+    private Long actionId = -1L;
 
     /**
      * 后续节点id format: nodeId1,nodeId2,..
@@ -79,9 +92,10 @@ public class ActionNode implements Serializable, DataFrom {
     private ActionNode parent;
 
     /**
-     * 操作参数
+     * 运行时操作参数
      */
     //@ToOne(joinProperty = "paramId")
+    @Expose(serialize = false)
     @Transient
     private ActionParam param;
     //private long paramId;
@@ -91,17 +105,17 @@ public class ActionNode implements Serializable, DataFrom {
      */
     private Long scopeId;
     @ToOne(joinProperty = "scopeId")
-    private
-    ActionScope actionScope;
+    @SerializedName("scope")
+    private ActionScope actionScope;
 
     private Long descId;
 
     @ToOne(joinProperty = "descId")
     private ActionDesc desc;
 
-    private String descTitle;
+    private String actionTitle;
 
-    private String tagId;//与服务器数据匹配标志
+    private String tagId;//与服务器数据匹配标志 Server端生成
     private int versionCode = 0;
 
     private Long publishUserId;//发布者
@@ -194,49 +208,49 @@ public class ActionNode implements Serializable, DataFrom {
         this.actionScopeType = type;
     }
 
-    public ActionNode(String descTitle, Long id, long actionId, long scopeId, int type) {
+    public ActionNode(String actionTitle, Long id, long actionId, long scopeId, int type) {
         this.id = id;
         this.actionId = actionId;
         this.scopeId = scopeId;
         this.actionScopeType = type;
-        this.descTitle = descTitle;
+        this.actionTitle = actionTitle;
     }
 
-    public ActionNode(String descTitle, Action action) {
-        this.descTitle = descTitle;
+    public ActionNode(String actionTitle, Action action) {
+        this.actionTitle = actionTitle;
         this.action = action;
     }
 
-    public ActionNode(String descTitle, Long id, int type) {
+    public ActionNode(String actionTitle, Long id, int type) {
         this.id = id;
         this.actionScopeType = type;
-        this.descTitle = descTitle;
+        this.actionTitle = actionTitle;
     }
 
 
     @Keep
-    public ActionNode(String descTitle, Long id, long actionId, int type, long parentId) {
+    public ActionNode(String actionTitle, Long id, long actionId, int type, long parentId) {
         this.id = id;
         this.actionId = actionId;
         this.actionScopeType = type;
-        this.descTitle = descTitle;
+        this.actionTitle = actionTitle;
         this.parentId = parentId;
     }
 
     @Keep
-    public ActionNode(String descTitle, Long id, long actionId, int type) {
+    public ActionNode(String actionTitle, Long id, long actionId, int type) {
         this.id = id;
         this.actionId = actionId;
         this.actionScopeType = type;
-        this.descTitle = descTitle;
+        this.actionTitle = actionTitle;
     }
 
-    public String getDescTitle() {
-        return descTitle;
+    public String getActionTitle() {
+        return actionTitle;
     }
 
-    public void setDescTitle(String descTitle) {
-        this.descTitle = descTitle;
+    public void setActionTitle(String actionTitle) {
+        this.actionTitle = actionTitle;
     }
 
     public long getActionId() {
@@ -261,40 +275,40 @@ public class ActionNode implements Serializable, DataFrom {
 
     @Keep
     public ActionNode(Long id, int actionScopeType, long actionId, long scopeId,
-                      String descTitle, Long parentId, int priority) {
+                      String actionTitle, Long parentId, int priority) {
         this.id = id;
         this.actionScopeType = actionScopeType;
         this.actionId = actionId;
         this.scopeId = scopeId;
-        this.descTitle = descTitle;
+        this.actionTitle = actionTitle;
         this.parentId = parentId;
         this.priority = priority;
     }
 
     @Keep
     public ActionNode(Long id, int actionScopeType, long actionId, long scopeId,
-                      String descTitle, Long parentId, String from, int priority) {
+                      String actionTitle, Long parentId, String from, int priority) {
         this.id = id;
         this.actionScopeType = actionScopeType;
         this.actionId = actionId;
         this.scopeId = scopeId;
-        this.descTitle = descTitle;
+        this.actionTitle = actionTitle;
         this.parentId = parentId;
         this.from = from;
         this.priority = priority;
     }
 
-    @Generated(hash = 646051730)
-    public ActionNode(Long id, int actionScopeType, Long actionId, Long parentId, Long scopeId,
-                      Long descId, String descTitle, String tagId, int versionCode, Long publishUserId,
-                      String parentTagId, int priority, String from) {
+    @Generated(hash = 194601630)
+    public ActionNode(Long id, int actionScopeType, Long actionId, Long parentId, Long scopeId, Long descId,
+                      String actionTitle, String tagId, int versionCode, Long publishUserId, String parentTagId,
+                      int priority, String from) {
         this.id = id;
         this.actionScopeType = actionScopeType;
         this.actionId = actionId;
         this.parentId = parentId;
         this.scopeId = scopeId;
         this.descId = descId;
-        this.descTitle = descTitle;
+        this.actionTitle = actionTitle;
         this.tagId = tagId;
         this.versionCode = versionCode;
         this.publishUserId = publishUserId;
@@ -317,11 +331,10 @@ public class ActionNode implements Serializable, DataFrom {
      */
     @Keep
     public Action getAction() {
-        if (daoSession == null) return action;
-        if (action != null) {
+        if (action != null) {// 防止重复执行new Action
             return action;
         }
-        if (actionId <= 0) {
+        if (actionId < 0) {
             this.action = new Action();
             return action;
         }
@@ -329,7 +342,8 @@ public class ActionNode implements Serializable, DataFrom {
         if (action__resolvedKey == null || !action__resolvedKey.equals(__key)) {
             final DaoSession daoSession = this.daoSession;
             if (daoSession == null) {
-                throw new DaoException("Entity is detached from DAO context");
+                return null;
+                //throw new DaoException("Entity is detached from DAO context");
             }
             ActionDao targetDao = daoSession.getActionDao();
             Action actionNew = targetDao.load(__key);
@@ -414,7 +428,7 @@ public class ActionNode implements Serializable, DataFrom {
 
     @Override
     public String toString() {
-        return descTitle;
+        return actionTitle;
     }
 
     public int getPriority() {
@@ -495,6 +509,16 @@ public class ActionNode implements Serializable, DataFrom {
             }
         }
         return follows;
+    }
+
+    @Keep
+    public void assembly() {
+        getAction();
+        getDesc();
+        getRegs();
+        getParent();
+        getFollows();
+        getActionScope();
     }
 
 
@@ -613,12 +637,13 @@ public class ActionNode implements Serializable, DataFrom {
      */
     @Keep
     public ActionDesc getDesc() {
-        if (daoSession == null) return desc;
-            Long __key = this.descId;
+        //if (daoSession == null) return desc;
+        Long __key = this.descId;
         if (desc__resolvedKey == null || !desc__resolvedKey.equals(__key)) {
             final DaoSession daoSession = this.daoSession;
             if (daoSession == null) {
-                throw new DaoException("Entity is detached from DAO context");
+                return null;
+                //throw new DaoException("Entity is detached from DAO context");
             }
             ActionDescDao targetDao = daoSession.getActionDescDao();
             ActionDesc descNew = targetDao.load(__key);
@@ -640,6 +665,35 @@ public class ActionNode implements Serializable, DataFrom {
             descId = desc == null ? null : desc.getId();
             desc__resolvedKey = descId;
         }
+    }
+
+    private static final String preOpen = "smartOpen('%s')\nwaitForApp('%s',3000)\n";
+
+    /**
+     * 从inApp复制一个全局Node
+     * 改变脚本
+     * 跟随操作最多一层
+     *
+     * @return
+     */
+    public ActionNode cloneGlobal(boolean containChild) throws Exception {
+        ActionNode newNode = new ActionNode();
+        this.assembly();
+        newNode.regs = this.regs;
+        newNode.action = this.action.cloneNew();
+        newNode.from = DataFrom.FROM_USER;
+        newNode.actionTitle = this.actionTitle;
+        newNode.publishUserId = UserInfo.getUserId();
+        //newNode.actionScopeType = this.actionScopeType;
+        String p = this.actionScope.getPackageName();
+        p = String.format(preOpen, p, p);
+        String newS = p + newNode.action.getActionScript();
+        Vog.INSTANCE.d(this, "cloneGlobal ---> \n" + newS);
+        newNode.action.setActionScript(newS);
+        newNode.desc = this.desc;
+        if (containChild)
+            newNode.follows = this.follows;
+        return newNode;
     }
 
     public void setActionId(Long actionId) {

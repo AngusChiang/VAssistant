@@ -1,6 +1,7 @@
 package cn.vove7.jarvis.view
 
 import android.support.annotation.ArrayRes
+import cn.vove7.jarvis.utils.AppConfig
 import cn.vove7.jarvis.view.utils.SettingItemHelper
 
 /**
@@ -44,10 +45,14 @@ open class SettingChildItem(
         val defaultValue: () -> Any,
 
         val range: Pair<Int, Int>? = null,
-        val callback: CallbackOnSet? = null,
+        val callback: CallbackOnSet? = reloadConfig,
         val entityArrId: Int? = null,
         val valueArrId: Int? = null
 )
+
+val reloadConfig: CallbackOnSet = { _, _ ->
+    AppConfig.reload()
+}
 
 class CheckBoxItem(
         titleId: Int,
@@ -61,7 +66,7 @@ class SwitchItem(
         summary: String? = null,
         keyId: Int,
         defaultValue: () -> Boolean,
-        callback: CallbackOnSet? = null
+        callback: CallbackOnSet? = reloadConfig
 ) : SettingChildItem(titleId, summary, TYPE_SWITCH, keyId, defaultValue, callback = callback)
 
 /**
@@ -81,7 +86,7 @@ class NumberPickerItem(
         keyId: Int,
         defaultValue: () -> Int,
         range: Pair<Int, Int>,
-        callback: CallbackOnSet? = null
+        callback: CallbackOnSet? = reloadConfig
 ) : SettingChildItem(titleId, summary, TYPE_NUMBER, keyId, defaultValue, range = range, callback = callback)
 
 class SingleChoiceItem(
@@ -91,7 +96,7 @@ class SingleChoiceItem(
         defaultValue: () -> String,
         @ArrayRes entityArrId: Int,
         @ArrayRes valueArrId: Int,
-        callback: CallbackOnSet? = null
+        callback: CallbackOnSet? = reloadConfig
 ) : SettingChildItem(titleId, summary, TYPE_SINGLE, keyId, defaultValue,
         entityArrId = entityArrId, valueArrId = valueArrId, callback = callback)
 

@@ -13,13 +13,13 @@ interface ViewOperation {
     fun trySelect(): Boolean
     fun scrollUp(): Boolean
     fun scrollDown(): Boolean
+    fun setText(text: String): Boolean
     fun setText(text: String, ep: String?): Boolean
     /**
      * 拼音首字母
      */
     fun setTextWithInitial(text: String): Boolean
 
-    fun setText(text: String): Boolean
     fun trySetText(text: String): Boolean
     fun getText(): String?
     fun focus(): Boolean

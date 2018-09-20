@@ -18,7 +18,7 @@ import cn.vove7.jarvis.adapters.SimpleListAdapter
 import cn.vove7.jarvis.adapters.ViewModel
 import cn.vove7.jarvis.fragments.base.BaseMarkedFragment
 import cn.vove7.jarvis.plugins.AdKillerService
-import cn.vove7.jarvis.utils.RuntimeConfig
+import cn.vove7.jarvis.utils.AppConfig
 import com.google.gson.reflect.TypeToken
 import kotlin.concurrent.thread
 
@@ -56,7 +56,7 @@ class MarkedAdFragment : BaseMarkedFragment<Map<String, ArrayList<AppAdInfo>>>()
                     DaoHelper.updateAppAdInfo(bean.data ?: emptyList())
                     toast.showShort("同步完成")
                     refresh()
-                    if (RuntimeConfig.isAdBlockService && AccessibilityApi.isOpen()) {//重启服务
+                    if (AppConfig.isAdBlockService && AccessibilityApi.isOpen()) {//重启服务
                         AdKillerService.restart()
                     }
                 } else {

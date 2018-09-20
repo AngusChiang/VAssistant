@@ -38,7 +38,7 @@ class SettingsActivity : AppCompatActivity() {
 
     lateinit var groupItems: List<SettingGroupItem>
 
-    private fun initData() {//TODO 震动
+    private fun initData() {
         groupItems = listOf(
                 SettingGroupItem(R.color.google_green, "通知", childItems = listOf(
                         SwitchItem(R.string.text_show_toast_when_remove_ad,

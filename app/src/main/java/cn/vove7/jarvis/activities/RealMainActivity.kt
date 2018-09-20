@@ -16,12 +16,12 @@ class RealMainActivity : AppCompatActivity() {
 
     val fSwitcher = FragmentSwitcher(this, R.id.fragment)
     val homeF = HomeFragment.newInstance()
-    val storeF = StoreFragment.newInstance()
+//    val storeF = StoreFragment.newInstance()
     val mineF = MineFragment.newInstance()
     private val mOnNavigationItemSelectedListener = BottomNavigationView.OnNavigationItemSelectedListener { item ->
         return@OnNavigationItemSelectedListener when (item.itemId) {
             R.id.nav_home -> fSwitcher.switchFragment(homeF)
-            R.id.nav_store -> fSwitcher.switchFragment(storeF)
+//            R.id.nav_store -> fSwitcher.switchFragment(storeF)
             R.id.nav_me -> fSwitcher.switchFragment(mineF)
             else -> false
         }

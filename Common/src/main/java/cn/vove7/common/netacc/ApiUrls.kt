@@ -15,16 +15,26 @@ object ApiUrls {
     private val ACCOUNT = SERVER_IP + "account/"
     private val MARKED = SERVER_IP + "marked/"
     private val ACTION = SERVER_IP + "action/"
-    val LOGIN = ACCOUNT + "loginVerify"
+    private val PAY = SERVER_IP + "p/"
+    val LOGIN = ACCOUNT + "lv"
+    val ACTIVATE_VIP = ACCOUNT + "act"
+    val VERIFY_TOKEN = ACCOUNT + "vt"
+    val GET_USER_INFO = ACCOUNT + "gi"
+    val GET_PRICES = ACCOUNT + "gp"
 
-    val REGISTER_BY_EMAIL = ACCOUNT + "registerByEmail"
+    val REGISTER_BY_EMAIL = ACCOUNT + "rbe"
+    val SEND_EMAIL_VER_CODE = ACCOUNT + "sec"
 
-    val SEND_EMAIL_VER_CODE = ACCOUNT + "sendEmailCode"
+    val SYNC_MARKED = MARKED + "sm"
+    val SHARE_MARKED = MARKED + "sd"
+    val SYNC_APP_AD = MARKED + "saa"
 
-    val SYNC_MARKED = MARKED + "sync"
-    val SYNC_APP_AD = MARKED + "syncAppAd"
 
-    val SYNC_GLOBAL_INST = ACTION + "syncGlobal"
+    val SYNC_GLOBAL_INST = ACTION + "sg"
+    val SYNC_IN_APP_INST = ACTION + "sia"
+    val SHARE_INST = ACTION + "fu"
+    val UPGRADE_INST = ACTION + "us"
 
+    val GET_ALI_ORDER = PAY + "a"
 
 }

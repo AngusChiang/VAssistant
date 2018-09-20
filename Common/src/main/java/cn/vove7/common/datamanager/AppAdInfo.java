@@ -8,7 +8,7 @@ import org.greenrobot.greendao.annotation.Keep;
 import java.io.Serializable;
 
 import cn.vove7.common.interfaces.Markable;
-import cn.vove7.common.netacc.tool.SignHelper;
+import cn.vove7.common.netacc.tool.SecureHelper;
 
 /**
  * Created by 17719247306 on 2018/9/3
@@ -47,7 +47,7 @@ public class AppAdInfo  implements Serializable, Markable{
     }
     @Override
     public void sign() {
-        setTagId(SignHelper.MD5(descTitle, pkg, activity, viewId, type, String.valueOf(versionCode), texts, descs, depths));
+        setTagId(SecureHelper.MD5(descTitle, pkg, activity, viewId, type, String.valueOf(versionCode), texts, descs, depths));
     }
 
     private Integer versionCode;//? 不需要 找不到就是找不到 . 消耗资源?

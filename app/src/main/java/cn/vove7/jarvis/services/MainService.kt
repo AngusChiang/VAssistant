@@ -26,7 +26,7 @@ import cn.vove7.executorengine.bridges.SystemBridge
 import cn.vove7.executorengine.exector.MultiExecutorEngine
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.activities.PermissionManagerActivity
-import cn.vove7.jarvis.utils.RuntimeConfig
+import cn.vove7.jarvis.utils.AppConfig
 import cn.vove7.jarvis.view.dialog.MultiChoiceDialog
 import cn.vove7.jarvis.view.dialog.OnMultiSelectListener
 import cn.vove7.jarvis.view.dialog.OnSelectListener
@@ -225,7 +225,7 @@ class MainService : BusService(),
 
     override fun onExecuteStart(tag: String) {//
         Vog.d(this, "开始执行 -> $tag")
-        listeningToast.showAndHideDelay("开始执行")
+//        listeningToast.showAndHideDelay("开始执行")
         executeAnimation.begin()
     }
 
@@ -423,7 +423,7 @@ class MainService : BusService(),
         override fun onStartRecog() {
             listeningAni.begin()//
             listeningToast.show("开始聆听")
-            if (RuntimeConfig.vibrateWhenStartReco) {
+            if (AppConfig.vibrateWhenStartReco) {
                 SystemBridge().vibrate(80L)
             }
 

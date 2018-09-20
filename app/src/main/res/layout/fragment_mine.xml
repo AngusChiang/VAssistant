@@ -5,42 +5,72 @@
     android:background="@color/app_background"
     android:fitsSystemWindows="true"
     android:orientation="vertical"
-    android:padding="10dp"
-    android:paddingTop="10dp"
     tools:context="cn.vove7.jarvis.fragments.MineFragment">
 
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="127dp"
+        android:layout_margin="10dp"
         android:layout_marginBottom="20dp"
         android:background="@color/app_foround"
         android:baselineAligned="false"
-        android:elevation="6dp"
+        android:elevation="2dp"
         android:gravity="center_vertical"
         android:orientation="horizontal"
         android:padding="20dp">
 
-        <LinearLayout
+        <RelativeLayout
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:orientation="vertical">
+            android:layout_weight="1">
 
-            <TextView
-                android:id="@+id/text_login"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/text_click_to_login"
-                android:textSize="22sp"
-                android:textStyle="bold" />
+            <LinearLayout
+                android:id="@+id/login_lay"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical">
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="" />
+                <TextView
+                    android:id="@+id/text_login"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/text_click_to_login"
+                    android:textSize="22sp"
+                    android:textStyle="bold" />
 
-        </LinearLayout>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/user_info_lay"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/user_name_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/text_click_to_login"
+                    android:textSize="22sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/user_vip_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="" />
+
+            </LinearLayout>
+
+
+        </RelativeLayout>
+
 
         <RelativeLayout
             android:id="@+id/header_view_lay"
@@ -60,6 +90,7 @@
         android:id="@+id/list_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_margin="10dp"
         android:divider="@color/app_background"
         android:dividerHeight="10dp"
         tools:listitem="@layout/item_mine_features" />

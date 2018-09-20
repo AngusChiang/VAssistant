@@ -2,6 +2,8 @@ package cn.vove7.executorengine.bridges
 
 import android.Manifest
 import android.bluetooth.BluetoothAdapter
+import android.content.ClipData
+import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -303,5 +305,15 @@ class SystemBridge : SystemOperation {
 
     override fun isScreenOn(): Boolean {
         return SystemHelper.isScreenOn(context)
+    }
+
+    override fun getClipText(): String? {
+        return SystemHelper.getClipBoardContent(context).toString()
+    }
+
+    override fun setClipText(text: String?) {
+            val cm = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+            val mClipData = ClipData.newPlainText("", text)
+            cm.primaryClip = mClipData
     }
 }

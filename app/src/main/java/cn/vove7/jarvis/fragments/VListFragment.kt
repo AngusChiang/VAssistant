@@ -35,8 +35,8 @@ abstract class VListFragment : Fragment() {
     lateinit var progressBar: ProgressBar
     private lateinit var netErrViewContainer: ViewGroup
     private var netErrView: View? = null
-    private lateinit var swipeRefreshLayout: SwipeRefreshLayout//TODO pullDown
-    open val pageSizeLimit = 15
+    private lateinit var swipeRefreshLayout: SwipeRefreshLayout
+    open val pageSizeLimit = 20
 
     //    var onRefreshing = false//下拉正在刷新标志
     var loading = false
@@ -216,9 +216,10 @@ abstract class VListFragment : Fragment() {
     }
 
     fun loadMore() {
+        if (loading) return
+        loading = true
         Vog.d(this, "loadMore $pageIndex")
         if (swipeRefreshLayout.isRefreshing) return
-        loading = true
         Vog.d(this, "onGetData $pageIndex")
         onGetData(pageIndex)
     }

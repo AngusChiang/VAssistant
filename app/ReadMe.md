@@ -4,7 +4,7 @@
 |  事件类型  |  发生时机  |
 |:-------------------------|--------:|
 | TYPE_WINDOW_CONTENT_CHANGED  | 局部/"帧"刷新/弹出菜单 |
-| TYPE_WINDOW_STATE_CHANGED  | 窗口切换/对话框 |
+| TYPE_WINDOW_STATE_CHANGED  | 窗口切换/对话框/弹出输入法  |
 | TYPE_VIEW_CLICKED | View点击（有响应事件才触发） |
 | TYPE_VIEW_LONG_CLICKED | View长按（有响应事件才触发） |
 | TYPE_VIEW_SCROLLED | （ListView）滚动 |

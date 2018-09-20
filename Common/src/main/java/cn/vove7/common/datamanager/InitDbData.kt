@@ -22,7 +22,7 @@ abstract class InitDbData {
         val appAdInfoDao = DAO.daoSession.appAdInfoDao
 //        if (appAdInfoDao.queryBuilder().count() <= 5L) {
         appAdInfoDao.deleteAll()
-        arrayOf(//TODO test depths
+        arrayOf(// test depths pass
                 AppAdInfo("网易云首屏广告", "com.netease.cloudmusic", "LoadingActivity", "Skip###跳过")
                 , AppAdInfo("网易云Resume广告", "com.netease.cloudmusic", "LoadingAdActivity", "Skip###跳过")
                 , AppAdInfo("租八戒首屏广告", "com.rentpig.customer", "WelcomeActivity").setDepths("0,0,0,0,0,1,1,0,2,0,1").setType("ImageView")

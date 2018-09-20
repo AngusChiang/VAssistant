@@ -1,5 +1,7 @@
 package cn.vove7.common.datamanager.parse.model;
 
+import com.google.gson.annotations.Expose;
+
 import org.greenrobot.greendao.annotation.Entity;
 import org.greenrobot.greendao.annotation.Generated;
 import org.greenrobot.greendao.annotation.Id;
@@ -17,6 +19,7 @@ import java.util.Objects;
  */
 @Entity()
 public class ActionScope {
+    @Expose(serialize = false)
     @Id
     private
     Long id;
@@ -27,7 +30,7 @@ public class ActionScope {
     /**
      * Activity页面
      */
-    private String activity = "";
+    private String activity;
     private Integer hashCode;
 
 
@@ -55,7 +58,7 @@ public class ActionScope {
 
     @Generated(hash = 432106659)
     public ActionScope(Long id, String packageName, String activity,
-            Integer hashCode) {
+                       Integer hashCode) {
         this.id = id;
         this.packageName = packageName;
         this.activity = activity;
@@ -104,8 +107,8 @@ public class ActionScope {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         ActionScope that = (ActionScope) o;
-        return packageName.startsWith(that.packageName) &&
-                (that.activity == null || Objects.equals(activity, that.activity));
+        return packageName != null && packageName.startsWith(that.packageName) &&
+                (that.activity == null || (activity != null && activity.endsWith("." + that.activity)));
     }
 
     @Override

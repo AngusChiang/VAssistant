@@ -67,7 +67,7 @@ class InAppInstListFragment : SimpleListFragment<ActionNode>() {
             Vog.d(this, "getInstList sIds: $sIds")
 
             return DAO.daoSession.actionNodeDao.queryBuilder()
-                    .where(ActionNodeDao.Properties.ActionScopeType.`in`(ActionNode.NODE_SCOPE_IN_APP, ActionNode.NODE_SCOPE_IN_APP_2))
+                    .where(ActionNodeDao.Properties.ActionScopeType.eq(ActionNode.NODE_SCOPE_IN_APP/*, ActionNode.NODE_SCOPE_IN_APP_2*/))
                     .where(ActionNodeDao.Properties.ScopeId.`in`(sIds))
                     .list()
 //                    .filter { it.actionScope.packageName == pkg }
@@ -89,7 +89,7 @@ class InAppInstListFragment : SimpleListFragment<ActionNode>() {
     override fun transData(nodes: List<ActionNode>): List<ViewModel> {
         val tmp = mutableListOf<ViewModel>()
         nodes.forEach {
-            tmp.add(ViewModel((it).descTitle, it.actionScope.activity, extra = it))
+            tmp.add(ViewModel((it).actionTitle, it.actionScope.activity, extra = it))
         }
         return tmp
     }

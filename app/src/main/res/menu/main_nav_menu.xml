@@ -6,10 +6,10 @@
         android:icon="@drawable/ic_home_black_24dp"
         android:title="@string/text_home" />
 
-    <item
-    android:id="@+id/nav_store"
-    android:title="@string/text_store"
-    android:icon="@drawable/ic_store_black_24dp"/>
+    <!--<item-->
+        <!--android:id="@+id/nav_store"-->
+        <!--android:icon="@drawable/ic_store_black_24dp"-->
+        <!--android:title="@string/text_store" />-->
 
     <item
         android:id="@+id/nav_me"

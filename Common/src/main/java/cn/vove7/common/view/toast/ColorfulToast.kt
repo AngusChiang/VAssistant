@@ -73,8 +73,13 @@ class ColorfulToast(val context: Context, textColor: Int = R.color.fff) {
     fun showShort(@StringRes textId: Int) {
         showShort(context.getString(textId))
     }
+
     fun showShort(text: String) {
         lHandler.sendMessage(lHandler.obtainMessage(SHOW_SHORT, text))
+    }
+
+    fun showLong(@StringRes textId: Int) {
+        showLong(context.getString(textId))
     }
 
     fun showLong(text: String) {

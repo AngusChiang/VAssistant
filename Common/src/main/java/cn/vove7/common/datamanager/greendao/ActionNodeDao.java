@@ -40,7 +40,7 @@ public class ActionNodeDao extends AbstractDao<ActionNode, Long> {
         public final static Property ParentId = new Property(3, Long.class, "parentId", false, "PARENT_ID");
         public final static Property ScopeId = new Property(4, Long.class, "scopeId", false, "SCOPE_ID");
         public final static Property DescId = new Property(5, Long.class, "descId", false, "DESC_ID");
-        public final static Property DescTitle = new Property(6, String.class, "descTitle", false, "DESC_TITLE");
+        public final static Property ActionTitle = new Property(6, String.class, "actionTitle", false, "ACTION_TITLE");
         public final static Property TagId = new Property(7, String.class, "tagId", false, "TAG_ID");
         public final static Property VersionCode = new Property(8, int.class, "versionCode", false, "VERSION_CODE");
         public final static Property PublishUserId = new Property(9, Long.class, "publishUserId", false, "PUBLISH_USER_ID");
@@ -72,7 +72,7 @@ public class ActionNodeDao extends AbstractDao<ActionNode, Long> {
                 "\"PARENT_ID\" INTEGER," + // 3: parentId
                 "\"SCOPE_ID\" INTEGER," + // 4: scopeId
                 "\"DESC_ID\" INTEGER," + // 5: descId
-                "\"DESC_TITLE\" TEXT," + // 6: descTitle
+                "\"ACTION_TITLE\" TEXT," + // 6: actionTitle
                 "\"TAG_ID\" TEXT," + // 7: tagId
                 "\"VERSION_CODE\" INTEGER NOT NULL ," + // 8: versionCode
                 "\"PUBLISH_USER_ID\" INTEGER," + // 9: publishUserId
@@ -117,9 +117,9 @@ public class ActionNodeDao extends AbstractDao<ActionNode, Long> {
             stmt.bindLong(6, descId);
         }
  
-        String descTitle = entity.getDescTitle();
-        if (descTitle != null) {
-            stmt.bindString(7, descTitle);
+        String actionTitle = entity.getActionTitle();
+        if (actionTitle != null) {
+            stmt.bindString(7, actionTitle);
         }
  
         String tagId = entity.getTagId();
@@ -175,9 +175,9 @@ public class ActionNodeDao extends AbstractDao<ActionNode, Long> {
             stmt.bindLong(6, descId);
         }
  
-        String descTitle = entity.getDescTitle();
-        if (descTitle != null) {
-            stmt.bindString(7, descTitle);
+        String actionTitle = entity.getActionTitle();
+        if (actionTitle != null) {
+            stmt.bindString(7, actionTitle);
         }
  
         String tagId = entity.getTagId();
@@ -223,7 +223,7 @@ public class ActionNodeDao extends AbstractDao<ActionNode, Long> {
             cursor.isNull(offset + 3) ? null : cursor.getLong(offset + 3), // parentId
             cursor.isNull(offset + 4) ? null : cursor.getLong(offset + 4), // scopeId
             cursor.isNull(offset + 5) ? null : cursor.getLong(offset + 5), // descId
-            cursor.isNull(offset + 6) ? null : cursor.getString(offset + 6), // descTitle
+            cursor.isNull(offset + 6) ? null : cursor.getString(offset + 6), // actionTitle
             cursor.isNull(offset + 7) ? null : cursor.getString(offset + 7), // tagId
             cursor.getInt(offset + 8), // versionCode
             cursor.isNull(offset + 9) ? null : cursor.getLong(offset + 9), // publishUserId
@@ -242,7 +242,7 @@ public class ActionNodeDao extends AbstractDao<ActionNode, Long> {
         entity.setParentId(cursor.isNull(offset + 3) ? null : cursor.getLong(offset + 3));
         entity.setScopeId(cursor.isNull(offset + 4) ? null : cursor.getLong(offset + 4));
         entity.setDescId(cursor.isNull(offset + 5) ? null : cursor.getLong(offset + 5));
-        entity.setDescTitle(cursor.isNull(offset + 6) ? null : cursor.getString(offset + 6));
+        entity.setActionTitle(cursor.isNull(offset + 6) ? null : cursor.getString(offset + 6));
         entity.setTagId(cursor.isNull(offset + 7) ? null : cursor.getString(offset + 7));
         entity.setVersionCode(cursor.getInt(offset + 8));
         entity.setPublishUserId(cursor.isNull(offset + 9) ? null : cursor.getLong(offset + 9));

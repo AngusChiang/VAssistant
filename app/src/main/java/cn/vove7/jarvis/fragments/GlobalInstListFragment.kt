@@ -48,14 +48,16 @@ class GlobalInstListFragment : SimpleListFragment<ActionNode>(), OnSyncInst {
     override fun onSync() {
         showProgressBar()
         NetHelper.postJson<List<ActionNode>>(ApiUrls.SYNC_GLOBAL_INST, BaseRequestModel(""),
-                type = object : TypeToken<ResponseMessage<List<ActionNode>>>() {}.type) { _, bean ->
+                type = NetHelper.ActionNodeListType) { _, bean ->
             if (bean != null) {
                 if (bean.isOk()) {
                     val list = bean.data
                     if (list != null) {
                         DaoHelper.updateGlobalInst(list).also {
-                            if(it)
+                            if(it) {
+                                toast.showShort("同步完成")
                                 refresh()
+                            }
                             else toast.showShort("同步失败")
                         }
 
@@ -75,7 +77,7 @@ class GlobalInstListFragment : SimpleListFragment<ActionNode>(), OnSyncInst {
     override fun transData(nodes: List<ActionNode>): List<ViewModel> {
         val tmp = mutableListOf<ViewModel>()
         nodes.forEach {
-            tmp.add(ViewModel((it).descTitle, extra = it))
+            tmp.add(ViewModel((it).actionTitle, extra = it))
         }
         return tmp
     }

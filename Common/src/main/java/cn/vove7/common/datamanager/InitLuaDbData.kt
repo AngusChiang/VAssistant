@@ -153,7 +153,7 @@ object InitLuaDbData : InitDbData() {
         arrayOf(
                 ActionNode("打开...", 1L, a1.id, NODE_SCOPE_GLOBAL)//打开
                 , ActionNode("QQ选择聊天人", 3L, a3.id, scrope_qq.id, NODE_SCOPE_IN_APP)//QQ选择聊天人
-                , ActionNode("QQ消息内容", 4L, a4.id, NODE_SCOPE_IN_APP_2, 3L)//QQ消息内容
+                , ActionNode("QQ消息内容", 4L, a4.id, NODE_SCOPE_IN_APP, 3L)//QQ消息内容
                 , ActionNode("拨打电话", 2L, a2.id, NODE_SCOPE_GLOBAL)//电话
                 , ActionNode("返回", 5L, a5.id, NODE_SCOPE_GLOBAL)//返回
                 , ActionNode("主页", 6L, a6.id, NODE_SCOPE_GLOBAL)//主页

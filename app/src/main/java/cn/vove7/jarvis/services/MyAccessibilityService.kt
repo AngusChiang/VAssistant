@@ -145,7 +145,6 @@ class MyAccessibilityService : AccessibilityApi() {
         dispatchPluginsEvent(ON_UI_UPDATE, rootInActiveWindow)
     }
 
-
     /**
      *
      * @param event AccessibilityEvent?
@@ -155,12 +154,6 @@ class MyAccessibilityService : AccessibilityApi() {
             return
         if (null == event || null == event.source) {
             return
-        }
-        val classNameStr = event.className
-        val pkg = event.packageName as String
-        if (classNameStr.startsWith(pkg)) {//解析当前App Activity todo check
-            currentActivity = classNameStr.substring(classNameStr.lastIndexOf('.') + 1)
-            updateCurrentApp(pkg)
         }
         Vog.v(this, "class :${currentAppInfo?.name} - ${currentAppInfo?.packageName} - $currentActivity \n" +
                 AccessibilityEvent.eventTypeToString(event.eventType))
@@ -173,7 +166,12 @@ class MyAccessibilityService : AccessibilityApi() {
             }
             //窗口的状态发生改变
             AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED -> {//窗口切换
-//                startTraverse(rootInActiveWindow)
+
+                val classNameStr = event.className
+                val pkg = event.packageName as String
+                Vog.d(this, "TYPE_WINDOW_STATE_CHANGED --->\n ${event.packageName} ${event.className}")
+                currentActivity = classNameStr.toString()//.substring(classNameStr.lastIndexOf('.') + 1)
+                updateCurrentApp(pkg)  //输入法??
                 callAllNotifier()
             }
             TYPE_WINDOWS_CHANGED -> {
@@ -181,7 +179,6 @@ class MyAccessibilityService : AccessibilityApi() {
             }
             TYPE_WINDOW_CONTENT_CHANGED -> {//"帧"刷新
                 val node = event.source
-//                startTraverse(node)
                 callAllNotifier()
             }
             AccessibilityEvent.TYPE_VIEW_HOVER_ENTER -> {

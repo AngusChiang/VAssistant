@@ -1,2 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="cn.vove7.common" />
+    package="cn.vove7.common" >
+
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+</manifest>

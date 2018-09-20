@@ -14,7 +14,7 @@ open class ResponseMessage<T> {
     var data: T? = null
 
     fun isOk(): Boolean {
-        return code == CODE_OK
+        return code == CODE_OK && data != null
     }
 
 

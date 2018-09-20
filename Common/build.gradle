@@ -38,5 +38,4 @@ dependencies {
     api "com.android.support:support-annotations:${support_version}"
     api 'com.google.code.gson:gson:2.8.5'
     api 'com.squareup.okhttp3:okhttp:3.11.0'
-
 }

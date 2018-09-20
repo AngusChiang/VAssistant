@@ -3,14 +3,12 @@ package cn.vove7.jarvis.adapters
 import android.content.Context
 import android.text.Editable
 import android.text.TextWatcher
-import android.view.KeyEvent
 import android.view.View
 import android.widget.EditText
 import android.widget.TextView
 import cn.vove7.common.datamanager.parse.statusmap.ActionNode
 import cn.vove7.jarvis.R
 import cn.vove7.vtp.easyadapter.BaseListAdapter
-import cn.vove7.vtp.log.Vog
 
 /**
  * # ExecuteQueueAdapter
@@ -22,7 +20,7 @@ class ExecuteQueueAdapter(context: Context, execQueue: MutableList<ActionNode>) 
     override fun layoutId(): Int = R.layout.item_of_exec_queue
 
     override fun onBindView(holder: VHolder, pos: Int, item: ActionNode) {
-        holder.descText.text = item.descTitle
+        holder.descText.text = item.actionTitle
         holder.paramText.addTextChangedListener(object:TextWatcher {
             override fun afterTextChanged(s: Editable?) {
             }

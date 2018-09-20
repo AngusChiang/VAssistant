@@ -48,7 +48,15 @@ class ViewNode(val node: AccessibilityNodeInfo) : ViewOperation, Comparable<View
             null
     }
 
-    override fun tryClick(): Boolean = tryOp(AccessibilityNodeInfo.ACTION_CLICK)
+    override fun tryClick(): Boolean {
+        for (i in 1..3) {
+            Vog.d(this, "tryClick ---> i: $i")
+            val r = tryOp(AccessibilityNodeInfo.ACTION_CLICK)
+            if (r) return true
+            sleep(50)
+        }
+        return false
+    }
 
     /**
      * 尝试操作次数

@@ -1,6 +1,6 @@
 package cn.vove7.jarvis.view.utils
 
-import cn.vove7.common.netacc.tool.SignHelper
+import cn.vove7.common.netacc.tool.SecureHelper
 import java.util.*
 
 /**
@@ -18,7 +18,7 @@ class NetParamsBuilder {
 
     fun sign(): TreeMap<String, String> {
         map["timestamp"] = (System.currentTimeMillis() / 1000).toString()
-        SignHelper.signParam(map)
+        SecureHelper.signParam(map)
         return map
     }
 

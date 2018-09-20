@@ -1,8 +1,10 @@
 package cn.vove7.common.datamanager.parse.model;
 
+import com.google.gson.annotations.Expose;
+
 import org.greenrobot.greendao.annotation.Entity;
-import org.greenrobot.greendao.annotation.Id;
 import org.greenrobot.greendao.annotation.Generated;
+import org.greenrobot.greendao.annotation.Id;
 
 /**
  * Created by Administrator.
@@ -10,25 +12,26 @@ import org.greenrobot.greendao.annotation.Generated;
  */
 @Entity
 public class ActionDesc {
+    @Expose(serialize = false)
     @Id
     private Long id;
 
-    private String descText;
+    private String instructions;
 
     private String example;
 
     public ActionDesc(String desc, String example) {
-        this.descText = desc;
+        this.instructions = desc;
         this.example = example;
     }
 
     public ActionDesc() {
     }
 
-    @Generated(hash = 130193740)
-    public ActionDesc(Long id, String descText, String example) {
+    @Generated(hash = 936804400)
+    public ActionDesc(Long id, String instructions, String example) {
         this.id = id;
-        this.descText = descText;
+        this.instructions = instructions;
         this.example = example;
     }
 
@@ -40,12 +43,12 @@ public class ActionDesc {
         this.id = id;
     }
 
-    public String getDescText() {
-        return descText;
+    public String getInstructions() {
+        return instructions;
     }
 
-    public void setDescText(String descText) {
-        this.descText = descText;
+    public void setInstructions(String instructions) {
+        this.instructions = instructions;
     }
 
     public String getExample() {

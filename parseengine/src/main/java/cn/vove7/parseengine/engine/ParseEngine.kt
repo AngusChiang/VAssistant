@@ -85,7 +85,7 @@ object ParseEngine {
         if (AppActionNodes == null) {
             AppActionNodes = DAO.daoSession.actionNodeDao.queryBuilder()
                     .where(ActionNodeDao.Properties.ActionScopeType
-                            .`in`(NODE_SCOPE_IN_APP, NODE_SCOPE_IN_APP_2))
+                            .eq(NODE_SCOPE_IN_APP/*, NODE_SCOPE_IN_APP_2*/))
                     .orderDesc(ActionNodeDao.Properties.Priority)
                     .list()
         }
@@ -114,7 +114,7 @@ object ParseEngine {
         it.regs.forEach { reg ->
             val result = reg.regex.matchEntire(cmd)
             if (result != null) {
-                val ac = it.action// 防止重复执行getAction
+                val ac = it.action
                 ac.param = it.param
                 extractParam(ac, reg, result)//提取参数
                 ac.matchWord = result.groupValues[0]

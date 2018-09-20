@@ -10,7 +10,7 @@ import java.util.Map;
  * Date: 2018/7/11
  * Time: 14:56
  */
-public class SignHelper {
+public class SecureHelper {
     private static final String SECRET_KEY = "vove777";
 
     /**
@@ -32,6 +32,7 @@ public class SignHelper {
         //String r = builder.toString();
         //Vog.INSTANCE.v(new Object(), "参数连接 -> " + r);
 
+        if (params == null) return;
         if (!params.containsKey("timestamp"))
             params.put("timestamp", String.valueOf((int) (System.currentTimeMillis() / 1000)));
 
@@ -67,4 +68,5 @@ public class SignHelper {
         }
         return ret.toString();
     }
+
 }

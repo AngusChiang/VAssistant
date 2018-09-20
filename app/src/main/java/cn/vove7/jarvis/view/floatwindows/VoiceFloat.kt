@@ -146,7 +146,6 @@ class VoiceFloat : AbFloatWindow<VoiceFloat.Holder> {
         smallImgMoveToEdgeAnim?.start()
     }
 
-    // TODO 效果
     fun onClick() {
 //        if (MainService.instance?.isListening() == true) {
 //            holder.result.text = "stop"
@@ -176,7 +175,6 @@ class VoiceFloat : AbFloatWindow<VoiceFloat.Holder> {
         val result = view.findViewById<TextView>(R.id.result)!!
     }
 
-    // TODO 事件响应效果
     @Subscribe(threadMode = ThreadMode.MAIN)
     fun showResult(data: VoiceData) {
         when (data.what) {

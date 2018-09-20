@@ -84,8 +84,8 @@ object AdvanAppHelper {
         Vog.v(this, "更新后 size: ${APP_LIST.size}")
     }
 
-    fun getPkgList(): List<String> {
-        val li = mutableListOf<String>()
+    fun getPkgList(): ArrayList<String> {
+        val li = arrayListOf<String>()
         APP_LIST.forEach {
             li.add(it.value.packageName)
         }

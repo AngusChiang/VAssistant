@@ -5,6 +5,8 @@ import android.support.annotation.Keep;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
 
+import com.google.gson.annotations.Expose;
+
 import org.greenrobot.greendao.annotation.Entity;
 import org.greenrobot.greendao.annotation.Generated;
 import org.greenrobot.greendao.annotation.Id;
@@ -21,10 +23,12 @@ import cn.vove7.common.datamanager.parse.statusmap.ActionNode;
 @Entity
 public class Action implements Comparable<Action>, Serializable {
     public static final long serialVersionUID = 1L;
+    @Expose(serialize = false)
     @Id
     private
     Long id;
 
+    @Expose(serialize = false)
     @Transient
     private String matchWord;
     /**
@@ -66,17 +70,20 @@ public class Action implements Comparable<Action>, Serializable {
      * 操作参数
      */
     @Transient
+    @Expose(serialize = false)
     private
     ActionParam param;
     /**
      * 请求结果
      */
     @Transient
+    @Expose(serialize = false)
     private
     Boolean responseResult = true;
     /**
      * 返回数据
      */
+    @Expose(serialize = false)
     @Transient
     private
     Bundle responseBundle = new Bundle();
@@ -112,6 +119,13 @@ public class Action implements Comparable<Action>, Serializable {
     public Action(int priority, String actionScript, String scriptType) {
         this(actionScript, scriptType);
         this.priority = priority;
+    }
+
+    public Action cloneNew() {
+        Action newA = new Action();
+        newA.scriptType = scriptType;
+        newA.actionScript = actionScript;
+        return newA;
     }
 
     public ActionParam getParam() {

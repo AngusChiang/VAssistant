@@ -49,7 +49,7 @@ import kotlin.concurrent.thread
 
 /**
  * # NewInstActivity
- *
+ * login & vip -> in
  * @author 17719247306
  * 2018/8/19
  */
@@ -65,7 +65,6 @@ class NewInstActivity : AppCompatActivity(), View.OnClickListener {
 
     private lateinit var searchView: SearchView
     private var enterTime = 0L
-
 
     lateinit var toolbar: Toolbar
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -107,7 +106,7 @@ class NewInstActivity : AppCompatActivity(), View.OnClickListener {
                 voast.showShort(getString(R.string.text_error_occurred) + " code :n117")
             } else {//展示信息
                 activity_name.setText(editNode?.actionScope?.activity)
-                desc_text.setText(editNode?.descTitle)
+                desc_text.setText(editNode?.actionTitle)
                 editNode?.regs?.forEach {
                     regs.add(Pair(it.regStr, posData[posArr.indexOf(it.paramPos)]))
                 }
@@ -158,6 +157,9 @@ class NewInstActivity : AppCompatActivity(), View.OnClickListener {
         bsController?.bottomToolbar?.setOnMenuItemClickListener(this::onOptionsItemSelected)
         searchView = MenuItemCompat.getActionView(searchItem) as SearchView
         searchView.queryHint = getString(R.string.text_search)
+
+        var sR: Runnable? = null
+        val handler = Handler()
         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String): Boolean {
                 return false
@@ -165,14 +167,18 @@ class NewInstActivity : AppCompatActivity(), View.OnClickListener {
 
             override fun onQueryTextChange(newText: String): Boolean {
                 Vog.d(this, "onQueryTextChange ----> $newText")
-                if (newText.trim() == "") {
-                    bsController?.setBottomListData(apps, onSelAppItemClick)
-                    return false
+                handler.removeCallbacks(sR)
+                val nt = newText.trim()
+                sR = Runnable {
+                    if (nt == "") {
+                        bsController?.setBottomListData(apps, onSelAppItemClick)
+                    }
+                    val tmp = apps.filter {
+                        it.title?.contains(nt, ignoreCase = true) == true
+                    }
+                    bsController?.setBottomListData(tmp as MutableList<ViewModel>, onSelAppItemClick)
                 }
-                val tmp = apps.filter {
-                    it.title.contains(newText.trim(), ignoreCase = true)
-                }
-                bsController?.setBottomListData(tmp as MutableList<ViewModel>, onSelAppItemClick)
+                handler.postDelayed(sR, 500)
                 return true
             }
         })
@@ -252,7 +258,7 @@ class NewInstActivity : AppCompatActivity(), View.OnClickListener {
 
         val desc = desc_text.text.toString().trim()
         if (desc == "") {//descTitle
-            desc_input_lay.error = "..."
+            desc_input_lay.error = getString(R.string.text_not_empty)
             return
         }
         if ((scriptText ?: "") == "") {//script
@@ -271,19 +277,30 @@ class NewInstActivity : AppCompatActivity(), View.OnClickListener {
             voast.showShort(getString(R.string.text_at_last_one_regex))
         }
 
+        var activityName: String? = null
+        activity_name.text.toString().trim().let {
+            activityName = if (it == "") {
+                null
+            } else it
+        }
         if (isReedit) {//保存编辑
             if (editNode == null) {
                 voast.showShort(getString(R.string.text_error_occurred))
                 GlobalLog.err(getString(R.string.text_error_occurred) + "code: na264")
                 return
             }
+
+            if (inApp) {//更新scope
+                editNode?.setScopeId(DaoHelper.getActionScopeId(ActionScope(pkg, activityName)))
+            }
             val ac = editNode?.action!!
             ac.scriptType = scriptType
             ac.actionScript = scriptText
             DAO.daoSession.actionDao.update(ac)
-            editNode?.descTitle = desc
+            editNode?.actionTitle = desc
 
-            editNode!!.regs.forEach { DAO.daoSession.delete(it) }
+            //fixme 数据保存无效
+            editNode!!.regs.forEach { DAO.daoSession.regDao.delete(it) }
             wrapRegs().forEach {
                 it.nodeId = editNode!!.id
                 DAO.daoSession.regDao.insert(it)
@@ -294,18 +311,22 @@ class NewInstActivity : AppCompatActivity(), View.OnClickListener {
 
         } else {//新发布 构造newNode
             val newNode = ActionNode()
+            if (parentNode != null) {
+                newNode.parentId = parentId
+                newNode.parentTagId = parentNode?.tagId
+            }
             if (inApp) {
-                val scope = ActionScope(pkg, activity_name.text.toString().trim())
+                val scope = ActionScope(pkg, activityName)
                 newNode.actionScope = scope
             }
 
             val action = Action(scriptText, scriptType)
             newNode.action = action
-            newNode.descTitle = desc
+            newNode.actionTitle = desc
 
             newNode.from = DataFrom.FROM_USER
-            if (UserInfo.isLogin || !BuildConfig.DEBUG) {
-                newNode.publishUserId = UserInfo.userId
+            if (UserInfo.isLogin() || !BuildConfig.DEBUG) {
+                newNode.publishUserId = UserInfo.getUserId()
             }
             newNode.actionScopeType = instType
 
@@ -499,12 +520,12 @@ class NewInstActivity : AppCompatActivity(), View.OnClickListener {
                 if (arg == null) arg = getString(R.string.text_none)
                 val t = String.format(getString(R.string.text_parse_result_placeholder),
                         p.matchWord, arg) // "匹配词: ${p.matchWord} 参数: ${p.param}\n")
-                val text = ColourTextClickableSpan(this, t, R.color.cardview_light_background, listener = null)
+                val text = ColourTextClickableSpan(this, t, android.R.color.white, listener = null)
 //                Vog.d(this, "outputParseResult $t")
                 resultOutput.append(text.spanStr)
                 resultOutput.append("\n")
             }
-            val succ = ColourTextClickableSpan(this, getString(R.string.text_test_passed), R.color.green_700, listener = null)
+            val succ = ColourTextClickableSpan(this, getString(R.string.text_test_passed), R.color.light_green_500, listener = null)
             resultOutput.append(succ.spanStr)
         } else {
             val err = ColourTextClickableSpan(this, getString(R.string.text_test_failed), R.color.red_500, listener = null)
@@ -529,7 +550,7 @@ class NewInstActivity : AppCompatActivity(), View.OnClickListener {
     private fun wrapTestNode(): ActionNode {
         val testId = Int.MAX_VALUE.toLong()
 
-        val testNode = ActionNode(desc_text.text.toString(), testId, 0L, instType, parentId
+        val testNode = ActionNode(desc_text.text.toString(), testId, -1L, instType, parentId
             ?: 0)
         testNode.follows = emptyList()
         testNode.regs = wrapRegs()
@@ -590,7 +611,7 @@ class NewInstActivity : AppCompatActivity(), View.OnClickListener {
 //                    .setTitle("添加正则")
                     .setView(dialogView)
                     .setPositiveButton("确认") { _, _ ->
-                        val r = regEditText.text.toString().replace(" ", "")
+                        val r = regEditText.text.trim().toString()
                         if (r == "") {
                             inputDialog?.hide()
                         } else
@@ -600,6 +621,7 @@ class NewInstActivity : AppCompatActivity(), View.OnClickListener {
                         inputDialog?.hide()
                     }.setOnDismissListener {
                         regEditText.text.clear()
+                        isModify = -1
                     }.show()
         } else {
             regEditText.setText(reg)
@@ -609,7 +631,7 @@ class NewInstActivity : AppCompatActivity(), View.OnClickListener {
         }
     }
 
-    inner class RegListAdapter(context: Context, dataSet: List<Pair<String, String>>?) : BaseListAdapter<Holder, Pair<String, String>>(context, dataSet) {
+    inner class RegListAdapter(context: Context, val dataSet: MutableList<Pair<String, String>>?) : BaseListAdapter<Holder, Pair<String, String>>(context, dataSet) {
 
         override fun onCreateViewHolder(view: View): Holder {
             return Holder(view)
@@ -622,6 +644,11 @@ class NewInstActivity : AppCompatActivity(), View.OnClickListener {
             holder.itemView.setOnClickListener {
                 isModify = pos
                 showInputRegDialog(item.first, item.second)
+            }
+            holder.itemView.setOnLongClickListener {//长按删除
+                dataSet?.removeAt(pos)
+                notifyDataSetChanged()
+                return@setOnLongClickListener true
             }
         }
     }

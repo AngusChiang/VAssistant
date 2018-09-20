@@ -18,7 +18,7 @@ public class CommandHistory {
 
     private String commandText;
     private Date commandDate;
-    private Long userId = UserInfo.Companion.getUserId();
+    private Long userId = UserInfo.getUserId();
     @Generated(hash = 1154937964)
     public CommandHistory(Long id, String commandText, Date commandDate,
             Long userId) {

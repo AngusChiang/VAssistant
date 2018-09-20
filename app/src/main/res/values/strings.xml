@@ -182,8 +182,34 @@
     <string name="text_get_ver_code">Get</string>
     <string name="text_email">EmailAddress</string>
     <string name="text_share">Share</string>
+    <string name="text_upgrade">Upgrade</string>
     <string name="text_sync">同步</string>
     <string name="text_vibrate_reco_begin">开始识别时震动</string>
     <string name="text_net_err">Network error</string>
+    <string name="key_login_info" translatable="false">login_info</string>
+    <string name="key_show_prompt_inapp_as_global_dialog" translatable="false">show_prompt_inapp_as_global_dialog</string>
+    <string name="text_action_title">Action title</string>
+    <string name="hint_example">打电话给xxx \n呼叫xxx</string>
+    <string name="hint_action_desc">拨打电话，可用别名标记联系人，见 标记管理/联系人</string>
+    <string name="text_instructions">Instructions</string>
+    <string name="text_example">Example</string>
+    <string name="text_share_success">Sharing success</string>
+    <string name="text_reg_time">Registration time</string>
+    <string name="text_vip_end_time">会员到期时间</string>
+    <string name="text_failed_to_get_data">Failed to get data</string>
+    <string name="text_logout">Logout</string>
+    <string name="text_activate">activate</string>
+    <string name="text_purchase_act_code">Purchase activation code</string>
+    <string name="text_recharge">Recharge</string>
+    <string name="text_alipay_pay">AliPay</string>
+    <string name="text_wechat_pay">Wechat</string>
+    <string name="text_recharge_code">Recharge code</string>
+    <string name="text_failed_to_get_user_info">Failed to get user info</string>
+    <string name="text_purchase_recharge_code">购买充值码</string>
+    <string name="text_purcharge_recharge_code_msg">通过支付宝转账下方指定金额，或者联系qq获取，在备注填写你的邮箱，不久你会收到含有充值码的邮件，点击下方[使用充值码]继续操作即可。</string>
+    <string name="text_email_copy_to_clip">你的邮箱已复制到剪切板</string>
+    <string name="text_understand">Understand</string>
+    <string name="text_continue">继续</string>
+    <string name="text_debug_service_starting">Debug service started on port</string>
 
 </resources>

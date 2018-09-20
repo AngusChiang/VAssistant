@@ -2,12 +2,17 @@ package cn.vove7.common.netacc
 
 import android.os.Handler
 import cn.vove7.common.app.GlobalLog
+import cn.vove7.common.datamanager.executor.entity.MarkedData
+import cn.vove7.common.datamanager.parse.statusmap.ActionNode
+import cn.vove7.common.model.UserInfo
+import cn.vove7.common.model.VipPrice
 import cn.vove7.common.netacc.model.BaseRequestModel
 import cn.vove7.common.netacc.model.ResponseMessage
 import cn.vove7.common.netacc.tool.OneGson
-import cn.vove7.common.netacc.tool.SignHelper
+import cn.vove7.common.netacc.tool.SecureHelper
+import cn.vove7.common.utils.GsonHelper
 import cn.vove7.vtp.log.Vog
-import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 import okhttp3.*
 import java.io.IOException
 import java.lang.reflect.Type
@@ -25,11 +30,26 @@ typealias OnResponse<T> = (Int, ResponseMessage<T>?) -> Unit
 object NetHelper {
 
     var timeout = 15L
+    fun <T> get(url: String, params: Map<String, String>? = null,
+                type: Type, requestCode: Int = 0, callback: OnResponse<T>) {
+        val client = OkHttpClient.Builder()
+                .readTimeout(timeout, TimeUnit.SECONDS).build()
+        SecureHelper.signParam(params)
+
+        val requestBuilder = Request.Builder().url(url).get()
+        params?.forEach { it ->
+            requestBuilder.addHeader(it.key, it.value)
+        }
+        val req = requestBuilder.build()
+        val call = client.newCall(req)
+        call(call, type, requestCode, callback)
+    }
+
     fun <T> post(url: String, params: Map<String, String>? = null,
                  type: Type, requestCode: Int = 0, callback: OnResponse<T>) {
         val client = OkHttpClient.Builder()
                 .readTimeout(timeout, TimeUnit.SECONDS).build()
-        SignHelper.signParam(params)
+        SecureHelper.signParam(params)
         val bodyBuilder = FormBody.Builder()
         params?.forEach { it ->
             bodyBuilder.add(it.key, it.value)
@@ -41,11 +61,11 @@ object NetHelper {
     }
 
     fun <T> postJson(url: String, model: BaseRequestModel<*>,
-                     type: Type, requestCode: Int = 0, callback: OnResponse<T>) {
+                     type: Type = StringType, requestCode: Int = 0, callback: OnResponse<T>) {
         val client = OkHttpClient.Builder()
                 .readTimeout(timeout, TimeUnit.SECONDS).build()
 
-        val json = Gson().toJson(model)
+        val json = GsonHelper.toJson(model)
         Vog.d(this, "postJson ---> $json")
         val requestBody = FormBody.create(MediaType
                 .parse("application/json; charset=utf-8"), json)
@@ -57,7 +77,7 @@ object NetHelper {
         call(call, type, requestCode, callback)
     }
 
-    private fun<T> call(call: Call, type: Type, requestCode: Int = 0, callback: OnResponse<T>) {
+    private fun <T> call(call: Call, type: Type, requestCode: Int = 0, callback: OnResponse<T>) {
         val handler = Handler()
         call.enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {//响应失败更新UI
@@ -72,7 +92,7 @@ object NetHelper {
                 if (response.isSuccessful) {
                     val s = response.body()?.string()
                     try {
-//                        Vog.d(this, "onResponse $url --->\n$s")
+                        Vog.d(this, "onResponse --->\n$s")
                         val bean = OneGson.fromJsonObj<T>(s, type)
                         handler.post {
                             callback.invoke(requestCode, bean)
@@ -92,6 +112,29 @@ object NetHelper {
 
             }
         })
+    }
+
+    val StringType: Type by lazy {
+        object : TypeToken<ResponseMessage<String>>() {}.type
+    }
+    val IntType: Type by lazy {
+        object : TypeToken<ResponseMessage<Int>>() {}.type
+    }
+    val UserInfoType: Type by lazy {
+        object : TypeToken<ResponseMessage<UserInfo>>() {}.type
+    }
+    val MarkedDataListType: Type by lazy {
+        object : TypeToken<ResponseMessage<List<MarkedData>>>() {}.type
+    }
+
+    val DoubleListType: Type by lazy {
+        object : TypeToken<ResponseMessage<List<Double>>>() {}.type
+    }
+    val VipPriceListType: Type by lazy {
+        object : TypeToken<ResponseMessage<List<VipPrice>>>() {}.type
+    }
+    val ActionNodeListType: Type by lazy {
+        object : TypeToken<ResponseMessage<List<ActionNode>>>() {}.type
     }
 
 }
