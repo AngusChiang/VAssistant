@@ -81,6 +81,7 @@ object NetHelper {
         val handler = Handler()
         call.enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {//响应失败更新UI
+                e.printStackTrace()
                 GlobalLog.err("net failure: " + e.message)
                 handler.post {
                     callback.invoke(requestCode, ResponseMessage.error(e.message))

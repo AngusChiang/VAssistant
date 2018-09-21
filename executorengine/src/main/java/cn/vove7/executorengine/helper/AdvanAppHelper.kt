@@ -2,6 +2,7 @@ package cn.vove7.executorengine.helper
 
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.model.MatchedData
+import cn.vove7.parseengine.engine.ParseEngine
 import cn.vove7.vtp.app.AppHelper
 import cn.vove7.vtp.app.AppInfo
 import cn.vove7.vtp.log.Vog
@@ -18,9 +19,7 @@ object AdvanAppHelper {
     val APP_LIST = hashMapOf<String, AppInfo>()
     private var limitRate = 0.8f
 
-    private
-
-    var lastUpdateTime = 0L
+    private var lastUpdateTime = 0L
     const val updateInterval = 30 * 60 * 1000
 //    }
 
@@ -37,28 +36,39 @@ object AdvanAppHelper {
     /**
      * appWord -> pkg
      * 匹配机制：标识 -> 按匹配率排序，若无匹配，更新app列表再次匹配 -> 搜索历史匹配
+     * 预解析跟随操作 ：  QQ扫一扫  QQ浏览器
      */
     fun matchAppName(appWord: String, update: Boolean = true): List<MatchedData<AppInfo>> {
         val context = GlobalApp.APP
         val matchList = mutableListOf<MatchedData<AppInfo>>()
         APP_LIST.values.forEach {
-            val rate = when {
-                appWord.startsWith(it.name, ignoreCase = true) -> 1f
-                else -> try {
+            val rate = try {
+                if (appWord.startsWith(it.name, ignoreCase = true)) {
+                    val follow = appWord.substring(it.name.length)
+                    Vog.d(this, "预解析---> $follow")
+                    val aq = ParseEngine.matchAppAction(follow, it.packageName)
+                    if (aq.isEmpty()) {//无匹配
+                        Vog.d(this, "预解析---> 无匹配")
+                        TextHelper.compareSimilarityWithPinyin(context, appWord, it.name)
+                    } else {//匹配ok
+                        1f
+                    }
+                } else {
                     Vog.v(this, "matchAppName $appWord ${it.name}")
                     TextHelper.compareSimilarityWithPinyin(context, appWord, it.name)
-                } catch (e: Exception) {
-                    e.printStackTrace()
-                    0f
                 }
+            } catch (e: Exception) {
+                e.printStackTrace()
+                0f
             }
+
             if (rate > limitRate) {
                 matchList.add(MatchedData(rate, it))
             }
         }
 
         val now = System.currentTimeMillis()
-        //未匹配到，距上次刷新时间，
+        //未匹配到，距上次刷新时间，重新匹配
         return if (matchList.size == 0 && (now - lastUpdateTime > updateInterval) && update) {
             lastUpdateTime = now
             updateAppList()

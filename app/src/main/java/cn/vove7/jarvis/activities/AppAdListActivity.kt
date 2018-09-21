@@ -3,11 +3,13 @@ package cn.vove7.jarvis.activities
 import android.os.Bundle
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.datamanager.AppAdInfo
+import cn.vove7.common.datamanager.parse.DataFrom
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.activities.base.OneFragmentActivity
 import cn.vove7.jarvis.adapters.SimpleListAdapter
 import cn.vove7.jarvis.adapters.ViewModel
 import cn.vove7.jarvis.fragments.SimpleListFragment
+import com.afollestad.materialdialogs.MaterialDialog
 
 /**
  * # AppAdListActivity
@@ -35,7 +37,21 @@ class AppAdListActivity : OneFragmentActivity() {
         override val itemClickListener: SimpleListAdapter.OnItemClickListener? = object : SimpleListAdapter.OnItemClickListener {
             override fun onClick(holder: SimpleListAdapter.VHolder?, pos: Int, item: ViewModel) {
                 // TODO detail
+                val data = item.extra as AppAdInfo?
+                MaterialDialog(context!!).show {
+                    if (DataFrom.userCanEdit(data?.from)) {
+                        neutralButton(R.string.text_edit) {
+                            //todo edit
+                            onEdit(item.extra as AppAdInfo)
+                        }
+                    }
+                    title(text = item.title)
+                    message(text = data.toString())
+                }
             }
+        }
+
+        fun onEdit(data: AppAdInfo) {
         }
 
         companion object {

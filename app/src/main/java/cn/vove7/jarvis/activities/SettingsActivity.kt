@@ -3,6 +3,7 @@ package cn.vove7.jarvis.activities
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.view.MenuItem
+import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.appbus.AppBus
 import cn.vove7.common.appbus.SpeechAction
 import cn.vove7.jarvis.R
@@ -63,21 +64,27 @@ class SettingsActivity : AppCompatActivity() {
                         SwitchItem(R.string.text_open_voice_wakeup, "以 \"你好小V\" 唤醒",
                                 keyId = R.string.key_open_voice_wakeup, callback = { holder, it ->
                             when (it as Boolean) {
-                                true -> AppBus.postSpeechAction(SpeechAction.ActionCode.ACTION_START_WAKEUP)
+                                true -> {
+                                    AppBus.postSpeechAction(SpeechAction.ActionCode.ACTION_START_WAKEUP)
+                                    GlobalApp.toastShort("语音唤醒已开启")
+                                }
                                 false -> AppBus.postSpeechAction(SpeechAction.ActionCode.ACTION_STOP_WAKEUP)
                             }
                         }, defaultValue = { false }),
                         CheckBoxItem(R.string.text_voice_control_dialog, "使用语言命令控制对话框",
                                 R.string.key_voice_control_dialog, defaultValue = { true })
                 )),
-                SettingGroupItem(R.color.google_blue, "辅助", childItems = listOf(
+                SettingGroupItem(R.color.google_blue, "去广告", childItems = listOf(
                         SwitchItem(R.string.text_open_ad_killer_service, null, R.string.key_open_ad_block,
-                                defaultValue = { true }, callback = { holder, it ->
+                                defaultValue = { true }) { holder, it ->
                             when (it as Boolean) {
                                 true -> AdKillerService.bindServer()
                                 false -> AdKillerService.unBindServer()
                             }
-                        })
+                        },
+                        NumberPickerItem(R.string.text_time_wait_ad, "界面等待广告出现最长时间，单位秒\n超时暂停",
+                                keyId = R.string.key_ad_wait_secs, range = Pair(10, 100),
+                                defaultValue = { 17 })
                 ))
         )
     }

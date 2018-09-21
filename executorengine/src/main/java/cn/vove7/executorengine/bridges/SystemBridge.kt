@@ -8,20 +8,22 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.media.AudioManager
+import android.media.AudioManager.ADJUST_MUTE
+import android.media.AudioManager.ADJUST_UNMUTE
 import android.net.Uri
 import android.os.Build
 import android.os.VibrationEffect
 import android.os.Vibrator
 import android.support.v4.content.ContextCompat
 import android.view.KeyEvent
-import cn.vove7.common.bridges.SystemOperation
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.appbus.AppBus
+import cn.vove7.common.bridges.SystemOperation
 import cn.vove7.common.model.ExResult
 import cn.vove7.common.model.RequestPermission
 import cn.vove7.executorengine.helper.AdvanAppHelper
-import cn.vove7.executorengine.helper.ContactHelper
+import cn.vove7.executorengine.helper.AdvanContactHelper
 import cn.vove7.vtp.app.AppHelper
 import cn.vove7.vtp.app.AppInfo
 import cn.vove7.vtp.hardware.HardwareHelper
@@ -32,9 +34,8 @@ import cn.vove7.vtp.system.SystemHelper
 
 class SystemBridge : SystemOperation {
     private val context: Context = GlobalApp.APP
-    private val contactHelper: ContactHelper  by lazy { ContactHelper(context) }
 
-    override fun openAppByPkg(pkg: String): ExResult<String> {
+    override fun openAppByPkg(pkg: String, resetTask: Boolean): ExResult<String> {
         return try {
             val launchIntent = context.packageManager
                     .getLaunchIntentForPackage(pkg)
@@ -45,7 +46,8 @@ class SystemBridge : SystemOperation {
                 ExResult("未找到此App: $pkg")
             } else {
                 launchIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP) //清空activity栈
-                launchIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK)
+                if (resetTask)
+                    launchIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK)
 
                 context.startActivity(launchIntent)
                 ExResult()
@@ -64,20 +66,27 @@ class SystemBridge : SystemOperation {
      * @return packageName if success
      */
     override fun openAppByWord(appWord: String): ExResult<String> {
-        val list = AdvanAppHelper.matchAppName(appWord)
-        return if (list.isNotEmpty()) {
-            val info = list[0].data
-            Vog.i(this, "打开应用：$appWord -> ${info.name}")
 
-            val o = openAppByPkg(info.packageName)
+        val pkg = getPkgByWord(appWord)
+        return if (pkg != null) {
+            val o = openAppByPkg(pkg, false)
             if (o.ok)
-                ExResult<String>().with(info.packageName)
+                ExResult<String>().with(pkg)
             else o
+
         }
 //        Bus.postInfo(MessageEvent("未找到应用:$appWord", WHAT_ERR))
         else ExResult("未找到应用:$appWord")
     }
 
+    fun getPkgByWord(appWord: String): String? {
+        val list = AdvanAppHelper.matchAppName(appWord)
+        return if (list.isNotEmpty()) {
+            list[0].data.packageName.also {
+                Vog.i(this, "打开应用：$appWord -> $it")
+            }
+        } else null
+    }
 
     // Open App 启动对应首页Activity
     fun startActivity(pkg: String, fullActivityName: String): Boolean {
@@ -98,7 +107,7 @@ class SystemBridge : SystemOperation {
      * 优先级：标记 -> 通讯录 -> 服务提供
      */
     override fun call(s: String): ExResult<String> {
-        val ph = contactHelper.matchPhone(context, s)
+        val ph = AdvanContactHelper.matchPhone(context, s)
             ?: return ExResult("未找到该联系人$s")// "未找到该联系人$s"
         val callIntent = Intent(Intent.ACTION_CALL, Uri.parse("tel:$ph"))
         return try {
@@ -186,13 +195,17 @@ class SystemBridge : SystemOperation {
      * 当前音量静音
      */
     override fun volumeMute() {
+        setMute(true)
+    }
+
+    fun setMute(state: Boolean) {
+        val direction = if (state) ADJUST_MUTE else ADJUST_UNMUTE
         val mAudioManager = GlobalApp.APP.getSystemService(Context.AUDIO_SERVICE) as AudioManager
-        mAudioManager.setStreamMute(AudioManager.USE_DEFAULT_STREAM_TYPE, true)
+        mAudioManager.adjustSuggestedStreamVolume(direction, AudioManager.USE_DEFAULT_STREAM_TYPE, 0)
     }
 
     override fun volumeUnmute() {
-        val mAudioManager = GlobalApp.APP.getSystemService(Context.AUDIO_SERVICE) as AudioManager
-        mAudioManager.setStreamMute(AudioManager.USE_DEFAULT_STREAM_TYPE, false)
+        setMute(false)
     }
 
     override fun volumeUp() {
@@ -312,8 +325,8 @@ class SystemBridge : SystemOperation {
     }
 
     override fun setClipText(text: String?) {
-            val cm = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-            val mClipData = ClipData.newPlainText("", text)
-            cm.primaryClip = mClipData
+        val cm = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+        val mClipData = ClipData.newPlainText("", text)
+        cm.primaryClip = mClipData
     }
 }

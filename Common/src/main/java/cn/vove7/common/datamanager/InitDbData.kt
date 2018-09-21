@@ -53,11 +53,11 @@ abstract class InitDbData {
         }
 
         arrayOf(
-                MarkedData("手电", MarkedData.MARKED_TYPE_SCRIPT_LUA, "((手电(筒)?)|(闪光灯)|(照明(灯)))", "system.openFlashlight()")
-                , MarkedData("网易云", MarkedData.MARKED_TYPE_APP, "网易云(音乐)?", "com.netease.cloudmusic")
-                , MarkedData("支付宝", MarkedData.MARKED_TYPE_APP, "(Alipay)|(支付宝)", "com.eg.android.AlipayGphone")
-                , MarkedData("蓝牙", MarkedData.MARKED_TYPE_SCRIPT_LUA, "蓝牙", "system.openBluetooth()")
-                , MarkedData("wifi", MarkedData.MARKED_TYPE_SCRIPT_LUA, "(Alipay)|(支付宝)", "system.openWlan()")
+                MarkedData("手电", MarkedData.MARKED_TYPE_SCRIPT_LUA, "((手电(筒)?)|(闪光灯)|(照明(灯)))", "system.openFlashlight()",DataFrom.FROM_SERVER)
+                , MarkedData("网易云", MarkedData.MARKED_TYPE_APP, "网易云(音乐)?", "com.netease.cloudmusic",DataFrom.FROM_SERVER)
+                , MarkedData("支付宝", MarkedData.MARKED_TYPE_APP, "(Alipay)|(支付宝)", "com.eg.android.AlipayGphone",DataFrom.FROM_SERVER)
+                , MarkedData("蓝牙", MarkedData.MARKED_TYPE_SCRIPT_LUA, "蓝牙", "system.openBluetooth()",DataFrom.FROM_SERVER)
+                , MarkedData("wifi", MarkedData.MARKED_TYPE_SCRIPT_LUA, "(Alipay)|(支付宝)", "system.openWlan()",DataFrom.FROM_SERVER)
         ).forEach {
             markedDataDao.insert(it)
         }

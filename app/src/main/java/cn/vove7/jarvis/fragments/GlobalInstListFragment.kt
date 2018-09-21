@@ -18,6 +18,7 @@ import cn.vove7.jarvis.activities.NewInstActivity
 import cn.vove7.jarvis.activities.OnSyncInst
 import cn.vove7.jarvis.adapters.SimpleListAdapter
 import cn.vove7.jarvis.adapters.ViewModel
+import cn.vove7.parseengine.engine.ParseEngine
 import cn.vove7.vtp.log.Vog
 import com.google.gson.reflect.TypeToken
 import kotlin.concurrent.thread
@@ -57,6 +58,7 @@ class GlobalInstListFragment : SimpleListFragment<ActionNode>(), OnSyncInst {
                             if(it) {
                                 toast.showShort("同步完成")
                                 refresh()
+                                ParseEngine.updateNode()
                             }
                             else toast.showShort("同步失败")
                         }

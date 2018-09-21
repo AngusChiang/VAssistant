@@ -1,19 +1,18 @@
 package cn.vove7.jarvis.fragments
 
 import android.os.Bundle
-import android.view.Menu
-import android.view.MenuInflater
-import android.view.MenuItem
 import android.view.View
 import android.widget.CompoundButton
 import cn.vove7.common.datamanager.DAO
 import cn.vove7.common.datamanager.executor.entity.MarkedData
 import cn.vove7.common.datamanager.greendao.MarkedDataDao
 import cn.vove7.common.datamanager.parse.DataFrom
+import cn.vove7.executorengine.helper.AdvanContactHelper
 import cn.vove7.jarvis.R
-import cn.vove7.jarvis.adapters.SimpleListAdapter
 import cn.vove7.jarvis.adapters.ViewModel
 import cn.vove7.jarvis.fragments.base.BaseMarkedFragment
+import com.afollestad.materialdialogs.MaterialDialog
+import com.afollestad.materialdialogs.list.listItems
 import kotlin.concurrent.thread
 
 /**
@@ -24,22 +23,25 @@ import kotlin.concurrent.thread
  */
 class MarkedContractFragment : BaseMarkedFragment<MarkedData>() {
 
-    var showServer = false
-    override val itemClickListener = object : SimpleListAdapter.OnItemClickListener {
-        override fun onClick(holder: SimpleListAdapter.VHolder?, pos: Int, item: ViewModel) {
-            //dialog edit
-        }
+    var showServer = true
+    override val keyHint: Int = R.string.text_show_name
+    override val valueHint: Int = R.string.text_phone
 
-        override fun onLongClick(holder: SimpleListAdapter.VHolder?, pos: Int, item: ViewModel): Boolean {
-            //batch
-
-            return true
-        }
+    override fun onSelect() {
+        //选择联系人
+        val phoneList = AdvanContactHelper.getSimpleList()
+        MaterialDialog(context!!)
+                .title(R.string.text_select_contact)
+                .listItems(items = phoneList, waitForPositiveButton = false) { _, i, s ->
+                   setValue(s.split("\n")[1])
+                }.show()
     }
+
+    override var markedType: String = MarkedData.MARKED_TYPE_CONTACT
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        buildHeader("显示外部数据", lis = CompoundButton.OnCheckedChangeListener { buttonView, isChecked ->
+        buildHeader("显示外部数据", true, lis = CompoundButton.OnCheckedChangeListener { buttonView, isChecked ->
             showServer = isChecked
             refresh()
         })
@@ -71,3 +73,4 @@ class MarkedContractFragment : BaseMarkedFragment<MarkedData>() {
         }
     }
 }
+

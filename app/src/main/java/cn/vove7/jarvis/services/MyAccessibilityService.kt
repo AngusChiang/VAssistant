@@ -53,6 +53,7 @@ class MyAccessibilityService : AccessibilityApi() {
             registerEvent(activityNotifier)
             if (SpHelper(GlobalApp.APP).getBoolean(R.string.key_open_ad_block, true))
                 AdKillerService.bindServer()//广告服务
+            dispatchPluginsEvent(ON_BIND)
         }
     }
 
@@ -155,7 +156,7 @@ class MyAccessibilityService : AccessibilityApi() {
         if (null == event || null == event.source) {
             return
         }
-        Vog.v(this, "class :${currentAppInfo?.name} - ${currentAppInfo?.packageName} - $currentActivity \n" +
+        Vog.v(this, "class :$currentAppInfo - ${event.className} \n" +
                 AccessibilityEvent.eventTypeToString(event.eventType))
         val eventType = event.eventType
         //根据事件回调类型进行处理
@@ -274,6 +275,7 @@ class MyAccessibilityService : AccessibilityApi() {
     var delayUp = 600L
 
     var v2 = false
+    var v3 = false
     /**
      * 按键监听
      * @param event KeyEvent
@@ -286,13 +288,20 @@ class MyAccessibilityService : AccessibilityApi() {
         when (event.action) {
             KeyEvent.ACTION_DOWN -> when (event.keyCode) {
                 KEYCODE_VOLUME_DOWN -> {
-                    if (MainService.recoIsListening) {//下键取消聆听
-                        v2 = true
-                        MainService.instance?.onCommand(MainService.ORDER_CANCEL_RECO)//up speed
-                    } else {
-                        postLongDelay(stopRunner)
+                    return when {
+                        MainService.recoIsListening -> {//下键取消聆听
+                            v2 = true
+                            MainService.instance?.onCommand(MainService.ORDER_CANCEL_RECO)//up speed
+                            true
+                        }
+                        MainService.exEngineRunning -> {//长按下键
+                            //正在执行才会触发
+                            v3 = true
+                            postLongDelay(stopRunner)
+                            true
+                        }
+                        else -> super.onKeyEvent(event)
                     }
-                    return true
                 }
                 KEYCODE_VOLUME_UP -> {
                     if (MainService.recoIsListening) {//按下停止聆听
@@ -313,7 +322,10 @@ class MyAccessibilityService : AccessibilityApi() {
                     KEYCODE_VOLUME_UP, KEYCODE_APP_SWITCH ->
                         return removeDelayIfInterrupt(event, startupRunner) || super.onKeyEvent(event)
                     KEYCODE_VOLUME_DOWN ->
-                        return removeDelayIfInterrupt(event, stopRunner) || super.onKeyEvent(event)
+                        if (v3) {
+                            v3 = false
+                            return removeDelayIfInterrupt(event, stopRunner) || super.onKeyEvent(event)
+                        }
                 }
             }
         }
@@ -455,19 +467,20 @@ class MyAccessibilityService : AccessibilityApi() {
 
         private const val ON_UI_UPDATE = 0
         private const val ON_APP_CHANGED = 1
+        private const val ON_BIND = 2
 
         /**
          * 注册放于静态变量，只用于通知事件。
          */
         private val pluginsServices = mutableSetOf<OnAccessibilityEvent>()
 
-        public fun registerEvent(e: OnAccessibilityEvent) {
+        fun registerEvent(e: OnAccessibilityEvent) {
             synchronized(pluginsServices) {
                 pluginsServices.add(e)
             }
         }
 
-        public fun unregisterEvent(e: OnAccessibilityEvent) {
+        fun unregisterEvent(e: OnAccessibilityEvent) {
             synchronized(pluginsServices) {
                 pluginsServices.remove(e)
             }
@@ -489,6 +502,11 @@ class MyAccessibilityService : AccessibilityApi() {
                     ON_APP_CHANGED -> {
                         pluginsServices.forEach {
                             thread { it.onAppChanged(data as ActionScope) }
+                        }
+                    }
+                    ON_BIND->{
+                        pluginsServices.forEach {
+                            thread { it.onBind() }
                         }
                     }
                     else -> {

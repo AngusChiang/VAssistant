@@ -8,7 +8,7 @@ interface SystemOperation {
     /**
      * 通过包名打开App
      */
-    fun openAppByPkg(pkg: String): ExResult<String>
+    fun openAppByPkg(pkg: String, resetTask: Boolean = false): ExResult<String>
 
     /**
      * 通过通过关键字匹配

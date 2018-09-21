@@ -1,6 +1,7 @@
 package cn.vove7.executorengine.helper
 
 import android.content.Context
+import android.content.pm.PackageManager
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.bridges.ChoiceData
 import cn.vove7.common.bridges.GenChoiceData
@@ -13,7 +14,6 @@ import cn.vove7.vtp.contact.ContactHelper
 import cn.vove7.vtp.contact.ContactInfo
 import cn.vove7.vtp.log.Vog
 import cn.vove7.vtp.text.TextHelper
-import java.text.Collator
 import java.util.*
 
 /**
@@ -21,7 +21,8 @@ import java.util.*
  *
  * Created by Vove on 2018/6/19
  */
-class ContactHelper(val context: Context) : GenChoiceData, Markable {
+object AdvanContactHelper : GenChoiceData, Markable {
+    val context = GlobalApp.APP
     //Dao
     private val markedContactDao = DAO.daoSession.markedDataDao
 
@@ -34,16 +35,19 @@ class ContactHelper(val context: Context) : GenChoiceData, Markable {
 
     private var lastUpdateTime = 0L
 
-    companion object {
-        private const val updateInterval = 30 * 60 * 1000
-        private const val limitRate = 0.8f
-        /**
-         * 存储本地联系人
-         */
-        private val LOCAL_CONTACT_LIST = HashMap<String, ContactInfo>()
-    }
+    private const val updateInterval = 30 * 60 * 1000
+    private const val limitRate = 0.8f
+    /**
+     * 存储本地联系人
+     */
+    private val LOCAL_CONTACT_LIST = HashMap<String, ContactInfo>()
 
-    fun updateContactList() {
+    fun updateContactList() {//todo check
+//        if (context.checkSelfPermission("android.permission.READ_CONTACTS")
+//                != PackageManager.PERMISSION_GRANTED) {
+//
+//            return
+//        }
         val now = System.currentTimeMillis()
         //更新
         if (now - lastUpdateTime > updateInterval) {
@@ -60,11 +64,11 @@ class ContactHelper(val context: Context) : GenChoiceData, Markable {
         if (phoneNum.matches(s)) {//数字
             return s
         }
-        val markedData = markedContactDao.queryBuilder()//by key
+        val markedPhone = markedContactDao.queryBuilder()//by key
                 .where(MarkedDataDao.Properties.Key.eq(s), MarkedDataDao.Properties.Type.eq(MarkedData.MARKED_TYPE_CONTACT)).unique()
-        if (markedData != null) {
+        if (markedPhone != null) {
             Vog.d(this, "Matched from MarkedData by key $s")
-            return markedData.value
+            return markedPhone.value
         }
         //本地匹配
         val localMatched = LOCAL_CONTACT_LIST[s]
@@ -117,8 +121,6 @@ class ContactHelper(val context: Context) : GenChoiceData, Markable {
         return matchList
     }
 
-    private val CHINA_COMPARE = Collator.getInstance(java.util.Locale.CHINA)
-
     /**
      * 获取标识列表
      */
@@ -133,6 +135,14 @@ class ContactHelper(val context: Context) : GenChoiceData, Markable {
             }
         }
         choiceList.sort()
+        return choiceList
+    }
+
+    fun getSimpleList(): List<String> {
+        val choiceList = mutableListOf<String>()
+        getChoiceData().forEach {
+            choiceList.add("${it.title}\n${it.subtitle}")
+        }
         return choiceList
     }
 }

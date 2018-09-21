@@ -24,7 +24,6 @@ import cn.vove7.jarvis.utils.pay.PurchaseHelper
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.customview.customView
 import com.afollestad.materialdialogs.input.input
-import com.afollestad.materialdialogs.list.listItemsSingleChoice
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -37,11 +36,11 @@ import java.util.*
  */
 class UserInfoDialog(val context: Activity, val onLogout: () -> Unit) {
     val dialog = MaterialDialog(context)
-    val userEmailText: TextView
-    val userNameText: TextView
-    val redHeardText: TextView
-    val vipEndDateText: TextView
-    val regDateText: TextView
+    private val userEmailText: TextView
+    private val userNameText: TextView
+    private val redHeardText: TextView
+    private val vipEndDateText: TextView
+    private val regDateText: TextView
     val toast = ColorfulToast(context).yellow()
 
     val dateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault())
@@ -63,6 +62,7 @@ class UserInfoDialog(val context: Activity, val onLogout: () -> Unit) {
                     pd.dismiss()
                     if (bean != null) {
                         if (bean.isOk()) {
+                            dialog.dismiss()
                             showReChargeDialog(bean.data!!)
                         } else toast.showShort(R.string.text_failed_to_get_data)
                     } else toast.showShort(R.string.text_failed_to_get_data)
@@ -120,7 +120,7 @@ class UserInfoDialog(val context: Activity, val onLogout: () -> Unit) {
      * @param ps List<VipPrice>
      */
     private fun showReChargeDialog(ps: List<VipPrice>) {
-        val bu = StringBuilder("\n\n")
+        val bu = StringBuilder("\n")
 
         ps.forEach {
             bu.append("${it.durationText} \t (${it.price}元)\n")
@@ -177,12 +177,16 @@ class UserInfoDialog(val context: Activity, val onLogout: () -> Unit) {
 //                .show()
 //    }
 
+    var pd: ProgressDialog? = null
     private fun showActCodeDialog() {
         var s = ""
         MaterialDialog(context).title(text = "使用充值码").input { materialDialog, charSequence ->
             s = charSequence.toString()
-        }.positiveButton { _ ->
+        }.positiveButton { d ->
+            pd = ProgressDialog(context)
+            d.dismiss()
             NetHelper.postJson<String>(ApiUrls.ACTIVATE_VIP, BaseRequestModel(null, s)) { _, bean ->
+                pd?.dismiss()
                 if (bean != null) {
                     if (bean.isOk()) {
                         toast.showShort("${bean.data}")
@@ -193,10 +197,9 @@ class UserInfoDialog(val context: Activity, val onLogout: () -> Unit) {
                     toast.showShort(R.string.text_net_err)
                 }
             }
-
-        }/*.neutralButton(text = "获取充值码") {
-
-        }*/.show()
+        }.negativeButton {
+            it.dismiss()
+        }.noAutoDismiss().show()
     }
 
 }

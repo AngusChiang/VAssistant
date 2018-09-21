@@ -4,6 +4,7 @@ import android.content.Context
 import android.support.annotation.CallSuper
 import cn.vove7.common.accessibility.AccessibilityApi
 import cn.vove7.common.accessibility.viewnode.ViewNode
+import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.appbus.AppBus
 import cn.vove7.common.bridges.*
@@ -11,6 +12,7 @@ import cn.vove7.common.bridges.ShowDialogEvent.Companion.WHICH_SINGLE
 import cn.vove7.common.datamanager.DAO
 import cn.vove7.common.datamanager.executor.entity.MarkedData
 import cn.vove7.common.datamanager.executor.entity.MarkedData.*
+import cn.vove7.common.datamanager.parse.DataFrom
 import cn.vove7.common.datamanager.parse.model.Action
 import cn.vove7.common.datamanager.parse.model.Action.SCRIPT_TYPE_JS
 import cn.vove7.common.datamanager.parse.model.Action.SCRIPT_TYPE_LUA
@@ -22,7 +24,7 @@ import cn.vove7.common.model.RequestPermission
 import cn.vove7.common.utils.ScreenAdapter
 import cn.vove7.common.view.finder.ViewFindBuilder
 import cn.vove7.executorengine.bridges.SystemBridge
-import cn.vove7.executorengine.helper.ContactHelper
+import cn.vove7.executorengine.helper.AdvanContactHelper
 import cn.vove7.parseengine.engine.ParseEngine
 import cn.vove7.vtp.contact.ContactInfo
 import cn.vove7.vtp.log.Vog
@@ -42,9 +44,10 @@ open class ExecutorImpl(
     var accessApi: AccessibilityApi? = null
     private var lock = Object()
     var currentAction: Action? = null
-    private val contactHelper = ContactHelper(context)
     private val markedOpenDao = DAO.daoSession.markedDataDao
     val globalActionExecutor = GlobalActionExecutor()
+
+    override var running: Boolean = false
 
     init {
         ScreenAdapter.init(systemBridge)
@@ -77,7 +80,11 @@ open class ExecutorImpl(
             }
         }
 
+    /**
+     * enter
+     */
     private var thread: Thread? = null
+
     override fun execQueue(cmdWords: String, actionQueue: PriorityQueue<Action>) {
         if (thread?.isAlive == true) {
             thread!!.interrupt()
@@ -85,6 +92,7 @@ open class ExecutorImpl(
         this.actionQueue = actionQueue
         lock = Object()
         thread = thread(start = true, isDaemon = true, priority = Thread.MAX_PRIORITY) {
+            running = true
             serviceBridge.onExecuteStart(cmdWords)
             actionCount = actionQueue.size
             currentActionIndex = 0
@@ -146,6 +154,7 @@ open class ExecutorImpl(
 
 
     override fun onFinish() {
+        running = false
         serviceBridge.onExecuteFinished("执行结束")
     }
 
@@ -164,11 +173,17 @@ open class ExecutorImpl(
 
     /**
      * 跟随打开解析App内操作
+     * 接着打开应用
      */
     private fun parseAppInnerOperation(cmd: String, pkg: String): Boolean {
         actionQueue = ParseEngine.matchAppAction(cmd, pkg)
-        if (actionQueue.isNotEmpty()) Vog.d(this, "smartOpen app内操作")
+        //打开应用
+        if (actionQueue.isNotEmpty()) {
+            Vog.d(this, "smartOpen app内操作")
+            systemBridge.openAppByPkg(pkg,true)
+        }
         else {
+            systemBridge.openAppByPkg(pkg,false)
             Vog.d(this, "smartOpen 无后续操作")
             return true
         }
@@ -191,22 +206,23 @@ open class ExecutorImpl(
     }
 
     private fun smartOpen(data: String, follow: String?): Boolean {
-        Vog.d(this, "smartOpen pkg:$data follow:$follow")
+        Vog.d(this, "smartOpen: $data follow:$follow")
         //包名
         if (PACKAGE_REGEX.matches(data)) {
             systemBridge.openAppByPkg(data).also {
                 return if (it.ok) {
                     follow == null || parseAppInnerOperation(follow, data)
                 } else {
-                    globalActionExecutor.toast(context.getString(R.string.text_app_not_install))
+                    GlobalApp.toastShort("未知操作")
                     false
                 }
             }
         }
         //By App Name
-        val o = systemBridge.openAppByWord(data)
-        return if (o.ok) {//打开App 解析跟随操作
-            parseAppInnerOperation(data, o.returnValue!!)
+        //确定有跟随操作，clear task
+        val o = systemBridge.getPkgByWord(data)
+        return if (o != null) {//打开App 解析跟随操作
+            parseAppInnerOperation(data, o)
         } else {//其他操作,打开网络,手电，网页
             parseOpenAction(data)
         }
@@ -492,19 +508,19 @@ open class ExecutorImpl(
             }
             //标识联系人
             val choiceData =
-                waitForSingleChoice("选择要标识的联系人", contactHelper.getChoiceData())
+                waitForSingleChoice("选择要标识的联系人", AdvanContactHelper.getChoiceData())
             if (choiceData != null) {
                 //开启线程
                 thread {
                     //保存标记
                     val data = choiceData.originalData as ContactInfo
-                    val marked = MarkedData(s, MarkedData.MARKED_TYPE_CONTACT, s, choiceData.subtitle)
+                    val marked = MarkedData(s, MarkedData.MARKED_TYPE_CONTACT, s, choiceData.subtitle, DataFrom.FROM_USER)
 //                    marked.key = s
 //                    marked.regStr = s
 //                    marked.value = choiceData.subtitle
 //                    marked.from = DataFrom.FROM_USER
 //                    marked.type = MarkedData.MARKED_TYPE_CONTACT
-                    contactHelper.addMark(marked)
+                    AdvanContactHelper.addMark(marked)
                 }
                 val sss = systemBridge.call(choiceData.subtitle!!)
                 PartialResult(sss.ok, if (!sss.ok) sss.errMsg else "")

@@ -77,10 +77,10 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content">
 
-            <cn.vove7.jarvis.view.custom.IconView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:src="@drawable/ic_home_black_24dp" />
+            <!--<cn.vove7.jarvis.view.custom.IconView-->
+                <!--android:layout_width="wrap_content"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:src="@drawable/ic_home_black_24dp" />-->
         </RelativeLayout>
 
     </LinearLayout>
@@ -90,9 +90,9 @@
         android:id="@+id/list_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_margin="10dp"
+        android:layout_marginTop="50dp"
         android:divider="@color/app_background"
-        android:dividerHeight="10dp"
+        android:dividerHeight="5dp"
         tools:listitem="@layout/item_mine_features" />
 
 </LinearLayout>

@@ -6,7 +6,9 @@ import org.greenrobot.greendao.annotation.Id;
 import org.greenrobot.greendao.annotation.Keep;
 
 import java.io.Serializable;
+import java.util.Arrays;
 
+import cn.vove7.common.datamanager.parse.DataFrom;
 import cn.vove7.common.interfaces.Markable;
 import cn.vove7.common.netacc.tool.SecureHelper;
 
@@ -14,7 +16,7 @@ import cn.vove7.common.netacc.tool.SecureHelper;
  * Created by 17719247306 on 2018/9/3
  */
 @Entity
-public class AppAdInfo  implements Serializable, Markable{
+public class AppAdInfo implements Serializable, Markable, DataFrom {
     static final long serialVersionUID = 111L;
     @Id
     private Long id;
@@ -38,6 +40,8 @@ public class AppAdInfo  implements Serializable, Markable{
     private String type;//class name
 
     private String tagId;
+    private String from;
+
     public String getTagId() {
         return tagId;
     }
@@ -45,6 +49,7 @@ public class AppAdInfo  implements Serializable, Markable{
     public void setTagId(String tagId) {
         this.tagId = tagId;
     }
+
     @Override
     public void sign() {
         setTagId(SecureHelper.MD5(descTitle, pkg, activity, viewId, type, String.valueOf(versionCode), texts, descs, depths));
@@ -87,8 +92,8 @@ public class AppAdInfo  implements Serializable, Markable{
 
     @Keep
     public AppAdInfo(Long id, String descTitle, String pkg, String activity, String texts,
-            String viewId, String descs, String depths, String type, String tagId,
-            Integer versionCode) {
+                     String viewId, String descs, String depths, String type, String tagId,
+                     Integer versionCode) {
         this.id = id;
         this.descTitle = descTitle;
         this.pkg = pkg;
@@ -100,6 +105,44 @@ public class AppAdInfo  implements Serializable, Markable{
         this.type = type;
         setTagId(tagId);
         this.versionCode = versionCode;
+    }
+
+    @Generated(hash = 1270623277)
+    public AppAdInfo(Long id, String descTitle, String pkg, String activity, String texts, String viewId, String descs, String depths,
+                     String type, String tagId, String from, Integer versionCode) {
+        this.id = id;
+        this.descTitle = descTitle;
+        this.pkg = pkg;
+        this.activity = activity;
+        this.texts = texts;
+        this.viewId = viewId;
+        this.descs = descs;
+        this.depths = depths;
+        this.type = type;
+        this.tagId = tagId;
+        this.from = from;
+        this.versionCode = versionCode;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder builder = new StringBuilder();
+        builder.append("Activity: ").append(activity).append('\n');
+        if (depths != null) {
+            builder.append("深度: ").append(depths).append('\n');
+        } else {
+            if (viewId != null)
+                builder.append("viewId: ").append(viewId).append('\n');
+            if (texts != null)
+                builder.append("texts: ").append(Arrays.toString(getTextArray())).append('\n');
+            if (descs != null)
+                builder.append("descs: ").append(Arrays.toString(getDescArray())).append('\n');
+        }
+        builder.append("来源: ").append(DataFrom.Companion.translate(from)).append('\n');
+        if (type != null)
+            builder.append("ClassType: ").append(type).append('\n');
+        return builder.toString();
+
     }
 
     public String getPkg() {
@@ -118,8 +161,18 @@ public class AppAdInfo  implements Serializable, Markable{
         this.activity = activity;
     }
 
+    public String[] getTextArray() {
+        if (texts == null) return new String[0];
+        return texts.split("###");
+    }
+
     public String getTexts() {
         return texts;
+    }
+
+    public String[] getDescArray() {
+        if (descs == null) return new String[0];
+        return descs.split("###");
     }
 
     public void setTexts(String text) {
@@ -182,6 +235,14 @@ public class AppAdInfo  implements Serializable, Markable{
 
     public String getType() {
         return this.type;
+    }
+
+    public String getFrom() {
+        return from;
+    }
+
+    public void setFrom(String from) {
+        this.from = from;
     }
 
     public AppAdInfo setType(String type) {

@@ -156,6 +156,7 @@
     <string name="key_vibrate_reco_begin" translatable="false">vibrate_reco_begin</string>
     <string name="key_voice_syn_model" translatable="false">voice_syn_model</string>
     <string name="key_open_ad_block" translatable="false">open_ad_block</string>
+    <string name="key_ad_wait_secs" translatable="false">ad_wait_secs</string>
     <string name="key_voice_control_dialog" translatable="false">voice_control_dialog</string>
     <string name="key_open_voice_wakeup" translatable="false">open_voice_wakeup</string>
     <string name="key_voice_syn_speed" translatable="false">voice_syn_speed</string>
@@ -192,7 +193,7 @@
     <string name="hint_example">打电话给xxx \n呼叫xxx</string>
     <string name="hint_action_desc">拨打电话，可用别名标记联系人，见 标记管理/联系人</string>
     <string name="text_instructions">Instructions</string>
-    <string name="text_example">Example</string>
+    <string name="text_examples">Examples</string>
     <string name="text_share_success">Sharing success</string>
     <string name="text_reg_time">Registration time</string>
     <string name="text_vip_end_time">会员到期时间</string>
@@ -205,11 +206,25 @@
     <string name="text_wechat_pay">Wechat</string>
     <string name="text_recharge_code">Recharge code</string>
     <string name="text_failed_to_get_user_info">Failed to get user info</string>
-    <string name="text_purchase_recharge_code">购买充值码</string>
+    <string name="text_purchase_recharge_code">Purchase Recharge code</string>
     <string name="text_purcharge_recharge_code_msg">通过支付宝转账下方指定金额，或者联系qq获取，在备注填写你的邮箱，不久你会收到含有充值码的邮件，点击下方[使用充值码]继续操作即可。</string>
     <string name="text_email_copy_to_clip">你的邮箱已复制到剪切板</string>
     <string name="text_understand">Understand</string>
-    <string name="text_continue">继续</string>
-    <string name="text_debug_service_starting">Debug service started on port</string>
+    <string name="text_continue">Continue</string>
+    <string name="text_debug_service_starting">Debug service started</string>
+    <string name="text_version_code">Version code</string>
+    <string name="text_script">Script</string>
+    <string name="text_script_type">Script type</string>
+    <string name="text_time_wait_ad">Valid time</string>
+    <string name="text_new">New</string>
+    <string name="text_complete">Complete</string>
+    <string name="text_phone">Phone</string>
+    <string name="text_show_name">Show name</string>
+    <string name="text_select_contact">Choice contact</string>
+    <string name="text_select">Select</string>
+    <string name="text_ok">OK</string>
+    <string name="text_delete_complete">Delete complete</string>
+    <string name="text_package_name">Package name</string>
+    <string name="text_func_name">Function name</string>
 
 </resources>

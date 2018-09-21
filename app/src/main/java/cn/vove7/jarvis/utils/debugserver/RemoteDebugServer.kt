@@ -49,7 +49,7 @@ class RemoteDebugServer : Runnable {
         server = ServerSocket(LISTEN_PORT)
         RhinoApi.regPrint(print)
         LuaHelper.regPrint(print)
-        GlobalApp.toastShort(GlobalApp.getString(R.string.text_debug_service_starting)+ LISTEN_PORT)
+        GlobalApp.toastShort(GlobalApp.getString(R.string.text_debug_service_starting))
         server.use {
             while (!stopped) {
                 try {

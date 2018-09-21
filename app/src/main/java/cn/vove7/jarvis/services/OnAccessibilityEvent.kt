@@ -17,4 +17,7 @@ interface OnAccessibilityEvent {
     fun onUiUpdate(root: AccessibilityNodeInfo?)
 
     fun onAppChanged(appScope: ActionScope)
+
+    fun onBind() {}
+    fun onUnBind() {}
 }

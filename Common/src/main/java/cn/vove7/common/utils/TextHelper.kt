@@ -1,4 +1,4 @@
-package cn.vove7.jarvis.view.utils
+package cn.vove7.common.utils
 
 /**
  * # TextHelper
@@ -28,5 +28,24 @@ object TextHelper {
                     append(separator + ss[it.index])
             }
         }
+    }
+
+    /**
+     * 包含比例
+     * 长度小于3 不比较
+     */
+    fun containsRatio(s1: String, s2: String): Float {
+        val shorter: String
+        val lener = if (s1.length > s2.length) {
+            shorter = s2
+            s1
+        } else {
+            shorter = s1
+            s2
+        }
+        if (lener.length <= 3) return 0f
+        return if (lener.contains(shorter, ignoreCase = true)) {
+            shorter.length.toFloat() / lener.length
+        } else 0f
     }
 }

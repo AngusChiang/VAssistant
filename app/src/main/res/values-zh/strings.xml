@@ -107,7 +107,7 @@
     <string name="hint_example">打电话给xxx \n呼叫xxx</string>
     <string name="hint_action_desc">拨打电话，可用别名标记联系人，见 标记管理/联系人</string>
     <string name="text_instructions">使用说明</string>
-    <string name="text_example">示例</string>
+    <string name="text_examples">示例</string>
     <string name="text_share_success">分享成功</string>
     <string name="text_reg_time">注册时间</string>
     <string name="text_vip_end_time">会员到期时间</string>
@@ -126,4 +126,18 @@
     <string name="text_understand">知道了</string>
     <string name="text_continue">继续</string>
     <string name="text_debug_service_starting">远程调试已开启</string>
+    <string name="text_version_code">版本号</string>
+    <string name="text_script">脚本</string>
+    <string name="text_script_type">脚本类型</string>
+    <string name="text_time_wait_ad">有效时间</string>
+    <string name="text_new">新建</string>
+    <string name="text_complete">完成</string>
+    <string name="text_phone">Phone</string>
+    <string name="text_show_name">显示名称</string>
+    <string name="text_select_contact">选择联系人</string>
+    <string name="text_select">选择</string>
+    <string name="text_ok">OK</string>
+    <string name="text_delete_complete">删除完成</string>
+    <string name="text_package_name">包名</string>
+    <string name="text_func_name">功能名</string>
 </resources>

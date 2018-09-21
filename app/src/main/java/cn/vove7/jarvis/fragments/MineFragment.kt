@@ -20,7 +20,7 @@ import cn.vove7.jarvis.view.dialog.UserInfoDialog
 import cn.vove7.vtp.easyadapter.BaseListAdapter
 import kotlinx.android.synthetic.main.fragment_mine.*
 
-class MineFragment : Fragment(), AdapterView.OnItemClickListener {
+class MineFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -59,11 +59,13 @@ class MineFragment : Fragment(), AdapterView.OnItemClickListener {
             override fun onBindView(holder: ItemHolder, pos: Int, item: Pair<Int, Int>) {
                 holder.leftLine.setBackgroundResource(item.first)
                 holder.textView.setText(item.second)
+                holder.clickBody.setOnClickListener {
+                    onItemClick(pos)
+                }
             }
 
             override fun onCreateViewHolder(view: View): ItemHolder = ItemHolder(view)
         }
-        listView.onItemClickListener = this
         return view
     }
 
@@ -88,7 +90,7 @@ class MineFragment : Fragment(), AdapterView.OnItemClickListener {
         }
     }
 
-    override fun onItemClick(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+    fun onItemClick(position: Int) {
         when (position) {
             0 -> {
                 startActivity(Intent(context, SettingsActivity::class.java))
@@ -113,6 +115,8 @@ class MineFragment : Fragment(), AdapterView.OnItemClickListener {
 
     class ItemHolder(v: View) : BaseListAdapter.ViewHolder(v) {
         val leftLine: View = v.findViewById(R.id.line)
+        val clickBody: View = v.findViewById(R.id.click_body)
+
         val textView: TextView = v.findViewById(R.id.text)
     }
 

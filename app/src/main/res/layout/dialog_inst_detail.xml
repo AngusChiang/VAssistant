@@ -1,63 +1,84 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:fitsSystemWindows="true">
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="10dp">
 
-    <android.support.design.widget.AppBarLayout
-        android:layout_width="match_parent"
+    <TextView
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:fitsSystemWindows="true"
-        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
+        android:labelFor="@id/example_text"
+        android:text="@string/text_instructions"
+        android:textColor="@color/colorAccent" />
 
-        <android.support.design.widget.CollapsingToolbarLayout
-            android:id="@+id/collapsing_coll"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:fitsSystemWindows="true"
-            app:contentScrim="@color/colorPrimary"
-            app:layout_scrollFlags="scroll|exitUntilCollapsed"
-            app:title="">
-
-            <ImageView
-                android:id="@+id/toolbar_img"
-                android:layout_width="match_parent"
-                android:layout_height="220dp"
-                android:fitsSystemWindows="true"
-                android:scaleType="centerCrop"
-                android:src="@drawable/global_bkg" />
-
-            <android.support.v7.widget.Toolbar
-                android:id="@+id/toolbar"
-                android:layout_width="match_parent"
-                android:layout_height="?attr/actionBarSize"
-                android:fitsSystemWindows="true"
-                app:layout_collapseMode="pin"
-                app:navigationIcon="@drawable/ic_close_white_24dp"
-                app:title=""
-                app:popupTheme="@style/Theme.AppCompat.Light.DarkActionBar"
-                app:titleTextColor="#fff" />
-
-        </android.support.design.widget.CollapsingToolbarLayout>
-
-    </android.support.design.widget.AppBarLayout>
-
-    <android.support.v4.widget.NestedScrollView
+    <TextView
+        android:id="@+id/instructions_text"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+        android:layout_height="wrap_content" />
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:labelFor="@id/example_text"
+        android:text="@string/text_examples"
+        android:textColor="@color/colorAccent" />
+
+    <TextView
+        android:id="@+id/examples_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
 
 
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="1555dp"
-                android:text="34646433131" />
-        </LinearLayout>
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:labelFor="@id/example_text"
+        android:text="@string/text_regex"
+        android:textColor="@color/colorAccent" />
 
-    </android.support.v4.widget.NestedScrollView>
-</android.support.design.widget.CoordinatorLayout>
+    <TextView
+        android:id="@+id/regs_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:labelFor="@id/example_text"
+        android:text="@string/text_version_code"
+        android:textColor="@color/colorAccent" />
+
+    <TextView
+        android:id="@+id/version_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:labelFor="@id/example_text"
+        android:text="@string/text_script"
+        android:textColor="@color/colorAccent" />
+
+    <TextView
+        android:id="@+id/script_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:labelFor="@id/example_text"
+        android:text="@string/text_script_type"
+        android:textColor="@color/colorAccent" />
+
+    <TextView
+        android:id="@+id/script_type_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+</LinearLayout>

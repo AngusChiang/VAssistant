@@ -5,18 +5,19 @@ import cn.vove7.common.accessibility.AccessibilityApi
 import cn.vove7.common.datamanager.AppAdInfo
 import cn.vove7.common.datamanager.DAO
 import cn.vove7.common.datamanager.DaoHelper
+import cn.vove7.common.datamanager.executor.entity.MarkedData
 import cn.vove7.common.datamanager.greendao.AppAdInfoDao
 import cn.vove7.common.netacc.ApiUrls
 import cn.vove7.common.netacc.NetHelper
 import cn.vove7.common.netacc.model.BaseRequestModel
 import cn.vove7.common.netacc.model.ResponseMessage
-import cn.vove7.common.netacc.model.SyncMarkedModel
 import cn.vove7.executorengine.bridges.SystemBridge
 import cn.vove7.executorengine.helper.AdvanAppHelper
 import cn.vove7.jarvis.activities.AppAdListActivity
 import cn.vove7.jarvis.adapters.SimpleListAdapter
 import cn.vove7.jarvis.adapters.ViewModel
 import cn.vove7.jarvis.fragments.base.BaseMarkedFragment
+import cn.vove7.jarvis.fragments.base.OnSyncMarked
 import cn.vove7.jarvis.plugins.AdKillerService
 import cn.vove7.jarvis.utils.AppConfig
 import com.google.gson.reflect.TypeToken
@@ -28,17 +29,16 @@ import kotlin.concurrent.thread
  * @author 17719247306
  * 2018/9/7
  */
-class MarkedAdFragment : BaseMarkedFragment<Map<String, ArrayList<AppAdInfo>>>() {
+class MarkedAdFragment : SimpleListFragment<Map<String, ArrayList<AppAdInfo>>>(), OnSyncMarked {
 
-    override val itemClickListener: SimpleListAdapter.OnItemClickListener
-        get() = object : SimpleListAdapter.OnItemClickListener {
-            override fun onClick(holder: SimpleListAdapter.VHolder?, pos: Int, item: ViewModel) {
-                val intent = Intent(context, AppAdListActivity::class.java)
-                intent.putExtra("title", item.title)
-                intent.putExtra("list", (item.extra as ArrayList<*>))
-                startActivity(intent)
-            }
+    override val itemClickListener = object : SimpleListAdapter.OnItemClickListener {
+        override fun onClick(holder: SimpleListAdapter.VHolder?, pos: Int, item: ViewModel) {
+            val intent = Intent(context, AppAdListActivity::class.java)
+            intent.putExtra("title", item.title)
+            intent.putExtra("list", (item.extra as ArrayList<*>))
+            startActivity(intent)
         }
+    }
 
     /**
      * 同步广告
@@ -46,7 +46,7 @@ class MarkedAdFragment : BaseMarkedFragment<Map<String, ArrayList<AppAdInfo>>>()
      */
     override fun onSync(types: Array<String>) {
         showProgressBar()
-        val syncPkgs = SyncMarkedModel(packages = AdvanAppHelper.getPkgList())
+        val syncPkgs = AdvanAppHelper.getPkgList()
 
         NetHelper.postJson<List<AppAdInfo>>(ApiUrls.SYNC_APP_AD, BaseRequestModel(syncPkgs), type = object
             : TypeToken<ResponseMessage<List<AppAdInfo>>>() {}.type) { _, bean ->
@@ -55,6 +55,7 @@ class MarkedAdFragment : BaseMarkedFragment<Map<String, ArrayList<AppAdInfo>>>()
                     //
                     DaoHelper.updateAppAdInfo(bean.data ?: emptyList())
                     toast.showShort("同步完成")
+                    AdKillerService.update()
                     refresh()
                     if (AppConfig.isAdBlockService && AccessibilityApi.isOpen()) {//重启服务
                         AdKillerService.restart()

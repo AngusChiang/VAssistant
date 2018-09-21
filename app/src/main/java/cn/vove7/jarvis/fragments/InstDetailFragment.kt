@@ -2,19 +2,11 @@ package cn.vove7.jarvis.fragments
 
 import android.annotation.SuppressLint
 import android.app.AlertDialog
-import android.app.Dialog
 import android.content.ActivityNotFoundException
 import android.content.DialogInterface
 import android.content.Intent
-import android.os.Bundle
-import android.support.design.widget.BottomSheetBehavior
-import android.support.design.widget.BottomSheetDialog
-import android.support.design.widget.BottomSheetDialogFragment
-import android.support.design.widget.CollapsingToolbarLayout
-import android.support.v7.widget.Toolbar
 import android.view.View
 import android.widget.EditText
-import android.widget.ImageView
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.appbus.AppBus
@@ -29,11 +21,11 @@ import cn.vove7.common.netacc.ApiUrls
 import cn.vove7.common.netacc.NetHelper
 import cn.vove7.common.netacc.model.BaseRequestModel
 import cn.vove7.common.netacc.model.ResponseMessage
-import cn.vove7.common.view.toast.ColorfulToast
 import cn.vove7.executorengine.bridges.SystemBridge
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.activities.NewInstActivity
 import cn.vove7.jarvis.adapters.ExecuteQueueAdapter
+import cn.vove7.jarvis.fragments.base.BaseBottomFragmentWithToolbar
 import cn.vove7.jarvis.view.dialog.ProgressDialog
 import cn.vove7.vtp.dialog.DialogWithList
 import cn.vove7.vtp.log.Vog
@@ -53,28 +45,20 @@ import kotlin.concurrent.thread
  * @author 17719247306
  * 2018/8/24
  */
-class InstDetailFragment : BottomSheetDialogFragment() {
+class InstDetailFragment : BaseBottomFragmentWithToolbar() {
 
     private var node: ActionNode? = null
-    private lateinit var mBehavior: BottomSheetBehavior<*>
-    lateinit var contentView: View
-    private lateinit var toolbarImg: ImageView
-    lateinit var toolbar: Toolbar
-    private lateinit var collapsingColl: CollapsingToolbarLayout
 
-    lateinit var toast: ColorfulToast
     private var load = false
 
-    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        val dialog = super.onCreateDialog(savedInstanceState) as BottomSheetDialog
-        contentView = View.inflate(context, R.layout.dialog_inst_detail, null)
-        dialog.setContentView(contentView)
-        toast = ColorfulToast(context!!)
-        initView()
-        mBehavior = BottomSheetBehavior.from(contentView.parent as View)
-        setData()
+    override fun onCreateContentView(parent: View): View {
+
+        val content = View.inflate(context, R.layout.dialog_inst_detail, null)
         load = true
-        return dialog
+        toolbar.inflateMenu(R.menu.menu_inst_detail)
+        setData()
+        initView()
+        return content
     }
 
     fun setInst(node: ActionNode) {
@@ -86,7 +70,7 @@ class InstDetailFragment : BottomSheetDialogFragment() {
     private fun setData() {
         val uId = UserInfo.getUserId()
         when {//编辑
-            node?.from == DataFrom.FROM_USER && node?.publishUserId ?: uId == uId -> {
+            DataFrom.userCanEdit(node?.from) && node?.publishUserId ?: uId == uId -> {
                 toolbar.menu.findItem(R.id.menu_edit).isVisible = true
                 toolbar.menu.findItem(R.id.menu_share).isVisible = true
                 toolbar.menu.findItem(R.id.menu_add_follow).isVisible = true
@@ -100,7 +84,7 @@ class InstDetailFragment : BottomSheetDialogFragment() {
         toolbar.menu.findItem(R.id.menu_as_global).isVisible = node?.belongInApp() ?: false
         contentView.post {
             //标题
-            collapsingColl.title = node?.actionTitle
+            title = node?.actionTitle
         }
     }
 
@@ -110,10 +94,7 @@ class InstDetailFragment : BottomSheetDialogFragment() {
             return
         }
         val node = node!!
-        collapsingColl = contentView.findViewById(R.id.collapsing_coll)
-        toolbar = contentView.findViewById(R.id.toolbar)
-        toolbar.inflateMenu(R.menu.menu_inst_detail)
-        toolbar.setNavigationOnClickListener { hide() }
+
         toolbar.setOnMenuItemClickListener { it ->
             when (it.itemId) {
                 R.id.menu_edit -> {//修改
@@ -206,7 +187,6 @@ class InstDetailFragment : BottomSheetDialogFragment() {
             }
             return@setOnMenuItemClickListener true
         }
-        toolbarImg = contentView.findViewById(R.id.toolbar_img)
     }
 
     var shareDialog: MaterialDialog? = null
@@ -384,20 +364,4 @@ class InstDetailFragment : BottomSheetDialogFragment() {
         d.show()
     }
 
-    override fun onStart() {
-        super.onStart()
-        expand()
-    }
-
-    fun expand() {
-        mBehavior.state = BottomSheetBehavior.STATE_EXPANDED
-    }
-
-    fun hide() {
-        mBehavior.state = BottomSheetBehavior.STATE_HIDDEN
-    }
-
-    fun collaps() {
-        mBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
-    }
 }

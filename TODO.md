@@ -12,12 +12,13 @@
 - [x] 设备信息
 - [x] 存储Api
 - [x] SpHelper
+- [ ] matchApp api
 
 ## TODO
 - Core
   - [x] lua call java getter setter
   - [x] 完善Lua 
-  - [ ] Rhino efficiency
+  - [-] Rhino efficiency
 - 截屏api
 - 屏幕内容
 - 屏幕文字
@@ -35,7 +36,7 @@
  - [x] 设置
  - [x] 语音唤醒
  - [x] 跳过广告
- - [ ] 商店
+ - [-] 商店
  - [ ] Dashboard
  - [x] Me
  - [x] 登陆
@@ -48,8 +49,10 @@
  - [x] 指令标识码
  - [x] 同步
  - [-] User history
- - [ ] inApp -> Global
-
+ - [x] inApp -> Global
+ - [ ] 数据记录 使用频率，命令记录
+ - [ ] 检查登陆
+ 
 ## 未来
 
  - [ ] **ActionNode参数编辑**
@@ -60,7 +63,8 @@
 
  - [x] 打开MarkedOpen
  - [x] Marked -联系人 -App -广告id
- - [ ] edit
+ - [x] edit
+ - [-] ad marked
 
 ## VIP提供
 

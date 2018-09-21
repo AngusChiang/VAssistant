@@ -212,14 +212,30 @@ object DaoHelper {
                 MarkedDataDao.Properties.Type.`in`(*types),
                 markedDao.queryBuilder().or(
                         MarkedDataDao.Properties.From.isNull,
-                        MarkedDataDao.Properties.From.notIn(DataFrom.FROM_USER)
+                        MarkedDataDao.Properties.From.notEq(DataFrom.FROM_USER)
                 )).list()
+        val userList = markedDao.queryBuilder().where(
+                MarkedDataDao.Properties.Type.`in`(*types),
+                MarkedDataDao.Properties.From.eq(DataFrom.FROM_USER)
+        ).list().toHashSet()
         return try {
             markedDao.deleteInTx(l)
-            markedDao.insertInTx(datas)
+            datas.forEach {
+                if (!userList.contains(it)) {
+                    if (it.belongUser(false)) {
+                        Vog.d(this, "updateMarkedData ---> 标记为用户:" + it.key)
+
+                        it.from = DataFrom.FROM_USER
+                    }
+                    markedDao.insert(it)
+                } else {
+                    Vog.d(this, "updateMarkedData ---> 重复:" + it.key)
+                }
+            }
             true
         } catch (e: Exception) {
             e.printStackTrace()
+            GlobalLog.err(e.message + "code: dh238")
             false
         }
     }

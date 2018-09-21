@@ -25,7 +25,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="大大大"
-            android:textSize="@dimen/dialog_choice_title" />
+            android:textSize="@dimen/dialog_choice_title"
+            android:textStyle="bold" />
 
         <TextView
             android:id="@+id/subtitle"

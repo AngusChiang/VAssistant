@@ -27,6 +27,7 @@ object ApiUrls {
 
     val SYNC_MARKED = MARKED + "sm"
     val SHARE_MARKED = MARKED + "sd"
+    val DELETE_SHARE_MARKED = MARKED + "ds"
     val SYNC_APP_AD = MARKED + "saa"
 
 

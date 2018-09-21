@@ -11,7 +11,7 @@ import cn.vove7.jarvis.fragments.MarkedAdFragment
 import cn.vove7.jarvis.fragments.MarkedAppFragment
 import cn.vove7.jarvis.fragments.MarkedContractFragment
 import cn.vove7.jarvis.fragments.MarkedOpenFragment
-import cn.vove7.jarvis.fragments.base.BaseMarkedFragment
+import cn.vove7.jarvis.fragments.base.OnSyncMarked
 import kotlinx.android.synthetic.main.activity_base_view_pager.*
 
 /**
@@ -27,7 +27,7 @@ class MarkedManagerActivity : BaseActivityWithViewPager() {
         set(_) {}
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        MenuInflater(this).inflate(R.menu.menu_sync,menu)
+        MenuInflater(this).inflate(R.menu.menu_sync, menu)
         return true
     }
 
@@ -35,7 +35,7 @@ class MarkedManagerActivity : BaseActivityWithViewPager() {
         when (item?.itemId) {
             R.id.menu_item_sync -> {//同步
                 val p = view_pager.currentItem
-                val f = fragments[p] as BaseMarkedFragment<*>
+                val f = fragments[p] as OnSyncMarked
                 f.onSync(indexTypes[p])
                 return true
             }

@@ -2,9 +2,9 @@ package cn.vove7.jarvis.fragments
 
 import cn.vove7.common.datamanager.DAO
 import cn.vove7.common.datamanager.executor.entity.MarkedData
-import cn.vove7.common.datamanager.executor.entity.MarkedData.MARKED_TYPE_CONTACT
+import cn.vove7.common.datamanager.executor.entity.MarkedData.MARKED_TYPE_SCRIPT_LUA
 import cn.vove7.common.datamanager.greendao.MarkedDataDao
-import cn.vove7.jarvis.adapters.SimpleListAdapter
+import cn.vove7.jarvis.R
 import cn.vove7.jarvis.adapters.ViewModel
 import cn.vove7.jarvis.fragments.base.BaseMarkedFragment
 import kotlin.concurrent.thread
@@ -17,17 +17,11 @@ import kotlin.concurrent.thread
  */
 class MarkedOpenFragment : BaseMarkedFragment<MarkedData>() {
 
-    override val itemClickListener = object : SimpleListAdapter.OnItemClickListener {
-        override fun onClick(holder: SimpleListAdapter.VHolder?, pos: Int, item: ViewModel) {
-            //dialog edit
-        }
+    override var markedType: String = MarkedData.MARKED_TYPE_SCRIPT_LUA
+    override val keyHint: Int = R.string.text_func_name
+    override val valueHint: Int = R.string.text_script
 
-        override fun onLongClick(holder: SimpleListAdapter.VHolder?, pos: Int, item: ViewModel): Boolean {
-            //batch edit
-
-            return true
-        }
-    }
+    override val showSel: Boolean = false
 
     override fun transData(nodes: List<MarkedData>): List<ViewModel> {
         val ss = mutableListOf<ViewModel>()
@@ -41,7 +35,7 @@ class MarkedOpenFragment : BaseMarkedFragment<MarkedData>() {
         thread {
             val builder = DAO.daoSession.markedDataDao
                     .queryBuilder()
-                    .where(MarkedDataDao.Properties.Type.notIn(MarkedData.MARKED_TYPE_APP, MARKED_TYPE_CONTACT))
+                    .where(MarkedDataDao.Properties.Type.`in`(MarkedData.MARKED_TYPE_SCRIPT_JS, MARKED_TYPE_SCRIPT_LUA))
                     .offset(pageSizeLimit * pageIndex)
                     .limit(pageSizeLimit)
 

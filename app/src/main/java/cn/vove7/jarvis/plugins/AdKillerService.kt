@@ -62,7 +62,7 @@ object AdKillerService : AccPluginsService() {//TO-DO fixed 猪八戒ad
      */
     override fun onUiUpdate(root: AccessibilityNodeInfo?) {// 浪费资源..
         val now = System.currentTimeMillis()
-        if (now - changedTime > 7000) return //7s等待时间
+        if (now - changedTime > (AppConfig.adWaitSecs * 1000)) return //7s等待时间
         if (locked) {
             Vog.v(this, "onUiUpdate ---> locked")
             return
@@ -174,12 +174,12 @@ object AdKillerService : AccPluginsService() {//TO-DO fixed 猪八戒ad
         }
 
         if (it.descs != null) {
-            finderBuilder.desc(*it.descs.split("###").toTypedArray())
+            finderBuilder.desc(*it.descArray)
         }
         if (it.viewId != null)
             finderBuilder.id(it.viewId!!)
-        if (it.texts != null) {
-            finderBuilder.containsText(*it.texts.split("###").toTypedArray())
+        if (it.textArray != null) {
+            finderBuilder.containsText(*it.textArray)
         }
 
         return finderBuilder.viewFinderX

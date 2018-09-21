@@ -13,18 +13,18 @@ import cn.vove7.vtp.log.Vog
 
 abstract class AccPluginsService : OnAccessibilityEvent {
 
-    open fun onBind() {}
-    open fun onUnBind() {}
+//    var opened = false
     fun bindServer() {
         Vog.d(this, "bindServer ---> $this")
         MyAccessibilityService.registerEvent(this)
-        onBind()
+//        opened = true
     }
 
     fun unBindServer() {
         Vog.d(this, "unBindServer ---> $this")
         MyAccessibilityService.unregisterEvent(this)
         onUnBind()
+//        opened = false
     }
 
     fun restart() {

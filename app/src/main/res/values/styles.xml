@@ -35,7 +35,7 @@
     <style name="MaterialButton.White" parent="MaterialButton">
         <item name="android:colorControlHighlight">#FAFAFA</item>
         <item name="colorButtonNormal">#fff</item>
-        <item name="android:textColor">@color/primary_text</item>
-        <item name="android:elevation">10dp</item>
+        <item name="android:textColor">@color/colorPrimary</item>
+        <item name="android:elevation">6dp</item>
     </style>
 </resources>

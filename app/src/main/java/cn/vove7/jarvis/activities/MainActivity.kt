@@ -6,12 +6,8 @@ import android.os.Bundle
 import android.view.KeyEvent
 import android.view.View
 import cn.vove7.androlua.LuaEditorActivity
-import cn.vove7.common.appbus.AppBus
-import cn.vove7.common.appbus.SpeechAction
 import cn.vove7.executorengine.helper.AdvanAppHelper
-import cn.vove7.executorengine.helper.ContactHelper
 import cn.vove7.jarvis.R
-import cn.vove7.jarvis.utils.debugserver.RemoteDebugServer
 import cn.vove7.rhino.RhinoActivity
 import cn.vove7.vtp.runtimepermission.PermissionUtils
 import kotlin.concurrent.thread
@@ -33,15 +29,6 @@ class MainActivity : Activity() {
         ))
 
         setContentView(R.layout.activity_main)
-        thread {
-            try {
-                if (PermissionUtils.isAllGranted(this@MainActivity, arrayOf("android.permission.READ_CONTACTS")))
-                    ContactHelper(this).updateContactList()
-            } catch (e: Exception) {
-                e.printStackTrace()
-            }
-            AdvanAppHelper.updateAppList()
-        }
     }
 
     override fun onKeyDown(keyCode: Int, event: KeyEvent): Boolean {

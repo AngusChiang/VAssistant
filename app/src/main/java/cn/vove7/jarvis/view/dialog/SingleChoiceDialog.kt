@@ -6,8 +6,8 @@ import android.content.DialogInterface
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
-import cn.vove7.jarvis.R
 import cn.vove7.common.bridges.ChoiceData
+import cn.vove7.jarvis.R
 import cn.vove7.vtp.easyadapter.BaseListAdapter
 
 /**
@@ -24,7 +24,8 @@ class SingleChoiceDialog(context: Context, title: String, list: List<ChoiceData>
         } catch (e: Exception) {
             listener.onSingleSelect(0, null, "无悬浮窗权限")
         }
-        dialog.setOnCancelListener{// fixed
+        dialog.setOnCancelListener {
+            // fixed
             listener.onSingleSelect(0, null)
         }
         dialog.setButton(DialogInterface.BUTTON_POSITIVE, "取消", View.OnClickListener {
@@ -55,8 +56,11 @@ class SingleChoiceDialog(context: Context, title: String, list: List<ChoiceData>
             }
             holder.choiceTitle.text = item.title
             holder.choiceSubtitle.text = item.subtitle ?: ""
-            if (item.iconDrawable != null)
+            if (item.iconDrawable != null) {
+                holder.choiceIcon.visibility = View.VISIBLE
                 holder.choiceIcon.setImageDrawable(item.iconDrawable)
+            } else holder.choiceIcon.visibility = View.INVISIBLE
+
         }
 
         inner class Holder(itemView: View) : BaseListAdapter.ViewHolder(itemView) {

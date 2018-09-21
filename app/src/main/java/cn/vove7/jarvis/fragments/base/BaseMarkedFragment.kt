@@ -1,15 +1,28 @@
 package cn.vove7.jarvis.fragments.base
 
+import android.annotation.SuppressLint
+import android.app.AlertDialog
+import android.support.design.widget.TextInputLayout
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.View
+import android.widget.Button
+import cn.vove7.common.app.GlobalLog
+import cn.vove7.common.datamanager.DAO
 import cn.vove7.common.datamanager.DaoHelper
 import cn.vove7.common.datamanager.executor.entity.MarkedData
+import cn.vove7.common.datamanager.parse.DataFrom
 import cn.vove7.common.netacc.ApiUrls
 import cn.vove7.common.netacc.NetHelper
 import cn.vove7.common.netacc.model.BaseRequestModel
-import cn.vove7.common.netacc.model.SyncMarkedModel
+import cn.vove7.common.utils.TextHelper
 import cn.vove7.jarvis.R
+import cn.vove7.jarvis.adapters.SimpleListAdapter
+import cn.vove7.jarvis.adapters.ViewModel
 import cn.vove7.jarvis.fragments.SimpleListFragment
-import cn.vove7.jarvis.view.utils.TextHelper
+import cn.vove7.vtp.log.Vog
+import com.afollestad.materialdialogs.MaterialDialog
+import com.afollestad.materialdialogs.customview.customView
 
 /**
  * # BaseMarkedFragment
@@ -18,21 +31,220 @@ import cn.vove7.jarvis.view.utils.TextHelper
  * 2018/9/16
  */
 abstract class BaseMarkedFragment<T> : SimpleListFragment<T>(), OnSyncMarked {
+
     override var floatClickListener: View.OnClickListener? = View.OnClickListener {
-        //        onSync(types)
+        showEditDialog()
     }
+
+    abstract var markedType: String
+    abstract val keyHint: Int
+    abstract val valueHint: Int
+    open fun onSelect() {}
+
+    fun onEdit(data: MarkedData) {
+        showEditDialog(data)
+    }
+
+    private val editDialog: MaterialDialog by lazy {
+        val s = MaterialDialog(context!!)
+                .customView(R.layout.dialig_edit_marked_data)
+                .cancelable(false)
+                .noAutoDismiss()
+                .negativeButton { it.dismiss() }
+                .positiveButton {
+                    val key = keyText.editText!!.text.toString().trim()
+                    val reg = regexText.editText!!.text.toString().trim()
+                    val phone = valueText.editText!!.text.toString().trim()
+                    if (key == "") {
+                        keyText.error = getString(R.string.text_not_empty)
+                        return@positiveButton
+                    }
+                    if (reg == "") {
+                        regexText.error = getString(R.string.text_not_empty)
+                        return@positiveButton
+                    }
+                    if (phone == "") {
+                        valueText.error = getString(R.string.text_not_empty)
+                        return@positiveButton
+                    }
+                    try {
+                        if (editData != null) {
+                            editData!!.key = key
+                            editData!!.value = phone
+                            editData!!.regStr = reg
+                            DAO.daoSession.markedDataDao.update(editData)
+                        } else {
+                            val markedData = MarkedData(key, markedType,
+                                    reg, phone, DataFrom.FROM_USER)
+                            DAO.daoSession.markedDataDao.insert(markedData)
+                        }
+                        toast.green().showLong(R.string.text_complete)
+                        refresh()
+                        it.dismiss()
+                    } catch (e: Exception) {
+                        GlobalLog.err(e.message + "code: mc63")
+                        toast.red().showLong(R.string.text_error_occurred)
+                    }
+                }
+        s
+    }
+
+    private val keyText: TextInputLayout by lazy {
+        //fixme
+        val s = editDialog.findViewById<TextInputLayout>(R.id.key_text)
+        s.editText?.addTextChangedListener(object : TextWatcher {
+            var same = true
+            override fun afterTextChanged(s: Editable?) {
+                if (same) regexText.editText?.text = s
+            }
+
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+                same = s == regexText.editText?.text.toString()
+            }
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+            }
+        })
+        s.hint = getString(keyHint)
+        s
+    }
+
+    fun setValue(s: String) {
+        valueText.editText?.setText(s)
+    }
+
+    fun setKey(s: String) {
+        keyText.editText?.setText(s)
+    }
+
+    fun getKey(): CharSequence {
+        return keyText.editText?.text!!
+    }
+
+    val regexText: TextInputLayout by lazy {
+        editDialog.findViewById<TextInputLayout>(R.id.regex_text)
+
+    }
+    val valueText: TextInputLayout by lazy {
+        val s = editDialog.findViewById<TextInputLayout>(R.id.value_text)
+        s.hint = getString(valueHint)
+        s
+    }
+    val selectButton: Button by lazy { editDialog.findViewById<Button>(R.id.sel_btn) }
+    var editData: MarkedData? = null
+
+    open val showSel = true
+    /**
+     * 编辑or新建
+     * @param data MarkedData?
+     */
+    @SuppressLint("CheckResult")
+    fun showEditDialog(data: MarkedData? = null) {
+        editData = data
+        editDialog.title(
+                if (editData == null) R.string.text_new
+                else R.string.text_edit
+        )
+        if (showSel)
+            selectButton.setOnClickListener {
+                onSelect()
+            }
+        else selectButton.visibility = View.GONE
+        keyText.editText?.setText(data?.key)
+        regexText.editText?.setText(data?.regStr)
+        valueText.editText?.setText(data?.value)
+        editDialog.show()
+    }
+
+    override val itemClickListener = object : SimpleListAdapter.OnItemClickListener {
+
+        @SuppressLint("CheckResult")
+        override fun onClick(holder: SimpleListAdapter.VHolder?, pos: Int, item: ViewModel) {
+            //dialog edit
+            val data = item.extra as MarkedData
+            MaterialDialog(context!!).show {
+                if (data.belongUser(true)) {
+                    negativeButton(R.string.text_share) {
+                        share(data)
+                    }
+                    positiveButton(R.string.text_edit) {
+                        onEdit(item.extra)
+                    }
+                    neutralButton(R.string.text_delete) {
+                        AlertDialog.Builder(context)
+                                .setTitle(R.string.text_confirm_2_del)
+                                .setMessage("若已分享，将同时删除云端记录")
+                                .setPositiveButton(R.string.text_confirm) { _, _ ->
+                                    if (data.tagId != null) {
+                                        deleteShare(data.tagId)
+                                    }
+                                    DAO.daoSession.markedDataDao.delete(data)
+                                    toast.showShort(R.string.text_delete_complete)
+                                    refresh()
+                                }.setNegativeButton(R.string.text_cancel, null)
+                                .show()
+                    }
+
+                }
+                title(text = item.title)
+                message(text = data.toString())
+            }
+        }
+
+        override fun onLongClick(holder: SimpleListAdapter.VHolder?, pos: Int, item: ViewModel): Boolean {
+            //batch
+
+            return true
+        }
+    }
+
+    private fun deleteShare(tagId: String) {
+        NetHelper.postJson<Any>(ApiUrls.DELETE_SHARE_MARKED, BaseRequestModel(tagId)) { _, bean ->
+            if (bean?.isOk() == true) {
+                Vog.d(this, "deleteShare ---> 云端删除成功")
+            } else
+                Vog.d(this, "deleteShare ---> 云端删除失败")
+
+        }
+    }
+
+    /**
+     * 分享上传
+     * @param data MarkedData
+     */
+    private fun share(data: MarkedData) {
+        NetHelper.postJson<String>(ApiUrls.SHARE_MARKED, BaseRequestModel(data),
+                type = NetHelper.StringType) { _, bean ->
+            if (bean != null) {
+                if (bean.isOk()) {
+                    //return tagId
+                    val tag = bean.data
+                    if (tag != null) {
+                        data.tagId = tag
+                        DAO.daoSession.markedDataDao.update(data)
+                    }
+                    toast.showLong(bean.message)
+                } else {
+                    toast.showLong(bean.message)
+                }
+            } else
+                toast.red().showShort(R.string.text_error_occurred)
+
+        }
+    }
+
 
     override fun onSync(types: Array<String>) {
         showProgressBar()
-        val syncData = SyncMarkedModel(TextHelper.arr2String(types))
+        val syncData = TextHelper.arr2String(types)
         val requestModel = BaseRequestModel(syncData)
 
         NetHelper.postJson<List<MarkedData>>(ApiUrls.SYNC_MARKED, requestModel, type = NetHelper.MarkedDataListType) { _, bean ->
             if (bean != null) {
                 if (bean.isOk()) {
-                    //
                     DaoHelper.updateMarkedData(types, bean.data ?: emptyList())
                     toast.showShort("同步完成")
+
                     refresh()
                 } else {
                     toast.showShort(bean.message)

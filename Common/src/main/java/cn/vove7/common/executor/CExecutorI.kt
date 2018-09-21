@@ -80,4 +80,5 @@ interface RuntimeArgs {
     var actionScope: Int?
 
     fun isGlobal(): Boolean
+    var running: Boolean
 }

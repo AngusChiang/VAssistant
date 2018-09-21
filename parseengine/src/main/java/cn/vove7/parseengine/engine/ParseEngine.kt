@@ -11,6 +11,7 @@ import cn.vove7.common.datamanager.parse.statusmap.Reg.*
 import cn.vove7.parseengine.model.ParseResult
 import cn.vove7.vtp.log.Vog
 import java.util.*
+import kotlin.concurrent.thread
 
 /**
  * # ParseEngine
@@ -24,6 +25,30 @@ object ParseEngine {
 
     var i = 0
 
+    /**
+     * 同步后，更新数据
+     */
+    fun updateNode() {
+        thread {
+            updateInApp()
+            updateGlobal()
+        }
+    }
+
+    private fun updateInApp() {
+        AppActionNodes = DAO.daoSession.actionNodeDao.queryBuilder()
+                .where(ActionNodeDao.Properties.ActionScopeType
+                        .eq(NODE_SCOPE_IN_APP/*, NODE_SCOPE_IN_APP_2*/))
+                .orderDesc(ActionNodeDao.Properties.Priority)
+                .list()
+    }
+    private fun updateGlobal() {
+        GlobalActionNodes = DAO.daoSession.actionNodeDao.queryBuilder()
+                .where(ActionNodeDao.Properties.ActionScopeType
+                        .eq(NODE_SCOPE_GLOBAL /*,NODE_SCOPE_GLOBAL_2*/))
+                .orderDesc(ActionNodeDao.Properties.Priority)
+                .list()
+    }
     /**
      * 匹配 ，返回操作
      * @return @see [ParseResult]
@@ -59,11 +84,7 @@ object ParseEngine {
     private fun globalActionMatch(cmd: String): PriorityQueue<Action> {
         val actionQueue = PriorityQueue<Action>()
         if (GlobalActionNodes == null)
-            GlobalActionNodes = DAO.daoSession.actionNodeDao.queryBuilder()
-                    .where(ActionNodeDao.Properties.ActionScopeType
-                            .`in`(NODE_SCOPE_GLOBAL, NODE_SCOPE_GLOBAL_2))
-                    .orderDesc(ActionNodeDao.Properties.Priority)
-                    .list()
+           updateGlobal()
         GlobalActionNodes?.forEach {
             val r = regSearch(cmd, it, actionQueue)
             if (r) return actionQueue
@@ -83,11 +104,7 @@ object ParseEngine {
     fun matchAppAction(cmd: String, currentAppPkg: String): PriorityQueue<Action> {
         Log.d("Debug :", "matchAppAction  ----> $currentAppPkg")
         if (AppActionNodes == null) {
-            AppActionNodes = DAO.daoSession.actionNodeDao.queryBuilder()
-                    .where(ActionNodeDao.Properties.ActionScopeType
-                            .eq(NODE_SCOPE_IN_APP/*, NODE_SCOPE_IN_APP_2*/))
-                    .orderDesc(ActionNodeDao.Properties.Priority)
-                    .list()
+            updateInApp()
         }
         val actionQueue = PriorityQueue<Action>()
         AppActionNodes?.filter {

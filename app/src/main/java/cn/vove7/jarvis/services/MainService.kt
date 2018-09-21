@@ -114,7 +114,7 @@ class MainService : BusService(),
             DialogUtil.setFloat(alertDialog!!)
             alertDialog?.show()
             //语音控制
-            if (SpHelper(this).getBoolean(R.string.key_voice_control_dialog)) {
+            if (SpHelper(this).getBoolean(R.string.key_voice_control_dialog, true)) {
                 voiceMode = MODE_ALERT
                 speechRecoService.startRecog()
             }
@@ -237,7 +237,7 @@ class MainService : BusService(),
     override fun onExecuteFinished(result: String) {//
         Vog.d(this, result)
 
-        listeningToast.showAndHideDelay("执行完毕")
+//        listeningToast.showAndHideDelay("执行完毕")
 //        effectHandler.sendEmptyMessage(ANI_HIDEEND)
         executeAnimation.hideDelay()
 //        toast.showShort(result)
@@ -365,6 +365,16 @@ class MainService : BusService(),
                 } else instance!!.speechRecoService.isListening()
                         ).also {
                     Vog.i(this, "recoIsListening ---> $it")
+                }
+            }
+        val exEngineRunning: Boolean
+            get() {
+                return (if (instance == null) {
+                    Vog.i(this, "instance ---> null")
+                    false
+                } else instance!!.cExecutor.running
+                        ).also {
+                    Vog.i(this, "exEngineRunning ---> $it")
                 }
             }
     }

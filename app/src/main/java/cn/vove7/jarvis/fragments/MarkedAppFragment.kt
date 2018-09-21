@@ -8,9 +8,12 @@ import cn.vove7.common.datamanager.executor.entity.MarkedData
 import cn.vove7.common.datamanager.executor.entity.MarkedData.MARKED_TYPE_APP
 import cn.vove7.common.datamanager.greendao.MarkedDataDao
 import cn.vove7.executorengine.bridges.SystemBridge
-import cn.vove7.jarvis.adapters.SimpleListAdapter
+import cn.vove7.executorengine.helper.AdvanAppHelper
+import cn.vove7.jarvis.R
 import cn.vove7.jarvis.adapters.ViewModel
 import cn.vove7.jarvis.fragments.base.BaseMarkedFragment
+import com.afollestad.materialdialogs.MaterialDialog
+import com.afollestad.materialdialogs.list.listItems
 import kotlin.concurrent.thread
 
 /**
@@ -22,17 +25,6 @@ import kotlin.concurrent.thread
 class MarkedAppFragment : BaseMarkedFragment<MarkedData>() {
 
     var showUninstall = false
-    override val itemClickListener = object : SimpleListAdapter.OnItemClickListener {
-        override fun onClick(holder: SimpleListAdapter.VHolder?, pos: Int, item: ViewModel) {
-            //dialog edit
-        }
-
-        override fun onLongClick(holder: SimpleListAdapter.VHolder?, pos: Int, item: ViewModel): Boolean {
-            //batch
-
-            return true
-        }
-    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -40,6 +32,29 @@ class MarkedAppFragment : BaseMarkedFragment<MarkedData>() {
             showUninstall = isChecked
             refresh()
         })
+    }
+
+    override var markedType: String = MarkedData.MARKED_TYPE_APP
+    override val keyHint: Int = R.string.text_show_name
+    override val valueHint: Int = R.string.text_package_name
+
+
+    override fun onSelect() {//app list
+        val list = arrayListOf<String>()
+        AdvanAppHelper.APP_LIST.values.forEach {
+            list.add(it.name + "\n" + it.packageName)
+        }
+        MaterialDialog(context!!)
+                .title(R.string.text_select_application)
+                .listItems(items = list, waitForPositiveButton = false) { _, i, s ->
+                    val ss = s.split("\n")
+                    setValue(ss[1])
+                    if (getKey() != "") {
+                        setKey(ss[0])
+                    }
+                }
+                .show()
+
     }
 
     override fun transData(nodes: List<MarkedData>): List<ViewModel> {

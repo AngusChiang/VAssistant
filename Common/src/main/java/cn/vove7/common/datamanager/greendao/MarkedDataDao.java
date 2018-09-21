@@ -28,9 +28,10 @@ public class MarkedDataDao extends AbstractDao<MarkedData, Long> {
         public final static Property Key = new Property(1, String.class, "key", false, "KEY");
         public final static Property Type = new Property(2, String.class, "type", false, "TYPE");
         public final static Property RegStr = new Property(3, String.class, "regStr", false, "REG_STR");
-        public final static Property Value = new Property(4, String.class, "value", false, "VALUE");
-        public final static Property From = new Property(5, String.class, "from", false, "FROM");
-        public final static Property TagId = new Property(6, String.class, "tagId", false, "TAG_ID");
+        public final static Property PublishUserId = new Property(4, Long.class, "publishUserId", false, "PUBLISH_USER_ID");
+        public final static Property Value = new Property(5, String.class, "value", false, "VALUE");
+        public final static Property From = new Property(6, String.class, "from", false, "FROM");
+        public final static Property TagId = new Property(7, String.class, "tagId", false, "TAG_ID");
     }
 
 
@@ -50,9 +51,10 @@ public class MarkedDataDao extends AbstractDao<MarkedData, Long> {
                 "\"KEY\" TEXT NOT NULL ," + // 1: key
                 "\"TYPE\" TEXT," + // 2: type
                 "\"REG_STR\" TEXT," + // 3: regStr
-                "\"VALUE\" TEXT," + // 4: value
-                "\"FROM\" TEXT," + // 5: from
-                "\"TAG_ID\" TEXT);"); // 6: tagId
+                "\"PUBLISH_USER_ID\" INTEGER," + // 4: publishUserId
+                "\"VALUE\" TEXT," + // 5: value
+                "\"FROM\" TEXT," + // 6: from
+                "\"TAG_ID\" TEXT);"); // 7: tagId
         // Add Indexes
         db.execSQL("CREATE INDEX " + constraint + "IDX_MARKED_DATA_KEY ON \"MARKED_DATA\"" +
                 " (\"KEY\" ASC);");
@@ -84,19 +86,24 @@ public class MarkedDataDao extends AbstractDao<MarkedData, Long> {
             stmt.bindString(4, regStr);
         }
  
+        Long publishUserId = entity.getPublishUserId();
+        if (publishUserId != null) {
+            stmt.bindLong(5, publishUserId);
+        }
+ 
         String value = entity.getValue();
         if (value != null) {
-            stmt.bindString(5, value);
+            stmt.bindString(6, value);
         }
  
         String from = entity.getFrom();
         if (from != null) {
-            stmt.bindString(6, from);
+            stmt.bindString(7, from);
         }
  
         String tagId = entity.getTagId();
         if (tagId != null) {
-            stmt.bindString(7, tagId);
+            stmt.bindString(8, tagId);
         }
     }
 
@@ -120,19 +127,24 @@ public class MarkedDataDao extends AbstractDao<MarkedData, Long> {
             stmt.bindString(4, regStr);
         }
  
+        Long publishUserId = entity.getPublishUserId();
+        if (publishUserId != null) {
+            stmt.bindLong(5, publishUserId);
+        }
+ 
         String value = entity.getValue();
         if (value != null) {
-            stmt.bindString(5, value);
+            stmt.bindString(6, value);
         }
  
         String from = entity.getFrom();
         if (from != null) {
-            stmt.bindString(6, from);
+            stmt.bindString(7, from);
         }
  
         String tagId = entity.getTagId();
         if (tagId != null) {
-            stmt.bindString(7, tagId);
+            stmt.bindString(8, tagId);
         }
     }
 
@@ -148,9 +160,10 @@ public class MarkedDataDao extends AbstractDao<MarkedData, Long> {
             cursor.getString(offset + 1), // key
             cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2), // type
             cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3), // regStr
-            cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4), // value
-            cursor.isNull(offset + 5) ? null : cursor.getString(offset + 5), // from
-            cursor.isNull(offset + 6) ? null : cursor.getString(offset + 6) // tagId
+            cursor.isNull(offset + 4) ? null : cursor.getLong(offset + 4), // publishUserId
+            cursor.isNull(offset + 5) ? null : cursor.getString(offset + 5), // value
+            cursor.isNull(offset + 6) ? null : cursor.getString(offset + 6), // from
+            cursor.isNull(offset + 7) ? null : cursor.getString(offset + 7) // tagId
         );
         return entity;
     }
@@ -161,9 +174,10 @@ public class MarkedDataDao extends AbstractDao<MarkedData, Long> {
         entity.setKey(cursor.getString(offset + 1));
         entity.setType(cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2));
         entity.setRegStr(cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3));
-        entity.setValue(cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4));
-        entity.setFrom(cursor.isNull(offset + 5) ? null : cursor.getString(offset + 5));
-        entity.setTagId(cursor.isNull(offset + 6) ? null : cursor.getString(offset + 6));
+        entity.setPublishUserId(cursor.isNull(offset + 4) ? null : cursor.getLong(offset + 4));
+        entity.setValue(cursor.isNull(offset + 5) ? null : cursor.getString(offset + 5));
+        entity.setFrom(cursor.isNull(offset + 6) ? null : cursor.getString(offset + 6));
+        entity.setTagId(cursor.isNull(offset + 7) ? null : cursor.getString(offset + 7));
      }
     
     @Override
