@@ -15,7 +15,8 @@
     <string name="text_select_application">选择应用</string>
     <string name="text_refresh">刷新</string>
     <string name="title_new_inst">新建命令</string>
-    <string name="activity_name">Activity名称(可选)</string>
+    <string name="text_activity_name">Activity名称</string>
+    <string name="text_activity_name_op">Activity名称(可选)</string>
     <string name="text_choose_file">选择文件</string>
     <string name="text_operation_need_permission">此操作需要%s</string>
     <string name="text_opened">已开启</string>
@@ -69,7 +70,7 @@
     <string name="text_run">执行</string>
     <string name="text_optional">可选</string>
     <string name="text_help">帮助</string>
-    <string name="text_msg_delete_action_node">此操作会同时删除此操作的跟随操作</string>
+    <string name="text_msg_delete_action_node">此操作会同时删除此操作的跟随操作，同时删除云端分享记录(若分享过)</string>
     <string name="text_confirm_2_del">确认删除</string>
     <string name="text_about">关于</string>
     <string name="text_advanced_features">高级</string>
@@ -110,7 +111,7 @@
     <string name="text_examples">示例</string>
     <string name="text_share_success">分享成功</string>
     <string name="text_reg_time">注册时间</string>
-    <string name="text_vip_end_time">会员到期时间</string>
+    <string name="text_vip_end_time">会员时间</string>
     <string name="text_failed_to_get_data">获取数据失败</string>
     <string name="text_logout">注销</string>
     <string name="text_activate">激活</string>
@@ -121,8 +122,9 @@
     <string name="text_recharge_code">充值码</string>
     <string name="text_failed_to_get_user_info">获取其个人信息失败</string>
     <string name="text_purchase_recharge_code">购买充值码</string>
-    <string name="text_purcharge_recharge_code_msg">通过支付宝转账下方指定金额，或者联系qq获取，在备注填写你的邮箱，不久你会收到含有充值码的邮件，点击下方[使用充值码]继续操作即可。</string>
-    <string name="text_email_copy_to_clip">你的邮箱已复制到剪切板</string>
+    <string name="text_purchase_recharge_code_msg">通过支付宝转账下方指定金额，或者联系qq获取，在备注填写你的邮箱，不久你会收到含有充值码的邮件，点击下方[使用充值码]继续操作即可。若长时间接收不到，请联系我，将给予补偿。</string>
+    <string name="text_advan_include_func">1.新建脚本指令\n2.远程调试脚本\n3.广告跳过无限制\n4.本地代码测试\n5.无限制标记管理\n6.操作、标记分享，且可同步</string>
+    <string name="text_recharege_pre_read">在支付前，请先阅读高级教程，确保它对你有用。</string> <string name="text_email_copy_to_clip">你的邮箱已复制到剪切板</string>
     <string name="text_understand">知道了</string>
     <string name="text_continue">继续</string>
     <string name="text_debug_service_starting">远程调试已开启</string>
@@ -140,4 +142,20 @@
     <string name="text_delete_complete">删除完成</string>
     <string name="text_package_name">包名</string>
     <string name="text_func_name">功能名</string>
+    <string name="text_custom">普通</string>
+    <string name="text_type">类型: </string>
+    <string name="hint_depths_array">深度数组</string>
+    <string name="hint_depths_array_helper">(以英文逗号分隔) 如 1,2,3</string>
+    <string name="text_ad_texts">文本</string>
+    <string name="text_need_vip">此操作需要高级用户</string>
+    <string name="text_please_login_first">请先登录</string>
+    <string name="text_unlock">解锁</string>
+    <string name="text_need_unlock">部分功能需要解锁高级用户</string>
+    <string name="text_add_regex">添加正则</string>
+    <string name="summary_not_vip_remove_ad">非高级用户，一天最多去广告20次</string>
+    <string name="text_open">开启</string>
+    <string name="text_unlock_functions">解锁将支持的功能</string>
+    <string name="text_guide">教程</string>
+    <string name="text_sel_from_existing">从已有选择</string>
+    <string name="text_coming_soon">敬请期待</string>
 </resources>

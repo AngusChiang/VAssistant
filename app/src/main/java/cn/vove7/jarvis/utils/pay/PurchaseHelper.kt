@@ -5,10 +5,6 @@ import android.didikee.donate.AlipayDonate
 import android.os.Handler
 import android.os.Message
 import android.text.TextUtils
-import android.util.Log
-import cn.vove7.common.netacc.ApiUrls
-import cn.vove7.common.netacc.NetHelper
-import cn.vove7.common.netacc.model.BaseRequestModel
 import cn.vove7.vtp.log.Vog
 //import com.alipay.sdk.app.PayTask
 

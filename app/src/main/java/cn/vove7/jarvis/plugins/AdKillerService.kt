@@ -6,6 +6,7 @@ import cn.vove7.common.datamanager.AppAdInfo
 import cn.vove7.common.datamanager.DAO
 import cn.vove7.common.datamanager.greendao.AppAdInfoDao
 import cn.vove7.common.datamanager.parse.model.ActionScope
+import cn.vove7.common.model.UserInfo
 import cn.vove7.common.view.finder.ViewFindBuilder
 import cn.vove7.common.view.finder.ViewFinder
 import cn.vove7.common.view.notifier.AppAdBlockNotifier
@@ -34,7 +35,7 @@ object AdKillerService : AccPluginsService() {//TO-DO fixed 猪八戒ad
      */
     private val finderCaches = ConcurrentHashMap<ActionScope, MutableSet<ViewFinder>>()
 
-    override fun onBind() {//todo load data
+    override fun onBind() {
         thread {
             locked = true
             finderCaches.clear()
@@ -93,8 +94,9 @@ object AdKillerService : AccPluginsService() {//TO-DO fixed 猪八戒ad
      * 更新数剧时，刷新缓存
      */
     fun update(/*s: Array<String>*/) {
-        finderCaches.clear()
-        onBind()
+        if (opened) {
+            onBind()
+        }
     }
 
     private fun gcIfNeed() {
@@ -108,6 +110,10 @@ object AdKillerService : AccPluginsService() {//TO-DO fixed 猪八戒ad
     private var appInfo: AppInfo? = null
 
     override fun onAppChanged(appScope: ActionScope) {
+        locked = true
+        if (!UserInfo.isVip() && AppAdBlockNotifier.useUp()) {
+            return
+        }
         locked = false
         changedTime = System.currentTimeMillis()
         appInfo = AdvanAppHelper.getAppInfo(appScope.packageName)

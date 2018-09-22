@@ -1,10 +1,13 @@
 package cn.vove7.common.appbus
 
+import cn.vove7.vtp.log.Vog
 import org.greenrobot.eventbus.EventBus
 import java.io.Serializable
 
 object AppBus {
+    const val EVENT_LOGOUT = "e_logout"
     fun post(data: Any) {
+        Vog.d(this,"post ---> $data")
         EventBus.getDefault().post(data)
     }
 
@@ -46,7 +49,8 @@ data class SpeechAction(val action: ActionCode) {
     override fun toString(): String {
         return "SpeechAction(action=$action)"
     }
-    enum class ActionCode{
+
+    enum class ActionCode {
         ACTION_START_RECO,
         ACTION_START_WAKEUP,
         ACTION_STOP_WAKEUP,

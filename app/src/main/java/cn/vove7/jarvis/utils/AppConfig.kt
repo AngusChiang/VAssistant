@@ -1,10 +1,11 @@
 package cn.vove7.jarvis.utils
 
 import android.os.Looper
+import android.widget.Toast
 import cn.vove7.common.app.GlobalApp
+import cn.vove7.common.appbus.AppBus
 import cn.vove7.common.model.UserInfo
 import cn.vove7.common.netacc.ApiUrls
-import cn.vove7.common.netacc.NetHelper
 import cn.vove7.common.netacc.model.BaseRequestModel
 import cn.vove7.jarvis.R
 import cn.vove7.vtp.log.Vog
@@ -73,6 +74,16 @@ object AppConfig {
         UserInfo.logout()
     }
 
+    fun checkUser():Boolean {
+        if (!UserInfo.isLogin()) {
+            GlobalApp.toastShort(R.string.text_please_login_first)
+            return false
+        }else if(!UserInfo.isVip()){
+            GlobalApp.toastShort(R.string.text_need_vip)
+            return false
+        }
+        return true
+    }
     //load
     fun reload() {
         val sp = SpHelper(GlobalApp.APP)

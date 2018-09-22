@@ -10,7 +10,6 @@ import cn.vove7.common.datamanager.parse.model.ActionScope
 import cn.vove7.common.datamanager.parse.statusmap.ActionNode
 import cn.vove7.common.datamanager.parse.statusmap.ActionNode.NODE_SCOPE_IN_APP
 import cn.vove7.common.netacc.ApiUrls
-import cn.vove7.common.netacc.NetHelper
 import cn.vove7.common.netacc.model.BaseRequestModel
 import cn.vove7.executorengine.helper.AdvanAppHelper
 import cn.vove7.jarvis.R
@@ -19,6 +18,8 @@ import cn.vove7.jarvis.activities.NewInstActivity
 import cn.vove7.jarvis.activities.OnSyncInst
 import cn.vove7.jarvis.adapters.SimpleListAdapter
 import cn.vove7.jarvis.adapters.ViewModel
+import cn.vove7.jarvis.utils.AppConfig
+import cn.vove7.jarvis.utils.NetHelper
 import cn.vove7.parseengine.engine.ParseEngine
 import cn.vove7.vtp.app.AppHelper
 
@@ -30,6 +31,9 @@ import cn.vove7.vtp.app.AppHelper
  */
 class InstAppListFragment : SimpleListFragment<ActionScope>(), OnSyncInst {
     override var floatClickListener: View.OnClickListener? = View.OnClickListener {
+        if (!AppConfig.checkUser()) {
+            return@OnClickListener
+        }
         val intent = Intent(context, NewInstActivity::class.java)
         intent.putExtra("type", NODE_SCOPE_IN_APP)
 

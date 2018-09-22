@@ -64,12 +64,12 @@
  - [x] 打开MarkedOpen
  - [x] Marked -联系人 -App -广告id
  - [x] edit
- - [-] ad marked
+ - [x] ad marked
 
 ## VIP提供
 
 - [ ] 云备份
-- [ ] 高级操作
+- [x] 高级操作
   - [x] 开发模式
   - [x] 上传分享
   - [x] 远程调试

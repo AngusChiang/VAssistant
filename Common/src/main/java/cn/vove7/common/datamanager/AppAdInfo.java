@@ -7,9 +7,12 @@ import org.greenrobot.greendao.annotation.Keep;
 
 import java.io.Serializable;
 import java.util.Arrays;
+import java.util.Objects;
 
+import cn.vove7.common.app.GlobalLog;
 import cn.vove7.common.datamanager.parse.DataFrom;
 import cn.vove7.common.interfaces.Markable;
+import cn.vove7.common.model.UserInfo;
 import cn.vove7.common.netacc.tool.SecureHelper;
 
 /**
@@ -42,6 +45,8 @@ public class AppAdInfo implements Serializable, Markable, DataFrom {
     private String tagId;
     private String from;
 
+    private Long publishUserId;
+
     public String getTagId() {
         return tagId;
     }
@@ -59,6 +64,43 @@ public class AppAdInfo implements Serializable, Markable, DataFrom {
 
     public String getDescTitle() {
         return descTitle;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        try {
+            AppAdInfo appAdInfo = (AppAdInfo) o;
+            return Objects.equals(tagId, appAdInfo.tagId);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(tagId, publishUserId);
+    }
+
+    public boolean belongUser(boolean update) {
+        if (DataFrom.FROM_USER.equals(from)) return true;
+        else if (publishUserId != null && publishUserId.equals(UserInfo.getUserId())) {
+            if (update) {
+                from = DataFrom.FROM_USER;
+                DAO.INSTANCE.getDaoSession().getAppAdInfoDao().update(this);
+            }
+            return true;
+        }
+        return false;
+    }
+
+    public Long getPublishUserId() {
+        return publishUserId;
+    }
+
+    public void setPublishUserId(Long publishUserId) {
+        this.publishUserId = publishUserId;
     }
 
     public void setDescTitle(String descTitle) {
@@ -107,9 +149,9 @@ public class AppAdInfo implements Serializable, Markable, DataFrom {
         this.versionCode = versionCode;
     }
 
-    @Generated(hash = 1270623277)
+    @Generated(hash = 1167445598)
     public AppAdInfo(Long id, String descTitle, String pkg, String activity, String texts, String viewId, String descs, String depths,
-                     String type, String tagId, String from, Integer versionCode) {
+                     String type, String tagId, String from, Long publishUserId, Integer versionCode) {
         this.id = id;
         this.descTitle = descTitle;
         this.pkg = pkg;
@@ -121,6 +163,7 @@ public class AppAdInfo implements Serializable, Markable, DataFrom {
         this.type = type;
         this.tagId = tagId;
         this.from = from;
+        this.publishUserId = publishUserId;
         this.versionCode = versionCode;
     }
 
@@ -222,10 +265,16 @@ public class AppAdInfo implements Serializable, Markable, DataFrom {
         String[] is = depths.split(",");
         Integer[] si = new Integer[is.length];
         int i = 0;
-        for (String s : is) {
-            si[i++] = Integer.valueOf(s);
+        try {
+            for (String s : is) {
+                si[i++] = Integer.valueOf(s);
+            }
+            return si;
+        } catch (NumberFormatException e) {
+            e.printStackTrace();
+            GlobalLog.INSTANCE.err("depths 格式化错误: " + descTitle + " pkg: " + pkg);
+            return null;
         }
-        return si;
     }
 
     public AppAdInfo setDepths(String depths) {

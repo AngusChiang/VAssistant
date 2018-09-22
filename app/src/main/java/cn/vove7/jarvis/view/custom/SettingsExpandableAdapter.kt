@@ -53,8 +53,8 @@ class SettingsExpandableAdapter(val context: Context,
                         val cpos = getChildAboPos(i, j)
                         Vog.d(this, "Collapse child ---> $i $j     $cpos")
                         if (i == gPos)//消失行
-                            animationHelper.hide(childHolders[i][j]!!.itemView)
-                        else animationHelper.fromB2T(childHolders[i][j]!!.itemView, cpos)
+                            animationHelper.hide(childHolders[i][j]?.itemView)
+                        else animationHelper.fromB2T(childHolders[i][j]?.itemView, cpos)
                     }
             }
             groupHolders[gPos]!!.downIcon.animate().rotation(0f).setDuration(200).start()

@@ -130,7 +130,7 @@
                             android:id="@+id/activity_name"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:hint="@string/activity_name"
+                            android:hint="@string/text_activity_name_op"
                             android:textColor="?attr/colorAccent" />
                     </android.support.design.widget.TextInputLayout>
                 </LinearLayout>

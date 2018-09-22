@@ -35,14 +35,14 @@ object ParseEngine {
         }
     }
 
-    private fun updateInApp() {
+    fun updateInApp() {
         AppActionNodes = DAO.daoSession.actionNodeDao.queryBuilder()
                 .where(ActionNodeDao.Properties.ActionScopeType
                         .eq(NODE_SCOPE_IN_APP/*, NODE_SCOPE_IN_APP_2*/))
                 .orderDesc(ActionNodeDao.Properties.Priority)
                 .list()
     }
-    private fun updateGlobal() {
+    fun updateGlobal() {
         GlobalActionNodes = DAO.daoSession.actionNodeDao.queryBuilder()
                 .where(ActionNodeDao.Properties.ActionScopeType
                         .eq(NODE_SCOPE_GLOBAL /*,NODE_SCOPE_GLOBAL_2*/))

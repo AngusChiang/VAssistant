@@ -20,7 +20,7 @@ object TextHelper {
         return userRegex.matches(s)
     }
 
-    fun arr2String(ss: Array<String>, separator: String = ","): String {
+    fun arr2String(ss: Array<*>, separator: String = ","): String {
         return buildString {
             ss.withIndex().forEach {
                 if (it.index == 0) append(ss[0])

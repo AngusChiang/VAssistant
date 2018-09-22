@@ -2,10 +2,7 @@ package cn.vove7.executorengine.bridges
 
 import android.Manifest
 import android.bluetooth.BluetoothAdapter
-import android.content.ClipData
-import android.content.ClipboardManager
-import android.content.Context
-import android.content.Intent
+import android.content.*
 import android.content.pm.PackageManager
 import android.media.AudioManager
 import android.media.AudioManager.ADJUST_MUTE
@@ -34,6 +31,10 @@ import cn.vove7.vtp.system.SystemHelper
 
 class SystemBridge : SystemOperation {
     private val context: Context = GlobalApp.APP
+
+    fun openAppByPkg(pkg: String): ExResult<String> {
+        return openAppByPkg(pkg, false)
+    }
 
     override fun openAppByPkg(pkg: String, resetTask: Boolean): ExResult<String> {
         return try {
@@ -135,7 +136,14 @@ class SystemBridge : SystemOperation {
     }
 
     override fun openUrl(url: String) {
-        SystemHelper.openLink(context, url)
+        try {
+            val intent = Intent(Intent.ACTION_VIEW)
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            intent.data = Uri.parse(url)
+            context.startActivity(intent)
+        } catch (e: ActivityNotFoundException) {
+            GlobalApp.toastShort("无可用浏览器")
+        }
     }
 
     /**
@@ -329,4 +337,5 @@ class SystemBridge : SystemOperation {
         val mClipData = ClipData.newPlainText("", text)
         cm.primaryClip = mClipData
     }
+
 }

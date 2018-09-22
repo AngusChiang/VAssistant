@@ -3,10 +3,7 @@ package cn.vove7.common.datamanager
 import cn.vove7.common.R
 import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.datamanager.executor.entity.MarkedData
-import cn.vove7.common.datamanager.greendao.ActionNodeDao
-import cn.vove7.common.datamanager.greendao.ActionScopeDao
-import cn.vove7.common.datamanager.greendao.MarkedDataDao
-import cn.vove7.common.datamanager.greendao.RegDao
+import cn.vove7.common.datamanager.greendao.*
 import cn.vove7.common.datamanager.parse.DataFrom
 import cn.vove7.common.datamanager.parse.model.ActionScope
 import cn.vove7.common.datamanager.parse.statusmap.ActionNode
@@ -53,7 +50,8 @@ object DaoHelper {
     }
 
 
-    fun deleteActionNodeInTX(nodeId: Long): Boolean {
+    fun deleteActionNodeInTX(nodeId: Long?): Boolean {
+        if (nodeId == null) return false;
         return try {
             DAO.daoSession.runInTx {
                 deleteActionNode(nodeId)
@@ -130,14 +128,25 @@ object DaoHelper {
         return try {
             DAO.daoSession.runInTx {
                 olds.forEach {
+                    //删除旧服务器数据
                     //del old global
                     deleteActionNode(it.id)
                 }
                 nodes.forEach {
-                    val oldNode = getActionNodeByTag(it.tagId)
-                    if (oldNode == null || it.versionCode > oldNode.versionCode)//更新
+                    if (it.isDelete) {
+                        Vog.d(this, "updateActionNodeByType ---> 已删除 ${it.actionTitle}")
+                        return@forEach
+                    }
+
+                    val oldNode = getActionNodeByTag(it.tagId)//存在？
+                    if (oldNode == null || it.versionCode > oldNode.versionCode) {//更新
+                        //判断属于用户
+                        if (it.belongSelf()) {//set from -> user
+                            it.from = DataFrom.FROM_USER
+                            Vog.d(this, "updateActionNodeByType ---> 属于用户: " + it.actionTitle)
+                        }
                         insertNewActionNode(it)
-                    else Vog.d(this, "updateGlobalInst ---> ${it.actionTitle} 存在")
+                    } else Vog.d(this, "updateGlobalInst ---> ${it.actionTitle} 存在")
                 }
             }
             true
@@ -224,7 +233,6 @@ object DaoHelper {
                 if (!userList.contains(it)) {
                     if (it.belongUser(false)) {
                         Vog.d(this, "updateMarkedData ---> 标记为用户:" + it.key)
-
                         it.from = DataFrom.FROM_USER
                     }
                     markedDao.insert(it)
@@ -243,16 +251,34 @@ object DaoHelper {
     /**
      * 更新广告数据
      * 删除来自服务器,保留用户数据
-     * TODO tagid 防止删除重叠数据
+     *
      * @param types Array<String>
      * @param datas List<AppAdInfo>
      * @return Boolean
      */
     fun updateAppAdInfo(datas: List<AppAdInfo>): Boolean {
         val appAdInfoDao = DAO.daoSession.appAdInfoDao
-        appAdInfoDao.deleteAll()
         return try {
-            appAdInfoDao.insertInTx(datas)
+            val delList = appAdInfoDao.queryBuilder()
+                    .where(AppAdInfoDao.Properties.From.notEq(DataFrom.FROM_USER)).list()
+            appAdInfoDao.deleteInTx(delList)
+
+            val userList = appAdInfoDao.queryBuilder().where(
+                    AppAdInfoDao.Properties.From.eq(DataFrom.FROM_USER)
+            ).list().toHashSet()
+
+            datas.forEach {
+                if (!userList.contains(it)) {
+                    if (it.belongUser(false)) {
+                        Vog.d(this, "updateMarkedData ---> 标记为用户:" + it.descTitle)
+                        it.from = DataFrom.FROM_USER
+                    }
+                    appAdInfoDao.insertInTx(it)
+                    Vog.d(this,"updateAppAdInfo ---> ${it.descTitle} ${it.id}")
+                } else {
+                    Vog.d(this, "updateMarkedData ---> 重复:" + it.descTitle)
+                }
+            }
             true
         } catch (e: Exception) {
             e.printStackTrace()

@@ -8,12 +8,10 @@ import cn.vove7.common.datamanager.executor.entity.MarkedData
 import cn.vove7.common.datamanager.executor.entity.MarkedData.MARKED_TYPE_APP
 import cn.vove7.common.datamanager.greendao.MarkedDataDao
 import cn.vove7.executorengine.bridges.SystemBridge
-import cn.vove7.executorengine.helper.AdvanAppHelper
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.adapters.ViewModel
 import cn.vove7.jarvis.fragments.base.BaseMarkedFragment
-import com.afollestad.materialdialogs.MaterialDialog
-import com.afollestad.materialdialogs.list.listItems
+import cn.vove7.jarvis.utils.DialogUtil
 import kotlin.concurrent.thread
 
 /**
@@ -40,21 +38,12 @@ class MarkedAppFragment : BaseMarkedFragment<MarkedData>() {
 
 
     override fun onSelect() {//app list
-        val list = arrayListOf<String>()
-        AdvanAppHelper.APP_LIST.values.forEach {
-            list.add(it.name + "\n" + it.packageName)
+        DialogUtil.showSelApp(context!!) {
+            setValue(it.second)
+            if (getKey() != "") {
+                setKey(it.first)
+            }
         }
-        MaterialDialog(context!!)
-                .title(R.string.text_select_application)
-                .listItems(items = list, waitForPositiveButton = false) { _, i, s ->
-                    val ss = s.split("\n")
-                    setValue(ss[1])
-                    if (getKey() != "") {
-                        setKey(ss[0])
-                    }
-                }
-                .show()
-
     }
 
     override fun transData(nodes: List<MarkedData>): List<ViewModel> {

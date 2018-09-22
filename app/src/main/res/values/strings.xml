@@ -89,7 +89,8 @@
     <string name="text_select_application">Select App</string>
     <string name="text_refresh">Refresh</string>
     <string name="title_new_inst">New Instruction</string>
-    <string name="activity_name">Activity Name(Optional)</string>
+    <string name="text_activity_name">Activity Name</string>
+    <string name="text_activity_name_op">Activity Name(Optional)</string>
     <string name="text_choose_file">Choose File</string>
     <string name="text_operation_need_permission">This operation needs %s</string>
     <string name="text_opened">Opened</string>
@@ -144,7 +145,7 @@
     <string name="text_run">Run</string>
     <string name="text_optional">Optional</string>
     <string name="text_help">Help</string>
-    <string name="text_msg_delete_action_node">此操作会同时删除此操作的跟随操作</string>
+    <string name="text_msg_delete_action_node">此操作会同时删除此操作的跟随操作，同时删除云端分享记录(若分享过)。</string>
     <string name="text_confirm_2_del">确认删除</string>
     <string name="text_about">About</string>
     <string name="text_advanced_features">Advanced Features</string>
@@ -207,7 +208,9 @@
     <string name="text_recharge_code">Recharge code</string>
     <string name="text_failed_to_get_user_info">Failed to get user info</string>
     <string name="text_purchase_recharge_code">Purchase Recharge code</string>
-    <string name="text_purcharge_recharge_code_msg">通过支付宝转账下方指定金额，或者联系qq获取，在备注填写你的邮箱，不久你会收到含有充值码的邮件，点击下方[使用充值码]继续操作即可。</string>
+    <string name="text_purchase_recharge_code_msg">通过支付宝转账下方指定金额，或者联系qq获取，在备注填写你的邮箱，不久你会收到含有充值码的邮件，点击下方[使用充值码]继续操作即可。</string>
+    <string name="text_advan_include_func">1.新建脚本指令\n2.远程调试脚本\n3.去广告次数跳无限制\n4.本地代码测试\n5.无限制标记管理\n6.操作、标记分享，且可同步</string>
+    <string name="text_recharege_pre_read">在支付前，请先阅读高级教程，确保它对你有用。</string>
     <string name="text_email_copy_to_clip">你的邮箱已复制到剪切板</string>
     <string name="text_understand">Understand</string>
     <string name="text_continue">Continue</string>
@@ -226,5 +229,21 @@
     <string name="text_delete_complete">Delete complete</string>
     <string name="text_package_name">Package name</string>
     <string name="text_func_name">Function name</string>
+    <string name="text_custom">Custom</string>
+    <string name="text_type">Type: </string>
+    <string name="hint_depths_array">Depths array</string>
+    <string name="hint_depths_array_helper">split with \',\' like: 1,2,3</string>
+    <string name="text_ad_texts">Texts</string>
+    <string name="text_need_vip">此操作需要高级用户</string>
+    <string name="text_please_login_first">Please login first</string>
+    <string name="text_unlock">Unlock</string>
+    <string name="text_need_unlock">Partial function need to unlock.</string>
+    <string name="text_add_regex">Add regex</string>
+    <string name="summary_not_vip_remove_ad">非高级用户，一天最多去广告0次</string>
+    <string name="text_open">Open</string>
+    <string name="text_unlock_functions">Unlock functions</string>
+    <string name="text_guide">Guide</string>
+    <string name="text_sel_from_existing">Select from existing</string>
+    <string name="text_coming_soon">Coming soon</string>
 
 </resources>

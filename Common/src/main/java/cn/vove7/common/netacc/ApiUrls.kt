@@ -27,15 +27,20 @@ object ApiUrls {
 
     val SYNC_MARKED = MARKED + "sm"
     val SHARE_MARKED = MARKED + "sd"
-    val DELETE_SHARE_MARKED = MARKED + "ds"
+    val SHARE_APP_AD_INFO = MARKED + "sai"
+    val DELETE_SHARE_MARKED = MARKED + "dsm"
+    val DELETE_SHARE_APP_AD = MARKED + "dsa"
     val SYNC_APP_AD = MARKED + "saa"
 
 
     val SYNC_GLOBAL_INST = ACTION + "sg"
     val SYNC_IN_APP_INST = ACTION + "sia"
     val SHARE_INST = ACTION + "fu"
+    val DELETE_SHARE_INST = ACTION + "ud"
     val UPGRADE_INST = ACTION + "us"
 
     val GET_ALI_ORDER = PAY + "a"
 
+    val GUIDE = SERVER_IP + "guide"
+    val HELP_DEL_INST = "$GUIDE#del-inst"
 }

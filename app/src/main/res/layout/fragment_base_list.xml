@@ -49,17 +49,20 @@
                     android:gravity="center"
                     android:orientation="vertical" />
 
-                <com.l4digital.fastscroll.FastScrollRecyclerView
+                <android.support.v7.widget.RecyclerView
                     android:id="@+id/recycle_view"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    app:bubbleColor="#00bb00"
-                    app:bubbleTextColor="#ffffff"
-                    app:handleColor="@color/colorAccent"
-                    app:hideScrollbar="false"
-                    app:layout_behavior="@string/appbar_scrolling_view_behavior"
-                    app:showTrack="false"
-                    app:trackColor="#bbbbbb" />
+                    android:animationCache="false"
+                    android:scrollingCache="false"
+                    android:smoothScrollbar="true"
+                    app:layout_behavior="@string/appbar_scrolling_view_behavior" />
+                <!--app:showTrack="false"-->
+                <!--app:trackColor="#bbbbbb"-->
+                <!--app:bubbleColor="#00bb00"-->
+                <!--app:bubbleTextColor="#ffffff"-->
+                <!--app:handleColor="@color/colorAccent"-->
+                <!--app:hideScrollbar="false"-->
             </RelativeLayout>
         </LinearLayout>
 
@@ -70,7 +73,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="20dp"
+        android:layout_marginBottom="40dp"
         android:src="@drawable/ic_add_white_24dp"
         app:layout_anchor="@id/swipe_refresh"
-        app:layout_anchorGravity="bottom|end" />
+        app:layout_anchorGravity="bottom|end"
+        app:layout_behavior="cn.vove7.jarvis.view.animation.FabBehavior" />
 </android.support.design.widget.CoordinatorLayout>

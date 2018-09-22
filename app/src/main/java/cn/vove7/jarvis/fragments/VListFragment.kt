@@ -20,7 +20,6 @@ import cn.vove7.common.view.toast.ColorfulToast
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.adapters.RecAdapterWithFooter
 import cn.vove7.vtp.log.Vog
-import com.l4digital.fastscroll.FastScrollRecyclerView
 import kotlinx.android.synthetic.main.fragment_base_list.*
 
 /**
@@ -50,7 +49,7 @@ abstract class VListFragment : Fragment() {
      * 页码
      */
     var pageIndex = 0
-    lateinit var recyclerView: FastScrollRecyclerView
+    lateinit var recyclerView: RecyclerView
 
     var layManager: RecyclerView.LayoutManager? = null
     lateinit var adapter: RecAdapterWithFooter<*>

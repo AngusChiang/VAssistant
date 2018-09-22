@@ -26,7 +26,6 @@
                 android:id="@+id/user_name_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="13232423423@qq.com"
                 android:textSize="27sp"
                 android:textStyle="bold" />
 
@@ -37,7 +36,7 @@
                 android:padding="5dp"
                 android:text="❤"
                 android:textColor="@color/red_500"
-                android:textSize="23sp" />
+                android:textSize="20sp" />
         </LinearLayout>
     </RelativeLayout>
 

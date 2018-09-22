@@ -1,6 +1,7 @@
-package cn.vove7.common.netacc
+package cn.vove7.jarvis.utils
 
 import android.os.Handler
+import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.datamanager.executor.entity.MarkedData
 import cn.vove7.common.datamanager.parse.statusmap.ActionNode
@@ -95,6 +96,11 @@ object NetHelper {
                     try {
                         Vog.d(this, "onResponse --->\n$s")
                         val bean = OneGson.fromJsonObj<T>(s, type)
+                        if (bean?.isInvalid() == true) {//无效下线
+                            if (UserInfo.isLogin())
+                                GlobalApp.toastShort("用户身份过期请重新登陆")
+                            AppConfig.logout()
+                        }
                         handler.post {
                             callback.invoke(requestCode, bean)
                         }

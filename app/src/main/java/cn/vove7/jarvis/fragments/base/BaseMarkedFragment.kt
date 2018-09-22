@@ -1,10 +1,7 @@
 package cn.vove7.jarvis.fragments.base
 
 import android.annotation.SuppressLint
-import android.app.AlertDialog
 import android.support.design.widget.TextInputLayout
-import android.text.Editable
-import android.text.TextWatcher
 import android.view.View
 import android.widget.Button
 import cn.vove7.common.app.GlobalLog
@@ -12,14 +9,17 @@ import cn.vove7.common.datamanager.DAO
 import cn.vove7.common.datamanager.DaoHelper
 import cn.vove7.common.datamanager.executor.entity.MarkedData
 import cn.vove7.common.datamanager.parse.DataFrom
+import cn.vove7.common.model.UserInfo
 import cn.vove7.common.netacc.ApiUrls
-import cn.vove7.common.netacc.NetHelper
+import cn.vove7.jarvis.utils.NetHelper
 import cn.vove7.common.netacc.model.BaseRequestModel
 import cn.vove7.common.utils.TextHelper
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.adapters.SimpleListAdapter
 import cn.vove7.jarvis.adapters.ViewModel
 import cn.vove7.jarvis.fragments.SimpleListFragment
+import cn.vove7.jarvis.utils.AppConfig
+import cn.vove7.jarvis.utils.DialogUtil
 import cn.vove7.vtp.log.Vog
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.customview.customView
@@ -90,21 +90,9 @@ abstract class BaseMarkedFragment<T> : SimpleListFragment<T>(), OnSyncMarked {
     }
 
     private val keyText: TextInputLayout by lazy {
-        //fixme
+
         val s = editDialog.findViewById<TextInputLayout>(R.id.key_text)
-        s.editText?.addTextChangedListener(object : TextWatcher {
-            var same = true
-            override fun afterTextChanged(s: Editable?) {
-                if (same) regexText.editText?.text = s
-            }
 
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
-                same = s == regexText.editText?.text.toString()
-            }
-
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-            }
-        })
         s.hint = getString(keyHint)
         s
     }
@@ -121,16 +109,15 @@ abstract class BaseMarkedFragment<T> : SimpleListFragment<T>(), OnSyncMarked {
         return keyText.editText?.text!!
     }
 
-    val regexText: TextInputLayout by lazy {
+    private val regexText: TextInputLayout by lazy {
         editDialog.findViewById<TextInputLayout>(R.id.regex_text)
-
     }
-    val valueText: TextInputLayout by lazy {
+    private val valueText: TextInputLayout by lazy {
         val s = editDialog.findViewById<TextInputLayout>(R.id.value_text)
         s.hint = getString(valueHint)
         s
     }
-    val selectButton: Button by lazy { editDialog.findViewById<Button>(R.id.sel_btn) }
+    private val selectButton: Button by lazy { editDialog.findViewById<Button>(R.id.sel_btn) }
     var editData: MarkedData? = null
 
     open val showSel = true
@@ -140,6 +127,9 @@ abstract class BaseMarkedFragment<T> : SimpleListFragment<T>(), OnSyncMarked {
      */
     @SuppressLint("CheckResult")
     fun showEditDialog(data: MarkedData? = null) {
+        if (!AppConfig.checkUser()) {
+            return
+        }
         editData = data
         editDialog.title(
                 if (editData == null) R.string.text_new
@@ -171,30 +161,20 @@ abstract class BaseMarkedFragment<T> : SimpleListFragment<T>(), OnSyncMarked {
                         onEdit(item.extra)
                     }
                     neutralButton(R.string.text_delete) {
-                        AlertDialog.Builder(context)
-                                .setTitle(R.string.text_confirm_2_del)
-                                .setMessage("若已分享，将同时删除云端记录")
-                                .setPositiveButton(R.string.text_confirm) { _, _ ->
-                                    if (data.tagId != null) {
-                                        deleteShare(data.tagId)
-                                    }
-                                    DAO.daoSession.markedDataDao.delete(data)
-                                    toast.showShort(R.string.text_delete_complete)
-                                    refresh()
-                                }.setNegativeButton(R.string.text_cancel, null)
-                                .show()
+                        DialogUtil.dataDelAlert(context) {
+                            if (data.tagId != null) {
+                                deleteShare(data.tagId)
+                            }
+                            DAO.daoSession.markedDataDao.delete(data)
+                            toast.showShort(R.string.text_delete_complete)
+                            refresh()
+                        }
                     }
 
                 }
                 title(text = item.title)
                 message(text = data.toString())
             }
-        }
-
-        override fun onLongClick(holder: SimpleListAdapter.VHolder?, pos: Int, item: ViewModel): Boolean {
-            //batch
-
-            return true
         }
     }
 
@@ -204,7 +184,6 @@ abstract class BaseMarkedFragment<T> : SimpleListFragment<T>(), OnSyncMarked {
                 Vog.d(this, "deleteShare ---> 云端删除成功")
             } else
                 Vog.d(this, "deleteShare ---> 云端删除失败")
-
         }
     }
 
@@ -213,6 +192,9 @@ abstract class BaseMarkedFragment<T> : SimpleListFragment<T>(), OnSyncMarked {
      * @param data MarkedData
      */
     private fun share(data: MarkedData) {
+        if (!AppConfig.checkUser()) {
+            return
+        }
         NetHelper.postJson<String>(ApiUrls.SHARE_MARKED, BaseRequestModel(data),
                 type = NetHelper.StringType) { _, bean ->
             if (bean != null) {

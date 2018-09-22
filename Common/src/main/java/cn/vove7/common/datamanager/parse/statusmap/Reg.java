@@ -51,9 +51,7 @@ public class Reg implements Serializable {
 
     @Override
     public String toString() {
-        return "Reg{" +
-                "regStr='" + regStr + '\'' +
-                '}';
+        return regStr;
     }
 
     @Keep

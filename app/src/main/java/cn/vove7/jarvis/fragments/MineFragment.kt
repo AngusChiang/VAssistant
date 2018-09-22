@@ -7,9 +7,9 @@ import android.support.v4.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.AdapterView
 import android.widget.ListView
 import android.widget.TextView
+import cn.vove7.common.appbus.AppBus
 import cn.vove7.common.model.UserInfo
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.activities.AdvancedSettingActivity
@@ -18,7 +18,10 @@ import cn.vove7.jarvis.activities.SettingsActivity
 import cn.vove7.jarvis.view.dialog.LoginDialog
 import cn.vove7.jarvis.view.dialog.UserInfoDialog
 import cn.vove7.vtp.easyadapter.BaseListAdapter
+import cn.vove7.vtp.log.Vog
 import kotlinx.android.synthetic.main.fragment_mine.*
+import org.greenrobot.eventbus.Subscribe
+import org.greenrobot.eventbus.ThreadMode
 
 class MineFragment : Fragment() {
 
@@ -28,6 +31,16 @@ class MineFragment : Fragment() {
 
         }
     }
+
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    fun onEvent(code: String) {
+        Vog.d(this, "onEvent ---> $code")
+        if (code == AppBus.EVENT_LOGOUT) {
+            loadUserInfo()
+        }
+    }
+
 
     lateinit var listView: ListView
     lateinit var loginView: View
@@ -74,14 +87,21 @@ class MineFragment : Fragment() {
         loadUserInfo()
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        AppBus.unreg(this)
+    }
+
     private fun loadUserInfo() {
         if (UserInfo.isLogin()) {
             login_lay.visibility = View.GONE
             user_info_lay.visibility = View.VISIBLE
             user_name_text.text = UserInfo.getUserName()
             user_vip_text.text = if (UserInfo.isVip()) {
+                red_heard.visibility = View.VISIBLE
                 "高级用户"
             } else {
+                red_heard.visibility = View.GONE
                 ""
             }
         } else {

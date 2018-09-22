@@ -49,6 +49,8 @@ class MyWakeup {
             this(context, WakeupEventAdapter(eventListener))
 
     fun start() {
+        //check recorder
+
 
         val params = HashMap<String, Any>()
         params.put(SpeechConstant.WP_WORDS_FILE, "assets:///bd/WakeUp.bin")

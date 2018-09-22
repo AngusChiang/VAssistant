@@ -11,6 +11,8 @@ import cn.vove7.common.datamanager.parse.statusmap.ActionNode.NODE_SCOPE_IN_APP
 import cn.vove7.jarvis.activities.NewInstActivity
 import cn.vove7.jarvis.adapters.SimpleListAdapter
 import cn.vove7.jarvis.adapters.ViewModel
+import cn.vove7.jarvis.utils.AppConfig
+import cn.vove7.parseengine.engine.ParseEngine
 import cn.vove7.vtp.builder.BundleBuilder
 import cn.vove7.vtp.log.Vog
 
@@ -23,9 +25,12 @@ import cn.vove7.vtp.log.Vog
  */
 class InAppInstListFragment : SimpleListFragment<ActionNode>() {
     lateinit var pkg: String
-    var instDetailFragment = InstDetailFragment()
+
 
     override var floatClickListener: View.OnClickListener? = View.OnClickListener {
+        if (!AppConfig.checkUser()) {
+            return@OnClickListener
+        }
         val intent = Intent(context, NewInstActivity::class.java)
         intent.putExtra("type", NODE_SCOPE_IN_APP)
         intent.putExtra("pkg", pkg)
@@ -34,10 +39,11 @@ class InAppInstListFragment : SimpleListFragment<ActionNode>() {
 
     override val itemClickListener = object : SimpleListAdapter.OnItemClickListener {
         override fun onClick(holder: SimpleListAdapter.VHolder?, pos: Int, item: ViewModel) {
-
             val node = item.extra as ActionNode
-            instDetailFragment.setInst(node)
-            instDetailFragment.show(activity?.supportFragmentManager, "inst_detail")
+            InstDetailFragment(node) {
+                ParseEngine.updateGlobal()
+                refresh()
+            }.show(activity?.supportFragmentManager, "inst_detail")
         }
     }
 

@@ -1,12 +1,11 @@
 package cn.vove7.jarvis.fragments
 
 import android.annotation.SuppressLint
-import android.app.AlertDialog
-import android.content.ActivityNotFoundException
 import android.content.DialogInterface
 import android.content.Intent
 import android.view.View
 import android.widget.EditText
+import android.widget.TextView
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.appbus.AppBus
@@ -18,25 +17,25 @@ import cn.vove7.common.datamanager.parse.model.ActionDesc
 import cn.vove7.common.datamanager.parse.statusmap.ActionNode
 import cn.vove7.common.model.UserInfo
 import cn.vove7.common.netacc.ApiUrls
-import cn.vove7.common.netacc.NetHelper
 import cn.vove7.common.netacc.model.BaseRequestModel
 import cn.vove7.common.netacc.model.ResponseMessage
+import cn.vove7.common.utils.TextHelper
 import cn.vove7.executorengine.bridges.SystemBridge
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.activities.NewInstActivity
 import cn.vove7.jarvis.adapters.ExecuteQueueAdapter
 import cn.vove7.jarvis.fragments.base.BaseBottomFragmentWithToolbar
+import cn.vove7.jarvis.utils.AppConfig
+import cn.vove7.jarvis.utils.NetHelper
 import cn.vove7.jarvis.view.dialog.ProgressDialog
 import cn.vove7.vtp.dialog.DialogWithList
 import cn.vove7.vtp.log.Vog
-import cn.vove7.vtp.sharedpreference.SpHelper
 import com.afollestad.materialdialogs.MaterialDialog
-import com.afollestad.materialdialogs.checkbox.checkBoxPrompt
 import com.afollestad.materialdialogs.customview.customView
+import com.afollestad.materialdialogs.list.listItems
 import com.google.gson.reflect.TypeToken
 import java.util.*
 import kotlin.concurrent.thread
-
 
 @SuppressLint("ValidFragment")
 /**
@@ -45,59 +44,76 @@ import kotlin.concurrent.thread
  * @author 17719247306
  * 2018/8/24
  */
-class InstDetailFragment : BaseBottomFragmentWithToolbar() {
+class InstDetailFragment(val node: ActionNode, val onUpdate: () -> Unit) : BaseBottomFragmentWithToolbar() {
 
-    private var node: ActionNode? = null
+//    private var node: ActionNode? = null
 
     private var load = false
+    private val instructions_text: TextView by lazy { bodyView.findViewById<TextView>(R.id.instructions_text) }
+    private val examples_text: TextView by lazy { bodyView.findViewById<TextView>(R.id.examples_text) }
+    private val regs_text: TextView by lazy { bodyView.findViewById<TextView>(R.id.regs_text) }
+    private val version_text: TextView by lazy { bodyView.findViewById<TextView>(R.id.version_text) }
+    private val script_text: TextView by lazy { bodyView.findViewById<TextView>(R.id.script_text) }
+    private val script_type_text: TextView by lazy { bodyView.findViewById<TextView>(R.id.script_type_text) }
 
+    lateinit var bodyView: View
     override fun onCreateContentView(parent: View): View {
 
-        val content = View.inflate(context, R.layout.dialog_inst_detail, null)
-        load = true
+        bodyView = View.inflate(context, R.layout.dialog_inst_detail, null)
         toolbar.inflateMenu(R.menu.menu_inst_detail)
-        setData()
         initView()
-        return content
-    }
-
-    fun setInst(node: ActionNode) {
-        this.node = node
-        if (!load) return
         setData()
+        load = true
+        return bodyView
     }
+//
+//    fun setInst(node: ActionNode) {
+//        this.node = node
+//        if (!load) return
+//        setData()
+//    }
 
+    //todo fill data  share user info
     private fun setData() {
         val uId = UserInfo.getUserId()
         when {//编辑
-            DataFrom.userCanEdit(node?.from) && node?.publishUserId ?: uId == uId -> {
+            DataFrom.userCanEdit(node.from) && node.publishUserId ?: uId == uId -> {
                 toolbar.menu.findItem(R.id.menu_edit).isVisible = true
                 toolbar.menu.findItem(R.id.menu_share).isVisible = true
-                toolbar.menu.findItem(R.id.menu_add_follow).isVisible = true
+//                toolbar.menu.findItem(R.id.menu_add_follow).isVisible = true
+                toolbar.menu.findItem(R.id.menu_delete).isVisible = true
             }
-            else -> {
+            else -> {//不允许删除编辑
                 toolbar.menu.findItem(R.id.menu_edit).isVisible = false
                 toolbar.menu.findItem(R.id.menu_share).isVisible = false
-                toolbar.menu.findItem(R.id.menu_add_follow).isVisible = false
+//                toolbar.menu.findItem(R.id.menu_add_follow).isVisible = false
+                toolbar.menu.findItem(R.id.menu_delete).isVisible = false
             }
         }
         toolbar.menu.findItem(R.id.menu_as_global).isVisible = node?.belongInApp() ?: false
         contentView.post {
             //标题
-            title = node?.actionTitle
+            title = node.actionTitle
+            //content
+            node.assembly()
+            instructions_text.text = node.desc?.instructions ?: "无"
+            examples_text.text = node.desc?.example ?: "无"
+            regs_text.text = TextHelper.arr2String(node.regs?.toTypedArray()
+                ?: arrayOf<Any>(), "\n")
+            version_text.text = node.versionCode.toString()
+            script_text.text = node.action?.actionScript
+            script_type_text.text = node.action?.scriptType
         }
+
     }
 
     private fun initView() {
-        if (node == null) {
-            hide()
-            return
-        }
-        val node = node!!
-
         toolbar.setOnMenuItemClickListener { it ->
             when (it.itemId) {
                 R.id.menu_edit -> {//修改
+                    if (!AppConfig.checkUser()) {
+                        return@setOnMenuItemClickListener true
+                    }
                     val editIntent = Intent(context, NewInstActivity::class.java)
                     editIntent.putExtra("nodeId", node.id)
                     editIntent.putExtra("type", node.actionScopeType)
@@ -108,49 +124,46 @@ class InstDetailFragment : BaseBottomFragmentWithToolbar() {
                     startActivity(editIntent)
                 }
                 R.id.menu_delete -> {//删除
-                    AlertDialog.Builder(context).setTitle(getString(R.string.text_confirm_2_del) + ": ${node.actionTitle} ?")
-                            .setNeutralButton(getString(R.string.text_help)) { _, _ ->
-                                try {
-                                    SystemBridge().openUrl("http://baidu.com")// TODO
-                                } catch (e: ActivityNotFoundException) {
-                                    GlobalApp.toastShort("无可用浏览器")
-                                }
+                    MaterialDialog(context!!).title(text = getString(R.string.text_confirm_2_del) + ": ${node.actionTitle} ?")
+                            .negativeButton(R.string.text_help) {
+                                SystemBridge().openUrl(ApiUrls.HELP_DEL_INST)// TODO
                             }
-                            .setMessage(getString(R.string.text_msg_delete_action_node))
-                            .setPositiveButton(R.string.text_confirm) { _, _ ->
+                            .message(R.string.text_msg_delete_action_node)
+                            .positiveButton(R.string.text_confirm) {
                                 val p = ProgressDialog(context!!)
-
-                                thread {
-                                    val b = DaoHelper.deleteActionNodeInTX(node.id)
+                                if (node.tagId != null) {
+                                    NetHelper.postJson<Any>(ApiUrls.DELETE_SHARE_INST,
+                                            BaseRequestModel(node.tagId)) { _, bean ->
+                                        if (bean?.isOk() == true) {
+                                            GlobalLog.log("云端删除成功$node")
+                                        } else {
+                                            GlobalLog.log("云端删除失败$node ${bean?.message}")
+                                        }
+                                        del()
+                                        p.dismiss()
+                                    }
+                                } else {
+                                    GlobalLog.log("未分享至server$node")
+                                    del()
                                     p.dismiss()
-                                    GlobalApp.toastShort(
-                                            if (b) "删除成功" else "删除失败，可至帮助进行反馈"
-                                    )
                                 }
+                                onUpdate.invoke()
+                                hide()
                             }
-                            .setNegativeButton(R.string.text_cancel, null)
+                            .negativeButton(R.string.text_cancel)
                             .show()
                 }
-                R.id.menu_add_follow -> {//todo 选择: 从已有(inApp Global)关联parentId，或者新建
+                R.id.menu_add_follow -> {// 选择: 从已有(inApp Global)关联parentId，或者新建
 
-                    val editIntent = Intent(context, NewInstActivity::class.java)
-                    val type = when {
-                        ActionNode.belongGlobal(node.actionScopeType) -> ActionNode.NODE_SCOPE_GLOBAL
-                        ActionNode.belongInApp(node.actionScopeType) -> ActionNode.NODE_SCOPE_IN_APP
-                        else -> {
-                            GlobalLog.log("maybe error")
-                            GlobalApp.toastShort("maybe error")
-                            return@setOnMenuItemClickListener true
+                    MaterialDialog(context!!).listItems(items = listOf(
+                            getString(R.string.text_new),
+                            getString(R.string.text_sel_from_existing)
+                    ), waitForPositiveButton = false) { _, i, s ->
+                        when (i) {
+                            0 -> addFollowFromNew()
+                            1 -> toast.showShort(R.string.text_coming_soon)//todo
                         }
-                    }
-                    editIntent.putExtra("nodeId", node.id)
-                    editIntent.putExtra("type", type)
-                    editIntent.putExtra("parent_title", node.actionTitle)
-                    val scope = node.actionScope
-                    if (scope != null)
-                        editIntent.putExtra("pkg", node.actionScope.packageName)
-                    editIntent.putExtra("reedit", false)
-                    startActivity(editIntent)
+                    }.show()
                 }
                 R.id.menu_run -> {
                     showRunDialog()
@@ -164,19 +177,19 @@ class InstDetailFragment : BaseBottomFragmentWithToolbar() {
                         showShareDialog()
                 }
                 R.id.menu_as_global -> {//copy as global
-                    val sp = SpHelper(context!!)
+                    //todo one month need vip
+//                    val sp = SpHelper(context!!)
 //                    val prompt = sp.getBoolean(R.string.key_show_prompt_inapp_as_global_dialog)
-
 //                    if (prompt) {
                     //重要信息
                     MaterialDialog(context!!).title(text = "设为全局命令")
                             .message(text = "此操作会复制此命令(包括跟随操作)至全局，若不选择复制跟随操作，" +
                                     "选择下方[不包含]即可。\n注意：跟随操作不允许此操作\n跟随操作最多之复制一层")
-                            .checkBoxPrompt(text = "不再提醒") {
+                            /*.checkBoxPrompt(text = "不再提醒") {
                                 sp.set(R.string.key_show_prompt_inapp_as_global_dialog, it)
-                            }.positiveButton(R.string.text_continue) {
-                                doCopy2Global(true)
-                            }.neutralButton(text = "不包含") {
+                            }*/.positiveButton(R.string.text_continue) {
+                        doCopy2Global(true)
+                    }.neutralButton(text = "不包含") {
                                 doCopy2Global(false)
                             }
                             .negativeButton().show()
@@ -189,34 +202,62 @@ class InstDetailFragment : BaseBottomFragmentWithToolbar() {
         }
     }
 
+    fun del() {
+        thread {
+            val b = DaoHelper.deleteActionNodeInTX(node?.id)
+            GlobalApp.toastShort(
+                    if (b) "删除成功" else "删除失败，可至帮助进行反馈"
+            )
+        }
+    }
+
+    private fun addFollowFromNew() {
+        val node = node!!
+        if (!AppConfig.checkUser()) {
+            return
+        }
+        val editIntent = Intent(context, NewInstActivity::class.java)
+        val type = when {
+            ActionNode.belongGlobal(node.actionScopeType) -> ActionNode.NODE_SCOPE_GLOBAL
+            ActionNode.belongInApp(node.actionScopeType) -> ActionNode.NODE_SCOPE_IN_APP
+            else -> {
+                GlobalLog.log("maybe error")
+                GlobalApp.toastShort("maybe error")
+                return
+            }
+        }
+        editIntent.putExtra("nodeId", node.id)
+        editIntent.putExtra("type", type)
+        editIntent.putExtra("parent_title", node.actionTitle)
+        val scope = node.actionScope
+        if (scope != null)
+            editIntent.putExtra("pkg", node.actionScope.packageName)
+        editIntent.putExtra("reedit", false)
+        startActivity(editIntent)
+    }
+
     var shareDialog: MaterialDialog? = null
 
     lateinit var p: ProgressDialog
     private fun doCopy2Global(containSub: Boolean) {
-        if (node != null) {
-            if (node!!.parentId != null) {
-                toast.showLong("跟随操作不允许此操作")
-                return
-            }
-            p = ProgressDialog(context!!)
-            thread {
-                val cloneNode: ActionNode?
-                try {
-                    cloneNode = node!!.cloneGlobal(containSub)
-                    val s = DaoHelper.copyInApp2Global(cloneNode)
-                    toast.showLong(s)
-
-                } catch (e: Exception) {
-                    GlobalLog.err("${e.message} code:id230")
-                    toast.showLong("复制失败")
-                }
-                p.dismiss()
-            }
-        } else {
-            GlobalLog.err("code: id211")
-            toast.red().showShort(R.string.text_error_occurred)
+        if (node.parentId != null) {
+            toast.showLong("跟随操作不允许此操作")
+            return
         }
+        p = ProgressDialog(context!!)
+        thread {
+            val cloneNode: ActionNode?
+            try {
+                cloneNode = node.cloneGlobal(containSub)
+                val s = DaoHelper.copyInApp2Global(cloneNode)
+                toast.showLong(s)
 
+            } catch (e: Exception) {
+                GlobalLog.err("${e.message} code:id230")
+                toast.showLong("复制失败")
+            }
+            p.dismiss()
+        }
     }
 
     /**
@@ -287,9 +328,9 @@ class InstDetailFragment : BaseBottomFragmentWithToolbar() {
                     }
                     thread {
                         //更新 tagId
-                        node!!.versionCode = s
+                        node.versionCode = s
                         Vog.d(this, "new ver---> $s")
-                        node!!.update()
+                        node.update()
                     }
                 } else {
                     toast.red().showShort(bean.message)

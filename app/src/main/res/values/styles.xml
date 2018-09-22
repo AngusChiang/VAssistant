@@ -5,6 +5,11 @@
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
+
+        <!--<item name="md_color_title">@color/colorAccent</item>-->
+        <!--<item name="md_color_content">@color/your_color</item>-->
+        <item name="md_corner_radius">16dp</item>
+
         <item name="android:windowBackground">@color/app_background</item>
 
     </style>
@@ -36,6 +41,12 @@
         <item name="android:colorControlHighlight">#FAFAFA</item>
         <item name="colorButtonNormal">#fff</item>
         <item name="android:textColor">@color/colorPrimary</item>
+        <item name="android:elevation">6dp</item>
+    </style>
+    <style name="MaterialButton.Blue" parent="MaterialButton.White">
+        <item name="android:colorControlHighlight">#FAFAFA</item>
+        <item name="colorButtonNormal">@color/google_blue</item>
+        <item name="android:textColor">#fff</item>
         <item name="android:elevation">6dp</item>
     </style>
 </resources>

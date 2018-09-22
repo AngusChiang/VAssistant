@@ -75,3 +75,5 @@
   - Marked同步
     - contact...app..open
     - ad只显示已安装，只获取本机已安装
+    - 更新 删除old 新tag
+    - 删除 

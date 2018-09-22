@@ -15,12 +15,13 @@ import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.model.UserInfo
 import cn.vove7.common.model.VipPrice
 import cn.vove7.common.netacc.ApiUrls
-import cn.vove7.common.netacc.NetHelper
 import cn.vove7.common.netacc.model.BaseRequestModel
 import cn.vove7.common.view.toast.ColorfulToast
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.utils.AppConfig
+import cn.vove7.jarvis.utils.NetHelper
 import cn.vove7.jarvis.utils.pay.PurchaseHelper
+import cn.vove7.vtp.system.SystemHelper
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.customview.customView
 import com.afollestad.materialdialogs.input.input
@@ -34,7 +35,7 @@ import java.util.*
  * @author Administrator
  * 2018/9/19
  */
-class UserInfoDialog(val context: Activity, val onLogout: () -> Unit) {
+class UserInfoDialog(val context: Activity, val onUpdate: () -> Unit) {
     val dialog = MaterialDialog(context)
     private val userEmailText: TextView
     private val userNameText: TextView
@@ -70,9 +71,10 @@ class UserInfoDialog(val context: Activity, val onLogout: () -> Unit) {
             }, 500)
         }
         view.findViewById<Button>(R.id.btn_logout).setOnClickListener {
+            exit = true
             AppConfig.logout()
-            onLogout.invoke()
             dialog.dismiss()
+            onUpdate.invoke()
         }
 
         setData()
@@ -81,17 +83,20 @@ class UserInfoDialog(val context: Activity, val onLogout: () -> Unit) {
 
     }
 
+    var exit = false
     /**
      * 获取数据
      */
     private fun loadInfo() {
         NetHelper.postJson<UserInfo>(ApiUrls.GET_USER_INFO, BaseRequestModel<String>(),
                 type = NetHelper.UserInfoType) { _, bean ->
+            if (exit) return@postJson
             if (bean != null) {
                 if (bean.isOk()) {
                     try {
                         val userInfo = bean.data!!
                         AppConfig.login(userInfo)
+                        onUpdate.invoke()
                         setData()
                     } catch (e: Exception) {
                         toast.showShort(R.string.text_error_occurred)
@@ -125,10 +130,13 @@ class UserInfoDialog(val context: Activity, val onLogout: () -> Unit) {
         ps.forEach {
             bu.append("${it.durationText} \t (${it.price}元)\n")
         }
-
+        val cView = View.inflate(context, R.layout.dialog_recharge, null)
+        cView.findViewById<TextView>(R.id.prices_text).text = bu.toString()
+        cView.findViewById<Button>(R.id.btn_guide).setOnClickListener {
+            SystemHelper.openLink(context,ApiUrls.GUIDE)
+        }
         MaterialDialog(context).title(R.string.text_purchase_recharge_code)
-                .message(text = context.getString(R.string.text_purcharge_recharge_code_msg)
-                        + bu.toString())
+                .customView(view = cView, scrollable = true)
                 .positiveButton(text = "支付宝") {
                     val cs = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
                     cs.primaryClip = ClipData.newPlainText("", UserInfo.getEmail())
@@ -180,26 +188,28 @@ class UserInfoDialog(val context: Activity, val onLogout: () -> Unit) {
     var pd: ProgressDialog? = null
     private fun showActCodeDialog() {
         var s = ""
-        MaterialDialog(context).title(text = "使用充值码").input { materialDialog, charSequence ->
-            s = charSequence.toString()
-        }.positiveButton { d ->
-            pd = ProgressDialog(context)
-            d.dismiss()
-            NetHelper.postJson<String>(ApiUrls.ACTIVATE_VIP, BaseRequestModel(null, s)) { _, bean ->
-                pd?.dismiss()
-                if (bean != null) {
-                    if (bean.isOk()) {
-                        toast.showShort("${bean.data}")
-                    } else {
-                        toast.showShort(bean.message)
+        MaterialDialog(context).title(text = "使用充值码")
+                .input { materialDialog, charSequence ->
+                    s = charSequence.toString()
+                }.positiveButton { d ->
+                    if (s == "") return@positiveButton
+                    pd = ProgressDialog(context)
+                    d.dismiss()
+                    NetHelper.postJson<String>(ApiUrls.ACTIVATE_VIP, BaseRequestModel(null, s)) { _, bean ->
+                        pd?.dismiss()
+                        if (bean != null) {
+                            if (bean.isOk()) {
+                                toast.showShort("${bean.data}")
+                            } else {
+                                toast.showShort(bean.message)
+                            }
+                        } else {
+                            toast.showShort(R.string.text_net_err)
+                        }
                     }
-                } else {
-                    toast.showShort(R.string.text_net_err)
-                }
-            }
-        }.negativeButton {
-            it.dismiss()
-        }.noAutoDismiss().show()
+                }.negativeButton {
+                    it.dismiss()
+                }.noAutoDismiss().show()
     }
 
 }

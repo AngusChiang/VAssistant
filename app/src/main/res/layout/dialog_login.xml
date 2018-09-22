@@ -4,8 +4,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:paddingStart="?attr/dialogPreferredPadding"
-    android:paddingEnd="?attr/dialogPreferredPadding"
-    android:paddingBottom="10dp">
+    android:paddingEnd="?attr/dialogPreferredPadding">
 
     <ProgressBar
         android:id="@+id/loading_bar"
@@ -21,6 +20,7 @@
         android:layout_height="wrap_content">
 
         <EditText
+            android:digits="0123456789qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM@."
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="@string/hint_username_email" />
@@ -48,42 +48,5 @@
         android:text="@string/text_login"
         android:theme="@style/MaterialButton" />
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:padding="5dp">
-
-        <TextView
-            android:id="@+id/sign_up_view"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="?android:selectableItemBackground"
-            android:paddingStart="5dp"
-            android:paddingTop="10dp"
-            android:paddingEnd="5dp"
-            android:paddingBottom="10dp"
-            android:text="@string/text_sign_up"
-            android:textColor="?attr/colorPrimary" />
-
-        <View
-            android:layout_width="0dp"
-            android:layout_height="1dp"
-            android:layout_weight="1" />
-
-        <TextView
-            android:id="@+id/retrieve_pass_view"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="?android:selectableItemBackground"
-            android:gravity="end"
-            android:paddingStart="5dp"
-            android:paddingTop="10dp"
-            android:paddingEnd="5dp"
-            android:paddingBottom="10dp"
-            android:text="@string/text_retrieve_password"
-            android:textColor="?attr/colorPrimary" />
-
-    </LinearLayout>
 
 </LinearLayout>

@@ -5,6 +5,8 @@ import com.google.gson.annotations.Expose;
 import java.io.Serializable;
 import java.util.Date;
 
+import cn.vove7.common.appbus.AppBus;
+
 /**
  * # UserInfo
  *
@@ -35,6 +37,7 @@ public class UserInfo implements Serializable {
     public static void logout() {
         INSTANCE = null;
         isLogin = false;
+        AppBus.INSTANCE.post(AppBus.EVENT_LOGOUT);
     }
 
     public void setUserId(Long userId) {

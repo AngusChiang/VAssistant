@@ -59,6 +59,17 @@ public class ActionNode implements Serializable, DataFrom {
         return actionScopeType == NODE_SCOPE_IN_APP;
     }
 
+    /**
+     * 属于用户自己
+     *
+     * @return
+     */
+    public boolean belongSelf() {
+        return DataFrom.FROM_SHARED.equals(from)
+                && (publishUserId != null &&
+                publishUserId.equals(UserInfo.getUserId()));
+    }
+
     public static boolean belongInApp(Integer type) {
         if (type == null) return false;
         return type == NODE_SCOPE_IN_APP /*|| type == NODE_SCOPE_IN_APP_2*/;
@@ -131,6 +142,12 @@ public class ActionNode implements Serializable, DataFrom {
     private int priority;//匹配优先级 bigger优先; 相对于action chain :(全局命令下: 返回主页>返回) (同一界面下)
 
     private String from = null;
+    /**
+     * 服务器端
+     */
+    @Expose(serialize = false)
+    @Transient
+    private boolean isDelete;
 
     public String getFrom() {
         return from;
@@ -577,6 +594,14 @@ public class ActionNode implements Serializable, DataFrom {
     public void __setDaoSession(DaoSession daoSession) {
         this.daoSession = daoSession;
         myDao = daoSession != null ? daoSession.getActionNodeDao() : null;
+    }
+
+    public boolean isDelete() {
+        return isDelete;
+    }
+
+    public void setDelete(boolean delete) {
+        isDelete = delete;
     }
 
     /**

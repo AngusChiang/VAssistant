@@ -5,6 +5,7 @@ package cn.vove7.jarvis.speech.wakeup
  */
 
 interface IWakeupListener {
+    fun onStart()
     fun onSuccess(word: String?, result: WakeUpResult)
     fun onStop()
     fun onError(errorCode: Int, errorMessage: String, result: WakeUpResult)

@@ -71,6 +71,11 @@ class NewInstActivity : AppCompatActivity(), View.OnClickListener {
         enterTime = System.currentTimeMillis()
         super.onCreate(savedInstanceState)
 
+        if (!UserInfo.isLogin()) {
+            finish()
+            return
+        }
+
         voast = ColorfulToast(this)
         setContentView(R.layout.activity_new_inst)
         toolbar = findViewById(R.id.toolbar)
@@ -608,7 +613,7 @@ class NewInstActivity : AppCompatActivity(), View.OnClickListener {
             val p = if (pos != null) posData.indexOf(pos) else 0
             spinner.setSelection(p)
             inputDialog = AlertDialog.Builder(this)
-//                    .setTitle("添加正则")
+                    .setTitle(R.string.text_add_regex)
                     .setView(dialogView)
                     .setPositiveButton("确认") { _, _ ->
                         val r = regEditText.text.trim().toString()
@@ -645,7 +650,8 @@ class NewInstActivity : AppCompatActivity(), View.OnClickListener {
                 isModify = pos
                 showInputRegDialog(item.first, item.second)
             }
-            holder.itemView.setOnLongClickListener {//长按删除
+            holder.itemView.setOnLongClickListener {
+                //长按删除
                 dataSet?.removeAt(pos)
                 notifyDataSetChanged()
                 return@setOnLongClickListener true
