@@ -62,7 +62,7 @@ class InstAppListFragment : SimpleListFragment<ActionScope>(), OnSyncInst {
                             if (it) {
                                 toast.showShort("同步完成")
                                 refresh()
-                                ParseEngine.updateNode()
+                                ParseEngine.updateInApp()
                             } else toast.showShort("同步失败")
                         }
 

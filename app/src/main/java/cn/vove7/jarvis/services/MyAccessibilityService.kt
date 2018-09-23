@@ -269,9 +269,9 @@ class MyAccessibilityService : AccessibilityApi() {
 
     private val delayHandler = Handler()
     private var startupRunner: Runnable = Runnable {
-        MainService.instance?.onCommand(MainService.ORDER_START_RECO)
+        MainService.instance?.onCommand(AppBus.ORDER_START_RECO)
     }
-    var stopRunner: Runnable = Runnable { AppBus.post(MainService.ORDER_STOP_EXEC) }
+    var stopRunner: Runnable = Runnable { AppBus.post(AppBus.ORDER_STOP_EXEC) }
     var delayUp = 600L
 
     var v2 = false
@@ -291,7 +291,7 @@ class MyAccessibilityService : AccessibilityApi() {
                     return when {
                         MainService.recoIsListening -> {//下键取消聆听
                             v2 = true
-                            MainService.instance?.onCommand(MainService.ORDER_CANCEL_RECO)//up speed
+                            MainService.instance?.onCommand(AppBus.ORDER_CANCEL_RECO)//up speed
                             true
                         }
                         MainService.exEngineRunning -> {//长按下键
@@ -306,7 +306,7 @@ class MyAccessibilityService : AccessibilityApi() {
                 KEYCODE_VOLUME_UP -> {
                     if (MainService.recoIsListening) {//按下停止聆听
                         v2 = true
-                        MainService.instance?.onCommand(MainService.ORDER_STOP_RECO)
+                        MainService.instance?.onCommand(AppBus.ORDER_STOP_RECO)
                     } else {
                         postLongDelay(startupRunner)
                     }

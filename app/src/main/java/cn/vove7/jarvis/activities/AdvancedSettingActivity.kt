@@ -2,13 +2,12 @@ package cn.vove7.jarvis.activities
 
 import android.content.Intent
 import android.os.Bundle
-import android.support.v7.app.AppCompatActivity
-import android.view.MenuItem
 import android.view.View
 import cn.vove7.androlua.LuaEditorActivity
 import cn.vove7.common.model.UserInfo
 import cn.vove7.common.view.toast.ColorfulToast
 import cn.vove7.jarvis.R
+import cn.vove7.jarvis.activities.base.ReturnableActivity
 import cn.vove7.jarvis.utils.AppConfig
 import cn.vove7.jarvis.utils.debugserver.RemoteDebugServer
 import cn.vove7.jarvis.view.IntentItem
@@ -18,6 +17,7 @@ import cn.vove7.jarvis.view.custom.SettingsExpandableAdapter
 import cn.vove7.jarvis.view.dialog.LoginDialog
 import cn.vove7.jarvis.view.dialog.UserInfoDialog
 import cn.vove7.jarvis.view.utils.SettingItemHelper
+import cn.vove7.rhino.RhinoActivity
 import kotlinx.android.synthetic.main.activity_expandable_settings.*
 
 /**
@@ -26,14 +26,12 @@ import kotlinx.android.synthetic.main.activity_expandable_settings.*
  * @author 17719247306
  * 2018/9/10
  */
-class AdvancedSettingActivity : AppCompatActivity() {
+class AdvancedSettingActivity : ReturnableActivity() {
 
     val toast: ColorfulToast by lazy { ColorfulToast(this).blue() }
-    lateinit var groupItems: List<SettingGroupItem>
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setupActionBar()
-        initData()
         setContentView(R.layout.activity_expandable_settings)
         val adapter = SettingsExpandableAdapter(this, groupItems, expand_list)
         expand_list.setAdapter(adapter)
@@ -42,7 +40,7 @@ class AdvancedSettingActivity : AppCompatActivity() {
             expand_list.expandGroup(0)
             expand_list.expandGroup(1)
         }
-        findViewById<View>(R.id.btn_unlock).setOnClickListener {
+        btn_unlock.setOnClickListener {
             if (UserInfo.isLogin()) {
                 UserInfoDialog(this) {}
             } else {
@@ -66,8 +64,9 @@ class AdvancedSettingActivity : AppCompatActivity() {
 
     }
 
-    fun initData() {
-        groupItems = listOf(
+
+    private val groupItems: List<SettingGroupItem> by lazy {
+        listOf(
                 SettingGroupItem(R.color.google_blue, "管理", childItems = listOf(
                         IntentItem(R.string.instru_management, onClick = { _, _ ->
                             startActivity(Intent(this, InstManagerActivity::class.java))
@@ -80,34 +79,25 @@ class AdvancedSettingActivity : AppCompatActivity() {
                         SwitchItemWithoutSp(R.string.text_remote_debug, summary = "", defaultValue = {
                             !RemoteDebugServer.stopped
                         }, callback = { holder, it ->
-                    if (!AppConfig.checkUser()) {
-                        (holder as SettingItemHelper.SwitchItemHolder).compoundWight.toggle()
-                        return@SwitchItemWithoutSp
-                    }
+                            if (!AppConfig.checkUser()) {
+                                (holder as SettingItemHelper.SwitchItemHolder).compoundWight.toggle()
+                                return@SwitchItemWithoutSp
+                            }
 
-                    if (it as Boolean) RemoteDebugServer.start()
-                    else RemoteDebugServer.stop()
-                }),
-                        IntentItem(R.string.text_test_code, null, onClick = { _, _ ->
+                            if (it as Boolean) RemoteDebugServer.start()
+                            else RemoteDebugServer.stop()
+                        }),
+                        IntentItem(R.string.text_test_code_lua, null, onClick = { _, _ ->
                             if (AppConfig.checkUser()) {
                                 startActivity(Intent(this, LuaEditorActivity::class.java))
+                            }
+                        }),
+                        IntentItem(R.string.text_code_test_js, null, onClick = { _, _ ->
+                            if (AppConfig.checkUser()) {
+                                startActivity(Intent(this, RhinoActivity::class.java))
                             }
                         })
                 ))
         )
     }
-
-    private fun setupActionBar() {
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
-        if (item?.itemId == android.R.id.home) {
-            finish()
-            return true
-        }
-        return super.onOptionsItemSelected(item)
-    }
-
-
 }

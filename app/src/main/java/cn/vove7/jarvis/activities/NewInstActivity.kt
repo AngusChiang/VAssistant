@@ -42,6 +42,9 @@ import cn.vove7.vtp.app.AppInfo
 import cn.vove7.vtp.easyadapter.BaseListAdapter
 import cn.vove7.vtp.log.Vog
 import cn.vove7.vtp.view.span.ColourTextClickableSpan
+import com.afollestad.materialdialogs.MaterialDialog
+import com.afollestad.materialdialogs.customview.customView
+import io.github.kbiakov.codeview.adapters.Options
 import kotlinx.android.synthetic.main.activity_new_inst.*
 import java.io.File
 import kotlin.concurrent.thread
@@ -105,14 +108,15 @@ class NewInstActivity : AppCompatActivity(), View.OnClickListener {
         if (isReedit) {//重新编辑
             val id = intent.getLongExtra("nodeId", 0L)
             editNode = DAO.daoSession.actionNodeDao.queryBuilder().where(ActionNodeDao.Properties.Id.eq(id)).unique()
-            scriptText = editNode?.action?.actionScript
+//            editNode?.assembly()
             scriptType = editNode!!.action.scriptType
+            scriptText = editNode?.action?.actionScript
             if (editNode == null) {
                 voast.showShort(getString(R.string.text_error_occurred) + " code :n117")
             } else {//展示信息
                 activity_name.setText(editNode?.actionScope?.activity)
                 desc_text.setText(editNode?.actionTitle)
-                editNode?.regs?.forEach {
+                editNode?.newRegs?.forEach {
                     regs.add(Pair(it.regStr, posData[posArr.indexOf(it.paramPos)]))
                 }
             }
@@ -241,7 +245,8 @@ class NewInstActivity : AppCompatActivity(), View.OnClickListener {
             return
         }
         AlertDialog.Builder(this)
-                .setMessage(R.string.text_confirm_to_exit)
+                .setTitle(R.string.text_confirm_to_exit)
+                .setMessage(R.string.text_content_wont_be_save)
                 .setPositiveButton(R.string.text_confirm) { _, _ ->
                     super.onBackPressed()
                 }.setNegativeButton(R.string.text_cancel, null)
@@ -304,13 +309,13 @@ class NewInstActivity : AppCompatActivity(), View.OnClickListener {
             DAO.daoSession.actionDao.update(ac)
             editNode?.actionTitle = desc
 
-            //fixme 数据保存无效
             editNode!!.regs.forEach { DAO.daoSession.regDao.delete(it) }
             wrapRegs().forEach {
                 it.nodeId = editNode!!.id
                 DAO.daoSession.regDao.insert(it)
             }
             DAO.daoSession.actionNodeDao.update(editNode)
+            ParseEngine.updateNode()
             voast.showShort(getString(R.string.text_save_success))
             finish()
 
@@ -339,6 +344,7 @@ class NewInstActivity : AppCompatActivity(), View.OnClickListener {
 
             if (DaoHelper.insertNewActionNode(newNode) != null) {
                 voast.showShort(getString(R.string.text_save_success))
+                ParseEngine.updateNode()
                 finish()
             } else {
                 voast.showShort(getString(R.string.text_save_failed))
@@ -377,9 +383,19 @@ class NewInstActivity : AppCompatActivity(), View.OnClickListener {
         }
     }
 
-    private var selScriptDialog: AlertDialog? = null
+    private var selScriptDialog: MaterialDialog? = null
     lateinit var scriptTextView: EditText
     private var scriptText: String? = null
+        set(value) {
+            field = value
+            if (code_view.getOptions() == null)
+                code_view.setOptions(Options.get(this)
+                        .withLanguage(scriptType ?: "lua")
+                        .withCode(value ?: ""))
+            else {
+                code_view.setCode(value ?: "")
+            }
+        }
     private var scriptType: String? = null
 
     private fun showSelScriptDialog() {
@@ -409,28 +425,25 @@ class NewInstActivity : AppCompatActivity(), View.OnClickListener {
                 scriptText = editNode?.action?.actionScript
                 scriptType = editNode!!.action.scriptType
             }
-            selScriptDialog = AlertDialog.Builder(this)
-                    .setView(dView)
-                    .setPositiveButton(R.string.text_confirm) { _, _ ->
+            selScriptDialog = MaterialDialog(this).noAutoDismiss()
+                    .customView(view = dView, scrollable = true)
+                    .positiveButton(R.string.text_confirm) { d ->
                         scriptText = scriptTextView.text.toString()
+                        d.dismiss()
                     }
-                    .setNegativeButton(R.string.text_cancel, null)
-                    .setNeutralButton(R.string.text_from_file, null)
-                    .create()
-            selScriptDialog?.setOnShowListener { i ->
-                val negBtn = selScriptDialog?.getButton(AlertDialog.BUTTON_NEUTRAL)
-                negBtn?.setOnClickListener {
-                    val selIntent = Intent(Intent.ACTION_GET_CONTENT)
-                    selIntent.type = "*/*"
-                    selIntent.addCategory(Intent.CATEGORY_OPENABLE)
-                    try {
-                        startActivityForResult(selIntent, 1)
-                    } catch (e: ActivityNotFoundException) {
-                        e.printStackTrace()
-                        voast.showShort(getString(R.string.text_cannot_open_file_manager))
+                    .negativeButton { it.dismiss() }
+                    .neutralButton(R.string.text_from_file) {
+                        val selIntent = Intent(Intent.ACTION_GET_CONTENT)
+                        selIntent.type = "*/*"
+                        selIntent.addCategory(Intent.CATEGORY_OPENABLE)
+                        try {
+                            startActivityForResult(selIntent, 1)
+                        } catch (e: ActivityNotFoundException) {
+                            e.printStackTrace()
+                            voast.showShort(getString(R.string.text_cannot_open_file_manager))
+                        }
                     }
-                }
-            }
+
         }
         scriptTextView.setText(scriptText)
         selScriptDialog?.show()

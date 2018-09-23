@@ -15,7 +15,7 @@ import kotlinx.android.synthetic.main.activity_base_view_pager.*
  */
 class InstManagerActivity : BaseActivityWithViewPager() {
 
-    override var titleInit: String? = "命令管理"
+    override var titleInit: String? = "指令管理"
 
     override var fragments: Array<Fragment> = arrayOf(
             GlobalInstListFragment(),

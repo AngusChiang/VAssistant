@@ -1,4 +1,6 @@
 <resources>
     <string name="app_name">ExecutorEngine</string>
     <string name="text_app_not_install">The app isn\'t install</string>
+    <string name="text_not_fount_email_app">Not found email app</string>
+    <string name="text_failed_to_open_email_app">Failed to open email app</string>
 </resources>

@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="text_app_not_install">未安装该应用</string>
+    <string name="text_not_fount_email_app">未找到邮件应用</string>
+    <string name="text_failed_to_open_email_app">唤起邮件应用失败</string>
 </resources>

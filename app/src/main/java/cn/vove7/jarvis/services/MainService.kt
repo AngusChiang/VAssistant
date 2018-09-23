@@ -11,6 +11,10 @@ import cn.vove7.androlua.luautils.LuaContext
 import cn.vove7.common.accessibility.AccessibilityApi
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.appbus.AppBus
+import cn.vove7.common.appbus.AppBus.ORDER_CANCEL_RECO
+import cn.vove7.common.appbus.AppBus.ORDER_START_RECO
+import cn.vove7.common.appbus.AppBus.ORDER_STOP_EXEC
+import cn.vove7.common.appbus.AppBus.ORDER_STOP_RECO
 import cn.vove7.common.appbus.SpeechAction
 import cn.vove7.common.appbus.VoiceData
 import cn.vove7.common.bridges.ChoiceData
@@ -343,12 +347,6 @@ class MainService : BusService(),
          * 确认对话框语音模式
          */
         const val MODE_ALERT = 27
-
-        const val ORDER_STOP_EXEC = "stop_exec"
-        const val ORDER_STOP_RECO = "stop_reco"
-        const val ORDER_CANCEL_RECO = "cancel_reco"
-        const val ORDER_START_RECO = "start_reco"
-        const val ORDER_STOP_DEBUG = "stop_debug"
 
         /**
          * 语音事件数据类型

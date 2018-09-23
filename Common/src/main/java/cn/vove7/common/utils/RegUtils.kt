@@ -19,6 +19,7 @@ object RegUtils {
     private val cancelWords = arrayOf(
             "取消".toRegex()
             , "停止".toRegex()
+            , "不好".toRegex()
             , "stop".toRegex()
             , "cancel".toRegex()
     )

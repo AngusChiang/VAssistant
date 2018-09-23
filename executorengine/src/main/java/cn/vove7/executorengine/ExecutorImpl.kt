@@ -178,12 +178,15 @@ open class ExecutorImpl(
     private fun parseAppInnerOperation(cmd: String, pkg: String): Boolean {
         actionQueue = ParseEngine.matchAppAction(cmd, pkg)
         //打开应用
-        if (actionQueue.isNotEmpty()) {
+        if (actionQueue.isNotEmpty()) {//判断是否在目标页 check
+            if (accessApi?.currentScope?.assertEquals(actionQueue.peek()?.scope) == false) {
+                systemBridge.openAppByPkg(pkg, true)
+            } else {
+                Vog.d(this, "parseAppInnerOperation ---> 已在页面")
+            }
             Vog.d(this, "smartOpen app内操作")
-            systemBridge.openAppByPkg(pkg,true)
-        }
-        else {
-            systemBridge.openAppByPkg(pkg,false)
+        } else {
+            systemBridge.openAppByPkg(pkg, false)
             Vog.d(this, "smartOpen 无后续操作")
             return true
         }

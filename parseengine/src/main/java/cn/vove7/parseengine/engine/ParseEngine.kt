@@ -4,8 +4,10 @@ import android.util.Log
 import cn.vove7.common.datamanager.DAO
 import cn.vove7.common.datamanager.greendao.ActionNodeDao
 import cn.vove7.common.datamanager.parse.model.Action
+import cn.vove7.common.datamanager.parse.model.ActionScope
 import cn.vove7.common.datamanager.parse.statusmap.ActionNode
-import cn.vove7.common.datamanager.parse.statusmap.ActionNode.*
+import cn.vove7.common.datamanager.parse.statusmap.ActionNode.NODE_SCOPE_GLOBAL
+import cn.vove7.common.datamanager.parse.statusmap.ActionNode.NODE_SCOPE_IN_APP
 import cn.vove7.common.datamanager.parse.statusmap.Reg
 import cn.vove7.common.datamanager.parse.statusmap.Reg.*
 import cn.vove7.parseengine.model.ParseResult
@@ -42,6 +44,7 @@ object ParseEngine {
                 .orderDesc(ActionNodeDao.Properties.Priority)
                 .list()
     }
+
     fun updateGlobal() {
         GlobalActionNodes = DAO.daoSession.actionNodeDao.queryBuilder()
                 .where(ActionNodeDao.Properties.ActionScopeType
@@ -49,6 +52,7 @@ object ParseEngine {
                 .orderDesc(ActionNodeDao.Properties.Priority)
                 .list()
     }
+
     /**
      * 匹配 ，返回操作
      * @return @see [ParseResult]
@@ -84,7 +88,7 @@ object ParseEngine {
     private fun globalActionMatch(cmd: String): PriorityQueue<Action> {
         val actionQueue = PriorityQueue<Action>()
         if (GlobalActionNodes == null)
-           updateGlobal()
+            updateGlobal()
         GlobalActionNodes?.forEach {
             val r = regSearch(cmd, it, actionQueue)
             if (r) return actionQueue
@@ -102,6 +106,7 @@ object ParseEngine {
      * 深度搜索
      */
     fun matchAppAction(cmd: String, currentAppPkg: String): PriorityQueue<Action> {
+        val matchScope = ActionScope(currentAppPkg, null)
         Log.d("Debug :", "matchAppAction  ----> $currentAppPkg")
         if (AppActionNodes == null) {
             updateInApp()
@@ -109,8 +114,7 @@ object ParseEngine {
         val actionQueue = PriorityQueue<Action>()
         AppActionNodes?.filter {
             //筛选当前App
-            it.actionScope != null && it.actionScope.packageName.startsWith(currentAppPkg)
-                    && it.actionScopeType == NODE_SCOPE_IN_APP
+            it.actionScope != null && it.actionScope == matchScope
         }?.forEach {
             val r = regSearch(cmd, it, actionQueue)
             if (r) return actionQueue
@@ -119,9 +123,9 @@ object ParseEngine {
         return actionQueue
     }
 
-    //Action正则匹配
+
     /**
-     *
+     * ActionNode正则匹配
      * @param cmd String
      * @param it ActionNode
      * @param actionQueue PriorityQueue<Action>
@@ -132,12 +136,13 @@ object ParseEngine {
             val result = reg.regex.matchEntire(cmd)
             if (result != null) {
                 val ac = it.action
+                ac.scope = it.actionScope
                 ac.param = it.param
                 extractParam(ac, reg, result)//提取参数
                 ac.matchWord = result.groupValues[0]
                 actionQueue.add(ac)
                 //深搜命令
-                actionDsMatch(actionQueue, it, result.groupValues[result.groups.size - 1],ac)
+                actionDsMatch(actionQueue, it, result.groupValues[result.groups.size - 1], ac)
                 return true
             }
         }

@@ -2,6 +2,8 @@ package cn.vove7.jarvis
 
 import cn.vove7.vtp.reflect.ReflectHelper
 import org.junit.Test
+import java.text.SimpleDateFormat
+import java.util.*
 
 /**
  * # NewT
@@ -15,6 +17,8 @@ class NewT {
     fun test() {
         //new A() by reflect
 
+        val c = SimpleDateFormat("HH:mm:ss")
+        c.format(Date())
         val b = B()
 
         val s = "sss"

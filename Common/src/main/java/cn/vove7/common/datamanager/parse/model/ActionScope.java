@@ -108,7 +108,19 @@ public class ActionScope {
         if (o == null || getClass() != o.getClass()) return false;
         ActionScope that = (ActionScope) o;
         return packageName != null && packageName.startsWith(that.packageName) &&
-                (that.activity == null || (activity != null && activity.endsWith("." + that.activity)));
+                (that.activity == null || activity == null ||
+                        activity.endsWith("." + that.activity) ||
+                        that.activity.endsWith("." + activity));
+    }
+
+
+    public boolean assertEquals(ActionScope that) {
+        if (that == null) return false;
+        return packageName != null && packageName.startsWith(that.packageName) &&
+                (that.activity != null && activity != null && (
+                        activity.endsWith("." + that.activity) ||
+                                activity.endsWith("$" + that.activity)
+                ));
     }
 
     @Override

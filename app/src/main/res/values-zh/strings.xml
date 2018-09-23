@@ -130,7 +130,7 @@
     <string name="text_debug_service_starting">远程调试已开启</string>
     <string name="text_version_code">版本号</string>
     <string name="text_script">脚本</string>
-    <string name="text_script_type">脚本类型</string>
+    <string name="text_script_type">脚本语言</string>
     <string name="text_time_wait_ad">有效时间</string>
     <string name="text_new">新建</string>
     <string name="text_complete">完成</string>
@@ -158,4 +158,16 @@
     <string name="text_guide">教程</string>
     <string name="text_sel_from_existing">从已有选择</string>
     <string name="text_coming_soon">敬请期待</string>
+    <string name="text_code_test_js">Js代码测试</string>
+    <string name="text_test_code_lua">Lua代码测试</string>
+    <string name="text_content_wont_be_save">内容将不会被保存</string>
+    <string name="text_inst_name">指令名称</string>
+    <string name="text_version">版本</string>
+    <string name="text_favor_it">给个好评</string>
+    <string name="text_open_source_libraries">开放源代码许可</string>
+    <string name="text_check_for_updates">检查更新</string>
+    <string name="text_contact_me">联系我</string>
+    <string name="text_advanced_user_guide">高级使用手册</string>
+    <string name="text_laboratory">实验室</string>
+    <string name="text_feedback">反馈</string>
 </resources>

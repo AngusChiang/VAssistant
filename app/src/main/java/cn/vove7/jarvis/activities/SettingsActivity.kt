@@ -7,6 +7,7 @@ import cn.vove7.common.appbus.AppBus
 import cn.vove7.common.appbus.SpeechAction
 import cn.vove7.common.model.UserInfo
 import cn.vove7.jarvis.R
+import cn.vove7.jarvis.activities.base.ReturnableActivity
 import cn.vove7.jarvis.plugins.AdKillerService
 import cn.vove7.jarvis.view.CheckBoxItem
 import cn.vove7.jarvis.view.NumberPickerItem
@@ -19,28 +20,24 @@ import kotlinx.android.synthetic.main.activity_expandable_settings.*
 /**
  *
  */
-class SettingsActivity : AppCompatActivity() {
+class SettingsActivity : ReturnableActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setupActionBar()
         initData()
         setContentView(R.layout.activity_expandable_settings)
-        val adapter = SettingsExpandableAdapter(this, groupItems, expand_list)
+        val adapter = SettingsExpandableAdapter(this, initData(), expand_list)
         expand_list.setAdapter(adapter)
 
         expand_list.post {
             expand_list.expandGroup(0)
             expand_list.expandGroup(1)
             expand_list.expandGroup(2)
-            expand_list.expandGroup(3)
         }
     }
 
-    lateinit var groupItems: List<SettingGroupItem>
-
-    private fun initData() {
-        groupItems = listOf(
+    private fun initData():List<SettingGroupItem>
+         = listOf(
                 SettingGroupItem(R.color.google_green, "通知", childItems = listOf(
                         SwitchItem(R.string.text_show_toast_when_remove_ad,
                                 keyId = R.string.key_show_toast_when_remove_ad, defaultValue = { true }),
@@ -72,33 +69,7 @@ class SettingsActivity : AppCompatActivity() {
                         }, defaultValue = { false }),
                         CheckBoxItem(R.string.text_voice_control_dialog, "使用语言命令控制对话框",
                                 R.string.key_voice_control_dialog, defaultValue = { true })
-                )),
-                SettingGroupItem(R.color.google_blue, getString(R.string.text_open_ad_killer_service),
-                        childItems = listOf(
-                        SwitchItem(R.string.text_open, if (UserInfo.isVip()) null
-                        else getString(R.string.summary_not_vip_remove_ad), R.string.key_open_ad_block,
-                                defaultValue = { true }) { holder, it ->
-                            when (it as Boolean) {
-                                true -> AdKillerService.bindServer()
-                                false -> AdKillerService.unBindServer()
-                            }
-                        },
-                        NumberPickerItem(R.string.text_time_wait_ad, "界面等待广告出现最长时间，单位秒",
-                                keyId = R.string.key_ad_wait_secs, range = Pair(10, 100),
-                                defaultValue = { 17 })
                 ))
         )
-    }
 
-    private fun setupActionBar() {
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
-        if (item?.itemId == android.R.id.home) {
-            finish()
-            return true
-        }
-        return super.onOptionsItemSelected(item)
-    }
 }

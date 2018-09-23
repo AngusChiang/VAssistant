@@ -17,6 +17,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+import cn.vove7.common.datamanager.DAO;
 import cn.vove7.common.datamanager.greendao.ActionDao;
 import cn.vove7.common.datamanager.greendao.ActionDescDao;
 import cn.vove7.common.datamanager.greendao.ActionNodeDao;
@@ -462,13 +463,13 @@ public class ActionNode implements Serializable, DataFrom {
      */
     @Keep
     public ActionScope getActionScope() {
-        if (daoSession == null) return actionScope;
         if (actionScope != null) return actionScope;
         Long __key = this.scopeId;
         if (actionScope__resolvedKey == null || !actionScope__resolvedKey.equals(__key)) {
             final DaoSession daoSession = this.daoSession;
             if (daoSession == null) {
-                throw new DaoException("Entity is detached from DAO context");
+                return null;
+                //throw new DaoException("Entity is detached from DAO context");
             }
             ActionScopeDao targetDao = daoSession.getActionScopeDao();
             ActionScope actionScopeNew = targetDao.load(__key);
@@ -478,6 +479,11 @@ public class ActionNode implements Serializable, DataFrom {
             }
         }
         return actionScope;
+    }
+
+    public List<Reg> getNewRegs() {
+        regs = null;
+        return getRegs();
     }
 
     /**
@@ -579,12 +585,12 @@ public class ActionNode implements Serializable, DataFrom {
      * Convenient call for {@link org.greenrobot.greendao.AbstractDao#update(Object)}.
      * Entity must attached to an entity context.
      */
-    @Generated(hash = 713229351)
+    @Keep
     public void update() {
         if (myDao == null) {
-            throw new DaoException("Entity is detached from DAO context");
-        }
-        myDao.update(this);
+            DAO.INSTANCE.getDaoSession().getActionNodeDao().update(this);
+        } else
+            myDao.update(this);
     }
 
     /**
@@ -662,7 +668,7 @@ public class ActionNode implements Serializable, DataFrom {
      */
     @Keep
     public ActionDesc getDesc() {
-        //if (daoSession == null) return desc;
+        if (desc != null) return desc;
         Long __key = this.descId;
         if (desc__resolvedKey == null || !desc__resolvedKey.equals(__key)) {
             final DaoSession daoSession = this.daoSession;
@@ -692,7 +698,12 @@ public class ActionNode implements Serializable, DataFrom {
         }
     }
 
-    private static final String preOpen = "smartOpen('%s')\nwaitForApp('%s',3000)\n";
+    private static final String PreOpen_JS = "smartOpen('%s')\n" +
+            "a = waitForApp('%s',3000)\n" +
+            "if(!a) return\n";
+    private static final String PreOpen_LUA = "smartOpen('%s')\n" +
+            "a = waitForApp('%s',3000)\n" +
+            "if(not a) then return\n";
 
     /**
      * 从inApp复制一个全局Node
@@ -711,11 +722,17 @@ public class ActionNode implements Serializable, DataFrom {
         newNode.publishUserId = UserInfo.getUserId();
         //newNode.actionScopeType = this.actionScopeType;
         String p = this.actionScope.getPackageName();
-        p = String.format(preOpen, p, p);
+        if (Action.SCRIPT_TYPE_JS.equals(newNode.action.getScriptType()))
+            p = String.format(PreOpen_JS, p, p);
+        else
+            p = String.format(PreOpen_LUA, p, p);
+
         String newS = p + newNode.action.getActionScript();
         Vog.INSTANCE.d(this, "cloneGlobal ---> \n" + newS);
         newNode.action.setActionScript(newS);
         newNode.desc = this.desc;
+
+        newNode.actionScopeType = ActionNode.NODE_SCOPE_GLOBAL;
         if (containChild)
             newNode.follows = this.follows;
         return newNode;

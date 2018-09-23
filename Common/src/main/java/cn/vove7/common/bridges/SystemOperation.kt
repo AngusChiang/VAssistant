@@ -81,4 +81,5 @@ interface SystemOperation {
     fun getClipText(): String?
     fun setClipText(text: String?)
 
+    fun sendEmail(to: String, subject: String? = null, content: String? = null)
 }

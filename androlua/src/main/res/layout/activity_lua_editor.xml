@@ -4,25 +4,6 @@
     android:layout_height="fill_parent"
     android:orientation="vertical">
 
-    <Button
-        android:id="@+id/executeBtn"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Execute" />
-
-    <Button
-        android:id="@+id/stop"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:onClick="onClick"
-        android:text="stop" />
-
-    <EditText
-        android:id="@+id/lua_args"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="args"
-        android:text="args" />
 
     <cn.vove7.androlua.luautils.LuaEditor
         android:id="@+id/source"
@@ -34,5 +15,30 @@
         android:textSize="14sp"
         android:typeface="monospace" />
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:orientation="horizontal"
+        android:layout_height="wrap_content">
+
+        <Button
+            android:id="@+id/executeBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/text_run" />
+
+        <Button
+            android:id="@+id/stop"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:onClick="onClick"
+            android:text="@string/text_stop" />
+
+        <EditText
+            android:id="@+id/lua_args"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="args"
+            android:text="args" />
+    </LinearLayout>
     <include layout="@layout/script_control_bar" />
 </LinearLayout>

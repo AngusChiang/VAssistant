@@ -217,7 +217,7 @@
     <string name="text_debug_service_starting">Debug service started</string>
     <string name="text_version_code">Version code</string>
     <string name="text_script">Script</string>
-    <string name="text_script_type">Script type</string>
+    <string name="text_script_type">Script language</string>
     <string name="text_time_wait_ad">Valid time</string>
     <string name="text_new">New</string>
     <string name="text_complete">Complete</string>
@@ -245,5 +245,18 @@
     <string name="text_guide">Guide</string>
     <string name="text_sel_from_existing">Select from existing</string>
     <string name="text_coming_soon">Coming soon</string>
+    <string name="text_code_test_js">Js code test</string>
+    <string name="text_test_code_lua">Lua code test</string>
+    <string name="text_content_wont_be_save">内容将不会被保存</string>
+    <string name="text_inst_name">指令名称</string>
+    <string name="text_version">Version</string>
+    <string name="text_favor_it">Favor it</string>
+    <string name="text_open_source_libraries">Open source libraries</string>
+    <string name="text_check_for_updates">Check for updates</string>
+    <string name="text_contact_me">联系我</string>
+    <string name="text_contact_email" translatable="false">vove7@qq.com</string>
+    <string name="text_advanced_user_guide">Advanced user guide</string>
+    <string name="text_laboratory">Laboratory</string>
+    <string name="text_feedback">Feedback</string>
 
 </resources>

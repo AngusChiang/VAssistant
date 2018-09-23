@@ -42,11 +42,6 @@ class MainActivity : Activity() {
         return super.onKeyDown(keyCode, event)
     }
 
-
-    fun go2Test(view: View) {
-        startActivity(Intent(this, CommandTestActivity::class.java))
-    }
-
     fun go2Lua(view: View) {
         startActivity(Intent(this, LuaEditorActivity::class.java))
     }

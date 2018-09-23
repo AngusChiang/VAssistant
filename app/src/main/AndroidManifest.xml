@@ -51,13 +51,12 @@
             android:name="com.baidu.speech.SECRET_KEY"
             android:value="d9ef661698c5d8cd45978aa55e600e03" />
 
-        <activity
-            android:name=".activities.VoiceTestActivity"/>
+        <activity android:name=".activities.VoiceTestActivity" />
         <activity
             android:name=".activities.RealMainActivity"
             android:excludeFromRecents="true"
-            android:windowSoftInputMode="adjustPan"
-            android:theme="@style/TranslucentStatus.NoActionBar">
+            android:theme="@style/TranslucentStatus.NoActionBar"
+            android:windowSoftInputMode="adjustPan">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -67,8 +66,8 @@
 
         <activity
             android:name=".activities.base.VoiceAssistActivity"
-            android:theme="@style/TransparentBackground"
-            android:launchMode="singleInstance">
+            android:launchMode="singleInstance"
+            android:theme="@style/TransparentBackground">
             <intent-filter>
                 <action android:name="android.intent.action.ASSIST" />
                 <category android:name="android.intent.category.DEFAULT" />
@@ -91,8 +90,6 @@
                 android:resource="@xml/accessibility_config" />
         </service>
 
-        <activity android:name=".activities.CommandTestActivity" />
-
         <service
             android:name="com.baidu.speech.VoiceRecognitionService"
             android:exported="false" />
@@ -109,6 +106,7 @@
         <activity android:name=".activities.InstManagerActivity" />
         <activity
             android:name=".activities.SettingsActivity"
+            android:excludeFromRecents="false"
             android:label="@string/title_activity_settings"
             android:theme="@style/AppTheme" />
         <activity
@@ -122,24 +120,18 @@
         <activity android:name=".activities.AppAdListActivity" />
         <activity
             android:name=".activities.AdvancedSettingActivity"
+            android:excludeFromRecents="false"
             android:label="@string/text_advanced_features"
             android:theme="@style/AppTheme" />
+        <activity
+            android:name=".activities.AboutActivity"
+            android:theme="@style/AppTheme" />
+        <activity android:name=".activities.HelpActivity" />
+        <activity
+            android:name=".activities.base.LaboratoryActivity"
+            android:label="@string/text_laboratory"
+            android:theme="@style/AppTheme" />
 
-        <!--Alipay-->
-        <activity
-            android:name="com.alipay.sdk.app.H5PayActivity"
-            android:configChanges="orientation|keyboardHidden|navigation|screenSize"
-            android:exported="false"
-            android:screenOrientation="behind"
-            android:windowSoftInputMode="adjustResize|stateHidden" >
-        </activity>
-        <activity
-            android:name="com.alipay.sdk.app.H5AuthActivity"
-            android:configChanges="orientation|keyboardHidden|navigation"
-            android:exported="false"
-            android:screenOrientation="behind"
-            android:windowSoftInputMode="adjustResize|stateHidden" >
-        </activity>
     </application>
 
 </manifest>

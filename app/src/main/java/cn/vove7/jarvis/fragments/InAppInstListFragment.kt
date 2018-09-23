@@ -41,7 +41,7 @@ class InAppInstListFragment : SimpleListFragment<ActionNode>() {
         override fun onClick(holder: SimpleListAdapter.VHolder?, pos: Int, item: ViewModel) {
             val node = item.extra as ActionNode
             InstDetailFragment(node) {
-                ParseEngine.updateGlobal()
+                ParseEngine.updateInApp()
                 refresh()
             }.show(activity?.supportFragmentManager, "inst_detail")
         }

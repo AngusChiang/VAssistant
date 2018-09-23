@@ -66,13 +66,6 @@
                 android:focusableInTouchMode="true"
                 android:orientation="vertical">
 
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="10dp"
-                    android:text="@string/text_action_title"
-                    android:textColor="?attr/colorAccent" />
-
                 <android.support.design.widget.TextInputLayout
                     android:id="@+id/desc_input_lay"
                     android:layout_width="match_parent"
@@ -83,8 +76,8 @@
                     <EditText
                         android:id="@+id/desc_text"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:hint="@string/text_purpose" />
+                        android:hint="@string/text_inst_name"
+                        android:layout_height="wrap_content" />
                 </android.support.design.widget.TextInputLayout>
 
 
@@ -186,8 +179,15 @@
                 android:layout_height="wrap_content"
                 android:text="@string/test_set_script"
                 android:theme="@style/MaterialButton" />
-        </LinearLayout>
+            <io.github.kbiakov.codeview.CodeView
+                android:id="@+id/code_view"
+                android:layout_width="match_parent"
+                android:minHeight="100dp"
+                android:layout_height="wrap_content">
 
+            </io.github.kbiakov.codeview.CodeView>
+
+        </LinearLayout>
     </android.support.v4.widget.NestedScrollView>
 
     <include

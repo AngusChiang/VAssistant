@@ -19,6 +19,7 @@ import cn.vove7.common.appbus.AppBus
 import cn.vove7.common.bridges.SystemOperation
 import cn.vove7.common.model.ExResult
 import cn.vove7.common.model.RequestPermission
+import cn.vove7.executorengine.R
 import cn.vove7.executorengine.helper.AdvanAppHelper
 import cn.vove7.executorengine.helper.AdvanContactHelper
 import cn.vove7.vtp.app.AppHelper
@@ -338,4 +339,28 @@ class SystemBridge : SystemOperation {
         cm.primaryClip = mClipData
     }
 
+    fun sendEmail(to: String) {
+        sendEmail(to, null, null)
+    }
+
+    fun sendEmail(to: String, subject: String?) {
+        sendEmail(to, subject, null)
+    }
+
+    override fun sendEmail(to: String, subject: String?, content: String?) {
+        val uri = Uri.parse("mailto:$to")
+        val intent = Intent(Intent.ACTION_SENDTO, uri)
+        intent.putExtra(Intent.EXTRA_SUBJECT, subject ?: "")
+        intent.putExtra(Intent.EXTRA_TEXT, content ?: "") // 正文
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        try {
+            context.startActivity(intent)
+        } catch (aw: ActivityNotFoundException) {
+            GlobalApp.toastShort(R.string.text_not_fount_email_app)
+        } catch (e: Exception) {
+            GlobalLog.err(e.message + "code: sy358")
+            GlobalApp.toastShort(R.string.text_failed_to_open_email_app)
+        }
+
+    }
 }

@@ -31,6 +31,10 @@ public class Action implements Comparable<Action>, Serializable {
     @Expose(serialize = false)
     @Transient
     private String matchWord;
+    @Expose(serialize = false)
+
+    @Transient
+    private ActionScope scope;
     /**
      * 执行优先级
      */
@@ -64,6 +68,14 @@ public class Action implements Comparable<Action>, Serializable {
 
     public boolean isNull() {
         return TextUtils.isEmpty(actionScript) && TextUtils.isEmpty(scriptType);
+    }
+
+    public ActionScope getScope() {
+        return scope;
+    }
+
+    public void setScope(ActionScope scope) {
+        this.scope = scope;
     }
 
     /**

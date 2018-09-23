@@ -15,6 +15,7 @@ import android.widget.TextView
 import cn.vove7.androlua.luabridge.LuaUtil
 import cn.vove7.androlua.luautils.LuaEditor
 import cn.vove7.common.appbus.AppBus
+import cn.vove7.common.appbus.AppBus.ORDER_STOP_EXEC
 import cn.vove7.common.datamanager.parse.model.Action
 import cn.vove7.common.datamanager.parse.model.ActionParam
 import cn.vove7.common.executor.OnPrint
@@ -148,7 +149,7 @@ class LuaEditorActivity : Activity(), OnClickListener {
                 nowIndex = (--nowIndex + len) % len
                 source.setText(LuaUtil.getTextFromAsset(this, "lua_sample/" + testFiles[nowIndex]))
             }
-            R.id.stop -> AppBus.post("stop_execQueue")
+            R.id.stop -> AppBus.post(ORDER_STOP_EXEC)
             R.id.choose_script -> {//选择jio本
                 AlertDialog.Builder(this).setTitle(R.string.text_select_script).setItems(testFiles) { d, p ->
                     nowIndex = p

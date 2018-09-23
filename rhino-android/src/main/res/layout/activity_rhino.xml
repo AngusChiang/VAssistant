@@ -16,6 +16,7 @@
         android:layout_marginEnd="0dp"
         android:layout_marginBottom="0dp"
         android:background="@null"
+        android:typeface="monospace"
         android:gravity="top" />
 
     <LinearLayout

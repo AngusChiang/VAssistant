@@ -63,8 +63,8 @@ class UserInfoDialog(val context: Activity, val onUpdate: () -> Unit) {
                     pd.dismiss()
                     if (bean != null) {
                         if (bean.isOk()) {
-                            dialog.dismiss()
                             showReChargeDialog(bean.data!!)
+                            dialog.dismiss()
                         } else toast.showShort(R.string.text_failed_to_get_data)
                     } else toast.showShort(R.string.text_failed_to_get_data)
                 }
@@ -103,7 +103,7 @@ class UserInfoDialog(val context: Activity, val onUpdate: () -> Unit) {
                         GlobalLog.err(e.message + "--code: ui52")
                         return@postJson
                     }
-                } else toast.showShort(bean.message)
+                } /*else toast.showShort(bean.message)*/
             } else toast.showShort(R.string.text_failed_to_get_user_info)
         }
     }
@@ -133,7 +133,7 @@ class UserInfoDialog(val context: Activity, val onUpdate: () -> Unit) {
         val cView = View.inflate(context, R.layout.dialog_recharge, null)
         cView.findViewById<TextView>(R.id.prices_text).text = bu.toString()
         cView.findViewById<Button>(R.id.btn_guide).setOnClickListener {
-            SystemHelper.openLink(context,ApiUrls.GUIDE)
+            SystemHelper.openLink(context,ApiUrls.USER_GUIDE)
         }
         MaterialDialog(context).title(R.string.text_purchase_recharge_code)
                 .customView(view = cView, scrollable = true)

@@ -21,6 +21,7 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
         android:labelFor="@id/example_text"
         android:text="@string/text_examples"
         android:textColor="@color/colorAccent" />
@@ -34,6 +35,7 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
         android:labelFor="@id/example_text"
         android:text="@string/text_regex"
         android:textColor="@color/colorAccent" />
@@ -47,38 +49,41 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:labelFor="@id/example_text"
-        android:text="@string/text_version_code"
-        android:textColor="@color/colorAccent" />
-
-    <TextView
-        android:id="@+id/version_text"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
-
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
         android:labelFor="@id/example_text"
         android:text="@string/text_script"
         android:textColor="@color/colorAccent" />
 
-    <TextView
+    <io.github.kbiakov.codeview.CodeView
         android:id="@+id/script_text"
         android:layout_width="match_parent"
-        android:typeface="monospace"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:typeface="monospace" />
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
         android:labelFor="@id/example_text"
         android:text="@string/text_script_type"
         android:textColor="@color/colorAccent" />
 
     <TextView
         android:id="@+id/script_type_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:labelFor="@id/example_text"
+        android:text="@string/text_version_code"
+        android:textColor="@color/colorAccent" />
+
+    <TextView
+        android:id="@+id/version_text"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 

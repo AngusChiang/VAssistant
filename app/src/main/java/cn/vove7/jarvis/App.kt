@@ -13,6 +13,7 @@ import cn.vove7.jarvis.utils.debugserver.RemoteDebugServer
 import cn.vove7.vtp.log.Vog
 import devliving.online.securedpreferencestore.DefaultRecoveryHandler
 import devliving.online.securedpreferencestore.SecuredPreferenceStore
+import io.github.kbiakov.codeview.classifier.CodeProcessor
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
@@ -46,6 +47,7 @@ class App : LuaApp() {
             AppConfig.init()
 //            AdvanContactHelper.updateContactList()
             AdvanAppHelper.updateAppList()
+            CodeProcessor.init(this)
         }
     }
 

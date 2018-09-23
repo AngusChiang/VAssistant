@@ -1,9 +1,7 @@
 package cn.vove7.jarvis.utils
 
 import android.os.Looper
-import android.widget.Toast
 import cn.vove7.common.app.GlobalApp
-import cn.vove7.common.appbus.AppBus
 import cn.vove7.common.model.UserInfo
 import cn.vove7.common.netacc.ApiUrls
 import cn.vove7.common.netacc.model.BaseRequestModel
@@ -74,16 +72,17 @@ object AppConfig {
         UserInfo.logout()
     }
 
-    fun checkUser():Boolean {
+    fun checkUser(): Boolean {
         if (!UserInfo.isLogin()) {
             GlobalApp.toastShort(R.string.text_please_login_first)
             return false
-        }else if(!UserInfo.isVip()){
+        } else if (!UserInfo.isVip()) {
             GlobalApp.toastShort(R.string.text_need_vip)
             return false
         }
         return true
     }
+
     //load
     fun reload() {
         val sp = SpHelper(GlobalApp.APP)
@@ -100,6 +99,13 @@ object AppConfig {
     override fun toString(): String {
 
         return "\nvibrateWhenStartReco: $vibrateWhenStartReco"
+    }
+
+    fun getVersionName(): String {
+        return GlobalApp.APP.let {
+            it.packageManager.getPackageInfo(
+                    it.packageName, 0).versionName
+        }
     }
 }
 

@@ -35,18 +35,21 @@ object DaoHelper {
         }
     }
 
-    fun copyInApp2Global(node: ActionNode): Int {
-        node.actionScopeType = ActionNode.NODE_SCOPE_GLOBAL
-
+    /**
+     *
+     * @param node ActionNode
+     * @return Int
+     */
+    fun insertNewActionNodeInTx(node: ActionNode): Int {
         try {
             DAO.daoSession.runInTx {
                 insertNewActionNode(node)
             }
         } catch (e: Exception) {
             GlobalLog.err("${e.message} code:dh48")
+            return R.string.text_an_err_happened
         }
-
-        return R.string.test_have_done
+        return R.string.text_have_done
     }
 
 
@@ -164,6 +167,11 @@ object DaoHelper {
     }
 
 
+    /**
+     *
+     * @param newNode ActionNode
+     * @return Long? newId
+     */
     fun insertNewActionNode(newNode: ActionNode): Long? {
         newNode.id = null
         var newScopeId: Long = -1
@@ -175,10 +183,10 @@ object DaoHelper {
         if (newScopeId != -1L)
             newNode.setScopeId(newScopeId)
 
-        val actionDesc = newNode.desc
-        if (actionDesc != null) {
-            DAO.daoSession.actionDescDao.insert(actionDesc)
-            newNode.descId = actionDesc.id
+        val desc = newNode.desc
+        if (desc != null) {
+            DAO.daoSession.actionDescDao.insert(desc)
+            newNode.descId = desc.id
         }
 
         val action = newNode.action

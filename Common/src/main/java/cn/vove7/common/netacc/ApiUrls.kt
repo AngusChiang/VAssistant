@@ -41,6 +41,6 @@ object ApiUrls {
 
     val GET_ALI_ORDER = PAY + "a"
 
-    val GUIDE = SERVER_IP + "guide"
-    val HELP_DEL_INST = "$GUIDE#del-inst"
+    val USER_GUIDE = SERVER_IP + "guide"
+    val HELP_DEL_INST = "$USER_GUIDE#del-inst"
 }

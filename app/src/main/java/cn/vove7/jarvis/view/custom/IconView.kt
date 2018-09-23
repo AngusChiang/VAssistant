@@ -29,7 +29,7 @@ class IconView : ImageView {
 
     fun init(context: Context?) {
         if (context == null) return
-        setColorFilter(context.resources.getColor(R.color.colorPrimary), PorterDuff.Mode.SRC_IN)
+        setColorFilter(context.resources.getColor(android.R.color.black), PorterDuff.Mode.SRC_IN)
 
     }
 

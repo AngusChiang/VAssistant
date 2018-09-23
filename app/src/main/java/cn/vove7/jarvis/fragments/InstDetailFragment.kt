@@ -34,6 +34,8 @@ import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.customview.customView
 import com.afollestad.materialdialogs.list.listItems
 import com.google.gson.reflect.TypeToken
+import io.github.kbiakov.codeview.CodeView
+import io.github.kbiakov.codeview.adapters.Options
 import java.util.*
 import kotlin.concurrent.thread
 
@@ -53,7 +55,7 @@ class InstDetailFragment(val node: ActionNode, val onUpdate: () -> Unit) : BaseB
     private val examples_text: TextView by lazy { bodyView.findViewById<TextView>(R.id.examples_text) }
     private val regs_text: TextView by lazy { bodyView.findViewById<TextView>(R.id.regs_text) }
     private val version_text: TextView by lazy { bodyView.findViewById<TextView>(R.id.version_text) }
-    private val script_text: TextView by lazy { bodyView.findViewById<TextView>(R.id.script_text) }
+    private val script_text: CodeView by lazy { bodyView.findViewById<CodeView>(R.id.script_text) }
     private val script_type_text: TextView by lazy { bodyView.findViewById<TextView>(R.id.script_type_text) }
 
     lateinit var bodyView: View
@@ -90,7 +92,7 @@ class InstDetailFragment(val node: ActionNode, val onUpdate: () -> Unit) : BaseB
                 toolbar.menu.findItem(R.id.menu_delete).isVisible = false
             }
         }
-        toolbar.menu.findItem(R.id.menu_as_global).isVisible = node?.belongInApp() ?: false
+        toolbar.menu.findItem(R.id.menu_as_global).isVisible = node.belongInApp()
         contentView.post {
             //标题
             title = node.actionTitle
@@ -101,7 +103,10 @@ class InstDetailFragment(val node: ActionNode, val onUpdate: () -> Unit) : BaseB
             regs_text.text = TextHelper.arr2String(node.regs?.toTypedArray()
                 ?: arrayOf<Any>(), "\n")
             version_text.text = node.versionCode.toString()
-            script_text.text = node.action?.actionScript
+//            script_text.setCode(node.action?.actionScript ?: "", )
+            script_text.setOptions(Options.get(context!!)
+                    .withLanguage(node.action?.scriptType ?: "lua")
+                    .withCode(node.action?.actionScript ?:"").withoutShadows())
             script_type_text.text = node.action?.scriptType
         }
 
@@ -249,7 +254,7 @@ class InstDetailFragment(val node: ActionNode, val onUpdate: () -> Unit) : BaseB
             val cloneNode: ActionNode?
             try {
                 cloneNode = node.cloneGlobal(containSub)
-                val s = DaoHelper.copyInApp2Global(cloneNode)
+                val s = DaoHelper.insertNewActionNodeInTx(cloneNode)
                 toast.showLong(s)
 
             } catch (e: Exception) {
@@ -315,6 +320,9 @@ class InstDetailFragment(val node: ActionNode, val onUpdate: () -> Unit) : BaseB
         shareDialog!!.show()
     }
 
+    /**
+     * 更新返回版本号
+     */
     private fun upgrade() {
         val type = object : TypeToken<ResponseMessage<Int>>() {}.type
         NetHelper.postJson<Int>(ApiUrls.UPGRADE_INST, BaseRequestModel(node), type = type, callback = { _, bean ->
@@ -341,6 +349,9 @@ class InstDetailFragment(val node: ActionNode, val onUpdate: () -> Unit) : BaseB
         })
     }
 
+    /**
+     * 首次分享返回tag
+     */
     private fun firstShare() {
         val type = object : TypeToken<ResponseMessage<String>>() {}.type
         NetHelper.postJson<String>(ApiUrls.SHARE_INST, BaseRequestModel(node), type = type, callback = { _, bean ->
@@ -352,9 +363,9 @@ class InstDetailFragment(val node: ActionNode, val onUpdate: () -> Unit) : BaseB
                     thread {
                         //更新 tagId
                         Vog.d(this, "share new tag---> $s")
-                        node!!.tagId = s
-                        node!!.update()
-                        node!!.follows.forEach { child ->
+                        node.tagId = s
+                        node.update()
+                        node.follows.forEach { child ->
                             child.parentTagId = s
                             child.update()
                         }
@@ -370,12 +381,7 @@ class InstDetailFragment(val node: ActionNode, val onUpdate: () -> Unit) : BaseB
     }
 
     private fun showRunDialog() {
-        if (node == null) {
-            hide()
-            GlobalLog.err("id243")
-            toast.red().showShort(R.string.text_error_occurred)
-            return
-        }
+
         // .. -> it.parent -> it
         var p: ActionNode? = node
         val execQueue = mutableListOf<ActionNode>()

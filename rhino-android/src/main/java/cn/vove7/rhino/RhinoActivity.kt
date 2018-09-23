@@ -9,6 +9,7 @@ import android.support.v7.app.AppCompatActivity
 import android.view.View
 import android.widget.TextView
 import cn.vove7.common.appbus.AppBus
+import cn.vove7.common.appbus.AppBus.ORDER_STOP_EXEC
 import cn.vove7.common.datamanager.parse.model.Action
 import cn.vove7.common.datamanager.parse.model.ActionParam
 import cn.vove7.common.executor.OnPrint
@@ -89,7 +90,7 @@ class RhinoActivity : AppCompatActivity() {
             AppBus.post(ac)
         }
         stop_js.setOnClickListener {
-            AppBus.post("stop_execQueue")
+            AppBus.post(ORDER_STOP_EXEC)
         }
 
         try {

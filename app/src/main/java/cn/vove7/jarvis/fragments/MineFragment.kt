@@ -12,9 +12,8 @@ import android.widget.TextView
 import cn.vove7.common.appbus.AppBus
 import cn.vove7.common.model.UserInfo
 import cn.vove7.jarvis.R
-import cn.vove7.jarvis.activities.AdvancedSettingActivity
-import cn.vove7.jarvis.activities.PermissionManagerActivity
-import cn.vove7.jarvis.activities.SettingsActivity
+import cn.vove7.jarvis.activities.*
+import cn.vove7.jarvis.activities.base.LaboratoryActivity
 import cn.vove7.jarvis.view.dialog.LoginDialog
 import cn.vove7.jarvis.view.dialog.UserInfoDialog
 import cn.vove7.vtp.easyadapter.BaseListAdapter
@@ -63,6 +62,7 @@ class MineFragment : Fragment() {
         listView.adapter = object : BaseListAdapter<ItemHolder, Pair<Int, Int>>(context!!, listOf(
                 Pair(R.color.google_blue, R.string.text_settings),
                 Pair(R.color.google_red, R.string.text_advanced_features),
+                Pair(cn.vove7.vtp.R.color.brown_800, R.string.text_laboratory),
                 Pair(cn.vove7.vtp.R.color.deep_purple_700, R.string.text_permission_manager),
                 Pair(R.color.google_green, R.string.text_help),
                 Pair(R.color.google_yellow, R.string.text_about)
@@ -112,23 +112,12 @@ class MineFragment : Fragment() {
 
     fun onItemClick(position: Int) {
         when (position) {
-            0 -> {
-                startActivity(Intent(context, SettingsActivity::class.java))
-            }
-            1 -> {
-                startActivity(Intent(context, AdvancedSettingActivity::class.java))
-            }
-            2 -> {
-                startActivity(Intent(context, PermissionManagerActivity::class.java))
-            }
-            3 -> {
-
-            }
-            4 -> {
-
-            }
-            else -> {
-            }
+            0 -> startActivity(Intent(context, SettingsActivity::class.java))
+            1 -> startActivity(Intent(context, AdvancedSettingActivity::class.java))
+            2 -> startActivity(Intent(context, LaboratoryActivity::class.java))
+            3 -> startActivity(Intent(context, PermissionManagerActivity::class.java))
+            4 -> startActivity(Intent(context, HelpActivity::class.java))
+            5 -> startActivity(Intent(context, AboutActivity::class.java))
         }
 
     }
