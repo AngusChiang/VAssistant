@@ -6,7 +6,8 @@ import android.content.pm.PackageManager
 import android.graphics.Rect
 import android.os.Handler
 import android.view.KeyEvent
-import android.view.KeyEvent.*
+import android.view.KeyEvent.KEYCODE_VOLUME_DOWN
+import android.view.KeyEvent.KEYCODE_VOLUME_UP
 import android.view.ViewGroup
 import android.view.accessibility.AccessibilityEvent
 import android.view.accessibility.AccessibilityEvent.*
@@ -27,6 +28,7 @@ import cn.vove7.executorengine.bridges.SystemBridge
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.plugins.AccPluginsService
 import cn.vove7.jarvis.plugins.AdKillerService
+import cn.vove7.jarvis.utils.AppConfig
 import cn.vove7.vtp.app.AppHelper
 import cn.vove7.vtp.log.Vog
 import cn.vove7.vtp.sharedpreference.SpHelper
@@ -43,6 +45,8 @@ import kotlin.concurrent.thread
 class MyAccessibilityService : AccessibilityApi() {
     private lateinit var pkgman: PackageManager
 
+    private val spHelper: SpHelper by lazy { SpHelper(GlobalApp.APP) }
+
     override fun onServiceConnected() {
         accessibilityService = this
         pkgman = packageManager
@@ -51,7 +55,7 @@ class MyAccessibilityService : AccessibilityApi() {
 
         thread {
             registerEvent(activityNotifier)
-            if (SpHelper(GlobalApp.APP).getBoolean(R.string.key_open_ad_block, true))
+            if (spHelper.getBoolean(R.string.key_open_ad_block, true))
                 AdKillerService.bindServer()//广告服务
             dispatchPluginsEvent(ON_BIND)
         }
@@ -159,21 +163,23 @@ class MyAccessibilityService : AccessibilityApi() {
         Vog.v(this, "class :$currentAppInfo - ${event.className} \n" +
                 AccessibilityEvent.eventTypeToString(event.eventType))
         val eventType = event.eventType
+        if (eventType == AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED) {//界面切换
+            val classNameStr = event.className
+            val pkg = event.packageName as String
+            Vog.d(this, "TYPE_WINDOW_STATE_CHANGED --->\n ${event.packageName} ${event.className}")
+            currentActivity = classNameStr.toString()//.substring(classNameStr.lastIndexOf('.') + 1)
+            updateCurrentApp(pkg)  //输入法??
+            callAllNotifier()
+        }
+        if (blackPackage.contains(currentScope.packageName)) {//black list
+            Vog.d(this, "onAccessibilityEvent ---> in black")
+            return
+        }
         //根据事件回调类型进行处理
         when (eventType) {
             //通知栏发生改变
             AccessibilityEvent.TYPE_NOTIFICATION_STATE_CHANGED -> {
 //                callAllNotifier()
-            }
-            //窗口的状态发生改变
-            AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED -> {//窗口切换
-
-                val classNameStr = event.className
-                val pkg = event.packageName as String
-                Vog.d(this, "TYPE_WINDOW_STATE_CHANGED --->\n ${event.packageName} ${event.className}")
-                currentActivity = classNameStr.toString()//.substring(classNameStr.lastIndexOf('.') + 1)
-                updateCurrentApp(pkg)  //输入法??
-                callAllNotifier()
             }
             TYPE_WINDOWS_CHANGED -> {
                 callAllNotifier()
@@ -271,11 +277,13 @@ class MyAccessibilityService : AccessibilityApi() {
     private var startupRunner: Runnable = Runnable {
         MainService.instance?.onCommand(AppBus.ORDER_START_RECO)
     }
-    var stopRunner: Runnable = Runnable { AppBus.post(AppBus.ORDER_STOP_EXEC) }
+    var stopRunner: Runnable = Runnable {
+        MainService.instance?.onCommand(AppBus.ORDER_STOP_EXEC)
+    }
     var delayUp = 600L
 
-    var v2 = false
-    var v3 = false
+    var v2 = false // 单击上下键 取消识别
+    var v3 = false // 是否触发长按唤醒
     /**
      * 按键监听
      * @param event KeyEvent
@@ -296,7 +304,6 @@ class MyAccessibilityService : AccessibilityApi() {
                         }
                         MainService.exEngineRunning -> {//长按下键
                             //正在执行才会触发
-                            v3 = true
                             postLongDelay(stopRunner)
                             true
                         }
@@ -304,13 +311,18 @@ class MyAccessibilityService : AccessibilityApi() {
                     }
                 }
                 KEYCODE_VOLUME_UP -> {
-                    if (MainService.recoIsListening) {//按下停止聆听
-                        v2 = true
-                        MainService.instance?.onCommand(AppBus.ORDER_STOP_RECO)
-                    } else {
-                        postLongDelay(startupRunner)
+                    when {
+                        MainService.recoIsListening -> {//按下停止聆听
+                            v2 = true
+                            MainService.instance?.onCommand(AppBus.ORDER_STOP_RECO)
+                            return true
+                        }
+                        AppConfig.isLongPressVolUpWakeUp -> {//长按唤醒
+                            postLongDelay(startupRunner)
+                            return true
+                        }
+                        else -> super.onKeyEvent(event)
                     }
-                    return true
                 }
 //                KEYCODE_HOME -> {
 //                    postLongDelay(startupRunner)
@@ -319,11 +331,12 @@ class MyAccessibilityService : AccessibilityApi() {
             }
             KeyEvent.ACTION_UP -> {
                 when (event.keyCode) {
-                    KEYCODE_VOLUME_UP, KEYCODE_APP_SWITCH ->
-                        return removeDelayIfInterrupt(event, startupRunner) || super.onKeyEvent(event)
+                    KEYCODE_VOLUME_UP ->
+                        if (v3) {
+                            return removeDelayIfInterrupt(event, startupRunner) || super.onKeyEvent(event)
+                        }
                     KEYCODE_VOLUME_DOWN ->
                         if (v3) {
-                            v3 = false
                             return removeDelayIfInterrupt(event, stopRunner) || super.onKeyEvent(event)
                         }
                 }
@@ -333,14 +346,20 @@ class MyAccessibilityService : AccessibilityApi() {
     }
 
     private fun postLongDelay(runnable: Runnable) {
+        v3 = true
         delayHandler.postDelayed(runnable, delayUp)
     }
 
     private fun removeDelayIfInterrupt(event: KeyEvent, runnable: Runnable): Boolean {
+        if (v3) {
+            v3 = false
+            v2 = false // ???
+        } else return false
         if (v2) {//防止弹出音量调节
             v2 = false
             return true
         }
+        Vog.d(this, "removeDelayIfInterrupt ---> $runnable")
         if ((event.eventTime - event.downTime) < (delayUp - 100)) {//时间短 移除runner 调节音量
             delayHandler.removeCallbacks(runnable)
             when (event.keyCode) {
@@ -465,6 +484,7 @@ class MyAccessibilityService : AccessibilityApi() {
             return false
         }
 
+        val blackPackage = hashSetOf("com.android.chrome", "com.android.systemui")
         private const val ON_UI_UPDATE = 0
         private const val ON_APP_CHANGED = 1
         private const val ON_BIND = 2
@@ -504,7 +524,7 @@ class MyAccessibilityService : AccessibilityApi() {
                             thread { it.onAppChanged(data as ActionScope) }
                         }
                     }
-                    ON_BIND->{
+                    ON_BIND -> {
                         pluginsServices.forEach {
                             thread { it.onBind() }
                         }

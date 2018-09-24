@@ -46,6 +46,7 @@ import cn.vove7.vtp.sharedpreference.SpHelper
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
 import java.util.*
+import kotlin.concurrent.thread
 
 /**
  * 主服务
@@ -296,24 +297,26 @@ class MainService : BusService(),
 
     @Subscribe(threadMode = ThreadMode.BACKGROUND)
     fun onCommand(order: String) {
-        when (order) {
-            ORDER_STOP_EXEC -> {
-                speechRecoService.cancelRecog()
-                speechSynService.stop()
-                cExecutor.interrupt()
-                hideAll()
-            }
-            ORDER_STOP_RECO -> {
-                speechRecoService.stopRecog()
-            }
-            ORDER_CANCEL_RECO -> {
-                speechRecoService.cancelRecog()
-            }
-            ORDER_START_RECO -> {
-                speechRecoService.startRecog()
-            }
+        thread {
+            when (order) {
+                ORDER_STOP_EXEC -> {
+                    speechRecoService.cancelRecog()
+                    speechSynService.stop()
+                    cExecutor.interrupt()
+                    hideAll()
+                }
+                ORDER_STOP_RECO -> {
+                    speechRecoService.stopRecog()
+                }
+                ORDER_CANCEL_RECO -> {
+                    speechRecoService.cancelRecog()
+                }
+                ORDER_START_RECO -> {
+                    speechRecoService.startRecog()
+                }
 
-            else -> {
+                else -> {
+                }
             }
         }
     }

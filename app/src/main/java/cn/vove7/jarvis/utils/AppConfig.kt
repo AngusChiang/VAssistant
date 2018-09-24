@@ -24,6 +24,7 @@ object AppConfig {
     var vibrateWhenStartReco = true
     var isToastWhenRemoveAd = true
     var isAdBlockService = false
+    var isLongPressVolUpWakeUp = true
     var adWaitSecs = 17
 
     fun init() {
@@ -89,6 +90,7 @@ object AppConfig {
         vibrateWhenStartReco = sp.getBoolean(R.string.key_vibrate_reco_begin, true)
         isToastWhenRemoveAd = sp.getBoolean(R.string.key_show_toast_when_remove_ad, true)
         isAdBlockService = sp.getBoolean(R.string.key_open_ad_block, false)
+        isLongPressVolUpWakeUp = sp.getBoolean(R.string.key_long_press_volume_up_wake_up, true)
         sp.getInt(R.string.key_ad_wait_secs).also {
             adWaitSecs = if (it == -1) 17 else it
         }

@@ -178,7 +178,7 @@ open class ExecutorImpl(
     private fun parseAppInnerOperation(cmd: String, pkg: String): Boolean {
         actionQueue = ParseEngine.matchAppAction(cmd, pkg)
         //打开应用
-        if (actionQueue.isNotEmpty()) {//判断是否在目标页 check
+        if (actionQueue.isNotEmpty()) {// 判断是否在目标页 check 在本App启动此App无反应???
             if (accessApi?.currentScope?.assertEquals(actionQueue.peek()?.scope) == false) {
                 systemBridge.openAppByPkg(pkg, true)
             } else {

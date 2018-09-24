@@ -51,6 +51,11 @@ public class ActionScope {
         this.packageName = packageName;
         this.activity = activity;
     }
+    @Keep
+    public ActionScope(String packageName) {
+        this.packageName = packageName;
+    }
+
 
     @Generated(hash = 1143247331)
     public ActionScope() {

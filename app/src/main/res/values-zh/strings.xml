@@ -170,4 +170,6 @@
     <string name="text_advanced_user_guide">高级使用手册</string>
     <string name="text_laboratory">实验室</string>
     <string name="text_feedback">反馈</string>
+    <string name="text_wakeup">唤醒</string>
+    <string name="text_long_press_volume_up">长按音量上键</string>
 </resources>
