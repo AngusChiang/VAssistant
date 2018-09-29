@@ -51,7 +51,9 @@
 - 数组索引: lua 从1开始(args[1])，js从0开始(args[0]) ,影响到外部参数
 - js:` ViewFinder().desc('搜索', 'Search')`   lua:`ViewFinder().desc({ '搜索', 'Search' })`
 
+## 连续操作
 
+连续的两个操作，无重叠可用分开节点实现，脚本功能重叠，使用脚本内控制
 
 ## cmd 批量重命名 
 
@@ -78,3 +80,25 @@
     - ad只显示已安装，只获取本机已安装
     - 更新 删除old 新tag
     - 删除 
+    
+## Inst Settings
+
+> 在代码头部中使用如下代码，即可注册指令设置
+```lua
+settings = {
+    number= { title= "震动强度", t= 'int', default= 123, range= {1, 10} },
+    text= { title= "文本测试", t= 'string', default= '你好' },
+    bool= { title= "布尔变量", summary= '我是说明', t= 'boolean', default= false },
+    choice = { title= "单选", summary= '选择类型', t= 'single_choice', items= {'一', '二'} }
+}
+
+config = registerSettings("lua_sample", settings, 2)
+
+-- ...
+-- ...
+-- ...
+
+```
+
+- 在`registerSettings`中创建与更新
+- 在指令详情页解析代码，解析出头部，包括`name,version,script`  script用于执行

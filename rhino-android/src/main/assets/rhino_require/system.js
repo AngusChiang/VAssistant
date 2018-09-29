@@ -5,8 +5,9 @@
 //通过包名打开App
 // ExResult
 //
-openAppByPkg = function(pkg){
-    return system.openAppByPkg(pkg)
+openAppByPkg = function(pkg,reset){
+    if(reset==undefined) reset=false
+    return system.openAppByPkg(pkg,reset)
 }
 
 

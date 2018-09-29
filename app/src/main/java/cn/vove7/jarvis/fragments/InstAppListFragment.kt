@@ -19,9 +19,10 @@ import cn.vove7.jarvis.activities.OnSyncInst
 import cn.vove7.jarvis.adapters.SimpleListAdapter
 import cn.vove7.jarvis.adapters.ViewModel
 import cn.vove7.jarvis.utils.AppConfig
-import cn.vove7.jarvis.utils.NetHelper
+import cn.vove7.common.utils.NetHelper
 import cn.vove7.parseengine.engine.ParseEngine
 import cn.vove7.vtp.app.AppHelper
+import kotlin.concurrent.thread
 
 /**
  * # InstAppListFragment
@@ -89,7 +90,7 @@ class InstAppListFragment : SimpleListFragment<ActionScope>(), OnSyncInst {
 
     override fun transData(nodes: List<ActionScope>): List<ViewModel> {
         val tmp = mutableListOf<ViewModel>()
-        val notInstalled = mutableListOf<ViewModel>()
+//        val notInstalled = mutableListOf<ViewModel>()
         kotlin.run breaking@{
             nodes.forEach goon@{
                 if (pkgSet.contains(it.packageName))
@@ -100,12 +101,12 @@ class InstAppListFragment : SimpleListFragment<ActionScope>(), OnSyncInst {
                     val c = InAppInstListFragment.getInstList(it.packageName).size
                     tmp.add(ViewModel(app.name, icon = app.icon, subTitle = "数量: $c", extra = it.packageName))
                 } else {//未安装 TODO app.info
-                    notInstalled.add(ViewModel(it.packageName, getString(R.string.text_not_installed), extra = it.packageName))
+//                    notInstalled.add(ViewModel(it.packageName, getString(R.string.text_not_installed), extra = it.packageName))
                 }
                 pkgSet.add(it.packageName)
             }
         }
-        tmp.addAll(notInstalled)
+//        tmp.addAll(notInstalled)
         return tmp
     }
 
@@ -113,12 +114,14 @@ class InstAppListFragment : SimpleListFragment<ActionScope>(), OnSyncInst {
      * 获取支持App列表
      */
     override fun onGetData(pageIndex: Int) {
-        val list = DAO.daoSession.actionScopeDao
-                .queryBuilder()
-                .offset(pageSizeLimit * pageIndex)
-                .limit(pageSizeLimit)
-                .list()
-        dataSet.addAll(transData(list))
-        notifyLoadSuccess(list.isEmpty())
+        thread {
+            val list = DAO.daoSession.actionScopeDao
+                    .queryBuilder()
+                    .offset(pageSizeLimit * pageIndex)
+                    .limit(pageSizeLimit)
+                    .list()
+            dataSet.addAll(transData(list))
+            postLoadResult(list.isEmpty())
+        }
     }
 }

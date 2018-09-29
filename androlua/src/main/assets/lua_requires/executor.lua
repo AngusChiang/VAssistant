@@ -13,6 +13,10 @@ runtime = executor
 actionCount = executor.actionCount
 currentActionIndex = executor.currentActionIndex
 
+function accessibility()
+    return executor.checkAccessibilityService(true)
+end
+
 function checkService()
     return executor.checkAccessibilityService(false)
 end
@@ -126,6 +130,9 @@ end
  ]]
 function smartOpen(s)
     return executor.smartOpen(s)
+end
+function smartClose(s)
+    return executor.smartClose(s)
 end
 
 function sleep(m)

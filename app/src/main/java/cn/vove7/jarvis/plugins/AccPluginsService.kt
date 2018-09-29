@@ -14,9 +14,10 @@ import cn.vove7.vtp.log.Vog
 abstract class AccPluginsService : OnAccessibilityEvent {
 
     var opened = false
-    fun bindServer() {
-        Vog.d(this, "bindServer ---> $this")
-        MyAccessibilityService.registerEvent(this)
+    override fun bindService() {
+        Vog.d(this, "bindService ---> $this")
+//        MyAccessibilityService.registerEvent(this)
+        onBind()
         opened = true
     }
 
@@ -29,7 +30,7 @@ abstract class AccPluginsService : OnAccessibilityEvent {
 
     fun restart() {
         unBindServer()
-        bindServer()
+        bindService()
     }
 
 }

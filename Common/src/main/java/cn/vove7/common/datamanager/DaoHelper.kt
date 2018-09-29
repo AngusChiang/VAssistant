@@ -282,7 +282,7 @@ object DaoHelper {
                         it.from = DataFrom.FROM_USER
                     }
                     appAdInfoDao.insertInTx(it)
-                    Vog.d(this,"updateAppAdInfo ---> ${it.descTitle} ${it.id}")
+                    Vog.d(this, "updateAppAdInfo ---> ${it.descTitle} ${it.id}")
                 } else {
                     Vog.d(this, "updateMarkedData ---> 重复:" + it.descTitle)
                 }
@@ -309,6 +309,10 @@ object DaoHelper {
             DAO.daoSession.actionScopeDao.insert(scope)
             scope.id
         } else s.id
+    }
 
+    fun getInsetSettingsByName(name: String): InstSettings? {
+        return DAO.daoSession.instSettingsDao.queryBuilder()
+                .where(InstSettingsDao.Properties.Name.eq(name)).unique()
     }
 }

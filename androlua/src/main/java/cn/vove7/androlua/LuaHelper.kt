@@ -11,6 +11,7 @@ import cn.vove7.androlua.luautils.LuaManagerI
 import cn.vove7.androlua.luautils.LuaPrinter
 import cn.vove7.common.BridgeManager
 import cn.vove7.common.app.GlobalApp
+import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.executor.OnPrint
 import cn.vove7.vtp.log.Vog
 import com.luajava.JavaFunction
@@ -39,8 +40,7 @@ class LuaHelper : LuaManagerI {
         bridgeManager = sBridgeManager
         initPath()
         init()
-
-        Vog.d(this, "constructor $sBridgeManager")
+//        Vog.d(this, "constructor $sBridgeManager")
     }
 
     override var bridgeManager: BridgeManager?
@@ -49,7 +49,7 @@ class LuaHelper : LuaManagerI {
     constructor(context: Context, b: BridgeManager) : this(context) {
         bridgeManager = b
         sBridgeManager = b
-        Vog.d(this, "constructor2 $sBridgeManager")
+//        Vog.d(this, "constructor2 $sBridgeManager")
     }
 
     lateinit var L: LuaState
@@ -110,7 +110,7 @@ class LuaHelper : LuaManagerI {
     }
 
     override fun log(log: Any?) {
-        Vog.d(this, "lua log  ----> $log")
+        GlobalLog.log(log.toString())
     }
 
     private fun initLua() {
@@ -191,7 +191,7 @@ class LuaHelper : LuaManagerI {
         try {
             evalString(src)
         } catch (e: LuaException) {
-            e.printStackTrace()
+            GlobalLog.err(e)
             Vog.d(this, "safeEvalLua  ----> " + e.message)
         }
     }
@@ -236,12 +236,11 @@ class LuaHelper : LuaManagerI {
         if (ok == 0) {
             return
         } else {
-            checkErr(ok)
-            return
+            throw Exception(checkErr(ok))
         }
     }
 
-    fun checkErr(r: Int) {
+    fun checkErr(r: Int):String {
         var e = errorReason(r) + ": " + L.toString(-1)
         var end = e.indexOf("stack traceback:")//隐藏stack traceback
         if (end == -1) end = e.length
@@ -251,27 +250,17 @@ class LuaHelper : LuaManagerI {
                 e.contains("java.lang.InterruptedException"))
             handleMessage(OnPrint.WARN, "强制终止\n")
         else
-            handleMessage(OnPrint.ERROR, e)
+            handleError(e)
+        return e
     }
 
     override fun handleError(err: String) {
-        Vog.e(this, err)
+        GlobalLog.err(err)
+        handleMessage(OnPrint.ERROR,err)
     }
 
     override fun handleError(e: Exception) {
-        e.printStackTrace()
-        val eBuilder = StringBuilder(e.message)
-        eBuilder.appendln()
-        val trace = e.stackTrace
-        for (traceElement in trace)
-            eBuilder.appendln("\tat $traceElement")
-
-        for (se in e.suppressed)
-            eBuilder.appendln("\t Suppressed :$se")
-        if (e.cause != null)
-            eBuilder.appendln("\t Cause By :${e.cause}")
-        notifyOutput(OnPrint.ERROR, eBuilder.toString())
-        Vog.e(this, eBuilder)
+        GlobalLog.err(e)
     }
 
 

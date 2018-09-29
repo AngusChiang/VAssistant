@@ -332,7 +332,7 @@ static void remarkupvals (global_State *g) {
 
 
 /*
-** mark root set and reset all gray lists, to start a new collection
+** mark root set and set all gray lists, to start a new collection
 */
 static void restartcollection (global_State *g) {
   g->gray = g->grayagain = NULL;

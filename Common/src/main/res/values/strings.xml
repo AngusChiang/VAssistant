@@ -6,7 +6,7 @@
     <string name="text_select_script">Select Script</string>
     <string name="text_stop">Stop</string>
     <string name="text_run">Run</string>
-    <string name="text_err_not_belong_inapp_inst">失败：不属于App内命令</string>
+    <string name="text_err_not_belong_inapp_inst">失败：不属于App内指令</string>
     <string name="text_have_done">Done</string>
     <string name="text_an_err_happened">An error happened</string>
 </resources>

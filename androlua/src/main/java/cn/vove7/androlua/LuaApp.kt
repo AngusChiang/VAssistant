@@ -2,6 +2,7 @@ package cn.vove7.androlua
 
 import cn.vove7.androlua.luabridge.LuaUtil
 import cn.vove7.common.app.GlobalApp
+import cn.vove7.common.app.GlobalLog
 import java.io.File
 import java.io.IOException
 import kotlin.concurrent.thread
@@ -15,18 +16,8 @@ import kotlin.concurrent.thread
  */
 open class LuaApp : GlobalApp() {
 
-    private var luaDir: String? = null
-//    lateinit var luaHelper: LuaHelper
-//
-//    override fun getLuaState(): LuaState {
-//        return luaHelper.L
-//    }
-
     override fun onCreate() {
         super.onCreate()
-        instance = this
-
-        luaDir = filesDir.absolutePath
         thread {
             initAsset()
         }
@@ -34,25 +25,17 @@ open class LuaApp : GlobalApp() {
 
     private fun initAsset() {
         assets.list("lua_requires")
-                .filter { it.endsWith(".lua") }
-                .forEach {
+                ?.filter { it.endsWith(".lua") }
+                ?.forEach {
                     val fp = filesDir.absolutePath + '/' + it
-//                    if (!File(fp).exists()) {
+                    if (!File(fp).exists() || BuildConfig.DEBUG)
                         try {
                             LuaUtil.assetsToSD(this, "lua_requires/$it", fp)
                         } catch (e: IOException) {
+                            GlobalLog.err(e)
                             e.printStackTrace()
                         }
-//                    }
                 }
     }
-
-
-    companion object {
-
-        lateinit var instance: LuaApp
-            private set
-    }
-
 
 }

@@ -41,6 +41,7 @@
 
             <EditText
                 android:layout_width="match_parent"
+                android:gravity="top|start"
                 android:layout_height="wrap_content" />
         </android.support.design.widget.TextInputLayout>
 
@@ -52,5 +53,13 @@
             android:theme="@style/MaterialButton.White" />
     </LinearLayout>
 
+    <Spinner
+        android:visibility="gone"
+        android:id="@+id/script_lang"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:entries="@array/list_script_type">
+
+    </Spinner>
 
 </LinearLayout>

@@ -1,18 +1,21 @@
 package cn.vove7.rhino.api;
 
 import android.util.Log;
-import cn.vove7.common.app.GlobalApp;
-import cn.vove7.common.executor.OnPrint;
-import cn.vove7.rhino.common.GcCollector;
-import cn.vove7.vtp.asset.AssetHelper;
+
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.Function;
 import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.annotations.JSFunction;
-import org.mozilla.javascript.tools.ToolErrorReporter;
 
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
+
+import cn.vove7.common.app.GlobalApp;
+import cn.vove7.common.app.GlobalLog;
+import cn.vove7.common.executor.OnPrint;
+import cn.vove7.rhino.common.GcCollector;
+import cn.vove7.vtp.asset.AssetHelper;
 
 /**
  * Created by 17719247306 on 2018/8/28
@@ -59,8 +62,7 @@ public class RhinoApi extends AbsApi {
     }
 
     public static void onException(Exception e) {
-        Log.e("ee", "onException: " + e.getMessage());
-        Log.e("ee", "cause by: " + e.getCause());
+        GlobalLog.INSTANCE.err(e);
         notifyOutput(OnPrint.ERROR,e.getMessage());
     }
 
@@ -71,6 +73,7 @@ public class RhinoApi extends AbsApi {
             printList.add(print);
         }
     }
+
     public static void unregPrint(OnPrint print) {
         synchronized (printList) {
             printList.remove(print);
@@ -88,12 +91,13 @@ public class RhinoApi extends AbsApi {
     @JSFunction
     public static void log(Context cx, Scriptable thisObj,
                            Object[] args, Function funObj) {
-        print(cx, thisObj, args, funObj);
+        GlobalLog.INSTANCE.log(Arrays.toString(args));
     }
+
 
     @JSFunction
     public synchronized static void print(Context cx, Scriptable thisObj,
-                             Object[] args, Function funObj) {
+                                          Object[] args, Function funObj) {
         StringBuilder builder = new StringBuilder();
         for (int i = 0; i < args.length; i++) {
             if (i > 0)
@@ -104,10 +108,10 @@ public class RhinoApi extends AbsApi {
         }
         builder.append("\n");
         doLog(builder.toString());
-        Log.d("Vove :", " out ----> " + builder.toString());
+        //Log.d("Vove :", " out ----> " + builder.toString());
     }
 
     public static void doLog(String m) {
-        notifyOutput(OnPrint.LOG,  m);
+        notifyOutput(OnPrint.LOG, m);
     }
 }

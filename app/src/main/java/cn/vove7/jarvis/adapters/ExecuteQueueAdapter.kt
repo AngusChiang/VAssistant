@@ -16,7 +16,8 @@ import cn.vove7.vtp.easyadapter.BaseListAdapter
  * @author 17719247306
  * 2018/9/8
  */
-class ExecuteQueueAdapter(context: Context, execQueue: MutableList<ActionNode>) : BaseListAdapter<ExecuteQueueAdapter.VHolder, ActionNode>(context, execQueue) {
+class ExecuteQueueAdapter(context: Context, execQueue: MutableList<ActionNode>)
+    : BaseListAdapter<ExecuteQueueAdapter.VHolder, ActionNode>(context, execQueue) {
     override fun layoutId(): Int = R.layout.item_of_exec_queue
 
     override fun onBindView(holder: VHolder, pos: Int, item: ActionNode) {

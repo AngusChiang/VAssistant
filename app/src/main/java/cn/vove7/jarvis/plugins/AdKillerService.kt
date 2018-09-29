@@ -2,6 +2,7 @@ package cn.vove7.jarvis.plugins
 
 import android.view.accessibility.AccessibilityNodeInfo
 import cn.vove7.common.app.GlobalApp
+import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.datamanager.AppAdInfo
 import cn.vove7.common.datamanager.DAO
 import cn.vove7.common.datamanager.greendao.AppAdInfoDao
@@ -10,8 +11,10 @@ import cn.vove7.common.model.UserInfo
 import cn.vove7.common.view.finder.ViewFindBuilder
 import cn.vove7.common.view.finder.ViewFinder
 import cn.vove7.common.view.notifier.AppAdBlockNotifier
+import cn.vove7.common.view.toast.ColorfulToast
 import cn.vove7.executorengine.helper.AdvanAppHelper
 import cn.vove7.jarvis.utils.AppConfig
+import cn.vove7.jarvis.view.statusbar.RemoveAdAnimation
 import cn.vove7.vtp.app.AppInfo
 import cn.vove7.vtp.log.Vog
 import java.lang.Thread.sleep
@@ -29,7 +32,9 @@ import kotlin.concurrent.thread
  * @author 17719247306
  * 2018/9/3
  */
-object AdKillerService : AccPluginsService() {//TO-DO fixed 猪八戒ad
+object AdKillerService : AccPluginsService() {
+    //TO-DO fixed 猪八戒ad
+    private val removeAdAnimation: RemoveAdAnimation by lazy { RemoveAdAnimation() }
     /**
      * 缓存
      */
@@ -49,7 +54,7 @@ object AdKillerService : AccPluginsService() {//TO-DO fixed 猪八戒ad
                     finderCaches[scope] = mutableSetOf(buildFinder(it))
                 }
             }
-            Vog.d(this, "onBind ---> ${finderCaches.size}")
+            Vog.d(this, "AdOnBind ---> ${finderCaches.size}")
             locked = false
         }
     }
@@ -77,8 +82,11 @@ object AdKillerService : AccPluginsService() {//TO-DO fixed 猪八戒ad
                 b.second == 0 -> Vog.d(this, "onUiUpdate ---> 发现广告，清除失败")
                 else -> {
                     Vog.d(this, "onUiUpdate ---> 发现广告，清除成功")
-                    if (AppConfig.isToastWhenRemoveAd)
-                        GlobalApp.toastShort("已为你关闭广告")
+                    if (AppConfig.isToastWhenRemoveAd){
+                        removeAdAnimation.begin()
+                        removeAdAnimation.hideDelay(2000)
+                    }
+//                        toast.showShortDelay("已为你关闭广告", 500L)
                     finders = null
                 }
             }
@@ -95,6 +103,7 @@ object AdKillerService : AccPluginsService() {//TO-DO fixed 猪八戒ad
      */
     fun update(/*s: Array<String>*/) {
         if (opened) {
+            GlobalLog.log("ad cache update")
             onBind()
         }
     }
@@ -111,7 +120,7 @@ object AdKillerService : AccPluginsService() {//TO-DO fixed 猪八戒ad
 
     override fun onAppChanged(appScope: ActionScope) {
         locked = true
-        if (!UserInfo.isVip() && AppAdBlockNotifier.useUp()) {
+        if (!UserInfo.isVip() && AppAdBlockNotifier.useUp()) {//非vip且useUp
             return
         }
         locked = false
@@ -171,8 +180,10 @@ object AdKillerService : AccPluginsService() {//TO-DO fixed 猪八戒ad
 //            return@forEach//continue
 
         val finderBuilder = ViewFindBuilder()
-        if (it.type != null)
-            finderBuilder.types(it.type)
+        it.type.also {
+            if (it != null)
+                finderBuilder.type(it)
+        }
         val des = it.depthArr
         if (des != null) {
             finderBuilder.depths(des)

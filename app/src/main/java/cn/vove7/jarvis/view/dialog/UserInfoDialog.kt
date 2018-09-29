@@ -16,10 +16,10 @@ import cn.vove7.common.model.UserInfo
 import cn.vove7.common.model.VipPrice
 import cn.vove7.common.netacc.ApiUrls
 import cn.vove7.common.netacc.model.BaseRequestModel
+import cn.vove7.common.utils.NetHelper
 import cn.vove7.common.view.toast.ColorfulToast
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.utils.AppConfig
-import cn.vove7.jarvis.utils.NetHelper
 import cn.vove7.jarvis.utils.pay.PurchaseHelper
 import cn.vove7.vtp.system.SystemHelper
 import com.afollestad.materialdialogs.MaterialDialog
@@ -36,51 +36,72 @@ import java.util.*
  * 2018/9/19
  */
 class UserInfoDialog(val context: Activity, val onUpdate: () -> Unit) {
+    val view = LayoutInflater.from(context).inflate(R.layout.dialog_user_info, null)
+
+    private val userEmailText: TextView = view.findViewById(R.id.user_email_text)
+    private val userNameText: TextView = view.findViewById(R.id.user_name_text)
+    private val redHeardText: TextView = view.findViewById(R.id.red_heard)
+    private val vipEndDateText: TextView = view.findViewById(R.id.vip_end_date)
+    private val regDateText: TextView = view.findViewById(R.id.reg_time)
+
     val dialog = MaterialDialog(context)
-    private val userEmailText: TextView
-    private val userNameText: TextView
-    private val redHeardText: TextView
-    private val vipEndDateText: TextView
-    private val regDateText: TextView
+            .positiveButton(R.string.text_modify_pass) {
+                ModifyUserPassDialog(context)
+            }
+            .neutralButton(R.string.text_recharge) { recharge() }
+            .negativeButton(R.string.text_logout) {
+                exit = true
+                AppConfig.logout()
+                onUpdate.invoke()
+            }.customView(view = view)
+
     val toast = ColorfulToast(context).yellow()
 
-    val dateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault())
+    private val dateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault())
 
     init {
-        val view = LayoutInflater.from(context).inflate(R.layout.dialog_user_info, null)
-
-        userEmailText = view.findViewById(R.id.user_email_text)
-        userNameText = view.findViewById(R.id.user_name_text)
-        redHeardText = view.findViewById(R.id.red_heard)
-        vipEndDateText = view.findViewById(R.id.vip_end_date)
-        regDateText = view.findViewById(R.id.reg_time)
-        view.findViewById<Button>(R.id.btn_recharge).setOnClickListener {
-            //get ps
-            val pd = ProgressDialog(context)
-            Handler().postDelayed({
-                NetHelper.get<List<VipPrice>>(ApiUrls.GET_PRICES,
-                        type = NetHelper.VipPriceListType) { _, bean ->
-                    pd.dismiss()
-                    if (bean != null) {
-                        if (bean.isOk()) {
-                            showReChargeDialog(bean.data!!)
-                            dialog.dismiss()
-                        } else toast.showShort(R.string.text_failed_to_get_data)
-                    } else toast.showShort(R.string.text_failed_to_get_data)
-                }
-            }, 500)
-        }
-        view.findViewById<Button>(R.id.btn_logout).setOnClickListener {
-            exit = true
-            AppConfig.logout()
-            dialog.dismiss()
-            onUpdate.invoke()
-        }
-
         setData()
         loadInfo()
-        dialog.customView(view = view).show()
+        //修改昵称
+        dialog.findViewById<View>(R.id.name_lay).setOnClickListener {
+            MaterialDialog(context).title(R.string.text_modify_user_name)
+                    .noAutoDismiss()
+                    .input(prefill = UserInfo.getUserName()) { materialDialog, s ->
+                        val p = ProgressDialog(context)
+                        NetHelper.postJson<String>(ApiUrls.MODIFY_NAME, BaseRequestModel(s.toString())) { _, b ->
+                            p.dismiss()
+                            if (b?.isOk() == true) {
+                                UserInfo.INSTANCE.setUserName(s.toString())
+                                toast.showShort(R.string.text_modify_succ)
+                                Handler().postDelayed({
+                                    onUpdate.invoke()
+                                },1000)
+                                materialDialog.dismiss()
+                            } else {
+                                GlobalLog.err(b?.message)
+                                toast.showShort(R.string.text_modify_failed)
+                            }
+                        }
+                    }.show()
+            dialog.dismiss()
+        }
+        dialog.show()
+    }
 
+    private fun recharge() {
+        val pd = ProgressDialog(context)
+        Handler().postDelayed({
+            NetHelper.get<List<VipPrice>>(ApiUrls.GET_PRICES,
+                    type = NetHelper.VipPriceListType) { _, bean ->
+                pd.dismiss()
+                if (bean != null) {
+                    if (bean.isOk()) {
+                        showReChargeDialog(bean.data!!)
+                        dialog.dismiss()
+                    } else toast.showShort(R.string.text_failed_to_get_data)
+                } else toast.showShort(R.string.text_failed_to_get_data)
+            }
+        }, 500)
     }
 
     var exit = false
@@ -125,7 +146,7 @@ class UserInfoDialog(val context: Activity, val onUpdate: () -> Unit) {
      * @param ps List<VipPrice>
      */
     private fun showReChargeDialog(ps: List<VipPrice>) {
-        val bu = StringBuilder("\n")
+        val bu = StringBuilder()
 
         ps.forEach {
             bu.append("${it.durationText} \t (${it.price}元)\n")
@@ -133,7 +154,7 @@ class UserInfoDialog(val context: Activity, val onUpdate: () -> Unit) {
         val cView = View.inflate(context, R.layout.dialog_recharge, null)
         cView.findViewById<TextView>(R.id.prices_text).text = bu.toString()
         cView.findViewById<Button>(R.id.btn_guide).setOnClickListener {
-            SystemHelper.openLink(context,ApiUrls.USER_GUIDE)
+            SystemHelper.openLink(context, ApiUrls.USER_GUIDE)
         }
         MaterialDialog(context).title(R.string.text_purchase_recharge_code)
                 .customView(view = cView, scrollable = true)

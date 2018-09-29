@@ -20,7 +20,7 @@ import cn.vove7.common.R
  */
 
 class ColorfulToast(val context: Context, textColor: Int = R.color.fff) {
-    var toast: Toast = Toast(context)
+    var toast: Toast
 
     var toastView: View
     var textView: TextView
@@ -32,7 +32,7 @@ class ColorfulToast(val context: Context, textColor: Int = R.color.fff) {
             Looper.prepare()
             looper = Looper.myLooper()!!
         }
-
+        toast = Toast(context)
         lHandler = ToastHandler(looper)
         toastView = LayoutInflater.from(context).inflate(R.layout.toast_colorful, null)
         textView = toastView.findViewById(R.id.text)
@@ -72,6 +72,10 @@ class ColorfulToast(val context: Context, textColor: Int = R.color.fff) {
 
     fun showShort(@StringRes textId: Int) {
         showShort(context.getString(textId))
+    }
+
+    fun showShortDelay(text: String, delay: Long = 0) {
+        lHandler.sendMessageDelayed(lHandler.obtainMessage(SHOW_SHORT, text), delay)
     }
 
     fun showShort(text: String) {

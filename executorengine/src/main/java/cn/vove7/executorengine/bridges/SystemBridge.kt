@@ -1,24 +1,34 @@
 package cn.vove7.executorengine.bridges
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.bluetooth.BluetoothAdapter
 import android.content.*
 import android.content.pm.PackageManager
+import android.location.Location
+import android.location.LocationListener
+import android.location.LocationManager
 import android.media.AudioManager
 import android.media.AudioManager.ADJUST_MUTE
 import android.media.AudioManager.ADJUST_UNMUTE
 import android.net.Uri
-import android.os.Build
-import android.os.VibrationEffect
-import android.os.Vibrator
+import android.net.wifi.WifiConfiguration
+import android.net.wifi.WifiManager
+import android.os.*
+import android.support.annotation.RequiresApi
 import android.support.v4.content.ContextCompat
 import android.view.KeyEvent
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.appbus.AppBus
 import cn.vove7.common.bridges.SystemOperation
+import cn.vove7.common.datamanager.DAO
+import cn.vove7.common.datamanager.executor.entity.MarkedData
+import cn.vove7.common.datamanager.greendao.MarkedDataDao
 import cn.vove7.common.model.ExResult
 import cn.vove7.common.model.RequestPermission
+import cn.vove7.common.model.ResultBox
+import cn.vove7.common.utils.RegUtils
 import cn.vove7.executorengine.R
 import cn.vove7.executorengine.helper.AdvanAppHelper
 import cn.vove7.executorengine.helper.AdvanContactHelper
@@ -31,35 +41,44 @@ import cn.vove7.vtp.system.SystemHelper
 
 
 class SystemBridge : SystemOperation {
-    private val context: Context = GlobalApp.APP
+    private val context: Context by lazy { GlobalApp.APP }
 
-    fun openAppByPkg(pkg: String): ExResult<String> {
+    override fun openAppDetail(pkg: String): Boolean {
+        return try {
+            AppHelper.showPackageDetail(context, pkg)
+            true
+        } catch (e: Exception) {
+            GlobalLog.err(e)
+            false
+        }
+    }
+
+    fun openAppByPkg(pkg: String): Boolean {
         return openAppByPkg(pkg, false)
     }
 
-    override fun openAppByPkg(pkg: String, resetTask: Boolean): ExResult<String> {
+    override fun openAppByPkg(pkg: String, resetTask: Boolean): Boolean {
         return try {
             val launchIntent = context.packageManager
                     .getLaunchIntentForPackage(pkg)
             if (launchIntent == null) {
-                GlobalLog.err("openAppByPkg 启动失败(未找到此App: $pkg")
-                Vog.e(this, "openAppByPkg 启动失败(未找到此App: $pkg")
+                GlobalLog.err("启动失败 未找到此App: $pkg")
 //                Bus.postInfo(MessageEvent("启动失败(未找到此App[pkg:]):$pkg ", WHAT_ERR))
-                ExResult("未找到此App: $pkg")
+//                ExResult("未找到此App: $pkg")
+                false
             } else {
                 launchIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP) //清空activity栈
                 if (resetTask)
                     launchIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK)
-
                 context.startActivity(launchIntent)
-                ExResult()
+                true
             }
         } catch (e: Exception) {
             e.printStackTrace()
-            Vog.wtf(this, "${e.message}")
+            Vog.wtf(this, "打开App{$pkg}失败 ${e.message}")
             GlobalLog.err(e.message ?: "未知错误")
 //            Bus.postInfo(MessageEvent("启动失败:$pkg  errMsg:${e.message}", WHAT_ERR))
-            ExResult(e.message)
+            false
         }
     }
 
@@ -67,21 +86,32 @@ class SystemBridge : SystemOperation {
      * openAppByWord
      * @return packageName if success
      */
-    override fun openAppByWord(appWord: String): ExResult<String> {
+    override fun openAppByWord(appWord: String): String? {
 
         val pkg = getPkgByWord(appWord)
         return if (pkg != null) {
             val o = openAppByPkg(pkg, false)
-            if (o.ok)
-                ExResult<String>().with(pkg)
-            else o
-
-        }
-//        Bus.postInfo(MessageEvent("未找到应用:$appWord", WHAT_ERR))
-        else ExResult("未找到应用:$appWord")
+            if (o) {
+                return pkg
+            } else null
+        } else null
     }
 
-    fun getPkgByWord(appWord: String): String? {
+    /**
+     * 标记 -> 应用列表
+     * @param appWord String
+     * @return String?
+     */
+    override fun getPkgByWord(appWord: String): String? {
+        DAO.daoSession.markedDataDao.queryBuilder()
+                .where(MarkedDataDao.Properties.Type.eq(MarkedData.MARKED_TYPE_APP))
+                .list().forEach {
+                    if (it.regex.matches(appWord)) {
+                        Vog.d(this, "getPkgByWord match from marked ---> ${it.regStr} $appWord")
+                        return it.value
+                    }
+                }
+
         val list = AdvanAppHelper.matchAppName(appWord)
         return if (list.isNotEmpty()) {
             list[0].data.packageName.also {
@@ -125,11 +155,28 @@ class SystemBridge : SystemOperation {
     }
 
     /**
-     * 手电
+     * 打开手电
      */
-    override fun openFlashlight(): ExResult<Any> {
-        HardwareHelper.switchFlashlight(context, true)
-        return ExResult()
+    override fun openFlashlight(): Boolean {
+        return switchFL(true)
+    }
+
+    /**
+     * 关闭手电
+     */
+    override fun closeFlashlight(): Boolean {
+        return switchFL(false)
+    }
+
+    private fun switchFL(on: Boolean): Boolean {
+        try {
+            HardwareHelper.switchFlashlight(context, on)
+        } catch (e: Exception) {
+            GlobalLog.err(e)
+            GlobalApp.toastShort((if (on) "打开" else "关闭") + "手电失败")
+            return false
+        }
+        return true
     }
 
     override fun getDeviceInfo(): DeviceInfo {
@@ -149,10 +196,15 @@ class SystemBridge : SystemOperation {
 
     /**
      * 获取App信息
-     * @param s 包名 或 App 名
+     * @param s 包名 或 App名/标记名
      */
     override fun getAppInfo(s: String): AppInfo? {
-        return AppHelper.getAppInfo(context, s, s)
+        return if (RegUtils.isPackage(s)) {
+            AppHelper.getAppInfo(context, "", s)
+        } else {
+            val pkg = getPkgByWord(s)
+            AppHelper.getAppInfo(context, s, pkg ?: s)
+        }
     }
 
     override fun sendKey(keyCode: Int) {
@@ -303,37 +355,114 @@ class SystemBridge : SystemOperation {
     override fun closeBluetooth(): Boolean = opBT(false)
 
     private fun opBT(enable: Boolean): Boolean {
-        if (Build.VERSION.SDK_INT >= 23) {
-            //检测当前app是否拥有某个权限
-            val checkCallPhonePermission = ContextCompat.checkSelfPermission(context,
-                    Manifest.permission.BLUETOOTH_ADMIN)
-            if (checkCallPhonePermission != PackageManager.PERMISSION_GRANTED) {
-                AppBus.post(RequestPermission("蓝牙权限"))
-                return false
-            }
-        }
+
         val mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter()
         return if (enable) mBluetoothAdapter.enable() //开启
         else mBluetoothAdapter.disable() //关闭
     }
 
-    override fun openWlan(): Boolean {//TODO
-        return false
+    override fun openWifi(): Boolean {
+        return switchWifi(true)
     }
 
-    override fun openWifiAp(): Boolean {
-        return false
+    private fun switchWifi(on: Boolean): Boolean {
+        return try {
+            val wifiMan = context.applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
+            wifiMan.isWifiEnabled = on
+            true
+        } catch (e: Exception) {
+            GlobalLog.err(e)
+            false
+        }
     }
+
+    override fun closeWifi(): Boolean {
+        return switchWifi(false)
+    }
+
+    override fun closeWifiAp(): Boolean {
+        return setWifiApEnabled(false)
+    }
+
+    //fixme
+    override fun openWifiAp(): Boolean {
+        return setWifiApEnabled(true)
+    }
+
+    /* 开启/关闭热点 */
+    private fun setWifiApEnabled(enabled: Boolean): Boolean {
+        val wifiManager = context.applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
+        if (enabled) {
+            // 因为wifi和热点不能同时打开，所以打开热点的时候需要关闭wifi
+            wifiManager.isWifiEnabled = false
+        }
+        if (Build.VERSION.SDK_INT >= 26) {
+            Handler(Looper.getMainLooper()).post {
+                setWifiApEnabledForAndroidO(enabled)
+            }
+            return true
+        }
+
+//        val ap: WifiConfiguration? = null
+        return try {
+            // 热点的配置类
+            val apConfig = WifiConfiguration()
+            // 配置热点的名称(可以在名字后面加点随机数什么的)
+//            apConfig.SSID = ssid
+//            apConfig.preSharedKey = password
+//            apConfig.allowedKeyManagement.set(4)//设置加密类型，这里4是wpa加密
+
+            val method = wifiManager.javaClass.getMethod("setWifiApEnabled", WifiConfiguration::class.java, java.lang.Boolean.TYPE)
+            // 返回热点打开状态
+            method.invoke(wifiManager, apConfig, enabled) as Boolean
+        } catch (e: Exception) {
+            e.printStackTrace()
+            false
+        }
+    }
+
+    /**
+     * 8.0 开启热点方法
+     * 注意：这个方法开启的热点名称和密码是手机系统里面默认的那个
+     *
+     */
+    @RequiresApi(Build.VERSION_CODES.O)
+    private fun setWifiApEnabledForAndroidO(isEnable: Boolean) {
+        val manager = context.applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
+        //cancelLocalOnlyHotspotRequest 是关闭热点
+        //打开热
+        manager.startLocalOnlyHotspot(object : WifiManager.LocalOnlyHotspotCallback() {
+            override fun onStarted(reservation: WifiManager.LocalOnlyHotspotReservation) {
+                super.onStarted(reservation)
+                Vog.d(this, "onStarted ---> ")
+            }
+
+            override fun onStopped() {
+                super.onStopped()
+                Vog.d(this, "onStopped ---> ")
+            }
+
+            override fun onFailed(reason: Int) {
+                super.onFailed(reason)
+                Vog.d(this, "onFailed ---> ")
+            }
+
+        }, Handler())
+
+    }
+
 
     override fun isScreenOn(): Boolean {
         return SystemHelper.isScreenOn(context)
     }
 
     override fun getClipText(): String? {
+        prepareIfNeeded()
         return SystemHelper.getClipBoardContent(context).toString()
     }
 
     override fun setClipText(text: String?) {
+        prepareIfNeeded()
         val cm = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
         val mClipData = ClipData.newPlainText("", text)
         cm.primaryClip = mClipData
@@ -362,5 +491,75 @@ class SystemBridge : SystemOperation {
             GlobalApp.toastShort(R.string.text_failed_to_open_email_app)
         }
 
+    }
+
+    //todo
+    override fun lockScreen(): Boolean {
+
+        return false
+    }
+
+    @SuppressLint("MissingPermission")
+    override fun location(): Location? {
+        if (ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            AppBus.post(RequestPermission("位置权限"))
+            return null
+        }
+
+        val serviceString = Context.LOCATION_SERVICE// 获取的是位置服务
+        val locationManager = context.getSystemService(serviceString) as LocationManager
+        val providers = locationManager.getProviders(true)
+        val locationProvider: String=LocationManager.NETWORK_PROVIDER
+        if (!providers.contains(LocationManager.NETWORK_PROVIDER)) {
+            GlobalApp.toastShort("无法获取位置信息")
+            GlobalLog.log("未打开位置设置")
+            Vog.d(this, "location ---> 没有可用的位置提供器")
+            return null
+        }
+        prepareIfNeeded()
+        val resu = ResultBox<Location?>()
+        var block = Runnable {}
+        val handler = Handler()
+        val loop=Looper.myLooper()
+
+        val loLis = object : LocationListener {
+            override fun onLocationChanged(location: Location?) {
+                Vog.d(this, "onLocationChanged ---> $location")
+                handler.removeCallbacks(block)
+                locationManager.removeUpdates(this)
+                resu.set(location)
+                quitLoop()
+            }
+
+            override fun onStatusChanged(provider: String?, status: Int, extras: Bundle?) {
+            }
+
+            override fun onProviderEnabled(provider: String?) {
+            }
+
+            override fun onProviderDisabled(provider: String?) {
+            }
+        }
+        block = Runnable {
+            locationManager.removeUpdates(loLis)
+            GlobalLog.log("location ---> 获取位置超时,使用上次位置")
+            resu.set(locationManager.getLastKnownLocation(locationProvider))
+            quitLoop()
+        }
+        locationManager.requestLocationUpdates(locationProvider, 500L, 0f, loLis,loop)
+        handler.postDelayed(block, 5000)//等待5秒
+        Looper.loop()
+        return resu.get()
+    }
+
+    private fun quitLoop() {
+        val looper = Looper.myLooper()
+        looper?.quit()
+    }
+
+    private fun prepareIfNeeded() {
+        if (Looper.myLooper() == null) {
+            Looper.prepare()
+        }
     }
 }

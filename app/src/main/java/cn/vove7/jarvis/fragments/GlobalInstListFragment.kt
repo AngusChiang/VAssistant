@@ -1,7 +1,6 @@
 package cn.vove7.jarvis.fragments
 
 import android.content.Intent
-import android.os.Handler
 import android.view.View
 import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.datamanager.DAO
@@ -10,7 +9,7 @@ import cn.vove7.common.datamanager.greendao.ActionNodeDao
 import cn.vove7.common.datamanager.parse.statusmap.ActionNode
 import cn.vove7.common.datamanager.parse.statusmap.ActionNode.NODE_SCOPE_GLOBAL
 import cn.vove7.common.netacc.ApiUrls
-import cn.vove7.jarvis.utils.NetHelper
+import cn.vove7.common.utils.NetHelper
 import cn.vove7.common.netacc.model.BaseRequestModel
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.activities.NewInstActivity
@@ -95,14 +94,9 @@ class GlobalInstListFragment : SimpleListFragment<ActionNode>(), OnSyncInst {
                     .limit(pageSizeLimit).list()
             Vog.d(this, "onGetData $offsetDatas")
             dataSet.addAll(transData(offsetDatas))
-            allLoadFlag = offsetDatas.isEmpty()
-            handler.sendEmptyMessage(0)
+            postLoadResult(offsetDatas.isEmpty())
         }
     }
 
-    val handler = Handler {
-        notifyLoadSuccess(allLoadFlag)
-        return@Handler true
-    }
 
 }

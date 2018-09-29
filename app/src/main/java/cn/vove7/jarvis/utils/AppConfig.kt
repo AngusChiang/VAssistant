@@ -1,10 +1,12 @@
 package cn.vove7.jarvis.utils
 
+import android.os.Build
 import android.os.Looper
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.model.UserInfo
 import cn.vove7.common.netacc.ApiUrls
 import cn.vove7.common.netacc.model.BaseRequestModel
+import cn.vove7.common.utils.NetHelper
 import cn.vove7.jarvis.R
 import cn.vove7.vtp.log.Vog
 import cn.vove7.vtp.sharedpreference.SpHelper
@@ -25,7 +27,10 @@ object AppConfig {
     var isToastWhenRemoveAd = true
     var isAdBlockService = false
     var isLongPressVolUpWakeUp = true
+    var voiceControlDialog = true
     var adWaitSecs = 17
+    var voiceWakeup = false
+    var audioSpeak = true//播报语音
 
     fun init() {
         thread {
@@ -73,7 +78,16 @@ object AppConfig {
         UserInfo.logout()
     }
 
+    fun checkDate() {
+        thread {
+            if (UserInfo.isLogin()) {
+                NetHelper.postJson<Any>(ApiUrls.CHECK_USER_DATE, BaseRequestModel(""))
+            }
+        }
+    }
+
     fun checkUser(): Boolean {
+        checkDate()
         if (!UserInfo.isLogin()) {
             GlobalApp.toastShort(R.string.text_please_login_first)
             return false
@@ -91,6 +105,9 @@ object AppConfig {
         isToastWhenRemoveAd = sp.getBoolean(R.string.key_show_toast_when_remove_ad, true)
         isAdBlockService = sp.getBoolean(R.string.key_open_ad_block, false)
         isLongPressVolUpWakeUp = sp.getBoolean(R.string.key_long_press_volume_up_wake_up, true)
+        voiceControlDialog = sp.getBoolean(R.string.key_voice_control_dialog, true)
+        voiceWakeup = sp.getBoolean(R.string.key_open_voice_wakeup, false)
+        audioSpeak = sp.getBoolean(R.string.key_audio_speak, true)
         sp.getInt(R.string.key_ad_wait_secs).also {
             adWaitSecs = if (it == -1) 17 else it
         }
@@ -103,12 +120,24 @@ object AppConfig {
         return "\nvibrateWhenStartReco: $vibrateWhenStartReco"
     }
 
-    fun getVersionName(): String {
-        return GlobalApp.APP.let {
-            it.packageManager.getPackageInfo(
-                    it.packageName, 0).versionName
+    val versionName: String
+        get() {
+            return GlobalApp.APP.let {
+                it.packageManager.getPackageInfo(
+                        it.packageName, 0).versionName
+            }
         }
-    }
+    val versionCode: Long
+        get() {
+            return GlobalApp.APP.packageManager.getPackageInfo(
+                    GlobalApp.APP.packageName, 0).let {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                    it.longVersionCode
+                } else {
+                    it.versionCode.toLong()
+                }
+            }
+        }
 }
 
 //

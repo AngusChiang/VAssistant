@@ -7,6 +7,9 @@ checkService = function(){
 }
 
 
+accessibility = function(){
+    return executor.checkAccessibilityService(true)
+}
 //  语音合成同步 ，说完再向下执行
 // @param text
 // @return booleam 是否成功
@@ -96,6 +99,9 @@ waitForText = function(text, millis){
  
 smartOpen = function(s){
     return executor.smartOpen(s)
+}
+smartClose = function(s){
+    return executor.smartClose(s)
 }
 
 sleep = function(m){

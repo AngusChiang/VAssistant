@@ -32,10 +32,22 @@ open class GlobalApp : Application() {
         fun toastShort(rId: Int) {
             toastShort(getString(rId))
         }
+
+        fun toastLong(msg: String) {
+            (APP as GlobalApp).toastLong(msg)
+        }
+
+        fun toastLong(rId: Int) {
+            toastLong(getString(rId))
+        }
     }
 
     private fun toastShort(msg: String) {
         colorfulToast.showShort(msg)
+    }
+
+    private fun toastLong(msg: String) {
+        colorfulToast.showLong(msg)
     }
 
     lateinit var colorfulToast: ColorfulToast

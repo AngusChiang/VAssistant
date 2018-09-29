@@ -6,6 +6,7 @@
 
 require 'import'
 import 'cn.vove7.vtp.text.TextTransHelper'
+import 'cn.vove7.common.utils.TextHelper'
 import 'cn.vove7.vtp.builder.*'
 
 function toPinyin(text, ...)
@@ -18,4 +19,14 @@ function toPinyin(text, ...)
 end
 
 
+function matches(s, regex)
+    return TextHelper.INSTANCE.matches(s, regex)
+end
 
+function matchValues(s, regex)
+    return TextHelper.INSTANCE.matchValues(s, regex)
+end
+
+function arr2String(arr)
+    return TextHelper.INSTANCE.arr2String(arr, ', ')
+end

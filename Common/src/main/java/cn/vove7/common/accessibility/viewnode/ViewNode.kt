@@ -28,19 +28,19 @@ class ViewNode(val node: AccessibilityNodeInfo) : ViewOperation, Comparable<View
         const val tryNum = 10
     }
 
-    fun getBoundsInParent(): Rect {
+    override fun getBoundsInParent(): Rect {
         val out = Rect()
         node.getBoundsInParent(out)
         return out
     }
 
-    fun getBounds(): Rect {
+    override fun getBounds(): Rect {
         val out = Rect()
         node.getBoundsInScreen(out)
         return out
     }
 
-    fun getParent(): ViewNode? {
+    override fun getParent(): ViewNode? {
         val it = node.parent
         return if (it != null) {
             ViewNode(it)
@@ -49,11 +49,11 @@ class ViewNode(val node: AccessibilityNodeInfo) : ViewOperation, Comparable<View
     }
 
     override fun tryClick(): Boolean {
-        for (i in 1..3) {
-            Vog.d(this, "tryClick ---> i: $i")
-            val r = tryOp(AccessibilityNodeInfo.ACTION_CLICK)
-            if (r) return true
-            sleep(50)
+        val r = tryOp(AccessibilityNodeInfo.ACTION_CLICK)
+        if (r) return true
+        //todo global op
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+
         }
         return false
     }
@@ -83,7 +83,7 @@ class ViewNode(val node: AccessibilityNodeInfo) : ViewOperation, Comparable<View
     /**
      * @return node.childs
      */
-    fun getChilds(): Array<ViewNode> {
+    override fun getChilds(): Array<ViewNode> {
         synchronized(lastGetChildTime) {
             val now = System.currentTimeMillis()
             if (childss != null && now - lastGetChildTime < 10000L) {//10s有效期
@@ -102,12 +102,7 @@ class ViewNode(val node: AccessibilityNodeInfo) : ViewOperation, Comparable<View
         }
     }
 
-
-//    fun childCount(): Int {
-//        return node.childCount
-//    }
-
-    fun getChildCount(): Int = node.childCount
+    override fun getChildCount(): Int = node.childCount
 
 
     fun childAt(i: Int): ViewNode? {
@@ -284,4 +279,7 @@ class ViewNode(val node: AccessibilityNodeInfo) : ViewOperation, Comparable<View
                 (if (node.isClickable) ", Clickable" else "") + '}'
     }
 
+    override fun isClickable(): Boolean {
+        return node.isClickable
+    }
 }

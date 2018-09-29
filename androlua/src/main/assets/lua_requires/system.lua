@@ -9,8 +9,13 @@ import 'android.view.KeyEvent'
 --通过包名打开App
 -- ExResult
 --
-function openAppByPkg(pkg)
-    return system.openAppByPkg(pkg)
+function openAppByPkg(pkg, ...)
+    local ps = { ... }
+    local reset = false
+    if (#ps >= 1) then
+        reset = ps[1]
+    end
+    return system.openAppByPkg(pkg, reset)
 end
 
 --*

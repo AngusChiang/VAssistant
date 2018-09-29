@@ -14,6 +14,8 @@ class ExampleUnitTest {
         assertEquals(4, (2 + 2).toLong())
         f(1, "2", 3,"4")
         f(2)
+
+        print(listOf(1,2,3).subList(1,3))
     }
 
     fun f(a: Any, vararg ss: Any) {

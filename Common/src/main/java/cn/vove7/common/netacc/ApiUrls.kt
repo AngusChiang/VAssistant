@@ -9,18 +9,25 @@ import cn.vove7.common.BuildConfig
  * 2018/9/11
  */
 object ApiUrls {
-    val SERVER_IP = if (BuildConfig.DEBUG) "http://192.168.137.1:8080/"
+    private val SERVER_IP = if (BuildConfig.DEBUG) "http://192.168.137.1:8080/"
     else "http://115.159.155.25:8080/"
 
     private val ACCOUNT = SERVER_IP + "account/"
     private val MARKED = SERVER_IP + "marked/"
     private val ACTION = SERVER_IP + "action/"
+    private val COMMON = SERVER_IP + "common/"
+    private val APP = SERVER_IP + "app/"
+
+    val CRASH_HANDLER = COMMON + "ch"
     private val PAY = SERVER_IP + "p/"
     val LOGIN = ACCOUNT + "lv"
     val ACTIVATE_VIP = ACCOUNT + "act"
     val VERIFY_TOKEN = ACCOUNT + "vt"
     val GET_USER_INFO = ACCOUNT + "gi"
     val GET_PRICES = ACCOUNT + "gp"
+    val MODIFY_NAME = ACCOUNT + "mun"
+    val MODIFY_PASS = ACCOUNT + "mup"
+    val CHECK_USER_DATE = ACCOUNT + "cud"
 
     val REGISTER_BY_EMAIL = ACCOUNT + "rbe"
     val SEND_EMAIL_VER_CODE = ACCOUNT + "sec"
@@ -41,6 +48,9 @@ object ApiUrls {
 
     val GET_ALI_ORDER = PAY + "a"
 
-    val USER_GUIDE = SERVER_IP + "guide"
+    const val USER_GUIDE = "https://vove.gitee.io/"
     val HELP_DEL_INST = "$USER_GUIDE#del-inst"
+
+    val UPLOAD_CMD_HIS = APP + "uch"
+    val NEW_USER_FEEDBACK = APP + "ufb"
 }

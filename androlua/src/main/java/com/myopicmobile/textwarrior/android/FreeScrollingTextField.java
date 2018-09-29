@@ -501,7 +501,7 @@ public class FreeScrollingTextField extends View
 
     /**
      * Sets the text displayed to the document referenced by hDoc. The view
-     * state is reset and the view is invalidated as a side-effect.
+     * state is set and the view is invalidated as a side-effect.
      */
     public void setDocumentProvider(DocumentProvider hDoc) {
         _hDoc = hDoc;

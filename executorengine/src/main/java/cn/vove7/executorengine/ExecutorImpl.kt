@@ -11,7 +11,10 @@ import cn.vove7.common.bridges.*
 import cn.vove7.common.bridges.ShowDialogEvent.Companion.WHICH_SINGLE
 import cn.vove7.common.datamanager.DAO
 import cn.vove7.common.datamanager.executor.entity.MarkedData
-import cn.vove7.common.datamanager.executor.entity.MarkedData.*
+import cn.vove7.common.datamanager.executor.entity.MarkedData.MARKED_TYPE_SCRIPT_JS
+import cn.vove7.common.datamanager.executor.entity.MarkedData.MARKED_TYPE_SCRIPT_LUA
+import cn.vove7.common.datamanager.greendao.MarkedDataDao
+import cn.vove7.common.datamanager.history.CommandHistory
 import cn.vove7.common.datamanager.parse.DataFrom
 import cn.vove7.common.datamanager.parse.model.Action
 import cn.vove7.common.datamanager.parse.model.Action.SCRIPT_TYPE_JS
@@ -21,6 +24,9 @@ import cn.vove7.common.datamanager.parse.statusmap.ActionNode
 import cn.vove7.common.executor.CExecutorI
 import cn.vove7.common.executor.PartialResult
 import cn.vove7.common.model.RequestPermission
+import cn.vove7.common.model.UserInfo
+import cn.vove7.common.utils.NetHelper
+import cn.vove7.common.utils.RegUtils
 import cn.vove7.common.utils.ScreenAdapter
 import cn.vove7.common.view.finder.ViewFindBuilder
 import cn.vove7.executorengine.bridges.SystemBridge
@@ -38,14 +44,15 @@ import kotlin.concurrent.thread
  */
 open class ExecutorImpl(
         val context: Context,
-        val serviceBridge: ServiceBridge
+        val serviceBridge: ServiceBridge?
 ) : CExecutorI {
-    val systemBridge = SystemBridge()
+    private val systemBridge = SystemBridge()
     var accessApi: AccessibilityApi? = null
     private var lock = Object()
     var currentAction: Action? = null
     private val markedOpenDao = DAO.daoSession.markedDataDao
     val globalActionExecutor = GlobalActionExecutor()
+    override var command: String? = null
 
     override var running: Boolean = false
 
@@ -56,11 +63,12 @@ open class ExecutorImpl(
     private lateinit var actionQueue: PriorityQueue<Action>
 
     override var actionCount: Int = -1
+    override var commandType: Int = 0
 
     override var currentActionIndex: Int = -1
     override var actionScope: Int? = null
 
-    override val currentApp: ActionScope?
+    override var currentApp: ActionScope? = null
         get() {
             val r = checkAccessibilityService(false)
             return if (r) {
@@ -68,7 +76,8 @@ open class ExecutorImpl(
             } else null
         }
 
-    override fun isGlobal(): Boolean = globalScopeType.contains(actionScope)
+    override fun isGlobal(): Boolean =
+        globalScopeType.contains(actionScope)
 
     override var currentActivity: String = ""
         get() {
@@ -89,11 +98,14 @@ open class ExecutorImpl(
         if (thread?.isAlive == true) {
             thread!!.interrupt()
         }
+        this.command = cmdWords
+        globalActionExecutor.screenAdapter.reSet()
         this.actionQueue = actionQueue
         lock = Object()
         thread = thread(start = true, isDaemon = true, priority = Thread.MAX_PRIORITY) {
             running = true
-            serviceBridge.onExecuteStart(cmdWords)
+            commandType = 0
+            serviceBridge?.onExecuteStart(cmdWords)
             actionCount = actionQueue.size
             currentActionIndex = 0
             pollActionQueue()
@@ -118,14 +130,14 @@ open class ExecutorImpl(
                     r.needTerminal -> {//出错
                         currentAction = null
                         actionQueue.clear()
-                        serviceBridge.onExecuteFailed(r.msg)
+                        serviceBridge?.onExecuteInterrupt(r.msg)
                         return
                     }
                 }
             } else {
                 Vog.i(this, "pollActionQueue 终止")
                 actionQueue.clear()
-                serviceBridge.onExecuteFailed("强行终止")
+                serviceBridge?.onExecuteInterrupt("强行终止")
                 break
             }
         }
@@ -155,7 +167,7 @@ open class ExecutorImpl(
 
     override fun onFinish() {
         running = false
-        serviceBridge.onExecuteFinished("执行结束")
+        serviceBridge?.onExecuteFinished("执行结束")
     }
 
     @CallSuper
@@ -176,18 +188,17 @@ open class ExecutorImpl(
      * 接着打开应用
      */
     private fun parseAppInnerOperation(cmd: String, pkg: String): Boolean {
-        actionQueue = ParseEngine.matchAppAction(cmd, pkg)
+        val appQ = ParseEngine.matchAppAction(cmd, pkg)
+        actionQueue = appQ.second
         //打开应用
-        if (actionQueue.isNotEmpty()) {// 判断是否在目标页 check 在本App启动此App无反应???
-            if (accessApi?.currentScope?.assertEquals(actionQueue.peek()?.scope) == false) {
-                systemBridge.openAppByPkg(pkg, true)
-            } else {
-                Vog.d(this, "parseAppInnerOperation ---> 已在页面")
-            }
-            Vog.d(this, "smartOpen app内操作")
+        if (actionQueue.isNotEmpty()) {//
+            systemBridge.openAppByPkg(pkg, true)
+            val his = CommandHistory(UserInfo.getUserId(), cmd, "打开$pkg -> ${appQ.first}")
+            NetHelper.uploadUserCommandHistory(his)
+            Vog.d(this, "parseAppInnerOperation app内操作")
         } else {
             systemBridge.openAppByPkg(pkg, false)
-            Vog.d(this, "smartOpen 无后续操作")
+            Vog.d(this, "parseAppInnerOperation 无后续操作")
             return true
         }
 
@@ -201,22 +212,34 @@ open class ExecutorImpl(
             //解析App内操作
         } else
             false
-
     }
 
     override fun smartOpen(data: String): Boolean {
         return smartOpen(data, null)
     }
 
+    override fun smartClose(data: String): Boolean {
+        val pkg =
+            if (RegUtils.isPackage(data)) data
+            else systemBridge.getPkgByWord(data)
+        return if (pkg != null)
+            onLuaExec(CloseAppScript, pkg).isSuccess//强制停止App
+        else {
+            //Marked打开
+            commandType = -1
+            parseOpenOrCloseAction(data)
+        }
+    }
+
     private fun smartOpen(data: String, follow: String?): Boolean {
         Vog.d(this, "smartOpen: $data follow:$follow")
         //包名
-        if (PACKAGE_REGEX.matches(data)) {
+        if (RegUtils.isPackage(data)) {
             systemBridge.openAppByPkg(data).also {
-                return if (it.ok) {
+                return if (it) {
                     follow == null || parseAppInnerOperation(follow, data)
                 } else {
-                    GlobalApp.toastShort("未知操作")
+                    GlobalApp.toastShort(R.string.text_app_not_install)
                     false
                 }
             }
@@ -227,14 +250,15 @@ open class ExecutorImpl(
         return if (o != null) {//打开App 解析跟随操作
             parseAppInnerOperation(data, o)
         } else {//其他操作,打开网络,手电，网页
-            parseOpenAction(data)
+            commandType = 1
+            parseOpenOrCloseAction(data)
         }
     }
 
     /**
      * 解析打开动作
      */
-    private fun parseOpenAction(p: String): Boolean {
+    private fun parseOpenOrCloseAction(p: String): Boolean {
         /*val marked = markedOpenDao.queryBuilder()
                 .where(MarkedOpenDao.Properties.Key.like(p)).unique()
          if (marked != null) {//通过Key查询到
@@ -242,13 +266,17 @@ open class ExecutorImpl(
             p.indexOf()
            return openByIdentifier(marked)
         } else {*/
-        markedOpenDao.loadAll().forEach {
+        markedOpenDao.queryBuilder().where(MarkedDataDao.Properties.Type.`in`(
+                MarkedData.MARKED_TYPE_SCRIPT_LUA,
+                MarkedData.MARKED_TYPE_SCRIPT_JS
+        )).list().forEach {
             val result = it.regex.matchEntire(p)
             if (result != null) {
                 return openByIdentifier(it, ParseEngine.getLastParam(result.groups))//执行
             }
         }
-        GlobalLog.err("parseOpenAction 未知操作: $p")
+        NetHelper.uploadUserCommandHistory(CommandHistory(UserInfo.getUserId(), "打开|关闭 $p", null))
+        GlobalLog.err("parseOpenOrCloseAction 未知操作: $p")
         return false
 //        }
     }
@@ -258,17 +286,6 @@ open class ExecutorImpl(
      */
     private fun openByIdentifier(it: MarkedData, follow: String?): Boolean {
         return when (it.type) {
-            MARKED_TYPE_APP -> {
-                smartOpen(it.value, follow)
-            }
-//            MARKED_TYPE_SYS_FUN -> {
-//                when (it.value) {
-//                    "openFlash" -> {//手电
-//                        systemBridge.openFlashlight().ok
-//                    }
-//                    else -> false
-//                }
-//            }
             MARKED_TYPE_SCRIPT_LUA -> {
                 onLuaExec(it.value).isSuccess
             }
@@ -352,7 +369,7 @@ open class ExecutorImpl(
                 e.printStackTrace()
                 //必须强行stop
                 Vog.d(this, "被迫强行停止")
-                serviceBridge.onExecuteFailed("终止执行")
+                serviceBridge?.onExecuteInterrupt("终止执行")
                 accessApi?.removeAllNotifier(this)
                 Thread.currentThread().interrupt()
                 Thread.currentThread().stop()//???
@@ -402,12 +419,22 @@ open class ExecutorImpl(
         return getViewNode()
     }
 
+    override fun waitForText(text: Array<String>, m: Long): ViewNode? {
+        Vog.d(this, "waitForText $text")
+        if (!checkAccessibilityService()) {
+            return null
+        }
+        accessApi?.waitForView(this, ViewFindBuilder(this).containsText(*text).viewFinderX)
+        waitForUnlock(m)
+        return getViewNode()
+    }
+
     /**
      * 等待语音参数
      */
     override fun waitForVoiceParam(askWord: String?): String? {
 
-        serviceBridge.getVoiceParam(currentAction!!)
+        serviceBridge?.getVoiceParam(currentAction!!)
         waitForUnlock()
         //得到结果 -> action.param
         return if (!currentAction!!.responseResult) {
@@ -464,11 +491,11 @@ open class ExecutorImpl(
     }
 
     override fun speak(text: String) {
-        serviceBridge.speak(text)
+        serviceBridge?.speak(text)
     }
 
     override fun speakSync(text: String): Boolean {
-        serviceBridge.speakSync(text)
+        serviceBridge?.speakSync(text)
         waitForUnlock()
         return if (callbackVal == null) true
         else {
@@ -546,8 +573,18 @@ open class ExecutorImpl(
         /**
          * 检测包名正则
          */
-        val PACKAGE_REGEX = "[a-zA-Z]+[0-9a-zA-Z_]*(\\.[a-zA-Z]+[0-9a-zA-Z_]*)+".toRegex()
-        private val globalScopeType = arrayListOf(ActionNode.NODE_SCOPE_GLOBAL, ActionNode.NODE_SCOPE_GLOBAL_2)
+        private val globalScopeType = arrayListOf(ActionNode.NODE_SCOPE_GLOBAL/*, ActionNode.NODE_SCOPE_GLOBAL_2*/)
+
+        private const val CloseAppScript = "require 'accessibility'\n" +
+                "system.openAppDetail(args[1])\n" +
+                "s = ViewFinder().equalsText({'强行停止','force stop'}).waitFor(3000)\n" +
+                "a=s.tryClick()\n" +
+                "if(not a) then \n" +
+                "speak('应用未运行')\n" +
+                "else\n" +
+                "ViewFinder().equalsText({'确定','OK'}).waitFor(2000).tryClick()\n" +
+                "home()" +
+                "end\n"
 
     }
 

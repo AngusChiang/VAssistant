@@ -3,11 +3,11 @@ package cn.vove7.jarvis.activities.base
 import android.os.Bundle
 import cn.vove7.common.model.UserInfo
 import cn.vove7.jarvis.R
+import cn.vove7.jarvis.adapters.SettingsExpandableAdapter
 import cn.vove7.jarvis.plugins.AdKillerService
 import cn.vove7.jarvis.view.NumberPickerItem
 import cn.vove7.jarvis.view.SwitchItem
 import cn.vove7.jarvis.view.custom.SettingGroupItem
-import cn.vove7.jarvis.view.custom.SettingsExpandableAdapter
 import kotlinx.android.synthetic.main.activity_expandable_settings.*
 
 /**
@@ -33,11 +33,11 @@ class LaboratoryActivity : ReturnableActivity() {
         listOf(
                 SettingGroupItem(R.color.google_blue, getString(R.string.text_open_ad_killer_service),
                         childItems = listOf(
-                                SwitchItem(R.string.text_open, if (UserInfo.isVip()) null
-                                else getString(R.string.summary_not_vip_remove_ad), R.string.key_open_ad_block,
-                                        defaultValue = { true }) { holder, it ->
+                                SwitchItem(R.string.text_open, summary = if (UserInfo.isVip()) null
+                                else getString(R.string.summary_not_vip_remove_ad), keyId = R.string.key_open_ad_block,
+                                        defaultValue = { true }) { _, it ->
                                     when (it as Boolean) {
-                                        true -> AdKillerService.bindServer()
+                                        true -> AdKillerService.restart()
                                         false -> AdKillerService.unBindServer()
                                     }
                                 },

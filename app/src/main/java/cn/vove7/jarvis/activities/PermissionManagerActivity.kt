@@ -147,6 +147,7 @@ class PermissionManagerActivity : OneFragmentActivity() {
                         PermissionStatus(arrayOf("android.permission.READ_PHONE_STATE"), "读取设备状态", ""),
                         PermissionStatus(arrayOf("android.permission.WRITE_EXTERNAL_STORAGE"), "写SD卡", ""),
                         PermissionStatus(arrayOf("android.permission.FLASHLIGHT"), "闪光灯", "打开闪光灯"),
+                        PermissionStatus(arrayOf("android.permission.ACCESS_COARSE_LOCATION","android.permission.ACCESS_FINE_LOCATION"), "位置信息", "不使用此类指令可不开启"),
 //                        PermissionStatus(arrayOf("android.permission.BLUETOOTH", "android.permission.BLUETOOTH_ADMIN"),
 //                                "蓝牙", "打开蓝牙"),
                         PermissionStatus(arrayOf("android.permission.CAMERA"), "相机", "打开闪光灯")

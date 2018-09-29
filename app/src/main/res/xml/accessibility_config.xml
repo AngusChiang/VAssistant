@@ -4,8 +4,9 @@
     android:accessibilityFeedbackType="feedbackAllMask"
     android:accessibilityFlags="flagIncludeNotImportantViews|flagReportViewIds|flagRetrieveInteractiveWindows|flagRequestEnhancedWebAccessibility|flagRequestFilterKeyEvents"
     android:canRequestEnhancedWebAccessibility="true"
+    android:canRequestTouchExplorationMode="true"
     android:canRequestFilterKeyEvents="true"
     android:canRetrieveWindowContent="true"
     android:description="@string/app_name"
     android:notificationTimeout="0"
-    android:settingsActivity="cn.vove7.vassistant.MainActivity" />
+    android:settingsActivity="cn.vove7.jarvis.activities.SettingsActivity" />

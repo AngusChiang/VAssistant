@@ -10,7 +10,7 @@ import android.widget.ProgressBar
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.model.UserInfo
 import cn.vove7.common.netacc.ApiUrls
-import cn.vove7.jarvis.utils.NetHelper
+import cn.vove7.common.utils.NetHelper
 import cn.vove7.common.netacc.model.BaseRequestModel
 import cn.vove7.common.netacc.model.ResponseMessage
 import cn.vove7.common.netacc.tool.SecureHelper
@@ -76,10 +76,10 @@ class SignupDialog(context: Context, val r: OnLoginSuccess) : View.OnClickListen
                     if (bean != null) {
                         if (bean.isOk()) {
                             toast.showShort(bean.data ?: "null")
-                            startDown(5)
+                            startDown(60)
                         } else {
                             this.isEnabled = true
-                            toast.showShort(bean.message ?: "null")
+                            toast.showShort(bean.message)
                         }
                     } else {
                         this.isEnabled = true

@@ -5,6 +5,7 @@ import android.os.Build
 import cn.vove7.common.bridges.ServiceBridge
 import cn.vove7.common.executor.PartialResult
 import cn.vove7.executorengine.ExecutorImpl
+import cn.vove7.executorengine.bridges.SystemBridge
 import cn.vove7.vtp.log.Vog
 import java.util.*
 
@@ -43,7 +44,7 @@ class SimpleActionScriptExecutor(
                     val msg = "执行终止-- on $line ${partialResult.msg}"
                     Vog.d(this, msg)
                     currentAction = null
-                    serviceBridge.onExecuteFailed(msg)
+                    serviceBridge?.onExecuteInterrupt(msg)
                     return partialResult
                 }
                 !partialResult.isSuccess -> {
@@ -135,7 +136,7 @@ class SimpleActionScriptExecutor(
                 }
             }
             ACTION_OPEN_ACTIVITY -> {
-                return if (ps.size >= 2) PartialResult(systemBridge.startActivity(p, ps[1]))
+                return if (ps.size >= 2) PartialResult(SystemBridge().startActivity(p, ps[1]))
                 else PartialResult.fatal("参数数量应为5")
             }
         }
@@ -151,44 +152,44 @@ class SimpleActionScriptExecutor(
         //
         fun operateViewOperation(v: String, by: Int, op: Int, v1: String = "",
                                  ep: String? = null, stopIfFail: Boolean = true): PartialResult {
-            val node = when (by) {
-                BY_ID -> accessApi?.findFirstNodeById(v)
-                BY_TEXT -> accessApi?.findFirstNodeByTextWhitFuzzy(v)
-                BY_DESC -> accessApi?.findFirstNodeByDesc(v)
-                BY_ID_AND_TEXT -> accessApi?.findFirstNodeByIdAndText(v, v1)//id/text
+//            val node = when (by) {
+//                BY_ID -> accessApi?.findFirstNodeById(v)
+//                BY_TEXT -> accessApi?.findFirstNodeByTextWhitFuzzy(v)
+//                BY_DESC -> accessApi?.findFirstNodeByDesc(v)
+//                BY_ID_AND_TEXT -> accessApi?.findFirstNodeByIdAndText(v, v1)//id/text
+//
+//                else -> null
+//            }
+//            return if (node != null) {
+//                if (when (op) {
+//                            OPERATION_CLICK -> node.tryClick()
+//                            OPERATION_LONG_CLICK -> node.tryLongClick()
+//                            OPERATION_SET_TEXT -> node.setText(v1, ep)
+//                            OPERATION_FOCUS -> node.focus()
+//                            OPERATION_DOUBLE_CLICK -> node.doubleClick()
+//                            OPERATION_SCROLL_UP -> {
+//                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+//                                    node.scrollUp()
+//                                } else {
+//                                    Vog.d(this, "operateViewOperation 版本M")
+//                                    false
+//                                }
+//                            }
+//                            OPERATION_SCROLL_DOWN -> {
+//                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+//                                    node.scrollDown()
+//                                } else {
+//                                    Vog.d(this, "operateViewOperation 版本M")
+//                                    false
+//                                }
+//                            }
+//                            else -> false
+//                        }) {
+//                    Thread.sleep(100)
+                   return PartialResult.success()
 
-                else -> null
-            }
-            return if (node != null) {
-                if (when (op) {
-                            OPERATION_CLICK -> node.tryClick()
-                            OPERATION_LONG_CLICK -> node.tryLongClick()
-                            OPERATION_SET_TEXT -> node.setText(v1, ep)
-                            OPERATION_FOCUS -> node.focus()
-                            OPERATION_DOUBLE_CLICK -> node.doubleClick()
-                            OPERATION_SCROLL_UP -> {
-                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                                    node.scrollUp()
-                                } else {
-                                    Vog.d(this, "operateViewOperation 版本M")
-                                    false
-                                }
-                            }
-                            OPERATION_SCROLL_DOWN -> {
-                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                                    node.scrollDown()
-                                } else {
-                                    Vog.d(this, "operateViewOperation 版本M")
-                                    false
-                                }
-                            }
-                            else -> false
-                        }) {
-                    Thread.sleep(100)
-                    PartialResult.success()
-
-                } else PartialResult(false, stopIfFail, "操作失败 - $op")
-            } else PartialResult(false, stopIfFail, "未找到View: $v")
+//                } else PartialResult(false, stopIfFail, "操作失败 - $op")
+//            } else PartialResult(false, stopIfFail, "未找到View: $v")
         }
 
 
@@ -234,7 +235,7 @@ class SimpleActionScriptExecutor(
                     return PartialResult(openRecent())
                 }
                 ACTION_PULL_NOTIFICATION -> {
-                    return PartialResult(globalActionExecutor.notifications())
+                    return PartialResult(globalActionExecutor.notificationBar())
                 }
             }
 

@@ -16,6 +16,7 @@
             <!--android:src="@drawable/bg_user_info" />-->
 
         <LinearLayout
+            android:id="@+id/name_lay"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="10dp"
@@ -109,21 +110,21 @@
             android:textStyle="bold" />
     </LinearLayout>
 
-    <Button
-        android:id="@+id/btn_recharge"
-        android:theme="@style/MaterialButton.White"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/text_recharge"
-        android:textColor="@color/green_700" />
+    <!--<Button-->
+        <!--android:id="@+id/btn_recharge"-->
+        <!--android:theme="@style/MaterialButton.White"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:text="@string/text_recharge"-->
+        <!--android:textColor="@color/green_700" />-->
 
-    <Button
-        android:id="@+id/btn_logout"
-        android:theme="@style/MaterialButton.White"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/text_logout"
-        android:textColor="@color/red_500" />
+    <!--<Button-->
+        <!--android:id="@+id/btn_logout"-->
+        <!--android:theme="@style/MaterialButton.White"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:text="@string/text_logout"-->
+        <!--android:textColor="@color/red_500" />-->
 
 
 </LinearLayout>

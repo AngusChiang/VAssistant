@@ -1,30 +1,53 @@
 package cn.vove7.common.bridges
 
+import android.location.Location
 import cn.vove7.common.model.ExResult
 import cn.vove7.vtp.app.AppInfo
 import cn.vove7.vtp.system.DeviceInfo
 
 interface SystemOperation {
     /**
+     * 打开应用详情页
+     * @param pkg String 包名
+     * @return Boolean
+     */
+    fun openAppDetail(pkg: String): Boolean
+
+    /**
+     * 根据App名，获取应用包名
+     * 标记 -> 应用列表
+     * @param appWord String App名/别名
+     * @return String?
+     */
+    fun getPkgByWord(appWord: String): String?
+
+    /**
      * 通过包名打开App
+     *
+     * @param pkg String
+     * @param resetTask Boolean 是否重置Activity栈（重置后可进入App首页）
+     * @return Boolean
      */
-    fun openAppByPkg(pkg: String, resetTask: Boolean = false): ExResult<String>
+    fun openAppByPkg(pkg: String, resetTask: Boolean = false): Boolean
 
     /**
-     * 通过通过关键字匹配
-     * @return pkgName if ok
+     * 通过getPkgByWord 打开pkg
+     * @return pkgName if ok, else null
      */
-    fun openAppByWord(appWord: String): ExResult<String>
+    fun openAppByWord(appWord: String):  String?
+
 
     /**
-     * 拨打
+     * 拨打电话
+     * @param s 纯数字电话/联系人/标记联系人
      */
     fun call(s: String): ExResult<String>
 
     /**
-     * 手电
+     * 闪光灯
      */
-    fun openFlashlight(): ExResult<Any>
+    fun openFlashlight(): Boolean
+    fun closeFlashlight(): Boolean
 
     /**
      * 获取手机信息
@@ -73,8 +96,10 @@ interface SystemOperation {
 
     fun openBluetooth(): Boolean
     fun closeBluetooth(): Boolean
-    fun openWlan(): Boolean
+    fun openWifi(): Boolean
+    fun closeWifi(): Boolean
     fun openWifiAp(): Boolean
+    fun closeWifiAp(): Boolean
 
     fun isScreenOn(): Boolean
 
@@ -82,4 +107,14 @@ interface SystemOperation {
     fun setClipText(text: String?)
 
     fun sendEmail(to: String, subject: String? = null, content: String? = null)
+
+    fun lockScreen():Boolean
+
+    /**
+     * 获取用户地理位置
+     * 需授权
+     * @return String? 获取失败返回空
+     */
+    fun location():Location?
+
 }

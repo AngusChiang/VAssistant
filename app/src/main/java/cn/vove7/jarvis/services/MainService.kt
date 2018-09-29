@@ -10,7 +10,9 @@ import android.os.IBinder
 import cn.vove7.androlua.luautils.LuaContext
 import cn.vove7.common.accessibility.AccessibilityApi
 import cn.vove7.common.app.GlobalApp
+import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.appbus.AppBus
+import cn.vove7.common.appbus.AppBus.EVENT_FORCE_OFFLINE
 import cn.vove7.common.appbus.AppBus.ORDER_CANCEL_RECO
 import cn.vove7.common.appbus.AppBus.ORDER_START_RECO
 import cn.vove7.common.appbus.AppBus.ORDER_STOP_EXEC
@@ -21,9 +23,12 @@ import cn.vove7.common.bridges.ChoiceData
 import cn.vove7.common.bridges.ServiceBridge
 import cn.vove7.common.bridges.ShowAlertEvent
 import cn.vove7.common.bridges.ShowDialogEvent
+import cn.vove7.common.datamanager.history.CommandHistory
 import cn.vove7.common.datamanager.parse.model.Action
 import cn.vove7.common.executor.CExecutorI
 import cn.vove7.common.model.RequestPermission
+import cn.vove7.common.model.UserInfo
+import cn.vove7.common.utils.NetHelper
 import cn.vove7.common.utils.RegUtils.checkCancel
 import cn.vove7.common.utils.RegUtils.checkConfirm
 import cn.vove7.executorengine.bridges.SystemBridge
@@ -42,8 +47,8 @@ import cn.vove7.jarvis.view.toast.ListeningToast
 import cn.vove7.parseengine.engine.ParseEngine
 import cn.vove7.vtp.dialog.DialogUtil
 import cn.vove7.vtp.log.Vog
-import cn.vove7.vtp.sharedpreference.SpHelper
 import org.greenrobot.eventbus.Subscribe
+import org.greenrobot.eventbus.SubscriberExceptionEvent
 import org.greenrobot.eventbus.ThreadMode
 import java.util.*
 import kotlin.concurrent.thread
@@ -96,6 +101,13 @@ class MainService : BusService(),
 //        floatVoice.show()
     }
 
+    @Subscribe(threadMode = ThreadMode.BACKGROUND)
+    fun onSubException(e: SubscriberExceptionEvent) {
+        Vog.d(this, "onSubException ---> $e")
+        e.throwable?.printStackTrace()
+        GlobalLog.err(e.throwable)
+    }
+
     /**
      * 继续执行确认框
      */
@@ -103,28 +115,31 @@ class MainService : BusService(),
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     override fun showAlert(r: ShowAlertEvent) {
+        messengerAction = r.action
         alertDialog = AlertDialog.Builder(this)
                 .setTitle(r.title)
                 .setMessage(r.msg)
                 .setCancelable(false)
-                .setPositiveButton("继续") { _, _ ->
+                .setPositiveButton(R.string.text_continue) { _, _ ->
                     r.action.responseResult = true
                     notifyAlertResult()
-                }.setNegativeButton("取消") { _, _ ->
+                }.setNegativeButton(R.string.text_cancel) { _, _ ->
                     r.action.responseResult = false
                     notifyAlertResult()
-                }
-                .create()
+                }.create()
         try {
             DialogUtil.setFloat(alertDialog!!)
             alertDialog?.show()
             //语音控制
-            if (SpHelper(this).getBoolean(R.string.key_voice_control_dialog, true)) {
+            if (AppConfig.voiceControlDialog) {
                 voiceMode = MODE_ALERT
                 speechRecoService.startRecog()
             }
         } catch (e: Exception) {
+            GlobalLog.err(e)
             onRequestPermission(RequestPermission("悬浮窗权限"))
+            r.action.responseResult = false
+            notifyAlertResult()
         }
     }
 
@@ -133,7 +148,7 @@ class MainService : BusService(),
      * 停止语音
      */
     private fun notifyAlertResult() {
-        if (SpHelper(this).getBoolean(R.string.key_voice_control_dialog)) {
+        if (AppConfig.voiceControlDialog) {
             speechRecoService.cancelRecog()
         }
         voiceMode = MODE_VOICE
@@ -209,8 +224,7 @@ class MainService : BusService(),
     private var speakSync = false
     override fun speak(text: String?) {
         //关闭语音播报 toast
-        if (SpHelper(this).getBoolean(getString(R.string.key_audio_speak), true)
-                && SystemBridge().musicCurrentVolume != 0) {
+        if (AppConfig.audioSpeak && SystemBridge().musicCurrentVolume != 0) {
             speakSync = false
             speechSynService.speak(text)
         } else {
@@ -219,7 +233,7 @@ class MainService : BusService(),
     }
 
     override fun speakSync(text: String?) {
-        if (SpHelper(this).getBoolean(getString(R.string.key_audio_speak), true)) {
+        if (AppConfig.audioSpeak && SystemBridge().musicCurrentVolume != 0) {
             speakSync = true
             speechSynService.speak(text)
         } else {
@@ -249,10 +263,17 @@ class MainService : BusService(),
     }
 
     //from executor 线程
-    override fun onExecuteFailed(errMsg: String) {//
+    override fun onExecuteFailed(errMsg: String?) {//
         Vog.e(this, "onExecuteFailed: $errMsg")
         executeAnimation.failed()
-        GlobalApp.toastShort(errMsg)
+        GlobalApp.toastShort(errMsg ?: "失败")
+    }
+
+    override fun onExecuteInterrupt(errMsg: String) {
+        Vog.e(this, "onExecuteInterrupt: $errMsg")
+        executeAnimation.failed()
+        GlobalApp.toastShort("执行出错")
+        executeAnimation.failed
     }
 
     override fun onBind(intent: Intent): IBinder {
@@ -314,7 +335,9 @@ class MainService : BusService(),
                 ORDER_START_RECO -> {
                     speechRecoService.startRecog()
                 }
-
+                EVENT_FORCE_OFFLINE -> {
+                    AppConfig.logout()
+                }
                 else -> {
                 }
             }
@@ -450,22 +473,7 @@ class MainService : BusService(),
             Vog.d(this, "结果 --------> $result")
             when (voiceMode) {
                 MODE_VOICE -> {
-//                    toast.showShort("开始解析")
-                    parseAnimation.begin()
-                    val parseResult = ParseEngine
-                            .parseAction(result, AccessibilityApi.accessibilityService?.currentScope?.packageName
-                                ?: "")
-                    resumeMusicIf()
-                    if (parseResult.isSuccess) {
-//                        toast.showShort("解析成功")
-//                        listeningToast.showAndHideDelay("解析成功")
-                        cExecutor.execQueue(result, parseResult.actionQueue)
-                    } else {
-//                        toast.showShort("解析失败")
-                        listeningToast.showAndHideDelay("解析失败")
-//                        effectHandler.sendEmptyMessage(PARSE_FAILED)
-                        parseAnimation.failed()
-                    }
+                    onParseCommand(result)
                 }
                 MODE_GET_PARAM -> {//中途参数
                     resumeMusicIf()
@@ -484,18 +492,40 @@ class MainService : BusService(),
                         checkConfirm(result) -> {
                             resumeMusicIf()
                             alertDialog?.getButton(DialogInterface.BUTTON_POSITIVE)?.performClick()
+                            alertDialog = null
                             voiceMode = MODE_VOICE
                             executeAnimation.begin()//继续显示执行
                         }
                         checkCancel(result) -> {
                             resumeMusicIf()
                             alertDialog?.getButton(DialogInterface.BUTTON_NEGATIVE)?.performClick()
+                            alertDialog = null
                             voiceMode = MODE_VOICE
                             executeAnimation.begin()
                         }
                         else -> AppBus.postSpeechAction(SpeechAction.ActionCode.ACTION_START_RECO)  //继续????
                     }
                 }
+            }
+        }
+
+        private fun onParseCommand(result: String) {
+//                    toast.showShort("开始解析")
+            parseAnimation.begin()
+            val parseResult = ParseEngine
+                    .parseAction(result, AccessibilityApi.accessibilityService?.currentScope?.packageName
+                        ?: "")
+            resumeMusicIf()
+            if (parseResult.isSuccess) {
+                val his = CommandHistory(UserInfo.getUserId(), result,
+                        parseResult.msg)
+                NetHelper.uploadUserCommandHistory(his)
+                cExecutor.execQueue(result, parseResult.actionQueue)
+            } else {//todo statistics
+                NetHelper.uploadUserCommandHistory(CommandHistory(UserInfo.getUserId(), result, null))
+                listeningToast.showAndHideDelay("解析失败")
+//                        effectHandler.sendEmptyMessage(PARSE_FAILED)
+                parseAnimation.failed()
             }
         }
 
@@ -551,8 +581,9 @@ class MainService : BusService(),
      */
     inner class SyncEventListener : SyncEvent {
 
-        override fun onError(err: String) {
-            Vog.d(this, err)
+        override fun onError(err: String, requestText: String?) {
+            GlobalApp.toastShort(requestText ?: "")
+            GlobalLog.err(err)
             if (speakSync) cExecutor.speakCallback(err)
             resumeMusicIf()
         }

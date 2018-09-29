@@ -14,7 +14,7 @@
     <string name="title_advanced_settings">高级设置</string>
     <string name="text_select_application">选择应用</string>
     <string name="text_refresh">刷新</string>
-    <string name="title_new_inst">新建命令</string>
+    <string name="title_new_inst">新建指令</string>
     <string name="text_activity_name">Activity名称</string>
     <string name="text_activity_name_op">Activity名称(可选)</string>
     <string name="text_choose_file">选择文件</string>
@@ -54,7 +54,7 @@
     <string name="text_at_last_one_regex">至少一个正则式</string>
     <string name="text_confirm_to_exit">确认退出?</string>
     <string name="text_error_occurred">发生错误</string>
-    <string name="text_cmd_in_app">应用内命令</string>
+    <string name="text_cmd_in_app">应用内指令</string>
     <string name="text_edit">编辑</string>
     <string name="text_delete">删除</string>
     <string name="text_not_editable">不可编辑</string>
@@ -74,7 +74,8 @@
     <string name="text_confirm_2_del">确认删除</string>
     <string name="text_about">关于</string>
     <string name="text_advanced_features">高级</string>
-    <string name="text_show_toast_when_remove_ad">去除广告时显示通知</string>
+    <string name="text_show_toast_when_remove_ad">去除广告通知</string>
+    <string name="text_show_toast_when_remove_ad_summary">去除广告时在通知栏显示反馈</string>
     <string name="text_sound_model">声音模型</string>
     <string name="text_volume">音量</string>
     <string name="text_speak_speed">语速</string>
@@ -168,8 +169,22 @@
     <string name="text_check_for_updates">检查更新</string>
     <string name="text_contact_me">联系我</string>
     <string name="text_advanced_user_guide">高级使用手册</string>
+    <string name="text_service_manual">使用手册</string>
     <string name="text_laboratory">实验室</string>
     <string name="text_feedback">反馈</string>
-    <string name="text_wakeup">唤醒</string>
+    <string name="text_wakeup_way">唤醒方式</string>
     <string name="text_long_press_volume_up">长按音量上键</string>
+    <string name="text_as_global_inst">设为全局指令</string>
+    <string name="text_animation">动画</string>
+    <string name="text_set_as_default_voice_assist">设为默认语音助手</string>
+    <string name="desc_device_admin">用于锁屏</string>
+    <string name="text_long_press_to_export_log">长按导出日志</string>
+    <string name="text_send">发送</string>
+    <string name="text_feedback_title_hint">问题或建议描述</string>
+    <string name="text_explore_log">查看日志</string>
+    <string name="text_modify_user_name">修改用户名</string>
+    <string name="text_modify_failed">修改失败</string>
+    <string name="text_modify_pass">修改密码</string>
+    <string name="text_modify_succ">修改成功</string>
+
 </resources>

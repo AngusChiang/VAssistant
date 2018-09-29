@@ -3,15 +3,15 @@ package cn.vove7.jarvis.fragments.base
 import android.annotation.SuppressLint
 import android.support.design.widget.TextInputLayout
 import android.view.View
+import android.widget.AdapterView
 import android.widget.Button
+import android.widget.Spinner
 import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.datamanager.DAO
 import cn.vove7.common.datamanager.DaoHelper
 import cn.vove7.common.datamanager.executor.entity.MarkedData
 import cn.vove7.common.datamanager.parse.DataFrom
-import cn.vove7.common.model.UserInfo
 import cn.vove7.common.netacc.ApiUrls
-import cn.vove7.jarvis.utils.NetHelper
 import cn.vove7.common.netacc.model.BaseRequestModel
 import cn.vove7.common.utils.TextHelper
 import cn.vove7.jarvis.R
@@ -20,6 +20,7 @@ import cn.vove7.jarvis.adapters.ViewModel
 import cn.vove7.jarvis.fragments.SimpleListFragment
 import cn.vove7.jarvis.utils.AppConfig
 import cn.vove7.jarvis.utils.DialogUtil
+import cn.vove7.common.utils.NetHelper
 import cn.vove7.vtp.log.Vog
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.customview.customView
@@ -47,7 +48,7 @@ abstract class BaseMarkedFragment<T> : SimpleListFragment<T>(), OnSyncMarked {
 
     private val editDialog: MaterialDialog by lazy {
         val s = MaterialDialog(context!!)
-                .customView(R.layout.dialig_edit_marked_data)
+                .customView(R.layout.dialig_edit_marked_data,scrollable = true)
                 .cancelable(false)
                 .noAutoDismiss()
                 .negativeButton { it.dismiss() }
@@ -90,9 +91,7 @@ abstract class BaseMarkedFragment<T> : SimpleListFragment<T>(), OnSyncMarked {
     }
 
     private val keyText: TextInputLayout by lazy {
-
         val s = editDialog.findViewById<TextInputLayout>(R.id.key_text)
-
         s.hint = getString(keyHint)
         s
     }
@@ -111,6 +110,20 @@ abstract class BaseMarkedFragment<T> : SimpleListFragment<T>(), OnSyncMarked {
 
     private val regexText: TextInputLayout by lazy {
         editDialog.findViewById<TextInputLayout>(R.id.regex_text)
+    }
+    private val scriptLang: Spinner by lazy {
+        editDialog.findViewById<Spinner>(R.id.script_lang).also {
+            it.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+                override fun onNothingSelected(parent: AdapterView<*>?) {}
+                override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                    when (position) {
+                        0 -> markedType = MarkedData.MARKED_TYPE_SCRIPT_LUA
+                        1 -> markedType = MarkedData.MARKED_TYPE_SCRIPT_JS
+                    }
+                    Vog.d(this,"onItemSelected ---> $markedType")
+                }
+            }
+        }
     }
     private val valueText: TextInputLayout by lazy {
         val s = editDialog.findViewById<TextInputLayout>(R.id.value_text)
@@ -139,7 +152,11 @@ abstract class BaseMarkedFragment<T> : SimpleListFragment<T>(), OnSyncMarked {
             selectButton.setOnClickListener {
                 onSelect()
             }
-        else selectButton.visibility = View.GONE
+        else {
+            selectButton.visibility = View.GONE
+            scriptLang.visibility = View.VISIBLE
+            valueText.editText?.minHeight = 300
+        }
         keyText.editText?.setText(data?.key)
         regexText.editText?.setText(data?.regStr)
         valueText.editText?.setText(data?.value)

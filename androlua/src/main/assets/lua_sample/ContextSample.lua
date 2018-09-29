@@ -19,6 +19,7 @@ print('actionCount',runtime.actionCount)
 print('currentActionIndex: ',runtime.currentActionIndex)
 print('actionScope: ',runtime.actionScope)--未指定 -1
 print('isGlobal: ',runtime.isGlobal())
+print('commandType: ',runtime.commandType)
 
 
 

@@ -32,6 +32,11 @@ class ScreenAdapter {
         relWidth = width
     }
 
+    fun reSet() {
+        relHeight = mHeight
+        relWidth = mWidth
+    }
+
 
     fun scalePoints(points: Array<Pair<Int, Int>>): Array<Pair<Float, Float>> {
 //        log('points size: ' + points.length)

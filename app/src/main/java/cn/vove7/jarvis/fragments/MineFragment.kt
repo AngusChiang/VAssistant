@@ -46,7 +46,7 @@ class MineFragment : Fragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.fragment_mine, container, false)
-
+        AppBus.reg(this)
         loginView = view.findViewById(R.id.text_login)
         view.findViewById<View>(R.id.user_name_text).setOnClickListener {
             UserInfoDialog(activity!!) {
@@ -80,6 +80,13 @@ class MineFragment : Fragment() {
             override fun onCreateViewHolder(view: View): ItemHolder = ItemHolder(view)
         }
         return view
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    fun on(s: String) {
+        if (s == AppBus.EVENT_FORCE_OFFLINE) {
+            loadUserInfo()
+        }
     }
 
     override fun onResume() {

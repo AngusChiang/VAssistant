@@ -12,11 +12,13 @@ import android.util.Pair
 import android.view.ViewConfiguration
 import cn.vove7.common.accessibility.AccessibilityApi
 import cn.vove7.common.app.GlobalApp
+import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.model.ResultBox
 import cn.vove7.common.utils.ScreenAdapter
 import cn.vove7.common.view.toast.ColorfulToast
 import cn.vove7.vtp.log.Vog
 import java.util.*
+
 
 /**
  * 无障碍全局执行器
@@ -43,7 +45,7 @@ class GlobalActionExecutor : GlobalActionExecutorI {
         return performGlobalAction(AccessibilityService.GLOBAL_ACTION_POWER_DIALOG)
     }
 
-    override fun notifications(): Boolean {
+    override fun notificationBar(): Boolean {
         return performGlobalAction(AccessibilityService.GLOBAL_ACTION_NOTIFICATIONS)
     }
 
@@ -65,10 +67,23 @@ class GlobalActionExecutor : GlobalActionExecutorI {
     }
 
     @RequiresApi(api = Build.VERSION_CODES.N)
-    fun splitScreen(): Boolean {
+    override fun splitScreen(): Boolean {
         return performGlobalAction(AccessibilityService.GLOBAL_ACTION_TOGGLE_SPLIT_SCREEN)
     }
 
+    override fun screenShot(): Boolean {
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            performGlobalAction(AccessibilityService.GLOBAL_ACTION_TAKE_SCREENSHOT)
+        } else {
+            GlobalLog.err("截屏需要Android9.0+")
+            //todo 手动截屏
+            false
+        }
+    }
+
+    fun gesture(duration: Long, points: Array<Pair<Int, Int>>): Boolean {
+        return gesture(0, duration, points)
+    }
 
     override fun gesture(start: Long, duration: Long, points: Array<Pair<Int, Int>>): Boolean {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
@@ -80,7 +95,7 @@ class GlobalActionExecutor : GlobalActionExecutorI {
         }
 
         val path = pointsToPath(points)
-        return gestures(GestureDescription.StrokeDescription(path, start, duration))
+        return playGestures(GestureDescription.StrokeDescription(path, start, duration))
     }
 
     @RequiresApi(api = Build.VERSION_CODES.N)
@@ -91,7 +106,7 @@ class GlobalActionExecutor : GlobalActionExecutorI {
     }
 
     @RequiresApi(api = Build.VERSION_CODES.N)
-    override fun gestures(vararg strokes: GestureDescription.StrokeDescription): Boolean {
+    override fun playGestures(vararg strokes: GestureDescription.StrokeDescription): Boolean {
         val builder = GestureDescription.Builder()
         for (stroke in strokes) {
             builder.addStroke(stroke)
@@ -172,7 +187,6 @@ class GlobalActionExecutor : GlobalActionExecutorI {
 
     override fun toast(msg: String) {
         voast.showShort(msg)
-
     }
 
     override fun click(x: Int, y: Int): Boolean {
@@ -199,9 +213,9 @@ class GlobalActionExecutor : GlobalActionExecutorI {
     }
 
 
-    override fun swipe(x1: Int, y1: Int, x2: Int, y2: Int, delay: Int): Boolean {
+    override fun swipe(x1: Int, y1: Int, x2: Int, y2: Int, dur: Int): Boolean {
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            gesture(0, delay.toLong(), arrayOf(Pair(x1, y1),
+            gesture(0, dur.toLong(), arrayOf(Pair(x1, y1),
                     Pair(x2, y2)))
         } else {
             Vog.d(this, "需SDK版本 -> N")
@@ -211,19 +225,25 @@ class GlobalActionExecutor : GlobalActionExecutorI {
 
     @RequiresApi(api = Build.VERSION_CODES.N)
     override fun scrollUp(): Boolean {
-        return swipe(550, 1600, 550, 300, 400)
+        val mtop = (screenAdapter.relHeight * 0.1).toInt()
+        val mBottom = (screenAdapter.relHeight * 0.85).toInt()
+        val xCenter = (screenAdapter.relWidth * 0.5).toInt()
+
+        return swipe(xCenter, mBottom, xCenter, mtop, 400)
     }
 
     @RequiresApi(api = Build.VERSION_CODES.N)
     override fun scrollDown(): Boolean {
-        return swipe(550, 300, 550, 1600, 400)
+        val mtop = (screenAdapter.relHeight * 0.15).toInt()
+        val mBottom = (screenAdapter.relHeight * 0.9).toInt()
+        val xCenter = (screenAdapter.relWidth * 0.5).toInt()
+        return swipe(xCenter, mtop, xCenter, mBottom, 400)
     }
-
 }
 
 interface GlobalActionExecutorI {
     @RequiresApi(api = Build.VERSION_CODES.N)
-    fun swipe(x1: Int, y1: Int, x2: Int, y2: Int, delay: Int): Boolean
+    fun swipe(x1: Int, y1: Int, x2: Int, y2: Int, dur: Int): Boolean
 
     @RequiresApi(api = Build.VERSION_CODES.N)
     fun press(x: Int, y: Int, delay: Int): Boolean
@@ -248,11 +268,14 @@ interface GlobalActionExecutorI {
 
     fun powerDialog(): Boolean
 
-    fun notifications(): Boolean
+    fun notificationBar(): Boolean
 
     fun quickSettings(): Boolean
 
     fun recents(): Boolean
+    fun splitScreen(): Boolean
+    @RequiresApi(api = Build.VERSION_CODES.P)
+    fun screenShot(): Boolean
 
     @RequiresApi(api = Build.VERSION_CODES.N)
     fun gesture(start: Long, duration: Long, points: Array<Pair<Int, Int>>): Boolean
@@ -261,10 +284,11 @@ interface GlobalActionExecutorI {
     fun gestureAsync(start: Long, duration: Long, points: Array<Pair<Int, Int>>)
 
     @RequiresApi(api = Build.VERSION_CODES.N)
-    fun gestures(vararg strokes: GestureDescription.StrokeDescription): Boolean
+    fun playGestures(vararg strokes: GestureDescription.StrokeDescription): Boolean
 
     @RequiresApi(api = Build.VERSION_CODES.N)
     fun gesturesAsync(vararg strokes: GestureDescription.StrokeDescription)
+
 
     /**
      * 通知

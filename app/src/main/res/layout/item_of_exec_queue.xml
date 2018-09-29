@@ -3,7 +3,10 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="horizontal"
-    android:padding="10dp">
+    android:paddingStart="?attr/dialogPreferredPadding"
+    android:paddingTop="5dp"
+    android:paddingBottom="5dp"
+    android:paddingEnd="?attr/dialogPreferredPadding">
 
     <TextView
         android:id="@+id/desc_text"
@@ -16,7 +19,7 @@
     <EditText
         android:id="@+id/param_text"
         android:layout_width="100dp"
-        android:maxLines="1"
+        android:layout_height="wrap_content"
         android:hint="@string/text_optional"
-        android:layout_height="wrap_content" />
+        android:maxLines="1" />
 </LinearLayout>

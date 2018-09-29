@@ -105,7 +105,7 @@ static const char *progname = LUA_PROGNAME;
 */
 static void lstop(lua_State *L, lua_Debug *ar) {
   (void) ar;  /* unused arg. */
-  lua_sethook(L, NULL, 0, 0);  /* reset hook */
+  lua_sethook(L, NULL, 0, 0);  /* set hook */
   luaL_error(L, "interrupted!");
 }
 
@@ -197,7 +197,7 @@ static int docall(lua_State *L, int narg, int nres) {
   globalL = L;  /* to be available to 'laction' */
   signal(SIGINT, laction);  /* set C-signal handler */
   status = lua_pcall(L, narg, nres, base);
-  signal(SIGINT, SIG_DFL); /* reset C-signal handler */
+  signal(SIGINT, SIG_DFL); /* set C-signal handler */
   lua_remove(L, base);  /* remove message handler from the stack */
   return status;
 }

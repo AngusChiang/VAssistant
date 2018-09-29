@@ -19,5 +19,6 @@ interface OnAccessibilityEvent {
     fun onAppChanged(appScope: ActionScope)
 
     fun onBind() {}
+    fun bindService()
     fun onUnBind() {}
 }

@@ -236,7 +236,7 @@ static void patchlistaux (FuncState *fs, int list, int vtarget, int reg,
 
 /*
 ** Ensure all pending jumps to current position are fixed (jumping
-** to current position with no values) and reset list of pending
+** to current position with no values) and set list of pending
 ** jumps
 */
 static void dischargejpc (FuncState *fs) {

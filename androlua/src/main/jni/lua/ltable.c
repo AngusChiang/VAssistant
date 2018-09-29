@@ -379,7 +379,7 @@ static void rehash (lua_State *L, Table *t, const TValue *ek) {
   unsigned int nums[MAXABITS + 1];
   int i;
   int totaluse;
-  for (i = 0; i <= MAXABITS; i++) nums[i] = 0;  /* reset counts */
+  for (i = 0; i <= MAXABITS; i++) nums[i] = 0;  /* set counts */
   na = numusearray(t, nums);  /* count keys in array part */
   totaluse = na;  /* all those keys are integer keys */
   totaluse += numusehash(t, nums, &na);  /* count keys in hash part */

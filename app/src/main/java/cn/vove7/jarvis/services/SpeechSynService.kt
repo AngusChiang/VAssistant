@@ -4,11 +4,11 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.pm.PackageManager
 import cn.vove7.common.app.GlobalApp
+import cn.vove7.common.app.GlobalLog
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.speech.synthesis.control.InitConfig
 import cn.vove7.jarvis.speech.synthesis.control.MySyntherizer
 import cn.vove7.jarvis.speech.synthesis.control.NonBlockSyntherizer
-import cn.vove7.jarvis.speech.synthesis.util.OfflineResource
 import cn.vove7.vtp.log.Vog
 import cn.vove7.vtp.sharedpreference.SpHelper
 import com.baidu.tts.chainofresponsibility.logger.LoggerProxy
@@ -28,14 +28,14 @@ class SpeechSynService(private val event: SyncEvent) : SpeechSynthesizerListener
     private var secretKey: String
 
     // TtsMode.MIX; 离在线融合，在线优先； TtsMode.ONLINE 纯在线； 没有纯离线
-    protected var ttsMode = TtsMode.MIX
+    protected var ttsMode = TtsMode.ONLINE
 
     // 离线发音选择，VOICE_FEMALE即为离线女声发音。
     // assets目录下bd_etts_common_speech_m15_mand_eng_high_am-mix_v3.0.0_20170505.dat为离线男声模型；
     // assets目录下bd_etts_common_speech_f7_mand_eng_high_am-mix_v3.0.0_20170512.dat为离线女声模型
 
-    protected var voiceModel = OfflineResource.VOICE_FEMALE
-    protected var voiceSpeed = "6"
+    protected var voiceModel = VOICE_FEMALE
+    protected var voiceSpeed = "5"
 
     var speaking = false
 
@@ -46,7 +46,7 @@ class SpeechSynService(private val event: SyncEvent) : SpeechSynthesizerListener
     private val context: Context = GlobalApp.APP
 
     fun reLoad() {
-        Vog.d(this,"reLoad ---> ")
+        Vog.d(this, "reLoad ---> ")
         release()
         initialTts() // 初始化TTS引擎
     }
@@ -67,12 +67,15 @@ class SpeechSynService(private val event: SyncEvent) : SpeechSynthesizerListener
     // synthesizer.setParams(params);
     fun speak(text: String?) {
         if (text == null) {
-            event.onError("文本空")
+            event.onError("文本空",text)
             return
         }
+        sText = text
         val result = synthesizer.speak(text)
         checkResult(result, "speak")
     }
+
+    var sText: String? = null
 
     /**
      * 暂停播放。仅调用speak后生效
@@ -106,7 +109,7 @@ class SpeechSynService(private val event: SyncEvent) : SpeechSynthesizerListener
     protected fun initialTts() {
 
         val sp = SpHelper(context)
-        voiceModel = sp.getString(R.string.key_voice_syn_model) ?: OfflineResource.VOICE_FEMALE
+        voiceModel = getTypeCode() ?: VOICE_FEMALE
         var eed = sp.getInt(R.string.key_voice_syn_speed)
         if (eed == -1) eed = 5
         voiceSpeed = eed.toString()
@@ -136,7 +139,12 @@ class SpeechSynService(private val event: SyncEvent) : SpeechSynthesizerListener
         // 设置合成的语调，0-9 ，默认 5
         params[SpeechSynthesizer.PARAM_PITCH] = "5"
 
-        params[SpeechSynthesizer.PARAM_MIX_MODE] = SpeechSynthesizer.MIX_MODE_HIGH_SPEED_SYNTHESIZE
+        // 不使用压缩传输
+//        params[SpeechSynthesizer.PARAM_AUDIO_ENCODE]= SpeechSynthesizer.AUDIO_ENCODE_PCM
+//        params[SpeechSynthesizer.PARAM_AUDIO_RATE] = SpeechSynthesizer.AUDIO_BITRATE_PCM
+
+//        params[SpeechSynthesizer.PARAM_MIX_MODE] = SpeechSynthesizer.MIX_MODE_HIGH_SPEED_SYNTHESIZE
+//        params[SpeechSynthesizer.PARAM_MIX_MODE] = SpeechSynthesizer.MIX_MODE_HIGH_SPEED_SYNTHESIZE
         // 该参数设置为TtsMode.MIX生效。即纯在线模式不生效。
         // MIX_MODE_DEFAULT 默认 ，wifi状态下使用在线，非wifi离线。在线状态下，请求超时6s自动转离线
         // MIX_MODE_HIGH_SPEED_SYNTHESIZE_WIFI wifi状态下使用在线，非wifi离线。在线状态下， 请求超时1.2s自动转离线
@@ -144,28 +152,38 @@ class SpeechSynService(private val event: SyncEvent) : SpeechSynthesizerListener
         // MIX_MODE_HIGH_SPEED_SYNTHESIZE, 2G 3G 4G wifi状态下使用在线，其它状态离线。在线状态下，请求超时1.2s自动转离线
 
         // 离线资源文件， 从assets目录中复制到临时目录，需要在initTTs方法前完成
-        val offlineResource = OfflineResource(context, voiceModel)
-        try {// 声学模型文件路径 (离线引擎使用), 请确认下面两个文件存在
-            params[SpeechSynthesizer.PARAM_TTS_TEXT_MODEL_FILE] = offlineResource.textFilename!!
-            params[SpeechSynthesizer.PARAM_TTS_SPEECH_MODEL_FILE] = offlineResource.modelFilename!!
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
+//        val offlineResource = OfflineResource(context, voiceModel)
+//        try {// 声学模型文件路径 (离线引擎使用), 请确认下面两个文件存在
+//            params[SpeechSynthesizer.PARAM_TTS_TEXT_MODEL_FILE] = offlineResource.textFilename!!
+//            params[SpeechSynthesizer.PARAM_TTS_SPEECH_MODEL_FILE] = offlineResource.modelFilename!!
+//        } catch (e: Exception) {
+//            e.printStackTrace()
+//        }
         return params
+    }
+
+    private fun getTypeCode(): String? {
+        val sp = SpHelper(context)
+
+        val type = sp.getString(R.string.key_voice_syn_model) ?: return null
+        val entity = context.resources.getStringArray(R.array.voice_model_entities)
+        val i = entity.indexOf(type)
+        val types = context.resources.getStringArray(R.array.voice_model_values)
+        return types[i]
     }
 
     /**
      * 切换离线发音。注意需要添加额外的判断：引擎在合成时该方法不能调用
      */
-    public fun reLoadVoiceModel(mode: String) {
-        voiceModel = mode
-        val offlineResource = OfflineResource(context, voiceModel)
-        Vog.d(this, "reLoadVoiceModel 切换离线语音：" + offlineResource.modelFilename)
-
-        val result = synthesizer.loadVoiceModel(offlineResource.modelFilename,
-                offlineResource.textFilename)
-        checkResult(result, "reLoadVoiceModel")
-    }
+//    public fun reLoadVoiceModel(mode: String) {
+//        voiceModel = mode
+//        val offlineResource = OfflineResource(context, voiceModel)
+//        Vog.d(this, "reLoadVoiceModel 切换离线语音：" + offlineResource.modelFilename)
+//
+//        val result = synthesizer.loadVoiceModel(offlineResource.modelFilename,
+//                offlineResource.textFilename)
+//        checkResult(result, "reLoadVoiceModel")
+//    }
 
     private fun checkResult(result: Int, method: String) {
         if (result != 0) {
@@ -206,13 +224,24 @@ class SpeechSynService(private val event: SyncEvent) : SpeechSynthesizerListener
         val e = "错误发生：${p1?.description} ，错误编码: $p1?.code} 序列号: $p0 "
 //        AppBus.post(SpeechSynData(e))
         speaking = false
-        event.onError(e)
+        event.onError(e, sText)
+        sText = null
+        GlobalLog.err(e)
         Vog.d(this, e)
     }
+
+    companion object {
+
+        const val VOICE_FEMALE = "0"
+        const val VOICE_MALE = "1"
+        const val VOICE_DUXY = "3"
+        const val VOICE_DUYY = "4"
+    }
+
 }
 
 interface SyncEvent {
-    fun onError(err: String)
+    fun onError(err: String, requestText: String?)
     fun onFinish()
     fun onStart()
 }

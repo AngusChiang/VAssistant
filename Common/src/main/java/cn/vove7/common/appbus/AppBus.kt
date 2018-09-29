@@ -6,13 +6,14 @@ import java.io.Serializable
 
 object AppBus {
     const val EVENT_LOGOUT = "e_logout"
+    const val EVENT_FORCE_OFFLINE = "e_force_offline"
+    const val EVENT_INST_SAVE_COMPLETE = "inst_settings_save_complete"
 
     const val ORDER_STOP_EXEC = "stop_exec"
     const val ORDER_STOP_RECO = "stop_reco"
     const val ORDER_CANCEL_RECO = "cancel_reco"
     const val ORDER_START_RECO = "start_reco"
-    const val ORDER_STOP_DEBUG = "stop_debug"
-
+//    const val ORDER_STOP_DEBUG = "stop_debug"
 
     fun post(data: Any) {
         Vog.d(this,"post ---> $data")

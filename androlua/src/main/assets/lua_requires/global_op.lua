@@ -92,12 +92,16 @@ function powerDialog()
     return automator.powerDialog()
 end
 
-function notifications()
-    return automator.notifications()
+function notificationBar()
+    return automator.notificationBar()
 end
 
 function quickSettings()
     return automator.quickSettings()
+end
+
+function screenShot()
+    return automator.screenShot()
 end
 
 function recents()

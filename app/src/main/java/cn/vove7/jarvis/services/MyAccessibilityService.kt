@@ -18,14 +18,12 @@ import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.appbus.AppBus
 import cn.vove7.common.datamanager.parse.model.ActionScope
 import cn.vove7.common.executor.CExecutorI
-import cn.vove7.common.view.finder.ViewFindBuilder
 import cn.vove7.common.view.finder.ViewFinder
 import cn.vove7.common.view.notifier.ActivityShowListener
 import cn.vove7.common.view.notifier.UiViewShowNotifier
 import cn.vove7.common.view.notifier.ViewShowListener
 import cn.vove7.common.view.toast.ColorfulToast
 import cn.vove7.executorengine.bridges.SystemBridge
-import cn.vove7.jarvis.R
 import cn.vove7.jarvis.plugins.AccPluginsService
 import cn.vove7.jarvis.plugins.AdKillerService
 import cn.vove7.jarvis.utils.AppConfig
@@ -33,7 +31,6 @@ import cn.vove7.vtp.app.AppHelper
 import cn.vove7.vtp.log.Vog
 import cn.vove7.vtp.sharedpreference.SpHelper
 import cn.vove7.vtp.system.SystemHelper
-import cn.vove7.vtp.text.TextHelper
 import java.lang.Thread.sleep
 import kotlin.concurrent.thread
 
@@ -45,21 +42,23 @@ import kotlin.concurrent.thread
 class MyAccessibilityService : AccessibilityApi() {
     private lateinit var pkgman: PackageManager
 
-    private val spHelper: SpHelper by lazy { SpHelper(GlobalApp.APP) }
-
     override fun onServiceConnected() {
         accessibilityService = this
         pkgman = packageManager
         updateCurrentApp(packageName)
         ColorfulToast(this).yellow().showShort("无障碍服务开启")
 
+        startPluginService()
+    }
+
+    private fun startPluginService() {
         thread {
             registerEvent(activityNotifier)
-            if (spHelper.getBoolean(R.string.key_open_ad_block, true))
-                AdKillerService.bindServer()//广告服务
-            dispatchPluginsEvent(ON_BIND)
+            registerEvent(AdKillerService)
         }
     }
+
+
 
     private fun updateCurrentApp(pkg: String) {
         currentAppInfo = AppHelper.getAppInfo(this, "", pkg)
@@ -394,50 +393,50 @@ class MyAccessibilityService : AccessibilityApi() {
     /**
      * 匹配  ***.***.***:id/view_id
      */
-    override fun findNodeById(id: String): List<ViewNode> {
-        return ViewFindBuilder()
-                .id(id).find()
-                .also { Vog.d(this, "findNodeById size :${it.size}") }
-    }
-
-    override fun findFirstNodeByIdAndText(id: String, text: String): ViewNode? {
-        return ViewFindBuilder()
-                .containsText(text)
-                .id(id)
-                .findFirst()
-                .also { Vog.d(this, "findFirstNodeByIdAndText $it") }
-    }
-
-    override fun findFirstNodeById(id: String): ViewNode? {
-        return ViewFindBuilder().id(id).findFirst()
-    }
-
-    override fun findFirstNodeByDesc(desc: String): ViewNode? {
-        return ViewFindBuilder().desc(desc).findFirst()
-    }
-
-    override fun findFirstNodeByText(text: String): ViewNode? {
-        val l = findNodeByText(text)
-        return if (l.isNotEmpty()) l[0] else null
-    }
-
-    override fun findFirstNodeByTextWhitFuzzy(text: String): ViewNode? {
-        return ViewFindBuilder().similaryText(text).findFirst()
-    }
-
-    override fun findNodeByText(text: String): List<ViewNode> {
-        val list = mutableListOf<ViewNode>()
-        if (rootInActiveWindow != null)
-            for (node in rootInActiveWindow.findAccessibilityNodeInfosByText(text)) {
-                if (node.text == null) continue
-                val newNode = ViewNode(node)
-                newNode.similarityText = TextHelper.compareSimilarity(text, node.text.toString())
-                list.add(newNode)
-            }
-        list.sort()
-        Vog.d(this, "size :${list.size}")
-        return list
-    }
+//    override fun findNodeById(id: String): List<ViewNode> {
+//        return ViewFindBuilder()
+//                .id(id).find()
+//                .also { Vog.d(this, "findNodeById size :${it.size}") }
+//    }
+//
+//    override fun findFirstNodeByIdAndText(id: String, text: String): ViewNode? {
+//        return ViewFindBuilder()
+//                .containsText(text)
+//                .id(id)
+//                .findFirst()
+//                .also { Vog.d(this, "findFirstNodeByIdAndText $it") }
+//    }
+//
+//    override fun findFirstNodeById(id: String): ViewNode? {
+//        return ViewFindBuilder().id(id).findFirst()
+//    }
+//
+//    override fun findFirstNodeByDesc(desc: String): ViewNode? {
+//        return ViewFindBuilder().desc(desc).findFirst()
+//    }
+//
+//    override fun findFirstNodeByText(text: String): ViewNode? {
+//        val l = findNodeByText(text)
+//        return if (l.isNotEmpty()) l[0] else null
+//    }
+//
+//    override fun findFirstNodeByTextWhitFuzzy(text: String): ViewNode? {
+//        return ViewFindBuilder().similaryText(text).findFirst()
+//    }
+//
+//    override fun findNodeByText(text: String): List<ViewNode> {
+//        val list = mutableListOf<ViewNode>()
+//        if (rootInActiveWindow != null)
+//            for (node in rootInActiveWindow.findAccessibilityNodeInfosByText(text)) {
+//                if (node.text == null) continue
+//                val newNode = ViewNode(node)
+//                newNode.similarityText = TextHelper.compareSimilarity(text, node.text.toString())
+//                list.add(newNode)
+//            }
+//        list.sort()
+//        Vog.d(this, "size :${list.size}")
+//        return list
+//    }
 
     /**
      *  Notifier By [currentScope]
@@ -487,7 +486,7 @@ class MyAccessibilityService : AccessibilityApi() {
         val blackPackage = hashSetOf("com.android.chrome", "com.android.systemui")
         private const val ON_UI_UPDATE = 0
         private const val ON_APP_CHANGED = 1
-        private const val ON_BIND = 2
+//        private const val ON_BIND = 2
 
         /**
          * 注册放于静态变量，只用于通知事件。
@@ -497,12 +496,14 @@ class MyAccessibilityService : AccessibilityApi() {
         fun registerEvent(e: OnAccessibilityEvent) {
             synchronized(pluginsServices) {
                 pluginsServices.add(e)
+                e.bindService()
             }
         }
 
         fun unregisterEvent(e: OnAccessibilityEvent) {
             synchronized(pluginsServices) {
                 pluginsServices.remove(e)
+                e.onUnBind()
             }
         }
 
@@ -524,11 +525,11 @@ class MyAccessibilityService : AccessibilityApi() {
                             thread { it.onAppChanged(data as ActionScope) }
                         }
                     }
-                    ON_BIND -> {
-                        pluginsServices.forEach {
-                            thread { it.onBind() }
-                        }
-                    }
+//                    ON_BIND -> {
+//                        pluginsServices.forEach {
+//                            thread { it.onBind() }
+//                        }
+//                    }
                     else -> {
                     }
                 }

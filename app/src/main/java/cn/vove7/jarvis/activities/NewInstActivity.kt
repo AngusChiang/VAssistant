@@ -244,12 +244,12 @@ class NewInstActivity : AppCompatActivity(), View.OnClickListener {
             super.onBackPressed()
             return
         }
-        AlertDialog.Builder(this)
-                .setTitle(R.string.text_confirm_to_exit)
-                .setMessage(R.string.text_content_wont_be_save)
-                .setPositiveButton(R.string.text_confirm) { _, _ ->
+        MaterialDialog(this)
+                .title(R.string.text_confirm_to_exit)
+                .message(R.string.text_content_wont_be_save)
+                .positiveButton { _ ->
                     super.onBackPressed()
-                }.setNegativeButton(R.string.text_cancel, null)
+                }.negativeButton()
                 .show()
         //TODO 草稿
     }

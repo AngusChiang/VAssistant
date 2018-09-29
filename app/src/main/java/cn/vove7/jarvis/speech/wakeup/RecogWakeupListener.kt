@@ -7,6 +7,7 @@ import cn.vove7.common.appbus.AppBus
 import cn.vove7.common.model.RequestPermission
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.speech.recognition.model.IStatus
+import cn.vove7.jarvis.utils.AppConfig
 import cn.vove7.vtp.builder.BundleBuilder
 import cn.vove7.vtp.sharedpreference.SpHelper
 
@@ -37,6 +38,7 @@ class RecogWakeupListener(private val handler: Handler) : SimpleWakeupListener()
         else
             GlobalApp.toastShort("语音唤醒错误")
         SpHelper(GlobalApp.APP).set(R.string.key_open_voice_wakeup, false)
+        AppConfig.reload()
     }
 
     override fun onStop() {

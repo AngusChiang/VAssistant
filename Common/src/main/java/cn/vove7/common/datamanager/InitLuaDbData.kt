@@ -69,7 +69,7 @@ object InitLuaDbData : InitDbData() {
         val a7 = Action(
                 "require 'accessibility'\n" + "recents()", scriptType)
         val a8 = Action(
-                "require 'accessibility'\n" + "notifications()", scriptType)
+                "require 'accessibility'\n" + "notificationBar()", scriptType)
 
 
         val a9 = Action("require 'accessibility'\n" + "clickText(args[1])", scriptType)

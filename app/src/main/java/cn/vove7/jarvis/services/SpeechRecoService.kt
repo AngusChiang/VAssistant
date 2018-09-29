@@ -7,7 +7,6 @@ import android.os.Message
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.appbus.AppBus
 import cn.vove7.common.appbus.VoiceData
-import cn.vove7.jarvis.R
 import cn.vove7.jarvis.speech.recognition.OfflineRecogParams
 import cn.vove7.jarvis.speech.recognition.listener.SpeechStatusListener
 import cn.vove7.jarvis.speech.recognition.model.IStatus
@@ -19,8 +18,8 @@ import cn.vove7.jarvis.speech.recognition.model.IStatus.Companion.CODE_WAKEUP_SU
 import cn.vove7.jarvis.speech.recognition.recognizer.MyRecognizer
 import cn.vove7.jarvis.speech.wakeup.MyWakeup
 import cn.vove7.jarvis.speech.wakeup.RecogWakeupListener
+import cn.vove7.jarvis.utils.AppConfig
 import cn.vove7.vtp.log.Vog
-import cn.vove7.vtp.sharedpreference.SpHelper
 import com.baidu.speech.asr.SpeechConstant
 import java.lang.Thread.sleep
 import kotlin.concurrent.thread
@@ -43,7 +42,7 @@ class SpeechRecoService(val event: SpeechEvent) {
     /*
      * 本Activity中是否需要调用离线命令词功能。根据此参数，判断是否需要调用SDK的ASR_KWS_LOAD_ENGINE事件
      */
-    var enableOffline = false
+    private var enableOffline = false
 
     /**
      * 分发事件
@@ -88,7 +87,7 @@ class SpeechRecoService(val event: SpeechEvent) {
         thread {
             initRecog()
             //初始化唤醒器
-            if (SpHelper(GlobalApp.APP).getBoolean(R.string.key_open_voice_wakeup,false))
+            if (AppConfig.voiceWakeup)
                 wakeuper.start()
         }
     }
@@ -112,9 +111,10 @@ class SpeechRecoService(val event: SpeechEvent) {
 
     private val params = mapOf(
             Pair(SpeechConstant.ACCEPT_AUDIO_DATA, false),
+//            Pair(SpeechConstant.VAD_MODEL, "dnn"),
             Pair(SpeechConstant.DISABLE_PUNCTUATION, false),//标点符号
             Pair(SpeechConstant.ACCEPT_AUDIO_VOLUME, true),
-            Pair(SpeechConstant.PID, 15361)
+            Pair(SpeechConstant.PID, 1536)
     )
 
     internal fun startRecog() {

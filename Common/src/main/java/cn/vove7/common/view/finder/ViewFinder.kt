@@ -18,12 +18,12 @@ abstract class ViewFinder(var accessibilityService: AccessibilityApi) {
 
     val list = mutableListOf<ViewNode>()
 
-    fun findAll(): List<ViewNode> {
+    fun findAll(): Array<ViewNode> {
         list.clear()
         traverseAllNode(accessibilityService.rootInActiveWindow, true)
         val l = mutableListOf<ViewNode>()
         l.addAll(list)
-        return l
+        return l.toTypedArray()
     }
 
     /**

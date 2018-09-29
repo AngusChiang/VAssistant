@@ -67,16 +67,18 @@ object ParseEngine {
     fun parseAction(cmdWord: String, pkg: String): ParseResult {
         i = 0
         val actionQueue = PriorityQueue<Action>()
-        actionQueue.addAll(globalActionMatch(cmdWord))
+        val gaq = globalActionMatch(cmdWord)
+        actionQueue.addAll(gaq.second)
         return if (actionQueue.isNotEmpty()) {
-            ParseResult(true, actionQueue)
+            ParseResult(true, actionQueue, gaq.first)
         } else {
-            println("globalAction--无匹配")
+            Vog.d(this, "globalAction--无匹配")
             if (pkg == "") {
                 ParseResult(false, "pkg null")
             }
-            actionQueue.addAll(matchAppAction(cmdWord, pkg))
-            ParseResult(actionQueue.isNotEmpty(), actionQueue)
+            val inappq=matchAppAction(cmdWord, pkg)
+            actionQueue.addAll(inappq.second)
+            ParseResult(actionQueue.isNotEmpty(), actionQueue,inappq.first)
         }
     }
 
@@ -85,15 +87,15 @@ object ParseEngine {
      * 一级匹配
      * 全局不存在follows
      */
-    private fun globalActionMatch(cmd: String): PriorityQueue<Action> {
+    private fun globalActionMatch(cmd: String): Pair<String?, PriorityQueue<Action>> {
         val actionQueue = PriorityQueue<Action>()
         if (GlobalActionNodes == null)
             updateGlobal()
         GlobalActionNodes?.forEach {
             val r = regSearch(cmd, it, actionQueue)
-            if (r) return actionQueue
+            if (r) return Pair(it.actionTitle, actionQueue)
         }
-        return actionQueue
+        return Pair(null, actionQueue)
     }
 
     /**
@@ -105,7 +107,7 @@ object ParseEngine {
      * App内指令
      * 深度搜索
      */
-    fun matchAppAction(cmd: String, currentAppPkg: String): PriorityQueue<Action> {
+    fun matchAppAction(cmd: String, currentAppPkg: String):  Pair<String?,PriorityQueue<Action>> {
         val matchScope = ActionScope(currentAppPkg, null)
         Log.d("Debug :", "matchAppAction  ----> $currentAppPkg")
         if (AppActionNodes == null) {
@@ -117,10 +119,9 @@ object ParseEngine {
             it.actionScope != null && it.actionScope == matchScope
         }?.forEach {
             val r = regSearch(cmd, it, actionQueue)
-            if (r) return actionQueue
-
+            if (r) return Pair(it.actionTitle, actionQueue)
         }
-        return actionQueue
+        return Pair(null, actionQueue)
     }
 
 

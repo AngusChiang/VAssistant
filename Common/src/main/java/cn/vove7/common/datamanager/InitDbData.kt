@@ -57,7 +57,7 @@ abstract class InitDbData {
                 , MarkedData("网易云", MarkedData.MARKED_TYPE_APP, "网易云(音乐)?", "com.netease.cloudmusic",DataFrom.FROM_SERVER)
                 , MarkedData("支付宝", MarkedData.MARKED_TYPE_APP, "(Alipay)|(支付宝)", "com.eg.android.AlipayGphone",DataFrom.FROM_SERVER)
                 , MarkedData("蓝牙", MarkedData.MARKED_TYPE_SCRIPT_LUA, "蓝牙", "system.openBluetooth()",DataFrom.FROM_SERVER)
-                , MarkedData("wifi", MarkedData.MARKED_TYPE_SCRIPT_LUA, "(Alipay)|(支付宝)", "system.openWlan()",DataFrom.FROM_SERVER)
+                , MarkedData("wifi", MarkedData.MARKED_TYPE_SCRIPT_LUA, "(Alipay)|(支付宝)", "system.openWifi()",DataFrom.FROM_SERVER)
         ).forEach {
             markedDataDao.insert(it)
         }

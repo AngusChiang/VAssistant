@@ -20,7 +20,8 @@ object TextHelper {
         return userRegex.matches(s)
     }
 
-    fun arr2String(ss: Array<*>, separator: String = ","): String {
+    fun arr2String(ss: Array<*>?, separator: String = ","): String? {
+        if (ss == null) return null
         return buildString {
             ss.withIndex().forEach {
                 if (it.index == 0) append(ss[0])
@@ -47,5 +48,24 @@ object TextHelper {
         return if (lener.contains(shorter, ignoreCase = true)) {
             shorter.length.toFloat() / lener.length
         } else 0f
+    }
+
+    fun matches(text: String?, regexStr: String?): Boolean {
+        if (text == null || regexStr == null) return false
+        val reg = RegUtils.dealRawReg(regexStr)
+        return reg.matches(text)
+    }
+
+    /**
+     * 根据正则字符串，匹配出占位符对应的值
+     * @param text String
+     * @param regexStr String
+     * @return Array<String>
+     */
+    fun matchValues(text: String?, regexStr: String?): Array<String>? {
+        if (text == null || regexStr == null) return null
+        val reg = RegUtils.dealRawReg(regexStr)
+        val r = reg.matchEntire(text)
+        return r?.groupValues?.subList(1, r.groupValues.size)?.toTypedArray()
     }
 }

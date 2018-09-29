@@ -16,7 +16,7 @@ import java.util.*
 class AppAdBlockNotifier(private val app: AppInfo?, finders: MutableSet<ViewFinder>)
     : AbsViewShowNotifier(finders) {
     companion object {
-        val KillCount = hashMapOf<String, Int>()
+        private val KillCount = hashMapOf<String, Int>()
         fun plusCount() {
             KillCount[getToday()] = (KillCount[getToday()] ?: 0) + 1
         }

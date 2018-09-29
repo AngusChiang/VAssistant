@@ -8,6 +8,7 @@ import android.widget.CompoundButton
 import android.widget.TextView
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.view.*
+import cn.vove7.vtp.easyadapter.BaseListAdapter
 import cn.vove7.vtp.log.Vog
 import cn.vove7.vtp.sharedpreference.SpHelper
 import com.afollestad.materialdialogs.MaterialDialog
@@ -45,7 +46,7 @@ class SettingItemHelper(val context: Context) {
             TYPE_SWITCH_CALLBACK -> {
                 val view = LayoutInflater.from(context).inflate(R.layout.item_of_settings_switch, null)
                 val holder = SwitchItemHolder(view!!)
-                initAndSetCompoundButtonListener(holder, childItem, true)
+                initAndSetCompoundButtonListener(holder, childItem)
                 return holder
             }
             TYPE_CHECK_BOX -> {
@@ -91,14 +92,16 @@ class SettingItemHelper(val context: Context) {
     private fun initAndSetInputListener(holder: ChildItemHolder, item: SettingChildItem) {
         setBasic(holder, item) {
             val sp = SpHelper(context)
-            holder.itemView.setOnClickListener {
-                MaterialDialog(context).title(item.titleId).input(prefill = sp.getString(item.keyId!!)) { d, c ->
-                    Vog.d(this, "initAndSetInputListener ---> $c")
-                    sp.set(item.keyId, c)
-                    item.summary = c.toString()
-                    setBasic(holder, item)
-                }.show()
-            }
+            val pre = if (item.keyId != null) sp.getString(item.keyId) else item.defaultValue.invoke() as String
+            MaterialDialog(context).title(text = item.title()).input(prefill = pre) { d, c ->
+                Vog.d(this, "initAndSetInputListener ---> $c")
+                val s = c.toString()
+                if (item.keyId != null)
+                    sp.set(item.keyId, s)
+                item.summary = s
+                item.callback?.invoke(holder, s)
+                setBasic(holder, item)
+            }.show()
         }
     }
 
@@ -109,7 +112,7 @@ class SettingItemHelper(val context: Context) {
      * @param lis View.OnClickListener
      */
     private fun setBasic(holder: ChildItemHolder, item: SettingChildItem, lis: OnClick? = null) {
-        holder.titleView.setText(item.titleId)
+        holder.titleView.text = item.title()
         if (item.summary == null) {
             holder.summaryView.visibility = View.GONE
         } else {
@@ -127,20 +130,21 @@ class SettingItemHelper(val context: Context) {
      *
      * @param holder SwitchItemHolder
      * @param item SettingsActivity.SettingChildItem
-     * @param callback Boolean
+     * @param withoutSp Boolean
      */
-    private fun initAndSetCompoundButtonListener(holder: CompoundItemHolder, item: SettingChildItem, callback: Boolean = false) {
+    private fun initAndSetCompoundButtonListener(holder: CompoundItemHolder, item: SettingChildItem) {
         setBasic(holder, item) { holder.compoundWight.toggle() }
 
-        if (!callback) {
+        if (item.keyId != null) {
             val sp = SpHelper(context)
-            val b = sp.getBoolean(item.keyId!!, item.defaultValue.invoke() as Boolean)
+            val b = sp.getBoolean(item.keyId, item.defaultValue.invoke() as Boolean)
             holder.compoundWight.isChecked = b
             holder.compoundWight.setOnCheckedChangeListener { _, isChecked ->
-                sp.set(item.keyId, isChecked)
+                if (item.keyId != null)
+                    sp.set(item.keyId, isChecked)
                 item.callback?.invoke(holder, isChecked)
             }
-        } else {//callback
+        } else {//withoutSp
             holder.compoundWight.isChecked = item.defaultValue.invoke() as Boolean? ?: false
             holder.compoundWight.setOnCheckedChangeListener { _, isChecked ->
                 item.callback?.invoke(holder, isChecked)
@@ -155,25 +159,32 @@ class SettingItemHelper(val context: Context) {
      */
     private fun initSingleDialog(holder: ChildItemHolder, item: SettingChildItem) {
         val sp = SpHelper(context)
-        val entity = context.resources.getStringArray(item.entityArrId!!)
-        val values = context.resources.getStringArray(item.valueArrId!!)
 
-        val v = sp.getString(item.keyId!!)
-        var initPos = if (v != null) {
-            item.summary = entity[values.indexOf(v)]
-            values.indexOf(v)
-        } else 0
+        var initPos = if (item.keyId != null) {
+            val v = sp.getString(item.keyId)
+            val entity = context.resources.getStringArray(item.entityArrId!!)
+            if (v != null) {
+                item.summary = v
+                entity.indexOf(v)
+            } else 0
+        } else item.defaultValue.invoke() as Int? ?: 0
+
         setBasic(holder, item) {
             MaterialDialog(context)
-                    .title(item.titleId)
-                    .listItemsSingleChoice(item.entityArrId, initialSelection = initPos) { _, i, t ->
-                        sp.set(item.keyId, values[i])
+                    .title(text = item.title())
+                    .listItemsSingleChoice(items =
+                    if (item.keyId != null) context.resources.getStringArray(item.entityArrId!!).asList()
+                    else item.items, initialSelection = initPos) { _, i, t ->
+                        if (item.keyId != null)
+                            sp.set(item.keyId, t)
                         item.summary = t
                         setBasic(holder, item)
                         initPos = i
                         item.callback?.invoke(holder, Pair(i, t))
                     }.show()
         }
+
+
     }
 
     /**
@@ -181,21 +192,23 @@ class SettingItemHelper(val context: Context) {
      * @param holder ChildItemHolder
      * @param item SettingChildItem
      */
+    @Deprecated("unuse")
     private fun initMultiDialog(holder: ChildItemHolder, item: SettingChildItem) {
         val sp = SpHelper(context)
         val entity = context.resources.getStringArray(item.entityArrId!!)
-        val values = context.resources.getStringArray(item.valueArrId!!)
 
         val v = sp.getString(item.keyId!!) ?: item.defaultValue.invoke()
-        item.summary = entity[values.indexOf(v)]
+
         setBasic(holder, item)
 
-        MaterialDialog(context).title(item.titleId).listItemsMultiChoice(item.entityArrId) { d, iss, ts ->
-            sp.set(item.keyId, ts)
-            item.summary = ts.toString()
-            setBasic(holder, item)
-            //TODO callback
-        }.show()
+        MaterialDialog(context).title(text = item.title())
+                .listItemsMultiChoice(item.entityArrId) { d, iss, ts ->
+                    if (item.keyId != null)
+                        sp.set(item.keyId, ts)
+                    item.summary = ts.toString()
+                    setBasic(holder, item)
+                    //TODO callback
+                }.show()
     }
 
     /**
@@ -205,17 +218,19 @@ class SettingItemHelper(val context: Context) {
      */
     private fun initNumberPickerDialog(holder: ChildItemHolder, item: SettingChildItem) {
         val sp = SpHelper(context)
-        item.summary.also {
-            if (it == null) item.summary = item.defaultValue.invoke().toString()
-        }
-        var old = sp.getInt(item.keyId!!)
+        var old = if (item.keyId == null) item.defaultValue.invoke() as Int
+        else sp.getInt(item.keyId)
         if (old == -1) old = item.defaultValue.invoke() as Int
+        item.summary = old.toString()
+
         setBasic(holder, item) {
             val vv = buildNumberPickerView(item.range!!, old)
-            MaterialDialog(context).title(item.titleId).customView(null, vv.first).title(item.titleId)
+            MaterialDialog(context).title(text = item.title())
+                    .customView(null, vv.first)
                     .positiveButton {
                         item.summary = old.toString()
-                        sp.set(item.keyId, old)
+                        if (item.keyId != null)
+                            sp.set(item.keyId, old)
                         setBasic(holder, item)
                         item.callback?.invoke(holder, old)
                     }
@@ -255,8 +270,8 @@ class SettingItemHelper(val context: Context) {
         return Pair(view, sb)
     }
 
-    open class ChildItemHolder(v: View) {
-        val itemView = v
+    open class ChildItemHolder(v: View) : BaseListAdapter.ViewHolder(v) {
+
         val titleView: TextView = v.findViewById(R.id.title)
         val summaryView: TextView = v.findViewById(R.id.summary)
     }

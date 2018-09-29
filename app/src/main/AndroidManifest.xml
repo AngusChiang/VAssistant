@@ -23,10 +23,16 @@
     <!-- 联系人 -->
     <uses-permission android:name="android.permission.READ_CONTACTS" />
 
+    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
     <uses-permission android:name="android.permission.BLUETOOTH" />
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission
+        android:name="android.permission.DEVICE_POWER"
+        tools:ignore="ProtectedPermissions" />
 
     <uses-feature
         android:name="android.hardware.bluetooth_le"
@@ -103,7 +109,9 @@
             android:label="@string/text_permission_manager" />
         <activity android:name=".activities.RegexParseTestActivity" />
 
-        <activity android:name=".activities.InstManagerActivity" />
+        <activity
+            android:name=".activities.InstManagerActivity"
+            android:windowSoftInputMode="adjustPan" />
         <activity
             android:name=".activities.SettingsActivity"
             android:excludeFromRecents="false"
@@ -125,8 +133,12 @@
             android:theme="@style/AppTheme" />
         <activity
             android:name=".activities.AboutActivity"
+            android:label="@string/text_about"
             android:theme="@style/AppTheme" />
-        <activity android:name=".activities.HelpActivity" />
+        <activity
+            android:name=".activities.HelpActivity"
+            android:label="@string/text_help"
+            android:theme="@style/AppTheme" />
         <activity
             android:name=".activities.base.LaboratoryActivity"
             android:label="@string/text_laboratory"

@@ -15,7 +15,7 @@ import cn.vove7.jarvis.adapters.ViewModel
 import cn.vove7.jarvis.fragments.SimpleListFragment
 import cn.vove7.jarvis.utils.AppConfig
 import cn.vove7.jarvis.utils.DialogUtil
-import cn.vove7.jarvis.utils.NetHelper
+import cn.vove7.common.utils.NetHelper
 import cn.vove7.jarvis.view.dialog.AdEditorDialog
 import cn.vove7.vtp.log.Vog
 import com.afollestad.materialdialogs.MaterialDialog

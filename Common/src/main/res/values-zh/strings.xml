@@ -4,7 +4,7 @@
     <string name="text_select_script">选择脚本</string>
     <string name="text_stop">停止</string>
     <string name="text_run">执行</string>
-    <string name="text_err_not_belong_inapp_inst">失败：不属于App内命令</string>
+    <string name="text_err_not_belong_inapp_inst">失败：不属于App内指令</string>
     <string name="text_have_done">完成</string>
     <string name="text_an_err_happened">发生错误，可发送日志进行反馈</string>
 

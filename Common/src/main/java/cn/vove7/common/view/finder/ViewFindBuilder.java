@@ -157,11 +157,21 @@ public class ViewFindBuilder extends FindBuilder {
         return this;
     }
 
+    /**
+     * 根据id 查找
+     * @param id
+     * @return
+     */
     public ViewFindBuilder id(String id) {
         viewFinderX.setViewId(id);
         return this;
     }
 
+    /**
+     * 说明
+     * @param desc
+     * @return
+     */
     public ViewFindBuilder desc(String... desc) {
         viewFinderX.getDesc().addAll(Arrays.asList(desc));
         return this;
@@ -195,7 +205,7 @@ public class ViewFindBuilder extends FindBuilder {
         return this;
     }
 
-    public ViewFindBuilder types(String... types) {
+    public ViewFindBuilder type(String... types) {
         viewFinderX.getTypeNames().addAll(Arrays.asList(types));
         return this;
     }

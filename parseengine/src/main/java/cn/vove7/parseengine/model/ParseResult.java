@@ -13,15 +13,6 @@ public class ParseResult {
     private PriorityQueue<Action> actionQueue;
 
     private String msg;
-    private String openWithCmd;
-
-    public String getOpenWithCmd() {
-        return openWithCmd;
-    }
-
-    public void setOpenWithCmd(String openWithCmd) {
-        this.openWithCmd = openWithCmd;
-    }
 
     public ParseResult(Boolean isSuccess) {
         this.isSuccess = isSuccess;
@@ -38,6 +29,12 @@ public class ParseResult {
     public ParseResult(Boolean isSuccess, PriorityQueue<Action> actionQueue) {
         this.isSuccess = isSuccess;
         this.actionQueue = actionQueue;
+    }
+
+    public ParseResult(boolean isSuccess, PriorityQueue<Action> actionQueue, String msg) {
+        this.isSuccess = isSuccess;
+        this.actionQueue = actionQueue;
+        this.msg = msg;
     }
 
     public ParseResult(boolean isSuccess, String msg) {

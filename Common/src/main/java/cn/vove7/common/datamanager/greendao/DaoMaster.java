@@ -26,9 +26,9 @@ public class DaoMaster extends AbstractDaoMaster {
         ActionNodeDao.createTable(db, ifNotExists);
         RegDao.createTable(db, ifNotExists);
         AppAdInfoDao.createTable(db, ifNotExists);
-        CommandHistoryDao.createTable(db, ifNotExists);
         MarkedDataDao.createTable(db, ifNotExists);
         ActionDescDao.createTable(db, ifNotExists);
+        InstSettingsDao.createTable(db, ifNotExists);
     }
 
     /** Drops underlying database table using DAOs. */
@@ -38,9 +38,9 @@ public class DaoMaster extends AbstractDaoMaster {
         ActionNodeDao.dropTable(db, ifExists);
         RegDao.dropTable(db, ifExists);
         AppAdInfoDao.dropTable(db, ifExists);
-        CommandHistoryDao.dropTable(db, ifExists);
         MarkedDataDao.dropTable(db, ifExists);
         ActionDescDao.dropTable(db, ifExists);
+        InstSettingsDao.dropTable(db, ifExists);
     }
 
     /**
@@ -64,9 +64,9 @@ public class DaoMaster extends AbstractDaoMaster {
         registerDaoClass(ActionNodeDao.class);
         registerDaoClass(RegDao.class);
         registerDaoClass(AppAdInfoDao.class);
-        registerDaoClass(CommandHistoryDao.class);
         registerDaoClass(MarkedDataDao.class);
         registerDaoClass(ActionDescDao.class);
+        registerDaoClass(InstSettingsDao.class);
     }
 
     public DaoSession newSession() {

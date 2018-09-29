@@ -28,4 +28,5 @@ require 'view_op'
 require 'system'
 require 'global_op'
 require 'storages'
+require 'settings'
 

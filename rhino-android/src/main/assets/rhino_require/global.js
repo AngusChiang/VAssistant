@@ -34,6 +34,10 @@ function swipe(x1, y1, x2, y2, delay){
 }
 //
 
+function screenShot(){
+    return automator.screenShot()
+}
+
 function press(x, y, delay){
     return automator.press(x, y, delay)
 }
@@ -103,8 +107,8 @@ function powerDialog(){
 }
 //
 
-function notifications(){
-    return automator.notifications()
+function notificationBar(){
+    return automator.notificationBar()
 }
 //
 

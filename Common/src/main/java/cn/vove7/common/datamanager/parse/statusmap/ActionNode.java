@@ -487,7 +487,7 @@ public class ActionNode implements Serializable, DataFrom {
     }
 
     /**
-     * To-many relationship, resolved on first access (and after reset).
+     * To-many relationship, resolved on first access (and after set).
      * Changes to to-many relations are not persisted, make changes to the target entity.
      */
     @Keep
@@ -511,7 +511,7 @@ public class ActionNode implements Serializable, DataFrom {
     }
 
     /**
-     * To-many relationship, resolved on first access (and after reset).
+     * To-many relationship, resolved on first access (and after set).
      * Changes to to-many relations are not persisted, make changes to the target entity.
      */
     @Keep
@@ -698,9 +698,9 @@ public class ActionNode implements Serializable, DataFrom {
         }
     }
 
-    private static final String PreOpen_JS = "smartOpen('%s')\n" +
-            "a = waitForApp('%s',3000)\n" +
-            "if(!a) return\n";
+    private static final String PreOpen_JS = "openAppByPkg('%s',true)\n" +
+            "a = waitForApp('%s',3000)\n";// +
+            //"if(!a) return\n";
     private static final String PreOpen_LUA = "smartOpen('%s')\n" +
             "a = waitForApp('%s',3000)\n" +
             "if(not a) then return\n";

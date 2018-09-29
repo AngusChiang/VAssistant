@@ -6,9 +6,8 @@ import cn.vove7.common.accessibility.AccessibilityApi
 import cn.vove7.common.datamanager.AppAdInfo
 import cn.vove7.common.datamanager.DAO
 import cn.vove7.common.datamanager.DaoHelper
-import cn.vove7.common.model.UserInfo
 import cn.vove7.common.netacc.ApiUrls
-import cn.vove7.jarvis.utils.NetHelper
+import cn.vove7.common.utils.NetHelper
 import cn.vove7.common.netacc.model.BaseRequestModel
 import cn.vove7.common.netacc.model.ResponseMessage
 import cn.vove7.executorengine.bridges.SystemBridge
@@ -17,7 +16,6 @@ import cn.vove7.jarvis.activities.AppAdListActivity
 import cn.vove7.jarvis.adapters.SimpleListAdapter
 import cn.vove7.jarvis.adapters.ViewModel
 import cn.vove7.jarvis.fragments.base.OnSyncMarked
-import cn.vove7.jarvis.R
 import cn.vove7.jarvis.plugins.AdKillerService
 import cn.vove7.jarvis.utils.AppConfig
 import cn.vove7.jarvis.view.dialog.AdEditorDialog

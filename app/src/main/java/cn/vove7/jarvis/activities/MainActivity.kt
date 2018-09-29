@@ -6,8 +6,10 @@ import android.os.Bundle
 import android.view.KeyEvent
 import android.view.View
 import cn.vove7.androlua.LuaEditorActivity
+import cn.vove7.common.model.UserInfo
 import cn.vove7.executorengine.helper.AdvanAppHelper
 import cn.vove7.jarvis.R
+import cn.vove7.jarvis.utils.AppConfig
 import cn.vove7.rhino.RhinoActivity
 import cn.vove7.vtp.runtimepermission.PermissionUtils
 import kotlin.concurrent.thread
@@ -16,6 +18,11 @@ class MainActivity : Activity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        if (!AppConfig.checkUser()) {
+            finish()
+            return
+        }
 
         PermissionUtils.autoRequestPermission(this, arrayOf(
                 "android.permission.RECORD_AUDIO",

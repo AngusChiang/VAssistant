@@ -1,5 +1,6 @@
 package cn.vove7.common.view.finder
 
+import android.graphics.Rect
 import cn.vove7.common.accessibility.AccessibilityApi
 import cn.vove7.common.accessibility.viewnode.ViewNode
 import cn.vove7.common.accessibility.viewnode.ViewOperation
@@ -32,8 +33,8 @@ open class FindBuilder : ViewOperation {
      *
      * @return list
      */
-    fun find(): List<ViewNode> {
-        return finder?.findAll() ?: emptyList()
+    fun find(): Array<ViewNode> {
+        return finder?.findAll() ?: emptyArray()
     }
 
 
@@ -137,7 +138,7 @@ open class FindBuilder : ViewOperation {
 
     override fun scrollLeft(): Boolean {
         val node = findFirst()
-        return node?.tryClick() == true
+        return node?.scrollLeft() == true
     }
 
     override fun swipe(dx: Int, dy: Int, delay: Int): Boolean {
@@ -147,7 +148,36 @@ open class FindBuilder : ViewOperation {
 
     override fun scrollRight(): Boolean {
         val node = findFirst()
-        return node?.tryClick() == true
+        return node?.scrollRight() == true
     }
 
+    override fun getChilds(): Array<ViewNode>? {
+        val node = findFirst()
+        return node?.getChilds()
+    }
+
+    override fun getBounds(): Rect? {
+        val node = findFirst()
+        return node?.getBounds()
+    }
+
+    override fun getBoundsInParent(): Rect? {
+        val node = findFirst()
+        return node?.getBoundsInParent()
+    }
+
+    override fun getParent(): ViewNode? {
+        val node = findFirst()
+        return node?.getParent()
+    }
+
+    override fun getChildCount(): Int? {
+        val node = findFirst()
+        return node?.getChildCount()
+    }
+
+    override fun isClickable(): Boolean {
+        val node = findFirst()
+        return node?.isClickable() ?: false
+    }
 }

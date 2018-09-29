@@ -38,7 +38,7 @@ class AboutActivity : AppCompatActivity(), AdapterView.OnItemClickListener {
 
         header_content.addView(layoutInflater.inflate(R.layout.header_about, null))
 
-        ver_name_view.text = AppConfig.getVersionName()
+        ver_name_view.text = AppConfig.versionName
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
         list_view.adapter = IconTitleListAdapter(this, getData())
@@ -59,7 +59,8 @@ class AboutActivity : AppCompatActivity(), AdapterView.OnItemClickListener {
                 SystemHelper.openApplicationMarket(this, this.packageName, APP_STORE_COLL_APK)
             }
             1 -> {
-                toast.showShort(R.string.text_coming_soon)
+                AppConfig.versionName
+                SystemHelper.openApplicationMarket(this, this.packageName, APP_STORE_COLL_APK)
             }
             3 -> {
                 SystemBridge().sendEmail("vove7@qq.com", null,

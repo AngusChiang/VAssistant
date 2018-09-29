@@ -1,4 +1,5 @@
 importClass(Packages.cn.vove7.vtp.text.TextTransHelper)
+importClass(Packages.cn.vove7.common.utils.TextHelper)
 importPackage(Packages.cn.vove7.vtp.builder)
 
 function toPinyin(text,firstLetter){
@@ -6,3 +7,12 @@ function toPinyin(text,firstLetter){
     return new TextTransHelper(app).chineseStr2Pinyin(text, firstLetter)
 }
 
+function matches(s,regex){
+    return TextHelper.INSTANCE.matches(s,regex)
+}
+function matchValues(s,regex){
+    return TextHelper.INSTANCE.matchValues(s,regex)
+}
+function arr2String(arr){
+    return TextHelper.INSTANCE.arr2String(arr,', ')
+}

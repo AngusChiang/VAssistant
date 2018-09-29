@@ -40,7 +40,7 @@ class InstManagerActivity : BaseActivityWithViewPager() {
 
     }
 
-    override var titles: Array<String> = arrayOf("全局命令", "应用内命令")
+    override var titles: Array<String> = arrayOf("全局指令", "应用内指令")
 }
 
 interface OnSyncInst {

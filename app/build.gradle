@@ -10,9 +10,10 @@ android {
         applicationId "cn.vove7.vassistant"
         minSdkVersion 21
         targetSdkVersion 28
-        versionCode 1
-        versionName "1.0"
+        versionCode 2
+        versionName "1.0.1"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        testApplicationId = 'cn.vove7.vassistant_test'
     }
     buildTypes {
         release {
@@ -20,9 +21,16 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
         debug {
+            minifyEnabled false
+            applicationIdSuffix ".debug"
+            versionNameSuffix = '_debug'
             jniDebuggable = false
             debuggable = true
         }
+//        beta {
+//            versionNameSuffix = '_beta'
+//            applicationIdSuffix = '.beta'
+//        }
     }
     signingConfigs {
         debug {
@@ -32,10 +40,6 @@ android {
         release {
             v1SigningEnabled true
             v2SigningEnabled true
-            keyAlias 'Vove'
-            keyPassword 'Va713148271314!@'
-            storeFile file('F:/Project/AndroidProjects/Vove.keystore')
-            storePassword 'Va713148271314!@'
         }
     }
     compileOptions {

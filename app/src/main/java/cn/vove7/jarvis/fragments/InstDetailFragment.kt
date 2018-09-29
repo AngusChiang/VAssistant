@@ -19,14 +19,17 @@ import cn.vove7.common.model.UserInfo
 import cn.vove7.common.netacc.ApiUrls
 import cn.vove7.common.netacc.model.BaseRequestModel
 import cn.vove7.common.netacc.model.ResponseMessage
+import cn.vove7.common.utils.RegUtils
 import cn.vove7.common.utils.TextHelper
 import cn.vove7.executorengine.bridges.SystemBridge
+import cn.vove7.executorengine.exector.MultiExecutorEngine
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.activities.NewInstActivity
 import cn.vove7.jarvis.adapters.ExecuteQueueAdapter
+import cn.vove7.jarvis.adapters.InstSettingListAdapter
 import cn.vove7.jarvis.fragments.base.BaseBottomFragmentWithToolbar
 import cn.vove7.jarvis.utils.AppConfig
-import cn.vove7.jarvis.utils.NetHelper
+import cn.vove7.common.utils.NetHelper
 import cn.vove7.jarvis.view.dialog.ProgressDialog
 import cn.vove7.vtp.dialog.DialogWithList
 import cn.vove7.vtp.log.Vog
@@ -60,7 +63,7 @@ class InstDetailFragment(val node: ActionNode, val onUpdate: () -> Unit) : BaseB
 
     lateinit var bodyView: View
     override fun onCreateContentView(parent: View): View {
-
+//        AppBus.reg(this)
         bodyView = View.inflate(context, R.layout.dialog_inst_detail, null)
         toolbar.inflateMenu(R.menu.menu_inst_detail)
         initView()
@@ -68,14 +71,16 @@ class InstDetailFragment(val node: ActionNode, val onUpdate: () -> Unit) : BaseB
         load = true
         return bodyView
     }
-//
-//    fun setInst(node: ActionNode) {
-//        this.node = node
-//        if (!load) return
-//        setData()
+
+//    @Subscribe
+//    fun on(event: String) {
+//        if (event == AppBus.EVENT_INST_SAVE_COMPLETE) {
+//            loadSettings()
+//        }
 //    }
 
-    //todo fill data  share user info
+
+    //todo  share user info
     private fun setData() {
         val uId = UserInfo.getUserId()
         when {//编辑
@@ -106,11 +111,37 @@ class InstDetailFragment(val node: ActionNode, val onUpdate: () -> Unit) : BaseB
 //            script_text.setCode(node.action?.actionScript ?: "", )
             script_text.setOptions(Options.get(context!!)
                     .withLanguage(node.action?.scriptType ?: "lua")
-                    .withCode(node.action?.actionScript ?:"").withoutShadows())
+                    .withCode(node.action?.actionScript ?: "").withoutShadows())
             script_type_text.text = node.action?.scriptType
         }
-
+        if (node.action != null) {
+            val settingsHeader = RegUtils.getRegisterSettingsTextAndName(node.action.actionScript)
+            if (settingsHeader != null) {
+                val script = settingsHeader.script
+                val version = settingsHeader.version
+                settingName = settingsHeader.name
+                val instSetting = DaoHelper.getInsetSettingsByName(settingName!!)
+                if (instSetting == null || instSetting.version < version) {//数据库不存在数据
+                    Vog.d(this, "setData ---> 执行新建or升级")
+//                  //执行
+                    val engine = MultiExecutorEngine(context!!, null)
+                    when (node.action.scriptType) {
+                        Action.SCRIPT_TYPE_LUA -> {
+                            engine.onLuaExec(script)
+                        }
+                        Action.SCRIPT_TYPE_JS -> {
+                            engine.onRhinoExec(script)
+                        }
+                    }
+                }
+                toolbar.menu.findItem(R.id.menu_settings).isVisible = true
+            } else {
+                toolbar.menu.findItem(R.id.menu_settings).isVisible = false
+            }
+        }
     }
+
+    var settingName: String? = null
 
     private fun initView() {
         toolbar.setOnMenuItemClickListener { it ->
@@ -130,9 +161,9 @@ class InstDetailFragment(val node: ActionNode, val onUpdate: () -> Unit) : BaseB
                 }
                 R.id.menu_delete -> {//删除
                     MaterialDialog(context!!).title(text = getString(R.string.text_confirm_2_del) + ": ${node.actionTitle} ?")
-                            .negativeButton(R.string.text_help) {
-                                SystemBridge().openUrl(ApiUrls.HELP_DEL_INST)// TODO
-                            }
+//                            .negativeButton(R.string.text_help) {
+//                                SystemBridge().openUrl(ApiUrls.HELP_DEL_INST)// TODO
+//                            }
                             .message(R.string.text_msg_delete_action_node)
                             .positiveButton(R.string.text_confirm) {
                                 val p = ProgressDialog(context!!)
@@ -144,12 +175,12 @@ class InstDetailFragment(val node: ActionNode, val onUpdate: () -> Unit) : BaseB
                                         } else {
                                             GlobalLog.log("云端删除失败$node ${bean?.message}")
                                         }
-                                        del()
+                                        delLocalNode()
                                         p.dismiss()
                                     }
                                 } else {
                                     GlobalLog.log("未分享至server$node")
-                                    del()
+                                    delLocalNode()
                                     p.dismiss()
                                 }
                                 onUpdate.invoke()
@@ -187,8 +218,8 @@ class InstDetailFragment(val node: ActionNode, val onUpdate: () -> Unit) : BaseB
 //                    val prompt = sp.getBoolean(R.string.key_show_prompt_inapp_as_global_dialog)
 //                    if (prompt) {
                     //重要信息
-                    MaterialDialog(context!!).title(text = "设为全局命令")
-                            .message(text = "此操作会复制此命令(包括跟随操作)至全局，若不选择复制跟随操作，" +
+                    MaterialDialog(context!!).title(text = "设为全局指令")
+                            .message(text = "此操作会复制此指令(包括跟随操作)至全局，若不选择复制跟随操作，" +
                                     "选择下方[不包含]即可。\n注意：跟随操作不允许此操作\n跟随操作最多之复制一层")
                             /*.checkBoxPrompt(text = "不再提醒") {
                                 sp.set(R.string.key_show_prompt_inapp_as_global_dialog, it)
@@ -202,12 +233,23 @@ class InstDetailFragment(val node: ActionNode, val onUpdate: () -> Unit) : BaseB
 //                        doCopy2Global()
 //                    }
                 }
+                R.id.menu_settings -> {//显示设置
+                    var d: DialogWithList?=null
+                    d = DialogWithList(context!!, InstSettingListAdapter(context!!,
+                            settingName ?: "") {
+                        toast.showLong("设置加载失败")
+                        d?.dismiss()
+                    })
+                    d.setTitle(title ?: "")
+                    d.setWidth(0.9)
+                    d.show()
+                }
             }
             return@setOnMenuItemClickListener true
         }
     }
 
-    fun del() {
+    private fun delLocalNode() {
         thread {
             val b = DaoHelper.deleteActionNodeInTX(node?.id)
             GlobalApp.toastShort(
@@ -217,7 +259,6 @@ class InstDetailFragment(val node: ActionNode, val onUpdate: () -> Unit) : BaseB
     }
 
     private fun addFollowFromNew() {
-        val node = node!!
         if (!AppConfig.checkUser()) {
             return
         }
@@ -269,12 +310,6 @@ class InstDetailFragment(val node: ActionNode, val onUpdate: () -> Unit) : BaseB
      * 更新 or upload
      */
     private fun showShareDialog() {
-        if (node == null) {
-            hide()
-            GlobalLog.err("id188")
-            toast.red().showShort(R.string.text_error_occurred)
-            return
-        }
         //判断首次分享
         val upgrade = node!!.tagId != null
         //dialog 说明|示例
@@ -304,14 +339,14 @@ class InstDetailFragment(val node: ActionNode, val onUpdate: () -> Unit) : BaseB
                         //set desc
                         desc = ActionDesc(descStr, exStr)
                         DAO.daoSession.actionDescDao.insert(desc)
-                        node?.descId = desc.id
+                        node.descId = desc.id
                         //set userId
-                        node?.publishUserId = UserInfo.getUserId()
+                        node.publishUserId = UserInfo.getUserId()
                         //update
-                        node?.update()
-                        node!!.desc = desc
+                        node.update()
+                        node.desc = desc
                         //assembly
-                        node!!.assembly()
+                        node.assembly()
                         //share
                         if (upgrade) upgrade()
                         else firstShare()
@@ -390,15 +425,14 @@ class InstDetailFragment(val node: ActionNode, val onUpdate: () -> Unit) : BaseB
             execQueue.add(0, p)
             p = p.parent
         }
-        if (ActionNode.belongInApp(node!!.actionScopeType)) {
-            val pkg = node!!.actionScope.packageName
+        if (ActionNode.belongInApp(node.actionScopeType)) {
+            val pkg = node.actionScope.packageName
             execQueue.add(0, ActionNode("打开App",
-                    Action("smartOpen('$pkg')\n" +
+                    Action("openAppByPkg('$pkg',true)\n" +
                             "waitForApp('$pkg')", Action.SCRIPT_TYPE_LUA)))
 
         }
         val d = DialogWithList(context!!, ExecuteQueueAdapter(context!!, execQueue))
-
                 .setButton(DialogInterface.BUTTON_POSITIVE, R.string.text_run, View.OnClickListener { v ->
                     val que = PriorityQueue<Action>()
                     execQueue.forEach {
@@ -407,6 +441,7 @@ class InstDetailFragment(val node: ActionNode, val onUpdate: () -> Unit) : BaseB
                     AppBus.post(que)
                 })
                 .setButton(DialogInterface.BUTTON_NEGATIVE, R.string.text_cancel, View.OnClickListener { v -> })
+        d.setWidth(0.9)
         d.setTitle("执行队列")
         d.show()
     }

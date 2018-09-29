@@ -107,7 +107,7 @@ class RemoteDebugServer : Runnable {
 
     private val print = object : OnPrint {
         override fun onPrint(l: Int, output: String) {
-            Vog.d(this, "onPrint ---> $output")
+//            Vog.d(this, "onPrint ---> $output")
 
             val end = if (output.endsWith('\n')) "" else "\n"
             try {

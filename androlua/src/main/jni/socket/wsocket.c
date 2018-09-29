@@ -379,9 +379,9 @@ static const char *wstrerror(int err) {
         case WSAEADDRNOTAVAIL: return "Cannot assign requested address";
         case WSAENETDOWN: return "Network is down";
         case WSAENETUNREACH: return "Network is unreachable";
-        case WSAENETRESET: return "Network dropped connection on reset";
+        case WSAENETRESET: return "Network dropped connection on set";
         case WSAECONNABORTED: return "Software caused connection abort";
-        case WSAECONNRESET: return PIE_CONNRESET; // "Connection reset by peer";
+        case WSAECONNRESET: return PIE_CONNRESET; // "Connection set by peer";
         case WSAENOBUFS: return "No buffer space available";
         case WSAEISCONN: return PIE_ISCONN; // "Socket is already connected";
         case WSAENOTCONN: return "Socket is not connected";

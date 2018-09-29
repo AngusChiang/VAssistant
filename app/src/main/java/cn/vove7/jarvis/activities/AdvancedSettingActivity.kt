@@ -8,12 +8,12 @@ import cn.vove7.common.model.UserInfo
 import cn.vove7.common.view.toast.ColorfulToast
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.activities.base.ReturnableActivity
+import cn.vove7.jarvis.adapters.SettingsExpandableAdapter
 import cn.vove7.jarvis.utils.AppConfig
 import cn.vove7.jarvis.utils.debugserver.RemoteDebugServer
 import cn.vove7.jarvis.view.IntentItem
-import cn.vove7.jarvis.view.SwitchItemWithoutSp
+import cn.vove7.jarvis.view.SwitchItem
 import cn.vove7.jarvis.view.custom.SettingGroupItem
-import cn.vove7.jarvis.view.custom.SettingsExpandableAdapter
 import cn.vove7.jarvis.view.dialog.LoginDialog
 import cn.vove7.jarvis.view.dialog.UserInfoDialog
 import cn.vove7.jarvis.view.utils.SettingItemHelper
@@ -57,7 +57,7 @@ class AdvancedSettingActivity : ReturnableActivity() {
 
     override fun onResume() {
         super.onResume()
-
+        AppConfig.checkDate()
         unlock_advan_fun.visibility = if (UserInfo.isVip()) {
             View.GONE
         } else View.VISIBLE
@@ -76,18 +76,18 @@ class AdvancedSettingActivity : ReturnableActivity() {
                         })
                 )),
                 SettingGroupItem(R.color.google_green, "脚本", childItems = listOf(
-                        SwitchItemWithoutSp(R.string.text_remote_debug, summary = "", defaultValue = {
+                        SwitchItem(R.string.text_remote_debug, summary = "方法请查阅使用手册", defaultValue = {
                             !RemoteDebugServer.stopped
                         }, callback = { holder, it ->
                             if (!AppConfig.checkUser()) {
-                                (holder as SettingItemHelper.SwitchItemHolder).compoundWight.toggle()
-                                return@SwitchItemWithoutSp
+                                (holder as SettingItemHelper.SwitchItemHolder).compoundWight.isChecked = false
+                                return@SwitchItem
                             }
 
                             if (it as Boolean) RemoteDebugServer.start()
                             else RemoteDebugServer.stop()
                         }),
-                        IntentItem(R.string.text_test_code_lua, null, onClick = { _, _ ->
+                        IntentItem(R.string.text_test_code_lua, onClick = { _, _ ->
                             if (AppConfig.checkUser()) {
                                 startActivity(Intent(this, LuaEditorActivity::class.java))
                             }

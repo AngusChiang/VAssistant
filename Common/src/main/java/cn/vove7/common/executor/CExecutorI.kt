@@ -44,6 +44,7 @@ interface CExecutorI : ViewShowListener, ActivityShowListener, RuntimeArgs {
     fun waitForViewId(id: String, m: Long = -1): ViewNode?
     fun waitForDesc(desc: String, m: Long = -1): ViewNode?
     fun waitForText(text: String, m: Long = -1): ViewNode?
+    fun waitForText(text: Array<String>, m: Long = -1): ViewNode?
     fun getViewNode(): ViewNode?
 
     /**
@@ -56,6 +57,7 @@ interface CExecutorI : ViewShowListener, ActivityShowListener, RuntimeArgs {
     fun onFinish()
 
     fun smartOpen(data: String): Boolean
+    fun smartClose(data: String): Boolean
     /**
      * 语音合成
      * 异步
@@ -69,16 +71,22 @@ interface CExecutorI : ViewShowListener, ActivityShowListener, RuntimeArgs {
 }
 
 interface RuntimeArgs {
-
+    var command:String?
     //Runtime
     var currentActionIndex: Int
     var actionCount: Int
 
-    val currentApp: ActionScope?
+    var currentApp: ActionScope?
     var currentActivity: String
 
     var actionScope: Int?
 
     fun isGlobal(): Boolean
     var running: Boolean
+
+    /**
+     * 打开 1
+     * 关闭-1
+     */
+    var commandType: Int
 }

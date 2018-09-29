@@ -667,7 +667,7 @@ void luaG_traceexec (lua_State *L) {
   lu_byte mask = L->hookmask;
   int counthook = (--L->hookcount == 0 && (mask & LUA_MASKCOUNT));
   if (counthook)
-    resethookcount(L);  /* reset count */
+    resethookcount(L);  /* set count */
   else if (!(mask & LUA_MASKLINE))
     return;  /* no line hook and count != 0; nothing to be done */
   if (ci->callstatus & CIST_HOOKYIELD) {  /* called hook last time? */
