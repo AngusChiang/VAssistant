@@ -6,8 +6,10 @@ import android.view.View
 import cn.vove7.common.datamanager.AppAdInfo
 import cn.vove7.common.datamanager.DAO
 import cn.vove7.common.datamanager.greendao.AppAdInfoDao
+import cn.vove7.common.datamanager.parse.DataFrom
 import cn.vove7.common.netacc.ApiUrls
 import cn.vove7.common.netacc.model.BaseRequestModel
+import cn.vove7.common.utils.NetHelper
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.activities.base.OneFragmentActivity
 import cn.vove7.jarvis.adapters.SimpleListAdapter
@@ -15,7 +17,6 @@ import cn.vove7.jarvis.adapters.ViewModel
 import cn.vove7.jarvis.fragments.SimpleListFragment
 import cn.vove7.jarvis.utils.AppConfig
 import cn.vove7.jarvis.utils.DialogUtil
-import cn.vove7.common.utils.NetHelper
 import cn.vove7.jarvis.view.dialog.AdEditorDialog
 import cn.vove7.vtp.log.Vog
 import com.afollestad.materialdialogs.MaterialDialog
@@ -52,7 +53,8 @@ class AppAdListActivity : OneFragmentActivity() {
             }
         }
 
-        override val itemClickListener: SimpleListAdapter.OnItemClickListener? = object : SimpleListAdapter.OnItemClickListener {
+        override val itemClickListener: SimpleListAdapter.OnItemClickListener? =
+            object : SimpleListAdapter.OnItemClickListener {
             @SuppressLint("CheckResult")
             override fun onClick(holder: SimpleListAdapter.VHolder?, pos: Int, item: ViewModel) {
 
@@ -101,7 +103,6 @@ class AppAdListActivity : OneFragmentActivity() {
         }
 
         fun share(adInfo: AppAdInfo) {
-
             NetHelper.postJson<String>(ApiUrls.SHARE_APP_AD_INFO, BaseRequestModel(adInfo),
                     type = NetHelper.StringType) { _, bean ->
                 if (bean != null) {
@@ -109,6 +110,7 @@ class AppAdListActivity : OneFragmentActivity() {
                         //return tagId
                         val tag = bean.data
                         if (tag != null) {
+                            adInfo.from = DataFrom.FROM_SHARED
                             adInfo.tagId = tag
                             DAO.daoSession.appAdInfoDao.update(adInfo)
                         }

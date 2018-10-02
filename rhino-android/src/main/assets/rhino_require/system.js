@@ -15,10 +15,13 @@ openAppByPkg = function(pkg,reset){
 //通过通过关键字匹配
 // return ExResult pkgName if ok
 //
-openAppByWord=function(appWord){
-    return system.openAppByWord(appWord)
+openAppByWord=function(appWord,reset){
+    if(reset==undefined) reset=false
+    return system.openAppByWord(appWord,reset)
 }
-
+getPkgByWord = function(appWord){
+    return system.getPkgByWord(appWord)
+}
 
 //*
 //手电

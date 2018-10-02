@@ -13,6 +13,7 @@ import cn.vove7.common.datamanager.executor.entity.MarkedData
 import cn.vove7.common.datamanager.parse.DataFrom
 import cn.vove7.common.netacc.ApiUrls
 import cn.vove7.common.netacc.model.BaseRequestModel
+import cn.vove7.common.utils.NetHelper
 import cn.vove7.common.utils.TextHelper
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.adapters.SimpleListAdapter
@@ -20,7 +21,6 @@ import cn.vove7.jarvis.adapters.ViewModel
 import cn.vove7.jarvis.fragments.SimpleListFragment
 import cn.vove7.jarvis.utils.AppConfig
 import cn.vove7.jarvis.utils.DialogUtil
-import cn.vove7.common.utils.NetHelper
 import cn.vove7.vtp.log.Vog
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.customview.customView
@@ -48,7 +48,7 @@ abstract class BaseMarkedFragment<T> : SimpleListFragment<T>(), OnSyncMarked {
 
     private val editDialog: MaterialDialog by lazy {
         val s = MaterialDialog(context!!)
-                .customView(R.layout.dialig_edit_marked_data,scrollable = true)
+                .customView(R.layout.dialig_edit_marked_data, scrollable = true)
                 .cancelable(false)
                 .noAutoDismiss()
                 .negativeButton { it.dismiss() }
@@ -120,7 +120,7 @@ abstract class BaseMarkedFragment<T> : SimpleListFragment<T>(), OnSyncMarked {
                         0 -> markedType = MarkedData.MARKED_TYPE_SCRIPT_LUA
                         1 -> markedType = MarkedData.MARKED_TYPE_SCRIPT_JS
                     }
-                    Vog.d(this,"onItemSelected ---> $markedType")
+                    Vog.d(this, "onItemSelected ---> $markedType")
                 }
             }
         }
@@ -220,6 +220,7 @@ abstract class BaseMarkedFragment<T> : SimpleListFragment<T>(), OnSyncMarked {
                     val tag = bean.data
                     if (tag != null) {
                         data.tagId = tag
+                        data.from = DataFrom.FROM_SHARED
                         DAO.daoSession.markedDataDao.update(data)
                     }
                     toast.showLong(bean.message)

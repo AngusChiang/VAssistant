@@ -1,5 +1,6 @@
 package cn.vove7.common.utils
 
+import android.graphics.Point
 import android.util.Pair
 import cn.vove7.common.bridges.SystemOperation
 
@@ -9,17 +10,17 @@ import cn.vove7.common.bridges.SystemOperation
  * @author 17719247306
  * 2018/9/6
  */
-class ScreenAdapter {
+object ScreenAdapter {
 
-    companion object {
-        private var mHeight = 1920// deviceInfo.screenInfo.height
-        private var mWidth = 1080// deviceInfo.screenInfo.width
-        fun init(systemBridge: SystemOperation) {
-            val deviceInfo = systemBridge.getDeviceInfo()
-            mHeight = deviceInfo.screenInfo.height
-            mWidth = deviceInfo.screenInfo.width
-        }
+    //    companion object {
+    private var mHeight = 1920// deviceInfo.screenInfo.height
+    private var mWidth = 1080// deviceInfo.screenInfo.width
+    fun init(systemBridge: SystemOperation) {
+        val deviceInfo = systemBridge.getDeviceInfo()
+        mHeight = deviceInfo.screenInfo.height
+        mWidth = deviceInfo.screenInfo.width
     }
+//    }
 
     /**
      * 相对大小
@@ -30,6 +31,13 @@ class ScreenAdapter {
     fun setScreenSize(width: Int, height: Int) {
         relHeight = height
         relWidth = width
+    }
+
+    fun getRelPoint(p: Point): Point {
+        return Point(
+                p.x * relWidth / mWidth,
+                p.y * relHeight / mHeight
+        )
     }
 
     fun reSet() {

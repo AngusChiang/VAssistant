@@ -7,6 +7,7 @@ import cn.vove7.common.datamanager.DAO
 import cn.vove7.common.datamanager.executor.entity.MarkedData
 import cn.vove7.common.datamanager.greendao.MarkedDataDao
 import cn.vove7.common.datamanager.parse.DataFrom
+import cn.vove7.common.model.UserInfo
 import cn.vove7.executorengine.helper.AdvanContactHelper
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.adapters.ViewModel
@@ -23,7 +24,7 @@ import kotlin.concurrent.thread
  */
 class MarkedContractFragment : BaseMarkedFragment<MarkedData>() {
 
-    var showServer = true
+    var onlySelf = true
     override val keyHint: Int = R.string.text_show_name
     override val valueHint: Int = R.string.text_phone
 
@@ -33,7 +34,7 @@ class MarkedContractFragment : BaseMarkedFragment<MarkedData>() {
         MaterialDialog(context!!)
                 .title(R.string.text_select_contact)
                 .listItems(items = phoneList, waitForPositiveButton = false) { _, i, s ->
-                   setValue(s.split("\n")[1])
+                    setValue(s.split("\n")[1])
                 }.show()
     }
 
@@ -41,8 +42,8 @@ class MarkedContractFragment : BaseMarkedFragment<MarkedData>() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        buildHeader("显示外部数据", true, lis = CompoundButton.OnCheckedChangeListener { buttonView, isChecked ->
-            showServer = isChecked
+        buildHeader("仅显示我的", lis = CompoundButton.OnCheckedChangeListener { buttonView, isChecked ->
+            onlySelf = isChecked
             refresh()
         })
     }
@@ -63,8 +64,11 @@ class MarkedContractFragment : BaseMarkedFragment<MarkedData>() {
                     .offset(pageSizeLimit * pageIndex)
                     .limit(pageSizeLimit)
 
-            if (!showServer) {
-                builder.where(MarkedDataDao.Properties.From.eq(DataFrom.FROM_USER))
+            if (onlySelf) {
+                builder.whereOr(MarkedDataDao.Properties.From.eq(DataFrom.FROM_USER),
+                        builder.and(MarkedDataDao.Properties.From.eq(DataFrom.FROM_SHARED),
+                                MarkedDataDao.Properties.PublishUserId.eq(UserInfo.getUserId()))
+                )
             }
             val list = builder.list()
 

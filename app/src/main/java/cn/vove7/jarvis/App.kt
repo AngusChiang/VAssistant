@@ -37,6 +37,9 @@ class App : LuaApp() {
         if (BuildConfig.DEBUG)
             RemoteDebugServer.start()
         startServices()
+        if (!BuildConfig.DEBUG)
+            Vog.init(this, Log.ERROR)
+
         thread {
             val storeFileName = "wdasfd"
             val keyPrefix = ""

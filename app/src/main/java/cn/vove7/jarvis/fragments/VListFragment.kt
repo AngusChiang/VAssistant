@@ -35,7 +35,7 @@ abstract class VListFragment : Fragment() {
     private lateinit var netErrViewContainer: ViewGroup
     private var netErrView: View? = null
     private lateinit var swipeRefreshLayout: SwipeRefreshLayout
-    open val pageSizeLimit = 20
+    open val pageSizeLimit = 50
 
     //    var onRefreshing = false//下拉正在刷新标志
     var loading = false

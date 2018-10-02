@@ -512,7 +512,7 @@ class NewInstActivity : AppCompatActivity(), View.OnClickListener {
                     voast.showLong(getString(R.string.test_tooltips_of_input_test_text))
                     return@setOnClickListener
                 }
-                //TODO 联合parentNode
+                //  联合parentNode
                 val result = ParseEngine.testParse(testText, wrapTestNode())
                 outputParseResult(result)
 
@@ -559,7 +559,7 @@ class NewInstActivity : AppCompatActivity(), View.OnClickListener {
     //第三个
     //最后一个
 
-    private val posArr = arrayListOf(Reg.PARAM_NO, Reg.PARAM_POS_0, Reg.PARAM_POS_1, Reg.PARAM_POS_2, Reg.PARAM_POS_END)
+    private val posArr = arrayListOf(Reg.PARAM_NO, /*Reg.PARAM_POS_0,*/ Reg.PARAM_POS_1, Reg.PARAM_POS_2, Reg.PARAM_POS_3, Reg.PARAM_POS_END)
     private val regs = mutableListOf<Pair<String, String>>()
     /**
      * 转换测试MapNode List

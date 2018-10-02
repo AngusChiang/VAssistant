@@ -4,7 +4,8 @@ import android.annotation.SuppressLint
 import android.provider.Settings
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.model.UserInfo
-import cn.vove7.common.netacc.tool.SecureHelper.MD5
+import cn.vove7.common.netacc.tool.SecureHelper.signData
+import cn.vove7.common.utils.GsonHelper
 import java.io.Serializable
 
 /**
@@ -13,12 +14,11 @@ import java.io.Serializable
  * @author Administrator
  * 2018/9/16
  */
-const val SECRET_KEY = "vove777"
-class BaseRequestModel<T>(var body: T? = null, val arg1: String? = null)
+class BaseRequestModel<T:Any>(var body: T? = null, val arg1: String? = null)
     : Serializable {
-    val timestamp = ((System.currentTimeMillis() / 1000).toInt()).toString()
-    var sign: String = MD5(timestamp + SECRET_KEY)
+    val timestamp = (System.currentTimeMillis() / 1000)
     val userId = UserInfo.getUserId()
+    var sign: String = signData(GsonHelper.toJson(body), userId,timestamp)
     val userToken = UserInfo.getUserToken()
     @SuppressLint("MissingPermission")
     val deviceId: String = DEVICE_ID

@@ -13,8 +13,6 @@ import cn.vove7.common.model.VipPrice
 import cn.vove7.common.netacc.ApiUrls
 import cn.vove7.common.netacc.model.BaseRequestModel
 import cn.vove7.common.netacc.model.ResponseMessage
-import cn.vove7.common.netacc.tool.OneGson
-import cn.vove7.common.netacc.tool.SecureHelper
 import cn.vove7.vtp.log.Vog
 import com.google.gson.reflect.TypeToken
 import okhttp3.*
@@ -35,35 +33,35 @@ typealias OnResponse<T> = (Int, ResponseMessage<T>?) -> Unit
 object NetHelper {
 
     var timeout = 15L
-    fun <T> get(url: String, params: Map<String, String>? = null,
-                type: Type, requestCode: Int = 0, callback: OnResponse<T>) {
-        val client = OkHttpClient.Builder()
-                .readTimeout(timeout, TimeUnit.SECONDS).build()
-        SecureHelper.signParam(params)
+//    fun <T> get(url: String, params: Map<String, String>? = null,
+//                type: Type, requestCode: Int = 0, callback: OnResponse<T>) {
+//        val client = OkHttpClient.Builder()
+//                .readTimeout(timeout, TimeUnit.SECONDS).build()
+//        SecureHelper.signParam(params)
+//
+//        val requestBuilder = Request.Builder().url(url).get()
+//        params?.forEach { it ->
+//            requestBuilder.addHeader(it.key, it.value)
+//        }
+//        val req = requestBuilder.build()
+//        val call = client.newCall(req)
+//        call(call, type, requestCode, callback)
+//    }
 
-        val requestBuilder = Request.Builder().url(url).get()
-        params?.forEach { it ->
-            requestBuilder.addHeader(it.key, it.value)
-        }
-        val req = requestBuilder.build()
-        val call = client.newCall(req)
-        call(call, type, requestCode, callback)
-    }
-
-    fun <T> post(url: String, params: Map<String, String>? = null,
-                 type: Type, requestCode: Int = 0, callback: OnResponse<T>) {
-        val client = OkHttpClient.Builder()
-                .readTimeout(timeout, TimeUnit.SECONDS).build()
-        SecureHelper.signParam(params)
-        val bodyBuilder = FormBody.Builder()
-        params?.forEach { it ->
-            bodyBuilder.add(it.key, it.value)
-        }
-        val request = Request.Builder().url(url)
-                .post(bodyBuilder.build()).build()
-        val call = client.newCall(request)
-        call(call, type, requestCode, callback)
-    }
+//    fun <T> post(url: String, params: Map<String, String>? = null,
+//                 type: Type, requestCode: Int = 0, callback: OnResponse<T>) {
+//        val client = OkHttpClient.Builder()
+//                .readTimeout(timeout, TimeUnit.SECONDS).build()
+//        SecureHelper.signParam(params)
+//        val bodyBuilder = FormBody.Builder()
+//        params?.forEach { it ->
+//            bodyBuilder.add(it.key, it.value)
+//        }
+//        val request = Request.Builder().url(url)
+//                .post(bodyBuilder.build()).build()
+//        val call = client.newCall(request)
+//        call(call, type, requestCode, callback)
+//    }
 
     fun <T> postJson(url: String, model: BaseRequestModel<*>,
                      type: Type = StringType, requestCode: Int = 0, callback: OnResponse<T>? = null) {
@@ -71,7 +69,7 @@ object NetHelper {
                 .readTimeout(timeout, TimeUnit.SECONDS).build()
 
         val json = GsonHelper.toJson(model)
-        Vog.d(this, "postJson ---> $json")
+        Vog.d(this, "postJson ---> $url\n $json")
         val requestBody = FormBody.create(MediaType
                 .parse("application/json; charset=utf-8"), json)
 
@@ -83,6 +81,7 @@ object NetHelper {
     }
 
     private fun <T> call(call: Call, type: Type, requestCode: Int = 0, callback: OnResponse<T>?) {
+        prepareIfNeeded()
         val handler = Handler()
         call.enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {//响应失败更新UI
@@ -99,7 +98,7 @@ object NetHelper {
                     val s = response.body()?.string()
                     try {
                         Vog.d(this, "onResponse --->\n$s")
-                        val bean = OneGson.fromJsonObj<T>(s, type)
+                        val bean = GsonHelper.fromJsonObj<T>(s, type)
                         if (bean?.isInvalid() == true) {//无效下线
                             if (UserInfo.isLogin()) {
                                 GlobalApp.toastShort("用户身份过期请重新登陆")
@@ -124,6 +123,11 @@ object NetHelper {
 
             }
         })
+    }
+
+    fun prepareIfNeeded() {
+        if (Looper.myLooper() == null)
+            Looper.prepare()
     }
 
     val StringType: Type by lazy {

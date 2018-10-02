@@ -1,7 +1,7 @@
 package cn.vove7.jarvis.plugins
 
 import cn.vove7.jarvis.services.MyAccessibilityService
-import cn.vove7.jarvis.services.OnAccessibilityEvent
+import cn.vove7.jarvis.services.PluginsService
 import cn.vove7.vtp.log.Vog
 
 /**
@@ -11,26 +11,26 @@ import cn.vove7.vtp.log.Vog
  * 2018/9/3
  */
 
-abstract class AccPluginsService : OnAccessibilityEvent {
+abstract class AccPluginsService : PluginsService {
 
     var opened = false
     override fun bindService() {
         Vog.d(this, "bindService ---> $this")
-//        MyAccessibilityService.registerEvent(this)
         onBind()
         opened = true
     }
 
-    fun unBindServer() {
+    override fun unBindServer() {
         Vog.d(this, "unBindServer ---> $this")
-        MyAccessibilityService.unregisterEvent(this)
         onUnBind()
         opened = false
     }
 
     fun restart() {
-        unBindServer()
-        bindService()
+        MyAccessibilityService.unregisterEvent(this)
+        MyAccessibilityService.registerEvent(this)
+//        unBindServer()
+//        bindService()
     }
 
 }

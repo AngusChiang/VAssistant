@@ -14,7 +14,6 @@ import android.view.accessibility.AccessibilityEvent.*
 import android.view.accessibility.AccessibilityNodeInfo
 import cn.vove7.common.accessibility.AccessibilityApi
 import cn.vove7.common.accessibility.viewnode.ViewNode
-import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.appbus.AppBus
 import cn.vove7.common.datamanager.parse.model.ActionScope
 import cn.vove7.common.executor.CExecutorI
@@ -29,7 +28,6 @@ import cn.vove7.jarvis.plugins.AdKillerService
 import cn.vove7.jarvis.utils.AppConfig
 import cn.vove7.vtp.app.AppHelper
 import cn.vove7.vtp.log.Vog
-import cn.vove7.vtp.sharedpreference.SpHelper
 import cn.vove7.vtp.system.SystemHelper
 import java.lang.Thread.sleep
 import kotlin.concurrent.thread
@@ -362,8 +360,8 @@ class MyAccessibilityService : AccessibilityApi() {
         if ((event.eventTime - event.downTime) < (delayUp - 100)) {//时间短 移除runner 调节音量
             delayHandler.removeCallbacks(runnable)
             when (event.keyCode) {
-                KEYCODE_VOLUME_UP -> SystemBridge().volumeUp()
-                KEYCODE_VOLUME_DOWN -> SystemBridge().volumeDown()
+                KEYCODE_VOLUME_UP -> SystemBridge.volumeUp()
+                KEYCODE_VOLUME_DOWN -> SystemBridge.volumeDown()
                 else -> return false
             } //其他按键
         } else {
@@ -491,19 +489,19 @@ class MyAccessibilityService : AccessibilityApi() {
         /**
          * 注册放于静态变量，只用于通知事件。
          */
-        private val pluginsServices = mutableSetOf<OnAccessibilityEvent>()
+        private val pluginsServices = mutableSetOf<PluginsService>()
 
-        fun registerEvent(e: OnAccessibilityEvent) {
+        fun registerEvent(e: PluginsService) {
             synchronized(pluginsServices) {
                 pluginsServices.add(e)
                 e.bindService()
             }
         }
 
-        fun unregisterEvent(e: OnAccessibilityEvent) {
+        fun unregisterEvent(e: PluginsService) {
             synchronized(pluginsServices) {
                 pluginsServices.remove(e)
-                e.onUnBind()
+                e.unBindServer()
             }
         }
 

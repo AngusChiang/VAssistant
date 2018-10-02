@@ -63,7 +63,7 @@ class AboutActivity : AppCompatActivity(), AdapterView.OnItemClickListener {
                 SystemHelper.openApplicationMarket(this, this.packageName, APP_STORE_COLL_APK)
             }
             3 -> {
-                SystemBridge().sendEmail("vove7@qq.com", null,
+                SystemBridge.sendEmail("vove7@qq.com", null,
                         "\n\n\n\n\n\n\n- 来自" + getString(R.string.app_name))
             }
         }

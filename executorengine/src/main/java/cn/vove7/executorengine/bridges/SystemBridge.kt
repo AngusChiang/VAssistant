@@ -4,6 +4,7 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.bluetooth.BluetoothAdapter
 import android.content.*
+import android.content.Context.WIFI_SERVICE
 import android.content.pm.PackageManager
 import android.location.Location
 import android.location.LocationListener
@@ -40,8 +41,11 @@ import cn.vove7.vtp.system.DeviceInfo
 import cn.vove7.vtp.system.SystemHelper
 
 
-class SystemBridge : SystemOperation {
-    private val context: Context by lazy { GlobalApp.APP }
+object SystemBridge : SystemOperation {
+    private val context: Context
+        get() {
+            return GlobalApp.APP
+        }
 
     override fun openAppDetail(pkg: String): Boolean {
         return try {
@@ -82,19 +86,23 @@ class SystemBridge : SystemOperation {
         }
     }
 
+    fun openAppByWord(appWord: String, resetTask: Boolean): String? {
+
+        val pkg = getPkgByWord(appWord)
+        return if (pkg != null) {
+            val o = openAppByPkg(pkg, resetTask)
+            if (o) {
+                return pkg
+            } else null
+        } else null
+    }
+
     /**
      * openAppByWord
      * @return packageName if success
      */
     override fun openAppByWord(appWord: String): String? {
-
-        val pkg = getPkgByWord(appWord)
-        return if (pkg != null) {
-            val o = openAppByPkg(pkg, false)
-            if (o) {
-                return pkg
-            } else null
-        } else null
+        return openAppByWord(appWord, false)
     }
 
     /**
@@ -389,6 +397,12 @@ class SystemBridge : SystemOperation {
         return setWifiApEnabled(true)
     }
 
+    val isWifiEnable: Boolean
+        get() {
+            val wifiManager = context.applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
+            return wifiManager.isWifiEnabled
+        }
+
     /* 开启/关闭热点 */
     private fun setWifiApEnabled(enabled: Boolean): Boolean {
         val wifiManager = context.applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
@@ -509,7 +523,7 @@ class SystemBridge : SystemOperation {
         val serviceString = Context.LOCATION_SERVICE// 获取的是位置服务
         val locationManager = context.getSystemService(serviceString) as LocationManager
         val providers = locationManager.getProviders(true)
-        val locationProvider: String=LocationManager.NETWORK_PROVIDER
+        val locationProvider: String = LocationManager.NETWORK_PROVIDER
         if (!providers.contains(LocationManager.NETWORK_PROVIDER)) {
             GlobalApp.toastShort("无法获取位置信息")
             GlobalLog.log("未打开位置设置")
@@ -520,7 +534,7 @@ class SystemBridge : SystemOperation {
         val resu = ResultBox<Location?>()
         var block = Runnable {}
         val handler = Handler()
-        val loop=Looper.myLooper()
+        val loop = Looper.myLooper()
 
         val loLis = object : LocationListener {
             override fun onLocationChanged(location: Location?) {
@@ -546,7 +560,7 @@ class SystemBridge : SystemOperation {
             resu.set(locationManager.getLastKnownLocation(locationProvider))
             quitLoop()
         }
-        locationManager.requestLocationUpdates(locationProvider, 500L, 0f, loLis,loop)
+        locationManager.requestLocationUpdates(locationProvider, 500L, 0f, loLis, loop)
         handler.postDelayed(block, 5000)//等待5秒
         Looper.loop()
         return resu.get()
@@ -562,4 +576,21 @@ class SystemBridge : SystemOperation {
             Looper.prepare()
         }
     }
+
+    override fun getIpAddress(): String? {
+        try {
+            val wifiService = context.getSystemService(WIFI_SERVICE) as WifiManager
+            val wifiInfo = wifiService.connectionInfo
+            return intToIp(wifiInfo.ipAddress)
+        } catch (e: Exception) {
+            GlobalLog.err(e)
+            return null
+        }
+    }
+
+    private fun intToIp(i: Int): String {
+        return (i and 0xFF).toString() + "." + ((i shr 8) and 0xFF) +
+                "." + ((i shr 16) and 0xFF) + "." + (i shr 24 and 0xFF)
+    }
+
 }

@@ -5,6 +5,7 @@ import cn.vove7.common.model.UserInfo
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.adapters.SettingsExpandableAdapter
 import cn.vove7.jarvis.plugins.AdKillerService
+import cn.vove7.jarvis.services.MyAccessibilityService
 import cn.vove7.jarvis.view.NumberPickerItem
 import cn.vove7.jarvis.view.SwitchItem
 import cn.vove7.jarvis.view.custom.SettingGroupItem
@@ -37,8 +38,9 @@ class LaboratoryActivity : ReturnableActivity() {
                                 else getString(R.string.summary_not_vip_remove_ad), keyId = R.string.key_open_ad_block,
                                         defaultValue = { true }) { _, it ->
                                     when (it as Boolean) {
-                                        true -> AdKillerService.restart()
-                                        false -> AdKillerService.unBindServer()
+                                        true -> MyAccessibilityService.registerEvent(AdKillerService)
+                                        false ->
+                                            MyAccessibilityService.unregisterEvent(AdKillerService)
                                     }
                                 },
                                 NumberPickerItem(R.string.text_time_wait_ad, "界面等待广告出现最长时间，单位秒",

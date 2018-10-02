@@ -50,7 +50,7 @@ class MarkedAppFragment : BaseMarkedFragment<MarkedData>() {
         val ss = mutableListOf<ViewModel>()
         val sss = mutableListOf<ViewModel>()
         nodes.forEach {
-            val app = SystemBridge().getAppInfo(it.value)
+            val app = SystemBridge.getAppInfo(it.value)
             if (app == null) {
                 if (showUninstall)
                     sss.add(ViewModel(it.key, it.value, null, it))

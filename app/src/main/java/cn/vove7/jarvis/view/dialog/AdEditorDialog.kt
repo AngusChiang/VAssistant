@@ -9,6 +9,8 @@ import android.widget.RadioGroup
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.datamanager.AppAdInfo
 import cn.vove7.common.datamanager.DAO
+import cn.vove7.common.datamanager.parse.DataFrom
+import cn.vove7.common.model.UserInfo
 import cn.vove7.common.view.toast.ColorfulToast
 import cn.vove7.executorengine.helper.AdvanAppHelper
 import cn.vove7.jarvis.R
@@ -78,15 +80,21 @@ class AdEditorDialog(val context: Context, val onUpdate: () -> Unit) {
                                 toast.red().showShort("至少一个")
                                 return@positiveButton
                             }
+
                             val newData = if (editData != null) editData!! else AppAdInfo()
+                            newData.depths = null
+
                             newData.descTitle = name
                             newData.pkg = pkg
                             newData.activity = activity
+                            newData.from = DataFrom.FROM_USER
 
                             newData.viewId = viewId
                             newData.texts = adText
                             newData.descs = adDesc
                             newData.type = classTex
+                            newData.from = DataFrom.FROM_USER
+                            newData.publishUserId = UserInfo.getUserId()
 
                             if (newData.id == null) {
                                 DAO.daoSession.appAdInfoDao.insertInTx(newData)
@@ -95,12 +103,24 @@ class AdEditorDialog(val context: Context, val onUpdate: () -> Unit) {
                             }
                         }
                         R.id.by_depths -> {
+
                             depthStr = depthsText.editText?.text.toString().trim()
                             if (!checkDepths()) {
                                 depthsText.error = "格式错误"
                                 return@positiveButton
                             }
                             val newData = if (editData != null) editData!! else AppAdInfo()
+                            newData.descTitle = name
+                            newData.pkg = pkg
+                            newData.activity = activity
+                            newData.from = DataFrom.FROM_USER
+                            newData.publishUserId = UserInfo.getUserId()
+
+                            newData.viewId = null
+                            newData.texts = null
+                            newData.descs = null
+                            newData.type = null
+
                             newData.depths = depthStr
                             if (newData.id == null) {
                                 DAO.daoSession.appAdInfoDao.insertInTx(newData)

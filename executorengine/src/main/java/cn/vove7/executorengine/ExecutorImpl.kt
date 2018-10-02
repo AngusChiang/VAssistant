@@ -46,12 +46,12 @@ open class ExecutorImpl(
         val context: Context,
         val serviceBridge: ServiceBridge?
 ) : CExecutorI {
-    private val systemBridge = SystemBridge()
+    private val systemBridge = SystemBridge
     var accessApi: AccessibilityApi? = null
     private var lock = Object()
     var currentAction: Action? = null
     private val markedOpenDao = DAO.daoSession.markedDataDao
-    val globalActionExecutor = GlobalActionExecutor()
+//    val globalActionExecutor = GlobalActionExecutor()
     override var command: String? = null
 
     override var running: Boolean = false
@@ -99,7 +99,7 @@ open class ExecutorImpl(
             thread!!.interrupt()
         }
         this.command = cmdWords
-        globalActionExecutor.screenAdapter.reSet()
+        ScreenAdapter.reSet()
         this.actionQueue = actionQueue
         lock = Object()
         thread = thread(start = true, isDaemon = true, priority = Thread.MAX_PRIORITY) {
@@ -514,17 +514,17 @@ open class ExecutorImpl(
     /**
      * 返回操作
      */
-    fun pressBack(): Boolean = globalActionExecutor.back()
+    fun pressBack(): Boolean = GlobalActionExecutor.back()
 
     /**
      * 最近界面
      */
-    fun openRecent(): Boolean = globalActionExecutor.recents()
+    fun openRecent(): Boolean = GlobalActionExecutor.recents()
 
     /**
      * 主页
      */
-    fun goHome(): Boolean = globalActionExecutor.home()
+    fun goHome(): Boolean = GlobalActionExecutor.home()
 
     /**
      * 拨打
@@ -561,7 +561,7 @@ open class ExecutorImpl(
     }
 
     override fun setScreenSize(width: Int, height: Int) {
-        globalActionExecutor.screenAdapter.setScreenSize(width, height)
+        ScreenAdapter.setScreenSize(width, height)
     }
 
     companion object {
@@ -614,7 +614,7 @@ open class ExecutorImpl(
         if (accessApi == null) {
             accessApi = AccessibilityApi.accessibilityService
             return if (accessApi != null) {
-                globalActionExecutor.setService(accessApi!!.getService())
+                GlobalActionExecutor.setService(accessApi!!.getService())
                 true
             } else {
                 GlobalLog.log(context.getString(R.string.text_acc_service_not_running))

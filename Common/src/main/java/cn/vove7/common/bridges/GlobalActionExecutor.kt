@@ -2,6 +2,7 @@ package cn.vove7.common.bridges
 
 import android.accessibilityservice.AccessibilityService
 import android.accessibilityservice.GestureDescription
+import android.annotation.SuppressLint
 import android.graphics.Path
 import android.os.Build
 import android.os.Handler
@@ -20,11 +21,12 @@ import cn.vove7.vtp.log.Vog
 import java.util.*
 
 
+@SuppressLint("StaticFieldLeak")
 /**
  * 无障碍全局执行器
  */
-class GlobalActionExecutor : GlobalActionExecutorI {
-    var screenAdapter = ScreenAdapter()
+object GlobalActionExecutor : GlobalActionExecutorI {
+//    var screenAdapter = ScreenAdapter()
 
     private var mService: AccessibilityService? = null
 
@@ -120,13 +122,13 @@ class GlobalActionExecutor : GlobalActionExecutorI {
         if (points.isEmpty()) return path
         var x = points[0].first
         var y = points[0].second
-        path.moveTo(screenAdapter.scaleX(x), screenAdapter.scaleY(y))
+        path.moveTo(ScreenAdapter.scaleX(x), ScreenAdapter.scaleY(y))
 
         for (i in 1 until points.size) {
             val point = points[i]
             x = point.first
             y = point.second
-            path.lineTo(screenAdapter.scaleX(x), screenAdapter.scaleY(y))
+            path.lineTo(ScreenAdapter.scaleX(x), ScreenAdapter.scaleY(y))
 
         }
         Log.d("Debug :", "pointsToPath  ----> ${Arrays.toString(points)}\n$path")
@@ -225,18 +227,18 @@ class GlobalActionExecutor : GlobalActionExecutorI {
 
     @RequiresApi(api = Build.VERSION_CODES.N)
     override fun scrollUp(): Boolean {
-        val mtop = (screenAdapter.relHeight * 0.1).toInt()
-        val mBottom = (screenAdapter.relHeight * 0.85).toInt()
-        val xCenter = (screenAdapter.relWidth * 0.5).toInt()
+        val mtop = (ScreenAdapter.relHeight * 0.1).toInt()
+        val mBottom = (ScreenAdapter.relHeight * 0.85).toInt()
+        val xCenter = (ScreenAdapter.relWidth * 0.5).toInt()
 
         return swipe(xCenter, mBottom, xCenter, mtop, 400)
     }
 
     @RequiresApi(api = Build.VERSION_CODES.N)
     override fun scrollDown(): Boolean {
-        val mtop = (screenAdapter.relHeight * 0.15).toInt()
-        val mBottom = (screenAdapter.relHeight * 0.9).toInt()
-        val xCenter = (screenAdapter.relWidth * 0.5).toInt()
+        val mtop = (ScreenAdapter.relHeight * 0.15).toInt()
+        val mBottom = (ScreenAdapter.relHeight * 0.9).toInt()
+        val xCenter = (ScreenAdapter.relWidth * 0.5).toInt()
         return swipe(xCenter, mtop, xCenter, mBottom, 400)
     }
 }

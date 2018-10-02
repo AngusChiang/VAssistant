@@ -18,12 +18,21 @@ function openAppByPkg(pkg, ...)
     return system.openAppByPkg(pkg, reset)
 end
 
---*
+--
 --通过通过关键字匹配
 -- return ExResult pkgName if ok
 --
-function openAppByWord(appWord)
-    return system.openAppByWord(appWord)
+function openAppByWord(appWord, ...)
+    local ps = { ... }
+    local reset = false
+    if (#ps >= 1) then
+        reset = ps[1]
+    end
+    return system.openAppByWord(appWord, reset)
+end
+
+function getPkgByWord(appWord)
+    return system.getPkgByWord(appWord)
 end
 
 --*

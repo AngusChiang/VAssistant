@@ -123,12 +123,12 @@
     <string name="text_recharge_code">充值码</string>
     <string name="text_failed_to_get_user_info">获取其个人信息失败</string>
     <string name="text_purchase_recharge_code">购买充值码</string>
-    <string name="text_purchase_recharge_code_msg">通过支付宝转账下方指定金额，或者联系qq获取，在备注填写你的邮箱，不久你会收到含有充值码的邮件，点击下方[使用充值码]继续操作即可。若长时间接收不到，请联系我，将给予补偿。</string>
+    <string name="text_purchase_recharge_code_msg">1.联系qq获取（推荐）\n2.通过支付宝转账下方指定金额，在备注填写你的邮箱，不久你会收到含有充值码的邮件\n点击下方[使用充值码]继续操作即可。</string>
     <string name="text_advan_include_func">1.新建脚本指令\n2.远程调试脚本\n3.广告跳过无限制\n4.本地代码测试\n5.无限制标记管理\n6.操作、标记分享，且可同步</string>
     <string name="text_recharege_pre_read">在支付前，请先阅读高级教程，确保它对你有用。</string> <string name="text_email_copy_to_clip">你的邮箱已复制到剪切板</string>
     <string name="text_understand">知道了</string>
     <string name="text_continue">继续</string>
-    <string name="text_debug_service_starting">远程调试已开启</string>
+    <string name="text_debug_service_starting">调试服务在空闲2分钟后自动关闭</string>
     <string name="text_version_code">版本号</string>
     <string name="text_script">脚本</string>
     <string name="text_script_type">脚本语言</string>
@@ -186,5 +186,7 @@
     <string name="text_modify_failed">修改失败</string>
     <string name="text_modify_pass">修改密码</string>
     <string name="text_modify_succ">修改成功</string>
+    <string name="text_add_qq_group">加入讨论群</string>
+    <string name="text_purchase_ways">购买方式</string>
 
 </resources>

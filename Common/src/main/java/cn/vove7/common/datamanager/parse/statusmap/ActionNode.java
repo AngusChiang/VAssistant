@@ -16,6 +16,7 @@ import org.greenrobot.greendao.annotation.Transient;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import cn.vove7.common.datamanager.DAO;
 import cn.vove7.common.datamanager.greendao.ActionDao;
@@ -66,9 +67,12 @@ public class ActionNode implements Serializable, DataFrom {
      * @return
      */
     public boolean belongSelf() {
-        return DataFrom.FROM_SHARED.equals(from)
-                && (publishUserId != null &&
-                publishUserId.equals(UserInfo.getUserId()));
+        Long uId = UserInfo.getUserId();
+        return DataFrom.FROM_USER.equals(from) ||
+                (DataFrom.FROM_SHARED.equals(from) && (publishUserId == null || publishUserId.equals(uId)));
+        //return DataFrom.FROM_SHARED.equals(from)
+        //        && (publishUserId != null &&
+        //        publishUserId.equals(UserInfo.getUserId()));
     }
 
     public static boolean belongInApp(Integer type) {
@@ -700,7 +704,7 @@ public class ActionNode implements Serializable, DataFrom {
 
     private static final String PreOpen_JS = "openAppByPkg('%s',true)\n" +
             "a = waitForApp('%s',3000)\n";// +
-            //"if(!a) return\n";
+    //"if(!a) return\n";
     private static final String PreOpen_LUA = "smartOpen('%s')\n" +
             "a = waitForApp('%s',3000)\n" +
             "if(not a) then return\n";
@@ -740,5 +744,18 @@ public class ActionNode implements Serializable, DataFrom {
 
     public void setActionId(Long actionId) {
         this.actionId = actionId;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ActionNode that = (ActionNode) o;
+        return Objects.equals(tagId, that.tagId);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(tagId);
     }
 }

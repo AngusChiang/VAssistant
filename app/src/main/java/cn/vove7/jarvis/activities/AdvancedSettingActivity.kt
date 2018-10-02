@@ -6,6 +6,7 @@ import android.view.View
 import cn.vove7.androlua.LuaEditorActivity
 import cn.vove7.common.model.UserInfo
 import cn.vove7.common.view.toast.ColorfulToast
+import cn.vove7.executorengine.bridges.SystemBridge
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.activities.base.ReturnableActivity
 import cn.vove7.jarvis.adapters.SettingsExpandableAdapter
@@ -76,7 +77,8 @@ class AdvancedSettingActivity : ReturnableActivity() {
                         })
                 )),
                 SettingGroupItem(R.color.google_green, "脚本", childItems = listOf(
-                        SwitchItem(R.string.text_remote_debug, summary = "方法请查阅使用手册", defaultValue = {
+                        SwitchItem(R.string.text_remote_debug, summary = if (RemoteDebugServer.stopped) "请查阅使用手册"
+                        else ipText, defaultValue = {
                             !RemoteDebugServer.stopped
                         }, callback = { holder, it ->
                             if (!AppConfig.checkUser()) {
@@ -84,8 +86,10 @@ class AdvancedSettingActivity : ReturnableActivity() {
                                 return@SwitchItem
                             }
 
-                            if (it as Boolean) RemoteDebugServer.start()
-                            else RemoteDebugServer.stop()
+                            if (it as Boolean) {
+                                RemoteDebugServer.start()
+                                holder.summaryView.text = ipText
+                            } else RemoteDebugServer.stop()
                         }),
                         IntentItem(R.string.text_test_code_lua, onClick = { _, _ ->
                             if (AppConfig.checkUser()) {
@@ -100,4 +104,9 @@ class AdvancedSettingActivity : ReturnableActivity() {
                 ))
         )
     }
+    val ipText: String
+        get() {
+            return "本机IP:" + SystemBridge.getIpAddress() +
+                    "\n更多资料请查阅手册"
+        }
 }

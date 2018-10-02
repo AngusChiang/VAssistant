@@ -1,5 +1,6 @@
 package cn.vove7.common.accessibility.viewnode
 
+import android.graphics.Point
 import android.graphics.Rect
 
 /**
@@ -12,6 +13,12 @@ interface ViewOperation {
      * @return Boolean 是否成功
      */
     fun tryClick(): Boolean
+
+    /**
+     * 获取中心点坐标(绝对)
+     * @return Point?
+     */
+    fun getCenterPoint(): Point?
 
     /**
      * 获取下级所有Node
@@ -125,5 +132,5 @@ interface ViewOperation {
     fun scrollLeft(): Boolean
     fun scrollRight(): Boolean
 
-    fun isClickable():Boolean
+    fun isClickable(): Boolean
 }

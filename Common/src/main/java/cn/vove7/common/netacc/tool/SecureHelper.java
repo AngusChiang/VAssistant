@@ -2,7 +2,9 @@ package cn.vove7.common.netacc.tool;
 
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
-import java.util.Map;
+
+import cn.vove7.common.app.GlobalLog;
+import cn.vove7.vtp.log.Vog;
 
 /**
  * Created by IntelliJ IDEA.
@@ -13,32 +15,15 @@ import java.util.Map;
 public class SecureHelper {
     private static final String SECRET_KEY = "vove777";
 
-    /**
-     * 统一请求签名
-     *
-     * @param params TreeMap 默认 通过key排序
-     */
-    public static void signParam(Map<String, String> params) {
-        //StringBuilder builder = new StringBuilder();
-        //for (Map.Entry<String, String> p : params.entrySet()) {
-        //    if (p.getValue() == null) {
-        //        String e = "参数错误 - s" + p.getKey();
-        //        builder.append(p.getKey()).append("null");
-        //        //return null;
-        //    }
-        //    if (!p.getKey().equalsIgnoreCase("sign"))
-        //        builder.append(p.getKey()).append(p.getValue());
-        //}
-        //String r = builder.toString();
-        //Vog.INSTANCE.v(new Object(), "参数连接 -> " + r);
+    public static String signData(Object body, Long uId, Long time) {
 
-        if (params == null) return;
-        if (!params.containsKey("timestamp"))
-            params.put("timestamp", String.valueOf((int) (System.currentTimeMillis() / 1000)));
+        //uid{data}time
+        String content = String.valueOf(uId == null ? "" : uId) + (body == null ? "" : body)
+                + String.valueOf(time);
+        //Vog.INSTANCE.d("", "signData --->\n" + content);
 
-        params.put("sign", MD5(params.get("timestamp") + SECRET_KEY));
+        return MD5(content + SECRET_KEY);
     }
-
 
     public static String MD5(String s) {
         try {
@@ -46,6 +31,7 @@ public class SecureHelper {
             byte[] bytes = md.digest(s.getBytes(StandardCharsets.UTF_8));
             return toHex(bytes);
         } catch (Exception e) {
+            GlobalLog.INSTANCE.err(e);
             throw new RuntimeException(e);
         }
     }

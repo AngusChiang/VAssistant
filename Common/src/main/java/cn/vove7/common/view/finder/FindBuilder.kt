@@ -1,5 +1,6 @@
 package cn.vove7.common.view.finder
 
+import android.graphics.Point
 import android.graphics.Rect
 import cn.vove7.common.accessibility.AccessibilityApi
 import cn.vove7.common.accessibility.viewnode.ViewNode
@@ -61,6 +62,11 @@ open class FindBuilder : ViewOperation {
     override fun tryLongClick(): Boolean {
         val node = findFirst()
         return node?.tryLongClick() == true
+    }
+
+    override fun getCenterPoint(): Point? {
+        val node = findFirst()
+        return node?.getCenterPoint()
     }
 
     override fun select(): Boolean {

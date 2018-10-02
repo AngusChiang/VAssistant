@@ -84,7 +84,7 @@ object AdKillerService : AccPluginsService() {
                     Vog.d(this, "onUiUpdate ---> 发现广告，清除成功")
                     if (AppConfig.isToastWhenRemoveAd){
                         removeAdAnimation.begin()
-                        removeAdAnimation.hideDelay(2000)
+                        removeAdAnimation.hideDelay(5000)
                     }
 //                        toast.showShortDelay("已为你关闭广告", 500L)
                     finders = null
@@ -110,7 +110,7 @@ object AdKillerService : AccPluginsService() {
 
     private fun gcIfNeed() {
         Vog.d(this, "finderCaches.size ---> ${finderCaches.size}")
-        if (finderCaches.size > 100) //TODO test
+        if (finderCaches.size > 100) //
             for (i in 0..30)
                 finderCaches.remove(finderCaches.keys.first())
     }

@@ -1,16 +1,21 @@
 package cn.vove7.jarvis.fragments
 
 import android.content.Intent
+import android.os.Bundle
 import android.view.View
+import android.widget.CompoundButton
 import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.datamanager.DAO
 import cn.vove7.common.datamanager.DaoHelper
 import cn.vove7.common.datamanager.greendao.ActionNodeDao
+import cn.vove7.common.datamanager.greendao.MarkedDataDao
+import cn.vove7.common.datamanager.parse.DataFrom
 import cn.vove7.common.datamanager.parse.statusmap.ActionNode
 import cn.vove7.common.datamanager.parse.statusmap.ActionNode.NODE_SCOPE_GLOBAL
+import cn.vove7.common.model.UserInfo
 import cn.vove7.common.netacc.ApiUrls
-import cn.vove7.common.utils.NetHelper
 import cn.vove7.common.netacc.model.BaseRequestModel
+import cn.vove7.common.utils.NetHelper
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.activities.NewInstActivity
 import cn.vove7.jarvis.activities.OnSyncInst
@@ -28,7 +33,7 @@ import kotlin.concurrent.thread
  */
 class GlobalInstListFragment : SimpleListFragment<ActionNode>(), OnSyncInst {
 
-//    var instDetailFragment =
+    //    var instDetailFragment =
     override var floatClickListener: View.OnClickListener? = View.OnClickListener {
         if (!AppConfig.checkUser()) {
             return@OnClickListener
@@ -48,6 +53,15 @@ class GlobalInstListFragment : SimpleListFragment<ActionNode>(), OnSyncInst {
                 }.show(activity?.supportFragmentManager, "inst_detail")
             }
         }
+
+    var onlySelf = false
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        buildHeader("仅显示我的", lis = CompoundButton.OnCheckedChangeListener { buttonView, isChecked ->
+            onlySelf = isChecked
+            refresh()
+        })
+    }
 
     override fun onSync() {
         showProgressBar()
@@ -81,16 +95,27 @@ class GlobalInstListFragment : SimpleListFragment<ActionNode>(), OnSyncInst {
     override fun transData(nodes: List<ActionNode>): List<ViewModel> {
         val tmp = mutableListOf<ViewModel>()
         nodes.forEach {
-            tmp.add(ViewModel((it).actionTitle, extra = it))
+//            if (!onlySelf || it.belongSelf()) {
+                tmp.add(ViewModel((it).actionTitle, extra = it))
+//            }
         }
         return tmp
     }
 
     override fun onGetData(pageIndex: Int) {
         thread {
-            val offsetDatas = DAO.daoSession.actionNodeDao.queryBuilder()
+            val builder = DAO.daoSession.actionNodeDao.queryBuilder()
                     .where(ActionNodeDao.Properties.ActionScopeType.eq(ActionNode.NODE_SCOPE_GLOBAL))
-                    .offset(pageIndex * pageSizeLimit)
+
+            if (onlySelf) {
+                if (onlySelf) {
+                    builder.whereOr(ActionNodeDao.Properties.From.eq(DataFrom.FROM_USER),
+                            builder.and(ActionNodeDao.Properties.From.eq(DataFrom.FROM_SHARED),
+                                    ActionNodeDao.Properties.PublishUserId.eq(UserInfo.getUserId()))
+                    )
+                }
+            }
+            val offsetDatas=builder.offset(pageIndex * pageSizeLimit)
                     .limit(pageSizeLimit).list()
             Vog.d(this, "onGetData $offsetDatas")
             dataSet.addAll(transData(offsetDatas))

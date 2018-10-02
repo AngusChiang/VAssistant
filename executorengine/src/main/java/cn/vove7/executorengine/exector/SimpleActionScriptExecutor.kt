@@ -2,6 +2,7 @@ package cn.vove7.executorengine.exector
 
 import android.content.Context
 import android.os.Build
+import cn.vove7.common.bridges.GlobalActionExecutor
 import cn.vove7.common.bridges.ServiceBridge
 import cn.vove7.common.executor.PartialResult
 import cn.vove7.executorengine.ExecutorImpl
@@ -125,7 +126,7 @@ class SimpleActionScriptExecutor(
             ACTION_SWIPE -> {
                 return try {
                     if (ps.size >= 5) {
-                        if (globalActionExecutor.swipe(ps[0].toInt(), ps[1].toInt(), ps[2].toInt(), ps[3].toInt(), ps[4].toInt())) {
+                        if (GlobalActionExecutor.swipe(ps[0].toInt(), ps[1].toInt(), ps[2].toInt(), ps[3].toInt(), ps[4].toInt())) {
                             PartialResult.success()
                         } else
                             PartialResult.failed()
@@ -136,7 +137,7 @@ class SimpleActionScriptExecutor(
                 }
             }
             ACTION_OPEN_ACTIVITY -> {
-                return if (ps.size >= 2) PartialResult(SystemBridge().startActivity(p, ps[1]))
+                return if (ps.size >= 2) PartialResult(SystemBridge.startActivity(p, ps[1]))
                 else PartialResult.fatal("参数数量应为5")
             }
         }
@@ -199,8 +200,8 @@ class SimpleActionScriptExecutor(
         fun scroll(op: Int): PartialResult {
             return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                 if (when (op) {
-                            OPERATION_SCROLL_DOWN -> globalActionExecutor.scrollDown()
-                            OPERATION_SCROLL_UP -> globalActionExecutor.scrollUp()
+                            OPERATION_SCROLL_DOWN -> GlobalActionExecutor.scrollDown()
+                            OPERATION_SCROLL_UP -> GlobalActionExecutor.scrollUp()
                             else -> false
                         }
                 ) PartialResult.success()
@@ -229,13 +230,13 @@ class SimpleActionScriptExecutor(
                     return PartialResult(goHome())
                 }
                 ACTION_POWER_DIALOG -> {
-                    return PartialResult(globalActionExecutor.powerDialog())
+                    return PartialResult(GlobalActionExecutor.powerDialog())
                 }
                 ACTION_RECENT -> {
                     return PartialResult(openRecent())
                 }
                 ACTION_PULL_NOTIFICATION -> {
-                    return PartialResult(globalActionExecutor.notificationBar())
+                    return PartialResult(GlobalActionExecutor.notificationBar())
                 }
             }
 
@@ -255,12 +256,12 @@ class SimpleActionScriptExecutor(
             return when (c) {
                 ACTION_CLICK -> {
                     if (ps.size >= 2) {
-                        PartialResult(globalActionExecutor.click(ps[0].toInt(), ps[1].toInt()))
+                        PartialResult(GlobalActionExecutor.click(ps[0].toInt(), ps[1].toInt()))
                     } else PartialResult.fatal("参数数量应为2")
                 }
                 ACTION_LONG_CLICK -> {
                     if (ps.size >= 2) {
-                        PartialResult(globalActionExecutor.longClick(ps[0].toInt(), ps[1].toInt()))
+                        PartialResult(GlobalActionExecutor.longClick(ps[0].toInt(), ps[1].toInt()))
                     } else PartialResult.fatal("参数数量应为2")
                 }
 

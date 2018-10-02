@@ -3,6 +3,7 @@ package cn.vove7.executorengine.exector
 import android.content.Context
 import cn.vove7.androlua.LuaHelper
 import cn.vove7.common.BridgeManager
+import cn.vove7.common.bridges.GlobalActionExecutor
 import cn.vove7.common.bridges.ServiceBridge
 import cn.vove7.common.executor.OnPrint
 import cn.vove7.common.executor.PartialResult
@@ -23,7 +24,7 @@ class MultiExecutorEngine(
         context: Context,
         serviceBridge: ServiceBridge?
 ) : ExecutorImpl(context, serviceBridge) {
-    private val bridgeManager = BridgeManager(this, globalActionExecutor, SystemBridge(), serviceBridge)
+    private val bridgeManager = BridgeManager(this, GlobalActionExecutor, SystemBridge, serviceBridge)
 
     /**
      * Rhino impl

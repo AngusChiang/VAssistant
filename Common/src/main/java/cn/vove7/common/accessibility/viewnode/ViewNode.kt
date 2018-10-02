@@ -1,5 +1,6 @@
 package cn.vove7.common.accessibility.viewnode
 
+import android.graphics.Point
 import android.graphics.Rect
 import android.os.Build
 import android.os.Bundle
@@ -8,6 +9,7 @@ import android.view.accessibility.AccessibilityNodeInfo
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.bridges.GlobalActionExecutor
+import cn.vove7.common.utils.ScreenAdapter
 import cn.vove7.vtp.log.Vog
 import cn.vove7.vtp.text.TextTransHelper
 import java.lang.Thread.sleep
@@ -53,7 +55,9 @@ class ViewNode(val node: AccessibilityNodeInfo) : ViewOperation, Comparable<View
         if (r) return true
         //todo global op
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-
+            //获得中心点
+            val relp = ScreenAdapter.getRelPoint(getCenterPoint())
+            return GlobalActionExecutor.click(relp.x, relp.y)
         }
         return false
     }
@@ -244,13 +248,16 @@ class ViewNode(val node: AccessibilityNodeInfo) : ViewOperation, Comparable<View
         return b
     }
 
-    override fun swipe(dx: Int, dy: Int, delay: Int): Boolean {
+    override fun getCenterPoint(): Point {
         val rect = getBounds()
-
         val x = (rect.left + rect.right) / 2
         val y = (rect.top + rect.bottom) / 2
+        return Point(x, y)
+    }
 
-        return GlobalActionExecutor().swipe(x, y, x + dx, y + dy, delay)
+    override fun swipe(dx: Int, dy: Int, delay: Int): Boolean {
+        val c = ScreenAdapter.getRelPoint(getCenterPoint())
+        return GlobalActionExecutor.swipe(c.x, c.y, c.x + dx, c.y + dy, delay)
     }
 
     override fun focus(): Boolean {

@@ -14,11 +14,11 @@ import cn.vove7.common.netacc.ApiUrls
 import cn.vove7.common.netacc.model.BaseRequestModel
 import cn.vove7.common.netacc.model.ResponseMessage
 import cn.vove7.common.netacc.tool.SecureHelper
+import cn.vove7.common.utils.NetHelper
 import cn.vove7.common.utils.TextHelper
 import cn.vove7.common.view.toast.ColorfulToast
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.utils.AppConfig
-import cn.vove7.common.utils.NetHelper
 import cn.vove7.vtp.log.Vog
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.customview.customView
@@ -39,6 +39,7 @@ class LoginDialog(val context: Context, initEmail: String? = null,
         it.dismiss()
     }.neutralButton(R.string.text_retrieve_password) {
         //todo
+        toast.showShort(R.string.text_coming_soon)
     }
 
     private var userAccountView: TextInputLayout
@@ -84,10 +85,8 @@ class LoginDialog(val context: Context, initEmail: String? = null,
 
             loadBar.visibility = View.VISIBLE
             //post
-            NetHelper.postJson<UserInfo>(ApiUrls.LOGIN, BaseRequestModel(loginInfo), type = object
-                : TypeToken<ResponseMessage<UserInfo>>() {}.type, callback = { _, bean ->
-                //泛型
-                Vog.d(this, "onResponse ---> $bean")
+            NetHelper.postJson<UserInfo>(ApiUrls.LOGIN, BaseRequestModel(loginInfo),
+                    type = NetHelper.UserInfoType, callback = { _, bean ->
                 loadBar.visibility = View.INVISIBLE
                 if (bean != null) {
                     if (bean.isOk()) {

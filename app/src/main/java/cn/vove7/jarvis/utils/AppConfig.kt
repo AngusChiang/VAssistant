@@ -78,10 +78,15 @@ object AppConfig {
         UserInfo.logout()
     }
 
+    var lastCheckTime = 0L
+
     fun checkDate() {
         thread {
-            if (UserInfo.isLogin()) {
-                NetHelper.postJson<Any>(ApiUrls.CHECK_USER_DATE, BaseRequestModel(""))
+            if (System.currentTimeMillis() - lastCheckTime > 600000) {
+                if (UserInfo.isLogin()) {
+                    lastCheckTime = System.currentTimeMillis()
+                    NetHelper.postJson<Any>(ApiUrls.CHECK_USER_DATE, BaseRequestModel(""))
+                }
             }
         }
     }

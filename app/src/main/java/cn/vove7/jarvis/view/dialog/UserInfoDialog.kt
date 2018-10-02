@@ -75,7 +75,7 @@ class UserInfoDialog(val context: Activity, val onUpdate: () -> Unit) {
                                 toast.showShort(R.string.text_modify_succ)
                                 Handler().postDelayed({
                                     onUpdate.invoke()
-                                },1000)
+                                }, 1000)
                                 materialDialog.dismiss()
                             } else {
                                 GlobalLog.err(b?.message)
@@ -91,7 +91,7 @@ class UserInfoDialog(val context: Activity, val onUpdate: () -> Unit) {
     private fun recharge() {
         val pd = ProgressDialog(context)
         Handler().postDelayed({
-            NetHelper.get<List<VipPrice>>(ApiUrls.GET_PRICES,
+            NetHelper.postJson<List<VipPrice>>(ApiUrls.GET_PRICES,BaseRequestModel(null),
                     type = NetHelper.VipPriceListType) { _, bean ->
                 pd.dismiss()
                 if (bean != null) {
@@ -148,8 +148,9 @@ class UserInfoDialog(val context: Activity, val onUpdate: () -> Unit) {
     private fun showReChargeDialog(ps: List<VipPrice>) {
         val bu = StringBuilder()
 
-        ps.forEach {
-            bu.append("${it.durationText} \t (${it.price}元)\n")
+        ps.withIndex().forEach {
+            bu.append("${it.value.durationText} \t (${it.value.price}元)")
+            if (it.index != ps.size - 1) bu.appendln()
         }
         val cView = View.inflate(context, R.layout.dialog_recharge, null)
         cView.findViewById<TextView>(R.id.prices_text).text = bu.toString()

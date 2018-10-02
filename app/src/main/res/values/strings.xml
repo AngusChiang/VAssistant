@@ -175,13 +175,13 @@
     <string name="text_recharge_code">Recharge code</string>
     <string name="text_failed_to_get_user_info">Failed to get user info</string>
     <string name="text_purchase_recharge_code">Purchase Recharge code</string>
-    <string name="text_purchase_recharge_code_msg">通过支付宝转账下方指定金额，或者联系qq获取，在备注填写你的邮箱，不久你会收到含有充值码的邮件，点击下方[使用充值码]继续操作即可。</string>
+    <string name="text_purchase_recharge_code_msg">1.联系qq获取（推荐）\n2.通过支付宝转账下方指定金额，在备注填写你的邮箱，不久你会收到含有充值码的邮件\n点击下方[使用充值码]继续操作即可。</string>
     <string name="text_advan_include_func">1.新建脚本指令\n2.远程调试脚本\n3.去广告次数跳无限制\n4.本地代码测试\n5.无限制标记管理\n6.操作、标记分享，且可同步</string>
     <string name="text_recharege_pre_read">在支付前，请先阅读高级教程，确保它对你有用。</string>
     <string name="text_email_copy_to_clip">你的邮箱已复制到剪切板</string>
     <string name="text_understand">Understand</string>
     <string name="text_continue">Continue</string>
-    <string name="text_debug_service_starting">Debug service started</string>
+    <string name="text_debug_service_starting">Debug service will close automatically after 2 minutes of free time.</string>
     <string name="text_version_code">Version code</string>
     <string name="text_script">Script</string>
     <string name="text_script_type">Script language</string>
@@ -238,8 +238,10 @@
     <string name="text_send">Send</string>
     <string name="text_feedback_title_hint">Question or suggestion</string>
     <string name="text_explore_log">Explore logs</string>
-    <string name="text_modify_user_name">修改用户名</string>
-    <string name="text_modify_failed">修改失败</string>
-    <string name="text_modify_pass">修改密码</string>
+    <string name="text_modify_user_name">Modify username</string>
+    <string name="text_modify_failed">Modify failed</string>
+    <string name="text_modify_pass">Modify password</string>
     <string name="text_modify_succ">修改成功</string>
+    <string name="text_add_qq_group">加入讨论群</string>
+    <string name="text_purchase_ways">Purchase way</string>
 </resources>

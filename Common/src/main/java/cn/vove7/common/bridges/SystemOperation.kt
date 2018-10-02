@@ -34,7 +34,7 @@ interface SystemOperation {
      * 通过getPkgByWord 打开pkg
      * @return pkgName if ok, else null
      */
-    fun openAppByWord(appWord: String):  String?
+    fun openAppByWord(appWord: String): String?
 
 
     /**
@@ -47,6 +47,7 @@ interface SystemOperation {
      * 闪光灯
      */
     fun openFlashlight(): Boolean
+
     fun closeFlashlight(): Boolean
 
     /**
@@ -108,13 +109,15 @@ interface SystemOperation {
 
     fun sendEmail(to: String, subject: String? = null, content: String? = null)
 
-    fun lockScreen():Boolean
+    fun lockScreen(): Boolean
 
     /**
      * 获取用户地理位置
      * 需授权
      * @return String? 获取失败返回空
      */
-    fun location():Location?
+    fun location(): Location?
+
+    fun getIpAddress(): String?
 
 }

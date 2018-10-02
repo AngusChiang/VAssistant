@@ -1,9 +1,14 @@
 package cn.vove7.jarvis.fragments
 
+import android.os.Bundle
+import android.view.View
+import android.widget.CompoundButton
 import cn.vove7.common.datamanager.DAO
 import cn.vove7.common.datamanager.executor.entity.MarkedData
 import cn.vove7.common.datamanager.executor.entity.MarkedData.MARKED_TYPE_SCRIPT_LUA
 import cn.vove7.common.datamanager.greendao.MarkedDataDao
+import cn.vove7.common.datamanager.parse.DataFrom
+import cn.vove7.common.model.UserInfo
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.adapters.ViewModel
 import cn.vove7.jarvis.fragments.base.BaseMarkedFragment
@@ -31,6 +36,16 @@ class MarkedOpenFragment : BaseMarkedFragment<MarkedData>() {
         return ss
     }
 
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        buildHeader("仅显示我的", lis = CompoundButton.OnCheckedChangeListener { buttonView, isChecked ->
+            onlySelf = isChecked
+            refresh()
+        })
+    }
+
+    var onlySelf = false
+
     override fun onGetData(pageIndex: Int) {
         thread {
             val builder = DAO.daoSession.markedDataDao
@@ -39,6 +54,12 @@ class MarkedOpenFragment : BaseMarkedFragment<MarkedData>() {
                     .offset(pageSizeLimit * pageIndex)
                     .limit(pageSizeLimit)
 
+            if (onlySelf) {
+                builder.whereOr(MarkedDataDao.Properties.From.eq(DataFrom.FROM_USER),
+                        builder.and(MarkedDataDao.Properties.From.eq(DataFrom.FROM_SHARED),
+                                MarkedDataDao.Properties.PublishUserId.eq(UserInfo.getUserId()))
+                )
+            }
             val list = builder.list()
 
             dataSet.addAll(transData(list))

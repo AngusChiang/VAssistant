@@ -1,7 +1,9 @@
 package cn.vove7.jarvis.fragments
 
 import android.content.Intent
+import android.os.Bundle
 import android.view.View
+import android.widget.CompoundButton
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.datamanager.DAO

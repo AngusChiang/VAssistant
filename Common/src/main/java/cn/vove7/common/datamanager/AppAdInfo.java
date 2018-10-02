@@ -9,6 +9,7 @@ import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Objects;
 
+import cn.vove7.common.BuildConfig;
 import cn.vove7.common.app.GlobalLog;
 import cn.vove7.common.datamanager.parse.DataFrom;
 import cn.vove7.common.interfaces.Markable;
@@ -84,7 +85,7 @@ public class AppAdInfo implements Serializable, Markable, DataFrom {
     }
 
     public boolean belongUser(boolean update) {
-        if (DataFrom.FROM_USER.equals(from)) return true;
+        if (from == null || DataFrom.FROM_USER.equals(from)) return true;
         else if (publishUserId != null && publishUserId.equals(UserInfo.getUserId())) {
             if (update) {
                 from = DataFrom.FROM_USER;
@@ -184,6 +185,9 @@ public class AppAdInfo implements Serializable, Markable, DataFrom {
         builder.append("来源: ").append(DataFrom.Companion.translate(from)).append('\n');
         if (type != null)
             builder.append("ClassType: ").append(type).append('\n');
+        if(BuildConfig.DEBUG){
+            builder.append("pUid: ").append(publishUserId).append('\n');
+        }
         return builder.toString();
 
     }

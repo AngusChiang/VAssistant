@@ -1,10 +1,11 @@
 package cn.vove7.common.utils
 
+import cn.vove7.common.netacc.model.ResponseMessage
 import com.google.gson.ExclusionStrategy
 import com.google.gson.FieldAttributes
-import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.google.gson.annotations.Expose
+import java.lang.reflect.Type
 
 /**
  * # GsonHelper
@@ -32,10 +33,19 @@ object GsonHelper {
             }
 
             override fun shouldSkipClass(aClass: Class<*>): Boolean = false
-        })
+        }).disableHtmlEscaping()
     }
 
-    fun toJson(model: Any): String {
+    fun toJson(model: Any?): String {
+        if (model == null) return ""
         return builder.create().toJson(model)
     }
+
+    fun <T> fromJsonObj(s: String?, type: Type): ResponseMessage<T>? {
+        val bean = GsonBuilder()
+                .setDateFormat("yyyy-MM-dd HH:mm:ss")
+                .create().fromJson<ResponseMessage<T>>(s, type)
+        return bean
+    }
+
 }

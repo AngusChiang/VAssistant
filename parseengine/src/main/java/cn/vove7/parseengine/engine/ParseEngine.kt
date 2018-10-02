@@ -76,9 +76,9 @@ object ParseEngine {
             if (pkg == "") {
                 ParseResult(false, "pkg null")
             }
-            val inappq=matchAppAction(cmdWord, pkg)
-            actionQueue.addAll(inappq.second)
-            ParseResult(actionQueue.isNotEmpty(), actionQueue,inappq.first)
+            val inAppQue=matchAppAction(cmdWord, pkg)
+            actionQueue.addAll(inAppQue.second)
+            ParseResult(actionQueue.isNotEmpty(), actionQueue,inAppQue.first)
         }
     }
 
@@ -160,7 +160,7 @@ object ParseEngine {
 //        println("${i++}. 匹配：$sufWord")
         node.follows.forEach { it ->
             it?.regs?.forEach { reg ->
-                val result = reg.regex.matchEntire(sufWord)
+                val result = reg.followRegex.matchEntire(sufWord)
                 if (result != null && result.groups.isNotEmpty()) {//深搜
 //                    println("--匹配成功")
                     //匹配成功

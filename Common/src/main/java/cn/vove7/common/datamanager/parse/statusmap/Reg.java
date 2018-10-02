@@ -72,6 +72,15 @@ public class Reg implements Serializable {
         return regex;
     }
 
+    @Keep
+    public Regex getFollowRegex() {
+        //头部加上% ， 防止有前参数匹配失败
+        String s = (!regStr.startsWith("%") ? "%" + regStr : regStr)
+                .replace("%", RegUtils.INSTANCE.getREG_ALL_CHAR());
+        regex = new Regex(s);
+        return regex;
+    }
+
     public void setRegex(Regex regex) {
         this.regex = regex;
     }
@@ -122,7 +131,7 @@ public class Reg implements Serializable {
      */
     public static final int PARAM_NO = -999;
     public static final int PARAM_POS_END = -1;
-    public static final int PARAM_POS_0 = 0;
+    //public static final int PARAM_POS_0 = 0;
     public static final int PARAM_POS_1 = 1;
     public static final int PARAM_POS_2 = 2;
     public static final int PARAM_POS_3 = 3;

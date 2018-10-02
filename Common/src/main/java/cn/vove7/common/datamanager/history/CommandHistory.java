@@ -1,7 +1,5 @@
 package cn.vove7.common.datamanager.history;
 
-import org.greenrobot.greendao.annotation.Generated;
-
 import java.util.Date;
 
 /**
@@ -22,6 +20,7 @@ public class CommandHistory {
         this.command = command;
         this.result = result;
     }
+
     public Long getUserId() {
         return this.userId;
     }

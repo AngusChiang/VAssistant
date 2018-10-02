@@ -53,4 +53,6 @@ object ApiUrls {
 
     val UPLOAD_CMD_HIS = APP + "uch"
     val NEW_USER_FEEDBACK = APP + "ufb"
+
+    val QQ_GROUP_1 = "https://jq.qq.com/?_wv=1027&k=58NR9UC"
 }

@@ -224,7 +224,7 @@ class MainService : BusService(),
     private var speakSync = false
     override fun speak(text: String?) {
         //关闭语音播报 toast
-        if (AppConfig.audioSpeak && SystemBridge().musicCurrentVolume != 0) {
+        if (AppConfig.audioSpeak && SystemBridge.musicCurrentVolume != 0) {
             speakSync = false
             speechSynService.speak(text)
         } else {
@@ -233,7 +233,7 @@ class MainService : BusService(),
     }
 
     override fun speakSync(text: String?) {
-        if (AppConfig.audioSpeak && SystemBridge().musicCurrentVolume != 0) {
+        if (AppConfig.audioSpeak && SystemBridge.musicCurrentVolume != 0) {
             speakSync = true
             speechSynService.speak(text)
         } else {
@@ -414,7 +414,7 @@ class MainService : BusService(),
     fun resumeMusicIf() {
         synchronized(haveMusicPlay) {
             if (haveMusicPlay) {
-                SystemBridge().mediaResume()
+                SystemBridge.mediaResume()
                 haveMusicPlay = false
             }
         }
@@ -458,11 +458,11 @@ class MainService : BusService(),
             listeningAni.begin()//
             listeningToast.show("开始聆听")
             if (AppConfig.vibrateWhenStartReco) {
-                SystemBridge().vibrate(80L)
+                SystemBridge.vibrate(80L)
             }
 
-            if (SystemBridge().isMediaPlaying() && !speechSynService.speaking) {//防止误判合成服务播报
-                SystemBridge().mediaPause()
+            if (SystemBridge.isMediaPlaying() && !speechSynService.speaking) {//防止误判合成服务播报
+                SystemBridge.mediaPause()
                 haveMusicPlay = true
             }
         }
@@ -506,26 +506,6 @@ class MainService : BusService(),
                         else -> AppBus.postSpeechAction(SpeechAction.ActionCode.ACTION_START_RECO)  //继续????
                     }
                 }
-            }
-        }
-
-        private fun onParseCommand(result: String) {
-//                    toast.showShort("开始解析")
-            parseAnimation.begin()
-            val parseResult = ParseEngine
-                    .parseAction(result, AccessibilityApi.accessibilityService?.currentScope?.packageName
-                        ?: "")
-            resumeMusicIf()
-            if (parseResult.isSuccess) {
-                val his = CommandHistory(UserInfo.getUserId(), result,
-                        parseResult.msg)
-                NetHelper.uploadUserCommandHistory(his)
-                cExecutor.execQueue(result, parseResult.actionQueue)
-            } else {//todo statistics
-                NetHelper.uploadUserCommandHistory(CommandHistory(UserInfo.getUserId(), result, null))
-                listeningToast.showAndHideDelay("解析失败")
-//                        effectHandler.sendEmptyMessage(PARSE_FAILED)
-                parseAnimation.failed()
             }
         }
 
@@ -576,6 +556,26 @@ class MainService : BusService(),
         }
     }
 
+    fun onParseCommand(result: String) {
+//                    toast.showShort("开始解析")
+        parseAnimation.begin()
+        val parseResult = ParseEngine
+                .parseAction(result, AccessibilityApi.accessibilityService?.currentScope?.packageName
+                    ?: "")
+        resumeMusicIf()
+        if (parseResult.isSuccess) {
+            val his = CommandHistory(UserInfo.getUserId(), result,
+                    parseResult.msg)
+            NetHelper.uploadUserCommandHistory(his)
+            cExecutor.execQueue(result, parseResult.actionQueue)
+        } else {//todo statistics
+            NetHelper.uploadUserCommandHistory(CommandHistory(UserInfo.getUserId(), result, null))
+            listeningToast.showAndHideDelay("解析失败")
+//                        effectHandler.sendEmptyMessage(PARSE_FAILED)
+            parseAnimation.failed()
+        }
+    }
+
     /**
      * 语音合成事件监听
      */
@@ -596,8 +596,8 @@ class MainService : BusService(),
 
         override fun onStart() {
             Vog.d(this, "onSynData 开始")
-            if (SystemBridge().isMediaPlaying()) {
-                SystemBridge().mediaPause()
+            if (SystemBridge.isMediaPlaying()) {
+                SystemBridge.mediaPause()
                 haveMusicPlay = true
             }
         }

@@ -7,6 +7,7 @@ import cn.vove7.common.datamanager.greendao.*
 import cn.vove7.common.datamanager.parse.DataFrom
 import cn.vove7.common.datamanager.parse.model.ActionScope
 import cn.vove7.common.datamanager.parse.statusmap.ActionNode
+import cn.vove7.common.model.UserInfo
 import cn.vove7.vtp.log.Vog
 import java.util.*
 
@@ -74,7 +75,8 @@ object DaoHelper {
     @Throws(Exception::class)
     fun deleteActionNode(nodeId: Long) {
         // 删除记录 Action Reg --ActionScope-- 判断follow 保留scope
-        val ancNode = DAO.daoSession.actionNodeDao.queryBuilder().where(ActionNodeDao.Properties.Id.eq(nodeId)).unique()
+        val ancNode = DAO.daoSession.actionNodeDao.queryBuilder()
+                .where(ActionNodeDao.Properties.Id.eq(nodeId)).unique()
         val delFollows = LinkedList<ActionNode>()
         delFollows.add(ancNode)
 
@@ -85,7 +87,7 @@ object DaoHelper {
                     .where(ActionNodeDao.Properties.ParentId.eq(p.id)).list())
             //Action
             val a = p.actionId
-            if (a != null && a > -0L)
+            if (a > -0L)
                 DAO.daoSession.actionDao.deleteByKey(a)
 
             //desc
@@ -125,9 +127,20 @@ object DaoHelper {
     private fun updateActionNodeByType(nodes: List<ActionNode>, type: Int): Boolean {
         //
         val actionNodeDao = DAO.daoSession.actionNodeDao
+
+        //select * from action_node where from=from_user and scopeType=type and (pud is null or pud = uid)
         val olds = actionNodeDao.queryBuilder()
                 .where(ActionNodeDao.Properties.From.notEq(DataFrom.FROM_USER),
-                        ActionNodeDao.Properties.ActionScopeType.eq(type)).list()
+                        ActionNodeDao.Properties.ActionScopeType.eq(type),
+                        actionNodeDao.queryBuilder().or(ActionNodeDao.Properties.PublishUserId.isNull,
+                                ActionNodeDao.Properties.PublishUserId.notEq(UserInfo.getUserId())
+                        )
+                ).list()
+        val userList = if (UserInfo.isLogin()) {
+            actionNodeDao.queryBuilder().whereOr(ActionNodeDao.Properties.From.notEq(DataFrom.FROM_USER),
+                    ActionNodeDao.Properties.PublishUserId.eq(UserInfo.getUserId()))
+                    .list().toHashSet()
+        } else emptySet<ActionNode>()
         return try {
             DAO.daoSession.runInTx {
                 olds.forEach {
@@ -136,20 +149,15 @@ object DaoHelper {
                     deleteActionNode(it.id)
                 }
                 nodes.forEach {
-                    if (it.isDelete) {
-                        Vog.d(this, "updateActionNodeByType ---> 已删除 ${it.actionTitle}")
-                        return@forEach
-                    }
-
-                    val oldNode = getActionNodeByTag(it.tagId)//存在？
-                    if (oldNode == null || it.versionCode > oldNode.versionCode) {//更新
-                        //判断属于用户
-                        if (it.belongSelf()) {//set from -> user
-                            it.from = DataFrom.FROM_USER
-                            Vog.d(this, "updateActionNodeByType ---> 属于用户: " + it.actionTitle)
-                        }
+                    if (!userList.contains(it)) {
                         insertNewActionNode(it)
-                    } else Vog.d(this, "updateGlobalInst ---> ${it.actionTitle} 存在")
+                    } else {//存在
+                        val oldNode = getActionNodeByTag(it.tagId)
+                        if (oldNode == null || it.versionCode > oldNode.versionCode) {//更新
+                            oldNode?.delete()
+                            insertNewActionNode(it)
+                        } else Vog.d(this, "updateGlobalInst ---> ${it.actionTitle} 存在")
+                    }
                 }
             }
             true
@@ -218,7 +226,6 @@ object DaoHelper {
     /**
      * 更新Marked数据
      * 删除来自服务器,保留用户数据
-     * TODO tagid 防止删除重叠数据
      * @param types Array<String>
      * @param datas List<MarkedData>
      * @return Boolean
@@ -227,22 +234,31 @@ object DaoHelper {
         val markedDao = DAO.daoSession.markedDataDao
         val l = markedDao.queryBuilder().where(
                 MarkedDataDao.Properties.Type.`in`(*types),
-                markedDao.queryBuilder().or(
-                        MarkedDataDao.Properties.From.isNull,
-                        MarkedDataDao.Properties.From.notEq(DataFrom.FROM_USER)
-                )).list()
+//                markedDao.queryBuilder().or(
+//                        MarkedDataDao.Properties.From.isNull,
+                MarkedDataDao.Properties.From.notEq(DataFrom.FROM_USER)
+//                )
+                ,
+                markedDao.queryBuilder().or(MarkedDataDao.Properties.PublishUserId.isNull,
+                        MarkedDataDao.Properties.PublishUserId.notEq(UserInfo.getUserId())
+                )
+        ).list()
         val userList = markedDao.queryBuilder().where(
                 MarkedDataDao.Properties.Type.`in`(*types),
-                MarkedDataDao.Properties.From.eq(DataFrom.FROM_USER)
+                markedDao.queryBuilder().or(
+                        MarkedDataDao.Properties.From.eq(DataFrom.FROM_USER),
+                        MarkedDataDao.Properties.PublishUserId.eq(UserInfo.getUserId())
+                )
         ).list().toHashSet()
         return try {
             markedDao.deleteInTx(l)
             datas.forEach {
+                it.id = null
                 if (!userList.contains(it)) {
-                    if (it.belongUser(false)) {
-                        Vog.d(this, "updateMarkedData ---> 标记为用户:" + it.key)
-                        it.from = DataFrom.FROM_USER
-                    }
+//                    if (it.belongUser(false)) {
+//                        Vog.d(this, "updateMarkedData ---> 标记为用户:" + it.key)
+//                        it.from = DataFrom.FROM_USER
+//                    }
                     markedDao.insert(it)
                 } else {
                     Vog.d(this, "updateMarkedData ---> 重复:" + it.key)
@@ -267,20 +283,26 @@ object DaoHelper {
     fun updateAppAdInfo(datas: List<AppAdInfo>): Boolean {
         val appAdInfoDao = DAO.daoSession.appAdInfoDao
         return try {
-            val delList = appAdInfoDao.queryBuilder()
-                    .where(AppAdInfoDao.Properties.From.notEq(DataFrom.FROM_USER)).list()
+            //删除服务端
+            val delList = appAdInfoDao.queryBuilder().where(
+                    AppAdInfoDao.Properties.From.notEq(DataFrom.FROM_USER),
+                    appAdInfoDao.queryBuilder().or(AppAdInfoDao.Properties.PublishUserId.isNull,
+                            AppAdInfoDao.Properties.PublishUserId.notEq(UserInfo.getUserId()))
+            ).list()
             appAdInfoDao.deleteInTx(delList)
 
-            val userList = appAdInfoDao.queryBuilder().where(
-                    AppAdInfoDao.Properties.From.eq(DataFrom.FROM_USER)
+            val userList = appAdInfoDao.queryBuilder().whereOr(
+                    AppAdInfoDao.Properties.From.eq(DataFrom.FROM_USER),
+                    AppAdInfoDao.Properties.PublishUserId.eq(UserInfo.getUserId())
             ).list().toHashSet()
 
             datas.forEach {
+                it.id = null
                 if (!userList.contains(it)) {
-                    if (it.belongUser(false)) {
-                        Vog.d(this, "updateMarkedData ---> 标记为用户:" + it.descTitle)
-                        it.from = DataFrom.FROM_USER
-                    }
+//                    if (it.belongUser(false)) {
+//                        Vog.d(this, "updateMarkedData ---> 标记为用户:" + it.descTitle)
+//                        it.from = DataFrom.FROM_USER
+//                    }
                     appAdInfoDao.insertInTx(it)
                     Vog.d(this, "updateAppAdInfo ---> ${it.descTitle} ${it.id}")
                 } else {

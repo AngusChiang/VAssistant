@@ -167,7 +167,11 @@ class SettingItemHelper(val context: Context) {
                 item.summary = v
                 entity.indexOf(v)
             } else 0
-        } else item.defaultValue.invoke() as Int? ?: 0
+        } else{
+            val i=item.defaultValue.invoke() as Int? ?: 0
+            item.summary= item.items?.get(i)
+            i
+        }
 
         setBasic(holder, item) {
             MaterialDialog(context)

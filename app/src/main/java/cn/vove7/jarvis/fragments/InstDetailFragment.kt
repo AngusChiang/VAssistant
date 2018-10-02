@@ -19,9 +19,9 @@ import cn.vove7.common.model.UserInfo
 import cn.vove7.common.netacc.ApiUrls
 import cn.vove7.common.netacc.model.BaseRequestModel
 import cn.vove7.common.netacc.model.ResponseMessage
+import cn.vove7.common.utils.NetHelper
 import cn.vove7.common.utils.RegUtils
 import cn.vove7.common.utils.TextHelper
-import cn.vove7.executorengine.bridges.SystemBridge
 import cn.vove7.executorengine.exector.MultiExecutorEngine
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.activities.NewInstActivity
@@ -29,7 +29,6 @@ import cn.vove7.jarvis.adapters.ExecuteQueueAdapter
 import cn.vove7.jarvis.adapters.InstSettingListAdapter
 import cn.vove7.jarvis.fragments.base.BaseBottomFragmentWithToolbar
 import cn.vove7.jarvis.utils.AppConfig
-import cn.vove7.common.utils.NetHelper
 import cn.vove7.jarvis.view.dialog.ProgressDialog
 import cn.vove7.vtp.dialog.DialogWithList
 import cn.vove7.vtp.log.Vog
@@ -82,9 +81,8 @@ class InstDetailFragment(val node: ActionNode, val onUpdate: () -> Unit) : BaseB
 
     //todo  share user info
     private fun setData() {
-        val uId = UserInfo.getUserId()
         when {//编辑
-            DataFrom.userCanEdit(node.from) && node.publishUserId ?: uId == uId -> {
+            node.belongSelf() -> {
                 toolbar.menu.findItem(R.id.menu_edit).isVisible = true
                 toolbar.menu.findItem(R.id.menu_share).isVisible = true
 //                toolbar.menu.findItem(R.id.menu_add_follow).isVisible = true
@@ -162,7 +160,7 @@ class InstDetailFragment(val node: ActionNode, val onUpdate: () -> Unit) : BaseB
                 R.id.menu_delete -> {//删除
                     MaterialDialog(context!!).title(text = getString(R.string.text_confirm_2_del) + ": ${node.actionTitle} ?")
 //                            .negativeButton(R.string.text_help) {
-//                                SystemBridge().openUrl(ApiUrls.HELP_DEL_INST)// TODO
+//                                SystemBridge.openUrl(ApiUrls.HELP_DEL_INST)// TODO
 //                            }
                             .message(R.string.text_msg_delete_action_node)
                             .positiveButton(R.string.text_confirm) {
@@ -234,7 +232,7 @@ class InstDetailFragment(val node: ActionNode, val onUpdate: () -> Unit) : BaseB
 //                    }
                 }
                 R.id.menu_settings -> {//显示设置
-                    var d: DialogWithList?=null
+                    var d: DialogWithList? = null
                     d = DialogWithList(context!!, InstSettingListAdapter(context!!,
                             settingName ?: "") {
                         toast.showLong("设置加载失败")
@@ -398,6 +396,7 @@ class InstDetailFragment(val node: ActionNode, val onUpdate: () -> Unit) : BaseB
                     thread {
                         //更新 tagId
                         Vog.d(this, "share new tag---> $s")
+                        node.from = DataFrom.FROM_SHARED
                         node.tagId = s
                         node.update()
                         node.follows.forEach { child ->

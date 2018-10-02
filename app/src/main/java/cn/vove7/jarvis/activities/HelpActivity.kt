@@ -2,7 +2,6 @@ package cn.vove7.jarvis.activities
 
 import android.os.Bundle
 import android.support.design.widget.TextInputLayout
-import android.support.v7.app.AppCompatActivity
 import android.view.View
 import android.widget.AdapterView
 import cn.vove7.common.app.GlobalLog
@@ -39,7 +38,7 @@ class HelpActivity : ReturnableActivity(), AdapterView.OnItemClickListener {
         list_view.adapter = IconTitleListAdapter(this, getData())
         list_view.onItemClickListener = this
         list_view.setOnItemLongClickListener { parent, view, position, id ->
-            if (position == 2) {
+            if (position == 3) {
                 GlobalLog.export2Sd()
                 return@setOnItemLongClickListener true
             }
@@ -49,8 +48,24 @@ class HelpActivity : ReturnableActivity(), AdapterView.OnItemClickListener {
 
     override fun onItemClick(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
         when (position) {
-            0 -> SystemBridge().openUrl(ApiUrls.USER_GUIDE)
-            1 -> showFeedbackDialog()
+            0 -> SystemBridge.openUrl(ApiUrls.USER_GUIDE)
+            1 -> {
+                SystemBridge.openUrl(ApiUrls.QQ_GROUP_1)
+//                val groupNum = "579224092"
+//                SystemBridge.apply {
+//                    setClipText(groupNum)
+//                    val qq = openAppByWord("QQ")
+//                    if (qq == null) {
+//                        val tim = openAppByWord("TIM")
+//                        if (tim == null) {
+//                            toast.showShort("唤起QQ失败")
+//                            return
+//                        }
+//                    }
+//                }
+//                toast.showShort("群号已复制进剪切板")
+            }
+            2 -> showFeedbackDialog()
 //            2 ->
         }
     }
@@ -99,6 +114,7 @@ class HelpActivity : ReturnableActivity(), AdapterView.OnItemClickListener {
     private fun getData(): List<IconTitleEntity> {
         return listOf(
                 IconTitleEntity(R.drawable.ic_book_24dp, R.string.text_service_manual)
+                , IconTitleEntity(R.drawable.ic_qq, R.string.text_add_qq_group)
                 , IconTitleEntity(R.drawable.ic_feedback_black_24dp, R.string.text_feedback)
                 , IconTitleEntity(R.drawable.ic_bug_report_24dp, titleId = R.string.text_explore_log,
                 summaryId = R.string.text_long_press_to_export_log)

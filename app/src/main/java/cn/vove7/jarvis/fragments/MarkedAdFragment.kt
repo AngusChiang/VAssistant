@@ -7,9 +7,9 @@ import cn.vove7.common.datamanager.AppAdInfo
 import cn.vove7.common.datamanager.DAO
 import cn.vove7.common.datamanager.DaoHelper
 import cn.vove7.common.netacc.ApiUrls
-import cn.vove7.common.utils.NetHelper
 import cn.vove7.common.netacc.model.BaseRequestModel
 import cn.vove7.common.netacc.model.ResponseMessage
+import cn.vove7.common.utils.NetHelper
 import cn.vove7.executorengine.bridges.SystemBridge
 import cn.vove7.executorengine.helper.AdvanAppHelper
 import cn.vove7.jarvis.activities.AppAdListActivity
@@ -69,7 +69,10 @@ class MarkedAdFragment : SimpleListFragment<String>(), OnSyncMarked {
         if (!AppConfig.checkUser()) {
             return@OnClickListener
         }
-        AdEditorDialog(context!!) { refresh() }.show()
+        AdEditorDialog(context!!) {
+            refresh()
+            AdKillerService.update()
+        }.show()
     }
 
     /**
@@ -89,9 +92,6 @@ class MarkedAdFragment : SimpleListFragment<String>(), OnSyncMarked {
                     toast.showShort("同步完成")
                     AdKillerService.update()
                     refresh()
-                    if (AppConfig.isAdBlockService && AccessibilityApi.isOpen()) {//重启服务
-                        AdKillerService.restart()
-                    }
                 } else {
                     toast.showShort(bean.message)
                 }
@@ -105,7 +105,7 @@ class MarkedAdFragment : SimpleListFragment<String>(), OnSyncMarked {
     override fun transData(nodes: List<String>): List<ViewModel> {
         val ss = mutableListOf<ViewModel>()
         val sss = mutableListOf<ViewModel>()
-        val bridge = SystemBridge()
+        val bridge = SystemBridge
         nodes.forEach {
             val app = bridge.getAppInfo(it)
             if (app != null)
