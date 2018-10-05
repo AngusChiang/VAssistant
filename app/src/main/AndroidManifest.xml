@@ -42,9 +42,9 @@
     <application
         android:name=".App"
         android:allowBackup="true"
-        android:icon="@mipmap/ic_launcher"
+        android:icon="@mipmap/ic_launcher_vassist"
         android:label="@string/app_name"
-        android:roundIcon="@mipmap/ic_launcher_round"
+        android:roundIcon="@mipmap/ic_launcher_vassist"
         android:supportsRtl="true"
         android:theme="@style/NoActionBar"
         tools:ignore="GoogleAppIndexingWarning">
@@ -62,6 +62,7 @@
         <activity
             android:name=".activities.RealMainActivity"
             android:excludeFromRecents="true"
+            android:launchMode="singleTask"
             android:theme="@style/TranslucentStatus.NoActionBar"
             android:windowSoftInputMode="adjustPan">
             <intent-filter>
@@ -113,9 +114,9 @@
         <activity
             android:name=".activities.InstManagerActivity"
             android:windowSoftInputMode="adjustPan" />
+
         <activity
             android:name=".activities.SettingsActivity"
-            android:excludeFromRecents="false"
             android:label="@string/title_activity_settings"
             android:theme="@style/AppTheme" />
         <activity
@@ -123,8 +124,10 @@
             android:label="@string/text_cmd_in_app" />
         <activity
             android:name=".activities.NewInstActivity"
+            android:launchMode="singleTop"
             android:windowSoftInputMode="adjustPan" />
-        <activity android:name=".activities.WelcomeActivity" />
+        <activity android:name=".activities.WelcomeActivity"
+            android:launchMode="singleTop" />
         <activity android:name=".activities.MarkedManagerActivity" />
         <activity android:name=".activities.AppAdListActivity" />
         <activity
@@ -144,6 +147,10 @@
             android:name=".activities.base.LaboratoryActivity"
             android:label="@string/text_laboratory"
             android:theme="@style/AppTheme" />
+        <activity android:name=".activities.InstDetailActivity"
+            android:theme="@style/TranslucentStatus.NoActionBar"/>
+        <activity android:name=".activities.OSLActivity"
+            android:label="@string/text_open_source_libraries"/>
 
     </application>
 

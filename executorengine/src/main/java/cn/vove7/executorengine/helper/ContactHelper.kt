@@ -2,13 +2,17 @@ package cn.vove7.executorengine.helper
 
 import android.content.Context
 import android.content.pm.PackageManager
+import android.support.v4.app.ActivityCompat
 import cn.vove7.common.app.GlobalApp
+import cn.vove7.common.app.GlobalLog
+import cn.vove7.common.appbus.AppBus
 import cn.vove7.common.bridges.ChoiceData
 import cn.vove7.common.bridges.GenChoiceData
 import cn.vove7.common.datamanager.DAO
 import cn.vove7.common.datamanager.executor.entity.MarkedData
 import cn.vove7.common.datamanager.greendao.MarkedDataDao
 import cn.vove7.common.model.MatchedData
+import cn.vove7.common.model.RequestPermission
 import cn.vove7.executorengine.model.Markable
 import cn.vove7.vtp.contact.ContactHelper
 import cn.vove7.vtp.contact.ContactInfo
@@ -42,18 +46,25 @@ object AdvanContactHelper : GenChoiceData, Markable {
      */
     private val LOCAL_CONTACT_LIST = HashMap<String, ContactInfo>()
 
-    fun updateContactList() {//todo check
-//        if (context.checkSelfPermission("android.permission.READ_CONTACTS")
-//                != PackageManager.PERMISSION_GRANTED) {
-//
-//            return
-//        }
+    fun updateContactList() {
+        if (ActivityCompat.checkSelfPermission(context, android.Manifest.permission.READ_CONTACTS)
+                != PackageManager.PERMISSION_GRANTED) {
+            AppBus.post(RequestPermission("录音权限"))
+            return
+        }
         val now = System.currentTimeMillis()
         //更新
         if (now - lastUpdateTime > updateInterval) {
             lastUpdateTime = now
             LOCAL_CONTACT_LIST.clear()
-            LOCAL_CONTACT_LIST.putAll(ContactHelper.getAllContacts(context))
+            try {
+                LOCAL_CONTACT_LIST.putAll(ContactHelper.getAllContacts(context))
+            } catch (e: Exception) {
+                if (e is ClassCastException) {
+                    AppBus.post(RequestPermission("联系人权限"))
+                } else GlobalLog.err(e)
+
+            }
         }
     }
 

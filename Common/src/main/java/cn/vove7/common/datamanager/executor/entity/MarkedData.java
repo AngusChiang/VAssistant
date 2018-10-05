@@ -94,16 +94,19 @@ public class MarkedData implements DataFrom, Markable, Serializable {
         this.value = value;
     }
 
-    public boolean belongUser(boolean update) {
-        if (DataFrom.FROM_USER.equals(from)) return true;
-        else if (publishUserId != null && publishUserId.equals(UserInfo.getUserId())) {
-            if (update) {
-                from = DataFrom.FROM_USER;
-                DAO.INSTANCE.getDaoSession().getMarkedDataDao().update(this);
-            }
-            return true;
-        }
-        return false;
+    public boolean belongUser() {
+        Long uId = UserInfo.getUserId();
+        return DataFrom.FROM_USER.equals(from) ||
+                (DataFrom.FROM_SHARED.equals(from) && (publishUserId == null || publishUserId.equals(uId)));
+        //if (DataFrom.FROM_USER.equals(from)) return true;
+        //else if (publishUserId != null && publishUserId.equals(UserInfo.getUserId())) {
+        //    if (update) {
+        //        from = DataFrom.FROM_USER;
+        //        DAO.INSTANCE.getDaoSession().getMarkedDataDao().update(this);
+        //    }
+        //    return true;
+        //}
+        //return false;
     }
 
     //AppInfo data;

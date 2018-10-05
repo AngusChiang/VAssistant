@@ -7,7 +7,7 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="让我们一起把世界变得更美好"
+        android:text="这里缺点什么"
         android:textColor="@color/primary_text"
         android:textSize="16sp" />
 

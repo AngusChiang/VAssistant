@@ -117,14 +117,23 @@ class MineFragment : Fragment() {
         }
     }
 
+    val accs = listOf(
+            SettingsActivity::class.java,
+            AdvancedSettingActivity::class.java,
+            LaboratoryActivity::class.java,
+            PermissionManagerActivity::class.java,
+            HelpActivity::class.java,
+            AboutActivity::class.java
+    )
+
     fun onItemClick(position: Int) {
-        when (position) {
-            0 -> startActivity(Intent(context, SettingsActivity::class.java))
-            1 -> startActivity(Intent(context, AdvancedSettingActivity::class.java))
-            2 -> startActivity(Intent(context, LaboratoryActivity::class.java))
-            3 -> startActivity(Intent(context, PermissionManagerActivity::class.java))
-            4 -> startActivity(Intent(context, HelpActivity::class.java))
-            5 -> startActivity(Intent(context, AboutActivity::class.java))
+        val intent = when (position) {
+            in 0..5 -> Intent(context, accs[position])
+            else -> null
+        }
+        if (intent != null) {
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_DOCUMENT)
+            startActivity(intent)
         }
 
     }

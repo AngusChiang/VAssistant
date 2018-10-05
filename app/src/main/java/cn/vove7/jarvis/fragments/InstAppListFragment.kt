@@ -1,9 +1,7 @@
 package cn.vove7.jarvis.fragments
 
 import android.content.Intent
-import android.os.Bundle
 import android.view.View
-import android.widget.CompoundButton
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.datamanager.DAO
@@ -11,6 +9,7 @@ import cn.vove7.common.datamanager.DaoHelper
 import cn.vove7.common.datamanager.parse.model.ActionScope
 import cn.vove7.common.datamanager.parse.statusmap.ActionNode
 import cn.vove7.common.datamanager.parse.statusmap.ActionNode.NODE_SCOPE_IN_APP
+import cn.vove7.common.model.UserInfo
 import cn.vove7.common.netacc.ApiUrls
 import cn.vove7.common.netacc.model.BaseRequestModel
 import cn.vove7.executorengine.helper.AdvanAppHelper
@@ -21,9 +20,10 @@ import cn.vove7.jarvis.activities.OnSyncInst
 import cn.vove7.jarvis.adapters.SimpleListAdapter
 import cn.vove7.jarvis.adapters.ViewModel
 import cn.vove7.jarvis.utils.AppConfig
-import cn.vove7.common.utils.NetHelper
+import cn.vove7.jarvis.utils.NetHelper
 import cn.vove7.parseengine.engine.ParseEngine
 import cn.vove7.vtp.app.AppHelper
+import cn.vove7.vtp.sharedpreference.SpHelper
 import kotlin.concurrent.thread
 
 /**
@@ -53,6 +53,10 @@ class InstAppListFragment : SimpleListFragment<ActionScope>(), OnSyncInst {
     }
 
     override fun onSync() {
+        if (!UserInfo.isLogin()) {
+            toast.blue().showShort("请登陆后操作")
+            return
+        }
         showProgressBar()
         NetHelper.postJson<List<ActionNode>>(ApiUrls.SYNC_IN_APP_INST,
                 BaseRequestModel(AdvanAppHelper.getPkgList()),
@@ -65,6 +69,7 @@ class InstAppListFragment : SimpleListFragment<ActionScope>(), OnSyncInst {
                             if (it) {
                                 toast.showShort("同步完成")
                                 refresh()
+                                SpHelper(GlobalApp.APP).set(R.string.key_last_sync_in_app_date, System.currentTimeMillis())
                                 ParseEngine.updateInApp()
                             } else toast.showShort("同步失败")
                         }

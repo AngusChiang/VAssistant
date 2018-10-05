@@ -7,6 +7,8 @@ import java.io.Serializable
 object AppBus {
     const val EVENT_LOGOUT = "e_logout"
     const val EVENT_FORCE_OFFLINE = "e_force_offline"
+    const val EVENT_START_DEBUG_SERVER = "start_debug_server"
+    const val EVENT_STOP_DEBUG_SERVER = "stop_debug_server"
     const val EVENT_INST_SAVE_COMPLETE = "inst_settings_save_complete"
 
     const val ORDER_STOP_EXEC = "stop_exec"

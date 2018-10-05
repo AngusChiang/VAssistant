@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Jarvis</string>
+    <string name="app_name">V Assist</string>
     <string name="simple_test_script">Simple Script Test</string>
     <string name="r" translatable="false"><![CDATA[>]]></string>
     <string name="l" translatable="false"><![CDATA[<]]></string>
@@ -112,13 +112,13 @@
     <string name="text_optional">Optional</string>
     <string name="text_help">Help</string>
     <string name="text_msg_delete_action_node">此操作会同时删除此操作的跟随操作，同时删除云端分享记录(若分享过)。</string>
-    <string name="text_confirm_2_del">确认删除</string>
+    <string name="text_confirm_2_del">confirm deletion</string>
     <string name="text_about">About</string>
     <string name="text_advanced_features">Advanced Features</string>
     <string name="text_show_toast_when_remove_ad">去除广告通知</string>
     <string name="text_show_toast_when_remove_ad_summary">去除广告时在通知栏显示反馈</string>
-    <string name="text_sound_model">声音模型</string>
-    <string name="text_volume">音量</string>
+    <string name="text_sound_model">Voice model</string>
+    <string name="text_volume">Volume</string>
     <string name="text_speak_speed">Speed of Speak</string>
     <string name="key_show_toast_when_remove_ad" translatable="false">show_toast_when_remove_ad</string>
     <string name="key_vibrate_reco_begin" translatable="false">vibrate_reco_begin</string>
@@ -130,12 +130,12 @@
     <string name="key_voice_syn_speed" translatable="false">voice_syn_speed</string>
     <string name="key_voice_syn_volume" translatable="false">voice_syn_volume</string>
     <string name="text_open_ad_killer_service">AdKiller service</string>
-    <string name="text_remote_debug">远程调试</string>
+    <string name="text_remote_debug">Remote debug</string>
     <string name="text_open_voice_wakeup">Voice wakeup</string>
     <string name="text_play_voice_message">Play voice message</string>
     <string name="text_test_code">Test code</string>
     <string name="text_voice_control">Voice control</string>
-    <string name="text_voice_control_dialog">控制对话框</string>
+    <string name="text_voice_control_dialog">Control the dialog</string>
     <string name="text_mark_management">Mark management</string>
     <string name="text_click_to_login">Sign in</string>
     <string name="hint_username_email">UserName/Email</string>
@@ -152,7 +152,7 @@
     <string name="text_email">EmailAddress</string>
     <string name="text_share">Share</string>
     <string name="text_upgrade">Upgrade</string>
-    <string name="text_sync">同步</string>
+    <string name="text_sync">Synchronize</string>
     <string name="text_vibrate_reco_begin">开始识别时震动</string>
     <string name="text_net_err">Network error</string>
     <string name="key_login_info" translatable="false">login_info</string>
@@ -176,7 +176,7 @@
     <string name="text_failed_to_get_user_info">Failed to get user info</string>
     <string name="text_purchase_recharge_code">Purchase Recharge code</string>
     <string name="text_purchase_recharge_code_msg">1.联系qq获取（推荐）\n2.通过支付宝转账下方指定金额，在备注填写你的邮箱，不久你会收到含有充值码的邮件\n点击下方[使用充值码]继续操作即可。</string>
-    <string name="text_advan_include_func">1.新建脚本指令\n2.远程调试脚本\n3.去广告次数跳无限制\n4.本地代码测试\n5.无限制标记管理\n6.操作、标记分享，且可同步</string>
+    <string name="text_advan_include_func">1.新建脚本指令\n2.远程调试脚本\n3.去广告次数跳无限制\n4.本地代码测试\n5.无限制标记管理\n6.操作、标记分享，且可同步恢复</string>
     <string name="text_recharege_pre_read">在支付前，请先阅读高级教程，确保它对你有用。</string>
     <string name="text_email_copy_to_clip">你的邮箱已复制到剪切板</string>
     <string name="text_understand">Understand</string>
@@ -230,7 +230,7 @@
     <string name="text_wakeup_way">The way of wake up</string>
     <string name="text_long_press_volume_up">Long press vol up</string>
     <string name="text_as_global_inst">As global inst</string>
-    <string name="text_animation">动画</string>
+    <string name="text_animation">Animation</string>
     <string name="text_set_as_default_voice_assist">设为默认语音助手</string>
 
     <string name="desc_device_admin">Lock screen</string>
@@ -241,7 +241,18 @@
     <string name="text_modify_user_name">Modify username</string>
     <string name="text_modify_failed">Modify failed</string>
     <string name="text_modify_pass">Modify password</string>
-    <string name="text_modify_succ">修改成功</string>
+    <string name="text_modify_succ">Successfully modified</string>
     <string name="text_add_qq_group">加入讨论群</string>
     <string name="text_purchase_ways">Purchase way</string>
+    <string name="key_user_exp_plan" translatable="false">user_exp_plan</string>
+    <string name="text_other">Other</string>
+    <string name="text_faq">FAQ</string>
+    <string name="text_check_last_data">检查最新数据</string>
+
+    <string name="key_last_sync_global_date" translatable="false">last_sync_global_date</string>
+    <string name="key_last_sync_in_app_date" translatable="false">last_sync_in_app_date</string>
+    <string name="key_last_sync_marked_contact_date" translatable="false">last_sync_marked_contact_date</string>
+    <string name="key_last_sync_marked_app_date" translatable="false">last_sync_marked_app_date</string>
+    <string name="key_last_sync_marked_open_date" translatable="false">last_sync_marked_open_date</string>
+    <string name="key_last_sync_marked_ad_date" translatable="false">last_sync_marked_ad_date</string>
 </resources>

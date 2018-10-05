@@ -14,11 +14,15 @@ open class ResponseMessage<T> {
     var data: T? = null
 
     fun isOk(): Boolean {
-        return code == CODE_OK && data != null
+        return code == CODE_OK
     }
 
     fun isInvalid(): Boolean {
         return code == CODE_INVALID
+    }
+
+    fun tokenIsOutdate():Boolean {
+        return code == CODE_TOKEN_OUT_DATE
     }
 
 
@@ -39,6 +43,7 @@ open class ResponseMessage<T> {
         const val CODE_FAILED = 1//失败
         const val CODE_SERVER_ERR = 2//出错
         const val CODE_INVALID = 5//无效
+        const val CODE_TOKEN_OUT_DATE = 6//token过期
 
 
         fun <T> error(err: String?): ResponseMessage<T> {

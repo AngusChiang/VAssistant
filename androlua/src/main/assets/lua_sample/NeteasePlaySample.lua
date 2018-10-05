@@ -19,9 +19,3 @@ x = (bounds.left + bounds.right) / 2
 y = bounds.bottom + 100 --276
 sleep(2000)
 click(x, y)
-
-sleep(2000) -- TODO  show
-if (runtime.currentActionIndex == runtime.actionCount) then --无后续操作
-    s = ViewFinder().similaryText(args[1]).findFirst()
-    s.tryClick()
-end

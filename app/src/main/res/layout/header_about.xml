@@ -9,10 +9,10 @@
     <!--android:layout_height="80dp"-->
     <!--android:src="@drawable/bg_user_info" />-->
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="假装有图标"
+    <ImageView
+        android:layout_width="127dp"
+        android:layout_height="127dp"
+        android:src="@drawable/icon_large"
         android:textColor="@color/primary_text"
         android:textSize="20sp" />
 

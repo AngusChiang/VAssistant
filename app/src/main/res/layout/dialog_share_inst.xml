@@ -6,6 +6,10 @@
     android:paddingStart="?attr/dialogPreferredPadding"
     android:paddingEnd="?attr/dialogPreferredPadding"
     android:paddingBottom="10dp">
+    <TextView
+        android:layout_width="match_parent"
+        android:text="分享通过审核后，每个用户都可以同步到你的指令"
+        android:layout_height="wrap_content" />
 
     <ProgressBar
         android:id="@+id/loading_bar"

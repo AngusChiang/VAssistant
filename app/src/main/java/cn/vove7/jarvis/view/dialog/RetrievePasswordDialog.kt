@@ -10,7 +10,6 @@ import android.widget.ProgressBar
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.model.UserInfo
 import cn.vove7.common.netacc.ApiUrls
-import cn.vove7.jarvis.utils.NetHelper
 import cn.vove7.common.netacc.model.BaseRequestModel
 import cn.vove7.common.netacc.model.ResponseMessage
 import cn.vove7.common.netacc.tool.SecureHelper
@@ -18,6 +17,7 @@ import cn.vove7.common.utils.TextHelper
 import cn.vove7.common.view.toast.ColorfulToast
 import cn.vove7.jarvis.BuildConfig
 import cn.vove7.jarvis.R
+import cn.vove7.jarvis.utils.NetHelper
 import cn.vove7.jarvis.view.custom.CountDownButton
 import cn.vove7.vtp.log.Vog
 import com.afollestad.materialdialogs.MaterialDialog
@@ -25,13 +25,12 @@ import com.afollestad.materialdialogs.customview.customView
 import com.google.gson.reflect.TypeToken
 
 /**
- * # SignupDialog
+ * # RetrievePasswordDialog
  *
  * @author Administrator
- * 2018/9/14
+ * 2018/10/5
  */
-
-class SignupDialog(context: Context, val r: OnLoginSuccess) : View.OnClickListener {
+class RetrievePasswordDialog(context: Context) {
     val dialog: MaterialDialog = MaterialDialog(context)
     val lastBit = 6
 
@@ -42,12 +41,15 @@ class SignupDialog(context: Context, val r: OnLoginSuccess) : View.OnClickListen
     private var signUpBtn: Button
     private var loadBar: ProgressBar
     private val toast = ColorfulToast(context)
-    val countDownSecs = 30
+    private val countDownSecs = 30
 
     init {
         val view = LayoutInflater.from(context).inflate(R.layout.dialog_sign_up, null)
         userEmailView = view.findViewById(R.id.user_email_view)
+        userEmailView.hint = "找回邮箱"
+        userEmailView.helperText = ""
         userPassView = view.findViewById(R.id.user_pass_view)
+        userPassView.hint = "新密码"
         confirmPassView = view.findViewById(R.id.confirm_pass_view)
         verCodeView = view.findViewById(R.id.ver_code_view)
 
@@ -70,7 +72,7 @@ class SignupDialog(context: Context, val r: OnLoginSuccess) : View.OnClickListen
                 loadBar.visibility = View.VISIBLE
 //                val p = NetParamsBuilder.of(Pair("emailAdd", userEmail)).sign()
 
-                NetHelper.postJson<String>(ApiUrls.SEND_SIGN_UP_EMAIL_VER_CODE, BaseRequestModel(userEmail),
+                NetHelper.postJson<String>(ApiUrls.SEND_RET_PASS_EMAIL_VER_CODE, BaseRequestModel(userEmail, "check"),
                         type = object : TypeToken<ResponseMessage<String>>() {}.type, callback = { _, bean ->
                     loadBar.visibility = View.INVISIBLE
                     if (bean != null) {
@@ -88,7 +90,7 @@ class SignupDialog(context: Context, val r: OnLoginSuccess) : View.OnClickListen
                 })
             }
         }
-
+        signUpBtn.text = "找回"
         signUpBtn.setOnClickListener {
             userEmailView.error = ""
             userPassView.error = ""
@@ -107,8 +109,6 @@ class SignupDialog(context: Context, val r: OnLoginSuccess) : View.OnClickListen
             }
             if (TextHelper.isEmail(userEmail)) {//邮箱
                 userInfo.setEmail(userEmail)
-                userInfo.setUserName(userEmail)
-
             } else {
                 userEmailView.error = GlobalApp.getString(R.string.text_email_format_err)
                 return@setOnClickListener
@@ -133,30 +133,23 @@ class SignupDialog(context: Context, val r: OnLoginSuccess) : View.OnClickListen
 
             loadBar.visibility = View.VISIBLE
             //post
-            NetHelper.postJson<String>(ApiUrls.REGISTER_BY_EMAIL, BaseRequestModel(userInfo, verCode), type = object
+            NetHelper.postJson<String>(ApiUrls.RET_PASS__BY_EMAIL, BaseRequestModel(userInfo, verCode), type = object
                 : TypeToken<ResponseMessage<String>>() {}.type, callback = { _, bean ->
                 //泛型
                 Vog.d(this, "onResponse ---> $bean")
                 loadBar.visibility = View.INVISIBLE
                 if (bean != null) {
                     if (bean.isOk()) {
-                        toast.showShort(bean.data ?: "null")
-                        LoginDialog(context, userEmail, userPass, r)
+                        toast.showShort(bean.data ?: "网络错误")
                         dialog.dismiss()
                     } else {
-                        toast.showShort(bean.message ?: "null")
+                        toast.showShort(bean.message)
                     }
                 } else {
                     toast.showShort("出错")
                 }
             })
         }
-        dialog.customView(view = view, scrollable = true).title(R.string.text_sign_up).show()
-    }
-
-    override fun onClick(v: View?) {
-        when (v?.id) {
-
-        }
+        dialog.customView(view = view, scrollable = true).title(R.string.text_retrieve_password).show()
     }
 }

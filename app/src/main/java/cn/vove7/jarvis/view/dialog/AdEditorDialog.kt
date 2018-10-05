@@ -129,6 +129,7 @@ class AdEditorDialog(val context: Context, val onUpdate: () -> Unit) {
                             }
                         }
                     }
+                    DAO.clear()
                     toast.green().showShort(R.string.text_complete)
                     dia.dismiss()
                     onUpdate.invoke()

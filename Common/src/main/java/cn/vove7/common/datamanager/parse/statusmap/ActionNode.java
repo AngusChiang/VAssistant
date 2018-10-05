@@ -137,10 +137,11 @@ public class ActionNode implements Serializable, DataFrom {
     private Long publishUserId;//发布者
 
     /**
-     * 服务器返回字段方便寻找parentId
+     * 分享时指定parentId
      * 插入顺序：parent > id > this
      * 使用队列
      */
+    @Transient
     private String parentTagId;//
 
 
@@ -320,10 +321,9 @@ public class ActionNode implements Serializable, DataFrom {
         this.priority = priority;
     }
 
-    @Generated(hash = 194601630)
+    @Generated(hash = 1407012622)
     public ActionNode(Long id, int actionScopeType, Long actionId, Long parentId, Long scopeId, Long descId,
-                      String actionTitle, String tagId, int versionCode, Long publishUserId, String parentTagId,
-                      int priority, String from) {
+            String actionTitle, String tagId, int versionCode, Long publishUserId, int priority, String from) {
         this.id = id;
         this.actionScopeType = actionScopeType;
         this.actionId = actionId;
@@ -334,7 +334,6 @@ public class ActionNode implements Serializable, DataFrom {
         this.tagId = tagId;
         this.versionCode = versionCode;
         this.publishUserId = publishUserId;
-        this.parentTagId = parentTagId;
         this.priority = priority;
         this.from = from;
     }
@@ -523,8 +522,7 @@ public class ActionNode implements Serializable, DataFrom {
         if (follows == null) {
             final DaoSession daoSession = this.daoSession;
             if (daoSession == null) {
-                follows = new ArrayList<>();
-                return follows;
+                return null;
                 //throw new DaoException("Entity is detached from DAO context");
             }
             ActionNodeDao targetDao = daoSession.getActionNodeDao();

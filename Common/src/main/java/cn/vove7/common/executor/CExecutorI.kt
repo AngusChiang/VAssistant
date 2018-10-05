@@ -71,7 +71,8 @@ interface CExecutorI : ViewShowListener, ActivityShowListener, RuntimeArgs {
 }
 
 interface RuntimeArgs {
-    var command:String?
+    var DEBUG: Boolean
+    var command: String?
     //Runtime
     var currentActionIndex: Int
     var actionCount: Int

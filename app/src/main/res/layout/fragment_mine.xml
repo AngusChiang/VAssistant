@@ -105,7 +105,7 @@
         android:id="@+id/list_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginTop="50dp"
+        android:layout_marginTop="30dp"
         android:divider="@color/app_background"
         android:dividerHeight="5dp"
         tools:listitem="@layout/item_mine_features" />

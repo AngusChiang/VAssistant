@@ -1,7 +1,9 @@
 package cn.vove7.jarvis
 
+import cn.vove7.common.datamanager.parse.model.Action
 import org.junit.Test
 import java.lang.Thread.sleep
+import java.util.*
 import kotlin.concurrent.thread
 
 /**
@@ -78,5 +80,18 @@ class ExampleUnitTest {
             }
         }
         while (t.isAlive) sleep(1000)
+    }
+
+    @Test
+    fun testActionQ() {
+        val q = PriorityQueue<Action>()
+        q.add(Action("123", ""))
+        q.add(Action("456", ""))
+        q.add(Action("789", ""))
+        q.add(Action(2, "0", ""))
+        q.add(Action(-1, "-1", ""))
+        while (q.isNotEmpty()) {
+            println(q.poll())
+        }
     }
 }

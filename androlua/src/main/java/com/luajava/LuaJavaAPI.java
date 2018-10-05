@@ -982,7 +982,7 @@ public final class LuaJavaAPI {
             Object arg = null;
             StringBuilder buf = new StringBuilder();
             for (Method m : methods) {
-                if (!m.getName().equals(name))
+                if (!m.getName().equalsIgnoreCase(name))// changed by vove 18-10-3
                     continue;
                 if (isClass && !Modifier.isStatic(m.getModifiers()))
                     continue;

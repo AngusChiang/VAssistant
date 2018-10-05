@@ -14,6 +14,15 @@ public class CommandHistory {
     private String command;
 
     private String result;
+    private String tagId; //todo
+
+    public CommandHistory(Long userId, Date requestTime, String command, String result, String tagId) {
+        this.userId = userId;
+        this.requestTime = requestTime;
+        this.command = command;
+        this.result = result;
+        this.tagId = tagId;
+    }
 
     public CommandHistory(Long userId, String command, String result) {
         this.userId = userId;

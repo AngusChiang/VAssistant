@@ -8,11 +8,11 @@ import cn.vove7.common.datamanager.greendao.ActionNodeDao
 import cn.vove7.common.datamanager.greendao.ActionScopeDao
 import cn.vove7.common.datamanager.parse.statusmap.ActionNode
 import cn.vove7.common.datamanager.parse.statusmap.ActionNode.NODE_SCOPE_IN_APP
+import cn.vove7.jarvis.activities.InstDetailActivity
 import cn.vove7.jarvis.activities.NewInstActivity
 import cn.vove7.jarvis.adapters.SimpleListAdapter
 import cn.vove7.jarvis.adapters.ViewModel
 import cn.vove7.jarvis.utils.AppConfig
-import cn.vove7.parseengine.engine.ParseEngine
 import cn.vove7.vtp.builder.BundleBuilder
 import cn.vove7.vtp.log.Vog
 
@@ -25,7 +25,6 @@ import cn.vove7.vtp.log.Vog
  */
 class InAppInstListFragment : SimpleListFragment<ActionNode>() {
     lateinit var pkg: String
-
 
     override var floatClickListener: View.OnClickListener? = View.OnClickListener {
         if (!AppConfig.checkUser()) {
@@ -40,10 +39,14 @@ class InAppInstListFragment : SimpleListFragment<ActionNode>() {
     override val itemClickListener = object : SimpleListAdapter.OnItemClickListener {
         override fun onClick(holder: SimpleListAdapter.VHolder?, pos: Int, item: ViewModel) {
             val node = item.extra as ActionNode
-            InstDetailFragment(node) {
-                ParseEngine.updateInApp()
-                refresh()
-            }.show(activity?.supportFragmentManager, "inst_detail")
+
+            val intent = Intent(context, InstDetailActivity::class.java)
+            intent.putExtra("nodeId", node.id)
+            startActivity(intent)
+//            InstDetailFragment(node) {
+//                ParseEngine.updateInApp()
+//                refresh()
+//            }.show(activity?.supportFragmentManager, "inst_detail")
         }
     }
 
@@ -95,7 +98,9 @@ class InAppInstListFragment : SimpleListFragment<ActionNode>() {
     override fun transData(nodes: List<ActionNode>): List<ViewModel> {
         val tmp = mutableListOf<ViewModel>()
         nodes.forEach {
-            tmp.add(ViewModel((it).actionTitle, it.actionScope.activity, extra = it))
+            val fs = it.follows?.size ?: 0
+            tmp.add(ViewModel((it).actionTitle, it.desc?.instructions ?: "无介绍"+
+            if (fs == 0) "" else "\n跟随 $fs", extra = it))
         }
         return tmp
     }

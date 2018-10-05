@@ -67,7 +67,7 @@ interface SystemOperation {
      */
     fun openUrl(url: String)
 
-    //TODO
+    //fixme
     fun sendKey(keyCode: Int)
 
     //Media control

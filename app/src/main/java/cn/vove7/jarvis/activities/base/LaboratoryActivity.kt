@@ -31,23 +31,23 @@ class LaboratoryActivity : ReturnableActivity() {
     }
 
     private val groupItems: List<SettingGroupItem> by lazy {
-        listOf(
-                SettingGroupItem(R.color.google_blue, getString(R.string.text_open_ad_killer_service),
-                        childItems = listOf(
-                                SwitchItem(R.string.text_open, summary = if (UserInfo.isVip()) null
-                                else getString(R.string.summary_not_vip_remove_ad), keyId = R.string.key_open_ad_block,
-                                        defaultValue = { true }) { _, it ->
-                                    when (it as Boolean) {
-                                        true -> MyAccessibilityService.registerEvent(AdKillerService)
-                                        false ->
-                                            MyAccessibilityService.unregisterEvent(AdKillerService)
-                                    }
-                                },
-                                NumberPickerItem(R.string.text_time_wait_ad, "界面等待广告出现最长时间，单位秒",
-                                        keyId = R.string.key_ad_wait_secs, range = Pair(10, 100),
-                                        defaultValue = { 17 })
-                        )
-                )
+        listOf(SettingGroupItem(R.color.google_blue, getString(R.string.text_open_ad_killer_service), childItems = listOf(
+                SwitchItem(R.string.text_open, summary = if (UserInfo.isVip()) null
+                else getString(R.string.summary_not_vip_remove_ad), keyId = R.string.key_open_ad_block,
+                        defaultValue = { true }) { _, it ->
+                    when (it as Boolean) {
+                        true -> MyAccessibilityService.registerEvent(AdKillerService)
+                        false ->
+                            MyAccessibilityService.unregisterEvent(AdKillerService)
+                    }
+                },
+                NumberPickerItem(R.string.text_time_wait_ad, "界面等待广告出现最长时间，单位秒",
+                        keyId = R.string.key_ad_wait_secs, range = Pair(10, 100),
+                        defaultValue = { 17 }),
+                SwitchItem(R.string.text_show_toast_when_remove_ad, summary = getString(R.string.text_show_toast_when_remove_ad_summary)
+                        , keyId = R.string.key_show_toast_when_remove_ad, defaultValue = { true })
+        )
+        )
         )
     }
 

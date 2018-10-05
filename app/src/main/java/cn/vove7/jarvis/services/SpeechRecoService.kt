@@ -2,11 +2,14 @@ package cn.vove7.jarvis.services
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.pm.PackageManager
 import android.os.Handler
 import android.os.Message
+import android.support.v4.app.ActivityCompat
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.appbus.AppBus
 import cn.vove7.common.appbus.VoiceData
+import cn.vove7.executorengine.helper.AdvanContactHelper
 import cn.vove7.jarvis.speech.recognition.OfflineRecogParams
 import cn.vove7.jarvis.speech.recognition.listener.SpeechStatusListener
 import cn.vove7.jarvis.speech.recognition.model.IStatus
@@ -118,6 +121,11 @@ class SpeechRecoService(val event: SpeechEvent) {
     )
 
     internal fun startRecog() {
+        if (ActivityCompat.checkSelfPermission(AdvanContactHelper.context,
+                        android.Manifest.permission.RECORD_AUDIO)
+                != PackageManager.PERMISSION_GRANTED) {
+            return
+        }
         //震动 音效
         event.onStartRecog()
         sleep(100)

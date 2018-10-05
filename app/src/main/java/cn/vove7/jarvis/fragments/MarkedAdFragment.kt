@@ -2,24 +2,27 @@ package cn.vove7.jarvis.fragments
 
 import android.content.Intent
 import android.view.View
-import cn.vove7.common.accessibility.AccessibilityApi
+import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.datamanager.AppAdInfo
 import cn.vove7.common.datamanager.DAO
 import cn.vove7.common.datamanager.DaoHelper
+import cn.vove7.common.model.UserInfo
 import cn.vove7.common.netacc.ApiUrls
 import cn.vove7.common.netacc.model.BaseRequestModel
 import cn.vove7.common.netacc.model.ResponseMessage
-import cn.vove7.common.utils.NetHelper
 import cn.vove7.executorengine.bridges.SystemBridge
 import cn.vove7.executorengine.helper.AdvanAppHelper
+import cn.vove7.jarvis.R
 import cn.vove7.jarvis.activities.AppAdListActivity
 import cn.vove7.jarvis.adapters.SimpleListAdapter
 import cn.vove7.jarvis.adapters.ViewModel
 import cn.vove7.jarvis.fragments.base.OnSyncMarked
 import cn.vove7.jarvis.plugins.AdKillerService
 import cn.vove7.jarvis.utils.AppConfig
+import cn.vove7.jarvis.utils.NetHelper
 import cn.vove7.jarvis.view.dialog.AdEditorDialog
 import cn.vove7.vtp.log.Vog
+import cn.vove7.vtp.sharedpreference.SpHelper
 import com.google.gson.reflect.TypeToken
 import kotlin.concurrent.thread
 
@@ -80,6 +83,10 @@ class MarkedAdFragment : SimpleListFragment<String>(), OnSyncMarked {
      * @param types Array<String>
      */
     override fun onSync(types: Array<String>) {
+        if (!UserInfo.isLogin()) {
+            toast.blue().showShort("请登陆后操作")
+            return
+        }
         showProgressBar()
         val syncPkgs = AdvanAppHelper.getPkgList()
 
@@ -90,6 +97,7 @@ class MarkedAdFragment : SimpleListFragment<String>(), OnSyncMarked {
                     //
                     DaoHelper.updateAppAdInfo(bean.data ?: emptyList())
                     toast.showShort("同步完成")
+                    SpHelper(GlobalApp.APP).set(R.string.key_last_sync_marked_ad_date, System.currentTimeMillis())
                     AdKillerService.update()
                     refresh()
                 } else {

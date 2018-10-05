@@ -12,17 +12,14 @@ import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.model.UserInfo
 import cn.vove7.common.netacc.ApiUrls
 import cn.vove7.common.netacc.model.BaseRequestModel
-import cn.vove7.common.netacc.model.ResponseMessage
 import cn.vove7.common.netacc.tool.SecureHelper
-import cn.vove7.common.utils.NetHelper
+import cn.vove7.jarvis.utils.NetHelper
 import cn.vove7.common.utils.TextHelper
 import cn.vove7.common.view.toast.ColorfulToast
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.utils.AppConfig
-import cn.vove7.vtp.log.Vog
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.customview.customView
-import com.google.gson.reflect.TypeToken
 
 /**
  * # LoginDialog
@@ -36,10 +33,8 @@ class LoginDialog(val context: Context, initEmail: String? = null,
                   initPas: String? = null, val r: OnLoginSuccess) {
     val dialog: MaterialDialog = MaterialDialog(context).positiveButton(R.string.text_sign_up) {
         SignupDialog(context, r)
-        it.dismiss()
     }.neutralButton(R.string.text_retrieve_password) {
-        //todo
-        toast.showShort(R.string.text_coming_soon)
+        RetrievePasswordDialog(context)
     }
 
     private var userAccountView: TextInputLayout

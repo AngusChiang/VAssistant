@@ -35,7 +35,7 @@ class MarkedAppFragment : BaseMarkedFragment<MarkedData>() {
     override var markedType: String = MarkedData.MARKED_TYPE_APP
     override val keyHint: Int = R.string.text_show_name
     override val valueHint: Int = R.string.text_package_name
-
+    override val lastKeyId: Int = R.string.key_last_sync_marked_app_date
 
     override fun onSelect() {//app list
         DialogUtil.showSelApp(context!!) {

@@ -6,14 +6,16 @@ import android.view.View
 import android.widget.AdapterView
 import android.widget.Button
 import android.widget.Spinner
+import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.datamanager.DAO
 import cn.vove7.common.datamanager.DaoHelper
 import cn.vove7.common.datamanager.executor.entity.MarkedData
 import cn.vove7.common.datamanager.parse.DataFrom
+import cn.vove7.common.model.UserInfo
 import cn.vove7.common.netacc.ApiUrls
 import cn.vove7.common.netacc.model.BaseRequestModel
-import cn.vove7.common.utils.NetHelper
+import cn.vove7.jarvis.utils.NetHelper
 import cn.vove7.common.utils.TextHelper
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.adapters.SimpleListAdapter
@@ -22,6 +24,7 @@ import cn.vove7.jarvis.fragments.SimpleListFragment
 import cn.vove7.jarvis.utils.AppConfig
 import cn.vove7.jarvis.utils.DialogUtil
 import cn.vove7.vtp.log.Vog
+import cn.vove7.vtp.sharedpreference.SpHelper
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.customview.customView
 
@@ -79,6 +82,7 @@ abstract class BaseMarkedFragment<T> : SimpleListFragment<T>(), OnSyncMarked {
                                     reg, phone, DataFrom.FROM_USER)
                             DAO.daoSession.markedDataDao.insert(markedData)
                         }
+                        DAO.clear()
                         toast.green().showLong(R.string.text_complete)
                         refresh()
                         it.dismiss()
@@ -170,7 +174,7 @@ abstract class BaseMarkedFragment<T> : SimpleListFragment<T>(), OnSyncMarked {
             //dialog edit
             val data = item.extra as MarkedData
             MaterialDialog(context!!).show {
-                if (data.belongUser(true)) {
+                if (data.belongUser()) {
                     negativeButton(R.string.text_share) {
                         share(data)
                     }
@@ -235,6 +239,10 @@ abstract class BaseMarkedFragment<T> : SimpleListFragment<T>(), OnSyncMarked {
 
 
     override fun onSync(types: Array<String>) {
+        if(!UserInfo.isLogin()){
+            toast.blue().showShort("请登陆后操作")
+            return
+        }
         showProgressBar()
         val syncData = TextHelper.arr2String(types)
         val requestModel = BaseRequestModel(syncData)
@@ -244,6 +252,7 @@ abstract class BaseMarkedFragment<T> : SimpleListFragment<T>(), OnSyncMarked {
                 if (bean.isOk()) {
                     DaoHelper.updateMarkedData(types, bean.data ?: emptyList())
                     toast.showShort("同步完成")
+                    SpHelper(GlobalApp.APP).set(lastKeyId, System.currentTimeMillis())
 
                     refresh()
                 } else {
@@ -253,6 +262,7 @@ abstract class BaseMarkedFragment<T> : SimpleListFragment<T>(), OnSyncMarked {
             hideProgressBar()
         }
     }
+    abstract val lastKeyId:Int
 
 }
 

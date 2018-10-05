@@ -44,9 +44,8 @@ public class ActionNodeDao extends AbstractDao<ActionNode, Long> {
         public final static Property TagId = new Property(7, String.class, "tagId", false, "TAG_ID");
         public final static Property VersionCode = new Property(8, int.class, "versionCode", false, "VERSION_CODE");
         public final static Property PublishUserId = new Property(9, Long.class, "publishUserId", false, "PUBLISH_USER_ID");
-        public final static Property ParentTagId = new Property(10, String.class, "parentTagId", false, "PARENT_TAG_ID");
-        public final static Property Priority = new Property(11, int.class, "priority", false, "PRIORITY");
-        public final static Property From = new Property(12, String.class, "from", false, "FROM");
+        public final static Property Priority = new Property(10, int.class, "priority", false, "PRIORITY");
+        public final static Property From = new Property(11, String.class, "from", false, "FROM");
     }
 
     private DaoSession daoSession;
@@ -76,9 +75,8 @@ public class ActionNodeDao extends AbstractDao<ActionNode, Long> {
                 "\"TAG_ID\" TEXT," + // 7: tagId
                 "\"VERSION_CODE\" INTEGER NOT NULL ," + // 8: versionCode
                 "\"PUBLISH_USER_ID\" INTEGER," + // 9: publishUserId
-                "\"PARENT_TAG_ID\" TEXT," + // 10: parentTagId
-                "\"PRIORITY\" INTEGER NOT NULL ," + // 11: priority
-                "\"FROM\" TEXT);"); // 12: from
+                "\"PRIORITY\" INTEGER NOT NULL ," + // 10: priority
+                "\"FROM\" TEXT);"); // 11: from
     }
 
     /** Drops the underlying database table. */
@@ -132,16 +130,11 @@ public class ActionNodeDao extends AbstractDao<ActionNode, Long> {
         if (publishUserId != null) {
             stmt.bindLong(10, publishUserId);
         }
- 
-        String parentTagId = entity.getParentTagId();
-        if (parentTagId != null) {
-            stmt.bindString(11, parentTagId);
-        }
-        stmt.bindLong(12, entity.getPriority());
+        stmt.bindLong(11, entity.getPriority());
  
         String from = entity.getFrom();
         if (from != null) {
-            stmt.bindString(13, from);
+            stmt.bindString(12, from);
         }
     }
 
@@ -190,16 +183,11 @@ public class ActionNodeDao extends AbstractDao<ActionNode, Long> {
         if (publishUserId != null) {
             stmt.bindLong(10, publishUserId);
         }
- 
-        String parentTagId = entity.getParentTagId();
-        if (parentTagId != null) {
-            stmt.bindString(11, parentTagId);
-        }
-        stmt.bindLong(12, entity.getPriority());
+        stmt.bindLong(11, entity.getPriority());
  
         String from = entity.getFrom();
         if (from != null) {
-            stmt.bindString(13, from);
+            stmt.bindString(12, from);
         }
     }
 
@@ -227,9 +215,8 @@ public class ActionNodeDao extends AbstractDao<ActionNode, Long> {
             cursor.isNull(offset + 7) ? null : cursor.getString(offset + 7), // tagId
             cursor.getInt(offset + 8), // versionCode
             cursor.isNull(offset + 9) ? null : cursor.getLong(offset + 9), // publishUserId
-            cursor.isNull(offset + 10) ? null : cursor.getString(offset + 10), // parentTagId
-            cursor.getInt(offset + 11), // priority
-            cursor.isNull(offset + 12) ? null : cursor.getString(offset + 12) // from
+            cursor.getInt(offset + 10), // priority
+            cursor.isNull(offset + 11) ? null : cursor.getString(offset + 11) // from
         );
         return entity;
     }
@@ -246,9 +233,8 @@ public class ActionNodeDao extends AbstractDao<ActionNode, Long> {
         entity.setTagId(cursor.isNull(offset + 7) ? null : cursor.getString(offset + 7));
         entity.setVersionCode(cursor.getInt(offset + 8));
         entity.setPublishUserId(cursor.isNull(offset + 9) ? null : cursor.getLong(offset + 9));
-        entity.setParentTagId(cursor.isNull(offset + 10) ? null : cursor.getString(offset + 10));
-        entity.setPriority(cursor.getInt(offset + 11));
-        entity.setFrom(cursor.isNull(offset + 12) ? null : cursor.getString(offset + 12));
+        entity.setPriority(cursor.getInt(offset + 10));
+        entity.setFrom(cursor.isNull(offset + 11) ? null : cursor.getString(offset + 11));
      }
     
     @Override

@@ -78,7 +78,7 @@ object GlobalActionExecutor : GlobalActionExecutorI {
             performGlobalAction(AccessibilityService.GLOBAL_ACTION_TAKE_SCREENSHOT)
         } else {
             GlobalLog.err("截屏需要Android9.0+")
-            //todo 手动截屏
+            //todo 手动截屏 other fun
             false
         }
     }

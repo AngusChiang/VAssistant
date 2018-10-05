@@ -211,7 +211,8 @@ class SettingItemHelper(val context: Context) {
                         sp.set(item.keyId, ts)
                     item.summary = ts.toString()
                     setBasic(holder, item)
-                    //TODO callback
+                    // callback
+                    item.callback?.invoke(holder,ts)
                 }.show()
     }
 

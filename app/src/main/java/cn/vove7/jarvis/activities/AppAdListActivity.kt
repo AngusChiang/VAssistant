@@ -9,7 +9,7 @@ import cn.vove7.common.datamanager.greendao.AppAdInfoDao
 import cn.vove7.common.datamanager.parse.DataFrom
 import cn.vove7.common.netacc.ApiUrls
 import cn.vove7.common.netacc.model.BaseRequestModel
-import cn.vove7.common.utils.NetHelper
+import cn.vove7.jarvis.utils.NetHelper
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.activities.base.OneFragmentActivity
 import cn.vove7.jarvis.adapters.SimpleListAdapter
@@ -55,47 +55,48 @@ class AppAdListActivity : OneFragmentActivity() {
 
         override val itemClickListener: SimpleListAdapter.OnItemClickListener? =
             object : SimpleListAdapter.OnItemClickListener {
-            @SuppressLint("CheckResult")
-            override fun onClick(holder: SimpleListAdapter.VHolder?, pos: Int, item: ViewModel) {
+                @SuppressLint("CheckResult")
+                override fun onClick(holder: SimpleListAdapter.VHolder?, pos: Int, item: ViewModel) {
 
-                val data = item.extra as AppAdInfo
-                MaterialDialog(context!!).show {
-                    if (data.belongUser(true)) {
-                        neutralButton(R.string.text_edit) {
-                            editDialog.show(item.extra)
-                        }
-                        positiveButton(R.string.text_share) {
-                            if (!AppConfig.checkUser()) {
-                                return@positiveButton
+                    val data = item.extra as AppAdInfo
+                    MaterialDialog(context!!).show {
+                        if (data.belongUser(true)) {
+                            neutralButton(R.string.text_edit) {
+                                editDialog.show(item.extra)
                             }
-                            share(data)
-                        }
-                        negativeButton(R.string.text_delete) {
-                            val tag = data.tagId
-                            DialogUtil.dataDelAlert(context) {
-                                if (tag != null) {
-                                    delRemoteShare(tag)
+                            positiveButton(R.string.text_share) {
+                                if (!AppConfig.checkUser()) {
+                                    return@positiveButton
                                 }
-                                DAO.daoSession.appAdInfoDao.delete(data)
-                                toast.showShort(R.string.text_delete_complete)
-                                refresh()
+                                share(data)
+                            }
+                            negativeButton(R.string.text_delete) {
+                                val tag = data.tagId
+                                DialogUtil.dataDelAlert(context) {
+                                    if (tag != null) {
+                                        delRemoteShare(tag)
+                                    }
+                                    DAO.daoSession.appAdInfoDao.delete(data)
+                                    toast.showShort(R.string.text_delete_complete)
+                                    refresh()
+                                }
                             }
                         }
+                        title(text = item.title)
+                        message(text = data.toString())
                     }
-                    title(text = item.title)
-                    message(text = data.toString())
                 }
             }
-        }
         override var floatClickListener: View.OnClickListener? = View.OnClickListener {
             if (!AppConfig.checkUser()) {
                 return@OnClickListener
             }
-            editDialog.show()
+            editDialog.show(null, pkg)
         }
 
         companion object {
             fun newInstance(pkg: String): AppAdListFragment {
+                Vog.d(this, "newInstance ---> $pkg")
                 return AppAdListFragment().also {
                     it.pkg = pkg
                 }

@@ -67,7 +67,7 @@
 
 - 服务器数据不可修改
 
-- 备份 ：备份用户自己的 DataFrom.from_user
+- 备份 ：备份用户自己的 DataFrom.from_user || from_share&&pid=userid
 
 - 同步
   - Action同步
@@ -102,3 +102,5 @@ config = registerSettings("lua_sample", settings, 2)
 
 - 在`registerSettings`中创建与更新
 - 在指令详情页解析代码，解析出头部，包括`name,version,script`  script用于执行
+
+- 指令批量打包导出

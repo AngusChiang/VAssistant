@@ -3,6 +3,7 @@ package cn.vove7.parseengine
 import cn.vove7.common.datamanager.parse.model.Action
 import cn.vove7.common.datamanager.parse.statusmap.ActionNode
 import cn.vove7.common.datamanager.parse.statusmap.Reg
+import cn.vove7.common.utils.TextHelper
 import cn.vove7.parseengine.engine.ParseEngine
 import cn.vove7.parseengine.model.ParseResult
 import org.junit.Assert.assertEquals
@@ -39,10 +40,11 @@ class ExampleUnitTest {
         arrayOf(//测试数据
 //                "播放许嵩的歌",
 //                "播放断桥残雪",
-                "播放许嵩的断桥残雪" //  two ways : 1.两步解析 "播放%" -> "的%"  ; 2.脚本内解析
+                "播放"
+//                "播放许嵩的断桥残雪" //  two ways : 1.两步解析 "播放%" -> "的%"  ; 2.脚本内解析
         ).forEach { STR ->
-            arrayOf(playNode,
-                    playSingerNode, playSingerSongNode).forEach {
+            arrayOf(playNode//,
+                    /*playSingerNode, playSingerSongNode*/).forEach {
                 println("匹配: $it")
                 outputParseResult(ParseEngine.testParse(STR, it))
 
@@ -70,4 +72,5 @@ class ExampleUnitTest {
         println()
         println()
     }
+
 }

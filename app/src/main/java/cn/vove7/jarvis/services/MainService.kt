@@ -13,6 +13,8 @@ import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.appbus.AppBus
 import cn.vove7.common.appbus.AppBus.EVENT_FORCE_OFFLINE
+import cn.vove7.common.appbus.AppBus.EVENT_START_DEBUG_SERVER
+import cn.vove7.common.appbus.AppBus.EVENT_STOP_DEBUG_SERVER
 import cn.vove7.common.appbus.AppBus.ORDER_CANCEL_RECO
 import cn.vove7.common.appbus.AppBus.ORDER_START_RECO
 import cn.vove7.common.appbus.AppBus.ORDER_STOP_EXEC
@@ -28,14 +30,16 @@ import cn.vove7.common.datamanager.parse.model.Action
 import cn.vove7.common.executor.CExecutorI
 import cn.vove7.common.model.RequestPermission
 import cn.vove7.common.model.UserInfo
-import cn.vove7.common.utils.NetHelper
 import cn.vove7.common.utils.RegUtils.checkCancel
 import cn.vove7.common.utils.RegUtils.checkConfirm
+import cn.vove7.executorengine.ExecutorImpl
 import cn.vove7.executorengine.bridges.SystemBridge
 import cn.vove7.executorengine.exector.MultiExecutorEngine
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.activities.PermissionManagerActivity
 import cn.vove7.jarvis.utils.AppConfig
+import cn.vove7.jarvis.utils.NetHelper
+import cn.vove7.jarvis.utils.debugserver.RemoteDebugServer
 import cn.vove7.jarvis.view.dialog.MultiChoiceDialog
 import cn.vove7.jarvis.view.dialog.OnMultiSelectListener
 import cn.vove7.jarvis.view.dialog.OnSelectListener
@@ -61,7 +65,7 @@ class MainService : BusService(),
 
     lateinit var listeningToast: ListeningToast
     override val serviceId: Int
-        get() = 127
+        get() = 126
     /**
      * 悬浮窗
      */
@@ -272,7 +276,7 @@ class MainService : BusService(),
     override fun onExecuteInterrupt(errMsg: String) {
         Vog.e(this, "onExecuteInterrupt: $errMsg")
         executeAnimation.failed()
-        GlobalApp.toastShort("执行出错")
+        GlobalApp.toastShort("☹")
         executeAnimation.failed
     }
 
@@ -303,7 +307,7 @@ class MainService : BusService(),
      */
     @Subscribe(threadMode = ThreadMode.POSTING)
     fun runAction(que: PriorityQueue<Action>) {
-        cExecutor.execQueue("测试runAction", que)
+        cExecutor.execQueue(ExecutorImpl.DEBUG_SCRIPT, que)
     }
 
     /**
@@ -313,7 +317,7 @@ class MainService : BusService(),
     fun runScript(ac: Action) {
         val q = PriorityQueue<Action>()
         q.add(ac)
-        cExecutor.execQueue("测试runScript", q)
+        cExecutor.execQueue(ExecutorImpl.DEBUG_SCRIPT, q)
     }
 
     @Subscribe(threadMode = ThreadMode.BACKGROUND)
@@ -337,6 +341,12 @@ class MainService : BusService(),
                 }
                 EVENT_FORCE_OFFLINE -> {
                     AppConfig.logout()
+                }
+                EVENT_START_DEBUG_SERVER -> {
+                    RemoteDebugServer.start()
+                }
+                EVENT_STOP_DEBUG_SERVER -> {
+                    RemoteDebugServer.stop()
                 }
                 else -> {
                 }
@@ -509,6 +519,11 @@ class MainService : BusService(),
             }
         }
 
+        @Subscribe(threadMode = ThreadMode.POSTING)
+        fun upHis(his: CommandHistory) {
+            NetHelper.uploadUserCommandHistory(his)
+        }
+
         override fun onTempResult(temp: String) {
             listeningToast.show(temp)
         }
@@ -560,15 +575,14 @@ class MainService : BusService(),
 //                    toast.showShort("开始解析")
         parseAnimation.begin()
         val parseResult = ParseEngine
-                .parseAction(result, AccessibilityApi.accessibilityService?.currentScope?.packageName
-                    ?: "")
+                .parseAction(result, AccessibilityApi.accessibilityService?.currentScope)
         resumeMusicIf()
         if (parseResult.isSuccess) {
             val his = CommandHistory(UserInfo.getUserId(), result,
                     parseResult.msg)
             NetHelper.uploadUserCommandHistory(his)
             cExecutor.execQueue(result, parseResult.actionQueue)
-        } else {//todo statistics
+        } else {// statistics
             NetHelper.uploadUserCommandHistory(CommandHistory(UserInfo.getUserId(), result, null))
             listeningToast.showAndHideDelay("解析失败")
 //                        effectHandler.sendEmptyMessage(PARSE_FAILED)

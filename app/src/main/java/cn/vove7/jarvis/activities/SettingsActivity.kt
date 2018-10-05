@@ -37,24 +37,22 @@ class SettingsActivity : ReturnableActivity() {
 
     private fun initData(): List<SettingGroupItem> = listOf(
             SettingGroupItem(R.color.google_blue, "😄", childItems = listOf(
-                    IntentItem(R.string.text_set_as_default_voice_assist,
+                    IntentItem(R.string.text_set_as_default_voice_assist, summary = "以快速唤醒",
                             onClick = { _, _ ->
                                 try {
                                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                                         startActivity(Intent(Settings.ACTION_MANAGE_DEFAULT_APPS_SETTINGS))
-                                    }else{
+                                    } else {
                                         startActivity(Intent("android.settings.MANAGE_DEFAULT_APPS_SETTINGS"))
                                     }
                                 } catch (e: Exception) {
                                     GlobalLog.err(e)
-                                    Toast.makeText(this@SettingsActivity, "跳转失败", Toast.LENGTH_SHORT)
-                                            .show()
+                                    Toast.makeText(this@SettingsActivity,
+                                            "跳转失败", Toast.LENGTH_SHORT).show()
                                 }
                             })
 
             )), SettingGroupItem(R.color.google_green, "通知", childItems = listOf(
-            SwitchItem(R.string.text_show_toast_when_remove_ad,summary = getString(R.string.text_show_toast_when_remove_ad_summary)
-                    , keyId = R.string.key_show_toast_when_remove_ad, defaultValue = { true }),
             SwitchItem(R.string.text_vibrate_reco_begin,
                     keyId = R.string.key_vibrate_reco_begin, defaultValue = { true })
     )),
@@ -86,12 +84,17 @@ class SettingsActivity : ReturnableActivity() {
                         }
                     }, defaultValue = { false }),
                     SwitchItem(R.string.text_long_press_volume_up, null,
-                            keyId = R.string.key_long_press_volume_up_wake_up, defaultValue = { true })
+                            keyId = R.string.key_long_press_volume_up_wake_up, summary = "需要无障碍模式开启", defaultValue = { true })
             ))
 //           ,SettingGroupItem(R.color.lime_600, titleId = R.string.text_animation, childItems = listOf(
 //                    CheckBoxItem(, "应用内动画",
 //                            R.string.key_voice_control_dialog, defaultValue = { true })
 //            )
+            ,
+            SettingGroupItem(R.color.lime_600, titleId = R.string.text_other, childItems = listOf(
+                    CheckBoxItem(title = "用户体验计划", summary = "改善体验与完善功能",
+                            keyId = R.string.key_user_exp_plan, defaultValue = { true })
+            ))
     )
 
 }

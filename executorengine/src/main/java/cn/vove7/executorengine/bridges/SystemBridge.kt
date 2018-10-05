@@ -2,6 +2,7 @@ package cn.vove7.executorengine.bridges
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.annotation.TargetApi
 import android.bluetooth.BluetoothAdapter
 import android.content.*
 import android.content.Context.WIFI_SERVICE
@@ -71,7 +72,7 @@ object SystemBridge : SystemOperation {
 //                ExResult("未找到此App: $pkg")
                 false
             } else {
-                launchIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP) //清空activity栈
+                launchIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                 if (resetTask)
                     launchIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK)
                 context.startActivity(launchIntent)
@@ -133,11 +134,11 @@ object SystemBridge : SystemOperation {
         return try {
             val launchIntent = Intent()
             launchIntent.setClassName(pkg, fullActivityName)
-            launchIntent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP //清空activity栈
+            launchIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             context.startActivity(launchIntent)
             true
         } catch (e: Exception) {
-            Vog.wtf(this, "${e.message}")
+            GlobalLog.err(e.message)
             false
         }
     }
@@ -388,11 +389,11 @@ object SystemBridge : SystemOperation {
         return switchWifi(false)
     }
 
+    //fixme
     override fun closeWifiAp(): Boolean {
         return setWifiApEnabled(false)
     }
 
-    //fixme
     override fun openWifiAp(): Boolean {
         return setWifiApEnabled(true)
     }
@@ -445,7 +446,15 @@ object SystemBridge : SystemOperation {
         val manager = context.applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
         //cancelLocalOnlyHotspotRequest 是关闭热点
         //打开热
-        manager.startLocalOnlyHotspot(object : WifiManager.LocalOnlyHotspotCallback() {
+        if (isEnable)
+            manager.startLocalOnlyHotspot(getWifiApLis(), Handler())
+        else {
+            GlobalApp.toastShort("不支持关闭热点")
+        }
+    }
+    @TargetApi(Build.VERSION_CODES.O)
+    fun getWifiApLis():WifiManager.LocalOnlyHotspotCallback {
+        return object : WifiManager.LocalOnlyHotspotCallback() {
             override fun onStarted(reservation: WifiManager.LocalOnlyHotspotReservation) {
                 super.onStarted(reservation)
                 Vog.d(this, "onStarted ---> ")
@@ -458,13 +467,15 @@ object SystemBridge : SystemOperation {
 
             override fun onFailed(reason: Int) {
                 super.onFailed(reason)
+                GlobalLog.err("失败：" + arrayOf(
+                        0, ERROR_NO_CHANNEL
+                        , ERROR_GENERIC
+                        , ERROR_INCOMPATIBLE_MODE
+                        , ERROR_TETHERING_DISALLOWED)[reason])
                 Vog.d(this, "onFailed ---> ")
             }
-
-        }, Handler())
-
+        }
     }
-
 
     override fun isScreenOn(): Boolean {
         return SystemHelper.isScreenOn(context)
@@ -578,13 +589,13 @@ object SystemBridge : SystemOperation {
     }
 
     override fun getIpAddress(): String? {
-        try {
+        return try {
             val wifiService = context.getSystemService(WIFI_SERVICE) as WifiManager
             val wifiInfo = wifiService.connectionInfo
-            return intToIp(wifiInfo.ipAddress)
+            intToIp(wifiInfo.ipAddress)
         } catch (e: Exception) {
             GlobalLog.err(e)
-            return null
+            null
         }
     }
 

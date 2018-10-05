@@ -133,12 +133,12 @@ object DaoHelper {
                 .where(ActionNodeDao.Properties.From.notEq(DataFrom.FROM_USER),
                         ActionNodeDao.Properties.ActionScopeType.eq(type),
                         actionNodeDao.queryBuilder().or(ActionNodeDao.Properties.PublishUserId.isNull,
-                                ActionNodeDao.Properties.PublishUserId.notEq(UserInfo.getUserId())
+                                ActionNodeDao.Properties.PublishUserId.notEq(UserInfo.getUserId()?:-1L)
                         )
                 ).list()
         val userList = if (UserInfo.isLogin()) {
             actionNodeDao.queryBuilder().whereOr(ActionNodeDao.Properties.From.notEq(DataFrom.FROM_USER),
-                    ActionNodeDao.Properties.PublishUserId.eq(UserInfo.getUserId()))
+                    ActionNodeDao.Properties.PublishUserId.eq(UserInfo.getUserId()?: -1L))
                     .list().toHashSet()
         } else emptySet<ActionNode>()
         return try {
@@ -150,13 +150,10 @@ object DaoHelper {
                 }
                 nodes.forEach {
                     if (!userList.contains(it)) {
+                        Vog.d(this, "updateGlobalInst 添加---> ${it.actionTitle}")
                         insertNewActionNode(it)
                     } else {//存在
-                        val oldNode = getActionNodeByTag(it.tagId)
-                        if (oldNode == null || it.versionCode > oldNode.versionCode) {//更新
-                            oldNode?.delete()
-                            insertNewActionNode(it)
-                        } else Vog.d(this, "updateGlobalInst ---> ${it.actionTitle} 存在")
+                        checkNode(it)
                     }
                 }
             }
@@ -164,6 +161,23 @@ object DaoHelper {
         } catch (e: Exception) {
             e.printStackTrace()
             false
+        }
+    }
+
+    //检查升级 ，follows
+    private fun checkNode(it: ActionNode) {
+        val oldNode = getActionNodeByTag(it.tagId)
+        if (oldNode == null || it.versionCode > oldNode.versionCode) {//更新
+            oldNode?.delete()
+            Vog.d(this, "updateGlobalInst 更新---> ${it.actionTitle}")
+            insertNewActionNode(it)
+        } else {//检查follows
+            Vog.d(this, "updateGlobalInst 存在---> ${it.actionTitle}")
+            if (it.follows?.isNotEmpty() == true)
+                for (ci in it.follows) {//递归 深度
+                    ci.parentId = it.id
+                    checkNode(ci)
+                }
         }
 
     }
@@ -173,7 +187,6 @@ object DaoHelper {
                 .where(ActionNodeDao.Properties.TagId.eq(tagId))
                 .unique()
     }
-
 
     /**
      *
@@ -185,6 +198,7 @@ object DaoHelper {
         var newScopeId: Long = -1
         if (newNode.actionScope != null) {
             val scope = newNode.actionScope
+            Vog.d(this, "save sid: $newScopeId")
             newScopeId = getActionScopeId(scope)
         }
 
@@ -200,10 +214,10 @@ object DaoHelper {
         val action = newNode.action
         if (action != null) {
             DAO.daoSession.actionDao.insert(action)
-            Vog.d(this, "save sid: $newScopeId")
+            Vog.d(this, "save sid: ${action.id}")
             newNode.setActionId(action.id)
         }
-
+        Vog.d(this, "insertNewActionNode ---> 插入 ${newNode.actionTitle}")
 
         DAO.daoSession.actionNodeDao.insert(newNode)
         Vog.d(this, "save nodeId: ${newNode.id}")
@@ -215,8 +229,9 @@ object DaoHelper {
         }
 
         //childs
-        if (newNode.follows != null)
+        if (newNode.follows?.isNotEmpty() == true)
             for (ci in newNode.follows) {//递归 深度
+                Vog.d(this, "insertNewActionNode ---> 检查 child ${ci.actionTitle}")
                 ci.parentId = newNode.id
                 insertNewActionNode(ci)
             }
@@ -240,14 +255,14 @@ object DaoHelper {
 //                )
                 ,
                 markedDao.queryBuilder().or(MarkedDataDao.Properties.PublishUserId.isNull,
-                        MarkedDataDao.Properties.PublishUserId.notEq(UserInfo.getUserId())
+                        MarkedDataDao.Properties.PublishUserId.notEq(UserInfo.getUserId()?:-1L)
                 )
         ).list()
         val userList = markedDao.queryBuilder().where(
                 MarkedDataDao.Properties.Type.`in`(*types),
                 markedDao.queryBuilder().or(
                         MarkedDataDao.Properties.From.eq(DataFrom.FROM_USER),
-                        MarkedDataDao.Properties.PublishUserId.eq(UserInfo.getUserId())
+                        MarkedDataDao.Properties.PublishUserId.eq(UserInfo.getUserId()?: -1L)
                 )
         ).list().toHashSet()
         return try {
@@ -287,13 +302,14 @@ object DaoHelper {
             val delList = appAdInfoDao.queryBuilder().where(
                     AppAdInfoDao.Properties.From.notEq(DataFrom.FROM_USER),
                     appAdInfoDao.queryBuilder().or(AppAdInfoDao.Properties.PublishUserId.isNull,
-                            AppAdInfoDao.Properties.PublishUserId.notEq(UserInfo.getUserId()))
+                            AppAdInfoDao.Properties.PublishUserId.notEq(UserInfo.getUserId()
+                                ?: -1L))
             ).list()
             appAdInfoDao.deleteInTx(delList)
 
             val userList = appAdInfoDao.queryBuilder().whereOr(
                     AppAdInfoDao.Properties.From.eq(DataFrom.FROM_USER),
-                    AppAdInfoDao.Properties.PublishUserId.eq(UserInfo.getUserId())
+                    AppAdInfoDao.Properties.PublishUserId.eq(UserInfo.getUserId()?:-1L)
             ).list().toHashSet()
 
             datas.forEach {

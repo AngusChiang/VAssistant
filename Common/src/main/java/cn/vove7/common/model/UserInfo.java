@@ -69,7 +69,7 @@ public class UserInfo implements Serializable {
     }
 
     public static Long getUserId() {
-        return INSTANCE == null ? null : INSTANCE.userId;
+        return INSTANCE == null ? -1L : INSTANCE.userId;
     }
 
 

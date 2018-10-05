@@ -25,6 +25,7 @@ class MarkedOpenFragment : BaseMarkedFragment<MarkedData>() {
     override var markedType: String = MarkedData.MARKED_TYPE_SCRIPT_LUA
     override val keyHint: Int = R.string.text_func_name
     override val valueHint: Int = R.string.text_script
+    override val lastKeyId: Int=R.string.key_last_sync_marked_open_date
 
     override val showSel: Boolean = false
 

@@ -1,4 +1,4 @@
-package cn.vove7.common.utils
+package cn.vove7.jarvis.utils
 
 import android.os.Handler
 import android.os.Looper
@@ -12,7 +12,9 @@ import cn.vove7.common.model.UserInfo
 import cn.vove7.common.model.VipPrice
 import cn.vove7.common.netacc.ApiUrls
 import cn.vove7.common.netacc.model.BaseRequestModel
+import cn.vove7.common.netacc.model.LastDateInfo
 import cn.vove7.common.netacc.model.ResponseMessage
+import cn.vove7.common.utils.GsonHelper
 import cn.vove7.vtp.log.Vog
 import com.google.gson.reflect.TypeToken
 import okhttp3.*
@@ -33,37 +35,8 @@ typealias OnResponse<T> = (Int, ResponseMessage<T>?) -> Unit
 object NetHelper {
 
     var timeout = 15L
-//    fun <T> get(url: String, params: Map<String, String>? = null,
-//                type: Type, requestCode: Int = 0, callback: OnResponse<T>) {
-//        val client = OkHttpClient.Builder()
-//                .readTimeout(timeout, TimeUnit.SECONDS).build()
-//        SecureHelper.signParam(params)
-//
-//        val requestBuilder = Request.Builder().url(url).get()
-//        params?.forEach { it ->
-//            requestBuilder.addHeader(it.key, it.value)
-//        }
-//        val req = requestBuilder.build()
-//        val call = client.newCall(req)
-//        call(call, type, requestCode, callback)
-//    }
 
-//    fun <T> post(url: String, params: Map<String, String>? = null,
-//                 type: Type, requestCode: Int = 0, callback: OnResponse<T>) {
-//        val client = OkHttpClient.Builder()
-//                .readTimeout(timeout, TimeUnit.SECONDS).build()
-//        SecureHelper.signParam(params)
-//        val bodyBuilder = FormBody.Builder()
-//        params?.forEach { it ->
-//            bodyBuilder.add(it.key, it.value)
-//        }
-//        val request = Request.Builder().url(url)
-//                .post(bodyBuilder.build()).build()
-//        val call = client.newCall(request)
-//        call(call, type, requestCode, callback)
-//    }
-
-    fun <T> postJson(url: String, model: BaseRequestModel<*>,
+    fun <T> postJson(url: String, model: BaseRequestModel<*>? = BaseRequestModel<Any>(),
                      type: Type = StringType, requestCode: Int = 0, callback: OnResponse<T>? = null) {
         val client = OkHttpClient.Builder()
                 .readTimeout(timeout, TimeUnit.SECONDS).build()
@@ -99,7 +72,7 @@ object NetHelper {
                     try {
                         Vog.d(this, "onResponse --->\n$s")
                         val bean = GsonHelper.fromJsonObj<T>(s, type)
-                        if (bean?.isInvalid() == true) {//无效下线
+                        if (bean?.isInvalid() == true || bean?.tokenIsOutdate() == true) {//无效下线
                             if (UserInfo.isLogin()) {
                                 GlobalApp.toastShort("用户身份过期请重新登陆")
                             }
@@ -136,6 +109,9 @@ object NetHelper {
     val IntType: Type by lazy {
         object : TypeToken<ResponseMessage<Int>>() {}.type
     }
+    val LastDateInfoType: Type by lazy {
+        object : TypeToken<ResponseMessage<LastDateInfo>>() {}.type
+    }
     val UserInfoType: Type by lazy {
         object : TypeToken<ResponseMessage<UserInfo>>() {}.type
     }
@@ -161,6 +137,7 @@ object NetHelper {
      */
     fun uploadUserCommandHistory(his: CommandHistory) {
         thread {
+            if (!AppConfig.userExpPlan) return@thread
             Looper.prepare()
             postJson<Any>(ApiUrls.UPLOAD_CMD_HIS, BaseRequestModel(his)) { _, b ->
                 if (b?.isOk() == true) {

@@ -5,6 +5,8 @@
     <color name="google_red">#fd3322</color>
     <color name="google_yellow">#fdb701</color>
     <color name="google_green">#00a95a</color>
+    <color name="p_green">#109D5A</color>
+    <color name="p_green_dark">#087D42</color>
 
     <color name="fff">#fff</color>
 </resources>

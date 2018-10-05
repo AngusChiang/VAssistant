@@ -34,8 +34,8 @@ class App : LuaApp() {
         services = arrayOf(mainService)
         CrashHandler.init()
 
-        if (BuildConfig.DEBUG)
-            RemoteDebugServer.start()
+//        if (BuildConfig.DEBUG)
+//            RemoteDebugServer.start()
         startServices()
         if (!BuildConfig.DEBUG)
             Vog.init(this, Log.ERROR)

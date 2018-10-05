@@ -75,8 +75,12 @@ public class Reg implements Serializable {
     @Keep
     public Regex getFollowRegex() {
         //头部加上% ， 防止有前参数匹配失败
-        String s = (!regStr.startsWith("%") ? "%" + regStr : regStr)
+        String s = (!regStr.startsWith("%") ? "[\\S\\s]*?" + regStr : regStr);
+
+        //尾部
+        s = (!s.endsWith("%") ? s + "%" : s)
                 .replace("%", RegUtils.INSTANCE.getREG_ALL_CHAR());
+
         regex = new Regex(s);
         return regex;
     }

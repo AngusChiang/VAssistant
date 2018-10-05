@@ -24,9 +24,10 @@ import kotlin.concurrent.thread
  */
 class MarkedContractFragment : BaseMarkedFragment<MarkedData>() {
 
-    var onlySelf = true
+    private var onlySelf = false
     override val keyHint: Int = R.string.text_show_name
     override val valueHint: Int = R.string.text_phone
+    override val lastKeyId: Int=R.string.key_last_sync_marked_contact_date
 
     override fun onSelect() {
         //选择联系人

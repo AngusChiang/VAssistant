@@ -84,7 +84,7 @@ object AdKillerService : AccPluginsService() {
                     Vog.d(this, "onUiUpdate ---> 发现广告，清除成功")
                     if (AppConfig.isToastWhenRemoveAd){
                         removeAdAnimation.begin()
-                        removeAdAnimation.hideDelay(5000)
+                        removeAdAnimation.hideDelay(3500)
                     }
 //                        toast.showShortDelay("已为你关闭广告", 500L)
                     finders = null

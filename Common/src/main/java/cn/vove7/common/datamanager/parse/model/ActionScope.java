@@ -51,6 +51,7 @@ public class ActionScope {
         this.packageName = packageName;
         this.activity = activity;
     }
+
     @Keep
     public ActionScope(String packageName) {
         this.packageName = packageName;
@@ -126,6 +127,11 @@ public class ActionScope {
                         activity.endsWith("." + that.activity) ||
                                 activity.endsWith("$" + that.activity)
                 ));
+    }
+
+    public boolean eqPkg(ActionScope o) {
+        return o.packageName.startsWith(this.packageName) ||
+                packageName.startsWith(o.packageName);
     }
 
     @Override

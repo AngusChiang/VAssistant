@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="text_permission_manager">权限管理</string>
-    <string name="app_name">Jarvis</string>
+    <string name="app_name">V Assist</string>
     <string name="simple_test_script">简单顺序脚本测试</string>
     <string name="text_androlua_test">AndroLua 测试</string>
     <string name="no_net_refresh">没有网络，下拉刷新试试</string>
@@ -124,7 +124,7 @@
     <string name="text_failed_to_get_user_info">获取其个人信息失败</string>
     <string name="text_purchase_recharge_code">购买充值码</string>
     <string name="text_purchase_recharge_code_msg">1.联系qq获取（推荐）\n2.通过支付宝转账下方指定金额，在备注填写你的邮箱，不久你会收到含有充值码的邮件\n点击下方[使用充值码]继续操作即可。</string>
-    <string name="text_advan_include_func">1.新建脚本指令\n2.远程调试脚本\n3.广告跳过无限制\n4.本地代码测试\n5.无限制标记管理\n6.操作、标记分享，且可同步</string>
+    <string name="text_advan_include_func">1.新建脚本指令\n2.远程调试脚本\n3.广告跳过无限制\n4.本地代码测试\n5.无限制标记管理\n6.操作、标记分享，且可同步恢复</string>
     <string name="text_recharege_pre_read">在支付前，请先阅读高级教程，确保它对你有用。</string> <string name="text_email_copy_to_clip">你的邮箱已复制到剪切板</string>
     <string name="text_understand">知道了</string>
     <string name="text_continue">继续</string>
@@ -165,13 +165,13 @@
     <string name="text_inst_name">指令名称</string>
     <string name="text_version">版本</string>
     <string name="text_favor_it">给个好评</string>
-    <string name="text_open_source_libraries">开放源代码许可</string>
+    <string name="text_open_source_libraries">开源许可</string>
     <string name="text_check_for_updates">检查更新</string>
     <string name="text_contact_me">联系我</string>
     <string name="text_advanced_user_guide">高级使用手册</string>
     <string name="text_service_manual">使用手册</string>
     <string name="text_laboratory">实验室</string>
-    <string name="text_feedback">反馈</string>
+    <string name="text_feedback">反馈与建议</string>
     <string name="text_wakeup_way">唤醒方式</string>
     <string name="text_long_press_volume_up">长按音量上键</string>
     <string name="text_as_global_inst">设为全局指令</string>
@@ -188,5 +188,8 @@
     <string name="text_modify_succ">修改成功</string>
     <string name="text_add_qq_group">加入讨论群</string>
     <string name="text_purchase_ways">购买方式</string>
+    <string name="text_other">其他</string>
+    <string name="text_faq">常见问题</string>
+    <string name="text_check_last_data">检查最新数据</string>
 
 </resources>

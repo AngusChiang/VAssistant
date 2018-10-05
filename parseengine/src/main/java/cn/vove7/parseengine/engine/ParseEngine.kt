@@ -1,6 +1,5 @@
 package cn.vove7.parseengine.engine
 
-import android.util.Log
 import cn.vove7.common.datamanager.DAO
 import cn.vove7.common.datamanager.greendao.ActionNodeDao
 import cn.vove7.common.datamanager.parse.model.Action
@@ -25,6 +24,8 @@ object ParseEngine {
     var GlobalActionNodes: List<ActionNode>? = null
     var AppActionNodes: List<ActionNode>? = null
 
+    //重置App
+    val PRE_OPEN = "openAppByPkg('%s',true)\n"
     var i = 0
 
     /**
@@ -64,7 +65,7 @@ object ParseEngine {
      * App内   ↓ 二级命令
      *
      */
-    fun parseAction(cmdWord: String, pkg: String): ParseResult {
+    fun parseAction(cmdWord: String, scope: ActionScope?): ParseResult {
         i = 0
         val actionQueue = PriorityQueue<Action>()
         val gaq = globalActionMatch(cmdWord)
@@ -73,12 +74,21 @@ object ParseEngine {
             ParseResult(true, actionQueue, gaq.first)
         } else {
             Vog.d(this, "globalAction--无匹配")
-            if (pkg == "") {
-                ParseResult(false, "pkg null")
+            if (scope == null) {
+                return ParseResult(false, "无匹配")
             }
-            val inAppQue=matchAppAction(cmdWord, pkg)
-            actionQueue.addAll(inAppQue.second)
-            ParseResult(actionQueue.isNotEmpty(), actionQueue,inAppQue.first)
+            val inAppQue = matchAppAction(cmdWord, scope)
+            actionQueue.addAll(inAppQue.second) //匹配应用内时
+            //todo 根据第一个action.scope 决定是否进入首页
+            if (actionQueue.isNotEmpty()) {
+                if (actionQueue.peek().scope != scope) {//不同页面
+                    Vog.d(this, "parseAction ---> 应用内不同页")
+                    actionQueue.add(Action(-999,
+                            String.format(PRE_OPEN, scope.packageName)
+                            , Action.SCRIPT_TYPE_LUA))
+                }
+            }
+            ParseResult(actionQueue.isNotEmpty(), actionQueue, inAppQue.first)
         }
     }
 
@@ -106,17 +116,18 @@ object ParseEngine {
      * QQ扫一扫
      * App内指令
      * 深度搜索
+     * @return  Pair<String?, PriorityQueue<Action> 匹配的标题
      */
-    fun matchAppAction(cmd: String, currentAppPkg: String):  Pair<String?,PriorityQueue<Action>> {
-        val matchScope = ActionScope(currentAppPkg, null)
-        Log.d("Debug :", "matchAppAction  ----> $currentAppPkg")
+    fun matchAppAction(cmd: String, matchScope: ActionScope): Pair<String?, PriorityQueue<Action>> {
+
+//        Log.d("Debug :", "matchAppAction  ----> $currentAppPkg")
         if (AppActionNodes == null) {
             updateInApp()
         }
         val actionQueue = PriorityQueue<Action>()
         AppActionNodes?.filter {
-            //筛选当前App
-            it.actionScope != null && it.actionScope == matchScope
+            //筛选当前App  根据pkg
+            it.actionScope != null && matchScope.eqPkg(it.actionScope)
         }?.forEach {
             val r = regSearch(cmd, it, actionQueue)
             if (r) return Pair(it.actionTitle, actionQueue)
@@ -134,7 +145,7 @@ object ParseEngine {
      */
     private fun regSearch(cmd: String, it: ActionNode, actionQueue: PriorityQueue<Action>): Boolean {
         it.regs.forEach { reg ->
-            val result = reg.regex.matchEntire(cmd)
+            val result = reg.followRegex.matchEntire(cmd)
             if (result != null) {
                 val ac = it.action
                 ac.scope = it.actionScope
@@ -203,13 +214,14 @@ object ParseEngine {
                     param.value = result.groups[reg.paramPos]?.value
             }
             it.param = param
-            Vog.d(this, "extractParam $param")
+//            Vog.d(this, "extractParam $param")
         }
     }
 
     fun getLastParam(colls: MatchGroupCollection): String? {
-        colls.reversed().forEach {
-            if (it != null && it.value != "") {
+        colls.reversed().withIndex().forEach { iv ->
+            val it = iv.value
+            if (it != null && it.value != "" && iv.index != colls.size - 1) {//不是第一个
                 return it.value
             }
         }

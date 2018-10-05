@@ -11,12 +11,13 @@ import android.view.LayoutInflater
 import android.view.View
 import android.widget.Button
 import android.widget.TextView
+import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.model.UserInfo
 import cn.vove7.common.model.VipPrice
 import cn.vove7.common.netacc.ApiUrls
 import cn.vove7.common.netacc.model.BaseRequestModel
-import cn.vove7.common.utils.NetHelper
+import cn.vove7.jarvis.utils.NetHelper
 import cn.vove7.common.view.toast.ColorfulToast
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.utils.AppConfig
@@ -78,8 +79,8 @@ class UserInfoDialog(val context: Activity, val onUpdate: () -> Unit) {
                                 }, 1000)
                                 materialDialog.dismiss()
                             } else {
-                                GlobalLog.err(b?.message)
-                                toast.showShort(R.string.text_modify_failed)
+                                toast.showShort(b?.message
+                                    ?: GlobalApp.getString(R.string.text_modify_failed))
                             }
                         }
                     }.show()
@@ -91,7 +92,7 @@ class UserInfoDialog(val context: Activity, val onUpdate: () -> Unit) {
     private fun recharge() {
         val pd = ProgressDialog(context)
         Handler().postDelayed({
-            NetHelper.postJson<List<VipPrice>>(ApiUrls.GET_PRICES,BaseRequestModel(null),
+            NetHelper.postJson<List<VipPrice>>(ApiUrls.GET_PRICES, BaseRequestModel(null),
                     type = NetHelper.VipPriceListType) { _, bean ->
                 pd.dismiss()
                 if (bean != null) {
@@ -200,7 +201,7 @@ class UserInfoDialog(val context: Activity, val onUpdate: () -> Unit) {
 //                        toast.showShort(result)
 //                    }
 //                }.negativeButton(R.string.text_wechat_pay) {
-//                    //todo
+//                    //
 //                }.neutralButton(R.string.text_recharge_code) {
 //                    showActCodeDialog()
 //                }

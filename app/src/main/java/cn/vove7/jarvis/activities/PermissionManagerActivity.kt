@@ -1,15 +1,18 @@
 package cn.vove7.jarvis.activities
 
-import android.Manifest
+import android.annotation.SuppressLint
+import android.app.Activity
 import android.os.Build
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Switch
 import android.widget.TextView
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.jarvis.R
-import cn.vove7.jarvis.activities.PermissionManagerActivity.ManageFragment.PermissionStatus.Companion.permissions
+import cn.vove7.jarvis.activities.PermissionManagerActivity.PermissionStatus.Companion.allPerStr
+import cn.vove7.jarvis.activities.PermissionManagerActivity.PermissionStatus.Companion.permissions
 import cn.vove7.jarvis.activities.base.OneFragmentActivity
 import cn.vove7.jarvis.adapters.RecAdapterWithFooter
 import cn.vove7.jarvis.fragments.VListFragment
@@ -19,7 +22,7 @@ import cn.vove7.vtp.runtimepermission.PermissionUtils
  * 权限管理
  */
 class PermissionManagerActivity : OneFragmentActivity() {
-    override var fragments: Array<Fragment> = arrayOf(ManageFragment())
+    override var fragments: Array<Fragment> = arrayOf(ManageFragment(this))
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -30,7 +33,8 @@ class PermissionManagerActivity : OneFragmentActivity() {
         }
     }
 
-    class ManageFragment : VListFragment() {
+    @SuppressLint("ValidFragment")
+    class ManageFragment(val pActivity: Activity) : VListFragment() {
         //        lateinit var permissionList: List<PermissionStatus>
         //        lateinit var adapter: BaseAdapter
         override fun clearDataSet() {
@@ -41,6 +45,17 @@ class PermissionManagerActivity : OneFragmentActivity() {
             PermissionStatus.refreshStatus()
             adapter = buildAdapter()
             recyclerView.isVerticalScrollBarEnabled = false
+            buildHeader()
+        }
+
+        private fun buildHeader() {
+            val v = layoutInflater.inflate(R.layout.list_header_with_switch, null, false)
+            val headerTitle = v.findViewById<TextView>(R.id.header_title)
+            val headerSwitch = v.findViewById<Switch>(R.id.header_switch)
+            headerTitle.text = "一键申请"
+            headerSwitch.visibility = View.GONE
+            v.setOnClickListener { PermissionUtils.autoRequestPermission(pActivity, allPerStr) }
+            setHeader(v)
         }
 
         override fun onGetData(pageIndex: Int) {
@@ -122,50 +137,65 @@ class PermissionManagerActivity : OneFragmentActivity() {
             }
         }
 
-        class Holder(view: View) : RecAdapterWithFooter.RecViewHolder(view, null) {
-            val title = view.findViewById<TextView>(R.id.title)
-            val subtitle = view.findViewById<TextView>(R.id.subtitle)
-            val open = view.findViewById<TextView>(R.id.open)
-        }
 
-        class PermissionStatus(
-                val permissionString: Array<String>,
-                val permissionName: String,
-                val desc: String,
-                var isOpen: Boolean = false
-        ) {
-            companion object {
+    }
 
-                val permissions = listOf(
-                        PermissionStatus(arrayOf("android.permission.BIND_ACCESSIBILITY_SERVICE"), "无障碍", "操作界面"),
-                        PermissionStatus(arrayOf("android.permission.SYSTEM_ALERT_WINDOW"), "悬浮窗", "显示全局对话框"),
-                        PermissionStatus(arrayOf("android.permission.READ_CONTACTS"), "联系人", "用于检索联系人"),
-                        PermissionStatus(arrayOf("android.permission.CALL_PHONE"), "电话", "用于拨打电话"),
-                        PermissionStatus(arrayOf("android.permission.RECORD_AUDIO"), "录音", "用于语音识别"),
-                        PermissionStatus(arrayOf("android.permission.ACCESS_NETWORK_STATE"), "获取网络状态", "用于获取网络状态"),
-                        PermissionStatus(arrayOf("android.permission.INTERNET"), "网络", ""),
-                        PermissionStatus(arrayOf("android.permission.READ_PHONE_STATE"), "读取设备状态", ""),
-                        PermissionStatus(arrayOf("android.permission.WRITE_EXTERNAL_STORAGE"), "写SD卡", ""),
-                        PermissionStatus(arrayOf("android.permission.FLASHLIGHT"), "闪光灯", "打开闪光灯"),
-                        PermissionStatus(arrayOf("android.permission.ACCESS_COARSE_LOCATION","android.permission.ACCESS_FINE_LOCATION"), "位置信息", "不使用此类指令可不开启"),
+    class Holder(view: View) : RecAdapterWithFooter.RecViewHolder(view, null) {
+        val title = view.findViewById<TextView>(R.id.title)
+        val subtitle = view.findViewById<TextView>(R.id.subtitle)
+        val open = view.findViewById<TextView>(R.id.open)
+    }
+
+    class PermissionStatus(
+            val permissionString: Array<String>,
+            val permissionName: String,
+            val desc: String,
+            var isOpen: Boolean = false
+    ) {
+        companion object {
+            val allPerStr = arrayOf(
+                    "android.permission.BIND_ACCESSIBILITY_SERVICE",
+                    "android.permission.SYSTEM_ALERT_WINDOW",
+                    "android.permission.READ_CONTACTS",
+                    "android.permission.CALL_PHONE",
+                    "android.permission.RECORD_AUDIO",
+                    "android.permission.ACCESS_NETWORK_STATE",
+                    "android.permission.INTERNET",
+                    "android.permission.READ_PHONE_STATE",
+                    "android.permission.WRITE_EXTERNAL_STORAGE",
+                    "android.permission.FLASHLIGHT",
+                    "android.permission.ACCESS_COARSE_LOCATION",
+                    "android.permission.ACCESS_FINE_LOCATION",
+                    "android.permission.CAMERA"
+            )
+            val permissions = listOf(
+                    PermissionStatus(arrayOf("android.permission.BIND_ACCESSIBILITY_SERVICE"), "无障碍", "操作界面"),
+                    PermissionStatus(arrayOf("android.permission.SYSTEM_ALERT_WINDOW"), "悬浮窗", "显示全局对话框"),
+                    PermissionStatus(arrayOf("android.permission.READ_CONTACTS"), "联系人", "用于检索联系人"),
+                    PermissionStatus(arrayOf("android.permission.CALL_PHONE"), "电话", "用于拨打电话"),
+                    PermissionStatus(arrayOf("android.permission.RECORD_AUDIO"), "录音", "用于语音识别"),
+                    PermissionStatus(arrayOf("android.permission.ACCESS_NETWORK_STATE"), "获取网络状态", "用于获取网络状态"),
+                    PermissionStatus(arrayOf("android.permission.INTERNET"), "网络", ""),
+                    PermissionStatus(arrayOf("android.permission.READ_PHONE_STATE"), "读取设备状态", ""),
+                    PermissionStatus(arrayOf("android.permission.WRITE_EXTERNAL_STORAGE"), "写SD卡", ""),
+                    PermissionStatus(arrayOf("android.permission.FLASHLIGHT"), "闪光灯", "打开闪光灯"),
+                    PermissionStatus(arrayOf("android.permission.ACCESS_COARSE_LOCATION", "android.permission.ACCESS_FINE_LOCATION"), "位置信息", "不使用此类指令可不开启"),
 //                        PermissionStatus(arrayOf("android.permission.BLUETOOTH", "android.permission.BLUETOOTH_ADMIN"),
 //                                "蓝牙", "打开蓝牙"),
-                        PermissionStatus(arrayOf("android.permission.CAMERA"), "相机", "打开闪光灯")
-                        //                    PermissionStatus("android.permission.VIBRATE", "震动", ""),
-                )
+                    PermissionStatus(arrayOf("android.permission.CAMERA"), "相机", "打开闪光灯")
+                    //                    PermissionStatus("android.permission.VIBRATE", "震动", ""),
+            )
 
-                fun refreshStatus() {
-                    val context = GlobalApp.APP
-                    permissions.forEach {
-                        it.isOpen = when {
-                            it.permissionName == "悬浮窗" -> Build.VERSION.SDK_INT < Build.VERSION_CODES.M || PermissionUtils.canDrawOverlays(context)
-                            it.permissionName == "无障碍" -> PermissionUtils.accessibilityServiceEnabled(context)
-                            else -> PermissionUtils.isAllGranted(context, it.permissionString)
-                        }
+            fun refreshStatus() {
+                val context = GlobalApp.APP
+                permissions.forEach {
+                    it.isOpen = when {
+                        it.permissionName == "悬浮窗" -> Build.VERSION.SDK_INT < Build.VERSION_CODES.M || PermissionUtils.canDrawOverlays(context)
+                        it.permissionName == "无障碍" -> PermissionUtils.accessibilityServiceEnabled(context)
+                        else -> PermissionUtils.isAllGranted(context, it.permissionString)
                     }
                 }
             }
-
         }
 
     }

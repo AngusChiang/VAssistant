@@ -4,26 +4,27 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import android.widget.CompoundButton
+import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.datamanager.DAO
 import cn.vove7.common.datamanager.DaoHelper
 import cn.vove7.common.datamanager.greendao.ActionNodeDao
-import cn.vove7.common.datamanager.greendao.MarkedDataDao
 import cn.vove7.common.datamanager.parse.DataFrom
 import cn.vove7.common.datamanager.parse.statusmap.ActionNode
 import cn.vove7.common.datamanager.parse.statusmap.ActionNode.NODE_SCOPE_GLOBAL
 import cn.vove7.common.model.UserInfo
 import cn.vove7.common.netacc.ApiUrls
 import cn.vove7.common.netacc.model.BaseRequestModel
-import cn.vove7.common.utils.NetHelper
 import cn.vove7.jarvis.R
+import cn.vove7.jarvis.activities.InstDetailActivity
 import cn.vove7.jarvis.activities.NewInstActivity
 import cn.vove7.jarvis.activities.OnSyncInst
 import cn.vove7.jarvis.adapters.SimpleListAdapter
 import cn.vove7.jarvis.adapters.ViewModel
 import cn.vove7.jarvis.utils.AppConfig
+import cn.vove7.jarvis.utils.NetHelper
 import cn.vove7.parseengine.engine.ParseEngine
-import cn.vove7.vtp.log.Vog
+import cn.vove7.vtp.sharedpreference.SpHelper
 import kotlin.concurrent.thread
 
 /**
@@ -47,10 +48,14 @@ class GlobalInstListFragment : SimpleListFragment<ActionNode>(), OnSyncInst {
             override fun onClick(holder: SimpleListAdapter.VHolder?, pos: Int, item: ViewModel) {
                 //显示详情
                 val node = item.extra as ActionNode
-                InstDetailFragment(node) {
-                    ParseEngine.updateGlobal()
-                    refresh()
-                }.show(activity?.supportFragmentManager, "inst_detail")
+
+                val intent = Intent(context, InstDetailActivity::class.java)
+                intent.putExtra("nodeId", node.id)
+                startActivity(intent)
+//                InstDetailFragment(node) {
+//                    ParseEngine.updateGlobal()
+//                    refresh()
+//                }.show(activity?.supportFragmentManager, "inst_detail")
             }
         }
 
@@ -64,6 +69,10 @@ class GlobalInstListFragment : SimpleListFragment<ActionNode>(), OnSyncInst {
     }
 
     override fun onSync() {
+        if (!UserInfo.isLogin()) {
+            toast.blue().showShort("请登陆后操作")
+            return
+        }
         showProgressBar()
         NetHelper.postJson<List<ActionNode>>(ApiUrls.SYNC_GLOBAL_INST, BaseRequestModel(""),
                 type = NetHelper.ActionNodeListType) { _, bean ->
@@ -75,6 +84,7 @@ class GlobalInstListFragment : SimpleListFragment<ActionNode>(), OnSyncInst {
                             if (it) {
                                 toast.showShort("同步完成")
                                 refresh()
+                                SpHelper(GlobalApp.APP).set(R.string.key_last_sync_global_date, System.currentTimeMillis())
                                 ParseEngine.updateGlobal()
                             } else toast.showShort("同步失败")
                         }
@@ -95,9 +105,9 @@ class GlobalInstListFragment : SimpleListFragment<ActionNode>(), OnSyncInst {
     override fun transData(nodes: List<ActionNode>): List<ViewModel> {
         val tmp = mutableListOf<ViewModel>()
         nodes.forEach {
-//            if (!onlySelf || it.belongSelf()) {
-                tmp.add(ViewModel((it).actionTitle, extra = it))
-//            }
+            val fs = it.follows?.size ?: 0
+            tmp.add(ViewModel((it).actionTitle, it.desc?.instructions ?: "无介绍"+
+            if (fs == 0) "" else "\n跟随 $fs", extra = it))
         }
         return tmp
     }
@@ -115,9 +125,8 @@ class GlobalInstListFragment : SimpleListFragment<ActionNode>(), OnSyncInst {
                     )
                 }
             }
-            val offsetDatas=builder.offset(pageIndex * pageSizeLimit)
+            val offsetDatas = builder.offset(pageIndex * pageSizeLimit)
                     .limit(pageSizeLimit).list()
-            Vog.d(this, "onGetData $offsetDatas")
             dataSet.addAll(transData(offsetDatas))
             postLoadResult(offsetDatas.isEmpty())
         }

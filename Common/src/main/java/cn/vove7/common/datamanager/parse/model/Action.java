@@ -15,7 +15,6 @@ import org.greenrobot.greendao.annotation.Transient;
 import java.io.Serializable;
 
 import cn.vove7.common.datamanager.parse.statusmap.ActionNode;
-import cn.vove7.common.utils.TextHelper;
 
 /**
  * Action 执行动作
@@ -39,7 +38,7 @@ public class Action implements Comparable<Action>, Serializable {
     /**
      * 执行优先级
      */
-    private int priority;
+    private int priority;//无用？
     private long nodeId;
 
     /**
@@ -215,6 +214,14 @@ public class Action implements Comparable<Action>, Serializable {
 
     public Boolean getResponseResult() {
         return this.responseResult;
+    }
+
+    @Override
+    public String toString() {
+        return "{" +
+                actionScript + '\'' +
+                "," + scriptType + '\'' +
+                '}';
     }
 
     public void setResponseResult(Boolean responseResult) {

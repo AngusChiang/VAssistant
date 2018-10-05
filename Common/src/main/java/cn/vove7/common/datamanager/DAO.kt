@@ -10,8 +10,11 @@ import cn.vove7.common.datamanager.greendao.DaoSession
  */
 object DAO {
     var daoSession: DaoSession = DaoMaster.newDevSession(GlobalApp.APP, "DataBase.db")
-//
+    //
 //    fun init(context: Context) {
 //        daoSession = DaoMaster.newDevSession(context, "DataBase.db")
 //    }
+    fun clear() {
+        daoSession.clear()
+    }
 }

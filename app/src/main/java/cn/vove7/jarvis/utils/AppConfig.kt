@@ -6,7 +6,6 @@ import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.model.UserInfo
 import cn.vove7.common.netacc.ApiUrls
 import cn.vove7.common.netacc.model.BaseRequestModel
-import cn.vove7.common.utils.NetHelper
 import cn.vove7.jarvis.R
 import cn.vove7.vtp.log.Vog
 import cn.vove7.vtp.sharedpreference.SpHelper
@@ -31,6 +30,7 @@ object AppConfig {
     var adWaitSecs = 17
     var voiceWakeup = false
     var audioSpeak = true//播报语音
+    var userExpPlan = true
 
     fun init() {
         thread {
@@ -49,16 +49,7 @@ object AppConfig {
 
             info.success()
             Looper.prepare()
-            NetHelper.postJson<Any>(ApiUrls.VERIFY_TOKEN, BaseRequestModel<Serializable>()) { _, bean ->
-                if (bean != null) {
-                    if (!bean.isOk()) {
-                        logout()
-                        GlobalApp.toastShort(bean.message)
-                    }
-                } else {
-                    GlobalApp.toastShort("用户信息获取失败")
-                }
-            }
+            NetHelper.postJson<Any>(ApiUrls.VERIFY_TOKEN)
         } else {
             Vog.d(this, "init ---> not login")
         }
@@ -113,6 +104,7 @@ object AppConfig {
         voiceControlDialog = sp.getBoolean(R.string.key_voice_control_dialog, true)
         voiceWakeup = sp.getBoolean(R.string.key_open_voice_wakeup, false)
         audioSpeak = sp.getBoolean(R.string.key_audio_speak, true)
+        userExpPlan = sp.getBoolean(R.string.key_user_exp_plan, true)
         sp.getInt(R.string.key_ad_wait_secs).also {
             adWaitSecs = if (it == -1) 17 else it
         }

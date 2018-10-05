@@ -11,6 +11,7 @@ import cn.vove7.common.executor.OnPrint
 import cn.vove7.jarvis.BuildConfig
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.services.MainService
+import cn.vove7.jarvis.utils.AppConfig
 import cn.vove7.rhino.api.RhinoApi
 import cn.vove7.vtp.log.Vog
 import com.google.gson.Gson
@@ -33,6 +34,9 @@ object RemoteDebugServer : Runnable {
 
     var handler: Handler? = null
     fun start() {
+        if (!AppConfig.checkUser()) {
+            return
+        }
         if (!stopped && thread?.isAlive == true) {
             Vog.d(this, "start ---> thread is Alive")
             return

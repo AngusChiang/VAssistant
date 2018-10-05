@@ -7,20 +7,17 @@ import android.support.annotation.LayoutRes
 import android.support.design.widget.FloatingActionButton
 import android.support.v4.app.Fragment
 import android.support.v4.widget.SwipeRefreshLayout
+import android.support.v7.widget.CardView
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.CompoundButton
-import android.widget.ProgressBar
-import android.widget.Switch
-import android.widget.TextView
+import android.widget.*
 import cn.vove7.common.view.toast.ColorfulToast
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.adapters.RecAdapterWithFooter
 import cn.vove7.vtp.log.Vog
-import kotlinx.android.synthetic.main.fragment_base_list.*
 
 /**
  * # VListFragment
@@ -67,7 +64,7 @@ abstract class VListFragment : Fragment() {
 //    var firstLoad = false
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        float_header.visibility = View.GONE
+//        float_header.visibility = View.GONE
 //        viewCreate = true
     }
 
@@ -95,6 +92,7 @@ abstract class VListFragment : Fragment() {
         addHeader(v)
     }
 
+    val float_header by lazy { contentView.findViewById<CardView>(R.id.float_header) }
     fun setHeader(v: View) {
         float_header.removeAllViews()
         float_header.addView(v)

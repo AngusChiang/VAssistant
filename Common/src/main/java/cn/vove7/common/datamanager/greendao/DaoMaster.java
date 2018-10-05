@@ -21,26 +21,26 @@ public class DaoMaster extends AbstractDaoMaster {
 
     /** Creates underlying database table using DAOs. */
     public static void createAllTables(Database db, boolean ifNotExists) {
+        AppAdInfoDao.createTable(db, ifNotExists);
+        MarkedDataDao.createTable(db, ifNotExists);
+        InstSettingsDao.createTable(db, ifNotExists);
         ActionDao.createTable(db, ifNotExists);
+        ActionDescDao.createTable(db, ifNotExists);
         ActionScopeDao.createTable(db, ifNotExists);
         ActionNodeDao.createTable(db, ifNotExists);
         RegDao.createTable(db, ifNotExists);
-        AppAdInfoDao.createTable(db, ifNotExists);
-        MarkedDataDao.createTable(db, ifNotExists);
-        ActionDescDao.createTable(db, ifNotExists);
-        InstSettingsDao.createTable(db, ifNotExists);
     }
 
     /** Drops underlying database table using DAOs. */
     public static void dropAllTables(Database db, boolean ifExists) {
+        AppAdInfoDao.dropTable(db, ifExists);
+        MarkedDataDao.dropTable(db, ifExists);
+        InstSettingsDao.dropTable(db, ifExists);
         ActionDao.dropTable(db, ifExists);
+        ActionDescDao.dropTable(db, ifExists);
         ActionScopeDao.dropTable(db, ifExists);
         ActionNodeDao.dropTable(db, ifExists);
         RegDao.dropTable(db, ifExists);
-        AppAdInfoDao.dropTable(db, ifExists);
-        MarkedDataDao.dropTable(db, ifExists);
-        ActionDescDao.dropTable(db, ifExists);
-        InstSettingsDao.dropTable(db, ifExists);
     }
 
     /**
@@ -59,14 +59,14 @@ public class DaoMaster extends AbstractDaoMaster {
 
     public DaoMaster(Database db) {
         super(db, SCHEMA_VERSION);
+        registerDaoClass(AppAdInfoDao.class);
+        registerDaoClass(MarkedDataDao.class);
+        registerDaoClass(InstSettingsDao.class);
         registerDaoClass(ActionDao.class);
+        registerDaoClass(ActionDescDao.class);
         registerDaoClass(ActionScopeDao.class);
         registerDaoClass(ActionNodeDao.class);
         registerDaoClass(RegDao.class);
-        registerDaoClass(AppAdInfoDao.class);
-        registerDaoClass(MarkedDataDao.class);
-        registerDaoClass(ActionDescDao.class);
-        registerDaoClass(InstSettingsDao.class);
     }
 
     public DaoSession newSession() {

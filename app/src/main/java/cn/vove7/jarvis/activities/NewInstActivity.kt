@@ -137,15 +137,20 @@ class NewInstActivity : AppCompatActivity(), View.OnClickListener {
                 }
                 getAppList()
             }
-            else -> {
+            0 -> {//新建
                 sel_app.visibility = View.GONE
                 if (!isReedit) {//add follow
                     parentId = intent.getLongExtra("nodeId", 0)
-                    parentNode = DAO.daoSession.actionNodeDao.queryBuilder().where(ActionNodeDao.Properties.Id.eq(parentId)).unique()
+                    parentNode = DAO.daoSession.actionNodeDao.queryBuilder()
+                            .where(ActionNodeDao.Properties.Id.eq(parentId)).unique()
 
                     parent_lay.visibility = View.VISIBLE
                     parent_title.text = intent.getStringExtra("parent_title")
                 }
+            }
+            else -> {
+                GlobalLog.err("新建类型错误")
+                finish()
             }
         }
     }
@@ -317,13 +322,14 @@ class NewInstActivity : AppCompatActivity(), View.OnClickListener {
             DAO.daoSession.actionNodeDao.update(editNode)
             ParseEngine.updateNode()
             voast.showShort(getString(R.string.text_save_success))
+            DAO.clear()
             finish()
 
         } else {//新发布 构造newNode
             val newNode = ActionNode()
             if (parentNode != null) {
                 newNode.parentId = parentId
-                newNode.parentTagId = parentNode?.tagId
+//                newNode.parentTagId = parentNode?.tagId
             }
             if (inApp) {
                 val scope = ActionScope(pkg, activityName)
@@ -345,6 +351,7 @@ class NewInstActivity : AppCompatActivity(), View.OnClickListener {
             if (DaoHelper.insertNewActionNode(newNode) != null) {
                 voast.showShort(getString(R.string.text_save_success))
                 ParseEngine.updateNode()
+                DAO.clear()
                 finish()
             } else {
                 voast.showShort(getString(R.string.text_save_failed))

@@ -25,7 +25,6 @@ import cn.vove7.common.executor.CExecutorI
 import cn.vove7.common.executor.PartialResult
 import cn.vove7.common.model.RequestPermission
 import cn.vove7.common.model.UserInfo
-import cn.vove7.common.utils.NetHelper
 import cn.vove7.common.utils.RegUtils
 import cn.vove7.common.utils.ScreenAdapter
 import cn.vove7.common.view.finder.ViewFindBuilder
@@ -46,13 +45,15 @@ open class ExecutorImpl(
         val context: Context,
         val serviceBridge: ServiceBridge?
 ) : CExecutorI {
+
     private val systemBridge = SystemBridge
     var accessApi: AccessibilityApi? = null
     private var lock = Object()
     var currentAction: Action? = null
     private val markedOpenDao = DAO.daoSession.markedDataDao
-//    val globalActionExecutor = GlobalActionExecutor()
+    //    val globalActionExecutor = GlobalActionExecutor()
     override var command: String? = null
+    override var DEBUG: Boolean = false
 
     override var running: Boolean = false
 
@@ -99,6 +100,9 @@ open class ExecutorImpl(
             thread!!.interrupt()
         }
         this.command = cmdWords
+        if (cmdWords == DEBUG_SCRIPT) {//DEBUG
+            DEBUG = true
+        }
         ScreenAdapter.reSet()
         this.actionQueue = actionQueue
         lock = Object()
@@ -188,13 +192,13 @@ open class ExecutorImpl(
      * 接着打开应用
      */
     private fun parseAppInnerOperation(cmd: String, pkg: String): Boolean {
-        val appQ = ParseEngine.matchAppAction(cmd, pkg)
+        val appQ = ParseEngine.matchAppAction(cmd, ActionScope(pkg))
         actionQueue = appQ.second
         //打开应用
-        if (actionQueue.isNotEmpty()) {//
+        if (actionQueue.isNotEmpty()) {//todo 检查App页面?
             systemBridge.openAppByPkg(pkg, true)
             val his = CommandHistory(UserInfo.getUserId(), cmd, "打开$pkg -> ${appQ.first}")
-            NetHelper.uploadUserCommandHistory(his)
+            AppBus.post(his)
             Vog.d(this, "parseAppInnerOperation app内操作")
         } else {
             systemBridge.openAppByPkg(pkg, false)
@@ -275,7 +279,7 @@ open class ExecutorImpl(
                 return openByIdentifier(it, ParseEngine.getLastParam(result.groups))//执行
             }
         }
-        NetHelper.uploadUserCommandHistory(CommandHistory(UserInfo.getUserId(), "打开|关闭 $p", null))
+        AppBus.post(CommandHistory(UserInfo.getUserId(), "打开|关闭 $p", null))
         GlobalLog.err("parseOpenOrCloseAction 未知操作: $p")
         return false
 //        }
@@ -570,6 +574,7 @@ open class ExecutorImpl(
          */
         fun checkParam(p: String?): Boolean = (p != null && p.trim() != "")
 
+        val DEBUG_SCRIPT = "DEBUG"
         /**
          * 检测包名正则
          */

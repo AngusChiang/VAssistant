@@ -1,6 +1,7 @@
 package cn.vove7.executorengine.helper
 
 import cn.vove7.common.app.GlobalApp
+import cn.vove7.common.datamanager.parse.model.ActionScope
 import cn.vove7.common.model.MatchedData
 import cn.vove7.parseengine.engine.ParseEngine
 import cn.vove7.vtp.app.AppHelper
@@ -17,7 +18,7 @@ object AdvanAppHelper {
     //    companion object {
     //记录 pkg -> AppInfo
     val APP_LIST = hashMapOf<String, AppInfo>()
-    private var limitRate = 0.8f
+    private var limitRate = 0.75f
 
     private var lastUpdateTime = 0L
     const val updateInterval = 30 * 60 * 1000
@@ -46,7 +47,7 @@ object AdvanAppHelper {
                 if (appWord.startsWith(it.name, ignoreCase = true)) {
                     val follow = appWord.substring(it.name.length)
                     Vog.d(this, "预解析---> $follow")
-                    val aq = ParseEngine.matchAppAction(follow, it.packageName)
+                    val aq = ParseEngine.matchAppAction(follow, ActionScope(it.packageName))
                     if (aq.second.isEmpty()) {//无匹配
                         Vog.d(this, "预解析---> 无匹配")
                         TextHelper.compareSimilarityWithPinyin(context, appWord, it.name)
@@ -62,7 +63,7 @@ object AdvanAppHelper {
                 0f
             }
 
-            if (rate > limitRate) {
+            if (rate >= limitRate) {
                 matchList.add(MatchedData(rate, it))
             }
         }

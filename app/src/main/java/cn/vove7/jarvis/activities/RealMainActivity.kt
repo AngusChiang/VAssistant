@@ -7,6 +7,9 @@ import cn.vove7.jarvis.R
 import cn.vove7.jarvis.fragments.HomeFragment
 import cn.vove7.jarvis.fragments.MineFragment
 import cn.vove7.jarvis.view.utils.FragmentSwitcher
+import cn.vove7.vtp.runtimepermission.PermissionUtils
+import cn.vove7.vtp.sharedpreference.SpHelper
+import com.afollestad.materialdialogs.MaterialDialog
 import kotlinx.android.synthetic.main.activity_real_main.*
 
 
@@ -31,6 +34,43 @@ class RealMainActivity : AppCompatActivity() {
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener)
         navigation.selectedItemId = R.id.nav_me
         fSwitcher.switchFragment(mineF)
+
+        requestPermission()
     }
 
+    companion object {
+        val ps = arrayOf(
+                android.Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                android.Manifest.permission.RECORD_AUDIO
+        )
+    }
+
+    private fun requestPermission() {
+        if (!PermissionUtils.isAllGranted(this, ps)) {
+            MaterialDialog(this).title(text = "请先授予必要的权限")
+                    .message(text = "1. 麦克风\n2. 存储权限\n需要其他权限可到权限管理开启").positiveButton {
+                        PermissionUtils.autoRequestPermission(this, ps)
+                    }.show()
+        } else {
+            userGuide()
+        }
+    }
+
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        userGuide()
+    }
+
+    private fun userGuide() {
+        val sp = SpHelper(this)
+        if (sp.getBoolean("first_in", true)) {
+            MaterialDialog(this).title(text = "引导")
+                    .message(text = "1. 首次使用，请至帮助中仔细阅读[使用手册]\n" +
+                            "2. 首次使用，可在注册登陆后至指令管理，标记管理中同步最新数据")
+                    .positiveButton()
+                    .negativeButton()
+                    .show()
+            sp.set("first_in", false)
+        }
+    }
 }
