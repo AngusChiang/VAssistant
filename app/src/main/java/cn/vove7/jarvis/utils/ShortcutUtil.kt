@@ -40,8 +40,10 @@ object ShortcutUtil {
     fun addWakeUpPinShortcut() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             addPinedShortcut(wakeUpShortcut!!)
+        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1) {
+            addShortcut(wakeUpShortcut!!)
         } else {
-            GlobalApp.toastShort("需要8.0+")
+            GlobalApp.toastShort("需要7.1+")
         }
     }
 
@@ -72,14 +74,29 @@ object ShortcutUtil {
 
     @TargetApi(Build.VERSION_CODES.N_MR1)
     private fun addShortcut(shortCutInfo: ShortcutInfo) {
+        if (existsCut(shortCutInfo.id)) {
+            if (shortCutInfo.id != "fast_wakeup") {
+                GlobalApp.toastShort("已添加")
+            }
+            return
+        }
         addShortcut(listOf(shortCutInfo))
+    }
+
+    @RequiresApi(Build.VERSION_CODES.N_MR1)
+    private fun existsCut(id: String): Boolean {
+        shortManager?.dynamicShortcuts?.forEach {
+            if (it.id == id) return true
+        }
+        return false
     }
 
     @RequiresApi(Build.VERSION_CODES.N_MR1)
     private fun addShortcut(shortCutInfo: List<ShortcutInfo>) {
         try {
+            checkLimit()
             shortManager?.addDynamicShortcuts(shortCutInfo) //创建2个快捷方式
-            GlobalApp.toastShort("添加成功")
+            GlobalApp.toastShort("Shortcut添加成功")
         } catch (e: Exception) {
             GlobalLog.err(e)
             GlobalApp.toastShort("添加失败，可能数量超出限制")
@@ -87,6 +104,14 @@ object ShortcutUtil {
 //        } else {
 //            GlobalApp.toastShort("添加快捷方式需要7.1+")
 //        }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.N_MR1)
+    private fun checkLimit() {
+        val nowCount = shortManager?.dynamicShortcuts?.size
+        if (nowCount == shortManager?.maxShortcutCountPerActivity) {//超出，移除
+            shortManager?.removeDynamicShortcuts(listOf(shortManager!!.dynamicShortcuts[0].id))
+        }
     }
 
     @RequiresApi(Build.VERSION_CODES.O)

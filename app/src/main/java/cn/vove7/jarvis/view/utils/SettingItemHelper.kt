@@ -7,6 +7,7 @@ import android.view.View
 import android.widget.CompoundButton
 import android.widget.TextView
 import cn.vove7.jarvis.R
+import cn.vove7.jarvis.utils.AppConfig
 import cn.vove7.jarvis.view.*
 import cn.vove7.vtp.easyadapter.BaseListAdapter
 import cn.vove7.vtp.log.Vog
@@ -98,8 +99,10 @@ class SettingItemHelper(val context: Context) {
             MaterialDialog(context).title(text = item.title()).input(prefill = pre) { d, c ->
                 Vog.d(this, "initAndSetInputListener ---> $c")
                 val s = c.toString()
-                if (item.keyId != null)
+                if (item.keyId != null) {
                     sp.set(item.keyId, s)
+                    AppConfig.reload()
+                }
                 item.summary = s
                 item.callback?.invoke(holder, s)
                 setBasic(holder, item)
@@ -142,8 +145,8 @@ class SettingItemHelper(val context: Context) {
             val b = sp.getBoolean(item.keyId, item.defaultValue.invoke() as Boolean)
             holder.compoundWight.isChecked = b
             holder.compoundWight.setOnCheckedChangeListener { _, isChecked ->
-                if (item.keyId != null)
-                    sp.set(item.keyId, isChecked)
+                sp.set(item.keyId, isChecked)
+                AppConfig.reload()
                 item.callback?.invoke(holder, isChecked)
             }
         } else {//withoutSp
@@ -181,8 +184,10 @@ class SettingItemHelper(val context: Context) {
                     .listItemsSingleChoice(items =
                     if (item.keyId != null) context.resources.getStringArray(item.entityArrId!!).asList()
                     else item.items, initialSelection = initPos) { _, i, t ->
-                        if (item.keyId != null)
+                        if (item.keyId != null) {
                             sp.set(item.keyId, t)
+                            AppConfig.reload()
+                        }
                         item.summary = t
                         setBasic(holder, item)
                         initPos = i
@@ -209,8 +214,9 @@ class SettingItemHelper(val context: Context) {
 
         MaterialDialog(context).title(text = item.title())
                 .listItemsMultiChoice(item.entityArrId) { d, iss, ts ->
-                    if (item.keyId != null)
+                    if (item.keyId != null){
                         sp.set(item.keyId, ts)
+                        AppConfig.reload()}
                     item.summary = ts.toString()
                     setBasic(holder, item)
                     // callback
@@ -236,8 +242,10 @@ class SettingItemHelper(val context: Context) {
                     .customView(null, vv.first)
                     .positiveButton {
                         item.summary = old.toString()
-                        if (item.keyId != null)
+                        if (item.keyId != null) {
                             sp.set(item.keyId, old)
+                            AppConfig.reload()
+                        }
                         setBasic(holder, item)
                         item.callback?.invoke(holder, old)
                     }

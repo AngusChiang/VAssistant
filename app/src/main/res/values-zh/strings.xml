@@ -195,5 +195,6 @@
     <string name="text_not_enable">未启用</string>
     <string name="text_add_wakeup_shortcut_to_launcher">添加唤醒到桌面快捷方式</string>
     <string name="text_add_shortcut_to_launcher">添加到桌面快捷方式</string>
+    <string name="text_auto_open_voice_wakeup_charging">充电时自动开启语音唤醒</string>
 
 </resources>

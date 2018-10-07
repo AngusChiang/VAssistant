@@ -45,6 +45,5 @@ class RecogWakeupListener(private val handler: Handler) : SimpleWakeupListener()
 
     override fun onStop() {
         super.onStop()
-        GlobalApp.toastShort("语音唤醒已关闭")
     }
 }

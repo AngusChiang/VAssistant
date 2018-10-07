@@ -11,7 +11,6 @@ import cn.vove7.vtp.log.Vog
 import cn.vove7.vtp.sharedpreference.SpHelper
 import com.google.gson.Gson
 import devliving.online.securedpreferencestore.SecuredPreferenceStore
-import java.io.Serializable
 import kotlin.concurrent.thread
 
 /**
@@ -31,6 +30,7 @@ object AppConfig {
     var voiceWakeup = false
     var audioSpeak = true//播报语音
     var userExpPlan = true
+    var isAutoVoiceWakeupCharging = false
 
     fun init() {
         thread {
@@ -105,6 +105,7 @@ object AppConfig {
         voiceWakeup = sp.getBoolean(R.string.key_open_voice_wakeup, false)
         audioSpeak = sp.getBoolean(R.string.key_audio_speak, true)
         userExpPlan = sp.getBoolean(R.string.key_user_exp_plan, true)
+        isAutoVoiceWakeupCharging = sp.getBoolean(R.string.key_auto_open_voice_wakeup_charging, false)
         sp.getInt(R.string.key_ad_wait_secs).also {
             adWaitSecs = if (it == -1) 17 else it
         }

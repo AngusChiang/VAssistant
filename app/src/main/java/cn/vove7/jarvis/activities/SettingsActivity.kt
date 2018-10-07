@@ -11,6 +11,7 @@ import cn.vove7.common.appbus.SpeechAction
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.activities.base.ReturnableActivity
 import cn.vove7.jarvis.adapters.SettingsExpandableAdapter
+import cn.vove7.jarvis.receivers.PowerEventReceiver
 import cn.vove7.jarvis.utils.ShortcutUtil
 import cn.vove7.jarvis.view.*
 import cn.vove7.jarvis.view.custom.SettingGroupItem
@@ -90,8 +91,16 @@ class SettingsActivity : ReturnableActivity() {
                     IntentItem(R.string.text_add_wakeup_shortcut_to_launcher, summary = "添加需要8.0+，" +
                             "7.1+可直接在桌面长按图标使用Shortcut快捷唤醒",
                             onClick = { _, _ ->
-                        ShortcutUtil.addWakeUpPinShortcut()
-                    })
+                                ShortcutUtil.addWakeUpPinShortcut()
+                            }),
+                    CheckBoxItem(R.string.text_auto_open_voice_wakeup_charging,
+                            keyId = R.string.key_auto_open_voice_wakeup_charging,
+                            callback = { _, b ->
+                                if (b as Boolean && PowerEventReceiver.isCharging) {//正在充电，开启
+                                    AppBus.post(SpeechAction(SpeechAction.ActionCode.ACTION_START_WAKEUP))
+                                }
+
+                            })
             ))
 //           ,SettingGroupItem(R.color.lime_600, titleId = R.string.text_animation, childItems = listOf(
 //                    CheckBoxItem(, "应用内动画",
@@ -102,6 +111,8 @@ class SettingsActivity : ReturnableActivity() {
                     CheckBoxItem(title = "用户体验计划", summary = "改善体验与完善功能",
                             keyId = R.string.key_user_exp_plan, defaultValue = { true })
             ))
+            //todo shortcut 管理
+
     )
 
 }

@@ -6,6 +6,7 @@ import android.util.Log
 import cn.vove7.androlua.LuaApp
 import cn.vove7.common.appbus.MessageEvent
 import cn.vove7.executorengine.helper.AdvanAppHelper
+import cn.vove7.jarvis.receivers.PowerEventReceiver
 import cn.vove7.jarvis.services.MainService
 import cn.vove7.jarvis.utils.AppConfig
 import cn.vove7.jarvis.utils.CrashHandler
@@ -48,6 +49,9 @@ class App : LuaApp() {
             AdvanAppHelper.updateAppList()
             CodeProcessor.init(this)
             ShortcutUtil.addWakeUpShortcut()
+            if (AppConfig.isAutoVoiceWakeupCharging) {
+                PowerEventReceiver.start()
+            }
         }
     }
 
@@ -67,6 +71,7 @@ class App : LuaApp() {
         services.forEach {
             stopService(it)
         }
+        PowerEventReceiver.stop()
         super.onTerminate()
     }
 

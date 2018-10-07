@@ -22,7 +22,7 @@ object MyWakeup {
     private lateinit var appKey: String
     private lateinit var secretKey: String
     val context: Context
-    get() = GlobalApp.APP
+        get() = GlobalApp.APP
 
     private var wp: EventManager? = null
     private lateinit var eventListener: EventListener
@@ -79,20 +79,22 @@ object MyWakeup {
         start(params)
     }
 
-    fun start(params: Map<String, Any?>) {
+    private fun start(params: Map<String, Any?>) {
         val json = JSONObject(params).toString()
         Vog.i(this, "wakeup params(反馈请带上此行日志):$json")
-        wp!!.send(SpeechConstant.WAKEUP_START, json, null, 0, 0)
+        wp?.send(SpeechConstant.WAKEUP_START, json, null, 0, 0)
     }
 
     fun stop() {
-        wp!!.send(SpeechConstant.WAKEUP_STOP, null, null, 0, 0)
+        if (wp == null) return
+        GlobalApp.toastShort("语音唤醒关闭")
+        wp?.send(SpeechConstant.WAKEUP_STOP, null, null, 0, 0)
         release()
     }
 
     fun release() {
 //        stop()
-        wp!!.unregisterListener(eventListener)
+        wp?.unregisterListener(eventListener)
         wp = null
         isInited = false
     }

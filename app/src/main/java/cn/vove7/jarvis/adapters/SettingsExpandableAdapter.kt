@@ -47,13 +47,13 @@ class SettingsExpandableAdapter(val context: Context,
             for (i in gPos until groupCount) {
                 if (i != gPos) {
                     val gpos = getGroupAbsPos(i)
-                    Vog.d(this, "Collapse group ---> $i         $gpos")
+//                    Vog.d(this, "Collapse group ---> $i         $gpos")
                     animationHelper.fromB2T(groupHolders[i]?.itemView, gpos)
                 }
                 if (i == gPos || expView.isGroupExpanded(i))//if展开
                     for (j in 0 until getChildrenCount(i)) {
                         val cpos = getChildAboPos(i, j)
-                        Vog.d(this, "Collapse child ---> $i $j     $cpos")
+//                        Vog.d(this, "Collapse child ---> $i $j     $cpos")
                         if (i == gPos)//消失行
                             animationHelper.hide(childHolders[i][j]?.itemView)
                         else animationHelper.fromB2T(childHolders[i][j]?.itemView, cpos)
@@ -70,7 +70,7 @@ class SettingsExpandableAdapter(val context: Context,
             //groups
             for (i in gPos until groupCount) {
                 if (gPos != i) {
-                    Vog.d(this, "Expand group ---> $i")
+//                    Vog.d(this, "Expand group ---> $i")
                     animationHelper.fromT2B(groupHolders[i]?.itemView, getGroupAbsPos(i))
                 }
                 if (expView.isGroupExpanded(i))//if展开
@@ -82,7 +82,7 @@ class SettingsExpandableAdapter(val context: Context,
                             else
                                 animationHelper.fromT2B(cv, getChildAboPos(i, j))
                         }
-                        Vog.d(this, "Expand child ---> $i $j")
+//                        Vog.d(this, "Expand child ---> $i $j")
                     }
             }
 

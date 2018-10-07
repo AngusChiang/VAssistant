@@ -300,7 +300,7 @@ class InstDetailActivity : AppCompatActivity() {
                 }
                 R.id.menu_add_shortcut -> {
                     MaterialDialog(this).title(R.string.text_add_shortcut_to_launcher)
-                            .message(text = "注意：只能添加没有参数指令，或者在运行时可以询问参数值指令，否则无法正常执行\n" +
+                            .message(text = "注意：只能添加没有参数的指令，或者在运行时可以询问参数值指令，否则无法正常执行\n" +
                                     "此操作需要7.1+\n8.0+系统可添加至桌面快捷图标")
                             .positiveButton {
                                 ShortcutUtil.addActionShortcut(node)

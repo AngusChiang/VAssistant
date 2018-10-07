@@ -590,10 +590,14 @@ class MainService : BusService(),
             NetHelper.uploadUserCommandHistory(his)
             cExecutor.execQueue(result, parseResult.actionQueue)
         } else {// statistics
-            NetHelper.uploadUserCommandHistory(CommandHistory(UserInfo.getUserId(), result, null))
-            listeningToast.showAndHideDelay("解析失败")
+            if(UserInfo.isLogin()) {
+                NetHelper.uploadUserCommandHistory(CommandHistory(UserInfo.getUserId(), result, null))
+                listeningToast.showAndHideDelay("解析失败")
 //                        effectHandler.sendEmptyMessage(PARSE_FAILED)
-            parseAnimation.failed()
+                parseAnimation.failed()
+            }else{
+                listeningToast.showAndHideDelay("可能需要登陆同步下指令数据")
+            }
         }
     }
 

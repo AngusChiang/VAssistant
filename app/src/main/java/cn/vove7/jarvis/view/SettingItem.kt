@@ -44,10 +44,10 @@ open class SettingChildItem(
         var summary: String? = null,
         val itemType: Int,
         val keyId: Int? = null,
-        val defaultValue: () -> Any,
+        val defaultValue: (() -> Any),
 //        val autoSetValue: Boolean = keyId!=null,
         val range: Pair<Int, Int>? = null,
-        val callback: CallbackOnSet? = reloadConfig,
+        val callback: CallbackOnSet? = null,
         val entityArrId: Int? = null,
 //        val valueArrId: Int? = null,
         val items: List<String>? = null
@@ -62,18 +62,18 @@ open class SettingChildItem(
     }
 }
 
-val reloadConfig: CallbackOnSet = { _, _ ->
-    AppConfig.reload()
-}
+//val reloadConfig: CallbackOnSet = { _, _ ->
+//    AppConfig.reload()
+//}
 
 class CheckBoxItem(
         titleId: Int? = null,
         title: String? = null,
         summary: String? = null,
         keyId: Int? = null,
-        defaultValue: () -> Boolean,
-        callback: CallbackOnSet? = reloadConfig
-) : SettingChildItem(titleId, title, summary, TYPE_CHECK_BOX, keyId, defaultValue,
+        defaultValue: (() -> Boolean)? = null,
+        callback: CallbackOnSet? = null
+) : SettingChildItem(titleId, title, summary, TYPE_CHECK_BOX, keyId, defaultValue ?: { false },
         callback = callback)
 
 class SwitchItem(
@@ -82,7 +82,7 @@ class SwitchItem(
         summary: String? = null,
         keyId: Int? = null,
         defaultValue: () -> Boolean,
-        callback: CallbackOnSet? = reloadConfig
+        callback: CallbackOnSet? = null
 ) : SettingChildItem(titleId, title, summary, TYPE_SWITCH, keyId, defaultValue, callback = callback)
 
 
@@ -93,7 +93,7 @@ class NumberPickerItem(
         keyId: Int? = null,
         defaultValue: () -> Int,
         range: Pair<Int, Int>,
-        callback: CallbackOnSet? = reloadConfig
+        callback: CallbackOnSet? = null
 ) : SettingChildItem(titleId, title, summary, TYPE_NUMBER, keyId, defaultValue, range = range,
         callback = callback)
 
@@ -104,10 +104,10 @@ class SingleChoiceItem(
         keyId: Int? = null,
         defaultValue: () -> Int,//pos
         @ArrayRes entityArrId: Int? = null,
-        callback: CallbackOnSet? = reloadConfig,
+        callback: CallbackOnSet? = null,
         items: List<String>? = null
 ) : SettingChildItem(titleId, title, summary, TYPE_SINGLE, keyId, defaultValue,
-        entityArrId = entityArrId,  callback = callback, items = items)
+        entityArrId = entityArrId, callback = callback, items = items)
 
 class IntentItem(titleId: Int? = null,
                  title: String? = null,
