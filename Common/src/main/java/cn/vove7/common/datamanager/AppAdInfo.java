@@ -185,8 +185,11 @@ public class AppAdInfo implements Serializable, Markable, DataFrom {
         builder.append("来源: ").append(DataFrom.Companion.translate(from)).append('\n');
         if (type != null)
             builder.append("ClassType: ").append(type).append('\n');
-        if(BuildConfig.DEBUG){
+        if (tagId != null)
+            builder.append("已分享").append('\n');
+        if (BuildConfig.DEBUG) {
             builder.append("pUid: ").append(publishUserId).append('\n');
+            builder.append("tag: ").append(tagId).append('\n');
         }
         return builder.toString();
 

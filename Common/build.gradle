@@ -32,6 +32,8 @@ greendao {
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+    implementation "com.android.support:appcompat-v7:${support_version}"
+    implementation "com.android.support:support-v4:${support_version}@aar"
     api "com.github.Vove7:VTP:$vtp_version"
     api 'org.greenrobot:eventbus:3.1.1'
     api "org.greenrobot:greendao:$greendao_version"

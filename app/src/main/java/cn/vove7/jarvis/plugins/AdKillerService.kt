@@ -139,10 +139,7 @@ object AdKillerService : AccPluginsService() {
                 }
             }
         }
-
-        Vog.d(this, "当前界面广告数--->${finders?.size} $appScope $finders")
-
-//        thread { gcIfNeed() }
+        Vog.v(this, "当前界面广告数--->${finders?.size} $appScope $finders")
 
         onUiUpdate(null)
     }

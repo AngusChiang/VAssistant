@@ -16,6 +16,7 @@ import com.baidu.tts.client.SpeechError
 import com.baidu.tts.client.SpeechSynthesizer
 import com.baidu.tts.client.SpeechSynthesizerListener
 import com.baidu.tts.client.TtsMode
+import java.lang.Thread.sleep
 import java.util.*
 
 /**
@@ -48,15 +49,16 @@ class SpeechSynService(private val event: SyncEvent) : SpeechSynthesizerListener
     fun reLoad() {
         Vog.d(this, "reLoad ---> ")
         release()
+        sleep(500)
         initialTts() // 初始化TTS引擎
     }
 
     init {
         val appInfo = context.packageManager.getApplicationInfo(context.packageName,
                 PackageManager.GET_META_DATA)
-        appId = appInfo.metaData.get("com.baidu.speech.APP_ID").toString()
-        appKey = appInfo.metaData.getString("com.baidu.speech.API_KEY")
-        secretKey = appInfo.metaData.getString("com.baidu.speech.SECRET_KEY")
+        appId = appInfo.metaData.getInt("com.baidu.speech.APP_ID").toString()
+        appKey = appInfo.metaData.getString("com.baidu.speech.API_KEY")!!
+        secretKey = appInfo.metaData.getString("com.baidu.speech.SECRET_KEY")!!
 
         initialTts() // 初始化TTS引擎
     }
@@ -67,12 +69,11 @@ class SpeechSynService(private val event: SyncEvent) : SpeechSynthesizerListener
     // synthesizer.setParams(params);
     fun speak(text: String?) {
         if (text == null) {
-            event.onError("文本空",text)
+            event.onError("文本空", text)
             return
         }
         sText = text
-        val result = synthesizer.speak(text)
-        checkResult(result, "speak")
+        synthesizer.speak(text)
     }
 
     var sText: String? = null
@@ -81,16 +82,14 @@ class SpeechSynService(private val event: SyncEvent) : SpeechSynthesizerListener
      * 暂停播放。仅调用speak后生效
      */
     fun pause() {
-        val result = synthesizer.pause()
-        checkResult(result, "pause")
+        synthesizer.pause()
     }
 
     /**
      * 继续播放。仅调用speak后生效，调用pause生效
      */
     fun resume() {
-        val result = synthesizer.resume()
-        checkResult(result, "resume")
+        synthesizer.resume()
     }
 
     fun release() {
@@ -101,8 +100,7 @@ class SpeechSynService(private val event: SyncEvent) : SpeechSynthesizerListener
      * 停止合成引擎。即停止播放，合成，清空内部合成队列。
      */
     fun stop() {
-        val result = synthesizer.stop()
-        checkResult(result, "stop")
+        synthesizer.stop()
     }
 
     @SuppressLint("HandlerLeak")
@@ -185,12 +183,6 @@ class SpeechSynService(private val event: SyncEvent) : SpeechSynthesizerListener
 //        checkResult(result, "reLoadVoiceModel")
 //    }
 
-    private fun checkResult(result: Int, method: String) {
-        if (result != 0) {
-            Vog.d(this, "checkResult error code :$result method:$method, 错误码文档:http://yuyin.baidu.com/docs/tts/122 ")
-        }
-    }
-
     override fun onSynthesizeStart(p0: String?) {
         Vog.d(this, "onSynthesizeStart 准备开始合成,序列号:$p0")
     }
@@ -204,9 +196,9 @@ class SpeechSynService(private val event: SyncEvent) : SpeechSynthesizerListener
     }
 
     override fun onSpeechStart(p0: String?) {
-        speaking = true
         Vog.d(this, "onSpeechStart 播放开始回调, 序列号:$p0")
-        event.onStart()
+        event.onStart()//顺序
+        speaking = true//
     }
 
     override fun onSpeechProgressChanged(p0: String?, p1: Int) {

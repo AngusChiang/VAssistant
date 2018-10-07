@@ -1,9 +1,11 @@
 package cn.vove7.common.bridges
 
+import android.graphics.Bitmap
 import android.location.Location
 import cn.vove7.common.model.ExResult
 import cn.vove7.vtp.app.AppInfo
 import cn.vove7.vtp.system.DeviceInfo
+import java.io.File
 
 interface SystemOperation {
     /**
@@ -110,6 +112,20 @@ interface SystemOperation {
     fun sendEmail(to: String, subject: String? = null, content: String? = null)
 
     fun lockScreen(): Boolean
+    fun screenShot(): Bitmap?
+    fun screen2File(): File?
+
+    /**
+     * 分享文字
+     * @param content String?
+     */
+    fun shareText(content: String?)
+
+    /**
+     * 分享图片
+     * @param imgPath String? 图片路径
+     */
+    fun shareImage(imgPath:String?)
 
     /**
      * 获取用户地理位置

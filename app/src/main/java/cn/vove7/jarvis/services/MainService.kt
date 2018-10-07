@@ -290,12 +290,15 @@ class MainService : BusService(),
     @Subscribe(threadMode = ThreadMode.BACKGROUND)
     fun onSpeechAction(sAction: SpeechAction) {
         when (sAction.action) {
-            SpeechAction.ActionCode.ACTION_START_RECO -> speechRecoService.startRecog()
+            SpeechAction.ActionCode.ACTION_START_RECO -> {
+                if (speechSynService.speaking) speechSynService.stop()
+                speechRecoService.startRecog()
+            }
             SpeechAction.ActionCode.ACTION_STOP_RECO -> speechRecoService.stopRecog()
             SpeechAction.ActionCode.ACTION_CANCEL_RECO -> speechRecoService.cancelRecog()
-            SpeechAction.ActionCode.ACTION_START_WAKEUP -> speechRecoService.wakeuper.start()
+            SpeechAction.ActionCode.ACTION_START_WAKEUP -> speechRecoService.startWakeUp()
             SpeechAction.ActionCode.ACTION_RELOAD_SYN_CONF -> speechSynService.reLoad()
-            SpeechAction.ActionCode.ACTION_STOP_WAKEUP -> speechRecoService.wakeuper.stop()
+            SpeechAction.ActionCode.ACTION_STOP_WAKEUP -> speechRecoService.stopWakeUp()
             else -> {
                 Vog.e(this, sAction)
             }
@@ -306,7 +309,7 @@ class MainService : BusService(),
      * 测试文本
      */
     @Subscribe(threadMode = ThreadMode.POSTING)
-    fun runAction(que: PriorityQueue<Action>) {
+    fun runActionQue(que: PriorityQueue<Action>) {
         cExecutor.execQueue(ExecutorImpl.DEBUG_SCRIPT, que)
     }
 
@@ -314,7 +317,7 @@ class MainService : BusService(),
      * 测试脚本
      */
     @Subscribe(threadMode = ThreadMode.POSTING)
-    fun runScript(ac: Action) {
+    fun runAction(ac: Action) {
         val q = PriorityQueue<Action>()
         q.add(ac)
         cExecutor.execQueue(ExecutorImpl.DEBUG_SCRIPT, q)
@@ -414,7 +417,7 @@ class MainService : BusService(),
     }
 
     fun hideAll() {
-        listeningToast.hideDelay(500)
+        listeningToast.hideImmediately()
         listeningAni.hideDelay(0)
     }
 
@@ -471,10 +474,14 @@ class MainService : BusService(),
                 SystemBridge.vibrate(80L)
             }
 
-            if (SystemBridge.isMediaPlaying() && !speechSynService.speaking) {//防止误判合成服务播报
-                SystemBridge.mediaPause()
-                haveMusicPlay = true
+            checkMusic()
+            if (!speechSynService.speaking) {
+                speechSynService.stop()
             }
+//            if (SystemBridge.isMediaPlaying() && ) {//防止误判合成服务播报
+//                SystemBridge.mediaPause()
+//                haveMusicPlay = true
+//            }
         }
 
         override fun onResult(result: String) {//解析完成再 resumeMusicIf()?
@@ -610,12 +617,16 @@ class MainService : BusService(),
 
         override fun onStart() {
             Vog.d(this, "onSynData 开始")
-            if (SystemBridge.isMediaPlaying()) {
-                SystemBridge.mediaPause()
-                haveMusicPlay = true
-            }
+            checkMusic()
         }
     }
 
+    fun checkMusic() {
+        if (SystemBridge.isMediaPlaying() && !speechSynService.speaking) {
+            SystemBridge.mediaPause()
+            Vog.d(this, "checkMusic ---> 有音乐播放")
+            haveMusicPlay = true
+        }
+    }
 }
 

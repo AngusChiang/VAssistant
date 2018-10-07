@@ -100,9 +100,8 @@ open class ExecutorImpl(
             thread!!.interrupt()
         }
         this.command = cmdWords
-        if (cmdWords == DEBUG_SCRIPT) {//DEBUG
-            DEBUG = true
-        }
+        DEBUG = (cmdWords == DEBUG_SCRIPT) //DEBUG
+
         ScreenAdapter.reSet()
         this.actionQueue = actionQueue
         lock = Object()

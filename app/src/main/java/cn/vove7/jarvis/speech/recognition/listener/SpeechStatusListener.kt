@@ -1,10 +1,12 @@
 package cn.vove7.jarvis.speech.recognition.listener
 
 import android.os.Handler
+import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.appbus.AppBus
 import cn.vove7.common.appbus.SpeechAction
 import cn.vove7.common.appbus.VoiceData
 import cn.vove7.common.model.RequestPermission
+import cn.vove7.jarvis.R
 import cn.vove7.jarvis.speech.recognition.message.SpeechMessage
 import cn.vove7.jarvis.speech.recognition.model.IStatus.Companion.CODE_VOICE_ERR
 import cn.vove7.jarvis.speech.recognition.model.IStatus.Companion.CODE_VOICE_RESULT
@@ -58,6 +60,9 @@ class SpeechStatusListener(private val handler: Handler) : StatusRecogListener()
             }
             3 -> {
                 handler.sendMessage(SpeechMessage.buildMessage(CODE_VOICE_ERR, "没有检测到用户说话"))
+            }
+            2 -> {
+                GlobalApp.toastShort(R.string.text_net_err)
             }
             else ->
                 handler.sendMessage(SpeechMessage.buildMessage(CODE_VOICE_ERR, message))

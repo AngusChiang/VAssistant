@@ -1,4 +1,5 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -8,97 +9,110 @@
     tools:context="cn.vove7.jarvis.fragments.MineFragment">
 
 
-    <LinearLayout
+    <android.support.v7.widget.CardView
         android:layout_width="match_parent"
-        android:layout_height="127dp"
-        android:layout_margin="10dp"
-        android:layout_marginBottom="20dp"
-        android:background="@color/app_foreground"
+        android:layout_height="157dp"
+        android:layout_marginStart="10dp"
+        android:layout_marginEnd="10dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginBottom="10dp"
         android:baselineAligned="false"
         android:elevation="2dp"
         android:gravity="center_vertical"
+        app:cardCornerRadius="10dp"
         android:orientation="horizontal"
-        android:padding="20dp">
+        app:cardBackgroundColor="@color/google_blue">
 
-        <RelativeLayout
-            android:layout_width="0dp"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_weight="1">
+            android:padding="20dp"
+            android:baselineAligned="false">
 
-            <LinearLayout
-                android:id="@+id/login_lay"
-                android:layout_width="match_parent"
+            <RelativeLayout
+                android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:orientation="vertical">
-
-                <TextView
-                    android:id="@+id/text_login"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/text_click_to_login"
-                    android:textSize="22sp"
-                    android:textStyle="bold" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="" />
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:id="@+id/user_info_lay"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="vertical">
+                android:layout_weight="1">
 
                 <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:gravity="center_vertical"
-                    android:layout_height="wrap_content">
+                    android:id="@+id/login_lay"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical">
 
                     <TextView
-                        android:id="@+id/user_name_text"
+                        android:id="@+id/text_login"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:text="@string/text_click_to_login"
+                        android:textColor="@color/app_background"
                         android:textSize="22sp"
                         android:textStyle="bold" />
 
                     <TextView
-                        android:id="@+id/red_heard"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:padding="5dp"
-                        android:text="❤"
-                        android:textColor="@color/red_500"
-                        android:textSize="20sp" />
+                        android:text=""
+                        android:textColor="@color/app_background" />
 
                 </LinearLayout>
 
-                <TextView
-                    android:id="@+id/user_vip_text"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="" />
+                <LinearLayout
+                    android:id="@+id/user_info_lay"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical">
 
-            </LinearLayout>
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical">
+
+                        <TextView
+                            android:id="@+id/user_name_text"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="@color/app_background"
+                            android:textSize="22sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/red_heard"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:padding="5dp"
+                            android:text="❤"
+                            android:textColor="@color/red_500"
+                            android:textSize="20sp" />
+
+                    </LinearLayout>
+
+                    <TextView
+                        android:id="@+id/user_vip_text"
+                        android:layout_width="wrap_content"
+                        android:textColor="@color/app_background"
+                        android:layout_height="wrap_content"
+                        android:text="" />
+
+                </LinearLayout>
 
 
-        </RelativeLayout>
+            </RelativeLayout>
 
 
-        <RelativeLayout
-            android:id="@+id/header_view_lay"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content">
+            <RelativeLayout
+                android:id="@+id/header_view_lay"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
 
-            <!--<cn.vove7.jarvis.view.custom.IconView-->
-            <!--android:layout_width="wrap_content"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:src="@drawable/ic_home_black_24dp" />-->
-        </RelativeLayout>
+                <!--<cn.vove7.jarvis.view.custom.IconView-->
+                <!--android:layout_width="wrap_content"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:src="@drawable/ic_home_black_24dp" />-->
+            </RelativeLayout>
+        </LinearLayout>
 
-    </LinearLayout>
+    </android.support.v7.widget.CardView>
 
 
     <ListView

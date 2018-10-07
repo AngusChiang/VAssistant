@@ -62,7 +62,7 @@ object ParseEngine {
      *
      * 命令    ↓
      * 全局命令 ↓ 一级命令
-     * App内   ↓ 二级命令
+     * App内   ↓ 二级命令 -> 扫一扫/ 不指定Activity -> 跳至首页
      *
      */
     fun parseAction(cmdWord: String, scope: ActionScope?): ParseResult {
@@ -81,7 +81,8 @@ object ParseEngine {
             actionQueue.addAll(inAppQue.second) //匹配应用内时
             //todo 根据第一个action.scope 决定是否进入首页
             if (actionQueue.isNotEmpty()) {
-                if (actionQueue.peek().scope != scope) {//不同页面
+                val appScope = actionQueue.peek().scope
+                if (appScope.activity ?: "" == "" || appScope.activity != scope.activity) {//Activity 空 or Activity 不等 => 不同页面
                     Vog.d(this, "parseAction ---> 应用内不同页")
                     actionQueue.add(Action(-999,
                             String.format(PRE_OPEN, scope.packageName)
@@ -109,7 +110,7 @@ object ParseEngine {
     }
 
     /**
-     * 全局命令解析失败
+     * 全局命令解析失败 匹配App内指令  根据[包名]
      * 或在执行打开应用后，解析跟随指令
      * eg:
      * 网易云 音乐 播放

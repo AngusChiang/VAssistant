@@ -106,8 +106,8 @@ class GlobalInstListFragment : SimpleListFragment<ActionNode>(), OnSyncInst {
         val tmp = mutableListOf<ViewModel>()
         nodes.forEach {
             val fs = it.follows?.size ?: 0
-            tmp.add(ViewModel((it).actionTitle, it.desc?.instructions ?: "无介绍"+
-            if (fs == 0) "" else "\n跟随 $fs", extra = it))
+            tmp.add(ViewModel((it).actionTitle, (it.desc?.instructions ?: "无介绍") +
+                    (if (fs == 0) "" else "\n跟随 $fs"), extra = it))
         }
         return tmp
     }

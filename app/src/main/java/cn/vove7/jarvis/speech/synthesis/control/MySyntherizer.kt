@@ -1,16 +1,13 @@
 package cn.vove7.jarvis.speech.synthesis.control
 
 import android.content.Context
-import android.util.Log
 import android.util.Pair
 import cn.vove7.common.app.GlobalLog
 import cn.vove7.vtp.log.Vog
-
 import com.baidu.tts.client.SpeechSynthesizeBag
 import com.baidu.tts.client.SpeechSynthesizer
 import com.baidu.tts.client.TtsMode
-
-import java.util.ArrayList
+import java.util.*
 
 /**
  * SpeechSynthesizer封装
@@ -44,7 +41,7 @@ open class MySyntherizer protected constructor(protected var context: Context) {
      */
     protected fun init(config: InitConfig): Boolean {
 
-        Vog.d(this,"init ---> 初始化开始")
+        Vog.d(this, "init ---> 初始化开始")
         val isMix = config.ttsMode == TtsMode.MIX
         mSpeechSynthesizer = SpeechSynthesizer.getInstance()
         mSpeechSynthesizer!!.setContext(context)
@@ -64,7 +61,7 @@ open class MySyntherizer protected constructor(protected var context: Context) {
                 GlobalLog.err("鉴权失败 =$errorMsg")
                 return false
             } else {
-                Vog.d(this,"init ---> 验证通过，离线正式授权文件存在。")
+                Vog.d(this, "init ---> 验证通过，离线正式授权文件存在。")
             }
         }
         setParams(config.params)
@@ -85,8 +82,8 @@ open class MySyntherizer protected constructor(protected var context: Context) {
      * @param text 小于1024 GBK字节，即512个汉字或者字母数字
      * @return
      */
-    fun speak(text: String): Int {
-        return mSpeechSynthesizer!!.speak(text)
+    fun speak(text: String) {
+        mSpeechSynthesizer?.speak(text)
     }
 
     /**
@@ -96,8 +93,15 @@ open class MySyntherizer protected constructor(protected var context: Context) {
      * @param utteranceId 用于listener的回调，默认"0"
      * @return
      */
-    fun speak(text: String, utteranceId: String): Int {
-        return mSpeechSynthesizer!!.speak(text, utteranceId)
+    fun speak(text: String, utteranceId: String) {
+        checkResult(mSpeechSynthesizer?.speak(text, utteranceId), "speak")
+    }
+
+    private fun checkResult(result: Int?, method: String) {
+        if (result != 0) {
+            GlobalLog.err("checkResult error code :$result method:$method")// +
+//                    "错误码文档:http://yuyin.baidu.com/docs/tts/122 ")
+        }
     }
 
     /**
@@ -127,16 +131,17 @@ open class MySyntherizer protected constructor(protected var context: Context) {
         }
     }
 
-    fun pause(): Int {
-        return mSpeechSynthesizer!!.pause()
+    fun pause() {
+
+        checkResult(mSpeechSynthesizer?.pause(), "speak")
     }
 
-    fun resume(): Int {
-        return mSpeechSynthesizer!!.resume()
+    fun resume() {
+        checkResult(mSpeechSynthesizer?.resume(), "resume")
     }
 
-    fun stop(): Int {
-        return mSpeechSynthesizer!!.stop()
+    fun stop() {
+        checkResult(mSpeechSynthesizer?.stop(), "stop")
     }
 
     /**
@@ -171,7 +176,7 @@ open class MySyntherizer protected constructor(protected var context: Context) {
 
 
     protected fun sendToUiThread(message: String) {
-        Vog.d(this,"合成器： $message")
+        Vog.d(this, "合成器： $message")
     }
 
     companion object {

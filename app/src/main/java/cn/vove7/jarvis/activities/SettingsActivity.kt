@@ -74,7 +74,7 @@ class SettingsActivity : ReturnableActivity() {
                             keyId = R.string.key_voice_control_dialog, defaultValue = { true })
             )),
             SettingGroupItem(R.color.cyan_500, titleId = R.string.text_wakeup_way, childItems = listOf(
-                    SwitchItem(R.string.text_open_voice_wakeup, "以 \"你好小V\" 唤醒",
+                    SwitchItem(R.string.text_open_voice_wakeup, summary = "以 \"你好小V\" 唤醒",
                             keyId = R.string.key_open_voice_wakeup, callback = { holder, it ->
                         when (it as Boolean) {
                             true -> {

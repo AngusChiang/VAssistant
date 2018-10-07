@@ -16,7 +16,7 @@ import java.util.*
  * 2018/8/11
  */
 object GlobalLog {
-    val tmpOutFile = GlobalApp.APP.filesDir.absolutePath + "/err"
+    val tmpOutFile = GlobalApp.APP.cacheDir.absolutePath + "/err"
 
     private val logList = mutableListOf<LogInfo>()
     fun log(msg: String?) {

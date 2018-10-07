@@ -167,7 +167,8 @@ abstract class BaseMarkedFragment<T> : SimpleListFragment<T>(), OnSyncMarked {
         editDialog.show()
     }
 
-    override val itemClickListener = object : SimpleListAdapter.OnItemClickListener {
+    override val itemClickListener =
+        object : SimpleListAdapter.OnItemClickListener {
 
         @SuppressLint("CheckResult")
         override fun onClick(holder: SimpleListAdapter.VHolder?, pos: Int, item: ViewModel) {

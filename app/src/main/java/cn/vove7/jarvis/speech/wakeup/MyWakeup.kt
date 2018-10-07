@@ -3,6 +3,7 @@ package cn.vove7.jarvis.speech.wakeup
 import android.content.Context
 import android.content.pm.PackageManager
 import cn.vove7.androlua.luabridge.LuaUtil
+import cn.vove7.common.app.GlobalApp
 import cn.vove7.jarvis.BuildConfig
 import cn.vove7.vtp.log.Vog
 import com.baidu.speech.EventListener
@@ -15,22 +16,26 @@ import org.json.JSONObject
  * Created by fujiayi on 2017/6/20.
  */
 
-class MyWakeup {
+object MyWakeup {
 
-    private var appId: Int
-    private var appKey: String?
-    private var secretKey: String?
+    private var appId: Int = 0
+    private lateinit var appKey: String
+    private lateinit var secretKey: String
+    val context: Context
+    get() = GlobalApp.APP
 
     private var wp: EventManager? = null
-    private val eventListener: EventListener
+    private lateinit var eventListener: EventListener
 
-    constructor(context: Context, eventListener: EventListener) {
+    private fun init(context: Context, eventListener: EventListener) {
         if (isInited) {
-            Vog.e(this, "还未调用release()，请勿新建一个新类")
+//            Vog.e(this, "还未调用release()，请勿新建一个新类")
 //            throw RuntimeException("还未调用release()，请勿新建一个新类")
-            instances?.release()
+            return
+//            instances?.release()
         }
-        instances = this
+//        this.context = context
+//        instances = this
         isInited = true
         this.eventListener = eventListener
         wp = EventManagerFactory.create(context, "wp")
@@ -43,17 +48,24 @@ class MyWakeup {
             secretKey = "di6djKXGGELgnCCusiQUlCBYRxXVrr46"
         } else {
             appId = appInfo.metaData.getInt("com.baidu.speech.APP_ID")
-            appKey = appInfo.metaData.getString("com.baidu.speech.API_KEY")
-            secretKey = appInfo.metaData.getString("com.baidu.speech.SECRET_KEY")
+            appKey = appInfo.metaData.getString("com.baidu.speech.API_KEY")!!
+            secretKey = appInfo.metaData.getString("com.baidu.speech.SECRET_KEY")!!
         }
         LuaUtil.assetsToSD(context, "bd/WakeUp.bin",
                 context.filesDir.absolutePath + "/bd/WakeUp.bin")
     }
 
-    constructor(context: Context, eventListener: IWakeupListener) :
-            this(context, WakeupEventAdapter(eventListener))
+//    constructor(context: Context, eventListener: EventListener) {
+//        init(context, eventListener)
+//    }
 
-    fun start() {
+//    constructor(context: Context, eventListener: IWakeupListener) :
+//            this(context, WakeupEventAdapter(eventListener))
+
+    fun start(eventL: WakeupEventAdapter) {
+        if (wp == null) {
+            init(context, eventL)
+        }
 
         val params = HashMap<String, Any?>()
         params[SpeechConstant.WP_WORDS_FILE] = "assets:///bd/WakeUp.bin"
@@ -75,17 +87,18 @@ class MyWakeup {
 
     fun stop() {
         wp!!.send(SpeechConstant.WAKEUP_STOP, null, null, 0, 0)
+        release()
     }
 
     fun release() {
-        stop()
+//        stop()
         wp!!.unregisterListener(eventListener)
         wp = null
         isInited = false
     }
 
-    companion object {
-        private var isInited = false
-        var instances: MyWakeup? = null
-    }
+    private var isInited = false
+//    companion object {
+//        var instances: MyWakeup? = null
+//    }
 }

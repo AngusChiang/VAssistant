@@ -21,6 +21,7 @@ import cn.vove7.jarvis.speech.recognition.model.IStatus.Companion.CODE_WAKEUP_SU
 import cn.vove7.jarvis.speech.recognition.recognizer.MyRecognizer
 import cn.vove7.jarvis.speech.wakeup.MyWakeup
 import cn.vove7.jarvis.speech.wakeup.RecogWakeupListener
+import cn.vove7.jarvis.speech.wakeup.WakeupEventAdapter
 import cn.vove7.jarvis.utils.AppConfig
 import cn.vove7.vtp.log.Vog
 import com.baidu.speech.asr.SpeechConstant
@@ -37,10 +38,10 @@ class SpeechRecoService(val event: SpeechEvent) {
      */
     private lateinit var myRecognizer: MyRecognizer
 
-    /**
-     * 唤醒器
-     */
-    lateinit var wakeuper: MyWakeup
+//    /**
+//     * 唤醒器
+//     */
+//    var wakeuper= MyWakeup()
 
     /*
      * 本Activity中是否需要调用离线命令词功能。根据此参数，判断是否需要调用SDK的ASR_KWS_LOAD_ENGINE事件
@@ -90,9 +91,19 @@ class SpeechRecoService(val event: SpeechEvent) {
         thread {
             initRecog()
             //初始化唤醒器
-            if (AppConfig.voiceWakeup)
-                wakeuper.start()
+            if (AppConfig.voiceWakeup) {
+                startWakeUp()
+            }
         }
+    }
+
+    fun startWakeUp() {
+        val wakeLis = RecogWakeupListener(handler)
+        MyWakeup.start(WakeupEventAdapter(wakeLis))
+    }
+
+    fun stopWakeUp() {
+        MyWakeup.stop()
     }
 
     lateinit var listener: SpeechStatusListener
@@ -104,8 +115,7 @@ class SpeechRecoService(val event: SpeechEvent) {
         val context: Context = GlobalApp.APP
         myRecognizer = MyRecognizer(context, listener)
 
-        val wakeLis = RecogWakeupListener(handler)
-        wakeuper = MyWakeup(context, wakeLis)
+//        wakeuper = MyWakeup(context, wakeLis)
 
         if (enableOffline) {
             myRecognizer.loadOfflineEngine(OfflineRecogParams.fetchOfflineParams())

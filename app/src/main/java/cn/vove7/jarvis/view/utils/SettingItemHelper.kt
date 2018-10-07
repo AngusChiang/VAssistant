@@ -90,8 +90,10 @@ class SettingItemHelper(val context: Context) {
     }
 
     private fun initAndSetInputListener(holder: ChildItemHolder, item: SettingChildItem) {
+        val sp = SpHelper(context)
+        item.summary = if (item.keyId != null) sp.getString(item.keyId)
+        else item.defaultValue.invoke() as String
         setBasic(holder, item) {
-            val sp = SpHelper(context)
             val pre = if (item.keyId != null) sp.getString(item.keyId) else item.defaultValue.invoke() as String
             MaterialDialog(context).title(text = item.title()).input(prefill = pre) { d, c ->
                 Vog.d(this, "initAndSetInputListener ---> $c")
@@ -167,9 +169,9 @@ class SettingItemHelper(val context: Context) {
                 item.summary = v
                 entity.indexOf(v)
             } else 0
-        } else{
-            val i=item.defaultValue.invoke() as Int? ?: 0
-            item.summary= item.items?.get(i)
+        } else {
+            val i = item.defaultValue.invoke() as Int? ?: 0
+            item.summary = item.items?.get(i)
             i
         }
 
@@ -196,7 +198,7 @@ class SettingItemHelper(val context: Context) {
      * @param holder ChildItemHolder
      * @param item SettingChildItem
      */
-    @Deprecated("unuse")
+    @Deprecated("unused")
     private fun initMultiDialog(holder: ChildItemHolder, item: SettingChildItem) {
         val sp = SpHelper(context)
         val entity = context.resources.getStringArray(item.entityArrId!!)
@@ -212,7 +214,7 @@ class SettingItemHelper(val context: Context) {
                     item.summary = ts.toString()
                     setBasic(holder, item)
                     // callback
-                    item.callback?.invoke(holder,ts)
+                    item.callback?.invoke(holder, ts)
                 }.show()
     }
 

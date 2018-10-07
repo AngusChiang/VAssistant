@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="text_permission_manager">权限管理</string>
-    <string name="app_name">V Assist</string>
+    <string name="app_name">V Assistant</string>
     <string name="simple_test_script">简单顺序脚本测试</string>
     <string name="text_androlua_test">AndroLua 测试</string>
     <string name="no_net_refresh">没有网络，下拉刷新试试</string>
@@ -81,7 +81,7 @@
     <string name="text_speak_speed">语速</string>
     <string name="text_open_ad_killer_service">去广告服务</string>
     <string name="text_remote_debug">远程调试</string>
-    <string name="text_open_voice_wakeup">开启语音唤醒</string>
+    <string name="text_open_voice_wakeup">语音唤醒</string>
     <string name="text_play_voice_message">播放语音消息</string>
     <string name="text_test_code">代码测试</string>
     <string name="text_voice_control">语音控制</string>

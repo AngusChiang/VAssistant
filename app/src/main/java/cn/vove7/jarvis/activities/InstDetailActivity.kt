@@ -23,15 +23,16 @@ import cn.vove7.common.model.UserInfo
 import cn.vove7.common.netacc.ApiUrls
 import cn.vove7.common.netacc.model.BaseRequestModel
 import cn.vove7.common.netacc.model.ResponseMessage
-import cn.vove7.jarvis.utils.NetHelper
 import cn.vove7.common.utils.RegUtils
 import cn.vove7.common.utils.TextHelper
 import cn.vove7.common.view.toast.ColorfulToast
 import cn.vove7.executorengine.exector.MultiExecutorEngine
+import cn.vove7.executorengine.helper.AdvanAppHelper
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.adapters.ExecuteQueueAdapter
 import cn.vove7.jarvis.adapters.InstSettingListAdapter
 import cn.vove7.jarvis.utils.AppConfig
+import cn.vove7.jarvis.utils.NetHelper
 import cn.vove7.jarvis.view.dialog.ProgressDialog
 import cn.vove7.vtp.dialog.DialogWithList
 import cn.vove7.vtp.easyadapter.BaseListAdapter
@@ -479,9 +480,10 @@ class InstDetailActivity : AppCompatActivity() {
             execQueue.add(0, p)
             p = p.parent
         }
-        if (ActionNode.belongInApp(node.actionScopeType)) {
-            val pkg = node.actionScope.packageName
-            execQueue.add(0, ActionNode("打开App",
+        if (ActionNode.belongInApp(execQueue[0].actionScopeType)) {
+            val pkg = execQueue[0].actionScope.packageName
+            val appName = AdvanAppHelper.getAppInfo(pkg)?.name
+            execQueue.add(0, ActionNode("打开App: $appName",
                     Action("openAppByPkg('$pkg',true)\n" +
                             "waitForApp('$pkg')", Action.SCRIPT_TYPE_LUA)))
 
@@ -489,8 +491,9 @@ class InstDetailActivity : AppCompatActivity() {
         val d = DialogWithList(this, ExecuteQueueAdapter(this, execQueue))
                 .setButton(DialogInterface.BUTTON_POSITIVE, R.string.text_run, View.OnClickListener { v ->
                     val que = PriorityQueue<Action>()
-                    execQueue.forEach {
-                        que.add(it.action)
+                    execQueue.withIndex().forEach {
+                        it.value.action.priority = it.index
+                        que.add(it.value.action)
                     }
                     AppBus.post(que)
                 })

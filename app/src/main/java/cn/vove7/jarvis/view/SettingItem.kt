@@ -16,7 +16,7 @@ const val TYPE_CHECK_BOX = 1
 const val TYPE_SWITCH = 2
 const val TYPE_INPUT = 3
 const val TYPE_SINGLE = 4
-@Deprecated("unuse")
+@Deprecated("unused")
 const val TYPE_MULTI = 5
 const val TYPE_NUMBER = 6
 const val TYPE_SWITCH_CALLBACK = 8
@@ -36,7 +36,6 @@ typealias CallbackOnSet = (SettingItemHelper.ChildItemHolder, Any) -> Unit
  * @property range Pair<Int, Int>?
  * @property callback Function1<Any, Unit>?
  * @property entityArrId Int?
- * @property valueArrId Int?
  * @constructor
  */
 open class SettingChildItem(

@@ -9,4 +9,5 @@
     <color name="p_green_dark">#087D42</color>
 
     <color name="fff">#fff</color>
+    <color name="trans">#00000000</color>
 </resources>

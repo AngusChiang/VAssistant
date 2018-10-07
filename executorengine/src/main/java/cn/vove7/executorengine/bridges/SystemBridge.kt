@@ -7,6 +7,7 @@ import android.bluetooth.BluetoothAdapter
 import android.content.*
 import android.content.Context.WIFI_SERVICE
 import android.content.pm.PackageManager
+import android.graphics.Bitmap
 import android.location.Location
 import android.location.LocationListener
 import android.location.LocationManager
@@ -19,11 +20,13 @@ import android.net.wifi.WifiManager
 import android.os.*
 import android.support.annotation.RequiresApi
 import android.support.v4.content.ContextCompat
+import android.support.v4.content.FileProvider
 import android.view.KeyEvent
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.appbus.AppBus
 import cn.vove7.common.bridges.SystemOperation
+import cn.vove7.common.bridges.UtilBridge.bitmap2File
 import cn.vove7.common.datamanager.DAO
 import cn.vove7.common.datamanager.executor.entity.MarkedData
 import cn.vove7.common.datamanager.greendao.MarkedDataDao
@@ -31,6 +34,7 @@ import cn.vove7.common.model.ExResult
 import cn.vove7.common.model.RequestPermission
 import cn.vove7.common.model.ResultBox
 import cn.vove7.common.utils.RegUtils
+import cn.vove7.common.view.ScreenshotActivity
 import cn.vove7.executorengine.R
 import cn.vove7.executorengine.helper.AdvanAppHelper
 import cn.vove7.executorengine.helper.AdvanContactHelper
@@ -40,13 +44,12 @@ import cn.vove7.vtp.hardware.HardwareHelper
 import cn.vove7.vtp.log.Vog
 import cn.vove7.vtp.system.DeviceInfo
 import cn.vove7.vtp.system.SystemHelper
+import java.io.File
 
 
 object SystemBridge : SystemOperation {
     private val context: Context
-        get() {
-            return GlobalApp.APP
-        }
+        get() = GlobalApp.APP
 
     override fun openAppDetail(pkg: String): Boolean {
         return try {
@@ -452,8 +455,9 @@ object SystemBridge : SystemOperation {
             GlobalApp.toastShort("不支持关闭热点")
         }
     }
+
     @TargetApi(Build.VERSION_CODES.O)
-    fun getWifiApLis():WifiManager.LocalOnlyHotspotCallback {
+    fun getWifiApLis(): WifiManager.LocalOnlyHotspotCallback {
         return object : WifiManager.LocalOnlyHotspotCallback() {
             override fun onStarted(reservation: WifiManager.LocalOnlyHotspotReservation) {
                 super.onStarted(reservation)
@@ -602,6 +606,66 @@ object SystemBridge : SystemOperation {
     private fun intToIp(i: Int): String {
         return (i and 0xFF).toString() + "." + ((i shr 8) and 0xFF) +
                 "." + ((i shr 16) and 0xFF) + "." + (i shr 24 and 0xFF)
+    }
+
+    override fun screenShot(): Bitmap? {
+        prepareIfNeeded()
+        val resultBox = ResultBox<Bitmap?>()
+        val capIntent = ScreenshotActivity.getScreenshotIntent(context, resultBox, Looper.myLooper())
+        context.startActivity(capIntent)
+        Looper.loop()
+        return resultBox.get()
+    }
+
+    override fun screen2File(): File? {
+        val tmpPath = context.cacheDir.absolutePath + "/screen.png"
+        return screen2File(tmpPath)
+    }
+
+    fun screen2File(p: String): File? {
+        val screenBitmap = screenShot()
+        return if (screenBitmap != null) {
+            bitmap2File(screenBitmap, p)
+        } else null
+    }
+
+    override fun shareText(content: String?) {
+        try {
+            val intent = Intent(Intent.ACTION_SEND)
+//            intent.putExtra(Intent.EXTRA_SUBJECT, title)
+            intent.putExtra(Intent.EXTRA_TEXT, content ?: "")
+            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+            context.startActivity(intent)
+        } catch (e: Exception) {
+            GlobalLog.err(e)
+            GlobalApp.toastShort("分享失败")
+        }
+    }
+
+    override fun shareImage(imgPath: String?) {
+        try {
+            val intent = Intent(Intent.ACTION_SEND)
+            if (imgPath == null || imgPath == "") {
+                intent.type = "text/plain"
+                // 纯文本
+            } else {
+                val f = File(imgPath)
+                if (f.exists() && f.isFile) {
+                    intent.type = "image/jpg"
+
+                    val imgUri = if (Build.VERSION.SDK_INT >= 24)
+                        FileProvider.getUriForFile(context, "${context.packageName}.fileprovider", f)
+                    else Uri.fromFile(f)
+
+                    intent.putExtra(Intent.EXTRA_STREAM, imgUri)
+                }
+            }
+            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+            context.startActivity(intent)
+        } catch (e: Exception) {
+            GlobalLog.err(e)
+            GlobalApp.toastShort("分享失败")
+        }
     }
 
 }

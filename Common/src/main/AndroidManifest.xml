@@ -2,4 +2,9 @@
     package="cn.vove7.common" >
 
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <application>
+        <activity android:name=".view.ScreenshotActivity"
+            android:launchMode="singleInstance"
+            android:theme="@style/ScreenShotTheme" />
+    </application>
 </manifest>

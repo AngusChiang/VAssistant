@@ -16,7 +16,6 @@ import java.io.Serializable;
 import java.util.Objects;
 
 import cn.vove7.common.BuildConfig;
-import cn.vove7.common.datamanager.DAO;
 import cn.vove7.common.datamanager.parse.DataFrom;
 import cn.vove7.common.interfaces.Markable;
 import cn.vove7.common.model.UserInfo;
@@ -230,6 +229,8 @@ public class MarkedData implements DataFrom, Markable, Serializable {
         }
         builder.append("正则：").append(regStr).append('\n');
         builder.append("来源：").append(DataFrom.Companion.translate(from)).append('\n');
+        if (tagId != null)
+            builder.append("已分享").append('\n');
         if (BuildConfig.DEBUG) {
             builder.append("tag：").append(tagId).append('\n');
         }
