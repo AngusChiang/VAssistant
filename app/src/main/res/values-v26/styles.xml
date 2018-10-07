@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+        <!-- Customize your theme here. -->
+        <item name="colorPrimary">@color/p_green</item>
+        <item name="colorPrimaryDark">@color/p_green_dark</item>
+        <item name="colorAccent">@color/google_blue</item>
+        <item name="android:navigationBarColor">@color/p_green</item>
+
+        <!--<item name="md_color_title">@color/colorAccent</item>-->
+        <!--<item name="md_color_content">@color/your_color</item>-->
+        <item name="md_corner_radius">16dp</item>
+
+        <item name="editTextStyle">@style/EditTextStyle</item>
+        <item name="android:windowBackground">@color/app_background</item>
+
+        <!--<item name="android:colorControlHighlight">@color/colorPrimary</item>-->
+    </style>
+
+    <style name="EditTextStyle" parent="@style/Widget.AppCompat.EditText">
+        <item name="android:importantForAutofill">noExcludeDescendants</item>
+    </style>
+</resources>

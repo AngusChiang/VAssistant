@@ -15,7 +15,7 @@ import java.util.*
  *
  * Created by Vove on 2018/6/18
  */
-@Deprecated("useless",ReplaceWith("[MultiExecutorEngine]"))
+@Deprecated("unused", ReplaceWith("[MultiExecutorEngine]"))
 class SimpleActionScriptExecutor(
         context: Context,
         serviceBridge: ServiceBridge
@@ -83,6 +83,7 @@ class SimpleActionScriptExecutor(
             if (mResult != null) {
                 val param = mResult.groupValues[1]
                 ps = param.substring(1, param.length - 1).split(",").toMutableList()//变量数组
+                @Deprecated("清空value ，不再改")
                 if (action.param != null && action.param!!.value != null) {//替换脚本变量
                     Vog.d(this, "execAction 替换变量${action.param!!.value}")
                     replaceVar(ps, action.param!!.value)
@@ -187,7 +188,7 @@ class SimpleActionScriptExecutor(
 //                            else -> false
 //                        }) {
 //                    Thread.sleep(100)
-                   return PartialResult.success()
+            return PartialResult.success()
 
 //                } else PartialResult(false, stopIfFail, "操作失败 - $op")
 //            } else PartialResult(false, stopIfFail, "未找到View: $v")

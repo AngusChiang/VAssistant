@@ -191,5 +191,9 @@
     <string name="text_other">其他</string>
     <string name="text_faq">常见问题</string>
     <string name="text_check_last_data">检查最新数据</string>
+    <string name="shortcut_wakeup">唤醒</string>
+    <string name="text_not_enable">未启用</string>
+    <string name="text_add_wakeup_shortcut_to_launcher">添加唤醒到桌面快捷方式</string>
+    <string name="text_add_shortcut_to_launcher">添加到桌面快捷方式</string>
 
 </resources>

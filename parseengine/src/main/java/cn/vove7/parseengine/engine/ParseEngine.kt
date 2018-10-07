@@ -79,7 +79,7 @@ object ParseEngine {
             }
             val inAppQue = matchAppAction(cmdWord, scope)
             actionQueue.addAll(inAppQue.second) //匹配应用内时
-            //todo 根据第一个action.scope 决定是否进入首页
+            // 根据第一个action.scope 决定是否进入首页
             if (actionQueue.isNotEmpty()) {
                 val appScope = actionQueue.peek().scope
                 if (appScope.activity ?: "" == "" || appScope.activity != scope.activity) {//Activity 空 or Activity 不等 => 不同页面
@@ -177,10 +177,11 @@ object ParseEngine {
 //                    println("--匹配成功")
                     //匹配成功
                     if (preAction != null) {//修剪上一个匹配结果参数,第一个%即为上一个参数
-                        if (result.groupValues[0].startsWith(preAction.param?.value ?: "--")) {
+                        val old = preAction.param?.value
+                        if (result.groupValues[0].startsWith(old ?: "--")) {
                             val preParamLen = if (preAction.param != null) result.groupValues[1].length else 0
                             val thisMatchLen = result.groupValues[0].length
-                            preAction.param?.value = preAction.param?.value?.substring(0, preParamLen)
+                            preAction.param?.value = old?.substring(0, preParamLen)
                             val allLen = preAction.matchWord.length
                             preAction.matchWord = preAction.matchWord
                                     .substring(0, allLen - (thisMatchLen - preParamLen))

@@ -11,6 +11,7 @@ import cn.vove7.common.appbus.SpeechAction
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.activities.base.ReturnableActivity
 import cn.vove7.jarvis.adapters.SettingsExpandableAdapter
+import cn.vove7.jarvis.utils.ShortcutUtil
 import cn.vove7.jarvis.view.*
 import cn.vove7.jarvis.view.custom.SettingGroupItem
 import kotlinx.android.synthetic.main.activity_expandable_settings.*
@@ -84,7 +85,13 @@ class SettingsActivity : ReturnableActivity() {
                         }
                     }, defaultValue = { false }),
                     SwitchItem(R.string.text_long_press_volume_up, null,
-                            keyId = R.string.key_long_press_volume_up_wake_up, summary = "需要无障碍模式开启", defaultValue = { true })
+                            keyId = R.string.key_long_press_volume_up_wake_up, summary = "需要无障碍模式开启",
+                            defaultValue = { true }),
+                    IntentItem(R.string.text_add_wakeup_shortcut_to_launcher, summary = "添加需要8.0+，" +
+                            "7.1+可直接在桌面长按图标使用Shortcut快捷唤醒",
+                            onClick = { _, _ ->
+                        ShortcutUtil.addWakeUpPinShortcut()
+                    })
             ))
 //           ,SettingGroupItem(R.color.lime_600, titleId = R.string.text_animation, childItems = listOf(
 //                    CheckBoxItem(, "应用内动画",

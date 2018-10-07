@@ -28,9 +28,8 @@
             android:focusable="true"
             app:contentInsetStart="0dp"
             app:contentInsetStartWithNavigation="-5dp"
-            app:navigationIcon="@drawable/ic_close_black_24dp"
-            app:title=""
-            app:titleTextColor="#757575" />
+            app:navigationIcon="@drawable/ic_close"
+            app:titleTextColor="@color/secondary_text" />
     </android.support.design.widget.AppBarLayout>
 
     <android.support.v4.widget.NestedScrollView

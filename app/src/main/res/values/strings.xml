@@ -255,4 +255,8 @@
     <string name="key_last_sync_marked_app_date" translatable="false">last_sync_marked_app_date</string>
     <string name="key_last_sync_marked_open_date" translatable="false">last_sync_marked_open_date</string>
     <string name="key_last_sync_marked_ad_date" translatable="false">last_sync_marked_ad_date</string>
+    <string name="shortcut_wakeup">WakeUp</string>
+    <string name="text_not_enable">Not enable</string>
+    <string name="text_add_wakeup_shortcut_to_launcher">添加唤醒到桌面快捷方式</string>
+    <string name="text_add_shortcut_to_launcher">添加到桌面快捷方式</string>
 </resources>

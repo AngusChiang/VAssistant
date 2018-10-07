@@ -2,6 +2,7 @@ package cn.vove7.jarvis.activities
 
 import android.content.DialogInterface
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.support.v7.app.AppCompatActivity
@@ -33,6 +34,7 @@ import cn.vove7.jarvis.adapters.ExecuteQueueAdapter
 import cn.vove7.jarvis.adapters.InstSettingListAdapter
 import cn.vove7.jarvis.utils.AppConfig
 import cn.vove7.jarvis.utils.NetHelper
+import cn.vove7.jarvis.utils.ShortcutUtil
 import cn.vove7.jarvis.view.dialog.ProgressDialog
 import cn.vove7.vtp.dialog.DialogWithList
 import cn.vove7.vtp.easyadapter.BaseListAdapter
@@ -295,6 +297,20 @@ class InstDetailActivity : AppCompatActivity() {
                     d.setTitle(title ?: "")
                     d.setWidth(0.9)
                     d.show()
+                }
+                R.id.menu_add_shortcut -> {
+                    MaterialDialog(this).title(R.string.text_add_shortcut_to_launcher)
+                            .message(text = "注意：只能添加没有参数指令，或者在运行时可以询问参数值指令，否则无法正常执行\n" +
+                                    "此操作需要7.1+\n8.0+系统可添加至桌面快捷图标")
+                            .positiveButton {
+                                ShortcutUtil.addActionShortcut(node)
+                            }.show {
+                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                                    neutralButton(text = "同时添加进图标shortcut") {
+                                        ShortcutUtil.addActionShortcut(node,true)
+                                    }
+                                }
+                            }
                 }
             }
             return@setOnMenuItemClickListener true

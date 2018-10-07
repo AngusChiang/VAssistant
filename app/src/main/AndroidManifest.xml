@@ -32,6 +32,9 @@
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
 
     <uses-permission android:name="android.permission.WAKE_LOCK" />
+
+    <uses-permission android:name="android.permission.INSTALL_SHORTCUT"/>
+    <uses-permission android:name="android.permission.UNINSTALL_SHORTCUT"/>
     <uses-permission
         android:name="android.permission.DEVICE_POWER"
         tools:ignore="ProtectedPermissions" />
@@ -81,8 +84,10 @@
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+            <meta-data android:name="android.app.shortcuts"
+                android:resource="@xml/shortcuts" />
         </activity>
-        <activity android:name=".activities.MainActivity" />
+        <!--<activity android:name=".activities.MainActivity" />-->
 
         <activity
             android:name=".activities.base.VoiceAssistActivity"

@@ -33,8 +33,12 @@
         app:showAsAction="never" />
     <item
         android:id="@+id/menu_settings"
+        android:icon="@drawable/ic_settings"
         android:title="@string/text_settings"
         android:visible="false"
-        android:icon="@drawable/ic_settings"
         app:showAsAction="ifRoom" />
+    <item
+        android:id="@+id/menu_add_shortcut"
+        android:title="@string/text_add_shortcut_to_launcher"
+        app:showAsAction="never"/>
 </menu>

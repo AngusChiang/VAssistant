@@ -18,6 +18,7 @@ import android.net.Uri
 import android.net.wifi.WifiConfiguration
 import android.net.wifi.WifiManager
 import android.os.*
+import android.provider.Settings
 import android.support.annotation.RequiresApi
 import android.support.v4.content.ContextCompat
 import android.support.v4.content.FileProvider
@@ -53,7 +54,13 @@ object SystemBridge : SystemOperation {
 
     override fun openAppDetail(pkg: String): Boolean {
         return try {
-            AppHelper.showPackageDetail(context, pkg)
+//            AppHelper.showPackageDetail(context, pkg)
+            val intent = Intent()
+            intent.action = Settings.ACTION_APPLICATION_DETAILS_SETTINGS
+            val uri = Uri.fromParts("package", pkg, null)
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            intent.data = uri
+            context.startActivity(intent)
             true
         } catch (e: Exception) {
             GlobalLog.err(e)

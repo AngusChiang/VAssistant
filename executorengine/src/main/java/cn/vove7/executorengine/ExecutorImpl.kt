@@ -128,7 +128,7 @@ open class ExecutorImpl(
                 currentAction = actionQueue.poll()
                 actionScope = currentAction?.actionScopeType
                 Vog.d(this, "pollActionQueue ---> $actionScope")
-                r = runScript(currentAction!!.actionScript, currentAction!!.param.value)
+                r = runScript(currentAction!!.actionScript, currentAction!!.param.valueWithClear)//todo 清除参数缓存
                 when {
                     r.needTerminal -> {//出错
                         currentAction = null
@@ -327,6 +327,22 @@ open class ExecutorImpl(
     }
 
     /**
+     * 等待语音参数
+     */
+    override fun waitForVoiceParam(askWord: String?): String? {
+
+        serviceBridge?.getVoiceParam(currentAction!!)
+        waitForUnlock()
+        //得到结果 -> action.param
+        return if (!currentAction!!.responseResult) {
+            null
+//                PartialResult.fatal("获取语音参数失败")
+        } else {
+            currentAction!!.param.valueWithClear
+        }
+    }
+
+    /**
      * 得到语音参数,赋值
      */
     override fun onGetVoiceParam(param: String?) {
@@ -430,22 +446,6 @@ open class ExecutorImpl(
         accessApi?.waitForView(this, ViewFindBuilder(this).containsText(*text).viewFinderX)
         waitForUnlock(m)
         return getViewNode()
-    }
-
-    /**
-     * 等待语音参数
-     */
-    override fun waitForVoiceParam(askWord: String?): String? {
-
-        serviceBridge?.getVoiceParam(currentAction!!)
-        waitForUnlock()
-        //得到结果 -> action.param
-        return if (!currentAction!!.responseResult) {
-            null
-//                PartialResult.fatal("获取语音参数失败")
-        } else {
-            currentAction!!.param.value
-        }
     }
 
     /**

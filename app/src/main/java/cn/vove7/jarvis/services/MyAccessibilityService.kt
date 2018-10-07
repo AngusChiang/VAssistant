@@ -14,6 +14,8 @@ import android.view.accessibility.AccessibilityEvent.*
 import android.view.accessibility.AccessibilityNodeInfo
 import cn.vove7.common.accessibility.AccessibilityApi
 import cn.vove7.common.accessibility.viewnode.ViewNode
+import cn.vove7.common.app.GlobalApp
+import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.appbus.AppBus
 import cn.vove7.common.datamanager.parse.model.ActionScope
 import cn.vove7.common.executor.CExecutorI
@@ -55,7 +57,6 @@ class MyAccessibilityService : AccessibilityApi() {
             registerEvent(AdKillerService)
         }
     }
-
 
 
     private fun updateCurrentApp(pkg: String) {
@@ -162,10 +163,12 @@ class MyAccessibilityService : AccessibilityApi() {
         val eventType = event.eventType
         if (eventType == AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED) {//界面切换
             val classNameStr = event.className
-            val pkg = event.packageName as String
-            Vog.d(this, "TYPE_WINDOW_STATE_CHANGED --->\n ${event.packageName} ${event.className}")
-            currentActivity = classNameStr.toString()//.substring(classNameStr.lastIndexOf('.') + 1)
-            updateCurrentApp(pkg)  //输入法??
+            val pkg = event.packageName as String?
+            Vog.d(this, "TYPE_WINDOW_STATE_CHANGED --->\n $pkg ${event.className}")
+            if (classNameStr != null)
+                currentActivity = classNameStr.toString()//.substring(classNameStr.lastIndexOf('.') + 1)
+            if (pkg != null)
+                updateCurrentApp(pkg)  //输入法??
             callAllNotifier()
         }
         if (blackPackage.contains(currentScope.packageName)) {//black list
@@ -287,8 +290,13 @@ class MyAccessibilityService : AccessibilityApi() {
      * @return Boolean
      */
     override fun onKeyEvent(event: KeyEvent): Boolean {
-        if (!SystemHelper.isScreenOn(this))//(火)?息屏下
+        try {
+            if (!SystemHelper.isScreenOn(GlobalApp.APP))//(火)?息屏下
+                return super.onKeyEvent(event)
+        } catch (e: Exception) {
+            GlobalLog.err(e)
             return super.onKeyEvent(event)
+        }
         Vog.v(this, "onKeyEvent  ----> " + event.toString())
         when (event.action) {
             KeyEvent.ACTION_DOWN -> when (event.keyCode) {

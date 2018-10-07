@@ -1,0 +1,17 @@
+<shortcuts xmlns:android="http://schemas.android.com/apk/res/android">
+    <shortcut
+        android:shortcutId="fast_wakeup"
+        android:enabled="true"
+        android:icon="@mipmap/ic_launcher_vassist"
+        android:shortcutShortLabel="@string/shortcut_wakeup"
+        android:shortcutDisabledMessage="@string/text_not_enable">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:targetPackage="cn.vove7.vassistant"
+            android:targetClass="cn.vove7.jarvis.activities.base.VoiceAssistActivity" />
+        <!-- If your shortcut is associated with multiple intents, include them
+             here. The last intent in the list determines what the user sees when
+             they launch this shortcut. -->
+        <categories android:name="android.shortcut.conversation" />
+    </shortcut>
+</shortcuts>

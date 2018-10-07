@@ -64,7 +64,7 @@ class MultiExecutorEngine(
                 Vog.d(this, "runScript arg : $arg")
                 luaHelper!!.evalString(script, arrayOf(arg))
             } else
-                luaHelper!!.evalString(script)
+                luaHelper!!.evalString(script, arrayOf())
 
             luaHelper!!.handleMessage(OnPrint.INFO, "主线程执行完毕\n")
             PartialResult.success()

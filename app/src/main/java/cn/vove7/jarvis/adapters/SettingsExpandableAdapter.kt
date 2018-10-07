@@ -48,7 +48,7 @@ class SettingsExpandableAdapter(val context: Context,
                 if (i != gPos) {
                     val gpos = getGroupAbsPos(i)
                     Vog.d(this, "Collapse group ---> $i         $gpos")
-                    animationHelper.fromB2T(groupHolders[i]!!.itemView, gpos)
+                    animationHelper.fromB2T(groupHolders[i]?.itemView, gpos)
                 }
                 if (i == gPos || expView.isGroupExpanded(i))//if展开
                     for (j in 0 until getChildrenCount(i)) {
@@ -71,7 +71,7 @@ class SettingsExpandableAdapter(val context: Context,
             for (i in gPos until groupCount) {
                 if (gPos != i) {
                     Vog.d(this, "Expand group ---> $i")
-                    animationHelper.fromT2B(groupHolders[i]!!.itemView, getGroupAbsPos(i))
+                    animationHelper.fromT2B(groupHolders[i]?.itemView, getGroupAbsPos(i))
                 }
                 if (expView.isGroupExpanded(i))//if展开
                     for (j in 0 until getChildrenCount(i)) {

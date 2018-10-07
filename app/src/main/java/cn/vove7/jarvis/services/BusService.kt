@@ -43,7 +43,8 @@ abstract class BusService : Service() {
         super.onCreate()
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             initChannel()
-            val n = Notification.Builder(this, serviceId.toString()).build()
+            val n = Notification.Builder(this, serviceId.toString())
+                    .build()
             startForeground(serviceId, n)
         }
         AppBus.reg(this)

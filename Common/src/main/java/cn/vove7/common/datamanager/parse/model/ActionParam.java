@@ -56,9 +56,21 @@ public class ActionParam implements Serializable {
     //    this.id = id;
     //}
 
+    /**
+     * 取后 清空值
+     * 防止GreenDao缓存
+     * @return value
+     */
+
+    public String getValueWithClear() {
+        String s = this.value;
+        this.value = null;
+        return s;
+    }
     public String getValue() {
         return this.value;
     }
+
 
     public void setValue(String value) {
         this.value = value;

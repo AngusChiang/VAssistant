@@ -4,13 +4,12 @@ import android.content.Intent
 import android.os.Build
 import android.util.Log
 import cn.vove7.androlua.LuaApp
-import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.appbus.MessageEvent
 import cn.vove7.executorengine.helper.AdvanAppHelper
 import cn.vove7.jarvis.services.MainService
 import cn.vove7.jarvis.utils.AppConfig
 import cn.vove7.jarvis.utils.CrashHandler
-import cn.vove7.jarvis.utils.debugserver.RemoteDebugServer
+import cn.vove7.jarvis.utils.ShortcutUtil
 import cn.vove7.vtp.log.Vog
 import devliving.online.securedpreferencestore.DefaultRecoveryHandler
 import devliving.online.securedpreferencestore.SecuredPreferenceStore
@@ -48,7 +47,7 @@ class App : LuaApp() {
             AppConfig.init()
             AdvanAppHelper.updateAppList()
             CodeProcessor.init(this)
-            GlobalLog
+            ShortcutUtil.addWakeUpShortcut()
         }
     }
 
