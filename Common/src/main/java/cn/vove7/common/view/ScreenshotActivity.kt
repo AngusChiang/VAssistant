@@ -31,9 +31,9 @@ class ScreenshotActivity : Activity() {
     private val pic: Bitmap?
         get() {
             var b: Bitmap? = null
-            sleep(800)//must  wait status bar hide
+            sleep(800)//must wait status bar hide
             mImageReader.acquireLatestImage()?.use { image ->
-                Vog.d(this, "cap ---> from mImageReader")
+//                Vog.d(this, "cap ---> from mImageReader")
                 val width = image.width
                 val height = image.height
                 val planes = image.planes
@@ -52,8 +52,10 @@ class ScreenshotActivity : Activity() {
                 img.setImageBitmap(b)
                 setContentView(img)
                 img.post {//fixme 动画
-                    val animY = ObjectAnimator.ofFloat(img, "scaleY", 1f, 0.7f)
-                    val animX = ObjectAnimator.ofFloat(img, "scaleX", 1f, 0.7f)
+                    val animY = ObjectAnimator.ofFloat(img, "scaleY",
+                            1f, 0.7f)
+                    val animX = ObjectAnimator.ofFloat(img, "scaleX",
+                            1f, 0.7f)
                     val aSet = AnimatorSet()
                     aSet.play(animX).with(animY)
                     aSet.duration = 300
@@ -115,8 +117,9 @@ class ScreenshotActivity : Activity() {
 
     private fun stopVirtualDisplay() {
         Vog.d(this, "stopVirtualDisplay ---> release mVirtualDisplay ")
-        mVirtualDisplay.release()
         mImageReader.close()
+        mVirtualDisplay.release()
+        mMediaProjection.stop()
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {

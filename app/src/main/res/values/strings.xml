@@ -262,4 +262,7 @@
     <string name="text_auto_open_voice_wakeup_charging">充电时自动开启语音唤醒</string>
     <string name="key_auto_open_voice_wakeup_charging" translatable="false">auto_open_voice_wakeup_charging</string>
     <string name="key_use_smartopen_if_parse_failed" translatable="false">use_smartopen_if_parse_failed</string>
+    <string name="key_cloud_service_parse" translatable="false">cloud_service_parse</string>
+    <string name="text_only_cloud_parse">仅使用云解析</string>
+    <string name="key_only_cloud_service_parse" translatable="false">only_cloud_service_parse</string>
 </resources>

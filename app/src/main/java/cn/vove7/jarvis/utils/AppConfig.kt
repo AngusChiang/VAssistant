@@ -32,7 +32,9 @@ object AppConfig {
     var userExpPlan = true
     var isAutoVoiceWakeupCharging = false
     var useSmartOpenIfParseFailed = true
-    var cloudServiceParse = true //云服务解析
+    var cloudServiceParseIfLocalFailed = true //云服务解析
+    var onlyCloudServiceParse = false //云服务解析
+
 
     fun init() {
         thread {
@@ -62,8 +64,7 @@ object AppConfig {
         //保存->sp
         val infoJson = Gson().toJson(userInfo)
         val ssp = SecuredPreferenceStore.getSharedInstance()
-        ssp.edit().putString(GlobalApp.getString(R.string.key_login_info), infoJson)
-                .apply()
+        ssp.edit().putString(GlobalApp.getString(R.string.key_login_info), infoJson).apply()
     }
 
     fun logout() {
@@ -98,23 +99,33 @@ object AppConfig {
 
     //load
     fun reload() {
-        val sp = SpHelper(GlobalApp.APP)
-        vibrateWhenStartReco = sp.getBoolean(R.string.key_vibrate_reco_begin, true)
-        isToastWhenRemoveAd = sp.getBoolean(R.string.key_show_toast_when_remove_ad, true)
-        isAdBlockService = sp.getBoolean(R.string.key_open_ad_block, false)
-        isLongPressVolUpWakeUp = sp.getBoolean(R.string.key_long_press_volume_up_wake_up, true)
-        voiceControlDialog = sp.getBoolean(R.string.key_voice_control_dialog, true)
-        voiceWakeup = sp.getBoolean(R.string.key_open_voice_wakeup, false)
-        audioSpeak = sp.getBoolean(R.string.key_audio_speak, true)
-        userExpPlan = sp.getBoolean(R.string.key_user_exp_plan, true)
-        isAutoVoiceWakeupCharging = sp.getBoolean(R.string.key_auto_open_voice_wakeup_charging, false)
-        useSmartOpenIfParseFailed = sp.getBoolean(R.string.key_use_smartopen_if_parse_failed, true)
-        cloudServiceParse = sp.getBoolean(R.string.key_cloud_service_parse, true)
+        vibrateWhenStartReco = getBooleanAndInit(R.string.key_vibrate_reco_begin, true)
+        isToastWhenRemoveAd = getBooleanAndInit(R.string.key_show_toast_when_remove_ad, true)
+        isAdBlockService = getBooleanAndInit(R.string.key_open_ad_block, false)
+        isLongPressVolUpWakeUp = getBooleanAndInit(R.string.key_long_press_volume_up_wake_up, true)
+        voiceControlDialog = getBooleanAndInit(R.string.key_voice_control_dialog, true)
+        voiceWakeup = getBooleanAndInit(R.string.key_open_voice_wakeup, false)
+        audioSpeak = getBooleanAndInit(R.string.key_audio_speak, true)
+        userExpPlan = getBooleanAndInit(R.string.key_user_exp_plan, true)
+        isAutoVoiceWakeupCharging = getBooleanAndInit(R.string.key_auto_open_voice_wakeup_charging, false)
+        useSmartOpenIfParseFailed = getBooleanAndInit(R.string.key_use_smartopen_if_parse_failed, true)
+        cloudServiceParseIfLocalFailed = getBooleanAndInit(R.string.key_cloud_service_parse, true)
+        onlyCloudServiceParse = getBooleanAndInit(R.string.key_only_cloud_service_parse, false)
         sp.getInt(R.string.key_ad_wait_secs).also {
             adWaitSecs = if (it == -1) 17 else it
         }
 
         Vog.d(this, "reload ---> AppConfig")
+    }
+
+    val sp: SpHelper by lazy { SpHelper(GlobalApp.APP) }
+    private fun getBooleanAndInit(keyId: Int, default: Boolean = false): Boolean {
+        return if (sp.containsKey(keyId)) {
+            sp.getBoolean(keyId)
+        } else {
+            sp.set(keyId, default)
+            default
+        }
     }
 
     val versionName: String

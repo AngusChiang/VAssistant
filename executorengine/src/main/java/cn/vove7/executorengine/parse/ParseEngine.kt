@@ -1,5 +1,6 @@
 package cn.vove7.executorengine.parse
 
+import cn.vove7.common.accessibility.AccessibilityApi
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.datamanager.DAO
 import cn.vove7.common.datamanager.greendao.ActionNodeDao
@@ -10,7 +11,7 @@ import cn.vove7.common.datamanager.parse.statusmap.ActionNode.NODE_SCOPE_GLOBAL
 import cn.vove7.common.datamanager.parse.statusmap.ActionNode.NODE_SCOPE_IN_APP
 import cn.vove7.common.datamanager.parse.statusmap.Reg
 import cn.vove7.common.datamanager.parse.statusmap.Reg.*
-import cn.vove7.executorengine.ExecutorImpl
+import cn.vove7.common.view.finder.ViewFindBuilder
 import cn.vove7.executorengine.exector.MultiExecutorEngine
 import cn.vove7.vtp.log.Vog
 import cn.vove7.vtp.sharedpreference.SpHelper
@@ -28,7 +29,7 @@ object ParseEngine {
     var AppActionNodes: List<ActionNode>? = null
 
     //重置App
-    val PRE_OPEN = "waitForApp(openAppByPkg('%s',true))\n"
+    val PRE_OPEN = "openAppByPkg('%s',true)\n"
     var i = 0
 
     /**
@@ -64,8 +65,11 @@ object ParseEngine {
      * 0>1>..>9
      *
      * 命令    ↓
-     * 全局命令 ↓ 一级命令
-     * App内   ↓ 二级命令 -> 扫一扫/ 不指定Activity -> 跳至首页
+     * 全局命令 ↓ 一级命令 -> ...
+     * 使用打开 ->
+     * App内   ↓ 二级命令 -> 扫一扫/ 不在指定Activity -> （有跟随指令）跳至首页
+     *
+     *
      *
      */
     fun parseAction(cmdWord: String, scope: ActionScope?): ParseResult {
@@ -75,7 +79,7 @@ object ParseEngine {
         actionQueue.addAll(gaq.second)
         return if (actionQueue.isNotEmpty()) {
             ParseResult(true, actionQueue, gaq.first)
-        } else {//自动执行打开
+        } else {
             Vog.d(this, "globalAction --无匹配")
             if (SpHelper(GlobalApp.APP).getBoolean("use_smartopen_if_parse_failed", true)) {
                 Vog.d(this, "开启 -- smartOpen")
@@ -89,14 +93,13 @@ object ParseEngine {
                 Vog.d(this, "smartOpen --无匹配")
             }//结果?
 
-
             if (scope == null) {
                 return ParseResult(false, "无匹配")
             }
             val inAppQue = matchAppAction(cmdWord, scope)
             actionQueue.addAll(inAppQue.second) //匹配应用内时
             // 根据第一个action.scope 决定是否进入首页
-            if (actionQueue.isNotEmpty()) {
+            if (actionQueue.isNotEmpty()) {//自动执行打开
                 val appScope = actionQueue.peek().scope
                 if (appScope.activity ?: "" == "" || appScope.activity != scope.activity) {//Activity 空 or Activity 不等 => 不同页面
                     Vog.d(this, "parseAction ---> 应用内不同页")
@@ -104,6 +107,10 @@ object ParseEngine {
                             String.format(PRE_OPEN, scope.packageName)
                             , Action.SCRIPT_TYPE_LUA))
                 }
+            } else if (SpHelper(GlobalApp.APP).getBoolean("use_smartopen_if_parse_failed",
+                            true) && AccessibilityApi.isOpen()) {//失败,默认点击
+                if(ViewFindBuilder().similaryText(cmdWord).tryClick())
+                    return ParseResult(true, PriorityQueue(), "smart点击 $cmdWord")
             }
             ParseResult(actionQueue.isNotEmpty(), actionQueue, inAppQue.first)
         }

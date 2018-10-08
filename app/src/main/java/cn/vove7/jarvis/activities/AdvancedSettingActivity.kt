@@ -93,7 +93,7 @@ class AdvancedSettingActivity : ReturnableActivity() {
                         })
                 )),
                 SettingGroupItem(R.color.google_green, "脚本", childItems = listOf(
-                        SwitchItem(R.string.text_remote_debug, summary = if (RemoteDebugServer.stopped) "请查阅使用手册"
+                        SwitchItem(R.string.text_remote_debug, summary = if (RemoteDebugServer.stopped) "使用Pc调试，请查阅使用手册"
                         else ipText, defaultValue = {
                             !RemoteDebugServer.stopped
                         }, callback = { holder, it ->
@@ -128,8 +128,14 @@ class AdvancedSettingActivity : ReturnableActivity() {
                             toast.showShort(R.string.text_coming_soon)
                         }
                 )),
-                SettingGroupItem(R.color.teal_A700, "命令解析", childItems = listOf (
-                        CheckBoxItem(title="自动使用打开操作",summary = "列表指令失败后，自动使用打开操作\n如：[打开QQ扫一扫] 可以直接使用 [QQ扫一扫] 使用",keyId = R.string.key_use_smartopen_if_parse_failed)
+                SettingGroupItem(R.color.teal_A700, "命令解析", childItems = listOf(
+                        CheckBoxItem(title = "自动使用打开操作", summary =
+                        "列表指令失败后，自动使用打开操作\n如：[打开QQ扫一扫] 可以直接使用 [QQ扫一扫] 使用",
+                                keyId = R.string.key_use_smartopen_if_parse_failed),
+                        CheckBoxItem(title = "云解析", summary = "本地解析失败时，使用云解析",
+                                keyId = R.string.key_cloud_service_parse),
+                        CheckBoxItem(R.string.text_only_cloud_parse, summary = "仅高级用户可用",
+                                keyId = R.string.key_only_cloud_service_parse)
                 ))
         ).also {
             if (BuildConfig.DEBUG) {
@@ -162,7 +168,7 @@ class AdvancedSettingActivity : ReturnableActivity() {
         val textV = TextView(this)
         textV.setPadding(60, 0, 60, 0)
         MaterialDialog(this).title(text = "数据更新")
-                .customView(view = textV,scrollable = true).show {
+                .customView(view = textV, scrollable = true).show {
                     arrayOf(
                             arrayOf("全局指令", lastInfo.instGlobal, R.string.key_last_sync_global_date)
                             , arrayOf("应用内指令", lastInfo.instInApp, R.string.key_last_sync_in_app_date)

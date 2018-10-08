@@ -53,12 +53,9 @@ class SpeechRecoService(val event: SpeechEvent) {
      * 分发事件
      */
     private val handler: RecoHandler
-//    fun buildHandler(loop: Looper): Handler =
 
     init {
-        val ht = HandlerThread("reco")
-        ht.start()
-        handler = RecoHandler(ht.looper)
+        handler = RecoHandler(Looper.getMainLooper())
         thread {
             initRecog()
             //初始化唤醒器
@@ -148,7 +145,7 @@ class SpeechRecoService(val event: SpeechEvent) {
                 CODE_WAKEUP_SUCCESS -> {//唤醒
                     val word = msg.data.getString("data")
                     event.onWakeup(word)
-                    AppBus.postVoiceData(VoiceData(msg.what, word))
+//                    AppBus.postVoiceData(VoiceData(msg.what, word))
                     myRecognizer.cancel()
                     startRecog()
                     return
@@ -156,22 +153,22 @@ class SpeechRecoService(val event: SpeechEvent) {
                 CODE_VOICE_TEMP -> {//中间结果
                     val res = msg.data.getString("data") ?: "null"
                     event.onTempResult(res)
-                    AppBus.postVoiceData(VoiceData(msg.what, res))
+//                    AppBus.postVoiceData(VoiceData(msg.what, res))
                 }
                 CODE_VOICE_ERR -> {//出错
                     val res = msg.data.getString("data") ?: "null"
                     event.onFailed(res)
-                    AppBus.postVoiceData(VoiceData(msg.what, res))
+//                    AppBus.postVoiceData(VoiceData(msg.what, res))
                 }
                 CODE_VOICE_VOL -> {//音量反馈
                     val data = msg.data.getSerializable("data") as VoiceData
                     event.onVolume(data)
-                    AppBus.postVoiceData(data)
+//                    AppBus.postVoiceData(data)
                 }
                 CODE_VOICE_RESULT -> {//结果
                     val result = msg.data.getString("data") ?: "null"
                     event.onResult(result)
-                    AppBus.postVoiceData(VoiceData(msg.what, result))
+//                    AppBus.postVoiceData(VoiceData(msg.what, result))
                 }
             }
         }

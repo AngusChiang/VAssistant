@@ -41,12 +41,10 @@ class SpeechStatusListener(private val handler: Handler) : StatusRecogListener()
         handler.sendMessage(SpeechMessage.buildMessage(CODE_VOICE_RESULT, tmp))
     }
 
-    var endFinish = true
     override fun onAsrEnd() {
         super.onAsrEnd()
         //立即停止识别 ，检测结果
         AppBus.postSpeechAction(SpeechAction.ActionCode.ACTION_STOP_RECO)
-
     }
 
     override fun onAsrFinishError(errorCode: Int, subErrorCode: Int, errorMessage: String?, descMessage: String?,

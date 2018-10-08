@@ -38,6 +38,9 @@ abstract class StatusAnimation {
         notifier.showNotification(nId, title, "", NotificationIcons(beginAniId))
     }
 
+    fun setContent(c:String) {
+        notifier.showNotification(nId, title, c, NotificationIcons(beginAniId))
+    }
     /**
      * such as play some effect
      */

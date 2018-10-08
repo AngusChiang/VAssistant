@@ -36,7 +36,7 @@ public class ViewFindBuilder extends FindBuilder {
     /**
      * wait使用
      *
-     * @param executor CExecutorI
+     * @param executor CExecutorI 执行器实例
      */
     public ViewFindBuilder(CExecutorI executor) {
         this();

@@ -1,13 +1,11 @@
 package cn.vove7.common.datamanager.parse.model;
 
 
-import java.io.Serializable;
-
 /**
  * Action参数
  */
 
-public class ActionParam implements Serializable {
+public class ActionParam {
 
     private String value;
     //private String desc;
@@ -59,6 +57,7 @@ public class ActionParam implements Serializable {
     /**
      * 取后 清空值
      * 防止GreenDao缓存
+     *
      * @return value
      */
 
@@ -67,6 +66,7 @@ public class ActionParam implements Serializable {
         this.value = null;
         return s;
     }
+
     public String getValue() {
         return this.value;
     }

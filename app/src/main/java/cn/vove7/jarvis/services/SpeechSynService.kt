@@ -193,12 +193,12 @@ class SpeechSynService(private val event: SyncEvent) : SpeechSynthesizerListener
 
     override fun onSynthesizeFinish(p0: String?) {
         Vog.d(this, "onSynthesizeFinish 合成结束回调, 序列号:$p0")
+        speaking = true//
+        event.onStart()//顺序
     }
 
     override fun onSpeechStart(p0: String?) {
         Vog.d(this, "onSpeechStart 播放开始回调, 序列号:$p0")
-        event.onStart()//顺序
-        speaking = true//
     }
 
     override fun onSpeechProgressChanged(p0: String?, p1: Int) {

@@ -98,22 +98,25 @@ class SettingsActivity : ReturnableActivity() {
                     CheckBoxItem(R.string.text_auto_open_voice_wakeup_charging,
                             keyId = R.string.key_auto_open_voice_wakeup_charging,
                             callback = { _, b ->
-                                if (b as Boolean && PowerEventReceiver.isCharging) {//正在充电，开启
-                                    AppBus.post(SpeechAction(SpeechAction.ActionCode.ACTION_START_WAKEUP))
+                                if (PowerEventReceiver.isCharging) {//充电中生效
+                                    if (b as Boolean) {//正在充电，开启
+                                        AppBus.post(SpeechAction(SpeechAction.ActionCode.ACTION_START_WAKEUP))
+                                    } else {
+                                        AppBus.post(SpeechAction(SpeechAction.ActionCode.ACTION_STOP_WAKEUP))
+                                    }
                                 }
-
                             })
             ))
 //           ,SettingGroupItem(R.color.lime_600, titleId = R.string.text_animation, childItems = listOf(
 //                    CheckBoxItem(, "应用内动画",
 //                            R.string.key_voice_control_dialog, defaultValue = { true })
 //            )
-    ,
-    SettingGroupItem(R.color.lime_600, titleId = R.string.text_other, childItems = listOf(
-    CheckBoxItem(title = "用户体验计划", summary = "改善体验与完善功能",
-    keyId = R.string.key_user_exp_plan, defaultValue = { true })
-    ))
-    //todo shortcut 管理
+            ,
+            SettingGroupItem(R.color.lime_600, titleId = R.string.text_other, childItems = listOf(
+                    CheckBoxItem(title = "用户体验计划", summary = "改善体验与完善功能",
+                            keyId = R.string.key_user_exp_plan, defaultValue = { true })
+            ))
+            //todo shortcut 管理
 
     )
 

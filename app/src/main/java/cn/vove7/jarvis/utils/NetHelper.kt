@@ -2,17 +2,21 @@ package cn.vove7.jarvis.utils
 
 import android.os.Handler
 import android.os.Looper
+import cn.vove7.common.accessibility.AccessibilityApi
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.appbus.AppBus
 import cn.vove7.common.datamanager.executor.entity.MarkedData
 import cn.vove7.common.datamanager.history.CommandHistory
+import cn.vove7.common.datamanager.parse.model.Action
+import cn.vove7.common.datamanager.parse.model.ActionScope
 import cn.vove7.common.datamanager.parse.statusmap.ActionNode
 import cn.vove7.common.model.UserInfo
 import cn.vove7.common.model.VipPrice
 import cn.vove7.common.netacc.ApiUrls
 import cn.vove7.common.netacc.model.BaseRequestModel
 import cn.vove7.common.netacc.model.LastDateInfo
+import cn.vove7.common.netacc.model.RequestParseModel
 import cn.vove7.common.netacc.model.ResponseMessage
 import cn.vove7.common.utils.GsonHelper
 import cn.vove7.jarvis.BuildConfig
@@ -58,7 +62,7 @@ object NetHelper {
         prepareIfNeeded()
         val handler = Handler()
         call.enqueue(object : Callback {
-            override fun onFailure(call: Call, e: IOException) {//响应失败更新UI
+            override fun onFailure(call: Call, e: IOException) {
                 e.printStackTrace()
                 GlobalLog.err("net failure: " + e.message)
                 handler.post {
@@ -94,12 +98,11 @@ object NetHelper {
                     GlobalLog.err("net: " + response.message())
                     callback?.invoke(requestCode, null)
                 }
-
             }
         })
     }
 
-    fun prepareIfNeeded() {
+    private fun prepareIfNeeded() {
         if (Looper.myLooper() == null)
             Looper.prepare()
     }
@@ -122,6 +125,9 @@ object NetHelper {
 
     val DoubleListType: Type by lazy {
         object : TypeToken<ResponseMessage<List<Double>>>() {}.type
+    }
+    val ActionListType: Type by lazy {
+        object : TypeToken<ResponseMessage<List<Action>>>() {}.type
     }
     val VipPriceListType: Type by lazy {
         object : TypeToken<ResponseMessage<List<VipPrice>>>() {}.type
@@ -148,5 +154,21 @@ object NetHelper {
                 }
             }
         }
+    }
+
+    fun cloudParse(cmd: String, scope: ActionScope? = AccessibilityApi
+            .accessibilityService?.currentScope, onResult: (List<Action>?) -> Unit) {
+//        thread {
+            postJson<List<Action>>(ApiUrls.CLOUD_PARSE, type = ActionListType,
+                    model = BaseRequestModel(RequestParseModel(cmd, scope))) { _, b ->
+                if (b?.isOk() == true) {
+                    Vog.d(this, "cloudParse ---> ${b.data}")
+                    onResult.invoke(b.data)
+                } else {
+                    onResult.invoke(null)
+                    GlobalLog.err(b?.message)
+                }
+            }
+//        }
     }
 }

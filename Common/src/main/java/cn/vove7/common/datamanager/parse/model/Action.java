@@ -220,7 +220,7 @@ public class Action implements Comparable<Action>, Serializable {
     public String toString() {
         return "{" +
                 actionScript + '\'' +
-                "," + scriptType + '\'' +
+                "," + scriptType + '\'' + param +
                 '}';
     }
 

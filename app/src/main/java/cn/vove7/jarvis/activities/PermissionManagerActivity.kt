@@ -1,10 +1,10 @@
 package cn.vove7.jarvis.activities
 
-import android.annotation.SuppressLint
 import android.app.Activity
 import android.os.Build
 import android.os.Bundle
 import android.support.v4.app.Fragment
+import android.support.v7.app.AppCompatActivity
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Switch
@@ -23,7 +23,7 @@ import cn.vove7.vtp.runtimepermission.PermissionUtils
  * 权限管理
  */
 class PermissionManagerActivity : OneFragmentActivity() {
-    override var fragments: Array<Fragment> = arrayOf(ManageFragment(this))
+    override var fragments: Array<Fragment> = arrayOf(ManageFragment.newIns(this))
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -34,11 +34,19 @@ class PermissionManagerActivity : OneFragmentActivity() {
         }
     }
 
-    @SuppressLint("ValidFragment")
-    class ManageFragment(val pActivity: Activity) : VListFragment() {
+    class ManageFragment : VListFragment() {
+        lateinit var pActivity: Activity
         //        lateinit var permissionList: List<PermissionStatus>
         //        lateinit var adapter: BaseAdapter
         override fun clearDataSet() {
+        }
+
+        companion object {
+            fun newIns(acti: AppCompatActivity): ManageFragment {
+                val m = ManageFragment()
+                m.pActivity = acti
+                return m
+            }
         }
 
 
@@ -111,7 +119,8 @@ class PermissionManagerActivity : OneFragmentActivity() {
                                         } catch (e: Exception) {
 //                                            toast.showShort("跳转失败，请手动开启")
                                             try {
-                                                SystemBridge.openAppDetail(context?.packageName?:"")
+                                                SystemBridge.openAppDetail(context?.packageName
+                                                    ?: "")
                                             } catch (e: Exception) {
                                                 toast.showLong("跳转失败，请到应用详情手动开启")
                                             }

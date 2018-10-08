@@ -19,6 +19,7 @@ object ApiUrls {
     private val ACTION: String get() = SERVER_IP + "action/"
     private val COMMON: String get() = SERVER_IP + "common/"
     private val APP: String get() = SERVER_IP + "app/"
+    private val SERVICE: String get() = SERVER_IP + "service/"
 
     val CRASH_HANDLER: String get() = COMMON + "ch"
     val GET_LAST_DATA_DATE: String get() = COMMON + "gldd"
@@ -63,6 +64,8 @@ object ApiUrls {
     val NEW_USER_FEEDBACK: String get() = APP + "ufb"
 
     val QQ_GROUP_1 = "https://jq.qq.com/?_wv=1027&k=58NR9UC"
+
+    val CLOUD_PARSE :String get()= APP + "cp"
 
     fun switch() {
         SERVER_IP = if (SERVER_IP == debig_server) official_server else debig_server

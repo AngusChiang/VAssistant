@@ -101,7 +101,7 @@ class ViewFinderWithMultiCondition(accessibilityService: AccessibilityApi) : Vie
                         val f = TextHelper.compareSimilarityWithPinyin(accessibilityService,
                                 "${node.text}", it)
                         Vog.v(this, "findCondition $f")
-                        if (f > 0.8) {
+                        if (f > 0.75) {
                             Vog.d(this, "find WITH_PINYIN $it")
                             ok = true
                             break

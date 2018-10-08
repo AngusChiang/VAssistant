@@ -32,7 +32,6 @@ import cn.vove7.common.model.RequestPermission
 import cn.vove7.common.model.UserInfo
 import cn.vove7.common.utils.RegUtils.checkCancel
 import cn.vove7.common.utils.RegUtils.checkConfirm
-import cn.vove7.executorengine.ExecutorImpl
 import cn.vove7.executorengine.bridges.SystemBridge
 import cn.vove7.executorengine.exector.MultiExecutorEngine
 import cn.vove7.executorengine.parse.ParseEngine
@@ -308,7 +307,11 @@ class MainService : BusService(),
      */
     @Subscribe(threadMode = ThreadMode.POSTING)
     fun runActionQue(que: PriorityQueue<Action>) {
-        cExecutor.execQueue(CExecutorI.DEBUG_SCRIPT, que)
+        runActionQue(CExecutorI.DEBUG_SCRIPT, que)
+    }
+
+    fun runActionQue(cmd: String, que: PriorityQueue<Action>) {
+        cExecutor.execQueue(cmd, que)
     }
 
     /**
@@ -523,6 +526,7 @@ class MainService : BusService(),
                 }
             }
         }
+
         override fun onTempResult(temp: String) {
             listeningToast.show(temp)
             listeningAni.setContent(temp)
@@ -576,12 +580,22 @@ class MainService : BusService(),
         NetHelper.uploadUserCommandHistory(his)
     }
 
+    /**
+     * 解析指令
+     * @param result String
+     */
     fun onParseCommand(result: String) {
-//                    toast.showShort("开始解析")
         parseAnimation.begin()
+        resumeMusicIf()
+        if (UserInfo.isVip() && AppConfig.onlyCloudServiceParse) {//高级用户且仅云解析
+            Vog.d(this, "onParseCommand ---> only云解析")
+            NetHelper.cloudParse(result) {
+                runFromCloud(result, it)
+            }
+            return
+        }
         val parseResult = ParseEngine
                 .parseAction(result, AccessibilityApi.accessibilityService?.currentScope)
-        resumeMusicIf()
         if (parseResult.isSuccess) {
             val his = CommandHistory(UserInfo.getUserId(), result,
                     parseResult.msg)
@@ -589,18 +603,38 @@ class MainService : BusService(),
             cExecutor.execQueue(result, parseResult.actionQueue)
         } else {// statistics
             //云解析
-            if(AppConfig.)
-            if (UserInfo.isLogin()) {
-                NetHelper.uploadUserCommandHistory(CommandHistory(UserInfo.getUserId(), result, null))
-                listeningToast.showAndHideDelay("解析失败")
-//                        effectHandler.sendEmptyMessage(PARSE_FAILED)
-                parseAnimation.failed()
+            if (AppConfig.cloudServiceParseIfLocalFailed) {
+                Vog.d(this, "onParseCommand ---> 失败云解析")
+                NetHelper.cloudParse(result) {
+                    runFromCloud(result, it)
+                }
             } else {
-                listeningToast.show("可能需要登陆同步下指令数据")
-                listeningToast.hideDelay(3000)
-                parseAnimation.hideDelay(0)
+                if (UserInfo.isLogin()) {
+                    NetHelper.uploadUserCommandHistory(CommandHistory(UserInfo.getUserId(), result, null))
+                    listeningToast.showAndHideDelay("解析失败")
+                    parseAnimation.failed()
+                } else {
+                    listeningToast.show("可能需要登陆同步下指令数据")
+                    listeningToast.hideDelay(3000)
+                    parseAnimation.hideDelay(0)
+                }
             }
         }
+    }
+
+    private fun runFromCloud(command: String, actions: List<Action>?) {
+        if (actions == null) {
+            listeningToast.showAndHideDelay("解析失败")
+            parseAnimation.failed()
+            return
+        }
+        val que = PriorityQueue<Action>()
+        actions.withIndex().forEach {
+            it.value.priority = it.index
+            que.add(it.value)
+        }
+        parseAnimation.finish()
+        runActionQue(command, que)
     }
 
     /**
@@ -628,7 +662,7 @@ class MainService : BusService(),
     }
 
     fun checkMusic() {
-        if (SystemBridge.isMediaPlaying() && !speechSynService.speaking) {
+        if (SystemBridge.isMediaPlaying()) {
             SystemBridge.mediaPause()
             Vog.d(this, "checkMusic ---> 有音乐播放")
             haveMusicPlay = true
