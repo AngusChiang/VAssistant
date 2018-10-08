@@ -51,8 +51,8 @@ class AdvancedSettingActivity : ReturnableActivity() {
         expand_list.setAdapter(adapter)
 
         expand_list.post {
-            expand_list.expandGroup(0)
-            expand_list.expandGroup(1)
+            expand_list?.expandGroup(0)
+            expand_list?.expandGroup(1)
         }
         btn_unlock.setOnClickListener {
             if (UserInfo.isLogin()) {
@@ -133,9 +133,10 @@ class AdvancedSettingActivity : ReturnableActivity() {
                         "列表指令失败后，自动使用打开操作\n如：[打开QQ扫一扫] 可以直接使用 [QQ扫一扫] 使用",
                                 keyId = R.string.key_use_smartopen_if_parse_failed),
                         CheckBoxItem(title = "云解析", summary = "本地解析失败时，使用云解析",
-                                keyId = R.string.key_cloud_service_parse),
-                        CheckBoxItem(R.string.text_only_cloud_parse, summary = "仅高级用户可用",
-                                keyId = R.string.key_only_cloud_service_parse)
+                                keyId = R.string.key_cloud_service_parse)
+//                        ,
+//                        CheckBoxItem(R.string.text_only_cloud_parse, summary = "仅高级用户可用",
+//                                keyId = R.string.key_only_cloud_service_parse)
                 ))
         ).also {
             if (BuildConfig.DEBUG) {

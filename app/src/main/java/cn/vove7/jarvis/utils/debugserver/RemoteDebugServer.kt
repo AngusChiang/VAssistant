@@ -152,40 +152,46 @@ object RemoteDebugServer : Runnable {
         GlobalApp.toastShort("与${client?.inetAddress}断开连接")
     }
 
+    /**
+     * 解析动作
+     * @param actionJson String
+     */
     private fun onPostAction(actionJson: String) {
         Vog.d(this, "onPostAction ---> $actionJson")
 
-        val action: RemoteAction
-        try {
-            action = Gson().fromJson<RemoteAction>(actionJson, RemoteAction::class.java)
-        } catch (e: Exception) {
-            GlobalLog.err(e)
-            print.onPrint(0, "发生错误${e.message}")
-            return
-        }
-        when (action.action) {
-            "run" -> {
-                val ac = Action()
-                ac.actionScript = action.text
-                when (action.type) {
-                    "lua" -> ac.scriptType = Action.SCRIPT_TYPE_LUA
-                    "javascript" -> ac.scriptType = Action.SCRIPT_TYPE_JS
-                    else -> print.onPrint(0, "不支持的语言${action.type}")
-                }
-                AppBus.post(ac)
+        thread {
+            val action: RemoteAction
+            try {
+                action = Gson().fromJson<RemoteAction>(actionJson, RemoteAction::class.java)
+            } catch (e: Exception) {
+                GlobalLog.err(e)
+                print.onPrint(0, "发生错误${e.message}")
+                return@thread
             }
-            "stop" -> {
-                AppBus.post(AppBus.ORDER_STOP_EXEC)
-            }
-            "command" -> {//文本指令
-                val cmd = action.text
-                if (cmd == null) {
-                    print.onPrint(0, "无动作")
-                } else {
-                    print.onPrint(0, "执行：$cmd")
-                    MainService.instance?.onParseCommand(cmd)
+            when (action.action) {
+                "run" -> {
+                    val ac = Action()
+                    ac.actionScript = action.text
+                    when (action.type) {
+                        "lua" -> ac.scriptType = Action.SCRIPT_TYPE_LUA
+                        "javascript" -> ac.scriptType = Action.SCRIPT_TYPE_JS
+                        else -> print.onPrint(0, "不支持的语言${action.type}")
+                    }
+                    AppBus.post(ac)
                 }
+                "stop" -> {
+                    AppBus.post(AppBus.ORDER_STOP_EXEC)
+                }
+                "command" -> {//文本指令
+                    val cmd = action.text
+                    if (cmd == null) {
+                        print.onPrint(0, "无动作")
+                    } else {
+                        print.onPrint(0, "执行：$cmd")
+                        MainService.instance?.onParseCommand(cmd)
+                    }
 
+                }
             }
         }
     }

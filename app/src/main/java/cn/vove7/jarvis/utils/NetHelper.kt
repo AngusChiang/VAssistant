@@ -60,7 +60,7 @@ object NetHelper {
 
     private fun <T> call(call: Call, type: Type, requestCode: Int = 0, callback: OnResponse<T>?) {
         prepareIfNeeded()
-        val handler = Handler()
+        val handler = Handler(Looper.getMainLooper())
         call.enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
                 e.printStackTrace()
@@ -159,16 +159,16 @@ object NetHelper {
     fun cloudParse(cmd: String, scope: ActionScope? = AccessibilityApi
             .accessibilityService?.currentScope, onResult: (List<Action>?) -> Unit) {
 //        thread {
-            postJson<List<Action>>(ApiUrls.CLOUD_PARSE, type = ActionListType,
-                    model = BaseRequestModel(RequestParseModel(cmd, scope))) { _, b ->
-                if (b?.isOk() == true) {
-                    Vog.d(this, "cloudParse ---> ${b.data}")
-                    onResult.invoke(b.data)
-                } else {
-                    onResult.invoke(null)
-                    GlobalLog.err(b?.message)
-                }
+        postJson<List<Action>>(ApiUrls.CLOUD_PARSE, type = ActionListType,
+                model = BaseRequestModel(RequestParseModel(cmd, scope))) { _, b ->
+            if (b?.isOk() == true) {
+                Vog.d(this, "cloudParse ---> ${b.data}")
+                onResult.invoke(b.data)
+            } else {
+                onResult.invoke(null)
+                GlobalLog.err(b?.message)
             }
+        }
 //        }
     }
 }
