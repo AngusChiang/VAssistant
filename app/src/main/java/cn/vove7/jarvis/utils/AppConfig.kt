@@ -32,6 +32,7 @@ object AppConfig {
     var userExpPlan = true
     var isAutoVoiceWakeupCharging = false
     var useSmartOpenIfParseFailed = true
+    var cloudServiceParse = true //云服务解析
 
     fun init() {
         thread {
@@ -108,6 +109,7 @@ object AppConfig {
         userExpPlan = sp.getBoolean(R.string.key_user_exp_plan, true)
         isAutoVoiceWakeupCharging = sp.getBoolean(R.string.key_auto_open_voice_wakeup_charging, false)
         useSmartOpenIfParseFailed = sp.getBoolean(R.string.key_use_smartopen_if_parse_failed, true)
+        cloudServiceParse = sp.getBoolean(R.string.key_cloud_service_parse, true)
         sp.getInt(R.string.key_ad_wait_secs).also {
             adWaitSecs = if (it == -1) 17 else it
         }

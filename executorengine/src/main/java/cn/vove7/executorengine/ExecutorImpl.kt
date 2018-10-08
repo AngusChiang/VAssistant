@@ -558,13 +558,8 @@ open class ExecutorImpl(
                 //开启线程
                 thread {
                     //保存标记
-                    val data = choiceData.originalData as ContactInfo
+//                    val data = choiceData.originalData as ContactInfo
                     val marked = MarkedData(s, MarkedData.MARKED_TYPE_CONTACT, s, choiceData.subtitle, DataFrom.FROM_USER)
-//                    marked.key = s
-//                    marked.regStr = s
-//                    marked.value = choiceData.subtitle
-//                    marked.from = DataFrom.FROM_USER
-//                    marked.type = MarkedData.MARKED_TYPE_CONTACT
                     AdvanContactHelper.addMark(marked)
                 }
                 val sss = systemBridge.call(choiceData.subtitle!!)
@@ -607,8 +602,8 @@ open class ExecutorImpl(
         try {
             Thread.sleep(millis)
         } catch (e: InterruptedException) {
-            //必须强行stop
             Thread.currentThread().interrupt()
+            //必须强行stop
 //            Thread.currentThread().stop()
         }
     }

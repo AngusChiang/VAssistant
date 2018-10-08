@@ -525,6 +525,7 @@ class MainService : BusService(),
         }
         override fun onTempResult(temp: String) {
             listeningToast.show(temp)
+            listeningAni.setContent(temp)
         }
 
         override fun onStop() {
@@ -587,12 +588,13 @@ class MainService : BusService(),
             NetHelper.uploadUserCommandHistory(his)
             cExecutor.execQueue(result, parseResult.actionQueue)
         } else {// statistics
+            //云解析
+            if(AppConfig.)
             if (UserInfo.isLogin()) {
                 NetHelper.uploadUserCommandHistory(CommandHistory(UserInfo.getUserId(), result, null))
                 listeningToast.showAndHideDelay("解析失败")
 //                        effectHandler.sendEmptyMessage(PARSE_FAILED)
                 parseAnimation.failed()
-
             } else {
                 listeningToast.show("可能需要登陆同步下指令数据")
                 listeningToast.hideDelay(3000)
