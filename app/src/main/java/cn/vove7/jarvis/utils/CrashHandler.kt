@@ -70,11 +70,11 @@ object CrashHandler : Thread.UncaughtExceptionHandler {
 //        }
     }
 
-
 }
 
 fun DeviceInfo.string(): String {
     val b = StringBuilder()
+    b.append("appVersion: ").append(AppConfig.versionName).appendln()
     b.append("manufacturerName: ").append(manufacturerName).appendln()
     b.append("productName: ").append(productName).appendln()
     b.append("brandName: ").append(brandName).appendln()

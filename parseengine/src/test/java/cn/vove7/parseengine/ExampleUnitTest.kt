@@ -3,9 +3,8 @@ package cn.vove7.parseengine
 import cn.vove7.common.datamanager.parse.model.Action
 import cn.vove7.common.datamanager.parse.statusmap.ActionNode
 import cn.vove7.common.datamanager.parse.statusmap.Reg
-import cn.vove7.common.utils.TextHelper
-import cn.vove7.parseengine.engine.ParseEngine
-import cn.vove7.parseengine.model.ParseResult
+import cn.vove7.executorengine.parse.ParseEngine
+import cn.vove7.executorengine.parse.ParseResult
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import java.util.*
@@ -46,14 +45,14 @@ class ExampleUnitTest {
             arrayOf(playNode//,
                     /*playSingerNode, playSingerSongNode*/).forEach {
                 println("匹配: $it")
-                outputParseResult(ParseEngine.testParse(STR, it))
+                outputParseResult(cn.vove7.executorengine.parse.ParseEngine.testParse(STR, it))
 
             }
         }
 
     }
 
-    private fun outputParseResult(result: ParseResult) {
+    private fun outputParseResult(result: cn.vove7.executorengine.parse.ParseResult) {
         if (result.isSuccess) {
             poll(result.actionQueue)
         } else {

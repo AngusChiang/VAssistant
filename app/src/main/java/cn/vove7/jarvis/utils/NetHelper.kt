@@ -15,6 +15,7 @@ import cn.vove7.common.netacc.model.BaseRequestModel
 import cn.vove7.common.netacc.model.LastDateInfo
 import cn.vove7.common.netacc.model.ResponseMessage
 import cn.vove7.common.utils.GsonHelper
+import cn.vove7.jarvis.BuildConfig
 import cn.vove7.vtp.log.Vog
 import com.google.gson.reflect.TypeToken
 import okhttp3.*
@@ -137,7 +138,7 @@ object NetHelper {
      */
     fun uploadUserCommandHistory(his: CommandHistory) {
         thread {
-            if (!AppConfig.userExpPlan) return@thread
+            if (BuildConfig.DEBUG || !AppConfig.userExpPlan) return@thread
             Looper.prepare()
             postJson<Any>(ApiUrls.UPLOAD_CMD_HIS, BaseRequestModel(his)) { _, b ->
                 if (b?.isOk() == true) {

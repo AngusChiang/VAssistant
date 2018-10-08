@@ -13,7 +13,11 @@ import java.util.*
  *
  */
 interface CExecutorI : ViewShowListener, ActivityShowListener, RuntimeArgs {
-    fun execQueue(cmdWords: String, actionQueue: PriorityQueue<Action>)
+    companion object {
+        val DEBUG_SCRIPT = "DEBUG"
+    }
+
+    fun execQueue(cmdWords: String, actionQueue: PriorityQueue<Action>?)
     fun interrupt()
     fun runScript(script: String, arg: String? = null): PartialResult
     fun setScreenSize(width: Int, height: Int)

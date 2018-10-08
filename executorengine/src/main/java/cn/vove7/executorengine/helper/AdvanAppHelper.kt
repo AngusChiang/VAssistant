@@ -3,7 +3,7 @@ package cn.vove7.executorengine.helper
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.datamanager.parse.model.ActionScope
 import cn.vove7.common.model.MatchedData
-import cn.vove7.parseengine.engine.ParseEngine
+import cn.vove7.executorengine.parse.ParseEngine
 import cn.vove7.vtp.app.AppHelper
 import cn.vove7.vtp.app.AppInfo
 import cn.vove7.vtp.log.Vog

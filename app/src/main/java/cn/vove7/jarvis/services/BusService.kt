@@ -52,8 +52,8 @@ abstract class BusService : Service() {
     }
 
     override fun onDestroy() {
-        super.onDestroy()
-        Vog.d(this, "onDestroy ${this.javaClass.simpleName}")
         AppBus.unreg(this)
+        Vog.d(this, "onDestroy ${this.javaClass.simpleName}")
+        super.onDestroy()
     }
 }

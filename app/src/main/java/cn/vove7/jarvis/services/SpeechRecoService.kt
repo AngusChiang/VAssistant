@@ -1,9 +1,10 @@
 package cn.vove7.jarvis.services
 
-import android.annotation.SuppressLint
 import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Handler
+import android.os.HandlerThread
+import android.os.Looper
 import android.os.Message
 import android.support.v4.app.ActivityCompat
 import cn.vove7.common.app.GlobalApp
@@ -51,43 +52,13 @@ class SpeechRecoService(val event: SpeechEvent) {
     /**
      * 分发事件
      */
-    private val handler = @SuppressLint("HandlerLeak")
-    object : Handler() {
-        override fun handleMessage(msg: Message?) {
-            when (msg?.what) {
-                CODE_WAKEUP_SUCCESS -> {//唤醒
-                    val word = msg.data.getString("data")
-                    event.onWakeup(word)
-                    AppBus.postVoiceData(VoiceData(msg.what, word))
-                    myRecognizer.cancel()
-                    startRecog()
-                    return
-                }
-                CODE_VOICE_TEMP -> {//中间结果
-                    val res = msg.data.getString("data") ?: "null"
-                    event.onTempResult(res)
-                    AppBus.postVoiceData(VoiceData(msg.what, res))
-                }
-                CODE_VOICE_ERR -> {//出错
-                    val res = msg.data.getString("data") ?: "null"
-                    event.onFailed(res)
-                    AppBus.postVoiceData(VoiceData(msg.what, res))
-                }
-                CODE_VOICE_VOL -> {//音量反馈
-                    val data = msg.data.getSerializable("data") as VoiceData
-                    event.onVolume(data)
-                    AppBus.postVoiceData(data)
-                }
-                CODE_VOICE_RESULT -> {//结果
-                    val result = msg.data.getString("data") ?: "null"
-                    event.onResult(result)
-                    AppBus.postVoiceData(VoiceData(msg.what, result))
-                }
-            }
-        }
-    }
+    private val handler: RecoHandler
+//    fun buildHandler(loop: Looper): Handler =
 
     init {
+        val ht = HandlerThread("reco")
+        ht.start()
+        handler = RecoHandler(ht.looper)
         thread {
             initRecog()
             //初始化唤醒器
@@ -169,6 +140,41 @@ class SpeechRecoService(val event: SpeechEvent) {
 
     fun release() {
         myRecognizer.release()
+    }
+
+    inner class RecoHandler(looper: Looper) : Handler(looper) {
+        override fun handleMessage(msg: Message?) {
+            when (msg?.what) {
+                CODE_WAKEUP_SUCCESS -> {//唤醒
+                    val word = msg.data.getString("data")
+                    event.onWakeup(word)
+                    AppBus.postVoiceData(VoiceData(msg.what, word))
+                    myRecognizer.cancel()
+                    startRecog()
+                    return
+                }
+                CODE_VOICE_TEMP -> {//中间结果
+                    val res = msg.data.getString("data") ?: "null"
+                    event.onTempResult(res)
+                    AppBus.postVoiceData(VoiceData(msg.what, res))
+                }
+                CODE_VOICE_ERR -> {//出错
+                    val res = msg.data.getString("data") ?: "null"
+                    event.onFailed(res)
+                    AppBus.postVoiceData(VoiceData(msg.what, res))
+                }
+                CODE_VOICE_VOL -> {//音量反馈
+                    val data = msg.data.getSerializable("data") as VoiceData
+                    event.onVolume(data)
+                    AppBus.postVoiceData(data)
+                }
+                CODE_VOICE_RESULT -> {//结果
+                    val result = msg.data.getString("data") ?: "null"
+                    event.onResult(result)
+                    AppBus.postVoiceData(VoiceData(msg.what, result))
+                }
+            }
+        }
     }
 }
 

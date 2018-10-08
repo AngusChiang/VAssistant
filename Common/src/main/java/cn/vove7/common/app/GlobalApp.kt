@@ -2,6 +2,7 @@ package cn.vove7.common.app
 
 import android.app.Application
 import android.support.annotation.StringRes
+import cn.vove7.common.bridges.ServiceBridge
 import cn.vove7.common.view.toast.ColorfulToast
 
 /**
@@ -40,6 +41,8 @@ open class GlobalApp : Application() {
         fun toastLong(rId: Int) {
             toastLong(getString(rId))
         }
+        var serviceBridge: ServiceBridge? = null
+
     }
 
     private fun toastShort(msg: String) {

@@ -35,6 +35,7 @@ import cn.vove7.common.utils.RegUtils.checkConfirm
 import cn.vove7.executorengine.ExecutorImpl
 import cn.vove7.executorengine.bridges.SystemBridge
 import cn.vove7.executorengine.exector.MultiExecutorEngine
+import cn.vove7.executorengine.parse.ParseEngine
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.activities.PermissionManagerActivity
 import cn.vove7.jarvis.utils.AppConfig
@@ -48,7 +49,6 @@ import cn.vove7.jarvis.view.statusbar.ExecuteAnimation
 import cn.vove7.jarvis.view.statusbar.ListeningAnimation
 import cn.vove7.jarvis.view.statusbar.ParseAnimation
 import cn.vove7.jarvis.view.toast.ListeningToast
-import cn.vove7.parseengine.engine.ParseEngine
 import cn.vove7.vtp.dialog.DialogUtil
 import cn.vove7.vtp.log.Vog
 import org.greenrobot.eventbus.Subscribe
@@ -95,11 +95,9 @@ class MainService : BusService(),
     override fun onCreate() {
         super.onCreate()
         instance = this
+        GlobalApp.serviceBridge = this
         listeningToast = ListeningToast(this)
-        cExecutor = MultiExecutorEngine(
-                this,
-                this
-        )
+        cExecutor = MultiExecutorEngine()
 
 //        floatVoice = VoiceFloat(this)
 //        floatVoice.show()
@@ -310,7 +308,7 @@ class MainService : BusService(),
      */
     @Subscribe(threadMode = ThreadMode.POSTING)
     fun runActionQue(que: PriorityQueue<Action>) {
-        cExecutor.execQueue(ExecutorImpl.DEBUG_SCRIPT, que)
+        cExecutor.execQueue(CExecutorI.DEBUG_SCRIPT, que)
     }
 
     /**
@@ -320,7 +318,7 @@ class MainService : BusService(),
     fun runAction(ac: Action) {
         val q = PriorityQueue<Action>()
         q.add(ac)
-        cExecutor.execQueue(ExecutorImpl.DEBUG_SCRIPT, q)
+        cExecutor.execQueue(CExecutorI.DEBUG_SCRIPT, q)
     }
 
     @Subscribe(threadMode = ThreadMode.BACKGROUND)
@@ -525,12 +523,6 @@ class MainService : BusService(),
                 }
             }
         }
-
-        @Subscribe(threadMode = ThreadMode.POSTING)
-        fun upHis(his: CommandHistory) {
-            NetHelper.uploadUserCommandHistory(his)
-        }
-
         override fun onTempResult(temp: String) {
             listeningToast.show(temp)
         }
@@ -578,6 +570,11 @@ class MainService : BusService(),
         }
     }
 
+    @Subscribe(threadMode = ThreadMode.BACKGROUND)
+    fun upHis(his: CommandHistory) {
+        NetHelper.uploadUserCommandHistory(his)
+    }
+
     fun onParseCommand(result: String) {
 //                    toast.showShort("开始解析")
         parseAnimation.begin()
@@ -591,19 +588,11 @@ class MainService : BusService(),
             cExecutor.execQueue(result, parseResult.actionQueue)
         } else {// statistics
             if (UserInfo.isLogin()) {
-                if (AppConfig.useSmartOpenIfParseFailed) {
-                    if (result != "") {//使用smartOpen
-                        val q = PriorityQueue<Action>()
-                        val action = Action("smartOpen('$result')", Action.SCRIPT_TYPE_LUA)
-                        q.add(action)
-                        cExecutor.execQueue(result, q)
-                    }
-                } else {
-                    NetHelper.uploadUserCommandHistory(CommandHistory(UserInfo.getUserId(), result, null))
-                    listeningToast.showAndHideDelay("解析失败")
+                NetHelper.uploadUserCommandHistory(CommandHistory(UserInfo.getUserId(), result, null))
+                listeningToast.showAndHideDelay("解析失败")
 //                        effectHandler.sendEmptyMessage(PARSE_FAILED)
-                    parseAnimation.failed()
-                }
+                parseAnimation.failed()
+
             } else {
                 listeningToast.show("可能需要登陆同步下指令数据")
                 listeningToast.hideDelay(3000)

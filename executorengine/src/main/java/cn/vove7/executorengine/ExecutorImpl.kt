@@ -22,6 +22,7 @@ import cn.vove7.common.datamanager.parse.model.Action.SCRIPT_TYPE_LUA
 import cn.vove7.common.datamanager.parse.model.ActionScope
 import cn.vove7.common.datamanager.parse.statusmap.ActionNode
 import cn.vove7.common.executor.CExecutorI
+import cn.vove7.common.executor.CExecutorI.Companion.DEBUG_SCRIPT
 import cn.vove7.common.executor.PartialResult
 import cn.vove7.common.model.RequestPermission
 import cn.vove7.common.model.UserInfo
@@ -30,7 +31,7 @@ import cn.vove7.common.utils.ScreenAdapter
 import cn.vove7.common.view.finder.ViewFindBuilder
 import cn.vove7.executorengine.bridges.SystemBridge
 import cn.vove7.executorengine.helper.AdvanContactHelper
-import cn.vove7.parseengine.engine.ParseEngine
+import cn.vove7.executorengine.parse.ParseEngine
 import cn.vove7.vtp.contact.ContactInfo
 import cn.vove7.vtp.log.Vog
 import java.util.*
@@ -42,8 +43,8 @@ import kotlin.concurrent.thread
  * Created by Vove on 2018/6/20
  */
 open class ExecutorImpl(
-        val context: Context,
-        val serviceBridge: ServiceBridge?
+        val context: Context = GlobalApp.APP,
+        val serviceBridge: ServiceBridge? = GlobalApp.serviceBridge
 ) : CExecutorI {
 
     private val systemBridge = SystemBridge
@@ -95,14 +96,14 @@ open class ExecutorImpl(
      */
     private var thread: Thread? = null
 
-    override fun execQueue(cmdWords: String, actionQueue: PriorityQueue<Action>) {
+    override fun execQueue(cmdWords: String, actionQueue: PriorityQueue<Action>?) {
+        if(actionQueue==null) return
         if (thread?.isAlive == true) {
             thread!!.interrupt()
         }
         this.command = cmdWords
         DEBUG = (cmdWords == DEBUG_SCRIPT) //DEBUG
 
-        ScreenAdapter.reSet()
         this.actionQueue = actionQueue
         lock = Object()
         thread = thread(start = true, isDaemon = true, priority = Thread.MAX_PRIORITY) {
@@ -128,7 +129,7 @@ open class ExecutorImpl(
                 currentAction = actionQueue.poll()
                 actionScope = currentAction?.actionScopeType
                 Vog.d(this, "pollActionQueue ---> $actionScope")
-                r = runScript(currentAction!!.actionScript, currentAction!!.param.valueWithClear)//todo 清除参数缓存
+                r = runScript(currentAction!!.actionScript, currentAction!!.param.valueWithClear)// 清除参数缓存
                 when {
                     r.needTerminal -> {//出错
                         currentAction = null
@@ -170,6 +171,7 @@ open class ExecutorImpl(
 
     override fun onFinish() {
         running = false
+        ScreenAdapter.reSet()
         serviceBridge?.onExecuteFinished("执行结束")
     }
 
@@ -217,10 +219,20 @@ open class ExecutorImpl(
             false
     }
 
+    /**
+     * 返回解析成功
+     * @param data String
+     * @return Boolean
+     */
     override fun smartOpen(data: String): Boolean {
         return smartOpen(data, null)
     }
 
+    /**
+     * 返回解析成功
+     * @param data String
+     * @return Boolean
+     */
     override fun smartClose(data: String): Boolean {
         val pkg =
             if (RegUtils.isPackage(data)) data
@@ -370,7 +382,7 @@ open class ExecutorImpl(
             //等待结果
             try {
                 if (millis < 0) {
-                    lock.wait()
+                    lock.wait(30000)//30s
                     Vog.d(this, "执行器-解锁")
                     return true
                 } else {
@@ -573,7 +585,6 @@ open class ExecutorImpl(
          */
         fun checkParam(p: String?): Boolean = (p != null && p.trim() != "")
 
-        val DEBUG_SCRIPT = "DEBUG"
         /**
          * 检测包名正则
          */

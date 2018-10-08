@@ -21,7 +21,7 @@ import cn.vove7.jarvis.adapters.SimpleListAdapter
 import cn.vove7.jarvis.adapters.ViewModel
 import cn.vove7.jarvis.utils.AppConfig
 import cn.vove7.jarvis.utils.NetHelper
-import cn.vove7.parseengine.engine.ParseEngine
+import cn.vove7.executorengine.parse.ParseEngine
 import cn.vove7.vtp.app.AppHelper
 import cn.vove7.vtp.sharedpreference.SpHelper
 import kotlin.concurrent.thread

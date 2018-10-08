@@ -29,11 +29,13 @@ class SettingsActivity : ReturnableActivity() {
         val adapter = SettingsExpandableAdapter(this, initData(), expand_list)
         expand_list.setAdapter(adapter)
 
-        expand_list.post {
-            expand_list.expandGroup(0)
-            expand_list.expandGroup(1)
-            expand_list.expandGroup(2)
-            expand_list.expandGroup(3)
+        expand_list?.post {
+            expand_list?.apply {
+                expandGroup(0)
+                expandGroup(1)
+                expandGroup(2)
+                expandGroup(3)
+            }
         }
     }
 
@@ -106,12 +108,12 @@ class SettingsActivity : ReturnableActivity() {
 //                    CheckBoxItem(, "应用内动画",
 //                            R.string.key_voice_control_dialog, defaultValue = { true })
 //            )
-            ,
-            SettingGroupItem(R.color.lime_600, titleId = R.string.text_other, childItems = listOf(
-                    CheckBoxItem(title = "用户体验计划", summary = "改善体验与完善功能",
-                            keyId = R.string.key_user_exp_plan, defaultValue = { true })
-            ))
-            //todo shortcut 管理
+    ,
+    SettingGroupItem(R.color.lime_600, titleId = R.string.text_other, childItems = listOf(
+    CheckBoxItem(title = "用户体验计划", summary = "改善体验与完善功能",
+    keyId = R.string.key_user_exp_plan, defaultValue = { true })
+    ))
+    //todo shortcut 管理
 
     )
 

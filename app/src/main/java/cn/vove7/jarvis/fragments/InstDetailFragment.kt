@@ -123,7 +123,7 @@ class InstDetailFragment(val node: ActionNode, val onUpdate: () -> Unit) : BaseB
                 if (instSetting == null || instSetting.version < version) {//数据库不存在数据
                     Vog.d(this, "setData ---> 执行新建or升级")
 //                  //执行
-                    val engine = MultiExecutorEngine(context!!, null)
+                    val engine = MultiExecutorEngine()
                     when (node.action.scriptType) {
                         Action.SCRIPT_TYPE_LUA -> {
                             engine.onLuaExec(script)

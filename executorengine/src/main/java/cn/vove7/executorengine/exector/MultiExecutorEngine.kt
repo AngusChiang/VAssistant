@@ -1,10 +1,8 @@
 package cn.vove7.executorengine.exector
 
-import android.content.Context
 import cn.vove7.androlua.LuaHelper
 import cn.vove7.common.BridgeManager
 import cn.vove7.common.bridges.GlobalActionExecutor
-import cn.vove7.common.bridges.ServiceBridge
 import cn.vove7.common.executor.OnPrint
 import cn.vove7.common.executor.PartialResult
 import cn.vove7.common.utils.RegUtils
@@ -20,10 +18,7 @@ import cn.vove7.vtp.log.Vog
  * @author 17719247306
  * 2018/8/28
  */
-class MultiExecutorEngine(
-        context: Context,
-        serviceBridge: ServiceBridge?
-) : ExecutorImpl(context, serviceBridge) {
+class MultiExecutorEngine : ExecutorImpl() {
     private val bridgeManager = BridgeManager(this, GlobalActionExecutor, SystemBridge, serviceBridge)
 
     /**

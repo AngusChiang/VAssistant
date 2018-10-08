@@ -115,11 +115,6 @@ object AppConfig {
         Vog.d(this, "reload ---> AppConfig")
     }
 
-    override fun toString(): String {
-
-        return "\nvibrateWhenStartReco: $vibrateWhenStartReco"
-    }
-
     val versionName: String
         get() {
             return GlobalApp.APP.let {

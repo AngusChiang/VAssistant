@@ -3,9 +3,8 @@ package cn.vove7.parseengine
 import android.content.Context
 import android.support.test.InstrumentationRegistry
 import android.support.test.runner.AndroidJUnit4
-import cn.vove7.common.datamanager.DAO
 import cn.vove7.common.parse.model.Action
-import cn.vove7.parseengine.engine.ParseEngine
+import cn.vove7.executorengine.parse.ParseEngine
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -49,9 +48,9 @@ class ExampleInstrumentedTest {
                 Pair("打开微博", true)
         )
         testDatas.forEach {
-            val s = ParseEngine.parseAction(it.key, "")
+            val s = cn.vove7.executorengine.parse.ParseEngine.parseAction(it.key, "")
             poll(s.actionQueue)
-            val q = ParseEngine.matchAppAction("", "com.tentcnt.mobileqq")
+            val q = cn.vove7.executorengine.parse.ParseEngine.matchAppAction("", "com.tentcnt.mobileqq")
             poll(q)
 
         }
