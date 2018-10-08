@@ -17,6 +17,7 @@ import cn.vove7.jarvis.adapters.SettingsExpandableAdapter
 import cn.vove7.jarvis.utils.AppConfig
 import cn.vove7.jarvis.utils.NetHelper
 import cn.vove7.jarvis.utils.debugserver.RemoteDebugServer
+import cn.vove7.jarvis.view.CheckBoxItem
 import cn.vove7.jarvis.view.IntentItem
 import cn.vove7.jarvis.view.SwitchItem
 import cn.vove7.jarvis.view.custom.SettingGroupItem
@@ -126,6 +127,9 @@ class AdvancedSettingActivity : ReturnableActivity() {
                             //todo
                             toast.showShort(R.string.text_coming_soon)
                         }
+                )),
+                SettingGroupItem(R.color.teal_A700, "命令解析", childItems = listOf (
+                        CheckBoxItem(title="自动使用打开操作",summary = "列表指令失败后，自动使用打开操作\n如：[打开QQ扫一扫] 可以直接使用 [QQ扫一扫] 使用",keyId = R.string.key_use_smartopen_if_parse_failed)
                 ))
         ).also {
             if (BuildConfig.DEBUG) {

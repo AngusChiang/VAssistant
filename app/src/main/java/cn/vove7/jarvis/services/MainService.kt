@@ -590,13 +590,24 @@ class MainService : BusService(),
             NetHelper.uploadUserCommandHistory(his)
             cExecutor.execQueue(result, parseResult.actionQueue)
         } else {// statistics
-            if(UserInfo.isLogin()) {
-                NetHelper.uploadUserCommandHistory(CommandHistory(UserInfo.getUserId(), result, null))
-                listeningToast.showAndHideDelay("解析失败")
+            if (UserInfo.isLogin()) {
+                if (AppConfig.useSmartOpenIfParseFailed) {
+                    if (result != "") {//使用smartOpen
+                        val q = PriorityQueue<Action>()
+                        val action = Action("smartOpen('$result')", Action.SCRIPT_TYPE_LUA)
+                        q.add(action)
+                        cExecutor.execQueue(result, q)
+                    }
+                } else {
+                    NetHelper.uploadUserCommandHistory(CommandHistory(UserInfo.getUserId(), result, null))
+                    listeningToast.showAndHideDelay("解析失败")
 //                        effectHandler.sendEmptyMessage(PARSE_FAILED)
-                parseAnimation.failed()
-            }else{
-                listeningToast.showAndHideDelay("可能需要登陆同步下指令数据")
+                    parseAnimation.failed()
+                }
+            } else {
+                listeningToast.show("可能需要登陆同步下指令数据")
+                listeningToast.hideDelay(3000)
+                parseAnimation.hideDelay(0)
             }
         }
     }

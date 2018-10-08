@@ -92,14 +92,15 @@ object ShortcutUtil {
     }
 
     @RequiresApi(Build.VERSION_CODES.N_MR1)
-    private fun addShortcut(shortCutInfo: List<ShortcutInfo>) {
-        try {
+    private fun addShortcut(shortCutInfo: List<ShortcutInfo>):Boolean {
+        return try {
             checkLimit()
             shortManager?.addDynamicShortcuts(shortCutInfo) //创建2个快捷方式
-            GlobalApp.toastShort("Shortcut添加成功")
+            true
         } catch (e: Exception) {
             GlobalLog.err(e)
             GlobalApp.toastShort("添加失败，可能数量超出限制")
+            false
         }
 //        } else {
 //            GlobalApp.toastShort("添加快捷方式需要7.1+")
@@ -110,7 +111,7 @@ object ShortcutUtil {
     private fun checkLimit() {
         val nowCount = shortManager?.dynamicShortcuts?.size
         if (nowCount == shortManager?.maxShortcutCountPerActivity) {//超出，移除
-            shortManager?.removeDynamicShortcuts(listOf(shortManager!!.dynamicShortcuts[0].id))
+            shortManager?.removeDynamicShortcuts(listOf(shortManager!!.dynamicShortcuts[1].id))
         }
     }
 

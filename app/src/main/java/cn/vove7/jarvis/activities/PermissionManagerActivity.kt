@@ -10,6 +10,7 @@ import android.view.ViewGroup
 import android.widget.Switch
 import android.widget.TextView
 import cn.vove7.common.app.GlobalApp
+import cn.vove7.executorengine.bridges.SystemBridge
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.activities.PermissionManagerActivity.PermissionStatus.Companion.allPerStr
 import cn.vove7.jarvis.activities.PermissionManagerActivity.PermissionStatus.Companion.permissions
@@ -105,7 +106,16 @@ class PermissionManagerActivity : OneFragmentActivity() {
                             when {
                                 item.permissionName == "悬浮窗" ->
                                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                                        PermissionUtils.requestDrawOverlays(activity!!, 0)
+                                        try {
+                                            PermissionUtils.requestDrawOverlays(activity!!, 0)
+                                        } catch (e: Exception) {
+//                                            toast.showShort("跳转失败，请手动开启")
+                                            try {
+                                                SystemBridge.openAppDetail(context?.packageName?:"")
+                                            } catch (e: Exception) {
+                                                toast.showLong("跳转失败，请到应用详情手动开启")
+                                            }
+                                        }
                                     }
                                 item.permissionName == "无障碍" ->
                                     PermissionUtils.gotoAccessibilitySetting(activity!!)

@@ -31,6 +31,7 @@ object AppConfig {
     var audioSpeak = true//播报语音
     var userExpPlan = true
     var isAutoVoiceWakeupCharging = false
+    var useSmartOpenIfParseFailed = true
 
     fun init() {
         thread {
@@ -106,6 +107,7 @@ object AppConfig {
         audioSpeak = sp.getBoolean(R.string.key_audio_speak, true)
         userExpPlan = sp.getBoolean(R.string.key_user_exp_plan, true)
         isAutoVoiceWakeupCharging = sp.getBoolean(R.string.key_auto_open_voice_wakeup_charging, false)
+        useSmartOpenIfParseFailed = sp.getBoolean(R.string.key_use_smartopen_if_parse_failed, true)
         sp.getInt(R.string.key_ad_wait_secs).also {
             adWaitSecs = if (it == -1) 17 else it
         }
