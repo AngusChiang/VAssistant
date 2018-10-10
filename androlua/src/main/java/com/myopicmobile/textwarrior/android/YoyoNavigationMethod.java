@@ -19,7 +19,6 @@ import android.util.TypedValue;
 import android.view.MotionEvent;
 
 import com.myopicmobile.textwarrior.common.ColorScheme;
-import com.myopicmobile.textwarrior.common.ColorScheme.Colorable;
 
 public class YoyoNavigationMethod extends TouchNavigationMethod {
     private final Yoyo _yoyoCaret;
@@ -232,7 +231,7 @@ public class YoyoNavigationMethod extends TouchNavigationMethod {
     @Override
     public void onColorSchemeChanged(ColorScheme colorScheme) {
         // TODO: Implement this method
-        _yoyoCaret.setHandleColor(colorScheme.getColor(Colorable.CARET_BACKGROUND));
+        _yoyoCaret.setHandleColor(colorScheme.getColor(ColorScheme.Colorable.CARET_BACKGROUND));
     }
 
     private class Yoyo {
@@ -263,7 +262,7 @@ public class YoyoNavigationMethod extends TouchNavigationMethod {
                     (int) HANDLE_RECT.bottom + YOYO_STRING_RESTING_HEIGHT);
 
             _brush = new Paint();
-            _brush.setColor(_textField.getColorScheme().getColor(Colorable.CARET_BACKGROUND));
+            _brush.setColor(_textField.getColorScheme().getColor(ColorScheme.Colorable.CARET_BACKGROUND));
             //,_brush.setStrokeWidth(2);
             _brush.setAntiAlias(true);
         }

@@ -25,6 +25,7 @@ public abstract class Language {
   public final static String GLYPH_SPACE = "\u00b7";
   public final static String GLYPH_TAB = "\u00bb";
 
+  public static Language currentLang ;
 
   private final static char[] BASIC_C_OPERATORS = {
     '(', ')', '{', '}', '.', ',', ';', '=', '+', '-',

@@ -1,20 +1,31 @@
 package cn.vove7.jarvis.activities
 
+import android.app.Activity
+import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
+import android.os.Handler
 import android.provider.Settings
+import android.view.View
+import android.widget.TextView
 import android.widget.Toast
 import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.appbus.AppBus
 import cn.vove7.common.appbus.SpeechAction
+import cn.vove7.executorengine.bridges.SystemBridge
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.activities.base.ReturnableActivity
 import cn.vove7.jarvis.adapters.SettingsExpandableAdapter
 import cn.vove7.jarvis.receivers.PowerEventReceiver
+import cn.vove7.jarvis.utils.AppConfig
 import cn.vove7.jarvis.utils.ShortcutUtil
+import cn.vove7.jarvis.utils.UriUtils
 import cn.vove7.jarvis.view.*
 import cn.vove7.jarvis.view.custom.SettingGroupItem
+import cn.vove7.vtp.sharedpreference.SpHelper
+import com.afollestad.materialdialogs.MaterialDialog
+import com.afollestad.materialdialogs.customview.customView
 import kotlinx.android.synthetic.main.activity_expandable_settings.*
 
 /**
@@ -55,7 +66,6 @@ class SettingsActivity : ReturnableActivity() {
                                             "跳转失败", Toast.LENGTH_SHORT).show()
                                 }
                             })
-
             )), SettingGroupItem(R.color.google_green, "通知", childItems = listOf(
             SwitchItem(R.string.text_vibrate_reco_begin,
                     keyId = R.string.key_vibrate_reco_begin, defaultValue = { true })
@@ -98,15 +108,38 @@ class SettingsActivity : ReturnableActivity() {
                     CheckBoxItem(R.string.text_auto_open_voice_wakeup_charging,
                             keyId = R.string.key_auto_open_voice_wakeup_charging,
                             callback = { _, b ->
-                                if (PowerEventReceiver.isCharging) {//充电中生效
+                                if (PowerEventReceiver.isCharging && PowerEventReceiver.open) {//充电中生效
                                     if (b as Boolean) {//正在充电，开启
                                         AppBus.post(SpeechAction(SpeechAction.ActionCode.ACTION_START_WAKEUP))
                                     } else {
                                         AppBus.post(SpeechAction(SpeechAction.ActionCode.ACTION_STOP_WAKEUP))
                                     }
                                 }
-                            })
-            ))
+                            }),
+                    IntentItem(R.string.text_customize_wakeup_words) { _, _ ->
+                        MaterialDialog(this).title(R.string.text_customize_wakeup_words)
+                                .customView(R.layout.dialog_customize_wakeup_words)
+                                .show {
+                                    findViewById<TextView>(R.id.wakeup_file_path).text = "当前文件路径：${AppConfig.wakeUpFilePath}"
+                                    findViewById<View>(R.id.get_wakeup_file).setOnClickListener {
+                                        SystemBridge.openUrl("http://ai.baidu.com/tech/speech/wake#tech-demo")
+                                        this.dismiss()
+                                    }
+                                    findViewById<View>(R.id.sel_wakeup_file).setOnClickListener {
+                                        val selIntent = Intent(Intent.ACTION_GET_CONTENT)
+                                        selIntent.type = "*/*"
+                                        selIntent.addCategory(Intent.CATEGORY_OPENABLE)
+                                        try {
+                                            startActivityForResult(selIntent, 1)
+                                            this.dismiss()
+                                        } catch (e: ActivityNotFoundException) {
+                                            e.printStackTrace()
+                                            toast.showShort(getString(R.string.text_cannot_open_file_manager))
+                                        }
+                                    }
+                                }
+                    })
+            )
 //           ,SettingGroupItem(R.color.lime_600, titleId = R.string.text_animation, childItems = listOf(
 //                    CheckBoxItem(, "应用内动画",
 //                            R.string.key_voice_control_dialog, defaultValue = { true })
@@ -114,10 +147,52 @@ class SettingsActivity : ReturnableActivity() {
             ,
             SettingGroupItem(R.color.lime_600, titleId = R.string.text_other, childItems = listOf(
                     CheckBoxItem(title = "用户体验计划", summary = "改善体验与完善功能",
-                            keyId = R.string.key_user_exp_plan, defaultValue = { true })
+                            keyId = R.string.key_user_exp_plan, defaultValue =
+                    { true })
             ))
             //todo shortcut 管理
-
     )
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        if (resultCode == Activity.RESULT_OK) {//选择文件回调
+            when (requestCode) {
+                1 -> {
+                    val uri = data?.data
+                    if (uri != null) {
+                        try {
+                            val path = UriUtils.getPathFromUri(this, uri)
+                            if (path == null) {
+                                toast.showShort("路径获取失败")
+                            } else {
+                                setPathAndReload(path)
+                            }
+                        } catch (e: Exception) {
+                            GlobalLog.err(e)
+                            toast.showShort("设置失败")
+                        }
+                    } else {
+                        toast.showShort(getString(R.string.text_open_failed))
+                    }
+                }
+                else -> {
+                }
+            }
+        }
+    }
+
+    private fun setPathAndReload(path: String) {
+        SpHelper(this).set(R.string.key_wakeup_file_path, path)
+        AppConfig.reload()
+        if (AppConfig.voiceWakeup) {
+            toast.showShort("正在重载配置")
+            Handler().postDelayed({
+                AppBus.postSpeechAction(SpeechAction.ActionCode.ACTION_STOP_WAKEUP)
+                Thread.sleep(2000)
+                AppBus.postSpeechAction(SpeechAction.ActionCode.ACTION_START_WAKEUP)
+            }, 3000)
+        } else
+            toast.showShort("设置完成")
+
+    }
 
 }

@@ -11,6 +11,7 @@
         <!--<item name="md_color_title">@color/colorAccent</item>-->
         <!--<item name="md_color_content">@color/your_color</item>-->
         <item name="md_corner_radius">16dp</item>
+        <item name="actionModeStyle">@style/MyActionMode</item>
 
         <item name="editTextStyle">@style/EditTextStyle</item>
         <item name="android:windowBackground">@color/app_background</item>

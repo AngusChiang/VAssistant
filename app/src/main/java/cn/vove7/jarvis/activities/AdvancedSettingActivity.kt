@@ -4,7 +4,6 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import android.widget.TextView
-import cn.vove7.androlua.LuaEditorActivity
 import cn.vove7.common.model.UserInfo
 import cn.vove7.common.netacc.ApiUrls
 import cn.vove7.common.netacc.model.LastDateInfo
@@ -25,7 +24,6 @@ import cn.vove7.jarvis.view.dialog.LoginDialog
 import cn.vove7.jarvis.view.dialog.ProgressDialog
 import cn.vove7.jarvis.view.dialog.UserInfoDialog
 import cn.vove7.jarvis.view.utils.SettingItemHelper
-import cn.vove7.rhino.RhinoActivity
 import cn.vove7.vtp.sharedpreference.SpHelper
 import cn.vove7.vtp.view.span.ColourTextClickableSpan
 import com.afollestad.materialdialogs.MaterialDialog
@@ -41,8 +39,6 @@ import java.util.*
  * 2018/9/10
  */
 class AdvancedSettingActivity : ReturnableActivity() {
-
-    val toast: ColorfulToast by lazy { ColorfulToast(this).blue() }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -75,9 +71,7 @@ class AdvancedSettingActivity : ReturnableActivity() {
         unlock_advan_fun.visibility = if (UserInfo.isVip()) {
             View.GONE
         } else View.VISIBLE
-
     }
-
 
     private val groupItems: List<SettingGroupItem> by lazy {
         mutableListOf(
@@ -109,12 +103,12 @@ class AdvancedSettingActivity : ReturnableActivity() {
                         }),
                         IntentItem(R.string.text_test_code_lua, onClick = { _, _ ->
                             if (AppConfig.checkUser()) {
-                                startActivity(Intent(this, LuaEditorActivity::class.java))
+                                startActivity(Intent(this, LuaEditorActivity::class.java).also { it.addFlags(Intent.FLAG_ACTIVITY_NEW_DOCUMENT) })
                             }
                         }),
                         IntentItem(R.string.text_code_test_js, null, onClick = { _, _ ->
                             if (AppConfig.checkUser()) {
-                                startActivity(Intent(this, RhinoActivity::class.java))
+                                startActivity(Intent(this, JsEditorActivity::class.java).also { it.addFlags(Intent.FLAG_ACTIVITY_NEW_DOCUMENT) })
                             }
                         })
                 )),
@@ -191,7 +185,6 @@ class AdvancedSettingActivity : ReturnableActivity() {
         val lastUpdate = sp.getLong(keyKd)
         val isOutDate = lastDate > lastUpdate
 
-
         view.apply {
             append(ColourTextClickableSpan(this@AdvancedSettingActivity, "$pre  ", R.color.primary_text, listener = null).spanStr)
             append(if (isOutDate)
@@ -203,7 +196,7 @@ class AdvancedSettingActivity : ReturnableActivity() {
         }
     }
 
-    val ipText: String
+    private val ipText: String
         get() {
             return "本机IP:" + SystemBridge.getIpAddress() +
                     "\n更多资料请查阅手册"

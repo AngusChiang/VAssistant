@@ -49,6 +49,7 @@ interface CExecutorI : ViewShowListener, ActivityShowListener, RuntimeArgs {
     fun waitForDesc(desc: String, m: Long = -1): ViewNode?
     fun waitForText(text: String, m: Long = -1): ViewNode?
     fun waitForText(text: Array<String>, m: Long = -1): ViewNode?
+    //返回
     fun getViewNode(): ViewNode?
 
     /**

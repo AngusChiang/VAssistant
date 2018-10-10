@@ -1,5 +1,8 @@
 package cn.vove7.common.utils
 
+import cn.vove7.common.app.GlobalLog
+import java.io.File
+
 /**
  * # TextHelper
  *
@@ -67,5 +70,26 @@ object TextHelper {
         val reg = RegUtils.dealRawReg(regexStr)
         val r = reg.matchEntire(text)
         return r?.groupValues?.subList(1, r.groupValues.size)?.toTypedArray()
+    }
+
+    fun readFile(path: String): String? {
+        val f = File(path)
+        return try {
+            f.readText()
+        } catch (e: Exception) {
+            GlobalLog.err(e)
+            null
+        }
+    }
+
+    fun writeFile(path: String, content: String): Boolean {
+        return try {
+            val f = File(path)
+            f.writeText(content)
+            true
+        } catch (e: Exception) {
+            GlobalLog.err(e)
+            false
+        }
     }
 }

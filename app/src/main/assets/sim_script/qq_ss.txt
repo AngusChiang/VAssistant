@@ -1,4 +1,0 @@
-open(QQ)
-waitForDesc(快捷入口)
-clickByDesc(快捷入口)
-clickByDesc(扫一扫 按钮)

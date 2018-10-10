@@ -10,4 +10,14 @@
 
     <color name="fff">#fff</color>
     <color name="trans">#00000000</color>
+    <color name="amber_A700">#FFAB00</color>
+    <color name="deep_purple_600">#5E35B1</color>
+    <color name="orange_900">#E65100</color>
+    <color name="red_900">#E60404</color>
+    <color name="brown_800">#4E342E</color>
+    <color name="indigo_700">#303F9F</color>
+    <color name="blue_900">#0D47A1</color>
+    <color name="green_900">#1B5E20</color>
+    <color name="yellow_700">#FBC02D</color>
+    <color name="primary_text">#212121</color>
 </resources>

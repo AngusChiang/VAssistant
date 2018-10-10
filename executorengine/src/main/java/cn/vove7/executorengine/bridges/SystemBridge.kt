@@ -8,6 +8,7 @@ import android.content.*
 import android.content.Context.WIFI_SERVICE
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
+import android.inputmethodservice.InputMethodService
 import android.location.Location
 import android.location.LocationListener
 import android.location.LocationManager
@@ -23,6 +24,8 @@ import android.support.annotation.RequiresApi
 import android.support.v4.content.ContextCompat
 import android.support.v4.content.FileProvider
 import android.view.KeyEvent
+import android.view.WindowManager
+import android.view.inputmethod.InputMethodManager
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.appbus.AppBus
@@ -674,5 +677,16 @@ object SystemBridge : SystemOperation {
             GlobalApp.toastShort("分享失败")
         }
     }
+
+
+//    override fun hideInputMethod() {
+//        try {
+//            val imm = context.getSystemService(Context.INPUT_METHOD_SERVICE)
+//                    as InputMethodManager
+//            imm.hideStatusIcon()
+//        } catch (e: Exception) {
+//            GlobalLog.err(e)
+//        }
+//    }
 
 }

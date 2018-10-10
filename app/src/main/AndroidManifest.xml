@@ -168,6 +168,13 @@
             android:theme="@style/TranslucentStatus.NoActionBar"/>
         <activity android:name=".activities.OSLActivity"
             android:label="@string/text_open_source_libraries"/>
+        <activity android:name=".activities.LuaEditorActivity"
+            android:label="Lua编辑器"
+            android:theme="@style/AppTheme" />
+        <activity android:name=".activities.JsEditorActivity"
+            android:label="Js编辑器"
+            android:theme="@style/Theme.Darcula"
+            android:windowSoftInputMode="adjustResize" />
 
     </application>
 

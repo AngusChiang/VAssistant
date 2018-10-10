@@ -13,7 +13,6 @@
             <option value="$PROJECT_DIR$/androlua" />
             <option value="$PROJECT_DIR$/app" />
             <option value="$PROJECT_DIR$/executorengine" />
-            <option value="$PROJECT_DIR$/parseengine" />
             <option value="$PROJECT_DIR$/rhino-android" />
           </set>
         </option>

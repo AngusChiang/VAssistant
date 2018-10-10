@@ -447,7 +447,7 @@ class NewInstActivity : AppCompatActivity(), View.OnClickListener {
                             startActivityForResult(selIntent, 1)
                         } catch (e: ActivityNotFoundException) {
                             e.printStackTrace()
-                            voast.showShort(getString(R.string.text_cannot_open_file_manager))
+                            voast.showShort(R.string.text_cannot_open_file_manager)
                         }
                     }
 

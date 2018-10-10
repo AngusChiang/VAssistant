@@ -5,10 +5,12 @@ import android.os.Handler
 import android.support.design.widget.TextInputLayout
 import android.view.View
 import android.widget.AdapterView
+import android.widget.TextView
 import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.netacc.ApiUrls
 import cn.vove7.common.netacc.model.BaseRequestModel
 import cn.vove7.common.netacc.model.UserFeedback
+import cn.vove7.common.view.editor.MultiSpan
 import cn.vove7.common.view.toast.ColorfulToast
 import cn.vove7.executorengine.bridges.SystemBridge
 import cn.vove7.jarvis.R
@@ -27,9 +29,6 @@ import kotlinx.android.synthetic.main.activity_abc_header.*
  * 9/23/2018
  */
 class HelpActivity : ReturnableActivity(), AdapterView.OnItemClickListener {
-    val toast: ColorfulToast by lazy {
-        ColorfulToast(this)
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -39,7 +38,7 @@ class HelpActivity : ReturnableActivity(), AdapterView.OnItemClickListener {
         list_view.adapter = IconTitleListAdapter(this, getData())
         list_view.onItemClickListener = this
         list_view.setOnItemLongClickListener { parent, view, position, id ->
-            if (position == 4) {
+            if (position == 5) {
                 GlobalLog.export2Sd()
                 return@setOnItemLongClickListener true
             }
@@ -51,13 +50,29 @@ class HelpActivity : ReturnableActivity(), AdapterView.OnItemClickListener {
         when (position) {
             0 -> {
                 SystemBridge.openUrl(ApiUrls.USER_GUIDE)
-                Handler().postDelayed( {
+                Handler().postDelayed({
                     toast.showShort("请查阅文章：用户手册")
-                },4000)
+                }, 4000)
             }
-            1 -> SystemBridge.openUrl(ApiUrls.USER_FAQ)
-            2 -> SystemBridge.openUrl(ApiUrls.QQ_GROUP_1)
-            3 -> showFeedbackDialog()
+            1 -> {
+                MaterialDialog(this).show {
+                    title(text = "快捷键")
+                    val text = TextView(this@HelpActivity).apply {
+                        setPadding(50, 0, 50, 30)
+                        append("1. 长按音量上键进行唤醒。\n" +
+                                "2. 在聆听时，可通过点按音量上键停止聆听，点按下音量下键取消聆听。\n" +
+                                "3. 在执行时，可长按下键，终止执行\n"+
+                                "4. 有线耳机适用\n"+
+                                "5. 锁屏下可进行唤醒。\n\n")
+                        append(MultiSpan(this@HelpActivity,
+                                "以上音量快捷键需要无障碍支持", bold = true).spanStr)
+                    }
+                    customView(view = text, scrollable = true)
+                }
+            }
+            2 -> SystemBridge.openUrl(ApiUrls.USER_FAQ)
+            3 -> SystemBridge.openUrl(ApiUrls.QQ_GROUP_1)
+            4 -> showFeedbackDialog()
         }
     }
 
@@ -104,7 +119,8 @@ class HelpActivity : ReturnableActivity(), AdapterView.OnItemClickListener {
 
     private fun getData(): List<IconTitleEntity> {
         return listOf(
-                IconTitleEntity(R.drawable.ic_book_24dp, R.string.text_service_manual)
+                IconTitleEntity(R.drawable.ic_book_24dp, R.string.text_service_manual),
+                IconTitleEntity(R.drawable.ic_accessibility, R.string.text_hot_key_desc)
                 , IconTitleEntity(R.drawable.ic_question_answer, R.string.text_faq)
                 , IconTitleEntity(R.drawable.ic_qq, R.string.text_add_qq_group)
                 , IconTitleEntity(R.drawable.ic_feedback_black_24dp, R.string.text_feedback)

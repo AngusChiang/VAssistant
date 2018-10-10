@@ -38,8 +38,13 @@ class ColorfulToast(val context: Context, textColor: Int = R.color.fff) {
         textView = toastView.findViewById(R.id.text)
         textView.setTextColor(context.resources.getColor(textColor))
         toast.view = toastView
-        toast.setGravity(Gravity.TOP, 0, 20)
+        toast.setGravity(Gravity.TOP, 0, 30)
 
+    }
+
+    fun bottom(): ColorfulToast {
+        toast.setGravity(Gravity.BOTTOM, 0, 30)
+        return this
     }
 
     fun red(): ColorfulToast {

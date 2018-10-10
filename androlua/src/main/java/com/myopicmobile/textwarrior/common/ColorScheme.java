@@ -13,19 +13,18 @@ import java.util.HashMap;
 
 public abstract class ColorScheme {
   // In ARGB format: 0xAARRGGBB
-  private static final int BLACK = 0xFF000000;
-  private static final int BLUE = 0xFF0000FF;
+  private static final int BACKGROUBD_ = 0xFF303030;
+  private static final int G_BLUE = 0xFF0085f4;
   private static final int DARK_RED = 0xFF8B0000;
-  private static final int DARK_BLUE = 0xFFD040DD;
+  private static final int DARK_ORA = 0xFFFF8000;
   private static final int GREY = 0xFF808080;
   private static final int LIGHT_GREY = 0xFFAAAAAA;
   private static final int MAROON = 0xFF800000;
-  private static final int INDIGO = 0xFF2A40FF;
+  private static final int INDIGO = 0xFF40B0FF;
   private static final int OLIVE_GREEN = 0xFF3F7F5F;
-  private static final int PURPLE = 0xFFDD4488;
+  private static final int STRING_GREEN = 0xFF33654B;
   private static final int RED = 0x44FF0000;
   private static final int WHITE = 0xFFFFFFE0;
-  private static final int PURPLE2 = 0xFFFF00FF;
   private static final int LIGHT_BLUE = 0xFF6080FF;
   private static final int LIGHT_BLUE2 = 0xFF40B0FF;
   private static final int GREEN = 0xFF88AA88;
@@ -90,8 +89,8 @@ public abstract class ColorScheme {
   private HashMap<Colorable, Integer> generateDefaultColors() {
     // High-contrast, black-on-white color scheme
     HashMap<Colorable, Integer> colors = new HashMap<Colorable, Integer>(Colorable.values().length);
-    colors.put(Colorable.FOREGROUND, BLACK);
-    colors.put(Colorable.BACKGROUND, WHITE);
+    colors.put(Colorable.FOREGROUND, G_BLUE);
+    colors.put(Colorable.BACKGROUND, BACKGROUBD_);
     colors.put(Colorable.SELECTION_FOREGROUND, WHITE);
     colors.put(Colorable.SELECTION_BACKGROUND, 0xFF97C024);
     colors.put(Colorable.CARET_FOREGROUND, WHITE);
@@ -100,11 +99,11 @@ public abstract class ColorScheme {
     colors.put(Colorable.LINE_HIGHLIGHT, 0x20888888);
 
     colors.put(Colorable.NON_PRINTING_GLYPH, LIGHT_GREY);
-    colors.put(Colorable.COMMENT, OLIVE_GREEN); //  Eclipse default color
-    colors.put(Colorable.KEYWORD, DARK_BLUE); // Eclipse default color
-    colors.put(Colorable.NAME, INDIGO); // Eclipse default color
-    colors.put(Colorable.LITERAL, LIGHT_BLUE); // Eclipse default color
-    colors.put(Colorable.STRING, PURPLE); // Eclipse default color
+    colors.put(Colorable.COMMENT, OLIVE_GREEN);
+    colors.put(Colorable.KEYWORD, DARK_ORA);
+    colors.put(Colorable.NAME, INDIGO);
+    colors.put(Colorable.LITERAL, LIGHT_BLUE);
+    colors.put(Colorable.STRING, STRING_GREEN);
     colors.put(Colorable.SECONDARY, GREY);
     return colors;
   }

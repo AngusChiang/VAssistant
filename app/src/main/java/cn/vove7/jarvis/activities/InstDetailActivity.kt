@@ -32,6 +32,7 @@ import cn.vove7.executorengine.helper.AdvanAppHelper
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.adapters.ExecuteQueueAdapter
 import cn.vove7.jarvis.adapters.InstSettingListAdapter
+import cn.vove7.jarvis.services.MainService
 import cn.vove7.jarvis.utils.AppConfig
 import cn.vove7.jarvis.utils.NetHelper
 import cn.vove7.jarvis.utils.ShortcutUtil
@@ -307,7 +308,7 @@ class InstDetailActivity : AppCompatActivity() {
                             }.show {
                                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                                     neutralButton(text = "同时添加进图标shortcut") {
-                                        ShortcutUtil.addActionShortcut(node,true)
+                                        ShortcutUtil.addActionShortcut(node, true)
                                     }
                                 }
                             }
@@ -483,7 +484,6 @@ class InstDetailActivity : AppCompatActivity() {
                 toast.red().showShort(R.string.text_net_err)
             }
         })
-
     }
 
     private fun showRunDialog() {
@@ -500,8 +500,7 @@ class InstDetailActivity : AppCompatActivity() {
             val pkg = execQueue[0].actionScope.packageName
             val appName = AdvanAppHelper.getAppInfo(pkg)?.name
             execQueue.add(0, ActionNode("打开App: $appName",
-                    Action("openAppByPkg('$pkg',true)\n" +
-                            "waitForApp('$pkg')", Action.SCRIPT_TYPE_LUA)))
+                    Action("openAppByPkg('$pkg',true)", Action.SCRIPT_TYPE_LUA)))
 
         }
         val d = DialogWithList(this, ExecuteQueueAdapter(this, execQueue))
@@ -511,7 +510,17 @@ class InstDetailActivity : AppCompatActivity() {
                         it.value.action.priority = it.index
                         que.add(it.value.action)
                     }
-                    AppBus.post(que)
+                    MainService.instance.also {
+                        if (it == null) {//
+                            toast.showShort("主服务已退出，正在重新开启")
+
+                            startService(Intent(this, MainService::class.java))
+                        } else {
+                            it.runActionQue("RUN: ${node.actionTitle}", que)
+                        }
+                    }
+                    //防止以DEBUG方式运行
+//                    AppBus.post(que)
                 })
                 .setButton(DialogInterface.BUTTON_NEGATIVE, R.string.text_cancel, View.OnClickListener { v -> })
         d.setWidth(0.9)

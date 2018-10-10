@@ -5,14 +5,9 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.KeyEvent
 import android.view.View
-import cn.vove7.androlua.LuaEditorActivity
-import cn.vove7.common.model.UserInfo
-import cn.vove7.executorengine.helper.AdvanAppHelper
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.utils.AppConfig
-import cn.vove7.rhino.RhinoActivity
 import cn.vove7.vtp.runtimepermission.PermissionUtils
-import kotlin.concurrent.thread
 
 class MainActivity : Activity() {
 
@@ -71,7 +66,7 @@ class MainActivity : Activity() {
     }
 
     fun go2Js(v: View) {
-        startActivity(Intent(this, RhinoActivity::class.java))
+        startActivity(Intent(this, JsEditorActivity::class.java))
     }
 
     fun go2Welcome(v: View) {

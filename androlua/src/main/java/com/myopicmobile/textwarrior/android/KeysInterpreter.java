@@ -12,6 +12,7 @@ import android.view.KeyEvent;
 
 import com.myopicmobile.textwarrior.common.Language;
 
+
 /**
  * Interprets shortcut key combinations and contains utility methods
  * to map Android keycodes to Unicode equivalents.

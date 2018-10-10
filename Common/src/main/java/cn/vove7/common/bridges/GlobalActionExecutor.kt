@@ -73,15 +73,15 @@ object GlobalActionExecutor : GlobalActionExecutorI {
         return performGlobalAction(AccessibilityService.GLOBAL_ACTION_TOGGLE_SPLIT_SCREEN)
     }
 
-    override fun screenShot(): Boolean {
-        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-            performGlobalAction(AccessibilityService.GLOBAL_ACTION_TAKE_SCREENSHOT)
-        } else {
-            GlobalLog.err("截屏需要Android9.0+")
-            //todo 手动截屏 other fun
-            false
-        }
-    }
+//    override fun screenShot(): Boolean {
+//        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+//            performGlobalAction(AccessibilityService.GLOBAL_ACTION_TAKE_SCREENSHOT)
+//        } else {
+//            GlobalLog.err("截屏需要Android9.0+")
+//            //todo 手动截屏 other fun
+//            false
+//        }
+//    }
 
     fun gesture(duration: Long, points: Array<Pair<Int, Int>>): Boolean {
         return gesture(0, duration, points)
@@ -276,8 +276,6 @@ interface GlobalActionExecutorI {
 
     fun recents(): Boolean
     fun splitScreen(): Boolean
-    @RequiresApi(api = Build.VERSION_CODES.P)
-    fun screenShot(): Boolean
 
     @RequiresApi(api = Build.VERSION_CODES.N)
     fun gesture(start: Long, duration: Long, points: Array<Pair<Int, Int>>): Boolean

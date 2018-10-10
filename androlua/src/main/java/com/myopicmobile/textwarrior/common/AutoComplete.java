@@ -1,5 +1,8 @@
 package com.myopicmobile.textwarrior.common;
 
+import com.myopicmobile.textwarrior.lua.LuaLexer;
+import com.myopicmobile.textwarrior.lua.LuaTokenTypes;
+
 import java.io.IOException;
 
 public class AutoComplete {

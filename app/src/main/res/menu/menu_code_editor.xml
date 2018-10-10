@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/menu_code_run"
+        android:icon="@drawable/ic_run"
+        android:title="@string/text_run"
+        app:showAsAction="always" />
+    <item
+        android:id="@+id/menu_code_stop"
+        android:icon="@drawable/ic_stop"
+        android:title="@string/text_stop"
+        app:showAsAction="always" />
+    <item
+        android:id="@+id/menu_log"
+        android:icon="@drawable/ic_assignment"
+        android:title="日志"
+        app:showAsAction="always" />
+    <item
+        android:id="@+id/menu_undo"
+        android:icon="@drawable/ic_undo"
+        android:title="撤销"
+        app:showAsAction="ifRoom" />
+    <item
+        android:id="@+id/menu_redo"
+        android:icon="@drawable/ic_redo"
+        android:title="重做"
+        app:showAsAction="ifRoom" />
+    <item
+        android:id="@+id/menu_find"
+        android:icon="@drawable/ic_search"
+        android:title="查找"
+        app:showAsAction="ifRoom" />
+    <item
+        android:id="@+id/menu_set_arg"
+        android:title="设置参数"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/menu_goto_line"
+        android:title="跳转行"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/menu_code_format"
+        android:title="格式化代码"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/menu_switch_ui_mode"
+        android:title="切换视图模式"
+        android:visible="false"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/menu_open_file"
+        android:title="打开文件"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/menu_save_file"
+        android:title="保存"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/menu_sel_code"
+        android:title="选择示例脚本"
+        app:showAsAction="never" />
+</menu>

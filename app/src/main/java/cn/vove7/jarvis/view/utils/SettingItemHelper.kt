@@ -208,7 +208,7 @@ class SettingItemHelper(val context: Context) {
         val sp = SpHelper(context)
         val entity = context.resources.getStringArray(item.entityArrId!!)
 
-        val v = sp.getString(item.keyId!!) ?: item.defaultValue.invoke()
+        val v = if(item.keyId!=null) sp.getString(item.keyId!!) else item.defaultValue.invoke()
 
         setBasic(holder, item)
 

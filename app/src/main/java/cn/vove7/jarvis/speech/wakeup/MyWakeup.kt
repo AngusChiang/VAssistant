@@ -5,6 +5,7 @@ import android.content.pm.PackageManager
 import cn.vove7.androlua.luabridge.LuaUtil
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.jarvis.BuildConfig
+import cn.vove7.jarvis.utils.AppConfig
 import cn.vove7.vtp.log.Vog
 import com.baidu.speech.EventListener
 import com.baidu.speech.EventManager
@@ -51,16 +52,9 @@ object MyWakeup {
             appKey = appInfo.metaData.getString("com.baidu.speech.API_KEY")!!
             secretKey = appInfo.metaData.getString("com.baidu.speech.SECRET_KEY")!!
         }
-        LuaUtil.assetsToSD(context, "bd/WakeUp.bin",
-                context.filesDir.absolutePath + "/bd/WakeUp.bin")
+//        LuaUtil.assetsToSD(context, "bd/WakeUp.bin",
+//                context.filesDir.absolutePath + "/bd/WakeUp.bin")
     }
-
-//    constructor(context: Context, eventListener: EventListener) {
-//        init(context, eventListener)
-//    }
-
-//    constructor(context: Context, eventListener: IWakeupListener) :
-//            this(context, WakeupEventAdapter(eventListener))
 
     fun start(eventL: WakeupEventAdapter) {
         if (wp == null) {
@@ -68,7 +62,7 @@ object MyWakeup {
         }
 
         val params = HashMap<String, Any?>()
-        params[SpeechConstant.WP_WORDS_FILE] = "assets:///bd/WakeUp.bin"
+        params[SpeechConstant.WP_WORDS_FILE] = AppConfig.wakeUpFilePath
         params[SpeechConstant.APP_ID] = appId
         params[SpeechConstant.APP_KEY] = appKey
         params[SpeechConstant.SECRET] = secretKey

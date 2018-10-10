@@ -136,4 +136,5 @@ interface SystemOperation {
 
     fun getIpAddress(): String?
 
+//    fun hideInputMethod()
 }

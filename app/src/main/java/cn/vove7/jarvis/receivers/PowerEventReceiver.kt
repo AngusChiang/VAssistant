@@ -18,12 +18,13 @@ import cn.vove7.vtp.log.Vog
  */
 class PowerEventReceiver : BroadcastReceiver() {
     companion object {
+        var open = false
         var isCharging = false
-        val receiver: PowerEventReceiver by lazy {
+        private val receiver: PowerEventReceiver by lazy {
             PowerEventReceiver()
         }
 
-        val intentFilter: IntentFilter by lazy {
+        private val intentFilter: IntentFilter by lazy {
             val i = IntentFilter()
             i.addAction(Intent.ACTION_POWER_CONNECTED)
             i.addAction(Intent.ACTION_POWER_DISCONNECTED)
@@ -31,10 +32,12 @@ class PowerEventReceiver : BroadcastReceiver() {
         }
 
         fun start() {
+            open = true
             GlobalApp.APP.registerReceiver(receiver, intentFilter)
         }
 
         fun stop() {
+            open = false
             GlobalApp.APP.unregisterReceiver(receiver)
         }
     }

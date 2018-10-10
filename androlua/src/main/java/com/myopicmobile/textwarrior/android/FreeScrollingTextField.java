@@ -68,6 +68,7 @@ import android.view.inputmethod.InputConnection;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Scroller;
 
+import com.myopicmobile.textwarrior.common.ColorScheme;
 import com.myopicmobile.textwarrior.common.AutoIndent;
 import com.myopicmobile.textwarrior.common.ColorScheme;
 import com.myopicmobile.textwarrior.common.ColorScheme.Colorable;
@@ -75,7 +76,6 @@ import com.myopicmobile.textwarrior.common.ColorSchemeLight;
 import com.myopicmobile.textwarrior.common.Document;
 import com.myopicmobile.textwarrior.common.DocumentProvider;
 import com.myopicmobile.textwarrior.common.Language;
-import com.myopicmobile.textwarrior.common.LanguageLua;
 import com.myopicmobile.textwarrior.common.Lexer;
 import com.myopicmobile.textwarrior.common.Pair;
 import com.myopicmobile.textwarrior.common.RowListener;
@@ -135,7 +135,7 @@ public class FreeScrollingTextField extends View
      */
     protected static float SEL_CARET_HEIGHT_SCALE = 0.5f;
     protected static int DEFAULT_TAB_LENGTH_SPACES = 4;
-    protected static int BASE_TEXT_SIZE_PIXELS = 16;
+    protected static int BASE_TEXT_SIZE_PIXELS = 14;
     protected static long SCROLL_PERIOD = 250; //in milliseconds
     /*
      * Hash map for determining which characters to let the user choose from when
@@ -479,7 +479,7 @@ public class FreeScrollingTextField extends View
         resetView();
         _clipboardPanel = new ClipboardPanel(this);
         _autoCompletePanel = new AutoCompletePanel(this);
-        _autoCompletePanel.setLanguage(LanguageLua.getInstance());
+        //_autoCompletePanel.setLanguage(Language.currentLang);
         //TODO find out if this function works
         //setScrollContainer(true);
         invalidate();

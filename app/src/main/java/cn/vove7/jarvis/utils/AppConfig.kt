@@ -35,6 +35,7 @@ object AppConfig {
     var cloudServiceParseIfLocalFailed = true //云服务解析
     var onlyCloudServiceParse = false //云服务解析
 
+    var wakeUpFilePath = "assets:///bd/WakeUp.bin"
 
     fun init() {
         thread {
@@ -111,6 +112,8 @@ object AppConfig {
         useSmartOpenIfParseFailed = getBooleanAndInit(R.string.key_use_smartopen_if_parse_failed, true)
         cloudServiceParseIfLocalFailed = getBooleanAndInit(R.string.key_cloud_service_parse, true)
         onlyCloudServiceParse = getBooleanAndInit(R.string.key_only_cloud_service_parse, false)
+
+        wakeUpFilePath = sp.getString(R.string.key_wakeup_file_path) ?: wakeUpFilePath
         sp.getInt(R.string.key_ad_wait_secs).also {
             adWaitSecs = if (it == -1) 17 else it
         }

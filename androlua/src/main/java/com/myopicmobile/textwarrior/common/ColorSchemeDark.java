@@ -12,34 +12,45 @@ package com.myopicmobile.textwarrior.common;
 
 public class ColorSchemeDark extends ColorScheme {
 
-  private static final int BEIGE = 0xFFD7BA7D;
-  private static final int DARK_GREY = 0xFF606060;
-  private static final int FLUORESCENT_YELLOW = 0xFFEFF193;
-  private static final int JUNGLE_GREEN = 0xFF608B4E;
-  private static final int LIGHT_GREY = 0xFFD3D3D3;
-  private static final int MARINE = 0xFF569CD6;
-  private static final int OCEAN_BLUE = 0xFF256395;
-  private static final int OFF_BLACK = 0xFF040404;
-  private static final int OFF_WHITE = 0xFFD0D2D3;
-  private static final int PEACH = 0xFFD69D85;
-  public ColorSchemeDark() {
-    setColor(Colorable.FOREGROUND, OFF_WHITE);
-    setColor(Colorable.BACKGROUND, OFF_BLACK);
-    //setColor(Colorable.SELECTION_FOREGROUND, OFF_WHITE);
-    //setColor(Colorable.SELECTION_BACKGROUND, OCEAN_BLUE);
-    //setColor(Colorable.CARET_FOREGROUND, OFF_BLACK);
-    //setColor(Colorable.CARET_BACKGROUND, FLUORESCENT_YELLOW);
-    //setColor(Colorable.CARET_DISABLED, LIGHT_GREY);
-    //setColor(Colorable.LINE_HIGHLIGHT, 0xFf00FF00);
-    setColor(Colorable.NON_PRINTING_GLYPH, DARK_GREY);
-    //setColor(Colorable.COMMENT, JUNGLE_GREEN);
-    //setColor(Colorable.KEYWORD, MARINE);
-    //setColor(Colorable.LITERAL, PEACH);
-    //setColor(Colorable.SECONDARY, BEIGE);
-  }
+    private static final int BLACK = 0xFF000000;
+    private static final int BACKGROUBD_ = 0xFF303030;
+    private static final int G_BLUE = 0xFF2F97EF;
+    private static final int DARK_RED = 0xFF8B0000;
+    private static final int DARK_ORA = 0xFFFF8000;
+    private static final int GREY = 0xFF808080;
+    private static final int LIGHT_GREY = 0xFFAAAAAA;
+    private static final int MAROON = 0xFF800000;
+    private static final int INDIGO = 0xFF40B0FF;
+    private static final int OLIVE_GREEN = 0xFF3F7F5F;
+    private static final int STRING_GREEN = 0xFF6E865A;
+    private static final int RED = 0x44FF0000;
+    private static final int WHITE = 0xFFFFFFE0;
+    private static final int LIGHT_BLUE = 0xFF6080FF;
+    private static final int LIGHT_BLUE2 = 0xFF40B0FF;
+    private static final int GREEN = 0xFF88AA88;
 
-  @Override
-  public boolean isDark() {
-    return true;
-  }
+    public ColorSchemeDark() {
+        // High-contrast, black-on-white color scheme
+        setColor(Colorable.FOREGROUND, G_BLUE);//2函数
+        setColor(Colorable.BACKGROUND, BACKGROUBD_);
+        setColor(Colorable.SELECTION_FOREGROUND, WHITE);
+        setColor(Colorable.SELECTION_BACKGROUND, 0xFF97C024);
+        setColor(Colorable.CARET_FOREGROUND, WHITE);
+        setColor(Colorable.CARET_BACKGROUND, LIGHT_BLUE2);
+        setColor(Colorable.CARET_DISABLED, GREY);
+        setColor(Colorable.LINE_HIGHLIGHT, 0x20888888);
+
+        setColor(Colorable.NON_PRINTING_GLYPH, LIGHT_GREY);
+        setColor(Colorable.COMMENT, OLIVE_GREEN);
+        setColor(Colorable.KEYWORD, DARK_ORA);
+        setColor(Colorable.NAME, INDIGO);
+        setColor(Colorable.LITERAL, LIGHT_BLUE);
+        setColor(Colorable.STRING, STRING_GREEN);
+        setColor(Colorable.SECONDARY, GREY);
+    }
+
+    @Override
+    public boolean isDark() {
+        return true;
+    }
 }

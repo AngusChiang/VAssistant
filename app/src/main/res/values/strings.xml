@@ -265,4 +265,7 @@
     <string name="key_cloud_service_parse" translatable="false">cloud_service_parse</string>
     <string name="text_only_cloud_parse">仅使用云解析</string>
     <string name="key_only_cloud_service_parse" translatable="false">only_cloud_service_parse</string>
+    <string name="text_hot_key_desc">快捷键</string>
+    <string name="text_customize_wakeup_words">自定义唤醒词</string>
+    <string name="key_wakeup_file_path" translatable="false">wakeup_file_path</string>
 </resources>

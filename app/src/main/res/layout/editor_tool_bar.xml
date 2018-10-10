@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/p_green"
+        android:gravity="center_vertical">
+
+        <TextView
+            android:id="@+id/toggle_functions"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="?attr/selectableItemBackground"
+            android:padding="10dp"
+            android:text="Fx"
+            android:textColor="#fff"
+            android:textStyle="bold" />
+
+        <!--符号栏-->
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/symbol_line"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+    </LinearLayout>
+
+    <!--函数-->
+    <LinearLayout
+        android:id="@+id/functions_grid"
+        android:layout_width="match_parent"
+        android:layout_height="227dp"
+        android:orientation="vertical" >
+
+        <android.support.v4.view.ViewPager
+            android:id="@+id/func_pager"
+            android:layout_width="match_parent"
+            android:layout_weight="1"
+            android:layout_height="0dp" />
+
+        <android.support.design.widget.TabLayout
+            android:id="@+id/tab_lay"
+            android:layout_width="match_parent"
+            app:tabMode="scrollable"
+            android:layout_height="40dp" />
+    </LinearLayout>
+
+</LinearLayout>
