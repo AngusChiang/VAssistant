@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.BaseExpandableListAdapter
 import android.widget.ExpandableListView
+import cn.vove7.common.app.GlobalLog
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.view.SettingChildItem
 import cn.vove7.jarvis.view.animation.ListItemAnimationHelper
@@ -44,22 +45,26 @@ class SettingsExpandableAdapter(val context: Context,
                     animationHelper.dy = it.toFloat()
             }
             //groups
-            for (i in gPos until groupCount) {
-                if (i != gPos) {
-                    val gpos = getGroupAbsPos(i)
+            try {
+                for (i in gPos until groupCount) {
+                    if (i != gPos) {
+                        val gpos = getGroupAbsPos(i)
 //                    Vog.d(this, "Collapse group ---> $i         $gpos")
-                    animationHelper.fromB2T(groupHolders[i]?.itemView, gpos)
-                }
-                if (i == gPos || expView.isGroupExpanded(i))//if展开
-                    for (j in 0 until getChildrenCount(i)) {
-                        val cpos = getChildAboPos(i, j)
-//                        Vog.d(this, "Collapse child ---> $i $j     $cpos")
-                        if (i == gPos)//消失行
-                            animationHelper.hide(childHolders[i][j]?.itemView)
-                        else animationHelper.fromB2T(childHolders[i][j]?.itemView, cpos)
+                        animationHelper.fromB2T(groupHolders[i]?.itemView, gpos)
                     }
+                    if (i == gPos || expView.isGroupExpanded(i))//if展开
+                        for (j in 0 until getChildrenCount(i)) {
+                            val cpos = getChildAboPos(i, j)
+//                        Vog.d(this, "Collapse child ---> $i $j     $cpos")
+                            if (i == gPos)//消失行
+                                animationHelper.hide(childHolders[i][j]?.itemView)
+                            else animationHelper.fromB2T(childHolders[i][j]?.itemView, cpos)
+                        }
+                }
+                groupHolders[gPos]!!.downIcon.animate().rotation(0f).setDuration(200).start()
+            }catch (e: Exception) {
+                GlobalLog.err(e)
             }
-            groupHolders[gPos]!!.downIcon.animate().rotation(0f).setDuration(200).start()
         }
         expView.setOnGroupExpandListener { gPos ->
             animationHelper.init()
@@ -68,22 +73,28 @@ class SettingsExpandableAdapter(val context: Context,
                     animationHelper.dy = it.toFloat()
             }
             //groups
-            for (i in gPos until groupCount) {
-                if (gPos != i) {
+            try {
+                for (i in gPos until groupCount) {
+                    if (gPos != i) {
 //                    Vog.d(this, "Expand group ---> $i")
-                    animationHelper.fromT2B(groupHolders[i]?.itemView, getGroupAbsPos(i))
-                }
-                if (expView.isGroupExpanded(i))//if展开
+                        animationHelper.fromT2B(groupHolders[i]?.itemView, getGroupAbsPos(i))
+                    }
+                    if (expView.isGroupExpanded(i)) {
+                    }//if展开
                     for (j in 0 until getChildrenCount(i)) {
                         val cv = childHolders[i][j]?.itemView
                         if (cv != null) {//maybe 未加载
-                            if (i == gPos)//展开行
+                            if (i == gPos) {//展开行
                                 animationHelper.fromT2B(cv, getChildAboPos(i, j), true, 50f)
-                            else
-                                animationHelper.fromT2B(cv, getChildAboPos(i, j))
+                            } else {
+                            }
+                            animationHelper.fromT2B(cv, getChildAboPos(i, j))
                         }
 //                        Vog.d(this, "Expand child ---> $i $j")
                     }
+                }
+            } catch (e: Exception) {
+                GlobalLog.err(e)
             }
 
             groupHolders[gPos]!!.downIcon.animate().rotation(180f).setDuration(200).start()

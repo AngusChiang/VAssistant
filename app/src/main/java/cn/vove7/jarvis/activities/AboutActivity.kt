@@ -63,8 +63,11 @@ class AboutActivity : AppCompatActivity(), AdapterView.OnItemClickListener {
                 AppConfig.versionName
                 SystemHelper.openApplicationMarket(this, this.packageName, APP_STORE_COLL_APK)
             }
-            2 -> startActivity(Intent(this, OSLActivity::class.java))
-            3 -> {
+            2 -> {
+                SystemBridge.openUrl("https://github.com/Vove7/VOSP")
+            }
+            3 -> startActivity(Intent(this, OSLActivity::class.java))
+            4 -> {
                 SystemBridge.sendEmail("vove7@qq.com", null,
                         "\n\n\n\n\n\n\n- 来自" + getString(R.string.app_name))
             }

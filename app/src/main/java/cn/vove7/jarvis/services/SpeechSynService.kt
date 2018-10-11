@@ -73,6 +73,7 @@ class SpeechSynService(private val event: SyncEvent) : SpeechSynthesizerListener
             return
         }
         sText = text
+        event.onStart()//检测后台音乐
         synthesizer.speak(text)
     }
 
@@ -194,7 +195,6 @@ class SpeechSynService(private val event: SyncEvent) : SpeechSynthesizerListener
     override fun onSynthesizeFinish(p0: String?) {
         Vog.d(this, "onSynthesizeFinish 合成结束回调, 序列号:$p0")
         speaking = true//
-        event.onStart()//顺序
     }
 
     override fun onSpeechStart(p0: String?) {
@@ -235,5 +235,5 @@ class SpeechSynService(private val event: SyncEvent) : SpeechSynthesizerListener
 interface SyncEvent {
     fun onError(err: String, requestText: String?)
     fun onFinish()
-    fun onStart()
+    fun onStart()//检测音乐播放，在合成前！！！//上面监听器中概率误认为有音乐播放
 }

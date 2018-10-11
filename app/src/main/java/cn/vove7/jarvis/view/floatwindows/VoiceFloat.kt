@@ -33,6 +33,7 @@ import org.greenrobot.eventbus.ThreadMode
  *
  * Created by Vove on 2018/7/1
  */
+@Deprecated("unused")
 class VoiceFloat : AbFloatWindow<VoiceFloat.Holder> {
 
     override var posX: Int = 500

@@ -17,7 +17,7 @@ import cn.vove7.vtp.log.Vog
 
 /**
  *
- *运算器
+ *
  * Created by Vove on 2018/6/18
  */
 class SpeechStatusListener(private val handler: Handler) : StatusRecogListener() {

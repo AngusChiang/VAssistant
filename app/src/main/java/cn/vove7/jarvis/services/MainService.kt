@@ -44,10 +44,10 @@ import cn.vove7.jarvis.view.dialog.MultiChoiceDialog
 import cn.vove7.jarvis.view.dialog.OnMultiSelectListener
 import cn.vove7.jarvis.view.dialog.OnSelectListener
 import cn.vove7.jarvis.view.dialog.SingleChoiceDialog
+import cn.vove7.jarvis.view.floatwindows.ListeningToast
 import cn.vove7.jarvis.view.statusbar.ExecuteAnimation
 import cn.vove7.jarvis.view.statusbar.ListeningAnimation
 import cn.vove7.jarvis.view.statusbar.ParseAnimation
-import cn.vove7.jarvis.view.toast.ListeningToast
 import cn.vove7.vtp.dialog.DialogUtil
 import cn.vove7.vtp.log.Vog
 import org.greenrobot.eventbus.Subscribe
@@ -292,7 +292,10 @@ class MainService : BusService(),
                 speechRecoService.startRecog()
             }
             SpeechAction.ActionCode.ACTION_STOP_RECO -> speechRecoService.stopRecog()
-            SpeechAction.ActionCode.ACTION_CANCEL_RECO -> speechRecoService.cancelRecog()
+            SpeechAction.ActionCode.ACTION_CANCEL_RECO -> {
+                hideAll()
+                speechRecoService.cancelRecog()
+            }
             SpeechAction.ActionCode.ACTION_START_WAKEUP -> speechRecoService.startWakeUp()
             SpeechAction.ActionCode.ACTION_RELOAD_SYN_CONF -> speechSynService.reLoad()
             SpeechAction.ActionCode.ACTION_STOP_WAKEUP -> speechRecoService.stopWakeUp()
@@ -417,13 +420,14 @@ class MainService : BusService(),
             }
     }
 
-    fun hideAll() {
+    private fun hideAll() {
         listeningToast.hideImmediately()
         listeningAni.hideDelay(0)
     }
 
     //识别前是否有音乐播放
     var haveMusicPlay = false
+    //
 
     fun resumeMusicIf() {
         synchronized(haveMusicPlay) {
@@ -539,9 +543,9 @@ class MainService : BusService(),
         }
 
         override fun onCancel() {
+            Vog.d(this,"onCancel ---> ")
             resumeMusicIf()
-            listeningToast.hideImmediately()
-            listeningAni.hideDelay()
+            hideAll()
             if (voiceMode == MODE_GET_PARAM) {
                 cExecutor.onGetVoiceParam(null)
                 executeAnimation.begin()//continue
@@ -666,6 +670,9 @@ class MainService : BusService(),
             SystemBridge.mediaPause()
             Vog.d(this, "checkMusic ---> 有音乐播放")
             haveMusicPlay = true
+        } else {
+            haveMusicPlay = false
+            Vog.d(this, "checkMusic ---> 无音乐播放")
         }
     }
 }

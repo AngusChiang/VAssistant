@@ -12,7 +12,7 @@ object ApiUrls {
     val debig_server = "http://192.168.137.1:8080/"
     val official_server = "http://115.159.155.25:8080/"
 
-    var SERVER_IP = if (BuildConfig.DEBUG) debig_server else official_server
+    var SERVER_IP = /*if (BuildConfig.DEBUG) debig_server else*/ official_server
 
     private val ACCOUNT: String get() = SERVER_IP + "account/"
     private val MARKED: String get() = SERVER_IP + "marked/"

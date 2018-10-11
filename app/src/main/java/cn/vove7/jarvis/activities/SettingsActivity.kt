@@ -8,6 +8,7 @@ import android.os.Bundle
 import android.os.Handler
 import android.provider.Settings
 import android.view.View
+import android.widget.ExpandableListView
 import android.widget.TextView
 import android.widget.Toast
 import cn.vove7.common.app.GlobalLog
@@ -41,7 +42,7 @@ class SettingsActivity : ReturnableActivity() {
         expand_list.setAdapter(adapter)
 
         expand_list?.post {
-            expand_list?.apply {
+            findViewById<ExpandableListView>(R.id.expand_list)?.apply {
                 expandGroup(0)
                 expandGroup(1)
                 expandGroup(2)
