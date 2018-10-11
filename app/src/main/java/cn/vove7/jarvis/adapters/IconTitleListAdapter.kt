@@ -17,7 +17,10 @@ class IconTitleListAdapter(context: Context, dataset: List<IconTitleEntity>)
     override fun layoutId(): Int = R.layout.item_whit_icon_title
 
     override fun onBindView(holder: AboutActivity.VH, pos: Int, item: IconTitleEntity) {
-        holder.iconView.setImageResource(item.iconId)
+        item.iconId.let {
+            if (it != null)
+                holder.iconView.setImageResource(it)
+        }
         holder.titleView.setText(item.titleId)
         val subtitle = item.summaryId
         if (subtitle == null) {
@@ -34,7 +37,7 @@ class IconTitleListAdapter(context: Context, dataset: List<IconTitleEntity>)
 }
 
 class IconTitleEntity(
-        val iconId: Int,
+        val iconId: Int? = null,
         val titleId: Int,
         val summaryId: Int? = null
 )

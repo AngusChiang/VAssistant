@@ -100,10 +100,6 @@ function quickSettings()
     return automator.quickSettings()
 end
 
-function screenShot()
-    return automator.screenShot()
-end
-
 function recents()
     return automator.recents()
 end

@@ -12,6 +12,7 @@ import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.text.SpannableStringBuilder
 import android.view.*
+import android.view.inputmethod.InputMethodManager
 import android.widget.TextView
 import cn.vove7.androlua.luabridge.LuaUtil
 import cn.vove7.common.app.GlobalLog
@@ -25,6 +26,7 @@ import cn.vove7.common.view.toast.ColorfulToast
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.utils.UriUtils
 import cn.vove7.jarvis.view.EditorFunsHelper
+import cn.vove7.vtp.log.Vog
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.callbacks.onDismiss
 import com.afollestad.materialdialogs.customview.customView
@@ -61,9 +63,11 @@ abstract class CodeEditorActivity : AppCompatActivity() {
             }
 
             val i = MultiSpan(this@CodeEditorActivity, pair.second, colorId = pair.first)
-            logList.add(i.spanStr)
             val v = MultiSpan(this@CodeEditorActivity, output, colorId = pair.first)
-            logList.add(v.spanStr)
+            synchronized(logList) {
+                logList.add(i.spanStr)
+                logList.add(v.spanStr)
+            }
             Handler(Looper.getMainLooper()).post {
                 logView?.append(i.spanStr)
                 logView?.append(v.spanStr)
@@ -89,33 +93,36 @@ abstract class CodeEditorActivity : AppCompatActivity() {
     }
 
     private fun hideInputMethod() {
-        window.setSoftInputMode(
-                WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE or
-                        WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN
-        )
-
+        val mInputManager = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        mInputManager.hideSoftInputFromWindow(findViewById<View>(R.id.root).windowToken, 0)
     }
 
     private fun initView() {
         toggle_functions.setOnClickListener {
-            functions_grid.visibility = if (functions_grid.visibility == View.GONE) {
+            if (functions_grid.visibility == View.GONE) {
+                functions_grid.visibility = View.VISIBLE
+                activityRootView.viewTreeObserver.removeOnGlobalLayoutListener(gloLis)
                 hideInputMethod()
-                View.VISIBLE
-            } else View.GONE
+                Handler().postDelayed({
+                    activityRootView.viewTreeObserver.addOnGlobalLayoutListener(gloLis)
+                }, 100)
+            } else functions_grid.visibility = View.GONE
+            functions_grid.animate().setDuration(1000).start()
         }
-        EditorFunsHelper(this, supportFragmentManager,func_pager, tab_lay) {
+        EditorFunsHelper(this, supportFragmentManager, func_pager, tab_lay) {
             codeEditor.insert(it)
         }
-
-//        val activityRootView = findViewById<View>(R.id.root)
-//        activityRootView.viewTreeObserver.addOnGlobalLayoutListener {
-//            val heightDiff = activityRootView.rootView.height - activityRootView.height
-//            if (heightDiff > 200) {
-//                functions_grid.visibility = View.GONE
-//            }
-//        }
+        activityRootView.viewTreeObserver.addOnGlobalLayoutListener(gloLis)
     }
 
+    private val gloLis = ViewTreeObserver.OnGlobalLayoutListener {
+        val heightDiff = activityRootView.rootView.height - activityRootView.height
+        Vog.d(this, "initView ---> $heightDiff")
+        if (heightDiff > 500) {
+            functions_grid.visibility = View.GONE
+        }
+    }
+    private val activityRootView: View by lazy { findViewById<View>(R.id.root) }
 
     private fun initEditorToolbar() {
         symbol_line.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
@@ -241,9 +248,11 @@ abstract class CodeEditorActivity : AppCompatActivity() {
     private fun buildLogText(): TextView {
         logView = TextView(this)
         logView?.setPadding(50, 0, 50, 0)
-//        textView.isVerticalScrollBarEnabled = true
-        logList.forEach {
-            logView?.append(it)
+        logView?.gravity = Gravity.BOTTOM
+        synchronized(logList) {
+            listOf(*logList.toTypedArray()).forEach {
+                logView?.append(it)
+            }
         }
         return logView!!
     }

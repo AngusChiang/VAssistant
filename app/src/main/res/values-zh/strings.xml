@@ -199,5 +199,7 @@
     <string name="text_only_cloud_parse">仅使用云解析</string>
     <string name="text_hot_key_desc">快捷键</string>
     <string name="text_customize_wakeup_words">自定义唤醒词</string>
+    <string name="text_vosp">VOSP</string>
+    <string name="text_vosp_summary">加入开源工程</string>
 
 </resources>

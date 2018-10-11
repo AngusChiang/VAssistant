@@ -122,7 +122,7 @@ class SettingsActivity : ReturnableActivity() {
                                 .show {
                                     findViewById<TextView>(R.id.wakeup_file_path).text = "当前文件路径：${AppConfig.wakeUpFilePath}"
                                     findViewById<View>(R.id.get_wakeup_file).setOnClickListener {
-                                        SystemBridge.openUrl("http://ai.baidu.com/tech/speech/wake#tech-demo")
+                                        SystemBridge.openUrl("https://vove.gitee.io/2018/10/11/GET_WAKEUP_FILE/")
                                         this.dismiss()
                                     }
                                     findViewById<View>(R.id.sel_wakeup_file).setOnClickListener {

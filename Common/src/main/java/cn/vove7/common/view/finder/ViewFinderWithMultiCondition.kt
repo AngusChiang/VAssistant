@@ -124,7 +124,7 @@ class ViewFinderWithMultiCondition(accessibilityService: AccessibilityApi) : Vie
 
                         val f = TextHelper.compareSimilarity("${node.text}", it)
                         Vog.v(this, "findCondition $f")
-                        if (f > 0.8) {
+                        if (f > 0.75) {
                             ok = true
                             break
                         }

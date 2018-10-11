@@ -34,10 +34,6 @@ function swipe(x1, y1, x2, y2, delay){
 }
 //
 
-function screenShot(){
-    return automator.screenShot()
-}
-
 function press(x, y, delay){
     return automator.press(x, y, delay)
 }
