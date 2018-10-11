@@ -80,9 +80,8 @@ class AboutActivity : AppCompatActivity(), AdapterView.OnItemClickListener {
     private fun getData(): List<IconTitleEntity> {
         return listOf(
                 IconTitleEntity(R.drawable.ic_favorite_border_24dp, R.string.text_favor_it)
-                , IconTitleEntity(R.drawable.ic_update_24dp, R.string.text_check_for_updates,
-                R.string.text_vosp_summary)
-                , IconTitleEntity(null, R.string.text_vosp)
+                , IconTitleEntity(R.drawable.ic_update_24dp, R.string.text_check_for_updates)
+                , IconTitleEntity(null, R.string.text_vosp, R.string.text_vosp_summary)
                 , IconTitleEntity(R.drawable.ic_github, R.string.text_open_source_libraries)
                 , IconTitleEntity(R.drawable.ic_email_24dp, R.string.text_contact_me, R.string.text_contact_email)
         )

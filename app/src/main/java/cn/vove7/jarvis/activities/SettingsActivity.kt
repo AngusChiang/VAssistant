@@ -125,6 +125,9 @@ class SettingsActivity : ReturnableActivity() {
                                         SystemBridge.openUrl("https://vove.gitee.io/2018/10/11/GET_WAKEUP_FILE/")
                                         this.dismiss()
                                     }
+                                    neutralButton(text = "恢复默认") {
+                                        setPathAndReload(AppConfig.DEFAULT_WAKEUP_FILE)
+                                    }
                                     findViewById<View>(R.id.sel_wakeup_file).setOnClickListener {
                                         val selIntent = Intent(Intent.ACTION_GET_CONTENT)
                                         selIntent.type = "*/*"
@@ -161,10 +164,13 @@ class SettingsActivity : ReturnableActivity() {
                     if (uri != null) {
                         try {
                             val path = UriUtils.getPathFromUri(this, uri)
+
                             if (path == null) {
                                 toast.showShort("路径获取失败")
-                            } else {
+                            } else if (path.endsWith(".bin")) {
                                 setPathAndReload(path)
+                            } else {
+                                toast.showShort("请选择.bin文件")
                             }
                         } catch (e: Exception) {
                             GlobalLog.err(e)

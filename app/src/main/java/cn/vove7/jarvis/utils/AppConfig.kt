@@ -33,9 +33,10 @@ object AppConfig {
     var isAutoVoiceWakeupCharging = false
     var useSmartOpenIfParseFailed = true
     var cloudServiceParseIfLocalFailed = true //云服务解析
+    var DEFAULT_WAKEUP_FILE = "assets:///bd/WakeUp.bin"
     var onlyCloudServiceParse = false //云服务解析
 
-    var wakeUpFilePath = "assets:///bd/WakeUp.bin"
+    var wakeUpFilePath = DEFAULT_WAKEUP_FILE
 
     fun init() {
         thread {

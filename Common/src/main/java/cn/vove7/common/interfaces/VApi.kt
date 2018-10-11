@@ -52,7 +52,7 @@ interface VApi {
                 "closeWifi()", "openWifiAp()", "closeWifiAp()",
                 "isScreenOn()", "getClipText()", "setClipText(s)", "sendEmail(to,subject,content)",
                 /* "lockScreen()",*/ "screenShot()",
-                "screen2File(path)", "shareText(text)", "shareImage(imgPah)", "location()",
+                "screen2File()", "shareText(text)", "shareImage(imgPah)", "location()",
                 "getIpAddress()"
         )
         val appFunctions = arrayOf(
@@ -138,7 +138,7 @@ interface VApi {
                 Pair("sendEmail(to,subject,content)", "调用系统发送邮件，to:收件人,subject:标题,content:内容"),
 //                Pair("lockScreen()", ""),
                 Pair("screenShot()", "截屏，返回Bitmap"),
-                Pair("screen2File(path)", "截图到文件，path:保存路径"),
+                Pair("screen2File()", "截屏保存至文件,返回File?"),
                 Pair("shareText(text)", "分享文本"),
                 Pair("shareImage(imgPah)", "分享图片,imgPah:图片路径"),
                 Pair("location()", "获取位置信息，Location?"),

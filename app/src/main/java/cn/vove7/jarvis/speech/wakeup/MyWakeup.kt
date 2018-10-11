@@ -52,8 +52,8 @@ object MyWakeup {
             appKey = appInfo.metaData.getString("com.baidu.speech.API_KEY")!!
             secretKey = appInfo.metaData.getString("com.baidu.speech.SECRET_KEY")!!
         }
-//        LuaUtil.assetsToSD(context, "bd/WakeUp.bin",
-//                context.filesDir.absolutePath + "/bd/WakeUp.bin")
+        LuaUtil.assetsToSD(context, "bd/WakeUp.bin",
+                context.filesDir.absolutePath + "/bd/WakeUp.bin")
     }
 
     fun start(eventL: WakeupEventAdapter) {
