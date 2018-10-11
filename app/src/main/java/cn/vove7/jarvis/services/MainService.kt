@@ -589,15 +589,16 @@ class MainService : BusService(),
      * @param result String
      */
     fun onParseCommand(result: String) {
+        hideAll()
         parseAnimation.begin()
         resumeMusicIf()
-        if (UserInfo.isVip() && AppConfig.onlyCloudServiceParse) {//高级用户且仅云解析
-            Vog.d(this, "onParseCommand ---> only云解析")
-            NetHelper.cloudParse(result) {
-                runFromCloud(result, it)
-            }
-            return
-        }
+//        if (UserInfo.isVip() && AppConfig.onlyCloudServiceParse) {//高级用户且仅云解析
+//            Vog.d(this, "onParseCommand ---> only云解析")
+//            NetHelper.cloudParse(result) {
+//                runFromCloud(result, it)
+//            }
+//            return
+//        }
         val parseResult = ParseEngine
                 .parseAction(result, AccessibilityApi.accessibilityService?.currentScope)
         if (parseResult.isSuccess) {

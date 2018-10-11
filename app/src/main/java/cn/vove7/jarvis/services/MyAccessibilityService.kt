@@ -43,7 +43,7 @@ class MyAccessibilityService : AccessibilityApi() {
     private lateinit var pkgman: PackageManager
 
     override fun onServiceConnected() {
-        accessibilityService = this
+//        accessibilityService = this
         pkgman = packageManager
         updateCurrentApp(packageName)
         ColorfulToast(this).yellow().showShort("无障碍服务开启")
@@ -164,6 +164,11 @@ class MyAccessibilityService : AccessibilityApi() {
         if (eventType == AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED) {//界面切换
             val classNameStr = event.className
             val pkg = event.packageName as String?
+            Vog.d(this,"onAccessibilityEvent ---> $classNameStr $pkg")
+            if (packageName == pkg) {//fix 悬浮窗造成阻塞
+                Vog.d(this, "onAccessibilityEvent ---> 自身悬浮窗")
+                return
+            }
             Vog.d(this, "TYPE_WINDOW_STATE_CHANGED --->\n $pkg ${event.className}")
             if (classNameStr != null)
                 currentActivity = classNameStr.toString()//.substring(classNameStr.lastIndexOf('.') + 1)

@@ -20,6 +20,11 @@ abstract class AccessibilityApi : AccessibilityService(),
     var currentActivity: String = ""
         protected set
 
+    override fun onCreate() {
+        super.onCreate()
+        accessibilityService = this
+    }
+
     var currentAppInfo: AppInfo? = null
         protected set
 

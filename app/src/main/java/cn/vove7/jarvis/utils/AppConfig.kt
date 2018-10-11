@@ -34,7 +34,7 @@ object AppConfig {
     var useSmartOpenIfParseFailed = true
     var cloudServiceParseIfLocalFailed = true //云服务解析
     var DEFAULT_WAKEUP_FILE = "assets:///bd/WakeUp.bin"
-    var onlyCloudServiceParse = false //云服务解析
+//    var onlyCloudServiceParse = false //云服务解析
 
     var wakeUpFilePath = DEFAULT_WAKEUP_FILE
 
@@ -112,7 +112,7 @@ object AppConfig {
         isAutoVoiceWakeupCharging = getBooleanAndInit(R.string.key_auto_open_voice_wakeup_charging, false)
         useSmartOpenIfParseFailed = getBooleanAndInit(R.string.key_use_smartopen_if_parse_failed, true)
         cloudServiceParseIfLocalFailed = getBooleanAndInit(R.string.key_cloud_service_parse, true)
-        onlyCloudServiceParse = getBooleanAndInit(R.string.key_only_cloud_service_parse, false)
+//        onlyCloudServiceParse = getBooleanAndInit(R.string.key_only_cloud_service_parse, false)
 
         wakeUpFilePath = sp.getString(R.string.key_wakeup_file_path) ?: wakeUpFilePath
         sp.getInt(R.string.key_ad_wait_secs).also {

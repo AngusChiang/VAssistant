@@ -94,6 +94,7 @@ object ParseEngine {
             }//结果?
 
             if (scope == null) {
+                Vog.d(this, "scope is null 无障碍未打开")
                 return ParseResult(false, "无匹配")
             }
             val inAppQue = matchAppAction(cmdWord, scope)

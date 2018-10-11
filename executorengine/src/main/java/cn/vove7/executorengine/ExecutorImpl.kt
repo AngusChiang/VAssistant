@@ -214,7 +214,6 @@ open class ExecutorImpl(
             if (!waitR) return false
             pollActionQueue()
             true
-            //解析App内操作
         } else
             false
     }
