@@ -195,7 +195,7 @@ class ViewNode(val node: AccessibilityNodeInfo) : ViewOperation, Comparable<View
     override fun getText(): String? {
         val text = node.text
         Vog.d(this, "$text")
-        return text as String?
+        return text?.toString()
     }
 
     /**
@@ -285,6 +285,8 @@ class ViewNode(val node: AccessibilityNodeInfo) : ViewOperation, Comparable<View
                 (", bounds: ${getBounds()}" + ", childCount: ${getChildCount()}") +
                 (if (node.isClickable) ", Clickable" else "") + '}'
     }
+
+    fun isVisibleToUser(): Boolean = node.isVisibleToUser
 
     override fun isClickable(): Boolean {
         return node.isClickable

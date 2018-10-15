@@ -8,7 +8,7 @@ import cn.vove7.common.datamanager.parse.model.ActionScope
 import cn.vove7.common.netacc.ApiUrls
 import cn.vove7.common.netacc.model.BaseRequestModel
 import cn.vove7.jarvis.utils.AppConfig
-import cn.vove7.jarvis.utils.NetHelper
+import cn.vove7.common.netacc.NetHelper
 
 /**
  * # VoiceWakeupStrategy

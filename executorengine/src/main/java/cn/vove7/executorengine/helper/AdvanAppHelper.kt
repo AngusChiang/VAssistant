@@ -47,7 +47,7 @@ object AdvanAppHelper {
                 if (appWord.startsWith(it.name, ignoreCase = true)) {
                     val follow = appWord.substring(it.name.length)
                     Vog.d(this, "预解析---> $follow")
-                    val aq = ParseEngine.matchAppAction(follow, ActionScope(it.packageName))
+                    val aq = ParseEngine.matchAppAction(follow, ActionScope(it.packageName),false)
                     if (aq.second.isEmpty()) {//无匹配
                         Vog.d(this, "预解析---> 无匹配")
                         TextHelper.compareSimilarityWithPinyin(context, appWord, it.name)

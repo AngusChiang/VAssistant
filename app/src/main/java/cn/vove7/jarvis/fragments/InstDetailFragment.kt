@@ -19,7 +19,7 @@ import cn.vove7.common.model.UserInfo
 import cn.vove7.common.netacc.ApiUrls
 import cn.vove7.common.netacc.model.BaseRequestModel
 import cn.vove7.common.netacc.model.ResponseMessage
-import cn.vove7.jarvis.utils.NetHelper
+import cn.vove7.common.netacc.NetHelper
 import cn.vove7.common.utils.RegUtils
 import cn.vove7.common.utils.TextHelper
 import cn.vove7.executorengine.exector.MultiExecutorEngine

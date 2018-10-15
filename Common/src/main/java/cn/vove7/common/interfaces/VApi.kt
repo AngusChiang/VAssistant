@@ -10,18 +10,21 @@ interface VApi {
                 "app",
                 "runtime",
                 "ViewFinder()",
-                "system"
+                "system",
+                "http"
         )
         val runtimeFunctions = arrayOf("currentApp",
                 "currentActivity", "actionCount", "currentActionIndex", "isGlobal()",
                 "commandType", "command", "DEBUG")
+
+        val httpFunctions = arrayOf("get()","post()","postJson()","getAsPc()")
 
         val finderFuns = arrayOf(
                 "ViewFinder()", "waitFor()", "depths()",
                 "containsText()", "matchesText()", "equalsText()",
                 "similaryText()", "id()", "desc()",
                 "editable()", "scrollable()", "type()", "await()",
-                "findFirst()", "find"
+                "findFirst()", "find()"
         )
         val utilFuns = arrayOf(
                 "toPinyin()", "arr2String()", "print()", "matches()", "matchValues()"
@@ -53,7 +56,7 @@ interface VApi {
                 "isScreenOn()", "getClipText()", "setClipText(s)", "sendEmail(to,subject,content)",
                 /* "lockScreen()",*/ "screenShot()",
                 "screen2File()", "shareText(text)", "shareImage(imgPah)", "location()",
-                "getIpAddress()"
+                "getLocalIpAddress()","getNetAddress()"
         )
         val appFunctions = arrayOf(
                 "startActivity()", "getSystemService()"
@@ -142,7 +145,8 @@ interface VApi {
                 Pair("shareText(text)", "分享文本"),
                 Pair("shareImage(imgPah)", "分享图片,imgPah:图片路径"),
                 Pair("location()", "获取位置信息，Location?"),
-                Pair("getIpAddress()", "获取ip地址")
+                Pair("getLocalIpAddress()", "获取内网ip地址"),
+                Pair("getNetAddress()", "获取外网ip地址")
         )
         val executorMap = hashMapOf(
                 Pair("interrupt()", "终止执行"),

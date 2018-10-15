@@ -42,7 +42,8 @@ traversingNode = function(index,d, node){
 	print(dd(d,index) + node.toString())
 	var cs = node.childs
 	cs.forEach(function(e,ii){
-		traversingNode(ii,i+1,e)
+	    if (e.isVisibleToUser())
+		    traversingNode(ii,i+1,e)
 	})
 }
 traversing = function(node){

@@ -13,14 +13,14 @@ import cn.vove7.rhino.processor.widget.GutterView
 
 class JsEditorActivity : CodeEditorActivity() {
 
-    override val assetFolder: String = "test&sample/"
+    override val assetFolder: String = "js_sample/"
     override val scriptType: String = Action.SCRIPT_TYPE_JS
 
     override val codeEditor: CodeEditorOperation by lazy {
         findViewById<TextProcessor>(R.id.editor)
     }
     override val testFiles: Array<String> by lazy {
-        assets.list("test&sample")
+        assets.list("js_sample")
     }
     override val symbols: List<Symbol>
         get() = jsSymbols

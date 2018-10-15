@@ -10,7 +10,7 @@ import cn.vove7.vtp.log.Vog
  * Created by Vove on 2018/7/2
  */
 object RegUtils {
-    val REG_ALL_CHAR = "([\\S\\s]*)"
+    val REG_ALL_CHAR = "([\\S\\s]*?)"
     private val confirmWords = arrayOf(
             "确([定认])".toRegex()
             , "好(的)?".toRegex()

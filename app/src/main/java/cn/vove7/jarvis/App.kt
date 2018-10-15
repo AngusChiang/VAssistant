@@ -23,19 +23,18 @@ import kotlin.concurrent.thread
 
 class App : LuaApp() {
 
-    private lateinit var mainService: Intent
+    private val mainService: Intent by lazy{Intent(this, MainService::class.java)}
     lateinit var services: Array<Intent>
-
     override fun onCreate() {
         super.onCreate()
+        ins=this
         EventBus.getDefault().register(this)
         Vog.init(this, Log.VERBOSE).log2Local(Log.ERROR)
-        mainService = Intent(this, MainService::class.java)
+
         services = arrayOf(mainService)
+
         CrashHandler.init()
 
-//        if (BuildConfig.DEBUG)
-//            RemoteDebugServer.start()
         startServices()
         if (!BuildConfig.DEBUG)
             Vog.init(this, Log.ERROR)
@@ -64,6 +63,13 @@ class App : LuaApp() {
                     startService(it)
                 }
             }
+        }
+    }
+    companion object {
+        var ins:App?=null
+
+        fun startServices() {
+            ins?.startServices()
         }
     }
 

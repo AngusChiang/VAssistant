@@ -1,27 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
-        <!-- Customize your theme here. -->
-        <item name="colorPrimary">@color/p_green</item>
-        <item name="colorPrimaryDark">@color/p_green_dark</item>
-        <item name="colorAccent">@color/google_blue</item>
-        <item name="android:navigationBarColor">@color/p_green</item>
-
-        <!--<item name="md_color_title">@color/colorAccent</item>-->
-        <!--<item name="md_color_content">@color/your_color</item>-->
-        <item name="actionModeStyle">@style/MyActionMode</item>
-        <!--<item name="android:colorControlHighlight">@color/colorPrimary</item>-->
-    </style>
     <style name="MyActionMode" parent="ThemeOverlay.AppCompat.Light">
         <item name="height">?attr/actionBarSize</item>
     </style>
-
 
     <style name="ScreenShotTheme" parent="Theme.AppCompat.Light.NoActionBar">
         <item name="android:windowBackground">@color/trans</item>
         <item name="android:statusBarColor">@color/trans</item>
         <item name="android:windowIsTranslucent">true</item>
+
         <!--<item name="android:windowAnimationStyle">@style/InOut</item>-->
     </style>
 

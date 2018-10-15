@@ -8,7 +8,6 @@ import android.content.*
 import android.content.Context.WIFI_SERVICE
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
-import android.inputmethodservice.InputMethodService
 import android.location.Location
 import android.location.LocationListener
 import android.location.LocationManager
@@ -24,8 +23,6 @@ import android.support.annotation.RequiresApi
 import android.support.v4.content.ContextCompat
 import android.support.v4.content.FileProvider
 import android.view.KeyEvent
-import android.view.WindowManager
-import android.view.inputmethod.InputMethodManager
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.appbus.AppBus
@@ -37,6 +34,8 @@ import cn.vove7.common.datamanager.greendao.MarkedDataDao
 import cn.vove7.common.model.ExResult
 import cn.vove7.common.model.RequestPermission
 import cn.vove7.common.model.ResultBox
+import cn.vove7.common.netacc.ApiUrls
+import cn.vove7.common.netacc.NetHelper
 import cn.vove7.common.utils.RegUtils
 import cn.vove7.common.view.ScreenshotActivity
 import cn.vove7.executorengine.R
@@ -559,15 +558,13 @@ object SystemBridge : SystemOperation {
         val resu = ResultBox<Location?>()
         var block = Runnable {}
         val handler = Handler()
-        val loop = Looper.myLooper()
 
         val loLis = object : LocationListener {
             override fun onLocationChanged(location: Location?) {
                 Vog.d(this, "onLocationChanged ---> $location")
                 handler.removeCallbacks(block)
                 locationManager.removeUpdates(this)
-                resu.set(location)
-                quitLoop()
+                resu.setAndNotify(location)
             }
 
             override fun onStatusChanged(provider: String?, status: Int, extras: Bundle?) {
@@ -582,13 +579,12 @@ object SystemBridge : SystemOperation {
         block = Runnable {
             locationManager.removeUpdates(loLis)
             GlobalLog.log("location ---> 获取位置超时,使用上次位置")
-            resu.set(locationManager.getLastKnownLocation(locationProvider))
-            quitLoop()
+            resu.setAndQuit(locationManager.getLastKnownLocation(locationProvider))
         }
-        locationManager.requestLocationUpdates(locationProvider, 500L, 0f, loLis, loop)
+        val looper = Looper.myLooper()
+        locationManager.requestLocationUpdates(locationProvider, 500L, 0f, loLis, looper)
         handler.postDelayed(block, 5000)//等待5秒
-        Looper.loop()
-        return resu.get()
+        return resu.blockedGet()
     }
 
     private fun quitLoop() {
@@ -602,7 +598,7 @@ object SystemBridge : SystemOperation {
         }
     }
 
-    override fun getIpAddress(): String? {
+    override fun getLocalIpAddress(): String? {
         return try {
             val wifiService = context.getSystemService(WIFI_SERVICE) as WifiManager
             val wifiInfo = wifiService.connectionInfo
@@ -613,18 +609,26 @@ object SystemBridge : SystemOperation {
         }
     }
 
+    override fun getNetAddress(): String? {
+        val r = ResultBox<String?>()
+        NetHelper.postJson<String>(ApiUrls.GET_IP) { _, b ->
+            if (b?.isOk() == true)
+                r.setAndNotify(b.data)
+            else r.setAndNotify(null)
+        }
+        return r.blockedGet()
+    }
+
     private fun intToIp(i: Int): String {
         return (i and 0xFF).toString() + "." + ((i shr 8) and 0xFF) +
                 "." + ((i shr 16) and 0xFF) + "." + (i shr 24 and 0xFF)
     }
 
     override fun screenShot(): Bitmap? {
-        prepareIfNeeded()
         val resultBox = ResultBox<Bitmap?>()
-        val capIntent = ScreenshotActivity.getScreenshotIntent(context, resultBox, Looper.myLooper())
+        val capIntent = ScreenshotActivity.getScreenshotIntent(context, resultBox)
         context.startActivity(capIntent)
-        Looper.loop()
-        return resultBox.get()
+        return resultBox.blockedGet()
     }
 
     override fun screen2File(): File? {

@@ -13,7 +13,6 @@ import android.util.Pair
 import android.view.ViewConfiguration
 import cn.vove7.common.accessibility.AccessibilityApi
 import cn.vove7.common.app.GlobalApp
-import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.model.ResultBox
 import cn.vove7.common.utils.ScreenAdapter
 import cn.vove7.common.view.toast.ColorfulToast
@@ -141,22 +140,18 @@ object GlobalActionExecutor : GlobalActionExecutorI {
             mService = AccessibilityApi.accessibilityService
             if (mService == null) return false
         }
-        prepareLooperIfNeeded()
-        val result = ResultBox(false)
+        val result = ResultBox(false).prepare()
         val handler = Handler(Looper.myLooper())
         mService!!.dispatchGesture(description, object : AccessibilityService.GestureResultCallback() {
             override fun onCompleted(gestureDescription: GestureDescription) {
-                result.set(true)
-                quitLoop()
+                result.setAndQuit(true)
             }
 
             override fun onCancelled(gestureDescription: GestureDescription) {
-                result.set(false)
-                quitLoop()
+                result.setAndQuit(false)
             }
         }, handler)
-        Looper.loop()
-        return result.get()
+        return result.loopGet() ?: false
     }
 
     @RequiresApi(api = Build.VERSION_CODES.N)
@@ -171,16 +166,6 @@ object GlobalActionExecutor : GlobalActionExecutorI {
         mService?.dispatchGesture(builder.build(), null, null)
     }
 
-    private fun quitLoop() {
-        val looper = Looper.myLooper()
-        looper?.quit()
-    }
-
-    private fun prepareLooperIfNeeded() {
-        if (Looper.myLooper() == null) {
-            Looper.prepare()
-        }
-    }
 
     /**
      * 名称避免和函数名同名

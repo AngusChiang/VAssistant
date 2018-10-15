@@ -37,30 +37,28 @@ class ListeningToast(context: Context) : AbFloatWindow<ListeningToast.VHolder>(c
         AppBus.post(RequestPermission("悬浮窗权限"))
 
     }
-    lateinit var lHandler: ListeningHandler
+    var lHandler: ListeningHandler? = null
 
     init {
     }
 
     fun show(text: String) {
-        if (Looper.myLooper() == null) {
-            Looper.prepare()
-        }
-        lHandler = ListeningHandler(Looper.getMainLooper())
-        lHandler.post {
+        if (lHandler == null)
+            lHandler = ListeningHandler(Looper.getMainLooper())
+        lHandler?.post {
             if (!isShowing)
                 show()
         }
-        lHandler.sendMessage(lHandler.obtainMessage(SHOW, text))
+        lHandler?.sendMessage(lHandler!!.obtainMessage(SHOW, text))
     }
 
     fun showAndHideDelay(text: String) {
-        lHandler.sendMessage(lHandler.obtainMessage(SHOW, text))
+        lHandler?.sendMessage(lHandler!!.obtainMessage(SHOW, text))
         hideDelay()
     }
 
     fun hideImmediately() {//立即
-        lHandler.sendEmptyMessage(HIDE)
+        lHandler?.sendEmptyMessage(HIDE)
     }
 
     inner class ListeningHandler(looper: Looper) : Handler(looper) {
@@ -88,7 +86,7 @@ class ListeningToast(context: Context) : AbFloatWindow<ListeningToast.VHolder>(c
 
     fun hideDelay(delay: Long = 800) {
         Vog.d(this, "hideDelay ---> hide delay $delay")
-        lHandler.sendEmptyMessageDelayed(HIDE, delay)
+        lHandler?.sendEmptyMessageDelayed(HIDE, delay)
     }
 
     class VHolder(val view: View) : AbFloatWindow.ViewHolder(view) {

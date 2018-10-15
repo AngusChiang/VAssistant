@@ -106,7 +106,7 @@ object GlobalLog {
             }
             val f = File(p, "log_${df.format(Date())}.log")
             f.writeText(this.toString())
-            GlobalApp.toastShort("日志已导出至${f.absolutePath}")
+            GlobalApp.toastLong("日志已导出至${f.absolutePath}")
             clear()
         } catch (e: Exception) {
             GlobalLog.err(e)

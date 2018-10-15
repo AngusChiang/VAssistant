@@ -25,9 +25,10 @@ object RemoteDebugServer : Runnable {
 
     //    companion object {
     var server: ServerSocket? = null
-    var out: PrintWriter? = null
 
-    var client: Socket? = null
+//    var out: MutableList<PrintWriter>? = null
+
+    var clients: MutableList<Pair<Socket, PrintWriter>>? = null
     var stopped: Boolean = true
     private const val LISTEN_PORT = 1527
     var thread: Thread? = null
@@ -53,14 +54,19 @@ object RemoteDebugServer : Runnable {
         thread {
             stopped = true
             server?.close()
-            client?.close()
-            out?.close()
+            clients?.forEach {
+                try {
+                    it.first.close()
+                    it.second.close()
+                } catch (e: Exception) {
+                }
+            }
+            clients?.clear()
+
             thread?.interrupt()
 
             stopAutoSleep()
             server = null
-            client = null
-            out = null
             thread = null
         }
     }
@@ -68,6 +74,7 @@ object RemoteDebugServer : Runnable {
 
     override fun run() {
         stopped = false
+        clients = mutableListOf()
         server = ServerSocket(LISTEN_PORT)
         RhinoApi.regPrint(print)
         LuaHelper.regPrint(print)
@@ -75,28 +82,29 @@ object RemoteDebugServer : Runnable {
         server.use {
             while (!stopped) {
                 try {
-                    client = server!!.accept()//等待
+                    val client = server!!.accept()//等待
                     stopAutoSleep()
                     val inputStream = BufferedReader(InputStreamReader(client!!.getInputStream(), "UTF-8"))
-                    out = PrintWriter(BufferedWriter(OutputStreamWriter(client!!.getOutputStream())), true)
-                    GlobalApp.toastShort(String.format(GlobalApp.getString(R.string.text_establish_connection), client?.inetAddress
+                    val o = PrintWriter(BufferedWriter(OutputStreamWriter(client.getOutputStream())), true)
+                    val p = Pair(client, o)
+                    clients?.add(p)
+                    GlobalApp.toastShort(String.format(GlobalApp.getString(R.string.text_establish_connection), client.inetAddress
                         ?: "none"))
-                    print.onPrint(0, "连接成功 ${client!!.inetAddress}")
+                    print.onPrint(0, "连接成功 ${client.inetAddress}")
                     //type -> script -> arg
                     thread {
                         try {
                             while (!stopped) {
                                 val data = inputStream.readLine()
                                 if (data == null) {//断开连接
-                                    onDisConnect(client)
-
+//                                    onDisConnect(client)
                                     break
                                 } else onPostAction(data)
                             }
-                            client?.close()
                         } catch (e: Exception) {//
                             GlobalLog.err(e)
                         }
+                        onDisConnect(p)
                     }
                 } catch (e: Exception) {
                     GlobalApp.toastShort(GlobalApp.getString(R.string.text_disconnect_with_debugger))
@@ -138,18 +146,25 @@ object RemoteDebugServer : Runnable {
 
             val end = if (output.endsWith('\n')) "" else "\n"
             try {
-                out?.print(output + end)
-                out?.flush()
+                clients?.forEach {
+                    it.second.print(output + end)
+                    it.second.flush()
+                }
             } catch (e: Exception) {
                 e.printStackTrace()
-                onFinish()
+//                onFinish()
             }
         }
     }
 
-    private fun onDisConnect(client: Socket?) {
-        startAutoSleep()
-        GlobalApp.toastShort("与${client?.inetAddress}断开连接")
+    private fun onDisConnect(client: Pair<Socket, PrintWriter>) {
+        client.first.apply {
+            GlobalApp.toastShort("与${inetAddress}断开连接")
+            close()
+        }
+        clients?.remove(client)
+        if (clients?.isEmpty() == true)
+            startAutoSleep()
     }
 
     /**

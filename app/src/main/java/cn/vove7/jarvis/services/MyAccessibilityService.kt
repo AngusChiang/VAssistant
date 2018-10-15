@@ -54,7 +54,8 @@ class MyAccessibilityService : AccessibilityApi() {
     private fun startPluginService() {
         thread {
             registerEvent(activityNotifier)
-            registerEvent(AdKillerService)
+            if (AppConfig.isAdBlockService)
+                registerEvent(AdKillerService)
         }
     }
 
@@ -164,7 +165,7 @@ class MyAccessibilityService : AccessibilityApi() {
         if (eventType == AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED) {//界面切换
             val classNameStr = event.className
             val pkg = event.packageName as String?
-            Vog.d(this,"onAccessibilityEvent ---> $classNameStr $pkg")
+            Vog.v(this, "onAccessibilityEvent ---> $classNameStr $pkg")
             if (packageName == pkg) {//fix 悬浮窗造成阻塞
                 Vog.d(this, "onAccessibilityEvent ---> 自身悬浮窗")
                 return
@@ -177,7 +178,7 @@ class MyAccessibilityService : AccessibilityApi() {
             callAllNotifier()
         }
         if (blackPackage.contains(currentScope.packageName)) {//black list
-            Vog.d(this, "onAccessibilityEvent ---> in black")
+            Vog.v(this, "onAccessibilityEvent ---> in black")
             return
         }
         //根据事件回调类型进行处理

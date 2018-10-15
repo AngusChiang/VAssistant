@@ -6,15 +6,15 @@ import android.view.View
 import android.widget.TextView
 import cn.vove7.common.model.UserInfo
 import cn.vove7.common.netacc.ApiUrls
+import cn.vove7.common.netacc.NetHelper
 import cn.vove7.common.netacc.model.LastDateInfo
-import cn.vove7.common.view.toast.ColorfulToast
 import cn.vove7.executorengine.bridges.SystemBridge
 import cn.vove7.jarvis.BuildConfig
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.activities.base.ReturnableActivity
 import cn.vove7.jarvis.adapters.SettingsExpandableAdapter
 import cn.vove7.jarvis.utils.AppConfig
-import cn.vove7.jarvis.utils.NetHelper
+import cn.vove7.jarvis.utils.DataUpdator
 import cn.vove7.jarvis.utils.debugserver.RemoteDebugServer
 import cn.vove7.jarvis.view.CheckBoxItem
 import cn.vove7.jarvis.view.IntentItem
@@ -84,7 +84,10 @@ class AdvancedSettingActivity : ReturnableActivity() {
                         }),
                         IntentItem(R.string.text_check_last_data, onClick = { _, _ ->
                             showLastDataDate()
-                        })
+                        }),
+                        CheckBoxItem(title = "自动更新", summary = "在进入App后自动检查并更新最新数据",
+                                keyId = R.string.key_auto_update_data, defaultValue = { true })
+
                 )),
                 SettingGroupItem(R.color.google_green, "脚本", childItems = listOf(
                         SwitchItem(R.string.text_remote_debug, summary = if (RemoteDebugServer.stopped) "使用Pc调试，请查阅使用手册"
@@ -147,32 +150,36 @@ class AdvancedSettingActivity : ReturnableActivity() {
 
     private fun showLastDataDate() {
         val p = ProgressDialog(this)
-
-        NetHelper.postJson<LastDateInfo>(ApiUrls.GET_LAST_DATA_DATE, type = NetHelper.LastDateInfoType) { _, b ->
+        NetHelper.getLastInfo {
             p.dismiss()
-            if (b?.isOk() == true && b.data != null) {
-                statistic(b.data!!)
+            if (it != null) {
+                statistic(it)
             } else {
                 toast.showShort("获取失败")
             }
         }
-
     }
 
     private fun statistic(lastInfo: LastDateInfo) {
         val textV = TextView(this)
         textV.setPadding(60, 0, 60, 0)
+        val list = mutableListOf<Int>()
         MaterialDialog(this).title(text = "数据更新")
                 .customView(view = textV, scrollable = true).show {
-                    arrayOf(
-                            arrayOf("全局指令", lastInfo.instGlobal, R.string.key_last_sync_global_date)
-                            , arrayOf("应用内指令", lastInfo.instInApp, R.string.key_last_sync_in_app_date)
-                            , arrayOf("标记通讯录", lastInfo.markedContact, R.string.key_last_sync_marked_contact_date)
-                            , arrayOf("标记应用", lastInfo.markedApp, R.string.key_last_sync_marked_app_date)
-                            , arrayOf("标记打开", lastInfo.markedOpen, R.string.key_last_sync_marked_open_date)
-                            , arrayOf("标记广告", lastInfo.markedAd, R.string.key_last_sync_marked_ad_date)
-                    ).forEach {
-                        build(textV, it[0] as String, it[1] as Long?, it[2] as Int)
+                    arrayOf(arrayOf("全局指令", lastInfo.instGlobal, R.string.key_last_sync_global_date)//1
+                            , arrayOf("应用内指令", lastInfo.instInApp, R.string.key_last_sync_in_app_date)//2
+                            , arrayOf("标记通讯录", lastInfo.markedContact, R.string.key_last_sync_marked_contact_date)//3
+                            , arrayOf("标记应用", lastInfo.markedApp, R.string.key_last_sync_marked_app_date)//4
+                            , arrayOf("标记打开", lastInfo.markedOpen, R.string.key_last_sync_marked_open_date)//5
+                            , arrayOf("标记广告", lastInfo.markedAd, R.string.key_last_sync_marked_ad_date)//6
+                    ).withIndex().forEach { kv ->
+                        val it = kv.value
+                        build(textV, it[0] as String, it[1] as Long?, it[2] as Int).also {
+                            if (it) list.add(kv.index)
+                        }
+                    }
+                    positiveButton(text = "一键同步") {
+                        DataUpdator.onKeyUpdate(this@AdvancedSettingActivity, list)
                     }
                 }
     }
@@ -180,7 +187,7 @@ class AdvancedSettingActivity : ReturnableActivity() {
     private val format = SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault())
 
     val sp: SpHelper by lazy { SpHelper(this) }
-    private fun build(view: TextView, pre: String, last: Long?, keyKd: Int) {
+    private fun build(view: TextView, pre: String, last: Long?, keyKd: Int): Boolean {
         val lastDate = last ?: -1L
         val lastUpdate = sp.getLong(keyKd)
         val isOutDate = lastDate > lastUpdate
@@ -194,11 +201,12 @@ class AdvancedSettingActivity : ReturnableActivity() {
             append("上次同步时间: " + (if (lastUpdate > 0) format.format(lastUpdate) else "无") + "\n")
             append("最新服务数据: " + (if (lastDate > 0) format.format(lastDate) else "无") + "\n\n")
         }
+        return isOutDate
     }
 
     private val ipText: String
         get() {
-            return "本机IP:" + SystemBridge.getIpAddress() +
+            return "本机IP:" + SystemBridge.getLocalIpAddress() +
                     "\n更多资料请查阅手册"
         }
 }

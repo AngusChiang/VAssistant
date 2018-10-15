@@ -34,7 +34,8 @@ import cn.vove7.jarvis.adapters.ExecuteQueueAdapter
 import cn.vove7.jarvis.adapters.InstSettingListAdapter
 import cn.vove7.jarvis.services.MainService
 import cn.vove7.jarvis.utils.AppConfig
-import cn.vove7.jarvis.utils.NetHelper
+import cn.vove7.common.netacc.NetHelper
+import cn.vove7.executorengine.bridges.SystemBridge
 import cn.vove7.jarvis.utils.ShortcutUtil
 import cn.vove7.jarvis.view.dialog.ProgressDialog
 import cn.vove7.vtp.dialog.DialogWithList
@@ -62,7 +63,17 @@ class InstDetailActivity : AppCompatActivity() {
         toolbar.inflateMenu(R.menu.menu_inst_detail)
         initView()
         nodeId = intent.getLongExtra("nodeId", -1)
-        if (nodeId == -1L) finish()
+        if (nodeId == -1L) {
+            finish()
+            return
+        }
+
+        refresh()
+        toolbar.setNavigationOnClickListener { finish() }
+        load = true
+    }
+
+    fun refresh() {
         val n = DAO.daoSession.actionNodeDao.queryBuilder()
                 .where(ActionNodeDao.Properties.Id.eq(nodeId))
                 .unique()
@@ -74,8 +85,6 @@ class InstDetailActivity : AppCompatActivity() {
         node = n
         setData()
         initFollows()
-        toolbar.setNavigationOnClickListener { finish() }
-        load = true
     }
 
     var title: String? = null
@@ -95,6 +104,10 @@ class InstDetailActivity : AppCompatActivity() {
 //    private val script_text: CodeView by lazy { findViewById<CodeView>(R.id.script_text) }
 //    private val script_type_text: TextView by lazy { findViewById<TextView>(R.id.script_type_text) }
 
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        refresh()
+    }
 
     //todo  share user info
     private fun setData() {
@@ -130,6 +143,10 @@ class InstDetailActivity : AppCompatActivity() {
             script_type_text.text = node.action?.scriptType
         }
         if (node.action != null) {
+            copy_script.setOnClickListener {
+                SystemBridge.setClipText(node.action?.actionScript ?: "")
+                toast.showShort(R.string.text_copied)
+            }
             val settingsHeader = RegUtils.getRegisterSettingsTextAndName(node.action.actionScript)
             if (settingsHeader != null) {
                 val script = settingsHeader.script
@@ -156,7 +173,7 @@ class InstDetailActivity : AppCompatActivity() {
         }
     }
 
-    fun initFollows() {
+    private fun initFollows() {
         if (node.follows != null) {
             follow_list.adapter = object : BaseListAdapter<VHolder, ActionNode>(this, node.follows) {
                 override fun layoutId(): Int = R.layout.item_normal_icon_title
@@ -211,7 +228,7 @@ class InstDetailActivity : AppCompatActivity() {
                     if (scope != null)
                         editIntent.putExtra("pkg", node.actionScope.packageName)
                     editIntent.putExtra("reedit", true)
-                    startActivity(editIntent)
+                    startActivityForResult(editIntent, 1)
                 }
                 R.id.menu_delete -> {//删除
                     MaterialDialog(this).title(text = getString(R.string.text_confirm_2_del) + ": ${node.actionTitle} ?")
@@ -348,7 +365,7 @@ class InstDetailActivity : AppCompatActivity() {
         if (scope != null)
             editIntent.putExtra("pkg", node.actionScope.packageName)
         editIntent.putExtra("reedit", false)
-        startActivity(editIntent)
+        startActivityForResult(editIntent, 10)
     }
 
     var shareDialog: MaterialDialog? = null

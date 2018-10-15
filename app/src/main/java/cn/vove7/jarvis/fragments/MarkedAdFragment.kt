@@ -19,7 +19,8 @@ import cn.vove7.jarvis.adapters.ViewModel
 import cn.vove7.jarvis.fragments.base.OnSyncMarked
 import cn.vove7.jarvis.plugins.AdKillerService
 import cn.vove7.jarvis.utils.AppConfig
-import cn.vove7.jarvis.utils.NetHelper
+import cn.vove7.common.netacc.NetHelper
+import cn.vove7.jarvis.utils.DataUpdator
 import cn.vove7.jarvis.view.dialog.AdEditorDialog
 import cn.vove7.vtp.log.Vog
 import cn.vove7.vtp.sharedpreference.SpHelper
@@ -88,25 +89,13 @@ class MarkedAdFragment : SimpleListFragment<String>(), OnSyncMarked {
             return
         }
         showProgressBar()
-        val syncPkgs = AdvanAppHelper.getPkgList()
 
-        NetHelper.postJson<List<AppAdInfo>>(ApiUrls.SYNC_APP_AD, BaseRequestModel(syncPkgs), type = object
-            : TypeToken<ResponseMessage<List<AppAdInfo>>>() {}.type) { _, bean ->
-            if (bean != null) {
-                if (bean.isOk()) {
-                    //
-                    DaoHelper.updateAppAdInfo(bean.data ?: emptyList())
-                    toast.showShort("同步完成")
-                    SpHelper(GlobalApp.APP).set(R.string.key_last_sync_marked_ad_date, System.currentTimeMillis())
-                    AdKillerService.update()
-                    refresh()
-                } else {
-                    toast.showShort(bean.message)
-                }
-            } else {
-                toast.showShort("出错")
-            }
+        DataUpdator.syncMarkedAd {
             hideProgressBar()
+            if(it){
+                refresh()
+                toast.showShort("同步完成")
+            }
         }
     }
 

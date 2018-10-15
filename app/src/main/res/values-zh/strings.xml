@@ -178,7 +178,7 @@
     <string name="text_animation">动画</string>
     <string name="text_set_as_default_voice_assist">设为默认语音助手</string>
     <string name="desc_device_admin">用于锁屏</string>
-    <string name="text_long_press_to_export_log">长按导出日志</string>
+    <string name="text_long_press_to_export_log">查看日志，长按导出日志</string>
     <string name="text_send">发送</string>
     <string name="text_feedback_title_hint">问题或建议描述</string>
     <string name="text_explore_log">查看日志</string>
@@ -201,5 +201,9 @@
     <string name="text_customize_wakeup_words">自定义唤醒词</string>
     <string name="text_vosp">VOSP</string>
     <string name="text_vosp_summary">加入开源工程</string>
+    <string name="text_lua_editor">Lua编辑器</string>
+    <string name="text_js_editor">Js编辑器</string>
+    <string name="text_select_nothing">未选择任何内容</string>
+    <string name="text_copied">已复制</string>
 
 </resources>

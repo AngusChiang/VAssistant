@@ -6,25 +6,22 @@ import android.view.View
 import android.widget.AdapterView
 import android.widget.Button
 import android.widget.Spinner
-import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.datamanager.DAO
-import cn.vove7.common.datamanager.DaoHelper
 import cn.vove7.common.datamanager.executor.entity.MarkedData
 import cn.vove7.common.datamanager.parse.DataFrom
 import cn.vove7.common.model.UserInfo
 import cn.vove7.common.netacc.ApiUrls
+import cn.vove7.common.netacc.NetHelper
 import cn.vove7.common.netacc.model.BaseRequestModel
-import cn.vove7.jarvis.utils.NetHelper
-import cn.vove7.common.utils.TextHelper
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.adapters.SimpleListAdapter
 import cn.vove7.jarvis.adapters.ViewModel
 import cn.vove7.jarvis.fragments.SimpleListFragment
 import cn.vove7.jarvis.utils.AppConfig
+import cn.vove7.jarvis.utils.DataUpdator
 import cn.vove7.jarvis.utils.DialogUtil
 import cn.vove7.vtp.log.Vog
-import cn.vove7.vtp.sharedpreference.SpHelper
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.customview.customView
 
@@ -115,6 +112,7 @@ abstract class BaseMarkedFragment<T> : SimpleListFragment<T>(), OnSyncMarked {
     private val regexText: TextInputLayout by lazy {
         editDialog.findViewById<TextInputLayout>(R.id.regex_text)
     }
+
     private val scriptLang: Spinner by lazy {
         editDialog.findViewById<Spinner>(R.id.script_lang).also {
             it.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
@@ -134,6 +132,7 @@ abstract class BaseMarkedFragment<T> : SimpleListFragment<T>(), OnSyncMarked {
         s.hint = getString(valueHint)
         s
     }
+
     private val selectButton: Button by lazy { editDialog.findViewById<Button>(R.id.sel_btn) }
     var editData: MarkedData? = null
 
@@ -170,35 +169,35 @@ abstract class BaseMarkedFragment<T> : SimpleListFragment<T>(), OnSyncMarked {
     override val itemClickListener =
         object : SimpleListAdapter.OnItemClickListener {
 
-        @SuppressLint("CheckResult")
-        override fun onClick(holder: SimpleListAdapter.VHolder?, pos: Int, item: ViewModel) {
-            //dialog edit
-            val data = item.extra as MarkedData
-            MaterialDialog(context!!).show {
-                if (data.belongUser()) {
-                    negativeButton(R.string.text_share) {
-                        share(data)
-                    }
-                    positiveButton(R.string.text_edit) {
-                        onEdit(item.extra)
-                    }
-                    neutralButton(R.string.text_delete) {
-                        DialogUtil.dataDelAlert(context) {
-                            if (data.tagId != null) {
-                                deleteShare(data.tagId)
-                            }
-                            DAO.daoSession.markedDataDao.delete(data)
-                            toast.showShort(R.string.text_delete_complete)
-                            refresh()
+            @SuppressLint("CheckResult")
+            override fun onClick(holder: SimpleListAdapter.VHolder?, pos: Int, item: ViewModel) {
+                //dialog edit
+                val data = item.extra as MarkedData
+                MaterialDialog(context!!).show {
+                    if (data.belongUser()) {
+                        negativeButton(R.string.text_share) {
+                            share(data)
                         }
-                    }
+                        positiveButton(R.string.text_edit) {
+                            onEdit(item.extra)
+                        }
+                        neutralButton(R.string.text_delete) {
+                            DialogUtil.dataDelAlert(context) {
+                                if (data.tagId != null) {
+                                    deleteShare(data.tagId)
+                                }
+                                DAO.daoSession.markedDataDao.delete(data)
+                                toast.showShort(R.string.text_delete_complete)
+                                refresh()
+                            }
+                        }
 
+                    }
+                    title(text = item.title)
+                    message(text = data.toString())
                 }
-                title(text = item.title)
-                message(text = data.toString())
             }
         }
-    }
 
     private fun deleteShare(tagId: String) {
         NetHelper.postJson<Any>(ApiUrls.DELETE_SHARE_MARKED, BaseRequestModel(tagId)) { _, bean ->
@@ -225,6 +224,7 @@ abstract class BaseMarkedFragment<T> : SimpleListFragment<T>(), OnSyncMarked {
                     val tag = bean.data
                     if (tag != null) {
                         data.tagId = tag
+                        data.publishUserId = UserInfo.getUserId()
                         data.from = DataFrom.FROM_SHARED
                         DAO.daoSession.markedDataDao.update(data)
                     }
@@ -238,32 +238,22 @@ abstract class BaseMarkedFragment<T> : SimpleListFragment<T>(), OnSyncMarked {
         }
     }
 
-
     override fun onSync(types: Array<String>) {
-        if(!UserInfo.isLogin()){
+        if (!UserInfo.isLogin()) {
             toast.blue().showShort("请登陆后操作")
             return
         }
         showProgressBar()
-        val syncData = TextHelper.arr2String(types)
-        val requestModel = BaseRequestModel(syncData)
-
-        NetHelper.postJson<List<MarkedData>>(ApiUrls.SYNC_MARKED, requestModel, type = NetHelper.MarkedDataListType) { _, bean ->
-            if (bean != null) {
-                if (bean.isOk()) {
-                    DaoHelper.updateMarkedData(types, bean.data ?: emptyList())
-                    toast.showShort("同步完成")
-                    SpHelper(GlobalApp.APP).set(lastKeyId, System.currentTimeMillis())
-
-                    refresh()
-                } else {
-                    toast.showShort(bean.message)
-                }
-            } else toast.showShort(R.string.text_net_err)
+        DataUpdator.syncMarkedData(types, lastKeyId) {
+            if (it) {
+                toast.showShort("同步完成")
+                refresh()
+            }
             hideProgressBar()
         }
     }
-    abstract val lastKeyId:Int
+
+    abstract val lastKeyId: Int
 
 }
 

@@ -97,12 +97,12 @@ object ParseEngine {
                 Vog.d(this, "scope is null 无障碍未打开")
                 return ParseResult(false, "无匹配")
             }
-            val inAppQue = matchAppAction(cmdWord, scope)
+            val inAppQue = matchAppAction(cmdWord, scope, false)
             actionQueue.addAll(inAppQue.second) //匹配应用内时
             // 根据第一个action.scope 决定是否进入首页
             if (actionQueue.isNotEmpty()) {//自动执行打开
                 val appScope = actionQueue.peek().scope
-                if (appScope.activity ?: "" == "" || appScope.activity != scope.activity) {//Activity 空 or Activity 不等 => 不同页面
+                if (appScope.activity ?: "" == "" || !scope.activity.endsWith(appScope.activity)) {//Activity 空 or Activity 不等 => 不同页面
                     Vog.d(this, "parseAction ---> 应用内不同页")
                     actionQueue.add(Action(-999,
                             String.format(PRE_OPEN, scope.packageName)
@@ -110,7 +110,7 @@ object ParseEngine {
                 }
             } else if (SpHelper(GlobalApp.APP).getBoolean("use_smartopen_if_parse_failed",
                             true) && AccessibilityApi.isOpen()) {//失败,默认点击
-                if(ViewFindBuilder().similaryText(cmdWord).tryClick())
+                if (ViewFindBuilder().similaryText(cmdWord).tryClick())
                     return ParseResult(true, PriorityQueue(), "smart点击 $cmdWord")
             }
             ParseResult(actionQueue.isNotEmpty(), actionQueue, inAppQue.first)
@@ -127,7 +127,7 @@ object ParseEngine {
         if (GlobalActionNodes == null)
             updateGlobal()
         GlobalActionNodes?.forEach {
-            val r = regSearch(cmd, it, actionQueue)
+            val r = regSearch(cmd, it, actionQueue, true)
             if (r) return Pair(it.actionTitle, actionQueue)
         }
         return Pair(null, actionQueue)
@@ -141,9 +141,11 @@ object ParseEngine {
      * QQ扫一扫
      * App内指令
      * 深度搜索
+     * @param isFollow 此时匹配应用内指令，指明是前面是否有指令，true: 有父级操作 false: 首个操作
+     * 用于判断是否加前缀%
      * @return  Pair<String?, PriorityQueue<Action> 匹配的标题
      */
-    fun matchAppAction(cmd: String, matchScope: ActionScope): Pair<String?, PriorityQueue<Action>> {
+    fun matchAppAction(cmd: String, matchScope: ActionScope, isFollow: Boolean = false): Pair<String?, PriorityQueue<Action>> {
 
 //        Log.d("Debug :", "matchAppAction  ----> $currentAppPkg")
         if (AppActionNodes == null) {
@@ -152,9 +154,10 @@ object ParseEngine {
         val actionQueue = PriorityQueue<Action>()
         AppActionNodes?.filter {
             //筛选当前App  根据pkg
-            it.actionScope != null && matchScope.eqPkg(it.actionScope)
+            val sc = it.actionScope
+            sc?.eqPkg(matchScope) == true
         }?.forEach {
-            val r = regSearch(cmd, it, actionQueue)
+            val r = regSearch(cmd, it, actionQueue, isFollow)
             if (r) return Pair(it.actionTitle, actionQueue)
         }
         return Pair(null, actionQueue)
@@ -168,9 +171,10 @@ object ParseEngine {
      * @param actionQueue PriorityQueue<Action>
      * @return Boolean
      */
-    private fun regSearch(cmd: String, it: ActionNode, actionQueue: PriorityQueue<Action>): Boolean {
+    private fun regSearch(cmd: String, it: ActionNode, actionQueue: PriorityQueue<Action>,
+                          isFollow: Boolean): Boolean {
         it.regs.forEach { reg ->
-            val result = reg.followRegex.matchEntire(cmd)
+            val result = (if (isFollow) reg.followRegex else reg.regex).matchEntire(cmd)//？？？？
             if (result != null) {
                 val ac = it.action
                 ac.scope = it.actionScope
@@ -263,7 +267,7 @@ object ParseEngine {
      */
     fun testParse(testWord: String, node: ActionNode): ParseResult {
         val actionQueue = PriorityQueue<Action>()
-        val r = regSearch(testWord, node, actionQueue)
+        val r = regSearch(testWord, node, actionQueue, false)
         return ParseResult(actionQueue.isNotEmpty(), actionQueue)
     }
 

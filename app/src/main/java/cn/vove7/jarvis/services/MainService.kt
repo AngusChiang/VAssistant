@@ -12,6 +12,7 @@ import cn.vove7.common.accessibility.AccessibilityApi
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.appbus.AppBus
+import cn.vove7.common.appbus.AppBus.EVENT_BEGIN_SCREEN_PICKER
 import cn.vove7.common.appbus.AppBus.EVENT_FORCE_OFFLINE
 import cn.vove7.common.appbus.AppBus.EVENT_START_DEBUG_SERVER
 import cn.vove7.common.appbus.AppBus.EVENT_STOP_DEBUG_SERVER
@@ -30,15 +31,17 @@ import cn.vove7.common.datamanager.parse.model.Action
 import cn.vove7.common.executor.CExecutorI
 import cn.vove7.common.model.RequestPermission
 import cn.vove7.common.model.UserInfo
+import cn.vove7.common.netacc.NetHelper
 import cn.vove7.common.utils.RegUtils.checkCancel
 import cn.vove7.common.utils.RegUtils.checkConfirm
 import cn.vove7.executorengine.bridges.SystemBridge
 import cn.vove7.executorengine.exector.MultiExecutorEngine
 import cn.vove7.executorengine.parse.ParseEngine
+import cn.vove7.jarvis.App
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.activities.PermissionManagerActivity
+import cn.vove7.jarvis.activities.ScreenPickerActivity
 import cn.vove7.jarvis.utils.AppConfig
-import cn.vove7.jarvis.utils.NetHelper
 import cn.vove7.jarvis.utils.debugserver.RemoteDebugServer
 import cn.vove7.jarvis.view.dialog.MultiChoiceDialog
 import cn.vove7.jarvis.view.dialog.OnMultiSelectListener
@@ -355,6 +358,12 @@ class MainService : BusService(),
                 EVENT_STOP_DEBUG_SERVER -> {
                     RemoteDebugServer.stop()
                 }
+                EVENT_BEGIN_SCREEN_PICKER -> {
+                    val intent = Intent(this, ScreenPickerActivity::class.java)
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or
+                            Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS)
+                    startActivity(intent)
+                }
                 else -> {
                 }
             }
@@ -367,6 +376,7 @@ class MainService : BusService(),
     @Subscribe(threadMode = ThreadMode.POSTING)
     fun onRequestPermission(r: RequestPermission) {
         val intent = Intent(this, PermissionManagerActivity::class.java)
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         intent.putExtra("pName", r.permissionName)
         startActivity(intent)
     }
@@ -401,6 +411,8 @@ class MainService : BusService(),
         val recoIsListening: Boolean
             get() {
                 return (if (instance == null) {
+                    GlobalApp.toastShort("正在启动服务")
+                    App.startServices()
                     Vog.i(this, "instance ---> null")
                     false
                 } else instance!!.speechRecoService.isListening()
@@ -543,7 +555,7 @@ class MainService : BusService(),
         }
 
         override fun onCancel() {
-            Vog.d(this,"onCancel ---> ")
+            Vog.d(this, "onCancel ---> ")
             resumeMusicIf()
             hideAll()
             if (voiceMode == MODE_GET_PARAM) {

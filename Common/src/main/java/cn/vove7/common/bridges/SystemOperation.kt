@@ -134,7 +134,16 @@ interface SystemOperation {
      */
     fun location(): Location?
 
-    fun getIpAddress(): String?
+    /**
+     * 获得内外ip
+     * @return String?
+     */
+    fun getLocalIpAddress(): String?
+    /**
+     * 获得外网ip
+     * @return String?
+     */
+    fun getNetAddress(): String?
 
 //    fun hideInputMethod()
 }

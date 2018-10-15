@@ -59,21 +59,21 @@ class EditorFunsHelper(
                     }
                 }),
                 ApiCategory("ViewNode", listOf(
-                        ApiFunction("tryClick()"," 尝试点击"),
-                        ApiFunction("swipe(dx, dy, delay)","以此Node中心滑动到相对(dx,dy)的地方"),
-                        ApiFunction("tryLongClick()","长按"),
-                        ApiFunction("longClick()","长按")
-                        , ApiFunction("doubleClick()","双击")
-                        , ApiFunction("setText(text)","设置文本,一般只能用于可编辑控件")
-                        , ApiFunction("trySetText(text)","设置文本")
-                        , ApiFunction("getChilds()","获取下级所有Node,返回Array<ViewNode>")
-                        , ApiFunction("getParent()","获取父级Node，返回ViewNode?")
-                        , ApiFunction("getBounds()","获取边界范围")
-                        , ApiFunction("getCenterPoint()","获取中心点坐标Point(x,y)(相对于本机屏幕),")
-                        , ApiFunction("getText()","获取Node包含的文本")
-                        , ApiFunction("select()","选择")
-                        , ApiFunction("trySelect()","选择")
-                        , ApiFunction("focus()","获得焦点")
+                        ApiFunction("tryClick()", " 尝试点击"),
+                        ApiFunction("swipe(dx, dy, delay)", "以此Node中心滑动到相对(dx,dy)的地方"),
+                        ApiFunction("tryLongClick()", "长按"),
+                        ApiFunction("longClick()", "长按")
+                        , ApiFunction("doubleClick()", "双击")
+                        , ApiFunction("setText(text)", "设置文本,一般只能用于可编辑控件")
+                        , ApiFunction("trySetText(text)", "设置文本")
+                        , ApiFunction("getChilds()", "获取下级所有Node,返回Array<ViewNode>")
+                        , ApiFunction("getParent()", "获取父级Node，返回ViewNode?")
+                        , ApiFunction("getBounds()", "获取边界范围")
+                        , ApiFunction("getCenterPoint()", "获取中心点坐标Point(x,y)(相对于本机屏幕),")
+                        , ApiFunction("getText()", "获取Node包含的文本")
+                        , ApiFunction("select()", "选择")
+                        , ApiFunction("trySelect()", "选择")
+                        , ApiFunction("focus()", "获得焦点")
                 )),
                 ApiCategory("ViewFinder", listOf(
                         ApiFunction("find()", "搜索所有符合条件,返回Array<ViewNode>")
@@ -88,6 +88,12 @@ class EditorFunsHelper(
                         , ApiFunction("scrollable()", "匹配可滑动")
                         , ApiFunction("type(types)", "匹配控件的className")
                         , ApiFunction("await()", "同waitFor()")
+                )),
+                ApiCategory("网络", listOf(
+                        ApiFunction("get(url)", "发起get请求，参数:(url [, params:Map])", insertText = "http.get()")
+                        , ApiFunction("post(url)", "发起post请求，参数:(url [, params:Map])", insertText = "http.post()")
+                        , ApiFunction("postJson(url, json)", "发起post请求, 参数:(url [, json:String)", insertText = "http.postJson()")
+                        , ApiFunction("getAsPc(url, json)", "模拟Pc发起get请求, 参数:(url [params:Map])", insertText = "http.getAsPc()")
                 )),
                 ApiCategory("全局", listOf(
                         ApiFunction("waitForId(id,m)", "等待指定视图id的出现，m:等待时长")
@@ -127,16 +133,16 @@ class EditorFunsHelper(
                                         "}\n" +
                                         "\n" +
                                         "config = registerSettings(\"\", settings, 0)\n")
-                        , ApiFunction("SpHelper('')","运行时存储")
-                        , ApiFunction("set(k,v)","参数k,v v: int,bol,string stringset(运行时存储)")
-                        , ApiFunction("getInt()","参数k")
-                        , ApiFunction("getString()","参数k")
-                        , ApiFunction("getBoolean()","参数k")
+                        , ApiFunction("SpHelper('')", "运行时存储")
+                        , ApiFunction("set(k,v)", "参数k,v v: int,bol,string stringset(运行时存储)")
+                        , ApiFunction("getInt()", "参数k")
+                        , ApiFunction("getString()", "参数k")
+                        , ApiFunction("getBoolean()", "参数k")
                 )),
                 ApiCategory("其他", listOf(//指令设置
-                ApiFunction("toPinyin()","将text文本中的中文转换为拼音，\n参数：(text [,onlyFirstLetter])\nonlyFirstLetter是否只需要首字母")
-                ,ApiFunction("matches()","匹配字符串,参数(text,regexStr)\ntext: 待匹配字符串 regex:正则式字符串 %为匹配任意字符 返回boolean 是否匹配成功")
-                ,ApiFunction("matchValues()","同matches 返回匹配成功的数组\n如 用%(2)?3% 匹配1234 返回 [1,2,4] " )
+                        ApiFunction("toPinyin()", "将text文本中的中文转换为拼音，\n参数：(text [,onlyFirstLetter])\nonlyFirstLetter是否只需要首字母")
+                        , ApiFunction("matches()", "匹配字符串,参数(text,regexStr)\ntext: 待匹配字符串 regex:正则式字符串 %为匹配任意字符 返回boolean 是否匹配成功")
+                        , ApiFunction("matchValues()", "同matches 返回匹配成功的数组\n如 用%(2)?3% 匹配1234 返回 [1,2,4] ")
                 ))
 
         )

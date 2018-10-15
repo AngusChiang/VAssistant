@@ -133,12 +133,13 @@ object DaoHelper {
                 .where(ActionNodeDao.Properties.From.notEq(DataFrom.FROM_USER),
                         ActionNodeDao.Properties.ActionScopeType.eq(type),
                         actionNodeDao.queryBuilder().or(ActionNodeDao.Properties.PublishUserId.isNull,
-                                ActionNodeDao.Properties.PublishUserId.notEq(UserInfo.getUserId()?:-1L)
+                                ActionNodeDao.Properties.PublishUserId.notEq(UserInfo.getUserId()
+                                    ?: -1L)
                         )
                 ).list()
         val userList = if (UserInfo.isLogin()) {
             actionNodeDao.queryBuilder().whereOr(ActionNodeDao.Properties.From.notEq(DataFrom.FROM_USER),
-                    ActionNodeDao.Properties.PublishUserId.eq(UserInfo.getUserId()?: -1L))
+                    ActionNodeDao.Properties.PublishUserId.eq(UserInfo.getUserId() ?: -1L))
                     .list().toHashSet()
         } else emptySet<ActionNode>()
         return try {
@@ -249,20 +250,21 @@ object DaoHelper {
         val markedDao = DAO.daoSession.markedDataDao
         val l = markedDao.queryBuilder().where(
                 MarkedDataDao.Properties.Type.`in`(*types),
-//                markedDao.queryBuilder().or(
-//                        MarkedDataDao.Properties.From.isNull,
-                MarkedDataDao.Properties.From.notEq(DataFrom.FROM_USER)
-//                )
+                MarkedDataDao.Properties.From.notEq(DataFrom.FROM_USER),
+                markedDao.queryBuilder().or(MarkedDataDao.Properties.PublishUserId.isNull,
+                        MarkedDataDao.Properties.PublishUserId.notEq(UserInfo.getUserId() ?: -1L)
+                )
                 ,
                 markedDao.queryBuilder().or(MarkedDataDao.Properties.PublishUserId.isNull,
-                        MarkedDataDao.Properties.PublishUserId.notEq(UserInfo.getUserId()?:-1L)
+                        MarkedDataDao.Properties.PublishUserId.notEq(UserInfo.getUserId()
+                            ?: -1L)
                 )
         ).list()
         val userList = markedDao.queryBuilder().where(
                 MarkedDataDao.Properties.Type.`in`(*types),
                 markedDao.queryBuilder().or(
                         MarkedDataDao.Properties.From.eq(DataFrom.FROM_USER),
-                        MarkedDataDao.Properties.PublishUserId.eq(UserInfo.getUserId()?: -1L)
+                        MarkedDataDao.Properties.PublishUserId.eq(UserInfo.getUserId() ?: -1L)
                 )
         ).list().toHashSet()
         return try {
@@ -270,10 +272,6 @@ object DaoHelper {
             datas.forEach {
                 it.id = null
                 if (!userList.contains(it)) {
-//                    if (it.belongUser(false)) {
-//                        Vog.d(this, "updateMarkedData ---> 标记为用户:" + it.key)
-//                        it.from = DataFrom.FROM_USER
-//                    }
                     markedDao.insert(it)
                 } else {
                     Vog.d(this, "updateMarkedData ---> 重复:" + it.key)
@@ -309,7 +307,7 @@ object DaoHelper {
 
             val userList = appAdInfoDao.queryBuilder().whereOr(
                     AppAdInfoDao.Properties.From.eq(DataFrom.FROM_USER),
-                    AppAdInfoDao.Properties.PublishUserId.eq(UserInfo.getUserId()?:-1L)
+                    AppAdInfoDao.Properties.PublishUserId.eq(UserInfo.getUserId() ?: -1L)
             ).list().toHashSet()
 
             datas.forEach {

@@ -4,27 +4,19 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import android.widget.CompoundButton
-import cn.vove7.common.app.GlobalApp
-import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.datamanager.DAO
-import cn.vove7.common.datamanager.DaoHelper
 import cn.vove7.common.datamanager.greendao.ActionNodeDao
 import cn.vove7.common.datamanager.parse.DataFrom
 import cn.vove7.common.datamanager.parse.statusmap.ActionNode
 import cn.vove7.common.datamanager.parse.statusmap.ActionNode.NODE_SCOPE_GLOBAL
 import cn.vove7.common.model.UserInfo
-import cn.vove7.common.netacc.ApiUrls
-import cn.vove7.common.netacc.model.BaseRequestModel
-import cn.vove7.jarvis.R
 import cn.vove7.jarvis.activities.InstDetailActivity
 import cn.vove7.jarvis.activities.NewInstActivity
 import cn.vove7.jarvis.activities.OnSyncInst
 import cn.vove7.jarvis.adapters.SimpleListAdapter
 import cn.vove7.jarvis.adapters.ViewModel
 import cn.vove7.jarvis.utils.AppConfig
-import cn.vove7.jarvis.utils.NetHelper
-import cn.vove7.executorengine.parse.ParseEngine
-import cn.vove7.vtp.sharedpreference.SpHelper
+import cn.vove7.jarvis.utils.DataUpdator
 import kotlin.concurrent.thread
 
 /**
@@ -74,32 +66,14 @@ class GlobalInstListFragment : SimpleListFragment<ActionNode>(), OnSyncInst {
             return
         }
         showProgressBar()
-        NetHelper.postJson<List<ActionNode>>(ApiUrls.SYNC_GLOBAL_INST, BaseRequestModel(""),
-                type = NetHelper.ActionNodeListType) { _, bean ->
-            if (bean != null) {
-                if (bean.isOk()) {
-                    val list = bean.data
-                    if (list != null) {
-                        DaoHelper.updateGlobalInst(list).also {
-                            if (it) {
-                                toast.showShort("同步完成")
-                                refresh()
-                                SpHelper(GlobalApp.APP).set(R.string.key_last_sync_global_date, System.currentTimeMillis())
-                                ParseEngine.updateGlobal()
-                            } else toast.showShort("同步失败")
-                        }
 
-                    } else {
-                        GlobalLog.err("code: GI57")
-                        toast.showShort(R.string.text_error_occurred)
-                    }
-                } else toast.showShort(R.string.text_net_err)
-
-            } else toast.showShort(R.string.text_net_err)
-
+        DataUpdator.syncGlobalInst {
             hideProgressBar()
+            if (it) {
+                toast.showShort("同步完成")
+                refresh()
+            }
         }
-
     }
 
     override fun transData(nodes: List<ActionNode>): List<ViewModel> {

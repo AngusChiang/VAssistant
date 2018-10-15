@@ -22,6 +22,7 @@ object ApiUrls {
     private val SERVICE: String get() = SERVER_IP + "service/"
 
     val CRASH_HANDLER: String get() = COMMON + "ch"
+    val GET_IP: String get() = COMMON + "ip"
     val GET_LAST_DATA_DATE: String get() = COMMON + "gldd"
 
     private val PAY: String get() = SERVER_IP + "p/"

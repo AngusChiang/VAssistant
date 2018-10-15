@@ -142,18 +142,14 @@ class ScreenshotActivity : Activity() {
 
         private const val REQUEST_MEDIA_PROJECTION = 100
         var resultBox: ResultBox<Bitmap?>? = null
-        var looper: Looper? = null
 
         fun notifyShot(bitmap: Bitmap?) {
-            resultBox?.set(bitmap)
-            looper?.quitSafely()
+            resultBox?.setAndNotify(bitmap)
             resultBox = null
-            looper = null
         }
 
-        fun getScreenshotIntent(context: Context, r: ResultBox<Bitmap?>, l: Looper?): Intent {
+        fun getScreenshotIntent(context: Context, r: ResultBox<Bitmap?>): Intent {
             resultBox = r
-            looper = l
             val intent = Intent(context, ScreenshotActivity::class.java)
             intent.flags = (
                     Intent.FLAG_ACTIVITY_NEW_TASK

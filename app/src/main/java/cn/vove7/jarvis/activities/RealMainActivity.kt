@@ -3,13 +3,19 @@ package cn.vove7.jarvis.activities
 import android.os.Bundle
 import android.support.design.widget.BottomNavigationView
 import android.support.v7.app.AppCompatActivity
+import cn.vove7.common.netacc.NetHelper
+import cn.vove7.common.netacc.model.LastDateInfo
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.fragments.HomeFragment
 import cn.vove7.jarvis.fragments.MineFragment
+import cn.vove7.jarvis.utils.AppConfig
+import cn.vove7.jarvis.utils.DataUpdator
 import cn.vove7.jarvis.view.utils.FragmentSwitcher
+import cn.vove7.vtp.log.Vog
 import cn.vove7.vtp.runtimepermission.PermissionUtils
 import cn.vove7.vtp.sharedpreference.SpHelper
 import com.afollestad.materialdialogs.MaterialDialog
+import com.afollestad.materialdialogs.callbacks.onDismiss
 import kotlinx.android.synthetic.main.activity_real_main.*
 
 
@@ -36,6 +42,7 @@ class RealMainActivity : AppCompatActivity() {
         fSwitcher.switchFragment(mineF)
 
         requestPermission()
+
     }
 
     companion object {
@@ -52,7 +59,13 @@ class RealMainActivity : AppCompatActivity() {
                         PermissionUtils.autoRequestPermission(this, ps)
                     }.show()
         } else {
-            userGuide()
+            val sp = SpHelper(this)
+            if (sp.getBoolean("first_in", true)) {
+                userGuide()
+                sp.set("first_in", false)
+            } else {
+                checkDataUpdate()
+            }
         }
     }
 
@@ -61,16 +74,23 @@ class RealMainActivity : AppCompatActivity() {
         userGuide()
     }
 
-    private fun userGuide() {
-        val sp = SpHelper(this)
-        if (sp.getBoolean("first_in", true)) {
-            MaterialDialog(this).title(text = "引导")
-                    .message(text = "1. 首次使用，请至帮助中仔细阅读[使用手册]\n" +
-                            "2. 首次使用，可在注册登陆后至指令管理，标记管理中同步最新数据")
-                    .positiveButton()
-                    .negativeButton()
-                    .show()
-            sp.set("first_in", false)
+    private fun checkDataUpdate() {
+        if(AppConfig.autoUpdateData) {
+            DataUpdator.checkUpdate(this)
         }
     }
+
+
+    private fun userGuide() {
+        MaterialDialog(this).title(text = "引导")
+                .message(text = "1. 首次使用，请至帮助中仔细阅读[使用手册]\n" +
+                        "2. 首次使用，可在注册登陆后至指令管理，标记管理中同步最新数据")
+                .positiveButton()
+                .negativeButton()
+                .onDismiss {
+                    checkDataUpdate()
+                }
+                .show()
+    }
+
 }

@@ -1,15 +1,29 @@
-<resources xmlns:tools="http://schemas.android.com/tools">
+<resources>
 
+    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+        <!-- Customize your theme here. -->
+        <item name="colorPrimary">@color/p_green</item>
+        <item name="colorPrimaryDark">@color/p_green_dark</item>
+        <item name="colorAccent">@color/google_blue</item>
+        <item name="android:navigationBarColor">@color/p_green</item>
+        <item name="md_corner_radius">16dp</item>
+
+        <!--<item name="md_color_content">@color/your_color</item>-->
+        <item name="actionModeStyle">@style/MyActionMode</item>
+        <!--<item name="android:colorControlHighlight">@color/colorPrimary</item>-->
+    </style>
     <style name="MyActionMode" parent="ThemeOverlay.AppCompat.Light">
 
         <item name="height">?attr/actionBarSize</item>
     </style>
+
     <style name="TranslucentStatus" parent="AppTheme">
         <item name="android:windowTranslucentStatus">true</item>
         <item name="android:windowDrawsSystemBarBackgrounds">false</item>
         <item name="android:statusBarColor">@android:color/transparent</item>
         <item name="android:windowSharedElementsUseOverlay">false</item>
     </style>
+
     <style name="TranslucentStatus.NoActionBar" parent="NoActionBar">
         <item name="android:windowTranslucentStatus">true</item>
         <item name="android:windowTranslucentNavigation">true</item>
@@ -18,11 +32,20 @@
         <!--<item name="android:windowSharedElementsUseOverlay">false</item>-->
     </style>
 
+    <style name="ScreenPicker" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="android:windowBackground">@color/trans</item>
+        <item name="md_corner_radius">16dp</item>
+        <item name="android:statusBarColor">@color/trans</item>
+        <item name="android:windowIsTranslucent">true</item>
+
+        <!--<item name="android:windowAnimationStyle">@style/InOut</item>-->
+    </style>
     <!--防止白色启动背景-->
-    <style name="TransparentBackground">
+    <style name="TransparentBackground" parent="Theme.AppCompat.Light.NoActionBar">
         <item name="android:windowBackground">@color/transparent</item>
         <item name="android:windowContentOverlay">@null</item>
     </style>
+
     <style name="NoActionBar" parent="AppTheme">
         <item name="windowNoTitle">true</item>
         <item name="windowActionBar">false</item>
@@ -35,11 +58,19 @@
         <item name="android:textColor">@color/colorPrimary</item>
         <item name="android:elevation">6dp</item>
     </style>
+
     <style name="MaterialButton.Blue" parent="MaterialButton.White">
         <item name="android:colorControlHighlight">#FAFAFA</item>
         <item name="colorButtonNormal">@color/google_blue</item>
         <item name="android:textColor">#fff</item>
         <item name="android:elevation">6dp</item>
+    </style>
+
+    <style name="WarpLinearLayoutDefault">
+        <item name="align">left</item>
+        <item name="horizontal_Space">20dp</item>
+        <item name="vertical_Space">20dp</item>
+        <item name="isFull">false</item>
     </style>
 
 </resources>

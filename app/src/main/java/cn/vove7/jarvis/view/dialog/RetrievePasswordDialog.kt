@@ -17,7 +17,7 @@ import cn.vove7.common.utils.TextHelper
 import cn.vove7.common.view.toast.ColorfulToast
 import cn.vove7.jarvis.BuildConfig
 import cn.vove7.jarvis.R
-import cn.vove7.jarvis.utils.NetHelper
+import cn.vove7.common.netacc.NetHelper
 import cn.vove7.jarvis.view.custom.CountDownButton
 import cn.vove7.vtp.log.Vog
 import com.afollestad.materialdialogs.MaterialDialog

@@ -10,6 +10,7 @@ object AppBus {
     const val EVENT_START_DEBUG_SERVER = "start_debug_server"
     const val EVENT_STOP_DEBUG_SERVER = "stop_debug_server"
     const val EVENT_INST_SAVE_COMPLETE = "inst_settings_save_complete"
+    const val EVENT_BEGIN_SCREEN_PICKER = "begin_screen_picker"
 
     const val ORDER_STOP_EXEC = "stop_exec"
     const val ORDER_STOP_RECO = "stop_reco"

@@ -36,6 +36,8 @@ import static cn.vove7.rhino.api.RhinoApi.quit;
 
 
 public class RhinoHelper extends ScriptableObject {
+    private static final long serialVersionUID = -804736422632824973L;
+
     @Override
     public String getClassName() {
         return "RhinoHelper";
@@ -60,6 +62,7 @@ public class RhinoHelper extends ScriptableObject {
 
     public RhinoHelper(BridgeManager bridgeManager) {
         putProperty("executor", bridgeManager.getExecutor());
+        putProperty("http", bridgeManager.getHttpBridge());
         putProperty("runtime", bridgeManager.getExecutor());
         putProperty("system", bridgeManager.getSystemBridge());
         putProperty("automator", bridgeManager.getAutomator());

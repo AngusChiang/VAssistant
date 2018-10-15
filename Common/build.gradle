@@ -40,4 +40,7 @@ dependencies {
     api "com.android.support:support-annotations:${support_version}"
     api 'com.google.code.gson:gson:2.8.5'
     api 'com.squareup.okhttp3:okhttp:3.11.0'
+    implementation files('libs/aip-java-sdk-4.4.1.jar')
+    implementation files('libs/json-20160810.jar')
+    implementation files('libs/log4j-1.2.17.jar')
 }

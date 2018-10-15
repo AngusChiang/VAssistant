@@ -13,6 +13,7 @@ import cn.vove7.common.interfaces.VApi.Companion.appFunctions
 import cn.vove7.common.interfaces.VApi.Companion.executorFunctions
 import cn.vove7.common.interfaces.VApi.Companion.finderFuns
 import cn.vove7.common.interfaces.VApi.Companion.globalFuns
+import cn.vove7.common.interfaces.VApi.Companion.httpFunctions
 import cn.vove7.common.interfaces.VApi.Companion.keywordss
 import cn.vove7.common.interfaces.VApi.Companion.myApiName
 import cn.vove7.common.interfaces.VApi.Companion.runtimeFunctions
@@ -33,7 +34,7 @@ class LanguageLua private constructor() : Language(), VApi {
 
         val kkk=ArrayUtil.merge(arrayOf(keywordsss, keywordss, appFunctions,
                 runtimeFunctions, executorFunctions, viewNodeFunctions, finderFuns,
-                globalFuns, systemFuncs, utilFuns, spFuncs)
+                globalFuns, systemFuncs, utilFuns, spFuncs, httpFunctions)
         )
         super.setKeywords(kkk)
         super.setNames(ArrayUtil.merge(arrayOf(kkk, myApiName)))

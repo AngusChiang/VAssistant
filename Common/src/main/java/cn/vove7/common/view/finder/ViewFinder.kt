@@ -18,6 +18,10 @@ abstract class ViewFinder(var accessibilityService: AccessibilityApi) {
 
     val list = mutableListOf<ViewNode>()
 
+    fun find(): Array<ViewNode> {
+        return findAll()
+    }
+
     fun findAll(): Array<ViewNode> {
         list.clear()
         traverseAllNode(accessibilityService.rootInActiveWindow, true)
@@ -40,6 +44,7 @@ abstract class ViewFinder(var accessibilityService: AccessibilityApi) {
             val childNode = node.getChild(index)
             if (childNode != null) {
                 if (!childNode.isVisibleToUser) {//TODO check it
+                    Vog.d(this,"unVisibleToUser ---> ${childNode.text}")
                     return@forEach
                 }
                 if (findCondition(childNode)) {

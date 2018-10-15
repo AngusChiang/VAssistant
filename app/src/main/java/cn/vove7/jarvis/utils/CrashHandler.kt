@@ -8,6 +8,7 @@ import android.widget.Toast
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.netacc.ApiUrls
+import cn.vove7.common.netacc.NetHelper
 import cn.vove7.common.netacc.model.BaseRequestModel
 import cn.vove7.common.utils.TextHelper
 import cn.vove7.vtp.system.DeviceInfo

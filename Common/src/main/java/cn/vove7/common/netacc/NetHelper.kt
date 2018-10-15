@@ -1,11 +1,13 @@
-package cn.vove7.jarvis.utils
+package cn.vove7.common.netacc
 
 import android.os.Handler
 import android.os.Looper
+import cn.vove7.common.BuildConfig
 import cn.vove7.common.accessibility.AccessibilityApi
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.appbus.AppBus
+import cn.vove7.common.datamanager.DaoHelper
 import cn.vove7.common.datamanager.executor.entity.MarkedData
 import cn.vove7.common.datamanager.history.CommandHistory
 import cn.vove7.common.datamanager.parse.model.Action
@@ -13,14 +15,14 @@ import cn.vove7.common.datamanager.parse.model.ActionScope
 import cn.vove7.common.datamanager.parse.statusmap.ActionNode
 import cn.vove7.common.model.UserInfo
 import cn.vove7.common.model.VipPrice
-import cn.vove7.common.netacc.ApiUrls
 import cn.vove7.common.netacc.model.BaseRequestModel
 import cn.vove7.common.netacc.model.LastDateInfo
 import cn.vove7.common.netacc.model.RequestParseModel
 import cn.vove7.common.netacc.model.ResponseMessage
 import cn.vove7.common.utils.GsonHelper
-import cn.vove7.jarvis.BuildConfig
+import cn.vove7.common.utils.TextHelper
 import cn.vove7.vtp.log.Vog
+import cn.vove7.vtp.sharedpreference.SpHelper
 import com.google.gson.reflect.TypeToken
 import okhttp3.*
 import java.io.IOException
@@ -39,7 +41,7 @@ typealias OnResponse<T> = (Int, ResponseMessage<T>?) -> Unit
 
 object NetHelper {
 
-    var timeout = 15L
+    private var timeout = 15L
 
     fun <T> postJson(url: String, model: BaseRequestModel<*>? = BaseRequestModel<Any>(),
                      type: Type = StringType, requestCode: Int = 0, callback: OnResponse<T>? = null) {
@@ -144,7 +146,7 @@ object NetHelper {
      */
     fun uploadUserCommandHistory(his: CommandHistory) {
         thread {
-            if (BuildConfig.DEBUG || !AppConfig.userExpPlan) return@thread
+            if (BuildConfig.DEBUG /*|| !AppConfig.userExpPlan*/) return@thread
             Looper.prepare()
             postJson<Any>(ApiUrls.UPLOAD_CMD_HIS, BaseRequestModel(his)) { _, b ->
                 if (b?.isOk() == true) {
@@ -156,6 +158,13 @@ object NetHelper {
         }
     }
 
+
+    /**
+     * 云解析
+     * @param cmd String
+     * @param scope ActionScope?
+     * @param onResult (List<Action>?) -> Unit
+     */
     fun cloudParse(cmd: String, scope: ActionScope? = AccessibilityApi
             .accessibilityService?.currentScope, onResult: (List<Action>?) -> Unit) {
 //        thread {
@@ -171,4 +180,15 @@ object NetHelper {
         }
 //        }
     }
+
+    fun getLastInfo(back: (LastDateInfo?) -> Unit) {
+        NetHelper.postJson<LastDateInfo>(ApiUrls.GET_LAST_DATA_DATE, type = NetHelper.LastDateInfoType) { _, b ->
+            if (b?.isOk() == true && b.data != null) {
+                back.invoke(b.data!!)
+            } else {
+                back.invoke(null)
+            }
+        }
+    }
+
 }

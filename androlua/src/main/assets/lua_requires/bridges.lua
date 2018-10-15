@@ -10,6 +10,7 @@ import 'cn.vove7.androlua.androbridge.*'
 --
 bridges = luaman.getBridgeManager()
 executor = bridges.getExecutor()
+http = bridges.getHttpBridge()
 serviceBridge = bridges.getServiceBridge()
 system = bridges.getSystemBridge()
 automator = bridges.getAutomator()

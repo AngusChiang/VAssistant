@@ -5,6 +5,7 @@ import android.os.Looper
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.model.UserInfo
 import cn.vove7.common.netacc.ApiUrls
+import cn.vove7.common.netacc.NetHelper
 import cn.vove7.common.netacc.model.BaseRequestModel
 import cn.vove7.jarvis.R
 import cn.vove7.vtp.log.Vog
@@ -32,7 +33,8 @@ object AppConfig {
     var userExpPlan = true
     var isAutoVoiceWakeupCharging = false
     var useSmartOpenIfParseFailed = true
-    var cloudServiceParseIfLocalFailed = true //云服务解析
+    var cloudServiceParseIfLocalFailed = false //云服务解析
+    var autoUpdateData = true //
     var DEFAULT_WAKEUP_FILE = "assets:///bd/WakeUp.bin"
 //    var onlyCloudServiceParse = false //云服务解析
 
@@ -111,7 +113,9 @@ object AppConfig {
         userExpPlan = getBooleanAndInit(R.string.key_user_exp_plan, true)
         isAutoVoiceWakeupCharging = getBooleanAndInit(R.string.key_auto_open_voice_wakeup_charging, false)
         useSmartOpenIfParseFailed = getBooleanAndInit(R.string.key_use_smartopen_if_parse_failed, true)
-        cloudServiceParseIfLocalFailed = getBooleanAndInit(R.string.key_cloud_service_parse, true)
+//  todo      cloudServiceParseIfLocalFailed = getBooleanAndInit(R.string.key_cloud_service_parse, true)
+        sp.set(R.string.key_cloud_service_parse,false)
+        autoUpdateData = getBooleanAndInit(R.string.key_auto_update_data, true)
 //        onlyCloudServiceParse = getBooleanAndInit(R.string.key_only_cloud_service_parse, false)
 
         wakeUpFilePath = sp.getString(R.string.key_wakeup_file_path) ?: wakeUpFilePath

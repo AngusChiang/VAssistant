@@ -20,11 +20,11 @@ class ListItemAnimationHelper(val onlyFirstIn: Boolean, var dy: Float = 50f) {
         lastAnimatedPosition = 0
     }
 
-    fun fromB2T(view: View?, position: Int, fadeShow: Boolean = false, dyy: Float = dy, d: Long = 300) {
+    fun fromB2T(view: View?, position: Int, fadeShow: Boolean = false, dyy: Float = dy, d: Long = 200) {
         start(view, position, 1, dyy, d, fadeShow)
     }
 
-    fun fromT2B(view: View?, position: Int, fadeShow: Boolean = false, dyy: Float = dy, d: Long = 300) {
+    fun fromT2B(view: View?, position: Int, fadeShow: Boolean = false, dyy: Float = dy, d: Long = 200) {
         start(view, position, -1, dyy, d, fadeShow)
     }
 
@@ -33,7 +33,7 @@ class ListItemAnimationHelper(val onlyFirstIn: Boolean, var dy: Float = 50f) {
         view.alpha = 1f
         view.animate()
                 .alpha(0f)
-                .setDuration(300)
+                .setDuration(200)
                 .setListener(object : Animator.AnimatorListener {
                     override fun onAnimationRepeat(animation: Animator?) {
                     }

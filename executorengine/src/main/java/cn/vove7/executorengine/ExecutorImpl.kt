@@ -193,7 +193,8 @@ open class ExecutorImpl(
      * 接着打开应用
      */
     private fun parseAppInnerOperation(cmd: String, pkg: String): Boolean {
-        val appQ = ParseEngine.matchAppAction(cmd, ActionScope(pkg))
+        //解析跟随
+        val appQ = ParseEngine.matchAppAction(cmd, ActionScope(pkg),true)
         actionQueue = appQ.second
         //打开应用
         if (actionQueue.isNotEmpty()) {//todo 检查App页面?
