@@ -64,6 +64,8 @@ object DataUpdator {
                 .positiveButton(text = "立即同步") {
                     onKeyUpdate(activity, needUpdateTypes)
                 }
+                .cancelable(false)
+                .negativeButton()
                 .show()
     }
 

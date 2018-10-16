@@ -122,7 +122,7 @@ class ScreenPickerActivity : Activity() {
 //                    val s = if (st.isEmpty()) text
 //                    else st
                     val selT = textView.selectionStart.let { b ->
-                        if (b < 0) text
+                        if (b == textView.selectionEnd) text
                         else text.substring(b, textView.selectionEnd)
                     }
                     Vog.d(this, "selT ---> $selT")

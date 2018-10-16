@@ -55,14 +55,14 @@ object DaoHelper {
 
 
     fun deleteActionNodeInTX(nodeId: Long?): Boolean {
-        if (nodeId == null) return false;
+        if (nodeId == null) return false
         return try {
             DAO.daoSession.runInTx {
                 deleteActionNode(nodeId)
             }
             true
         } catch (e: Exception) {
-            e.printStackTrace()
+            GlobalLog.err(e)
             false
         }
     }
@@ -160,7 +160,7 @@ object DaoHelper {
             }
             true
         } catch (e: Exception) {
-            e.printStackTrace()
+            GlobalLog.err(e)
             false
         }
     }
@@ -279,8 +279,7 @@ object DaoHelper {
             }
             true
         } catch (e: Exception) {
-            e.printStackTrace()
-            GlobalLog.err(e.message + "code: dh238")
+            GlobalLog.err(e)
             false
         }
     }
@@ -325,6 +324,7 @@ object DaoHelper {
             }
             true
         } catch (e: Exception) {
+            GlobalLog.err(e)
             e.printStackTrace()
             false
         }

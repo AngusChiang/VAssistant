@@ -8,6 +8,9 @@ import android.content.*
 import android.content.Context.WIFI_SERVICE
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
+import android.hardware.Camera
+import android.hardware.camera2.CameraCharacteristics
+import android.hardware.camera2.CameraManager
 import android.location.Location
 import android.location.LocationListener
 import android.location.LocationManager
@@ -43,7 +46,6 @@ import cn.vove7.executorengine.helper.AdvanAppHelper
 import cn.vove7.executorengine.helper.AdvanContactHelper
 import cn.vove7.vtp.app.AppHelper
 import cn.vove7.vtp.app.AppInfo
-import cn.vove7.vtp.hardware.HardwareHelper
 import cn.vove7.vtp.log.Vog
 import cn.vove7.vtp.system.DeviceInfo
 import cn.vove7.vtp.system.SystemHelper
@@ -189,9 +191,45 @@ object SystemBridge : SystemOperation {
         return switchFL(false)
     }
 
+    @Throws(Exception::class)
+    private fun switchFlashlight(on: Boolean) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {//<7.0
+            val camera: Camera
+            camera = Camera.open()
+            val parameters = camera.parameters
+            parameters.flashMode = if (!on) {
+                Camera.Parameters.FLASH_MODE_OFF
+            } else {
+                Camera.Parameters.FLASH_MODE_TORCH
+            }
+            camera.parameters = parameters
+        } else {
+            //获取CameraManager
+            val mCameraManager = context.getSystemService(Context.CAMERA_SERVICE) as CameraManager;
+            //获取当前手机所有摄像头设备ID
+            val ids = mCameraManager.getCameraIdList();
+            var r = false
+            ids.forEach { id ->
+                val c = mCameraManager.getCameraCharacteristics(id);
+                //查询该摄像头组件是否包含闪光灯
+                val flashAvailable = c.get(CameraCharacteristics.FLASH_INFO_AVAILABLE);
+                val lensFacing = c.get(CameraCharacteristics.LENS_FACING);
+                if (flashAvailable != null && flashAvailable && lensFacing != null
+                        && lensFacing == CameraCharacteristics.LENS_FACING_BACK) {
+                    //打开或关闭手电筒
+                    mCameraManager.setTorchMode(id, on);
+                    r = true
+                }
+            }
+            if (!r) {
+                throw Exception("未找到可用闪光灯")
+            }
+        }
+    }
+
     private fun switchFL(on: Boolean): Boolean {
         try {
-            HardwareHelper.switchFlashlight(context, on)
+            switchFlashlight(on)
         } catch (e: Exception) {
             GlobalLog.err(e)
             GlobalApp.toastShort((if (on) "打开" else "关闭") + "手电失败")

@@ -30,14 +30,14 @@ import cn.vove7.common.datamanager.parse.statusmap.Reg
 import cn.vove7.common.model.UserInfo
 import cn.vove7.common.view.toast.ColorfulToast
 import cn.vove7.executorengine.helper.AdvanAppHelper
+import cn.vove7.executorengine.parse.ParseEngine
+import cn.vove7.executorengine.parse.ParseResult
 import cn.vove7.jarvis.BuildConfig
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.adapters.SimpleListAdapter
 import cn.vove7.jarvis.adapters.ViewModel
 import cn.vove7.jarvis.utils.UriUtils.getPathFromUri
 import cn.vove7.jarvis.view.BottomSheetController
-import cn.vove7.executorengine.parse.ParseEngine
-import cn.vove7.executorengine.parse.ParseResult
 import cn.vove7.vtp.app.AppInfo
 import cn.vove7.vtp.easyadapter.BaseListAdapter
 import cn.vove7.vtp.log.Vog
@@ -539,7 +539,7 @@ class NewInstActivity : AppCompatActivity(), View.OnClickListener {
         resultOutput.text = ""
         if (result.isSuccess) {
             val actions = result.actionQueue
-            while (actions.isNotEmpty()) {
+            while (actions?.isNotEmpty() == true) {
                 val p = actions.poll()
                 var arg = p.param.value
                 if (arg == null) arg = getString(R.string.text_none)
