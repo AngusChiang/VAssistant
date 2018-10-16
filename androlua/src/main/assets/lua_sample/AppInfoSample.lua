@@ -1,5 +1,5 @@
 --
--- @author 17719247306
+-- @author Vove
 -- 2018/8/17 17:46
 -- AppInfoSample.lua
 --

@@ -1,5 +1,5 @@
 --
--- @author 17719
+-- @author Vove
 -- 2018/8/10 20:49
 -- SynSample.lua
 --

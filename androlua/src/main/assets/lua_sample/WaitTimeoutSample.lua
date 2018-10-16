@@ -1,5 +1,5 @@
 --
--- @author 17719247306
+-- @author Vove
 -- 2018/8/19 10:57
 -- WaitTimeoutSample.lua
 --

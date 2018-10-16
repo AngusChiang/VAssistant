@@ -156,7 +156,12 @@ class MyAccessibilityService : AccessibilityApi() {
     override fun onAccessibilityEvent(event: AccessibilityEvent?) {
         if (!SystemHelper.isScreenOn(this))//(火)?息屏下
             return
-        if (null == event || null == event.source) {
+        try {
+            if (null == event || null == event.source) {
+                return
+            }
+        } catch (e: Exception) {// NullPoint in event.source
+            GlobalLog.err(e.message)
             return
         }
         Vog.v(this, "class :$currentAppInfo - ${event.className} \n" +

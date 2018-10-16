@@ -1,5 +1,5 @@
 --
--- @author 17719
+-- @author Vove
 -- 2018/8/7 2:54
 -- qq_send_msg.lua
 --

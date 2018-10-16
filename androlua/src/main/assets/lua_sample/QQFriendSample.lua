@@ -1,5 +1,5 @@
 --
--- @author 17719
+-- @author Vove
 -- 2018/8/8 0:35
 -- QQFriendSample.lua
 --

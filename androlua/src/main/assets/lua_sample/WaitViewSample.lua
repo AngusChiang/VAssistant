@@ -1,5 +1,5 @@
 --
--- @author 17719
+-- @author Vove
 -- 2018/8/6 15:48
 -- WaitViewSample.lua
 --

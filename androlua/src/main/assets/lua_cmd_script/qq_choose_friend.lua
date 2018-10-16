@@ -1,5 +1,5 @@
 --
--- @author 17719
+-- @author Vove
 -- 2018/8/6 23:53
 -- qq_choose_friend.lua
 --

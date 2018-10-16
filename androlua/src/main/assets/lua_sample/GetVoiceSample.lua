@@ -1,5 +1,5 @@
 --
--- @author 17719
+-- @author Vove
 -- 2018/8/7 3:05
 -- GetVoiceSample.lua
 --

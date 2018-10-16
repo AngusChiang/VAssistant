@@ -1,5 +1,5 @@
 --
--- @author 17719247306
+-- @author Vove
 -- 2018/8/22 22:14
 -- NeteasePlaySample.lua
 -- 网易云播放歌曲
