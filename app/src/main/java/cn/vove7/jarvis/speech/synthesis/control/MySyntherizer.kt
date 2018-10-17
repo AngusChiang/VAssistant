@@ -28,7 +28,8 @@ open class MySyntherizer protected constructor(protected var context: Context) {
     init {
         if (isInited) {
             // SpeechSynthesizer.getInstance() 不要连续调用
-            throw RuntimeException("MySynthesizer 类里面 SpeechSynthesizer还未释放，请勿新建一个新类")
+//            throw RuntimeException("MySynthesizer 类里面 SpeechSynthesizer还未释放，请勿新建一个新类")
+            this@MySyntherizer.release()
         }
         isInited = true
     }
@@ -168,8 +169,8 @@ open class MySyntherizer protected constructor(protected var context: Context) {
     }
 
     open fun release() {
-        mSpeechSynthesizer!!.stop()
-        mSpeechSynthesizer!!.release()
+        mSpeechSynthesizer?.stop()
+        mSpeechSynthesizer?.release()
         mSpeechSynthesizer = null
         isInited = false
     }

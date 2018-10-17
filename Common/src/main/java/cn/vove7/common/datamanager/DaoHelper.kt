@@ -74,6 +74,8 @@ object DaoHelper {
      */
     @Throws(Exception::class)
     fun deleteActionNode(nodeId: Long) {
+        GlobalLog.log("deleteActionNode ：$nodeId")
+
         // 删除记录 Action Reg --ActionScope-- 判断follow 保留scope
         val ancNode = DAO.daoSession.actionNodeDao.queryBuilder()
                 .where(ActionNodeDao.Properties.Id.eq(nodeId)).unique()
@@ -82,9 +84,16 @@ object DaoHelper {
 
         while (delFollows.isNotEmpty()) {
             val p = delFollows.poll()
+            if (p == null) {//p maybe null ???
+                GlobalLog.err("delFollows.poll() -> null $p")
+                continue
+            }
+            GlobalLog.log("deleteActionNode ---> poll ${p.actionTitle}")
             //添加follows至队列
             delFollows.addAll(DAO.daoSession.actionNodeDao.queryBuilder()
                     .where(ActionNodeDao.Properties.ParentId.eq(p.id)).list())
+
+            //开始删除
             //Action
             val a = p.actionId
             if (a > -0L)
