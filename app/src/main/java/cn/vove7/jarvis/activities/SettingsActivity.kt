@@ -19,6 +19,7 @@ import cn.vove7.jarvis.R
 import cn.vove7.jarvis.activities.base.ReturnableActivity
 import cn.vove7.jarvis.adapters.SettingsExpandableAdapter
 import cn.vove7.jarvis.receivers.PowerEventReceiver
+import cn.vove7.jarvis.services.SpeechSynService
 import cn.vove7.jarvis.utils.AppConfig
 import cn.vove7.jarvis.utils.ShortcutUtil
 import cn.vove7.jarvis.utils.UriUtils
@@ -79,7 +80,6 @@ class SettingsActivity : ReturnableActivity() {
                             keyId = R.string.key_response_word, defaultValue = { AppConfig.responseWord }),
                     CheckBoxItem(title = "仅在语音唤醒时响应", keyId = R.string.key_speak_response_word_on_voice_wakeup,
                             defaultValue = { AppConfig.speakResponseWordOnVoiceWakeup })
-
             )),
             SettingGroupItem(R.color.google_yellow, "语音合成", childItems = listOf(
                     SwitchItem(R.string.text_play_voice_message, summary = "关闭后以弹窗形式提醒",
@@ -92,7 +92,12 @@ class SettingsActivity : ReturnableActivity() {
                     NumberPickerItem(R.string.text_speak_speed, keyId = R.string.key_voice_syn_speed,
                             defaultValue = { 5 }, range = Pair(1, 9), callback = { h, i ->
                         AppBus.postSpeechAction(SpeechAction.ActionCode.ACTION_RELOAD_SYN_CONF)
-                    })
+                    }),
+                    SingleChoiceItem(title = "输出方式", summary = "选择音量跟随", keyId = R.string.stream_of_syn_output,
+                            entityArrId = R.array.list_stream_syn_output, defaultValue = { 0 }) { _, b ->
+                        val pair = b as Pair<Int, String>
+                        SpeechSynService.setStreamType(pair.first)
+                    }
             )),
             SettingGroupItem(R.color.google_red, titleId = R.string.text_voice_control, childItems = listOf(
                     CheckBoxItem(R.string.text_voice_control_dialog, summary = "使用语言命令控制对话框",

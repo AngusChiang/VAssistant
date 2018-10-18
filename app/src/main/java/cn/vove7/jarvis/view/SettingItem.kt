@@ -103,8 +103,8 @@ class SingleChoiceItem(
         keyId: Int? = null,
         defaultValue: () -> Int,//pos
         @ArrayRes entityArrId: Int? = null,
-        callback: CallbackOnSet? = null,
-        items: List<String>? = null
+        items: List<String>? = null,
+        callback: CallbackOnSet? = null
 ) : SettingChildItem(titleId, title, summary, TYPE_SINGLE, keyId, defaultValue,
         entityArrId = entityArrId, callback = callback, items = items)
 

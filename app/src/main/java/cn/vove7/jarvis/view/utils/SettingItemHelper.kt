@@ -177,13 +177,17 @@ class SettingItemHelper(val context: Context) {
             item.summary = item.items?.get(i)
             i
         }
+        val items =
+            if (item.keyId != null) {
+                if (item.entityArrId != null)
+                    context.resources.getStringArray(item.entityArrId).asList()
+                else item.items
+            } else item.items
 
         setBasic(holder, item) {
             MaterialDialog(context)
                     .title(text = item.title())
-                    .listItemsSingleChoice(items =
-                    if (item.keyId != null) context.resources.getStringArray(item.entityArrId!!).asList()
-                    else item.items, initialSelection = initPos) { _, i, t ->
+                    .listItemsSingleChoice(items = items, initialSelection = initPos) { _, i, t ->
                         if (item.keyId != null) {
                             sp.set(item.keyId, t)
                             AppConfig.reload()
@@ -194,8 +198,6 @@ class SettingItemHelper(val context: Context) {
                         item.callback?.invoke(holder, Pair(i, t))
                     }.show()
         }
-
-
     }
 
     /**
@@ -208,7 +210,7 @@ class SettingItemHelper(val context: Context) {
         val sp = SpHelper(context)
         val entity = context.resources.getStringArray(item.entityArrId!!)
 
-        val v = if (item.keyId != null) sp.getString(item.keyId!!) else item.defaultValue.invoke()
+        val v = if (item.keyId != null) sp.getString(item.keyId) else item.defaultValue.invoke()
 
         setBasic(holder, item)
 

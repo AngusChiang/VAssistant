@@ -48,6 +48,12 @@
         <item>3</item>
     </string-array>
 
+    <string-array name="list_stream_syn_output" translatable="false">
+        <item>媒体音量</item>
+        <item>铃声音量</item>
+        <item>通知音量</item>
+    </string-array>
+
     <string-array name="multi_select_list_preference_default_value" />
 
     <string name="text_settings">Settings</string>
@@ -278,4 +284,5 @@
     <string name="key_open_response_word" translatable="false">open_response_word</string>
     <string name="key_response_word" translatable="false">response_word</string>
     <string name="key_speak_response_word_on_voice_wakeup" translatable="false">speak_response_word_on_voice_wakeup</string>
+    <string name="stream_of_syn_output">stream_of_syn_output</string>
 </resources>

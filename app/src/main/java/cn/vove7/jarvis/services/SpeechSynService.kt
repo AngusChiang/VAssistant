@@ -3,6 +3,7 @@ package cn.vove7.jarvis.services
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.pm.PackageManager
+import android.media.AudioManager
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.app.GlobalLog
 import cn.vove7.jarvis.BuildConfig
@@ -11,6 +12,7 @@ import cn.vove7.jarvis.speech.synthesis.control.InitConfig
 import cn.vove7.jarvis.speech.synthesis.control.MySyntherizer
 import cn.vove7.jarvis.speech.synthesis.control.NonBlockSyntherizer
 import cn.vove7.jarvis.speech.synthesis.util.OfflineResource
+import cn.vove7.jarvis.utils.AppConfig
 import cn.vove7.vtp.log.Vog
 import cn.vove7.vtp.sharedpreference.SpHelper
 import com.baidu.tts.chainofresponsibility.logger.LoggerProxy
@@ -24,29 +26,34 @@ import java.util.*
 /**
  * 语音合成服务
  */
-class SpeechSynService(private val event: SyncEvent) : SpeechSynthesizerListener {
+object SpeechSynService : SpeechSynthesizerListener {
 
     private var appId: String
     private var appKey: String
     private var secretKey: String
 
+    const val VOICE_FEMALE = "0"
+    const val VOICE_MALE = "1"
+    const val VOICE_DUXY = "3"
+    const val VOICE_DUYY = "4"
+    var event: SyncEvent? = null
+
     // TtsMode.MIX; 离在线融合，在线优先； TtsMode.ONLINE 纯在线； 没有纯离线
-    protected var ttsMode = TtsMode.MIX
+    private var ttsMode = TtsMode.MIX
 
     // 离线发音选择，VOICE_FEMALE即为离线女声发音。
     // assets目录下bd_etts_common_speech_m15_mand_eng_high_am-mix_v3.0.0_20170505.dat为离线男声模型；
     // assets目录下bd_etts_common_speech_f7_mand_eng_high_am-mix_v3.0.0_20170512.dat为离线女声模型
 
-    protected var voiceModel = VOICE_FEMALE
-    protected var voiceSpeed = "5"
+    private var voiceModel = VOICE_FEMALE
+    private var voiceSpeed = "5"
 
     var speaking = false
 
-
     // 主控制类，所有合成控制方法从这个类开始
-    protected lateinit var synthesizer: MySyntherizer
+    lateinit var synthesizer: MySyntherizer
 
-    private val context: Context = GlobalApp.APP
+    private val context: Context get() = GlobalApp.APP
 
     fun reLoad() {
         Vog.d(this, "reLoad ---> ")
@@ -54,6 +61,12 @@ class SpeechSynService(private val event: SyncEvent) : SpeechSynthesizerListener
         sleep(500)
         initialTts() // 初始化TTS引擎
     }
+
+    private val streamTypeArray = arrayOf(
+            AudioManager.STREAM_MUSIC
+            , AudioManager.STREAM_RING
+            , AudioManager.STREAM_NOTIFICATION
+    )
 
     init {
         val appInfo = context.packageManager.getApplicationInfo(context.packageName,
@@ -77,11 +90,11 @@ class SpeechSynService(private val event: SyncEvent) : SpeechSynthesizerListener
     // synthesizer.setParams(params);
     fun speak(text: String?) {
         if (text == null) {
-            event.onError("文本空", text)
+            event?.onError("文本空", text)
             return
         }
         sText = text
-        event.onStart()//检测后台音乐
+        event?.onStart()//检测后台音乐
         synthesizer.speak(text)
     }
 
@@ -113,8 +126,7 @@ class SpeechSynService(private val event: SyncEvent) : SpeechSynthesizerListener
     }
 
     @SuppressLint("HandlerLeak")
-    protected fun initialTts() {
-
+    private fun initialTts() {
         val sp = SpHelper(context)
         voiceModel = getTypeCode() ?: VOICE_FEMALE
         var eed = sp.getInt(R.string.key_voice_syn_speed)
@@ -125,7 +137,19 @@ class SpeechSynService(private val event: SyncEvent) : SpeechSynthesizerListener
 
         val params = getParams()
         val initConfig = InitConfig(appId, appKey, secretKey, ttsMode, params, this)
-        synthesizer = NonBlockSyntherizer(context, initConfig)
+        synthesizer = NonBlockSyntherizer(initConfig)
+        setStreamType(AppConfig.synStreamIndex)
+    }
+
+
+    fun setStreamType(settingsIndex: Int) {
+        Vog.d(this, "setStreamType ---> $settingsIndex")
+        if (settingsIndex < 0 || settingsIndex > 2) {
+            GlobalLog.err("切换输出通道失败：$settingsIndex ")
+            GlobalApp.toastShort("切换输出通道失败")
+            return
+        }
+        synthesizer.setAudioStream(streamTypeArray[settingsIndex])
     }
 
     /**
@@ -133,7 +157,7 @@ class SpeechSynService(private val event: SyncEvent) : SpeechSynthesizerListener
      *
      * @return
      */
-    protected fun getParams(): Map<String, String> {
+    private fun getParams(): Map<String, String> {
         val params = HashMap<String, String>()
         // 以下参数均为选填
         // 设置在线发声音人： 0 普通女声（默认） 1 普通男声 2 特别男声 3 情感男声<度逍遥> 4 情感儿童声<度丫丫>
@@ -217,26 +241,22 @@ class SpeechSynService(private val event: SyncEvent) : SpeechSynthesizerListener
         Vog.d(this, "onSpeechFinish 播放结束回调 $p0")
         speaking = false
 //        AppBus.post(SpeechSynData(SpeechSynData.SYN_STATUS_FINISH))
-        event.onFinish()
+        event?.onFinish()
     }
 
     override fun onError(p0: String?, p1: SpeechError?) {
         val e = "错误发生：${p1?.description} ，错误编码: $p1?.code} 序列号: $p0 "
 //        AppBus.post(SpeechSynData(e))
         speaking = false
-        event.onError(e, sText)
+        event?.onError(e, sText)
         sText = null
         GlobalLog.err(e)
         Vog.d(this, e)
     }
 
-    companion object {
+//    companion object {
 
-        const val VOICE_FEMALE = "0"
-        const val VOICE_MALE = "1"
-        const val VOICE_DUXY = "3"
-        const val VOICE_DUYY = "4"
-    }
+//    }
 
 }
 

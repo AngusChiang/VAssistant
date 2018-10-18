@@ -20,8 +20,9 @@ public class NonBlockSyntherizer extends MySyntherizer {
     private HandlerThread hThread;
     private Handler tHandler;
 
-    public NonBlockSyntherizer(Context context, InitConfig initConfig) {
-        super(context);
+
+    public NonBlockSyntherizer(InitConfig initConfig) {
+        super(initConfig);
         initThread();
         runInHandlerThread(INIT, initConfig);
     }

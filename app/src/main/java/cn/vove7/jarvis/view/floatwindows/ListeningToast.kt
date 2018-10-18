@@ -1,6 +1,5 @@
 package cn.vove7.jarvis.view.floatwindows
 
-import android.content.Context
 import android.graphics.drawable.AnimationDrawable
 import android.os.Handler
 import android.os.Looper
@@ -8,6 +7,7 @@ import android.os.Message
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
+import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.appbus.AppBus
 import cn.vove7.common.appbus.SpeechAction
 import cn.vove7.common.model.RequestPermission
@@ -20,7 +20,7 @@ import cn.vove7.vtp.log.Vog
  * @author 17719247306
  * 2018/9/9
  */
-class ListeningToast(context: Context) : AbFloatWindow<ListeningToast.VHolder>(context) {
+class ListeningToast : AbFloatWindow<ListeningToast.VHolder>(GlobalApp.APP) {
     override var posY: Int = 80
 
     override fun layoutResId(): Int = R.layout.toast_listening_text

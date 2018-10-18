@@ -2,6 +2,7 @@ package cn.vove7.jarvis.speech.synthesis.control
 
 import android.content.Context
 import android.util.Pair
+import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.app.GlobalLog
 import cn.vove7.vtp.log.Vog
 import com.baidu.tts.client.SpeechSynthesizeBag
@@ -15,13 +16,13 @@ import java.util.*
  *
  */
 
-open class MySyntherizer protected constructor(protected var context: Context) {
-
-    protected var mSpeechSynthesizer: SpeechSynthesizer? = null
+open class MySyntherizer(initConfig: InitConfig) {
+    val context: Context get() = GlobalApp.APP
+    private var mSpeechSynthesizer: SpeechSynthesizer? = null
 
     private val isCheckFile = true
 
-    constructor(context: Context, initConfig: InitConfig) : this(context) {
+    init {
         init(initConfig)
     }
 
@@ -75,6 +76,10 @@ open class MySyntherizer protected constructor(protected var context: Context) {
         // 此时可以调用 speak和synthesize方法
         sendToUiThread("合成引擎初始化成功")
         return true
+    }
+
+    fun setAudioStream(type: Int) {
+        mSpeechSynthesizer?.setAudioStreamType(type)
     }
 
     /**

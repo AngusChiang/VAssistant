@@ -86,7 +86,7 @@ class MainService : BusService(),
     private lateinit var cExecutor: CExecutorI
 
     private val speechRecoService = SpeechRecoService(RecgEventListener())
-    private val speechSynService = SpeechSynService(SyncEventListener())
+    private val speechSynService = SpeechSynService
 
     /**
      * 当前语音使用方式
@@ -101,11 +101,16 @@ class MainService : BusService(),
         super.onCreate()
         instance = this
         GlobalApp.serviceBridge = this
-        listeningToast = ListeningToast(this)
+        listeningToast = ListeningToast()
         cExecutor = MultiExecutorEngine()
 
 //        floatVoice = VoiceFloat(this)
 //        floatVoice.show()
+        init()
+    }
+
+    fun init() {
+        speechSynService.event = SyncEventListener()
     }
 
     @Subscribe(threadMode = ThreadMode.BACKGROUND)

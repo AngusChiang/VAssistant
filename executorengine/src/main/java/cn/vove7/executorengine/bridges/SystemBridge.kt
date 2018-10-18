@@ -357,6 +357,11 @@ object SystemBridge : SystemOperation {
             return mAudioManager.getStreamVolume(AudioManager.STREAM_MUSIC)
         }
 
+    fun getVolumeByType(type: Int): Int {
+        val mAudioManager = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
+        return mAudioManager.getStreamVolume(type)
+    }
+
     override fun setMusicVolume(index: Int) {
         val mAudioManager = GlobalApp.APP.getSystemService(Context.AUDIO_SERVICE) as AudioManager
         mAudioManager.setStreamVolume(AudioManager.STREAM_MUSIC, index, 0)

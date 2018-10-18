@@ -38,8 +38,9 @@ object AppConfig {
     var DEFAULT_WAKEUP_FILE = "assets:///bd/WakeUp.bin"
     var openResponseWord = true
     var responseWord = "我在"
-    var speakResponseWordOnVoiceWakeup=true
-//    var onlyCloudServiceParse = false //云服务解析
+    var speakResponseWordOnVoiceWakeup = true
+    //    var onlyCloudServiceParse = false //云服务解析
+    var synStreamIndex: Int = 0//合成输出通道 对应 R.array.list_stream_syn_output
 
     var wakeUpFilePath = DEFAULT_WAKEUP_FILE
 
@@ -122,6 +123,9 @@ object AppConfig {
         sp.set(R.string.key_cloud_service_parse, false)
         autoUpdateData = getBooleanAndInit(R.string.key_auto_update_data, true)
 //        onlyCloudServiceParse = getBooleanAndInit(R.string.key_only_cloud_service_parse, false)
+
+        synStreamIndex = GlobalApp.APP.resources.getStringArray(R.array.list_stream_syn_output)
+                .indexOf(sp.getString(R.string.stream_of_syn_output)).let { if (it < 0) it else 0 }
 
         responseWord = sp.getString(R.string.key_response_word) ?: responseWord
         wakeUpFilePath = sp.getString(R.string.key_wakeup_file_path) ?: wakeUpFilePath
