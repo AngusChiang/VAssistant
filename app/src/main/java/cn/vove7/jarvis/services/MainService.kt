@@ -236,7 +236,8 @@ class MainService : BusService(),
     private var speakSync = false
     override fun speak(text: String?) {
         //关闭语音播报 toast
-        if (AppConfig.audioSpeak && SystemBridge.musicCurrentVolume != 0) {
+        if (AppConfig.audioSpeak && SystemBridge
+                        .getVolumeByType(SpeechSynService.currentStreamType) != 0) {
             speakSync = false
             speechSynService.speak(text)
         } else {
@@ -253,7 +254,8 @@ class MainService : BusService(),
     }
 
     override fun speakSync(text: String?) {
-        if (AppConfig.audioSpeak && SystemBridge.musicCurrentVolume != 0) {
+        if (AppConfig.audioSpeak && SystemBridge
+                        .getVolumeByType(SpeechSynService.currentStreamType) != 0) {
             speakSync = true
             speechSynService.speak(text)
         } else {

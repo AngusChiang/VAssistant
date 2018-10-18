@@ -54,27 +54,26 @@ class SettingsActivity : ReturnableActivity() {
 
     private fun initData(): List<SettingGroupItem> = listOf(
             SettingGroupItem(R.color.google_blue, "😄", childItems = listOf(
-                    IntentItem(R.string.text_set_as_default_voice_assist, summary = "以快速唤醒",
-                            onClick = { _, _ ->
-                                try {
-                                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                                        startActivity(Intent(Settings.ACTION_MANAGE_DEFAULT_APPS_SETTINGS))
-                                    } else {
-                                        startActivity(Intent("android.settings.MANAGE_DEFAULT_APPS_SETTINGS"))
-                                    }
-                                } catch (e: Exception) {
-                                    GlobalLog.err(e)
-                                    Toast.makeText(this@SettingsActivity,
-                                            "跳转失败", Toast.LENGTH_SHORT).show()
-                                }
-                            })
+                    IntentItem(R.string.text_set_as_default_voice_assist, summary = "以快速唤醒", onClick = { _, _ ->
+                        try {
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                                startActivity(Intent(Settings.ACTION_MANAGE_DEFAULT_APPS_SETTINGS))
+                            } else {
+                                startActivity(Intent("android.settings.MANAGE_DEFAULT_APPS_SETTINGS"))
+                            }
+                        } catch (e: Exception) {
+                            GlobalLog.err(e)
+                            Toast.makeText(this@SettingsActivity,
+                                    "跳转失败", Toast.LENGTH_SHORT).show()
+                        }
+                    })
             )),
             SettingGroupItem(R.color.google_green, "通知", childItems = listOf(
                     SwitchItem(R.string.text_vibrate_reco_begin,
                             keyId = R.string.key_vibrate_reco_begin, defaultValue = { true })
             )),
             SettingGroupItem(R.color.indigo_700, "响应词", childItems = listOf(
-                    SwitchItem(title = "响应词", summary = "开始识别前，使用响应词", keyId = R.string.key_open_response_word,
+                    SwitchItem(title = "开启", summary = "开始识别前，响应词反馈", keyId = R.string.key_open_response_word,
                             defaultValue = { AppConfig.openResponseWord }),
                     InputItem(title = "设置响应词", summary = AppConfig.responseWord,
                             keyId = R.string.key_response_word, defaultValue = { AppConfig.responseWord }),
@@ -93,10 +92,9 @@ class SettingsActivity : ReturnableActivity() {
                             defaultValue = { 5 }, range = Pair(1, 9), callback = { h, i ->
                         AppBus.postSpeechAction(SpeechAction.ActionCode.ACTION_RELOAD_SYN_CONF)
                     }),
-                    SingleChoiceItem(title = "输出方式", summary = "选择音量跟随", keyId = R.string.stream_of_syn_output,
+                    SingleChoiceItem(title = "输出方式", summary = "选择音量跟随", keyId = R.string.key_stream_of_syn_output,
                             entityArrId = R.array.list_stream_syn_output, defaultValue = { 0 }) { _, b ->
-                        val pair = b as Pair<Int, String>
-                        SpeechSynService.setStreamType(pair.first)
+                        SpeechSynService.reloadStreamType()
                     }
             )),
             SettingGroupItem(R.color.google_red, titleId = R.string.text_voice_control, childItems = listOf(

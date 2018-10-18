@@ -1,9 +1,11 @@
 package cn.vove7.jarvis.services
 
+import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.pm.PackageManager
 import android.media.AudioManager
+import android.support.v4.app.ActivityCompat
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.app.GlobalLog
 import cn.vove7.jarvis.BuildConfig
@@ -136,11 +138,24 @@ object SpeechSynService : SpeechSynthesizerListener {
         LoggerProxy.printable(false) // 日志打印在logcat中
 
         val params = getParams()
-        val initConfig = InitConfig(appId, appKey, secretKey, ttsMode, params, this)
+
+        val initConfig = InitConfig(appId, appKey, secretKey, if (hasStoragePermission())
+            ttsMode else TtsMode.ONLINE, params, this)
         synthesizer = NonBlockSyntherizer(initConfig)
         setStreamType(AppConfig.synStreamIndex)
     }
 
+
+    val currentStreamType: Int
+        get() {
+            val i = AppConfig.synStreamIndex.let { if (it in 0..2) it else 0 }
+            return streamTypeArray[i]
+        }
+
+
+    fun reloadStreamType() {
+        synthesizer.setAudioStream(streamTypeArray[currentStreamType])
+    }
 
     fun setStreamType(settingsIndex: Int) {
         Vog.d(this, "setStreamType ---> $settingsIndex")
@@ -183,14 +198,21 @@ object SpeechSynService : SpeechSynthesizerListener {
         // MIX_MODE_HIGH_SPEED_SYNTHESIZE, 2G 3G 4G wifi状态下使用在线，其它状态离线。在线状态下，请求超时1.2s自动转离线
 
 //         离线资源文件， 从assets目录中复制到临时目录，需要在initTTs方法前完成
-        val offlineResource = OfflineResource(context, voiceModel)
-        try {// 声学模型文件路径 (离线引擎使用), 请确认下面两个文件存在
-            params[SpeechSynthesizer.PARAM_TTS_TEXT_MODEL_FILE] = offlineResource.textFilename!!
-            params[SpeechSynthesizer.PARAM_TTS_SPEECH_MODEL_FILE] = offlineResource.modelFilename!!
-        } catch (e: Exception) {
-            e.printStackTrace()
+        if (hasStoragePermission()) {
+            val offlineResource = OfflineResource(context, voiceModel)
+            try {// 声学模型文件路径 (离线引擎使用), 请确认下面两个文件存在
+                params[SpeechSynthesizer.PARAM_TTS_TEXT_MODEL_FILE] = offlineResource.textFilename!!
+                params[SpeechSynthesizer.PARAM_TTS_SPEECH_MODEL_FILE] = offlineResource.modelFilename!!
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
         }
         return params
+    }
+
+    private fun hasStoragePermission(): Boolean {
+        return ActivityCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE) ==
+                PackageManager.PERMISSION_GRANTED
     }
 
     private fun getTypeCode(): String? {

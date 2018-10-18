@@ -108,6 +108,9 @@ object GlobalActionExecutor : GlobalActionExecutorI {
 
     @RequiresApi(api = Build.VERSION_CODES.N)
     override fun playGestures(vararg strokes: GestureDescription.StrokeDescription): Boolean {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
+            return false
+        }
         val builder = GestureDescription.Builder()
         for (stroke in strokes) {
             builder.addStroke(stroke)

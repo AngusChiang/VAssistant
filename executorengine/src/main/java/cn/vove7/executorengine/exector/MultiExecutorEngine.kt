@@ -2,6 +2,7 @@ package cn.vove7.executorengine.exector
 
 import cn.vove7.androlua.LuaHelper
 import cn.vove7.common.BridgeManager
+import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.bridges.GlobalActionExecutor
 import cn.vove7.common.executor.OnPrint
 import cn.vove7.common.executor.PartialResult
@@ -29,14 +30,13 @@ class MultiExecutorEngine : ExecutorImpl() {
 
     override fun onRhinoExec(script: String, arg: String?): PartialResult {
 
-        if (rhinoHelper != null) {
-            rhinoHelper?.stop()
-        }
-        if (currentActionIndex == 1) {
+        rhinoHelper?.stop()
+        if (currentActionIndex <= 1) {
             rhinoHelper = RhinoHelper(bridgeManager)
         }
         val sc = RegUtils.replaceRhinoHeader(script)
-        rhinoHelper!!.evalString(sc, arg)
+        rhinoHelper?.evalString(sc, arg)
+        if (rhinoHelper == null) GlobalApp.toastShort("执行器未就绪")
         RhinoApi.doLog("主线程执行完毕\n")
 //        }
         return PartialResult.success()

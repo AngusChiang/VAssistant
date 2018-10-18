@@ -284,5 +284,5 @@
     <string name="key_open_response_word" translatable="false">open_response_word</string>
     <string name="key_response_word" translatable="false">response_word</string>
     <string name="key_speak_response_word_on_voice_wakeup" translatable="false">speak_response_word_on_voice_wakeup</string>
-    <string name="stream_of_syn_output">stream_of_syn_output</string>
+    <string name="key_stream_of_syn_output" translatable="false">stream_of_syn_output</string>
 </resources>

@@ -1,6 +1,7 @@
 package cn.vove7.jarvis.plugins
 
 import android.view.accessibility.AccessibilityNodeInfo
+import cn.vove7.common.accessibility.AccessibilityApi
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.datamanager.AppAdInfo
@@ -42,6 +43,7 @@ object AdKillerService : AccPluginsService() {
 
     override fun onBind() {
         thread {
+            if(!AccessibilityApi.isOpen()) return@thread
             locked = true
             finderCaches.clear()
             val appAdInfoDao = DAO.daoSession.appAdInfoDao

@@ -461,17 +461,16 @@ object SystemBridge : SystemOperation {
 
     /* 开启/关闭热点 */
     private fun setWifiApEnabled(enabled: Boolean): Boolean {
-        val wifiManager = context.applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
-        if (enabled) {
-            // 因为wifi和热点不能同时打开，所以打开热点的时候需要关闭wifi
-            wifiManager.isWifiEnabled = false
-        }
-        if (Build.VERSION.SDK_INT >= 26) {
+        // 因为wifi和热点不能同时打开，所以打开热点的时候需要关闭wifi
+        closeWifi()
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             Handler(Looper.getMainLooper()).post {
                 setWifiApEnabledForAndroidO(enabled)
             }
             return true
         }
+        val wifiManager = context.applicationContext
+                .getSystemService(Context.WIFI_SERVICE) as WifiManager
 
 //        val ap: WifiConfiguration? = null
         return try {
@@ -508,7 +507,7 @@ object SystemBridge : SystemOperation {
         }
     }
 
-    @TargetApi(Build.VERSION_CODES.O)
+    @RequiresApi(Build.VERSION_CODES.O)
     fun getWifiApLis(): WifiManager.LocalOnlyHotspotCallback {
         return object : WifiManager.LocalOnlyHotspotCallback() {
             override fun onStarted(reservation: WifiManager.LocalOnlyHotspotReservation) {
