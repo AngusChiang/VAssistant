@@ -459,13 +459,18 @@ class MainService : BusService(),
 
     //识别前是否有音乐播放
     var haveMusicPlay = false
+    var continuePlay = true//是否继续播放| 在说完响应词后，不改变haveMusicPlay
     //
 
     fun resumeMusicIf() {
         synchronized(haveMusicPlay) {
             if (haveMusicPlay) {
-                SystemBridge.mediaResume()
-                haveMusicPlay = false
+                if (continuePlay) {//   speak响应词
+                    SystemBridge.mediaResume()
+                    haveMusicPlay = false
+                } else continuePlay = true
+            } else {
+                continuePlay = true
             }
         }
     }
@@ -502,13 +507,14 @@ class MainService : BusService(),
      */
     inner class RecgEventListener : SpeechEvent {
         override fun onWakeup(word: String?) {
+            checkMusic()
             if (AppConfig.openResponseWord && AppConfig.speakResponseWordOnVoiceWakeup) {
                 speakResponseWord()
             }
         }
 
         private fun speakResponseWord() {
-            Vog.d(this, "onStartRecog 响应词---> ${AppConfig.responseWord}")
+            Vog.d(this, "onStartRecog 响应词 ---> ${AppConfig.responseWord}")
             val resultBox = ResultBox<Boolean>()
             speakWithCallback(AppConfig.responseWord, object : SpeakCallback {
                 override fun speakCallback(result: String?) {
@@ -522,9 +528,11 @@ class MainService : BusService(),
         }
 
         override fun onStartRecog() {
+            checkMusic()//检查后台播放
             listeningAni.begin()//
             //todo 音效
             if (AppConfig.openResponseWord && !AppConfig.speakResponseWordOnVoiceWakeup) {
+                continuePlay = false//不继续播放后台，
                 speakResponseWord()
             }
             listeningToast.show("开始聆听")
@@ -532,7 +540,6 @@ class MainService : BusService(),
                 SystemBridge.vibrate(80L)
             }
 
-            checkMusic()
             if (!speechSynService.speaking) {
                 speechSynService.stop()
             }
@@ -731,6 +738,7 @@ class MainService : BusService(),
             checkMusic()
         }
     }
+
 
     fun checkMusic() {
         if (SystemBridge.isMediaPlaying()) {
