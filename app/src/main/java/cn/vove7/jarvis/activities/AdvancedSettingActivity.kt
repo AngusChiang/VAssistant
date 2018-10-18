@@ -1,5 +1,6 @@
 package cn.vove7.jarvis.activities
 
+import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
@@ -15,6 +16,8 @@ import cn.vove7.jarvis.activities.base.ReturnableActivity
 import cn.vove7.jarvis.adapters.SettingsExpandableAdapter
 import cn.vove7.jarvis.utils.AppConfig
 import cn.vove7.jarvis.utils.DataUpdator
+import cn.vove7.jarvis.utils.UriUtils
+import cn.vove7.jarvis.utils.backup.BackupHelper
 import cn.vove7.jarvis.utils.debugserver.RemoteDebugServer
 import cn.vove7.jarvis.view.CheckBoxItem
 import cn.vove7.jarvis.view.IntentItem
@@ -29,6 +32,7 @@ import cn.vove7.vtp.view.span.ColourTextClickableSpan
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.customview.customView
 import kotlinx.android.synthetic.main.activity_expandable_settings.*
+import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -58,8 +62,7 @@ class AdvancedSettingActivity : ReturnableActivity() {
                 LoginDialog(this) {
                     if (UserInfo.isVip()) {
                         unlock_advan_fun.visibility = View.GONE
-                    } else
-                        UserInfoDialog(this) {}
+                    } else UserInfoDialog(this) {}
                 }
             }
         }
@@ -87,7 +90,6 @@ class AdvancedSettingActivity : ReturnableActivity() {
                         }),
                         CheckBoxItem(title = "自动更新", summary = "在进入App后自动检查并更新最新数据",
                                 keyId = R.string.key_auto_update_data, defaultValue = { true })
-
                 )),
                 SettingGroupItem(R.color.google_green, "脚本", childItems = listOf(
                         SwitchItem(R.string.text_remote_debug, summary = if (RemoteDebugServer.stopped) "使用Pc调试，请查阅使用手册"
@@ -116,18 +118,30 @@ class AdvancedSettingActivity : ReturnableActivity() {
                         })
                 )),
                 SettingGroupItem(R.color.google_red, "备份", childItems = listOf(
-                        IntentItem(title = "备份到本地") { _, _ ->
-                            //todo
-                            toast.showShort(R.string.text_coming_soon)
+                        IntentItem(title = "备份") { _, _ ->
+                            if (UserInfo.isLogin()) {
+                                BackupHelper.showBackupDialog(this)
+                            } else {
+                                toast.showShort("请登录后操作")
+                            }
                         },
-                        IntentItem(title = "备份到云端") { _, _ ->
+                        IntentItem(title = "从本地恢复") { _, _ ->
+                            if (UserInfo.isLogin()) {
+                                BackupHelper.showBackupFileList(this)
+                            } else {
+                                toast.showShort("请登录后操作")
+                            }
+                        },
+                        IntentItem(title = "查看云端备份") { _, _ ->
                             //todo
                             toast.showShort(R.string.text_coming_soon)
                         }
                 )),
                 SettingGroupItem(R.color.teal_A700, "命令解析", childItems = listOf(
                         CheckBoxItem(title = "自动使用打开操作", summary =
-                        "列表指令失败后，自动使用打开操作\n如：[打开QQ扫一扫] 可以直接使用 [QQ扫一扫] 使用",
+                        "列表指令失败后，自动使用打开操作\n如：[打开QQ扫一扫] 可以直接使用 [QQ扫一扫] 使用\n" +
+                                "或者点击屏幕文字\n" +
+                                "需要无障碍支持",
                                 keyId = R.string.key_use_smartopen_if_parse_failed),
                         CheckBoxItem(title = "云解析", summary = "本地解析失败时，使用云解析",
                                 keyId = R.string.key_cloud_service_parse)
@@ -144,6 +158,23 @@ class AdvancedSettingActivity : ReturnableActivity() {
                             h.summaryView.text = ApiUrls.SERVER_IP
                         }
                 )))
+            }
+        }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        if (resultCode == Activity.RESULT_OK) {//选择文件回调
+            when (requestCode) {
+                1 -> {
+                    val uri = data?.data
+                    if (uri != null) {
+                        val path = UriUtils.getPathFromUri(this, uri)!!
+                        BackupHelper.restoreFromFile(this, File(path))
+                    } else {
+                        toast.showShort(getString(R.string.text_open_failed))
+                    }
+                }
+
             }
         }
     }

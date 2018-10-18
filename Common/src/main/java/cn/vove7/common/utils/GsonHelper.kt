@@ -41,6 +41,11 @@ object GsonHelper {
         return builder.create().toJson(model)
     }
 
+    fun prettyJson(model: Any?): String {
+        if (model == null) return ""
+        return builder.setPrettyPrinting().create().toJson(model)
+    }
+
     fun <T> fromJsonObj(s: String?, type: Type): ResponseMessage<T>? {
         val bean = GsonBuilder()
                 .setDateFormat("yyyy-MM-dd HH:mm:ss")

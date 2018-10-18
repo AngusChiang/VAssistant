@@ -5,10 +5,12 @@ import android.content.Context
 import android.content.pm.PackageManager
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.app.GlobalLog
+import cn.vove7.jarvis.BuildConfig
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.speech.synthesis.control.InitConfig
 import cn.vove7.jarvis.speech.synthesis.control.MySyntherizer
 import cn.vove7.jarvis.speech.synthesis.control.NonBlockSyntherizer
+import cn.vove7.jarvis.speech.synthesis.util.OfflineResource
 import cn.vove7.vtp.log.Vog
 import cn.vove7.vtp.sharedpreference.SpHelper
 import com.baidu.tts.chainofresponsibility.logger.LoggerProxy
@@ -29,7 +31,7 @@ class SpeechSynService(private val event: SyncEvent) : SpeechSynthesizerListener
     private var secretKey: String
 
     // TtsMode.MIX; 离在线融合，在线优先； TtsMode.ONLINE 纯在线； 没有纯离线
-    protected var ttsMode = TtsMode.ONLINE
+    protected var ttsMode = TtsMode.MIX
 
     // 离线发音选择，VOICE_FEMALE即为离线女声发音。
     // assets目录下bd_etts_common_speech_m15_mand_eng_high_am-mix_v3.0.0_20170505.dat为离线男声模型；
@@ -56,9 +58,15 @@ class SpeechSynService(private val event: SyncEvent) : SpeechSynthesizerListener
     init {
         val appInfo = context.packageManager.getApplicationInfo(context.packageName,
                 PackageManager.GET_META_DATA)
-        appId = appInfo.metaData.getInt("com.baidu.speech.APP_ID").toString()
-        appKey = appInfo.metaData.getString("com.baidu.speech.API_KEY")!!
-        secretKey = appInfo.metaData.getString("com.baidu.speech.SECRET_KEY")!!
+        if (BuildConfig.DEBUG) {
+            appId = "11389525"
+            appKey = "ILdLUepG75UwwQVa0rqiEUVa"
+            secretKey = "di6djKXGGELgnCCusiQUlCBYRxXVrr46"
+        } else {
+            appId = appInfo.metaData.getInt("com.baidu.speech.APP_ID").toString()
+            appKey = appInfo.metaData.getString("com.baidu.speech.API_KEY")!!
+            secretKey = appInfo.metaData.getString("com.baidu.speech.SECRET_KEY")!!
+        }
 
         initialTts() // 初始化TTS引擎
     }
@@ -150,14 +158,14 @@ class SpeechSynService(private val event: SyncEvent) : SpeechSynthesizerListener
         // MIX_MODE_HIGH_SPEED_NETWORK ， 3G 4G wifi状态下使用在线，其它状态离线。在线状态下，请求超时1.2s自动转离线
         // MIX_MODE_HIGH_SPEED_SYNTHESIZE, 2G 3G 4G wifi状态下使用在线，其它状态离线。在线状态下，请求超时1.2s自动转离线
 
-        // 离线资源文件， 从assets目录中复制到临时目录，需要在initTTs方法前完成
-//        val offlineResource = OfflineResource(context, voiceModel)
-//        try {// 声学模型文件路径 (离线引擎使用), 请确认下面两个文件存在
-//            params[SpeechSynthesizer.PARAM_TTS_TEXT_MODEL_FILE] = offlineResource.textFilename!!
-//            params[SpeechSynthesizer.PARAM_TTS_SPEECH_MODEL_FILE] = offlineResource.modelFilename!!
-//        } catch (e: Exception) {
-//            e.printStackTrace()
-//        }
+//         离线资源文件， 从assets目录中复制到临时目录，需要在initTTs方法前完成
+        val offlineResource = OfflineResource(context, voiceModel)
+        try {// 声学模型文件路径 (离线引擎使用), 请确认下面两个文件存在
+            params[SpeechSynthesizer.PARAM_TTS_TEXT_MODEL_FILE] = offlineResource.textFilename!!
+            params[SpeechSynthesizer.PARAM_TTS_SPEECH_MODEL_FILE] = offlineResource.modelFilename!!
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
         return params
     }
 

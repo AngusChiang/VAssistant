@@ -275,4 +275,7 @@
     <string name="text_select_nothing">未选择任何内容</string>
     <string name="text_copied">已复制</string>
     <string name="key_auto_update_data" translatable="false">auto_update_data</string>
+    <string name="key_open_response_word" translatable="false">open_response_word</string>
+    <string name="key_response_word" translatable="false">response_word</string>
+    <string name="key_speak_response_word_on_voice_wakeup" translatable="false">speak_response_word_on_voice_wakeup</string>
 </resources>

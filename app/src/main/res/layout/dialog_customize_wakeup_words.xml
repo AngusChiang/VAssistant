@@ -36,4 +36,12 @@
         android:text="如何获取唤醒词文件?"
         android:textColor="@color/google_green" />
 
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?attr/selectableItemBackground"
+        android:padding="10dp"
+        android:text="若设置失败，请使用其他文件管理器选择唤醒文件"
+        android:textColor="@color/google_red" />
+
 </LinearLayout>

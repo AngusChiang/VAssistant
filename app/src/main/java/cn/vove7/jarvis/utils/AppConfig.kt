@@ -36,6 +36,9 @@ object AppConfig {
     var cloudServiceParseIfLocalFailed = false //云服务解析
     var autoUpdateData = true //
     var DEFAULT_WAKEUP_FILE = "assets:///bd/WakeUp.bin"
+    var openResponseWord = true
+    var responseWord = "我在"
+    var speakResponseWordOnVoiceWakeup=true
 //    var onlyCloudServiceParse = false //云服务解析
 
     var wakeUpFilePath = DEFAULT_WAKEUP_FILE
@@ -113,11 +116,14 @@ object AppConfig {
         userExpPlan = getBooleanAndInit(R.string.key_user_exp_plan, true)
         isAutoVoiceWakeupCharging = getBooleanAndInit(R.string.key_auto_open_voice_wakeup_charging, false)
         useSmartOpenIfParseFailed = getBooleanAndInit(R.string.key_use_smartopen_if_parse_failed, true)
+        openResponseWord = getBooleanAndInit(R.string.key_open_response_word, true)
+        speakResponseWordOnVoiceWakeup = getBooleanAndInit(R.string.key_speak_response_word_on_voice_wakeup, true)
 //  todo      cloudServiceParseIfLocalFailed = getBooleanAndInit(R.string.key_cloud_service_parse, true)
-        sp.set(R.string.key_cloud_service_parse,false)
+        sp.set(R.string.key_cloud_service_parse, false)
         autoUpdateData = getBooleanAndInit(R.string.key_auto_update_data, true)
 //        onlyCloudServiceParse = getBooleanAndInit(R.string.key_only_cloud_service_parse, false)
 
+        responseWord = sp.getString(R.string.key_response_word) ?: responseWord
         wakeUpFilePath = sp.getString(R.string.key_wakeup_file_path) ?: wakeUpFilePath
         sp.getInt(R.string.key_ad_wait_secs).also {
             adWaitSecs = if (it == -1) 17 else it

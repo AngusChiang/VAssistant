@@ -39,6 +39,7 @@ public class Action implements Comparable<Action>, Serializable {
      * 执行优先级
      */
     private int priority;//无用？
+    @Expose(serialize = false)
     private long nodeId;
 
     /**

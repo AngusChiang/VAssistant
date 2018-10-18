@@ -93,6 +93,10 @@ public class MarkedData implements DataFrom, Markable, Serializable {
         this.value = value;
     }
 
+    public boolean infoIsOk() {
+        return key != null && value != null && DataFrom.FROM_USER.equals(from);
+    }
+
     public boolean belongUser() {
         Long uId = UserInfo.getUserId();
         return DataFrom.FROM_USER.equals(from) ||

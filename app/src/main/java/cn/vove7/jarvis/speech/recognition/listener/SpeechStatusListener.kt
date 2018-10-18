@@ -61,6 +61,7 @@ class SpeechStatusListener(private val handler: Handler) : StatusRecogListener()
             }
             2 -> {
                 GlobalApp.toastShort(R.string.text_net_err)
+                handler.sendMessage(SpeechMessage.buildMessage(CODE_VOICE_ERR, "网络错误"))
             }
             else ->
                 handler.sendMessage(SpeechMessage.buildMessage(CODE_VOICE_ERR, message))

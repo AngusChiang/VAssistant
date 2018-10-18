@@ -1,5 +1,7 @@
 package cn.vove7.common.datamanager;
 
+import com.google.gson.annotations.Expose;
+
 import org.greenrobot.greendao.annotation.Entity;
 import org.greenrobot.greendao.annotation.Generated;
 import org.greenrobot.greendao.annotation.Id;
@@ -22,6 +24,7 @@ import cn.vove7.common.netacc.tool.SecureHelper;
 @Entity
 public class AppAdInfo implements Serializable, Markable, DataFrom {
     static final long serialVersionUID = 111L;
+    @Expose(serialize = false)
     @Id
     private Long id;
     private String descTitle;
@@ -82,6 +85,10 @@ public class AppAdInfo implements Serializable, Markable, DataFrom {
     @Override
     public int hashCode() {
         return Objects.hash(tagId, publishUserId);
+    }
+
+    public boolean infoIsOk() {
+        return descTitle != null && pkg != null && activity != null && DataFrom.FROM_USER.equals(from);
     }
 
     public boolean belongUser(boolean update) {

@@ -59,14 +59,15 @@ object DataUpdator {
      * @param s String
      */
     private fun notifyUpdate(activity: Activity, needUpdateTypes: List<Int>, s: String) {
-        MaterialDialog(activity).title(text = "数据更新")
+        val d = MaterialDialog(activity).title(text = "数据更新")
                 .message(text = "检查到以下数据有更新\n$s")
                 .positiveButton(text = "立即同步") {
                     onKeyUpdate(activity, needUpdateTypes)
                 }
                 .cancelable(false)
                 .negativeButton()
-                .show()
+        if (!activity.isFinishing)//
+            d.show()
     }
 
     /**

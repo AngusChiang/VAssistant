@@ -4,6 +4,7 @@ import cn.vove7.common.accessibility.viewnode.ViewNode
 import cn.vove7.common.bridges.ChoiceData
 import cn.vove7.common.datamanager.parse.model.Action
 import cn.vove7.common.datamanager.parse.model.ActionScope
+import cn.vove7.common.interfaces.SpeakCallback
 import cn.vove7.common.view.notifier.ActivityShowListener
 import cn.vove7.common.view.notifier.ViewShowListener
 import java.util.*
@@ -12,7 +13,7 @@ import java.util.*
  *
  *
  */
-interface CExecutorI : ViewShowListener, ActivityShowListener, RuntimeArgs {
+interface CExecutorI : ViewShowListener, ActivityShowListener, RuntimeArgs, SpeakCallback {
     companion object {
         val DEBUG_SCRIPT = "DEBUG"
     }
@@ -72,7 +73,6 @@ interface CExecutorI : ViewShowListener, ActivityShowListener, RuntimeArgs {
     //同步
     fun speakSync(text: String): Boolean
 
-    fun speakCallback(result: String? = null)
 }
 
 interface RuntimeArgs {

@@ -14,7 +14,6 @@ import org.greenrobot.greendao.annotation.ToOne;
 import org.greenrobot.greendao.annotation.Transient;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -75,6 +74,10 @@ public class ActionNode implements Serializable, DataFrom {
         //        publishUserId.equals(UserInfo.getUserId()));
     }
 
+    public boolean infoIsOk() {
+        return actionTitle != null && DataFrom.FROM_USER.equals(from) && actionScopeType >= 1 && actionScopeType <= 4;
+    }
+
     public static boolean belongInApp(Integer type) {
         if (type == null) return false;
         return type == NODE_SCOPE_IN_APP /*|| type == NODE_SCOPE_IN_APP_2*/;
@@ -104,6 +107,7 @@ public class ActionNode implements Serializable, DataFrom {
     private List<ActionNode> follows;
     private Long parentId;
 
+    @Expose(serialize = false)
     @ToOne(joinProperty = "parentId")
     private ActionNode parent;
 
@@ -323,7 +327,7 @@ public class ActionNode implements Serializable, DataFrom {
 
     @Generated(hash = 1407012622)
     public ActionNode(Long id, int actionScopeType, Long actionId, Long parentId, Long scopeId, Long descId,
-            String actionTitle, String tagId, int versionCode, Long publishUserId, int priority, String from) {
+                      String actionTitle, String tagId, int versionCode, Long publishUserId, int priority, String from) {
         this.id = id;
         this.actionScopeType = actionScopeType;
         this.actionId = actionId;
@@ -537,13 +541,23 @@ public class ActionNode implements Serializable, DataFrom {
     }
 
     @Keep
-    public void assembly() {
+    public void assembly2(boolean needParent) {
         getAction();
         getDesc();
         getRegs();
-        getParent();
+        if (needParent)
+            getParent();
         getFollows();
+        if (follows != null) {//填充
+            for (ActionNode n : follows)
+                n.assembly2(false);
+        }
         getActionScope();
+    }
+
+    @Keep
+    public void assembly() {
+        assembly2(true);
     }
 
 

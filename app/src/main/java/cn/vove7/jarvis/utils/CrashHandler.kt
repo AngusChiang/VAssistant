@@ -11,6 +11,7 @@ import cn.vove7.common.netacc.ApiUrls
 import cn.vove7.common.netacc.NetHelper
 import cn.vove7.common.netacc.model.BaseRequestModel
 import cn.vove7.common.utils.TextHelper
+import cn.vove7.jarvis.BuildConfig
 import cn.vove7.vtp.system.DeviceInfo
 import cn.vove7.vtp.system.SystemHelper
 import java.io.BufferedWriter
@@ -44,13 +45,16 @@ object CrashHandler : Thread.UncaughtExceptionHandler {
 
     private val errFile = Environment.getExternalStorageDirectory().absolutePath + "/crash.log"
     override fun uncaughtException(t: Thread?, e: Throwable?) {
-        val header = SystemHelper.getDeviceInfo(context).string()
+        if (BuildConfig.DEBUG) {
+            return
+        }
+        val headerInfo = SystemHelper.getDeviceInfo(context).string()
         val log = GlobalLog.toString()
 
         Toast.makeText(context, "程序出现异常，请在帮助内进行反馈", Toast.LENGTH_SHORT).show()
         try {
             val pw = PrintWriter(BufferedWriter(FileWriter(File(errFile))))
-            pw.println(header)
+            pw.println(headerInfo)
             pw.println(SimpleDateFormat("MM-dd HH:mm:ss", Locale.getDefault()).format(Date()))
             e?.printStackTrace(pw)
             pw.println(log)
@@ -60,7 +64,7 @@ object CrashHandler : Thread.UncaughtExceptionHandler {
             //
             Toast.makeText(context, "写入错误记录失败，请给予读写存储权限", Toast.LENGTH_SHORT).show()
             NetHelper.postJson<Any>(ApiUrls.CRASH_HANDLER,
-                    BaseRequestModel(header + e?.message + log + "\n\n写入失败${e1.message}")) { _, _ -> }
+                    BaseRequestModel(headerInfo + e?.message + log + "\n\n写入失败${e1.message}")) { _, _ -> }
         }
 //        if (mDefaultHandler != null) {
 //            // 如果用户没有处理则让系统默认的异常处理器来处理

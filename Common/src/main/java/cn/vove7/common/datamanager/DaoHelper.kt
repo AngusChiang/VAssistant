@@ -9,7 +9,6 @@ import cn.vove7.common.datamanager.parse.model.ActionScope
 import cn.vove7.common.datamanager.parse.statusmap.ActionNode
 import cn.vove7.common.model.UserInfo
 import cn.vove7.vtp.log.Vog
-import java.util.*
 
 /**
  * # DaoHelper
@@ -69,6 +68,7 @@ object DaoHelper {
 
     /**
      * 删除指定ActionNode
+     * child优先
      * @param nodeId Long
      * @return Boolean
      */
@@ -79,40 +79,44 @@ object DaoHelper {
         // 删除记录 Action Reg --ActionScope-- 判断follow 保留scope
         val ancNode = DAO.daoSession.actionNodeDao.queryBuilder()
                 .where(ActionNodeDao.Properties.Id.eq(nodeId)).unique()
-        val delFollows = LinkedList<ActionNode>()
-        delFollows.add(ancNode)
+//        val delFollows = LinkedList<ActionNode>()
+//        delFollows.add(ancNode)
 
-        while (delFollows.isNotEmpty()) {
-            val p = delFollows.poll()
-            if (p == null) {//p maybe null ???
-                GlobalLog.err("delFollows.poll() -> null $p")
-                continue
-            }
-            GlobalLog.log("deleteActionNode ---> poll ${p.actionTitle}")
-            //添加follows至队列
-            delFollows.addAll(DAO.daoSession.actionNodeDao.queryBuilder()
-                    .where(ActionNodeDao.Properties.ParentId.eq(p.id)).list())
-
-            //开始删除
-            //Action
-            val a = p.actionId
-            if (a > -0L)
-                DAO.daoSession.actionDao.deleteByKey(a)
-
-            //desc
-            if (p.descId != null) {
-                DAO.daoSession.actionDescDao.deleteByKey(p.descId)
-            }
-
-            //Regs
-            DAO.daoSession.regDao.deleteInTx(
-                    DAO.daoSession.regDao.queryBuilder()
-                            .where(RegDao.Properties.NodeId.eq(p.id))
-                            .list()
-            )
-            DAO.daoSession.actionNodeDao.delete(p)
+//        while (delFollows.isNotEmpty()) {
+        val p = ancNode
+        if (p == null) {//p maybe null ???
+            GlobalLog.err("delFollows.poll() -> null $p")
+//                continue
+            return
         }
+        GlobalLog.log("deleteActionNode ---> poll ${p.actionTitle}")
+        //添加follows至队列
+        DAO.daoSession.actionNodeDao.queryBuilder()
+                .where(ActionNodeDao.Properties.ParentId.eq(p.id))
+                .list()?.forEach {
+                    deleteActionNode(it?.id ?: -1L)
+                }
+
+        //开始删除
+        //Action
+        val a = p.actionId
+        if (a > -0L)
+            DAO.daoSession.actionDao.deleteByKey(a)
+
+        //desc
+        if (p.descId != null) {
+            DAO.daoSession.actionDescDao.deleteByKey(p.descId)
+        }
+
+        //Regs
+        DAO.daoSession.regDao.deleteInTx(
+                DAO.daoSession.regDao.queryBuilder()
+                        .where(RegDao.Properties.NodeId.eq(p.id))
+                        .list()
+        )
+        DAO.daoSession.actionNodeDao.delete(p)
     }
+//}
 
     /**
      * 更新全局命令
@@ -359,5 +363,79 @@ object DaoHelper {
     fun getInsetSettingsByName(name: String): InstSettings? {
         return DAO.daoSession.instSettingsDao.queryBuilder()
                 .where(InstSettingsDao.Properties.Name.eq(name)).unique()
+    }
+
+    fun getLocalMarkedByType(types: Array<String>): List<MarkedData> {
+        val b = DAO.daoSession.markedDataDao.queryBuilder()
+                .where(MarkedDataDao.Properties.From.eq(DataFrom.FROM_USER),
+                        if (types.size == 1) MarkedDataDao.Properties.Type.eq(types[0])
+                        else MarkedDataDao.Properties.Type.`in`(types.toList()))
+        return b.list()
+    }
+
+    fun getLocalInstByType(type: Int): List<ActionNode> {
+        return DAO.daoSession.actionNodeDao.queryBuilder()
+                .where(ActionNodeDao.Properties.From.eq(DataFrom.FROM_USER),
+                        ActionNodeDao.Properties.ActionScopeType.eq(type),
+                        ActionNodeDao.Properties.ParentId.isNull)//ParentId.isNull
+                .list().also { l ->
+                    //填充
+                    l.forEach {
+                        it.assembly2(false)
+                    }
+                }
+    }
+
+    fun deleteAllUserInst() {
+        DAO.daoSession.actionNodeDao.queryBuilder()
+                .where(ActionNodeDao.Properties.From.eq(DataFrom.FROM_USER),
+                        ActionNodeDao.Properties.ParentId.isNull)//
+                .list().forEach {
+                    deleteActionNode(it.id)
+                }
+    }
+
+    fun deleteAllUserMarkedData() {
+        DAO.daoSession.markedDataDao.queryBuilder()
+                .where(MarkedDataDao.Properties.From.eq(DataFrom.FROM_USER))
+                .list().forEach {
+                    DAO.daoSession.markedDataDao.delete(it)
+                }
+    }
+
+    fun deleteAllUserMarkedAd() {
+        DAO.daoSession.appAdInfoDao.queryBuilder()
+                .where(AppAdInfoDao.Properties.From.eq(DataFrom.FROM_USER)).list()
+                .forEach {
+                    DAO.daoSession.appAdInfoDao.delete(it)
+                }
+    }
+
+    fun getSimActionNode(new: ActionNode): ActionNode? {
+        return DAO.daoSession.actionNodeDao.queryBuilder()
+                .where(ActionNodeDao.Properties.ActionTitle.eq(new.actionTitle ?: ""),
+                        ActionNodeDao.Properties.From.eq(DataFrom.FROM_USER),
+                        ActionNodeDao.Properties.ActionScopeType.eq(new.actionScopeType)
+                ).unique()
+    }
+
+    fun getSimMarkedData(new: MarkedData): MarkedData? {
+        return DAO.daoSession.markedDataDao.queryBuilder()
+                .where(
+                        MarkedDataDao.Properties.Key.eq(new.key),
+                        MarkedDataDao.Properties.Type.eq(new.type),
+                        MarkedDataDao.Properties.From.eq(DataFrom.FROM_USER)
+                ).unique()
+
+    }
+
+    fun getSimMarkedAppAd(new: AppAdInfo): AppAdInfo? {
+        return DAO.daoSession.appAdInfoDao.queryBuilder()
+                .where(
+                        AppAdInfoDao.Properties.Pkg.eq(new.pkg),
+                        AppAdInfoDao.Properties.Activity.eq(new.activity),
+                        AppAdInfoDao.Properties.DescTitle.eq(new.descTitle ?: "")
+                ).unique()
+
     }
 }

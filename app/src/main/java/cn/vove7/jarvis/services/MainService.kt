@@ -29,7 +29,9 @@ import cn.vove7.common.bridges.ShowDialogEvent
 import cn.vove7.common.datamanager.history.CommandHistory
 import cn.vove7.common.datamanager.parse.model.Action
 import cn.vove7.common.executor.CExecutorI
+import cn.vove7.common.interfaces.SpeakCallback
 import cn.vove7.common.model.RequestPermission
+import cn.vove7.common.model.ResultBox
 import cn.vove7.common.model.UserInfo
 import cn.vove7.common.netacc.NetHelper
 import cn.vove7.common.utils.RegUtils.checkCancel
@@ -56,6 +58,7 @@ import cn.vove7.vtp.log.Vog
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.SubscriberExceptionEvent
 import org.greenrobot.eventbus.ThreadMode
+import java.lang.Thread.sleep
 import java.util.*
 import kotlin.concurrent.thread
 
@@ -236,6 +239,14 @@ class MainService : BusService(),
         }
     }
 
+    private val speakCallbacks = mutableListOf<SpeakCallback>()
+
+    private fun speakWithCallback(text: String?, call: SpeakCallback) {
+        speakCallbacks.add(call)
+        speakSync = true
+        speechSynService.speak(text)
+    }
+
     override fun speakSync(text: String?) {
         if (AppConfig.audioSpeak && SystemBridge.musicCurrentVolume != 0) {
             speakSync = true
@@ -411,9 +422,11 @@ class MainService : BusService(),
         val recoIsListening: Boolean
             get() {
                 return (if (instance == null) {
-                    GlobalApp.toastShort("正在启动服务")
-                    App.startServices()
-                    Vog.i(this, "instance ---> null")
+                    thread {
+                        GlobalApp.toastShort("正在启动服务")
+                        App.startServices()
+                        Vog.i(this, "instance ---> null")
+                    }
                     false
                 } else instance!!.speechRecoService.isListening()
                         ).also {
@@ -482,10 +495,31 @@ class MainService : BusService(),
      */
     inner class RecgEventListener : SpeechEvent {
         override fun onWakeup(word: String?) {
+            if (AppConfig.openResponseWord && AppConfig.speakResponseWordOnVoiceWakeup) {
+                speakResponseWord()
+            }
+        }
+
+        private fun speakResponseWord() {
+            Vog.d(this, "onStartRecog 响应词---> ${AppConfig.responseWord}")
+            val resultBox = ResultBox<Boolean>()
+            speakWithCallback(AppConfig.responseWord, object : SpeakCallback {
+                override fun speakCallback(result: String?) {
+                    Vog.d(this, "speakWithCallback ---> $result")
+                    resultBox.setAndNotify(true)
+                }
+            })
+            resultBox.blockedGet()
+            Vog.d(this, "onStartRecog ---> speak finish")
+            sleep(200)
         }
 
         override fun onStartRecog() {
             listeningAni.begin()//
+            //todo 音效
+            if (AppConfig.openResponseWord && !AppConfig.speakResponseWordOnVoiceWakeup) {
+                speakResponseWord()
+            }
             listeningToast.show("开始聆听")
             if (AppConfig.vibrateWhenStartReco) {
                 SystemBridge.vibrate(80L)
@@ -573,6 +607,7 @@ class MainService : BusService(),
             when (voiceMode) {
                 MODE_VOICE -> {
                     listeningAni.failed()
+                    hideAll()
                 }
                 MODE_GET_PARAM -> {//获取参数失败
                     cExecutor.onGetVoiceParam(null)
@@ -662,13 +697,25 @@ class MainService : BusService(),
         override fun onError(err: String, requestText: String?) {
             GlobalApp.toastShort(requestText ?: "")
             GlobalLog.err(err)
-            if (speakSync) cExecutor.speakCallback(err)
+            if (speakSync) {
+                cExecutor.speakCallback(err)
+                speakCallbacks.forEach {
+                    it.speakCallback(err)
+                }
+                speakCallbacks.clear()
+            }
             resumeMusicIf()
         }
 
         override fun onFinish() {
             Vog.d(this, "onSynData 结束")
-            if (speakSync) cExecutor.speakCallback()
+            if (speakSync) {
+                cExecutor.speakCallback()
+                speakCallbacks.forEach {
+                    it.speakCallback()
+                }
+                speakCallbacks.clear()
+            }
             resumeMusicIf()
         }
 

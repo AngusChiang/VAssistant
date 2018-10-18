@@ -92,11 +92,11 @@ class SettingItemHelper(val context: Context) {
 
     private fun initAndSetInputListener(holder: ChildItemHolder, item: SettingChildItem) {
         val sp = SpHelper(context)
-        item.summary = if (item.keyId != null) sp.getString(item.keyId)
-        else item.defaultValue.invoke() as String
+        val d = item.defaultValue.invoke() as String?
+        item.summary = if (item.keyId != null) sp.getString(item.keyId) ?: d
+        else d
         setBasic(holder, item) {
-            val pre = if (item.keyId != null) sp.getString(item.keyId) else item.defaultValue.invoke() as String
-            MaterialDialog(context).title(text = item.title()).input(prefill = pre) { d, c ->
+            MaterialDialog(context).title(text = item.title()).input(prefill = item.summary) { d, c ->
                 Vog.d(this, "initAndSetInputListener ---> $c")
                 val s = c.toString()
                 if (item.keyId != null) {
@@ -208,15 +208,16 @@ class SettingItemHelper(val context: Context) {
         val sp = SpHelper(context)
         val entity = context.resources.getStringArray(item.entityArrId!!)
 
-        val v = if(item.keyId!=null) sp.getString(item.keyId!!) else item.defaultValue.invoke()
+        val v = if (item.keyId != null) sp.getString(item.keyId!!) else item.defaultValue.invoke()
 
         setBasic(holder, item)
 
         MaterialDialog(context).title(text = item.title())
                 .listItemsMultiChoice(item.entityArrId) { d, iss, ts ->
-                    if (item.keyId != null){
+                    if (item.keyId != null) {
                         sp.set(item.keyId, ts)
-                        AppConfig.reload()}
+                        AppConfig.reload()
+                    }
                     item.summary = ts.toString()
                     setBasic(holder, item)
                     // callback

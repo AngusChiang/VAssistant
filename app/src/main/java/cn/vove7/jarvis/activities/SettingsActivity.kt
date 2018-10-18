@@ -67,10 +67,20 @@ class SettingsActivity : ReturnableActivity() {
                                             "跳转失败", Toast.LENGTH_SHORT).show()
                                 }
                             })
-            )), SettingGroupItem(R.color.google_green, "通知", childItems = listOf(
-            SwitchItem(R.string.text_vibrate_reco_begin,
-                    keyId = R.string.key_vibrate_reco_begin, defaultValue = { true })
-    )),
+            )),
+            SettingGroupItem(R.color.google_green, "通知", childItems = listOf(
+                    SwitchItem(R.string.text_vibrate_reco_begin,
+                            keyId = R.string.key_vibrate_reco_begin, defaultValue = { true })
+            )),
+            SettingGroupItem(R.color.indigo_700, "响应词", childItems = listOf(
+                    SwitchItem(title = "响应词", summary = "开始识别前，使用响应词", keyId = R.string.key_open_response_word,
+                            defaultValue = { AppConfig.openResponseWord }),
+                    InputItem(title = "设置响应词", summary = AppConfig.responseWord,
+                            keyId = R.string.key_response_word, defaultValue = { AppConfig.responseWord }),
+                    CheckBoxItem(title = "仅在语音唤醒时响应", keyId = R.string.key_speak_response_word_on_voice_wakeup,
+                            defaultValue = { AppConfig.speakResponseWordOnVoiceWakeup })
+
+            )),
             SettingGroupItem(R.color.google_yellow, "语音合成", childItems = listOf(
                     SwitchItem(R.string.text_play_voice_message, summary = "关闭后以弹窗形式提醒",
                             keyId = R.string.key_audio_speak, defaultValue = { true }),
@@ -138,7 +148,7 @@ class SettingsActivity : ReturnableActivity() {
                                             this.dismiss()
                                         } catch (e: ActivityNotFoundException) {
                                             e.printStackTrace()
-                                            toast.showShort(getString(R.string.text_cannot_open_file_manager))
+                                            toast.showShort(R.string.text_cannot_open_file_manager)
                                         }
                                     }
                                 }
@@ -165,13 +175,10 @@ class SettingsActivity : ReturnableActivity() {
                     if (uri != null) {
                         try {
                             val path = UriUtils.getPathFromUri(this, uri)
-
-                            if (path == null) {
-                                toast.showShort("路径获取失败")
-                            } else if (path.endsWith(".bin")) {
-                                setPathAndReload(path)
-                            } else {
-                                toast.showShort("请选择.bin文件")
+                            when {
+                                path == null -> toast.showShort("路径获取失败")
+                                path.endsWith(".bin") -> setPathAndReload(path)
+                                else -> toast.showShort("请选择.bin文件")
                             }
                         } catch (e: Exception) {
                             GlobalLog.err(e)

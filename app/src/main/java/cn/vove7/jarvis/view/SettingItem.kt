@@ -2,7 +2,6 @@ package cn.vove7.jarvis.view
 
 import android.support.annotation.ArrayRes
 import cn.vove7.common.app.GlobalApp
-import cn.vove7.jarvis.utils.AppConfig
 import cn.vove7.jarvis.view.utils.SettingItemHelper
 
 /**
@@ -119,7 +118,8 @@ class IntentItem(titleId: Int? = null,
 class InputItem(titleId: Int? = null,
                 title: String? = null,
                 summary: String? = null,
+                keyId: Int? = null,
                 defaultValue: () -> String,
-                callback: CallbackOnSet)
-    : SettingChildItem(titleId, title, summary, itemType = TYPE_INPUT,
+                callback: CallbackOnSet? = null)
+    : SettingChildItem(titleId, title, summary, itemType = TYPE_INPUT, keyId = keyId,
         defaultValue = defaultValue, callback = callback)
