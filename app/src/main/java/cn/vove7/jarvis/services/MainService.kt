@@ -1,5 +1,6 @@
 package cn.vove7.jarvis.services
 
+import android.Manifest
 import android.app.AlertDialog
 import android.app.Dialog
 import android.content.Context
@@ -53,6 +54,7 @@ import cn.vove7.jarvis.view.floatwindows.ListeningToast
 import cn.vove7.jarvis.view.statusbar.ExecuteAnimation
 import cn.vove7.jarvis.view.statusbar.ListeningAnimation
 import cn.vove7.jarvis.view.statusbar.ParseAnimation
+import cn.vove7.vtp.app.AppInfo
 import cn.vove7.vtp.dialog.DialogUtil
 import cn.vove7.vtp.log.Vog
 import org.greenrobot.eventbus.Subscribe
@@ -514,6 +516,7 @@ class MainService : BusService(),
         }
 
         private fun speakResponseWord() {
+            continuePlay = false//不继续播放后台，
             Vog.d(this, "onStartRecog 响应词 ---> ${AppConfig.responseWord}")
             val resultBox = ResultBox<Boolean>()
             speakWithCallback(AppConfig.responseWord, object : SpeakCallback {
@@ -532,7 +535,6 @@ class MainService : BusService(),
             listeningAni.begin()//
             //todo 音效
             if (AppConfig.openResponseWord && !AppConfig.speakResponseWordOnVoiceWakeup) {
-                continuePlay = false//不继续播放后台，
                 speakResponseWord()
             }
             listeningToast.show("开始聆听")
@@ -743,12 +745,13 @@ class MainService : BusService(),
     fun checkMusic() {
         if (SystemBridge.isMediaPlaying()) {
             SystemBridge.mediaPause()
+            GlobalLog.log("checkMusic ---> 有音乐播放")
             Vog.d(this, "checkMusic ---> 有音乐播放")
             haveMusicPlay = true
         } else {
             haveMusicPlay = false
+            GlobalLog.log("checkMusic ---> 无音乐播放")
             Vog.d(this, "checkMusic ---> 无音乐播放")
         }
     }
 }
-

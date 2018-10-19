@@ -67,7 +67,7 @@ class MineFragment : Fragment() {
                 Pair(R.color.google_green, R.string.text_help),
                 Pair(R.color.google_yellow, R.string.text_about)
         )) {
-            override fun layoutId(): Int = R.layout.item_mine_features
+            override fun layoutId(position: Int): Int = R.layout.item_mine_features
 
             override fun onBindView(holder: ItemHolder, pos: Int, item: Pair<Int, Int>) {
                 holder.leftLine.setBackgroundResource(item.first)

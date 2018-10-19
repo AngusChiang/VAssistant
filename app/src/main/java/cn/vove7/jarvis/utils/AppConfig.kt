@@ -42,6 +42,7 @@ object AppConfig {
     //    var onlyCloudServiceParse = false //云服务解析
     var synStreamIndex: Int = 0//合成输出通道 对应 R.array.list_stream_syn_output
 
+    var volumeKeyDelayUp = 600L//音量长按延迟
     var wakeUpFilePath = DEFAULT_WAKEUP_FILE
 
     fun init() {
@@ -124,8 +125,15 @@ object AppConfig {
         autoUpdateData = getBooleanAndInit(R.string.key_auto_update_data, true)
 //        onlyCloudServiceParse = getBooleanAndInit(R.string.key_only_cloud_service_parse, false)
 
-        synStreamIndex = GlobalApp.APP.resources.getStringArray(R.array.list_stream_syn_output)
-                .indexOf(sp.getString(R.string.key_stream_of_syn_output)).let { if (it < 0) it else 0 }
+        synStreamIndex = sp.getString(R.string.key_stream_of_syn_output).let {
+            Vog.d(this, "reload ---> $it")
+            if (it == null) 0
+            else {
+                var i = GlobalApp.APP.resources.getStringArray(R.array.list_stream_syn_output).indexOf(it)
+                if (i < 0) i = 0
+                i
+            }
+        }
 
         responseWord = sp.getString(R.string.key_response_word) ?: responseWord
         wakeUpFilePath = sp.getString(R.string.key_wakeup_file_path) ?: wakeUpFilePath

@@ -49,7 +49,7 @@ class MultiChoiceDialog(context: Context, title: String, list: List<ChoiceData>,
         /**
          * @return your layout
          */
-        override fun layoutId(): Int = R.layout.item_of_dialog_choice_list
+        override fun layoutId(position: Int): Int = R.layout.item_of_dialog_choice_list
 
         /**
          * Init your holder's contentView whit holder

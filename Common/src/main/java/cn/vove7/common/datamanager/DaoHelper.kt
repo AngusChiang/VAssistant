@@ -1,5 +1,6 @@
 package cn.vove7.common.datamanager
 
+import cn.vove7.common.BuildConfig
 import cn.vove7.common.R
 import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.datamanager.executor.entity.MarkedData
@@ -17,7 +18,7 @@ import cn.vove7.vtp.log.Vog
  * 2018/8/25
  */
 
-typealias OnUpdate = (Int) -> Unit
+typealias OnUpdate = (msg: String) -> Unit
 
 object DaoHelper {
     fun deleteActionNodesInTX(ids: Array<Long>): Boolean {
@@ -123,9 +124,9 @@ object DaoHelper {
      * 删除 scopeType is Global and not from user
      * @param nodes List<ActionNode>
      */
-    fun updateGlobalInst(nodes: List<ActionNode>): Boolean {
+    fun updateGlobalInst(nodes: List<ActionNode>, onUpdate: OnUpdate? = null): Boolean {
         //
-        return updateActionNodeByType(nodes, ActionNode.NODE_SCOPE_GLOBAL)
+        return updateActionNodeByType(nodes, ActionNode.NODE_SCOPE_GLOBAL, onUpdate)
     }
 
     /**
@@ -133,11 +134,11 @@ object DaoHelper {
      * 删除 scopeType is Global and not from user
      * @param nodes List<ActionNode>
      */
-    fun updateInAppInst(nodes: List<ActionNode>): Boolean {
-        return updateActionNodeByType(nodes, ActionNode.NODE_SCOPE_IN_APP)
+    fun updateInAppInst(nodes: List<ActionNode>, onUpdate: OnUpdate? = null): Boolean {
+        return updateActionNodeByType(nodes, ActionNode.NODE_SCOPE_IN_APP, onUpdate)
     }
 
-    private fun updateActionNodeByType(nodes: List<ActionNode>, type: Int): Boolean {
+    private fun updateActionNodeByType(nodes: List<ActionNode>, type: Int, onUpdate: OnUpdate? = null): Boolean {
         //
         val actionNodeDao = DAO.daoSession.actionNodeDao
 
@@ -160,10 +161,14 @@ object DaoHelper {
                 olds.forEach {
                     //删除旧服务器数据
                     //del old global
+                    if (BuildConfig.DEBUG) {
+                        onUpdate?.invoke("删除旧指令：${it.actionTitle}")
+                    }
                     deleteActionNode(it.id)
                 }
                 nodes.forEach {
                     if (!userList.contains(it)) {
+                        onUpdate?.invoke("更新指令：${it.actionTitle}")
                         Vog.d(this, "updateGlobalInst 添加---> ${it.actionTitle}")
                         insertNewActionNode(it)
                     } else {//存在
@@ -259,7 +264,7 @@ object DaoHelper {
      * @param datas List<MarkedData>
      * @return Boolean
      */
-    fun updateMarkedData(types: Array<String>, datas: List<MarkedData>): Boolean {
+    fun updateMarkedData(onUpdate: OnUpdate? = null, types: Array<String>, datas: List<MarkedData>): Boolean {
         val markedDao = DAO.daoSession.markedDataDao
         val l = markedDao.queryBuilder().where(
                 MarkedDataDao.Properties.Type.`in`(*types),
@@ -281,10 +286,14 @@ object DaoHelper {
                 )
         ).list().toHashSet()
         return try {
+            if (BuildConfig.DEBUG) {
+                onUpdate?.invoke("删除旧纪录")
+            }
             markedDao.deleteInTx(l)
             datas.forEach {
                 it.id = null
                 if (!userList.contains(it)) {
+                    onUpdate?.invoke("更新：${it.key}")
                     markedDao.insert(it)
                 } else {
                     Vog.d(this, "updateMarkedData ---> 重复:" + it.key)
@@ -305,7 +314,7 @@ object DaoHelper {
      * @param datas List<AppAdInfo>
      * @return Boolean
      */
-    fun updateAppAdInfo(datas: List<AppAdInfo>): Boolean {
+    fun updateAppAdInfo(datas: List<AppAdInfo>, onUpdate: OnUpdate? = null): Boolean {
         val appAdInfoDao = DAO.daoSession.appAdInfoDao
         return try {
             //删除服务端
@@ -315,6 +324,8 @@ object DaoHelper {
                             AppAdInfoDao.Properties.PublishUserId.notEq(UserInfo.getUserId()
                                 ?: -1L))
             ).list()
+            if (BuildConfig.DEBUG)
+                onUpdate?.invoke("删除旧纪录 ${delList.size}")
             appAdInfoDao.deleteInTx(delList)
 
             val userList = appAdInfoDao.queryBuilder().whereOr(
@@ -325,10 +336,7 @@ object DaoHelper {
             datas.forEach {
                 it.id = null
                 if (!userList.contains(it)) {
-//                    if (it.belongUser(false)) {
-//                        Vog.d(this, "updateMarkedData ---> 标记为用户:" + it.descTitle)
-//                        it.from = DataFrom.FROM_USER
-//                    }
+                    onUpdate?.invoke("更新标记广告：${it.descTitle}")
                     appAdInfoDao.insertInTx(it)
                     Vog.d(this, "updateAppAdInfo ---> ${it.descTitle} ${it.id}")
                 } else {

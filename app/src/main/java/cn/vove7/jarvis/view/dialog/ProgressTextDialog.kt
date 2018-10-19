@@ -28,7 +28,7 @@ class ProgressTextDialog(val context: Context, val title: String? = null,
     init {
         textView.setPadding(60, 0, 60, 0)
         textView.gravity = Gravity.BOTTOM
-        textView.setTextColor(R.color.primary_text)
+        textView.setTextColor(context.resources.getColor(R.color.primary_text))
         dialog.title(text = title)
                 .customView(view = textView, scrollable = true)
                 .cancelable(cancelable)

@@ -1,5 +1,6 @@
 package cn.vove7.jarvis.services
 
+import android.Manifest
 import android.accessibilityservice.AccessibilityService
 import android.content.Context
 import android.content.pm.PackageManager
@@ -25,10 +26,11 @@ import cn.vove7.common.view.notifier.UiViewShowNotifier
 import cn.vove7.common.view.notifier.ViewShowListener
 import cn.vove7.common.view.toast.ColorfulToast
 import cn.vove7.executorengine.bridges.SystemBridge
+import cn.vove7.executorengine.helper.AdvanAppHelper
 import cn.vove7.jarvis.plugins.AccPluginsService
 import cn.vove7.jarvis.plugins.AdKillerService
 import cn.vove7.jarvis.utils.AppConfig
-import cn.vove7.vtp.app.AppHelper
+import cn.vove7.vtp.app.AppInfo
 import cn.vove7.vtp.log.Vog
 import cn.vove7.vtp.system.SystemHelper
 import java.lang.Thread.sleep
@@ -44,8 +46,9 @@ class MyAccessibilityService : AccessibilityApi() {
 
     override fun onServiceConnected() {
 //        accessibilityService = this
+
         pkgman = packageManager
-        updateCurrentApp(packageName)
+        updateCurrentApp(packageName, "")
         ColorfulToast(this).yellow().showShort("无障碍服务开启")
 
         startPluginService()
@@ -60,19 +63,26 @@ class MyAccessibilityService : AccessibilityApi() {
     }
 
 
-    private fun updateCurrentApp(pkg: String) {
-        currentAppInfo = AppHelper.getAppInfo(this, "", pkg)
+    private fun updateCurrentApp(pkg: String, activityName: String) {
+        if (currentScope.packageName == pkg && activityName == currentActivity) return
+        AdvanAppHelper.getAppInfo(pkg).also {
+            if (it == null || it.isInputMethod(this)) {//过滤输入法
+                return
+            } else currentAppInfo = it
+        }
+        currentActivity = activityName
+        Vog.d(this, "updateCurrentApp ---> $pkg")
+        Vog.d(this, "updateCurrentApp ---> $activityName")
         currentScope.activity = currentActivity
         currentScope.packageName = pkg
         Vog.d(this, currentScope.toString())
-        dispatchPluginsEvent(ON_APP_CHANGED, currentScope)
+        dispatchPluginsEvent(ON_APP_CHANGED, currentScope)//发送事件
     }
 
     override fun getRootViewNode(): ViewNode? {
-        if (rootInActiveWindow == null) {
-            return null
-        }
-        return ViewNode(rootInActiveWindow)
+        val root = rootInWindow
+        return if (root == null) null
+        else ViewNode(root)
     }
 
 
@@ -146,8 +156,17 @@ class MyAccessibilityService : AccessibilityApi() {
         viewNotifierThread = thread {
             viewNotifier.notifyIfShow()
         }
-        dispatchPluginsEvent(ON_UI_UPDATE, rootInActiveWindow)
+        dispatchPluginsEvent(ON_UI_UPDATE, rootInWindow)
     }
+
+    private val rootInWindow: AccessibilityNodeInfo?
+        get() {
+            return try {
+                rootInActiveWindow
+            } catch (e: Exception) {
+                null
+            }
+        }
 
     /**
      *
@@ -172,14 +191,13 @@ class MyAccessibilityService : AccessibilityApi() {
             val pkg = event.packageName as String?
             Vog.v(this, "onAccessibilityEvent ---> $classNameStr $pkg")
             if (packageName == pkg) {//fix 悬浮窗造成阻塞
-                Vog.d(this, "onAccessibilityEvent ---> 自身悬浮窗")
+                Vog.d(this, "onAccessibilityEvent ---> 自身(悬浮窗)")
                 return
             }
-            Vog.d(this, "TYPE_WINDOW_STATE_CHANGED --->\n $pkg ${event.className}")
-            if (classNameStr != null)
-                currentActivity = classNameStr.toString()//.substring(classNameStr.lastIndexOf('.') + 1)
-            if (pkg != null)
-                updateCurrentApp(pkg)  //输入法??
+//            Vog.d(this, "TYPE_WINDOW_STATE_CHANGED --->\n $pkg ${event.className}")
+            if (classNameStr != null && pkg != null)
+                updateCurrentApp(pkg, classNameStr.toString())
+
             callAllNotifier()
         }
         if (blackPackage.contains(currentScope.packageName)) {//black list
@@ -288,13 +306,13 @@ class MyAccessibilityService : AccessibilityApi() {
     private var startupRunner: Runnable = Runnable {
         MainService.instance?.onCommand(AppBus.ORDER_START_RECO)
     }
-    var stopRunner: Runnable = Runnable {
+    private var stopRunner: Runnable = Runnable {
         MainService.instance?.onCommand(AppBus.ORDER_STOP_EXEC)
     }
-    var delayUp = 600L
+//    private var delayUp = 600L
 
-    var v2 = false // 单击上下键 取消识别
-    var v3 = false // 是否触发长按唤醒
+    private var v2 = false // 单击上下键 取消识别
+    private var v3 = false // 是否触发长按唤醒
     /**
      * 按键监听
      * @param event KeyEvent
@@ -363,7 +381,7 @@ class MyAccessibilityService : AccessibilityApi() {
 
     private fun postLongDelay(runnable: Runnable) {
         v3 = true
-        delayHandler.postDelayed(runnable, delayUp)
+        delayHandler.postDelayed(runnable, AppConfig.volumeKeyDelayUp)
     }
 
     private fun removeDelayIfInterrupt(event: KeyEvent, runnable: Runnable): Boolean {
@@ -376,7 +394,7 @@ class MyAccessibilityService : AccessibilityApi() {
             return true
         }
         Vog.d(this, "removeDelayIfInterrupt ---> $runnable")
-        if ((event.eventTime - event.downTime) < (delayUp - 100)) {//时间短 移除runner 调节音量
+        if ((event.eventTime - event.downTime) < (AppConfig.volumeKeyDelayUp - 100)) {//时间短 移除runner 调节音量
             delayHandler.removeCallbacks(runnable)
             when (event.keyCode) {
                 KEYCODE_VOLUME_UP -> SystemBridge.volumeUp()
@@ -530,6 +548,7 @@ class MyAccessibilityService : AccessibilityApi() {
          * @param data Any?
          */
         private fun dispatchPluginsEvent(what: Int, data: Any? = null) {
+            if (data == null) return
             synchronized(pluginsServices) {
                 when (what) {
                     ON_UI_UPDATE -> {
@@ -554,4 +573,17 @@ class MyAccessibilityService : AccessibilityApi() {
         }
     }
 
+}
+
+fun AppInfo.isInputMethod(context: Context): Boolean {
+
+    val pm = context.packageManager
+    val pkgInfo = pm.getPackageInfo(packageName, PackageManager.GET_SERVICES)
+    pkgInfo.services?.forEach {
+        if (it.permission == Manifest.permission.BIND_INPUT_METHOD) {
+            Vog.d(this, "isInputMethod ---> 输入法：$packageName")
+            return true
+        }
+    }
+    return false
 }

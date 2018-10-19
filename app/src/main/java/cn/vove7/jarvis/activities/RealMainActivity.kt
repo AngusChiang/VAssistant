@@ -62,7 +62,6 @@ class RealMainActivity : AppCompatActivity() {
             val sp = SpHelper(this)
             if (sp.getBoolean("first_in", true)) {
                 userGuide()
-                sp.set("first_in", false)
             } else {
                 checkDataUpdate()
             }
@@ -91,6 +90,7 @@ class RealMainActivity : AppCompatActivity() {
                     checkDataUpdate()
                 }
                 .show()
+        SpHelper(this).set("first_in", false)
     }
 
 }

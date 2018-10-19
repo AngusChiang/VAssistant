@@ -142,29 +142,19 @@ object SpeechSynService : SpeechSynthesizerListener {
         val initConfig = InitConfig(appId, appKey, secretKey, if (hasStoragePermission())
             ttsMode else TtsMode.ONLINE, params, this)
         synthesizer = NonBlockSyntherizer(initConfig)
-        setStreamType(AppConfig.synStreamIndex)
+        reloadStreamType()
     }
 
 
     val currentStreamType: Int
         get() {
             val i = AppConfig.synStreamIndex.let { if (it in 0..2) it else 0 }
+            Vog.d(this, "currentStreamIndex ---> $i")
             return streamTypeArray[i]
         }
 
-
     fun reloadStreamType() {
-        synthesizer.setAudioStream(streamTypeArray[currentStreamType])
-    }
-
-    fun setStreamType(settingsIndex: Int) {
-        Vog.d(this, "setStreamType ---> $settingsIndex")
-        if (settingsIndex < 0 || settingsIndex > 2) {
-            GlobalLog.err("切换输出通道失败：$settingsIndex ")
-            GlobalApp.toastShort("切换输出通道失败")
-            return
-        }
-        synthesizer.setAudioStream(streamTypeArray[settingsIndex])
+        synthesizer.setAudioStream(currentStreamType)
     }
 
     /**

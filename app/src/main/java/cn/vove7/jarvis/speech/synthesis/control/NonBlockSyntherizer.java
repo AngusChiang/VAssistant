@@ -1,7 +1,5 @@
 package cn.vove7.jarvis.speech.synthesis.control;
 
-import android.content.Context;
-import android.os.Build;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Message;

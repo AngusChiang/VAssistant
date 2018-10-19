@@ -2,7 +2,6 @@ package cn.vove7.executorengine.bridges
 
 import android.Manifest
 import android.annotation.SuppressLint
-import android.annotation.TargetApi
 import android.bluetooth.BluetoothAdapter
 import android.content.*
 import android.content.Context.WIFI_SERVICE
@@ -21,6 +20,7 @@ import android.net.Uri
 import android.net.wifi.WifiConfiguration
 import android.net.wifi.WifiManager
 import android.os.*
+import android.provider.AlarmClock
 import android.provider.Settings
 import android.support.annotation.RequiresApi
 import android.support.v4.content.ContextCompat
@@ -46,6 +46,8 @@ import cn.vove7.executorengine.helper.AdvanAppHelper
 import cn.vove7.executorengine.helper.AdvanContactHelper
 import cn.vove7.vtp.app.AppHelper
 import cn.vove7.vtp.app.AppInfo
+import cn.vove7.vtp.calendar.CalendarAccount
+import cn.vove7.vtp.calendar.CalendarHelper
 import cn.vove7.vtp.log.Vog
 import cn.vove7.vtp.system.DeviceInfo
 import cn.vove7.vtp.system.SystemHelper
@@ -724,15 +726,37 @@ object SystemBridge : SystemOperation {
         }
     }
 
+    fun createAlarm(hour: Int, minutes: Int) {
+        createAlarm(null, null, hour, minutes, true)
+    }
 
-//    override fun hideInputMethod() {
-//        try {
-//            val imm = context.getSystemService(Context.INPUT_METHOD_SERVICE)
-//                    as InputMethodManager
-//            imm.hideStatusIcon()
-//        } catch (e: Exception) {
-//            GlobalLog.err(e)
-//        }
-//    }
+    override fun createAlarm(message: String?, day: Int?, hour: Int, minutes: Int, noUi: Boolean) {
+        val intent = Intent(AlarmClock.ACTION_SET_ALARM)
+                .putExtra(AlarmClock.EXTRA_HOUR, hour)
+                .putExtra(AlarmClock.EXTRA_MINUTES, minutes)
+                .putExtra(AlarmClock.EXTRA_SKIP_UI, noUi)
+        if (message != null) intent.putExtra(AlarmClock.EXTRA_MESSAGE, message)
+        if (day != null) intent.putExtra(AlarmClock.EXTRA_DAYS, day)
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        if (intent.resolveActivity(context.packageManager) != null) {
+            context.startActivity(intent)
+        } else {
+            GlobalApp.toastShort("未找到时钟App，无法创建")
+        }
+    }
 
+    override fun createCalendarEvent(title: String, content: String?, beginTime: Long,
+                                     endTime: Long?, isAlarm: Boolean) {
+        try {
+            val account = CalendarAccount("V Assist", "v_assist@qq.com", autoCreateContext = context)
+            val cal = CalendarHelper(context, account)
+            val end = if (endTime == null) beginTime + 1000 * 60 * 10//十分钟
+            else endTime
+            cal.addCalendarEvent(title, content ?: "", beginTime, end, isAlarm)
+        } catch (e: SecurityException) {
+            GlobalLog.err(e)
+            AppBus.post(RequestPermission("读写日历权限"))
+        }
+
+    }
 }

@@ -125,7 +125,7 @@ interface SystemOperation {
      * 分享图片
      * @param imgPath String? 图片路径
      */
-    fun shareImage(imgPath:String?)
+    fun shareImage(imgPath: String?)
 
     /**
      * 获取用户地理位置
@@ -139,11 +139,32 @@ interface SystemOperation {
      * @return String?
      */
     fun getLocalIpAddress(): String?
+
     /**
      * 获得外网ip
      * @return String?
      */
     fun getNetAddress(): String?
+
+    /**
+     * 创建系统闹钟
+     * @param message String? 备注
+     * @param day Int? 周 重复  1日 - 7六
+     * @param hour Int 小时
+     * @param minutes Int 分钟
+     * @param noUi 不显示闹钟界面
+     */
+    fun createAlarm(message: String?, day: Int?, hour: Int, minutes: Int, noUi: Boolean)
+
+    /**
+     * 创建日历事件
+     * @param title String
+     * @param content String?
+     * @param beginTime Long
+     * @param endTime Long?
+     * @param isAlarm Boolean
+     */
+    fun createCalendarEvent(title: String, content: String?, beginTime: Long, endTime: Long? = null, isAlarm: Boolean)
 
 //    fun hideInputMethod()
 }

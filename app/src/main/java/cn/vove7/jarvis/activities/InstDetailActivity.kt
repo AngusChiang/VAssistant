@@ -176,7 +176,7 @@ class InstDetailActivity : AppCompatActivity() {
     private fun initFollows() {
         if (node.follows != null) {
             follow_list.adapter = object : BaseListAdapter<VHolder, ActionNode>(this, node.follows) {
-                override fun layoutId(): Int = R.layout.item_normal_icon_title
+                override fun layoutId(position: Int): Int = R.layout.item_normal_icon_title
 
                 override fun onBindView(holder: VHolder, pos: Int, item: ActionNode) {
                     holder.title.text = item.actionTitle

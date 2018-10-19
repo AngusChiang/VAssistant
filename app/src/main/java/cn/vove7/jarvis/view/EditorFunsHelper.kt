@@ -195,7 +195,7 @@ class GridAdapter(val c: Context, val functions: List<ApiFunction>, val onClick:
 
     private fun showDetail(f: ApiFunction) {
         MaterialDialog(c).title(text = f.name)
-                .message(text = f.doc ?: "")
+                .message(text = f.doc)
                 .show()
     }
 
@@ -203,7 +203,7 @@ class GridAdapter(val c: Context, val functions: List<ApiFunction>, val onClick:
     override fun onBindViewHolder(p0: VV, p1: Int) {
         val item = getItem(p1)
         p0.title.text = item.name
-        p0.summary.text = item.summary
+        p0.summary.text = item.sortSummary
         p0.itemView.apply {
             setOnClickListener {
                 onClick.invoke(item.insertText)
@@ -232,4 +232,8 @@ class ApiFunction(
         val summary: String = name,
         val insertText: String = name,
         val doc: String = summary
-)
+) {
+    val sortSummary: String
+        get() = if (summary.length > 30) (summary.substring(0, 28) + "\n...") else summary
+
+}

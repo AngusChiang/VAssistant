@@ -244,7 +244,7 @@ abstract class BaseMarkedFragment<T> : SimpleListFragment<T>(), OnSyncMarked {
             return
         }
         showProgressBar()
-        DataUpdator.syncMarkedData(types, lastKeyId) {
+        DataUpdator.syncMarkedData(null, types, lastKeyId) {
             if (it) {
                 toast.showShort("同步完成")
                 refresh()

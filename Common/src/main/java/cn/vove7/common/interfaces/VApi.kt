@@ -56,7 +56,7 @@ interface VApi {
                 "isScreenOn()", "getClipText()", "setClipText(s)", "sendEmail(to,subject,content)",
                 /* "lockScreen()",*/ "screenShot()",
                 "screen2File()", "shareText(text)", "shareImage(imgPah)", "location()",
-                "getLocalIpAddress()","getNetAddress()"
+                "getLocalIpAddress()","getNetAddress()","createAlarm()","createCalendarEvent()"
         )
         val appFunctions = arrayOf(
                 "startActivity()", "getSystemService()"
@@ -146,7 +146,13 @@ interface VApi {
                 Pair("shareImage(imgPah)", "分享图片,imgPah:图片路径"),
                 Pair("location()", "获取位置信息，Location?"),
                 Pair("getLocalIpAddress()", "获取内网ip地址"),
-                Pair("getNetAddress()", "获取外网ip地址")
+                Pair("getNetAddress()", "获取外网ip地址"),
+                Pair("createCalendarEvent()", "创建日历事件,参数title: String, content: String?, " +
+                        "beginTime: Long, endTime: Long?, isAlarm: Boolean\n" +
+                        "title:标题,content:事件详情,beginTime:开始时间(毫秒数),endTime:结束时间(毫秒数,为空默认十分钟)，isAlarm:是否(响铃?)提醒"),
+                Pair("createAlarm()", "创建闹钟，参数(message: String?, day: Int?, hour: Int, minutes: Int, noUi: Boolean)\n" +
+                        "message:备注,day:重复周,hour:时,minutes:分,noUi:是否显示闹钟界面")
+
         )
         val executorMap = hashMapOf(
                 Pair("interrupt()", "终止执行"),

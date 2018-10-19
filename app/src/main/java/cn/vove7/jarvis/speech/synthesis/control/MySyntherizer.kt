@@ -23,15 +23,12 @@ open class MySyntherizer(initConfig: InitConfig) {
     private val isCheckFile = true
 
     init {
-        init(initConfig)
-    }
-
-    init {
         if (isInited) {
             // SpeechSynthesizer.getInstance() 不要连续调用
 //            throw RuntimeException("MySynthesizer 类里面 SpeechSynthesizer还未释放，请勿新建一个新类")
             this@MySyntherizer.release()
         }
+        init(initConfig)
         isInited = true
     }
 
@@ -42,7 +39,7 @@ open class MySyntherizer(initConfig: InitConfig) {
      * @return
      */
     protected fun init(config: InitConfig): Boolean {
-
+        if(isInited) return true
         Vog.d(this, "init ---> 初始化开始")
         val isMix = config.ttsMode == TtsMode.MIX
         mSpeechSynthesizer = SpeechSynthesizer.getInstance()
@@ -78,6 +75,10 @@ open class MySyntherizer(initConfig: InitConfig) {
         return true
     }
 
+    /**
+     * [AudioManager]
+     * @param type Int
+     */
     fun setAudioStream(type: Int) {
         mSpeechSynthesizer?.setAudioStreamType(type)
     }

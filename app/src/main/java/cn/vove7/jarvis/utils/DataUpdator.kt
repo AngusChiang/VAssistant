@@ -1,12 +1,12 @@
 package cn.vove7.jarvis.utils
 
 import android.app.Activity
-import android.widget.TextView
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.datamanager.AppAdInfo
 import cn.vove7.common.datamanager.DAO
 import cn.vove7.common.datamanager.DaoHelper
+import cn.vove7.common.datamanager.OnUpdate
 import cn.vove7.common.datamanager.executor.entity.MarkedData
 import cn.vove7.common.datamanager.parse.statusmap.ActionNode
 import cn.vove7.common.model.ResultBox
@@ -20,11 +20,12 @@ import cn.vove7.executorengine.helper.AdvanAppHelper
 import cn.vove7.executorengine.parse.ParseEngine
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.plugins.AdKillerService
+import cn.vove7.jarvis.view.dialog.ProgressTextDialog
 import cn.vove7.vtp.log.Vog
 import cn.vove7.vtp.sharedpreference.SpHelper
 import com.afollestad.materialdialogs.MaterialDialog
-import com.afollestad.materialdialogs.customview.customView
 import com.google.gson.reflect.TypeToken
+import java.lang.Thread.sleep
 import kotlin.concurrent.thread
 
 /**
@@ -75,64 +76,63 @@ object DataUpdator {
      * @param types List<Int>
      */
     fun onKeyUpdate(activity: Activity, types: List<Int>) {
-        val tetView = TextView(activity)
-        tetView.setPadding(60, 0, 60, 0)
-        val dialog = MaterialDialog(activity)
-                .title(text = "一键同步")
-                .cancelable(false)
-                .customView(view = tetView, scrollable = true)
-        dialog.show()
+        val textDialog = ProgressTextDialog(activity, "正在更新", false)
         thread {
             types.forEach {
-                val result = ResultBox<String>()
+                val result = ResultBox<Boolean>()
+                val onUpdate = object : OnUpdate {
+                    override fun invoke(msg: String) {
+                        textDialog.appendln(msg)
+                    }
+                }
                 when (it) {
                     0 -> {
-                        appendOnMain(activity, tetView, "正在更新：全局指令\n")
-                        syncGlobalInst { b ->
-                            result.setAndNotify(if (b) "成功\n" else "失败\n")
+                        textDialog.appendlnGreen("开始更新：全局指令")
+                        syncGlobalInst(onUpdate) { b ->
+                            result.setAndNotify(b)
                         }
-                        appendOnMain(activity, tetView, result.blockedGet())
+                        if (result.blockedGet() == true) {
+                            textDialog.appendlnGreen("成功")
+                        } else {
+                            textDialog.appendlnRed("失败")
+                        }
                     }
                     1 -> {
-                        appendOnMain(activity, tetView, "正在更新：应用内指令\n")
-                        syncInAppInst { b ->
-                            result.setAndNotify(if (b) "成功\n" else "失败\n")
+                        textDialog.appendlnGreen("正在更新：应用内指令")
+                        syncInAppInst(onUpdate) { b -> result.setAndNotify(b) }
+                        if (result.blockedGet() == true) {
+                            textDialog.appendlnGreen("成功")
+                        } else {
+                            textDialog.appendlnRed("失败")
                         }
-                        appendOnMain(activity, tetView, result.blockedGet())
                     }
                     2, 3, 4 -> {//marked data
-                        appendOnMain(activity, tetView, "正在更新：")
-                        appendOnMain(activity, tetView, arrayOf("标记联系人", "标记应用", "标记打开")[it - 2] + '\n')
-                        syncMarkedData(getTypes(it), markedLastKeyId[it - 2]) { b ->
-                            result.setAndNotify(if (b) "成功\n" else "失败\n")
+                        textDialog.appendlnGreen("正在更新：" + arrayOf("标记联系人", "标记应用", "标记打开")[it - 2])
+                        syncMarkedData(onUpdate, getTypes(it), markedLastKeyId[it - 2]) { b ->
+                            result.setAndNotify(b)
                         }
-                        appendOnMain(activity, tetView, result.blockedGet())
+                        if (result.blockedGet() == true) {
+                            textDialog.appendlnGreen("成功")
+                        } else {
+                            textDialog.appendlnRed("失败")
+                        }
                     }
                     5 -> {//ad
-                        syncMarkedAd { b ->
-                            result.setAndNotify(if (b) "成功\n" else "失败\n")
+                        textDialog.appendlnGreen("正在更新：标记广告")
+                        syncMarkedAd(onUpdate) { b -> result.setAndNotify(b) }
+                        if (result.blockedGet() == true) {
+                            textDialog.appendlnGreen("成功")
+                        } else {
+                            textDialog.appendlnRed("失败")
                         }
-                        appendOnMain(activity, tetView, result.blockedGet())
                     }
                 }
             }
-            appendOnMain(activity, tetView, "更新完成\n")
-            dialog.positiveButton(text = "完成")
-                    .cancelable(true)
+            textDialog.appendlnGreen("更新完成")
+            textDialog.finish()
         }
     }
 
-    /**
-     * 显示
-     * @param activity Activity
-     * @param textView TextView
-     * @param s String?
-     */
-    private fun appendOnMain(activity: Activity, textView: TextView, s: String?) {
-        activity.runOnUiThread {
-            textView.append(s)
-        }
-    }
 
     private val markedLastKeyId = arrayOf(
             R.string.key_last_sync_marked_contact_date,
@@ -178,14 +178,14 @@ object DataUpdator {
      * 同步全局命令
      * @param back (Boolean) -> Unit
      */
-    fun syncGlobalInst(back: (Boolean) -> Unit) {
+    fun syncGlobalInst(onUpdate: OnUpdate? = null, back: (Boolean) -> Unit) {
         NetHelper.postJson<List<ActionNode>>(ApiUrls.SYNC_GLOBAL_INST, BaseRequestModel(""),
                 type = NetHelper.ActionNodeListType) { _, bean ->
             if (bean != null) {
                 if (bean.isOk()) {
                     val list = bean.data
                     if (list != null) {
-                        DaoHelper.updateGlobalInst(list).also {
+                        DaoHelper.updateGlobalInst(list, onUpdate).also {
                             if (it) {
                                 SpHelper(GlobalApp.APP).set(R.string.key_last_sync_global_date, System.currentTimeMillis())
                                 DAO.clear()
@@ -216,7 +216,7 @@ object DataUpdator {
      * 同步App内指令
      * @param back (Boolean)->Unit
      */
-    fun syncInAppInst(back: (Boolean) -> Unit) {
+    fun syncInAppInst(onUpdate: OnUpdate? = null, back: (Boolean) -> Unit) {
         NetHelper.postJson<List<ActionNode>>(ApiUrls.SYNC_IN_APP_INST,
                 BaseRequestModel(AdvanAppHelper.getPkgList()),
                 type = NetHelper.ActionNodeListType) { _, bean ->
@@ -224,7 +224,7 @@ object DataUpdator {
                 if (bean.isOk()) {
                     val list = bean.data
                     if (list != null) {
-                        DaoHelper.updateInAppInst(list).also {
+                        DaoHelper.updateInAppInst(list, onUpdate).also {
                             if (it) {
                                 SpHelper(GlobalApp.APP).set(R.string.key_last_sync_in_app_date,
                                         System.currentTimeMillis())
@@ -260,14 +260,14 @@ object DataUpdator {
      * @param lastKeyId Int
      * @param back (Boolean) -> Unit
      */
-    fun syncMarkedData(types: Array<String>, lastKeyId: Int, back: (Boolean) -> Unit) {
+    fun syncMarkedData(onUpdate: OnUpdate? = null, types: Array<String>, lastKeyId: Int, back: (Boolean) -> Unit) {
         val syncData = TextHelper.arr2String(types)
         val requestModel = BaseRequestModel(syncData)
 
         NetHelper.postJson<List<MarkedData>>(ApiUrls.SYNC_MARKED, requestModel,
                 type = NetHelper.MarkedDataListType) { _, bean ->
             if (bean?.isOk() == true) {
-                DaoHelper.updateMarkedData(types, bean.data ?: emptyList())
+                DaoHelper.updateMarkedData(onUpdate, types, bean.data ?: emptyList())
                 SpHelper(GlobalApp.APP).set(lastKeyId, System.currentTimeMillis())
                 DAO.clear()
                 back.invoke(true)
@@ -282,7 +282,7 @@ object DataUpdator {
      * 同步标记广告
      * @param back (Boolean) -> Unit
      */
-    fun syncMarkedAd(back: (Boolean) -> Unit) {
+    fun syncMarkedAd(onUpdate: OnUpdate? = null, back: (Boolean) -> Unit) {
 
         val syncPkgs = AdvanAppHelper.getPkgList()
         NetHelper.postJson<List<AppAdInfo>>(ApiUrls.SYNC_APP_AD, BaseRequestModel(syncPkgs), type = object

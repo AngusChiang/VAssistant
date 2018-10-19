@@ -3,6 +3,7 @@ package cn.vove7.jarvis.fragments
 import android.os.Bundle
 import android.view.View
 import android.widget.CompoundButton
+import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.datamanager.DAO
 import cn.vove7.common.datamanager.executor.entity.MarkedData
 import cn.vove7.common.datamanager.executor.entity.MarkedData.MARKED_TYPE_APP
@@ -54,7 +55,7 @@ class MarkedAppFragment : BaseMarkedFragment<MarkedData>() {
             if (app == null) {
                 if (showUninstall)
                     sss.add(ViewModel(it.key, it.value, null, it))
-            } else ss.add(ViewModel(it.key, app.name, app.icon, it))
+            } else ss.add(ViewModel(it.key, app.name, app.getIcon(GlobalApp.APP), it))
         }
         ss.addAll(sss)
         return ss

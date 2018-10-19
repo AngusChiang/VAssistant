@@ -1,6 +1,7 @@
 package cn.vove7.jarvis.activities
 
 import android.app.Activity
+import android.content.ActivityNotFoundException
 import android.os.Build
 import android.os.Bundle
 import android.support.v4.app.Fragment
@@ -126,8 +127,13 @@ class PermissionManagerActivity : OneFragmentActivity() {
                                             }
                                         }
                                     }
-                                item.permissionName == "无障碍" ->
-                                    PermissionUtils.gotoAccessibilitySetting(activity!!)
+                                item.permissionName == "无障碍" -> {
+                                    try {
+                                        PermissionUtils.gotoAccessibilitySetting(activity!!)
+                                    } catch (e: ActivityNotFoundException) {
+                                        toast.showShort("跳转失败，请自行开启")
+                                    }
+                                }
                                 else ->
                                     PermissionUtils.autoRequestPermission(activity!!,
                                             item.permissionString, position)
@@ -188,8 +194,8 @@ class PermissionManagerActivity : OneFragmentActivity() {
                     "android.permission.CAMERA"
             )
             val permissions = listOf(
-                    PermissionStatus(arrayOf("android.permission.BIND_ACCESSIBILITY_SERVICE"), "无障碍", "操作界面"),
-                    PermissionStatus(arrayOf("android.permission.SYSTEM_ALERT_WINDOW"), "悬浮窗", "显示全局对话框"),
+                    PermissionStatus(arrayOf("android.permission.BIND_ACCESSIBILITY_SERVICE"), "无障碍", "1.使用音量快捷键\n2.操作界面\n3.根据当前界面响应指令"),
+                    PermissionStatus(arrayOf("android.permission.SYSTEM_ALERT_WINDOW"), "悬浮窗", "显示全局对话框、语音面板"),
                     PermissionStatus(arrayOf("android.permission.READ_CONTACTS"), "联系人", "用于检索联系人"),
                     PermissionStatus(arrayOf("android.permission.CALL_PHONE"), "电话", "用于拨打电话"),
                     PermissionStatus(arrayOf("android.permission.RECORD_AUDIO"), "录音", "用于语音识别"),
@@ -201,8 +207,9 @@ class PermissionManagerActivity : OneFragmentActivity() {
                     PermissionStatus(arrayOf("android.permission.ACCESS_COARSE_LOCATION", "android.permission.ACCESS_FINE_LOCATION"), "位置信息", "不使用此类指令可不开启"),
 //                        PermissionStatus(arrayOf("android.permission.BLUETOOTH", "android.permission.BLUETOOTH_ADMIN"),
 //                                "蓝牙", "打开蓝牙"),
-                    PermissionStatus(arrayOf("android.permission.CAMERA"), "相机", "打开闪光灯")
-                    //                    PermissionStatus("android.permission.VIBRATE", "震动", ""),
+                    PermissionStatus(arrayOf("android.permission.CAMERA"), "相机", "打开闪光灯"),
+                    PermissionStatus(arrayOf("android.permission.WRITE_CALENDAR",
+                            "android.permission.READ_CALENDAR"), "日历", "读写日历")
             )
 
             fun refreshStatus() {

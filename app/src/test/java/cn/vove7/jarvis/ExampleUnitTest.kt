@@ -94,4 +94,31 @@ class ExampleUnitTest {
             println(q.poll())
         }
     }
+
+
+    @Test
+    fun testArrayIn() {
+        arrayOf("媒体音量", "铃声音量", "通知音量").let {
+            it.forEach { s ->
+                println(it.indexOf(s) in 0..2)
+            }
+            println(it.indexOf("1") in 0..2)
+
+        }
+    }
+
+    @Test
+    fun testParseDate() {
+        arrayOf(
+                "十二点", "八点四十五", "八点半",
+                "明天中午", "后天下午", "晚上八点"  //is pm true
+                , ""
+
+        ).forEach {
+            //parse
+            System.currentTimeMillis()
+        }
+
+
+    }
 }

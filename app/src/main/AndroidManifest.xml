@@ -35,6 +35,11 @@
 
     <uses-permission android:name="android.permission.INSTALL_SHORTCUT" />
     <uses-permission android:name="android.permission.UNINSTALL_SHORTCUT" />
+
+    <uses-permission android:name="com.android.alarm.permission.SET_ALARM" />
+    <uses-permission android:name="android.permission.WRITE_CALENDAR"/>
+    <uses-permission android:name="android.permission.READ_CALENDAR"/>
+
     <uses-permission
         android:name="android.permission.DEVICE_POWER"
         tools:ignore="ProtectedPermissions" />

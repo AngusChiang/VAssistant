@@ -14,7 +14,7 @@ import cn.vove7.vtp.easyadapter.BaseListAdapter
  */
 class IconTitleListAdapter(context: Context, dataset: List<IconTitleEntity>)
     : BaseListAdapter<AboutActivity.VH, IconTitleEntity>(context, dataset) {
-    override fun layoutId(): Int = R.layout.item_whit_icon_title
+    override fun layoutId(position: Int): Int = R.layout.item_whit_icon_title
 
     override fun onBindView(holder: AboutActivity.VH, pos: Int, item: IconTitleEntity) {
         item.iconId.let {

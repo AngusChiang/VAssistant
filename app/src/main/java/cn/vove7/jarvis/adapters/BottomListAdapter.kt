@@ -13,7 +13,7 @@ class BottomListAdapter(val context: Context, items: MutableList<ViewModel>,
                         private val listener: SimpleListAdapter.OnItemClickListener)
     : BaseListAdapter<BottomListAdapter.VHolder, ViewModel>(context, items) {
 
-    override fun layoutId(): Int = R.layout.item_normal_icon_title
+    override fun layoutId(position: Int): Int = R.layout.item_normal_icon_title
 
     override fun onCreateViewHolder(view: View): VHolder {
         return VHolder(view)

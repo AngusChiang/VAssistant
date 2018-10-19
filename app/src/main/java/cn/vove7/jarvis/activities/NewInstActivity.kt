@@ -228,7 +228,7 @@ class NewInstActivity : AppCompatActivity(), View.OnClickListener {
     private fun getInstalledApp(): MutableList<ViewModel> {
         val list = mutableListOf<ViewModel>()
         AdvanAppHelper.APP_LIST.values.forEach {
-            list.add(ViewModel(it.name, icon = it.icon, extra = it))
+            list.add(ViewModel(it.name, icon = it.getIcon(this), extra = it))
         }
         return list
     }
@@ -662,7 +662,7 @@ class NewInstActivity : AppCompatActivity(), View.OnClickListener {
             return Holder(view)
         }
 
-        override fun layoutId(): Int = R.layout.item_left_right_text
+        override fun layoutId(position: Int): Int = R.layout.item_left_right_text
         override fun onBindView(holder: Holder, pos: Int, item: Pair<String, String>) {
             holder.left.text = item.first
             holder.right.text = item.second

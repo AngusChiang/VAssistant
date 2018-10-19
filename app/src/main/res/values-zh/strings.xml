@@ -205,5 +205,6 @@
     <string name="text_js_editor">Js编辑器</string>
     <string name="text_select_nothing">未选择任何内容</string>
     <string name="text_copied">已复制</string>
+    <string name="desc_accessibility">开启后将后的技能\n1.使用音量快捷键\n2.操作界面\n3.根据当前界面响应指令</string>
 
 </resources>

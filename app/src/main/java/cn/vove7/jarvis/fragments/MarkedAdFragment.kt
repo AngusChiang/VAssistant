@@ -106,7 +106,7 @@ class MarkedAdFragment : SimpleListFragment<String>(), OnSyncMarked {
         nodes.forEach {
             val app = bridge.getAppInfo(it)
             if (app != null)
-                sss.add(ViewModel(app.name, "数量：${maps[it]}", app.icon, extra = it))
+                sss.add(ViewModel(app.name, "数量：${maps[it]}", app.getIcon(GlobalApp.APP), extra = it))
         }
         ss.addAll(sss)
         return ss

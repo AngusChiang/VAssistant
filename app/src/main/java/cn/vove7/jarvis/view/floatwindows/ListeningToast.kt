@@ -42,9 +42,13 @@ class ListeningToast : AbFloatWindow<ListeningToast.VHolder>(GlobalApp.APP) {
     init {
     }
 
-    fun show(text: String) {
+    fun initIfNeed() {
         if (lHandler == null)
             lHandler = ListeningHandler(Looper.getMainLooper())
+    }
+
+    fun show(text: String) {
+        initIfNeed()
         lHandler?.post {
             if (!isShowing)
                 show()
@@ -53,11 +57,19 @@ class ListeningToast : AbFloatWindow<ListeningToast.VHolder>(GlobalApp.APP) {
     }
 
     fun showAndHideDelay(text: String) {
+        initIfNeed()
         lHandler?.sendMessage(lHandler!!.obtainMessage(SHOW, text))
         hideDelay()
     }
 
+    fun hideDelay(delay: Long = 800) {
+        initIfNeed()
+        Vog.d(this, "hideDelay ---> hide delay $delay")
+        lHandler?.sendEmptyMessageDelayed(HIDE, delay)
+    }
+
     fun hideImmediately() {//立即
+        initIfNeed()
         lHandler?.sendEmptyMessage(HIDE)
     }
 
@@ -82,11 +94,6 @@ class ListeningToast : AbFloatWindow<ListeningToast.VHolder>(GlobalApp.APP) {
     companion object {
         const val SHOW = 5
         const val HIDE = 1
-    }
-
-    fun hideDelay(delay: Long = 800) {
-        Vog.d(this, "hideDelay ---> hide delay $delay")
-        lHandler?.sendEmptyMessageDelayed(HIDE, delay)
     }
 
     class VHolder(val view: View) : AbFloatWindow.ViewHolder(view) {

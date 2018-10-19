@@ -18,7 +18,7 @@ import cn.vove7.vtp.easyadapter.BaseListAdapter
  */
 class ExecuteQueueAdapter(context: Context, execQueue: MutableList<ActionNode>)
     : BaseListAdapter<ExecuteQueueAdapter.VHolder, ActionNode>(context, execQueue) {
-    override fun layoutId(): Int = R.layout.item_of_exec_queue
+    override fun layoutId(position: Int): Int = R.layout.item_of_exec_queue
 
     override fun onBindView(holder: VHolder, pos: Int, item: ActionNode) {
         holder.descText.text = item.actionTitle

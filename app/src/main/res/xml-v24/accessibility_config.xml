@@ -7,6 +7,6 @@
     android:canRequestEnhancedWebAccessibility="true"
     android:canRequestFilterKeyEvents="true"
     android:canRetrieveWindowContent="true"
-    android:description="@string/app_name"
+    android:description="@string/desc_accessibility"
     android:notificationTimeout="0"
     android:settingsActivity="cn.vove7.jarvis.activities.SettingsActivity" />
