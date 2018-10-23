@@ -21,6 +21,7 @@ package cn.vove7.rhino.processor.language
 
 
 import cn.vove7.common.interfaces.VApi
+import cn.vove7.common.interfaces.VApi.Companion.androRuntimeFuncs
 import cn.vove7.common.interfaces.VApi.Companion.appFunctions
 import cn.vove7.common.interfaces.VApi.Companion.executorFunctions
 import cn.vove7.common.interfaces.VApi.Companion.finderFuns
@@ -191,7 +192,8 @@ class MyJsLanguageWithApi : Language(), VApi {
          */
         private val ALL_KEYWORDS = ArrayUtil.merge(arrayOf(keywordss, myApiName,
                 appFunctions, runtimeFunctions, executorFunctions, viewNodeFunctions,
-                finderFuns, globalFuns, systemFuncs, utilFuns, spFuncs, JS_KEYWORDS, httpFunctions))
+                finderFuns, globalFuns, systemFuncs, utilFuns, spFuncs, JS_KEYWORDS, httpFunctions,
+                androRuntimeFuncs))
     }
 
 }

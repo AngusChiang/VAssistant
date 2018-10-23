@@ -22,7 +22,7 @@ class ExecuteQueueAdapter(context: Context, execQueue: MutableList<ActionNode>)
 
     override fun onBindView(holder: VHolder, pos: Int, item: ActionNode) {
         holder.descText.text = item.actionTitle
-        holder.paramText.addTextChangedListener(object:TextWatcher {
+        holder.paramText.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(s: Editable?) {
             }
 
@@ -31,7 +31,7 @@ class ExecuteQueueAdapter(context: Context, execQueue: MutableList<ActionNode>)
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 val action = item.action
-                action.param.value = s?.toString()
+                action.param.value = s?.split(',')?.toTypedArray()
             }
         })
 

@@ -154,7 +154,7 @@ interface SystemOperation {
      * @param minutes Int 分钟
      * @param noUi 不显示闹钟界面
      */
-    fun createAlarm(message: String?, day: Int?, hour: Int, minutes: Int, noUi: Boolean)
+    fun createAlarm(message: String?, days: Array<Int>?, hour: Int, minutes: Int, noUi: Boolean)
 
     /**
      * 创建日历事件

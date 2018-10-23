@@ -29,7 +29,7 @@ public class RegDao extends AbstractDao<Reg, Long> {
     public static class Properties {
         public final static Property Id = new Property(0, Long.class, "id", true, "_id");
         public final static Property RegStr = new Property(1, String.class, "regStr", false, "REG_STR");
-        public final static Property ParamPos = new Property(2, int.class, "paramPos", false, "PARAM_POS");
+        public final static Property ParamPos = new Property(2, String.class, "paramPos", false, "PARAM_POS");
         public final static Property NodeId = new Property(3, long.class, "nodeId", false, "NODE_ID");
     }
 
@@ -49,7 +49,7 @@ public class RegDao extends AbstractDao<Reg, Long> {
         db.execSQL("CREATE TABLE " + constraint + "\"REG\" (" + //
                 "\"_id\" INTEGER PRIMARY KEY ," + // 0: id
                 "\"REG_STR\" TEXT NOT NULL ," + // 1: regStr
-                "\"PARAM_POS\" INTEGER NOT NULL ," + // 2: paramPos
+                "\"PARAM_POS\" TEXT," + // 2: paramPos
                 "\"NODE_ID\" INTEGER NOT NULL );"); // 3: nodeId
     }
 
@@ -68,7 +68,11 @@ public class RegDao extends AbstractDao<Reg, Long> {
             stmt.bindLong(1, id);
         }
         stmt.bindString(2, entity.getRegStr());
-        stmt.bindLong(3, entity.getParamPos());
+ 
+        String paramPos = entity.getParamPos();
+        if (paramPos != null) {
+            stmt.bindString(3, paramPos);
+        }
         stmt.bindLong(4, entity.getNodeId());
     }
 
@@ -81,7 +85,11 @@ public class RegDao extends AbstractDao<Reg, Long> {
             stmt.bindLong(1, id);
         }
         stmt.bindString(2, entity.getRegStr());
-        stmt.bindLong(3, entity.getParamPos());
+ 
+        String paramPos = entity.getParamPos();
+        if (paramPos != null) {
+            stmt.bindString(3, paramPos);
+        }
         stmt.bindLong(4, entity.getNodeId());
     }
 
@@ -95,7 +103,7 @@ public class RegDao extends AbstractDao<Reg, Long> {
         Reg entity = new Reg( //
             cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0), // id
             cursor.getString(offset + 1), // regStr
-            cursor.getInt(offset + 2), // paramPos
+            cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2), // paramPos
             cursor.getLong(offset + 3) // nodeId
         );
         return entity;
@@ -105,7 +113,7 @@ public class RegDao extends AbstractDao<Reg, Long> {
     public void readEntity(Cursor cursor, Reg entity, int offset) {
         entity.setId(cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0));
         entity.setRegStr(cursor.getString(offset + 1));
-        entity.setParamPos(cursor.getInt(offset + 2));
+        entity.setParamPos(cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2));
         entity.setNodeId(cursor.getLong(offset + 3));
      }
     

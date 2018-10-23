@@ -32,7 +32,6 @@ import cn.vove7.common.view.finder.ViewFindBuilder
 import cn.vove7.executorengine.bridges.SystemBridge
 import cn.vove7.executorengine.helper.AdvanContactHelper
 import cn.vove7.executorengine.parse.ParseEngine
-import cn.vove7.vtp.contact.ContactInfo
 import cn.vove7.vtp.log.Vog
 import java.util.*
 import kotlin.concurrent.thread
@@ -97,7 +96,7 @@ open class ExecutorImpl(
     private var thread: Thread? = null
 
     override fun execQueue(cmdWords: String, actionQueue: PriorityQueue<Action>?) {
-        if(actionQueue==null) return
+        if (actionQueue == null) return
         if (thread?.isAlive == true) {
             thread!!.interrupt()
         }
@@ -129,7 +128,8 @@ open class ExecutorImpl(
                 currentAction = actionQueue.poll()
                 actionScope = currentAction?.actionScopeType
                 Vog.d(this, "pollActionQueue ---> $actionScope")
-                r = runScript(currentAction!!.actionScript, currentAction!!.param.valueWithClear)// 清除参数缓存
+                r = runScript(currentAction!!.actionScript, currentAction!!.param.valueWithClear
+                    ?: arrayOf())// 清除参数缓存
                 when {
                     r.needTerminal -> {//出错
                         currentAction = null
@@ -147,24 +147,24 @@ open class ExecutorImpl(
         }
     }
 
-    override fun runScript(script: String, arg: String?): PartialResult {
+    override fun runScript(script: String, args: Array<String>?): PartialResult {
         return when (currentAction?.scriptType) {
             SCRIPT_TYPE_LUA -> {
-                onLuaExec(script, arg)
+                onLuaExec(script, args)
             }
             SCRIPT_TYPE_JS -> {
-                onRhinoExec(script, arg)
+                onRhinoExec(script, args)
             }
             else ->
                 PartialResult.fatal("未知脚本类型: " + currentAction?.scriptType)
         }
     }
 
-    open fun onLuaExec(script: String, arg: String? = null): PartialResult {
+    open fun onLuaExec(script: String, args: Array<String>? = null): PartialResult {
         return PartialResult.fatal("not implement onLuaExec")
     }
 
-    open fun onRhinoExec(script: String, arg: String? = null): PartialResult {
+    open fun onRhinoExec(script: String, arg: Array<String>? = null): PartialResult {
         return PartialResult.fatal("not implement onRhinoExec")
     }
 
@@ -194,7 +194,7 @@ open class ExecutorImpl(
      */
     private fun parseAppInnerOperation(cmd: String, pkg: String): Boolean {
         //解析跟随
-        val appQ = ParseEngine.matchAppAction(cmd, ActionScope(pkg),true)
+        val appQ = ParseEngine.matchAppAction(cmd, ActionScope(pkg), true)
         actionQueue = appQ.second
         //打开应用
         if (actionQueue.isNotEmpty()) {//todo 检查App页面?
@@ -238,7 +238,7 @@ open class ExecutorImpl(
             if (RegUtils.isPackage(data)) data
             else systemBridge.getPkgByWord(data)
         return if (pkg != null)
-            onLuaExec(CloseAppScript, pkg).isSuccess//强制停止App
+            onLuaExec(CloseAppScript, arrayOf(pkg)).isSuccess//强制停止App
         else {
             //Marked打开
             commandType = -1
@@ -350,7 +350,7 @@ open class ExecutorImpl(
             null
 //                PartialResult.fatal("获取语音参数失败")
         } else {
-            currentAction!!.param.valueWithClear
+            currentAction!!.param.valueWithClear[0]
         }
     }
 
@@ -364,7 +364,7 @@ open class ExecutorImpl(
             currentAction?.responseResult = false
         } else {
             currentAction?.responseResult = true
-            currentAction?.param?.value = param
+            currentAction?.param?.value = arrayOf(param)
         }
         //继续执行
         notifySync()
@@ -590,7 +590,7 @@ open class ExecutorImpl(
                 "s = ViewFinder().equalsText({'强行停止','force stop'}).waitFor(3000)\n" +
                 "a=s.tryClick()\n" +
                 "if(not a) then \n" +
-                "speak('应用未运行')\n" +
+                "speak('应用未运行')\nhome()\n" +
                 "else\n" +
                 "ViewFinder().equalsText({'确定','OK'}).waitFor(2000).tryClick()\n" +
                 "home()" +

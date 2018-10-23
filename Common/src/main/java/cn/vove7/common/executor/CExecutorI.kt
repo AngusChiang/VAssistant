@@ -20,7 +20,7 @@ interface CExecutorI : ViewShowListener, ActivityShowListener, RuntimeArgs, Spea
 
     fun execQueue(cmdWords: String, actionQueue: PriorityQueue<Action>?)
     fun interrupt()
-    fun runScript(script: String, arg: String? = null): PartialResult
+    fun runScript(script: String, args: Array<String>? = null): PartialResult
     fun setScreenSize(width: Int, height: Int)
 
     fun checkAccessibilityService(jump: Boolean = true): Boolean

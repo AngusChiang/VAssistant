@@ -69,7 +69,7 @@ class SignupDialog(context: Context, val r: OnLoginSuccess) : View.OnClickListen
                 this.isEnabled = false
                 loadBar.visibility = View.VISIBLE
 //                val p = NetParamsBuilder.of(Pair("emailAdd", userEmail)).sign()
-
+                verCodeView.error = "如果长时间未收到邮件，请检查地址是否正确。若一切无误，可能是邮箱管理员判定验证码邮件为垃圾邮件导致发送失败，可使用QQ与我联系，谢谢:)"
                 NetHelper.postJson<String>(ApiUrls.SEND_SIGN_UP_EMAIL_VER_CODE, BaseRequestModel(userEmail),
                         type = object : TypeToken<ResponseMessage<String>>() {}.type, callback = { _, bean ->
                     loadBar.visibility = View.INVISIBLE
@@ -144,7 +144,7 @@ class SignupDialog(context: Context, val r: OnLoginSuccess) : View.OnClickListen
                         LoginDialog(context, userEmail, userPass, r)
                         dialog.dismiss()
                     } else {
-                        toast.showShort(bean.message ?: "null")
+                        toast.showShort(bean.message)
                     }
                 } else {
                     toast.showShort("出错")

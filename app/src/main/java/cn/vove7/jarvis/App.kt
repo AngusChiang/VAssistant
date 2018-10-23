@@ -6,9 +6,11 @@ import android.os.Handler
 import android.util.Log
 import cn.vove7.androlua.LuaApp
 import cn.vove7.common.appbus.MessageEvent
+import cn.vove7.common.bridges.RootHelper
 import cn.vove7.executorengine.helper.AdvanAppHelper
 import cn.vove7.jarvis.receivers.PowerEventReceiver
 import cn.vove7.jarvis.services.MainService
+import cn.vove7.jarvis.services.MyAccessibilityService
 import cn.vove7.jarvis.utils.AppConfig
 import cn.vove7.jarvis.utils.CrashHandler
 import cn.vove7.jarvis.utils.ShortcutUtil
@@ -19,26 +21,23 @@ import io.github.kbiakov.codeview.classifier.CodeProcessor
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
-import java.lang.Thread.sleep
 import kotlin.concurrent.thread
 
 
 class App : LuaApp() {
 
-    private val mainService: Intent by lazy{Intent(this, MainService::class.java)}
+    private val mainService: Intent by lazy { Intent(this, MainService::class.java) }
     lateinit var services: Array<Intent>
     override fun onCreate() {
-        Vog.d(this,"onCreate ---> begin ${System.currentTimeMillis()/1000}")
+        Vog.d(this, "onCreate ---> begin ${System.currentTimeMillis() / 1000}")
         super.onCreate()
-        ins=this
+        ins = this
         EventBus.getDefault().register(this)
-        Vog.init(this, Log.VERBOSE).log2Local(Log.ERROR)
-
-        services = arrayOf(mainService)
 
         CrashHandler.init()
 
-        Vog.d(this,"onCreate ---> startServices ${System.currentTimeMillis()/1000}")
+        services = arrayOf(mainService)
+        Vog.d(this, "onCreate ---> startServices ${System.currentTimeMillis() / 1000}")
         val storeFileName = "wdasfd"
         val keyPrefix = ""
         val seedKey = "fddfouafpiua".toByteArray()
@@ -49,15 +48,19 @@ class App : LuaApp() {
             AdvanAppHelper.updateAppList()
             CodeProcessor.init(this)
             ShortcutUtil.addWakeUpShortcut()
-            if (AppConfig.isAutoVoiceWakeupCharging) {
-                PowerEventReceiver.start()
-            }
-            Vog.d(this,"service thread ---> finish ${System.currentTimeMillis()/1000}")
 
-        },1000)
+            thread {
+                if (AppConfig.autoOpenASWithRoot) {
+                    RootHelper.openAppAccessService(packageName, "${MyAccessibilityService::class.qualifiedName}")
+                }
+            }
+            PowerEventReceiver.start()
+            Vog.d(this, "service thread ---> finish ${System.currentTimeMillis() / 1000}")
+
+        }, 1000)
         if (!BuildConfig.DEBUG)
             Vog.init(this, Log.ERROR)
-        Vog.d(this,"onCreate ---> end ${System.currentTimeMillis()/1000}")
+        Vog.d(this, "onCreate ---> end ${System.currentTimeMillis() / 1000}")
     }
 
     private fun startServices() {
@@ -71,8 +74,9 @@ class App : LuaApp() {
             }
         }
     }
+
     companion object {
-        var ins:App?=null
+        var ins: App? = null
 
         fun startServices() {
             ins?.startServices()

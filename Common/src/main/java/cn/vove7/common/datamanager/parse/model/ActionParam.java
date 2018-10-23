@@ -7,7 +7,7 @@ package cn.vove7.common.datamanager.parse.model;
 
 public class ActionParam {
 
-    private String value;
+    private String[] value;
     //private String desc;
     //private String askText;
     ///**
@@ -61,18 +61,18 @@ public class ActionParam {
      * @return value
      */
 
-    public String getValueWithClear() {
-        String s = this.value;
+    public String[] getValueWithClear() {
+        String[] s = this.value;
         this.value = null;
         return s;
     }
 
-    public String getValue() {
+    public String[] getValue() {
         return this.value;
     }
 
 
-    public void setValue(String value) {
+    public void setValue(String[] value) {
         this.value = value;
     }
 

@@ -52,6 +52,8 @@ import cn.vove7.vtp.log.Vog
 import cn.vove7.vtp.system.DeviceInfo
 import cn.vove7.vtp.system.SystemHelper
 import java.io.File
+import java.util.*
+import kotlin.math.min
 
 
 object SystemBridge : SystemOperation {
@@ -730,13 +732,14 @@ object SystemBridge : SystemOperation {
         createAlarm(null, null, hour, minutes, true)
     }
 
-    override fun createAlarm(message: String?, day: Int?, hour: Int, minutes: Int, noUi: Boolean) {
+    override fun createAlarm(message: String?, days: Array<Int>?, hour: Int, minutes: Int, noUi: Boolean) {
+        Vog.d(this,"createAlarm ---> $message ${Arrays.toString(days)} $hour : $minutes")
         val intent = Intent(AlarmClock.ACTION_SET_ALARM)
                 .putExtra(AlarmClock.EXTRA_HOUR, hour)
                 .putExtra(AlarmClock.EXTRA_MINUTES, minutes)
                 .putExtra(AlarmClock.EXTRA_SKIP_UI, noUi)
         if (message != null) intent.putExtra(AlarmClock.EXTRA_MESSAGE, message)
-        if (day != null) intent.putExtra(AlarmClock.EXTRA_DAYS, day)
+        if (days != null) intent.putIntegerArrayListExtra(AlarmClock.EXTRA_DAYS, ArrayList(days.toList()))
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         if (intent.resolveActivity(context.packageManager) != null) {
             context.startActivity(intent)
@@ -748,7 +751,7 @@ object SystemBridge : SystemOperation {
     override fun createCalendarEvent(title: String, content: String?, beginTime: Long,
                                      endTime: Long?, isAlarm: Boolean) {
         try {
-            val account = CalendarAccount("V Assist", "v_assist@qq.com", autoCreateContext = context)
+            val account = CalendarAccount("V Assistant", "V Assistant", autoCreateContext = context)
             val cal = CalendarHelper(context, account)
             val end = if (endTime == null) beginTime + 1000 * 60 * 10//十分钟
             else endTime

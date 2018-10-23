@@ -2,6 +2,7 @@ package cn.vove7.common;
 
 import cn.vove7.common.bridges.GlobalActionExecutor;
 import cn.vove7.common.bridges.HttpBridge;
+import cn.vove7.common.bridges.RootHelper;
 import cn.vove7.common.bridges.ServiceBridge;
 import cn.vove7.common.bridges.SystemOperation;
 import cn.vove7.common.executor.CExecutorI;
@@ -16,6 +17,7 @@ public class BridgeManager {
     private GlobalActionExecutor automator;
     private SystemOperation systemBridge;
     private ServiceBridge serviceBridge;
+    private RootHelper rootHelper = RootHelper.INSTANCE;
     private HttpBridge httpBridge = HttpBridge.INSTANCE;
 
 
@@ -32,6 +34,10 @@ public class BridgeManager {
 
     public void setResultNotifier(ServiceBridge serviceBridge) {
         this.serviceBridge = serviceBridge;
+    }
+
+    public RootHelper getRootHelper() {
+        return rootHelper;
     }
 
     public SystemOperation getSystemBridge() {

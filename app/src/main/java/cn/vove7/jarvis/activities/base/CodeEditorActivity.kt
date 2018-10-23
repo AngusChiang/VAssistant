@@ -136,13 +136,12 @@ abstract class CodeEditorActivity : AppCompatActivity() {
 
     override fun onBackPressed() {
         if (haveFileUnsaved) {
-            AlertDialog.Builder(this).setTitle("提示")
-                    .setMessage("有未保存的文件，是否放弃保存")
-                    .setPositiveButton(R.string.text_ok) { _, _ ->
+            MaterialDialog(this).title(text = "提示")
+                    .message(text = "有未保存的文件，是否放弃保存")
+                    .positiveButton { _ ->
                         finish()
-                    }.setNegativeButton(R.string.text_cancel) { _, _ ->
-
-                    }.setNegativeButton("保存退出") { _, _ ->
+                    }.negativeButton()
+                    .neutralButton(text = "保存退出") { _ ->
                         codeEditor.saveFile(openFile!!)
                         finish()
                     }
@@ -160,13 +159,13 @@ abstract class CodeEditorActivity : AppCompatActivity() {
                 clearLog()
                 val ac = Action(editorText, scriptType)
                 ac.param = ActionParam()
-                ac.param.value = runArgs
+                ac.param.value = runArgs?.split(',')?.toTypedArray()
                 AppBus.post(ac)
             }
             R.id.menu_set_arg -> {
                 MaterialDialog(this)
                         .title(text = "设置参数")
-                        .input(prefill = runArgs) { materialDialog, charSequence ->
+                        .input(prefill = runArgs, hint = "多参数可以以英文','分隔") { _, charSequence ->
                             runArgs = charSequence.toString()
                             toast.showShort("参数已设置")
                         }.positiveButton()

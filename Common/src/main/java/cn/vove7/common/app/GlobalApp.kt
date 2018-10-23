@@ -23,6 +23,8 @@ open class GlobalApp : Application() {
     companion object {
         //        var toastHandler: ColorfulToast.ToastHandler? = null
         lateinit var APP: Application
+        val GApp: Application
+            get() = APP
 
         fun getString(@StringRes id: Int): String = APP.getString(id)
 
@@ -41,6 +43,7 @@ open class GlobalApp : Application() {
         fun toastLong(rId: Int) {
             toastLong(getString(rId))
         }
+
         var serviceBridge: ServiceBridge? = null
 
     }

@@ -1,6 +1,5 @@
 package cn.vove7.jarvis.services
 
-import android.Manifest
 import android.app.AlertDialog
 import android.app.Dialog
 import android.content.Context
@@ -54,7 +53,6 @@ import cn.vove7.jarvis.view.floatwindows.ListeningToast
 import cn.vove7.jarvis.view.statusbar.ExecuteAnimation
 import cn.vove7.jarvis.view.statusbar.ListeningAnimation
 import cn.vove7.jarvis.view.statusbar.ParseAnimation
-import cn.vove7.vtp.app.AppInfo
 import cn.vove7.vtp.dialog.DialogUtil
 import cn.vove7.vtp.log.Vog
 import org.greenrobot.eventbus.Subscribe
@@ -262,7 +260,7 @@ class MainService : BusService(),
             speechSynService.speak(text)
         } else {
             GlobalApp.toastShort(text ?: "null")
-            cExecutor.speakCallback()
+            notifySpeakFinish()
         }
     }
 
@@ -713,25 +711,13 @@ class MainService : BusService(),
         override fun onError(err: String, requestText: String?) {
             GlobalApp.toastShort(requestText ?: "")
             GlobalLog.err(err)
-            if (speakSync) {
-                cExecutor.speakCallback(err)
-                speakCallbacks.forEach {
-                    it.speakCallback(err)
-                }
-                speakCallbacks.clear()
-            }
+            notifySpeakFinish()
             resumeMusicIf()
         }
 
         override fun onFinish() {
             Vog.d(this, "onSynData 结束")
-            if (speakSync) {
-                cExecutor.speakCallback()
-                speakCallbacks.forEach {
-                    it.speakCallback()
-                }
-                speakCallbacks.clear()
-            }
+            notifySpeakFinish()
             resumeMusicIf()
         }
 
@@ -741,6 +727,15 @@ class MainService : BusService(),
         }
     }
 
+    fun notifySpeakFinish() {
+        if (speakSync) {
+            cExecutor.speakCallback()
+            speakCallbacks.forEach {
+                it.speakCallback()
+            }
+            speakCallbacks.clear()
+        }
+    }
 
     fun checkMusic() {
         if (SystemBridge.isMediaPlaying()) {

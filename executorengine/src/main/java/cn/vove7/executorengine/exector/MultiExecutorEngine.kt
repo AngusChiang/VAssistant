@@ -12,6 +12,7 @@ import cn.vove7.executorengine.bridges.SystemBridge
 import cn.vove7.rhino.RhinoHelper
 import cn.vove7.rhino.api.RhinoApi
 import cn.vove7.vtp.log.Vog
+import java.util.*
 
 /**
  * # MultiExecutorEngine
@@ -28,15 +29,14 @@ class MultiExecutorEngine : ExecutorImpl() {
 //    private var tHandler: HandlerThread? = null
     private var rhinoHelper: RhinoHelper? = null
 
-    override fun onRhinoExec(script: String, arg: String?): PartialResult {
+    override fun onRhinoExec(script: String, args: Array<String>?): PartialResult {
 
         rhinoHelper?.stop()
         if (currentActionIndex <= 1) {
             rhinoHelper = RhinoHelper(bridgeManager)
         }
         val sc = RegUtils.replaceRhinoHeader(script)
-        rhinoHelper?.evalString(sc, arg)
-        if (rhinoHelper == null) GlobalApp.toastShort("执行器未就绪")
+        rhinoHelper?.evalString(sc, *(args ?: arrayOf())) ?: GlobalApp.toastShort("执行器未就绪")
         RhinoApi.doLog("主线程执行完毕\n")
 //        }
         return PartialResult.success()
@@ -49,18 +49,14 @@ class MultiExecutorEngine : ExecutorImpl() {
 //    private val luaFunHelper = LuaFunHelper(luaHelper, luaHelper.L)
 
     //可提取ExecutorHelper 接口 handleMessage
-    override fun onLuaExec(src: String, arg: String?): PartialResult {
-//        if (luaHelper == null) {
-        luaHelper = LuaHelper(context, bridgeManager)
-//        }
+    override fun onLuaExec(src: String, args: Array<String>?): PartialResult {
+        if (currentActionIndex <= 1) {
+            luaHelper = LuaHelper(context, bridgeManager)
+        }
         val script = RegUtils.replaceLuaHeader(src)
         return try {
-            if (arg != null) {
-                Vog.d(this, "runScript arg : $arg")
-                luaHelper!!.evalString(script, arrayOf(arg))
-            } else
-                luaHelper!!.evalString(script, arrayOf())
-
+            Vog.d(this, "runScript arg : ${Arrays.toString(args)}")
+            luaHelper!!.evalString(script, args)
             luaHelper!!.handleMessage(OnPrint.INFO, "主线程执行完毕\n")
             PartialResult.success()
         } catch (e: Exception) {

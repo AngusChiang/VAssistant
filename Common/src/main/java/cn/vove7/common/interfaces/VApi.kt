@@ -17,8 +17,11 @@ interface VApi {
                 "currentActivity", "actionCount", "currentActionIndex", "isGlobal()",
                 "commandType", "command", "DEBUG")
 
-        val httpFunctions = arrayOf("get()","post()","postJson()","getAsPc()")
+        val httpFunctions = arrayOf("get()", "post()", "postJson()", "getAsPc()")
 
+        val androRuntimeFuncs = arrayOf(
+                "isRoot()","requestRoot()", "exec()", "execWithSu()"
+        )
         val finderFuns = arrayOf(
                 "ViewFinder()", "waitFor()", "depths()",
                 "containsText()", "matchesText()", "equalsText()",
@@ -27,7 +30,8 @@ interface VApi {
                 "findFirst()", "find()"
         )
         val utilFuns = arrayOf(
-                "toPinyin()", "arr2String()", "print()", "matches()", "matchValues()"
+                "toPinyin()", "arr2String()", "print()", "matches()", "matchValues()",
+                "parseDateText()"
         )
         val globalFuns = arrayOf(
                 "toast()", "back()", "home()", "powerDialog()", "quickSettings()",
@@ -56,7 +60,8 @@ interface VApi {
                 "isScreenOn()", "getClipText()", "setClipText(s)", "sendEmail(to,subject,content)",
                 /* "lockScreen()",*/ "screenShot()",
                 "screen2File()", "shareText(text)", "shareImage(imgPah)", "location()",
-                "getLocalIpAddress()","getNetAddress()","createAlarm()","createCalendarEvent()"
+                "getLocalIpAddress()", "getNetAddress()", "createAlarm()", "createCalendarEvent()",
+                "startActivity(pkg,fullActivityName)"
         )
         val appFunctions = arrayOf(
                 "startActivity()", "getSystemService()"
@@ -102,6 +107,7 @@ interface VApi {
         )
         val systemFunMap = hashMapOf(
                 Pair("openAppDetail(pkg)", "打开app详情页"),
+                Pair("startActivity(pkg,fullActivityName)", "打开指定app的Activity"),
                 Pair("getPkgByWord(s)", "从app标记和app列表获取包名"),
                 Pair("openAppByPkg(pkg, reset)", "打开指定app,reset:可选,跳转'首页'"),
                 Pair("openAppByWord(s)", "从标记和安装列表匹配，打开app"),
@@ -150,9 +156,10 @@ interface VApi {
                 Pair("createCalendarEvent()", "创建日历事件,参数title: String, content: String?, " +
                         "beginTime: Long, endTime: Long?, isAlarm: Boolean\n" +
                         "title:标题,content:事件详情,beginTime:开始时间(毫秒数),endTime:结束时间(毫秒数,为空默认十分钟)，isAlarm:是否(响铃?)提醒"),
-                Pair("createAlarm()", "创建闹钟，参数(message: String?, day: Int?, hour: Int, minutes: Int, noUi: Boolean)\n" +
-                        "message:备注,day:重复周,hour:时,minutes:分,noUi:是否显示闹钟界面")
-
+                Pair("createAlarm()", "创建闹钟\n1.创建一次性闹钟参数(hour: Int, minutes: Int)" +
+                        "\n2.参数(message: String?, days: Array<Int>?, hour: Int, minutes: Int, noUi: Boolean)\n" +
+                        "message:备注,days:重复周,hour:时,minutes:分,noUi:是否显示闹钟界面\n" +
+                        "注:参数days 周日 - 周六 对应 1 - 7")
         )
         val executorMap = hashMapOf(
                 Pair("interrupt()", "终止执行"),

@@ -198,29 +198,33 @@ object ParseEngine {
                               preAction: Action? = null): Boolean {
         if (sufWord.isEmpty()) return true
 //        println("${i++}. 匹配：$sufWord")
-        node.follows.forEach { it ->
-            it?.regs?.forEach { reg ->
+        node.follows.forEach FollowsForEach@{ it ->
+            it?.regs?.forEach RegForEach@{ reg ->
                 val result = reg.followRegex.matchEntire(sufWord)
                 if (result != null && result.groups.isNotEmpty()) {//深搜
 //                    println("--匹配成功")
                     //匹配成功
-                    if (preAction != null) {//修剪上一个匹配结果参数,第一个%即为上一个参数
-                        val old = preAction.param?.value
-                        if (result.groupValues[0].startsWith(old ?: "--")) {
-                            val preParamLen = if (preAction.param != null) result.groupValues[1].length else 0
-                            val thisMatchLen = result.groupValues[0].length
-                            preAction.param?.value = old?.substring(0, preParamLen)
-                            val allLen = preAction.matchWord.length
-                            preAction.matchWord = preAction.matchWord
-                                    .substring(0, allLen - (thisMatchLen - preParamLen))
+                    if (preAction != null)  {//修剪上一个匹配结果参数,第一个%即为上一个参数
+                        preAction.param?.value?.withIndex()?.forEach f@{ kv ->
+                            val p = kv.value ?: return@f
+                            if (result.groupValues[0].startsWith(p)) {//end
+                                val preParamLen = if (preAction.param == null) 0
+                                else  result.groupValues[1].length
+                                val thisMatchLen = result.groupValues[0].length
+                                preAction.param?.value!![kv.index] = p.substring(0, preParamLen)
+                                val allLen = preAction.matchWord.length
+                                preAction.matchWord = preAction.matchWord
+                                        .substring(0, allLen - (thisMatchLen - preParamLen))
+                                return@RegForEach
+                            }
                         }
                     }
                     val itsAction = it.action
                     extractParam(itsAction, reg, result)//提取参数
                     //println("--临时提取参数：$param -${it.param!!.desc}")
 
-                    itsAction.matchWord = result.groupValues[0]
-                            .substring(preAction?.param?.value?.length ?: 0)//
+//                    itsAction.matchWord = result.groupValues[0]
+//                            .substring(preAction?.param?.value?.length ?: 0)//
                     actionQueue.add(itsAction)
                     return if (it.follows.isNotEmpty()) {//不空
                         actionDsMatch(actionQueue, it, result.groupValues[result.groupValues.size - 1], itsAction)//递归匹配
@@ -235,13 +239,16 @@ object ParseEngine {
     //提取参数
     private fun extractParam(it: Action, reg: Reg, result: MatchResult) {
         val param = it.param
-        if (param != null) {//设置参数
-            when (reg.paramPos) {
-                PARAM_POS_END -> {
-                    param.value = getLastParam(result.groups)
+         if (param != null) {//设置参数
+            param.value = Array<String?>(reg.paramPosArray.size, init = { null })
+            reg.paramPosArray.withIndex().forEach {
+                when (it.value) {
+                    PARAM_POS_END -> {
+                        param.value[it.index] = getLastParam(result.groups)
+                    }
+                    PARAM_POS_1, PARAM_POS_2, PARAM_POS_3 ->
+                        param.value[it.index] = result.groups[it.value]?.value
                 }
-                PARAM_POS_1, PARAM_POS_2, PARAM_POS_3 ->
-                    param.value = result.groups[reg.paramPos]?.value
             }
             it.param = param
 //            Vog.d(this, "extractParam $param")
@@ -249,13 +256,14 @@ object ParseEngine {
     }
 
     fun getLastParam(colls: MatchGroupCollection): String? {
-        colls.reversed().withIndex().forEach { iv ->
-            val it = iv.value
-            if (it != null && it.value != "" && iv.index != colls.size - 1) {//不是第一个
-                return it.value
-            }
-        }
-        return null
+        return colls.reversed()[0]?.value
+//        colls.reversed().withIndex().forEach { iv ->
+//            val it = iv.value
+//            if (it != null && it.value != "" && iv.index != colls.size - 1) {//不是第一个
+//                return it.value
+//            }
+//        }
+//        return null
     }
 
 
@@ -267,7 +275,7 @@ object ParseEngine {
      */
     fun testParse(testWord: String, node: ActionNode): ParseResult {
         val actionQueue = PriorityQueue<Action>()
-        val r = regSearch(testWord, node, actionQueue, false)
+        regSearch(testWord, node, actionQueue, false)
         return ParseResult(actionQueue.isNotEmpty(), actionQueue)
     }
 

@@ -66,6 +66,7 @@ public class RhinoHelper extends ScriptableObject {
         putProperty("runtime", bridgeManager.getExecutor());
         putProperty("system", bridgeManager.getSystemBridge());
         putProperty("automator", bridgeManager.getAutomator());
+        putProperty("androRuntime", bridgeManager.getRootHelper());
         putProperty("serviceBridge", bridgeManager.getServiceBridge());
         putProperty("app", appContext);
         init();

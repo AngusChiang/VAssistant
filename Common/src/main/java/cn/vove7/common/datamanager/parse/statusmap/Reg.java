@@ -11,6 +11,7 @@ import org.greenrobot.greendao.annotation.Transient;
 
 import java.io.Serializable;
 
+import cn.vove7.common.app.GlobalLog;
 import cn.vove7.common.utils.RegUtils;
 import kotlin.text.Regex;
 
@@ -30,7 +31,11 @@ public class Reg implements Serializable {
      */
     @NotNull
     private String regStr;
-    private int paramPos = PARAM_NO;
+    /**
+     * 数组 分隔 ','
+     */
+    private String paramPos = null;// String.valueOf(PARAM_NO);
+
     @Transient
     @Expose(serialize = false)
     private Regex regex;
@@ -39,12 +44,12 @@ public class Reg implements Serializable {
     @Keep
     public Reg(String regStr, int paramPos, long nodeId) {
         this.regStr = regStr;
-        this.paramPos = paramPos;
+        this.paramPos = String.valueOf(paramPos);
         this.nodeId = nodeId;
     }
 
     @Keep
-    public Reg(String regStr, int paramPos) {//Test need
+    public Reg(String regStr, String paramPos) {//Test need
         this.regStr = regStr;
         this.paramPos = paramPos;
     }
@@ -90,8 +95,8 @@ public class Reg implements Serializable {
     }
 
 
-    @Generated(hash = 526783767)
-    public Reg(Long id, @NotNull String regStr, int paramPos, long nodeId) {
+    @Generated(hash = 1266605423)
+    public Reg(Long id, @NotNull String regStr, String paramPos, long nodeId) {
         this.id = id;
         this.regStr = regStr;
         this.paramPos = paramPos;
@@ -114,11 +119,32 @@ public class Reg implements Serializable {
         this.regStr = regStr;
     }
 
-    public int getParamPos() {
-        return this.paramPos;
+    @Transient
+    @Expose(serialize = false)
+    private Integer[] paramPosArr;
+
+    public String getParamPos() {
+        return paramPos;
     }
 
-    public void setParamPos(int paramPos) {
+    public Integer[] getParamPosArray() {
+        if (paramPosArr != null) return paramPosArr;
+        if (this.paramPos == null) return null;
+        String[] ss = this.paramPos.split(",");
+        paramPosArr = new Integer[ss.length];
+        try {
+            int i = 0;
+            for (String s : ss) {
+                paramPosArr[i++] = Integer.parseInt(s);
+            }
+            return paramPosArr;
+        } catch (NumberFormatException e) {
+            GlobalLog.INSTANCE.err(e);
+            return null;
+        }
+    }
+
+    public void setParamPos(String paramPos) {
         this.paramPos = paramPos;
     }
 
@@ -133,6 +159,7 @@ public class Reg implements Serializable {
     /**
      * 参数位置，提取参数用
      */
+    @Deprecated
     public static final int PARAM_NO = -999;
     public static final int PARAM_POS_END = -1;
     //public static final int PARAM_POS_0 = 0;

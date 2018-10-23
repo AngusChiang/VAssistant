@@ -488,7 +488,7 @@ public class ActionNode implements Serializable, DataFrom {
         return actionScope;
     }
 
-    public List<Reg> getNewRegs() {
+    public List<Reg> getRegsWithoutCache() {
         regs = null;
         return getRegs();
     }

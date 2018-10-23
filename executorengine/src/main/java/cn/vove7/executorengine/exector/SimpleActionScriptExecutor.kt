@@ -31,7 +31,7 @@ class SimpleActionScriptExecutor(
      * pullNotification
      * call
      */
-    override fun runScript(script: String, arg: String?): PartialResult {
+    override fun runScript(script: String, args: Array<String>?): PartialResult {
 
         var execLog = ""
         val sin = Scanner(script)
@@ -86,11 +86,11 @@ class SimpleActionScriptExecutor(
                 @Deprecated("清空value ，不再改")
                 if (action.param != null && action.param!!.value != null) {//替换脚本变量
                     Vog.d(this, "execAction 替换变量${action.param!!.value}")
-                    replaceVar(ps, action.param!!.value)
+                    replaceVar(ps, action.param!!.value[0])
                 }
                 cmd.substring(0, mResult.groups[1]?.range?.first ?: cmd.length)
             } else {
-                ps = mutableListOf(action.param?.value ?: "")
+                ps = action.param?.value?.toMutableList()?: mutableListOf()
                 cmd
             }
         Vog.d(this, "执行 - $c $ps")
@@ -127,7 +127,8 @@ class SimpleActionScriptExecutor(
             ACTION_SWIPE -> {
                 return try {
                     if (ps.size >= 5) {
-                        if (GlobalActionExecutor.swipe(ps[0].toInt(), ps[1].toInt(), ps[2].toInt(), ps[3].toInt(), ps[4].toInt())) {
+                        if (GlobalActionExecutor.swipe(ps[0].toInt(), ps[1].toInt(),
+                                        ps[2].toInt(), ps[3].toInt(), ps[4].toInt())) {
                             PartialResult.success()
                         } else
                             PartialResult.failed()

@@ -9,6 +9,7 @@
 package com.myopicmobile.textwarrior.lua
 
 import cn.vove7.common.interfaces.VApi
+import cn.vove7.common.interfaces.VApi.Companion.androRuntimeFuncs
 import cn.vove7.common.interfaces.VApi.Companion.appFunctions
 import cn.vove7.common.interfaces.VApi.Companion.executorFunctions
 import cn.vove7.common.interfaces.VApi.Companion.finderFuns
@@ -32,9 +33,9 @@ class LanguageLua private constructor() : Language(), VApi {
     init {
         super.setOperators(LUA_OPERATORS)
 
-        val kkk=ArrayUtil.merge(arrayOf(keywordsss, keywordss, appFunctions,
+        val kkk = ArrayUtil.merge(arrayOf(keywordsss, keywordss, appFunctions,
                 runtimeFunctions, executorFunctions, viewNodeFunctions, finderFuns,
-                globalFuns, systemFuncs, utilFuns, spFuncs, httpFunctions)
+                globalFuns, systemFuncs, utilFuns, spFuncs, httpFunctions, androRuntimeFuncs)
         )
         super.setKeywords(kkk)
         super.setNames(ArrayUtil.merge(arrayOf(kkk, myApiName)))
@@ -43,6 +44,7 @@ class LanguageLua private constructor() : Language(), VApi {
         super.addBasePackage("runtime", runtimeFunctions)
         super.addBasePackage("ViewFinder()", finderFuns)
         super.addBasePackage("system", systemFuncs)
+        super.addBasePackage("androRuntime", androRuntimeFuncs)
 
         super.addBasePackage("io", package_io.split("\\|".toRegex()).dropLastWhile
         { it.isEmpty() }.toTypedArray())

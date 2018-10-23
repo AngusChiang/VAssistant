@@ -2,7 +2,6 @@ package cn.vove7.jarvis.activities
 
 import android.app.Activity
 import android.app.AlertDialog
-import android.app.Dialog
 import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
@@ -28,6 +27,7 @@ import cn.vove7.common.datamanager.parse.statusmap.ActionNode.NODE_SCOPE_GLOBAL
 import cn.vove7.common.datamanager.parse.statusmap.ActionNode.NODE_SCOPE_IN_APP
 import cn.vove7.common.datamanager.parse.statusmap.Reg
 import cn.vove7.common.model.UserInfo
+import cn.vove7.common.utils.TextHelper
 import cn.vove7.common.view.toast.ColorfulToast
 import cn.vove7.executorengine.helper.AdvanAppHelper
 import cn.vove7.executorengine.parse.ParseEngine
@@ -38,6 +38,7 @@ import cn.vove7.jarvis.adapters.SimpleListAdapter
 import cn.vove7.jarvis.adapters.ViewModel
 import cn.vove7.jarvis.utils.UriUtils.getPathFromUri
 import cn.vove7.jarvis.view.BottomSheetController
+import cn.vove7.jarvis.view.dialog.InstRegexEditorDialog
 import cn.vove7.vtp.app.AppInfo
 import cn.vove7.vtp.easyadapter.BaseListAdapter
 import cn.vove7.vtp.log.Vog
@@ -47,6 +48,7 @@ import com.afollestad.materialdialogs.customview.customView
 import io.github.kbiakov.codeview.adapters.Options
 import kotlinx.android.synthetic.main.activity_new_inst.*
 import java.io.File
+import java.util.*
 import kotlin.concurrent.thread
 
 
@@ -98,6 +100,14 @@ class NewInstActivity : AppCompatActivity(), View.OnClickListener {
         this.title = title
     }
 
+    private fun getRegList(reg: Reg): List<String> {
+        val list = mutableListOf<String>()
+        reg.paramPosArray?.forEach {
+            list.add(posData[posArr.indexOf(it)])
+        }
+        return list
+    }
+
     private fun initData() {
         initBottom()
         isReedit = intent.getBooleanExtra("reedit", false)
@@ -116,8 +126,8 @@ class NewInstActivity : AppCompatActivity(), View.OnClickListener {
             } else {//展示信息
                 activity_name.setText(editNode?.actionScope?.activity)
                 desc_text.setText(editNode?.actionTitle)
-                editNode?.newRegs?.forEach {
-                    regs.add(Pair(it.regStr, posData[posArr.indexOf(it.paramPos)]))
+                editNode?.regsWithoutCache?.forEach {
+                    regs.add(Pair(it.regStr, it.paramPosArray))
                 }
             }
         }
@@ -541,10 +551,9 @@ class NewInstActivity : AppCompatActivity(), View.OnClickListener {
             val actions = result.actionQueue
             while (actions?.isNotEmpty() == true) {
                 val p = actions.poll()
-                var arg = p.param.value
-                if (arg == null) arg = getString(R.string.text_none)
+                val args = p.param.value?:arrayOf(getString(R.string.text_none))
                 val t = String.format(getString(R.string.text_parse_result_placeholder),
-                        p.matchWord, arg) // "匹配词: ${p.matchWord} 参数: ${p.param}\n")
+                        p.matchWord, Arrays.toString(args)) // "匹配词: ${p.matchWord} 参数: ${p.param}\n")
                 val text = ColourTextClickableSpan(this, t, android.R.color.white, listener = null)
 //                Vog.d(this, "outputParseResult $t")
                 resultOutput.append(text.spanStr)
@@ -566,8 +575,8 @@ class NewInstActivity : AppCompatActivity(), View.OnClickListener {
     //第三个
     //最后一个
 
-    private val posArr = arrayListOf(Reg.PARAM_NO, /*Reg.PARAM_POS_0,*/ Reg.PARAM_POS_1, Reg.PARAM_POS_2, Reg.PARAM_POS_3, Reg.PARAM_POS_END)
-    private val regs = mutableListOf<Pair<String, String>>()
+    private val posArr = arrayListOf(/*Reg.PARAM_NO,*/ /*Reg.PARAM_POS_0,*/ Reg.PARAM_POS_1, Reg.PARAM_POS_2, Reg.PARAM_POS_3, Reg.PARAM_POS_END)
+    private val regs = mutableListOf<Pair<String, Array<Int>>>()
     /**
      * 转换测试MapNode List
      * @return regs:List<Pair<String,String>> -> List<ActionNode>
@@ -591,83 +600,96 @@ class NewInstActivity : AppCompatActivity(), View.OnClickListener {
     private fun wrapRegs(): List<Reg> {
         val tregs = mutableListOf<Reg>()
         regs.forEach {
-            val p = posArr[posData.indexOf(it.second)]
-            tregs.add(Reg(it.first, p))
+            //            val p = posArr[posData.indexOf(it.second)]
+            tregs.add(Reg(it.first, TextHelper.arr2String(it.second)))
         }
         return tregs
     }
 
-    var isModify = -1
-    private fun add2RegexList(reg: String, pos: String) {
-        Vog.d(this, "add2RegexList $reg $pos")
-        if (isModify > -1) {
-            regs[isModify] = Pair(reg, pos)
-            isModify = -1
+    var editIndex = -1
+    /**
+     * 添加到正则式列表
+     * 判断editIndex 是否为编辑
+     * @param reg String
+     * @param posArr Array<Int>
+     */
+    private fun add2RegexList(reg: String, posArr: Array<Int>) {
+        Vog.d(this, "add2RegexList $reg ${Arrays.toString(posArr)}")
+        if (editIndex > -1) {
+            regs[editIndex] = Pair(reg, posArr)
+            editIndex = -1
         } else {
-            regs.add(Pair(reg, pos))
+            regs.add(Pair(reg, posArr))
         }
         regAdapter.notifyDataSetChanged()
     }
 
 
-    lateinit var regEditText: EditText
-    lateinit var spinner: Spinner
+    //    lateinit var regEditText: EditText
+//    lateinit var spinner: Spinner
     lateinit var posData: ArrayList<String>
 
-    private var inputDialog: Dialog? = null
-    private fun showInputRegDialog(reg: String? = null, pos: String? = null) {
-        if (inputDialog == null) {
-            val dialogView = layoutInflater.inflate(R.layout.dialog_add_new_regex, null)
-
-            regEditText = dialogView.findViewById(R.id.text_regex)
-            spinner = dialogView.findViewById(R.id.pos_of_param_spinner)
-
-            //适配器
-            val arrAdapter = ArrayAdapter<String>(this,
-                    android.R.layout.simple_spinner_item, posData)
-            //设置样式
-            arrAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-            //加载适配器
-            spinner.adapter = arrAdapter
-            regEditText.setText(reg)
-            val p = if (pos != null) posData.indexOf(pos) else 0
-            spinner.setSelection(p)
-            inputDialog = AlertDialog.Builder(this)
-                    .setTitle(R.string.text_add_regex)
-                    .setView(dialogView)
-                    .setPositiveButton("确认") { _, _ ->
-                        val r = regEditText.text.trim().toString()
-                        if (r == "") {
-                            inputDialog?.hide()
-                        } else
-                            add2RegexList(r, posData[spinner.selectedItemPosition])
-                    }.setNegativeButton("取消") { i, _ ->
-                        isModify = -1
-                        inputDialog?.hide()
-                    }.setOnDismissListener {
-                        regEditText.text.clear()
-                        isModify = -1
-                    }.show()
-        } else {
-            regEditText.setText(reg)
-            val p = if (pos != null) posData.indexOf(pos) else 0
-            spinner.setSelection(p)
-            inputDialog?.show()
+    //    private var inputDialog: Dialog? = null
+    private fun showInputRegDialog(reg: String? = null, pos: Array<Int>? = null) {
+        InstRegexEditorDialog(this, reg, pos) {
+            //on add
+            add2RegexList(it.first, it.second)
         }
+        //region
+//        if (inputDialog == null) {
+//            val dialogView = layoutInflater.inflate(R.layout.dialog_new_inst_regex, null)
+//
+//            regEditText = dialogView.findViewById(R.id.text_regex)
+//            spinner = dialogView.findViewById(R.id.pos_of_param_spinner)
+//
+//            //适配器
+//            val arrAdapter = ArrayAdapter<String>(this,
+//                    android.R.layout.simple_spinner_item, posData)
+//            //设置样式
+//            arrAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+//            //加载适配器
+//            spinner.adapter = arrAdapter
+//            regEditText.setText(reg)
+//            val p = if (pos != null) posData.indexOf(pos) else 0
+//            spinner.setSelection(p)
+//            inputDialog = AlertDialog.Builder(this)
+//                    .setTitle(R.string.text_add_regex)
+//                    .setView(dialogView)
+//                    .setPositiveButton("确认") { _, _ ->
+//                        val r = regEditText.text.trim().toString()
+//                        if (r == "") {
+//                            inputDialog?.hide()
+//                        } else
+//                            add2RegexList(r, posData[spinner.selectedItemPosition])
+//                    }.setNegativeButton("取消") { i, _ ->
+//                        editIndex = -1
+//                        inputDialog?.hide()
+//                    }.setOnDismissListener {
+//                        regEditText.text.clear()
+//                        editIndex = -1
+//                    }.show()
+//        } else {
+//            regEditText.setText(reg)
+//            val p = if (pos != null) posData.indexOf(pos) else 0
+//            spinner.setSelection(p)
+//            inputDialog?.show()
+//        }
+        //endregion
     }
 
-    inner class RegListAdapter(context: Context, val dataSet: MutableList<Pair<String, String>>?) : BaseListAdapter<Holder, Pair<String, String>>(context, dataSet) {
+    inner class RegListAdapter(context: Context, val dataSet: MutableList<Pair<String, Array<Int>>>?)
+        : BaseListAdapter<Holder, Pair<String, Array<Int>>>(context, dataSet) {
 
         override fun onCreateViewHolder(view: View): Holder {
             return Holder(view)
         }
 
         override fun layoutId(position: Int): Int = R.layout.item_left_right_text
-        override fun onBindView(holder: Holder, pos: Int, item: Pair<String, String>) {
+        override fun onBindView(holder: Holder, pos: Int, item: Pair<String, Array<Int>>) {
             holder.left.text = item.first
-            holder.right.text = item.second
+            holder.right.text = Arrays.toString(item.second)
             holder.itemView.setOnClickListener {
-                isModify = pos
+                editIndex = pos
                 showInputRegDialog(item.first, item.second)
             }
             holder.itemView.setOnLongClickListener {

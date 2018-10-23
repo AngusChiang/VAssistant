@@ -168,7 +168,7 @@ object DaoHelper {
                 }
                 nodes.forEach {
                     if (!userList.contains(it)) {
-                        onUpdate?.invoke("更新指令：${it.actionTitle}")
+                        onUpdate?.invoke("更新指令：${it.actionTitle}\n${it.desc.instructions}")
                         Vog.d(this, "updateGlobalInst 添加---> ${it.actionTitle}")
                         insertNewActionNode(it)
                     } else {//存在

@@ -8,6 +8,7 @@ require 'import'
 import 'cn.vove7.vtp.text.TextTransHelper'
 import 'cn.vove7.common.utils.TextHelper'
 import 'cn.vove7.vtp.builder.*'
+import 'cn.vove7.common.utils.TextDateParser'
 
 function toPinyin(text, ...)
     local ps = { ... }
@@ -18,6 +19,9 @@ function toPinyin(text, ...)
     return TextTransHelper(app).chineseStr2Pinyin(text, firstLetter)
 end
 
+function parseDateText(s)
+    return TextDateParser.INSTANCE.parseDateText(s)
+end
 
 function matches(s, regex)
     return TextHelper.INSTANCE.matches(s, regex)

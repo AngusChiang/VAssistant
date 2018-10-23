@@ -29,6 +29,7 @@ object AppConfig {
     var voiceControlDialog = true
     var adWaitSecs = 17
     var voiceWakeup = false
+    var autoOpenASWithRoot = false
     var audioSpeak = true//播报语音
     var userExpPlan = true
     var isAutoVoiceWakeupCharging = false
@@ -120,6 +121,7 @@ object AppConfig {
         useSmartOpenIfParseFailed = getBooleanAndInit(R.string.key_use_smartopen_if_parse_failed, true)
         openResponseWord = getBooleanAndInit(R.string.key_open_response_word, true)
         speakResponseWordOnVoiceWakeup = getBooleanAndInit(R.string.key_speak_response_word_on_voice_wakeup, true)
+        autoOpenASWithRoot = getBooleanAndInit(R.string.key_auto_open_as_with_root, false)
 //  todo      cloudServiceParseIfLocalFailed = getBooleanAndInit(R.string.key_cloud_service_parse, true)
         sp.set(R.string.key_cloud_service_parse, false)
         autoUpdateData = getBooleanAndInit(R.string.key_auto_update_data, true)

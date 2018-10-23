@@ -112,7 +112,6 @@ class ExampleUnitTest {
         arrayOf(
                 "十二点", "八点四十五", "八点半",
                 "明天中午", "后天下午", "晚上八点"  //is pm true
-                , ""
 
         ).forEach {
             //parse

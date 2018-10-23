@@ -81,6 +81,7 @@ class EditorFunsHelper(
                         , ApiFunction("waitFor(m)", "等待最长m毫秒，超时失败返回空")
                         , ApiFunction("findFirst()", "立即搜索，返回找到第一个，可能失败")
                         , ApiFunction("equalsText(texts)", "文本匹配模式：相同文本,不区分大小写")
+                        , ApiFunction("containsText(texts)", "文本匹配模式：包含文本,不区分大小写")
                         , ApiFunction("similaryText(texts)", "根据文本相似度 > 0.75(中文转为拼音后的比较)")
                         , ApiFunction("id(id)", "匹配id")
                         , ApiFunction("desc(descs)", "匹配desc")
@@ -139,10 +140,22 @@ class EditorFunsHelper(
                         , ApiFunction("getString()", "参数k")
                         , ApiFunction("getBoolean()", "参数k")
                 )),
+                ApiCategory("安卓Runtime", listOf(//指令设置
+                        ApiFunction("exec(cmd)", "执行终端命令，返回String", "androRuntime.exec()"),
+                        ApiFunction("isRoot()", "获取设备是否Root，返回Boolean", "androRuntime.isRoot()"),
+                        ApiFunction("requestRoot()", "请求Root权限，返回Boolean", "androRuntime.requestRoot()"),
+                        ApiFunction("execWithSu(cmd)", "执行root命令，返回String", "androRuntime.execWithSu()")
+
+                )),
                 ApiCategory("其他", listOf(//指令设置
                         ApiFunction("toPinyin()", "将text文本中的中文转换为拼音，\n参数：(text [,onlyFirstLetter])\nonlyFirstLetter是否只需要首字母")
                         , ApiFunction("matches()", "匹配字符串,参数(text,regexStr)\ntext: 待匹配字符串 regex:正则式字符串 %为匹配任意字符 返回boolean 是否匹配成功")
                         , ApiFunction("matchValues()", "同matches 返回匹配成功的数组\n如 用%(2)?3% 匹配1234 返回 [1,2,4] ")
+                        , ApiFunction("parseDateText()", "解析中文时间,长按查看示例", doc = "返回Calendar\n支持示例：\"十二点\", \"八点四十五\", \"八点半\", \"晚上八点\", \"中午12点\", \"下午2点一刻\",\n" +
+                        "            \"明天中午\", \"后天下午3点\", \"大后天中午\", \"昨天下午2:21\", \"前天下午两点半\",\n" +
+                        "            \"周一下午\", \"下周二八点半\", \"周日晚上八点\",\n" +
+                        "            \"二十号晚上七点\", \"21号\", \"二十八号\", \"下个月十八号上午8点二十三\", \"十二月25号\",\n" +
+                        "            \"12月8号上午8点\", \"周二一点\", \"这周五八点\", \"周五晚上7点半\"")
                 ))
 
         )

@@ -1,7 +1,6 @@
 package cn.vove7.androlua
 
 import android.content.Context
-import android.util.Log
 import cn.vove7.androlua.luabridge.LuaThread
 import cn.vove7.androlua.luabridge.LuaUtil
 import cn.vove7.androlua.luabridge.LuaUtil.errorReason
@@ -214,16 +213,16 @@ class LuaHelper : LuaManagerI {
         return L.LloadFile(fileName)
     }
 
-
-    fun evalString(src: String, args: Array<Any> = arrayOf()) {
+    fun evalString(src: String, args: Array<*>? = null) {
         var r = 1
         if (loadString(src).also { r = it } == 0) {
-            loadAfterExec(args)
+            if (args != null)
+                loadAfterExec(args)
         } else
             checkErr(r)
     }
 
-    private fun loadAfterExec(args: Array<Any>) {
+    private fun loadAfterExec(args: Array<*>) {
         L.getGlobal("debug")
         L.getField(-1, "traceback")
         L.remove(-2)
@@ -240,7 +239,7 @@ class LuaHelper : LuaManagerI {
         }
     }
 
-    fun checkErr(r: Int):String {
+    fun checkErr(r: Int): String {
         var e = errorReason(r) + ": " + L.toString(-1)
         var end = e.indexOf("stack traceback:")//隐藏stack traceback
         if (end == -1) end = e.length
@@ -256,7 +255,7 @@ class LuaHelper : LuaManagerI {
 
     override fun handleError(err: String) {
         GlobalLog.err(err)
-        handleMessage(OnPrint.ERROR,err)
+        handleMessage(OnPrint.ERROR, err)
     }
 
     override fun handleError(e: Exception) {
