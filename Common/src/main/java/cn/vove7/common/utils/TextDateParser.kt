@@ -19,7 +19,8 @@ object TextDateParser {
      * "二十号晚上七点", "21号", "二十八号", "下个月十八号上午8点二十三", "十二月25号",
      * "12月8号上午8点", "周二一点", "这周五八点", "周五晚上7点半",
      * "一小时后", "一个半小时后", "半小时后", "两个半小时后", "45分钟后", "三十二分钟后",
-     * "两个小时后", "两小时后", "二十小时后"
+     * "两个小时后", "两小时后", "二十小时后",
+     * "八天后"
      * )
      * @param s String
      * @return Calendar
@@ -107,6 +108,7 @@ object TextDateParser {
      * 解析相对天数
      * %天
      * (星期|周)%
+     * x天后
      * @param s String
      * @return Int
      */
@@ -136,6 +138,10 @@ object TextDateParser {
                 week - todayWeek + dNextWeek
             } else {//1 3 小于
                 7 + week - todayWeek
+            }
+        } else {//x天后
+            matchValues(s, "%#天后%")?.also {
+                return toNum(it[1])
             }
         }
         return 0// default today
