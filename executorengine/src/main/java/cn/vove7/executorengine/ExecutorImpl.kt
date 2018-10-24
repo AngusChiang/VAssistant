@@ -302,10 +302,18 @@ open class ExecutorImpl(
     private fun openByIdentifier(it: MarkedData, follow: String?): Boolean {
         return when (it.type) {
             MARKED_TYPE_SCRIPT_LUA -> {
-                onLuaExec(it.value).isSuccess
+                actionQueue= PriorityQueue()
+                actionQueue.add(Action(it.value,Action.SCRIPT_TYPE_LUA))
+                pollActionQueue()
+                true
+//                onLuaExec(it.value).isSuccess
             }
             MARKED_TYPE_SCRIPT_JS -> {
-                onRhinoExec(it.value).isSuccess
+//                onRhinoExec(it.value).isSuccess
+                actionQueue= PriorityQueue()
+                actionQueue.add(Action(it.value,Action.SCRIPT_TYPE_JS))
+                pollActionQueue()
+                true
             }
             else -> {
                 GlobalLog.err("openByIdentifier -> 未知Type $it")
@@ -588,13 +596,14 @@ open class ExecutorImpl(
         private const val CloseAppScript = "require 'accessibility'\n" +
                 "system.openAppDetail(args[1])\n" +
                 "s = ViewFinder().equalsText({'强行停止','force stop'}).waitFor(3000)\n" +
-                "a=s.tryClick()\n" +
-                "if(not a) then \n" +
-                "speak('应用未运行')\nhome()\n" +
+                "if(s and s.tryClick()) then \n" +
+                "ok=ViewFinder().equalsText({'确定','OK'}).waitFor(2000)\n" +
+                "if(ok) then ok.tryClick()\n" +
+                "end\n" +
                 "else\n" +
-                "ViewFinder().equalsText({'确定','OK'}).waitFor(2000).tryClick()\n" +
-                "home()" +
-                "end\n"
+                "speak('应用未运行')\n" +
+                "end\n" +
+                "home()\n"
 
     }
 

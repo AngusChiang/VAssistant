@@ -1,10 +1,13 @@
 package cn.vove7.common.bridges
 
+import android.accessibilityservice.AccessibilityServiceInfo
+import android.content.Context
+import android.view.accessibility.AccessibilityManager
+import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.app.GlobalLog
 import cn.vove7.vtp.log.Vog
 import java.io.DataInputStream
 import java.io.DataOutputStream
-import java.io.IOException
 
 /**
  *
@@ -109,11 +112,26 @@ object RootHelper {
 
     fun openAppAccessService(pkg: String, serviceName: String) {
         Vog.d(this, "openAppAccessService ---> $serviceName")
+        //同时不关闭其他
+
         execWithSu(
-                "settings put secure enabled_accessibility_services $pkg/$serviceName\n" +
+                "settings put secure enabled_accessibility_services $pkg/$serviceName ${buildList()}\n" +
                         "settings put secure accessibility_enabled 1\n"
         ).also {
             Vog.d(this, "openAppAccessService ---> $it")
         }
     }
+
+    private fun buildList(): String {
+        return buildString {
+            val am = GlobalApp.APP.getSystemService(Context.ACCESSIBILITY_SERVICE) as AccessibilityManager
+            am.getEnabledAccessibilityServiceList(AccessibilityServiceInfo.FEEDBACK_GENERIC)
+                    ?.forEach {
+                        append(it.id).append(' ')
+                    }
+        }.also {
+            Vog.d(this,"buildList ---> $it")
+        }
+    }
+
 }

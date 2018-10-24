@@ -130,6 +130,7 @@ public class ActionScope {
     }
 
     public boolean eqPkg(ActionScope o) {
+        if(o.packageName==null) return false;
         return o.packageName.startsWith(this.packageName) ||
                 packageName.startsWith(o.packageName);
     }

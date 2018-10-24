@@ -48,12 +48,18 @@ class ListeningToast : AbFloatWindow<ListeningToast.VHolder>(GlobalApp.APP) {
     }
 
     fun show(text: String) {
-        initIfNeed()
-        lHandler?.post {
+        if (Looper.myLooper() == Looper.getMainLooper()) {
             if (!isShowing)
                 show()
+            holder.text = text
+        } else {
+            initIfNeed()
+            lHandler?.post {
+                if (!isShowing)
+                    show()
+            }
+            lHandler?.sendMessage(lHandler!!.obtainMessage(SHOW, text))
         }
-        lHandler?.sendMessage(lHandler!!.obtainMessage(SHOW, text))
     }
 
     fun showAndHideDelay(text: String) {
@@ -69,8 +75,12 @@ class ListeningToast : AbFloatWindow<ListeningToast.VHolder>(GlobalApp.APP) {
     }
 
     fun hideImmediately() {//立即
-        initIfNeed()
-        lHandler?.sendEmptyMessage(HIDE)
+        if (Looper.myLooper() == Looper.getMainLooper()) {
+            hide()
+        }else {
+            initIfNeed()
+            lHandler?.sendEmptyMessage(HIDE)
+        }
     }
 
     inner class ListeningHandler(looper: Looper) : Handler(looper) {

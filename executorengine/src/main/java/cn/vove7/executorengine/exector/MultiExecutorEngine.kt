@@ -3,6 +3,7 @@ package cn.vove7.executorengine.exector
 import cn.vove7.androlua.LuaHelper
 import cn.vove7.common.BridgeManager
 import cn.vove7.common.app.GlobalApp
+import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.bridges.GlobalActionExecutor
 import cn.vove7.common.executor.OnPrint
 import cn.vove7.common.executor.PartialResult
@@ -50,9 +51,9 @@ class MultiExecutorEngine : ExecutorImpl() {
 
     //可提取ExecutorHelper 接口 handleMessage
     override fun onLuaExec(src: String, args: Array<String>?): PartialResult {
-        if (currentActionIndex <= 1) {
-            luaHelper = LuaHelper(context, bridgeManager)
-        }
+//        if (currentActionIndex <= 1) {//fixme ?????
+        luaHelper = LuaHelper(context, bridgeManager)
+//        }
         val script = RegUtils.replaceLuaHeader(src)
         return try {
             Vog.d(this, "runScript arg : ${Arrays.toString(args)}")
@@ -60,7 +61,7 @@ class MultiExecutorEngine : ExecutorImpl() {
             luaHelper!!.handleMessage(OnPrint.INFO, "主线程执行完毕\n")
             PartialResult.success()
         } catch (e: Exception) {
-            e.printStackTrace()
+            GlobalLog.err(e)
             luaHelper!!.handleError(e)
             PartialResult.fatal(e.message ?: "no message")
         }

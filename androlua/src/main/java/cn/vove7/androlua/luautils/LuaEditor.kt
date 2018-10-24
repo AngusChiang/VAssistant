@@ -35,7 +35,9 @@ class LuaEditor(private val mContext: Context, attrs: AttributeSet)
 
     override val selectedText: String?
         get() = _hDoc.subSequence(selectionStart, selectionEnd - selectionStart) as String
-    override var isEdit: Boolean =false
+    override var isEdit: Boolean = false
+        get() = isEdited
+
     val text: DocumentProvider
         get() = createDocumentProvider()
 

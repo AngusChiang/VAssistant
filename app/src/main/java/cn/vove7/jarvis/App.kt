@@ -45,18 +45,17 @@ class App : LuaApp() {
         AppConfig.init()
         Handler().postDelayed({
             startServices()
-            AdvanAppHelper.updateAppList()
-            CodeProcessor.init(this)
-            ShortcutUtil.addWakeUpShortcut()
 
             thread {
+                CodeProcessor.init(this)
+                ShortcutUtil.addWakeUpShortcut()
+                AdvanAppHelper.updateAppList()
+                PowerEventReceiver.start()
                 if (AppConfig.autoOpenASWithRoot) {
                     RootHelper.openAppAccessService(packageName, "${MyAccessibilityService::class.qualifiedName}")
                 }
+                Vog.d(this, "service thread ---> finish ${System.currentTimeMillis() / 1000}")
             }
-            PowerEventReceiver.start()
-            Vog.d(this, "service thread ---> finish ${System.currentTimeMillis() / 1000}")
-
         }, 1000)
         if (!BuildConfig.DEBUG)
             Vog.init(this, Log.ERROR)

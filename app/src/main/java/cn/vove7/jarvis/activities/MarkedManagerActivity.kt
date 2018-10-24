@@ -58,5 +58,5 @@ class MarkedManagerActivity : BaseActivityWithViewPager() {
             MarkedOpenFragment(),
             MarkedAdFragment()
     )
-    override var titles: Array<String> = arrayOf("联系人", "应用", "打开|关闭", "广告")
+    override var titles: Array<String> = arrayOf("联系人", "应用", "功能", "广告")
 }

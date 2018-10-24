@@ -8,7 +8,6 @@ import android.os.Looper
 import android.os.Message
 import android.support.v4.app.ActivityCompat
 import cn.vove7.common.app.GlobalApp
-import cn.vove7.common.appbus.AppBus
 import cn.vove7.common.appbus.VoiceData
 import cn.vove7.executorengine.helper.AdvanContactHelper
 import cn.vove7.jarvis.speech.recognition.OfflineRecogParams
@@ -55,7 +54,9 @@ class SpeechRecoService(val event: SpeechEvent) {
     private val handler: RecoHandler
 
     init {
-        handler = RecoHandler(Looper.getMainLooper())
+        val t = HandlerThread("reco")
+        t.start()
+        handler = RecoHandler(t.looper)
         thread {
             initRecog()
             //初始化唤醒器

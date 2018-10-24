@@ -209,7 +209,7 @@ object TextDateParser {
      * or x点|x点半|x点xx(分)?
      *
      * @param s String
-     * @return Pair<Int, Int> default:(12, 0)
+     * @return Pair<Int, Int> default:null
      */
     private fun parseHourAndTime(s: String): Pair<Int, Int>? {
         var hour = 12
@@ -244,6 +244,9 @@ object TextDateParser {
                     haveResult = true
                 }
             }
+        if (!haveResult && s.contains("中午")) {
+            return Pair(12, 0)
+        }
         if (!haveResult) {//无匹配 parseOffset
             return null
         }

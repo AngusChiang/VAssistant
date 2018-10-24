@@ -349,7 +349,8 @@ class MainService : BusService(),
     }
 
     @Subscribe(threadMode = ThreadMode.BACKGROUND)
-    fun onCommand(order: String) {
+    fun onCommand(order: String) {//外部命令
+        Vog.d(this,"onCommand ---> $order")
         thread {
             when (order) {
                 ORDER_STOP_EXEC -> {
@@ -675,15 +676,9 @@ class MainService : BusService(),
                     runFromCloud(result, it)
                 }
             } else {
-                if (UserInfo.isLogin()) {
-                    NetHelper.uploadUserCommandHistory(CommandHistory(UserInfo.getUserId(), result, null))
-                    listeningToast.showAndHideDelay("解析失败")
-                    parseAnimation.failed()
-                } else {
-                    listeningToast.show("可能需要登陆同步下指令数据")
-                    listeningToast.hideDelay(3000)
-                    parseAnimation.hideDelay(0)
-                }
+                NetHelper.uploadUserCommandHistory(CommandHistory(UserInfo.getUserId(), result, null))
+                listeningToast.showAndHideDelay("解析失败")
+                parseAnimation.failed()
             }
         }
     }
