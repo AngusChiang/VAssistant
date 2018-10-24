@@ -168,7 +168,8 @@ object DaoHelper {
                 }
                 nodes.forEach {
                     if (!userList.contains(it)) {
-                        onUpdate?.invoke("更新指令：${it.actionTitle}\n${it.desc.instructions}")
+                        onUpdate?.invoke("更新指令：${it.actionTitle}\n${it.desc?.instructions
+                            ?: "无描述"}")
                         Vog.d(this, "updateGlobalInst 添加---> ${it.actionTitle}")
                         insertNewActionNode(it)
                     } else {//存在
@@ -224,10 +225,9 @@ object DaoHelper {
         if (newScopeId != -1L)
             newNode.setScopeId(newScopeId)
 
-        val desc = newNode.desc
-        if (desc != null) {
-            DAO.daoSession.actionDescDao.insert(desc)
-            newNode.descId = desc.id
+        newNode.desc?.apply {
+            DAO.daoSession.actionDescDao.insert(this)
+            newNode.descId = this.id
         }
 
         val action = newNode.action

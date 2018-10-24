@@ -94,7 +94,7 @@ object DataUpdator {
                         if (result.blockedGet() == true) {
                             textDialog.appendlnGreen("成功")
                         } else {
-                            textDialog.appendlnRed("失败")
+                            textDialog.appendlnRed("失败,可至帮助进行反馈")
                         }
                     }
                     1 -> {
@@ -103,7 +103,7 @@ object DataUpdator {
                         if (result.blockedGet() == true) {
                             textDialog.appendlnGreen("成功")
                         } else {
-                            textDialog.appendlnRed("失败")
+                            textDialog.appendlnRed("失败,可至帮助进行反馈")
                         }
                     }
                     2, 3, 4 -> {//marked data
@@ -114,7 +114,7 @@ object DataUpdator {
                         if (result.blockedGet() == true) {
                             textDialog.appendlnGreen("成功")
                         } else {
-                            textDialog.appendlnRed("失败")
+                            textDialog.appendlnRed("失败,可至帮助进行反馈")
                         }
                     }
                     5 -> {//ad
@@ -123,7 +123,7 @@ object DataUpdator {
                         if (result.blockedGet() == true) {
                             textDialog.appendlnGreen("成功")
                         } else {
-                            textDialog.appendlnRed("失败")
+                            textDialog.appendlnRed("失败,可至帮助进行反馈")
                         }
                     }
                 }

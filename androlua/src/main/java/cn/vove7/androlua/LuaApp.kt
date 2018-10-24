@@ -28,7 +28,7 @@ open class LuaApp : GlobalApp() {
                 ?.filter { it.endsWith(".lua") }
                 ?.forEach {
                     val fp = filesDir.absolutePath + '/' + it
-                    if (!File(fp).exists() || BuildConfig.DEBUG)
+//                    if (!File(fp).exists() || BuildConfig.DEBUG)
                         try {
                             LuaUtil.assetsToSD(this, "lua_requires/$it", fp)
                         } catch (e: IOException) {

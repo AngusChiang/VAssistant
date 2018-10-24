@@ -43,23 +43,32 @@ class ProgressTextDialog(val context: Context, val title: String? = null,
     }
 
     fun appendlnGreen(s: String) {
-        appendlnColor(s,R.color.green_700)
+        appendlnColor(s, R.color.green_700)
     }
 
     fun appendlnRed(s: String) {
-        appendlnColor(s,R.color.red_900)
-    }
-    fun appendlnAmber(s: String) {
-        appendlnColor(s,R.color.amber_A700)
+        appendlnColor(s, R.color.red_900)
     }
 
-    private fun appendlnColor(s: String, color:Int) {
+    fun appendlnAmber(s: String) {
+        appendlnColor(s, R.color.amber_A700)
+    }
+
+    private fun appendlnColor(s: String, color: Int) {
         val ss = MultiSpan(context, s, color).spanStr
         appendln(ss)
     }
 
+    fun set(s: Any) {
+        handler.sendMessage(handler.obtainMessage(SET, s))
+    }
+
+    fun clear() {
+        set("")
+    }
+
     fun append(s: Any) {
-        handler.sendMessage(handler.obtainMessage(0, s))
+        handler.sendMessage(handler.obtainMessage(APPEND, s))
     }
 
     fun finish() {
@@ -70,18 +79,28 @@ class ProgressTextDialog(val context: Context, val title: String? = null,
 
     class UiHandler(val textView: TextView, loop: Looper) : Handler(loop) {
         override fun handleMessage(msg: Message?) {
-
-            val it = msg?.obj
-            when (it) {
-                is CharSequence -> {
-                    textView.append(it)
+            val data = msg?.obj
+            when (msg?.what) {
+                APPEND -> {
+                    when (data) {
+                        is CharSequence -> textView.append(data)
+                        is SpannableStringBuilder -> textView.append(data)
+                    }
                 }
-                is SpannableStringBuilder -> {
-                    textView.append(it)
+                SET -> {
+                    when (data) {
+                        is CharSequence -> textView.text = data
+                        is SpannableStringBuilder -> textView.text = data
+                    }
                 }
             }
 
         }
+    }
+
+    companion object {
+        private const val APPEND = 0
+        private const val SET = 1
     }
 
 
