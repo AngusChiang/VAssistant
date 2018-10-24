@@ -47,7 +47,8 @@ open class ExecutorImpl(
 ) : CExecutorI {
 
     private val systemBridge = SystemBridge
-    var accessApi: AccessibilityApi? = null
+    val accessApi: AccessibilityApi?
+        get() = AccessibilityApi.accessibilityService
     private var lock = Object()
     var currentAction: Action? = null
     private val markedOpenDao = DAO.daoSession.markedDataDao
@@ -173,6 +174,7 @@ open class ExecutorImpl(
         running = false
         ScreenAdapter.reSet()
         serviceBridge?.onExecuteFinished("执行结束")
+        accessApi?.removeAllNotifier(this)
     }
 
     @CallSuper
@@ -302,16 +304,16 @@ open class ExecutorImpl(
     private fun openByIdentifier(it: MarkedData, follow: String?): Boolean {
         return when (it.type) {
             MARKED_TYPE_SCRIPT_LUA -> {
-                actionQueue= PriorityQueue()
-                actionQueue.add(Action(it.value,Action.SCRIPT_TYPE_LUA))
+                actionQueue = PriorityQueue()
+                actionQueue.add(Action(it.value, Action.SCRIPT_TYPE_LUA))
                 pollActionQueue()
                 true
 //                onLuaExec(it.value).isSuccess
             }
             MARKED_TYPE_SCRIPT_JS -> {
 //                onRhinoExec(it.value).isSuccess
-                actionQueue= PriorityQueue()
-                actionQueue.add(Action(it.value,Action.SCRIPT_TYPE_JS))
+                actionQueue = PriorityQueue()
+                actionQueue.add(Action(it.value, Action.SCRIPT_TYPE_JS))
                 pollActionQueue()
                 true
             }
@@ -398,7 +400,7 @@ open class ExecutorImpl(
                     val end = System.currentTimeMillis()
                     Vog.d(this, "执行器-解锁")
                     if (end - begin >= millis) {//自动超时 终止执行
-//                        serviceBridge.onExecuteFailed("等待超时")
+                        Vog.d(this, "等待超时")
                         accessApi?.removeAllNotifier(this)//移除监听器
                         return false
                     }
@@ -630,16 +632,13 @@ open class ExecutorImpl(
      * 检查无障碍服务
      */
     private fun bridgeIsAvailable(): Boolean {
-        if (accessApi == null) {
-            accessApi = AccessibilityApi.accessibilityService
-            return if (accessApi != null) {
-                GlobalActionExecutor.setService(accessApi!!.getService())
-                true
-            } else {
-                GlobalLog.log(context.getString(R.string.text_acc_service_not_running))
-                false
-            }
+        val ac = accessApi
+        return if (ac != null) {
+            GlobalActionExecutor.setService(ac.getService())
+            true
+        } else {
+            GlobalLog.log(context.getString(R.string.text_acc_service_not_running))
+            false
         }
-        return true
     }
 }

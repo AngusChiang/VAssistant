@@ -5,6 +5,7 @@ import cn.vove7.common.BridgeManager
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.bridges.GlobalActionExecutor
+import cn.vove7.common.datamanager.parse.model.Action
 import cn.vove7.common.executor.OnPrint
 import cn.vove7.common.executor.PartialResult
 import cn.vove7.common.utils.RegUtils
@@ -41,6 +42,12 @@ class MultiExecutorEngine : ExecutorImpl() {
         RhinoApi.doLog("主线程执行完毕\n")
 //        }
         return PartialResult.success()
+    }
+
+    //didn't work fixme
+    fun runActionSilent(action: Action, args: Array<String>? = null) {//静默
+        currentAction = action
+        runScript(action.actionScript, args)
     }
 
     /**

@@ -164,6 +164,7 @@ public class SettingsBridge {
             return null;
         }
     }
+
     /**
      * 检查一个存在name实例
      */

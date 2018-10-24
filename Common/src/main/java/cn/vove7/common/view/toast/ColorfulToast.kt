@@ -31,10 +31,12 @@ class ColorfulToast(val context: Context, textColor: Int = R.color.fff) {
         if (looper == null) {
             Looper.prepare()
             looper = Looper.myLooper()!!
+
+
         }
         toast = Toast(context)
         lHandler = ToastHandler(looper)
-        toastView = LayoutInflater.from(context).inflate(R.layout.toast_colorful, null)
+        toastView = LayoutInflater.from(context.applicationContext).inflate(R.layout.toast_colorful, null)
         textView = toastView.findViewById(R.id.text)
         textView.setTextColor(context.resources.getColor(textColor))
         toast.view = toastView

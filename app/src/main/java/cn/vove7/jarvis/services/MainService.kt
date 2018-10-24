@@ -268,6 +268,7 @@ class MainService : BusService(),
         Vog.d(this, "开始执行 -> $tag")
 //        listeningToast.showAndHideDelay("开始执行")
         executeAnimation.begin()
+        executeAnimation.setContent(tag)
     }
 
     /**
@@ -350,7 +351,7 @@ class MainService : BusService(),
 
     @Subscribe(threadMode = ThreadMode.BACKGROUND)
     fun onCommand(order: String) {//外部命令
-        Vog.d(this,"onCommand ---> $order")
+        Vog.d(this, "onCommand ---> $order")
         thread {
             when (order) {
                 ORDER_STOP_EXEC -> {
@@ -426,30 +427,24 @@ class MainService : BusService(),
 
         private val data = HashMap<String, Any>()
         var instance: MainService? = null
-
-        val recoIsListening: Boolean
             get() {
-                return (if (instance == null) {
+                return if (field == null) {
                     thread {
                         GlobalApp.toastShort("正在启动服务")
                         App.startServices()
                         Vog.i(this, "instance ---> null")
                     }
-                    false
-                } else instance!!.speechRecoService.isListening()
-                        ).also {
-                    Vog.i(this, "recoIsListening ---> $it")
-                }
+                    null
+                } else field
+            }
+
+        val recoIsListening: Boolean
+            get() {
+                return  instance?.speechRecoService?.isListening() == true
             }
         val exEngineRunning: Boolean
             get() {
-                return (if (instance == null) {
-                    Vog.i(this, "instance ---> null")
-                    false
-                } else instance!!.cExecutor.running
-                        ).also {
-                    Vog.i(this, "exEngineRunning ---> $it")
-                }
+                return instance?.cExecutor?.running == true
             }
     }
 

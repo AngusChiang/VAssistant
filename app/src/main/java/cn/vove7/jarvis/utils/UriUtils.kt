@@ -2,9 +2,7 @@ package cn.vove7.jarvis.utils
 
 import android.content.ContentUris
 import android.content.Context
-import android.database.Cursor
 import android.net.Uri
-import android.os.Build
 import android.os.Environment
 import android.provider.DocumentsContract
 import android.provider.MediaStore
@@ -28,24 +26,27 @@ object UriUtils {
      */
     fun getPathFromUri(context: Context, uri: Uri): String? {
 
-        val isKitKat = Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT
 
         // DocumentProvider
-        if (isKitKat && DocumentsContract.isDocumentUri(context, uri)) {
+        if (DocumentsContract.isDocumentUri(context, uri)) {
             // ExternalStorageProvider
             if (isExternalStorageDocument(uri)) {
                 val docId = DocumentsContract.getDocumentId(uri)
-                val split = docId.split(":".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
+                val split = docId.split(":".toRegex()).dropLastWhile {
+                    it.isEmpty()
+                }.toTypedArray()
                 val type = split[0]
 
                 if ("primary".equals(type, ignoreCase = true)) {
-                    return Environment.getExternalStorageDirectory().toString() +'/' + split[1]
+                    return Environment.getExternalStorageDirectory().toString() + '/' + split[1]
                 }
 
                 // TODO handle non-primary volumes
             } else if (isDownloadsDocument(uri)) {
-
                 val id = DocumentsContract.getDocumentId(uri)
+                if(id.startsWith("raw:")){
+                    return id.substring(4)
+                }
                 val contentUri = ContentUris.withAppendedId(
                         Uri.parse("content://downloads/public_downloads"), java.lang.Long.valueOf(id))
 
@@ -56,12 +57,10 @@ object UriUtils {
                 val type = split[0]
 
                 var contentUri: Uri? = null
-                if ("image" == type) {
-                    contentUri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
-                } else if ("video" == type) {
-                    contentUri = MediaStore.Video.Media.EXTERNAL_CONTENT_URI
-                } else if ("audio" == type) {
-                    contentUri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI
+                when (type) {
+                    "image" -> contentUri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
+                    "video" -> contentUri = MediaStore.Video.Media.EXTERNAL_CONTENT_URI
+                    "audio" -> contentUri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI
                 }
 
                 val selection = "_id=?"
@@ -70,10 +69,10 @@ object UriUtils {
                 return getDataColumn(context, contentUri, selection, selectionArgs)
             }// MediaProvider
             // DownloadsProvider
-        } else if ("content".equals(uri.getScheme(), ignoreCase = true)) {
+        } else if ("content".equals(uri.scheme, ignoreCase = true)) {
             return getDataColumn(context, uri, null, null)
-        } else if ("file".equals(uri.getScheme(), ignoreCase = true)) {
-            return uri.getPath()
+        } else if ("file".equals(uri.scheme, ignoreCase = true)) {
+            return uri.path
         }// File
         // MediaStore (and general)
 
@@ -92,21 +91,15 @@ object UriUtils {
      */
     fun getDataColumn(context: Context, uri: Uri?, selection: String?,
                       selectionArgs: Array<String>?): String? {
-
-        var cursor: Cursor? = null
         val column = "_data"
         val projection = arrayOf(column)
-
-        try {
-            cursor = context.getContentResolver().query(uri, projection, selection, selectionArgs, null)
-            if (cursor != null && cursor!!.moveToFirst()) {
-                val column_index = cursor!!.getColumnIndexOrThrow(column)
-                return cursor!!.getString(column_index)
-            }
-        } finally {
-            if (cursor != null)
-                cursor!!.close()
-        }
+        context.contentResolver.query(uri, projection, selection, selectionArgs, null)
+                .use { cursor ->
+                    if (cursor != null && cursor.moveToFirst()) {
+                        val column_index = cursor.getColumnIndexOrThrow(column)
+                        return cursor.getString(column_index)
+                    }
+                }
         return null
     }
 

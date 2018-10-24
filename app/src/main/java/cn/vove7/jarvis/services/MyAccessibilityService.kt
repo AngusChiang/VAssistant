@@ -134,14 +134,16 @@ class MyAccessibilityService : AccessibilityApi() {
                 Vog.d(this, "removeAllNotifier locksWaitForActivity ${a != null}")
             }
             synchronized(locksWaitForView) {
-                val values = locksWaitForView.values
-                var success = false
-                var a = true
-                while (values.contains(executor) && a) {
-                    a = values.remove(executor)
-                    if (a) success = true
+//                val success = values.remove(executor)
+                val removeList = mutableListOf<ViewFinder>()
+                locksWaitForView.forEach {
+                    if (it.value == executor) removeList.add(it.key)
                 }
-                Vog.d(this, "removeAllNotifier locksWaitForView $success")
+                Vog.d(this, "removeAllNotifier locksWaitForView ${removeList.size}")
+                removeList.forEach {
+                    locksWaitForView.remove(it)
+                }
+                removeList.clear()
             }
         }
     }
@@ -411,7 +413,6 @@ class MyAccessibilityService : AccessibilityApi() {
         return true
     }
 
-
     override fun onInterrupt() {
         Vog.d(this, "onInterrupt ")
 
@@ -423,55 +424,6 @@ class MyAccessibilityService : AccessibilityApi() {
     }
 
     override fun getService(): AccessibilityService = this
-
-
-    /**
-     * 匹配  ***.***.***:id/view_id
-     */
-//    override fun findNodeById(id: String): List<ViewNode> {
-//        return ViewFindBuilder()
-//                .id(id).find()
-//                .also { Vog.d(this, "findNodeById size :${it.size}") }
-//    }
-//
-//    override fun findFirstNodeByIdAndText(id: String, text: String): ViewNode? {
-//        return ViewFindBuilder()
-//                .containsText(text)
-//                .id(id)
-//                .findFirst()
-//                .also { Vog.d(this, "findFirstNodeByIdAndText $it") }
-//    }
-//
-//    override fun findFirstNodeById(id: String): ViewNode? {
-//        return ViewFindBuilder().id(id).findFirst()
-//    }
-//
-//    override fun findFirstNodeByDesc(desc: String): ViewNode? {
-//        return ViewFindBuilder().desc(desc).findFirst()
-//    }
-//
-//    override fun findFirstNodeByText(text: String): ViewNode? {
-//        val l = findNodeByText(text)
-//        return if (l.isNotEmpty()) l[0] else null
-//    }
-//
-//    override fun findFirstNodeByTextWhitFuzzy(text: String): ViewNode? {
-//        return ViewFindBuilder().similaryText(text).findFirst()
-//    }
-//
-//    override fun findNodeByText(text: String): List<ViewNode> {
-//        val list = mutableListOf<ViewNode>()
-//        if (rootInActiveWindow != null)
-//            for (node in rootInActiveWindow.findAccessibilityNodeInfosByText(text)) {
-//                if (node.text == null) continue
-//                val newNode = ViewNode(node)
-//                newNode.similarityText = TextHelper.compareSimilarity(text, node.text.toString())
-//                list.add(newNode)
-//            }
-//        list.sort()
-//        Vog.d(this, "size :${list.size}")
-//        return list
-//    }
 
     /**
      *  Notifier By [currentScope]

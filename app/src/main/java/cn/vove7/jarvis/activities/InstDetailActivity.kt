@@ -22,20 +22,19 @@ import cn.vove7.common.datamanager.parse.model.ActionDesc
 import cn.vove7.common.datamanager.parse.statusmap.ActionNode
 import cn.vove7.common.model.UserInfo
 import cn.vove7.common.netacc.ApiUrls
+import cn.vove7.common.netacc.NetHelper
 import cn.vove7.common.netacc.model.BaseRequestModel
 import cn.vove7.common.netacc.model.ResponseMessage
 import cn.vove7.common.utils.RegUtils
 import cn.vove7.common.utils.TextHelper
 import cn.vove7.common.view.toast.ColorfulToast
-import cn.vove7.executorengine.exector.MultiExecutorEngine
+import cn.vove7.executorengine.bridges.SystemBridge
 import cn.vove7.executorengine.helper.AdvanAppHelper
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.adapters.ExecuteQueueAdapter
 import cn.vove7.jarvis.adapters.InstSettingListAdapter
 import cn.vove7.jarvis.services.MainService
 import cn.vove7.jarvis.utils.AppConfig
-import cn.vove7.common.netacc.NetHelper
-import cn.vove7.executorengine.bridges.SystemBridge
 import cn.vove7.jarvis.utils.ShortcutUtil
 import cn.vove7.jarvis.view.dialog.ProgressDialog
 import cn.vove7.vtp.dialog.DialogWithList
@@ -109,7 +108,7 @@ class InstDetailActivity : AppCompatActivity() {
         refresh()
     }
 
-    //todo  share user info
+    //todo  get user info who shared
     private fun setData() {
         when {//编辑
             node.belongSelf() -> {
@@ -142,33 +141,35 @@ class InstDetailActivity : AppCompatActivity() {
                     .withCode(node.action?.actionScript ?: "").withoutShadows())
             script_type_text.text = node.action?.scriptType
         }
-        if (node.action != null) {
-            copy_script.setOnClickListener {
-                SystemBridge.setClipText(node.action?.actionScript ?: "")
-                toast.showShort(R.string.text_copied)
-            }
-            val settingsHeader = RegUtils.getRegisterSettingsTextAndName(node.action.actionScript)
-            if (settingsHeader != null) {
-                val script = settingsHeader.script
-                val version = settingsHeader.version
-                settingName = settingsHeader.name
-                val instSetting = DaoHelper.getInsetSettingsByName(settingName!!)
-                if (instSetting == null || instSetting.version < version) {//数据库不存在数据
-                    Vog.d(this, "setData ---> 执行新建or升级")
-//                  //执行
-                    val engine = MultiExecutorEngine()
-                    when (node.action.scriptType) {
-                        Action.SCRIPT_TYPE_LUA -> {
-                            engine.onLuaExec(script)
-                        }
-                        Action.SCRIPT_TYPE_JS -> {
-                            engine.onRhinoExec(script)
-                        }
-                    }
+        Handler().post {
+            if (node.action != null) {
+                copy_script.setOnClickListener {
+                    SystemBridge.setClipText(node.action?.actionScript ?: "")
+                    toast.showShort(R.string.text_copied)
                 }
-                toolbar.menu.findItem(R.id.menu_settings).isVisible = true
-            } else {
-                toolbar.menu.findItem(R.id.menu_settings).isVisible = false
+                val settingsHeader = RegUtils.getRegisterSettingsTextAndName(node.action.actionScript)
+                if (settingsHeader != null) {
+                    val script = settingsHeader.script
+                    val version = settingsHeader.version
+                    settingName = settingsHeader.name
+                    val instSetting = DaoHelper.getInsetSettingsByName(settingName!!)
+                    if (instSetting == null || instSetting.version < version) {//数据库不存在数据
+                        Vog.d(this, "setData ---> 执行新建or升级")
+//                  //执行
+                        val createSettingAction = Action(script, null)
+                        createSettingAction.scriptType = when (node.action.scriptType) {
+                            Action.SCRIPT_TYPE_LUA -> Action.SCRIPT_TYPE_LUA
+                            Action.SCRIPT_TYPE_JS -> Action.SCRIPT_TYPE_JS
+                            else -> null
+                        }
+                        MainService.instance?.runActionQue("初始化指令设置",
+                                PriorityQueue<Action>().also { it.add(createSettingAction) })
+//                        AppBus.post(createSettingAction)
+                    }
+                    toolbar.menu.findItem(R.id.menu_settings).isVisible = true
+                } else {
+                    toolbar.menu.findItem(R.id.menu_settings).isVisible = false
+                }
             }
         }
     }
@@ -527,15 +528,8 @@ class InstDetailActivity : AppCompatActivity() {
                         it.value.action.priority = it.index
                         que.add(it.value.action)
                     }
-                    MainService.instance.also {
-                        if (it == null) {//
-                            toast.showShort("主服务已退出，正在重新开启")
-
-                            startService(Intent(this, MainService::class.java))
-                        } else {
-                            it.runActionQue("RUN: ${node.actionTitle}", que)
-                        }
-                    }
+                    MainService.instance
+                            ?.runActionQue("RUN: ${node.actionTitle}", que)
                     //防止以DEBUG方式运行
 //                    AppBus.post(que)
                 })
