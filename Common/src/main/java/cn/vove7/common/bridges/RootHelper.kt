@@ -115,22 +115,26 @@ object RootHelper {
         //同时不关闭其他
 
         execWithSu(
-                "settings put secure enabled_accessibility_services $pkg/$serviceName ${buildList()}\n" +
-                        "settings put secure accessibility_enabled 1\n"
+                buildList("$pkg/$serviceName")
         ).also {
             Vog.d(this, "openAppAccessService ---> $it")
         }
     }
 
-    private fun buildList(): String {
+    private fun buildList(s: String): String {
+        val p = "settings put secure enabled_accessibility_services "
         return buildString {
+            append(p)
+            append(s)
             val am = GlobalApp.APP.getSystemService(Context.ACCESSIBILITY_SERVICE) as AccessibilityManager
             am.getEnabledAccessibilityServiceList(AccessibilityServiceInfo.FEEDBACK_GENERIC)
                     ?.forEach {
-                        append(it.id).append(' ')
+                        append(":${it.id}")
                     }
+            appendln()
+            appendln("settings put secure accessibility_enabled 1")
         }.also {
-            Vog.d(this,"buildList ---> $it")
+            Vog.d(this, "buildList ---> $it")
         }
     }
 
