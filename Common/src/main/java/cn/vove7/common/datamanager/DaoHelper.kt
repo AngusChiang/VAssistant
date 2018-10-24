@@ -173,7 +173,7 @@ object DaoHelper {
                         Vog.d(this, "updateGlobalInst 添加---> ${it.actionTitle}")
                         insertNewActionNode(it)
                     } else {//存在
-                        checkNode(it)
+                        checkNode(it,onUpdate)
                     }
                 }
             }
@@ -185,18 +185,20 @@ object DaoHelper {
     }
 
     //检查升级 ，follows
-    private fun checkNode(it: ActionNode) {
+    private fun checkNode(it: ActionNode,onUpdate: OnUpdate? = null) {
         val oldNode = getActionNodeByTag(it.tagId)
         if (oldNode == null || it.versionCode > oldNode.versionCode) {//更新
             oldNode?.delete()
             Vog.d(this, "updateGlobalInst 更新---> ${it.actionTitle}")
+            onUpdate?.invoke("升级指令：${it.actionTitle}\n${it.desc?.instructions
+                ?: "无描述"}")
             insertNewActionNode(it)
         } else {//检查follows
             Vog.d(this, "updateGlobalInst 存在---> ${it.actionTitle}")
             if (it.follows?.isNotEmpty() == true)
                 for (ci in it.follows) {//递归 深度
                     ci.parentId = it.id
-                    checkNode(ci)
+                    checkNode(ci,onUpdate)
                 }
         }
 

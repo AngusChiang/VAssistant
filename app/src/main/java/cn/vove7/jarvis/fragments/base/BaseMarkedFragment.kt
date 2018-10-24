@@ -6,6 +6,7 @@ import android.view.View
 import android.widget.AdapterView
 import android.widget.Button
 import android.widget.Spinner
+import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.datamanager.DAO
 import cn.vove7.common.datamanager.executor.entity.MarkedData
@@ -213,7 +214,8 @@ abstract class BaseMarkedFragment<T> : SimpleListFragment<T>(), OnSyncMarked {
      * @param data MarkedData
      */
     private fun share(data: MarkedData) {
-        if (!AppConfig.checkUser()) {
+        if (!UserInfo.isLogin()) {
+            GlobalApp.toastShort(R.string.text_please_login_first)
             return
         }
         NetHelper.postJson<String>(ApiUrls.SHARE_MARKED, BaseRequestModel(data),

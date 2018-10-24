@@ -2,6 +2,7 @@ package cn.vove7.jarvis
 
 import cn.vove7.common.datamanager.parse.model.Action
 import cn.vove7.common.utils.TextDateParser
+import cn.vove7.common.utils.TextHelper
 import org.junit.Test
 import java.lang.Thread.sleep
 import java.text.SimpleDateFormat
@@ -111,9 +112,9 @@ class ExampleUnitTest {
 
     @Test
     fun testParseDate() {
-        val s=SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
+        val s = SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
         arrayOf(
-                "中午","十二点", "八点四十五", "八点半", "晚上八点", "中午12点", "下午2点一刻",
+                "中午", "十二点", "八点四十五", "八点半", "晚上八点", "中午12点", "下午2点一刻",
                 "明天中午", "后天下午3点", "大后天中午", "昨天下午2:21", "前天下午两点半",
                 "周一下午", "下周二八点半", "周日晚上八点",
                 "二十号晚上七点", "21号", "二十八号", "下个月十八号上午8点二十三", "十二月25号",
@@ -123,9 +124,13 @@ class ExampleUnitTest {
                 "八天后"
         ).forEach {
             //parse
-            println(it+"  "+s.format(TextDateParser.parseDateText(it).time))
+            println(it + "  " + s.format(TextDateParser.parseDateText(it).time))
         }
+    }
 
-
+    @Test
+    fun testReg() {
+        val m = TextHelper.matchValues("切换应用", "(使?用|打开)%")
+        println(m)
     }
 }

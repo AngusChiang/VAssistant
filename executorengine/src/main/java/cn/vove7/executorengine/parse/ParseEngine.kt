@@ -127,7 +127,7 @@ object ParseEngine {
         if (GlobalActionNodes == null)
             updateGlobal()
         GlobalActionNodes?.forEach {
-            val r = regSearch(cmd, it, actionQueue, true)
+            val r = regSearch(cmd, it, actionQueue, false)
             if (r) return Pair(it.actionTitle, actionQueue)
         }
         return Pair(null, actionQueue)
