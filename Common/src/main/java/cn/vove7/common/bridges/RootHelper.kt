@@ -113,12 +113,7 @@ object RootHelper {
     fun openAppAccessService(pkg: String, serviceName: String) {
         Vog.d(this, "openAppAccessService ---> $serviceName")
         //同时不关闭其他
-
-        execWithSu(
-                buildList("$pkg/$serviceName")
-        ).also {
-            Vog.d(this, "openAppAccessService ---> $it")
-        }
+        execWithSu(buildList("$pkg/$serviceName"))
     }
 
     private fun buildList(s: String): String {
