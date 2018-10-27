@@ -102,7 +102,7 @@ object ParseEngine {
             // 根据第一个action.scope 决定是否进入首页
             if (actionQueue.isNotEmpty()) {//自动执行打开
                 val appScope = actionQueue.peek().scope
-                if (appScope.activity ?: "" == "" || !scope.activity.endsWith(appScope.activity)) {//Activity 空 or Activity 不等 => 不同页面
+                if (appScope?.activity ?: "" == "" || !scope.activity.endsWith(appScope.activity)) {//Activity 空 or Activity 不等 => 不同页面
                     Vog.d(this, "parseAction ---> 应用内不同页")
                     actionQueue.add(Action(-999,
                             String.format(PRE_OPEN, scope.packageName)
@@ -183,7 +183,7 @@ object ParseEngine {
                 ac.matchWord = result.groupValues[0]
                 actionQueue.add(ac)
                 //深搜命令
-                actionDsMatch(actionQueue, it, result.groupValues[result.groups.size - 1], ac)
+//                actionDsMatch(actionQueue, it, result.groupValues[result.groups.size - 1], ac)
                 return true
             }
         }
@@ -204,12 +204,12 @@ object ParseEngine {
                 if (result != null && result.groups.isNotEmpty()) {//深搜
 //                    println("--匹配成功")
                     //匹配成功
-                    if (preAction != null)  {//修剪上一个匹配结果参数,第一个%即为上一个参数
+                    if (preAction != null) {//修剪上一个匹配结果参数,第一个%即为上一个参数
                         preAction.param?.value?.withIndex()?.forEach f@{ kv ->
                             val p = kv.value ?: return@f
                             if (result.groupValues[0].startsWith(p)) {//end
                                 val preParamLen = if (preAction.param == null) 0
-                                else  result.groupValues[1].length
+                                else result.groupValues[1].length
                                 val thisMatchLen = result.groupValues[0].length
                                 preAction.param?.value!![kv.index] = p.substring(0, preParamLen)
                                 val allLen = preAction.matchWord.length
@@ -239,9 +239,9 @@ object ParseEngine {
     //提取参数
     private fun extractParam(it: Action, reg: Reg, result: MatchResult) {
         val param = it.param
-         if (param != null) {//设置参数
-            param.value = Array<String?>(reg.paramPosArray.size, init = { null })
-            reg.paramPosArray.withIndex().forEach {
+        if (param != null) {//设置参数
+            param.value = Array<String?>(reg.paramPosArray?.size ?: 0, init = { null })
+            reg.paramPosArray?.withIndex()?.forEach {
                 when (it.value) {
                     PARAM_POS_END -> {
                         param.value[it.index] = getLastParam(result.groups)

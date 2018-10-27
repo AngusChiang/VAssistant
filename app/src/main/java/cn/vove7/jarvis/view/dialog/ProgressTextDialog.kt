@@ -36,6 +36,10 @@ class ProgressTextDialog(val context: Context, val title: String? = null,
         dialog
     }
 
+    fun seletable(b: Boolean) {
+        textView.setTextIsSelectable(b)
+    }
+
     @Synchronized
     fun appendln(s: Any) {
         append(s)

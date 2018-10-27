@@ -5,7 +5,7 @@ import android.content.pm.PackageManager
 import cn.vove7.androlua.luabridge.LuaUtil
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.jarvis.BuildConfig
-import cn.vove7.jarvis.utils.AppConfig
+import cn.vove7.jarvis.tools.AppConfig
 import cn.vove7.vtp.log.Vog
 import com.baidu.speech.EventListener
 import com.baidu.speech.EventManager
@@ -15,6 +15,9 @@ import org.json.JSONObject
 
 /**
  * Created by fujiayi on 2017/6/20.
+ *
+ * 唤醒定时关闭，not 充电
+ *
  */
 
 object MyWakeup {
@@ -27,8 +30,9 @@ object MyWakeup {
 
     private var wp: EventManager? = null
     private lateinit var eventListener: EventListener
+    var opened = false
 
-    private fun init(context: Context, eventListener: EventListener) {
+    private fun init(eventListener: EventListener) {
         if (isInited) {
 //            Vog.e(this, "还未调用release()，请勿新建一个新类")
 //            throw RuntimeException("还未调用release()，请勿新建一个新类")
@@ -52,13 +56,13 @@ object MyWakeup {
             appKey = appInfo.metaData.getString("com.baidu.speech.API_KEY")!!
             secretKey = appInfo.metaData.getString("com.baidu.speech.SECRET_KEY")!!
         }
-        LuaUtil.assetsToSD(context, "bd/WakeUp.bin",
-                context.filesDir.absolutePath + "/bd/WakeUp.bin")
+        LuaUtil.assetsToSD(context, "bd/WakeUp_xvtx.bin",
+                context.filesDir.absolutePath + "/bd/WakeUp_xvtx.bin")
     }
 
     fun start(eventL: WakeupEventAdapter) {
         if (wp == null) {
-            init(context, eventL)
+            init(eventL)
         }
 
         val params = HashMap<String, Any?>()
@@ -66,7 +70,9 @@ object MyWakeup {
         params[SpeechConstant.APP_ID] = appId
         params[SpeechConstant.APP_KEY] = appKey
         params[SpeechConstant.SECRET] = secretKey
-        // "assets:///WakeUp.bin" 表示WakeUp.bin文件定义在assets目录下
+        params[SpeechConstant.IN_FILE] = "#cn.vove7.jarvis.tools.MicrophoneInputStream.getInstance()"
+
+        // "assets:///WakeUp_xvtx.bin" 表示WakeUp.bin文件定义在assets目录下
         // params.put(SpeechConstant.ACCEPT_AUDIO_DATA,true);
         // params.put(SpeechConstant.ACCEPT_AUDIO_VOLUME,true);
         // params.put(SpeechConstant.IN_FILE,"res:///com/baidu/android/voicedemo/wakeup.pcm");
@@ -77,6 +83,7 @@ object MyWakeup {
         val json = JSONObject(params).toString()
         Vog.i(this, "wakeup params(反馈请带上此行日志):$json")
         wp?.send(SpeechConstant.WAKEUP_START, json, null, 0, 0)
+        opened = true
     }
 
     fun stop() {
@@ -84,6 +91,7 @@ object MyWakeup {
         GlobalApp.toastShort("语音唤醒关闭")
         wp?.send(SpeechConstant.WAKEUP_STOP, null, null, 0, 0)
         release()
+        opened = false
     }
 
     fun release() {

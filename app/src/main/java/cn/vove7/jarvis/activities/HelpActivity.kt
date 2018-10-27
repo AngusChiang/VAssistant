@@ -62,7 +62,7 @@ class HelpActivity : ReturnableActivity(), AdapterView.OnItemClickListener {
                         append("1. 长按音量上键进行唤醒。\n" +
                                 "2. 在聆听时，可通过点按音量上键停止聆听，点按下音量下键取消聆听。\n" +
                                 "3. 在执行时，可长按下键，终止执行\n" +
-                                "4. 有线耳机适用\n" +
+                                "4. 有线耳机适用,并且支持长按中键唤醒\n" +
                                 "5. 锁屏下可进行唤醒。\n\n")
                         append(MultiSpan(this@HelpActivity,
                                 "以上音量快捷键需要无障碍支持", bold = true).spanStr)

@@ -68,7 +68,9 @@ data class SpeechAction(val action: ActionCode) {
         ACTION_STOP_WAKEUP,
         ACTION_STOP_RECO,
         ACTION_RELOAD_SYN_CONF,
-        ACTION_CANCEL_RECO
+        ACTION_CANCEL_RECO,
+        ACTION_START_WAKEUP_TIMER,
+        ACTION_STOP_WAKEUP_TIMER
     }
 }
 

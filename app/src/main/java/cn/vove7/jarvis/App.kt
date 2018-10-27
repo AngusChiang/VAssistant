@@ -11,9 +11,9 @@ import cn.vove7.executorengine.helper.AdvanAppHelper
 import cn.vove7.jarvis.receivers.PowerEventReceiver
 import cn.vove7.jarvis.services.MainService
 import cn.vove7.jarvis.services.MyAccessibilityService
-import cn.vove7.jarvis.utils.AppConfig
-import cn.vove7.jarvis.utils.CrashHandler
-import cn.vove7.jarvis.utils.ShortcutUtil
+import cn.vove7.jarvis.tools.AppConfig
+import cn.vove7.jarvis.tools.CrashHandler
+import cn.vove7.jarvis.tools.ShortcutUtil
 import cn.vove7.vtp.log.Vog
 import devliving.online.securedpreferencestore.DefaultRecoveryHandler
 import devliving.online.securedpreferencestore.SecuredPreferenceStore
@@ -43,20 +43,20 @@ class App : LuaApp() {
         val seedKey = "fddfouafpiua".toByteArray()
         SecuredPreferenceStore.init(applicationContext, storeFileName, keyPrefix, seedKey, DefaultRecoveryHandler())
         AppConfig.init()
-        Handler().postDelayed({
-            startServices()
+        startServices()
 
+        Handler().postDelayed({
             thread {
                 CodeProcessor.init(this)
                 ShortcutUtil.addWakeUpShortcut()
-                AdvanAppHelper.updateAppList()
+//                AdvanAppHelper.updateAppList()
                 PowerEventReceiver.start()
                 if (AppConfig.autoOpenASWithRoot) {
                     RootHelper.openAppAccessService(packageName, "${MyAccessibilityService::class.qualifiedName}")
                 }
                 Vog.d(this, "service thread ---> finish ${System.currentTimeMillis() / 1000}")
             }
-        }, 1000)
+        },1000)
         if (!BuildConfig.DEBUG)
             Vog.init(this, Log.ERROR)
         Vog.d(this, "onCreate ---> end ${System.currentTimeMillis() / 1000}")

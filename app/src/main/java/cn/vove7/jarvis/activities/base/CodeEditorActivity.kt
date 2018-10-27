@@ -24,7 +24,7 @@ import cn.vove7.common.interfaces.CodeEditorOperation
 import cn.vove7.common.view.editor.MultiSpan
 import cn.vove7.common.view.toast.ColorfulToast
 import cn.vove7.jarvis.R
-import cn.vove7.jarvis.utils.UriUtils
+import cn.vove7.jarvis.tools.UriUtils
 import cn.vove7.jarvis.view.EditorFunsHelper
 import cn.vove7.vtp.log.Vog
 import com.afollestad.materialdialogs.MaterialDialog
@@ -349,12 +349,15 @@ abstract class CodeEditorActivity : AppCompatActivity() {
                 Symbol("-"), Symbol("\\"), Symbol("*"), Symbol("?"),
                 Symbol("&"), Symbol("="), Symbol("%"), Symbol("")
         )
+
         val jsSymbols = mutableListOf(
+                Symbol("🚩", "require 'accessibility'\n"),
                 Symbol("⇥", "  "),
                 Symbol("fun", "function () {\n  \n}\n"),
                 Symbol("!")
         ).also { it.addAll(commonSymbols) }
         val luaSymbols = mutableListOf(
+                Symbol("🚩", "require 'accessibility'"),
                 Symbol("⇥", "  "),
                 Symbol("fun", "function ()\n  \nend\n"),
                 Symbol("not"), Symbol("end"), Symbol("then"),

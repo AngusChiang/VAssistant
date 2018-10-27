@@ -1,8 +1,8 @@
 package cn.vove7.jarvis.speech.recognition.recognizer
 
 import cn.vove7.common.app.GlobalApp
-import cn.vove7.jarvis.speech.recognition.model.ErrorTranslation
 import cn.vove7.jarvis.speech.recognition.listener.IRecogListener
+import cn.vove7.jarvis.speech.recognition.model.ErrorTranslation
 import cn.vove7.jarvis.speech.recognition.model.RecogResult
 import cn.vove7.vtp.log.Vog
 import com.baidu.speech.EventListener
@@ -55,13 +55,7 @@ class RecogEventAdapter(private val listener: IRecogListener) : EventListener {
                 val subErrorCode = recogResult.subError
                 Vog.e(this, "asr error:$params")
                 listener.onAsrFinishError(errorCode, subErrorCode, ErrorTranslation.recogError(errorCode), recogResult.desc, recogResult)
-                when (errorCode) {
-                    3 -> {
-                        GlobalApp.toastShort("麦克风打开失败")
-                    }
-                    else -> {
-                    }
-                }
+
             } else {
                 listener.onAsrFinish(recogResult)
             }

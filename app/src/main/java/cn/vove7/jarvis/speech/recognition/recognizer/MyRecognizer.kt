@@ -66,6 +66,14 @@ class MyRecognizer(
         asr.send(SpeechConstant.ASR_START, json, null, 0, 0)
     }
 
+    /**
+     * 加载离线词
+     * @param param Map<String, Any>
+     */
+    fun loadOfWord(param: Map<String, Any>) {
+        Vog.d(this,"loadOfWord ---> 加载离线命令词 ${param}")
+        asr.send(SpeechConstant.ASR_KWS_LOAD_ENGINE, JSONObject(param).toString(), null, 0, 0)
+    }
 
     /**
      * 提前结束录音等待识别结果。

@@ -20,8 +20,8 @@ import cn.vove7.common.netacc.model.BaseRequestModel
 import cn.vove7.common.netacc.NetHelper
 import cn.vove7.common.view.toast.ColorfulToast
 import cn.vove7.jarvis.R
-import cn.vove7.jarvis.utils.AppConfig
-import cn.vove7.jarvis.utils.pay.PurchaseHelper
+import cn.vove7.jarvis.tools.AppConfig
+import cn.vove7.jarvis.tools.pay.PurchaseHelper
 import cn.vove7.vtp.system.SystemHelper
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.customview.customView

@@ -30,7 +30,7 @@ interface ServiceBridge : OnExecutorResult {
     fun showAlert(r: ShowAlertEvent)
 
     fun speak(text: String?)
-    fun speakSync(text: String?)
+    fun speakSync(text: String?):Boolean
 }
 
 class ShowAlertEvent(

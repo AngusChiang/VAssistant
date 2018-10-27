@@ -15,8 +15,8 @@ import cn.vove7.jarvis.activities.NewInstActivity
 import cn.vove7.jarvis.activities.OnSyncInst
 import cn.vove7.jarvis.adapters.SimpleListAdapter
 import cn.vove7.jarvis.adapters.ViewModel
-import cn.vove7.jarvis.utils.AppConfig
-import cn.vove7.jarvis.utils.DataUpdator
+import cn.vove7.jarvis.tools.AppConfig
+import cn.vove7.jarvis.tools.DataUpdator
 import kotlin.concurrent.thread
 
 /**

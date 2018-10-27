@@ -34,8 +34,8 @@ import cn.vove7.jarvis.R
 import cn.vove7.jarvis.adapters.ExecuteQueueAdapter
 import cn.vove7.jarvis.adapters.InstSettingListAdapter
 import cn.vove7.jarvis.services.MainService
-import cn.vove7.jarvis.utils.AppConfig
-import cn.vove7.jarvis.utils.ShortcutUtil
+import cn.vove7.jarvis.tools.AppConfig
+import cn.vove7.jarvis.tools.ShortcutUtil
 import cn.vove7.jarvis.view.dialog.ProgressDialog
 import cn.vove7.vtp.dialog.DialogWithList
 import cn.vove7.vtp.easyadapter.BaseListAdapter

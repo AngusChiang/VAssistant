@@ -6,7 +6,7 @@ import android.os.Bundle
 import android.view.KeyEvent
 import android.view.View
 import cn.vove7.jarvis.R
-import cn.vove7.jarvis.utils.AppConfig
+import cn.vove7.jarvis.tools.AppConfig
 import cn.vove7.vtp.runtimepermission.PermissionUtils
 
 class MainActivity : Activity() {

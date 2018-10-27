@@ -61,7 +61,7 @@ interface VApi {
                 /* "lockScreen()",*/ "screenShot()",
                 "screen2File()", "shareText(text)", "shareImage(imgPah)", "location()",
                 "getLocalIpAddress()", "getNetAddress()", "createAlarm()", "createCalendarEvent()",
-                "startActivity(pkg,fullActivityName)"
+                "startActivity(pkg,fullActivityName)","screenOn()","screenOff()","sendKey()"
         )
         val appFunctions = arrayOf(
                 "startActivity()", "getSystemService()"
@@ -159,7 +159,97 @@ interface VApi {
                 Pair("createAlarm()", "创建闹钟\n1.创建一次性闹钟参数(hour: Int, minutes: Int)" +
                         "\n2.参数(message: String?, days: Array<Int>?, hour: Int, minutes: Int, noUi: Boolean)\n" +
                         "message:备注,days:重复周,hour:时,minutes:分,noUi:是否显示闹钟界面\n" +
-                        "注:参数days 周日 - 周六 对应 1 - 7")
+                        "注:参数days 周日 - 周六 对应 1 - 7"),
+                Pair("screenOn()","熄屏状态下,唤醒屏幕"),
+                Pair("screenOff()","熄屏,需要root"),
+                Pair("sendKey()","模拟按键,需要root,参数keyCode:Int\n" +
+                        "0 -->  \"KEYCODE_UNKNOWN\"\n" +
+                        "1 -->  \"KEYCODE_MENU\"\n" +
+                        "2 -->  \"KEYCODE_SOFT_RIGHT\"\n" +
+                        "3 -->  \"KEYCODE_HOME\"\n" +
+                        "4 -->  \"KEYCODE_BACK\"\n" +
+                        "5 -->  \"KEYCODE_CALL\" \n" +
+                        "6 -->  \"KEYCODE_ENDCALL\" \n" +
+                        "7 -->  \"KEYCODE_0\" \n" +
+                        "8 -->  \"KEYCODE_1\" \n" +
+                        "9 -->  \"KEYCODE_2\" \n" +
+                        "10 -->  \"KEYCODE_3\"\n" +
+                        "11 -->  \"KEYCODE_4\" \n" +
+                        "12 -->  \"KEYCODE_5\" \n" +
+                        "13 -->  \"KEYCODE_6\" \n" +
+                        "14 -->  \"KEYCODE_7\" \n" +
+                        "15 -->  \"KEYCODE_8\" \n" +
+                        "16 -->  \"KEYCODE_9\" \n" +
+                        "17 -->  \"KEYCODE_STAR\" \n" +
+                        "18 -->  \"KEYCODE_POUND\" \n" +
+                        "19 -->  \"KEYCODE_DPAD_UP\" \n" +
+                        "20 -->  \"KEYCODE_DPAD_DOWN\" \n" +
+                        "21 -->  \"KEYCODE_DPAD_LEFT\" \n" +
+                        "22 -->  \"KEYCODE_DPAD_RIGHT\"\n" +
+                        "23 -->  \"KEYCODE_DPAD_CENTER\"\n" +
+                        "24 -->  \"KEYCODE_VOLUME_UP\" \n" +
+                        "25 -->  \"KEYCODE_VOLUME_DOWN\" \n" +
+                        "26 -->  \"KEYCODE_POWER\" \n" +
+                        "27 -->  \"KEYCODE_CAMERA\" \n" +
+                        "28 -->  \"KEYCODE_CLEAR\" \n" +
+                        "29 -->  \"KEYCODE_A\" \n" +
+                        "30 -->  \"KEYCODE_B\" \n" +
+                        "31 -->  \"KEYCODE_C\" \n" +
+                        "32 -->  \"KEYCODE_D\" \n" +
+                        "33 -->  \"KEYCODE_E\" \n" +
+                        "34 -->  \"KEYCODE_F\" \n" +
+                        "35 -->  \"KEYCODE_G\" \n" +
+                        "36 -->  \"KEYCODE_H\" \n" +
+                        "37 -->  \"KEYCODE_I\" \n" +
+                        "38 -->  \"KEYCODE_J\" \n" +
+                        "39 -->  \"KEYCODE_K\" \n" +
+                        "40 -->  \"KEYCODE_L\" \n" +
+                        "41 -->  \"KEYCODE_M\"\n" +
+                        "42 -->  \"KEYCODE_N\" \n" +
+                        "43 -->  \"KEYCODE_O\" \n" +
+                        "44 -->  \"KEYCODE_P\" \n" +
+                        "45 -->  \"KEYCODE_Q\" \n" +
+                        "46 -->  \"KEYCODE_R\" \n" +
+                        "47 -->  \"KEYCODE_S\" \n" +
+                        "48 -->  \"KEYCODE_T\" \n" +
+                        "49 -->  \"KEYCODE_U\" \n" +
+                        "50 -->  \"KEYCODE_V\" \n" +
+                        "51 -->  \"KEYCODE_W\" \n" +
+                        "52 -->  \"KEYCODE_X\"\n" +
+                        "53 -->  \"KEYCODE_Y\" \n" +
+                        "54 -->  \"KEYCODE_Z\" \n" +
+                        "55 -->  \"KEYCODE_COMMA\" \n" +
+                        "56 -->  \"KEYCODE_PERIOD\"\n" +
+                        "57 -->  \"KEYCODE_ALT_LEFT\" \n" +
+                        "58 -->  \"KEYCODE_ALT_RIGHT\" \n" +
+                        "59 -->  \"KEYCODE_SHIFT_LEFT\" \n" +
+                        "60 -->  \"KEYCODE_SHIFT_RIGHT\" \n" +
+                        "61 -->  \"KEYCODE_TAB\" \n" +
+                        "62 -->  \"KEYCODE_SPACE\" \n" +
+                        "63 -->  \"KEYCODE_SYM\" \n" +
+                        "64 -->  \"KEYCODE_EXPLORER\" \n" +
+                        "65 -->  \"KEYCODE_ENVELOPE\" \n" +
+                        "66 -->  \"KEYCODE_ENTER\" \n" +
+                        "67 -->  \"KEYCODE_DEL\" \n" +
+                        "68 -->  \"KEYCODE_GRAVE\" \n" +
+                        "69 -->  \"KEYCODE_MINUS\" \n" +
+                        "70 -->  \"KEYCODE_EQUALS\" \n" +
+                        "71 -->  \"KEYCODE_LEFT_BRACKET\" \n" +
+                        "72 -->  \"KEYCODE_RIGHT_BRACKET\" \n" +
+                        "73 -->  \"KEYCODE_BACKSLASH\"\n" +
+                        "74 -->  \"KEYCODE_SEMICOLON\" \n" +
+                        "75 -->  \"KEYCODE_APOSTROPHE\"\n" +
+                        "76 -->  \"KEYCODE_SLASH\" \n" +
+                        "77 -->  \"KEYCODE_AT\" \n" +
+                        "78 -->  \"KEYCODE_NUM\" \n" +
+                        "79 -->  \"KEYCODE_HEADSETHOOK\" \n" +
+                        "80 -->  \"KEYCODE_FOCUS\"\n" +
+                        "81 -->  \"KEYCODE_PLUS\"\n" +
+                        "82 -->  \"KEYCODE_MENU\"\n" +
+                        "83 -->  \"KEYCODE_NOTIFICATION\"\n" +
+                        "84 -->  \"KEYCODE_SEARCH\" \n" +
+                        "85 -->  \"TAG_LAST_KEYCODE\"\n " +
+                        "from https://blog.csdn.net/chen825919148/article/details/18732041")
         )
         val executorMap = hashMapOf(
                 Pair("interrupt()", "终止执行"),

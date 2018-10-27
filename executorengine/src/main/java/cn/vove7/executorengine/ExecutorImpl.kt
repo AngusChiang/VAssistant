@@ -520,7 +520,9 @@ open class ExecutorImpl(
     }
 
     override fun speakSync(text: String): Boolean {
-        serviceBridge?.speakSync(text)
+        if (serviceBridge?.speakSync(text) == false) {
+            return true
+        }
         waitForUnlock()
         return if (callbackVal == null) true
         else {

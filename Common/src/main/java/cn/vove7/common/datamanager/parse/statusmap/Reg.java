@@ -129,8 +129,10 @@ public class Reg implements Serializable {
 
     public Integer[] getParamPosArray() {
         if (paramPosArr != null) return paramPosArr;
-        if (this.paramPos == null) return null;
+        if (this.paramPos == null) return new Integer[0];
         String[] ss = this.paramPos.split(",");
+        if (ss.length == 1 && ss[0].equals("")) return new Integer[0];;
+
         paramPosArr = new Integer[ss.length];
         try {
             int i = 0;

@@ -60,11 +60,26 @@ class SpeechStatusListener(private val handler: Handler) : StatusRecogListener()
                 handler.sendMessage(SpeechMessage.buildMessage(CODE_VOICE_ERR, "没有检测到用户说话"))
             }
             2 -> {
-                GlobalApp.toastShort(R.string.text_net_err)
                 handler.sendMessage(SpeechMessage.buildMessage(CODE_VOICE_ERR, "网络错误"))
             }
             else ->
                 handler.sendMessage(SpeechMessage.buildMessage(CODE_VOICE_ERR, message))
+        }
+        when (subErrorCode) {
+            3101 -> {
+                GlobalApp.toastShort("?")
+            }
+            7001 -> {
+            }
+            3001 -> {
+                GlobalApp.toastShort("麦克风打开失败")
+            }
+            2004->{
+                GlobalApp.toastShort("网络错误")
+            }
+//            else -> {
+//                GlobalApp.toastShort("未知错误")
+//            }
         }
     }
 

@@ -1,4 +1,4 @@
-package cn.vove7.jarvis.utils
+package cn.vove7.jarvis.tools
 
 import android.content.Context
 import android.os.Build

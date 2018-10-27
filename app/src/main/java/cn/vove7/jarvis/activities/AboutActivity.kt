@@ -12,7 +12,7 @@ import cn.vove7.executorengine.bridges.SystemBridge
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.adapters.IconTitleEntity
 import cn.vove7.jarvis.adapters.IconTitleListAdapter
-import cn.vove7.jarvis.utils.AppConfig
+import cn.vove7.jarvis.tools.AppConfig
 import cn.vove7.jarvis.view.custom.IconView
 import cn.vove7.vtp.easyadapter.BaseListAdapter
 import cn.vove7.vtp.system.SystemHelper

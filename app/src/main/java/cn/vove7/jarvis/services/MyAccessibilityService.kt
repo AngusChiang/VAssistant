@@ -7,8 +7,7 @@ import android.content.pm.PackageManager
 import android.graphics.Rect
 import android.os.Handler
 import android.view.KeyEvent
-import android.view.KeyEvent.KEYCODE_VOLUME_DOWN
-import android.view.KeyEvent.KEYCODE_VOLUME_UP
+import android.view.KeyEvent.*
 import android.view.ViewGroup
 import android.view.accessibility.AccessibilityEvent
 import android.view.accessibility.AccessibilityEvent.*
@@ -29,7 +28,7 @@ import cn.vove7.executorengine.bridges.SystemBridge
 import cn.vove7.executorengine.helper.AdvanAppHelper
 import cn.vove7.jarvis.plugins.AccPluginsService
 import cn.vove7.jarvis.plugins.AdKillerService
-import cn.vove7.jarvis.utils.AppConfig
+import cn.vove7.jarvis.tools.AppConfig
 import cn.vove7.vtp.app.AppInfo
 import cn.vove7.vtp.log.Vog
 import cn.vove7.vtp.system.SystemHelper
@@ -134,7 +133,7 @@ class MyAccessibilityService : AccessibilityApi() {
                 Vog.d(this, "removeAllNotifier locksWaitForActivity ${a != null}")
             }
             synchronized(locksWaitForView) {
-//                val success = values.remove(executor)
+                //                val success = values.remove(executor)
                 val removeList = mutableListOf<ViewFinder>()
                 locksWaitForView.forEach {
                     if (it.value == executor) removeList.add(it.key)
@@ -193,7 +192,7 @@ class MyAccessibilityService : AccessibilityApi() {
             val pkg = event.packageName as String?
             Vog.v(this, "onAccessibilityEvent ---> $classNameStr $pkg")
             if (packageName == pkg) {//fix 悬浮窗造成阻塞
-                Vog.d(this, "onAccessibilityEvent ---> 自身(悬浮窗)")
+                Vog.d(this, "onAccessibilityEvent ---> 自身(屏蔽悬浮窗)")
                 return
             }
 //            Vog.d(this, "TYPE_WINDOW_STATE_CHANGED --->\n $pkg ${event.className}")
@@ -315,20 +314,23 @@ class MyAccessibilityService : AccessibilityApi() {
 
     private var v2 = false // 单击上下键 取消识别
     private var v3 = false // 是否触发长按唤醒
+    var lastEvent: KeyEvent? = null
     /**
      * 按键监听
      * @param event KeyEvent
      * @return Boolean
      */
     override fun onKeyEvent(event: KeyEvent): Boolean {
+        Vog.v(this, "onKeyEvent  ----> " + event.toString())
         try {
-            if (!SystemHelper.isScreenOn(GlobalApp.APP))//(火)?息屏下
+            if (!AppConfig.volumeWakeUpWhenScreenOff &&
+                    !SystemHelper.isScreenOn(GlobalApp.APP))//(火)?息屏下
                 return super.onKeyEvent(event)
         } catch (e: Exception) {
             GlobalLog.err(e)
             return super.onKeyEvent(event)
         }
-        Vog.v(this, "onKeyEvent  ----> " + event.toString())
+        lastEvent = event
         when (event.action) {
             KeyEvent.ACTION_DOWN -> when (event.keyCode) {
                 KEYCODE_VOLUME_DOWN -> {
@@ -346,7 +348,7 @@ class MyAccessibilityService : AccessibilityApi() {
                         else -> super.onKeyEvent(event)
                     }
                 }
-                KEYCODE_VOLUME_UP -> {
+                KEYCODE_HEADSETHOOK, KEYCODE_VOLUME_UP -> {
                     when {
                         MainService.recoIsListening -> {//按下停止聆听
                             v2 = true
@@ -367,7 +369,7 @@ class MyAccessibilityService : AccessibilityApi() {
             }
             KeyEvent.ACTION_UP -> {
                 when (event.keyCode) {
-                    KEYCODE_VOLUME_UP ->
+                    KEYCODE_HEADSETHOOK, KEYCODE_VOLUME_UP ->
                         if (v3) {
                             return removeDelayIfInterrupt(event, startupRunner) || super.onKeyEvent(event)
                         }
@@ -400,6 +402,14 @@ class MyAccessibilityService : AccessibilityApi() {
             delayHandler.removeCallbacks(runnable)
             when (event.keyCode) {
                 KEYCODE_VOLUME_UP -> SystemBridge.volumeUp()
+                KEYCODE_HEADSETHOOK -> {
+                    SystemBridge.switchMusicStatus()//
+//                    Vog.d(this,"removeDelayIfInterrupt ---> KEYCODE_HEADSETHOOK resume")
+//                    if (lastEvent != null)
+//                        super.onKeyEvent(lastEvent)
+//                    super.onKeyEvent(event)
+
+                }
                 KEYCODE_VOLUME_DOWN -> SystemBridge.volumeDown()
                 else -> return false
             } //其他按键

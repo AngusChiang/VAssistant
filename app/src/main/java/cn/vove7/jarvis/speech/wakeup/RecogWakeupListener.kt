@@ -3,11 +3,9 @@ package cn.vove7.jarvis.speech.wakeup
 import android.os.Handler
 import android.os.Message
 import cn.vove7.common.app.GlobalApp
-import cn.vove7.common.appbus.AppBus
-import cn.vove7.common.model.RequestPermission
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.speech.recognition.model.IStatus
-import cn.vove7.jarvis.utils.AppConfig
+import cn.vove7.jarvis.tools.AppConfig
 import cn.vove7.vtp.builder.BundleBuilder
 import cn.vove7.vtp.sharedpreference.SpHelper
 

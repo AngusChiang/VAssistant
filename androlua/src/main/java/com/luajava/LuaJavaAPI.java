@@ -888,6 +888,13 @@ public final class LuaJavaAPI {
                 clazz = obj.getClass();
             }
 
+            try {//changed by vove
+                method = clazz.getMethod(methodName);//函数
+                return 0;
+            } catch (NoSuchMethodException e) {
+                //e.printStackTrace();
+            }
+
             String postfix = (methodName.charAt(0) + "")
                     .toUpperCase() + methodName.substring(1);
             try {

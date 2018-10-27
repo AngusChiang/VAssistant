@@ -7,9 +7,13 @@ import android.os.HandlerThread
 import android.os.Looper
 import android.os.Message
 import android.support.v4.app.ActivityCompat
+import cn.vove7.androlua.luabridge.LuaUtil
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.appbus.VoiceData
+import cn.vove7.executorengine.helper.AdvanAppHelper
 import cn.vove7.executorengine.helper.AdvanContactHelper
+import cn.vove7.jarvis.BuildConfig
+import cn.vove7.jarvis.receivers.PowerEventReceiver
 import cn.vove7.jarvis.speech.recognition.OfflineRecogParams
 import cn.vove7.jarvis.speech.recognition.listener.SpeechStatusListener
 import cn.vove7.jarvis.speech.recognition.model.IStatus
@@ -22,9 +26,11 @@ import cn.vove7.jarvis.speech.recognition.recognizer.MyRecognizer
 import cn.vove7.jarvis.speech.wakeup.MyWakeup
 import cn.vove7.jarvis.speech.wakeup.RecogWakeupListener
 import cn.vove7.jarvis.speech.wakeup.WakeupEventAdapter
-import cn.vove7.jarvis.utils.AppConfig
+import cn.vove7.jarvis.tools.AppConfig
 import cn.vove7.vtp.log.Vog
 import com.baidu.speech.asr.SpeechConstant
+import com.google.gson.Gson
+import com.google.gson.annotations.SerializedName
 import java.lang.Thread.sleep
 import kotlin.concurrent.thread
 
@@ -59,6 +65,7 @@ class SpeechRecoService(val event: SpeechEvent) {
         handler = RecoHandler(t.looper)
         thread {
             initRecog()
+            initOfflineWord()
             //初始化唤醒器
             if (AppConfig.voiceWakeup) {
                 startWakeUp()
@@ -66,12 +73,43 @@ class SpeechRecoService(val event: SpeechEvent) {
         }
     }
 
+    private val timerHandler: Handler by lazy {
+        val t = HandlerThread("auto_sleep")
+        t.start()
+        Handler(t.looper)
+    }
+
+    /**
+     * 开启定时关闭
+     * 重启定时器
+     */
+    fun startAutoSleepWakeUp() {
+        if (PowerEventReceiver.isCharging) return
+        stopAutoSleepWakeup()
+        Vog.d(this, "startAutoSleepWakeUp ---> 开启自动休眠")
+        timerHandler.postDelayed(stopWakeUpTimer,
+                if (BuildConfig.DEBUG) 60000
+                else AppConfig.autoSleepWakeupMillis)
+    }
+
+    //关闭定时器
+    fun stopAutoSleepWakeup() {
+        Vog.d(this, "stopAutoSleepWakeup ---> 关闭自动休眠")
+        timerHandler.removeCallbacks(stopWakeUpTimer)
+    }
+
+    private val stopWakeUpTimer = Runnable {
+        stopWakeUp()
+    }
+
     fun startWakeUp() {
         val wakeLis = RecogWakeupListener(handler)
         MyWakeup.start(WakeupEventAdapter(wakeLis))
+        startAutoSleepWakeUp()
     }
 
     fun stopWakeUp() {
+        stopAutoSleepWakeup()
         MyWakeup.stop()
     }
 
@@ -91,13 +129,46 @@ class SpeechRecoService(val event: SpeechEvent) {
         }
     }
 
-    private val params = mapOf(
+    val context: Context
+        get() = GlobalApp.APP
+
+    private val offSpeechGrammarPath = context.filesDir.absolutePath + "/bd/baidu_speech_grammar.bsg"
+    private fun initOfflineWord() {
+        LuaUtil.assetsToSD(context, "bd/baidu_speech_grammar.bsg",
+                offSpeechGrammarPath)
+        myRecognizer.loadOfWord(offWordParams)
+    }
+
+    private val offWordParams: Map<String, Any>
+        get() = mapOf(
+                Pair(SpeechConstant.DECODER, 0),
+                Pair(SpeechConstant.ASR_OFFLINE_ENGINE_GRAMMER_FILE_PATH, offSpeechGrammarPath),
+                Pair(SpeechConstant.SLOT_DATA, OffWord(
+                        AdvanContactHelper.getContactName()
+                        , AdvanAppHelper.getAppName()
+                ).toString())
+        )
+
+    private val recoParams = mapOf(
             Pair(SpeechConstant.ACCEPT_AUDIO_DATA, false),
 //            Pair(SpeechConstant.VAD_MODEL, "dnn"),
             Pair(SpeechConstant.DISABLE_PUNCTUATION, false),//标点符号
             Pair(SpeechConstant.ACCEPT_AUDIO_VOLUME, true),
+            Pair(SpeechConstant.IN_FILE, "#cn.vove7.jarvis.tools.MicrophoneInputStream.getInstance()"),
             Pair(SpeechConstant.PID, 1536)
     )
+
+    class OffWord(
+            @SerializedName("contact_name")
+            val contactName: Array<String>
+            , @SerializedName("appname")
+            val appName: Array<String>
+    ) {
+        override fun toString(): String {
+            Vog.d(this, "OffWord ---> $contactName \n $appName")
+            return Gson().toJson(this)
+        }
+    }
 
     internal fun startRecog() {
         if (ActivityCompat.checkSelfPermission(AdvanContactHelper.context,
@@ -109,7 +180,7 @@ class SpeechRecoService(val event: SpeechEvent) {
         event.onStartRecog()
         sleep(100)
         if (!isListening()) {
-            myRecognizer.start(params)
+            myRecognizer.start(recoParams)
         } else {
             Vog.d(this, "启动失败，正在运行")
         }
@@ -145,7 +216,9 @@ class SpeechRecoService(val event: SpeechEvent) {
             when (msg?.what) {
                 CODE_WAKEUP_SUCCESS -> {//唤醒
                     val word = msg.data.getString("data")
-                    event.onWakeup(word)
+                    startAutoSleepWakeUp()
+                    if (!event.onWakeup(word))
+                        return
 //                    AppBus.postVoiceData(VoiceData(msg.what, word))
                     myRecognizer.cancel()
                     startRecog()
@@ -177,7 +250,13 @@ class SpeechRecoService(val event: SpeechEvent) {
 }
 
 interface SpeechEvent {
-    fun onWakeup(word: String?)
+    /**
+     *
+     * @param word String?
+     * @return Boolean 是否需要继续唤醒识别
+     */
+    fun onWakeup(word: String?): Boolean
+
     fun onStartRecog()
     fun onResult(result: String)
     fun onTempResult(temp: String)

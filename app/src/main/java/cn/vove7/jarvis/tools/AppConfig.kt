@@ -1,4 +1,4 @@
-package cn.vove7.jarvis.utils
+package cn.vove7.jarvis.tools
 
 import android.os.Build
 import android.os.Looper
@@ -28,7 +28,11 @@ object AppConfig {
     var isLongPressVolUpWakeUp = true
     var voiceControlDialog = true
     var adWaitSecs = 17
-    var voiceWakeup = false
+    var voiceWakeup = false//语音唤醒
+    set(v) {
+        field = v
+        sp.set(R.string.key_open_voice_wakeup, v)
+    }
     var autoOpenASWithRoot = false
     var audioSpeak = true//播报语音
     var userExpPlan = true
@@ -36,16 +40,20 @@ object AppConfig {
     var useSmartOpenIfParseFailed = true
     var cloudServiceParseIfLocalFailed = false //云服务解析
     var autoUpdateData = true //
-    var DEFAULT_WAKEUP_FILE = "assets:///bd/WakeUp.bin"
+    var WAKEUP_FILE_NHXV = "assets:///bd/WakeUp_nhxv.bin"
+    var WAKEUP_FILE_XVTX = "assets:///bd/WakeUp_xvtx.bin"
+    var DEFAULT_WAKEUP_FILE = WAKEUP_FILE_XVTX
     var openResponseWord = true
     var responseWord = "我在"
     var speakResponseWordOnVoiceWakeup = true
+    var volumeWakeUpWhenScreenOff = true
     //    var onlyCloudServiceParse = false //云服务解析
     var synStreamIndex: Int = 0//合成输出通道 对应 R.array.list_stream_syn_output
 
     var volumeKeyDelayUp = 600L//音量长按延迟
     var wakeUpFilePath = DEFAULT_WAKEUP_FILE
 
+    var autoSleepWakeupMillis: Long = 30 * 60 * 1000
     fun init() {
         thread {
             reload()
@@ -125,6 +133,7 @@ object AppConfig {
 //  todo      cloudServiceParseIfLocalFailed = getBooleanAndInit(R.string.key_cloud_service_parse, true)
         sp.set(R.string.key_cloud_service_parse, false)
         autoUpdateData = getBooleanAndInit(R.string.key_auto_update_data, true)
+        volumeWakeUpWhenScreenOff = getBooleanAndInit(R.string.key_volume_wakeup_when_screen_off, true)
 //        onlyCloudServiceParse = getBooleanAndInit(R.string.key_only_cloud_service_parse, false)
 
         synStreamIndex = sp.getString(R.string.key_stream_of_syn_output).let {
@@ -135,6 +144,21 @@ object AppConfig {
                 if (i < 0) i = 0
                 i
             }
+        }
+        autoSleepWakeupMillis = sp.getString(R.string.key_auto_sleep_wakeup_duration).let {
+            if (it == null) autoSleepWakeupMillis
+            else {
+                val i = GlobalApp.APP.resources.getStringArray(R.array.list_auto_sleep_duration).indexOf(it)
+                when (i) {
+                    0 -> 30 * 60 * 1000
+                    1 -> 60 * 60 * 1000
+                    2 -> 2 * 60 * 60 * 1000
+                    3 -> 5 * 60 * 60 * 1000
+                    else -> autoSleepWakeupMillis
+                }
+            }
+        }.also {
+            Vog.d(this, "reload ---> autoSleepWakeupMillis = $it")
         }
 
         responseWord = sp.getString(R.string.key_response_word) ?: responseWord

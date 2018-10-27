@@ -40,7 +40,7 @@ object AdvanContactHelper : GenChoiceData, Markable {
     private var lastUpdateTime = 0L
 
     private const val updateInterval = 30 * 60 * 1000
-    private const val limitRate = 0.8f
+    private const val limitRate = 0.75f
     /**
      * 存储本地联系人
      */
@@ -49,7 +49,7 @@ object AdvanContactHelper : GenChoiceData, Markable {
     fun updateContactList() {
         if (ActivityCompat.checkSelfPermission(context, android.Manifest.permission.READ_CONTACTS)
                 != PackageManager.PERMISSION_GRANTED) {
-            AppBus.post(RequestPermission("录音权限"))
+            AppBus.post(RequestPermission("联系人权限"))
             return
         }
         val now = System.currentTimeMillis()
@@ -155,5 +155,11 @@ object AdvanContactHelper : GenChoiceData, Markable {
             choiceList.add("${it.title}\n${it.subtitle}")
         }
         return choiceList
+    }
+
+    fun getContactName() :Array<String>{
+        if(LOCAL_CONTACT_LIST.isEmpty()) updateContactList()
+        val set= hashSetOf(*LOCAL_CONTACT_LIST.keys.toTypedArray())
+        return set.toTypedArray()
     }
 }

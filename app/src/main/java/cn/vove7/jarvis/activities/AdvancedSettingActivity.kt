@@ -14,11 +14,11 @@ import cn.vove7.jarvis.BuildConfig
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.activities.base.ReturnableActivity
 import cn.vove7.jarvis.adapters.SettingsExpandableAdapter
-import cn.vove7.jarvis.utils.AppConfig
-import cn.vove7.jarvis.utils.DataUpdator
-import cn.vove7.jarvis.utils.UriUtils
-import cn.vove7.jarvis.utils.backup.BackupHelper
-import cn.vove7.jarvis.utils.debugserver.RemoteDebugServer
+import cn.vove7.jarvis.tools.AppConfig
+import cn.vove7.jarvis.tools.DataUpdator
+import cn.vove7.jarvis.tools.UriUtils
+import cn.vove7.jarvis.tools.backup.BackupHelper
+import cn.vove7.jarvis.tools.debugserver.RemoteDebugServer
 import cn.vove7.jarvis.view.CheckBoxItem
 import cn.vove7.jarvis.view.IntentItem
 import cn.vove7.jarvis.view.SwitchItem
@@ -47,13 +47,18 @@ class AdvancedSettingActivity : ReturnableActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_expandable_settings)
-        val adapter = SettingsExpandableAdapter(this, groupItems, expand_list)
-        expand_list.setAdapter(adapter)
+        val expandableListView = expand_list
+        val adapter = SettingsExpandableAdapter(this, groupItems, expandableListView)
 
-        expand_list.post {
-            expand_list?.expandGroup(0)
-            expand_list?.expandGroup(1)
+        expandableListView?.setAdapter(adapter)
+
+        expandableListView?.post {
+            expandableListView.apply {
+                expandGroup(0)
+                expandGroup(1)
+            }
         }
+
         btn_unlock.setOnClickListener {
             if (UserInfo.isLogin()) {
                 UserInfoDialog(this) {}

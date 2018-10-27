@@ -14,7 +14,7 @@ import cn.vove7.jarvis.speech.synthesis.control.InitConfig
 import cn.vove7.jarvis.speech.synthesis.control.MySyntherizer
 import cn.vove7.jarvis.speech.synthesis.control.NonBlockSyntherizer
 import cn.vove7.jarvis.speech.synthesis.util.OfflineResource
-import cn.vove7.jarvis.utils.AppConfig
+import cn.vove7.jarvis.tools.AppConfig
 import cn.vove7.vtp.log.Vog
 import cn.vove7.vtp.sharedpreference.SpHelper
 import com.baidu.tts.chainofresponsibility.logger.LoggerProxy
@@ -251,9 +251,9 @@ object SpeechSynService : SpeechSynthesizerListener {
 
     override fun onSpeechFinish(p0: String?) {
         Vog.d(this, "onSpeechFinish 播放结束回调 $p0")
-        speaking = false
 //        AppBus.post(SpeechSynData(SpeechSynData.SYN_STATUS_FINISH))
-        event?.onFinish()
+        event?.onFinish()//speaking=true
+        speaking = false
     }
 
     override fun onError(p0: String?, p1: SpeechError?) {
@@ -274,6 +274,9 @@ object SpeechSynService : SpeechSynthesizerListener {
 
 interface SyncEvent {
     fun onError(err: String, requestText: String?)
+    /**
+     * speaking is true
+     */
     fun onFinish()
     fun onStart()//检测音乐播放，在合成前！！！//上面监听器中概率误认为有音乐播放
 }

@@ -3,15 +3,12 @@ package cn.vove7.jarvis.activities
 import android.os.Bundle
 import android.support.design.widget.BottomNavigationView
 import android.support.v7.app.AppCompatActivity
-import cn.vove7.common.netacc.NetHelper
-import cn.vove7.common.netacc.model.LastDateInfo
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.fragments.HomeFragment
 import cn.vove7.jarvis.fragments.MineFragment
-import cn.vove7.jarvis.utils.AppConfig
-import cn.vove7.jarvis.utils.DataUpdator
+import cn.vove7.jarvis.tools.AppConfig
+import cn.vove7.jarvis.tools.DataUpdator
 import cn.vove7.jarvis.view.utils.FragmentSwitcher
-import cn.vove7.vtp.log.Vog
 import cn.vove7.vtp.runtimepermission.PermissionUtils
 import cn.vove7.vtp.sharedpreference.SpHelper
 import com.afollestad.materialdialogs.MaterialDialog

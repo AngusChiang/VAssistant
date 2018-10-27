@@ -91,7 +91,7 @@ abstract class AbFloatWindow<VH : AbFloatWindow.ViewHolder>(
         windowManager.updateViewLayout(contentView, buildLayoutParams(x, y))
     }
 
-    fun buildLayoutParams(x: Int = posX, y: Int = posY): WindowManager.LayoutParams {
+    private fun buildLayoutParams(x: Int = posX, y: Int = posY): WindowManager.LayoutParams {
         val params = WindowManager.LayoutParams()
         params.packageName = context.packageName
         params.width = WindowManager.LayoutParams.MATCH_PARENT
@@ -99,7 +99,9 @@ abstract class AbFloatWindow<VH : AbFloatWindow.ViewHolder>(
         params.flags = WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL or
                 WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE or
                 WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN or
-                WindowManager.LayoutParams.FLAG_LAYOUT_INSET_DECOR
+                WindowManager.LayoutParams.FLAG_LAYOUT_INSET_DECOR or
+                WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE // 无法触摸
+
         params.format = PixelFormat.RGBA_8888
         params.gravity = Gravity.TOP or Gravity.START
         params.x = x

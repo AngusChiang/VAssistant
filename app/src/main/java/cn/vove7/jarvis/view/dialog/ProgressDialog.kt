@@ -23,10 +23,12 @@ class ProgressDialog(val context: Context) {
             //10s强制关闭
             if (dialog.isShowing)
                 dismiss()
-        }, 10000)
+        }, 15000)
     }
 
     fun dismiss() {
-        dialog.dismiss()
+        if(dialog.isShowing) {
+            dialog.dismiss()
+        }
     }
 }

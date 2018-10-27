@@ -36,7 +36,7 @@ import cn.vove7.jarvis.BuildConfig
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.adapters.SimpleListAdapter
 import cn.vove7.jarvis.adapters.ViewModel
-import cn.vove7.jarvis.utils.UriUtils.getPathFromUri
+import cn.vove7.jarvis.tools.UriUtils.getPathFromUri
 import cn.vove7.jarvis.view.BottomSheetController
 import cn.vove7.jarvis.view.dialog.InstRegexEditorDialog
 import cn.vove7.vtp.app.AppInfo

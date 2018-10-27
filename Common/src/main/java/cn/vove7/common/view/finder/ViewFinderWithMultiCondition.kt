@@ -99,7 +99,7 @@ class ViewFinderWithMultiCondition(accessibilityService: AccessibilityApi) : Vie
                 MATCH_MODE_FUZZY_WITH_PINYIN -> {
                     for (it in viewText) {
                         val f = TextHelper.compareSimilarityWithPinyin(accessibilityService,
-                                "${node.text}", it)
+                                "${node.text}", it,replaceNumberWithPinyin = true)
                         Vog.v(this, "findCondition $f")
                         if (f > 0.75) {
                             Vog.d(this, "find WITH_PINYIN $it")

@@ -69,7 +69,6 @@ interface SystemOperation {
      */
     fun openUrl(url: String)
 
-    //fixme
     fun sendKey(keyCode: Int)
 
     //Media control
@@ -167,4 +166,8 @@ interface SystemOperation {
     fun createCalendarEvent(title: String, content: String?, beginTime: Long, endTime: Long? = null, isAlarm: Boolean)
 
 //    fun hideInputMethod()
+
+    fun screenOn()
+    fun screenOff()
+    fun quickSearch(s: String?)
 }

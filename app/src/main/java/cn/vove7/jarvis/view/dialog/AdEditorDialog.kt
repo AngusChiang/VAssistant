@@ -14,8 +14,8 @@ import cn.vove7.common.model.UserInfo
 import cn.vove7.common.view.toast.ColorfulToast
 import cn.vove7.executorengine.helper.AdvanAppHelper
 import cn.vove7.jarvis.R
-import cn.vove7.jarvis.utils.AppConfig
-import cn.vove7.jarvis.utils.DialogUtil
+import cn.vove7.jarvis.tools.AppConfig
+import cn.vove7.jarvis.tools.DialogUtil
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.customview.customView
 

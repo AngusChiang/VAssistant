@@ -8,7 +8,6 @@ import android.os.Bundle
 import android.os.Handler
 import android.provider.Settings
 import android.view.View
-import android.widget.ExpandableListView
 import android.widget.TextView
 import android.widget.Toast
 import cn.vove7.common.app.GlobalLog
@@ -20,9 +19,10 @@ import cn.vove7.jarvis.activities.base.ReturnableActivity
 import cn.vove7.jarvis.adapters.SettingsExpandableAdapter
 import cn.vove7.jarvis.receivers.PowerEventReceiver
 import cn.vove7.jarvis.services.SpeechSynService
-import cn.vove7.jarvis.utils.AppConfig
-import cn.vove7.jarvis.utils.ShortcutUtil
-import cn.vove7.jarvis.utils.UriUtils
+import cn.vove7.jarvis.speech.wakeup.MyWakeup
+import cn.vove7.jarvis.tools.AppConfig
+import cn.vove7.jarvis.tools.ShortcutUtil
+import cn.vove7.jarvis.tools.UriUtils
 import cn.vove7.jarvis.view.*
 import cn.vove7.jarvis.view.custom.SettingGroupItem
 import cn.vove7.vtp.sharedpreference.SpHelper
@@ -39,11 +39,13 @@ class SettingsActivity : ReturnableActivity() {
         super.onCreate(savedInstanceState)
         initData()
         setContentView(R.layout.activity_expandable_settings)
-        val adapter = SettingsExpandableAdapter(this, initData(), expand_list)
-        expand_list.setAdapter(adapter)
 
-        expand_list?.post {
-            findViewById<ExpandableListView>(R.id.expand_list)?.apply {
+        val expandableListView = expand_list
+        val adapter = SettingsExpandableAdapter(this, initData(), expandableListView)
+        expandableListView.setAdapter(adapter)
+
+        expandableListView?.post {
+            expandableListView.apply {
                 expandGroup(0)
                 expandGroup(1)
                 expandGroup(2)
@@ -54,7 +56,7 @@ class SettingsActivity : ReturnableActivity() {
 
     private fun initData(): List<SettingGroupItem> = listOf(
             SettingGroupItem(R.color.google_blue, "😄", childItems = listOf(
-                    IntentItem(R.string.text_set_as_default_voice_assist, summary = "以快速唤醒", onClick = { _, _ ->
+                    IntentItem(R.string.text_set_as_default_voice_assist, summary = "可以通过长按HOME键或蓝牙快捷键唤醒", onClick = { _, _ ->
                         try {
                             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                                 startActivity(Intent(Settings.ACTION_MANAGE_DEFAULT_APPS_SETTINGS))
@@ -102,8 +104,9 @@ class SettingsActivity : ReturnableActivity() {
                             keyId = R.string.key_voice_control_dialog, defaultValue = { true })
             )),
             SettingGroupItem(R.color.cyan_500, titleId = R.string.text_wakeup_way, childItems = listOf(
-                    SwitchItem(R.string.text_open_voice_wakeup, summary = "以 \"你好小V\" 唤醒",
-                            keyId = R.string.key_open_voice_wakeup, callback = { holder, it ->
+                    SwitchItem(R.string.text_open_voice_wakeup, summary = "以 \"你好小V\" 唤醒" +
+                            (if (AppConfig.voiceWakeup && !MyWakeup.opened) "\n已自动关闭" else ""),
+                            keyId = R.string.key_open_voice_wakeup, callback = { _, it ->
                         when (it as Boolean) {
                             true -> {
                                 AppBus.postSpeechAction(SpeechAction.ActionCode.ACTION_START_WAKEUP)
@@ -111,8 +114,19 @@ class SettingsActivity : ReturnableActivity() {
                             false -> AppBus.postSpeechAction(SpeechAction.ActionCode.ACTION_STOP_WAKEUP)
                         }
                     }, defaultValue = { false }),
-                    SwitchItem(R.string.text_long_press_volume_up, null,
-                            keyId = R.string.key_long_press_volume_up_wake_up, summary = "需要无障碍模式开启",
+                    SingleChoiceItem(
+                            title = "自动休眠时长", summary = "在非充电状态下，为了节省电量，在无操作一段时间后将自动关闭唤醒",
+                            keyId = R.string.key_auto_sleep_wakeup_duration,
+                            entityArrId = R.array.list_auto_sleep_duration
+                            , defaultValue = { 0 }
+                    ) { _, _ ->
+                        if (AppConfig.voiceWakeup) {
+                            AppBus.postSpeechAction(SpeechAction.ActionCode.ACTION_STOP_WAKEUP)
+                            AppBus.postSpeechAction(SpeechAction.ActionCode.ACTION_START_WAKEUP)
+                        }
+                    },
+                    SwitchItem(title = "按键唤醒",
+                            keyId = R.string.key_long_press_volume_up_wake_up, summary = "可通过长按音量上键或耳机中键唤醒\n需要无障碍模式开启",
                             defaultValue = { true }),
                     IntentItem(R.string.text_add_wakeup_shortcut_to_launcher, summary = "添加需要8.0+，" +
                             "7.1+可直接在桌面长按图标使用Shortcut快捷唤醒",
@@ -130,7 +144,9 @@ class SettingsActivity : ReturnableActivity() {
                                     }
                                 }
                             }),
-                    IntentItem(R.string.text_customize_wakeup_words) { _, _ ->
+//                    CheckBoxItem(title = "熄屏按键唤醒", summary = "熄屏时仍开启按键唤醒",
+//                            keyId = R.string.key_volume_wakeup_when_screen_off, defaultValue = { true }),
+                    IntentItem(R.string.text_customize_wakeup_words, summary = "注意：自定义将失去一些唤醒即用功能") { _, _ ->
                         MaterialDialog(this).title(R.string.text_customize_wakeup_words)
                                 .customView(R.layout.dialog_customize_wakeup_words)
                                 .show {
@@ -139,8 +155,14 @@ class SettingsActivity : ReturnableActivity() {
                                         SystemBridge.openUrl("https://vove.gitee.io/2018/10/11/GET_WAKEUP_FILE/")
                                         this.dismiss()
                                     }
-                                    neutralButton(text = "恢复默认") {
-                                        setPathAndReload(AppConfig.DEFAULT_WAKEUP_FILE)
+//                                    neutralButton(text = "恢复默认") {
+//                                        setPathAndReload(AppConfig.DEFAULT_WAKEUP_FILE)
+//                                    }
+                                    positiveButton(text = "你好小V") {
+                                        setPathAndReload(AppConfig.WAKEUP_FILE_NHXV)
+                                    }
+                                    negativeButton(text = "小V同学") {
+                                        setPathAndReload(AppConfig.WAKEUP_FILE_XVTX)
                                     }
                                     findViewById<View>(R.id.sel_wakeup_file).setOnClickListener {
                                         val selIntent = Intent(Intent.ACTION_GET_CONTENT)

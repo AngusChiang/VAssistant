@@ -1,6 +1,7 @@
-package cn.vove7.jarvis.utils
+package cn.vove7.jarvis.tools
 
 import android.app.Activity
+import android.graphics.Color
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.datamanager.AppAdInfo
@@ -25,7 +26,6 @@ import cn.vove7.vtp.log.Vog
 import cn.vove7.vtp.sharedpreference.SpHelper
 import com.afollestad.materialdialogs.MaterialDialog
 import com.google.gson.reflect.TypeToken
-import java.lang.Thread.sleep
 import kotlin.concurrent.thread
 
 /**
@@ -81,13 +81,22 @@ object DataUpdator {
             types.forEach {
                 val result = ResultBox<Boolean>()
                 val onUpdate = object : OnUpdate {
-                    override fun invoke(msg: String) {
-                        textDialog.appendln(msg)
+                    override fun invoke(p1: Int, p2: String) {
+                        when (p1) {
+                            Color.GREEN ->
+                                textDialog.appendlnGreen(p2)
+                            Color.RED -> {
+                                textDialog.appendlnRed(p2)
+                            }
+                            else ->
+                                textDialog.appendln(p2)
+                        }
                     }
                 }
+
                 when (it) {
                     0 -> {
-                        textDialog.appendlnGreen("开始更新：全局指令")
+                        textDialog.appendlnGreen("正在获取：全局指令")
                         syncGlobalInst(onUpdate) { b ->
                             result.setAndNotify(b)
                         }
@@ -98,7 +107,7 @@ object DataUpdator {
                         }
                     }
                     1 -> {
-                        textDialog.appendlnGreen("正在更新：应用内指令")
+                        textDialog.appendlnGreen("正在获取：应用内指令")
                         syncInAppInst(onUpdate) { b -> result.setAndNotify(b) }
                         if (result.blockedGet() == true) {
                             textDialog.appendlnGreen("成功")
@@ -107,7 +116,7 @@ object DataUpdator {
                         }
                     }
                     2, 3, 4 -> {//marked data
-                        textDialog.appendlnGreen("正在更新：" + arrayOf("标记联系人", "标记应用", "标记打开")[it - 2])
+                        textDialog.appendlnGreen("正在获取：" + arrayOf("标记联系人", "标记应用", "标记功能")[it - 2])
                         syncMarkedData(onUpdate, getTypes(it), markedLastKeyId[it - 2]) { b ->
                             result.setAndNotify(b)
                         }
@@ -118,7 +127,7 @@ object DataUpdator {
                         }
                     }
                     5 -> {//ad
-                        textDialog.appendlnGreen("正在更新：标记广告")
+                        textDialog.appendlnGreen("正在获取：标记广告")
                         syncMarkedAd(onUpdate) { b -> result.setAndNotify(b) }
                         if (result.blockedGet() == true) {
                             textDialog.appendlnGreen("成功")
@@ -158,7 +167,7 @@ object DataUpdator {
                 , arrayOf("应用内指令", lastDateInfo.instInApp, R.string.key_last_sync_in_app_date)//2
                 , arrayOf("标记通讯录", lastDateInfo.markedContact, R.string.key_last_sync_marked_contact_date)//3
                 , arrayOf("标记应用", lastDateInfo.markedApp, R.string.key_last_sync_marked_app_date)//4
-                , arrayOf("标记打开", lastDateInfo.markedOpen, R.string.key_last_sync_marked_open_date)//5
+                , arrayOf("标记功能", lastDateInfo.markedOpen, R.string.key_last_sync_marked_open_date)//5
                 , arrayOf("标记广告", lastDateInfo.markedAd, R.string.key_last_sync_marked_ad_date) //6
         ).withIndex().forEach { kv ->
             val it = kv.value

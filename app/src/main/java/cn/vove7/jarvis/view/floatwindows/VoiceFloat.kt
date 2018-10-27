@@ -20,7 +20,7 @@ import cn.vove7.jarvis.speech.recognition.model.IStatus.Companion.CODE_VOICE_RES
 import cn.vove7.jarvis.speech.recognition.model.IStatus.Companion.CODE_VOICE_TEMP
 import cn.vove7.jarvis.speech.recognition.model.IStatus.Companion.CODE_VOICE_VOL
 import cn.vove7.jarvis.speech.recognition.model.IStatus.Companion.CODE_WAKEUP_SUCCESS
-import cn.vove7.jarvis.utils.ServiceChecker
+import cn.vove7.jarvis.tools.ServiceChecker
 import cn.vove7.vtp.floatwindow.AbFloatWindow
 import cn.vove7.vtp.log.Vog
 import cn.vove7.vtp.system.DeviceInfo

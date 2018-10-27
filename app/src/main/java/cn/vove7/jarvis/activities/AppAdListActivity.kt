@@ -15,8 +15,8 @@ import cn.vove7.jarvis.activities.base.OneFragmentActivity
 import cn.vove7.jarvis.adapters.SimpleListAdapter
 import cn.vove7.jarvis.adapters.ViewModel
 import cn.vove7.jarvis.fragments.SimpleListFragment
-import cn.vove7.jarvis.utils.AppConfig
-import cn.vove7.jarvis.utils.DialogUtil
+import cn.vove7.jarvis.tools.AppConfig
+import cn.vove7.jarvis.tools.DialogUtil
 import cn.vove7.jarvis.view.dialog.AdEditorDialog
 import cn.vove7.vtp.log.Vog
 import com.afollestad.materialdialogs.MaterialDialog
@@ -60,7 +60,7 @@ class AppAdListActivity : OneFragmentActivity() {
 
                     val data = item.extra as AppAdInfo
                     MaterialDialog(context!!).show {
-                        if (data.belongUser(true)) {
+                        if (data.belongUser()) {
                             neutralButton(R.string.text_edit) {
                                 editDialog.show(item.extra)
                             }

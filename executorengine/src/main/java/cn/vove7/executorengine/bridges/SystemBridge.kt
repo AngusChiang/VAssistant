@@ -2,6 +2,7 @@ package cn.vove7.executorengine.bridges
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.app.SearchManager
 import android.bluetooth.BluetoothAdapter
 import android.content.*
 import android.content.Context.WIFI_SERVICE
@@ -13,6 +14,7 @@ import android.hardware.camera2.CameraManager
 import android.location.Location
 import android.location.LocationListener
 import android.location.LocationManager
+import android.media.AudioFocusRequest
 import android.media.AudioManager
 import android.media.AudioManager.ADJUST_MUTE
 import android.media.AudioManager.ADJUST_UNMUTE
@@ -29,6 +31,7 @@ import android.view.KeyEvent
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.appbus.AppBus
+import cn.vove7.common.bridges.RootHelper
 import cn.vove7.common.bridges.SystemOperation
 import cn.vove7.common.bridges.UtilBridge.bitmap2File
 import cn.vove7.common.datamanager.DAO
@@ -53,7 +56,6 @@ import cn.vove7.vtp.system.DeviceInfo
 import cn.vove7.vtp.system.SystemHelper
 import java.io.File
 import java.util.*
-import kotlin.math.min
 
 
 object SystemBridge : SystemOperation {
@@ -271,11 +273,36 @@ object SystemBridge : SystemOperation {
     }
 
     override fun sendKey(keyCode: Int) {
-        sendMediaKey(keyCode)
+        RootHelper.execWithSu("input keyevent $keyCode")
     }
 
     override fun mediaPause() {
         sendMediaKey(KeyEvent.KEYCODE_MEDIA_PAUSE)
+    }
+
+    fun removeMusicFocus() {
+        val mAm = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager;
+        mAm.abandonAudioFocusRequest(AudioFocusRequest
+                .Builder(AudioManager.AUDIOFOCUS_GAIN_TRANSIENT).build())
+    }
+
+
+    fun getMusicFocus() {
+        val mAm = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager;
+        val vIsActive = mAm.isMusicActive();
+//        val mListener = MyOnAudioFocusChangeListener();
+//        val a= AudioFocusRequest.Builder(AudioManager.AUDIOFOCUS_GAIN_TRANSIENT)
+//                .setAudioAttributes()
+
+        if (vIsActive) {
+            val result = mAm.requestAudioFocus(null, AudioManager.STREAM_MUSIC,
+                    AudioManager.AUDIOFOCUS_GAIN_TRANSIENT);
+            if (result == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
+                Vog.d(this, "getMusicFocus ---> successfully")
+            } else {
+                Vog.d(this, "getMusicFocus ---> failed")
+            }
+        }
     }
 
     /**
@@ -301,6 +328,7 @@ object SystemBridge : SystemOperation {
 
     override fun mediaResume() {
         sendMediaKey(KeyEvent.KEYCODE_MEDIA_PLAY)
+        removeMusicFocus()
     }
 
     override fun mediaStop() {
@@ -313,6 +341,12 @@ object SystemBridge : SystemOperation {
 
     override fun mediaPre() {
         sendMediaKey(KeyEvent.KEYCODE_MEDIA_PREVIOUS)
+    }
+
+    fun switchMusicStatus() {
+        if (isMediaPlaying()) {
+            mediaPause()
+        } else mediaResume()
     }
 
     /**
@@ -497,17 +531,24 @@ object SystemBridge : SystemOperation {
     /**
      * 8.0 开启热点方法
      * 注意：这个方法开启的热点名称和密码是手机系统里面默认的那个
-     *
+     * fixme 一段时间后自动关闭 and 名称密码?
      */
     @RequiresApi(Build.VERSION_CODES.O)
     private fun setWifiApEnabledForAndroidO(isEnable: Boolean) {
         val manager = context.applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
         //cancelLocalOnlyHotspotRequest 是关闭热点
         //打开热
-        if (isEnable)
-            manager.startLocalOnlyHotspot(getWifiApLis(), Handler())
-        else {
-            GlobalApp.toastShort("不支持关闭热点")
+        try {
+            if (isEnable)
+                manager.startLocalOnlyHotspot(getWifiApLis(), Handler())
+            else {
+                GlobalApp.toastShort("不支持关闭热点")
+            }
+        } catch (e: SecurityException) {
+            AppBus.post(RequestPermission("位置权限"))
+        } catch (e: Exception) {
+            GlobalLog.err(e)
+            GlobalApp.toastShort("出错")
         }
     }
 
@@ -694,8 +735,9 @@ object SystemBridge : SystemOperation {
             val intent = Intent(Intent.ACTION_SEND)
 //            intent.putExtra(Intent.EXTRA_SUBJECT, title)
             intent.putExtra(Intent.EXTRA_TEXT, content ?: "")
+            intent.setType("text/plain");
             intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-            context.startActivity(intent)
+            context.startActivity(Intent.createChooser(intent, "分享到"))
         } catch (e: Exception) {
             GlobalLog.err(e)
             GlobalApp.toastShort("分享失败")
@@ -705,8 +747,9 @@ object SystemBridge : SystemOperation {
     override fun shareImage(imgPath: String?) {
         try {
             val intent = Intent(Intent.ACTION_SEND)
-            if (imgPath == null || imgPath == "") {
-                intent.type = "text/plain"
+            if (imgPath ?: "" == "") {
+                GlobalApp.toastShort("图片不存在")
+                return
                 // 纯文本
             } else {
                 val f = File(imgPath)
@@ -721,7 +764,7 @@ object SystemBridge : SystemOperation {
                 }
             }
             intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-            context.startActivity(intent)
+            context.startActivity(Intent.createChooser(intent, "分享到"))
         } catch (e: Exception) {
             GlobalLog.err(e)
             GlobalApp.toastShort("分享失败")
@@ -733,7 +776,7 @@ object SystemBridge : SystemOperation {
     }
 
     override fun createAlarm(message: String?, days: Array<Int>?, hour: Int, minutes: Int, noUi: Boolean) {
-        Vog.d(this,"createAlarm ---> $message ${Arrays.toString(days)} $hour : $minutes")
+        Vog.d(this, "createAlarm ---> $message ${Arrays.toString(days)} $hour : $minutes")
         val intent = Intent(AlarmClock.ACTION_SET_ALARM)
                 .putExtra(AlarmClock.EXTRA_HOUR, hour)
                 .putExtra(AlarmClock.EXTRA_MINUTES, minutes)
@@ -753,13 +796,39 @@ object SystemBridge : SystemOperation {
         try {
             val account = CalendarAccount("V Assistant", "V Assistant", autoCreateContext = context)
             val cal = CalendarHelper(context, account)
-            val end = if (endTime == null) beginTime + 1000 * 60 * 10//十分钟
-            else endTime
+            val end = endTime ?: (beginTime + 1000 * 60 * 10)//十分钟
             cal.addCalendarEvent(title, content ?: "", beginTime, end, isAlarm)
         } catch (e: SecurityException) {
             GlobalLog.err(e)
             AppBus.post(RequestPermission("读写日历权限"))
         }
 
+    }
+
+    override fun screenOn() {
+        val pm = context.getSystemService(Context.POWER_SERVICE) as PowerManager
+        val screenOn = pm.isScreenOn()
+        if (!screenOn) {
+            // 获取PowerManager.WakeLock对象,后面的参数|表示同时传入两个值,最后的是LogCat里用的Tag
+            val wl = pm.newWakeLock(
+                    PowerManager.ACQUIRE_CAUSES_WAKEUP or
+                            PowerManager.SCREEN_BRIGHT_WAKE_LOCK, "bright");
+            //点亮屏幕
+            wl.acquire(10000);
+            //释放
+            wl.release();
+        }
+    }
+
+    //发送电源按键
+    override fun screenOff() {
+        sendKey(66)
+    }
+
+    override fun quickSearch(s: String?) {
+        val intent = Intent(Intent.ACTION_WEB_SEARCH)
+        intent.putExtra(SearchManager.QUERY, s)
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        context.startActivity(intent)
     }
 }

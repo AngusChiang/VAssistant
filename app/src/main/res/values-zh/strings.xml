@@ -1,5 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+
+    <string-array name="list_auto_sleep_duration">
+        <item>30分钟</item>
+        <item>1小时</item>
+        <item>2小时</item>
+        <item>5小时</item>
+    </string-array>
+
     <string name="text_permission_manager">权限管理</string>
     <string name="app_name">V Assistant</string>
     <string name="simple_test_script">简单顺序脚本测试</string>

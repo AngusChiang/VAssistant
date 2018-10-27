@@ -91,16 +91,17 @@ public class AppAdInfo implements Serializable, Markable, DataFrom {
         return descTitle != null && pkg != null && activity != null && DataFrom.FROM_USER.equals(from);
     }
 
-    public boolean belongUser(boolean update) {
-        if (from == null || DataFrom.FROM_USER.equals(from)) return true;
-        else if (publishUserId != null && publishUserId.equals(UserInfo.getUserId())) {
-            if (update) {
-                from = DataFrom.FROM_USER;
-                DAO.INSTANCE.getDaoSession().getAppAdInfoDao().update(this);
-            }
-            return true;
-        }
-        return false;
+    public boolean belongUser() {
+        Long uId = UserInfo.getUserId();
+        return DataFrom.FROM_USER.equals(from) ||
+                (DataFrom.FROM_SHARED.equals(from) && (publishUserId == null || publishUserId.equals(uId)));
+            //if (update) {
+            //    from = DataFrom.FROM_USER;
+            //    DAO.INSTANCE.getDaoSession().getAppAdInfoDao().update(this);
+            //}
+        //    return true;
+        //}
+        //return false;
     }
 
     public Long getPublishUserId() {

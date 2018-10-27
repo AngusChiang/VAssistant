@@ -11,6 +11,10 @@ import android.view.View
 import android.widget.TextView
 import android.widget.Toast
 import cn.vove7.common.R
+import android.app.AppOpsManager
+import android.content.pm.ApplicationInfo
+import cn.vove7.common.app.GlobalLog
+
 
 /**
  * # ColorfulToast
@@ -132,9 +136,14 @@ class ColorfulToast(val context: Context, textColor: Int = R.color.fff) {
     }
 
     private fun s(s: String, t: Int) {
-        textView.text = s
-        toast.duration = t
-        toast.show()
+        try {
+            textView.text = s
+            toast.duration = t
+            toast.show()
+        } catch (e: Exception) {
+            GlobalLog.err("toast 显示失败")
+            GlobalLog.err(e)
+        }
     }
 
     companion object {

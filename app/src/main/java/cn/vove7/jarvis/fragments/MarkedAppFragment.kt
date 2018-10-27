@@ -12,7 +12,7 @@ import cn.vove7.executorengine.bridges.SystemBridge
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.adapters.ViewModel
 import cn.vove7.jarvis.fragments.base.BaseMarkedFragment
-import cn.vove7.jarvis.utils.DialogUtil
+import cn.vove7.jarvis.tools.DialogUtil
 import kotlin.concurrent.thread
 
 /**

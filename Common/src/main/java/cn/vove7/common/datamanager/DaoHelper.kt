@@ -1,5 +1,6 @@
 package cn.vove7.common.datamanager
 
+import android.graphics.Color
 import cn.vove7.common.BuildConfig
 import cn.vove7.common.R
 import cn.vove7.common.app.GlobalLog
@@ -18,7 +19,7 @@ import cn.vove7.vtp.log.Vog
  * 2018/8/25
  */
 
-typealias OnUpdate = (msg: String) -> Unit
+typealias OnUpdate = (Int, String) -> Unit
 
 object DaoHelper {
     fun deleteActionNodesInTX(ids: Array<Long>): Boolean {
@@ -162,18 +163,18 @@ object DaoHelper {
                     //删除旧服务器数据
                     //del old global
                     if (BuildConfig.DEBUG) {
-                        onUpdate?.invoke("删除旧指令：${it.actionTitle}")
+                        onUpdate?.invoke(Color.BLACK, "删除旧指令：${it.actionTitle}")
                     }
                     deleteActionNode(it.id)
                 }
                 nodes.forEach {
-                    if (!userList.contains(it)) {
-                        onUpdate?.invoke("更新指令：${it.actionTitle}\n${it.desc?.instructions
-                            ?: "无描述"}")
-                        Vog.d(this, "updateGlobalInst 添加---> ${it.actionTitle}")
-                        insertNewActionNode(it)
-                    } else {//存在
-                        checkNode(it,onUpdate)
+                        if (!userList.contains(it)) {
+                            onUpdate?.invoke(Color.GREEN, "更新指令：${it.actionTitle}\n${it.desc?.instructions
+                                ?: "无描述"}")
+                            Vog.d(this, "updateGlobalInst 添加---> ${it.actionTitle}")
+                            insertNewActionNode(it)
+                        } else {//存在
+                            checkNode(it, onUpdate)
                     }
                 }
             }
@@ -185,12 +186,12 @@ object DaoHelper {
     }
 
     //检查升级 ，follows
-    private fun checkNode(it: ActionNode,onUpdate: OnUpdate? = null) {
+    private fun checkNode(it: ActionNode, onUpdate: OnUpdate? = null) {
         val oldNode = getActionNodeByTag(it.tagId)
         if (oldNode == null || it.versionCode > oldNode.versionCode) {//更新
             oldNode?.delete()
             Vog.d(this, "updateGlobalInst 更新---> ${it.actionTitle}")
-            onUpdate?.invoke("升级指令：${it.actionTitle}\n${it.desc?.instructions
+            onUpdate?.invoke(Color.GREEN, "升级指令：${it.actionTitle}\n${it.desc?.instructions
                 ?: "无描述"}")
             insertNewActionNode(it)
         } else {//检查follows
@@ -198,10 +199,9 @@ object DaoHelper {
             if (it.follows?.isNotEmpty() == true)
                 for (ci in it.follows) {//递归 深度
                     ci.parentId = it.id
-                    checkNode(ci,onUpdate)
+                    checkNode(ci, onUpdate)
                 }
         }
-
     }
 
     fun getActionNodeByTag(tagId: String): ActionNode? {
@@ -289,13 +289,13 @@ object DaoHelper {
         ).list().toHashSet()
         return try {
             if (BuildConfig.DEBUG) {
-                onUpdate?.invoke("删除旧纪录")
+                onUpdate?.invoke(Color.BLACK, "删除旧纪录")
             }
             markedDao.deleteInTx(l)
             datas.forEach {
                 it.id = null
                 if (!userList.contains(it)) {
-                    onUpdate?.invoke("更新：${it.key}")
+                    onUpdate?.invoke(Color.GREEN, "更新：${it.key}")
                     markedDao.insert(it)
                 } else {
                     Vog.d(this, "updateMarkedData ---> 重复:" + it.key)
@@ -327,7 +327,7 @@ object DaoHelper {
                                 ?: -1L))
             ).list()
             if (BuildConfig.DEBUG)
-                onUpdate?.invoke("删除旧纪录 ${delList.size}")
+                onUpdate?.invoke(Color.BLACK, "删除旧纪录 ${delList.size}")
             appAdInfoDao.deleteInTx(delList)
 
             val userList = appAdInfoDao.queryBuilder().whereOr(
@@ -338,7 +338,7 @@ object DaoHelper {
             datas.forEach {
                 it.id = null
                 if (!userList.contains(it)) {
-                    onUpdate?.invoke("更新标记广告：${it.descTitle}")
+                    onUpdate?.invoke(Color.GREEN, "更新标记广告：${it.descTitle}")
                     appAdInfoDao.insertInTx(it)
                     Vog.d(this, "updateAppAdInfo ---> ${it.descTitle} ${it.id}")
                 } else {

@@ -9,6 +9,16 @@
 
 
     <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:background="?attr/selectableItemBackground"
+        android:gravity="center"
+        android:padding="10dp"
+        android:text="注意：现在支持唤醒命令，自定义唤醒词可能失去这些快捷功能。\n当前支持快捷唤醒词：播放,停止,暂停,上一首,下一首,打开手电筒,关闭手电筒,截屏分享,文字提取
+\n你可以选择 '小V同学'和'你好小V' 其中一个作为唤醒词"
+        android:textColor="@color/google_blue" />
+    <TextView
         android:id="@+id/wakeup_file_path"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

@@ -54,6 +54,13 @@
         <item>通知音量</item>
     </string-array>
 
+    <string-array name="list_auto_sleep_duration">
+        <item>30 minutes</item>
+        <item>1 hours</item>
+        <item>2 hours</item>
+        <item>5 hours</item>
+    </string-array>
+
     <string-array name="multi_select_list_preference_default_value" />
 
     <string name="text_settings">Settings</string>
@@ -287,4 +294,6 @@
     <string name="key_stream_of_syn_output" translatable="false">stream_of_syn_output</string>
     <string name="desc_accessibility">开启后将后的技能\n1.使用音量快捷键\n2.操作界面\n3.根据当前界面响应指令</string>
     <string name="key_auto_open_as_with_root" translatable="false">auto_open_as_with_root</string>
+    <string name="key_volume_wakeup_when_screen_off" translatable="false">volume_wakeup_when_screen_off</string>
+    <string name="key_auto_sleep_wakeup_duration" translatable="false">auto_sleep_wakeup_duration</string>
 </resources>

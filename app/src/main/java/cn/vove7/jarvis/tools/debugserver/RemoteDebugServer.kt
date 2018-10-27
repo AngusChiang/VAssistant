@@ -1,4 +1,4 @@
-package cn.vove7.jarvis.utils.debugserver
+package cn.vove7.jarvis.tools.debugserver
 
 import android.os.Handler
 import android.os.Looper
@@ -11,7 +11,7 @@ import cn.vove7.common.executor.OnPrint
 import cn.vove7.jarvis.BuildConfig
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.services.MainService
-import cn.vove7.jarvis.utils.AppConfig
+import cn.vove7.jarvis.tools.AppConfig
 import cn.vove7.rhino.api.RhinoApi
 import cn.vove7.vtp.log.Vog
 import com.google.gson.Gson
@@ -130,7 +130,7 @@ object RemoteDebugServer : Runnable {
     }
 
     private fun stopAutoSleep() {
-        Vog.d(this, "stopAutoSleep ---> 关闭自动休眠")
+        Vog.d(this, "stopAutoSleepWakeup ---> 关闭自动休眠")
 
         handler?.removeCallbacks(sleepRun)
     }

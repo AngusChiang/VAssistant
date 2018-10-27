@@ -1,5 +1,6 @@
 package cn.vove7.executorengine.helper
 
+import android.content.Context
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.datamanager.parse.model.ActionScope
 import cn.vove7.common.model.MatchedData
@@ -39,24 +40,26 @@ object AdvanAppHelper {
      * 匹配机制：标识 -> 按匹配率排序，若无匹配，更新app列表再次匹配 -> 搜索历史匹配
      * 预解析跟随操作 ：  QQ扫一扫  QQ浏览器
      */
+    val context: Context get() = GlobalApp.APP
+
     fun matchAppName(appWord: String, update: Boolean = true): List<MatchedData<AppInfo>> {
-        val context = GlobalApp.APP
         val matchList = mutableListOf<MatchedData<AppInfo>>()
         APP_LIST.values.forEach {
             val rate = try {
                 if (appWord.startsWith(it.name, ignoreCase = true)) {
                     val follow = appWord.substring(it.name.length)
                     Vog.d(this, "预解析---> $follow")
-                    val aq = ParseEngine.matchAppAction(follow, ActionScope(it.packageName),false)
+                    val aq = ParseEngine.matchAppAction(follow, ActionScope(it.packageName), false)
                     if (aq.second.isEmpty()) {//无匹配
                         Vog.d(this, "预解析---> 无匹配")
-                        TextHelper.compareSimilarityWithPinyin(context, appWord, it.name)
+                        TextHelper.compareSimilarityWithPinyin(context, appWord, it.name, replaceNumberWithPinyin = true)
                     } else {//匹配ok
                         1f
                     }
                 } else {
-                    Vog.v(this, "matchAppName $appWord ${it.name}")
-                    TextHelper.compareSimilarityWithPinyin(context, appWord, it.name)
+                    val f = TextHelper.compareSimilarityWithPinyin(context, appWord, it.name, replaceNumberWithPinyin = true)
+                    Vog.v(this, "matchAppName $appWord ${it.name} $f")
+                    f
                 }
             } catch (e: Exception) {
                 e.printStackTrace()
@@ -101,6 +104,15 @@ object AdvanAppHelper {
             li.add(it.value.packageName)
         }
         return li
+    }
+
+    fun getAppName(): Array<String> {
+        if (APP_LIST.isEmpty()) updateAppList()
+        val li = arrayListOf<String>()
+        APP_LIST.forEach {
+            li.add(it.value.name)
+        }
+        return li.toTypedArray()
     }
 
 }
