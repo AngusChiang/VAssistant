@@ -33,7 +33,6 @@ class ProgressTextDialog(val context: Context, val title: String? = null,
                 .customView(view = textView, scrollable = true)
                 .cancelable(cancelable)
                 .show()
-        dialog
     }
 
     fun seletable(b: Boolean) {
@@ -41,8 +40,8 @@ class ProgressTextDialog(val context: Context, val title: String? = null,
     }
 
     @Synchronized
-    fun appendln(s: Any) {
-        append(s)
+    fun appendln(s: Any? = null) {
+        if (s != null) append(s)
         append("\n")
     }
 

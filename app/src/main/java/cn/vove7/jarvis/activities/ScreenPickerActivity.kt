@@ -1,6 +1,5 @@
 package cn.vove7.jarvis.activities
 
-import android.annotation.SuppressLint
 import android.app.Activity
 import android.os.Bundle
 import android.view.View
@@ -20,7 +19,6 @@ import cn.vove7.jarvis.view.dialog.WordSplitDialog
 import cn.vove7.vtp.log.Vog
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.customview.customView
-import java.lang.Thread.sleep
 import kotlin.concurrent.thread
 
 /**

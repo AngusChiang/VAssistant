@@ -8,11 +8,11 @@ import cn.vove7.jarvis.fragments.HomeFragment
 import cn.vove7.jarvis.fragments.MineFragment
 import cn.vove7.jarvis.tools.AppConfig
 import cn.vove7.jarvis.tools.DataUpdator
+import cn.vove7.jarvis.view.dialog.UpdateLogDialog
 import cn.vove7.jarvis.view.utils.FragmentSwitcher
 import cn.vove7.vtp.runtimepermission.PermissionUtils
 import cn.vove7.vtp.sharedpreference.SpHelper
 import com.afollestad.materialdialogs.MaterialDialog
-import com.afollestad.materialdialogs.callbacks.onDismiss
 import kotlinx.android.synthetic.main.activity_real_main.*
 
 
@@ -56,38 +56,33 @@ class RealMainActivity : AppCompatActivity() {
                         PermissionUtils.autoRequestPermission(this, ps)
                     }.show()
         } else {
-            val sp = SpHelper(this)
-            if (sp.getBoolean("first_in", true)) {
-                userGuide()
-            } else {
-                checkDataUpdate()
-            }
+            showUpdateLog()
         }
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        userGuide()
+        showUpdateLog()
     }
 
     private fun checkDataUpdate() {
-        if(AppConfig.autoUpdateData) {
+        if (AppConfig.autoUpdateData) {
             DataUpdator.checkUpdate(this)
         }
     }
 
-
-    private fun userGuide() {
-        MaterialDialog(this).title(text = "引导")
-                .message(text = "1. 首次使用，请至帮助中仔细阅读[使用手册]\n" +
-                        "2. 首次使用，可在注册登陆后至指令管理，标记管理中同步最新数据")
-                .positiveButton()
-                .negativeButton()
-                .onDismiss {
-                    checkDataUpdate()
-                }
-                .show()
-        SpHelper(this).set("first_in", false)
+    private fun showUpdateLog() {
+        val sp=SpHelper(this)
+        val lastCode = sp.getLong("v_code")
+        val nowCode=AppConfig.versionCode
+        if (lastCode < nowCode) {
+            UpdateLogDialog(this) {
+                checkDataUpdate()
+            }
+            sp.set("v_code",nowCode)
+        } else {
+            checkDataUpdate()
+        }
     }
 
 }
