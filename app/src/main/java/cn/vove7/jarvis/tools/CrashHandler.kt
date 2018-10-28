@@ -7,6 +7,7 @@ import android.os.Process
 import android.widget.Toast
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.app.GlobalLog
+import cn.vove7.common.model.UserInfo
 import cn.vove7.common.netacc.ApiUrls
 import cn.vove7.common.netacc.NetHelper
 import cn.vove7.common.netacc.model.BaseRequestModel
@@ -79,6 +80,9 @@ object CrashHandler : Thread.UncaughtExceptionHandler {
 
 fun DeviceInfo.string(): String {
     val b = StringBuilder()
+    b.append("userId: ").append(UserInfo.getUserId()).appendln()
+    b.append("userName: ").append(UserInfo.getUserName()).appendln()
+    b.append("email: ").append(UserInfo.getEmail()).appendln()
     b.append("appVersion: ").append(AppConfig.versionName).appendln()
     b.append("manufacturerName: ").append(manufacturerName).appendln()
     b.append("productName: ").append(productName).appendln()

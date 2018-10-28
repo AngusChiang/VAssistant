@@ -8,9 +8,12 @@ import cn.vove7.jarvis.plugins.AdKillerService
 import cn.vove7.jarvis.services.MainService
 import cn.vove7.jarvis.services.MyAccessibilityService
 import cn.vove7.jarvis.view.NumberPickerItem
+import cn.vove7.jarvis.view.SingleChoiceItem
 import cn.vove7.jarvis.view.SwitchItem
 import cn.vove7.jarvis.view.custom.SettingGroupItem
 import kotlinx.android.synthetic.main.activity_expandable_settings.*
+import java.lang.Thread.sleep
+import kotlin.concurrent.thread
 
 /**
  * # LaboratoryActivity
@@ -23,11 +26,15 @@ class LaboratoryActivity : ReturnableActivity() {
         super.onCreate(savedInstanceState)
 
         setContentView(R.layout.activity_expandable_settings)
-        val adapter = SettingsExpandableAdapter(this, groupItems, expand_list)
-        expand_list.setAdapter(adapter)
+        val expandableListView = expand_list
+        val adapter = SettingsExpandableAdapter(this, groupItems, expandableListView)
+        expandableListView.setAdapter(adapter)
 
-        expand_list.post {
-            expand_list.expandGroup(0)
+        expandableListView?.post {
+            expandableListView.apply {
+                expandGroup(0)
+                expandGroup(1)
+            }
         }
     }
 
@@ -41,6 +48,7 @@ class LaboratoryActivity : ReturnableActivity() {
                         false ->
                             MyAccessibilityService.unregisterEvent(AdKillerService)
                     }
+                    return@SwitchItem true
                 },
                 NumberPickerItem(R.string.text_time_wait_ad, "界面等待广告出现最长时间，单位秒",
                         keyId = R.string.key_ad_wait_secs, range = Pair(10, 100),
@@ -54,9 +62,23 @@ class LaboratoryActivity : ReturnableActivity() {
                             if (b as Boolean) {
                                 MainService.instance?.loadChatSystem()
                             }
+                            return@SwitchItem true
+                        },
+                        SingleChoiceItem(title = "对话系统", summary = "由于每日调用次数有限，图灵机器人仅高级用户可用",
+                                keyId = R.string.key_chat_system_type, entityArrId = R.array.list_chat_system,
+                                defaultValue = { 0 }) { _, d ->
+                            if (!UserInfo.isVip() && (d as Pair<*, *>).first != 0) {
+                                toast.showShort("设置无效")
+                                return@SingleChoiceItem false
+                            }
+                            thread {
+                                sleep(500)//等待设置完成
+                                MainService.instance?.loadChatSystem(true)
+                            }
+                            return@SingleChoiceItem true
                         }
                 ))
-                )
+        )
     }
 
 }

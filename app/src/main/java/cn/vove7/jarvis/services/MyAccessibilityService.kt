@@ -346,6 +346,7 @@ class MyAccessibilityService : AccessibilityApi() {
                             true
                         }
                         SpeechSynService.speaking -> {
+                            v3=true
                             SpeechSynService.stop()
                             true
                         }

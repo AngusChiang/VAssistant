@@ -11,6 +11,7 @@ import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.appbus.AppBus
 import cn.vove7.common.appbus.SpeechAction
 import cn.vove7.common.model.RequestPermission
+import cn.vove7.common.utils.runOnUi
 import cn.vove7.jarvis.R
 import cn.vove7.vtp.log.Vog
 
@@ -37,90 +38,95 @@ class ListeningToast : AbFloatWindow<ListeningToast.VHolder>(GlobalApp.APP) {
         AppBus.post(RequestPermission("悬浮窗权限"))
 
     }
-    var lHandler: ListeningHandler? = null
 
     init {
     }
 
-    fun initIfNeed() {
-        if (lHandler == null)
-            lHandler = ListeningHandler(Looper.getMainLooper())
-    }
-
+    var ani = R.drawable.listening_animation
     private fun setAniRes(resId: Int) {
-        holder.aniImg.apply {
-            setImageResource(resId)
-            post {
-                (drawable as? AnimationDrawable)?.start()
+        if (ani == resId) return
+        ani = resId
+        runOnUi {
+            holder.aniImg.apply {
+                setImageResource(resId)
+                post {
+                    (drawable as? AnimationDrawable)?.start()
+                }
             }
         }
     }
 
     fun showParseAni() {
-        setAniRes(R.drawable.parsing_animation)
-        if (!isShowing)
-            show()
+        runOnUi {
+            setAniRes(R.drawable.parsing_animation)
+            if (!isShowing)
+                show()
+        }
     }
 
     fun show(text: String) {
-        setAniRes(R.drawable.listening_animation)
-        if (Looper.myLooper() == Looper.getMainLooper()) {
+//        initIfNeed()
+        runOnUi {
+            setAniRes(R.drawable.listening_animation)
+            holder.text = text
             if (!isShowing)
                 show()
-            holder.text = text
-        } else {
-            initIfNeed()
-            lHandler?.post {
-                if (!isShowing)
-                    show()
-            }
-            lHandler?.sendMessage(lHandler!!.obtainMessage(SHOW, text))
         }
+
     }
 
     fun showAndHideDelay(text: String) {
-        initIfNeed()
-        lHandler?.sendMessage(lHandler!!.obtainMessage(SHOW, text))
-        hideDelay()
+
+        show(text)
+
+        hideDelay(1000)
     }
 
     fun hideDelay(delay: Long = 800) {
-        initIfNeed()
+//        initIfNeed()
+        runOnUi {
+            Handler().postDelayed({
+                hide()
+            }, delay)
+        }
         Vog.d(this, "hideDelay ---> hide delay $delay")
-        lHandler?.sendEmptyMessageDelayed(HIDE, delay)
+
     }
 
     fun hideImmediately() {//立即
-        if (Looper.myLooper() == Looper.getMainLooper()) {
+//        initIfNeed()
+        runOnUi {
             hide()
-        } else {
-            initIfNeed()
-            lHandler?.sendEmptyMessage(HIDE)
         }
+//        if (Looper.myLooper() == Looper.getMainLooper()) {
+//            hide()
+//        } else {
+//            lHandler?.sendEmptyMessage(HIDE)
+//        }
     }
+//
+//    inner class ListeningHandler(looper: Looper) : Handler(looper) {
+//        override fun handleMessage(msg: Message?) {
+//            when (msg?.what) {
+//                SHOW -> {
+//                    val text = msg.obj as String
+//                    holder.text = text
+//                }
+//                HIDE -> {
+//                    Vog.v(this, "hideDelay ---> hide exec")
+//                    hide()
+//                }
+//                else -> {
+//                }
+//            }
+//
+//        }
+//    }
 
-    inner class ListeningHandler(looper: Looper) : Handler(looper) {
-        override fun handleMessage(msg: Message?) {
-            when (msg?.what) {
-                SHOW -> {
-                    val text = msg.obj as String
-                    holder.text = text
-                }
-                HIDE -> {
-                    Vog.v(this, "hideDelay ---> hide exec")
-                    hide()
-                }
-                else -> {
-                }
-            }
-
-        }
-    }
-
-    companion object {
-        const val SHOW = 5
-        const val HIDE = 1
-    }
+//    companion object {
+//        const val SHOW = 5
+//        const val HIDE = 1
+//    }
 
     class VHolder(val view: View) : AbFloatWindow.ViewHolder(view) {
         var text: String

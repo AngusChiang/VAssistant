@@ -27,7 +27,13 @@ class UpdateLogDialog(context: Context, onDismiss: (() -> Unit)? = null) {
 
     private val logs: List<Pair<String, String>>
         get() = listOf(
-                Pair("1.2.1_0","fix 7.1.1及以下设备识别结束崩溃问题\n" +
+                Pair("1.2.4", "加入对话系统：图灵机器人 (/实验室)"),
+                Pair("1.2.3", "修复部分机型识别后崩溃"),
+                Pair("1.2.2", "加入App自动检查更新\n" +
+                        "加入对话系统\n" +
+                        "加入语音唤醒自动休眠后亮屏后自动开启\n" +
+                        "加入在播放语音合成时，长按音量下可停止播放"),
+                Pair("1.2.1_0", "fix 7.1.1及以下设备识别结束崩溃问题\n" +
                         "移除对[5.0-6.0)的支持\n" +
                         "fix 部分设备截屏崩溃问题"),
                 Pair("1.2.1", "在[文字提取]加入分词功能\n" +

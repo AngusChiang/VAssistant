@@ -67,10 +67,11 @@ object AppConfig {
     var openVoiceWakeUpIfAutoSleep = true// 自动休眠后，亮屏自动开启语音唤醒
     var openChatSystem = true
     var autoSleepWakeupMillis: Long = 30 * 60 * 1000
+    var chatSystem: String = ""
     fun init() {
         thread {
-            reload()
             checkUserInfo()
+            reload()
         }
     }
 
@@ -160,6 +161,10 @@ object AppConfig {
                 i
             }
         }
+        chatSystem = sp.getString(R.string.key_chat_system_type).let {
+            val i = GlobalApp.APP.resources.getStringArray(R.array.list_chat_system)
+            if (!UserInfo.isVip()) i[0] else it ?: i[0]
+        }.also { Vog.d(this, "reload ---> chatSystem $it") }
         autoSleepWakeupMillis = sp.getString(R.string.key_auto_sleep_wakeup_duration).let {
             if (it == null) autoSleepWakeupMillis
             else {
@@ -229,7 +234,7 @@ object AppConfig {
                 runOnUi {
                     val noUpdateName = sp.getString("no_update_ver_name") ?: ""
                     if (!byUser && noUpdateName == verName) {
-                        Vog.d(this,"checkAppUpdate ---> 忽略此版")
+                        Vog.d(this, "checkAppUpdate ---> 忽略此版")
                         return@runOnUi
                     }
                     if (verName != AppConfig.versionName) {
@@ -247,8 +252,7 @@ object AppConfig {
                                 .negativeButton()
                                 .cancelable(false)
                                 .show()
-                    }
-                    else
+                    } else
                         onUpdate?.invoke(false)
                 }
             } catch (e: Exception) {

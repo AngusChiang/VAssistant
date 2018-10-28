@@ -86,12 +86,15 @@ class AdvancedSettingActivity : ReturnableActivity() {
                 SettingGroupItem(R.color.google_blue, "管理", childItems = listOf(
                         IntentItem(R.string.instru_management, onClick = { _, _ ->
                             startActivity(Intent(this, InstManagerActivity::class.java))
+                            return@IntentItem true
                         }),
                         IntentItem(R.string.text_mark_management, onClick = { _, _ ->
                             startActivity(Intent(this, MarkedManagerActivity::class.java))
+                            return@IntentItem true
                         }),
                         IntentItem(R.string.text_check_last_data, onClick = { _, _ ->
                             showLastDataDate()
+                            return@IntentItem true
                         }),
                         CheckBoxItem(title = "自动更新", summary = "在进入App后自动检查并更新最新数据",
                                 keyId = R.string.key_auto_update_data, defaultValue = { true })
@@ -103,23 +106,26 @@ class AdvancedSettingActivity : ReturnableActivity() {
                         }, callback = { holder, it ->
                             if (!AppConfig.checkUser()) {
                                 (holder as SettingItemHelper.SwitchItemHolder).compoundWight.isChecked = false
-                                return@SwitchItem
+                                return@SwitchItem true
                             }
 
                             if (it as Boolean) {
                                 RemoteDebugServer.start()
                                 holder.summaryView.text = ipText
                             } else RemoteDebugServer.stop()
+                            return@SwitchItem true
                         }),
                         IntentItem(R.string.text_test_code_lua, onClick = { _, _ ->
                             if (AppConfig.checkUser()) {
                                 startActivity(Intent(this, LuaEditorActivity::class.java).also { it.addFlags(Intent.FLAG_ACTIVITY_NEW_DOCUMENT) })
                             }
+                            return@IntentItem true
                         }),
                         IntentItem(R.string.text_code_test_js, null, onClick = { _, _ ->
                             if (AppConfig.checkUser()) {
                                 startActivity(Intent(this, JsEditorActivity::class.java).also { it.addFlags(Intent.FLAG_ACTIVITY_NEW_DOCUMENT) })
                             }
+                            return@IntentItem true
                         })
                 )),
                 SettingGroupItem(R.color.google_red, "备份", childItems = listOf(
@@ -129,6 +135,7 @@ class AdvancedSettingActivity : ReturnableActivity() {
                             } else {
                                 toast.showShort("请登录后操作")
                             }
+                            return@IntentItem true
                         },
                         IntentItem(title = "从本地恢复") { _, _ ->
                             if (UserInfo.isLogin()) {
@@ -136,10 +143,12 @@ class AdvancedSettingActivity : ReturnableActivity() {
                             } else {
                                 toast.showShort("请登录后操作")
                             }
+                            return@IntentItem true
                         },
                         IntentItem(title = "查看云端备份") { _, _ ->
                             //todo
                             toast.showShort(R.string.text_coming_soon)
+                            return@IntentItem true
                         }
                 )),
                 SettingGroupItem(R.color.teal_A700, "命令解析", childItems = listOf(
@@ -161,6 +170,7 @@ class AdvancedSettingActivity : ReturnableActivity() {
                                 summary = ApiUrls.SERVER_IP) { h, b ->
                             ApiUrls.switch()
                             h.summaryView.text = ApiUrls.SERVER_IP
+                            return@SwitchItem true
                         }
                 )))
             }

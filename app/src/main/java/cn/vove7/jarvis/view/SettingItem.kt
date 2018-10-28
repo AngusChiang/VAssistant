@@ -21,7 +21,10 @@ const val TYPE_NUMBER = 6
 const val TYPE_SWITCH_CALLBACK = 8
 const val TYPE_INTENT = 9
 
-typealias CallbackOnSet = (SettingItemHelper.ChildItemHolder, Any) -> Unit
+/**
+ * 返回结果用于是否设置
+ */
+typealias CallbackOnSet = (SettingItemHelper.ChildItemHolder, Any) -> Boolean
 
 /**
  * 基类

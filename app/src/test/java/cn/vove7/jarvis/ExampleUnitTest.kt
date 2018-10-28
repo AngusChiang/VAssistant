@@ -11,6 +11,13 @@ import java.lang.Thread.sleep
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.concurrent.thread
+import android.database.CharArrayBuffer
+import android.os.AsyncTask.execute
+import cn.vove7.jarvis.chat.TulingChatSystem
+import org.json.JSONObject
+import java.io.IOException
+import java.io.InputStreamReader
+
 
 /**
  * Example local unit test, which will execute on the development machine (host).
@@ -147,4 +154,11 @@ class ExampleUnitTest {
         println(doc.body().getElementsByClass("apk_left_title_info")[0].html().replace("<br> ","\n"))
 
     }
+
+    @Test
+    fun tulingChat() {
+        val a= TulingChatSystem().chatWithText("你好")
+        println(a)
+    }
+
 }

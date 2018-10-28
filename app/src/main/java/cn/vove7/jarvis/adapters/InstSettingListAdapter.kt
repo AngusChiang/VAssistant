@@ -57,13 +57,17 @@ class InstSettingListAdapter(val context: Context, settingsName: String, val onF
             return when (s.type) {
                 InstSettingItem.TYPE_CHECK_BOX -> {
                     CheckBoxItem(title = s.title, summary = s.summary,
-                            callback = { _, d -> settingsBridge.set(key, d as Boolean) }, defaultValue = {
+                            callback = { _, d ->
+                                settingsBridge.set(key, d as Boolean)
+                                return@CheckBoxItem false
+                            }, defaultValue = {
                         settingsBridge.getBoolean(key) ?: s.defaultValue as Boolean? ?: false
                     })
                 }
                 InstSettingItem.TYPE_SWITCH -> {
                     SwitchItem(title = s.title, summary = s.summary, callback = { _, d ->
                         settingsBridge.set(key, d as Boolean)
+                        return@SwitchItem false
                     }, defaultValue = {
                         settingsBridge.getBoolean(key) ?: s.defaultValue as Boolean? ?: false
                     })
@@ -71,6 +75,7 @@ class InstSettingListAdapter(val context: Context, settingsName: String, val onF
                 InstSettingItem.TYPE_INT -> {
                     NumberPickerItem(title = s.title, summary = s.summary, callback = { _, d ->
                         settingsBridge.set(key, d as Int)
+                        return@NumberPickerItem false
                     }, defaultValue = {
                         settingsBridge.getInt(key) ?: s.defaultValue as Int? ?: 0
                     }, range = Pair(s.range[0], s.range[1]))
@@ -78,6 +83,7 @@ class InstSettingListAdapter(val context: Context, settingsName: String, val onF
                 InstSettingItem.TYPE_TEXT -> {
                     InputItem(title = s.title, summary = s.summary, callback = { _, d ->
                         settingsBridge.set(key, d)
+                        return@InputItem false
                     }, defaultValue = {
                         settingsBridge.getString(key) ?: s.defaultValue as String? ?: ""
                     })
@@ -85,6 +91,7 @@ class InstSettingListAdapter(val context: Context, settingsName: String, val onF
                 InstSettingItem.TYPE_SINGLE_CHOICE -> {
                     SingleChoiceItem(title = s.title, summary = s.summary, callback = { _, d ->
                         settingsBridge.set(key, (d as Pair<*, *>).second)
+                        return@SingleChoiceItem true
                     }, defaultValue = {
                         val p = settingsBridge.getString(key)
                         when {

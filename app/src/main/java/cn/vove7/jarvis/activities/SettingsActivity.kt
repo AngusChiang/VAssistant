@@ -71,6 +71,7 @@ class SettingsActivity : ReturnableActivity() {
                             Toast.makeText(this@SettingsActivity,
                                     "跳转失败", Toast.LENGTH_SHORT).show()
                         }
+                        return@IntentItem true
                     })
             )),
             SettingGroupItem(R.color.google_green, "通知", childItems = listOf(
@@ -92,14 +93,17 @@ class SettingsActivity : ReturnableActivity() {
                             defaultValue = { 0 }, entityArrId = R.array.voice_model_entities,
                             callback = { h, i ->
                                 AppBus.postSpeechAction(SpeechAction.ActionCode.ACTION_RELOAD_SYN_CONF)
+                                return@SingleChoiceItem true
                             }),
                     NumberPickerItem(R.string.text_speak_speed, keyId = R.string.key_voice_syn_speed,
                             defaultValue = { 5 }, range = Pair(1, 9), callback = { h, i ->
                         AppBus.postSpeechAction(SpeechAction.ActionCode.ACTION_RELOAD_SYN_CONF)
+                        return@NumberPickerItem true
                     }),
                     SingleChoiceItem(title = "输出方式", summary = "选择音量跟随", keyId = R.string.key_stream_of_syn_output,
                             entityArrId = R.array.list_stream_syn_output, defaultValue = { 0 }) { _, b ->
                         SpeechSynService.reloadStreamType()
+                        return@SingleChoiceItem true
                     }
             )),
             SettingGroupItem(R.color.google_red, titleId = R.string.text_voice_control, childItems = listOf(
@@ -116,6 +120,7 @@ class SettingsActivity : ReturnableActivity() {
                             }
                             false -> AppBus.postSpeechAction(SpeechAction.ActionCode.ACTION_STOP_WAKEUP)
                         }
+                        return@SwitchItem true
                     }, defaultValue = { false }),
                     SingleChoiceItem(
                             title = "自动休眠时长", summary = "在非充电状态下，为了节省电量，在无操作一段时间后将自动关闭唤醒",
@@ -127,6 +132,7 @@ class SettingsActivity : ReturnableActivity() {
                             AppBus.postSpeechAction(SpeechAction.ActionCode.ACTION_STOP_WAKEUP)
                             AppBus.postSpeechAction(SpeechAction.ActionCode.ACTION_START_WAKEUP)
                         }
+                        return@SingleChoiceItem true
                     },
                     CheckBoxItem(title = "开屏唤醒", summary = "自动休眠后，开屏自动打开语音唤醒",
                             keyId = R.string.key_open_voice_wakeup_if_auto_sleep, defaultValue = { true })
@@ -138,6 +144,7 @@ class SettingsActivity : ReturnableActivity() {
                             "7.1+可直接在桌面长按图标使用Shortcut快捷唤醒",
                             onClick = { _, _ ->
                                 ShortcutUtil.addWakeUpPinShortcut()
+                                return@IntentItem true
                             }),
                     CheckBoxItem(R.string.text_auto_open_voice_wakeup_charging,
                             keyId = R.string.key_auto_open_voice_wakeup_charging,
@@ -149,6 +156,7 @@ class SettingsActivity : ReturnableActivity() {
                                         AppBus.post(SpeechAction(SpeechAction.ActionCode.ACTION_STOP_WAKEUP))
                                     }
                                 }
+                                return@CheckBoxItem true
                             }),
 //                    CheckBoxItem(title = "熄屏按键唤醒", summary = "熄屏时仍开启按键唤醒",
 //                            keyId = R.string.key_volume_wakeup_when_screen_off, defaultValue = { true }),
@@ -183,6 +191,7 @@ class SettingsActivity : ReturnableActivity() {
                                         }
                                     }
                                 }
+                        return@IntentItem true
                     })
             )
 //           ,SettingGroupItem(R.color.lime_600, titleId = R.string.text_animation, childItems = listOf(

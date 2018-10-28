@@ -99,12 +99,13 @@ class SettingItemHelper(val context: Context) {
             MaterialDialog(context).title(text = item.title()).input(prefill = item.summary) { d, c ->
                 Vog.d(this, "initAndSetInputListener ---> $c")
                 val s = c.toString()
-                if (item.keyId != null) {
-                    sp.set(item.keyId, s)
-                    AppConfig.reload()
+                if (item.callback?.invoke(holder, s) != false) {
+                    if (item.keyId != null) {
+                        sp.set(item.keyId, s)
+                        AppConfig.reload()
+                    }
+                    item.summary = s
                 }
-                item.summary = s
-                item.callback?.invoke(holder, s)
                 setBasic(holder, item)
             }.show()
         }
@@ -145,9 +146,10 @@ class SettingItemHelper(val context: Context) {
             val b = sp.getBoolean(item.keyId, item.defaultValue.invoke() as Boolean)
             holder.compoundWight.isChecked = b
             holder.compoundWight.setOnCheckedChangeListener { _, isChecked ->
-                sp.set(item.keyId, isChecked)
-                AppConfig.reload()
-                item.callback?.invoke(holder, isChecked)
+                if (item.callback?.invoke(holder, isChecked) != false) {
+                    sp.set(item.keyId, isChecked)
+                    AppConfig.reload()
+                }
             }
         } else {//withoutSp
             holder.compoundWight.isChecked = item.defaultValue.invoke() as Boolean? ?: false
@@ -188,14 +190,15 @@ class SettingItemHelper(val context: Context) {
             MaterialDialog(context)
                     .title(text = item.title())
                     .listItemsSingleChoice(items = items, initialSelection = initPos) { _, i, t ->
-                        if (item.keyId != null) {
-                            sp.set(item.keyId, t)
-                            AppConfig.reload()
+                        if (item.callback?.invoke(holder, Pair(i, t)) != false) {
+                            if (item.keyId != null) {
+                                sp.set(item.keyId, t)
+                                AppConfig.reload()
+                            }
+                            item.summary = t
+                            setBasic(holder, item)
+                            initPos = i
                         }
-                        item.summary = t
-                        setBasic(holder, item)
-                        initPos = i
-                        item.callback?.invoke(holder, Pair(i, t))
                     }.show()
         }
     }
@@ -216,14 +219,15 @@ class SettingItemHelper(val context: Context) {
 
         MaterialDialog(context).title(text = item.title())
                 .listItemsMultiChoice(item.entityArrId) { d, iss, ts ->
-                    if (item.keyId != null) {
-                        sp.set(item.keyId, ts)
-                        AppConfig.reload()
+                    if (item.callback?.invoke(holder, ts) != false) {
+                        if (item.keyId != null) {
+                            sp.set(item.keyId, ts)
+                            AppConfig.reload()
+                        }
+                        item.summary = ts.toString()
+                        setBasic(holder, item)
                     }
-                    item.summary = ts.toString()
-                    setBasic(holder, item)
                     // callback
-                    item.callback?.invoke(holder, ts)
                 }.show()
     }
 
@@ -244,13 +248,14 @@ class SettingItemHelper(val context: Context) {
             MaterialDialog(context).title(text = item.title())
                     .customView(null, vv.first)
                     .positiveButton {
-                        item.summary = old.toString()
-                        if (item.keyId != null) {
-                            sp.set(item.keyId, old)
-                            AppConfig.reload()
+                        if (item.callback?.invoke(holder, old) != false) {
+                            item.summary = old.toString()
+                            if (item.keyId != null) {
+                                sp.set(item.keyId, old)
+                                AppConfig.reload()
+                            }
+                            setBasic(holder, item)
                         }
-                        setBasic(holder, item)
-                        item.callback?.invoke(holder, old)
                     }
                     .show()
 

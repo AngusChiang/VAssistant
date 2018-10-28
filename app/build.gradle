@@ -8,10 +8,10 @@ android {
     buildToolsVersion '28.0.2'
     defaultConfig {
         applicationId "cn.vove7.vassistant"
-        minSdkVersion 23
+        minSdkVersion 21
         targetSdkVersion 27
-        versionCode 27
-        versionName "1.2.2"
+        versionCode 30
+        versionName "1.2.4"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         testApplicationId = 'cn.vove7.vassistant_test'
     }

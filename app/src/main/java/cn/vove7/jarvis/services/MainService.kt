@@ -46,6 +46,7 @@ import cn.vove7.jarvis.activities.PermissionManagerActivity
 import cn.vove7.jarvis.activities.ScreenPickerActivity
 import cn.vove7.jarvis.chat.ChatSystem
 import cn.vove7.jarvis.chat.QykChatSystem
+import cn.vove7.jarvis.chat.TulingChatSystem
 import cn.vove7.jarvis.tools.AppConfig
 import cn.vove7.jarvis.tools.debugserver.RemoteDebugServer
 import cn.vove7.jarvis.view.dialog.MultiChoiceDialog
@@ -116,9 +117,18 @@ class MainService : BusService(),
         }
     }
 
-    fun loadChatSystem() {
-        if (AppConfig.openChatSystem) {//todo type
-            chatSystem = QykChatSystem()
+    fun loadChatSystem(bySet: Boolean = false) {
+        val type = GlobalApp.APP.resources.getStringArray(R.array.list_chat_system)
+
+        if (!AppConfig.openChatSystem)
+            return
+        chatSystem = when (AppConfig.chatSystem) {
+            type[0] -> QykChatSystem()
+            type[1] -> TulingChatSystem()
+            else -> QykChatSystem()
+        }
+        if (bySet) {
+            GlobalApp.toastShort("对话系统切换完成")
         }
     }
 
@@ -498,7 +508,7 @@ class MainService : BusService(),
     }
 
     private fun hideAll() {
-        listeningToast.hideImmediately()
+        listeningToast.hideDelay()
         listeningAni.hideDelay(0)
     }
 
@@ -560,7 +570,6 @@ class MainService : BusService(),
      */
     inner class RecgEventListener : SpeechEvent {
         override fun onWakeup(word: String?): Boolean {
-            //todo check command
             //解析成功  不再唤醒
             parseWakeUpCommmand(word ?: "").also {
                 if (it) return false
@@ -612,7 +621,6 @@ class MainService : BusService(),
         }
 
         override fun onResult(result: String) {//解析完成再 resumeMusicIf()?
-//            listeningToast.showAndHideDelay(result)
             Vog.d(this, "结果 --------> $result")
             when (voiceMode) {
                 MODE_VOICE -> {
@@ -650,8 +658,9 @@ class MainService : BusService(),
         }
 
         override fun onStop() {
+            Vog.d(this, "onStop ---> ")
             resumeMusicIf()
-            listeningToast.hideDelay()
+//            listeningToast.hideImmediately()
             parseAnimation.begin()
         }
 
@@ -683,8 +692,6 @@ class MainService : BusService(),
                     executeAnimation.begin()//continue
                 }
                 MODE_ALERT -> {
-//                        toast.showShort("重新说")
-//                        speakSync("reSay")
                     AppBus.postSpeechAction(SpeechAction.ActionCode.ACTION_START_RECO)  //继续????
                 }
             }
@@ -704,7 +711,7 @@ class MainService : BusService(),
      * @param result String
      */
     fun onParseCommand(result: String, needCloud: Boolean = true): Boolean {
-//        hideAll()
+        listeningToast.show(result)
         parseAnimation.begin()
         resumeMusicIf()
 //        if (UserInfo.isVip() && AppConfig.onlyCloudServiceParse) {//高级用户且仅云解析
@@ -717,7 +724,7 @@ class MainService : BusService(),
         val parseResult = ParseEngine
                 .parseAction(result, AccessibilityApi.accessibilityService?.currentScope)
         if (parseResult.isSuccess) {
-            listeningToast.hideImmediately()//执行时 消失
+            listeningToast.hideDelay()//执行时 消失
             val his = CommandHistory(UserInfo.getUserId(), result,
                     parseResult.msg)
             NetHelper.uploadUserCommandHistory(his)
@@ -740,7 +747,7 @@ class MainService : BusService(),
                         listeningToast.showAndHideDelay("获取失败")
                         parseAnimation.failed()
                     } else {
-                        listeningToast.hideImmediately()
+                        listeningToast.hideDelay()
                         executeAnimation.begin()
                         speakWithCallback(data, object : SpeakCallback {
                             override fun speakCallback(result: String?) {
