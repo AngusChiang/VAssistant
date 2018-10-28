@@ -18,7 +18,7 @@ class QykChatSystem : ChatSystem {
             Vog.d(this, "chatWithText ---> 失败")
             null
         } else {
-            Gson().fromJson<Map<String, String>>(data, NetHelper.MapType)["content"]
+            Gson().fromJson<Map<String, String>>(data, NetHelper.MapType)["content"]?.replace("{br}"," ")
         }
     }
 }

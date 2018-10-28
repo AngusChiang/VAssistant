@@ -139,7 +139,6 @@ open class MySyntherizer(initConfig: InitConfig) {
     }
 
     fun pause() {
-
         checkResult(mSpeechSynthesizer?.pause(), "speak")
     }
 

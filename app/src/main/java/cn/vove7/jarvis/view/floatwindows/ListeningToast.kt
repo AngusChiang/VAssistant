@@ -47,7 +47,23 @@ class ListeningToast : AbFloatWindow<ListeningToast.VHolder>(GlobalApp.APP) {
             lHandler = ListeningHandler(Looper.getMainLooper())
     }
 
+    private fun setAniRes(resId: Int) {
+        holder.aniImg.apply {
+            setImageResource(resId)
+            post {
+                (drawable as? AnimationDrawable)?.start()
+            }
+        }
+    }
+
+    fun showParseAni() {
+        setAniRes(R.drawable.parsing_animation)
+        if (!isShowing)
+            show()
+    }
+
     fun show(text: String) {
+        setAniRes(R.drawable.listening_animation)
         if (Looper.myLooper() == Looper.getMainLooper()) {
             if (!isShowing)
                 show()
@@ -77,7 +93,7 @@ class ListeningToast : AbFloatWindow<ListeningToast.VHolder>(GlobalApp.APP) {
     fun hideImmediately() {//立即
         if (Looper.myLooper() == Looper.getMainLooper()) {
             hide()
-        }else {
+        } else {
             initIfNeed()
             lHandler?.sendEmptyMessage(HIDE)
         }

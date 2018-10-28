@@ -125,6 +125,7 @@ object SpeechSynService : SpeechSynthesizerListener {
      */
     fun stop() {
         synthesizer.stop()
+        event?.onFinish()
     }
 
     @SuppressLint("HandlerLeak")

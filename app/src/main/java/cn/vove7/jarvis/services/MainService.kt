@@ -281,6 +281,11 @@ class MainService : BusService(),
 
     private val speakCallbacks = mutableListOf<SpeakCallback>()
 
+    /**
+     * 同步
+     * @param text String?
+     * @param call SpeakCallback
+     */
     private fun speakWithCallback(text: String?, call: SpeakCallback) {
         speakCallbacks.add(call)
         speakSync = true
@@ -607,8 +612,7 @@ class MainService : BusService(),
         }
 
         override fun onResult(result: String) {//解析完成再 resumeMusicIf()?
-            listeningToast.showAndHideDelay(result)
-
+//            listeningToast.showAndHideDelay(result)
             Vog.d(this, "结果 --------> $result")
             when (voiceMode) {
                 MODE_VOICE -> {
@@ -701,7 +705,6 @@ class MainService : BusService(),
      */
     fun onParseCommand(result: String, needCloud: Boolean = true): Boolean {
 //        hideAll()
-        listeningToast.hideImmediately()
         parseAnimation.begin()
         resumeMusicIf()
 //        if (UserInfo.isVip() && AppConfig.onlyCloudServiceParse) {//高级用户且仅云解析
@@ -714,6 +717,7 @@ class MainService : BusService(),
         val parseResult = ParseEngine
                 .parseAction(result, AccessibilityApi.accessibilityService?.currentScope)
         if (parseResult.isSuccess) {
+            listeningToast.hideImmediately()//执行时 消失
             val his = CommandHistory(UserInfo.getUserId(), result,
                     parseResult.msg)
             NetHelper.uploadUserCommandHistory(his)
@@ -729,12 +733,14 @@ class MainService : BusService(),
                 true
             } else if (AppConfig.openChatSystem) {//聊天
                 parseAnimation.begin()
+                listeningToast.showParseAni()
                 thread {
                     val data = chatSystem.chatWithText(result)
                     if (data == null) {
                         listeningToast.showAndHideDelay("获取失败")
                         parseAnimation.failed()
                     } else {
+                        listeningToast.hideImmediately()
                         executeAnimation.begin()
                         speakWithCallback(data, object : SpeakCallback {
                             override fun speakCallback(result: String?) {

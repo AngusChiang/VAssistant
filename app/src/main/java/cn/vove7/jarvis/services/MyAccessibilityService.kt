@@ -345,6 +345,10 @@ class MyAccessibilityService : AccessibilityApi() {
                             postLongDelay(stopRunner)
                             true
                         }
+                        SpeechSynService.speaking -> {
+                            SpeechSynService.stop()
+                            true
+                        }
                         else -> super.onKeyEvent(event)
                     }
                 }
