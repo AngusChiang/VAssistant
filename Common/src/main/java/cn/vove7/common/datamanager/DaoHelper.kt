@@ -139,6 +139,13 @@ object DaoHelper {
         return updateActionNodeByType(nodes, ActionNode.NODE_SCOPE_IN_APP, onUpdate)
     }
 
+    /**
+     * 检查是否更新 检查是否删除
+     * @param nodes List<ActionNode>
+     * @param type Int
+     * @param onUpdate OnUpdate?
+     * @return Boolean
+     */
     private fun updateActionNodeByType(nodes: List<ActionNode>, type: Int, onUpdate: OnUpdate? = null): Boolean {
         //
         val actionNodeDao = DAO.daoSession.actionNodeDao

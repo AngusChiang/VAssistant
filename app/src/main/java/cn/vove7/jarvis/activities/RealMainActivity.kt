@@ -7,6 +7,7 @@ import cn.vove7.jarvis.R
 import cn.vove7.jarvis.fragments.HomeFragment
 import cn.vove7.jarvis.fragments.MineFragment
 import cn.vove7.jarvis.tools.AppConfig
+import cn.vove7.jarvis.tools.AppConfig.checkAppUpdate
 import cn.vove7.jarvis.tools.DataUpdator
 import cn.vove7.jarvis.view.dialog.UpdateLogDialog
 import cn.vove7.jarvis.view.utils.FragmentSwitcher
@@ -18,10 +19,10 @@ import kotlinx.android.synthetic.main.activity_real_main.*
 
 class RealMainActivity : AppCompatActivity() {
 
-    val fSwitcher = FragmentSwitcher(this, R.id.fragment)
-    val homeF = HomeFragment.newInstance()
+    private val fSwitcher = FragmentSwitcher(this, R.id.fragment)
+    private val homeF = HomeFragment.newInstance()
     //    val storeF = StoreFragment.newInstance()
-    val mineF = MineFragment.newInstance()
+    private val mineF = MineFragment.newInstance()
     private val mOnNavigationItemSelectedListener = BottomNavigationView.OnNavigationItemSelectedListener { item ->
         return@OnNavigationItemSelectedListener when (item.itemId) {
             R.id.nav_home -> fSwitcher.switchFragment(homeF)
@@ -39,8 +40,11 @@ class RealMainActivity : AppCompatActivity() {
         fSwitcher.switchFragment(mineF)
 
         requestPermission()
-
     }
+
+//    override fun onResume() {
+//        super.onResume()
+//    }
 
     companion object {
         val ps = arrayOf(
@@ -56,13 +60,13 @@ class RealMainActivity : AppCompatActivity() {
                         PermissionUtils.autoRequestPermission(this, ps)
                     }.show()
         } else {
-            showUpdateLog()
+            showDataUpdateLog()
         }
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        showUpdateLog()
+        showDataUpdateLog()
     }
 
     private fun checkDataUpdate() {
@@ -71,17 +75,19 @@ class RealMainActivity : AppCompatActivity() {
         }
     }
 
-    private fun showUpdateLog() {
-        val sp=SpHelper(this)
+    private fun showDataUpdateLog() {
+        val sp = SpHelper(this)
         val lastCode = sp.getLong("v_code")
-        val nowCode=AppConfig.versionCode
+        val nowCode = AppConfig.versionCode
         if (lastCode < nowCode) {
             UpdateLogDialog(this) {
                 checkDataUpdate()
             }
-            sp.set("v_code",nowCode)
+            sp.set("v_code", nowCode)
         } else {
             checkDataUpdate()
+            checkAppUpdate (this,false)
+
         }
     }
 

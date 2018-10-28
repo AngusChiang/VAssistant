@@ -44,6 +44,8 @@ import cn.vove7.jarvis.App
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.activities.PermissionManagerActivity
 import cn.vove7.jarvis.activities.ScreenPickerActivity
+import cn.vove7.jarvis.chat.ChatSystem
+import cn.vove7.jarvis.chat.QykChatSystem
 import cn.vove7.jarvis.tools.AppConfig
 import cn.vove7.jarvis.tools.debugserver.RemoteDebugServer
 import cn.vove7.jarvis.view.dialog.MultiChoiceDialog
@@ -61,6 +63,7 @@ import org.greenrobot.eventbus.SubscriberExceptionEvent
 import org.greenrobot.eventbus.ThreadMode
 import java.lang.Thread.sleep
 import java.util.*
+import kotlin.collections.HashMap
 import kotlin.concurrent.thread
 
 /**
@@ -86,6 +89,8 @@ class MainService : BusService(),
      */
     private lateinit var cExecutor: CExecutorI
 
+    private lateinit var chatSystem: ChatSystem
+
     private val speechRecoService = SpeechRecoService(RecgEventListener())
     private val speechSynService = SpeechSynService
 
@@ -106,13 +111,21 @@ class MainService : BusService(),
         thread {
             listeningToast = ListeningToast()
             cExecutor = MultiExecutorEngine()
+            loadChatSystem()
             init()
+        }
+    }
+
+    fun loadChatSystem() {
+        if (AppConfig.openChatSystem) {//todo type
+            chatSystem = QykChatSystem()
         }
     }
 
     override fun onBind(intent: Intent): IBinder {
         return object : Binder() {}
     }
+
     fun init() {
         speechSynService.event = SyncEventListener()
     }
@@ -528,7 +541,9 @@ class MainService : BusService(),
             //打开手电筒、关闭手电筒
             "打开手电筒", "打开电灯" -> SystemBridge.openFlashlight()
             "关闭手电筒", "关闭电灯" -> SystemBridge.closeFlashlight()
-            "截屏分享","文字提取" -> { onParseCommand(w) }
+            "截屏分享", "文字提取" -> {
+                onParseCommand(w)
+            }
             else -> return false
 
         }
@@ -685,7 +700,8 @@ class MainService : BusService(),
      * @param result String
      */
     fun onParseCommand(result: String, needCloud: Boolean = true): Boolean {
-        hideAll()
+//        hideAll()
+        listeningToast.hideImmediately()
         parseAnimation.begin()
         resumeMusicIf()
 //        if (UserInfo.isVip() && AppConfig.onlyCloudServiceParse) {//高级用户且仅云解析
@@ -709,6 +725,23 @@ class MainService : BusService(),
                 Vog.d(this, "onParseCommand ---> 失败云解析")
                 NetHelper.cloudParse(result) {
                     runFromCloud(result, it)
+                }
+                true
+            } else if (AppConfig.openChatSystem) {//聊天
+                parseAnimation.begin()
+                thread {
+                    val data = chatSystem.chatWithText(result)
+                    if (data == null) {
+                        listeningToast.showAndHideDelay("获取失败")
+                        parseAnimation.failed()
+                    } else {
+                        executeAnimation.begin()
+                        speakWithCallback(data, object : SpeakCallback {
+                            override fun speakCallback(result: String?) {
+                                hideAll()
+                            }
+                        })
+                    }
                 }
                 true
             } else {
@@ -796,7 +829,7 @@ class MainService : BusService(),
     }
 
     //识别前是否有音乐播放
-    var haveMusicPlay = false
+    private var haveMusicPlay = false
     var continuePlay = true//是否继续播放| 在说完响应词后，不改变haveMusicPlay
     //
 

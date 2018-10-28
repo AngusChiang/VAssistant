@@ -1,10 +1,8 @@
 package cn.vove7.jarvis.receivers
 
-import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
-import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.appbus.AppBus
 import cn.vove7.common.appbus.SpeechAction
 import cn.vove7.jarvis.speech.wakeup.MyWakeup
@@ -17,36 +15,15 @@ import cn.vove7.vtp.log.Vog
  * @author Administrator
  * 2018/10/8
  */
-class PowerEventReceiver : BroadcastReceiver() {
-    companion object {
-        var open = false
-        var isCharging: Boolean = false //初始状态?
-            get() {
-                Vog.d(this, "isCharging ---> $field")
-                return field
-            }
-        private val receiver: PowerEventReceiver by lazy {
-            Vog.d(this, "pow ---> ")
-            PowerEventReceiver()
-        }
-
-        private val intentFilter: IntentFilter by lazy {
-            val i = IntentFilter()
-            i.addAction(Intent.ACTION_POWER_CONNECTED)
-            i.addAction(Intent.ACTION_POWER_DISCONNECTED)
-            i
-        }
-
-        fun start() {
-            open = true
-            GlobalApp.APP.registerReceiver(receiver, intentFilter)
-        }
-
-        fun stop() {
-            open = false
-            GlobalApp.APP.unregisterReceiver(receiver)
-        }
+object PowerEventReceiver : DyBCReceiver() {
+    override val intentFilter: IntentFilter by lazy {
+        val i = IntentFilter()
+        i.addAction(Intent.ACTION_POWER_CONNECTED)
+        i.addAction(Intent.ACTION_POWER_DISCONNECTED)
+        i
     }
+    var isCharging: Boolean = false //初始状态?
+
 
     override fun onReceive(context: Context?, intent: Intent?) {
         if (!AppConfig.isAutoVoiceWakeupCharging) {

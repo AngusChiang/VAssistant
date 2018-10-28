@@ -137,6 +137,9 @@ object NetHelper {
     val ActionNodeListType: Type by lazy {
         object : TypeToken<ResponseMessage<List<ActionNode>>>() {}.type
     }
+    val MapType: Type by lazy {
+        object : TypeToken<Map<String,Any>>() {}.type
+    }
 
     /**
      * 命令记录，

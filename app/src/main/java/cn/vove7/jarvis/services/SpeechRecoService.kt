@@ -88,7 +88,7 @@ class SpeechRecoService(val event: SpeechEvent) {
         stopAutoSleepWakeup()
         Vog.d(this, "startAutoSleepWakeUp ---> 开启自动休眠")
         timerHandler.postDelayed(stopWakeUpTimer,
-                if (BuildConfig.DEBUG) 60000
+                if (BuildConfig.DEBUG) 10000
                 else AppConfig.autoSleepWakeupMillis)
     }
 

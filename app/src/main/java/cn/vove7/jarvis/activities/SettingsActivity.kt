@@ -128,6 +128,9 @@ class SettingsActivity : ReturnableActivity() {
                             AppBus.postSpeechAction(SpeechAction.ActionCode.ACTION_START_WAKEUP)
                         }
                     },
+                    CheckBoxItem(title = "开屏唤醒", summary = "自动休眠后，开屏自动打开语音唤醒",
+                            keyId = R.string.key_open_voice_wakeup_if_auto_sleep, defaultValue = { true })
+                    ,
                     SwitchItem(title = "按键唤醒",
                             keyId = R.string.key_long_press_volume_up_wake_up, summary = "可通过长按音量上键或耳机中键唤醒\n需要无障碍模式开启",
                             defaultValue = { true }),

@@ -332,7 +332,7 @@ object SystemBridge : SystemOperation {
 
     override fun mediaResume() {
         sendMediaKey(KeyEvent.KEYCODE_MEDIA_PLAY)
-        removeMusicFocus()
+//        removeMusicFocus()
     }
 
     override fun mediaStop() {

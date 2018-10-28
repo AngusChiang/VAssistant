@@ -297,4 +297,6 @@
     <string name="key_volume_wakeup_when_screen_off" translatable="false">volume_wakeup_when_screen_off</string>
     <string name="key_auto_sleep_wakeup_duration" translatable="false">auto_sleep_wakeup_duration</string>
     <string name="text_update_log">Update log</string>
+    <string name="key_open_chat_system" translatable="false">open_chat_system</string>
+    <string name="key_open_voice_wakeup_if_auto_sleep" translatable="false">open_voice_wakeup_if_auto_sleep</string>
 </resources>

@@ -5,6 +5,7 @@ import cn.vove7.common.model.UserInfo
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.adapters.SettingsExpandableAdapter
 import cn.vove7.jarvis.plugins.AdKillerService
+import cn.vove7.jarvis.services.MainService
 import cn.vove7.jarvis.services.MyAccessibilityService
 import cn.vove7.jarvis.view.NumberPickerItem
 import cn.vove7.jarvis.view.SwitchItem
@@ -46,9 +47,16 @@ class LaboratoryActivity : ReturnableActivity() {
                         defaultValue = { 17 }),
                 SwitchItem(R.string.text_show_toast_when_remove_ad, summary = getString(R.string.text_show_toast_when_remove_ad_summary)
                         , keyId = R.string.key_show_toast_when_remove_ad, defaultValue = { true })
-        )
-        )
-        )
+        )),
+                SettingGroupItem(R.color.google_green, titleS = "聊天", childItems = listOf(
+                        SwitchItem(title = "开启", summary = "指令匹配失败，调用聊天系统",
+                                keyId = R.string.key_open_chat_system, defaultValue = { true }) { _, b ->
+                            if (b as Boolean) {
+                                MainService.instance?.loadChatSystem()
+                            }
+                        }
+                ))
+                )
     }
 
 }

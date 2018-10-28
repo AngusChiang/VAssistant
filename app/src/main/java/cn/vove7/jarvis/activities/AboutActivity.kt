@@ -61,8 +61,9 @@ class AboutActivity : AppCompatActivity(), AdapterView.OnItemClickListener {
                 SystemHelper.openApplicationMarket(this, this.packageName, APP_STORE_COLL_APK)
             }
             1 -> {
-                AppConfig.versionName
-                SystemHelper.openApplicationMarket(this, this.packageName, APP_STORE_COLL_APK)
+                AppConfig.checkAppUpdate(this,true){
+                    toast.showShort("未发现更新")
+                }
             }
             2 -> {
                 SystemBridge.openUrl("https://github.com/Vove7/VOSP")
@@ -95,3 +96,4 @@ class AboutActivity : AppCompatActivity(), AdapterView.OnItemClickListener {
         )
     }
 }
+

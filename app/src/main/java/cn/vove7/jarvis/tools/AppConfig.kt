@@ -1,18 +1,28 @@
 package cn.vove7.jarvis.tools
 
+import android.content.Context
 import android.os.Build
 import android.os.Looper
 import cn.vove7.common.app.GlobalApp
+import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.model.UserInfo
 import cn.vove7.common.netacc.ApiUrls
 import cn.vove7.common.netacc.NetHelper
 import cn.vove7.common.netacc.model.BaseRequestModel
+import cn.vove7.common.utils.runOnUi
 import cn.vove7.jarvis.R
 import cn.vove7.vtp.log.Vog
 import cn.vove7.vtp.sharedpreference.SpHelper
+import cn.vove7.vtp.system.SystemHelper
+import com.afollestad.materialdialogs.MaterialDialog
 import com.google.gson.Gson
 import devliving.online.securedpreferencestore.SecuredPreferenceStore
+import org.jsoup.Jsoup
 import kotlin.concurrent.thread
+import android.content.Intent
+import android.net.Uri
+import com.afollestad.materialdialogs.checkbox.checkBoxPrompt
+
 
 /**
  * # AppConfig
@@ -28,11 +38,12 @@ object AppConfig {
     var isLongPressVolUpWakeUp = true
     var voiceControlDialog = true
     var adWaitSecs = 17
-    var voiceWakeup = false//语音唤醒
-    set(v) {
-        field = v
-        sp.set(R.string.key_open_voice_wakeup, v)
-    }
+    var voiceWakeup = false
+        //语音唤醒
+        set(v) {
+            field = v
+            sp.set(R.string.key_open_voice_wakeup, v)
+        }
     var autoOpenASWithRoot = false
     var audioSpeak = true//播报语音
     var userExpPlan = true
@@ -42,7 +53,7 @@ object AppConfig {
     var autoUpdateData = true //
     var WAKEUP_FILE_NHXV = "assets:///bd/WakeUp_nhxv.bin"
     var WAKEUP_FILE_XVTX = "assets:///bd/WakeUp_xvtx.bin"
-    var DEFAULT_WAKEUP_FILE = WAKEUP_FILE_XVTX
+    var DEFAULT_WAKEUP_FILE = WAKEUP_FILE_NHXV
     var openResponseWord = true
     var responseWord = "我在"
     var speakResponseWordOnVoiceWakeup = true
@@ -53,6 +64,8 @@ object AppConfig {
     var volumeKeyDelayUp = 600L//音量长按延迟
     var wakeUpFilePath = DEFAULT_WAKEUP_FILE
 
+    var openVoiceWakeUpIfAutoSleep = true// 自动休眠后，亮屏自动开启语音唤醒
+    var openChatSystem = true
     var autoSleepWakeupMillis: Long = 30 * 60 * 1000
     fun init() {
         thread {
@@ -130,6 +143,8 @@ object AppConfig {
         openResponseWord = getBooleanAndInit(R.string.key_open_response_word, true)
         speakResponseWordOnVoiceWakeup = getBooleanAndInit(R.string.key_speak_response_word_on_voice_wakeup, true)
         autoOpenASWithRoot = getBooleanAndInit(R.string.key_auto_open_as_with_root, false)
+        openChatSystem = getBooleanAndInit(R.string.key_open_chat_system, true)
+        openVoiceWakeUpIfAutoSleep = getBooleanAndInit(R.string.key_open_voice_wakeup_if_auto_sleep, true)
 //  todo      cloudServiceParseIfLocalFailed = getBooleanAndInit(R.string.key_cloud_service_parse, true)
         sp.set(R.string.key_cloud_service_parse, false)
         autoUpdateData = getBooleanAndInit(R.string.key_auto_update_data, true)
@@ -198,6 +213,72 @@ object AppConfig {
                 }
             }
         }
+
+    fun checkAppUpdate(context: Context, byUser: Boolean, onUpdate: (() -> Unit)? = null) {
+//        if (BuildConfig.DEBUG) {
+//            return
+//        }
+        thread {
+            val doc = Jsoup.connect("https://www.coolapk.com/apk/cn.vove7.vassistant").get()
+            try {
+                val sp = SpHelper(context)
+                val verName = doc.body().getElementsByClass("list_app_info").text()
+                val log = doc.body().getElementsByClass("apk_left_title_info")[0]
+                        .html().replace("<br> ", "\n")
+                runOnUi {
+                    val noUpdateName = sp.getString("no_update_ver_name") ?: ""
+                    if (!byUser && noUpdateName == verName) {
+                        Vog.d(this,"checkAppUpdate ---> 忽略此版")
+                        return@runOnUi
+                    }
+                    if (verName != AppConfig.versionName)
+
+                        MaterialDialog(context).title(text = "发现新版本 v$verName")
+                                .message(text = log)
+                                .positiveButton(text = "用酷安下载") { _ ->
+                                    openCollapk(context)
+                                }
+                                .checkBoxPrompt(text = "不再提醒此版本") {
+                                    if (it) {
+                                        sp.set("no_update_ver_name", verName)
+                                    } else sp.removeKey("no_update_ver_name")
+                                }
+                                .negativeButton()
+                                .cancelable(false)
+                                .show()
+                    else
+                        onUpdate?.invoke()
+                }
+            } catch (e: Exception) {
+                GlobalLog.err("检查更新失败" + e.message)
+                onUpdate?.invoke()
+            }
+
+        }
+    }
+
+    val PACKAGE_COOL_MARKET = "com.coolapk.market"
+//    //小米应用商店
+//    val PACKAGE_MI_MARKET = "com.xiaomi.market"
+//    //应用宝
+//    val PACKAGE_TENCENT_MARKET = "com.tencent.android.qqdownloader"
+//    //豌豆荚
+//    val PACKAGE_WANDOUJIA_MARKET = "com.wandoujia.phoenix2"
+
+    private fun openCollapk(context: Context) {
+        val intent = Intent(Intent.ACTION_VIEW)
+        intent.data = Uri.parse("market://details?id=${context.packageName}")
+        //跳转酷市场
+        intent.setClassName(PACKAGE_COOL_MARKET, "com.coolapk.market.view.app.AppViewV8Activity")
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        try {
+            context.startActivity(intent)
+        } catch (e: Exception) {
+            e.printStackTrace()
+            GlobalApp.toastShort("未安装酷安")
+        }
+
+    }
 }
 
 //

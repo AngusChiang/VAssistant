@@ -7,8 +7,8 @@ import android.util.Log
 import cn.vove7.androlua.LuaApp
 import cn.vove7.common.appbus.MessageEvent
 import cn.vove7.common.bridges.RootHelper
-import cn.vove7.executorengine.helper.AdvanAppHelper
 import cn.vove7.jarvis.receivers.PowerEventReceiver
+import cn.vove7.jarvis.receivers.ScreenStatusListener
 import cn.vove7.jarvis.services.MainService
 import cn.vove7.jarvis.services.MyAccessibilityService
 import cn.vove7.jarvis.tools.AppConfig
@@ -50,9 +50,10 @@ class App : LuaApp() {
                 CodeProcessor.init(this)
                 ShortcutUtil.addWakeUpShortcut()
 //                AdvanAppHelper.updateAppList()
-                PowerEventReceiver.start()
+                startBroadcastReceivers()
                 if (AppConfig.autoOpenASWithRoot) {
-                    RootHelper.openAppAccessService(packageName, "${MyAccessibilityService::class.qualifiedName}")
+                    RootHelper.openAppAccessService(packageName,
+                            "${MyAccessibilityService::class.qualifiedName}")
                 }
                 Vog.d(this, "service thread ---> finish ${System.currentTimeMillis() / 1000}")
             }
@@ -74,6 +75,15 @@ class App : LuaApp() {
         }
     }
 
+    private fun startBroadcastReceivers() {
+        PowerEventReceiver.start()
+        ScreenStatusListener.start()
+    }
+    private fun stopBroadcastReceivers() {
+        PowerEventReceiver.stop()
+        ScreenStatusListener.stop()
+    }
+
     companion object {
         var ins: App? = null
 
@@ -86,7 +96,7 @@ class App : LuaApp() {
         services.forEach {
             stopService(it)
         }
-        PowerEventReceiver.stop()
+        stopBroadcastReceivers()
         super.onTerminate()
     }
 

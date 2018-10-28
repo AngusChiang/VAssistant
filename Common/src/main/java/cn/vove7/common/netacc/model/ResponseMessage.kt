@@ -30,6 +30,7 @@ open class ResponseMessage<T> {
         return "{code=$code, message=$message, err=$err, data=$data}"
     }
 
+
     constructor(code: Int, message: String) {
         this.code = code
         this.message = message

@@ -1,8 +1,11 @@
 package cn.vove7.jarvis
 
+import cn.vove7.common.bridges.HttpBridge
 import cn.vove7.common.datamanager.parse.model.Action
 import cn.vove7.common.utils.TextDateParser
 import cn.vove7.common.utils.TextHelper
+import org.jsoup.Jsoup
+import org.jsoup.nodes.Document
 import org.junit.Test
 import java.lang.Thread.sleep
 import java.text.SimpleDateFormat
@@ -132,5 +135,16 @@ class ExampleUnitTest {
     fun testReg() {
         val m = TextHelper.matchValues("切换应用", "(使?用|打开)%")
         println(m)
+    }
+
+    @Test
+    fun htmlParse() {
+//        val data = HttpBridge.get("https://www.coolapk.com/apk/cn.vove7.vassistant")
+
+        val doc = Jsoup.connect("https://www.coolapk.com/apk/cn.vove7.vassistant").get()
+
+        println(doc.body().getElementsByClass("list_app_info").text())
+        println(doc.body().getElementsByClass("apk_left_title_info")[0].html().replace("<br> ","\n"))
+
     }
 }
