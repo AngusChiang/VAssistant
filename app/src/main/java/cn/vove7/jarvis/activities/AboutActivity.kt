@@ -14,6 +14,7 @@ import cn.vove7.jarvis.adapters.IconTitleEntity
 import cn.vove7.jarvis.adapters.IconTitleListAdapter
 import cn.vove7.jarvis.tools.AppConfig
 import cn.vove7.jarvis.view.custom.IconView
+import cn.vove7.jarvis.view.dialog.ProgressDialog
 import cn.vove7.jarvis.view.dialog.UpdateLogDialog
 import cn.vove7.vtp.easyadapter.BaseListAdapter
 import cn.vove7.vtp.system.SystemHelper
@@ -61,8 +62,14 @@ class AboutActivity : AppCompatActivity(), AdapterView.OnItemClickListener {
                 SystemHelper.openApplicationMarket(this, this.packageName, APP_STORE_COLL_APK)
             }
             1 -> {
-                AppConfig.checkAppUpdate(this,true){
-                    toast.showShort("未发现更新")
+                val p = ProgressDialog(this){
+                    toast.showShort("检查失败")
+                }
+                AppConfig.checkAppUpdate(this, true) {
+                    p.dismiss()
+                    if (!it) {
+                        toast.showShort("未发现更新")
+                    }
                 }
             }
             2 -> {

@@ -214,12 +214,13 @@ object AppConfig {
             }
         }
 
-    fun checkAppUpdate(context: Context, byUser: Boolean, onUpdate: (() -> Unit)? = null) {
+    fun checkAppUpdate(context: Context, byUser: Boolean, onUpdate: ((Boolean) -> Unit)? = null) {
 //        if (BuildConfig.DEBUG) {
 //            return
 //        }
         thread {
-            val doc = Jsoup.connect("https://www.coolapk.com/apk/cn.vove7.vassistant").get()
+            val doc = Jsoup.connect("https://www.coolapk.com/apk/cn.vove7.vassistant")
+                    .timeout(5000).get()
             try {
                 val sp = SpHelper(context)
                 val verName = doc.body().getElementsByClass("list_app_info").text()
@@ -231,8 +232,8 @@ object AppConfig {
                         Vog.d(this,"checkAppUpdate ---> 忽略此版")
                         return@runOnUi
                     }
-                    if (verName != AppConfig.versionName)
-
+                    if (verName != AppConfig.versionName) {
+                        onUpdate?.invoke(true)
                         MaterialDialog(context).title(text = "发现新版本 v$verName")
                                 .message(text = log)
                                 .positiveButton(text = "用酷安下载") { _ ->
@@ -246,12 +247,13 @@ object AppConfig {
                                 .negativeButton()
                                 .cancelable(false)
                                 .show()
+                    }
                     else
-                        onUpdate?.invoke()
+                        onUpdate?.invoke(false)
                 }
             } catch (e: Exception) {
                 GlobalLog.err("检查更新失败" + e.message)
-                onUpdate?.invoke()
+                onUpdate?.invoke(false)
             }
 
         }

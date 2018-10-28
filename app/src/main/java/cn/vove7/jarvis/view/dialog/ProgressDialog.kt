@@ -12,23 +12,30 @@ import com.afollestad.materialdialogs.customview.customView
  * @author Administrator
  * 2018/9/20
  */
-class ProgressDialog(val context: Context) {
+class ProgressDialog(val context: Context, whenAutoClose: (() -> Unit)? = null) {
     val dialog = MaterialDialog(context)
+    val handler: Handler
+    private val autoDismiss = Runnable {
+        //15s强制关闭
+        if (dialog.isShowing) {
+            dismiss()
+            whenAutoClose?.invoke()
+        }
+    }
 
     init {
         dialog.customView(R.layout.dialog_progress)
                 .cancelable(false)
                 .show()
-        Handler().postDelayed({
-            //10s强制关闭
-            if (dialog.isShowing)
-                dismiss()
-        }, 15000)
+        handler = Handler()
+        handler.postDelayed(autoDismiss
+                , 15000)
     }
 
     fun dismiss() {
-        if(dialog.isShowing) {
+        if (dialog.isShowing) {
             dialog.dismiss()
+            handler.removeCallbacks(autoDismiss)
         }
     }
 }
