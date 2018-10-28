@@ -48,6 +48,10 @@ class MultiSpan
         }
     }
 
+    fun build(): SpannableStringBuilder {
+        return spanStr
+    }
+
     override fun onClick(widget: View) {
         onClick?.invoke(text)
     }

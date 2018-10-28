@@ -13,10 +13,13 @@ import android.hardware.display.VirtualDisplay
 import android.media.ImageReader
 import android.media.projection.MediaProjection
 import android.media.projection.MediaProjectionManager
+import android.os.Build
 import android.os.Bundle
 import android.os.Looper
 import android.view.WindowManager
 import android.widget.ImageView
+import cn.vove7.common.app.GlobalApp
+import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.model.ResultBox
 import cn.vove7.common.view.toast.ColorfulToast
 import cn.vove7.vtp.log.Vog
@@ -87,7 +90,13 @@ class ScreenshotActivity : Activity() {
     private fun requestCap() {//请求
         mMediaProjectionManager = application.getSystemService(Context.MEDIA_PROJECTION_SERVICE)
                 as MediaProjectionManager
-        startActivityForResult(mMediaProjectionManager.createScreenCaptureIntent(), REQUEST_MEDIA_PROJECTION)
+        try {
+            startActivityForResult(mMediaProjectionManager.createScreenCaptureIntent(), REQUEST_MEDIA_PROJECTION)
+        } catch (e: Exception) {
+            GlobalApp.toastShort("不支持截屏")
+            GlobalLog.err(e)
+            notifyShot(null)
+        }
     }
 
     private fun startCapture() {

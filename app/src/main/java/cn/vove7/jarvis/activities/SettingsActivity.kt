@@ -44,13 +44,16 @@ class SettingsActivity : ReturnableActivity() {
         val adapter = SettingsExpandableAdapter(this, initData(), expandableListView)
         expandableListView.setAdapter(adapter)
 
-        expandableListView?.post {
-            expandableListView.apply {
-                expandGroup(0)
-                expandGroup(1)
-                expandGroup(2)
-                expandGroup(3)
+        try {
+            expandableListView?.post {
+                expandableListView.apply {
+                    expandGroup(0)
+                    expandGroup(1)
+                    expandGroup(2)
+                    expandGroup(3)
+                }
             }
+        } catch (e: Exception) {
         }
     }
 

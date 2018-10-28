@@ -281,9 +281,13 @@ object SystemBridge : SystemOperation {
     }
 
     fun removeMusicFocus() {
-        val mAm = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager;
-        mAm.abandonAudioFocusRequest(AudioFocusRequest
-                .Builder(AudioManager.AUDIOFOCUS_GAIN_TRANSIENT).build())
+        val mAm = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
+        try {
+            mAm.abandonAudioFocusRequest(AudioFocusRequest
+                    .Builder(AudioManager.AUDIOFOCUS_GAIN_TRANSIENT).build())
+        } catch (e: NoClassDefFoundError) {//7.1.2- 异常
+
+        }
     }
 
 
