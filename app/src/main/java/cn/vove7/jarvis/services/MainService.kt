@@ -507,9 +507,14 @@ class MainService : BusService(),
             }
     }
 
-    private fun hideAll() {
-        listeningToast.hideDelay()
-        listeningAni.hideDelay(0)
+    private fun hideAll(immediately: Boolean = false) {
+        if (immediately) {
+            listeningToast.hideImmediately()
+            listeningAni.hideDelay(0)
+        } else {
+            listeningToast.hideDelay()
+            listeningAni.hideDelay()
+        }
     }
 
     override fun getGlobalData(): Map<*, *> {
@@ -668,7 +673,7 @@ class MainService : BusService(),
             Vog.d(this, "onCancel ---> ")
             continuePlay = true
             resumeMusicIf()
-            hideAll()
+            hideAll(true)
             if (voiceMode == MODE_GET_PARAM) {
                 cExecutor.onGetVoiceParam(null)
                 executeAnimation.begin()//continue
