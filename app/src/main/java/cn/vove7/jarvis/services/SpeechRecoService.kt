@@ -2,14 +2,13 @@ package cn.vove7.jarvis.services
 
 import android.content.Context
 import android.content.pm.PackageManager
-import android.os.Handler
-import android.os.HandlerThread
-import android.os.Looper
-import android.os.Message
+import android.os.*
 import android.support.v4.app.ActivityCompat
 import cn.vove7.androlua.luabridge.LuaUtil
 import cn.vove7.common.app.GlobalApp
+import cn.vove7.common.appbus.AppBus
 import cn.vove7.common.appbus.VoiceData
+import cn.vove7.common.model.RequestPermission
 import cn.vove7.executorengine.helper.AdvanAppHelper
 import cn.vove7.executorengine.helper.AdvanContactHelper
 import cn.vove7.jarvis.BuildConfig
@@ -28,6 +27,7 @@ import cn.vove7.jarvis.speech.wakeup.RecogWakeupListener
 import cn.vove7.jarvis.speech.wakeup.WakeupEventAdapter
 import cn.vove7.jarvis.tools.AppConfig
 import cn.vove7.vtp.log.Vog
+import cn.vove7.vtp.runtimepermission.PermissionUtils
 import com.baidu.speech.asr.SpeechConstant
 import com.google.gson.Gson
 import com.google.gson.annotations.SerializedName
@@ -144,7 +144,10 @@ class SpeechRecoService(val event: SpeechEvent) {
                 Pair(SpeechConstant.DECODER, 0),
                 Pair(SpeechConstant.ASR_OFFLINE_ENGINE_GRAMMER_FILE_PATH, offSpeechGrammarPath),
                 Pair(SpeechConstant.SLOT_DATA, OffWord(
-                        AdvanContactHelper.getContactName()
+                        if (ActivityCompat.checkSelfPermission(AdvanContactHelper.context,
+                                        android.Manifest.permission.RECORD_AUDIO)
+                                != PackageManager.PERMISSION_GRANTED) //首次启动无权限 不做
+                         AdvanContactHelper.getContactName() else arrayOf()
                         , AdvanAppHelper.getAppName()
                 ).toString())
         )
@@ -170,10 +173,16 @@ class SpeechRecoService(val event: SpeechEvent) {
         }
     }
 
-    internal fun startRecog() {
+    internal fun startRecog() {//检查权限
         if (ActivityCompat.checkSelfPermission(AdvanContactHelper.context,
                         android.Manifest.permission.RECORD_AUDIO)
                 != PackageManager.PERMISSION_GRANTED) {
+            AppBus.post(RequestPermission("麦克风权限"))
+            return
+        }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && !PermissionUtils.canDrawOverlays(context)) {
+            Vog.d(this, "show ---> 无悬浮窗")
+            AppBus.post(RequestPermission("悬浮窗权限"))
             return
         }
         //震动 音效

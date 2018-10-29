@@ -23,7 +23,6 @@ import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
 import kotlin.concurrent.thread
 
-
 class App : LuaApp() {
 
     private val mainService: Intent by lazy { Intent(this, MainService::class.java) }

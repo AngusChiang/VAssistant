@@ -62,11 +62,11 @@ object TextDateParser {
                     val c = Calendar.getInstance()
                     val offHt = parseOffsetHourTime(s) //与parseHourAndTime分开好处理
                     if (offHt != null) {
-                        add(Calendar.HOUR_OF_DAY, offHt.first + c.get(Calendar.HOUR_OF_DAY))
-                        add(Calendar.MINUTE, offHt.second + c.get(Calendar.MINUTE))
+                        set(Calendar.HOUR_OF_DAY, offHt.first + c.get(Calendar.HOUR_OF_DAY))
+                        set(Calendar.MINUTE, offHt.second + c.get(Calendar.MINUTE))
                     } /*else {// 没指定时分默认当前时分
-                        add(Calendar.HOUR_OF_DAY, c.get(Calendar.HOUR_OF_DAY))
-                        add(Calendar.MINUTE, c.get(Calendar.MINUTE))
+                        set(Calendar.HOUR_OF_DAY, c.get(Calendar.HOUR_OF_DAY))
+                        set(Calendar.MINUTE, c.get(Calendar.MINUTE))
                     }*/
                 }
             }

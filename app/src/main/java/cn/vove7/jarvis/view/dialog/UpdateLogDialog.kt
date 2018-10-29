@@ -27,6 +27,9 @@ class UpdateLogDialog(context: Context, onDismiss: (() -> Unit)? = null) {
 
     private val logs: List<Pair<String, String>>
         get() = listOf(
+                Pair("1.2.5", "修复图灵机器人调用问题\n" +
+                        "修复解析日期‘x小时’后错误\n" +
+                        "其他问题"),
                 Pair("1.2.4", "加入对话系统：图灵机器人 (/实验室)"),
                 Pair("1.2.3", "修复部分机型识别后崩溃"),
                 Pair("1.2.2", "加入App自动检查更新\n" +

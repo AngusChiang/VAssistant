@@ -11,9 +11,8 @@ import android.view.View
 import android.widget.TextView
 import android.widget.Toast
 import cn.vove7.common.R
-import android.app.AppOpsManager
-import android.content.pm.ApplicationInfo
 import cn.vove7.common.app.GlobalLog
+import java.lang.reflect.Field
 
 
 /**
@@ -35,8 +34,6 @@ class ColorfulToast(val context: Context, textColor: Int = R.color.fff) {
         if (looper == null) {
             Looper.prepare()
             looper = Looper.myLooper()!!
-
-
         }
         toast = Toast(context)
         lHandler = ToastHandler(looper)
@@ -46,6 +43,7 @@ class ColorfulToast(val context: Context, textColor: Int = R.color.fff) {
         toast.view = toastView
         toast.setGravity(Gravity.TOP, 0, 30)
 
+        hook(toast)
     }
 
     fun bottom(): ColorfulToast {
@@ -150,5 +148,48 @@ class ColorfulToast(val context: Context, textColor: Int = R.color.fff) {
         const val SHOW_SHORT = 5
         const val SHOW_LONG = 6
         const val HIDE = 1
+
+        private var sField_TN: Field? = null
+        private var sField_TN_Handler: Field? = null
+
+        init {
+            try {
+                sField_TN = Toast::class.java.getDeclaredField("mTN")
+                sField_TN?.isAccessible = true
+                sField_TN_Handler = sField_TN?.type?.getDeclaredField("mHandler")
+                sField_TN_Handler?.isAccessible = true
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+
+        /**
+         * https://blog.csdn.net/icuihai/article/details/81179105?tdsourcetag=s_pcqq_aiomsg
+         * @param toast Toast
+         */
+        private fun hook(toast: Toast) {
+            try {
+                val tn = sField_TN?.get(toast)
+                val preHandler = sField_TN_Handler?.get(tn) as Handler?
+                sField_TN_Handler?.set(tn, SafelyHandlerWarpper(preHandler))
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+    }
+
+    class SafelyHandlerWarpper(val impl: Handler?) : Handler() {
+
+        override fun dispatchMessage(msg: Message) {
+            try {
+                super.dispatchMessage(msg)
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+
+        override fun handleMessage(msg: Message?) {
+            impl?.handleMessage(msg)//需要委托给原Handler执行
+        }
     }
 }

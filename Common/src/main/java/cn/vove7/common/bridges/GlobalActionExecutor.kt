@@ -173,10 +173,11 @@ object GlobalActionExecutor : GlobalActionExecutorI {
     /**
      * 名称避免和函数名同名
      */
-    private val voast = ColorfulToast(GlobalApp.APP).yellow()
+    private val voast = ColorfulToast(GlobalApp.APP).yellow()//???
 
-    override fun toast(msg: String) {
-        voast.showShort(msg)
+    override fun toast(msg: String?) {
+        GlobalApp.toastShort(msg ?: "null")
+//        voast.showShort(msg)
     }
 
     override fun click(x: Int, y: Int): Boolean {
@@ -281,5 +282,5 @@ interface GlobalActionExecutorI {
     /**
      * 通知
      */
-    fun toast(msg: String)
+    fun toast(msg: String?)
 }

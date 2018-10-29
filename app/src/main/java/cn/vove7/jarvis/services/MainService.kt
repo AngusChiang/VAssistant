@@ -544,7 +544,7 @@ class MainService : BusService(),
     }
 
 
-    fun parseWakeUpCommmand(w: String): Boolean {
+    fun parseWakeUpCommand(w: String): Boolean {
         when (w) {
             "增大音量" -> {
                 SystemBridge.volumeUp()
@@ -576,7 +576,7 @@ class MainService : BusService(),
     inner class RecgEventListener : SpeechEvent {
         override fun onWakeup(word: String?): Boolean {
             //解析成功  不再唤醒
-            parseWakeUpCommmand(word ?: "").also {
+            parseWakeUpCommand(word ?: "").also {
                 if (it) return false
             }
 
@@ -603,6 +603,9 @@ class MainService : BusService(),
         }
 
         override fun onStartRecog() {
+            if (speechSynService.speaking) {
+                speechSynService.stop()
+            }
             Vog.d(this, "onStartRecog ---> 开始识别")
             if (continuePlay)//唤醒时检查过
                 checkMusic()//检查后台播放

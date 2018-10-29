@@ -27,7 +27,7 @@ class TulingChatSystem : ChatSystem {
                 val obj = Gson().fromJson<ResponseData>(res, ResponseDataType)
                 if (!obj.parseError())
                     return null
-                if(obj.results?.isNotEmpty()==true){
+                if (obj.results?.isNotEmpty() == true) {
                     return obj.results!![0].values?.text
                 }
                 return null
@@ -68,7 +68,8 @@ class RequestData {
 
 class UserI {
     val apiKey = "2a4a7374cf1147759d70432237593c15"
-    val userId = UserInfo.getUserName() ?: "guest"
+    val userId = UserInfo.getEmail()?.let {
+        it.substring(0, it.indexOf('@')) } ?: "guest"
 }
 
 class Perception {
