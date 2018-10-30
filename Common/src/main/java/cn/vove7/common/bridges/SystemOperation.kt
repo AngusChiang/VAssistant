@@ -170,4 +170,6 @@ interface SystemOperation {
     fun screenOn()
     fun screenOff()
     fun quickSearch(s: String?)
+    fun disableSoftKeyboard():Boolean
+    fun enableSoftKeyboard():Boolean
 }

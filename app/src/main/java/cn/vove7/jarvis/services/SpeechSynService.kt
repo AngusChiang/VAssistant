@@ -122,10 +122,13 @@ object SpeechSynService : SpeechSynthesizerListener {
 
     /**
      * 停止合成引擎。即停止播放，合成，清空内部合成队列。
+     * @param byUser 是否用户
      */
-    fun stop() {
+    fun stop(byUser: Boolean = false) {
         synthesizer.stop()
-        if(speaking)
+        if (byUser)
+            event?.onUserInterupt()
+        if (speaking)
             event?.onFinish()
     }
 
@@ -254,8 +257,8 @@ object SpeechSynService : SpeechSynthesizerListener {
     override fun onSpeechFinish(p0: String?) {
         Vog.d(this, "onSpeechFinish 播放结束回调 $p0")
 //        AppBus.post(SpeechSynData(SpeechSynData.SYN_STATUS_FINISH))
-        event?.onFinish()//speaking=true
         speaking = false
+        event?.onFinish() //speaking=false
     }
 
     override fun onError(p0: String?, p1: SpeechError?) {
@@ -268,10 +271,6 @@ object SpeechSynService : SpeechSynthesizerListener {
         Vog.d(this, e)
     }
 
-//    companion object {
-
-//    }
-
 }
 
 interface SyncEvent {
@@ -280,5 +279,7 @@ interface SyncEvent {
      * speaking is true
      */
     fun onFinish()
+
+    fun onUserInterupt()
     fun onStart()//检测音乐播放，在合成前！！！//上面监听器中概率误认为有音乐播放
 }

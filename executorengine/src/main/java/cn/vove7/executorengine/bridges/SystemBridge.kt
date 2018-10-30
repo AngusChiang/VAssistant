@@ -28,6 +28,7 @@ import android.support.annotation.RequiresApi
 import android.support.v4.content.ContextCompat
 import android.support.v4.content.FileProvider
 import android.view.KeyEvent
+import cn.vove7.common.accessibility.AccessibilityApi
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.appbus.AppBus
@@ -811,8 +812,7 @@ object SystemBridge : SystemOperation {
 
     override fun screenOn() {
         val pm = context.getSystemService(Context.POWER_SERVICE) as PowerManager
-        val screenOn = pm.isScreenOn()
-        if (!screenOn) {
+        if (!pm.isInteractive) {
             // 获取PowerManager.WakeLock对象,后面的参数|表示同时传入两个值,最后的是LogCat里用的Tag
             val wl = pm.newWakeLock(
                     PowerManager.ACQUIRE_CAUSES_WAKEUP or
@@ -834,5 +834,13 @@ object SystemBridge : SystemOperation {
         intent.putExtra(SearchManager.QUERY, s)
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         context.startActivity(intent)
+    }
+
+    override fun disableSoftKeyboard(): Boolean {
+        return AccessibilityApi.accessibilityService?.disableSoftKeyboard() ?: false
+    }
+
+    override fun enableSoftKeyboard(): Boolean {
+        return AccessibilityApi.accessibilityService?.enableSoftKeyboard() ?: false
     }
 }

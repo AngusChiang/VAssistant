@@ -3,6 +3,8 @@ package cn.vove7.common.appbus
 import cn.vove7.vtp.log.Vog
 import org.greenrobot.eventbus.EventBus
 import java.io.Serializable
+import java.lang.Thread.sleep
+import kotlin.concurrent.thread
 
 object AppBus {
     const val EVENT_LOGOUT = "e_logout"
@@ -19,8 +21,33 @@ object AppBus {
 //    const val ORDER_STOP_DEBUG = "stop_debug"
 
     fun post(data: Any) {
-        Vog.d(this,"post ---> $data")
+        Vog.d(this, "post ---> $data")
         EventBus.getDefault().post(data)
+    }
+
+    private val threadList = mutableListOf<Thread>()
+    private fun removeByName(name: String) {
+        threadList.removeAll {
+            it.name == name
+        }
+    }
+
+    fun postDelay(tag: String, data: Any, delay: Long) {
+        threadList.add(thread(name = tag) {
+            try {
+                sleep(delay)
+            } catch (e: InterruptedException) {
+                return@thread
+            }
+            post(data)
+            removeByName(tag)
+        })
+    }
+
+    fun remove(tag: String) {
+        threadList.forEach {
+            if (it.name == tag) it.interrupt()
+        }
     }
 
     /**

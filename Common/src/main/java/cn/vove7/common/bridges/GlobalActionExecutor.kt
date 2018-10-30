@@ -27,11 +27,8 @@ import java.util.*
 object GlobalActionExecutor : GlobalActionExecutorI {
 //    var screenAdapter = ScreenAdapter()
 
-    private var mService: AccessibilityService? = null
-
-    override fun setService(mService: AccessibilityService) {
-        this.mService = mService
-    }
+    private val mService: AccessibilityService?
+        get() = AccessibilityApi.accessibilityService
 
     override fun back(): Boolean {
         return performGlobalAction(AccessibilityService.GLOBAL_ACTION_BACK)
@@ -57,8 +54,7 @@ object GlobalActionExecutor : GlobalActionExecutorI {
 
     private fun performGlobalAction(globalAction: Int): Boolean {
         if (mService == null) {
-            mService = AccessibilityApi.accessibilityService
-            if (mService == null) return false
+            return false
         }
         return mService?.performGlobalAction(globalAction) == true
     }
@@ -87,14 +83,9 @@ object GlobalActionExecutor : GlobalActionExecutorI {
     }
 
     override fun gesture(start: Long, duration: Long, points: Array<Pair<Int, Int>>): Boolean {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N || mService == null) {
             return false
         }
-        if (mService == null) {
-            mService = AccessibilityApi.accessibilityService
-            if (mService == null) return false
-        }
-
         val path = pointsToPath(points)
         return playGestures(GestureDescription.StrokeDescription(path, start, duration))
     }
@@ -139,9 +130,8 @@ object GlobalActionExecutor : GlobalActionExecutorI {
 
     @RequiresApi(api = Build.VERSION_CODES.N)
     private fun gesturesWithoutHandler(description: GestureDescription): Boolean {
-        if (mService == null) {
-            mService = AccessibilityApi.accessibilityService
-            if (mService == null) return false
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N || mService == null) {
+            return false
         }
         val result = ResultBox(false).prepare()
         val handler = Handler(Looper.myLooper())
@@ -159,8 +149,8 @@ object GlobalActionExecutor : GlobalActionExecutorI {
 
     @RequiresApi(api = Build.VERSION_CODES.N)
     override fun gesturesAsync(vararg strokes: GestureDescription.StrokeDescription) {
-        if (mService == null) {
-            mService = AccessibilityApi.accessibilityService
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N || mService == null) {
+            return
         }
         val builder = GestureDescription.Builder()
         for (stroke in strokes) {
@@ -250,8 +240,6 @@ interface GlobalActionExecutorI {
 
     @RequiresApi(api = Build.VERSION_CODES.N)
     fun scrollUp(): Boolean
-
-    fun setService(mService: AccessibilityService)
 
     fun back(): Boolean
 

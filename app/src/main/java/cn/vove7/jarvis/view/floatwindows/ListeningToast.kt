@@ -66,6 +66,7 @@ class ListeningToast : AbFloatWindow<ListeningToast.VHolder>(GlobalApp.APP) {
 
     fun show(text: String) {
 //        initIfNeed()
+        removeDelayHide()
         runOnUi {
             setAniRes(R.drawable.listening_animation)
             holder.text = text
@@ -75,58 +76,34 @@ class ListeningToast : AbFloatWindow<ListeningToast.VHolder>(GlobalApp.APP) {
 
     }
 
+    private fun removeDelayHide() {
+        delayHandler?.removeCallbacks(delayHide)
+    }
+
     fun showAndHideDelay(text: String) {
-
         show(text)
-
         hideDelay(1000)
     }
 
+    var delayHide = Runnable {
+        hide()
+    }
+    var delayHandler: Handler? = null
     fun hideDelay(delay: Long = 800) {
-//        initIfNeed()
         runOnUi {
-            Handler().postDelayed({
-                hide()
-            }, delay)
+            if (delayHandler == null) delayHandler = Handler()
+            delayHandler?.postDelayed(delayHide, delay)
         }
         Vog.d(this, "hideDelay ---> hide delay $delay")
 
     }
 
     fun hideImmediately() {//立即
-//        initIfNeed()
         runOnUi {
             hide()
         }
-//        if (Looper.myLooper() == Looper.getMainLooper()) {
-//            hide()
-//        } else {
-//            lHandler?.sendEmptyMessage(HIDE)
-//        }
     }
-//
-//    inner class ListeningHandler(looper: Looper) : Handler(looper) {
-//        override fun handleMessage(msg: Message?) {
-//            when (msg?.what) {
-//                SHOW -> {
-//                    val text = msg.obj as String
-//                    holder.text = text
-//                }
-//                HIDE -> {
-//                    Vog.v(this, "hideDelay ---> hide exec")
-//                    hide()
-//                }
-//                else -> {
-//                }
-//            }
-//
-//        }
-//    }
 
-//    companion object {
-//        const val SHOW = 5
-//        const val HIDE = 1
-//    }
 
     class VHolder(val view: View) : AbFloatWindow.ViewHolder(view) {
         var text: String

@@ -165,14 +165,19 @@ class AdvancedSettingActivity : ReturnableActivity() {
                 ))
         ).also {
             if (BuildConfig.DEBUG) {
-                it.add(SettingGroupItem(R.color.google_red, "..", childItems = listOf(
+                it.add(SettingGroupItem(R.color.google_red, "调试", childItems = listOf(
                         SwitchItem(title = "切换服务器", defaultValue = { false },
                                 summary = ApiUrls.SERVER_IP) { h, b ->
                             ApiUrls.switch()
                             h.summaryView.text = ApiUrls.SERVER_IP
                             return@SwitchItem true
+                        },
+                        IntentItem(title = "触发崩溃") { _, _ ->
+                            return@IntentItem "a".toInt() == 0
                         }
-                )))
+                )
+                )
+                )
             }
         }
     }

@@ -58,7 +58,7 @@ class SettingsActivity : ReturnableActivity() {
     }
 
     private fun initData(): List<SettingGroupItem> = listOf(
-            SettingGroupItem(R.color.google_blue, "😄", childItems = listOf(
+            SettingGroupItem(R.color.google_blue, "默认助手", childItems = listOf(
                     IntentItem(R.string.text_set_as_default_voice_assist, summary = "可以通过长按HOME键或蓝牙快捷键唤醒", onClick = { _, _ ->
                         try {
                             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
@@ -72,7 +72,11 @@ class SettingsActivity : ReturnableActivity() {
                                     "跳转失败", Toast.LENGTH_SHORT).show()
                         }
                         return@IntentItem true
-                    })
+                    }),
+                    IntentItem(title = "唤醒测试") { _, _ ->
+                        startActivity(Intent(Intent.ACTION_ASSIST))
+                        return@IntentItem false
+                    }
             )),
             SettingGroupItem(R.color.google_green, "通知", childItems = listOf(
                     SwitchItem(R.string.text_vibrate_reco_begin,

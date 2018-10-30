@@ -636,7 +636,6 @@ open class ExecutorImpl(
     private fun bridgeIsAvailable(): Boolean {
         val ac = accessApi
         return if (ac != null) {
-            GlobalActionExecutor.setService(ac.getService())
             true
         } else {
             GlobalLog.log(context.getString(R.string.text_acc_service_not_running))

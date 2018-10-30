@@ -5,7 +5,7 @@ import android.os.Looper
 
 /**
  * # ExpandedFuns
- *
+ * 扩展函数
  * @author Administrator
  * 2018/10/25
  */

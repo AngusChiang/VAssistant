@@ -54,7 +54,7 @@ object ParseEngine {
         GlobalActionNodes = DAO.daoSession.actionNodeDao.queryBuilder()
                 .where(ActionNodeDao.Properties.ActionScopeType
                         .eq(NODE_SCOPE_GLOBAL /*,NODE_SCOPE_GLOBAL_2*/))
-                .orderDesc(ActionNodeDao.Properties.Priority)
+                .orderDesc(ActionNodeDao.Properties.Priority)//按优先级
                 .list()
     }
 

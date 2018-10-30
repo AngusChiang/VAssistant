@@ -90,14 +90,12 @@ class GlobalInstListFragment : SimpleListFragment<ActionNode>(), OnSyncInst {
         thread {
             val builder = DAO.daoSession.actionNodeDao.queryBuilder()
                     .where(ActionNodeDao.Properties.ActionScopeType.eq(ActionNode.NODE_SCOPE_GLOBAL))
-
+                    .orderDesc(ActionNodeDao.Properties.Priority)//按优先级
             if (onlySelf) {
-                if (onlySelf) {
-                    builder.whereOr(ActionNodeDao.Properties.From.eq(DataFrom.FROM_USER),
-                            builder.and(ActionNodeDao.Properties.From.eq(DataFrom.FROM_SHARED),
-                                    ActionNodeDao.Properties.PublishUserId.eq(UserInfo.getUserId()))
-                    )
-                }
+                builder.whereOr(ActionNodeDao.Properties.From.eq(DataFrom.FROM_USER),
+                        builder.and(ActionNodeDao.Properties.From.eq(DataFrom.FROM_SHARED),
+                                ActionNodeDao.Properties.PublishUserId.eq(UserInfo.getUserId()))
+                )
             }
             val offsetDatas = builder.offset(pageIndex * pageSizeLimit)
                     .limit(pageSizeLimit).list()

@@ -1,7 +1,9 @@
 package cn.vove7.common.accessibility
 
 import android.accessibilityservice.AccessibilityService
+import android.os.Build
 import cn.vove7.common.accessibility.viewnode.ViewNode
+import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.datamanager.parse.model.ActionScope
 import cn.vove7.common.executor.CExecutorI
 import cn.vove7.common.view.finder.ViewFinder
@@ -23,6 +25,27 @@ abstract class AccessibilityApi : AccessibilityService(),
     override fun onCreate() {
         super.onCreate()
         accessibilityService = this
+    }
+
+    /**
+     * 禁用软键盘，并且无法手动弹出
+     * @return Boolean
+     */
+    fun disableSoftKeyboard():Boolean {
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            softKeyboardController.setShowMode(SHOW_MODE_HIDDEN)
+        } else {
+            GlobalLog.log("7.0以下不支持hideSoftKeyboard")
+            false
+        }
+    }
+    fun enableSoftKeyboard():Boolean {
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            softKeyboardController.setShowMode(SHOW_MODE_AUTO)
+        } else {
+            GlobalLog.log("7.0以下不支持hideSoftKeyboard")
+            false
+        }
     }
 
     var currentAppInfo: AppInfo? = null

@@ -99,6 +99,7 @@ class MainService : BusService(),
      * 当前语音使用方式
      */
     private var voiceMode = MODE_VOICE
+
     //识别过程动画
     private var listeningAni = ListeningAnimation()
     private var parseAnimation = ParseAnimation()
@@ -352,6 +353,7 @@ class MainService : BusService(),
 
     /**
      * onSpeechAction
+     *
      */
     @Subscribe(threadMode = ThreadMode.BACKGROUND)
     fun onSpeechAction(sAction: SpeechAction) {
@@ -714,11 +716,13 @@ class MainService : BusService(),
         NetHelper.uploadUserCommandHistory(his)
     }
 
+    var isContinousDialogue = false
     /**
      * 解析指令
      * @param result String
      */
     fun onParseCommand(result: String, needCloud: Boolean = true): Boolean {
+        isContinousDialogue = false
         listeningToast.show(result)
         parseAnimation.begin()
         resumeMusicIf()
@@ -760,6 +764,10 @@ class MainService : BusService(),
                         speakWithCallback(data, object : SpeakCallback {
                             override fun speakCallback(result: String?) {
                                 hideAll()
+                                if (!userInterrupted && AppConfig.continuousDialogue) {//连续对话
+                                    isContinousDialogue = true
+                                    AppBus.postDelay(ORDER_START_RECO, ORDER_START_RECO, 750)
+                                }
                             }
                         })
                     }
@@ -790,6 +798,13 @@ class MainService : BusService(),
         return true
     }
 
+    var userInterrupted = false
+        get() {
+            val b = field
+            field = false
+            return b
+        }
+
     /**
      * 语音合成事件监听
      */
@@ -808,6 +823,10 @@ class MainService : BusService(),
             if (continuePlay) {//
                 resumeMusicIf()
             }
+        }
+
+        override fun onUserInterupt() {
+            userInterrupted = true
         }
 
         override fun onStart() {
@@ -834,10 +853,13 @@ class MainService : BusService(),
      * 合成 ：(check) 开始合成 -> 结束 -> 继续播放ifNeed
      *
      * 带响应词 ：唤醒 -> (check) [合成 响应词](不再继续) -> (不再check)开始识别 -> 识别结束 -> 继续播放ifNeed
+     * 连续对话 ： 最后不再继续
      *
+     * 连续 加上 speak 会误判
      */
     fun checkMusic() {
-        if (continuePlay && SystemBridge.isMediaPlaying() && !speechSynService.speaking) {
+        if (!isContinousDialogue && continuePlay && SystemBridge.isMediaPlaying()
+                && !speechSynService.speaking) {
             SystemBridge.getMusicFocus()
             GlobalLog.log("checkMusic ---> 有音乐播放")
 //            Vog.d(this, "checkMusic ---> 有音乐播放")
@@ -855,9 +877,10 @@ class MainService : BusService(),
     //
 
     fun resumeMusicIf() {
+//        if() return
         Vog.d(this, "音乐继续 ---> HAVE: $haveMusicPlay CONTINUE: $continuePlay")
         synchronized(haveMusicPlay) {
-            if (haveMusicPlay) {
+            if (!isContinousDialogue && haveMusicPlay) {
                 if (continuePlay) {//   speak响应词
                     SystemBridge.mediaResume()
                     haveMusicPlay = false

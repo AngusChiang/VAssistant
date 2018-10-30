@@ -7,6 +7,7 @@ import cn.vove7.jarvis.adapters.SettingsExpandableAdapter
 import cn.vove7.jarvis.plugins.AdKillerService
 import cn.vove7.jarvis.services.MainService
 import cn.vove7.jarvis.services.MyAccessibilityService
+import cn.vove7.jarvis.view.CheckBoxItem
 import cn.vove7.jarvis.view.NumberPickerItem
 import cn.vove7.jarvis.view.SingleChoiceItem
 import cn.vove7.jarvis.view.SwitchItem
@@ -76,7 +77,9 @@ class LaboratoryActivity : ReturnableActivity() {
                                 MainService.instance?.loadChatSystem(true)
                             }
                             return@SingleChoiceItem true
-                        }
+                        },
+                        CheckBoxItem(title = "连续对话", summary = "开启后可连续对话",
+                                keyId = R.string.key_continuous_dialogue)
                 ))
         )
     }

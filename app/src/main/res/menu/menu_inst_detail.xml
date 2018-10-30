@@ -38,6 +38,10 @@
         android:visible="false"
         app:showAsAction="ifRoom" />
     <item
+        android:id="@+id/menu_set_inst_priority"
+        android:title="@string/text_set_priority"
+        app:showAsAction="never" />
+    <item
         android:id="@+id/menu_add_shortcut"
         android:title="@string/text_add_shortcut_to_launcher"
         app:showAsAction="never"/>

@@ -68,6 +68,7 @@ object AppConfig {
     var openChatSystem = true
     var autoSleepWakeupMillis: Long = 30 * 60 * 1000
     var chatSystem: String = ""
+    var continuousDialogue = false//连续对话
     fun init() {
         thread {
             checkUserInfo()
@@ -146,6 +147,7 @@ object AppConfig {
         autoOpenASWithRoot = getBooleanAndInit(R.string.key_auto_open_as_with_root, false)
         openChatSystem = getBooleanAndInit(R.string.key_open_chat_system, true)
         openVoiceWakeUpIfAutoSleep = getBooleanAndInit(R.string.key_open_voice_wakeup_if_auto_sleep, true)
+        continuousDialogue = getBooleanAndInit(R.string.key_continuous_dialogue, false)
 //  todo      cloudServiceParseIfLocalFailed = getBooleanAndInit(R.string.key_cloud_service_parse, true)
         sp.set(R.string.key_cloud_service_parse, false)
         autoUpdateData = getBooleanAndInit(R.string.key_auto_update_data, true)

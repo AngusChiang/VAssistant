@@ -19,12 +19,12 @@ import cn.vove7.common.utils.GsonHelper
 import cn.vove7.executorengine.parse.ParseEngine
 import cn.vove7.jarvis.BuildConfig
 import cn.vove7.jarvis.R
+import cn.vove7.jarvis.tools.checkBoxText
 import cn.vove7.jarvis.view.dialog.ProgressDialog
 import cn.vove7.jarvis.view.dialog.ProgressTextDialog
 import cn.vove7.vtp.log.Vog
 import com.afollestad.materialdialogs.DialogCallback
 import com.afollestad.materialdialogs.MaterialDialog
-import com.afollestad.materialdialogs.checkbox.checkBoxPrompt
 import com.afollestad.materialdialogs.list.listItemsMultiChoice
 import com.afollestad.materialdialogs.list.listItemsSingleChoice
 import com.google.gson.Gson
@@ -50,12 +50,15 @@ object BackupHelper {
         var indices = intArrayOf(0, 1, 2, 3, 4, 5)
         MaterialDialog(activity).title(text = "选择备份数据")
                 .noAutoDismiss()
+                .checkBoxText(text = "tips: 备份本地数据，不包括已分享的数据。云端未审核通过和信息过旧的记录，请自行处理\n" +
+                        "保存路径：$backupPath") {}
                 .listItemsMultiChoice(items = listOf(
                         "全局指令", "应用内指令", "标记联系人", "标记应用", "标记(打开)功能", "标记广告信息"
                 ), waitForPositiveButton = false, initialSelection = indices) { _, indexes, _ ->
                     indices = indexes
                     Vog.d(this, "indexes ---> ${Arrays.toString(indexes)}")
                 }.show {
+
                     positiveButton(text = "备份到本地") {
                         if (!checkSel(indices)) return@positiveButton
                         val p = ProgressDialog(activity)
@@ -79,14 +82,6 @@ object BackupHelper {
                         val data = wrapData(indices)
                         showPreviewDialog(activity, data, "返回")
                     }
-                    checkBoxPrompt(text = "tips: 备份本地数据，不包括已分享的数据。云端未审核通过和信息过旧的记录，请自行处理\n" +
-                            "保存路径：$backupPath") {}
-//                    onShow {
-//                        val tipView = TextView(activity)
-//                        tipView.text = "tips: 备份本地数据，不包括已分享的数据。云端未审核通过和信息过旧的记录，请自行处理\n" +
-//                                "保存路径：$backupPath"
-//                        findViewById<View>(R.id.md_recyclerview_content)?.parent//todo
-//                    }
                 }
     }
 

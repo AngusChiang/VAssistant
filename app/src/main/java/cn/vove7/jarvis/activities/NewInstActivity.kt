@@ -616,7 +616,11 @@ class NewInstActivity : AppCompatActivity(), View.OnClickListener {
     private fun add2RegexList(reg: String, posArr: Array<Int>) {
         Vog.d(this, "add2RegexList $reg ${Arrays.toString(posArr)}")
         if (editIndex > -1) {
-            regs[editIndex] = Pair(reg, posArr)
+            try {
+                regs[editIndex] = Pair(reg, posArr)
+            } catch (e: Exception) {//index out
+                GlobalLog.err(e)
+            }
             editIndex = -1
         } else {
             regs.add(Pair(reg, posArr))

@@ -1,6 +1,7 @@
 package cn.vove7.jarvis.tools
 
 import android.content.Context
+import android.content.Intent
 import android.os.Build
 import android.os.Environment
 import android.os.Process
@@ -13,6 +14,8 @@ import cn.vove7.common.netacc.NetHelper
 import cn.vove7.common.netacc.model.BaseRequestModel
 import cn.vove7.common.utils.TextHelper
 import cn.vove7.jarvis.BuildConfig
+import cn.vove7.jarvis.activities.CrashInfoActivity
+import cn.vove7.jarvis.chat.Inten
 import cn.vove7.vtp.system.DeviceInfo
 import cn.vove7.vtp.system.SystemHelper
 import java.io.BufferedWriter
@@ -46,8 +49,28 @@ object CrashHandler : Thread.UncaughtExceptionHandler {
 
     private val errFile = Environment.getExternalStorageDirectory().absolutePath + "/crash.log"
     override fun uncaughtException(t: Thread?, e: Throwable?) {
-        if (BuildConfig.DEBUG) {
-            return
+
+        if (!handleException(e) && mDefaultHandler != null) {
+            // 如果用户没有处理则让系统默认的异常处理器来处
+            mDefaultHandler?.uncaughtException(t, e)
+        } else {
+            val intent = Intent(context, CrashInfoActivity::class.java)
+            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+            context.startActivity(intent)
+            System.exit(0)// 关闭已奔溃的app进程
+        }
+
+    }
+
+    /**
+     * 自定义错误捕获
+     *
+     * @param e
+     * @return true:如果处理了该异常信息;否则返回false.
+     */
+    private fun handleException(e: Throwable?): Boolean {
+        if (e == null) {
+            return false
         }
         val headerInfo = SystemHelper.getDeviceInfo(context).string()
         val log = GlobalLog.toString()
@@ -57,25 +80,21 @@ object CrashHandler : Thread.UncaughtExceptionHandler {
             val pw = PrintWriter(BufferedWriter(FileWriter(File(errFile))))
             pw.println(headerInfo)
             pw.println(SimpleDateFormat("MM-dd HH:mm:ss", Locale.getDefault()).format(Date()))
-            e?.printStackTrace(pw)
+            e.printStackTrace(pw)
             pw.println(log)
             pw.close()
-            NetHelper.postJson<Any>(ApiUrls.CRASH_HANDLER, BaseRequestModel(File(errFile).readText())) { _, _ -> }
+            if (!BuildConfig.DEBUG)
+                NetHelper.postJson<Any>(ApiUrls.CRASH_HANDLER, BaseRequestModel(File(errFile).readText())) { _, _ -> }
         } catch (e1: Exception) {//文件读写
             //
             Toast.makeText(context, "写入错误记录失败，请给予读写存储权限", Toast.LENGTH_SHORT).show()
-            NetHelper.postJson<Any>(ApiUrls.CRASH_HANDLER,
-                    BaseRequestModel(headerInfo + e?.message + log + "\n\n写入失败${e1.message}")) { _, _ -> }
+            if (!BuildConfig.DEBUG)
+                NetHelper.postJson<Any>(ApiUrls.CRASH_HANDLER,
+                        BaseRequestModel(headerInfo + e.message + log + "\n\n写入失败${e1.message}")) { _, _ -> }
         }
-//        if (mDefaultHandler != null) {
-//            // 如果用户没有处理则让系统默认的异常处理器来处理
-//            mDefaultHandler!!.uncaughtException(t, e)
-//        } else {
-        sleep(1000)
-        Process.killProcess(Process.myPid())//主动杀死进程
-//        }
-    }
 
+        return true
+    }
 }
 
 fun DeviceInfo.string(): String {

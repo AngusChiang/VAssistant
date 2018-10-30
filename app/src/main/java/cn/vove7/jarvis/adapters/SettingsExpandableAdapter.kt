@@ -97,7 +97,7 @@ class SettingsExpandableAdapter(val context: Context,
                 GlobalLog.err(e)
             }
 
-            groupHolders[gPos]!!.downIcon.animate().rotation(180f).setDuration(200).start()
+            groupHolders[gPos]?.downIcon?.animate()?.rotation(180f)?.setDuration(200)?.start()
         }
     }
 

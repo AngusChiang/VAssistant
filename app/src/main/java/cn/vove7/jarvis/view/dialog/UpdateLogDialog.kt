@@ -27,6 +27,9 @@ class UpdateLogDialog(context: Context, onDismiss: (() -> Unit)? = null) {
 
     private val logs: List<Pair<String, String>>
         get() = listOf(
+                Pair("1.2.6", "加入指令优先级设置   (指令详情菜单) ps: 指令列表按优先级排列\n" +
+                        "加入连续对话 (实验室)\n" +
+                        "修复若干问题"),
                 Pair("1.2.5", "修复图灵机器人调用问题\n" +
                         "修复解析日期‘x小时’后错误\n" +
                         "其他问题"),

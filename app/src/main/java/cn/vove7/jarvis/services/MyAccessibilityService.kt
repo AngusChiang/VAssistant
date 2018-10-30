@@ -310,6 +310,9 @@ class MyAccessibilityService : AccessibilityApi() {
     private var stopRunner: Runnable = Runnable {
         MainService.instance?.onCommand(AppBus.ORDER_STOP_EXEC)
     }
+    private var stopSpeakRunner: Runnable = Runnable {
+        SpeechSynService.stop(true)
+    }
 //    private var delayUp = 600L
 
     private var v2 = false // 单击上下键 取消识别
@@ -340,14 +343,13 @@ class MyAccessibilityService : AccessibilityApi() {
                             MainService.instance?.onCommand(AppBus.ORDER_CANCEL_RECO)//up speed
                             true
                         }
+                        SpeechSynService.speaking -> {
+                            postLongDelay(stopSpeakRunner)
+                            true
+                        }
                         MainService.exEngineRunning -> {//长按下键
                             //正在执行才会触发
                             postLongDelay(stopRunner)
-                            true
-                        }
-                        SpeechSynService.speaking -> {
-                            v3 = true
-                            SpeechSynService.stop()
                             true
                         }
                         else -> super.onKeyEvent(event)
@@ -378,10 +380,18 @@ class MyAccessibilityService : AccessibilityApi() {
                         if (v3) {
                             return removeDelayIfInterrupt(event, startupRunner) || super.onKeyEvent(event)
                         }
-                    KEYCODE_VOLUME_DOWN ->
+                    KEYCODE_VOLUME_DOWN -> {
                         if (v3) {
-                            return removeDelayIfInterrupt(event, stopRunner) || super.onKeyEvent(event)
+                            when {
+                                SpeechSynService.speaking -> {
+                                    return removeDelayIfInterrupt(event, stopSpeakRunner) || super.onKeyEvent(event)
+                                }
+                                MainService.exEngineRunning -> {//长按下键
+                                    return removeDelayIfInterrupt(event, stopRunner) || super.onKeyEvent(event)
+                                }
+                            }
                         }
+                    }
                 }
             }
         }
@@ -409,21 +419,10 @@ class MyAccessibilityService : AccessibilityApi() {
                 KEYCODE_VOLUME_UP -> SystemBridge.volumeUp()
                 KEYCODE_HEADSETHOOK -> {
                     SystemBridge.switchMusicStatus()//
-//                    Vog.d(this,"removeDelayIfInterrupt ---> KEYCODE_HEADSETHOOK resume")
-//                    if (lastEvent != null)
-//                        super.onKeyEvent(lastEvent)
-//                    super.onKeyEvent(event)
-
                 }
                 KEYCODE_VOLUME_DOWN -> SystemBridge.volumeDown()
                 else -> return false
             } //其他按键
-        } else {
-//            if (event.keyCode == KEYCODE_VOLUME_UP && event.eventTime - event.downTime > 3000) {//长按松下,结束聆听
-//                //
-//                MainService.instance?.onCommand(MainService.ORDER_STOP_EXEC)
-//                return true
-//            }
         }
         return true
     }

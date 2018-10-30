@@ -6,6 +6,7 @@ import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.support.v7.app.AppCompatActivity
+import android.text.InputType
 import android.view.View
 import android.widget.EditText
 import android.widget.ImageView
@@ -30,6 +31,8 @@ import cn.vove7.common.utils.TextHelper
 import cn.vove7.common.view.toast.ColorfulToast
 import cn.vove7.executorengine.bridges.SystemBridge
 import cn.vove7.executorengine.helper.AdvanAppHelper
+import cn.vove7.executorengine.parse.ParseEngine
+import cn.vove7.jarvis.BuildConfig
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.adapters.ExecuteQueueAdapter
 import cn.vove7.jarvis.adapters.InstSettingListAdapter
@@ -41,7 +44,9 @@ import cn.vove7.vtp.dialog.DialogWithList
 import cn.vove7.vtp.easyadapter.BaseListAdapter
 import cn.vove7.vtp.log.Vog
 import com.afollestad.materialdialogs.MaterialDialog
+import com.afollestad.materialdialogs.checkbox.checkBoxPrompt
 import com.afollestad.materialdialogs.customview.customView
+import com.afollestad.materialdialogs.input.input
 import com.afollestad.materialdialogs.list.listItems
 import com.google.gson.reflect.TypeToken
 import io.github.kbiakov.codeview.adapters.Options
@@ -277,6 +282,29 @@ class InstDetailActivity : AppCompatActivity() {
                 R.id.menu_run -> {
                     showRunDialog()
                 }
+                R.id.menu_set_inst_priority -> {
+                    MaterialDialog(this).title(R.string.text_set_priority)
+                            .noAutoDismiss()
+                            .message(text = "值大优先匹配")
+                            .input(inputType = InputType.TYPE_NUMBER_FLAG_SIGNED,
+                                    prefill = node.priority.toString()) { d, s ->
+                                val p = try {
+                                    if (s == "") 0
+                                    else s.toString().toInt()
+                                } catch (e: Exception) {
+                                    toast.showShort("输入整数值")
+                                    return@input
+                                }
+                                node.priority = p
+                                node.update()
+                                toast.showShort("设置完成")
+                                ParseEngine.updateNode()
+                                DAO.clear()
+                                d.dismiss()
+                            }
+                            .positiveButton()
+                            .negativeButton { it.dismiss() }.show()
+                }
                 R.id.menu_share -> {
                     if (UserInfo.isLogin().not()) {
                         toast.red().showShort("请登录")
@@ -307,6 +335,9 @@ class InstDetailActivity : AppCompatActivity() {
 //                    }
                 }
                 R.id.menu_settings -> {//显示设置
+                    if (!AppConfig.checkUser() && !BuildConfig.DEBUG) {
+                        return@setOnMenuItemClickListener true
+                    }
                     var d: DialogWithList? = null
                     d = DialogWithList(this, InstSettingListAdapter(this,
                             settingName ?: "") {
