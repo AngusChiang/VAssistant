@@ -88,6 +88,9 @@ object DataUpdator {
                             Color.RED -> {
                                 textDialog.appendlnRed(p2)
                             }
+                            Color.YELLOW ->
+                                textDialog.appendlnAmber(p2)
+
                             else ->
                                 textDialog.appendln(p2)
                         }
@@ -299,7 +302,7 @@ object DataUpdator {
             if (bean != null) {
                 if (bean.isOk()) {
                     //
-                    DaoHelper.updateAppAdInfo(bean.data ?: emptyList())
+                    DaoHelper.updateAppAdInfo(bean.data ?: emptyList(), onUpdate)
                     SpHelper(GlobalApp.APP).set(R.string.key_last_sync_marked_ad_date, System.currentTimeMillis())
                     AdKillerService.update()
                     DAO.clear()

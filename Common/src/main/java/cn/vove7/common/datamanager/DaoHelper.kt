@@ -32,7 +32,7 @@ object DaoHelper {
             }
             true
         } catch (e: Exception) {
-            e.printStackTrace()
+            GlobalLog.err(e)
             false
         }
     }
@@ -141,73 +141,101 @@ object DaoHelper {
 
     /**
      * 检查是否更新 检查是否删除
-     * @param nodes List<ActionNode>
+     * 第一级增量更新  比较数据集  follows 格式化更新
+     * old(a1 b1 c1) new(a1 b2 d1)
+     * 删除old-new  del: c1
+     * 更新old,new并集 .forEach 升级版本高的  up: b2
+     * 插入new-old ins: d1
+     * @param newNodes List<ActionNode>
      * @param type Int
      * @param onUpdate OnUpdate?
      * @return Boolean
      */
-    private fun updateActionNodeByType(nodes: List<ActionNode>, type: Int, onUpdate: OnUpdate? = null): Boolean {
-        //
+    private fun updateActionNodeByType(newNodes: List<ActionNode>, type: Int, onUpdate: OnUpdate? = null): Boolean {
         val actionNodeDao = DAO.daoSession.actionNodeDao
 
-        //select * from action_node where from=from_user and scopeType=type and (pud is null or pud = uid)
-        val olds = actionNodeDao.queryBuilder()
+        //已同步（其他人分享）的云端数据记录
+        //select * from action_node where from != from_user and scopeType=type and (pud is null or pud != uid)
+        val localSyncedDataSet = actionNodeDao.queryBuilder()
                 .where(ActionNodeDao.Properties.From.notEq(DataFrom.FROM_USER),
                         ActionNodeDao.Properties.ActionScopeType.eq(type),
                         actionNodeDao.queryBuilder().or(ActionNodeDao.Properties.PublishUserId.isNull,
                                 ActionNodeDao.Properties.PublishUserId.notEq(UserInfo.getUserId()
                                     ?: -1L)
                         )
-                ).list()
-        val userList = if (UserInfo.isLogin()) {
+                ).list().toHashSet()
+
+        //用户分享的数据 可能未审核
+        val userSharedDataSet = if (UserInfo.isLogin()) {
             actionNodeDao.queryBuilder().whereOr(ActionNodeDao.Properties.From.notEq(DataFrom.FROM_USER),
                     ActionNodeDao.Properties.PublishUserId.eq(UserInfo.getUserId() ?: -1L))
                     .list().toHashSet()
         } else emptySet<ActionNode>()
         return try {
+            //old(a1 b1 c1 d1s) new(a1 b2 d1 [d1s])
+            //删除old-new  del: c1 保留d1s
+            //更新old,new并集 .forEach 升级版本高的  up: b2
+            //插入new-old ins: d1
             DAO.daoSession.runInTx {
-                olds.forEach {
+                //del old-new  exclude user shared
+                localSyncedDataSet.toHashSet().subtract(newNodes).filter { !userSharedDataSet.contains(it) }.forEach {
+                    //del old - new
                     //删除旧服务器数据
                     //del old global
-                    if (BuildConfig.DEBUG) {
-                        onUpdate?.invoke(Color.BLACK, "删除旧指令：${it.actionTitle}")
-                    }
+//                    if (BuildConfig.DEBUG) {
+                    onUpdate?.invoke(Color.BLACK, "删除旧指令：${it.actionTitle}")
+//                    }
                     deleteActionNode(it.id)
                 }
-                nodes.forEach {
-                        if (!userList.contains(it)) {
-                            onUpdate?.invoke(Color.GREEN, "更新指令：${it.actionTitle}\n${it.desc?.instructions
-                                ?: "无描述"}")
-                            Vog.d(this, "updateGlobalInst 添加---> ${it.actionTitle}")
-                            insertNewActionNode(it)
-                        } else {//存在
-                            checkNode(it, onUpdate)
-                    }
+                newNodes.filter { localSyncedDataSet.contains(it) }.forEach {
+                    //up 交集
+                    //交集
+//                    if (!userDataSet.contains(it)) {
+//                        onUpdate?.invoke(Color.GREEN, "更新指令：${it.actionTitle}")
+//                        onUpdate?.invoke(Color.YELLOW, it.desc?.instructions ?: "无描述")
+//                        Vog.d(this, "updateGlobalInst 添加---> ${it.actionTitle}")
+//                        insertNewActionNode(it)
+//                    } else {//存在
+                    checkUpgradeNode(it, onUpdate)
+//                    }
+                }
+                newNodes.toHashSet().subtract(localSyncedDataSet).filter {
+                    !userSharedDataSet.contains(it)  //不更新本用户分享的
+                }.forEach {
+                    //new - old  insert
+                    insertNewActionNode(it, onUpdate)
                 }
             }
             true
         } catch (e: Exception) {
             GlobalLog.err(e)
+            onUpdate?.invoke(Color.BLACK, "错误：${e.message}")
             false
         }
     }
 
     //检查升级 ，follows
-    private fun checkNode(it: ActionNode, onUpdate: OnUpdate? = null) {
-        val oldNode = getActionNodeByTag(it.tagId)
-        if (oldNode == null || it.versionCode > oldNode.versionCode) {//更新
-            oldNode?.delete()
-            Vog.d(this, "updateGlobalInst 更新---> ${it.actionTitle}")
-            onUpdate?.invoke(Color.GREEN, "升级指令：${it.actionTitle}\n${it.desc?.instructions
-                ?: "无描述"}")
-            insertNewActionNode(it)
-        } else {//检查follows
-            Vog.d(this, "updateGlobalInst 存在---> ${it.actionTitle}")
-            if (it.follows?.isNotEmpty() == true)
-                for (ci in it.follows) {//递归 深度
-                    ci.parentId = it.id
-                    checkNode(ci, onUpdate)
-                }
+    private fun checkUpgradeNode(node: ActionNode, onUpdate: OnUpdate? = null) {
+        val oldNode = getActionNodeByTag(node.tagId)
+        if (oldNode == null || node.versionCode > oldNode.versionCode) {//更新
+            if (oldNode != null) deleteActionNode(oldNode.id)//完全删除
+            Vog.d(this, "updateGlobalInst 更新---> ${node.actionTitle}")
+            onUpdate?.invoke(Color.GREEN, "升级指令：${node.actionTitle}")
+            onUpdate?.invoke(Color.YELLOW, node.desc?.instructions ?: "无描述")
+            insertNewActionNode(node) //插入
+        } else {
+            //更新follows  删除本地  插入
+            //a1,b3  a1,c2
+            Vog.d(this, "updateGlobalInst 存在---> ${node.actionTitle}")
+
+            oldNode.follows.forEach {
+                //完全删除 old fs
+                deleteActionNode(it.id)
+            }
+            for (ci in node.follows) {//递归 深度
+                ci.parentId = oldNode.id  //node 未更新  更新fs
+                insertNewActionNode(ci, onUpdate)
+            }
         }
     }
 
@@ -222,9 +250,10 @@ object DaoHelper {
      * @param newNode ActionNode
      * @return Long? newId
      */
-    fun insertNewActionNode(newNode: ActionNode): Long? {
+    fun insertNewActionNode(newNode: ActionNode, onUpdate: OnUpdate? = null): Long? {
         newNode.id = null
         var newScopeId: Long = -1
+        onUpdate?.invoke(Color.GREEN, "添加：${newNode.actionTitle}")
         if (newNode.actionScope != null) {
             val scope = newNode.actionScope
             Vog.d(this, "save sid: $newScopeId")
@@ -267,15 +296,20 @@ object DaoHelper {
     }
 
     /**
-     * 更新Marked数据
+     * 更新Marked数据  无版本 每分享一次有新tag
      * 删除来自服务器,保留用户数据
+     * 增量更新
+     * tag : 1 2 3 5u -> 1 2 4  [5u]
+     * 删除old-new  del: 3 exclude user 5
+     * 插入new-old ins: 4
      * @param types Array<String>
      * @param datas List<MarkedData>
      * @return Boolean
      */
     fun updateMarkedData(onUpdate: OnUpdate? = null, types: Array<String>, datas: List<MarkedData>): Boolean {
         val markedDao = DAO.daoSession.markedDataDao
-        val l = markedDao.queryBuilder().where(
+        //本地同步(其他人分享)的数据
+        val localSyncedDataSet = markedDao.queryBuilder().where(
                 MarkedDataDao.Properties.Type.`in`(*types),
                 MarkedDataDao.Properties.From.notEq(DataFrom.FROM_USER),
                 markedDao.queryBuilder().or(MarkedDataDao.Properties.PublishUserId.isNull,
@@ -287,6 +321,7 @@ object DaoHelper {
                             ?: -1L)
                 )
         ).list()
+        //用户自己 可能未审核
         val userList = markedDao.queryBuilder().where(
                 MarkedDataDao.Properties.Type.`in`(*types),
                 markedDao.queryBuilder().or(
@@ -295,18 +330,20 @@ object DaoHelper {
                 )
         ).list().toHashSet()
         return try {
-            if (BuildConfig.DEBUG) {
-                onUpdate?.invoke(Color.BLACK, "删除旧纪录")
+            //del old-new
+            localSyncedDataSet.toHashSet().subtract(datas).filter {
+                !userList.contains(it)//排除用户的
+            }.forEach {
+                onUpdate?.invoke(Color.BLACK, "删除：${it.key}")
+                markedDao.deleteInTx(it)
             }
-            markedDao.deleteInTx(l)
-            datas.forEach {
+            //up new - old
+            datas.subtract(localSyncedDataSet).filter {
+                !userList.contains(it) //排除用户的
+            }.forEach {
                 it.id = null
-                if (!userList.contains(it)) {
-                    onUpdate?.invoke(Color.GREEN, "更新：${it.key}")
-                    markedDao.insert(it)
-                } else {
-                    Vog.d(this, "updateMarkedData ---> 重复:" + it.key)
-                }
+                onUpdate?.invoke(Color.GREEN, "更新：${it.key}")
+                markedDao.insert(it)
             }
             true
         } catch (e: Exception) {
@@ -327,30 +364,32 @@ object DaoHelper {
         val appAdInfoDao = DAO.daoSession.appAdInfoDao
         return try {
             //删除服务端
-            val delList = appAdInfoDao.queryBuilder().where(
+            val localSyncedDataSet = appAdInfoDao.queryBuilder().where(
                     AppAdInfoDao.Properties.From.notEq(DataFrom.FROM_USER),
                     appAdInfoDao.queryBuilder().or(AppAdInfoDao.Properties.PublishUserId.isNull,
                             AppAdInfoDao.Properties.PublishUserId.notEq(UserInfo.getUserId()
                                 ?: -1L))
-            ).list()
-            if (BuildConfig.DEBUG)
-                onUpdate?.invoke(Color.BLACK, "删除旧纪录 ${delList.size}")
-            appAdInfoDao.deleteInTx(delList)
-
+            ).list().toHashSet()
             val userList = appAdInfoDao.queryBuilder().whereOr(
                     AppAdInfoDao.Properties.From.eq(DataFrom.FROM_USER),
                     AppAdInfoDao.Properties.PublishUserId.eq(UserInfo.getUserId() ?: -1L)
             ).list().toHashSet()
 
-            datas.forEach {
+            //del old-new
+            localSyncedDataSet.toHashSet().subtract(datas).filter {
+                !userList.contains(it)
+            }.forEach {
+                onUpdate?.invoke(Color.BLACK, "删除 ${it.descTitle}")
+                appAdInfoDao.deleteInTx(it)
+            }
+            //up new - old
+            datas.subtract(localSyncedDataSet).filter {
+                !userList.contains(it)
+            }.forEach {
                 it.id = null
-                if (!userList.contains(it)) {
-                    onUpdate?.invoke(Color.GREEN, "更新标记广告：${it.descTitle}")
-                    appAdInfoDao.insertInTx(it)
-                    Vog.d(this, "updateAppAdInfo ---> ${it.descTitle} ${it.id}")
-                } else {
-                    Vog.d(this, "updateMarkedData ---> 重复:" + it.descTitle)
-                }
+                onUpdate?.invoke(Color.GREEN, "更新标记广告：${it.descTitle}")
+                appAdInfoDao.insertInTx(it)
+                Vog.d(this, "updateAppAdInfo ---> ${it.descTitle} ${it.id}")
             }
             true
         } catch (e: Exception) {
