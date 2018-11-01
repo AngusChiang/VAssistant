@@ -36,7 +36,7 @@ class VoiceAssistActivity : Activity() {
                                 , Action.SCRIPT_TYPE_LUA))
                 }
                 que.add(node.action)
-                node.action.param=null
+                node.action.param = null
                 AppBus.post(que)
             } else {
                 GlobalApp.toastShort("指令不存在")
@@ -44,11 +44,7 @@ class VoiceAssistActivity : Activity() {
         } catch (e: Exception) {
             super.onCreate(savedInstanceState)
             Vog.d(this, "onCreate ---> ASSIST wakeup")
-            if (MainService.recoIsListening) {//配置
-                MainService.instance?.onCommand(AppBus.ORDER_CANCEL_RECO)
-//            MainService.instance?.onCommand(MainService.ORDER_STOP_RECO)
-            } else
-                MainService.instance?.onCommand(AppBus.ORDER_START_RECO)
+            MainService.switchReco()
         }
         finish()
     }

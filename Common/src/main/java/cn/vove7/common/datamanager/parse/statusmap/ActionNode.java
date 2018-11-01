@@ -758,6 +758,11 @@ public class ActionNode implements Serializable, DataFrom {
         this.actionId = actionId;
     }
 
+    /**
+     * 比较tagId
+     * @param o
+     * @return
+     */
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

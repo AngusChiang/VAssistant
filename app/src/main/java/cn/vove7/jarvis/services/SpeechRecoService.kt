@@ -145,9 +145,9 @@ class SpeechRecoService(val event: SpeechEvent) {
                 Pair(SpeechConstant.ASR_OFFLINE_ENGINE_GRAMMER_FILE_PATH, offSpeechGrammarPath),
                 Pair(SpeechConstant.SLOT_DATA, OffWord(
                         if (ActivityCompat.checkSelfPermission(AdvanContactHelper.context,
-                                        android.Manifest.permission.RECORD_AUDIO)
+                                        android.Manifest.permission.READ_CONTACTS)
                                 != PackageManager.PERMISSION_GRANTED) //首次启动无权限 不做
-                         AdvanContactHelper.getContactName() else arrayOf()
+                            arrayOf() else AdvanContactHelper.getContactName()
                         , AdvanAppHelper.getAppName()
                 ).toString())
         )

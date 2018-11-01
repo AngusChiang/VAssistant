@@ -80,7 +80,7 @@ class ProgressTextDialog(val context: Context, val title: String? = null,
         }
     }
 
-    class UiHandler(val textView: TextView, loop: Looper) : Handler(loop) {
+    class UiHandler(private val textView: TextView, loop: Looper) : Handler(loop) {
         override fun handleMessage(msg: Message?) {
             val data = msg?.obj
             when (msg?.what) {

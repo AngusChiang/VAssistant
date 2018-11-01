@@ -106,6 +106,13 @@ interface ViewOperation {
      */
     fun getText(): String?
 
+    /**
+     * 追加文本
+     * @param s String
+     * @return Boolean
+     */
+    fun appendText(s: String): Boolean
+
     //选择
     fun select(): Boolean
 

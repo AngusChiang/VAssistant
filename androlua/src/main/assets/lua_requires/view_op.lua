@@ -59,16 +59,22 @@ function dd(d, i)
 end
 
 
-local function traversingNode(index, d, node)
-    print(dd(d, index) .. ' ' .. node.toString())
+local function traversingNode(index, d, node, printer)
+    if (printer) then
+        printer(node)
+    else
+        print(dd(d, index) .. ' ' .. node.toString())
+    end
     local cs = node.childs
     for i = 0, #cs - 1 do
         if (cs[i].isVisibleToUser()) then
-            traversingNode(i, d + 1, cs[i])
+            traversingNode(i, d + 1, cs[i], printer)
         end
     end
 end
 
-function traversing(node)
-    traversingNode(0, 0, node)
+function traversing(node, ...)
+    local ps = { ... }
+    local printer = ps[1]
+    traversingNode(0, 0, node, printer)
 end

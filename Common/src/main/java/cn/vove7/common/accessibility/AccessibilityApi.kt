@@ -2,6 +2,7 @@ package cn.vove7.common.accessibility
 
 import android.accessibilityservice.AccessibilityService
 import android.os.Build
+import android.support.v4.view.accessibility.AccessibilityNodeInfoCompat.FOCUS_INPUT
 import cn.vove7.common.accessibility.viewnode.ViewNode
 import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.datamanager.parse.model.ActionScope
@@ -27,11 +28,16 @@ abstract class AccessibilityApi : AccessibilityService(),
         accessibilityService = this
     }
 
+    val currentFocusedEditor: ViewNode?
+        get() = findFocus(FOCUS_INPUT).let {
+            if (it == null) null else ViewNode(it)
+        }
+
     /**
      * 禁用软键盘，并且无法手动弹出
      * @return Boolean
      */
-    fun disableSoftKeyboard():Boolean {
+    fun disableSoftKeyboard(): Boolean {
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             softKeyboardController.setShowMode(SHOW_MODE_HIDDEN)
         } else {
@@ -39,7 +45,8 @@ abstract class AccessibilityApi : AccessibilityService(),
             false
         }
     }
-    fun enableSoftKeyboard():Boolean {
+
+    fun enableSoftKeyboard(): Boolean {
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             softKeyboardController.setShowMode(SHOW_MODE_AUTO)
         } else {

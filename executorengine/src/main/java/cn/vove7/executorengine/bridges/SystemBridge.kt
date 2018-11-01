@@ -79,6 +79,15 @@ object SystemBridge : SystemOperation {
         }
     }
 
+    override fun getLaunchIntent(pkg: String): Intent? {
+        return context.packageManager
+                .getLaunchIntentForPackage(pkg)
+    }
+
+    override fun getPhoneByName(name: String): String? {
+         return AdvanContactHelper.matchPhone(name)
+    }
+
     fun openAppByPkg(pkg: String): Boolean {
         return openAppByPkg(pkg, false)
     }
@@ -169,7 +178,7 @@ object SystemBridge : SystemOperation {
      * 优先级：标记 -> 通讯录 -> 服务提供
      */
     override fun call(s: String): ExResult<String> {
-        val ph = AdvanContactHelper.matchPhone(context, s)
+        val ph = AdvanContactHelper.matchPhone(s)
             ?: return ExResult("未找到该联系人$s")// "未找到该联系人$s"
         val callIntent = Intent(Intent.ACTION_CALL, Uri.parse("tel:$ph"))
         return try {
@@ -842,5 +851,19 @@ object SystemBridge : SystemOperation {
 
     override fun enableSoftKeyboard(): Boolean {
         return AccessibilityApi.accessibilityService?.enableSoftKeyboard() ?: false
+    }
+
+    override fun sendSMS(phone: String, content: String) {
+//        //获取短信管理器
+//        val smsManager = android.telephony.SmsManager.getDefault();
+//        //拆分短信内容（手机短信长度限制）
+//        smsManager.divideMessage(content).forEach {
+//            smsManager.sendTextMessage(phone, null, it);
+//        }
+
+        val intent = Intent(Intent.ACTION_SENDTO, Uri.parse("smsto:$phone"));
+        intent.putExtra("sms_body", content);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        context.startActivity(intent)
     }
 }

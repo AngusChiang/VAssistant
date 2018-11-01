@@ -3,9 +3,11 @@ package cn.vove7.jarvis.activities
 import android.os.Bundle
 import android.support.design.widget.BottomNavigationView
 import android.support.v7.app.AppCompatActivity
+import cn.vove7.common.bridges.RootHelper
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.fragments.HomeFragment
 import cn.vove7.jarvis.fragments.MineFragment
+import cn.vove7.jarvis.services.MyAccessibilityService
 import cn.vove7.jarvis.tools.AppConfig
 import cn.vove7.jarvis.tools.AppConfig.checkAppUpdate
 import cn.vove7.jarvis.tools.DataUpdator
@@ -15,6 +17,7 @@ import cn.vove7.vtp.runtimepermission.PermissionUtils
 import cn.vove7.vtp.sharedpreference.SpHelper
 import com.afollestad.materialdialogs.MaterialDialog
 import kotlinx.android.synthetic.main.activity_real_main.*
+import kotlin.concurrent.thread
 
 
 class RealMainActivity : AppCompatActivity() {
@@ -42,9 +45,15 @@ class RealMainActivity : AppCompatActivity() {
         requestPermission()
     }
 
-//    override fun onResume() {
-//        super.onResume()
-//    }
+    override fun onResume() {
+        super.onResume()
+        thread {
+            if (AppConfig.autoOpenASWithRoot && !PermissionUtils.accessibilityServiceEnabled(this)) {
+                RootHelper.openAppAccessService(packageName,
+                        "${MyAccessibilityService::class.qualifiedName}")
+            }
+        }
+    }
 
     companion object {
         val ps = arrayOf(
@@ -86,7 +95,7 @@ class RealMainActivity : AppCompatActivity() {
             sp.set("v_code", nowCode)
         } else {
             checkDataUpdate()
-            checkAppUpdate (this,false)
+            checkAppUpdate(this, false)
 
         }
     }

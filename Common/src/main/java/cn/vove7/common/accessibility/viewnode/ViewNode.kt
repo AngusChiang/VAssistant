@@ -198,6 +198,13 @@ class ViewNode(val node: AccessibilityNodeInfo) : ViewOperation, Comparable<View
         return text?.toString()
     }
 
+    override fun appendText(s: String): Boolean {
+        return setText(buildString {
+            append(getText())
+            append(s)
+        })
+    }
+
     /**
      * @param ep 额外参数
      */
@@ -272,13 +279,28 @@ class ViewNode(val node: AccessibilityNodeInfo) : ViewOperation, Comparable<View
         return nodeSummary(node)
     }
 
+    fun sortOutInfo(): ViewInfo {
+        return ViewInfo(
+                getText(),
+                node.contentDescription,
+                classType,
+                getBoundsInParent(),
+                getBounds()
+//                node.isClickable,
+//                null,
+//                node.canOpenPopup()
+        )
+    }
+
+    val classType: String?
+        get() = node.className.let { it.substring(it.lastIndexOf('.') + 1) }
+
+
     private fun nodeSummary(node: AccessibilityNodeInfo): String {
-        val clsName = node.className
         val id = node.viewIdResourceName
-        val cls = clsName.substring(clsName.lastIndexOf('.') + 1)
         val desc = node.contentDescription
 
-        return "{class: " + cls +
+        return "{class: " + classType +
                 (if (id == null) "" else ", id: " + id.substring(id.lastIndexOf('/') + 1)) +
                 (if (node.text == null) "" else ", text: ${node.text}") +
                 (if (desc == null) "" else ", desc: $desc") +

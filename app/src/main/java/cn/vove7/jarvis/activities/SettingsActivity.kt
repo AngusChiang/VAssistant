@@ -207,7 +207,7 @@ class SettingsActivity : ReturnableActivity() {
                     CheckBoxItem(title = "用户体验计划", summary = "改善体验与完善功能",
                             keyId = R.string.key_user_exp_plan, defaultValue = { true }
                     ),
-                    CheckBoxItem(title = "自动开启无障碍服务", summary = "App启动时自动开启无障碍服务，需要root支持",
+                    CheckBoxItem(title = "自动开启无障碍服务", summary = "App启动时自动开启无障碍服务，需要root支持\n重启App后生效",
                             keyId = R.string.key_auto_open_as_with_root, defaultValue = { false })
             ))
             //todo shortcut 管理

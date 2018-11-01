@@ -6,11 +6,9 @@ import android.os.Handler
 import android.util.Log
 import cn.vove7.androlua.LuaApp
 import cn.vove7.common.appbus.MessageEvent
-import cn.vove7.common.bridges.RootHelper
 import cn.vove7.jarvis.receivers.PowerEventReceiver
 import cn.vove7.jarvis.receivers.ScreenStatusListener
 import cn.vove7.jarvis.services.MainService
-import cn.vove7.jarvis.services.MyAccessibilityService
 import cn.vove7.jarvis.tools.AppConfig
 import cn.vove7.jarvis.tools.CrashHandler
 import cn.vove7.jarvis.tools.ShortcutUtil
@@ -50,10 +48,6 @@ class App : LuaApp() {
                 ShortcutUtil.addWakeUpShortcut()
 //                AdvanAppHelper.updateAppList()
                 startBroadcastReceivers()
-                if (AppConfig.autoOpenASWithRoot) {
-                    RootHelper.openAppAccessService(packageName,
-                            "${MyAccessibilityService::class.qualifiedName}")
-                }
                 Vog.d(this, "service thread ---> finish ${System.currentTimeMillis() / 1000}")
             }
         },1000)

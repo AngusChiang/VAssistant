@@ -1,10 +1,16 @@
 package cn.vove7.jarvis.services
 
 import android.Manifest
+import android.accessibilityservice.AccessibilityButtonController
 import android.accessibilityservice.AccessibilityService
+import android.accessibilityservice.AccessibilityServiceInfo.FLAG_REQUEST_ACCESSIBILITY_BUTTON
+import android.accessibilityservice.FingerprintGestureController
+import android.accessibilityservice.FingerprintGestureController.FINGERPRINT_GESTURE_SWIPE_DOWN
+import android.accessibilityservice.FingerprintGestureController.FINGERPRINT_GESTURE_SWIPE_RIGHT
 import android.content.Context
 import android.content.pm.PackageManager
 import android.graphics.Rect
+import android.os.Build
 import android.os.Handler
 import android.view.KeyEvent
 import android.view.KeyEvent.*
@@ -61,6 +67,33 @@ class MyAccessibilityService : AccessibilityApi() {
         }
     }
 
+    fun fingerprintGesture() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            fingerprintGestureController.isGestureDetectionAvailable.also {
+                Vog.d(this, "onServiceConnected ---> isGestureDetectionAvailable $it")
+                if (it) {
+                    fingerprintGestureController.registerFingerprintGestureCallback(
+                            object : FingerprintGestureController.FingerprintGestureCallback() {
+                                override fun onGestureDetected(gesture: Int) {
+                                    Vog.d(this, "onGestureDetected ---> $gesture")
+                                    when (gesture) {
+                                        FINGERPRINT_GESTURE_SWIPE_RIGHT -> {
+
+                                        }
+                                        FINGERPRINT_GESTURE_SWIPE_DOWN -> {
+
+                                        }
+                                        else -> {
+                                        }
+                                    }
+
+                                }
+                            }, Handler())
+                }
+            }
+        }
+
+    }
 
     private fun updateCurrentApp(pkg: String, activityName: String) {
         if (currentScope.packageName == pkg && activityName == currentActivity) return
@@ -191,10 +224,10 @@ class MyAccessibilityService : AccessibilityApi() {
             val classNameStr = event.className
             val pkg = event.packageName as String?
             Vog.v(this, "onAccessibilityEvent ---> $classNameStr $pkg")
-            if (packageName == pkg) {//fix 悬浮窗造成阻塞
-                Vog.d(this, "onAccessibilityEvent ---> 自身(屏蔽悬浮窗)")
-                return
-            }
+//            if (packageName == pkg) {//fix 悬浮窗造成阻塞
+//                Vog.d(this, "onAccessibilityEvent ---> 自身(屏蔽悬浮窗)")
+//                return
+//            }
 //            Vog.d(this, "TYPE_WINDOW_STATE_CHANGED --->\n $pkg ${event.className}")
             if (classNameStr != null && pkg != null)
                 updateCurrentApp(pkg, classNameStr.toString())
@@ -539,6 +572,22 @@ class MyAccessibilityService : AccessibilityApi() {
         }
     }
 
+    /**
+     * 无障碍小人
+     * @param b Boolean
+     */
+    fun setAccessibilityButton(b: Boolean) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            serviceInfo.flags = serviceInfo.flags or FLAG_REQUEST_ACCESSIBILITY_BUTTON
+            serviceInfo = serviceInfo
+            accessibilityButtonController.registerAccessibilityButtonCallback(object : AccessibilityButtonController.AccessibilityButtonCallback() {
+                override fun onClicked(controller: AccessibilityButtonController?) {
+                    super.onClicked(controller)
+                    MainService.switchReco()
+                }
+            })
+        }
+    }
 }
 
 fun AppInfo.isInputMethod(context: Context): Boolean {

@@ -1,5 +1,6 @@
 package cn.vove7.common.bridges
 
+import android.content.Intent
 import android.graphics.Bitmap
 import android.location.Location
 import cn.vove7.common.model.ExResult
@@ -15,6 +16,7 @@ interface SystemOperation {
      */
     fun openAppDetail(pkg: String): Boolean
 
+    fun getLaunchIntent(pkg: String): Intent?
     /**
      * 根据App名，获取应用包名
      * 标记 -> 应用列表
@@ -22,6 +24,13 @@ interface SystemOperation {
      * @return String?
      */
     fun getPkgByWord(appWord: String): String?
+
+    /**
+     * 模糊匹配 标记本地
+     * @param name String
+     * @return String?
+     */
+    fun getPhoneByName(name: String): String?
 
     /**
      * 通过包名打开App
@@ -170,6 +179,15 @@ interface SystemOperation {
     fun screenOn()
     fun screenOff()
     fun quickSearch(s: String?)
-    fun disableSoftKeyboard():Boolean
-    fun enableSoftKeyboard():Boolean
+    fun disableSoftKeyboard(): Boolean
+    fun enableSoftKeyboard(): Boolean
+
+    /**
+     * 发送短信
+     * @param phone String
+     * @param content String
+     */
+    fun sendSMS(phone: String, content: String)
+
+
 }

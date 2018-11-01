@@ -68,7 +68,7 @@ class AboutActivity : AppCompatActivity(), AdapterView.OnItemClickListener {
                 AppConfig.checkAppUpdate(this, true) {
                     p.dismiss()
                     if (!it) {
-                        toast.showShort("未发现更新")
+                        toast.showShort("未发现新版本")
                     }
                 }
             }

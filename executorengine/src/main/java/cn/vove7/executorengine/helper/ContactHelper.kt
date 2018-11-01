@@ -26,7 +26,8 @@ import java.util.*
  * Created by Vove on 2018/6/19
  */
 object AdvanContactHelper : GenChoiceData, Markable {
-    val context = GlobalApp.APP
+    val context:Context
+            get() = GlobalApp.APP
     //Dao
     private val markedContactDao = DAO.daoSession.markedDataDao
 
@@ -71,7 +72,7 @@ object AdvanContactHelper : GenChoiceData, Markable {
     /**
      * 纯数字 -> 标记 -> 模糊匹配 -> 匹配提供
      */
-    fun matchPhone(context: Context, s: String, update: Boolean = true): String? {
+    fun matchPhone(s: String, update: Boolean = true): String? {
         if (phoneNum.matches(s)) {//数字
             return s
         }
@@ -89,7 +90,7 @@ object AdvanContactHelper : GenChoiceData, Markable {
         //更新列表
         if (update) {
             updateContactList()
-            return matchPhone(context, s, false)
+            return matchPhone(s, false)
         }
         //模糊匹配 -> 匹配提供
         val matchedList = fuzzyMatching(s)

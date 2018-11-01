@@ -55,7 +55,8 @@ open class ExecutorImpl(
     //    val globalActionExecutor = GlobalActionExecutor()
     override var command: String? = null
     override var DEBUG: Boolean = false
-
+    override val focusView: ViewNode?
+        get() = AccessibilityApi.accessibilityService?.currentFocusedEditor
     override var running: Boolean = false
 
     init {
@@ -71,12 +72,7 @@ open class ExecutorImpl(
     override var actionScope: Int? = null
 
     override var currentApp: ActionScope? = null
-        get() {
-            val r = checkAccessibilityService(false)
-            return if (r) {
-                accessApi?.currentScope
-            } else null
-        }
+        get() = accessApi?.currentScope
 
     override fun isGlobal(): Boolean =
         globalScopeType.contains(actionScope)
@@ -601,7 +597,7 @@ open class ExecutorImpl(
                 "system.openAppDetail(args[1])\n" +
                 "s = ViewFinder().equalsText({'强行停止','force stop'}).waitFor(3000)\n" +
                 "if(s and s.tryClick()) then \n" +
-                "ok=ViewFinder().equalsText({'确定','OK'}).waitFor(2000)\n" +
+                "ok=ViewFinder().containsText({'确定','OK','强行停止'}).waitFor(2000)\n" +
                 "if(ok) then ok.tryClick()\n" +
                 "end\n" +
                 "else\n" +

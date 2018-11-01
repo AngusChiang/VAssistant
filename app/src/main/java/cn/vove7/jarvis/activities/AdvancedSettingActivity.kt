@@ -81,15 +81,21 @@ class AdvancedSettingActivity : ReturnableActivity() {
         } else View.VISIBLE
     }
 
+    private fun startOnNewWin(cls:Class<*>) {
+        startActivity(Intent(this, cls).also{
+            it.addFlags(Intent.FLAG_ACTIVITY_NEW_DOCUMENT)
+        })
+    }
+
     private val groupItems: List<SettingGroupItem> by lazy {
         mutableListOf(
                 SettingGroupItem(R.color.google_blue, "管理", childItems = listOf(
                         IntentItem(R.string.instru_management, onClick = { _, _ ->
-                            startActivity(Intent(this, InstManagerActivity::class.java))
+                            startOnNewWin(InstManagerActivity::class.java)
                             return@IntentItem true
                         }),
                         IntentItem(R.string.text_mark_management, onClick = { _, _ ->
-                            startActivity(Intent(this, MarkedManagerActivity::class.java))
+                            startOnNewWin(MarkedManagerActivity::class.java)
                             return@IntentItem true
                         }),
                         IntentItem(R.string.text_check_last_data, onClick = { _, _ ->
@@ -117,14 +123,13 @@ class AdvancedSettingActivity : ReturnableActivity() {
                         }),
                         IntentItem(R.string.text_test_code_lua, onClick = { _, _ ->
                             if (AppConfig.checkUser()) {
-                                startActivity(Intent(this, LuaEditorActivity::class.java).also { it.addFlags(Intent.FLAG_ACTIVITY_NEW_DOCUMENT) })
+                                startOnNewWin(LuaEditorActivity::class.java)
                             }
                             return@IntentItem true
                         }),
                         IntentItem(R.string.text_code_test_js, null, onClick = { _, _ ->
-                            if (AppConfig.checkUser()) {
-                                startActivity(Intent(this, JsEditorActivity::class.java).also { it.addFlags(Intent.FLAG_ACTIVITY_NEW_DOCUMENT) })
-                            }
+                            if (AppConfig.checkUser())
+                                startOnNewWin(JsEditorActivity::class.java)
                             return@IntentItem true
                         })
                 )),

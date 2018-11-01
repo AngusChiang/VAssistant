@@ -111,6 +111,11 @@ open class FindBuilder : ViewOperation {
         return node?.setText(text) == true
     }
 
+    override fun appendText(s: String): Boolean {
+        val node = findFirst()
+        return node?.appendText(s) == true
+    }
+
     override fun setTextWithInitial(text: String): Boolean {
         val node = findFirst()
         return node?.setTextWithInitial(text) == true

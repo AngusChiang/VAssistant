@@ -84,7 +84,7 @@ object RootHelper {
                 }
             }
         } catch (e: Exception) {
-            e.printStackTrace()
+            GlobalLog.err(e)
         }
         return result.toString()
     }

@@ -507,6 +507,16 @@ class MainService : BusService(),
             get() {
                 return instance?.cExecutor?.running == true
             }
+
+        /**
+         * 切换识别
+         */
+        fun switchReco() {
+            if (recoIsListening) {//配置
+                instance?.onCommand(AppBus.ORDER_CANCEL_RECO)
+            } else
+                instance?.onCommand(AppBus.ORDER_START_RECO)
+        }
     }
 
     private fun hideAll(immediately: Boolean = false) {
@@ -736,7 +746,7 @@ class MainService : BusService(),
         val parseResult = ParseEngine
                 .parseAction(result, AccessibilityApi.accessibilityService?.currentScope)
         if (parseResult.isSuccess) {
-            listeningToast.hideDelay()//执行时 消失
+            listeningToast.hideImmediately()//执行时 消失
             val his = CommandHistory(UserInfo.getUserId(), result,
                     parseResult.msg)
             NetHelper.uploadUserCommandHistory(his)
