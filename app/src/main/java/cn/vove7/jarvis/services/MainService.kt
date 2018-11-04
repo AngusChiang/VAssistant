@@ -12,7 +12,7 @@ import cn.vove7.common.accessibility.AccessibilityApi
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.appbus.AppBus
-import cn.vove7.common.appbus.AppBus.EVENT_BEGIN_SCREEN_PICKER
+import cn.vove7.common.appbus.AppBus.ORDER_BEGIN_SCREEN_PICKER
 import cn.vove7.common.appbus.AppBus.EVENT_FORCE_OFFLINE
 import cn.vove7.common.appbus.AppBus.EVENT_START_DEBUG_SERVER
 import cn.vove7.common.appbus.AppBus.EVENT_STOP_DEBUG_SERVER
@@ -47,6 +47,7 @@ import cn.vove7.jarvis.activities.ScreenPickerActivity
 import cn.vove7.jarvis.chat.ChatSystem
 import cn.vove7.jarvis.chat.QykChatSystem
 import cn.vove7.jarvis.chat.TulingChatSystem
+import cn.vove7.jarvis.speech.SpeechEvent
 import cn.vove7.jarvis.tools.AppConfig
 import cn.vove7.jarvis.tools.debugserver.RemoteDebugServer
 import cn.vove7.jarvis.view.dialog.MultiChoiceDialog
@@ -92,8 +93,8 @@ class MainService : BusService(),
 
     private lateinit var chatSystem: ChatSystem
 
-    private val speechRecoService = SpeechRecoService(RecgEventListener())
-    private val speechSynService = SpeechSynService
+    private lateinit var speechRecoService: SpeechRecoService
+    private lateinit var speechSynService: SpeechSynService
 
     /**
      * 当前语音使用方式
@@ -101,9 +102,9 @@ class MainService : BusService(),
     private var voiceMode = MODE_VOICE
 
     //识别过程动画
-    private var listeningAni = ListeningAnimation()
-    private var parseAnimation = ParseAnimation()
-    private var executeAnimation = ExecuteAnimation()
+    private val listeningAni: ListeningAnimation by lazy { ListeningAnimation() }
+    private val parseAnimation: ParseAnimation by lazy { ParseAnimation() }
+    private val executeAnimation: ExecuteAnimation by lazy { ExecuteAnimation() }
 
 
     override fun onCreate() {
@@ -112,10 +113,18 @@ class MainService : BusService(),
         GlobalApp.serviceBridge = this
         thread {
             listeningToast = ListeningToast()
+            speechSynService = SpeechSynService
+
             cExecutor = MultiExecutorEngine()
-            loadChatSystem()
             init()
         }
+    }
+
+    fun init() {
+        speechRecoService = SpeechRecoService(RecgEventListener())
+
+        loadChatSystem()
+        speechSynService.event = SyncEventListener()
     }
 
     fun loadChatSystem(bySet: Boolean = false) {
@@ -137,9 +146,6 @@ class MainService : BusService(),
         return object : Binder() {}
     }
 
-    fun init() {
-        speechSynService.event = SyncEventListener()
-    }
 
     @Subscribe(threadMode = ThreadMode.BACKGROUND)
     fun onSubException(e: SubscriberExceptionEvent) {
@@ -324,36 +330,36 @@ class MainService : BusService(),
 
     /**
      * 执行结果回调
+     * from executor 线程
      */
-    //from executor 线程
-
-    override fun onExecuteFinished(result: String) {//
-        Vog.d(this, result)
-
-//        listeningToast.showAndHideDelay("执行完毕")
-//        effectHandler.sendEmptyMessage(ANI_HIDEEND)
-        executeAnimation.hideDelay()
-//        toast.showShort(result)
+    override fun onExecuteFinished(result: Boolean) {//
+        Vog.d(this, "onExecuteFinished  --> $result")
+        listeningToast.hideImmediately()
+        if (AppConfig.execSuccessFeedback && result) executeAnimation.success()
+        else executeAnimation.hideDelay()
     }
 
     //from executor 线程
-    override fun onExecuteFailed(errMsg: String?) {//
+    override fun onExecuteFailed(errMsg: String?) {//错误信息
         Vog.e(this, "onExecuteFailed: $errMsg")
         executeAnimation.failed()
-        GlobalApp.toastShort(errMsg ?: "失败")
+        if (AppConfig.execFailedVoiceFeedback)
+            speakSync("执行失败")
+        else GlobalApp.toastShort("执行失败")
+        listeningToast.hideImmediately()
     }
 
     override fun onExecuteInterrupt(errMsg: String) {
         Vog.e(this, "onExecuteInterrupt: $errMsg")
         executeAnimation.failed()
-        GlobalApp.toastShort("☹")
-        executeAnimation.failed
+//        GlobalApp.toastShort("")
+        executeAnimation.failed()
     }
 
 
     /**
      * onSpeechAction
-     *
+     * 无需立即执行，可延缓使用AppBus
      */
     @Subscribe(threadMode = ThreadMode.BACKGROUND)
     fun onSpeechAction(sAction: SpeechAction) {
@@ -368,7 +374,10 @@ class MainService : BusService(),
                 speechRecoService.cancelRecog()
             }
             SpeechAction.ActionCode.ACTION_START_WAKEUP -> {
-//                AppConfig.voiceWakeup = true
+                AppConfig.voiceWakeup = true
+                speechRecoService.startWakeUp()
+            }
+            SpeechAction.ActionCode.ACTION_START_WAKEUP_WITHOUT_SWITCH -> {
                 speechRecoService.startWakeUp()
             }
             SpeechAction.ActionCode.ACTION_RELOAD_SYN_CONF -> speechSynService.reLoad()
@@ -410,6 +419,10 @@ class MainService : BusService(),
         cExecutor.execQueue(CExecutorI.DEBUG_SCRIPT, q)
     }
 
+    /**
+     * 立即执行的指令
+     * @param order String
+     */
     @Subscribe(threadMode = ThreadMode.BACKGROUND)
     fun onCommand(order: String) {//外部命令
         Vog.d(this, "onCommand ---> $order")
@@ -439,7 +452,7 @@ class MainService : BusService(),
                 EVENT_STOP_DEBUG_SERVER -> {
                     RemoteDebugServer.stop()
                 }
-                EVENT_BEGIN_SCREEN_PICKER -> {
+                ORDER_BEGIN_SCREEN_PICKER -> {
                     val intent = Intent(this, ScreenPickerActivity::class.java)
                     intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or
                             Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS)
@@ -573,10 +586,12 @@ class MainService : BusService(),
             //打开手电筒、关闭手电筒
             "打开手电筒", "打开电灯" -> SystemBridge.openFlashlight()
             "关闭手电筒", "关闭电灯" -> SystemBridge.closeFlashlight()
-            "截屏分享", "文字提取" -> {
+            "你好小V", "你好小v", "小V同学", "小v同学" -> { //唤醒词
+                return false
+            }
+            else -> {//"截屏分享", "文字提取" 等命令
                 onParseCommand(w)
             }
-            else -> return false
 
         }
         return true
@@ -591,7 +606,7 @@ class MainService : BusService(),
             parseWakeUpCommand(word ?: "").also {
                 if (it) return false
             }
-
+            //唤醒词 你好小V，小V同学 ↓
             checkMusic()
             if (AppConfig.openResponseWord && AppConfig.speakResponseWordOnVoiceWakeup) {
                 speakResponseWord()
@@ -618,6 +633,7 @@ class MainService : BusService(),
             if (speechSynService.speaking) {
                 speechSynService.stop()
             }
+            AppBus.post(AppBus.EVENT_BEGIN_RECO)
             Vog.d(this, "onStartRecog ---> 开始识别")
             if (continuePlay)//唤醒时检查过
                 checkMusic()//检查后台播放
@@ -640,30 +656,29 @@ class MainService : BusService(),
 //            }
         }
 
-        override fun onResult(result: String) {//解析完成再 resumeMusicIf()?
-            Vog.d(this, "结果 --------> $result")
+        override fun onResult(voiceResult: String) {//解析完成再 resumeMusicIf()?
+            Vog.d(this, "结果 --------> $voiceResult")
             when (voiceMode) {
                 MODE_VOICE -> {
-                    onParseCommand(result)
+                    onParseCommand(voiceResult)
                 }
                 MODE_GET_PARAM -> {//中途参数
                     resumeMusicIf()
-                    if (result == "") {//失败
+                    if (voiceResult == "") {//失败
                         //询问重新
-//                            return
                         messengerAction?.responseResult = false
                         cExecutor.onGetVoiceParam(null)
                     } else {//通知
-                        cExecutor.onGetVoiceParam(result)
+                        cExecutor.onGetVoiceParam(voiceResult)
                     }
                     voiceMode = MODE_VOICE
                 }
                 MODE_ALERT -> {
                     when {
-                        checkConfirm(result) -> {
+                        checkConfirm(voiceResult) -> {
                             performAlertClick(true)
                         }
-                        checkCancel(result) -> {
+                        checkCancel(voiceResult) -> {
                             performAlertClick(false)
                         }
                         else -> AppBus.postSpeechAction(SpeechAction.ActionCode.ACTION_START_RECO)  //继续????
@@ -675,6 +690,13 @@ class MainService : BusService(),
         override fun onTempResult(temp: String) {
             listeningToast.show(temp)
             listeningAni.setContent(temp)
+            AppConfig.finishWord.also {
+                if (it != null && it != "") {
+                    if (temp.endsWith(it)) {
+                        onCommand(ORDER_STOP_RECO)
+                    }
+                }
+            }
         }
 
         override fun onStop() {
@@ -700,6 +722,7 @@ class MainService : BusService(),
 
         override fun onFailed(err: String) {
             resumeMusicIf()
+            AppBus.post(AppBus.EVENT_ERROR_RECO)
             listeningToast.showAndHideDelay("😭")
             when (voiceMode) {
                 MODE_VOICE -> {
@@ -868,17 +891,19 @@ class MainService : BusService(),
      * 连续 加上 speak 会误判
      */
     fun checkMusic() {
-        if (!isContinousDialogue && continuePlay && SystemBridge.isMediaPlaying()
-                && !speechSynService.speaking) {
-            SystemBridge.getMusicFocus()
-            GlobalLog.log("checkMusic ---> 有音乐播放")
-//            Vog.d(this, "checkMusic ---> 有音乐播放")
-            haveMusicPlay = true
-        } else {
-            haveMusicPlay = false
-            GlobalLog.log("checkMusic ---> 无音乐播放")
-//            Vog.d(this, "checkMusic ---> 无音乐播放")
-        }
+        SystemBridge.getMusicFocus()
+
+//        if (!isContinousDialogue && continuePlay && SystemBridge.isMediaPlaying()
+//                && !speechSynService.speaking) {
+//            SystemBridge.getMusicFocus()
+//            GlobalLog.log("checkMusic ---> 有音乐播放")
+////            Vog.d(this, "checkMusic ---> 有音乐播放")
+//            haveMusicPlay = true
+//        } else {
+//            haveMusicPlay = false
+//            GlobalLog.log("checkMusic ---> 无音乐播放")
+////            Vog.d(this, "checkMusic ---> 无音乐播放")
+//        }
     }
 
     //识别前是否有音乐播放
@@ -887,18 +912,19 @@ class MainService : BusService(),
     //
 
     fun resumeMusicIf() {
+        SystemBridge.removeMusicFocus()
 //        if() return
-        Vog.d(this, "音乐继续 ---> HAVE: $haveMusicPlay CONTINUE: $continuePlay")
-        synchronized(haveMusicPlay) {
-            if (!isContinousDialogue && haveMusicPlay) {
-                if (continuePlay) {//   speak响应词
-                    SystemBridge.mediaResume()
-                    haveMusicPlay = false
-                } else continuePlay = true
-            } else {
-                continuePlay = true
-            }
-        }
+//        Vog.d(this, "音乐继续 ---> HAVE: $haveMusicPlay CONTINUE: $continuePlay")
+//        synchronized(haveMusicPlay) {
+//            if (!isContinousDialogue && haveMusicPlay) {
+//                if (continuePlay) {//   speak响应词
+//                    SystemBridge.mediaResume()
+//                    haveMusicPlay = false
+//                } else continuePlay = true
+//            } else {
+//                continuePlay = true
+//            }
+//        }
     }
 
 }

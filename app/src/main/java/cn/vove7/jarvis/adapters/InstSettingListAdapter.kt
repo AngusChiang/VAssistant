@@ -7,7 +7,7 @@ import android.widget.BaseAdapter
 import cn.vove7.common.bridges.SettingsBridge
 import cn.vove7.common.model.InstSettingItem
 import cn.vove7.jarvis.view.*
-import cn.vove7.jarvis.view.utils.SettingItemHelper
+import cn.vove7.jarvis.view.tools.SettingItemHelper
 
 /**
  * # InstSettingListAdapter

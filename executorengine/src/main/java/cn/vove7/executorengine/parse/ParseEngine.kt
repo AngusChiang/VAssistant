@@ -2,6 +2,7 @@ package cn.vove7.executorengine.parse
 
 import cn.vove7.common.accessibility.AccessibilityApi
 import cn.vove7.common.app.GlobalApp
+import cn.vove7.common.appbus.AppBus
 import cn.vove7.common.datamanager.DAO
 import cn.vove7.common.datamanager.greendao.ActionNodeDao
 import cn.vove7.common.datamanager.parse.model.Action
@@ -101,6 +102,7 @@ object ParseEngine {
             actionQueue.addAll(inAppQue.second) //匹配应用内时
             // 根据第一个action.scope 决定是否进入首页
             if (actionQueue.isNotEmpty()) {//自动执行打开
+                AppBus.post(AppBus.EVENT_HIDE_FLOAT)//关闭助手dialog
                 val appScope = actionQueue.peek().scope
                 if (appScope?.activity ?: "" == "" || !scope.activity.endsWith(appScope.activity)) {//Activity 空 or Activity 不等 => 不同页面
                     Vog.d(this, "parseAction ---> 应用内不同页")

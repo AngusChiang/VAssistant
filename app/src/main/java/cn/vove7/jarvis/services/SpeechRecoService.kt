@@ -13,18 +13,19 @@ import cn.vove7.executorengine.helper.AdvanAppHelper
 import cn.vove7.executorengine.helper.AdvanContactHelper
 import cn.vove7.jarvis.BuildConfig
 import cn.vove7.jarvis.receivers.PowerEventReceiver
-import cn.vove7.jarvis.speech.recognition.OfflineRecogParams
-import cn.vove7.jarvis.speech.recognition.listener.SpeechStatusListener
-import cn.vove7.jarvis.speech.recognition.model.IStatus
-import cn.vove7.jarvis.speech.recognition.model.IStatus.Companion.CODE_VOICE_ERR
-import cn.vove7.jarvis.speech.recognition.model.IStatus.Companion.CODE_VOICE_RESULT
-import cn.vove7.jarvis.speech.recognition.model.IStatus.Companion.CODE_VOICE_TEMP
-import cn.vove7.jarvis.speech.recognition.model.IStatus.Companion.CODE_VOICE_VOL
-import cn.vove7.jarvis.speech.recognition.model.IStatus.Companion.CODE_WAKEUP_SUCCESS
-import cn.vove7.jarvis.speech.recognition.recognizer.MyRecognizer
-import cn.vove7.jarvis.speech.wakeup.MyWakeup
-import cn.vove7.jarvis.speech.wakeup.RecogWakeupListener
-import cn.vove7.jarvis.speech.wakeup.WakeupEventAdapter
+import cn.vove7.jarvis.speech.SpeechEvent
+import cn.vove7.jarvis.speech.baiduspeech.recognition.OfflineRecogParams
+import cn.vove7.jarvis.speech.baiduspeech.recognition.listener.SpeechStatusListener
+import cn.vove7.jarvis.speech.baiduspeech.recognition.model.IStatus
+import cn.vove7.jarvis.speech.baiduspeech.recognition.model.IStatus.Companion.CODE_VOICE_ERR
+import cn.vove7.jarvis.speech.baiduspeech.recognition.model.IStatus.Companion.CODE_VOICE_RESULT
+import cn.vove7.jarvis.speech.baiduspeech.recognition.model.IStatus.Companion.CODE_VOICE_TEMP
+import cn.vove7.jarvis.speech.baiduspeech.recognition.model.IStatus.Companion.CODE_VOICE_VOL
+import cn.vove7.jarvis.speech.baiduspeech.recognition.model.IStatus.Companion.CODE_WAKEUP_SUCCESS
+import cn.vove7.jarvis.speech.baiduspeech.recognition.recognizer.MyRecognizer
+import cn.vove7.jarvis.speech.baiduspeech.wakeup.MyWakeup
+import cn.vove7.jarvis.speech.baiduspeech.wakeup.RecogWakeupListener
+import cn.vove7.jarvis.speech.baiduspeech.wakeup.WakeupEventAdapter
 import cn.vove7.jarvis.tools.AppConfig
 import cn.vove7.vtp.log.Vog
 import cn.vove7.vtp.runtimepermission.PermissionUtils
@@ -35,7 +36,7 @@ import java.lang.Thread.sleep
 import kotlin.concurrent.thread
 
 /**
- * 语音识别服务
+ * 百度语音识别服务
  */
 class SpeechRecoService(val event: SpeechEvent) {
 
@@ -53,6 +54,19 @@ class SpeechRecoService(val event: SpeechEvent) {
      * 本Activity中是否需要调用离线命令词功能。根据此参数，判断是否需要调用SDK的ASR_KWS_LOAD_ENGINE事件
      */
     private var enableOffline = false
+
+//    /**
+//     * 唤醒词无间断标志，用于去掉命令头部
+//     * 0 -> 无
+//     * 1 -> 你好小V
+//     * 2 -> 小v同学
+//     */
+//    var wakeupNoInterruptType = 0
+//        get() {//获取即恢复false
+//            val r = field
+//            field = 0
+//            return r
+//        }
 
     /**
      * 分发事件
@@ -88,7 +102,7 @@ class SpeechRecoService(val event: SpeechEvent) {
         stopAutoSleepWakeup()
         Vog.d(this, "startAutoSleepWakeUp ---> 开启自动休眠")
         timerHandler.postDelayed(stopWakeUpTimer,
-                if (BuildConfig.DEBUG) 10000
+                if (BuildConfig.DEBUG) 60000
                 else AppConfig.autoSleepWakeupMillis)
     }
 
@@ -152,16 +166,20 @@ class SpeechRecoService(val event: SpeechEvent) {
                 ).toString())
         )
 
-    private val recoParams = mapOf(
-            Pair(SpeechConstant.ACCEPT_AUDIO_DATA, false),
+    private val recoParams
+        get() = mutableMapOf(
+                Pair(SpeechConstant.ACCEPT_AUDIO_DATA, false),
 //            Pair(SpeechConstant.VAD_MODEL, "dnn"),
-            Pair(SpeechConstant.DISABLE_PUNCTUATION, false),//标点符号
-            Pair(SpeechConstant.ACCEPT_AUDIO_VOLUME, true),
-            Pair(SpeechConstant.IN_FILE, "#cn.vove7.jarvis.tools.MicrophoneInputStream.getInstance()"),
-            Pair(SpeechConstant.PID, 1536)
-    )
+                Pair(SpeechConstant.DISABLE_PUNCTUATION, false),//标点符号
+                Pair(SpeechConstant.ACCEPT_AUDIO_VOLUME, true),
+                Pair(SpeechConstant.IN_FILE, "#cn.vove7.jarvis.tools.MicrophoneInputStream.getInstance()"),
+                Pair(SpeechConstant.PID, 1536),
+                Pair(SpeechConstant.AUDIO_MILLS, System.currentTimeMillis() - 500)//从指定时间开始识别，可以 - 指定ms 识别之前的内容
+        )
 
-    class OffWord(
+//    private val backTrackInMs = 1500
+
+    class OffWord(//离线词
             @SerializedName("contact_name")
             val contactName: Array<String>
             , @SerializedName("appname")
@@ -185,10 +203,10 @@ class SpeechRecoService(val event: SpeechEvent) {
             AppBus.post(RequestPermission("悬浮窗权限"))
             return
         }
-        //震动 音效
-        event.onStartRecog()
-        sleep(100)
+        sleep(80)
         if (!isListening()) {
+            //震动 音效
+            event.onStartRecog()
             myRecognizer.start(recoParams)
         } else {
             Vog.d(this, "启动失败，正在运行")
@@ -205,10 +223,12 @@ class SpeechRecoService(val event: SpeechEvent) {
 
     /**
      * 开始录音后，取消这次录音。SDK会取消本次识别，回到原始状态。点击“取消”按钮后调用。
+     * @param notify 通知事件
      */
-    fun cancelRecog() {
+    fun cancelRecog(notify: Boolean = true) {
         myRecognizer.cancel()
-        event.onCancel()
+        if (notify)
+            event.onCancel()
     }
 
     fun isListening(): Boolean {
@@ -219,6 +239,37 @@ class SpeechRecoService(val event: SpeechEvent) {
     fun release() {
         myRecognizer.release()
     }
+
+    /**
+     * 无间断唤醒，命令会带着唤醒词 '你好小V'
+     * @param resultWithWakeupWord String
+     * @return String
+     */
+//    fun trimWakeupWord(resultWithWakeupWord: String): String {
+//        return when (wakeupNoInterruptType) {//减去头部唤醒词
+//            1 -> {
+//                var f = false
+//                resultWithWakeupWord.substring(resultWithWakeupWord.indexOfFirst {
+//                    when (it) {
+//                        '小' -> f = true
+//                        'v', 'V', '薇' -> if (f) return@indexOfFirst true
+//                    }
+//                    return@indexOfFirst false
+//                } + 1)
+//            }
+//            2 -> {
+//                var f = false
+//                resultWithWakeupWord.substring(resultWithWakeupWord.indexOfFirst {
+//                    when (it) {
+//                        '同' -> f = true
+//                        '学' -> if (f) return@indexOfFirst true
+//                    }
+//                    return@indexOfFirst false
+//                } + 1)
+//            }
+//            else -> resultWithWakeupWord
+//        }.also { Vog.d(this, "trimWakeupWord ---> $it") }
+//    }
 
     inner class RecoHandler(looper: Looper) : Handler(looper) {
         override fun handleMessage(msg: Message?) {
@@ -256,21 +307,4 @@ class SpeechRecoService(val event: SpeechEvent) {
             }
         }
     }
-}
-
-interface SpeechEvent {
-    /**
-     *
-     * @param word String?
-     * @return Boolean 是否需要继续唤醒识别
-     */
-    fun onWakeup(word: String?): Boolean
-
-    fun onStartRecog()
-    fun onResult(result: String)
-    fun onTempResult(temp: String)
-    fun onFailed(err: String)
-    fun onVolume(data: VoiceData)
-    fun onStop()
-    fun onCancel()
 }

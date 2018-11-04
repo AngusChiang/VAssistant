@@ -12,8 +12,12 @@ object AppBus {
     const val EVENT_START_DEBUG_SERVER = "start_debug_server"
     const val EVENT_STOP_DEBUG_SERVER = "stop_debug_server"
     const val EVENT_INST_SAVE_COMPLETE = "inst_settings_save_complete"
-    const val EVENT_BEGIN_SCREEN_PICKER = "begin_screen_picker"
+    const val EVENT_BEGIN_RECO = "e_begin_reco"
+    const val EVENT_FINISH_RECO = "e_finish_reco"
+    const val EVENT_ERROR_RECO = "e_error_reco"
+    const val EVENT_HIDE_FLOAT = "e_hide_float"
 
+    const val ORDER_BEGIN_SCREEN_PICKER = "begin_screen_picker"
     const val ORDER_STOP_EXEC = "stop_exec"
     const val ORDER_STOP_RECO = "stop_reco"
     const val ORDER_CANCEL_RECO = "cancel_reco"
@@ -92,6 +96,7 @@ data class SpeechAction(val action: ActionCode) {
     enum class ActionCode {
         ACTION_START_RECO,
         ACTION_START_WAKEUP,
+        ACTION_START_WAKEUP_WITHOUT_SWITCH,//不打开设置开关 @see[AppConfig.voiceWakeup]
         ACTION_STOP_WAKEUP,
         ACTION_STOP_RECO,
         ACTION_RELOAD_SYN_CONF,

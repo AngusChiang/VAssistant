@@ -3,6 +3,7 @@ package cn.vove7.jarvis.activities
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
+import android.os.Handler
 import android.view.View
 import android.widget.TextView
 import cn.vove7.common.model.UserInfo
@@ -14,9 +15,7 @@ import cn.vove7.jarvis.BuildConfig
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.activities.base.ReturnableActivity
 import cn.vove7.jarvis.adapters.SettingsExpandableAdapter
-import cn.vove7.jarvis.tools.AppConfig
-import cn.vove7.jarvis.tools.DataUpdator
-import cn.vove7.jarvis.tools.UriUtils
+import cn.vove7.jarvis.tools.*
 import cn.vove7.jarvis.tools.backup.BackupHelper
 import cn.vove7.jarvis.tools.debugserver.RemoteDebugServer
 import cn.vove7.jarvis.view.CheckBoxItem
@@ -26,7 +25,7 @@ import cn.vove7.jarvis.view.custom.SettingGroupItem
 import cn.vove7.jarvis.view.dialog.LoginDialog
 import cn.vove7.jarvis.view.dialog.ProgressDialog
 import cn.vove7.jarvis.view.dialog.UserInfoDialog
-import cn.vove7.jarvis.view.utils.SettingItemHelper
+import cn.vove7.jarvis.view.tools.SettingItemHelper
 import cn.vove7.vtp.sharedpreference.SpHelper
 import cn.vove7.vtp.view.span.ColourTextClickableSpan
 import com.afollestad.materialdialogs.MaterialDialog
@@ -44,11 +43,12 @@ import java.util.*
  */
 class AdvancedSettingActivity : ReturnableActivity() {
 
+    lateinit var adapter: SettingsExpandableAdapter
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_expandable_settings)
         val expandableListView = expand_list
-        val adapter = SettingsExpandableAdapter(this, groupItems, expandableListView)
+        adapter = SettingsExpandableAdapter(this, groupItems, expandableListView)
 
         expandableListView?.setAdapter(adapter)
 
@@ -73,6 +73,24 @@ class AdvancedSettingActivity : ReturnableActivity() {
         }
     }
 
+    var first = true
+
+    override fun onWindowFocusChanged(hasFocus: Boolean) {
+        if (hasFocus && first) {
+            startTutorials()
+            first = false
+        }
+    }
+
+    private fun startTutorials() {
+        Handler().postDelayed({
+            Tutorials.oneStep(this, list = arrayOf(
+                    ItemWrap(Tutorials.t_inst_man, adapter.childHolders[0][0]?.titleView, "指令管理", "这里查看支持的指令和指令管理")
+                    , ItemWrap(Tutorials.t_mark_man, adapter.childHolders[0][1]?.titleView, "标记管理", "这里查看标记的数据和管理")
+            ))
+        }, 1000)
+    }
+
     override fun onResume() {
         super.onResume()
         AppConfig.checkDate()
@@ -81,8 +99,8 @@ class AdvancedSettingActivity : ReturnableActivity() {
         } else View.VISIBLE
     }
 
-    private fun startOnNewWin(cls:Class<*>) {
-        startActivity(Intent(this, cls).also{
+    private fun startOnNewWin(cls: Class<*>) {
+        startActivity(Intent(this, cls).also {
             it.addFlags(Intent.FLAG_ACTIVITY_NEW_DOCUMENT)
         })
     }
@@ -90,18 +108,15 @@ class AdvancedSettingActivity : ReturnableActivity() {
     private val groupItems: List<SettingGroupItem> by lazy {
         mutableListOf(
                 SettingGroupItem(R.color.google_blue, "管理", childItems = listOf(
-                        IntentItem(R.string.instru_management, onClick = { _, _ ->
+                        IntentItem(R.string.instru_management) {
                             startOnNewWin(InstManagerActivity::class.java)
-                            return@IntentItem true
-                        }),
-                        IntentItem(R.string.text_mark_management, onClick = { _, _ ->
+                        },
+                        IntentItem(R.string.text_mark_management) {
                             startOnNewWin(MarkedManagerActivity::class.java)
-                            return@IntentItem true
-                        }),
-                        IntentItem(R.string.text_check_last_data, onClick = { _, _ ->
+                        },
+                        IntentItem(R.string.text_check_last_data) {
                             showLastDataDate()
-                            return@IntentItem true
-                        }),
+                        },
                         CheckBoxItem(title = "自动更新", summary = "在进入App后自动检查并更新最新数据",
                                 keyId = R.string.key_auto_update_data, defaultValue = { true })
                 )),
@@ -114,56 +129,52 @@ class AdvancedSettingActivity : ReturnableActivity() {
                                 (holder as SettingItemHelper.SwitchItemHolder).compoundWight.isChecked = false
                                 return@SwitchItem true
                             }
-
                             if (it as Boolean) {
                                 RemoteDebugServer.start()
                                 holder.summaryView.text = ipText
                             } else RemoteDebugServer.stop()
                             return@SwitchItem true
                         }),
-                        IntentItem(R.string.text_test_code_lua, onClick = { _, _ ->
+                        IntentItem(R.string.text_test_code_lua, onClick = {
                             if (AppConfig.checkUser()) {
                                 startOnNewWin(LuaEditorActivity::class.java)
                             }
-                            return@IntentItem true
                         }),
-                        IntentItem(R.string.text_code_test_js, null, onClick = { _, _ ->
+                        IntentItem(R.string.text_code_test_js, null, onClick = {
                             if (AppConfig.checkUser())
                                 startOnNewWin(JsEditorActivity::class.java)
-                            return@IntentItem true
                         })
                 )),
                 SettingGroupItem(R.color.google_red, "备份", childItems = listOf(
-                        IntentItem(title = "备份") { _, _ ->
+                        IntentItem(title = "备份") {
                             if (UserInfo.isLogin()) {
                                 BackupHelper.showBackupDialog(this)
                             } else {
                                 toast.showShort("请登录后操作")
                             }
-                            return@IntentItem true
                         },
-                        IntentItem(title = "从本地恢复") { _, _ ->
+                        IntentItem(title = "从本地恢复") {
                             if (UserInfo.isLogin()) {
                                 BackupHelper.showBackupFileList(this)
                             } else {
                                 toast.showShort("请登录后操作")
                             }
-                            return@IntentItem true
                         },
-                        IntentItem(title = "查看云端备份") { _, _ ->
+                        IntentItem(title = "查看云端备份") {
                             //todo
                             toast.showShort(R.string.text_coming_soon)
-                            return@IntentItem true
                         }
                 )),
                 SettingGroupItem(R.color.teal_A700, "命令解析", childItems = listOf(
                         CheckBoxItem(title = "自动使用打开操作", summary =
                         "列表指令失败后，自动使用打开操作\n如：[打开QQ扫一扫] 可以直接使用 [QQ扫一扫] 使用\n" +
-                                "或者点击屏幕文字\n" +
-                                "需要无障碍支持",
+                                "或者点击屏幕文字\n" + "*需要无障碍支持",
                                 keyId = R.string.key_use_smartopen_if_parse_failed),
-                        CheckBoxItem(title = "云解析", summary = "本地解析失败时，使用云解析",
-                                keyId = R.string.key_cloud_service_parse)
+                        CheckBoxItem(title = "云解析", summary = "本地解析失败时，使用云解析(暂未开放)",
+                                keyId = R.string.key_cloud_service_parse) { _, _ ->
+                            toast.showLong("暂未开放")
+                            return@CheckBoxItem false//todo true
+                        }
 //                        ,
 //                        CheckBoxItem(R.string.text_only_cloud_parse, summary = "仅高级用户可用",
 //                                keyId = R.string.key_only_cloud_service_parse)
@@ -177,12 +188,14 @@ class AdvancedSettingActivity : ReturnableActivity() {
                             h.summaryView.text = ApiUrls.SERVER_IP
                             return@SwitchItem true
                         },
-                        IntentItem(title = "触发崩溃") { _, _ ->
-                            return@IntentItem "a".toInt() == 0
+                        IntentItem(title = "触发崩溃") {
+                            "a".toInt()
+                        },
+                        IntentItem(title = "切换引导debug") {
+                            Tutorials.debug = !Tutorials.debug
+                            toast.showShort("${Tutorials.debug}")
                         }
-                )
-                )
-                )
+                )))
             }
         }
     }
@@ -235,7 +248,7 @@ class AdvancedSettingActivity : ReturnableActivity() {
                         }
                     }
                     positiveButton(text = "一键同步") {
-                        DataUpdator.onKeyUpdate(this@AdvancedSettingActivity, list)
+                        DataUpdator.oneKeyUpdate(this@AdvancedSettingActivity, list)
                     }
                 }
     }

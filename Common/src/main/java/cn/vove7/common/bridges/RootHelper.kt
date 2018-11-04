@@ -64,28 +64,26 @@ object RootHelper {
     /**
      * 执行命令并且输出结果
      */
+    @Throws(Exception::class)
     fun execWithSu(cmd: String): String {
         val result = StringBuilder()
         Vog.d(this, "execWithSu ---> $cmd")
-        try {
-            val p = Runtime.getRuntime().exec("su")// 经过Root处理的android系统即有su命令
-            DataOutputStream(p.outputStream).use { dos ->
-                DataInputStream(p.inputStream).use { dis ->
-                    dos.writeBytes(cmd + "\n")
-                    dos.flush()
-                    dos.writeBytes("exit\n")
-                    dos.flush()
+        val p = Runtime.getRuntime().exec("su")// 经过Root处理的android系统即有su命令
+        DataOutputStream(p.outputStream).use { dos ->
+            DataInputStream(p.inputStream).use { dis ->
+                dos.writeBytes(cmd + "\n")
+                dos.flush()
+                dos.writeBytes("exit\n")
+                dos.flush()
 
-                    var line: String? = null
-                    while ((dis.readLine().also { line = it }) != null) {
-                        result.append(line).append("\n")
-                    }
-                    p.waitFor()
+                var line: String? = null
+                while ((dis.readLine().also { line = it }) != null) {
+                    result.append(line).append("\n")
                 }
+                p.waitFor()
             }
-        } catch (e: Exception) {
-            GlobalLog.err(e)
         }
+
         return result.toString()
     }
 
@@ -113,7 +111,11 @@ object RootHelper {
     fun openAppAccessService(pkg: String, serviceName: String) {
         Vog.d(this, "openAppAccessService ---> $serviceName")
         //同时不关闭其他
-        execWithSu(buildList("$pkg/$serviceName"))
+        try {
+            execWithSu(buildList("$pkg/$serviceName"))
+        } catch (e: Exception) {
+            GlobalApp.toastShort("无障碍自动开启失败")
+        }
     }
 
     private fun buildList(s: String): String {

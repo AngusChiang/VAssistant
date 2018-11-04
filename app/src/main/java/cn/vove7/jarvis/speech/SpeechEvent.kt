@@ -1,0 +1,54 @@
+package cn.vove7.jarvis.speech
+
+import cn.vove7.common.appbus.VoiceData
+
+/**
+ * 语音识别事件interface
+ */
+interface SpeechEvent {
+    /**
+     *
+     * @param word String?
+     * @return Boolean 是否需要继续唤醒识别
+     */
+    fun onWakeup(word: String?): Boolean
+
+    /**
+     * 开始识别
+     */
+    fun onStartRecog()
+
+    /**
+     * 识别成功结果
+     * @param voiceResult String
+     */
+    fun onResult(voiceResult: String)
+
+    /**
+     * 中间结果
+     * @param temp String
+     */
+    fun onTempResult(temp: String)
+
+    /**
+     * 识别出错
+     * @param err String
+     */
+    fun onFailed(err: String)
+
+    /**
+     * 音量事件
+     * @param data VoiceData
+     */
+    fun onVolume(data: VoiceData)
+
+    /**
+     * 手动停止聆听
+     */
+    fun onStop()
+
+    /**
+     * 手动取消
+     */
+    fun onCancel()
+}

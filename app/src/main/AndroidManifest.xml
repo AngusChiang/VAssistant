@@ -4,7 +4,6 @@
     package="cn.vove7.jarvis">
 
     <!-- 语音识别 -->
-    <uses-permission android:name="android.permission.USE_FINGERPRINT" />
     <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
@@ -12,6 +11,7 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.USE_FINGERPRINT" />
     <!-- 闪光灯，相机 -->
     <uses-permission android:name="android.permission.FLASHLIGHT" />
     <uses-permission android:name="android.permission.CAMERA" />
@@ -42,8 +42,9 @@
     <uses-permission android:name="android.permission.READ_CALENDAR" />
 
     <!--???-->
-    <permission android:name="android.permission.INTERACT_ACROSS_USERS_FULL"
-        android:protectionLevel="signature"/>
+    <permission
+        android:name="android.permission.INTERACT_ACROSS_USERS_FULL"
+        android:protectionLevel="signature" />
 
     <uses-permission android:name="android.permission.DISABLE_KEYGUARD" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
@@ -104,8 +105,16 @@
             android:theme="@style/TransparentBackground">
             <intent-filter>
                 <action android:name="android.intent.action.ASSIST" />
+                <action android:name="android.intent.action.VOICE_ASSIST" />
+                <action android:name="android.intent.action.VOICE_COMMAND" />
+
                 <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.VOICE_LAUNCH" />
             </intent-filter>
+
+            <meta-data
+                android:name="com.android.systemui.action_assist_icon"
+                android:resource="@mipmap/ic_launcher_vassist" />
             <intent-filter>
                 <action android:name="android.intent.action.VOICE_COMMAND" />
                 <category android:name="android.intent.category.DEFAULT" />
@@ -131,6 +140,21 @@
             android:name=".services.MainService"
             android:enabled="true"
             android:exported="false" />
+        <service
+            android:name=".services.AssistSessionService"
+            android:permission="android.permission.BIND_VOICE_INTERACTION">
+            <meta-data
+                android:name="android.voice_interaction"
+                android:resource="@xml/assist_service" />
+
+            <meta-data
+                android:name="com.android.systemui.action_assist_icon"
+                android:resource="@mipmap/ic_launcher_vassist" />
+            <intent-filter>
+                <action android:name="android.service.voice.VoiceInteractionService" />
+            </intent-filter>
+
+        </service>
 
         <activity
             android:name=".activities.PermissionManagerActivity"

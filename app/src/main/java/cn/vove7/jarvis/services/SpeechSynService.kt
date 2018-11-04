@@ -10,10 +10,10 @@ import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.app.GlobalLog
 import cn.vove7.jarvis.BuildConfig
 import cn.vove7.jarvis.R
-import cn.vove7.jarvis.speech.synthesis.control.InitConfig
-import cn.vove7.jarvis.speech.synthesis.control.MySyntherizer
-import cn.vove7.jarvis.speech.synthesis.control.NonBlockSyntherizer
-import cn.vove7.jarvis.speech.synthesis.util.OfflineResource
+import cn.vove7.jarvis.speech.baiduspeech.synthesis.control.InitConfig
+import cn.vove7.jarvis.speech.baiduspeech.synthesis.control.MySyntherizer
+import cn.vove7.jarvis.speech.baiduspeech.synthesis.control.NonBlockSyntherizer
+import cn.vove7.jarvis.speech.baiduspeech.synthesis.util.OfflineResource
 import cn.vove7.jarvis.tools.AppConfig
 import cn.vove7.vtp.log.Vog
 import cn.vove7.vtp.sharedpreference.SpHelper

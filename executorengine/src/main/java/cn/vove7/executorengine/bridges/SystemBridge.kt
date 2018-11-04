@@ -283,7 +283,11 @@ object SystemBridge : SystemOperation {
     }
 
     override fun sendKey(keyCode: Int) {
-        RootHelper.execWithSu("input keyevent $keyCode")
+        try {
+            RootHelper.execWithSu("input keyevent $keyCode")
+        } catch (e: Exception) {
+            GlobalLog.err(e)
+        }
     }
 
     override fun mediaPause() {
@@ -412,6 +416,11 @@ object SystemBridge : SystemOperation {
     fun getVolumeByType(type: Int): Int {
         val mAudioManager = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
         return mAudioManager.getStreamVolume(type)
+    }
+
+    fun getMaxVolumeByType(type: Int): Int {
+        val mAudioManager = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
+        return mAudioManager.getStreamMaxVolume(type)
     }
 
     override fun setMusicVolume(index: Int) {

@@ -19,7 +19,7 @@
     <android.support.design.widget.TextInputLayout
         android:id="@+id/user_email_view"
         android:layout_width="match_parent"
-        app:helperText="建议QQ/163邮箱"
+        app:helperText="建议QQ邮箱"
         android:layout_height="wrap_content">
 
         <EditText
@@ -66,6 +66,7 @@
             android:id="@+id/ver_code_view"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            app:helperText="如果长时间未收到邮件，请检查地址是否正确。若一切无误，可能是邮箱管理员判定验证码邮件为垃圾邮件导致发送失败，可使用QQ与我联系，谢谢:)"
             android:layout_weight="1">
 
             <EditText

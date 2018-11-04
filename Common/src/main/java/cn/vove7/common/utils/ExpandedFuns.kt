@@ -1,7 +1,9 @@
 package cn.vove7.common.utils
 
+import android.graphics.Rect
 import android.os.Handler
 import android.os.Looper
+import android.view.View
 
 /**
  * # ExpandedFuns
@@ -20,4 +22,15 @@ fun runOnUi(action: () -> Unit) {
     } else {
         Handler(mainLoop).post(action)
     }
+}
+
+fun View.boundsInScreen(): Rect {
+    val rect = Rect()
+    val arr = IntArray(2)
+    getLocationOnScreen(arr)
+    rect.left = arr[0]
+    rect.right = arr[0] + width
+    rect.top = arr[1]
+    rect.bottom = arr[1] + height
+    return rect
 }

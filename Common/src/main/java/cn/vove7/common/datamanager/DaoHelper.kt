@@ -140,7 +140,7 @@ object DaoHelper {
     }
 
     /**
-     * 检查是否更新 检查是否删除
+     * 检查是否更新 检查是否删除  tag 更新不变
      * 第一级增量更新  比较数据集  follows 格式化更新
      * old(a1 b1 c1) new(a1 b2 d1)
      * 删除old-new  del: c1
@@ -167,7 +167,8 @@ object DaoHelper {
 
         //用户分享的数据 可能未审核
         val userSharedDataSet = if (UserInfo.isLogin()) {
-            actionNodeDao.queryBuilder().whereOr(ActionNodeDao.Properties.From.notEq(DataFrom.FROM_USER),
+            actionNodeDao.queryBuilder().where(ActionNodeDao.Properties.From.eq(DataFrom.FROM_SHARED),
+                    ActionNodeDao.Properties.ActionScopeType.eq(type),
                     ActionNodeDao.Properties.PublishUserId.eq(UserInfo.getUserId() ?: -1L))
                     .list().toHashSet()
         } else emptySet<ActionNode>()
@@ -187,8 +188,8 @@ object DaoHelper {
 //                    }
                     deleteActionNode(it.id)
                 }
-                newNodes.filter { localSyncedDataSet.contains(it) }.forEach {
-                    //up 交集
+                newNodes.filter { userSharedDataSet.contains(it)||localSyncedDataSet.contains(it) }.forEach {
+                    //up 交集 new and user
                     //交集
 //                    if (!userDataSet.contains(it)) {
 //                        onUpdate?.invoke(Color.GREEN, "更新指令：${it.actionTitle}")
@@ -199,10 +200,10 @@ object DaoHelper {
                     checkUpgradeNode(it, onUpdate)
 //                    }
                 }
-                newNodes.toHashSet().subtract(localSyncedDataSet).filter {
+                newNodes.toHashSet().subtract(localSyncedDataSet).subtract(userSharedDataSet).filter {
                     !userSharedDataSet.contains(it)  //不更新本用户分享的
                 }.forEach {
-                    //new - old  insert
+                    //new - old - user insert
                     insertNewActionNode(it, onUpdate)
                 }
             }

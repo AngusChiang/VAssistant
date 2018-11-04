@@ -13,7 +13,6 @@ import cn.vove7.common.utils.runOnUi
 import cn.vove7.jarvis.R
 import cn.vove7.vtp.log.Vog
 import cn.vove7.vtp.sharedpreference.SpHelper
-import cn.vove7.vtp.system.SystemHelper
 import com.afollestad.materialdialogs.MaterialDialog
 import com.google.gson.Gson
 import devliving.online.securedpreferencestore.SecuredPreferenceStore
@@ -69,6 +68,12 @@ object AppConfig {
     var autoSleepWakeupMillis: Long = 30 * 60 * 1000
     var chatSystem: String = ""
     var continuousDialogue = false//连续对话
+    var finishWord: String? = null
+    //    var resumeMusic = true//继续播放
+    var recoWhenWakeupAssist = false//立即识别
+    var useAssistService = false//助手服务
+    var execFailedVoiceFeedback = true//执行失败语音反馈
+    var execSuccessFeedback = true//执行成功反馈
     fun init() {
         thread {
             checkUserInfo()
@@ -151,7 +156,13 @@ object AppConfig {
 //  todo      cloudServiceParseIfLocalFailed = getBooleanAndInit(R.string.key_cloud_service_parse, true)
         sp.set(R.string.key_cloud_service_parse, false)
         autoUpdateData = getBooleanAndInit(R.string.key_auto_update_data, true)
+//        resumeMusic = getBooleanAndInit(R.string.key_resume_bkg_music, true)
+        recoWhenWakeupAssist = getBooleanAndInit(R.string.key_reco_when_wakeup_assist, false)
         volumeWakeUpWhenScreenOff = getBooleanAndInit(R.string.key_volume_wakeup_when_screen_off, true)
+        useAssistService = getBooleanAndInit(R.string.key_use_assist_service, useAssistService)
+        execFailedVoiceFeedback = getBooleanAndInit(R.string.key_exec_failed_voice_feedback, true)
+        execSuccessFeedback = getBooleanAndInit(R.string.key_exec_failed_voice_feedback, true)
+        finishWord = sp.getString(R.string.key_finish_word)
 //        onlyCloudServiceParse = getBooleanAndInit(R.string.key_only_cloud_service_parse, false)
 
         synStreamIndex = sp.getString(R.string.key_stream_of_syn_output).let {
@@ -226,9 +237,9 @@ object AppConfig {
 //            return
 //        }
         thread {
-            val doc = Jsoup.connect("https://www.coolapk.com/apk/cn.vove7.vassistant")
-                    .timeout(5000).get()
             try {
+                val doc = Jsoup.connect("https://www.coolapk.com/apk/cn.vove7.vassistant")
+                        .timeout(5000).get()
                 val sp = SpHelper(context)
                 val verName = doc.body().getElementsByClass("list_app_info").text()
                 val log = doc.body().getElementsByClass("apk_left_title_info")[0]

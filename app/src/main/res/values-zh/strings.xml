@@ -216,5 +216,6 @@
     <string name="desc_accessibility">开启后将后的技能\n1.使用音量快捷键\n2.操作界面\n3.根据当前界面响应指令</string>
     <string name="text_update_log">更新日志</string>
     <string name="text_set_priority">设置优先级</string>
+    <string name="desc_new_account">新用户将获得7天高级用户免费体验资格</string>
 
 </resources>

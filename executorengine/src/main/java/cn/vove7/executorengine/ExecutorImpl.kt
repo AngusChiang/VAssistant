@@ -108,16 +108,15 @@ open class ExecutorImpl(
             serviceBridge?.onExecuteStart(cmdWords)
             actionCount = actionQueue.size
             currentActionIndex = 0
-            pollActionQueue()
+            onFinish(pollActionQueue())
             currentAction = null
-            onFinish()
         }
     }
 
     /**
      * 执行队列
      */
-    private fun pollActionQueue() {
+    private fun pollActionQueue(): Boolean {
         var r: PartialResult
         while (actionQueue.isNotEmpty()) {
             currentActionIndex++
@@ -131,17 +130,18 @@ open class ExecutorImpl(
                     r.needTerminal -> {//出错
                         currentAction = null
                         actionQueue.clear()
-                        serviceBridge?.onExecuteInterrupt(r.msg)
-                        return
+                        serviceBridge?.onExecuteFailed(r.msg)
+                        return false
                     }
                 }
             } else {
                 Vog.i(this, "pollActionQueue 终止")
                 actionQueue.clear()
                 serviceBridge?.onExecuteInterrupt("强行终止")
-                break
+                return false
             }
         }
+        return true
     }
 
     override fun runScript(script: String, args: Array<String>?): PartialResult {
@@ -165,11 +165,10 @@ open class ExecutorImpl(
         return PartialResult.fatal("not implement onRhinoExec")
     }
 
-
-    override fun onFinish() {
+    override fun onFinish(result: Boolean) {
         running = false
         ScreenAdapter.reSet()
-        serviceBridge?.onExecuteFinished("执行结束")
+        serviceBridge?.onExecuteFinished(result)
         accessApi?.removeAllNotifier(this)
     }
 
@@ -209,6 +208,7 @@ open class ExecutorImpl(
         val r = checkAccessibilityService()
         return if (r) {
             //等待App打开
+            AppBus.post(AppBus.EVENT_HIDE_FLOAT)//关闭助手dialog
             val waitR = waitForApp(pkg, null, 5000)
             if (!waitR) return false
             pollActionQueue()

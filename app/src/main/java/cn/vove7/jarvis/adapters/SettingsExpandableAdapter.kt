@@ -13,8 +13,7 @@ import cn.vove7.jarvis.view.SettingChildItem
 import cn.vove7.jarvis.view.animation.ListItemAnimationHelper
 import cn.vove7.jarvis.view.custom.GroupItemHolder
 import cn.vove7.jarvis.view.custom.SettingGroupItem
-import cn.vove7.jarvis.view.utils.SettingItemHelper
-import cn.vove7.vtp.log.Vog
+import cn.vove7.jarvis.view.tools.SettingItemHelper
 
 /**
  * # SettingsExpandableAdapter

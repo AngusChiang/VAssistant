@@ -8,6 +8,7 @@ import cn.vove7.androlua.LuaApp
 import cn.vove7.common.appbus.MessageEvent
 import cn.vove7.jarvis.receivers.PowerEventReceiver
 import cn.vove7.jarvis.receivers.ScreenStatusListener
+import cn.vove7.jarvis.services.AssistSessionService
 import cn.vove7.jarvis.services.MainService
 import cn.vove7.jarvis.tools.AppConfig
 import cn.vove7.jarvis.tools.CrashHandler
@@ -24,6 +25,7 @@ import kotlin.concurrent.thread
 class App : LuaApp() {
 
     private val mainService: Intent by lazy { Intent(this, MainService::class.java) }
+
     lateinit var services: Array<Intent>
     override fun onCreate() {
         Vog.d(this, "onCreate ---> begin ${System.currentTimeMillis() / 1000}")
@@ -40,17 +42,14 @@ class App : LuaApp() {
         val seedKey = "fddfouafpiua".toByteArray()
         SecuredPreferenceStore.init(applicationContext, storeFileName, keyPrefix, seedKey, DefaultRecoveryHandler())
         AppConfig.init()
-        startServices()
-
-        Handler().postDelayed({
-            thread {
-                CodeProcessor.init(this)
-                ShortcutUtil.addWakeUpShortcut()
+        thread {
+            CodeProcessor.init(this)
+            ShortcutUtil.addWakeUpShortcut()
 //                AdvanAppHelper.updateAppList()
-                startBroadcastReceivers()
-                Vog.d(this, "service thread ---> finish ${System.currentTimeMillis() / 1000}")
-            }
-        },1000)
+            startBroadcastReceivers()
+            Vog.d(this, "service thread ---> finish ${System.currentTimeMillis() / 1000}")
+            startServices()
+        }
         if (!BuildConfig.DEBUG)
             Vog.init(this, Log.ERROR)
         Vog.d(this, "onCreate ---> end ${System.currentTimeMillis() / 1000}")
@@ -65,6 +64,7 @@ class App : LuaApp() {
                     startService(it)
                 }
             }
+            startService(Intent(this, AssistSessionService::class.java))
         }
     }
 
@@ -72,6 +72,7 @@ class App : LuaApp() {
         PowerEventReceiver.start()
         ScreenStatusListener.start()
     }
+
     private fun stopBroadcastReceivers() {
         PowerEventReceiver.stop()
         ScreenStatusListener.stop()

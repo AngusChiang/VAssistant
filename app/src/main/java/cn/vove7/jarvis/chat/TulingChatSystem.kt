@@ -113,7 +113,7 @@ class ResponseData {
                 Pair(4300, "批量操作超过限制"),
                 Pair(4400, "没有上传合法userid"),
                 Pair(4500, "userid申请个数超过限制"),
-                Pair(4600, "输入内容为空"),
+//                Pair(4600, "输入内容为空"),
                 Pair(4602, "输入文本内容超长上限150"),
                 Pair(7002, "上传信息失败"),
                 Pair(8008, "服务器错误"))[intent?.code ?: "0"]?.also {

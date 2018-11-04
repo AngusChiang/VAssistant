@@ -2,7 +2,7 @@ package cn.vove7.jarvis.view
 
 import android.support.annotation.ArrayRes
 import cn.vove7.common.app.GlobalApp
-import cn.vove7.jarvis.view.utils.SettingItemHelper
+import cn.vove7.jarvis.view.tools.SettingItemHelper
 
 /**
  * # SettingItem
@@ -114,15 +114,18 @@ class SingleChoiceItem(
 class IntentItem(titleId: Int? = null,
                  title: String? = null,
                  summary: String? = null,
-                 onClick: CallbackOnSet)
+                 onClick: () -> Unit)
     : SettingChildItem(titleId, title, summary, itemType = TYPE_INTENT,
-        defaultValue = { Any() }, callback = onClick)
+        defaultValue = { Any() }, callback = { _, _ ->
+    onClick.invoke()
+    true
+})
 
 class InputItem(titleId: Int? = null,
                 title: String? = null,
                 summary: String? = null,
                 keyId: Int? = null,
-                defaultValue: () -> String,
+                defaultValue: () -> String = { "" },
                 callback: CallbackOnSet? = null)
     : SettingChildItem(titleId, title, summary, itemType = TYPE_INPUT, keyId = keyId,
         defaultValue = defaultValue, callback = callback)

@@ -18,6 +18,8 @@ import cn.vove7.jarvis.R
 import cn.vove7.jarvis.activities.base.ReturnableActivity
 import cn.vove7.jarvis.adapters.IconTitleEntity
 import cn.vove7.jarvis.adapters.IconTitleListAdapter
+import cn.vove7.jarvis.tools.ItemWrap
+import cn.vove7.jarvis.tools.Tutorials
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.customview.customView
 import kotlinx.android.synthetic.main.activity_abc_header.*
@@ -29,13 +31,13 @@ import kotlinx.android.synthetic.main.activity_abc_header.*
  * 9/23/2018
  */
 class HelpActivity : ReturnableActivity(), AdapterView.OnItemClickListener {
-
+    lateinit var adapter: IconTitleListAdapter
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_abc_header)
         header_content.addView(layoutInflater.inflate(R.layout.header_help, null))
 
-        list_view.adapter = IconTitleListAdapter(this, getData())
+        list_view.adapter = IconTitleListAdapter(this, getData()).also { adapter = it }
         list_view.onItemClickListener = this
         list_view.setOnItemLongClickListener { parent, view, position, id ->
             if (position == 5) {
@@ -43,6 +45,18 @@ class HelpActivity : ReturnableActivity(), AdapterView.OnItemClickListener {
                 return@setOnItemLongClickListener true
             }
             return@setOnItemLongClickListener false
+        }
+        startTutorials()
+    }
+
+    private fun startTutorials() {
+        list_view.post{
+            Tutorials.oneStep(this, list = arrayOf(
+                    ItemWrap(Tutorials.h_t_1, adapter.holders[0]?.titleView, getString(R.string.text_service_manual), "自定义指令、脚本Api、远程调试都在这里")
+                    , ItemWrap(Tutorials.h_t_2, adapter.holders[1]?.titleView, getString(R.string.text_hot_key_desc), "快速了解快捷键操作")
+                    , ItemWrap(Tutorials.h_t_3, adapter.holders[4]?.titleView, getString(R.string.text_feedback), "在这里进行反馈与建议，或者加入QQ群")
+                    , ItemWrap(Tutorials.h_t_4, adapter.holders[5]?.titleView, getString(R.string.text_explore_log), "当出现问题时，或非预想结果时可提供日志给作者")
+            ))
         }
     }
 
@@ -84,10 +98,10 @@ class HelpActivity : ReturnableActivity(), AdapterView.OnItemClickListener {
                             SystemBridge.setClipText(logView.text.toString())
                             toast.showShort(R.string.text_copied)
                         }
-                        .negativeButton(text = "清空"){
+                        .negativeButton(text = "清空") {
                             GlobalLog.clear()
                         }
-                        .neutralButton(text = "导出至文件"){
+                        .neutralButton(text = "导出至文件") {
                             GlobalLog.export2Sd()
                         }
                         .show()

@@ -33,6 +33,8 @@ public class MicrophoneInputStream extends InputStream {
 
     private static final String TAG = "MicrophoneInputStream";
 
+    private AudioManager mAudioManager = (AudioManager) GlobalApp.APP.getSystemService(Context.AUDIO_SERVICE);
+
     public MicrophoneInputStream() {
         initAudioSource();
     }
@@ -42,9 +44,11 @@ public class MicrophoneInputStream extends InputStream {
             int bufferSize = AudioRecord.getMinBufferSize(16000,
                     AudioFormat.CHANNEL_IN_MONO, AudioFormat.ENCODING_PCM_16BIT) * 16;
             audioRecord = new AudioRecord(
-                    isBTHSConnect()? MediaRecorder.AudioSource.VOICE_COMMUNICATION:MediaRecorder.AudioSource.DEFAULT,
+                    MediaRecorder.AudioSource.DEFAULT,
                     16000, AudioFormat.CHANNEL_IN_MONO,
                     AudioFormat.ENCODING_PCM_16BIT, bufferSize);
+            mAudioManager.setBluetoothScoOn(true);
+            mAudioManager.startBluetoothSco();
         }
     }
 
@@ -102,15 +106,18 @@ public class MicrophoneInputStream extends InputStream {
                 audioRecord.release();
                 //closeBTHeadsetMicro();
                 audioRecord = null;
-                isStarted = false;
+                mAudioManager.setBluetoothScoOn(false);
+                mAudioManager.stopBluetoothSco();
             } catch (Exception e) {
                 GlobalLog.INSTANCE.err(e);
+            }finally {
+                isStarted = false;
             }
         }
         is = null;
     }
 
-    public static final String toLogFriendlyAudioSource(int source) {
+    public static String toLogFriendlyAudioSource(int source) {
         switch (source) {
             case MediaRecorder.AudioSource.DEFAULT:
                 return "DEFAULT";

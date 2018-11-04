@@ -17,16 +17,8 @@ class CrashInfoActivity : Activity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val sp = SpHelper(this)
-        val lastCrashTime = sp.getLong("last_crash_time")
-        val now = System.currentTimeMillis()
-        sp.set("last_crash_time", now)
-        if (now > lastCrashTime + 60 * 1000) {//restart
-            Toast.makeText(this, "程序出现异常,已重启", Toast.LENGTH_LONG).show()
-            restart()
-        } else {
-            Toast.makeText(this, "程序反复出现异常,可联系作者进行反馈", Toast.LENGTH_LONG).show()
-        }
+        Toast.makeText(this, "程序出现异常,已重启", Toast.LENGTH_LONG).show()
+        restart()
 //        MaterialDialog(this).title(text = "异常")
 //                .message(text = "程序出现异常")
 //                .positiveButton(text = "重启") { restart() }
@@ -38,7 +30,7 @@ class CrashInfoActivity : Activity() {
 
     private fun restart() {
         val intent = baseContext.packageManager
-                .getLaunchIntentForPackage(baseContext.packageName);
+                .getLaunchIntentForPackage(baseContext.packageName)
         intent?.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK)
         startActivity(intent)
         finish()

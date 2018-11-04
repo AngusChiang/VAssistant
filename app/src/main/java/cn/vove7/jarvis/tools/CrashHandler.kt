@@ -16,6 +16,7 @@ import cn.vove7.common.utils.TextHelper
 import cn.vove7.jarvis.BuildConfig
 import cn.vove7.jarvis.activities.CrashInfoActivity
 import cn.vove7.jarvis.chat.Inten
+import cn.vove7.vtp.sharedpreference.SpHelper
 import cn.vove7.vtp.system.DeviceInfo
 import cn.vove7.vtp.system.SystemHelper
 import java.io.BufferedWriter
@@ -49,15 +50,21 @@ object CrashHandler : Thread.UncaughtExceptionHandler {
 
     private val errFile = Environment.getExternalStorageDirectory().absolutePath + "/crash.log"
     override fun uncaughtException(t: Thread?, e: Throwable?) {
-
         if (!handleException(e) && mDefaultHandler != null) {
             // 如果用户没有处理则让系统默认的异常处理器来处
             mDefaultHandler?.uncaughtException(t, e)
         } else {
-            val intent = Intent(context, CrashInfoActivity::class.java)
-            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-            context.startActivity(intent)
-            System.exit(0)// 关闭已奔溃的app进程
+            val sp = SpHelper(context)
+            val lastCrashTime = sp.getLong("last_crash_time")
+            val now = System.currentTimeMillis()
+            sp.set("last_crash_time", now)
+            if (now > lastCrashTime + 60 * 1000) {//restart
+                val intent = Intent(context, CrashInfoActivity::class.java)
+                intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                context.startActivity(intent)
+            }
+            Process.killProcess(Process.myPid())
+//            System.exit(0)// 关闭已奔溃的app进程
         }
 
     }
@@ -75,7 +82,6 @@ object CrashHandler : Thread.UncaughtExceptionHandler {
         val headerInfo = SystemHelper.getDeviceInfo(context).string()
         val log = GlobalLog.toString()
 
-        Toast.makeText(context, "程序出现异常，请在帮助内进行反馈", Toast.LENGTH_SHORT).show()
         try {
             val pw = PrintWriter(BufferedWriter(FileWriter(File(errFile))))
             pw.println(headerInfo)

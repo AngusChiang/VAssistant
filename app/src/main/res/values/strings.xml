@@ -224,7 +224,7 @@
     <string name="text_unlock">Unlock</string>
     <string name="text_need_unlock">Partial function need to unlock.</string>
     <string name="text_add_regex">Add regex</string>
-    <string name="summary_not_vip_remove_ad">非高级用户，一天最多去广告0次</string>
+    <string name="summary_not_vip_remove_ad">非高级用户，一天最多去广告20次</string>
     <string name="text_open">Open</string>
     <string name="text_unlock_functions">Unlock functions</string>
     <string name="text_guide">Guide</string>
@@ -307,4 +307,11 @@
     <string name="key_continuous_dialogue" translatable="false">continuous_dialogue</string>
     <string name="key_chat_system_type" translatable="false">chat_system_type</string>
     <string name="text_set_priority">设置优先级</string>
+    <string name="desc_new_account">新用户将获得7天高级用户免费体验资格</string>
+    <string name="key_resume_bkg_music" translatable="false">resume_bkg_music</string>
+    <string name="key_reco_when_wakeup_assist" translatable="false">reco_when_wakeup_assist</string>
+    <string name="key_use_assist_service" translatable="false">use_assist_service</string>
+    <string name="key_finish_word" translatable="false">finish_word</string>
+    <string name="key_exec_failed_voice_feedback" translatable="false">exec_failed_voice_feedback</string>
+    <string name="key_exec_succ_feedback" translatable="false">exec_succ_feedback</string>
 </resources>

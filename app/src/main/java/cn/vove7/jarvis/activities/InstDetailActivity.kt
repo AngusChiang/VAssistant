@@ -8,6 +8,7 @@ import android.os.Handler
 import android.support.v7.app.AppCompatActivity
 import android.text.InputType
 import android.view.View
+import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.TextView
@@ -38,13 +39,14 @@ import cn.vove7.jarvis.adapters.ExecuteQueueAdapter
 import cn.vove7.jarvis.adapters.InstSettingListAdapter
 import cn.vove7.jarvis.services.MainService
 import cn.vove7.jarvis.tools.AppConfig
+import cn.vove7.jarvis.tools.ItemWrap
 import cn.vove7.jarvis.tools.ShortcutUtil
+import cn.vove7.jarvis.tools.Tutorials
 import cn.vove7.jarvis.view.dialog.ProgressDialog
 import cn.vove7.vtp.dialog.DialogWithList
 import cn.vove7.vtp.easyadapter.BaseListAdapter
 import cn.vove7.vtp.log.Vog
 import com.afollestad.materialdialogs.MaterialDialog
-import com.afollestad.materialdialogs.checkbox.checkBoxPrompt
 import com.afollestad.materialdialogs.customview.customView
 import com.afollestad.materialdialogs.input.input
 import com.afollestad.materialdialogs.list.listItems
@@ -111,6 +113,29 @@ class InstDetailActivity : AppCompatActivity() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         refresh()
+    }
+
+    var first = true
+    override fun onWindowFocusChanged(hasFocus: Boolean) {
+        if (hasFocus && first) {
+            startTutorials()
+            first = false
+        }
+    }
+
+    private fun startTutorials() {
+        Handler().postDelayed({
+            Tutorials.oneStep(this, list = arrayOf(
+                    ItemWrap(Tutorials.t_inst_detail_desc, label_instructions, "指令描述", "可以根据描述了解用途")
+                    , ItemWrap(Tutorials.t_inst_detail_exp, label_examples, "指令示例", "根据示例，理解指令的“说法”")
+                    , ItemWrap(Tutorials.t_inst_detail_regex, label_regex, "指令正则式", "正则式是该指令能匹配到用户说的命令\n基本格式有：\n" +
+                    "1. (用|打开|启动|开启)% ----- 可匹配：'用xxx'、'打开xxx'、'启动xxx'...等命令\n" +
+                    "2. 大+点声   -------------------  可匹配 大大大点声 ('大'个数大于0)\n" +
+                    "3. (播放)?下一[首|曲]  -------- (播放)?代表‘播放’可加可不加，[首|曲]代表可以是曲也可以是首,就可匹配:播放下一曲，下一曲，下一首...等命令\n")
+                    , ItemWrap(Tutorials.t_inst_detail_run, (toolbar.getChildAt(1) as ViewGroup).getChildAt(0), "运行"
+                    , "这里可以直接运行指令中的脚本")
+            ))
+        }, 1000)
     }
 
     //todo  get user info who shared

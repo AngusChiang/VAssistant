@@ -60,7 +60,7 @@ interface CExecutorI : ViewShowListener, ActivityShowListener, RuntimeArgs, Spea
 
     fun notifySync()
     fun sleep(millis: Long)
-    fun onFinish()
+    fun onFinish(result: Boolean)
 
     fun smartOpen(data: String): Boolean
     fun smartClose(data: String): Boolean
@@ -82,7 +82,7 @@ interface RuntimeArgs {
     var currentActionIndex: Int
     var actionCount: Int
 
-    val focusView:ViewNode?
+    val focusView: ViewNode?
     var currentApp: ActionScope?
     var currentActivity: String
 

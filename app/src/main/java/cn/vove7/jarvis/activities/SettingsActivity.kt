@@ -9,39 +9,40 @@ import android.os.Handler
 import android.provider.Settings
 import android.view.View
 import android.widget.TextView
-import android.widget.Toast
 import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.appbus.AppBus
 import cn.vove7.common.appbus.SpeechAction
+import cn.vove7.common.bridges.RootHelper
 import cn.vove7.executorengine.bridges.SystemBridge
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.activities.base.ReturnableActivity
 import cn.vove7.jarvis.adapters.SettingsExpandableAdapter
 import cn.vove7.jarvis.receivers.PowerEventReceiver
+import cn.vove7.jarvis.services.MyAccessibilityService
 import cn.vove7.jarvis.services.SpeechSynService
-import cn.vove7.jarvis.speech.wakeup.MyWakeup
-import cn.vove7.jarvis.tools.AppConfig
-import cn.vove7.jarvis.tools.ShortcutUtil
-import cn.vove7.jarvis.tools.UriUtils
+import cn.vove7.jarvis.speech.baiduspeech.wakeup.MyWakeup
+import cn.vove7.jarvis.tools.*
 import cn.vove7.jarvis.view.*
 import cn.vove7.jarvis.view.custom.SettingGroupItem
+import cn.vove7.vtp.runtimepermission.PermissionUtils
 import cn.vove7.vtp.sharedpreference.SpHelper
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.customview.customView
 import kotlinx.android.synthetic.main.activity_expandable_settings.*
+import kotlin.concurrent.thread
 
 /**
  *
  */
 class SettingsActivity : ReturnableActivity() {
-
+    lateinit var adapter: SettingsExpandableAdapter
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         initData()
         setContentView(R.layout.activity_expandable_settings)
 
         val expandableListView = expand_list
-        val adapter = SettingsExpandableAdapter(this, initData(), expandableListView)
+        adapter = SettingsExpandableAdapter(this, initData(), expandableListView)
         expandableListView.setAdapter(adapter)
 
         try {
@@ -57,9 +58,26 @@ class SettingsActivity : ReturnableActivity() {
         }
     }
 
+    var first = true
+    override fun onWindowFocusChanged(hasFocus: Boolean) {
+        if (hasFocus && first) {
+            startTutorials()
+            first = false
+        }
+    }
+
+    private fun startTutorials() {
+        Handler().postDelayed({
+            Tutorials.oneStep(this, list = arrayOf(
+                    ItemWrap(Tutorials.t_settings_set_assist, adapter.childHolders[0][0]?.titleView, "设为默认语音助手",
+                            "打开后支持长按HOME键快捷唤醒，未来将加入屏幕内容识别，快捷文字提取")
+            ))
+        }, 1000)
+    }
+
     private fun initData(): List<SettingGroupItem> = listOf(
-            SettingGroupItem(R.color.google_blue, "默认助手", childItems = listOf(
-                    IntentItem(R.string.text_set_as_default_voice_assist, summary = "可以通过长按HOME键或蓝牙快捷键唤醒", onClick = { _, _ ->
+            SettingGroupItem(R.color.google_blue, "语音助手", childItems = listOf(
+                    IntentItem(R.string.text_set_as_default_voice_assist, summary = "可以通过长按HOME键或蓝牙快捷键唤醒", onClick = {
                         try {
                             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                                 startActivity(Intent(Settings.ACTION_MANAGE_DEFAULT_APPS_SETTINGS))
@@ -68,56 +86,77 @@ class SettingsActivity : ReturnableActivity() {
                             }
                         } catch (e: Exception) {
                             GlobalLog.err(e)
-                            Toast.makeText(this@SettingsActivity,
-                                    "跳转失败", Toast.LENGTH_SHORT).show()
+                            toast.showShort("跳转失败")
                         }
-                        return@IntentItem true
-                    }),
-                    IntentItem(title = "唤醒测试") { _, _ ->
-                        startActivity(Intent(Intent.ACTION_ASSIST))
-                        return@IntentItem false
-                    }
+                    })/*,
+                    IntentItem(title = "唤醒测试") {
+                        try {
+                            startActivity(Intent(Intent.ACTION_ASSIST))
+                        } catch (e: Exception) {
+                            toast.showShort("失败")
+                        }
+                    }*/
             )),
-            SettingGroupItem(R.color.google_green, "通知", childItems = listOf(
+            SettingGroupItem(R.color.google_green, "反馈", childItems = listOf(
                     SwitchItem(R.string.text_vibrate_reco_begin,
-                            keyId = R.string.key_vibrate_reco_begin, defaultValue = { true })
+                            keyId = R.string.key_vibrate_reco_begin, defaultValue = { true }),
+                    SwitchItem(title = "执行失败", keyId = R.string.key_exec_failed_voice_feedback,
+                            summary = "失败时的语音反馈",
+                            defaultValue = { AppConfig.execFailedVoiceFeedback }),
+                    SwitchItem(title = "执行成功", keyId = R.string.key_exec_succ_feedback,
+                            summary = "失败时状态栏效果反馈",
+                            defaultValue = { AppConfig.execFailedVoiceFeedback })
             )),
             SettingGroupItem(R.color.indigo_700, "响应词", childItems = listOf(
                     SwitchItem(title = "开启", summary = "开始识别前，响应词反馈", keyId = R.string.key_open_response_word,
-                            defaultValue = { AppConfig.openResponseWord }),
+                            defaultValue =
+                            { AppConfig.openResponseWord }),
                     InputItem(title = "设置响应词", summary = AppConfig.responseWord,
-                            keyId = R.string.key_response_word, defaultValue = { AppConfig.responseWord }),
+                            keyId = R.string.key_response_word, defaultValue =
+                    { AppConfig.responseWord }),
                     CheckBoxItem(title = "仅在语音唤醒时响应", keyId = R.string.key_speak_response_word_on_voice_wakeup,
-                            defaultValue = { AppConfig.speakResponseWordOnVoiceWakeup })
+                            defaultValue =
+                            { AppConfig.speakResponseWordOnVoiceWakeup })
             )),
             SettingGroupItem(R.color.google_yellow, "语音合成", childItems = listOf(
                     SwitchItem(R.string.text_play_voice_message, summary = "关闭后以弹窗形式提醒",
-                            keyId = R.string.key_audio_speak, defaultValue = { true }),
+                            keyId = R.string.key_audio_speak, defaultValue =
+                    { true }),
                     SingleChoiceItem(R.string.text_sound_model, summary = "在线声音模型", keyId = R.string.key_voice_syn_model,
-                            defaultValue = { 0 }, entityArrId = R.array.voice_model_entities,
-                            callback = { h, i ->
+                            defaultValue =
+                            { 0 }, entityArrId = R.array.voice_model_entities,
+                            callback =
+                            { h, i ->
                                 AppBus.postSpeechAction(SpeechAction.ActionCode.ACTION_RELOAD_SYN_CONF)
                                 return@SingleChoiceItem true
                             }),
                     NumberPickerItem(R.string.text_speak_speed, keyId = R.string.key_voice_syn_speed,
-                            defaultValue = { 5 }, range = Pair(1, 9), callback = { h, i ->
+                            defaultValue =
+                            { 5 }, range = Pair(1, 9), callback =
+                    { h, i ->
                         AppBus.postSpeechAction(SpeechAction.ActionCode.ACTION_RELOAD_SYN_CONF)
                         return@NumberPickerItem true
                     }),
                     SingleChoiceItem(title = "输出方式", summary = "选择音量跟随", keyId = R.string.key_stream_of_syn_output,
-                            entityArrId = R.array.list_stream_syn_output, defaultValue = { 0 }) { _, b ->
+                            entityArrId = R.array.list_stream_syn_output, defaultValue =
+                    { 0 })
+                    { _, b ->
                         SpeechSynService.reloadStreamType()
                         return@SingleChoiceItem true
                     }
             )),
             SettingGroupItem(R.color.google_red, titleId = R.string.text_voice_control, childItems = listOf(
                     CheckBoxItem(R.string.text_voice_control_dialog, summary = "使用语言命令控制对话框",
-                            keyId = R.string.key_voice_control_dialog, defaultValue = { true })
+                            keyId = R.string.key_voice_control_dialog, defaultValue =
+                    { true })
+//                    CheckBoxItem(title = "继续播放", summary = "当后台有音乐时，执行结束后继续音乐",
+//                            keyId = R.string.key_resume_bkg_music,defaultValue = {true})
             )),
             SettingGroupItem(R.color.cyan_500, titleId = R.string.text_wakeup_way, childItems = listOf(
                     SwitchItem(R.string.text_open_voice_wakeup, summary = "以 \"你好小V\" 唤醒" +
                             (if (AppConfig.voiceWakeup && !MyWakeup.opened) "\n已自动关闭" else ""),
-                            keyId = R.string.key_open_voice_wakeup, callback = { _, it ->
+                            keyId = R.string.key_open_voice_wakeup, callback =
+                    { _, it ->
                         when (it as Boolean) {
                             true -> {
                                 AppBus.postSpeechAction(SpeechAction.ActionCode.ACTION_START_WAKEUP)
@@ -125,48 +164,49 @@ class SettingsActivity : ReturnableActivity() {
                             false -> AppBus.postSpeechAction(SpeechAction.ActionCode.ACTION_STOP_WAKEUP)
                         }
                         return@SwitchItem true
-                    }, defaultValue = { false }),
+                    }, defaultValue =
+                    { false }),
                     SingleChoiceItem(
                             title = "自动休眠时长", summary = "在非充电状态下，为了节省电量，在无操作一段时间后将自动关闭唤醒",
                             keyId = R.string.key_auto_sleep_wakeup_duration,
                             entityArrId = R.array.list_auto_sleep_duration
-                            , defaultValue = { 0 }
-                    ) { _, _ ->
+                            , defaultValue =
+                    { 0 }
+                    )
+                    { _, _ ->
                         if (AppConfig.voiceWakeup) {
                             AppBus.postSpeechAction(SpeechAction.ActionCode.ACTION_STOP_WAKEUP)
                             AppBus.postSpeechAction(SpeechAction.ActionCode.ACTION_START_WAKEUP)
                         }
                         return@SingleChoiceItem true
                     },
-                    CheckBoxItem(title = "开屏唤醒", summary = "自动休眠后，开屏自动打开语音唤醒",
-                            keyId = R.string.key_open_voice_wakeup_if_auto_sleep, defaultValue = { true })
+                    CheckBoxItem(title = "亮屏开启唤醒", summary = "自动休眠后，开屏自动打开语音唤醒",
+                            keyId = R.string.key_open_voice_wakeup_if_auto_sleep, defaultValue =
+                    { true })
                     ,
                     SwitchItem(title = "按键唤醒",
                             keyId = R.string.key_long_press_volume_up_wake_up, summary = "可通过长按音量上键或耳机中键唤醒\n需要无障碍模式开启",
                             defaultValue = { true }),
                     IntentItem(R.string.text_add_wakeup_shortcut_to_launcher, summary = "添加需要8.0+，" +
-                            "7.1+可直接在桌面长按图标使用Shortcut快捷唤醒",
-                            onClick = { _, _ ->
-                                ShortcutUtil.addWakeUpPinShortcut()
-                                return@IntentItem true
-                            }),
-                    CheckBoxItem(R.string.text_auto_open_voice_wakeup_charging,
-                            keyId = R.string.key_auto_open_voice_wakeup_charging,
-                            callback = { _, b ->
-                                if (PowerEventReceiver.isCharging && PowerEventReceiver.open) {//充电中生效
-                                    if (b as Boolean) {//正在充电，开启
-                                        AppBus.post(SpeechAction(SpeechAction.ActionCode.ACTION_START_WAKEUP))
-                                    } else {
-                                        AppBus.post(SpeechAction(SpeechAction.ActionCode.ACTION_STOP_WAKEUP))
-                                    }
-                                }
-                                return@CheckBoxItem true
-                            }),
+                            "7.1+可直接在桌面长按图标使用Shortcut快捷唤醒") {
+                        ShortcutUtil.addWakeUpPinShortcut()
+                    },
+                    CheckBoxItem(R.string.text_auto_open_voice_wakeup_charging, keyId = R.string.key_auto_open_voice_wakeup_charging) { _, b ->
+                        if (PowerEventReceiver.isCharging && PowerEventReceiver.open) {//充电中生效
+                            if (b as Boolean) {//正在充电，开启
+                                AppBus.post(SpeechAction(SpeechAction.ActionCode.ACTION_START_WAKEUP))
+                            } else {
+                                AppBus.post(SpeechAction(SpeechAction.ActionCode.ACTION_STOP_WAKEUP))
+                            }
+                        }
+                        return@CheckBoxItem true
+                    },
 //                    CheckBoxItem(title = "熄屏按键唤醒", summary = "熄屏时仍开启按键唤醒",
 //                            keyId = R.string.key_volume_wakeup_when_screen_off, defaultValue = { true }),
-                    IntentItem(R.string.text_customize_wakeup_words, summary = "注意：自定义将失去一些唤醒即用功能") { _, _ ->
+                    IntentItem(R.string.text_customize_wakeup_words, summary = "注意：自定义将失去一些唤醒即用功能")
+                    {
                         MaterialDialog(this).title(R.string.text_customize_wakeup_words)
-                                .customView(R.layout.dialog_customize_wakeup_words)
+                                .customView(R.layout.dialog_customize_wakeup_words, scrollable = true)
                                 .show {
                                     findViewById<TextView>(R.id.wakeup_file_path).text = "当前文件路径：${AppConfig.wakeUpFilePath}"
                                     findViewById<View>(R.id.get_wakeup_file).setOnClickListener {
@@ -195,7 +235,6 @@ class SettingsActivity : ReturnableActivity() {
                                         }
                                     }
                                 }
-                        return@IntentItem true
                     })
             )
 //           ,SettingGroupItem(R.color.lime_600, titleId = R.string.text_animation, childItems = listOf(
@@ -205,10 +244,26 @@ class SettingsActivity : ReturnableActivity() {
             ,
             SettingGroupItem(R.color.lime_600, titleId = R.string.text_other, childItems = listOf(
                     CheckBoxItem(title = "用户体验计划", summary = "改善体验与完善功能",
-                            keyId = R.string.key_user_exp_plan, defaultValue = { true }
+                            keyId = R.string.key_user_exp_plan, defaultValue =
+                    { true }
                     ),
-                    CheckBoxItem(title = "自动开启无障碍服务", summary = "App启动时自动开启无障碍服务，需要root支持\n重启App后生效",
-                            keyId = R.string.key_auto_open_as_with_root, defaultValue = { false })
+                    CheckBoxItem(title = "自动开启无障碍服务", summary = "App启动时自动开启无障碍服务，需要root支持",
+                            keyId = R.string.key_auto_open_as_with_root, defaultValue =
+                    { false })
+                    { _, b ->
+                        if (b as Boolean && !PermissionUtils.accessibilityServiceEnabled(this)) {
+                            thread {
+                                RootHelper.openAppAccessService(packageName,
+                                        "${MyAccessibilityService::class.qualifiedName}")
+                            }
+                        }
+                        return@CheckBoxItem true
+                    },
+                    IntentItem(title = "重置引导")
+                    {
+                        Tutorials.resetTutorials()
+                        toast.showShort("重置完成")
+                    }
             ))
             //todo shortcut 管理
     )
@@ -249,7 +304,7 @@ class SettingsActivity : ReturnableActivity() {
                 AppBus.postSpeechAction(SpeechAction.ActionCode.ACTION_STOP_WAKEUP)
                 Thread.sleep(2000)
                 AppBus.postSpeechAction(SpeechAction.ActionCode.ACTION_START_WAKEUP)
-            }, 3000)
+            }, 1000)
         } else
             toast.showShort("设置完成")
 

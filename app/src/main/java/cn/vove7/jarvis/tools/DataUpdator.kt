@@ -40,15 +40,18 @@ object DataUpdator {
      * 启动时检查更新
      * @param activity Activity
      */
-    fun checkUpdate(activity: Activity) {
+    fun checkUpdate(activity: Activity, back: () -> Unit) {
         NetHelper.getLastInfo {
             if (it != null) {
                 val v = check(it)
                 if (v.first.isNotEmpty()) {
-                    notifyUpdate(activity, v.first, v.second)
+                    notifyUpdate(activity, v.first, v.second, back)
+                } else {
+                    back.invoke()
                 }
             } else {
                 Vog.d(this, "checkDataUpdate ---> 检查数据失败")
+                back.invoke()
             }
         }
     }
@@ -59,11 +62,11 @@ object DataUpdator {
      * @param needUpdateTypes List<Int>
      * @param s String
      */
-    private fun notifyUpdate(activity: Activity, needUpdateTypes: List<Int>, s: String) {
+    private fun notifyUpdate(activity: Activity, needUpdateTypes: List<Int>, s: String, back: () -> Unit) {
         val d = MaterialDialog(activity).title(text = "数据更新")
                 .message(text = "检查到以下数据有更新\n$s")
                 .positiveButton(text = "立即同步") {
-                    onKeyUpdate(activity, needUpdateTypes)
+                    oneKeyUpdate(activity, needUpdateTypes, back)
                 }
                 .cancelable(false)
                 .negativeButton()
@@ -75,7 +78,7 @@ object DataUpdator {
      * 根据type更新数据
      * @param types List<Int>
      */
-    fun onKeyUpdate(activity: Activity, types: List<Int>) {
+    fun oneKeyUpdate(activity: Activity, types: List<Int>, back: (() -> Unit)?=null) {
         val textDialog = ProgressTextDialog(activity, "正在更新", false)
         thread {
             types.forEach {
@@ -142,6 +145,7 @@ object DataUpdator {
             }
             textDialog.appendlnGreen("更新完成")
             textDialog.finish()
+            back?.invoke()
         }
     }
 

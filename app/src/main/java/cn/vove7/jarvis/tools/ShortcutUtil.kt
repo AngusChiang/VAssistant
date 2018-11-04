@@ -54,7 +54,7 @@ object ShortcutUtil {
                         .setIcon(Icon.createWithResource(context, R.mipmap.ic_launcher_vassist)) //添加标签图标
                         .setShortLabel(getString(R.string.shortcut_wakeup)) // 短标签名
                         .setLongLabel(getString(R.string.shortcut_wakeup))  //长标签名
-                        .setIntent(Intent("wakeup", null, context, VoiceAssistActivity::class.java))  //action
+                        .setIntent(Intent(Intent.ACTION_ASSIST, null, context, VoiceAssistActivity::class.java))  //action
                         .setDisabledMessage(getString(R.string.text_not_enable)) //disable后提示
                         .setRank(0) //位置
                         .build()

@@ -2,6 +2,7 @@ package cn.vove7.common.bridges
 
 import android.graphics.Bitmap
 import cn.vove7.common.app.GlobalLog
+import cn.vove7.vtp.log.Vog
 import java.io.File
 import java.io.FileOutputStream
 
@@ -14,6 +15,7 @@ import java.io.FileOutputStream
 object UtilBridge {
 
     fun bitmap2File(bitmap: Bitmap, fullPath: String): File? {//保存到本地
+        Vog.d(this,"bitmap2File ---> $fullPath")
         return try {
             val f = File(fullPath)
             if (!f.parentFile.exists())

@@ -5,6 +5,7 @@ import android.content.Context
 import android.os.Build
 import android.support.v4.app.NotificationManagerCompat
 import cn.vove7.common.app.GlobalApp
+import cn.vove7.jarvis.R
 import cn.vove7.vtp.log.Vog
 import cn.vove7.vtp.notification.ChannelBuilder
 import cn.vove7.vtp.notification.NotificationHelper
@@ -28,8 +29,10 @@ abstract class StatusAnimation {
 
     abstract var title: String
     abstract var beginAniId: Int
-    abstract var failedAniId: Int
-    open protected val finishId: Int? = null
+    open var failedAniId: Int = R.drawable.ic_dissatisfied
+
+    open var successId = -1
+    open val finishId: Int? = null
 
     private val notifier = NotificationHelper(GlobalApp.APP, c)
 
@@ -38,9 +41,10 @@ abstract class StatusAnimation {
         notifier.showNotification(nId, title, "", NotificationIcons(beginAniId))
     }
 
-    fun setContent(c:String) {
+    fun setContent(c: String) {
         notifier.showNotification(nId, title, c, NotificationIcons(beginAniId))
     }
+
     /**
      * such as play some effect
      */
@@ -75,4 +79,10 @@ abstract class StatusAnimation {
         }
     }
 
+    fun success() {
+        hideThread?.interrupt()
+        if (successId != -1)
+            notifier.showNotification(nId, title, "", NotificationIcons(successId))
+        hideDelay(1000)
+    }
 }
