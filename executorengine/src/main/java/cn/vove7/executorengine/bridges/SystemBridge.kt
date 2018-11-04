@@ -85,7 +85,7 @@ object SystemBridge : SystemOperation {
     }
 
     override fun getPhoneByName(name: String): String? {
-         return AdvanContactHelper.matchPhone(name)
+        return AdvanContactHelper.matchPhone(name)
     }
 
     fun openAppByPkg(pkg: String): Boolean {
@@ -798,7 +798,7 @@ object SystemBridge : SystemOperation {
         createAlarm(null, null, hour, minutes, true)
     }
 
-    override fun createAlarm(message: String?, days: Array<Int>?, hour: Int, minutes: Int, noUi: Boolean) {
+    override fun createAlarm(message: String?, days: Array<Int>?, hour: Int, minutes: Int, noUi: Boolean): Boolean {
         Vog.d(this, "createAlarm ---> $message ${Arrays.toString(days)} $hour : $minutes")
         val intent = Intent(AlarmClock.ACTION_SET_ALARM)
                 .putExtra(AlarmClock.EXTRA_HOUR, hour)
@@ -807,10 +807,17 @@ object SystemBridge : SystemOperation {
         if (message != null) intent.putExtra(AlarmClock.EXTRA_MESSAGE, message)
         if (days != null) intent.putIntegerArrayListExtra(AlarmClock.EXTRA_DAYS, ArrayList(days.toList()))
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-        if (intent.resolveActivity(context.packageManager) != null) {
-            context.startActivity(intent)
-        } else {
-            GlobalApp.toastShort("未找到时钟App，无法创建")
+        try {
+            if (intent.resolveActivity(context.packageManager) != null) {
+                context.startActivity(intent)
+                return true
+            } else {
+                GlobalApp.toastShort("未找到时钟App")
+                return false
+            }
+        } catch (e: Exception) {
+            GlobalLog.err(e)
+            return false
         }
     }
 

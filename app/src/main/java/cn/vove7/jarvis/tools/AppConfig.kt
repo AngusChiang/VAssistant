@@ -15,6 +15,7 @@ import cn.vove7.vtp.log.Vog
 import cn.vove7.vtp.sharedpreference.SpHelper
 import com.afollestad.materialdialogs.MaterialDialog
 import com.google.gson.Gson
+import devliving.online.securedpreferencestore.DefaultRecoveryHandler
 import devliving.online.securedpreferencestore.SecuredPreferenceStore
 import org.jsoup.Jsoup
 import kotlin.concurrent.thread
@@ -74,11 +75,12 @@ object AppConfig {
     var useAssistService = false//助手服务
     var execFailedVoiceFeedback = true//执行失败语音反馈
     var execSuccessFeedback = true//执行成功反馈
-    fun init() {
-        thread {
-            checkUserInfo()
-            reload()
-        }
+    fun init(context: Context) {
+        val storeFileName = "wdasfd"
+        val keyPrefix = ""
+        val seedKey = "fddfouafpiua".toByteArray()
+        SecuredPreferenceStore.init(context, storeFileName, keyPrefix, seedKey, DefaultRecoveryHandler())
+        checkUserInfo()
     }
 
     private fun checkUserInfo() {
@@ -88,13 +90,12 @@ object AppConfig {
             val info = Gson().fromJson(sp.getString(R.string.key_login_info),
                     UserInfo::class.java)
             Vog.d(this, "init user info ---> $info")
-
-            info.success()
-            Looper.prepare()
+            info.success()//设置登陆后，读取配置
             NetHelper.postJson<Any>(ApiUrls.VERIFY_TOKEN)
         } else {
             Vog.d(this, "init ---> not login")
         }
+        reload()
     }
 
     fun login(userInfo: UserInfo) {

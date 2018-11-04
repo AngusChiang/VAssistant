@@ -62,6 +62,17 @@ class ViewNode(val node: AccessibilityNodeInfo) : ViewOperation, Comparable<View
         return false
     }
 
+    fun globalClick(): Boolean {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            //获得中心点
+            val relp = ScreenAdapter.getRelPoint(getCenterPoint())
+            return GlobalActionExecutor.click(relp.x, relp.y)
+        } else {
+            GlobalLog.log("globalClick 需要7.0+")
+        }
+        return false
+    }
+
     /**
      * 尝试操作次数
      * 点击，长按，选择
@@ -196,6 +207,10 @@ class ViewNode(val node: AccessibilityNodeInfo) : ViewOperation, Comparable<View
         val text = node.text
         Vog.d(this, "$text")
         return text?.toString()
+    }
+
+    override fun desc(): String? {
+        return node.contentDescription?.toString()
     }
 
     override fun appendText(s: String): Boolean {

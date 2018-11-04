@@ -26,7 +26,6 @@ import java.util.LinkedHashMap;
 import cn.vove7.common.BridgeManager;
 import cn.vove7.common.app.GlobalApp;
 import cn.vove7.rhino.api.RhinoApi;
-import cn.vove7.rhino.api.UtilsApi;
 import cn.vove7.rhino.common.AndroidContextFactory;
 import cn.vove7.rhino.common.GcCollector;
 import cn.vove7.rhino.common.RhinoAndroidHelper;
@@ -98,7 +97,6 @@ public class RhinoHelper extends ScriptableObject {
 
         //initRequireBuilder(rhinoContext, global);
 
-        new UtilsApi().bind(global);
         new RhinoApi().bind(global);
         //new ViewFinderApi().bind(global);
 

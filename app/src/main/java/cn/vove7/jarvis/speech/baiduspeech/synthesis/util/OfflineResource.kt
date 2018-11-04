@@ -2,10 +2,10 @@ package cn.vove7.jarvis.speech.baiduspeech.synthesis.util
 
 import android.content.Context
 import android.content.res.AssetManager
-import cn.vove7.jarvis.services.SpeechSynService.VOICE_DUXY
-import cn.vove7.jarvis.services.SpeechSynService.VOICE_DUYY
-import cn.vove7.jarvis.services.SpeechSynService.VOICE_FEMALE
-import cn.vove7.jarvis.services.SpeechSynService.VOICE_MALE
+import cn.vove7.jarvis.services.SpeechSynService.Companion.VOICE_DUXY
+import cn.vove7.jarvis.services.SpeechSynService.Companion.VOICE_DUYY
+import cn.vove7.jarvis.services.SpeechSynService.Companion.VOICE_FEMALE
+import cn.vove7.jarvis.services.SpeechSynService.Companion.VOICE_MALE
 import java.io.IOException
 
 

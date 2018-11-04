@@ -50,12 +50,6 @@ class RealMainActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        thread {
-            if (AppConfig.autoOpenASWithRoot && !PermissionUtils.accessibilityServiceEnabled(this)) {
-                RootHelper.openAppAccessService(packageName,
-                        "${MyAccessibilityService::class.qualifiedName}")
-            }
-        }
     }
 
     companion object {

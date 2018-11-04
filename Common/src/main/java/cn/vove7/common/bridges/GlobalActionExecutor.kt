@@ -159,12 +159,6 @@ object GlobalActionExecutor : GlobalActionExecutorI {
         mService?.dispatchGesture(builder.build(), null, null)
     }
 
-
-    /**
-     * 名称避免和函数名同名
-     */
-    private val voast = ColorfulToast(GlobalApp.APP).yellow()//???
-
     override fun toast(msg: String?) {
         GlobalApp.toastShort(msg ?: "null")
 //        voast.showShort(msg)

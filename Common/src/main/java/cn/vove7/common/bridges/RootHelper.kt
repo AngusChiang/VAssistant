@@ -114,8 +114,10 @@ object RootHelper {
         try {
             execWithSu(buildList("$pkg/$serviceName"))
         } catch (e: Exception) {
+            GlobalLog.err(e)
             GlobalApp.toastShort("无障碍自动开启失败")
         }
+        Vog.d(this,"openAppAccessService ---> 申请结束")
     }
 
     private fun buildList(s: String): String {

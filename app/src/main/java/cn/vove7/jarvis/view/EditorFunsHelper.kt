@@ -59,7 +59,8 @@ class EditorFunsHelper(
                     }
                 }),
                 ApiCategory("ViewNode", listOf(
-                        ApiFunction("tryClick()", " 尝试点击"),
+                        ApiFunction("tryClick()", "尝试点击"),
+                        ApiFunction("globalClick()", "使用全局函数click进行点击操作，如点击网页控件\n需要7.0+"),
                         ApiFunction("swipe(dx, dy, delay)", "以此Node中心滑动到相对(dx,dy)的地方"),
                         ApiFunction("tryLongClick()", "长按"),
                         ApiFunction("longClick()", "长按")
@@ -74,6 +75,7 @@ class EditorFunsHelper(
                         , ApiFunction("select()", "选择")
                         , ApiFunction("trySelect()", "选择")
                         , ApiFunction("focus()", "获得焦点")
+                        , ApiFunction("appendText()()", "追加文本，适用于纯文本输入框")
                 )),
                 ApiCategory("ViewFinder", listOf(
                         ApiFunction("find()", "搜索所有符合条件,返回Array<ViewNode>")
@@ -85,6 +87,7 @@ class EditorFunsHelper(
                         , ApiFunction("similaryText(texts)", "根据文本相似度 > 0.75(中文转为拼音后的比较)")
                         , ApiFunction("id(id)", "匹配id")
                         , ApiFunction("desc(descs)", "匹配desc")
+                        , ApiFunction("containsDesc(descs)", "包含desc")
                         , ApiFunction("editable()", "匹配可编辑控件")
                         , ApiFunction("scrollable()", "匹配可滑动")
                         , ApiFunction("type(types)", "匹配控件的className")

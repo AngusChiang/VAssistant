@@ -119,7 +119,7 @@ class ScreenPickerActivity : Activity() {
 
     var d: MaterialDialog? = null
     private val onItemClick: (ViewNode) -> Unit = { node ->
-        val text = node.getText() ?: "失败"
+        val text = node.getText() ?: node.desc() ?: ""
         val textView = TextView(this)
         textView.setPadding(60, 0, 60, 0)
         textView.setTextIsSelectable(true)

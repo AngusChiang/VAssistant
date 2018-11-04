@@ -8,6 +8,7 @@ import com.baidu.speech.EventManager
 import com.baidu.speech.EventManagerFactory
 import com.baidu.speech.asr.SpeechConstant
 import org.json.JSONObject
+import java.lang.Thread.sleep
 
 /**
  * 初始化 提供 EventManagerFactory需要的Context和EventListener

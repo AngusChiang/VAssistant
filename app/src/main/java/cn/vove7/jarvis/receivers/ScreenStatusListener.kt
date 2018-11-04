@@ -5,7 +5,7 @@ import android.content.Intent
 import android.content.IntentFilter
 import cn.vove7.common.appbus.AppBus
 import cn.vove7.common.appbus.SpeechAction
-import cn.vove7.jarvis.speech.baiduspeech.wakeup.MyWakeup
+import cn.vove7.jarvis.speech.WakeupI
 import cn.vove7.jarvis.tools.AppConfig
 import cn.vove7.vtp.log.Vog
 
@@ -28,7 +28,7 @@ object ScreenStatusListener : DyBCReceiver() {
         when (intent?.action) {
             Intent.ACTION_SCREEN_ON -> {
                 Vog.d(this, "onReceive ---> 亮屏")
-                if (AppConfig.openVoiceWakeUpIfAutoSleep && AppConfig.voiceWakeup && !MyWakeup.opened) {
+                if (AppConfig.openVoiceWakeUpIfAutoSleep && AppConfig.voiceWakeup &&  WakeupI.instance?.opened == false) {
                     Vog.d(this, "onReceive ---> 开启语音唤醒")
                     AppBus.postSpeechAction(SpeechAction.ActionCode.ACTION_START_WAKEUP_WITHOUT_SWITCH)
                 }

@@ -53,8 +53,8 @@ class RecogEventAdapter(private val listener: IRecogListener) : EventListener {
                 val errorCode = recogResult.error
                 val subErrorCode = recogResult.subError
                 Vog.e(this, "asr error:$params")
-                listener.onAsrFinishError(errorCode, subErrorCode, ErrorTranslation.recogError(errorCode), recogResult.desc, recogResult)
-
+                listener.onAsrFinishError(errorCode, subErrorCode, ErrorTranslation.recogError(errorCode),
+                        recogResult.desc, recogResult)
             } else {
                 listener.onAsrFinish(recogResult)
             }

@@ -88,7 +88,6 @@ open class LogMessage(val level: Int, val msg: String) {
  * 语音识别控制消息
  */
 data class SpeechAction(val action: ActionCode) {
-
     override fun toString(): String {
         return "SpeechAction(action=$action)"
     }
@@ -98,6 +97,7 @@ data class SpeechAction(val action: ActionCode) {
         ACTION_START_WAKEUP,
         ACTION_START_WAKEUP_WITHOUT_SWITCH,//不打开设置开关 @see[AppConfig.voiceWakeup]
         ACTION_STOP_WAKEUP,
+        ACTION_STOP_WAKEUP_WITHOUT_SWITCH,
         ACTION_STOP_RECO,
         ACTION_RELOAD_SYN_CONF,
         ACTION_CANCEL_RECO,

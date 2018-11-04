@@ -15,19 +15,19 @@ interface VApi {
         )
         val runtimeFunctions = arrayOf("currentApp",
                 "currentActivity", "actionCount", "currentActionIndex", "isGlobal()",
-                "commandType", "command", "DEBUG")
+                "commandType", "command", "DEBUG", "focusView")
 
         val httpFunctions = arrayOf("get()", "post()", "postJson()", "getAsPc()")
 
         val androRuntimeFuncs = arrayOf(
-                "isRoot()","requestRoot()", "exec()", "execWithSu()"
+                "isRoot()", "requestRoot()", "exec()", "execWithSu()"
         )
         val finderFuns = arrayOf(
                 "ViewFinder()", "waitFor()", "depths()",
                 "containsText()", "matchesText()", "equalsText()",
                 "similaryText()", "id()", "desc()",
                 "editable()", "scrollable()", "type()", "await()",
-                "findFirst()", "find()"
+                "findFirst()", "find()", "containsDesc()"
         )
         val utilFuns = arrayOf(
                 "toPinyin()", "arr2String()", "print()", "matches()", "matchValues()",
@@ -61,7 +61,8 @@ interface VApi {
                 /* "lockScreen()",*/ "screenShot()",
                 "screen2File()", "shareText(text)", "shareImage(imgPah)", "location()",
                 "getLocalIpAddress()", "getNetAddress()", "createAlarm()", "createCalendarEvent()",
-                "startActivity(pkg,fullActivityName)","screenOn()","screenOff()","sendKey()"
+                "startActivity(pkg,fullActivityName)", "screenOn()", "screenOff()", "sendKey()",
+                "sendSMS()", "getLaunchIntent()", "getPhoneByName()"
         )
         val appFunctions = arrayOf(
                 "startActivity()", "getSystemService()"
@@ -71,11 +72,11 @@ interface VApi {
                     "tryClick()", "getCenterPoint()", "centerPoint()",
                     "getChilds()", "childs", "bounds", "getBounds()",
                     "getBoundsInParent()", "boundsInParent", "getParent()",
-                    "parent", "click()", "swipe()", "tryLongClick()",
+                    "parent", "click()", "globalClick()", "swipe()", "tryLongClick()",
                     "getChildCount()", "childCount", "longClick()",
                     "doubleClick()", "setText()", "text", "trySetText()",
                     "getText()", "select()", "trySelect()", "focus()", "scrollUp()",
-                    "scrollDown()", "setTextWithInitial()", "isClickable"
+                    "scrollDown()", "setTextWithInitial()", "isClickable", "appendText()"
             )
         val executorFunctions =
             arrayOf("interrupt()", "setScreenSize()",
@@ -93,7 +94,6 @@ interface VApi {
                 "switch", "while", "continue", "function", "this", "with", "default",
                 "if", "throw", "delete", "in", "try", "do", "instranceof", "typeof")
 
-
         //map
         val runtimeMap = hashMapOf(
                 Pair("currentApp", "当前App信息"),
@@ -103,7 +103,8 @@ interface VApi {
                 Pair("isGlobal()", "全局标志"),
                 Pair("commandType", "指令类型(1打开|-1关闭)"),
                 Pair("command", "用户命令"),
-                Pair("DEBUG", "调试标志")
+                Pair("DEBUG", "调试标志"),
+                Pair("focusView", "当前获得焦点的ViewNode")
         )
         val systemFunMap = hashMapOf(
                 Pair("openAppDetail(pkg)", "打开app详情页"),
@@ -160,9 +161,9 @@ interface VApi {
                         "\n2.参数(message: String?, days: Array<Int>?, hour: Int, minutes: Int, noUi: Boolean)\n" +
                         "message:备注,days:重复周,hour:时,minutes:分,noUi:是否显示闹钟界面\n" +
                         "注:参数days 周日 - 周六 对应 1 - 7"),
-                Pair("screenOn()","熄屏状态下,唤醒屏幕"),
-                Pair("screenOff()","熄屏,需要root"),
-                Pair("sendKey()","模拟按键,需要root,参数keyCode:Int\n" +
+                Pair("screenOn()", "熄屏状态下,唤醒屏幕"),
+                Pair("screenOff()", "熄屏,需要root"),
+                Pair("sendKey()", "模拟按键,需要root,参数keyCode:Int\n" +
                         "0 -->  \"KEYCODE_UNKNOWN\"\n" +
                         "1 -->  \"KEYCODE_MENU\"\n" +
                         "2 -->  \"KEYCODE_SOFT_RIGHT\"\n" +
@@ -249,7 +250,10 @@ interface VApi {
                         "83 -->  \"KEYCODE_NOTIFICATION\"\n" +
                         "84 -->  \"KEYCODE_SEARCH\" \n" +
                         "85 -->  \"TAG_LAST_KEYCODE\"\n " +
-                        "from https://blog.csdn.net/chen825919148/article/details/18732041")
+                        "from https://blog.csdn.net/chen825919148/article/details/18732041"),
+                Pair("sendSMS()", "发送短信\n参数：(phone: String, content: String)"),
+                Pair("getLaunchIntent(pkg)", "根据pkg(包名)获取App的启动Intent,类似桌面启动App\n参数：(pkg:String)"),
+                Pair("getPhoneByName()", "根据姓名查找手机号，搜索范围：标记数据、通讯录\n参数：(name: String)")
         )
         val executorMap = hashMapOf(
                 Pair("interrupt()", "终止执行"),

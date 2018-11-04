@@ -10,10 +10,10 @@ import cn.vove7.common.app.GlobalLog;
 import cn.vove7.common.executor.CExecutorI;
 import cn.vove7.vtp.log.Vog;
 
-import static cn.vove7.common.view.finder.ViewFinderWithMultiCondition.MATCH_MODE_CONTAIN;
-import static cn.vove7.common.view.finder.ViewFinderWithMultiCondition.MATCH_MODE_EQUAL;
-import static cn.vove7.common.view.finder.ViewFinderWithMultiCondition.MATCH_MODE_FUZZY_WITH_PINYIN;
-import static cn.vove7.common.view.finder.ViewFinderWithMultiCondition.MATCH_MODE_MATCHES;
+import static cn.vove7.common.view.finder.ViewFinderWithMultiCondition.TEXT_MATCH_MODE_CONTAIN;
+import static cn.vove7.common.view.finder.ViewFinderWithMultiCondition.TEXT_MATCH_MODE_EQUAL;
+import static cn.vove7.common.view.finder.ViewFinderWithMultiCondition.TEXT_MATCH_MODE_FUZZY_WITH_PINYIN;
+import static cn.vove7.common.view.finder.ViewFinderWithMultiCondition.TEXT_MATCH_MODE_MATCHES;
 
 
 /**
@@ -79,7 +79,7 @@ public class ViewFindBuilder extends FindBuilder {
         }
     }
 
-    public ViewFindBuilder depths(Integer[] ds){
+    public ViewFindBuilder depths(Integer[] ds) {
         viewFinderX.setDepths(ds);
         return this;
     }
@@ -92,13 +92,13 @@ public class ViewFindBuilder extends FindBuilder {
      */
     public ViewFindBuilder containsText(String... text) {
         viewFinderX.getViewText().addAll(Arrays.asList(text));
-        viewFinderX.setTextMatchMode(MATCH_MODE_CONTAIN);
+        viewFinderX.setTextMatchMode(TEXT_MATCH_MODE_CONTAIN);
         return this;
     }
 
     public ViewFindBuilder containsText(String text) {
         viewFinderX.getViewText().add(text);
-        viewFinderX.setTextMatchMode(MATCH_MODE_CONTAIN);
+        viewFinderX.setTextMatchMode(TEXT_MATCH_MODE_CONTAIN);
         return this;
     }
 
@@ -110,13 +110,13 @@ public class ViewFindBuilder extends FindBuilder {
      */
     public ViewFindBuilder matchesText(String... regs) {
         viewFinderX.getViewText().addAll(Arrays.asList(regs));
-        viewFinderX.setTextMatchMode(MATCH_MODE_MATCHES);
+        viewFinderX.setTextMatchMode(TEXT_MATCH_MODE_MATCHES);
         return this;
     }
 
     public ViewFindBuilder matchesText(String regs) {
         viewFinderX.getViewText().add(regs);
-        viewFinderX.setTextMatchMode(MATCH_MODE_MATCHES);
+        viewFinderX.setTextMatchMode(TEXT_MATCH_MODE_MATCHES);
         return this;
     }
 
@@ -129,13 +129,13 @@ public class ViewFindBuilder extends FindBuilder {
      */
     public ViewFindBuilder equalsText(String... text) {
         viewFinderX.getViewText().addAll(Arrays.asList(text));
-        viewFinderX.setTextMatchMode(MATCH_MODE_EQUAL);
+        viewFinderX.setTextMatchMode(TEXT_MATCH_MODE_EQUAL);
         return this;
     }
 
     public ViewFindBuilder equalsText(String text) {
         viewFinderX.getViewText().add(text);
-        viewFinderX.setTextMatchMode(MATCH_MODE_EQUAL);
+        viewFinderX.setTextMatchMode(TEXT_MATCH_MODE_EQUAL);
         return this;
     }
 
@@ -147,18 +147,19 @@ public class ViewFindBuilder extends FindBuilder {
      */
     public ViewFindBuilder similaryText(String... text) {
         viewFinderX.getViewText().addAll(Arrays.asList(text));
-        viewFinderX.setTextMatchMode(MATCH_MODE_FUZZY_WITH_PINYIN);
+        viewFinderX.setTextMatchMode(TEXT_MATCH_MODE_FUZZY_WITH_PINYIN);
         return this;
     }
 
     public ViewFindBuilder similaryText(String text) {
         viewFinderX.getViewText().add(text);
-        viewFinderX.setTextMatchMode(MATCH_MODE_FUZZY_WITH_PINYIN);
+        viewFinderX.setTextMatchMode(TEXT_MATCH_MODE_FUZZY_WITH_PINYIN);
         return this;
     }
 
     /**
      * 根据id 查找
+     *
      * @param id
      * @return
      */
@@ -169,16 +170,31 @@ public class ViewFindBuilder extends FindBuilder {
 
     /**
      * 说明
+     *
      * @param desc
      * @return
      */
     public ViewFindBuilder desc(String... desc) {
-        viewFinderX.getDesc().addAll(Arrays.asList(desc));
+        viewFinderX.getDescTexts().addAll(Arrays.asList(desc));
+        viewFinderX.setDescMatchMode(TEXT_MATCH_MODE_EQUAL);
         return this;
     }
 
     public ViewFindBuilder desc(String desc) {
-        viewFinderX.getDesc().add(desc);
+        viewFinderX.getDescTexts().add(desc);
+        viewFinderX.setDescMatchMode(TEXT_MATCH_MODE_EQUAL);
+        return this;
+    }
+
+    public ViewFindBuilder containsDesc(String desc) {
+        viewFinderX.getDescTexts().add(desc);
+        viewFinderX.setDescMatchMode(TEXT_MATCH_MODE_CONTAIN);
+        return this;
+    }
+
+    public ViewFindBuilder containsDesc(String... desc) {
+        viewFinderX.getDescTexts().addAll(Arrays.asList(desc));
+        viewFinderX.setDescMatchMode(TEXT_MATCH_MODE_CONTAIN);
         return this;
     }
 

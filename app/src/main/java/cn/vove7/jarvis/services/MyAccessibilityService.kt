@@ -340,11 +340,13 @@ class MyAccessibilityService : AccessibilityApi() {
     private var startupRunner: Runnable = Runnable {
         MainService.instance?.onCommand(AppBus.ORDER_START_RECO)
     }
+
     private var stopRunner: Runnable = Runnable {
         MainService.instance?.onCommand(AppBus.ORDER_STOP_EXEC)
     }
+
     private var stopSpeakRunner: Runnable = Runnable {
-        SpeechSynService.stop(true)
+        MainService.instance?.speechSynService?.stop(true)
     }
 //    private var delayUp = 600L
 
@@ -376,7 +378,7 @@ class MyAccessibilityService : AccessibilityApi() {
                             MainService.instance?.onCommand(AppBus.ORDER_CANCEL_RECO)//up speed
                             true
                         }
-                        SpeechSynService.speaking -> {
+                        MainService.instance?.speechSynService?.speaking == true -> {
                             postLongDelay(stopSpeakRunner)
                             true
                         }
@@ -416,7 +418,7 @@ class MyAccessibilityService : AccessibilityApi() {
                     KEYCODE_VOLUME_DOWN -> {
                         if (v3) {
                             when {
-                                SpeechSynService.speaking -> {
+                                MainService.instance?.speechSynService?.speaking == true -> {
                                     return removeDelayIfInterrupt(event, stopSpeakRunner) || super.onKeyEvent(event)
                                 }
                                 MainService.exEngineRunning -> {//长按下键

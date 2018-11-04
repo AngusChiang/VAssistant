@@ -5,6 +5,7 @@ import android.content.pm.PackageManager
 import cn.vove7.androlua.luabridge.LuaUtil
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.jarvis.BuildConfig
+import cn.vove7.jarvis.speech.WakeupI
 import cn.vove7.jarvis.tools.AppConfig
 import cn.vove7.vtp.log.Vog
 import com.baidu.speech.EventListener
@@ -20,7 +21,7 @@ import org.json.JSONObject
  *
  */
 
-object MyWakeup {
+class BaiduVoiceWakeup(private val eventListener: EventListener) : WakeupI() {
 
     private var appId: Int = 0
     private lateinit var appKey: String
@@ -29,24 +30,19 @@ object MyWakeup {
         get() = GlobalApp.APP
 
     private var wp: EventManager? = null
-    private lateinit var eventListener: EventListener
-    var opened = false
+    override var opened: Boolean = false
 
-    private fun init(eventListener: EventListener) {
-        if (isInited) {
-//            Vog.e(this, "还未调用release()，请勿新建一个新类")
-//            throw RuntimeException("还未调用release()，请勿新建一个新类")
-            return
-//            instances?.release()
-        }
-//        this.context = context
-//        instances = this
-        isInited = true
-        this.eventListener = eventListener
+    init {
+        initIfNeed()
+    }
+
+    private fun initIfNeed() {
+        if (wp != null) return
         wp = EventManagerFactory.create(context, "wp")
-        wp!!.registerListener(eventListener)
+        wp?.registerListener(eventListener)
 
-        val appInfo = context.packageManager.getApplicationInfo(context.packageName, PackageManager.GET_META_DATA)
+        val appInfo = context.packageManager.getApplicationInfo(context.packageName,
+                PackageManager.GET_META_DATA)
         if (BuildConfig.DEBUG) {
             appId = 11389525
             appKey = "ILdLUepG75UwwQVa0rqiEUVa"
@@ -60,50 +56,45 @@ object MyWakeup {
                 context.filesDir.absolutePath + "/bd/WakeUp_xvtx.bin")
     }
 
-    fun start(eventL: WakeupEventAdapter) {
-        if (wp == null) {
-            init(eventL)
-        }
-
+    override fun start() {
+        initIfNeed()
+        super.start()
         val params = HashMap<String, Any?>()
         params[SpeechConstant.WP_WORDS_FILE] = AppConfig.wakeUpFilePath
         params[SpeechConstant.APP_ID] = appId
         params[SpeechConstant.APP_KEY] = appKey
         params[SpeechConstant.SECRET] = secretKey
-        params[SpeechConstant.IN_FILE] = "#cn.vove7.jarvis.tools.MicrophoneInputStream.getInstance()"
+        params[SpeechConstant.IN_FILE] = "#cn.vove7.jarvis.speech.baiduspeech.MicrophoneInputStream.getInstance()"
 
         // "assets:///WakeUp_xvtx.bin" 表示WakeUp.bin文件定义在assets目录下
         // params.put(SpeechConstant.ACCEPT_AUDIO_DATA,true);
         // params.put(SpeechConstant.ACCEPT_AUDIO_VOLUME,true);
         // params.put(SpeechConstant.IN_FILE,"res:///com/baidu/android/voicedemo/wakeup.pcm");
-        start(params)
+        send(params)
     }
 
-    private fun start(params: Map<String, Any?>) {
+    private fun send(params: Map<String, Any?>) {
         val json = JSONObject(params).toString()
         Vog.i(this, "wakeup params(反馈请带上此行日志):$json")
         wp?.send(SpeechConstant.WAKEUP_START, json, null, 0, 0)
         GlobalApp.toastShort("语音唤醒开启")
-        opened = true
     }
 
-    fun stop() {
+    override fun stop() {
+        super.stop()
         if (wp == null) return
         GlobalApp.toastShort("语音唤醒关闭")
         wp?.send(SpeechConstant.WAKEUP_STOP, null, null, 0, 0)
         release()
-        opened = false
     }
 
-    fun release() {
+    override fun release() {
 //        stop()
         wp?.unregisterListener(eventListener)
         wp = null
-        isInited = false
     }
 
-    private var isInited = false
 //    companion object {
-//        var instances: MyWakeup? = null
+//        var instances: BaiduVoiceWakeup? = null
 //    }
 }

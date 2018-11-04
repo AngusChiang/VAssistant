@@ -1,4 +1,4 @@
-package cn.vove7.jarvis.tools;
+package cn.vove7.jarvis.speech.baiduspeech;
 
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothProfile;
@@ -47,8 +47,12 @@ public class MicrophoneInputStream extends InputStream {
                     MediaRecorder.AudioSource.DEFAULT,
                     16000, AudioFormat.CHANNEL_IN_MONO,
                     AudioFormat.ENCODING_PCM_16BIT, bufferSize);
-            mAudioManager.setBluetoothScoOn(true);
-            mAudioManager.startBluetoothSco();
+            try {
+                mAudioManager.setBluetoothScoOn(true);
+                mAudioManager.startBluetoothSco();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
     }
 

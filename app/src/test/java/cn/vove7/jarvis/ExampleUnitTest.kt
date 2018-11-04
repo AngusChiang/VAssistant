@@ -151,14 +151,23 @@ class ExampleUnitTest {
         val doc = Jsoup.connect("https://www.coolapk.com/apk/cn.vove7.vassistant").get()
 
         println(doc.body().getElementsByClass("list_app_info").text())
-        println(doc.body().getElementsByClass("apk_left_title_info")[0].html().replace("<br> ","\n"))
+        println(doc.body().getElementsByClass("apk_left_title_info")[0].html().replace("<br> ", "\n"))
 
     }
 
     @Test
     fun tulingChat() {
-        val a= TulingChatSystem().chatWithText("你好")
+        val a = TulingChatSystem().chatWithText("你好")
         println(a)
+    }
+
+    @Test
+    fun subStr() {
+        val voiceResult = "你好完毕"
+        val it = "完毕"
+        if (voiceResult.endsWith(it)) {
+            println(voiceResult.substring(0, voiceResult.length - it.length))
+        }
     }
 
 }

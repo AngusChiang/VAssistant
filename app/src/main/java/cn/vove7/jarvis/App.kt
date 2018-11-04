@@ -3,21 +3,23 @@ package cn.vove7.jarvis
 import android.content.Intent
 import android.os.Build
 import android.os.Handler
+import android.os.HandlerThread
 import android.util.Log
 import cn.vove7.androlua.LuaApp
+import cn.vove7.common.appbus.AppBus
 import cn.vove7.common.appbus.MessageEvent
+import cn.vove7.common.bridges.RootHelper
 import cn.vove7.jarvis.receivers.PowerEventReceiver
 import cn.vove7.jarvis.receivers.ScreenStatusListener
 import cn.vove7.jarvis.services.AssistSessionService
 import cn.vove7.jarvis.services.MainService
+import cn.vove7.jarvis.services.MyAccessibilityService
 import cn.vove7.jarvis.tools.AppConfig
 import cn.vove7.jarvis.tools.CrashHandler
 import cn.vove7.jarvis.tools.ShortcutUtil
 import cn.vove7.vtp.log.Vog
-import devliving.online.securedpreferencestore.DefaultRecoveryHandler
-import devliving.online.securedpreferencestore.SecuredPreferenceStore
+import cn.vove7.vtp.runtimepermission.PermissionUtils
 import io.github.kbiakov.codeview.classifier.CodeProcessor
-import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
 import kotlin.concurrent.thread
@@ -31,28 +33,34 @@ class App : LuaApp() {
         Vog.d(this, "onCreate ---> begin ${System.currentTimeMillis() / 1000}")
         super.onCreate()
         ins = this
-        EventBus.getDefault().register(this)
-
+        AppBus.reg(this)
         CrashHandler.init()
 
         services = arrayOf(mainService)
-        Vog.d(this, "onCreate ---> startServices ${System.currentTimeMillis() / 1000}")
-        val storeFileName = "wdasfd"
-        val keyPrefix = ""
-        val seedKey = "fddfouafpiua".toByteArray()
-        SecuredPreferenceStore.init(applicationContext, storeFileName, keyPrefix, seedKey, DefaultRecoveryHandler())
-        AppConfig.init()
-        thread {
-            CodeProcessor.init(this)
-            ShortcutUtil.addWakeUpShortcut()
+        AppConfig.init(this)
+        Vog.d(this, "onCreate ---> 配置加载完成")
+        HandlerThread("app_load").apply {
+            start()
+            Handler(looper).post {
+                startServices()
+                CodeProcessor.init(this@App)
+                ShortcutUtil.addWakeUpShortcut()
 //                AdvanAppHelper.updateAppList()
-            startBroadcastReceivers()
-            Vog.d(this, "service thread ---> finish ${System.currentTimeMillis() / 1000}")
-            startServices()
+                startBroadcastReceivers()
+                thread {
+                    if (AppConfig.autoOpenASWithRoot && !PermissionUtils.accessibilityServiceEnabled(this@App)) {
+                        RootHelper.openAppAccessService(packageName,
+                                "${MyAccessibilityService::class.qualifiedName}")
+                    }
+                }
+                Vog.d(this, "onCreate ---> 结束 ${System.currentTimeMillis() / 1000}")
+
+                quitSafely()
+            }
         }
+
         if (!BuildConfig.DEBUG)
             Vog.init(this, Log.ERROR)
-        Vog.d(this, "onCreate ---> end ${System.currentTimeMillis() / 1000}")
     }
 
     private fun startServices() {

@@ -80,7 +80,7 @@ class LaboratoryActivity : ReturnableActivity() {
                                 keyId = R.string.key_continuous_dialogue)
                 )),
                 SettingGroupItem(R.color.google_red, titleS = "语音助手", childItems = listOf(
-                        SwitchItem(title = "开启", summary = "(暂未开放)\n助手模式，通过唤醒用系统语音助手触发，可捕捉屏幕内容\n关闭后只能使快速唤醒", keyId = R.string.key_use_assist_service,
+                        SwitchItem(title = "助手模式(暂未开放)", summary = "通过唤醒用系统语音助手触发，可捕捉屏幕内容\n关闭后只能使快速唤醒", keyId = R.string.key_use_assist_service,
                                 defaultValue = { false }),
                         SwitchItem(title = "立即识别", summary = "开启自动识别",
                                 keyId = R.string.key_reco_when_wakeup_assist, defaultValue = { false }

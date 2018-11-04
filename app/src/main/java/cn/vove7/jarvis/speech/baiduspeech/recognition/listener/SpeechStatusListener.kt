@@ -2,6 +2,7 @@ package cn.vove7.jarvis.speech.baiduspeech.recognition.listener
 
 import android.os.Handler
 import cn.vove7.common.app.GlobalApp
+import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.appbus.AppBus
 import cn.vove7.common.appbus.SpeechAction
 import cn.vove7.common.appbus.VoiceData
@@ -50,20 +51,23 @@ class SpeechStatusListener(private val handler: Handler) : StatusRecogListener()
                                   recogResult: RecogResult) {
         super.onAsrFinishError(errorCode, subErrorCode, errorMessage, descMessage, recogResult)
         val message = "识别错误, 错误码：$errorCode,$subErrorCode"
-        when (errorCode) {
+        val errMsg = when (errorCode) {
             9 -> {
                 AppBus.post(RequestPermission("麦克风权限"))
-                handler.sendMessage(SpeechMessage.buildMessage(CODE_VOICE_ERR, "需要麦克风权限"))
+                "需要麦克风权限"
             }
-            3 -> {
-                handler.sendMessage(SpeechMessage.buildMessage(CODE_VOICE_ERR, "没有检测到用户说话"))
+            3 -> "没有检测到用户说话"
+            7 -> "无结果"
+            2 -> "网络错误"
+            8 -> "引擎忙"
+            1 -> "网络超时"
+            else -> {
+                GlobalLog.err(message)
+                "位置错误"
             }
-            2 -> {
-                handler.sendMessage(SpeechMessage.buildMessage(CODE_VOICE_ERR, "网络错误"))
-            }
-            else ->
-                handler.sendMessage(SpeechMessage.buildMessage(CODE_VOICE_ERR, message))
         }
+
+        handler.sendMessage(SpeechMessage.buildMessage(CODE_VOICE_ERR, errMsg))
         when (subErrorCode) {
             3101 -> {
                 GlobalApp.toastShort("?")
@@ -71,9 +75,9 @@ class SpeechStatusListener(private val handler: Handler) : StatusRecogListener()
             7001 -> {
             }
             3001 -> {
-                GlobalApp.toastShort("麦克风打开失败")
+                handler.sendMessage(SpeechMessage.buildMessage(CODE_VOICE_ERR, "麦克风打开失败"))
             }
-            2004 -> {
+            2004, 2100 -> {
                 GlobalApp.toastShort("网络错误")
             }
 //            else -> {

@@ -44,7 +44,7 @@ class VoiceWakeupStrategy : AccPluginsService() {
 
     override fun onAppChanged(appScope: ActionScope) {
         if (AppConfig.voiceWakeup) {
-            AppBus.post(SpeechAction.ActionCode.ACTION_STOP_WAKEUP)
+            AppBus.post(SpeechAction.ActionCode.ACTION_STOP_WAKEUP_WITHOUT_SWITCH)
         }
     }
 }

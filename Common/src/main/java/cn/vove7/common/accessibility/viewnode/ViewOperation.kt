@@ -113,6 +113,7 @@ interface ViewOperation {
      */
     fun appendText(s: String): Boolean
 
+    fun desc(): String?
     //选择
     fun select(): Boolean
 

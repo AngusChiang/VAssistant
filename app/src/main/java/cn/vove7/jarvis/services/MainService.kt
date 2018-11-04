@@ -6,6 +6,8 @@ import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
 import android.os.Binder
+import android.os.Handler
+import android.os.HandlerThread
 import android.os.IBinder
 import cn.vove7.androlua.luautils.LuaContext
 import cn.vove7.common.accessibility.AccessibilityApi
@@ -48,6 +50,7 @@ import cn.vove7.jarvis.chat.ChatSystem
 import cn.vove7.jarvis.chat.QykChatSystem
 import cn.vove7.jarvis.chat.TulingChatSystem
 import cn.vove7.jarvis.speech.SpeechEvent
+import cn.vove7.jarvis.speech.SpeechRecoService
 import cn.vove7.jarvis.tools.AppConfig
 import cn.vove7.jarvis.tools.debugserver.RemoteDebugServer
 import cn.vove7.jarvis.view.dialog.MultiChoiceDialog
@@ -74,7 +77,9 @@ import kotlin.concurrent.thread
 class MainService : BusService(),
         ServiceBridge, OnSelectListener, OnMultiSelectListener, LuaContext {
 
-    lateinit var listeningToast: ListeningToast
+    private val listeningToast: ListeningToast by lazy {
+        ListeningToast()
+    }
     override val serviceId: Int
         get() = 126
     /**
@@ -94,7 +99,7 @@ class MainService : BusService(),
     private lateinit var chatSystem: ChatSystem
 
     private lateinit var speechRecoService: SpeechRecoService
-    private lateinit var speechSynService: SpeechSynService
+    lateinit var speechSynService: SpeechSynService
 
     /**
      * 当前语音使用方式
@@ -106,28 +111,31 @@ class MainService : BusService(),
     private val parseAnimation: ParseAnimation by lazy { ParseAnimation() }
     private val executeAnimation: ExecuteAnimation by lazy { ExecuteAnimation() }
 
-
     override fun onCreate() {
         super.onCreate()
         instance = this
         GlobalApp.serviceBridge = this
-        thread {
-            listeningToast = ListeningToast()
-            speechSynService = SpeechSynService
-
-            cExecutor = MultiExecutorEngine()
-            init()
+        HandlerThread("load_").apply {
+            start()
+            Handler(looper).post {
+                init()
+                quitSafely()
+            }
         }
     }
 
     fun init() {
-        speechRecoService = SpeechRecoService(RecgEventListener())
-
+        loadSpeechService()
         loadChatSystem()
-        speechSynService.event = SyncEventListener()
+        cExecutor = MultiExecutorEngine()
     }
 
-    fun loadChatSystem(bySet: Boolean = false) {
+    private fun loadSpeechService() {
+        speechRecoService = BaiduSpeechRecoService(RecgEventListener())
+        speechSynService = SpeechSynService(SyncEventListener())
+    }
+
+    fun loadChatSystem(byUserSet: Boolean = false) {
         val type = GlobalApp.APP.resources.getStringArray(R.array.list_chat_system)
 
         if (!AppConfig.openChatSystem)
@@ -137,7 +145,7 @@ class MainService : BusService(),
             type[1] -> TulingChatSystem()
             else -> QykChatSystem()
         }
-        if (bySet) {
+        if (byUserSet) {
             GlobalApp.toastShort("对话系统切换完成")
         }
     }
@@ -288,7 +296,7 @@ class MainService : BusService(),
     override fun speak(text: String?) {
         //关闭语音播报 toast
         if (AppConfig.audioSpeak && SystemBridge
-                        .getVolumeByType(SpeechSynService.currentStreamType) != 0) {
+                        .getVolumeByType(speechSynService.synthesizer.currentStreamType) != 0) {
             speakSync = false
             speechSynService.speak(text)
         } else {
@@ -312,7 +320,7 @@ class MainService : BusService(),
     override fun speakSync(text: String?): Boolean {
         speakSync = true
         return if (AppConfig.audioSpeak && SystemBridge
-                        .getVolumeByType(SpeechSynService.currentStreamType) != 0) {//当前音量非静音
+                        .getVolumeByType(speechSynService.synthesizer.currentStreamType) != 0) {//当前音量非静音
             speechSynService.speak(text)
             true
         } else {
@@ -382,7 +390,10 @@ class MainService : BusService(),
             }
             SpeechAction.ActionCode.ACTION_RELOAD_SYN_CONF -> speechSynService.reLoad()
             SpeechAction.ActionCode.ACTION_STOP_WAKEUP -> {
-//                AppConfig.voiceWakeup = false
+                AppConfig.voiceWakeup = false
+                speechRecoService.stopWakeUp()
+            }
+            SpeechAction.ActionCode.ACTION_STOP_WAKEUP_WITHOUT_SWITCH -> {
                 speechRecoService.stopWakeUp()
             }
             SpeechAction.ActionCode.ACTION_STOP_WAKEUP_TIMER -> {
@@ -514,7 +525,7 @@ class MainService : BusService(),
 
         val recoIsListening: Boolean
             get() {
-                return instance?.speechRecoService?.isListening() == true
+                return instance?.speechRecoService?.isListening == true
             }
         val exEngineRunning: Boolean
             get() {
@@ -659,8 +670,14 @@ class MainService : BusService(),
         override fun onResult(voiceResult: String) {//解析完成再 resumeMusicIf()?
             Vog.d(this, "结果 --------> $voiceResult")
             when (voiceMode) {
-                MODE_VOICE -> {
-                    onParseCommand(voiceResult)
+                MODE_VOICE -> {//剪去结束词
+                    AppConfig.finishWord.also {
+                        if (it == null || it == "") {
+                            onParseCommand(voiceResult)
+                        } else if (voiceResult.endsWith(it)) {
+                            onParseCommand(voiceResult.substring(0, voiceResult.length - it.length))
+                        } else onParseCommand(voiceResult)
+                    }
                 }
                 MODE_GET_PARAM -> {//中途参数
                     resumeMusicIf()
@@ -723,7 +740,7 @@ class MainService : BusService(),
         override fun onFailed(err: String) {
             resumeMusicIf()
             AppBus.post(AppBus.EVENT_ERROR_RECO)
-            listeningToast.showAndHideDelay("😭")
+            listeningToast.showAndHideDelay(err)
             when (voiceMode) {
                 MODE_VOICE -> {
                     listeningAni.failed()
@@ -858,7 +875,7 @@ class MainService : BusService(),
             }
         }
 
-        override fun onUserInterupt() {
+        override fun onUserInterrupt() {
             userInterrupted = true
         }
 

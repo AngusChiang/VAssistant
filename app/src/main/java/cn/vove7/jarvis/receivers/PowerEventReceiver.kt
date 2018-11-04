@@ -5,7 +5,7 @@ import android.content.Intent
 import android.content.IntentFilter
 import cn.vove7.common.appbus.AppBus
 import cn.vove7.common.appbus.SpeechAction
-import cn.vove7.jarvis.speech.baiduspeech.wakeup.MyWakeup
+import cn.vove7.jarvis.speech.WakeupI
 import cn.vove7.jarvis.tools.AppConfig
 import cn.vove7.vtp.log.Vog
 
@@ -34,7 +34,7 @@ object PowerEventReceiver : DyBCReceiver() {
         when (intent?.action) {
             Intent.ACTION_POWER_CONNECTED -> {//连接充电器
                 isCharging = true
-                if (!MyWakeup.opened) {//开启 并 已自动关闭
+                if (WakeupI.instance?.opened == false) {//开启 并 已自动关闭
                     Vog.d(this, "onReceive ---> 正在充电 开启语语音唤醒")
                     AppBus.postSpeechAction(SpeechAction.ActionCode.ACTION_START_WAKEUP_WITHOUT_SWITCH)//不打开语音唤醒开关
                 } else {
@@ -49,7 +49,7 @@ object PowerEventReceiver : DyBCReceiver() {
                     //关闭
                     Vog.d(this, "onReceive ---> 充电结束 语音唤醒关闭")
 
-                    AppBus.postSpeechAction(SpeechAction.ActionCode.ACTION_STOP_WAKEUP)
+                    AppBus.postSpeechAction(SpeechAction.ActionCode.ACTION_STOP_WAKEUP_WITHOUT_SWITCH)
                 } else {//开启
                     //开启定时器
                     AppBus.postSpeechAction(SpeechAction.ActionCode.ACTION_START_WAKEUP_TIMER)

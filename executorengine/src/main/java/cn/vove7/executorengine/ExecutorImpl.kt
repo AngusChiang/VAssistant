@@ -552,7 +552,7 @@ open class ExecutorImpl(
     /**
      * 拨打
      */
-    fun smartCallPhone(s: String): PartialResult {
+    fun smartCallPhone(s: String): PartialResult {//todo 脚本内实现
         Vog.d(this, "smartCallPhone $s")
         val result = systemBridge.call(s)
         return if (!result.ok) {
@@ -593,17 +593,25 @@ open class ExecutorImpl(
          */
         private val globalScopeType = arrayListOf(ActionNode.NODE_SCOPE_GLOBAL/*, ActionNode.NODE_SCOPE_GLOBAL_2*/)
 
+        //todo 脚本内实现
         private const val CloseAppScript = "require 'accessibility'\n" +
                 "system.openAppDetail(args[1])\n" +
                 "s = ViewFinder().equalsText({'强行停止','force stop'}).waitFor(3000)\n" +
-                "if(s and s.tryClick()) then \n" +
-                "ok=ViewFinder().containsText({'确定','OK','强行停止'}).waitFor(2000)\n" +
-                "if(ok) then ok.tryClick()\n" +
-                "end\n" +
+                "if (s and s.tryClick()) then\n" +
+                "    ok = ViewFinder().containsText({\"确定\", \"OK\"}).waitFor(600)\n" +
+                "    if (ok) then\n" +
+                "        sleep(200)\n" +
+                "        print(ok.tryClick())\n" +
+                "    else\n" +
+                "        ok = ViewFinder().containsText(\"强行停止\").waitFor(600)\n" +
+                "        if(ok) then\n" +
+                "            ok.tryClick()\n" +
+                "        end\n" +
+                "    end\n" +
                 "else\n" +
-                "speak('应用未运行')\n" +
+                "    speak(\"应用未运行\")\n" +
                 "end\n" +
-                "home()\n"
+                "sleep(500)\nhome()\n"
 
     }
 
