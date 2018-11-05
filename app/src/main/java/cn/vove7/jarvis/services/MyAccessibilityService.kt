@@ -1,6 +1,5 @@
 package cn.vove7.jarvis.services
 
-import android.Manifest
 import android.accessibilityservice.AccessibilityButtonController
 import android.accessibilityservice.AccessibilityService
 import android.accessibilityservice.AccessibilityServiceInfo.FLAG_REQUEST_ACCESSIBILITY_BUTTON
@@ -25,6 +24,8 @@ import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.appbus.AppBus
 import cn.vove7.common.datamanager.parse.model.ActionScope
 import cn.vove7.common.executor.CExecutorI
+import cn.vove7.common.utils.activities
+import cn.vove7.common.utils.isInputMethod
 import cn.vove7.common.view.finder.ViewFinder
 import cn.vove7.common.view.notifier.ActivityShowListener
 import cn.vove7.common.view.notifier.UiViewShowNotifier
@@ -35,7 +36,6 @@ import cn.vove7.executorengine.helper.AdvanAppHelper
 import cn.vove7.jarvis.plugins.AccPluginsService
 import cn.vove7.jarvis.plugins.AdKillerService
 import cn.vove7.jarvis.tools.AppConfig
-import cn.vove7.vtp.app.AppInfo
 import cn.vove7.vtp.log.Vog
 import cn.vove7.vtp.system.SystemHelper
 import java.lang.Thread.sleep
@@ -97,15 +97,15 @@ class MyAccessibilityService : AccessibilityApi() {
 
     private fun updateCurrentApp(pkg: String, activityName: String) {
         if (currentScope.packageName == pkg && activityName == currentActivity) return
-        AdvanAppHelper.getAppInfo(pkg).also {
-            if (it == null || it.isInputMethod(this)) {//过滤输入法
+        AdvanAppHelper.getAppInfo(pkg).also { // 系统界面??
+            if (it == null || it.isInputMethod(this) || !it.activities().contains(activityName)) {//过滤输入法、非activity
                 return
             } else currentAppInfo = it
         }
         currentActivity = activityName
         Vog.d(this, "updateCurrentApp ---> $pkg")
         Vog.d(this, "updateCurrentApp ---> $activityName")
-        currentScope.activity = currentActivity
+        currentScope.activity = activityName
         currentScope.packageName = pkg
         Vog.d(this, currentScope.toString())
         dispatchPluginsEvent(ON_APP_CHANGED, currentScope)//发送事件
@@ -217,13 +217,13 @@ class MyAccessibilityService : AccessibilityApi() {
             GlobalLog.err(e.message)
             return
         }
-        Vog.v(this, "class :$currentAppInfo - ${event.className} \n" +
+        Vog.v(this, "class :$currentAppInfo - $currentActivity ${event.className} \n" +
                 AccessibilityEvent.eventTypeToString(event.eventType))
         val eventType = event.eventType
         if (eventType == AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED) {//界面切换
             val classNameStr = event.className
             val pkg = event.packageName as String?
-            Vog.v(this, "onAccessibilityEvent ---> $classNameStr $pkg")
+            Vog.v(this, "onAccessibilityEvent WINDOW_STATE_CHANGED ---> $classNameStr $pkg")
 //            if (packageName == pkg) {//fix 悬浮窗造成阻塞
 //                Vog.d(this, "onAccessibilityEvent ---> 自身(屏蔽悬浮窗)")
 //                return
@@ -590,17 +590,4 @@ class MyAccessibilityService : AccessibilityApi() {
             })
         }
     }
-}
-
-fun AppInfo.isInputMethod(context: Context): Boolean {
-
-    val pm = context.packageManager
-    val pkgInfo = pm.getPackageInfo(packageName, PackageManager.GET_SERVICES)
-    pkgInfo.services?.forEach {
-        if (it.permission == Manifest.permission.BIND_INPUT_METHOD) {
-            Vog.d(this, "isInputMethod ---> 输入法：$packageName")
-            return true
-        }
-    }
-    return false
 }

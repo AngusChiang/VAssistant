@@ -58,6 +58,7 @@ open class ExecutorImpl(
     override val focusView: ViewNode?
         get() = AccessibilityApi.accessibilityService?.currentFocusedEditor
     override var running: Boolean = false
+    override var userInterrupted: Boolean = false
 
     init {
         ScreenAdapter.init(systemBridge)
@@ -104,6 +105,7 @@ open class ExecutorImpl(
         lock = Object()
         thread = thread(start = true, isDaemon = true, priority = Thread.MAX_PRIORITY) {
             running = true
+            userInterrupted = false
             commandType = 0
             serviceBridge?.onExecuteStart(cmdWords)
             actionCount = actionQueue.size
@@ -141,7 +143,7 @@ open class ExecutorImpl(
                 return false
             }
         }
-        return true
+        return !userInterrupted
     }
 
     override fun runScript(script: String, args: Array<String>?): PartialResult {
@@ -173,15 +175,17 @@ open class ExecutorImpl(
         accessApi?.removeAllNotifier(this)
     }
 
+    /**
+     * 中断操作
+     */
     @CallSuper
     override fun interrupt() {
-        if (thread != null) {
-            try {
-                thread?.checkAccess()
-                thread?.interrupt()
-            } catch (e: Exception) {
-                e.printStackTrace()
-            }
+        userInterrupted = true
+        try {
+            thread?.checkAccess()
+            thread?.interrupt()//打破wait
+        } catch (e: Exception) {
+            e.printStackTrace()
         }
         accessApi?.removeAllNotifier(this)
     }

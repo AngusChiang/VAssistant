@@ -15,7 +15,7 @@ interface VApi {
         )
         val runtimeFunctions = arrayOf("currentApp",
                 "currentActivity", "actionCount", "currentActionIndex", "isGlobal()",
-                "commandType", "command", "DEBUG", "focusView")
+                "commandType", "command", "DEBUG", "focusView", "userInterrupted")
 
         val httpFunctions = arrayOf("get()", "post()", "postJson()", "getAsPc()")
 
@@ -104,7 +104,8 @@ interface VApi {
                 Pair("commandType", "指令类型(1打开|-1关闭)"),
                 Pair("command", "用户命令"),
                 Pair("DEBUG", "调试标志"),
-                Pair("focusView", "当前获得焦点的ViewNode")
+                Pair("focusView", "当前获得焦点的ViewNode"),
+                Pair("userInterrupted", "用户终止的标志\n此标志用于在脚本长时间循环操作")
         )
         val systemFunMap = hashMapOf(
                 Pair("openAppDetail(pkg)", "打开app详情页"),

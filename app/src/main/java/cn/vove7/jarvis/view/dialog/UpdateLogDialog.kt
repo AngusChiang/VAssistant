@@ -27,12 +27,26 @@ class UpdateLogDialog(context: Context, onDismiss: (() -> Unit)? = null) {
 
     private val logs: List<Pair<String, String>>
         get() = listOf(
-                Pair("1.2.7", "更新方式换为增量更新\n" +
-                        "修改后台音乐逻辑\n" +
-                        "加入结束词 (实验室)\n" +
-                        "优化首次进入app速度\n" +
-                        "打开自动开启无障碍，返回首页即可自动开启\n" +
-                        "添加基础引导"),
+                Pair("1.2.9","加入用户唤醒词\n" +
+                        "添加标志runtime.userInterrupt"),
+                Pair("1.2.8", "- 数据更新方式换为增量更新\n" +
+                        "- 支持网页内文字提取\n" +
+                        "- 支持语音唤醒后无间断说出命令（响应词打开则无效）\n" +
+                        "- 修改后台控制音乐逻辑\n" +
+                        "- 加入结束词 (实验室)\n" +
+                        "- 加入执行反馈设置\n" +
+                        "- 完善自动开启无障碍\n" +
+                        "- 添加基础引导\n" +
+                        "- 修复关闭应用指令\n" +
+                        "- 命令修剪结束词\n" +
+                        "- 添加api\n" +
+                        "system.sendSMS(phone: String, content: String)\n" +
+                        "system.getLaunchIntent(pkg:String)\n" +
+                        "system.getPhoneByName(name: String)\n" +
+                        "runtime.focusView\n" +
+                        "ViewNode.appendText()\n" +
+                        "ViewNode.globalClick()\n" +
+                        "ViewFinder.containsDesc(...)"),
                 Pair("1.2.6", "加入指令优先级设置   (指令详情菜单) ps: 指令列表按优先级排列\n" +
                         "加入连续对话 (实验室)\n" +
                         "修复若干问题"),
