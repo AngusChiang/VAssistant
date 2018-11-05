@@ -121,9 +121,9 @@ class SettingsActivity : ReturnableActivity() {
                             keyId = R.string.key_audio_speak, defaultValue = { true }),
                     SingleChoiceItem(R.string.text_sound_model, summary = "在线声音模型", keyId = R.string.key_voice_syn_model,
                             defaultValue = { 0 }, entityArrId = R.array.voice_model_entities, callback = { h, i ->
-                                AppBus.postSpeechAction(SpeechAction.ActionCode.ACTION_RELOAD_SYN_CONF)
-                                return@SingleChoiceItem true
-                            }),
+                        AppBus.postSpeechAction(SpeechAction.ActionCode.ACTION_RELOAD_SYN_CONF)
+                        return@SingleChoiceItem true
+                    }),
                     NumberPickerItem(R.string.text_speak_speed, keyId = R.string.key_voice_syn_speed,
                             defaultValue = { 5 }, range = Pair(1, 9), callback = { h, i ->
                         AppBus.postSpeechAction(SpeechAction.ActionCode.ACTION_RELOAD_SYN_CONF)
@@ -214,8 +214,10 @@ class SettingsActivity : ReturnableActivity() {
                                         }
                                     }
                                 }
-                    })
-            )
+                    },
+                    InputItem(title = "用户唤醒词", summary = "如果不想把你的唤醒词被当作命令，把他写到这里",
+                            keyId = R.string.key_user_wakeup_word)
+            ))
 //           ,SettingGroupItem(R.color.lime_600, titleId = R.string.text_animation, childItems = listOf(
 //                    CheckBoxItem(, "应用内动画",
 //                            R.string.key_voice_control_dialog, defaultValue = { true })

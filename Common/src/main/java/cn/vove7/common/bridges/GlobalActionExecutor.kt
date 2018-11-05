@@ -133,18 +133,17 @@ object GlobalActionExecutor : GlobalActionExecutorI {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N || mService == null) {
             return false
         }
-        val result = ResultBox(false).prepare()
-        val handler = Handler(Looper.myLooper())
+        val result = ResultBox(false)
         mService!!.dispatchGesture(description, object : AccessibilityService.GestureResultCallback() {
             override fun onCompleted(gestureDescription: GestureDescription) {
-                result.setAndQuit(true)
+                result.setAndNotify(true)
             }
 
             override fun onCancelled(gestureDescription: GestureDescription) {
-                result.setAndQuit(false)
+                result.setAndNotify(false)
             }
-        }, handler)
-        return result.loopGet() ?: false
+        },null)
+        return result.blockedGet() ?: false
     }
 
     @RequiresApi(api = Build.VERSION_CODES.N)

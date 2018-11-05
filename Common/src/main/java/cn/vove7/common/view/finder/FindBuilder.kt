@@ -5,6 +5,8 @@ import android.graphics.Rect
 import cn.vove7.common.accessibility.AccessibilityApi
 import cn.vove7.common.accessibility.viewnode.ViewNode
 import cn.vove7.common.accessibility.viewnode.ViewOperation
+import cn.vove7.vtp.log.Vog
+import java.lang.Thread.sleep
 
 /**
  * # FindBuilder
@@ -38,6 +40,33 @@ open class FindBuilder : ViewOperation {
         return finder?.findAll() ?: emptyArray()
     }
 
+    /**
+     * 默认10s等待时间
+     * @return Boolean
+     */
+    fun waitHide(): Boolean {
+        return waitHide(10000)
+    }
+
+    /**
+     * 等待消失
+     * @param waitMs max 60s
+     * @return Boolean false 超时 true 消失
+     */
+    fun waitHide(waitMs: Int): Boolean {
+        val enterTime = System.currentTimeMillis()
+        var now: Long
+        while (findFirst() != null) {
+            now = System.currentTimeMillis()
+            if (now < enterTime + waitMs)
+                sleep(100)
+            else {
+                Vog.d(this, "waitHide ---> 等待超时")
+                return false
+            }
+        }
+        return true
+    }
 
     override fun tryClick(): Boolean {
         val node = findFirst()

@@ -314,4 +314,5 @@
     <string name="key_finish_word" translatable="false">finish_word</string>
     <string name="key_exec_failed_voice_feedback" translatable="false">exec_failed_voice_feedback</string>
     <string name="key_exec_succ_feedback" translatable="false">exec_succ_feedback</string>
+    <string name="key_user_wakeup_word" translatable="false">user_wakeup_word</string>
 </resources>

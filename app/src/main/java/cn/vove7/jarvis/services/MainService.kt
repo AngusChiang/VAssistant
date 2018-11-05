@@ -128,6 +128,7 @@ class MainService : BusService(),
         loadSpeechService()
         loadChatSystem()
         cExecutor = MultiExecutorEngine()
+        GlobalApp.toastShort("启动完成")
     }
 
     private fun loadSpeechService() {
@@ -597,7 +598,7 @@ class MainService : BusService(),
             //打开手电筒、关闭手电筒
             "打开手电筒", "打开电灯" -> SystemBridge.openFlashlight()
             "关闭手电筒", "关闭电灯" -> SystemBridge.closeFlashlight()
-            "你好小V", "你好小v", "小V同学", "小v同学" -> { //唤醒词
+            "你好小V", "你好小v", "小V同学", "小v同学", AppConfig.userWakeupWord -> { //唤醒词
                 return false
             }
             else -> {//"截屏分享", "文字提取" 等命令

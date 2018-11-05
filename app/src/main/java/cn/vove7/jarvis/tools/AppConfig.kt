@@ -68,6 +68,7 @@ object AppConfig {
     var openChatSystem = true
     var autoSleepWakeupMillis: Long = 30 * 60 * 1000
     var chatSystem: String = ""
+    var userWakeupWord: String = ""//用户唤醒词
     var continuousDialogue = false//连续对话
     var finishWord: String? = null
     //    var resumeMusic = true//继续播放
@@ -165,7 +166,7 @@ object AppConfig {
         execSuccessFeedback = getBooleanAndInit(R.string.key_exec_failed_voice_feedback, true)
         finishWord = sp.getString(R.string.key_finish_word)
 //        onlyCloudServiceParse = getBooleanAndInit(R.string.key_only_cloud_service_parse, false)
-
+        userWakeupWord = sp.getString(R.string.key_user_wakeup_word) ?: ""
         synStreamIndex = sp.getString(R.string.key_stream_of_syn_output).let {
             Vog.d(this, "reload ---> $it")
             if (it == null) 0

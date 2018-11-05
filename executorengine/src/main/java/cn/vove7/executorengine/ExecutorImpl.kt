@@ -145,6 +145,7 @@ open class ExecutorImpl(
     }
 
     override fun runScript(script: String, args: Array<String>?): PartialResult {
+        Vog.d(this, "runScript arg : ${Arrays.toString(args)}")
         return when (currentAction?.scriptType) {
             SCRIPT_TYPE_LUA -> {
                 onLuaExec(script, args)
@@ -176,8 +177,8 @@ open class ExecutorImpl(
     override fun interrupt() {
         if (thread != null) {
             try {
-                thread!!.checkAccess()
-                thread!!.interrupt()
+                thread?.checkAccess()
+                thread?.interrupt()
             } catch (e: Exception) {
                 e.printStackTrace()
             }

@@ -63,13 +63,11 @@ class MultiExecutorEngine : ExecutorImpl() {
 //        }
         val script = RegUtils.replaceLuaHeader(src)
         return try {
-            Vog.d(this, "runScript arg : ${Arrays.toString(args)}")
-            luaHelper!!.evalString(script, args)
-            luaHelper!!.handleMessage(OnPrint.INFO, "主线程执行完毕\n")
+            luaHelper?.evalString(script, args)
+            luaHelper?.handleMessage(OnPrint.INFO, "主线程执行完毕\n")
             PartialResult.success()
         } catch (e: Exception) {
-            GlobalLog.err(e)
-            luaHelper!!.handleError(e)
+            luaHelper?.handleError(e)
             PartialResult.fatal(e.message ?: "no message")
         }
     }
