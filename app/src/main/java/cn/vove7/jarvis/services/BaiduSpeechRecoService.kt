@@ -26,7 +26,6 @@ import com.baidu.speech.asr.SpeechConstant
 import com.google.gson.Gson
 import com.google.gson.annotations.SerializedName
 import java.lang.Thread.sleep
-import kotlin.concurrent.thread
 
 /**
  * 百度语音识别服务
@@ -85,11 +84,22 @@ class BaiduSpeechRecoService(event: SpeechEvent) : SpeechRecoService(event) {
     }
 
     override fun startWakeUp() {
+        GlobalApp.toastShort("语音唤醒开启")
+        startWakeUpSilently()
+    }
+
+    override fun startWakeUpSilently(resetTimer: Boolean) {
         wakeupI.start()
-        startAutoSleepWakeUp()
+        if (resetTimer)
+            startAutoSleepWakeUp()
     }
 
     override fun stopWakeUp() {
+        GlobalApp.toastShort("语音唤醒关闭")
+        stopWakeUpSilently()
+    }
+
+    override fun stopWakeUpSilently() {
         stopAutoSleepWakeup()
         wakeupI.stop()
     }

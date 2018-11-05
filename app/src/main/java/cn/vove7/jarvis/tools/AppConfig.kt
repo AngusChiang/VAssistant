@@ -2,7 +2,6 @@ package cn.vove7.jarvis.tools
 
 import android.content.Context
 import android.os.Build
-import android.os.Looper
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.model.UserInfo
@@ -76,6 +75,9 @@ object AppConfig {
     var useAssistService = false//助手服务
     var execFailedVoiceFeedback = true//执行失败语音反馈
     var execSuccessFeedback = true//执行成功反馈
+    var fixVoiceMico = true//唤醒冲突
+    var notifyCloseMico = true//唤醒冲突
+
     fun init(context: Context) {
         val storeFileName = "wdasfd"
         val keyPrefix = ""
@@ -164,6 +166,8 @@ object AppConfig {
         useAssistService = getBooleanAndInit(R.string.key_use_assist_service, useAssistService)
         execFailedVoiceFeedback = getBooleanAndInit(R.string.key_exec_failed_voice_feedback, true)
         execSuccessFeedback = getBooleanAndInit(R.string.key_exec_failed_voice_feedback, true)
+        fixVoiceMico = getBooleanAndInit(R.string.key_fix_voice_micro, true)
+        notifyCloseMico = getBooleanAndInit(R.string.key_close_wakeup_notification, true)
         finishWord = sp.getString(R.string.key_finish_word)
 //        onlyCloudServiceParse = getBooleanAndInit(R.string.key_only_cloud_service_parse, false)
         userWakeupWord = sp.getString(R.string.key_user_wakeup_word) ?: ""

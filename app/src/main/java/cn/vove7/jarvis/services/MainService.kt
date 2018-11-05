@@ -20,8 +20,10 @@ import cn.vove7.common.appbus.AppBus.EVENT_START_DEBUG_SERVER
 import cn.vove7.common.appbus.AppBus.EVENT_STOP_DEBUG_SERVER
 import cn.vove7.common.appbus.AppBus.ORDER_CANCEL_RECO
 import cn.vove7.common.appbus.AppBus.ORDER_START_RECO
+import cn.vove7.common.appbus.AppBus.ORDER_START_VOICE_WAKEUP_WITHOUT_NOTIFY
 import cn.vove7.common.appbus.AppBus.ORDER_STOP_EXEC
 import cn.vove7.common.appbus.AppBus.ORDER_STOP_RECO
+import cn.vove7.common.appbus.AppBus.ORDER_STOP_VOICE_WAKEUP_WITHOUT_NOTIFY
 import cn.vove7.common.appbus.SpeechAction
 import cn.vove7.common.appbus.VoiceData
 import cn.vove7.common.bridges.ChoiceData
@@ -98,7 +100,7 @@ class MainService : BusService(),
 
     private lateinit var chatSystem: ChatSystem
 
-    private lateinit var speechRecoService: SpeechRecoService
+    lateinit var speechRecoService: SpeechRecoService
     lateinit var speechSynService: SpeechSynService
 
     /**
@@ -457,6 +459,12 @@ class MainService : BusService(),
                 }
                 EVENT_FORCE_OFFLINE -> {
                     AppConfig.logout()
+                }
+                ORDER_START_VOICE_WAKEUP_WITHOUT_NOTIFY -> {//不重新计时
+                    speechRecoService.startWakeUpSilently(false)
+                }
+                ORDER_STOP_VOICE_WAKEUP_WITHOUT_NOTIFY -> {
+                    speechRecoService.stopWakeUpSilently()
                 }
                 EVENT_START_DEBUG_SERVER -> {
                     RemoteDebugServer.start()

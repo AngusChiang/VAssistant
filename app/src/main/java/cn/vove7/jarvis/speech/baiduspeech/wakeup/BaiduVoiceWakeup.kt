@@ -77,13 +77,11 @@ class BaiduVoiceWakeup(private val eventListener: EventListener) : WakeupI() {
         val json = JSONObject(params).toString()
         Vog.i(this, "wakeup params(反馈请带上此行日志):$json")
         wp?.send(SpeechConstant.WAKEUP_START, json, null, 0, 0)
-        GlobalApp.toastShort("语音唤醒开启")
     }
 
     override fun stop() {
         super.stop()
         if (wp == null) return
-        GlobalApp.toastShort("语音唤醒关闭")
         wp?.send(SpeechConstant.WAKEUP_STOP, null, null, 0, 0)
         release()
     }

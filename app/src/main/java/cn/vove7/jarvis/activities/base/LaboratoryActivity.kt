@@ -5,6 +5,7 @@ import cn.vove7.common.model.UserInfo
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.adapters.SettingsExpandableAdapter
 import cn.vove7.jarvis.plugins.AdKillerService
+import cn.vove7.jarvis.plugins.WakeUpListener
 import cn.vove7.jarvis.services.MainService
 import cn.vove7.jarvis.services.MyAccessibilityService
 import cn.vove7.jarvis.view.*
@@ -43,9 +44,9 @@ class LaboratoryActivity : ReturnableActivity() {
                         else getString(R.string.summary_not_vip_remove_ad), keyId = R.string.key_open_ad_block,
                                 defaultValue = { true }) { _, it ->
                             when (it as Boolean) {
-                                true -> MyAccessibilityService.registerEvent(AdKillerService)
+                                true -> MyAccessibilityService.registerPlugin(AdKillerService)
                                 false ->
-                                    MyAccessibilityService.unregisterEvent(AdKillerService)
+                                    MyAccessibilityService.unregisterPlugin(AdKillerService)
                             }
                             return@SwitchItem true
                         },
@@ -86,9 +87,22 @@ class LaboratoryActivity : ReturnableActivity() {
                                 keyId = R.string.key_reco_when_wakeup_assist, defaultValue = { false }
                         )
                 )),
-                SettingGroupItem(R.color.amber_A700,titleS = "结束词", childItems = listOf(
+                SettingGroupItem(R.color.amber_A700, titleS = "结束词", childItems = listOf(
                         InputItem(title = "设置结束词", summary = "在指令结尾可以快速结束聆听\n注意根据效果来设置结束词\n不使用，置空即可",
                                 keyId = R.string.key_finish_word)
+                )),
+                SettingGroupItem(R.color.yellow_700, titleS = "语音唤醒", childItems = listOf(
+                        SwitchItem(title = "自动释放麦克风", summary = "在已授予麦克风权限的其他App内自动关闭语音唤醒\n需要无障碍",
+                                keyId = R.string.key_fix_voice_micro, defaultValue = { true }) { _, b ->
+                            if (b as Boolean)
+                                WakeUpListener.register()
+                            else
+                                WakeUpListener.unregister()
+                            return@SwitchItem true
+                        },
+                        CheckBoxItem(title = "显示通知", summary = "关闭和打开时在状态栏显示通知",
+                                keyId = R.string.key_close_wakeup_notification, defaultValue = { true })
+
                 ))
         )
     }

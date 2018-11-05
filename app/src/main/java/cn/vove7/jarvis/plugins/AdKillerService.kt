@@ -32,7 +32,7 @@ import kotlin.concurrent.thread
  * 2018/9/3
  */
 object AdKillerService : AccPluginsService() {
-    //TO-DO fixed 猪八戒ad
+    //TO-DO fixed 猪八戒ad fixed
     private val removeAdAnimation: RemoveAdAnimation by lazy { RemoveAdAnimation() }
     /**
      * 缓存

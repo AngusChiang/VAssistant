@@ -11,6 +11,7 @@ import cn.vove7.vtp.app.AppInfo
 import cn.vove7.vtp.log.Vog
 import android.content.Intent
 import android.content.pm.ApplicationInfo
+import android.content.pm.PackageInfo.REQUESTED_PERMISSION_GRANTED
 import cn.vove7.common.app.GlobalApp
 import java.util.*
 
@@ -93,6 +94,37 @@ fun AppInfo.activities(): Array<String> {
 
 fun AppInfo.isUserApp(): Boolean {
     return (packageInfo.applicationInfo.flags and ApplicationInfo.FLAG_SYSTEM) == 0
+}
+
+fun AppInfo.hasGrantedPermission(p: String): Boolean {
+    val pm = GlobalApp.APP.packageManager
+
+    return (PackageManager.PERMISSION_GRANTED == pm.checkPermission(p, packageName)).also {
+        Vog.d(this, "hasPermission ---> $p $it")
+    }
+}
+//麦克风权限App缓存
+val microPermissionCache = hashMapOf<String, Boolean>()
+fun AppInfo.hasMicroPermission(): Boolean {
+    if (packageName == GlobalApp.APP.packageName) return false//排除自身
+    microPermissionCache[packageName]?.also {
+        Vog.d(this, "hasMicroPermission ---> $name 麦克风权限 $it")
+        //若无权限 再次检查（可能动态申请）
+        if (it) return true
+    }
+
+    val pm = GlobalApp.APP.packageManager
+    val pkgInfo = pm.getPackageInfo(packageName, PackageManager.GET_PERMISSIONS)
+    pkgInfo.requestedPermissions?.forEach {
+        if (it.endsWith(".RECORD_AUDIO") && hasGrantedPermission(it)) {
+            Vog.d(this, "hasMicroPermission ---> $name 授权麦克风权限")
+            microPermissionCache[packageName] = true
+            return true
+        }
+    }
+    Vog.d(this, "hasMicroPermission ---> $name 无麦克风权限")
+    microPermissionCache[packageName] = false
+    return false
 }
 
 private fun getHomes(context: Context): List<String> {

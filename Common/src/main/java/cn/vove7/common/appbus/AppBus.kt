@@ -19,6 +19,8 @@ object AppBus {
 
     const val ORDER_BEGIN_SCREEN_PICKER = "begin_screen_picker"
     const val ORDER_STOP_EXEC = "stop_exec"
+    const val ORDER_STOP_VOICE_WAKEUP_WITHOUT_NOTIFY = "stop_voice_wp_without_notify"
+    const val ORDER_START_VOICE_WAKEUP_WITHOUT_NOTIFY = "start_voice_wp_without_notify"
     const val ORDER_STOP_RECO = "stop_reco"
     const val ORDER_CANCEL_RECO = "cancel_reco"
     const val ORDER_START_RECO = "start_reco"

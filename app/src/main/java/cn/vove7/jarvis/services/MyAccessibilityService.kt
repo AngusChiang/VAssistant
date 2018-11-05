@@ -35,6 +35,7 @@ import cn.vove7.executorengine.bridges.SystemBridge
 import cn.vove7.executorengine.helper.AdvanAppHelper
 import cn.vove7.jarvis.plugins.AccPluginsService
 import cn.vove7.jarvis.plugins.AdKillerService
+import cn.vove7.jarvis.plugins.WakeUpListener
 import cn.vove7.jarvis.tools.AppConfig
 import cn.vove7.vtp.log.Vog
 import cn.vove7.vtp.system.SystemHelper
@@ -61,9 +62,12 @@ class MyAccessibilityService : AccessibilityApi() {
 
     private fun startPluginService() {
         thread {
-            registerEvent(activityNotifier)
+            registerPlugin(activityNotifier)
             if (AppConfig.isAdBlockService)
-                registerEvent(AdKillerService)
+                registerPlugin(AdKillerService)
+            if (AppConfig.fixVoiceMico) {
+                registerPlugin(WakeUpListener)
+            }
         }
     }
 
@@ -528,14 +532,18 @@ class MyAccessibilityService : AccessibilityApi() {
          */
         private val pluginsServices = mutableSetOf<PluginsService>()
 
-        fun registerEvent(e: PluginsService) {
+        /**
+         * 注册无障碍插件服务
+         * @param e PluginsService
+         */
+        fun registerPlugin(e: PluginsService) {
             synchronized(pluginsServices) {
                 pluginsServices.add(e)
                 e.bindService()
             }
         }
 
-        fun unregisterEvent(e: PluginsService) {
+        fun unregisterPlugin(e: PluginsService) {
             synchronized(pluginsServices) {
                 pluginsServices.remove(e)
                 e.unBindServer()

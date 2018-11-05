@@ -9,6 +9,9 @@ import android.support.annotation.CallSuper
  * 2018/11/4
  */
 abstract class WakeupI {
+    /**
+     * 唤醒开启状态
+     */
     abstract var opened: Boolean
 
     init {
