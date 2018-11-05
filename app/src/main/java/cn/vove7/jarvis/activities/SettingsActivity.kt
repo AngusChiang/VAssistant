@@ -167,12 +167,12 @@ class SettingsActivity : ReturnableActivity() {
                     SwitchItem(title = "按键唤醒",
                             keyId = R.string.key_long_press_volume_up_wake_up, summary = "可通过长按音量上键或耳机中键唤醒\n需要无障碍模式开启",
                             defaultValue = { true }),
-                    IntentItem(R.string.text_add_wakeup_shortcut_to_launcher, summary = "添加需要8.0+，" +
+                    IntentItem(R.string.text_add_wakeup_shortcut_to_launcher, summary = "添加需要8.0+" +
                             "7.1+可直接在桌面长按图标使用Shortcut快捷唤醒") {
                         ShortcutUtil.addWakeUpPinShortcut()
                     },
                     CheckBoxItem(R.string.text_auto_open_voice_wakeup_charging, keyId = R.string.key_auto_open_voice_wakeup_charging) { _, b ->
-                        if (PowerEventReceiver.isCharging && PowerEventReceiver.open) {//充电中生效
+                        if (PowerEventReceiver.isCharging) {//充电中生效
                             if (b as Boolean) {//正在充电，开启
                                 AppBus.postSpeechAction(SpeechAction.ActionCode.ACTION_START_WAKEUP_WITHOUT_SWITCH)
                             } else {

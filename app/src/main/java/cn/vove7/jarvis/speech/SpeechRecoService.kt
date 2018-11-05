@@ -23,6 +23,8 @@ import cn.vove7.vtp.log.Vog
 abstract class SpeechRecoService(val event: SpeechEvent) : SpeechRecoI {
     val context: Context
         get() = GlobalApp.APP
+    //定时器关闭标志
+    override var timerEnd: Boolean = false
 
     abstract var enableOffline: Boolean
 
@@ -46,10 +48,11 @@ abstract class SpeechRecoService(val event: SpeechEvent) : SpeechRecoI {
      * 定时关闭语音唤醒任务
      */
     private val stopWakeUpTimer = Runnable {
+        timerEnd = true
         stopWakeUp()
     }
 
-    private val timerHandler: Handler by lazy {
+    val timerHandler: Handler by lazy {
         val t = HandlerThread("auto_sleep")
         t.start()
         Handler(t.looper)
@@ -59,13 +62,17 @@ abstract class SpeechRecoService(val event: SpeechEvent) : SpeechRecoI {
      * 开启定时关闭
      * 重启定时器
      */
-    fun startAutoSleepWakeUp() {
-        if (PowerEventReceiver.isCharging) return
+    fun startAutoSleepWakeup() {
+        timerEnd = false
+        if (PowerEventReceiver.isCharging){
+            Vog.d(this,"startAutoSleepWakeup ---> 充电中")
+            return
+        }
         stopAutoSleepWakeup()
-        Vog.d(this, "startAutoSleepWakeUp ---> 开启自动休眠")
-        timerHandler.postDelayed(stopWakeUpTimer,
-                if (BuildConfig.DEBUG) 15000
-                else AppConfig.autoSleepWakeupMillis)
+        val sleepTime = if (BuildConfig.DEBUG) 15000
+        else AppConfig.autoSleepWakeupMillis
+        Vog.d(this, "startAutoSleepWakeup ---> 开启自动休眠 $sleepTime")
+        timerHandler.postDelayed(stopWakeUpTimer, sleepTime)
     }
 
     //关闭定时器
@@ -84,7 +91,7 @@ abstract class SpeechRecoService(val event: SpeechEvent) : SpeechRecoI {
             when (msg?.what) {
                 IStatus.CODE_WAKEUP_SUCCESS -> {//唤醒
                     val word = msg.data.getString("data")
-                    startAutoSleepWakeUp()//重新倒计时
+                    startAutoSleepWakeup()//重新倒计时
                     if (!event.onWakeup(word))
                         return
 //                    AppBus.postVoiceData(VoiceData(msg.what, word))
@@ -121,10 +128,11 @@ abstract class SpeechRecoService(val event: SpeechEvent) : SpeechRecoI {
 
 interface SpeechRecoI {
     val wakeupI: WakeupI
+    var timerEnd: Boolean
     fun startRecog()
     fun cancelRecog(notify: Boolean = true)
     fun startWakeUp()
-    fun startWakeUpSilently(resetTimer: Boolean = false)
+    fun startWakeUpSilently(resetTimer: Boolean = true)
     fun stopWakeUp()
     fun stopWakeUpSilently()
     fun release()

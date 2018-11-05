@@ -403,7 +403,7 @@ class MainService : BusService(),
                 speechRecoService.stopAutoSleepWakeup()
             }
             SpeechAction.ActionCode.ACTION_START_WAKEUP_TIMER -> {
-                speechRecoService.startAutoSleepWakeUp()
+                speechRecoService.startAutoSleepWakeup()
             }
             else -> {
                 Vog.e(this, sAction)

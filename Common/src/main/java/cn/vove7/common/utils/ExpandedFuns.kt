@@ -74,21 +74,23 @@ fun AppInfo.isHomeApp(): Boolean {
 
 val appActivityCache = hashMapOf<String, Array<String>>()
 fun AppInfo.activities(): Array<String> {
-    appActivityCache[packageName]?.let {
-        return it
-    }
-
-    val pm = GlobalApp.APP.packageManager
-    val pkgInfo = pm.getPackageInfo(packageName, PackageManager.GET_ACTIVITIES)
-    val acs = pkgInfo.activities
-    val rList = mutableListOf<String>()
-    acs?.forEach { ac ->
-        ac.name?.also {
-            rList.add(it)
+    synchronized(AppInfo::class) {
+        appActivityCache[packageName]?.let {
+            return it
         }
-    }
-    return rList.toTypedArray().also {
-        appActivityCache[packageName] = it
+
+        val pm = GlobalApp.APP.packageManager
+        val pkgInfo = pm.getPackageInfo(packageName, PackageManager.GET_ACTIVITIES)
+        val acs = pkgInfo.activities
+        val rList = mutableListOf<String>()
+        acs?.forEach { ac ->
+            ac.name?.also {
+                rList.add(it)
+            }
+        }
+        return rList.toTypedArray().also {
+            appActivityCache[packageName] = it
+        }
     }
 }
 

@@ -13,8 +13,9 @@ import kotlin.concurrent.thread
 object AppInstallReceiver : DyBCReceiver() {
     override val intentFilter: IntentFilter by lazy {
         val i = IntentFilter()
-        i.addAction(Intent.ACTION_POWER_CONNECTED)
-        i.addAction(Intent.ACTION_POWER_DISCONNECTED)
+        i.addAction(Intent.ACTION_PACKAGE_ADDED)
+        i.addAction(Intent.ACTION_PACKAGE_REMOVED)
+        i.addAction(Intent.ACTION_PACKAGE_REPLACED)
         i
     }
 

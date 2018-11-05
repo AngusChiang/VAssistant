@@ -90,17 +90,17 @@ class BaiduSpeechRecoService(event: SpeechEvent) : SpeechRecoService(event) {
 
     override fun startWakeUpSilently(resetTimer: Boolean) {
         wakeupI.start()
-        if (resetTimer)
-            startAutoSleepWakeUp()
+        if (resetTimer || timerEnd)//定时器结束
+            startAutoSleepWakeup()
     }
 
     override fun stopWakeUp() {
         GlobalApp.toastShort("语音唤醒关闭")
         stopWakeUpSilently()
+        stopAutoSleepWakeup()
     }
 
     override fun stopWakeUpSilently() {
-        stopAutoSleepWakeup()
         wakeupI.stop()
     }
 

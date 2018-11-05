@@ -52,10 +52,10 @@ class ViewFinderWithMultiCondition(accessibilityService: AccessibilityApi) : Vie
      * @return ViewNode?
      */
     fun findByDepths(): ViewNode? {
-        var p = accessibilityService.rootInActiveWindow
+        var p: AccessibilityNodeInfo? = rootNode ?: return null
         depths.forEach {
             try {
-                p = p.getChild(it)
+                p = p?.getChild(it)
             } catch (e: ArrayIndexOutOfBoundsException) {
                 Vog.d(this, "findByDepths ---> ArrayIndexOutOfBounds null")
                 return null
@@ -64,14 +64,17 @@ class ViewFinderWithMultiCondition(accessibilityService: AccessibilityApi) : Vie
                 return null
             }
         }
+        if (p == null) return null
+
+        val pp = p!!
         return if (typeNames.isNotEmpty()) {
-            if ("${p.className}".contains(typeNames[0], ignoreCase = true))
-                ViewNode(p)
+            if ("${pp.className}".contains(typeNames[0], ignoreCase = true))
+                ViewNode(pp)
             else {
                 Vog.e(this, "findByDepths ---> typeNames not match")
                 null
             }
-        } else ViewNode(p)
+        } else ViewNode(pp)
     }
 
     /**

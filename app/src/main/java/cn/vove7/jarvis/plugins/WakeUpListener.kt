@@ -28,10 +28,14 @@ object WakeUpListener : AccPluginsService() {
 
 
     override fun onUiUpdate(root: AccessibilityNodeInfo?) {}
+
+    //是否关闭唤醒 by WakeUpListener
     var closed = false
+
     override fun onAppChanged(appScope: ActionScope) {//
         val appInfo = AdvanAppHelper.getAppInfo(appScope.packageName) ?: return
         if (appInfo.hasMicroPermission()) {//有麦克风权限的App
+            //case 1 进入App 自动休眠 ->  ORDER_STOP_VOICE_WAKEUP_WITHOUT_NOTIFY
             //wakeupI?.opened开启时，在内关闭唤醒
             if (MainService.instance?.speechRecoService?.wakeupI?.opened == true) {
                 MainService.instance?.onCommand(AppBus.ORDER_STOP_VOICE_WAKEUP_WITHOUT_NOTIFY)
@@ -41,7 +45,7 @@ object WakeUpListener : AccPluginsService() {
                     statusAni.failed(2000)
                 }
             }
-        } else if (closed) {//已自动关闭
+        } else if (closed && MainService.instance?.speechRecoService?.timerEnd == false) {//已自动关闭 并且定时器有效
             Vog.d(this, "WakeUpListener ---> 开启语音唤醒")
             closed = false
 
@@ -55,6 +59,7 @@ object WakeUpListener : AccPluginsService() {
 
     /**
      * 充电/亮屏自动开启唤醒 前 判断当前App
+     *
      * @return Boolean
      */
     fun canOpenRecord(): Boolean {
@@ -63,7 +68,11 @@ object WakeUpListener : AccPluginsService() {
             if (!AppConfig.fixVoiceMico || !it.hasMicroPermission()) {
                 true
             } else {
-                Vog.d(this, "canOpenRecord ---> 在有麦克风权限的App内")
+                if (opened) {//通知 开启定时器
+                    AppBus.postSpeechAction(SpeechAction.ActionCode.ACTION_START_WAKEUP_TIMER)
+                    closed = true //设置标志
+                }
+                Vog.d(this, "canOpenRecord ---> 在有麦克风权限的App内/不打开唤醒")
                 false
             }
         } ?: true

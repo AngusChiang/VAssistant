@@ -9,9 +9,17 @@ import cn.vove7.vtp.log.Vog
  * 查找符合条件的AccessibilityNodeInfo
  */
 abstract class ViewFinder(var accessibilityService: AccessibilityApi) {
+    val rootNode: AccessibilityNodeInfo?
+        get() {
+            return try {
+                accessibilityService.rootInActiveWindow
+            } catch (e: Exception) {
+                null
+            }
+        }
 
     open fun findFirst(): ViewNode? {
-        val r = traverseAllNode(accessibilityService.rootInActiveWindow)
+        val r = traverseAllNode(rootNode)
         Vog.i(this, "findFirst ${r != null}")
         return r
     }
@@ -24,7 +32,7 @@ abstract class ViewFinder(var accessibilityService: AccessibilityApi) {
 
     fun findAll(): Array<ViewNode> {
         list.clear()
-        traverseAllNode(accessibilityService.rootInActiveWindow, true)
+        traverseAllNode(rootNode, true)
         val l = mutableListOf<ViewNode>()
         l.addAll(list)
         return l.toTypedArray()
@@ -44,7 +52,7 @@ abstract class ViewFinder(var accessibilityService: AccessibilityApi) {
             val childNode = node.getChild(index)
             if (childNode != null) {
                 if (!childNode.isVisibleToUser) {//TODO check it
-                    Vog.d(this,"unVisibleToUser ---> ${childNode.text}")
+                    Vog.d(this, "unVisibleToUser ---> ${childNode.text}")
                     return@forEach
                 }
                 if (findCondition(childNode)) {
