@@ -580,9 +580,24 @@ class MainService : BusService(),
         return resources.displayMetrics.heightPixels
     }
 
-
+    /**
+     * 解析唤醒词
+     * @param w String
+     * @return Boolean 是否继续识别
+     */
     fun parseWakeUpCommand(w: String): Boolean {
+        if (recoIsListening) {
+            Vog.d(this, "parseWakeUpCommand ---> 正在识别")
+            return true
+        }
         when (w) {
+            "你好小V", "你好小v", "小V同学", "小v同学" -> { //唤醒词
+                return false
+            }
+            in AppConfig.userWakeupWord.split('#') -> { //用户唤醒词
+                Vog.d(this, "parseWakeUpCommand ---> 用户唤醒词")
+                return false
+            }
             "增大音量" -> {
                 SystemBridge.volumeUp()
             }
@@ -598,13 +613,11 @@ class MainService : BusService(),
             //打开手电筒、关闭手电筒
             "打开手电筒", "打开电灯" -> SystemBridge.openFlashlight()
             "关闭手电筒", "关闭电灯" -> SystemBridge.closeFlashlight()
-            "你好小V", "你好小v", "小V同学", "小v同学", AppConfig.userWakeupWord -> { //唤醒词
-                return false
-            }
             else -> {//"截屏分享", "文字提取" 等命令
-                onParseCommand(w)
+                thread {
+                    onParseCommand(w)
+                }
             }
-
         }
         return true
     }

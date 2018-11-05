@@ -146,17 +146,6 @@ class BaiduSpeechRecoService(event: SpeechEvent) : SpeechRecoService(event) {
 
 //    private val backTrackInMs = 1500
 
-    class OffWord(//离线词
-            @SerializedName("contact_name")
-            val contactName: Array<String>
-            , @SerializedName("appname")
-            val appName: Array<String>
-    ) {
-        override fun toString(): String {
-            return Gson().toJson(this)
-        }
-    }
-
     override fun startRecog() {//检查权限
         if (ActivityCompat.checkSelfPermission(AdvanContactHelper.context,
                         android.Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
@@ -207,6 +196,17 @@ class BaiduSpeechRecoService(event: SpeechEvent) : SpeechRecoService(event) {
     override fun release() {
         myRecognizer.release()
         wakeupI.stop()
+    }
+
+    class OffWord(//离线词
+            @SerializedName("contact_name")
+            val contactName: Array<String>
+            , @SerializedName("appname")
+            val appName: Array<String>
+    ) {
+        override fun toString(): String {
+            return Gson().toJson(this)
+        }
     }
 
 }

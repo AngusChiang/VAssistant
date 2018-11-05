@@ -102,7 +102,6 @@ class MyAccessibilityService : AccessibilityApi() {
                 return
             } else currentAppInfo = it
         }
-        currentActivity = activityName
         Vog.d(this, "updateCurrentApp ---> $pkg")
         Vog.d(this, "updateCurrentApp ---> $activityName")
         currentScope.activity = activityName

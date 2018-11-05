@@ -27,8 +27,12 @@ class UpdateLogDialog(context: Context, onDismiss: (() -> Unit)? = null) {
 
     private val logs: List<Pair<String, String>>
         get() = listOf(
+                Pair("1.2.10","支持多个用户唤醒词\n" +
+                        "修复识别时仍能使用唤醒词唤醒问题\n" +
+                        "修复开启无障碍崩溃问题"),
                 Pair("1.2.9","加入用户唤醒词\n" +
-                        "添加标志runtime.userInterrupt"),
+                        "添加标志runtime.userInterrupt\n" +
+                        "优化当前App/Activity判断"),
                 Pair("1.2.8", "- 数据更新方式换为增量更新\n" +
                         "- 支持网页内文字提取\n" +
                         "- 支持语音唤醒后无间断说出命令（响应词打开则无效）\n" +

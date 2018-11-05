@@ -78,11 +78,11 @@ open class ExecutorImpl(
     override fun isGlobal(): Boolean =
         globalScopeType.contains(actionScope)
 
-    override var currentActivity: String = ""
+    override var currentActivity: String? = null
         get() {
             val r = checkAccessibilityService(false)
             return if (r) {
-                accessApi?.currentActivity ?: ""
+                accessApi?.currentActivity
             } else {
                 ""
             }

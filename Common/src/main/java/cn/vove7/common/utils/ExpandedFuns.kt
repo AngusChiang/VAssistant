@@ -73,22 +73,20 @@ fun AppInfo.isHomeApp(): Boolean {
 
 val appActivityCache = hashMapOf<String, Array<String>>()
 fun AppInfo.activities(): Array<String> {
-    appActivityCache[packageName].let {
-        if (it != null) return it
+    appActivityCache[packageName]?.let {
+        return it
     }
 
     val pm = GlobalApp.APP.packageManager
     val pkgInfo = pm.getPackageInfo(packageName, PackageManager.GET_ACTIVITIES)
     val acs = pkgInfo.activities
     val rList = mutableListOf<String>()
-    acs.forEach { ac ->
-        ac.name.also {
-            if (it != null)
-                rList.add(it)
+    acs?.forEach { ac ->
+        ac.name?.also {
+            rList.add(it)
         }
     }
     return rList.toTypedArray().also {
-        Vog.d(this, "activities ---> ${Arrays.toString(it)}")
         appActivityCache[packageName] = it
     }
 }
@@ -104,9 +102,9 @@ private fun getHomes(context: Context): List<String> {
     intent.addCategory(Intent.CATEGORY_HOME)
     val resolveInfo = packageManager.queryIntentActivities(intent,
             PackageManager.MATCH_DEFAULT_ONLY)
-    for (ri in resolveInfo) {
-        homeAppPkgs.add(ri.activityInfo.packageName)
-        Vog.d("", "桌面应用 ---> ${ri.activityInfo.packageName}")
+    resolveInfo?.forEach {
+        homeAppPkgs.add(it.activityInfo.packageName)
+        Vog.d("", "桌面应用 ---> ${it.activityInfo.packageName}")
     }
     return homeAppPkgs
 }

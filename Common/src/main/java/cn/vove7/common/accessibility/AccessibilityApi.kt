@@ -20,8 +20,8 @@ abstract class AccessibilityApi : AccessibilityService(),
     abstract fun getService(): AccessibilityService
 
     val currentScope = ActionScope()
-    var currentActivity: String = ""
-        protected set
+    var currentActivity: String? = null
+        private set
         get() = currentScope.activity
 
     override fun onCreate() {

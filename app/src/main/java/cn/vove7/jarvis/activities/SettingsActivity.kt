@@ -215,7 +215,7 @@ class SettingsActivity : ReturnableActivity() {
                                     }
                                 }
                     },
-                    InputItem(title = "用户唤醒词", summary = "如果不想把你的唤醒词被当作命令，把他写到这里",
+                    InputItem(title = "用户唤醒词", summary = "如果不想把你的唤醒词被当作命令，把他写到这里\n多个词以'#'隔开",
                             keyId = R.string.key_user_wakeup_word)
             ))
 //           ,SettingGroupItem(R.color.lime_600, titleId = R.string.text_animation, childItems = listOf(

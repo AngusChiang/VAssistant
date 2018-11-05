@@ -58,10 +58,16 @@ object CrashHandler : Thread.UncaughtExceptionHandler {
             val lastCrashTime = sp.getLong("last_crash_time")
             val now = System.currentTimeMillis()
             sp.set("last_crash_time", now)
+            sp.set("last_crash_data", SimpleDateFormat("yyyy-MM-dd HH:mm:ss",
+                    Locale.getDefault()).format(Date()))
             if (now > lastCrashTime + 60 * 1000) {//restart
                 val intent = Intent(context, CrashInfoActivity::class.java)
                 intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
                 context.startActivity(intent)
+            }
+            try {
+                sleep(2000)
+            } catch (e: Exception) {
             }
             Process.killProcess(Process.myPid())
 //            System.exit(0)// 关闭已奔溃的app进程
@@ -90,13 +96,13 @@ object CrashHandler : Thread.UncaughtExceptionHandler {
             pw.println(log)
             pw.close()
             if (!BuildConfig.DEBUG)
-                NetHelper.postJson<Any>(ApiUrls.CRASH_HANDLER, BaseRequestModel(File(errFile).readText())) { _, _ -> }
+                NetHelper.postJson<Any>(ApiUrls.CRASH_HANDLER, BaseRequestModel(File(errFile).readText()))
         } catch (e1: Exception) {//文件读写
             //
             Toast.makeText(context, "写入错误记录失败，请给予读写存储权限", Toast.LENGTH_SHORT).show()
             if (!BuildConfig.DEBUG)
                 NetHelper.postJson<Any>(ApiUrls.CRASH_HANDLER,
-                        BaseRequestModel(headerInfo + e.message + log + "\n\n写入失败${e1.message}")) { _, _ -> }
+                        BaseRequestModel(headerInfo + e.message + log + "\n\n写入失败${e1.message}"))
         }
 
         return true

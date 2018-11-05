@@ -76,7 +76,7 @@ abstract class SpeechRecoService(val event: SpeechEvent) : SpeechRecoI {
 
 
     /**
-     * 事件分发[中枢]
+     * 语音事件分发[中枢]
      * @constructor
      */
     inner class RecoHandler(looper: Looper) : Handler(looper) {
@@ -111,6 +111,7 @@ abstract class SpeechRecoService(val event: SpeechEvent) : SpeechRecoI {
                 IStatus.CODE_VOICE_RESULT -> {//结果
                     val result = msg.data.getString("data") ?: "null"
                     event.onResult(result)
+                    isListening = false
 //                    AppBus.postVoiceData(VoiceData(msg.what, result))
                 }
             }
