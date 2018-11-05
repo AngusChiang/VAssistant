@@ -1,8 +1,5 @@
 package cn.vove7.jarvis.services
 
-import android.annotation.SuppressLint
-import android.content.Context
-import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.app.GlobalLog
 import cn.vove7.jarvis.speech.SpeechSynthesizerI
 import cn.vove7.jarvis.speech.baiduspeech.synthesis.control.BaiduSynthesizer
