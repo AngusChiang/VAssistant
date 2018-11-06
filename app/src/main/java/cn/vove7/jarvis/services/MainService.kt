@@ -336,7 +336,7 @@ class MainService : BusService(),
         Vog.d(this, "开始执行 -> $tag")
 //        listeningToast.showAndHideDelay("开始执行")
         executeAnimation.begin()
-        executeAnimation.setContent(tag)
+        executeAnimation.show(tag)
     }
 
     /**
@@ -728,7 +728,7 @@ class MainService : BusService(),
 
         override fun onTempResult(temp: String) {
             listeningToast.show(temp)
-            listeningAni.setContent(temp)
+            listeningAni.show(temp)
             AppConfig.finishWord.also {
                 if (it != null && it != "") {
                     if (temp.endsWith(it)) {

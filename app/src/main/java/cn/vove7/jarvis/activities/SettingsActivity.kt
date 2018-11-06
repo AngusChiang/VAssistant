@@ -100,12 +100,12 @@ class SettingsActivity : ReturnableActivity() {
             SettingGroupItem(R.color.google_green, "反馈", childItems = listOf(
                     SwitchItem(R.string.text_vibrate_reco_begin,
                             keyId = R.string.key_vibrate_reco_begin, defaultValue = { true }),
-                    SwitchItem(title = "执行失败", keyId = R.string.key_exec_failed_voice_feedback,
+                    CheckBoxItem(title = "执行失败", keyId = R.string.key_exec_failed_voice_feedback,
                             summary = "失败时的语音反馈",
                             defaultValue = { AppConfig.execFailedVoiceFeedback }),
-                    SwitchItem(title = "执行成功", keyId = R.string.key_exec_succ_feedback,
-                            summary = "失败时状态栏效果反馈",
-                            defaultValue = { AppConfig.execFailedVoiceFeedback })
+                    CheckBoxItem(title = "执行结束", keyId = R.string.key_exec_succ_feedback,
+                            summary = "结束时状态栏效果反馈",
+                            defaultValue = { AppConfig.execSuccessFeedback })
             )),
             SettingGroupItem(R.color.indigo_700, "响应词", childItems = listOf(
                     SwitchItem(title = "开启", summary = "开始识别前，响应词反馈", keyId = R.string.key_open_response_word,

@@ -42,6 +42,7 @@ class WakeupEventAdapter(private val listener: IWakeupListener) : EventListener 
             }
             SpeechConstant.CALLBACK_EVENT_WAKEUP_AUDIO -> {
                 // 音频回调
+                Vog.d(this,"onEvent ---> $params")
                 listener.onASrAudio(data, offset, length)
             }
             CALLBACK_EVENT_WAKEUP_STARTED ->{

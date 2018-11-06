@@ -20,6 +20,9 @@ import cn.vove7.jarvis.speech.baiduspeech.wakeup.BaiduVoiceWakeup
 import cn.vove7.jarvis.speech.baiduspeech.wakeup.RecogWakeupListener
 import cn.vove7.jarvis.speech.baiduspeech.wakeup.WakeupEventAdapter
 import cn.vove7.jarvis.tools.AppConfig
+import cn.vove7.jarvis.view.statusbar.MicroToggleAnimation
+import cn.vove7.jarvis.view.statusbar.StatusAnimation
+import cn.vove7.jarvis.view.statusbar.WakeupStatusAnimation
 import cn.vove7.vtp.log.Vog
 import cn.vove7.vtp.runtimepermission.PermissionUtils
 import com.baidu.speech.asr.SpeechConstant
@@ -37,10 +40,11 @@ class BaiduSpeechRecoService(event: SpeechEvent) : SpeechRecoService(event) {
      */
     private lateinit var myRecognizer: MyRecognizer
     override val wakeupI: WakeupI by lazy { BaiduVoiceWakeup(WakeupEventAdapter(RecogWakeupListener(handler))) }
-//    /**
+    //    /**
 //     * 唤醒器
 //     */
 //    var wakeuper= BaiduVoiceWakeup()
+    private val wakeupStatusAni: StatusAnimation by lazy { WakeupStatusAnimation() }
 
     /*
  * 本Activity中是否需要调用离线命令词功能。根据此参数，判断是否需要调用SDK的ASR_KWS_LOAD_ENGINE事件
@@ -84,7 +88,7 @@ class BaiduSpeechRecoService(event: SpeechEvent) : SpeechRecoService(event) {
     }
 
     override fun startWakeUp() {
-        GlobalApp.toastShort("语音唤醒开启")
+        wakeupStatusAni.showAndHideDelay("语音唤醒开启")
         startWakeUpSilently()
     }
 
@@ -95,7 +99,7 @@ class BaiduSpeechRecoService(event: SpeechEvent) : SpeechRecoService(event) {
     }
 
     override fun stopWakeUp() {
-        GlobalApp.toastShort("语音唤醒关闭")
+        wakeupStatusAni.failed("语音唤醒关闭")
         stopWakeUpSilently()
         stopAutoSleepWakeup()
     }

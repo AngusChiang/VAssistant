@@ -19,10 +19,10 @@ import kotlin.concurrent.thread
  * @author 17719247306
  * 2018/9/2
  */
-private val nId = 127
 
 abstract class StatusAnimation {
 
+    open val nId = 127
     val c = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
         ChannelBuilder.with("StatusBarIcon", "IconAnimation", NotificationManagerCompat.IMPORTANCE_LOW).build()
     } else null
@@ -41,8 +41,17 @@ abstract class StatusAnimation {
         notifier.showNotification(nId, title, "", NotificationIcons(beginAniId))
     }
 
-    fun setContent(c: String) {
+    /**
+     * 显示内容
+     * @param c String message
+     */
+    fun show(c: String) {
         notifier.showNotification(nId, title, c, NotificationIcons(beginAniId))
+    }
+
+    fun showAndHideDelay(msg: String, delay: Long = 1500) {
+        show(msg)
+        hideDelay(delay)
     }
 
     /**
@@ -50,9 +59,9 @@ abstract class StatusAnimation {
      */
     open fun onFailed() {}
 
-    fun failed(delay: Long = 1500L) {
+    fun failed(msg:String?=null,delay: Long = 1500L) {
         hideThread?.interrupt()
-        notifier.showNotification(nId, title, "", NotificationIcons(failedAniId))
+        notifier.showNotification(nId, title, msg?:"", NotificationIcons(failedAniId))
         onFailed()
         hideDelay(delay)
     }

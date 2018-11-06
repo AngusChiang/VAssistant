@@ -23,8 +23,6 @@ class WakeUpResult {
 
         private val ERROR_NONE = 0
 
-        private val TAG = "WakeUpResult"
-
         fun parseJson(name: String, jsonStr: String): WakeUpResult {
             val result = WakeUpResult()
             result.origalJson = jsonStr

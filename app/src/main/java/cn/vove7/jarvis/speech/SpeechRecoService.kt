@@ -64,13 +64,12 @@ abstract class SpeechRecoService(val event: SpeechEvent) : SpeechRecoI {
      */
     fun startAutoSleepWakeup() {
         timerEnd = false
-        if (PowerEventReceiver.isCharging){
-            Vog.d(this,"startAutoSleepWakeup ---> 充电中")
+        if (PowerEventReceiver.isCharging) {
+            Vog.d(this, "startAutoSleepWakeup ---> 充电中")
             return
         }
         stopAutoSleepWakeup()
-        val sleepTime = if (BuildConfig.DEBUG) 15000
-        else AppConfig.autoSleepWakeupMillis
+        val sleepTime = AppConfig.autoSleepWakeupMillis / 60
         Vog.d(this, "startAutoSleepWakeup ---> 开启自动休眠 $sleepTime")
         timerHandler.postDelayed(stopWakeUpTimer, sleepTime)
     }

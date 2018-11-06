@@ -187,12 +187,13 @@ object AppConfig {
         autoSleepWakeupMillis = sp.getString(R.string.key_auto_sleep_wakeup_duration).let {
             if (it == null) autoSleepWakeupMillis
             else {
+                val oneHour: Long = 60 * 60 * 1000
                 val i = GlobalApp.APP.resources.getStringArray(R.array.list_auto_sleep_duration).indexOf(it)
                 when (i) {
-                    0 -> 30 * 60 * 1000
-                    1 -> 60 * 60 * 1000
-                    2 -> 2 * 60 * 60 * 1000
-                    3 -> 5 * 60 * 60 * 1000
+                    0 -> oneHour / 2
+                    1 -> oneHour
+                    2 -> 2 * oneHour
+                    3 -> 5 * oneHour
                     else -> autoSleepWakeupMillis
                 }
             }
