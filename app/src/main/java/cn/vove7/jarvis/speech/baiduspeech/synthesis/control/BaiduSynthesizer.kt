@@ -130,6 +130,7 @@ class BaiduSynthesizer(val lis: SpeechSynthesizerListener) : SpeechSynthesizerI 
                         if (isSuccess) {
                             sendToUiThread("合成引擎 初始化成功")
                         } else {
+                            GlobalApp.toastShort("合成引擎初始化失败")
                             sendToUiThread("合成引擎初始化失败, 请查看日志")
                         }
                     }

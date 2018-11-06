@@ -59,9 +59,9 @@ abstract class StatusAnimation {
      */
     open fun onFailed() {}
 
-    fun failed(msg:String?=null,delay: Long = 1500L) {
+    fun failed(msg: String? = null, delay: Long = 1500L) {
         hideThread?.interrupt()
-        notifier.showNotification(nId, title, msg?:"", NotificationIcons(failedAniId))
+        notifier.showNotification(nId, title, msg ?: "", NotificationIcons(failedAniId))
         onFailed()
         hideDelay(delay)
     }

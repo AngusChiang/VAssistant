@@ -19,6 +19,7 @@ import devliving.online.securedpreferencestore.SecuredPreferenceStore
 import org.jsoup.Jsoup
 import kotlin.concurrent.thread
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.net.Uri
 import com.afollestad.materialdialogs.checkbox.checkBoxPrompt
 
@@ -304,6 +305,22 @@ object AppConfig {
             GlobalApp.toastShort("未安装酷安")
         }
 
+    }
+
+    object BaiduKey {//不通用
+        val appId: Int
+        val appKey: String
+        val sKey: String
+
+        init {
+            val appInfo = GlobalApp.APP.let {
+                it.packageManager.getApplicationInfo(it.packageName,
+                        PackageManager.GET_META_DATA)
+            }
+            appId = appInfo.metaData.getInt("com.baidu.speech.APP_ID")
+            appKey = appInfo.metaData.getString("com.baidu.speech.API_KEY")!!
+            sKey = appInfo.metaData.getString("com.baidu.speech.SECRET_KEY")!!
+        }
     }
 }
 

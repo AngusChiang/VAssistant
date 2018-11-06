@@ -48,9 +48,9 @@ class BaiduVoiceWakeup(private val eventListener: EventListener) : WakeupI() {
             appKey = "ILdLUepG75UwwQVa0rqiEUVa"
             secretKey = "di6djKXGGELgnCCusiQUlCBYRxXVrr46"
         } else {
-            appId = appInfo.metaData.getInt("com.baidu.speech.APP_ID")
-            appKey = appInfo.metaData.getString("com.baidu.speech.API_KEY")!!
-            secretKey = appInfo.metaData.getString("com.baidu.speech.SECRET_KEY")!!
+            appId = AppConfig.BaiduKey.appId
+            appKey = AppConfig.BaiduKey.appKey
+            secretKey = AppConfig.BaiduKey.sKey
         }
         LuaUtil.assetsToSD(context, "bd/WakeUp_xvtx.bin",
                 context.filesDir.absolutePath + "/bd/WakeUp_xvtx.bin")
@@ -79,6 +79,9 @@ class BaiduVoiceWakeup(private val eventListener: EventListener) : WakeupI() {
         wp?.send(SpeechConstant.WAKEUP_START, json, null, 0, 0)
     }
 
+    /**
+     * 停止即释放
+     */
     override fun stop() {
         super.stop()
         if (wp == null) return

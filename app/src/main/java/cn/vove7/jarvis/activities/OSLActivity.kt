@@ -52,6 +52,8 @@ class OSLActivity : OneFragmentActivity() {
                     , OslItem("CodeView (Android)", "https://github.com/kbiakov/CodeView-android", "CodeView helps to show code content with syntax highlighting in native way.")
                     , OslItem("Jsoup", "https://jsoup.org/", "jsoup is a Java library for working with real-world HTML. It provides a very convenient API for extracting and manipulating data, using the best of DOM, CSS, and jquery-like methods.")
                     , OslItem("TapTargetView", "https://github.com/KeepSafe/TapTargetView", "")
+                    , OslItem("Zxing", "https://github.com/zxing/zxing", "ZXing (\"zebra crossing\") is an open-source, multi-format 1D/2D barcode image processing library implemented in Java, with ports to other languages.")
+                    , OslItem("Glide", "https://bumptech.github.io/glide/", "Glide is a fast and efficient image loading library for Android focused on smooth scrolling. Glide offers an easy to use API, a performant and extensible resource decoding pipeline and automatic resource pooling.")
 //                    , OslItem("", "", "")
 
             )))

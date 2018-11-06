@@ -138,7 +138,11 @@ object NetHelper {
         object : TypeToken<ResponseMessage<List<ActionNode>>>() {}.type
     }
     val MapType: Type by lazy {
-        object : TypeToken<Map<String,Any>>() {}.type
+        object : TypeToken<Map<String, Any>>() {}.type
+    }
+
+    inline fun <reified T> getType(): Type {
+        return object : TypeToken<T>() {}.type
     }
 
     /**

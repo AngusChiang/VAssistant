@@ -5,7 +5,7 @@ import cn.vove7.common.model.UserInfo
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.adapters.SettingsExpandableAdapter
 import cn.vove7.jarvis.plugins.AdKillerService
-import cn.vove7.jarvis.plugins.WakeUpListener
+import cn.vove7.jarvis.plugins.VoiceWakeupStrategy
 import cn.vove7.jarvis.services.MainService
 import cn.vove7.jarvis.services.MyAccessibilityService
 import cn.vove7.jarvis.view.*
@@ -81,9 +81,9 @@ class LaboratoryActivity : ReturnableActivity() {
                                 keyId = R.string.key_continuous_dialogue)
                 )),
                 SettingGroupItem(R.color.google_red, titleS = "语音助手", childItems = listOf(
-                        SwitchItem(title = "助手模式(暂未开放)", summary = "通过唤醒用系统语音助手触发，可捕捉屏幕内容\n关闭后只能使快速唤醒", keyId = R.string.key_use_assist_service,
+                        SwitchItem(title = "助手模式", summary = "通过唤醒用系统语音助手触发，可捕捉屏幕内容\n关闭后只能使快速唤醒", keyId = R.string.key_use_assist_service,
                                 defaultValue = { false }),
-                        SwitchItem(title = "立即识别", summary = "开启自动识别",
+                        CheckBoxItem(title = "立即识别", summary = "开启自动识别",
                                 keyId = R.string.key_reco_when_wakeup_assist, defaultValue = { false }
                         )
                 )),
@@ -95,9 +95,9 @@ class LaboratoryActivity : ReturnableActivity() {
                         SwitchItem(title = "自动释放麦克风", summary = "在已授予麦克风权限的其他App内自动关闭语音唤醒\n需要无障碍",
                                 keyId = R.string.key_fix_voice_micro, defaultValue = { true }) { _, b ->
                             if (b as Boolean)
-                                WakeUpListener.register()
+                                VoiceWakeupStrategy.register()
                             else
-                                WakeUpListener.unregister()
+                                VoiceWakeupStrategy.unregister()
                             return@SwitchItem true
                         },
                         CheckBoxItem(title = "显示通知", summary = "关闭和打开时在状态栏显示通知",

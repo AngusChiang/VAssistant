@@ -1,6 +1,7 @@
 package cn.vove7.common.utils
 
 import android.Manifest
+import android.app.Activity
 import android.content.Context
 import android.content.pm.PackageManager
 import android.graphics.Rect
@@ -33,6 +34,17 @@ fun runOnUi(action: () -> Unit) {
     } else {
         Handler(mainLoop).post(action)
     }
+}
+
+fun Context.startActivityOnNewTask(intent: Intent) {
+    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+    startActivity(intent)
+}
+
+fun Context.startActivityOnNewTask(actCls: Class<*>) {
+    val intent = Intent(this, actCls)
+    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+    startActivity(intent)
 }
 
 fun View.boundsInScreen(): Rect {
@@ -105,8 +117,10 @@ fun AppInfo.hasGrantedPermission(p: String): Boolean {
         Vog.d(this, "hasPermission ---> $p $it")
     }
 }
+
 //麦克风权限App缓存
 val microPermissionCache = hashMapOf<String, Boolean>()
+
 fun AppInfo.hasMicroPermission(): Boolean {
     if (packageName == GlobalApp.APP.packageName) return false//排除自身
     microPermissionCache[packageName]?.also {

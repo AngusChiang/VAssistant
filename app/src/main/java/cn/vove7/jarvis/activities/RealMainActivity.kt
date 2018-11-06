@@ -78,11 +78,11 @@ class RealMainActivity : AppCompatActivity() {
     private fun checkDataUpdate() {
         if (AppConfig.autoUpdateData) {
             DataUpdator.checkUpdate(this) {
-                text_login.post {
-                    if (!UserInfo.isLogin())
+                if (!UserInfo.isLogin())
+                    text_login?.post {
                         Tutorials.showForView(this, Tutorials.T_LOGIN, text_login,
                                 "新用户注册", getString(R.string.desc_new_account))
-                }
+                    }
             }
         }
     }

@@ -37,7 +37,7 @@ import cn.vove7.jarvis.R
 import cn.vove7.jarvis.adapters.SimpleListAdapter
 import cn.vove7.jarvis.adapters.ViewModel
 import cn.vove7.jarvis.tools.UriUtils.getPathFromUri
-import cn.vove7.jarvis.view.BottomSheetController
+import cn.vove7.jarvis.view.BottomSheetWithToolbarController
 import cn.vove7.jarvis.view.dialog.InstRegexEditorDialog
 import cn.vove7.vtp.app.AppInfo
 import cn.vove7.vtp.easyadapter.BaseListAdapter
@@ -59,7 +59,7 @@ import kotlin.concurrent.thread
  * 2018/8/19
  */
 class NewInstActivity : AppCompatActivity(), View.OnClickListener {
-    var bsController: BottomSheetController? = null
+    var bsController: BottomSheetWithToolbarController? = null
     var pkg: String? = null
     var parentId: Long? = null//上级命令MapNodeId
     private var instType: Int = NODE_SCOPE_GLOBAL
@@ -176,7 +176,7 @@ class NewInstActivity : AppCompatActivity(), View.OnClickListener {
 
     private fun initBottom() {
         val bottomView = findViewById<LinearLayout>(R.id.bottom_sheet_view)
-        bsController = BottomSheetController(this, bottomView, getString(R.string.text_select_application), R.menu.menu_toolbar_with_search_refresh)
+        bsController = BottomSheetWithToolbarController(this, bottomView, getString(R.string.text_select_application), R.menu.menu_toolbar_with_search_refresh)
         val searchItem = bsController!!.bottomToolbar.menu.findItem(R.id.menu_search)
         bsController?.bottomToolbar?.setOnMenuItemClickListener(this::onOptionsItemSelected)
         searchView = MenuItemCompat.getActionView(searchItem) as SearchView

@@ -15,11 +15,11 @@ import cn.vove7.vtp.log.Vog
 class AssistSessionService : VoiceInteractionSessionService() {
     override fun onNewSession(args: Bundle): VoiceInteractionSession? {
         Vog.d(this, "onNewSession ---> 新会话")
-//        return if (AppConfig.useAssistService) {//开启
-//            AssistSession(this)
-//        } else {
-           return OnlyRecoAssistSession(this)
-//        }
+        return if (AppConfig.useAssistService) {//开启
+            AssistSession(this)
+        } else {
+            return OnlyRecoAssistSession(this)
+        }
     }
 
 }

@@ -65,7 +65,7 @@ object ApiUrls {
     val UPLOAD_CMD_HIS: String get() = APP + "uch"
     val NEW_USER_FEEDBACK: String get() = APP + "ufb"
 
-    val QQ_GROUP_1 = "https://jq.qq.com/?_wv=1027&k=58NR9UC"
+    val QQ_GROUP_1 = "http://qm.qq.com/cgi-bin/qm/qr?k=BKTXyMMmLDKS8SXOht71bKKbI9rdPAd3"
 
     val CLOUD_PARSE :String get()= APP + "cp"
 

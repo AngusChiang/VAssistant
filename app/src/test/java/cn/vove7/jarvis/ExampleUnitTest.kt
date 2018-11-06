@@ -13,6 +13,7 @@ import java.util.*
 import kotlin.concurrent.thread
 import android.database.CharArrayBuffer
 import android.os.AsyncTask.execute
+import cn.vove7.common.baiduaip.BaiduAipHelper
 import cn.vove7.jarvis.chat.TulingChatSystem
 import org.json.JSONObject
 import java.io.IOException
@@ -170,4 +171,12 @@ class ExampleUnitTest {
         }
     }
 
+    @Test
+    fun testImageClassify() {
+        val a = BaiduAipHelper.imageClassify("C:\\Users\\Administrator\\Desktop\\新建文件夹/home-bg-o.jpg")
+        if (a?.hasErr == false) {
+            println(a.bestResult)
+        }
+
+    }
 }

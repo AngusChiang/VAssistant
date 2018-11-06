@@ -1,5 +1,6 @@
 package cn.vove7.common.utils
 
+import cn.vove7.common.netacc.NetHelper
 import cn.vove7.common.netacc.model.ResponseMessage
 import com.google.gson.ExclusionStrategy
 import com.google.gson.FieldAttributes
@@ -46,10 +47,24 @@ object GsonHelper {
         return builder.setPrettyPrinting().create().toJson(model)
     }
 
+    /**
+     * 服务返回Json解析
+     * @param s String?
+     * @param type Type
+     * @return ResponseMessage<T>?
+     */
     fun <T> fromJsonObj(s: String?, type: Type): ResponseMessage<T>? {
         val bean = GsonBuilder()
                 .setDateFormat("yyyy-MM-dd HH:mm:ss")
                 .create().fromJson<ResponseMessage<T>>(s, type)
+        return bean
+    }
+
+    inline fun <reified T> fromJson(s: String?): T? {
+        val type = NetHelper.getType<T>()
+        val bean = GsonBuilder()
+                .setDateFormat("yyyy-MM-dd HH:mm:ss")
+                .create().fromJson<T>(s, type)
         return bean
     }
 

@@ -87,6 +87,7 @@
         <activity
             android:name=".activities.RealMainActivity"
             android:excludeFromRecents="true"
+            android:autoRemoveFromRecents="true"
             android:launchMode="singleTask"
             android:theme="@style/TranslucentStatus.NoActionBar"
             android:windowSoftInputMode="adjustPan">

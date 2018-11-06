@@ -120,6 +120,7 @@ class SettingItemHelper(val context: Context) {
                 }
                 setBasic(holder, item)
             }.show {
+                positiveButton()
                 neutralButton(text = "清空") {
                     if (item.keyId != null) {
                         sp.set(item.keyId, "")

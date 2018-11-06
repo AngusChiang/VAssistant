@@ -35,7 +35,7 @@ import cn.vove7.executorengine.bridges.SystemBridge
 import cn.vove7.executorengine.helper.AdvanAppHelper
 import cn.vove7.jarvis.plugins.AccPluginsService
 import cn.vove7.jarvis.plugins.AdKillerService
-import cn.vove7.jarvis.plugins.WakeUpListener
+import cn.vove7.jarvis.plugins.VoiceWakeupStrategy
 import cn.vove7.jarvis.tools.AppConfig
 import cn.vove7.vtp.log.Vog
 import cn.vove7.vtp.system.SystemHelper
@@ -66,7 +66,7 @@ class MyAccessibilityService : AccessibilityApi() {
             if (AppConfig.isAdBlockService)
                 registerPlugin(AdKillerService)
             if (AppConfig.fixVoiceMico) {
-                registerPlugin(WakeUpListener)
+                registerPlugin(VoiceWakeupStrategy)
             }
         }
     }

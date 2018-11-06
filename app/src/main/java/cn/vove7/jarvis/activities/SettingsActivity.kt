@@ -113,8 +113,7 @@ class SettingsActivity : ReturnableActivity() {
                     InputItem(title = "设置响应词", summary = AppConfig.responseWord,
                             keyId = R.string.key_response_word, defaultValue = { AppConfig.responseWord }),
                     CheckBoxItem(title = "仅在语音唤醒时响应", keyId = R.string.key_speak_response_word_on_voice_wakeup,
-                            defaultValue =
-                            { AppConfig.speakResponseWordOnVoiceWakeup })
+                            defaultValue = { AppConfig.speakResponseWordOnVoiceWakeup })
             )),
             SettingGroupItem(R.color.google_yellow, "语音合成", childItems = listOf(
                     SwitchItem(R.string.text_play_voice_message, summary = "关闭后以弹窗形式提醒",

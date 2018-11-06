@@ -88,7 +88,7 @@ class BaiduSpeechRecoService(event: SpeechEvent) : SpeechRecoService(event) {
     }
 
     override fun startWakeUp() {
-        wakeupStatusAni.showAndHideDelay("语音唤醒开启")
+        wakeupStatusAni.showAndHideDelay("语音唤醒开启", 2500)
         startWakeUpSilently()
     }
 
@@ -99,7 +99,7 @@ class BaiduSpeechRecoService(event: SpeechEvent) : SpeechRecoService(event) {
     }
 
     override fun stopWakeUp() {
-        wakeupStatusAni.failed("语音唤醒关闭")
+        wakeupStatusAni.failed("语音唤醒关闭", 2500)
         stopWakeUpSilently()
         stopAutoSleepWakeup()
     }
