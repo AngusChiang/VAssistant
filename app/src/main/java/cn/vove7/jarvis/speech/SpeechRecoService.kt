@@ -130,10 +130,29 @@ interface SpeechRecoI {
     var timerEnd: Boolean
     fun startRecog()
     fun cancelRecog(notify: Boolean = true)
+    /**
+     * 重新计时
+     */
     fun startWakeUp()
+
+    /**
+     * 不重新计时
+     * 开启语音唤醒/暂时性
+     * @param resetTimer Boolean
+     */
     fun startWakeUpSilently(resetTimer: Boolean = true)
+
+    /**
+     * 关闭计时
+     */
     fun stopWakeUp()
+
+    /**
+     * 不重新计时
+     * 关闭语音唤醒/暂时性
+     */
     fun stopWakeUpSilently()
+
     fun release()
 
     /**

@@ -19,7 +19,6 @@ import devliving.online.securedpreferencestore.SecuredPreferenceStore
 import org.jsoup.Jsoup
 import kotlin.concurrent.thread
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.net.Uri
 import com.afollestad.materialdialogs.checkbox.checkBoxPrompt
 
@@ -73,11 +72,13 @@ object AppConfig {
     var finishWord: String? = null
     //    var resumeMusic = true//继续播放
     var recoWhenWakeupAssist = false//立即识别
-    var useAssistService = false//助手服务
+    var useAssistService = true//助手服务
     var execFailedVoiceFeedback = true//执行失败语音反馈
     var execSuccessFeedback = true//执行成功反馈
-    var fixVoiceMico = true//唤醒冲突
-    var notifyCloseMico = true//唤醒冲突
+    var fixVoiceMico = true//麦克风冲突
+    var notifyCloseMico = true//通知唤醒状态/麦克风
+//    var disableAdKillerOnLowBattery = true//低电量关闭去广告
+    var disableAccessibilityOnLowBattery = true//低电量关闭无障碍
 
     fun init(context: Context) {
         val storeFileName = "wdasfd"
@@ -91,11 +92,16 @@ object AppConfig {
         val sp = SecuredPreferenceStore.getSharedInstance()
         //用户信息
         if (sp.contains(R.string.key_login_info)) {
-            val info = Gson().fromJson(sp.getString(R.string.key_login_info),
-                    UserInfo::class.java)
-            Vog.d(this, "init user info ---> $info")
-            info.success()//设置登陆后，读取配置
-            NetHelper.postJson<Any>(ApiUrls.VERIFY_TOKEN)
+            try {
+                val info = Gson().fromJson(sp.getString(R.string.key_login_info),
+                        UserInfo::class.java)
+                Vog.d(this, "init user info ---> $info")
+                info.success()//设置登陆后，读取配置
+                NetHelper.postJson<Any>(ApiUrls.VERIFY_TOKEN)
+            } catch (e: Exception) {
+                GlobalApp.toastShort("用户信息提取失败，请重新登陆")
+                sp.Editor().remove(R.string.key_login_info)
+            }
         } else {
             Vog.d(this, "init ---> not login")
         }
@@ -169,6 +175,9 @@ object AppConfig {
         execSuccessFeedback = getBooleanAndInit(R.string.key_exec_failed_voice_feedback, true)
         fixVoiceMico = getBooleanAndInit(R.string.key_fix_voice_micro, true)
         notifyCloseMico = getBooleanAndInit(R.string.key_close_wakeup_notification, true)
+//        disableAdKillerOnLowBattery = getBooleanAndInit(R.string.key_remove_ad_power_saving_mode, true)
+        disableAccessibilityOnLowBattery = getBooleanAndInit(R.string.key_accessibility_service_power_saving_mode, true)
+
         finishWord = sp.getString(R.string.key_finish_word)
 //        onlyCloudServiceParse = getBooleanAndInit(R.string.key_only_cloud_service_parse, false)
         userWakeupWord = sp.getString(R.string.key_user_wakeup_word) ?: ""
@@ -307,21 +316,6 @@ object AppConfig {
 
     }
 
-    object BaiduKey {//不通用
-        val appId: Int
-        val appKey: String
-        val sKey: String
-
-        init {
-            val appInfo = GlobalApp.APP.let {
-                it.packageManager.getApplicationInfo(it.packageName,
-                        PackageManager.GET_META_DATA)
-            }
-            appId = appInfo.metaData.getInt("com.baidu.speech.APP_ID")
-            appKey = appInfo.metaData.getString("com.baidu.speech.API_KEY")!!
-            sKey = appInfo.metaData.getString("com.baidu.speech.SECRET_KEY")!!
-        }
-    }
 }
 
 //

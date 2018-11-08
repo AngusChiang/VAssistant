@@ -7,6 +7,7 @@ import cn.vove7.common.appbus.AppBus
 import cn.vove7.common.appbus.SpeechAction
 import cn.vove7.common.appbus.VoiceData
 import cn.vove7.common.model.RequestPermission
+import cn.vove7.jarvis.services.MainService
 import cn.vove7.jarvis.speech.baiduspeech.recognition.message.SpeechMessage
 import cn.vove7.jarvis.speech.baiduspeech.recognition.model.IStatus.Companion.CODE_VOICE_ERR
 import cn.vove7.jarvis.speech.baiduspeech.recognition.model.IStatus.Companion.CODE_VOICE_RESULT
@@ -44,7 +45,7 @@ class SpeechStatusListener(private val handler: Handler) : StatusRecogListener()
     override fun onAsrEnd() {
         super.onAsrEnd()
         //立即停止识别 ，检测结果
-        AppBus.postSpeechAction(SpeechAction.ActionCode.ACTION_STOP_RECO)
+        MainService.instance?.onCommand(AppBus.ORDER_STOP_RECO)
     }
 
     override fun onAsrFinishError(errorCode: Int, subErrorCode: Int, errorMessage: String?, descMessage: String?,

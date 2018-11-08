@@ -76,7 +76,7 @@ interface SystemOperation {
     /**
      * 打开链接
      */
-    fun openUrl(url: String)
+    fun openUrl(url: String):Boolean
 
     fun sendKey(keyCode: Int)
 
@@ -188,6 +188,16 @@ interface SystemOperation {
      * @param content String
      */
     fun sendSMS(phone: String, content: String)
+
+    /**
+     * 电量
+     */
+    val batteryLevel: Int
+    /**
+     * 充电状态
+     * 脚本对应：
+     */
+    val isCharging: Boolean
 
 
 }

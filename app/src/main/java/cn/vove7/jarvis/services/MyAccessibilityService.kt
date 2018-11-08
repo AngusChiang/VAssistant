@@ -36,7 +36,10 @@ import cn.vove7.executorengine.helper.AdvanAppHelper
 import cn.vove7.jarvis.plugins.AccPluginsService
 import cn.vove7.jarvis.plugins.AdKillerService
 import cn.vove7.jarvis.plugins.VoiceWakeupStrategy
+import cn.vove7.jarvis.receivers.PowerEventReceiver
 import cn.vove7.jarvis.tools.AppConfig
+import cn.vove7.jarvis.view.statusbar.AccessibilityStatusAnimation
+import cn.vove7.jarvis.view.statusbar.StatusAnimation
 import cn.vove7.vtp.log.Vog
 import cn.vove7.vtp.system.SystemHelper
 import java.lang.Thread.sleep
@@ -49,13 +52,13 @@ import kotlin.concurrent.thread
  */
 class MyAccessibilityService : AccessibilityApi() {
     private lateinit var pkgman: PackageManager
-
+    private val accAni: StatusAnimation by lazy { AccessibilityStatusAnimation() }
     override fun onServiceConnected() {
 //        accessibilityService = this
 
         pkgman = packageManager
         updateCurrentApp(packageName, "")
-        ColorfulToast(this).yellow().showShort("无障碍服务开启")
+        accAni.showAndHideDelay("服务开启", 5000L)
 
         startPluginService()
     }
@@ -101,10 +104,16 @@ class MyAccessibilityService : AccessibilityApi() {
 
     private fun updateCurrentApp(pkg: String, activityName: String) {
         if (currentScope.packageName == pkg && activityName == currentActivity) return
-        AdvanAppHelper.getAppInfo(pkg).also { // 系统界面??
-            if (it == null || it.isInputMethod(this) || !it.activities().contains(activityName)) {//过滤输入法、非activity
-                return
-            } else currentAppInfo = it
+        AdvanAppHelper.getAppInfo(pkg).also {
+            // 系统界面??
+            currentAppInfo = try {//todo 防止阻塞
+                if (it == null || it.isInputMethod(this) || !it.activities().contains(activityName)) {//过滤输入法、非activity
+                    return
+                } else it
+            } catch (e: Exception) {
+                GlobalLog.err(e)
+                it
+            }
         }
         Vog.d(this, "updateCurrentApp ---> $pkg")
         Vog.d(this, "updateCurrentApp ---> $activityName")
@@ -186,7 +195,7 @@ class MyAccessibilityService : AccessibilityApi() {
     var viewNotifierThread: Thread? = null
 
     /**
-     *
+     * 通知UI更新（UI驱动事件）
      */
     private fun callAllNotifier() {
         viewNotifierThread?.interrupt()
@@ -210,6 +219,11 @@ class MyAccessibilityService : AccessibilityApi() {
      * @param event AccessibilityEvent?
      */
     override fun onAccessibilityEvent(event: AccessibilityEvent?) {
+        //兼容<24 无法自动关闭无障碍
+        if (AppConfig.disableAccessibilityOnLowBattery && PowerEventReceiver.powerSavingMode &&
+                !PowerEventReceiver.isCharging)//开启低电量模式
+            return
+
         if (!SystemHelper.isScreenOn(this))//(火)?息屏下
             return
         try {
@@ -251,7 +265,7 @@ class MyAccessibilityService : AccessibilityApi() {
                 callAllNotifier()
             }
             TYPE_WINDOW_CONTENT_CHANGED -> {//"帧"刷新
-                val node = event.source
+//                val node = event.source
                 callAllNotifier()
             }
             AccessibilityEvent.TYPE_VIEW_HOVER_ENTER -> {
@@ -467,7 +481,6 @@ class MyAccessibilityService : AccessibilityApi() {
 
     override fun onInterrupt() {
         Vog.d(this, "onInterrupt ")
-
     }
 
     override fun onDestroy() {
@@ -579,6 +592,17 @@ class MyAccessibilityService : AccessibilityApi() {
                 }
             }
         }
+    }
+
+    override fun powerSavingMode() {
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+//            disableSelf()
+//        }
+        accAni.failed("省电模式，服务关闭")
+    }
+
+    override fun disablePowerSavingMode() {
+        accAni.showAndHideDelay("服务恢复", 5000L)
     }
 
     /**

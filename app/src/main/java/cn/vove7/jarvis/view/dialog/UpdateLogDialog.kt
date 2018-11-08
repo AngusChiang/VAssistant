@@ -27,6 +27,17 @@ class UpdateLogDialog(context: Context, onDismiss: (() -> Unit)? = null) {
 
     private val logs: List<Pair<String, String>>
         get() = listOf(
+                Pair("1.3.1", "加入省电模式(必关闭语音唤醒)\n" +
+                        "加入快捷屏幕助手[实验室]（设为默认辅助应用，可长按HOME键触发，部分机型需手动设置）\n" +
+                        "  -屏幕识别\n" +
+                        "  -文字提取\n" +
+                        "  -分享屏幕\n" +
+                        "  -二维码/条码识别\n" +
+                        "无障碍/语音唤醒状态改通知栏通知\n" +
+                        "修复若干问题\n" +
+                        "添加api\n" +
+                        "  system.batteryLevel\n" +
+                        "  system.isCharging()"),
                 Pair("1.3.0", "解决语音唤醒麦克风占用问题\n修复若干问题"),
                 Pair("1.2.10", "支持多个用户唤醒词\n" +
                         "修复识别时仍能使用唤醒词唤醒问题\n" +

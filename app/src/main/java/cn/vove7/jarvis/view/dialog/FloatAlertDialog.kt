@@ -11,7 +11,10 @@ import cn.vove7.vtp.dialog.DialogUtil
  * 全局对话框
  * Created by Vove on 2018/7/1
  */
-open class FloatAlertDialog(context: Context) : AlertDialog(context) {
+open class FloatAlertDialog : AlertDialog {
+    constructor(context: Context) : super(context)
+    constructor(context: Context?, themeResId: Int) : super(context, themeResId)
+
     override fun show() {
         try {
             DialogUtil.setFloat(this)
@@ -21,4 +24,5 @@ open class FloatAlertDialog(context: Context) : AlertDialog(context) {
             AppBus.post(RequestPermission("悬浮窗权限"))
         }
     }
+
 }

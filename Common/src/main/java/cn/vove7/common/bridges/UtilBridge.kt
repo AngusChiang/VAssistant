@@ -1,6 +1,7 @@
 package cn.vove7.common.bridges
 
 import android.graphics.Bitmap
+import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.app.GlobalLog
 import cn.vove7.vtp.log.Vog
 import java.io.File
@@ -15,16 +16,18 @@ import java.io.FileOutputStream
 object UtilBridge {
 
     fun bitmap2File(bitmap: Bitmap, fullPath: String): File? {//保存到本地
-        Vog.d(this,"bitmap2File ---> $fullPath")
+        Vog.d(this, "bitmap2File ---> $fullPath")
         return try {
-            val f = File(fullPath)
-            if (!f.parentFile.exists())
-                f.parentFile.mkdirs()
-
-            FileOutputStream(f).use {
-                bitmap.compress(Bitmap.CompressFormat.PNG, 80, it)
+            File(fullPath).apply {
+                if (!parentFile.exists())
+                    parentFile.mkdirs()
+                FileOutputStream(this).use {
+                    bitmap.compress(Bitmap.CompressFormat.PNG, 80, it)
+                }
             }
-            f
+        } catch (se: SecurityException) {
+            GlobalApp.toastShort("无存储权限")
+            null
         } catch (e: Exception) {
             GlobalLog.err(e)
             GlobalLog.err("bitmap2File 保存到失败")

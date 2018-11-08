@@ -8,6 +8,7 @@ import cn.vove7.jarvis.plugins.AdKillerService
 import cn.vove7.jarvis.plugins.VoiceWakeupStrategy
 import cn.vove7.jarvis.services.MainService
 import cn.vove7.jarvis.services.MyAccessibilityService
+import cn.vove7.jarvis.tools.AppConfig
 import cn.vove7.jarvis.view.*
 import cn.vove7.jarvis.view.custom.SettingGroupItem
 import kotlinx.android.synthetic.main.activity_expandable_settings.*
@@ -80,16 +81,21 @@ class LaboratoryActivity : ReturnableActivity() {
                         CheckBoxItem(title = "连续对话", summary = "开启后可连续对话",
                                 keyId = R.string.key_continuous_dialogue)
                 )),
-                SettingGroupItem(R.color.google_red, titleS = "语音助手", childItems = listOf(
-                        SwitchItem(title = "助手模式", summary = "通过唤醒用系统语音助手触发，可捕捉屏幕内容\n关闭后只能使快速唤醒", keyId = R.string.key_use_assist_service,
-                                defaultValue = { false }),
-                        CheckBoxItem(title = "立即识别", summary = "开启自动识别",
-                                keyId = R.string.key_reco_when_wakeup_assist, defaultValue = { false }
-                        )
+                SettingGroupItem(R.color.google_red, titleS = "屏幕助手", childItems = listOf(
+                        SwitchItem(title = "助手模式", summary = "设为默认语音辅助应用后\n通过唤醒用系统语音助手触发\n可捕捉屏幕内容进行快捷操作\n关闭后只能使快速唤醒", keyId = R.string.key_use_assist_service,
+                                defaultValue = { AppConfig.useAssistService })
                 )),
                 SettingGroupItem(R.color.amber_A700, titleS = "结束词", childItems = listOf(
                         InputItem(title = "设置结束词", summary = "在指令结尾可以快速结束聆听\n注意根据效果来设置结束词\n不使用，置空即可",
                                 keyId = R.string.key_finish_word)
+                )),
+                SettingGroupItem(R.color.teal_A700, titleS = "省电模式", childItems = listOf(
+//                        CheckBoxItem(title = "去广告服务", defaultValue = { true },
+//                                keyId = R.string.key_remove_ad_power_saving_mode,
+//                                summary = "在系统发出低电量提醒后，自动关闭去广告服务\n充电后自动开启"),
+                        CheckBoxItem(title = "无障碍服务", summary = "在系统发出低电量提醒后，自动关闭无障碍服务\n依赖无障碍服务的部分功将无法使用，基础功能仍能使用\n充电后自动恢复服务",
+                                keyId = R.string.key_accessibility_service_power_saving_mode)
+
                 )),
                 SettingGroupItem(R.color.yellow_700, titleS = "语音唤醒", childItems = listOf(
                         SwitchItem(title = "自动释放麦克风", summary = "在已授予麦克风权限的其他App内自动关闭语音唤醒\n需要无障碍",

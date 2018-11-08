@@ -56,6 +56,16 @@ abstract class AccessibilityApi : AccessibilityService(),
         }
     }
 
+    /**
+     * 省电模式
+     */
+    abstract fun powerSavingMode()
+
+    /**
+     * 关闭省电
+     */
+    abstract fun disablePowerSavingMode()
+
     var currentAppInfo: AppInfo? = null
         protected set
 

@@ -117,7 +117,7 @@ class MainService : BusService(),
         super.onCreate()
         instance = this
         GlobalApp.serviceBridge = this
-        HandlerThread("load_").apply {
+        HandlerThread("load_speech_engine").apply {
             start()
             Handler(looper).post {
                 init()
@@ -133,9 +133,11 @@ class MainService : BusService(),
         GlobalApp.toastShort("启动完成")
     }
 
+    var speechEngineLoaded = false
     private fun loadSpeechService() {
         speechRecoService = BaiduSpeechRecoService(RecgEventListener())
         speechSynService = SpeechSynService(SyncEventListener())
+        speechEngineLoaded = true
     }
 
     fun loadChatSystem(byUserSet: Boolean = false) {
@@ -353,7 +355,7 @@ class MainService : BusService(),
     //from executor 线程
     override fun onExecuteFailed(errMsg: String?) {//错误信息
         Vog.e(this, "onExecuteFailed: $errMsg")
-        executeAnimation.failed()
+        executeAnimation.failedAndHideDelay()
         if (AppConfig.execFailedVoiceFeedback)
             speakSync("执行失败")
         else GlobalApp.toastShort("执行失败")
@@ -362,9 +364,9 @@ class MainService : BusService(),
 
     override fun onExecuteInterrupt(errMsg: String) {
         Vog.e(this, "onExecuteInterrupt: $errMsg")
-        executeAnimation.failed()
+        executeAnimation.failedAndHideDelay()
 //        GlobalApp.toastShort("")
-        executeAnimation.failed()
+        executeAnimation.failedAndHideDelay()
     }
 
 
@@ -374,6 +376,10 @@ class MainService : BusService(),
      */
     @Subscribe(threadMode = ThreadMode.BACKGROUND)
     fun onSpeechAction(sAction: SpeechAction) {
+        if (!speechEngineLoaded) {
+            GlobalApp.toastShort("引擎未就绪")
+            return
+        }
         when (sAction.action) {
             SpeechAction.ActionCode.ACTION_START_RECO -> {
                 if (speechSynService.speaking) speechSynService.stop()
@@ -443,27 +449,51 @@ class MainService : BusService(),
         thread {
             when (order) {
                 ORDER_STOP_EXEC -> {
+                    if (!speechEngineLoaded) {
+                        GlobalApp.toastShort("引擎未就绪")
+                        return@thread
+                    }
                     speechRecoService.cancelRecog()
                     speechSynService.stop()
                     cExecutor.interrupt()
                     hideAll()
                 }
                 ORDER_STOP_RECO -> {
+                    if (!speechEngineLoaded) {
+                        GlobalApp.toastShort("引擎未就绪")
+                        return@thread
+                    }
                     speechRecoService.stopRecog()
                 }
                 ORDER_CANCEL_RECO -> {
+                    if (!speechEngineLoaded) {
+                        GlobalApp.toastShort("引擎未就绪")
+                        return@thread
+                    }
                     speechRecoService.cancelRecog()
                 }
                 ORDER_START_RECO -> {
+                    if (!speechEngineLoaded) {
+                        GlobalApp.toastShort("引擎未就绪")
+                        return@thread
+                    }
                     speechRecoService.startRecog()
                 }
                 EVENT_FORCE_OFFLINE -> {
                     AppConfig.logout()
                 }
                 ORDER_START_VOICE_WAKEUP_WITHOUT_NOTIFY -> {//不重新计时
+                    if (!speechEngineLoaded) {
+                        GlobalApp.toastShort("引擎未就绪")
+                        return@thread
+                    }
                     speechRecoService.startWakeUpSilently(false)
                 }
                 ORDER_STOP_VOICE_WAKEUP_WITHOUT_NOTIFY -> {
+                    if (!speechEngineLoaded) {
+                        GlobalApp.toastShort("引擎未就绪")
+                        return@thread
+                    }
                     speechRecoService.stopWakeUpSilently()
                 }
                 EVENT_START_DEBUG_SERVER -> {
@@ -720,7 +750,7 @@ class MainService : BusService(),
                         checkCancel(voiceResult) -> {
                             performAlertClick(false)
                         }
-                        else -> AppBus.postSpeechAction(SpeechAction.ActionCode.ACTION_START_RECO)  //继续????
+                        else -> onCommand(ORDER_START_RECO)  //继续????
                     }
                 }
             }
@@ -765,7 +795,7 @@ class MainService : BusService(),
             listeningToast.showAndHideDelay(err)
             when (voiceMode) {
                 MODE_VOICE -> {
-                    listeningAni.failed()
+                    listeningAni.failedAndHideDelay()
                     hideAll()
                 }
                 MODE_GET_PARAM -> {//获取参数失败
@@ -774,7 +804,7 @@ class MainService : BusService(),
                     executeAnimation.begin()//continue
                 }
                 MODE_ALERT -> {
-                    AppBus.postSpeechAction(SpeechAction.ActionCode.ACTION_START_RECO)  //继续????
+                    onCommand(ORDER_START_RECO)  //继续????
                 }
             }
         }
@@ -829,7 +859,7 @@ class MainService : BusService(),
                     val data = chatSystem.chatWithText(result)
                     if (data == null) {
                         listeningToast.showAndHideDelay("获取失败")
-                        parseAnimation.failed()
+                        parseAnimation.failedAndHideDelay()
                     } else {
                         listeningToast.hideDelay()
                         executeAnimation.begin()
@@ -848,7 +878,7 @@ class MainService : BusService(),
             } else {
                 NetHelper.uploadUserCommandHistory(CommandHistory(UserInfo.getUserId(), result, null))
                 listeningToast.showAndHideDelay("解析失败")
-                parseAnimation.failed()
+                parseAnimation.failedAndHideDelay()
                 false
             }
         }
@@ -857,7 +887,7 @@ class MainService : BusService(),
     private fun runFromCloud(command: String, actions: List<Action>?): Boolean {
         if (actions == null || actions.isEmpty()) {
             listeningToast.showAndHideDelay("解析失败")
-            parseAnimation.failed()
+            parseAnimation.failedAndHideDelay()
             return false
         }
         val que = PriorityQueue<Action>()

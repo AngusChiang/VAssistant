@@ -108,6 +108,10 @@ object RootHelper {
         return result
     }
 
+    fun openSelfAccessService() {
+        openAppAccessService(GlobalApp.APP.packageName,
+                "cn.vove7.jarvis.services.MyAccessibilityService")
+    }
     fun openAppAccessService(pkg: String, serviceName: String) {
         Vog.d(this, "openAppAccessService ---> $serviceName")
         //同时不关闭其他

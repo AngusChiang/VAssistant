@@ -51,7 +51,7 @@ open class BottomSheetController(
     /**
      * 复写onItemClick
      */
-    open fun initBottomSheetView(hide: Boolean = false) {
+    open fun initBottomSheetView(hide: Boolean = true) {
         bottomListView = f(R.id.bottom_list_view)
         behavior = BottomSheetBehavior.from(bottomView)
         if (hide)

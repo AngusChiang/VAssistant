@@ -108,11 +108,9 @@ object AdKillerService : AccPluginsService() {
         }
     }
 
-    private fun gcIfNeed() {
-        Vog.d(this, "finderCaches.size ---> ${finderCaches.size}")
-        if (finderCaches.size > 100) //
-            for (i in 0..30)
-                finderCaches.remove(finderCaches.keys.first())
+    fun gc() {
+        Vog.d(this, "gc finderCaches.size ---> ${finderCaches.size}")
+        finderCaches.clear()
     }
 
     private var finders: MutableSet<ViewFinder>? = null

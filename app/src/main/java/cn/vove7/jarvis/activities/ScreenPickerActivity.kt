@@ -7,8 +7,10 @@ import android.widget.RelativeLayout
 import android.widget.TextView
 import cn.vove7.common.accessibility.AccessibilityApi
 import cn.vove7.common.accessibility.viewnode.ViewNode
-import cn.vove7.common.baiduaip.BaiduAipHelper
+import cn.vove7.common.app.GlobalApp
+import cn.vove7.jarvis.tools.baiduaip.BaiduAipHelper
 import cn.vove7.common.utils.LooperHelper
+import cn.vove7.common.utils.runOnNewHandlerThread
 import cn.vove7.common.utils.runOnUi
 import cn.vove7.common.view.finder.ScreenTextFinder
 import cn.vove7.common.view.toast.ColorfulToast
@@ -38,11 +40,17 @@ class ScreenPickerActivity : Activity() {
             finish()
             return
         }
-
-        textViewList = ScreenTextFinder(AccessibilityApi.accessibilityService!!)
-                .findAll().toList()
-
-        buildContent()
+        runOnNewHandlerThread {
+            textViewList = ScreenTextFinder(AccessibilityApi.accessibilityService!!)
+                    .findAll().toList()
+            Vog.d(this, "onCreate ---> 提取数量 ${textViewList.size}")
+            if (textViewList.isEmpty()) {
+                GlobalApp.toastShort("未提取到任何内容")
+                finish()
+            } else runOnUi {
+                buildContent()
+            }
+        }
     }
 
     private val statusbarHeight: Int by lazy {
@@ -105,17 +113,14 @@ class ScreenPickerActivity : Activity() {
     override fun onStop() {
         super.onStop()
         onBackPressed()
+        d?.dismiss()
+        sd?.dismiss()
         finish()
         onDestroy()
         Vog.d(this, "onStop ---> ")
     }
 
     var sd: MaterialDialog? = null
-    override fun finish() {
-        d?.dismiss()
-        sd?.dismiss()
-        super.finish()
-    }
 
     var d: MaterialDialog? = null
     private val onItemClick: (ViewNode) -> Unit = { node ->

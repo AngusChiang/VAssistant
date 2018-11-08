@@ -9,6 +9,7 @@ import cn.vove7.androlua.LuaApp
 import cn.vove7.common.appbus.AppBus
 import cn.vove7.common.appbus.MessageEvent
 import cn.vove7.common.bridges.RootHelper
+import cn.vove7.common.utils.runOnNewHandlerThread
 import cn.vove7.jarvis.receivers.AppInstallReceiver
 import cn.vove7.jarvis.receivers.PowerEventReceiver
 import cn.vove7.jarvis.receivers.ScreenStatusListener
@@ -78,9 +79,11 @@ class App : LuaApp() {
     }
 
     private fun startBroadcastReceivers() {
-        PowerEventReceiver.start()
-        ScreenStatusListener.start()
-        AppInstallReceiver.start()
+        runOnNewHandlerThread("startBroadcastReceivers") {
+            PowerEventReceiver.start()
+            ScreenStatusListener.start()
+            AppInstallReceiver.start()
+        }
     }
 
     private fun stopBroadcastReceivers() {

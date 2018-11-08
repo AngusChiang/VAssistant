@@ -6,6 +6,7 @@ import cn.vove7.common.appbus.AppBus
 import cn.vove7.common.appbus.SpeechAction
 import cn.vove7.common.datamanager.parse.model.ActionScope
 import cn.vove7.common.utils.hasMicroPermission
+import cn.vove7.common.utils.microPermissionCache
 import cn.vove7.executorengine.helper.AdvanAppHelper
 import cn.vove7.jarvis.services.MainService
 import cn.vove7.jarvis.tools.AppConfig
@@ -42,7 +43,7 @@ object VoiceWakeupStrategy : AccPluginsService() {
                 Vog.d(this, "VoiceWakeupStrategy ---> 关闭语音唤醒")
                 closed = true
                 if (AppConfig.notifyCloseMico) {
-                    statusAni.failed("关闭语音唤醒",2000)
+                    statusAni.failedAndHideDelay("关闭语音唤醒", 2000)
                 }
             }
         } else if (closed && MainService.instance?.speechRecoService?.timerEnd == false) {//已自动关闭 并且定时器有效
@@ -55,6 +56,11 @@ object VoiceWakeupStrategy : AccPluginsService() {
             }
             MainService.instance?.onCommand(AppBus.ORDER_START_VOICE_WAKEUP_WITHOUT_NOTIFY)
         }
+    }
+
+    override fun unBindServer() {
+        super.unBindServer()
+        microPermissionCache.clear()
     }
 
     /**

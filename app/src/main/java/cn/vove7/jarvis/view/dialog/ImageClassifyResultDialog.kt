@@ -2,7 +2,6 @@ package cn.vove7.jarvis.view.dialog
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.content.DialogInterface
 import android.graphics.Bitmap
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
@@ -13,8 +12,10 @@ import android.view.Window
 import android.widget.ImageView
 import android.widget.TextView
 import cn.vove7.common.app.GlobalApp
-import cn.vove7.common.baiduaip.ImageClassifyResult
+import cn.vove7.jarvis.tools.baiduaip.ImageClassifyResult
+import cn.vove7.executorengine.bridges.SystemBridge
 import cn.vove7.jarvis.R
+import cn.vove7.vtp.log.Vog
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.DataSource
 import com.bumptech.glide.load.engine.GlideException
@@ -25,11 +26,13 @@ import com.bumptech.glide.request.target.Target
 
 /**
  * # ImageClassifyResultDialog
- *
+ * 图片识别Dialog
  * @author Administrator
  * 2018/11/7
  */
-class ImageClassifyResultDialog(val result: ImageClassifyResult.Rlt, context: Context, val screen: Bitmap?) : FloatAlertDialog(context) {
+class ImageClassifyResultDialog(val result: ImageClassifyResult.Rlt, context: Context,
+                                val screen: Bitmap?, val hideEvent: () -> Unit) : FloatAlertDialog(context, R.style.TransparentDialog) {
+
     init {
         requestWindowFeature(Window.FEATURE_NO_TITLE)
     }
@@ -37,11 +40,7 @@ class ImageClassifyResultDialog(val result: ImageClassifyResult.Rlt, context: Co
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        setButton(DialogInterface.BUTTON_POSITIVE, context.getString(R.string.text_confirm)) { i, _ ->
-            i.dismiss()
-        }
         setContentView()
-
     }
 
     lateinit var viewHolder: Holder
@@ -56,17 +55,28 @@ class ImageClassifyResultDialog(val result: ImageClassifyResult.Rlt, context: Co
         viewHolder.titleView.text = "${result.keyword} | ${result.root}"
         viewHolder.subtitleView.text = "匹配率：${result.score?.times(100)}%"
         result.baikeInfo.apply {
-                if (this == null || imageUrl == null) {
-                    GlobalApp.toastShort("无详细信息")
-                } else {
-                    viewHolder.descView.text = description
-                }
+            if (this == null || description == null) {
+                GlobalApp.toastShort("无详细信息")
+            } else {
+                viewHolder.descView.text = description
+            }
             val s = Glide.with(context).applyDefaultRequestOptions(RequestOptions().also {
                 it.centerCrop()
             })
             (if (this?.imageUrl != null)
                 s.load(imageUrl)
             else s.load(screen)).listener(getLis()).into(viewHolder.imgView)
+
+            viewHolder.headerView.setOnClickListener {
+                Vog.d(this ?: "", "bindView ---> ${this?.baikeUrl}")
+                SystemBridge.openUrl(this?.baikeUrl
+                    ?: "https://baike.baidu.com/item/${result.keyword}").also { r ->
+                    if (r) {
+                        dismiss()
+                        hideEvent.invoke()
+                    }
+                }
+            }
         }
     }
 
@@ -80,7 +90,7 @@ class ImageClassifyResultDialog(val result: ImageClassifyResult.Rlt, context: Co
             if (resource == null) return false
             Palette.from((resource as BitmapDrawable).bitmap)
                     .generate().darkMutedSwatch?.rgb?.also {
-                viewHolder.titleBgLay.setBackgroundColor(it)
+                viewHolder.titleBgLay.setBackgroundColor((0x88000000 + it).toInt())//半透明
             }
             viewHolder.imgView.setImageDrawable(resource)
             return true
@@ -93,6 +103,7 @@ class ImageClassifyResultDialog(val result: ImageClassifyResult.Rlt, context: Co
         val subtitleView: TextView = dialogView.findViewById(R.id.subtitle)
         val descView: TextView = dialogView.findViewById(R.id.desc_text)
         val titleBgLay = dialogView.findViewById<View>(R.id.title_lay)
+        val headerView = dialogView.findViewById<View>(R.id.header_view)
     }
 
 }

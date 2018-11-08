@@ -39,20 +39,24 @@ object AppBus {
     }
 
     fun postDelay(tag: String, data: Any, delay: Long) {
-        threadList.add(thread(name = tag) {
-            try {
-                sleep(delay)
-            } catch (e: InterruptedException) {
-                return@thread
-            }
-            post(data)
-            removeByName(tag)
-        })
+        synchronized(threadList) {
+            threadList.add(thread(name = tag) {
+                try {
+                    sleep(delay)
+                } catch (e: InterruptedException) {
+                    return@thread
+                }
+                post(data)
+                removeByName(tag)
+            })
+        }
     }
 
     fun remove(tag: String) {
-        threadList.forEach {
-            if (it.name == tag) it.interrupt()
+        synchronized(threadList) {
+            threadList.filter { it.name == tag }.forEach {
+                it.interrupt()
+            }
         }
     }
 
@@ -74,14 +78,6 @@ object AppBus {
 
     fun unreg(a: Any) {
         EventBus.getDefault().unregister(a)
-    }
-}
-
-open class LogMessage(val level: Int, val msg: String) {
-    companion object {
-        const val LEV_1 = 1
-        const val LEV_2 = 2
-        const val LEV_3 = 3
     }
 }
 

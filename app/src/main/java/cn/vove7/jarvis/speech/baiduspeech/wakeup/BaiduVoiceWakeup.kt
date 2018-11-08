@@ -7,6 +7,7 @@ import cn.vove7.common.app.GlobalApp
 import cn.vove7.jarvis.BuildConfig
 import cn.vove7.jarvis.speech.WakeupI
 import cn.vove7.jarvis.tools.AppConfig
+import cn.vove7.jarvis.tools.BaiduKey
 import cn.vove7.vtp.log.Vog
 import com.baidu.speech.EventListener
 import com.baidu.speech.EventManager
@@ -41,17 +42,9 @@ class BaiduVoiceWakeup(private val eventListener: EventListener) : WakeupI() {
         wp = EventManagerFactory.create(context, "wp")
         wp?.registerListener(eventListener)
 
-        val appInfo = context.packageManager.getApplicationInfo(context.packageName,
-                PackageManager.GET_META_DATA)
-        if (BuildConfig.DEBUG) {
-            appId = 11389525
-            appKey = "ILdLUepG75UwwQVa0rqiEUVa"
-            secretKey = "di6djKXGGELgnCCusiQUlCBYRxXVrr46"
-        } else {
-            appId = AppConfig.BaiduKey.appId
-            appKey = AppConfig.BaiduKey.appKey
-            secretKey = AppConfig.BaiduKey.sKey
-        }
+        appId = BaiduKey.appId
+        appKey = BaiduKey.appKey
+        secretKey = BaiduKey.sKey
         LuaUtil.assetsToSD(context, "bd/WakeUp_xvtx.bin",
                 context.filesDir.absolutePath + "/bd/WakeUp_xvtx.bin")
     }

@@ -1,7 +1,6 @@
 package cn.vove7.common.utils
 
 import android.Manifest
-import android.app.Activity
 import android.content.Context
 import android.content.pm.PackageManager
 import android.graphics.Rect
@@ -12,8 +11,9 @@ import cn.vove7.vtp.app.AppInfo
 import cn.vove7.vtp.log.Vog
 import android.content.Intent
 import android.content.pm.ApplicationInfo
-import android.content.pm.PackageInfo.REQUESTED_PERMISSION_GRANTED
+import android.os.HandlerThread
 import cn.vove7.common.app.GlobalApp
+import java.text.SimpleDateFormat
 import java.util.*
 
 
@@ -35,6 +35,21 @@ fun runOnUi(action: () -> Unit) {
         Handler(mainLoop).post(action)
     }
 }
+
+fun runOnNewHandlerThread(name: String = "anonymous", autoQuit: Boolean = true,
+                          run: () -> Unit): HandlerThread {
+    return HandlerThread(name).apply {
+        start()
+        Vog.d(this, "runOnNewHandlerThread ---> $name")
+        Handler(looper).post {
+            run.invoke()
+            if (autoQuit)
+                quitSafely()
+        }
+    }
+}
+
+fun formatNow(pat: String): String = SimpleDateFormat(pat, Locale.getDefault()).format(Date())
 
 fun Context.startActivityOnNewTask(intent: Intent) {
     intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
@@ -65,16 +80,22 @@ fun View.boundsInScreen(): Rect {
  * @param context Context
  * @return Boolean
  */
-fun AppInfo.isInputMethod(context: Context): Boolean {
+val inputMethodCache = hashMapOf<String, Boolean>()
 
+fun AppInfo.isInputMethod(context: Context): Boolean {
+    inputMethodCache[packageName]?.also {
+        return it
+    }
     val pm = context.packageManager
     val pkgInfo = pm.getPackageInfo(packageName, PackageManager.GET_SERVICES)
     pkgInfo.services?.forEach {
         if (it.permission == Manifest.permission.BIND_INPUT_METHOD) {
             Vog.d(this, "isInputMethod ---> 输入法：$packageName")
+            inputMethodCache[packageName] = true
             return true
         }
     }
+    inputMethodCache[packageName] = false
     return false
 }
 
@@ -85,12 +106,11 @@ fun AppInfo.isHomeApp(): Boolean {
 }
 
 val appActivityCache = hashMapOf<String, Array<String>>()
-fun AppInfo.activities(): Array<String> {
+fun AppInfo.activities(): Array<String> {//fixme packageManager died
     synchronized(AppInfo::class) {
         appActivityCache[packageName]?.let {
             return it
         }
-
         val pm = GlobalApp.APP.packageManager
         val pkgInfo = pm.getPackageInfo(packageName, PackageManager.GET_ACTIVITIES)
         val acs = pkgInfo.activities
@@ -101,6 +121,7 @@ fun AppInfo.activities(): Array<String> {
             }
         }
         return rList.toTypedArray().also {
+            Vog.d(this, "activities ---> $it")
             appActivityCache[packageName] = it
         }
     }

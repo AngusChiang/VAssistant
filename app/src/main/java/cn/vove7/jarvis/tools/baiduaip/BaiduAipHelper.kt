@@ -1,12 +1,12 @@
-package cn.vove7.common.baiduaip
+package cn.vove7.jarvis.tools.baiduaip
 
 import cn.vove7.common.app.GlobalLog
-import cn.vove7.common.netacc.NetHelper
 import cn.vove7.common.utils.GsonHelper
+import cn.vove7.jarvis.tools.AppConfig
+import cn.vove7.jarvis.tools.BaiduKey
 import cn.vove7.vtp.log.Vog
 import com.baidu.aip.imageclassify.AipImageClassify
 import com.baidu.aip.nlp.AipNlp
-import com.google.gson.Gson
 import com.google.gson.annotations.SerializedName
 import org.json.JSONObject
 
@@ -17,9 +17,6 @@ import org.json.JSONObject
  * 2018/10/14
  */
 object BaiduAipHelper {
-    private val APP_ID = "14434099"
-    private val API_KEY = "mfDGvqViuSk9ZuRyubRwwGhs"
-    private val SECRET_KEY = "PsNGEsfU67qVoprKToLVaE1eT4bCbbML"
 
     /**
      * 分词
@@ -27,7 +24,7 @@ object BaiduAipHelper {
      * @return List<String>?
      */
     fun lexer(text: String): List<String>? {
-        val client = AipNlp(APP_ID, API_KEY, SECRET_KEY)
+        val client = AipNlp(BaiduKey.appId.toString(), BaiduKey.appKey, BaiduKey.sKey)
 
         try {// 可选：设置网络连接参数
             client.setConnectionTimeoutInMillis(5000)
@@ -58,12 +55,11 @@ object BaiduAipHelper {
     }
 
     fun imageClassify(path: String): ImageClassifyResult? {
-        val client = AipImageClassify("10922901", "xwzlOfIIysRN7IDdcjA823ZS",
-                "d9ef661698c5d8cd45978aa55e600e03")
+        val client = AipImageClassify(BaiduKey.appId.toString(), BaiduKey.appKey, BaiduKey.sKey)
         client.setConnectionTimeoutInMillis(5000)
         client.setSocketTimeoutInMillis(6000)
         val result = client.advancedGeneral(path, hashMapOf(Pair("baike_num", "1")))
-        Vog.d(this,"imageClassify ---> $result")
+        Vog.d(this, "imageClassify ---> $result")
         return GsonHelper.fromJson<ImageClassifyResult>(result.toString())
     }
 }

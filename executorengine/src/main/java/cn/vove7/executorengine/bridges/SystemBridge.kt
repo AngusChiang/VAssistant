@@ -258,14 +258,16 @@ object SystemBridge : SystemOperation {
         return SystemHelper.getDeviceInfo(context)
     }
 
-    override fun openUrl(url: String) {
-        try {
+    override fun openUrl(url: String): Boolean {
+        return try {
             val intent = Intent(Intent.ACTION_VIEW)
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             intent.data = Uri.parse(url)
             context.startActivity(intent)
+            true
         } catch (e: ActivityNotFoundException) {
             GlobalApp.toastShort("无可用浏览器")
+            false
         }
     }
 
@@ -729,6 +731,11 @@ object SystemBridge : SystemOperation {
         return r.blockedGet()
     }
 
+    /**
+     * 转IP
+     * @param i Int
+     * @return String
+     */
     private fun intToIp(i: Int): String {
         return (i and 0xFF).toString() + "." + ((i shr 8) and 0xFF) +
                 "." + ((i shr 16) and 0xFF) + "." + (i shr 24 and 0xFF)
@@ -882,4 +889,26 @@ object SystemBridge : SystemOperation {
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         context.startActivity(intent)
     }
+
+    override val batteryLevel: Int
+        get() {
+            val filter = IntentFilter(Intent.ACTION_BATTERY_CHANGED);
+            val intent = context.registerReceiver(null, filter);
+            if (intent == null) return -1
+
+            val level = intent.getIntExtra(BatteryManager.EXTRA_LEVEL, 100) //电量的刻度
+            val maxLevel = intent.getIntExtra(BatteryManager.EXTRA_SCALE, 100) //最大
+            return level * 100 / maxLevel
+        }
+    override val isCharging: Boolean
+        get() = {
+            val filter = IntentFilter(Intent.ACTION_BATTERY_CHANGED);
+            val intent = context.registerReceiver(null, filter);
+
+            val i = intent?.getIntExtra(BatteryManager.EXTRA_STATUS,
+                    BatteryManager.BATTERY_STATUS_UNKNOWN) == BatteryManager.BATTERY_STATUS_CHARGING
+            Vog.d(this, "isCharging ---> $i")
+            i
+        }.invoke()
+
 }

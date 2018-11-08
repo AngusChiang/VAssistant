@@ -10,7 +10,6 @@ import android.view.ViewAnimationUtils
 import android.view.animation.AccelerateDecelerateInterpolator
 import android.widget.TextView
 import cn.vove7.common.appbus.AppBus
-import cn.vove7.common.appbus.LogMessage
 import cn.vove7.common.appbus.SpeechAction
 import cn.vove7.common.appbus.VoiceData
 import cn.vove7.jarvis.R
@@ -71,10 +70,6 @@ class VoiceTestActivity : Activity() {
         super.onStop()
     }
 
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    fun log(log: LogMessage) {
-        logText.append(log.msg + "\n")
-    }
 
     var op = 0
     @Subscribe(threadMode = ThreadMode.MAIN)

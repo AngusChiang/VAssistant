@@ -20,7 +20,6 @@ import cn.vove7.jarvis.speech.baiduspeech.wakeup.BaiduVoiceWakeup
 import cn.vove7.jarvis.speech.baiduspeech.wakeup.RecogWakeupListener
 import cn.vove7.jarvis.speech.baiduspeech.wakeup.WakeupEventAdapter
 import cn.vove7.jarvis.tools.AppConfig
-import cn.vove7.jarvis.view.statusbar.MicroToggleAnimation
 import cn.vove7.jarvis.view.statusbar.StatusAnimation
 import cn.vove7.jarvis.view.statusbar.WakeupStatusAnimation
 import cn.vove7.vtp.log.Vog
@@ -88,7 +87,7 @@ class BaiduSpeechRecoService(event: SpeechEvent) : SpeechRecoService(event) {
     }
 
     override fun startWakeUp() {
-        wakeupStatusAni.showAndHideDelay("语音唤醒开启", 2500)
+        wakeupStatusAni.showAndHideDelay("语音唤醒开启", 5000)
         startWakeUpSilently()
     }
 
@@ -99,7 +98,7 @@ class BaiduSpeechRecoService(event: SpeechEvent) : SpeechRecoService(event) {
     }
 
     override fun stopWakeUp() {
-        wakeupStatusAni.failed("语音唤醒关闭", 2500)
+        wakeupStatusAni.failedAndHideDelay("语音唤醒关闭", 5000)
         stopWakeUpSilently()
         stopAutoSleepWakeup()
     }

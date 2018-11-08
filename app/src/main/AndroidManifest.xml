@@ -105,7 +105,11 @@
             android:launchMode="singleInstance"
             android:theme="@style/TransparentBackground">
             <intent-filter>
+                <!--搜索助手 触发辅助应用-->
                 <action android:name="android.intent.action.ASSIST" />
+
+                <action android:name="android.search.action.GLOBAL_SEARCH"/>
+                <!--语音搜索 触发 语音识别-->
                 <action android:name="android.intent.action.VOICE_ASSIST" />
                 <action android:name="android.intent.action.VOICE_COMMAND" />
 
@@ -116,10 +120,6 @@
             <meta-data
                 android:name="com.android.systemui.action_assist_icon"
                 android:resource="@mipmap/ic_launcher_vassist" />
-            <intent-filter>
-                <action android:name="android.intent.action.VOICE_COMMAND" />
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
         </activity>
 
         <service

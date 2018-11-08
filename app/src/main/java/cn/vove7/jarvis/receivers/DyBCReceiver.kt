@@ -18,7 +18,10 @@ abstract class DyBCReceiver : BroadcastReceiver() {
 
     open fun start() {
         open = true
-        GlobalApp.APP.registerReceiver(this, intentFilter)
+        GlobalApp.APP.apply {
+            val intent = registerReceiver(this@DyBCReceiver, intentFilter)
+            if (intent != null) onReceive(this, intent)//注册时即通知
+        }
     }
 
     fun stop() {

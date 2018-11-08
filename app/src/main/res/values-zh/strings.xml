@@ -132,7 +132,15 @@
     <string name="text_failed_to_get_user_info">获取其个人信息失败</string>
     <string name="text_purchase_recharge_code">购买充值码</string>
     <string name="text_purchase_recharge_code_msg">1.联系qq获取（推荐）\n2.通过支付宝转账下方指定金额，在备注填写你的邮箱，不久你会收到含有充值码的邮件\n点击下方[使用充值码]继续操作即可。</string>
-    <string name="text_advan_include_func">1.新建脚本指令\n2.远程调试脚本\n3.广告跳过无限制\n4.本地代码测试\n5.无限制标记管理\n6.操作、标记分享，且可同步恢复</string>
+    <string name="text_advan_include_func">
+        1.新建脚本指令\n
+        2.远程调试脚本\n
+        3.去广告次数跳无限制\n
+        4.本地代码测试\n
+        5.无限制标记管理\n
+        6.操作、标记分享，且可同步恢复\n
+        7.无限制屏幕识别/文字识别
+    </string>
     <string name="text_recharege_pre_read">在支付前，请先阅读高级教程，确保它对你有用。</string> <string name="text_email_copy_to_clip">你的邮箱已复制到剪切板</string>
     <string name="text_understand">知道了</string>
     <string name="text_continue">继续</string>
@@ -184,7 +192,7 @@
     <string name="text_long_press_volume_up">长按音量上键</string>
     <string name="text_as_global_inst">设为全局指令</string>
     <string name="text_animation">动画</string>
-    <string name="text_set_as_default_voice_assist">设为默认语音助手</string>
+    <string name="text_set_as_default_assist">设为默认辅助应用</string>
     <string name="desc_device_admin">用于锁屏</string>
     <string name="text_long_press_to_export_log">查看日志，长按导出日志</string>
     <string name="text_send">发送</string>

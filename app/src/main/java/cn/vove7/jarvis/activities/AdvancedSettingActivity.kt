@@ -15,6 +15,7 @@ import cn.vove7.jarvis.BuildConfig
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.activities.base.ReturnableActivity
 import cn.vove7.jarvis.adapters.SettingsExpandableAdapter
+import cn.vove7.jarvis.receivers.PowerEventReceiver
 import cn.vove7.jarvis.tools.*
 import cn.vove7.jarvis.tools.backup.BackupHelper
 import cn.vove7.jarvis.tools.debugserver.RemoteDebugServer
@@ -194,6 +195,9 @@ class AdvancedSettingActivity : ReturnableActivity() {
                         IntentItem(title = "切换引导debug") {
                             Tutorials.debug = !Tutorials.debug
                             toast.showShort("${Tutorials.debug}")
+                        },
+                        IntentItem(title = "触发低电量") {
+                            PowerEventReceiver.onLowBattery()
                         }
                 )))
             }

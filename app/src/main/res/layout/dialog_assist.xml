@@ -12,27 +12,43 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="20dp"
         app:behavior_hideable="true"
-        app:behavior_peekHeight="320dp"
+        app:behavior_peekHeight="500dp"
         app:cardCornerRadius="6dp"
         app:cardElevation="2dp"
         app:layout_behavior="@string/bottom_sheet_behavior">
 
-        <ProgressBar
-            android:id="@+id/progress_bar"
-            style="@style/Base.Widget.AppCompat.ProgressBar.Horizontal"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:visibility="invisible"
-            android:indeterminate="true" />
+            android:orientation="vertical">
 
-        <cn.vove7.vtp.view.listview.BottomSheetListView
-            android:id="@+id/bottom_list_view"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_marginTop="8dp"
-            android:layout_marginBottom="8dp"
-            android:divider="#00000000"
-            app:layout_behavior="@string/bottom_sheet_behavior" />
+            <ProgressBar
+                android:id="@+id/progress_bar"
+                style="@style/Base.Widget.AppCompat.ProgressBar.Horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="22dp"
+                android:indeterminate="true"
+                android:visibility="invisible" />
+
+            <cn.vove7.vtp.view.listview.BottomSheetListView
+                android:id="@+id/bottom_list_view"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginBottom="8dp"
+                android:divider="#00000000"
+                app:layout_behavior="@string/bottom_sheet_behavior" />
+
+            <ImageView
+                android:id="@+id/voice_btn"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_gravity="center"
+                android:layout_marginBottom="10dp"
+                android:background="@color/trans"
+                android:padding="8dp"
+                android:src="@drawable/ic_keyboard_voice_black_24dp" />
+        </LinearLayout>
+
     </android.support.v7.widget.CardView>
 
 </android.support.design.widget.CoordinatorLayout>

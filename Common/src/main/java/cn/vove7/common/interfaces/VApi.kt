@@ -62,7 +62,7 @@ interface VApi {
                 "screen2File()", "shareText(text)", "shareImage(imgPah)", "location()",
                 "getLocalIpAddress()", "getNetAddress()", "createAlarm()", "createCalendarEvent()",
                 "startActivity(pkg,fullActivityName)", "screenOn()", "screenOff()", "sendKey()",
-                "sendSMS()", "getLaunchIntent()", "getPhoneByName()"
+                "sendSMS()", "getLaunchIntent()", "getPhoneByName()", "isCharging()", "batteryLevel"
         )
         val appFunctions = arrayOf(
                 "startActivity()", "getSystemService()"
@@ -254,7 +254,9 @@ interface VApi {
                         "from https://blog.csdn.net/chen825919148/article/details/18732041"),
                 Pair("sendSMS()", "发送短信\n参数：(phone: String, content: String)"),
                 Pair("getLaunchIntent(pkg)", "根据pkg(包名)获取App的启动Intent,类似桌面启动App\n参数：(pkg:String)"),
-                Pair("getPhoneByName()", "根据姓名查找手机号，搜索范围：标记数据、通讯录\n参数：(name: String)")
+                Pair("getPhoneByName()", "根据姓名查找手机号，搜索范围：标记数据、通讯录\n参数：(name: String)"),
+                Pair("batteryLevel", "返回当前电量，范围0-100"),
+                Pair("isCharging()", "返回是否在充电")
         )
         val executorMap = hashMapOf(
                 Pair("interrupt()", "终止执行"),

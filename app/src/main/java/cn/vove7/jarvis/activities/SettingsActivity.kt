@@ -19,7 +19,6 @@ import cn.vove7.jarvis.activities.base.ReturnableActivity
 import cn.vove7.jarvis.adapters.SettingsExpandableAdapter
 import cn.vove7.jarvis.receivers.PowerEventReceiver
 import cn.vove7.jarvis.services.MainService
-import cn.vove7.jarvis.services.MyAccessibilityService
 import cn.vove7.jarvis.speech.WakeupI
 import cn.vove7.jarvis.tools.*
 import cn.vove7.jarvis.view.*
@@ -76,8 +75,8 @@ class SettingsActivity : ReturnableActivity() {
     }
 
     private fun initData(): List<SettingGroupItem> = listOf(
-            SettingGroupItem(R.color.google_blue, "语音助手", childItems = listOf(
-                    IntentItem(R.string.text_set_as_default_voice_assist, summary = "可以通过长按HOME键或蓝牙快捷键唤醒", onClick = {
+            SettingGroupItem(R.color.google_blue, "辅助应用", childItems = listOf(
+                    IntentItem(R.string.text_set_as_default_assist, summary = "可以通过长按HOME键或蓝牙快捷键唤醒", onClick = {
                         try {
                             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                                 startActivity(Intent(Settings.ACTION_MANAGE_DEFAULT_APPS_SETTINGS))
@@ -98,7 +97,7 @@ class SettingsActivity : ReturnableActivity() {
                     }*/
             )),
             SettingGroupItem(R.color.google_green, "反馈", childItems = listOf(
-                    SwitchItem(R.string.text_vibrate_reco_begin,
+                    CheckBoxItem(R.string.text_vibrate_reco_begin,
                             keyId = R.string.key_vibrate_reco_begin, defaultValue = { true }),
                     CheckBoxItem(title = "执行失败", keyId = R.string.key_exec_failed_voice_feedback,
                             summary = "失败时的语音反馈",
@@ -230,8 +229,7 @@ class SettingsActivity : ReturnableActivity() {
                             keyId = R.string.key_auto_open_as_with_root, defaultValue = { false }) { _, b ->
                         if (b as Boolean && !PermissionUtils.accessibilityServiceEnabled(this)) {
                             thread {
-                                RootHelper.openAppAccessService(packageName,
-                                        "${MyAccessibilityService::class.qualifiedName}")
+                                RootHelper.openSelfAccessService()
                             }
                         }
                         return@CheckBoxItem true

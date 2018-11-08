@@ -1,23 +1,16 @@
 package cn.vove7.jarvis
 
-import cn.vove7.common.bridges.HttpBridge
 import cn.vove7.common.datamanager.parse.model.Action
 import cn.vove7.common.utils.TextDateParser
 import cn.vove7.common.utils.TextHelper
 import org.jsoup.Jsoup
-import org.jsoup.nodes.Document
 import org.junit.Test
 import java.lang.Thread.sleep
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.concurrent.thread
-import android.database.CharArrayBuffer
-import android.os.AsyncTask.execute
-import cn.vove7.common.baiduaip.BaiduAipHelper
+import cn.vove7.jarvis.tools.baiduaip.BaiduAipHelper
 import cn.vove7.jarvis.chat.TulingChatSystem
-import org.json.JSONObject
-import java.io.IOException
-import java.io.InputStreamReader
 
 
 /**
