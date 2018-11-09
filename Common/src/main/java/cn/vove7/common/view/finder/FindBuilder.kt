@@ -69,60 +69,44 @@ open class FindBuilder : ViewOperation {
     }
 
     override fun tryClick(): Boolean {
-        val node = findFirst()
-        return node?.tryClick() == true
+        return findFirst()?.tryClick() == true
     }
 
     override fun click(): Boolean {
-        val node = findFirst()
-        return node?.tryClick() == true
+        return findFirst()?.tryClick() == true
+    }
+
+    override fun globalClick(): Boolean {
+        return findFirst()?.globalClick() == true
     }
 
     override fun longClick(): Boolean {
-        val node = findFirst()
-        return node?.longClick() == true
+        return findFirst()?.longClick() == true
     }
 
     override fun doubleClick(): Boolean {
-        val node = findFirst()
-        return node?.doubleClick() == true
+        return findFirst()?.doubleClick() == true
     }
 
     override fun tryLongClick(): Boolean {
-        val node = findFirst()
-        return node?.tryLongClick() == true
+        return findFirst()?.tryLongClick() == true
     }
 
     override fun getCenterPoint(): Point? {
-        val node = findFirst()
-        return node?.getCenterPoint()
+        return findFirst()?.getCenterPoint()
     }
 
     override fun select(): Boolean {
-        val node = findFirst()
-        return node?.select() == true
+        return findFirst()?.select() == true
     }
 
     override fun trySelect(): Boolean {
-        val node = findFirst()
-        return node?.trySelect() == true
+        return findFirst()?.trySelect() == true
     }
 
     override fun scrollUp(): Boolean {
-        val node = findFirst()
-        try {
-            return node?.scrollUp() == true
-        } catch (e: Exception) {
-            e.printStackTrace()
-            return false
-        }
-
-    }
-
-    override fun scrollDown(): Boolean {
-        val node = findFirst()
         return try {
-            node?.scrollDown() == true
+            findFirst()?.scrollUp() == true
         } catch (e: Exception) {
             e.printStackTrace()
             false
@@ -130,99 +114,88 @@ open class FindBuilder : ViewOperation {
 
     }
 
+    override fun scrollDown(): Boolean {
+        return try {
+            findFirst()?.scrollDown() == true
+        } catch (e: Exception) {
+            e.printStackTrace()
+            false
+        }
+    }
+
     override fun setText(text: String, ep: String?): Boolean {
-        val node = findFirst()
-        return node?.setText(text, ep) == true
+        return findFirst()?.setText(text, ep) == true
     }
 
     override fun setText(text: String): Boolean {
-        val node = findFirst()
-        return node?.setText(text) == true
+        return findFirst()?.setText(text) == true
     }
 
     override fun appendText(s: String): Boolean {
-        val node = findFirst()
-        return node?.appendText(s) == true
+        return findFirst()?.appendText(s) == true
     }
 
     override fun desc(): String? {
-        val node = findFirst()
-        return node?.desc()
+        return findFirst()?.desc()
     }
 
     override fun setTextWithInitial(text: String): Boolean {
-        val node = findFirst()
-        return node?.setTextWithInitial(text) == true
-
+        return findFirst()?.setTextWithInitial(text) == true
     }
 
     override fun trySetText(text: String): Boolean {
-        val node = findFirst()
-        return node?.trySetText(text) == true
+        return findFirst()?.trySetText(text) == true
     }
 
     override fun getText(): String? {
-        val node = findFirst()
-        return node?.getText()
+        return findFirst()?.getText()
     }
 
     override fun focus(): Boolean {
-        val node = findFirst()
-        return node?.focus() == true
+        return findFirst()?.focus() == true
     }
 
     override fun scrollForward(): Boolean {
-        val node = findFirst()
-        return node?.scrollForward() == true
+        return findFirst()?.scrollForward() == true
     }
 
     override fun scrollBackward(): Boolean {
-        val node = findFirst()
-        return node?.scrollBackward() == true
+        return findFirst()?.scrollBackward() == true
     }
 
     override fun scrollLeft(): Boolean {
-        val node = findFirst()
-        return node?.scrollLeft() == true
+        return findFirst()?.scrollLeft() == true
     }
 
     override fun swipe(dx: Int, dy: Int, delay: Int): Boolean {
-        val node = findFirst()
-        return node?.swipe(dx, dy, delay) == true
+        return findFirst()?.swipe(dx, dy, delay) == true
     }
 
     override fun scrollRight(): Boolean {
-        val node = findFirst()
-        return node?.scrollRight() == true
+        return findFirst()?.scrollRight() == true
     }
 
     override fun getChilds(): Array<ViewNode>? {
-        val node = findFirst()
-        return node?.getChilds()
+        return findFirst()?.getChilds()
     }
 
     override fun getBounds(): Rect? {
-        val node = findFirst()
-        return node?.getBounds()
+        return findFirst()?.getBounds()
     }
 
     override fun getBoundsInParent(): Rect? {
-        val node = findFirst()
-        return node?.getBoundsInParent()
+        return findFirst()?.getBoundsInParent()
     }
 
     override fun getParent(): ViewNode? {
-        val node = findFirst()
-        return node?.getParent()
+        return findFirst()?.getParent()
     }
 
     override fun getChildCount(): Int? {
-        val node = findFirst()
-        return node?.getChildCount()
+        return findFirst()?.getChildCount()
     }
 
     override fun isClickable(): Boolean {
-        val node = findFirst()
-        return node?.isClickable() ?: false
+        return findFirst()?.isClickable() ?: false
     }
 }

@@ -62,7 +62,7 @@ class ViewNode(val node: AccessibilityNodeInfo) : ViewOperation, Comparable<View
         return false
     }
 
-    fun globalClick(): Boolean {
+    override fun globalClick(): Boolean {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             //获得中心点
             val relp = ScreenAdapter.getRelPoint(getCenterPoint())
