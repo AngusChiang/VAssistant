@@ -101,12 +101,16 @@ abstract class CodeEditorActivity : AppCompatActivity() {
         toggle_functions.setOnClickListener {
             if (functions_grid.visibility == View.GONE) {
                 functions_grid.visibility = View.VISIBLE
+                functions_grid.animate().setDuration(1000).alpha(1f).alphaBy(0f).start()
                 activityRootView.viewTreeObserver.removeOnGlobalLayoutListener(gloLis)
                 hideInputMethod()
                 Handler().postDelayed({
                     activityRootView.viewTreeObserver.addOnGlobalLayoutListener(gloLis)
                 }, 100)
-            } else functions_grid.visibility = View.GONE
+            } else {
+                functions_grid.visibility = View.GONE
+                functions_grid.animate().setDuration(500).alpha(0f).alphaBy(1f).start()
+            }
             functions_grid.animate().setDuration(1000).start()
         }
         EditorFunsHelper(this, supportFragmentManager, func_pager, tab_lay) {

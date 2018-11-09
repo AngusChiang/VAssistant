@@ -62,7 +62,8 @@ interface VApi {
                 "screen2File()", "shareText(text)", "shareImage(imgPah)", "location()",
                 "getLocalIpAddress()", "getNetAddress()", "createAlarm()", "createCalendarEvent()",
                 "startActivity(pkg,fullActivityName)", "screenOn()", "screenOff()", "sendKey()",
-                "sendSMS()", "getLaunchIntent()", "getPhoneByName()", "isCharging()", "batteryLevel"
+                "sendSMS()", "getLaunchIntent()", "getPhoneByName()", "isCharging()", "batteryLevel",
+                "simCount", "contacts", "saveMarkedContact()", "saveMarkedApp()"
         )
         val appFunctions = arrayOf(
                 "startActivity()", "getSystemService()"
@@ -104,16 +105,22 @@ interface VApi {
                 Pair("commandType", "指令类型(1打开|-1关闭)"),
                 Pair("command", "用户命令"),
                 Pair("DEBUG", "调试标志"),
-                Pair("focusView", "当前获得焦点的ViewNode"),
+                Pair("focusView", "当前获得焦点的ViewNode,可能为空"),
                 Pair("userInterrupted", "用户终止的标志\n此标志用于在脚本长时间循环操作")
         )
         val systemFunMap = hashMapOf(
+                Pair("simCount", "当前插卡数量"),
+                Pair("contacts", "获得联系人数组Array<Pair<>String,String>  数组元素：Pair(contactName,phone)\n提示：Pair类 使用 pair.first和pair.second 获取 里面的值"),
+                Pair("saveMarkedContact()", "保存到标记联系人\n参数(name: String, regex: String, phone: String)"),
+                Pair("saveMarkedApp()", "保存到标记应用\n参数(name: String, regex: String, pkg: String)"),
+
                 Pair("openAppDetail(pkg)", "打开app详情页"),
                 Pair("startActivity(pkg,fullActivityName)", "打开指定app的Activity"),
                 Pair("getPkgByWord(s)", "从app标记和app列表获取包名"),
                 Pair("openAppByPkg(pkg, reset)", "打开指定app,reset:可选,跳转'首页'"),
                 Pair("openAppByWord(s)", "从标记和安装列表匹配，打开app"),
-                Pair("call(p)", "拨打电话"),
+                Pair("getPhoneByName()", "根据姓名查找手机号，搜索范围：标记数据、通讯录\n参数：(name: String)"),
+                Pair("call(p)", "拨打电话\n参数：(s:String [,simId:Int])\ns可为纯数字电话或联系人姓名(此时phone根据getPhoneByName获取)，simId(可选)为卡号，0:卡1  1:卡2，出错将按默认卡呼出"),
                 Pair("openFlashlight()", "打开闪光灯"),
                 Pair("closeFlashlight()", "关闭闪光灯"),
                 Pair("getDeviceInfo()", "获取设备信息，返回DeviceInfo"),
@@ -254,7 +261,6 @@ interface VApi {
                         "from https://blog.csdn.net/chen825919148/article/details/18732041"),
                 Pair("sendSMS()", "发送短信\n参数：(phone: String, content: String)"),
                 Pair("getLaunchIntent(pkg)", "根据pkg(包名)获取App的启动Intent,类似桌面启动App\n参数：(pkg:String)"),
-                Pair("getPhoneByName()", "根据姓名查找手机号，搜索范围：标记数据、通讯录\n参数：(name: String)"),
                 Pair("batteryLevel", "返回当前电量，范围0-100"),
                 Pair("isCharging()", "返回是否在充电")
         )
@@ -263,7 +269,7 @@ interface VApi {
                 Pair("setScreenSize()", "设置屏幕尺寸值，其他使用到屏幕坐标的都基于此尺寸，默认为本机屏幕实际尺寸"),
                 Pair("checkService()", "检查无障碍 返回无障碍是否开启"),
                 Pair("alert()", "显示对话框，返回是否继续"),
-                Pair("singleChoiceDialog()", "显示单选对话框，返回选择文本，若取消返回空"),
+                Pair("singleChoiceDialog()", "显示单选对话框，返回选择的索引，若取消返回空\n(1)参数：(title:String, items:Array<String>)\n(2)参数：(title:String, items:Array<Pair<String,String>>)"),
                 Pair("waitForVoiceParam()", "等待用户说话，并返回识别结果，识别失败返回空"),
                 Pair("waitForApp()", "等待应用出现,参数：(pkg[,activity[,millis]])"),
                 Pair("speak(s)", "语音合成（异步）无返回值"),

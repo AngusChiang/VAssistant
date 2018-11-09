@@ -108,7 +108,7 @@ class SimpleActionScriptExecutor(
                 }
             }
             ACTION_CALL -> {
-                return if (checkParam(p)) smartCallPhone(p)
+                return if (checkParam(p)) PartialResult(smartCallPhone(p))
                 else {
                     if (waitForVoiceParam() != null)
                         execAction(cmd)

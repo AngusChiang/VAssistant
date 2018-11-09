@@ -27,6 +27,17 @@ class UpdateLogDialog(context: Context, onDismiss: (() -> Unit)? = null) {
 
     private val logs: List<Pair<String, String>>
         get() = listOf(
+                Pair("1.3.4","支持选卡拨号\n" +
+                        "支持VSCode将代码发送至App新建指令\n" +
+                        "支持VSCode将文本复制至手机剪切板\n" +
+                        "添加api\n" +
+                        "  system.simCount\n" +
+                        "  system.contacts\n" +
+                        "  system.saveMarkedContact\n" +
+                        "  system.saveMarkedApp\n" +
+                        "  system.call(phone,simId)\n"),
+                Pair("1.3.3", "修复低于安卓8.0执行system函数崩溃问题"),
+                Pair("1.3.2", "修复语音唤醒定时问题"),
                 Pair("1.3.1", "加入省电模式(必关闭语音唤醒)\n" +
                         "加入快捷屏幕助手[实验室]（设为默认辅助应用，可长按HOME键触发，部分机型需手动设置）\n" +
                         "  -屏幕识别\n" +

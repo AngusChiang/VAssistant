@@ -468,7 +468,12 @@ object DaoHelper {
                 }
     }
 
-    fun getSimActionNode(new: ActionNode): ActionNode? {
+    /**
+     * ActionNode相似数据
+     * @param new ActionNode
+     * @return ActionNode?
+     */
+    fun getSimActionNode(new: ActionNode): ActionNode? {//Sim????  相似
         return DAO.daoSession.actionNodeDao.queryBuilder()
                 .where(ActionNodeDao.Properties.ActionTitle.eq(new.actionTitle ?: ""),
                         ActionNodeDao.Properties.From.eq(DataFrom.FROM_USER),
@@ -476,6 +481,11 @@ object DaoHelper {
                 ).unique()
     }
 
+    /**
+     * MarkedData相似数据
+     * @param new MarkedData
+     * @return MarkedData?
+     */
     fun getSimMarkedData(new: MarkedData): MarkedData? {
         return DAO.daoSession.markedDataDao.queryBuilder()
                 .where(

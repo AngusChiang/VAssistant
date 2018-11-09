@@ -491,10 +491,27 @@ open class ExecutorImpl(
         }.also { Vog.d(this, "waitForSingleChoice result : $it") }
     }
 
-    override fun singleChoiceDialog(askTitle: String, choiceData: Array<String>): String? {
-        return waitForSingleChoice(askTitle, array2ChoiceData(choiceData))?.title
+    override fun singleChoiceDialog(askTitle: String, choiceData: Array<String>): Int? {
+        return waitForSingleChoice(askTitle, array2ChoiceData(choiceData))?.index
     }
 
+    fun singleChoiceDialog(askTitle: String, choiceData: Array<Pair<String, String?>>): Int? {
+        return waitForSingleChoice(askTitle, pair2ChoiceData(choiceData))?.index
+    }
+
+    fun pair2ChoiceData(choiceDatas: Array<Pair<String, String?>>): List<ChoiceData> {
+        val list = mutableListOf<ChoiceData>()
+        choiceDatas.forEach {
+            list.add(ChoiceData(it.first, subtitle = it.second))
+        }
+        return list
+    }
+
+    /**
+     * 数组转
+     * @param arr Array<String>
+     * @return List<ChoiceData>
+     */
     private fun array2ChoiceData(arr: Array<String>): List<ChoiceData> {
         val l = mutableListOf<ChoiceData>()
         arr.forEach {
@@ -557,12 +574,12 @@ open class ExecutorImpl(
     /**
      * 拨打
      */
-    fun smartCallPhone(s: String): PartialResult {//todo 脚本内实现
+    fun smartCallPhone(s: String): Boolean {//todo 脚本内实现
         Vog.d(this, "smartCallPhone $s")
         val result = systemBridge.call(s)
-        return if (!result.ok) {
+        return if (!result) {
             if (!alert("未识别该联系人", "选择是否标记该联系人: $s")) {
-                return PartialResult.failed()
+                return false
             }
             //标识联系人
             val choiceData =
@@ -576,11 +593,11 @@ open class ExecutorImpl(
                     AdvanContactHelper.addMark(marked)
                 }
                 val sss = systemBridge.call(choiceData.subtitle!!)
-                PartialResult(sss.ok, if (!sss.ok) sss.errMsg else "")
+                sss
             } else {
-                PartialResult(false, "取消")
+                false
             }
-        } else PartialResult.success()
+        } else true
     }
 
     override fun setScreenSize(width: Int, height: Int) {

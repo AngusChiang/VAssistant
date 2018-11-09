@@ -1,5 +1,6 @@
 package cn.vove7.jarvis.tools.debugserver
 
+import android.content.Intent
 import android.os.Handler
 import android.os.Looper
 import cn.vove7.androlua.LuaHelper
@@ -7,9 +8,13 @@ import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.appbus.AppBus
 import cn.vove7.common.datamanager.parse.model.Action
+import cn.vove7.common.datamanager.parse.statusmap.ActionNode
 import cn.vove7.common.executor.OnPrint
+import cn.vove7.common.utils.startActivityOnNewTask
+import cn.vove7.executorengine.bridges.SystemBridge
 import cn.vove7.jarvis.BuildConfig
 import cn.vove7.jarvis.R
+import cn.vove7.jarvis.activities.NewInstActivity
 import cn.vove7.jarvis.services.MainService
 import cn.vove7.jarvis.tools.AppConfig
 import cn.vove7.rhino.api.RhinoApi
@@ -90,7 +95,7 @@ object RemoteDebugServer : Runnable {
                     clients?.add(p)
                     GlobalApp.toastShort(String.format(GlobalApp.getString(R.string.text_establish_connection), client.inetAddress
                         ?: "none"))
-                    print.onPrint(0, "连接成功 ${client.inetAddress}")
+                    print.onPrint(0, "与PC[${client.inetAddress}]建立连接   --来自App")
                     //type -> script -> arg
                     thread {
                         try {
@@ -205,7 +210,27 @@ object RemoteDebugServer : Runnable {
                         print.onPrint(0, "执行：$cmd")
                         MainService.instance?.onParseCommand(cmd)
                     }
-
+                }
+                "copyText" -> {
+                    SystemBridge.setClipText(action.text)
+                    print.onPrint(0, "已复制")
+                    GlobalApp.toastShort("已复制")
+                }
+                else -> {
+                    if (action.action.startsWith("new_inst")) {
+                        GlobalApp.APP.apply {
+                            val intent = Intent(this, NewInstActivity::class.java)
+                            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK)
+                            intent.putExtra("remote_script", action.text)
+                            intent.putExtra("remote_script_type", if ("lua" == action.type) "lua" else "js")
+                            intent.putExtra("type", if (action.action == "new_inst_as_inapp")
+                                ActionNode.NODE_SCOPE_IN_APP else ActionNode.NODE_SCOPE_GLOBAL)
+                            //类型
+                            startActivityOnNewTask(intent)
+                        }
+                    } else {
+                        print.onPrint(0, "未知操作${action.action}")
+                    }
                 }
             }
         }
@@ -220,5 +245,6 @@ object RemoteDebugServer : Runnable {
 class RemoteAction(
         val action: String,
         val type: String?,
-        val text: String?
+        val text: String?,
+        val extra: String?
 )

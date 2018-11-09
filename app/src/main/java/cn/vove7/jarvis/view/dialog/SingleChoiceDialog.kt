@@ -54,6 +54,7 @@ class SingleChoiceDialog(context: Context, title: String, list: List<ChoiceData>
             holder.itemView.setOnClickListener {
                 listener.onSingleSelect(pos, item)
             }
+            item.index = pos
             holder.choiceTitle.text = item.title
             holder.choiceSubtitle.text = item.subtitle ?: ""
             if (item.iconDrawable != null) {

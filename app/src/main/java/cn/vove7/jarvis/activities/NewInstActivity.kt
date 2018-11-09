@@ -70,8 +70,24 @@ class NewInstActivity : AppCompatActivity(), View.OnClickListener {
 
     private lateinit var searchView: SearchView
     private var enterTime = 0L
+    private lateinit var voast: ColorfulToast
 
+    lateinit var scriptTextView: EditText
+    private var scriptText: String? = null
+        set(value) {
+            field = value
+            if (code_view.getOptions() == null)
+                code_view.setOptions(Options.get(this)
+                        .withLanguage(scriptType ?: "lua")
+                        .withCode(value ?: ""))
+            else {
+                code_view.setCode(value ?: "")
+            }
+        }
+
+    private var scriptType: String? = null
     lateinit var toolbar: Toolbar
+
     override fun onCreate(savedInstanceState: Bundle?) {
         enterTime = System.currentTimeMillis()
         super.onCreate(savedInstanceState)
@@ -80,6 +96,7 @@ class NewInstActivity : AppCompatActivity(), View.OnClickListener {
             finish()
             return
         }
+
 
         voast = ColorfulToast(this)
         setContentView(R.layout.activity_new_inst)
@@ -129,6 +146,13 @@ class NewInstActivity : AppCompatActivity(), View.OnClickListener {
                 editNode?.regsWithoutCache?.forEach {
                     regs.add(Pair(it.regStr, it.paramPosArray))
                 }
+            }
+        } else {// 来自RemoteDebugServer
+            if (intent.hasExtra("remote_script")) {
+                scriptText = intent.getStringExtra("remote_script")
+                scriptType = intent.getStringExtra("remote_script_type")
+
+                Vog.d(this,"initData ---> $scriptType\n$scriptText")
             }
         }
         instType = intent.getIntExtra("type", NODE_SCOPE_GLOBAL)
@@ -233,7 +257,6 @@ class NewInstActivity : AppCompatActivity(), View.OnClickListener {
         return super.onOptionsItemSelected(item)
     }
 
-    private lateinit var voast: ColorfulToast
 
     private fun getInstalledApp(): MutableList<ViewModel> {
         val list = mutableListOf<ViewModel>()
@@ -401,19 +424,6 @@ class NewInstActivity : AppCompatActivity(), View.OnClickListener {
     }
 
     private var selScriptDialog: MaterialDialog? = null
-    lateinit var scriptTextView: EditText
-    private var scriptText: String? = null
-        set(value) {
-            field = value
-            if (code_view.getOptions() == null)
-                code_view.setOptions(Options.get(this)
-                        .withLanguage(scriptType ?: "lua")
-                        .withCode(value ?: ""))
-            else {
-                code_view.setCode(value ?: "")
-            }
-        }
-    private var scriptType: String? = null
 
     private fun showSelScriptDialog() {
         if (selScriptDialog == null) {
@@ -423,7 +433,6 @@ class NewInstActivity : AppCompatActivity(), View.OnClickListener {
             dView.findViewById<Spinner>(R.id.script_type_spinner).also {
                 it.setSelection(
                         when (scriptType) {
-                            null -> 0
                             Action.SCRIPT_TYPE_LUA -> 0
                             Action.SCRIPT_TYPE_JS -> 1
                             else -> 0
@@ -551,7 +560,7 @@ class NewInstActivity : AppCompatActivity(), View.OnClickListener {
             val actions = result.actionQueue
             while (actions?.isNotEmpty() == true) {
                 val p = actions.poll()
-                val args = p.param.value?:arrayOf(getString(R.string.text_none))
+                val args = p.param.value ?: arrayOf(getString(R.string.text_none))
                 val t = String.format(getString(R.string.text_parse_result_placeholder),
                         p.matchWord, Arrays.toString(args)) // "匹配词: ${p.matchWord} 参数: ${p.param}\n")
                 val text = ColourTextClickableSpan(this, t, android.R.color.white, listener = null)

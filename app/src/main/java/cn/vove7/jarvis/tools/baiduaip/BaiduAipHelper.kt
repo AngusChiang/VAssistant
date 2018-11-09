@@ -2,12 +2,11 @@ package cn.vove7.jarvis.tools.baiduaip
 
 import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.utils.GsonHelper
-import cn.vove7.jarvis.tools.AppConfig
 import cn.vove7.jarvis.tools.BaiduKey
+import cn.vove7.jarvis.tools.baiduaip.model.ImageClassifyResult
 import cn.vove7.vtp.log.Vog
 import com.baidu.aip.imageclassify.AipImageClassify
 import com.baidu.aip.nlp.AipNlp
-import com.google.gson.annotations.SerializedName
 import org.json.JSONObject
 
 /**
@@ -54,6 +53,11 @@ object BaiduAipHelper {
 
     }
 
+    /**
+     * 图像识别
+     * @param path String
+     * @return ImageClassifyResult?
+     */
     fun imageClassify(path: String): ImageClassifyResult? {
         val client = AipImageClassify(BaiduKey.appId.toString(), BaiduKey.appKey, BaiduKey.sKey)
         client.setConnectionTimeoutInMillis(5000)
@@ -62,59 +66,4 @@ object BaiduAipHelper {
         Vog.d(this, "imageClassify ---> $result")
         return GsonHelper.fromJson<ImageClassifyResult>(result.toString())
     }
-}
-
-/**
- * 图象识别结果
- * @property result Array<Rlt>?
- * @property errorCode String?
- * @property errorMsg String?
- * @property bestResult Rlt?
- * @property resultNum Int
- * @property logId String?
- */
-class ImageClassifyResult {
-    val result: Array<Rlt>? = null
-
-    @SerializedName("error_code")
-    var errorCode: String? = null
-    @SerializedName("error_msg")
-    var errorMsg: String? = null
-    val hasErr: Boolean
-        get() {
-            val r = errorCode != null
-            if (r) {
-                GlobalLog.err("图象识别错误信息：$errorMsg")
-            }
-            return r
-        }
-
-    val bestResult: Rlt?
-        get() {
-            return if (result?.isNotEmpty() == true) {
-                result[0]
-            } else null
-        }
-
-    @SerializedName("result_num")
-    val resultNum: Int = 0
-    @SerializedName("log_id")
-    val logId: String? = null
-
-    data class Rlt(
-            var score: Float? = null,
-            var root: String? = null,
-            var keyword: String? = null,
-            @SerializedName("baike_info")
-            var baikeInfo: BaiKeInfo? = null
-    )
-
-    data class BaiKeInfo(
-            @SerializedName("baike_url")
-            var baikeUrl: String? = null,
-            @SerializedName("image_url")
-            var imageUrl: String? = null,
-            var description: String? = null,
-            var keyword: String? = null
-    )
 }

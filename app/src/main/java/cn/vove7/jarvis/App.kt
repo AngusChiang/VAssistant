@@ -11,6 +11,7 @@ import cn.vove7.common.appbus.MessageEvent
 import cn.vove7.common.bridges.RootHelper
 import cn.vove7.common.utils.runOnNewHandlerThread
 import cn.vove7.jarvis.receivers.AppInstallReceiver
+import cn.vove7.jarvis.receivers.BTConnectListener
 import cn.vove7.jarvis.receivers.PowerEventReceiver
 import cn.vove7.jarvis.receivers.ScreenStatusListener
 import cn.vove7.jarvis.services.AssistSessionService
@@ -83,6 +84,7 @@ class App : LuaApp() {
             PowerEventReceiver.start()
             ScreenStatusListener.start()
             AppInstallReceiver.start()
+//            BTConnectListener.start()
         }
     }
 

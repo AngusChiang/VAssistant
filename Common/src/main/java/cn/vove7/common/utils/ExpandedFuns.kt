@@ -121,7 +121,7 @@ fun AppInfo.activities(): Array<String> {//fixme packageManager died
             }
         }
         return rList.toTypedArray().also {
-            Vog.d(this, "activities ---> $it")
+            Vog.d(this, "activities ---> ${Arrays.toString(it)}")
             appActivityCache[packageName] = it
         }
     }

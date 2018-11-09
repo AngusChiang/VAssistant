@@ -1,15 +1,18 @@
 package cn.vove7.jarvis.receivers
 
-import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothHeadset
-import android.bluetooth.BluetoothManager
 import android.bluetooth.BluetoothProfile
-import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.util.Log
 import cn.vove7.common.app.GlobalApp
+import android.bluetooth.BluetoothDevice
+import android.speech.SpeechRecognizer
+import cn.vove7.common.appbus.AppBus
+import cn.vove7.jarvis.services.MainService
+import cn.vove7.vtp.log.Vog
+import kotlin.concurrent.thread
 
 
 /**
@@ -18,45 +21,78 @@ import cn.vove7.common.app.GlobalApp
  * @author Administrator
  * 2018/10/26
  */
-class BTConnectListener : BroadcastReceiver() {
+object BTConnectListener : DyBCReceiver() {
 
-    private val intentFilter: IntentFilter by lazy {
+    override val intentFilter: IntentFilter by lazy {
         val i = IntentFilter()
-        i.addAction(BluetoothAdapter.ACTION_CONNECTION_STATE_CHANGED)
+        i.addAction(BluetoothHeadset.ACTION_CONNECTION_STATE_CHANGED)
+        i.addAction(BluetoothHeadset.ACTION_AUDIO_STATE_CHANGED)
         i
     }
-
     val context: Context get() = GlobalApp.APP
 
-    private fun initBlueToothHeadset() {
-        val adapter: BluetoothAdapter
-        val bm = context.getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
-        adapter = bm.adapter
-        adapter.getProfileProxy(context, blueHeadsetListener, BluetoothProfile.HEADSET)
-    }
 
     var bluetoothHeadset: BluetoothHeadset? = null
-    var blueHeadsetListener: BluetoothProfile.ServiceListener = object : BluetoothProfile.ServiceListener {
+    var bluetoothDevice: BluetoothDevice? = null
 
-        override fun onServiceDisconnected(profile: Int) {
-            Log.i("blueHeadsetListener", "onServiceDisconnected:$profile")
-            if (profile == BluetoothProfile.HEADSET) {
-                bluetoothHeadset = null
-            }
+    fun useBTRecorderIf() {
+        val bh = bluetoothHeadset
+        val bd = bluetoothDevice
+
+        if (bh != null && bd != null) {//录音
+            Vog.d(this, "useBTRecorderIf ---> ok")
+            bh.startVoiceRecognition(bd)
         }
+    }
+    fun stopBTRecorderIf() {
+        val bh = bluetoothHeadset
+        val bd = bluetoothDevice
 
-        override fun onServiceConnected(profile: Int, proxy: BluetoothProfile) {
-            Log.i("blueHeadsetListener", "onServiceConnected:$profile")
-            if (profile == BluetoothProfile.HEADSET) {
-                bluetoothHeadset = proxy as BluetoothHeadset
-            }
+        if (bh != null && bd != null) {//录音
+            Vog.d(this, "useBTRecorderIf ---> ok")
+            bh.stopVoiceRecognition(bd)
         }
     }
 
     override fun onReceive(context: Context?, intent: Intent?) {
+        Vog.d(this,"onReceive ---> ${intent?.action}")
         when (intent?.action) {
-            BluetoothAdapter.ACTION_CONNECTION_STATE_CHANGED -> {
+            BluetoothHeadset.ACTION_CONNECTION_STATE_CHANGED -> {
+                val device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE) as BluetoothDevice?
+                val state = intent.getIntExtra(BluetoothProfile.EXTRA_STATE, -1)
 
+                Vog.d(this, "onReceive BluetoothHeadset ---> $state")
+
+                if (state == BluetoothProfile.STATE_CONNECTED) {
+                    if (device == null) return
+
+                    bluetoothDevice = device
+                    //config
+//                    useBTRecorderIf()//连接
+//                    updateBluetoothParameters(true)
+                    if (MainService.instance?.speechRecoService?.wakeupI?.opened == true) {
+//                        MainService.instance?.onCommand(AppBus.)
+                    }
+
+                } else if (state == BluetoothProfile.STATE_DISCONNECTED) {
+                    bluetoothDevice = null
+//                    updateBluetoothParameters(false)
+                }
+            }
+            BluetoothHeadset.ACTION_AUDIO_STATE_CHANGED -> {
+                val state = intent.getIntExtra(BluetoothProfile.EXTRA_STATE, -1)
+                val prevState = intent.getIntExtra(BluetoothProfile.EXTRA_PREVIOUS_STATE, -1)
+                if (state == BluetoothHeadset.STATE_AUDIO_CONNECTED) {
+                    // SCO channel has just become available.
+                        // still waiting for the TTS to be set up.
+                        // we now have SCO connection and TTS, so we can start.
+                } else if (prevState == BluetoothHeadset.STATE_AUDIO_CONNECTED) {
+                    // apparently our connection to the headset has dropped.
+                    // we won't be able to continue voice dialing.
+                    bluetoothDevice = null
+                    bluetoothHeadset = null
+                    Vog.d(this, "onReceive ---> 断开连接")
+                }
             }
         }
     }

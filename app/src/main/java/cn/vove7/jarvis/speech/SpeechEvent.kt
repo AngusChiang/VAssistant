@@ -34,7 +34,7 @@ interface SpeechEvent {
      * 识别出错
      * @param err String
      */
-    fun onFailed(err: String)
+    fun onRecogFailed(err: String)
 
     /**
      * 音量事件
@@ -45,10 +45,10 @@ interface SpeechEvent {
     /**
      * 手动停止聆听
      */
-    fun onStop()
+    fun onStopRecog()
 
     /**
      * 手动取消
      */
-    fun onCancel()
+    fun onCancelRecog()
 }

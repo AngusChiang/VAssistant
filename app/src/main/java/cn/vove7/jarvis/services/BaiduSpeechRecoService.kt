@@ -6,8 +6,7 @@ import android.os.*
 import android.support.v4.app.ActivityCompat
 import cn.vove7.androlua.luabridge.LuaUtil
 import cn.vove7.common.app.GlobalApp
-import cn.vove7.common.appbus.AppBus
-import cn.vove7.common.model.RequestPermission
+import cn.vove7.common.app.GlobalLog
 import cn.vove7.executorengine.helper.AdvanAppHelper
 import cn.vove7.executorengine.helper.AdvanContactHelper
 import cn.vove7.jarvis.speech.SpeechEvent
@@ -20,14 +19,10 @@ import cn.vove7.jarvis.speech.baiduspeech.wakeup.BaiduVoiceWakeup
 import cn.vove7.jarvis.speech.baiduspeech.wakeup.RecogWakeupListener
 import cn.vove7.jarvis.speech.baiduspeech.wakeup.WakeupEventAdapter
 import cn.vove7.jarvis.tools.AppConfig
-import cn.vove7.jarvis.view.statusbar.StatusAnimation
-import cn.vove7.jarvis.view.statusbar.WakeupStatusAnimation
 import cn.vove7.vtp.log.Vog
-import cn.vove7.vtp.runtimepermission.PermissionUtils
 import com.baidu.speech.asr.SpeechConstant
 import com.google.gson.Gson
 import com.google.gson.annotations.SerializedName
-import java.lang.Thread.sleep
 
 /**
  * 百度语音识别服务
@@ -43,71 +38,57 @@ class BaiduSpeechRecoService(event: SpeechEvent) : SpeechRecoService(event) {
 //     * 唤醒器
 //     */
 //    var wakeuper= BaiduVoiceWakeup()
-    private val wakeupStatusAni: StatusAnimation by lazy { WakeupStatusAnimation() }
 
     /*
  * 本Activity中是否需要调用离线命令词功能。根据此参数，判断是否需要调用SDK的ASR_KWS_LOAD_ENGINE事件
  */
     override var enableOffline = false
 
-//    /**
-//     * 唤醒词无间断标志，用于去掉命令头部
-//     * 0 -> 无
-//     * 1 -> 你好小V
-//     * 2 -> 小v同学
-//     */
-//    var wakeupNoInterruptType = 0
-//        get() {//获取即恢复false
-//            val r = field
-//            field = 0
-//            return r
-//        }
-
     /**
      * 分发事件
      */
-    private val handler: RecoHandler
+    private val handler: RecogHandler
+    private val offSpeechGrammarPath = context.filesDir.absolutePath + "/bd/baidu_speech_grammar.bsg"
 
     init {
         val t = HandlerThread("reco")
         t.start()
-        handler = RecoHandler(t.looper)
-        HandlerThread("load_reco").apply {
-            start()
-            Handler(looper).post {
-                initRecog()
-                initOfflineWord()
-                //初始化唤醒器
-                if (AppConfig.voiceWakeup) {
-                    startWakeUp()
-                }
-                quitSafely()
-            }
+        handler = RecogHandler(t.looper)
+        initRecog()
+        initOfflineWord()
+        //初始化唤醒器
+        if (AppConfig.voiceWakeup) {
+            startWakeUp()
         }
     }
 
     override fun startWakeUp() {
-        wakeupStatusAni.showAndHideDelay("语音唤醒开启", 5000)
+        super.startWakeUp()
         startWakeUpSilently()
     }
 
     override fun startWakeUpSilently(resetTimer: Boolean) {
-        wakeupI.start()
-        if (resetTimer || timerEnd)//定时器结束
-            startAutoSleepWakeup()
+        synchronized(SpeechRecoService::class.java) {
+            wakeupI.start()
+            if (resetTimer || timerEnd)//定时器结束
+                startAutoSleepWakeup()
+        }
     }
 
     override fun stopWakeUp() {
-        wakeupStatusAni.failedAndHideDelay("语音唤醒关闭", 5000)
+        super.stopWakeUp()
         stopWakeUpSilently()
         stopAutoSleepWakeup()
     }
 
     override fun stopWakeUpSilently() {
-        wakeupI.stop()
+        synchronized(SpeechRecoService::class.java) {
+            wakeupI.stop()
+        }
     }
 
     lateinit var listener: SpeechStatusListener
+
     /**
      * 在onCreate中调用。初始化识别控制类MyRecognizer
      */
@@ -123,11 +104,14 @@ class BaiduSpeechRecoService(event: SpeechEvent) : SpeechRecoService(event) {
         }
     }
 
-    private val offSpeechGrammarPath = context.filesDir.absolutePath + "/bd/baidu_speech_grammar.bsg"
     private fun initOfflineWord() {
         LuaUtil.assetsToSD(context, "bd/baidu_speech_grammar.bsg",
                 offSpeechGrammarPath)
-        myRecognizer.loadOfWord(offWordParams)
+        try {//gson error null of array.length
+            myRecognizer.loadOfWord(offWordParams)
+        } catch (e: Exception) {
+            GlobalLog.err(e)
+        }
     }
 
     private val offWordParams: Map<String, Any>
@@ -159,48 +143,26 @@ class BaiduSpeechRecoService(event: SpeechEvent) : SpeechRecoService(event) {
 
 //    private val backTrackInMs = 1500
 
-    override fun startRecog() {//检查权限
-        if (ActivityCompat.checkSelfPermission(AdvanContactHelper.context,
-                        android.Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
-            AppBus.post(RequestPermission("麦克风权限"))
-            return
-        }
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && !PermissionUtils.canDrawOverlays(context)) {
-            Vog.d(this, "show ---> 无悬浮窗")
-            AppBus.post(RequestPermission("悬浮窗权限"))
-            return
-        }
-        sleep(80)
-        if (!isListening) {
-            //震动 音效
-            event.onStartRecog()
-            myRecognizer.start(recoParams)
-        } else {
-            Vog.d(this, "启动失败，正在运行")
-        }
-        super.startRecog()
+    override fun doStartRecog() {
+        Vog.d(this, "doStartRecog ---> 开始识别")
+        //震动 音效
+        myRecognizer.start(recoParams)
     }
 
     /**
      * 开始录音后，手动停止录音。SDK会识别在此过程中的录音。点击“停止”按钮后调用。
      */
-    override fun stopRecog() {
-        super.stopRecog()
+    override fun doStopRecog() {
         myRecognizer.stop()
-        event.onStop()
     }
 
     /**
      * 开始录音后，取消这次录音。SDK会取消本次识别，回到原始状态。点击“取消”按钮后调用。
-     * @param notify 通知事件
      */
-    override fun cancelRecog(notify: Boolean) {
-        super.cancelRecog(notify)
-        myRecognizer.cancel()
-        if (notify)
-            event.onCancel()
-    }
 
+    override fun doCancelRecog() {
+        myRecognizer.cancel()
+    }
 //    fun isListening(): Boolean {
 //        return !arrayOf(IStatus.STATUS_NONE, IStatus.STATUS_FINISHED, IStatus.CODE_WAKEUP_EXIT)
 //                .contains(listener.status)

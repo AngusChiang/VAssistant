@@ -31,10 +31,7 @@ class VoiceAssistActivity : Activity() {
         when (action) {
             Intent.ACTION_ASSIST, Intent.ACTION_VOICE_COMMAND, "android.intent.action.VOICE_ASSIST", "wakeup" -> {
                 Vog.d(this, "onCreate ---> ASSIST wakeup")
-                val data = intent.getBundleExtra(Intent.EXTRA_ASSIST_CONTEXT)
-                for (k in data?.keySet() ?: emptySet()) {
-                    Vog.d(this, "Bundle data ---> $k ${data.get(k)}")
-                }
+
                 MainService.switchReco()
             }
             else -> {

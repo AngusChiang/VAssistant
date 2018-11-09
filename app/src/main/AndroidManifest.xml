@@ -11,6 +11,9 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+
+    <uses-permission android:name="android.permission.BROADCAST_STICKY"/>
+    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS"/>
     <uses-permission android:name="android.permission.USE_FINGERPRINT" />
     <!-- 闪光灯，相机 -->
     <uses-permission android:name="android.permission.FLASHLIGHT" />
@@ -111,6 +114,7 @@
                 <action android:name="android.search.action.GLOBAL_SEARCH"/>
                 <!--语音搜索 触发 语音识别-->
                 <action android:name="android.intent.action.VOICE_ASSIST" />
+                <!--蓝牙耳机触发-->
                 <action android:name="android.intent.action.VOICE_COMMAND" />
 
                 <category android:name="android.intent.category.DEFAULT" />

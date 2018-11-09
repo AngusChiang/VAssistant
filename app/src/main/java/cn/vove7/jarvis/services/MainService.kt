@@ -40,6 +40,7 @@ import cn.vove7.common.model.UserInfo
 import cn.vove7.common.netacc.NetHelper
 import cn.vove7.common.utils.RegUtils.checkCancel
 import cn.vove7.common.utils.RegUtils.checkConfirm
+import cn.vove7.common.utils.runOnNewHandlerThread
 import cn.vove7.common.utils.runOnUi
 import cn.vove7.executorengine.bridges.SystemBridge
 import cn.vove7.executorengine.exector.MultiExecutorEngine
@@ -117,27 +118,23 @@ class MainService : BusService(),
         super.onCreate()
         instance = this
         GlobalApp.serviceBridge = this
-        HandlerThread("load_speech_engine").apply {
-            start()
-            Handler(looper).post {
-                init()
-                quitSafely()
-            }
+        runOnNewHandlerThread("load_speech_engine") {
+            init()
         }
     }
 
+    var speechEngineLoaded = false
     fun init() {
         loadSpeechService()
         loadChatSystem()
         cExecutor = MultiExecutorEngine()
+        speechEngineLoaded = true
         GlobalApp.toastShort("启动完成")
     }
 
-    var speechEngineLoaded = false
     private fun loadSpeechService() {
         speechRecoService = BaiduSpeechRecoService(RecgEventListener())
         speechSynService = SpeechSynService(SyncEventListener())
-        speechEngineLoaded = true
     }
 
     fun loadChatSystem(byUserSet: Boolean = false) {
@@ -441,12 +438,13 @@ class MainService : BusService(),
 
     /**
      * 立即执行的指令
+     * 可使用AppBus(延迟)
      * @param order String
      */
     @Subscribe(threadMode = ThreadMode.BACKGROUND)
     fun onCommand(order: String) {//外部命令
         Vog.d(this, "onCommand ---> $order")
-        thread {
+        thread(priority = Thread.MAX_PRIORITY) {
             when (order) {
                 ORDER_STOP_EXEC -> {
                     if (!speechEngineLoaded) {
@@ -600,9 +598,7 @@ class MainService : BusService(),
         return data[name]
     }
 
-    override fun getContext(): Context {
-        return this
-    }
+    override fun getContext(): Context = this
 
     override fun call(name: String, args: Array<Any>) {}
 
@@ -768,15 +764,15 @@ class MainService : BusService(),
             }
         }
 
-        override fun onStop() {
-            Vog.d(this, "onStop ---> ")
+        override fun onStopRecog() {
+            Vog.d(this, "onStopRecog ---> ")
             resumeMusicIf()
 //            listeningToast.hideImmediately()
             parseAnimation.begin()
         }
 
-        override fun onCancel() {
-            Vog.d(this, "onCancel ---> ")
+        override fun onCancelRecog() {
+            Vog.d(this, "onCancelRecog ---> ")
             continuePlay = true
             resumeMusicIf()
             hideAll(true)
@@ -789,7 +785,7 @@ class MainService : BusService(),
             voiceMode = MODE_VOICE
         }
 
-        override fun onFailed(err: String) {
+        override fun onRecogFailed(err: String) {
             resumeMusicIf()
             AppBus.post(AppBus.EVENT_ERROR_RECO)
             listeningToast.showAndHideDelay(err)

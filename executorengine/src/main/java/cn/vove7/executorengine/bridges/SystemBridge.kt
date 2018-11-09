@@ -27,6 +27,9 @@ import android.provider.Settings
 import android.support.annotation.RequiresApi
 import android.support.v4.content.ContextCompat
 import android.support.v4.content.FileProvider
+import android.telecom.PhoneAccountHandle
+import android.telecom.TelecomManager
+import android.telephony.SmsManager
 import android.view.KeyEvent
 import cn.vove7.common.accessibility.AccessibilityApi
 import cn.vove7.common.app.GlobalApp
@@ -36,6 +39,7 @@ import cn.vove7.common.bridges.RootHelper
 import cn.vove7.common.bridges.SystemOperation
 import cn.vove7.common.bridges.UtilBridge.bitmap2File
 import cn.vove7.common.datamanager.DAO
+import cn.vove7.common.datamanager.DaoHelper
 import cn.vove7.common.datamanager.executor.entity.MarkedData
 import cn.vove7.common.datamanager.greendao.MarkedDataDao
 import cn.vove7.common.model.ExResult
@@ -177,19 +181,46 @@ object SystemBridge : SystemOperation {
      * 打电话
      * 优先级：标记 -> 通讯录 -> 服务提供
      */
-    override fun call(s: String): ExResult<String> {
+    override fun call(s: String): Boolean {
+        return call(s, null)
+    }
+
+    /**
+     * 输入 纯数字 | [标记]联系人
+     * @param s String
+     * @param simId Int? 卡号 0:卡1  1:卡2
+     * @return Boolean
+     */
+    override fun call(s: String, simId: Int?): Boolean {
         val ph = AdvanContactHelper.matchPhone(s)
-            ?: return ExResult("未找到该联系人$s")// "未找到该联系人$s"
+            ?: return {
+                GlobalLog.err("未找到该联系人 $s")
+                false
+            }.invoke()
         val callIntent = Intent(Intent.ACTION_CALL, Uri.parse("tel:$ph"))
+        if (simId != null) {
+            val telecomManager = context.getSystemService(Context.TELECOM_SERVICE) as TelecomManager
+            val phoneAccountHandleList = telecomManager.getCallCapablePhoneAccounts();
+            val sId = if (simId >= phoneAccountHandleList.size) {
+                GlobalLog.err("call ---> 卡号指定错误,使用默认卡拨号")
+//                GlobalApp.toastShort("卡号无效")
+                0
+            } else simId
+            try {
+                callIntent.putExtra(TelecomManager.EXTRA_PHONE_ACCOUNT_HANDLE,
+                        phoneAccountHandleList.get(sId))
+            } catch (e: Exception) {
+            }
+        }
         return try {
             context.startActivity(callIntent)
-            ExResult()
+            true
         } catch (e: SecurityException) {
-
-            ExResult("无电话权限")
+            GlobalApp.toastShort("无电话权限")
+            false
         } catch (e: Exception) {
-            val m = e.message ?: "ERROR: UNKNOWN"
-            ExResult(m)
+            GlobalLog.err("call" + (e.message ?: "ERROR: UNKNOWN"))
+            false
         }
     }
 
@@ -565,7 +596,27 @@ object SystemBridge : SystemOperation {
         //打开热
         try {
             if (isEnable)
-                manager.startLocalOnlyHotspot(getWifiApLis(), Handler())
+                manager.startLocalOnlyHotspot(object : WifiManager.LocalOnlyHotspotCallback() {
+                    override fun onStarted(reservation: WifiManager.LocalOnlyHotspotReservation) {
+                        super.onStarted(reservation)
+                        Vog.d(this, "onStarted ---> ")
+                    }
+
+                    override fun onStopped() {
+                        super.onStopped()
+                        Vog.d(this, "onStopped ---> ")
+                    }
+
+                    override fun onFailed(reason: Int) {
+                        super.onFailed(reason)
+                        GlobalLog.err("失败：" + arrayOf(
+                                0, ERROR_NO_CHANNEL
+                                , ERROR_GENERIC
+                                , ERROR_INCOMPATIBLE_MODE
+                                , ERROR_TETHERING_DISALLOWED)[reason])
+                        Vog.d(this, "onFailed ---> ")
+                    }
+                }, Handler())
             else {
                 GlobalApp.toastShort("不支持关闭热点")
             }
@@ -574,31 +625,6 @@ object SystemBridge : SystemOperation {
         } catch (e: Exception) {
             GlobalLog.err(e)
             GlobalApp.toastShort("出错")
-        }
-    }
-
-    @RequiresApi(Build.VERSION_CODES.O)
-    fun getWifiApLis(): WifiManager.LocalOnlyHotspotCallback {
-        return object : WifiManager.LocalOnlyHotspotCallback() {
-            override fun onStarted(reservation: WifiManager.LocalOnlyHotspotReservation) {
-                super.onStarted(reservation)
-                Vog.d(this, "onStarted ---> ")
-            }
-
-            override fun onStopped() {
-                super.onStopped()
-                Vog.d(this, "onStopped ---> ")
-            }
-
-            override fun onFailed(reason: Int) {
-                super.onFailed(reason)
-                GlobalLog.err("失败：" + arrayOf(
-                        0, ERROR_NO_CHANNEL
-                        , ERROR_GENERIC
-                        , ERROR_INCOMPATIBLE_MODE
-                        , ERROR_TETHERING_DISALLOWED)[reason])
-                Vog.d(this, "onFailed ---> ")
-            }
         }
     }
 
@@ -910,5 +936,43 @@ object SystemBridge : SystemOperation {
             Vog.d(this, "isCharging ---> $i")
             i
         }.invoke()
+
+    override val simCount: Int
+        get() {
+            val telecomManager = context.getSystemService(Context.TELECOM_SERVICE) as TelecomManager?
+            if (telecomManager != null) {
+                val phoneAccountHandleList =
+                    telecomManager.getCallCapablePhoneAccounts()
+                return phoneAccountHandleList?.size ?: 0
+            }
+            return 0
+        }
+
+    override val contacts: Array<Pair<String, String?>>
+        get() {
+            val list = mutableListOf<Pair<String, String?>>()
+            AdvanContactHelper.getChoiceData().forEach {
+                list.add(Pair(it.title, it.subtitle))
+            }
+            return list.toTypedArray()
+        }
+
+    override fun saveMarkedContact(name: String, regex: String, phone: String): Boolean {
+        return saveMarkedData(MarkedData.MARKED_TYPE_CONTACT, name, regex, phone)
+    }
+
+    override fun saveMarkedApp(name: String, regex: String, pkg: String): Boolean {
+        return saveMarkedData(MarkedData.MARKED_TYPE_APP, name, regex, pkg)
+    }
+
+    private fun saveMarkedData(type: String, key: String, regex: String, value: String): Boolean {
+        return try {
+            DAO.daoSession.markedDataDao.insertInTx(MarkedData(key, type, regex, value))
+            true
+        } catch (e: Exception) {
+            GlobalLog.err(e)
+            false
+        }
+    }
 
 }

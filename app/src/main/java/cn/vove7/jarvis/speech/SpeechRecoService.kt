@@ -1,18 +1,22 @@
 package cn.vove7.jarvis.speech
 
 import android.content.Context
-import android.os.Handler
-import android.os.HandlerThread
-import android.os.Looper
-import android.os.Message
+import android.content.pm.PackageManager
+import android.os.*
 import android.support.annotation.CallSuper
+import android.support.v4.app.ActivityCompat
 import cn.vove7.common.app.GlobalApp
+import cn.vove7.common.appbus.AppBus
 import cn.vove7.common.appbus.VoiceData
+import cn.vove7.common.model.RequestPermission
 import cn.vove7.jarvis.BuildConfig
 import cn.vove7.jarvis.receivers.PowerEventReceiver
 import cn.vove7.jarvis.speech.baiduspeech.recognition.model.IStatus
 import cn.vove7.jarvis.tools.AppConfig
+import cn.vove7.jarvis.view.statusbar.StatusAnimation
+import cn.vove7.jarvis.view.statusbar.WakeupStatusAnimation
 import cn.vove7.vtp.log.Vog
+import cn.vove7.vtp.runtimepermission.PermissionUtils
 
 /**
  * #SpeechRecoService
@@ -25,23 +29,67 @@ abstract class SpeechRecoService(val event: SpeechEvent) : SpeechRecoI {
         get() = GlobalApp.APP
     //定时器关闭标志
     override var timerEnd: Boolean = false
+    protected val wakeupStatusAni: StatusAnimation by lazy { WakeupStatusAnimation() }
 
     abstract var enableOffline: Boolean
 
     var isListening = false
-    @CallSuper
+
+    /**
+     * 重写函数结尾处callSuper
+     */
     override fun startRecog() {
-        isListening = true
+        //检查权限
+        if (!checkRecoderPermission()) return
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && !PermissionUtils.canDrawOverlays(context)) {
+            Vog.d(this, "show ---> 无悬浮窗")
+            AppBus.post(RequestPermission("悬浮窗权限"))
+            return
+        }
+        Vog.d(this, "startRecog ---> 这里")
+        Thread.sleep(80)
+        if (!isListening) {
+            doStartRecog()
+            event.onStartRecog()
+            isListening = true
+        } else {
+            Vog.d(this, "启动失败，正在识别")
+        }
     }
 
-    @CallSuper
+    /**
+     * 开始识别
+     */
+    abstract fun doStartRecog()
+
+
     override fun cancelRecog(notify: Boolean) {
         isListening = false
+        doCancelRecog()
+        if (notify)
+            event.onCancelRecog()
     }
+
+    abstract fun doCancelRecog()
+
+
+    override fun startWakeUp() {
+        wakeupStatusAni.showAndHideDelay("语音唤醒开启", 5000)
+    }
+
+    override fun stopWakeUp() {
+        wakeupStatusAni.failedAndHideDelay("语音唤醒关闭", 5000)
+        doStopRecog()
+        event.onStopRecog()
+    }
+
+    abstract fun doStopRecog()
+
 
     @CallSuper
     override fun stopRecog() {
         isListening = false
+        doStopRecog()
     }
 
     /**
@@ -49,7 +97,8 @@ abstract class SpeechRecoService(val event: SpeechEvent) : SpeechRecoI {
      */
     private val stopWakeUpTimer = Runnable {
         timerEnd = true
-        stopWakeUp()
+        wakeupStatusAni.failed("语音唤醒已自动休眠")
+        stopWakeUpSilently()//不通知
     }
 
     val timerHandler: Handler by lazy {
@@ -69,7 +118,8 @@ abstract class SpeechRecoService(val event: SpeechEvent) : SpeechRecoI {
             return
         }
         stopAutoSleepWakeup()
-        val sleepTime = AppConfig.autoSleepWakeupMillis / 60
+        val sleepTime = if (BuildConfig.DEBUG) AppConfig.autoSleepWakeupMillis / 60
+        else AppConfig.autoSleepWakeupMillis
         Vog.d(this, "startAutoSleepWakeup ---> 开启自动休眠 $sleepTime")
         timerHandler.postDelayed(stopWakeUpTimer, sleepTime)
     }
@@ -80,12 +130,20 @@ abstract class SpeechRecoService(val event: SpeechEvent) : SpeechRecoI {
         timerHandler.removeCallbacks(stopWakeUpTimer)
     }
 
+    fun checkRecoderPermission(jump: Boolean = true): Boolean {
+        return (ActivityCompat.checkSelfPermission(context,
+                android.Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED)
+                .also {
+                    if (!it && jump)
+                        AppBus.post(RequestPermission("麦克风权限"))
+                }
+    }
 
     /**
      * 语音事件分发[中枢]
      * @constructor
      */
-    inner class RecoHandler(looper: Looper) : Handler(looper) {
+    inner class RecogHandler(looper: Looper) : Handler(looper) {
         override fun handleMessage(msg: Message?) {
             when (msg?.what) {
                 IStatus.CODE_WAKEUP_SUCCESS -> {//唤醒
@@ -106,7 +164,7 @@ abstract class SpeechRecoService(val event: SpeechEvent) : SpeechRecoI {
                 IStatus.CODE_VOICE_ERR -> {//出错
                     val res = msg.data.getString("data") ?: "null"
                     isListening = false
-                    event.onFailed(res)
+                    event.onRecogFailed(res)
 //                    AppBus.postVoiceData(VoiceData(msg.what, res))
                 }
                 IStatus.CODE_VOICE_VOL -> {//音量反馈

@@ -33,7 +33,7 @@ interface CExecutorI : ViewShowListener, ActivityShowListener, RuntimeArgs, Spea
     fun waitForSingleChoice(askTitle: String, choiceData: List<ChoiceData>): ChoiceData?
 
     //Api使用
-    fun singleChoiceDialog(askTitle: String, choiceData: Array<String>): String?
+    fun singleChoiceDialog(askTitle: String, choiceData: Array<String>): Int?
 //    fun multiChoiceDialog(askTitle: String, choiceData: Array<String>)
 
     /**

@@ -26,8 +26,8 @@ import java.util.*
  * Created by Vove on 2018/6/19
  */
 object AdvanContactHelper : GenChoiceData, Markable {
-    val context:Context
-            get() = GlobalApp.APP
+    val context: Context
+        get() = GlobalApp.APP
     //Dao
     private val markedContactDao = DAO.daoSession.markedDataDao
 
@@ -103,6 +103,9 @@ object AdvanContactHelper : GenChoiceData, Markable {
             val list = markedContactDao.queryBuilder()
                     .where(MarkedDataDao.Properties.Type.eq(MarkedData.MARKED_TYPE_CONTACT)).list()
             list.forEach {
+                if (TextHelper.compareSimilarityWithPinyin(GlobalApp.APP, s, it.key) >= 0.8) // key 模糊查询
+                    return it.value
+
                 val regex = it.regex
                 if (regex.matches(s))
                     return it.value
@@ -158,9 +161,9 @@ object AdvanContactHelper : GenChoiceData, Markable {
         return choiceList
     }
 
-    fun getContactName() :Array<String>{
-        if(LOCAL_CONTACT_LIST.isEmpty()) updateContactList()
-        val set= hashSetOf(*LOCAL_CONTACT_LIST.keys.toTypedArray())
+    fun getContactName(): Array<String> {
+        if (LOCAL_CONTACT_LIST.isEmpty()) updateContactList()
+        val set = hashSetOf(*LOCAL_CONTACT_LIST.keys.toTypedArray())
         return set.toTypedArray()
     }
 }

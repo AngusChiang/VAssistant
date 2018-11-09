@@ -52,7 +52,9 @@ interface SystemOperation {
      * 拨打电话
      * @param s 纯数字电话/联系人/标记联系人
      */
-    fun call(s: String): ExResult<String>
+    fun call(s: String): Boolean
+
+    fun call(s: String, simId: Int? = null): Boolean
 
     /**
      * 闪光灯
@@ -76,7 +78,7 @@ interface SystemOperation {
     /**
      * 打开链接
      */
-    fun openUrl(url: String):Boolean
+    fun openUrl(url: String): Boolean
 
     fun sendKey(keyCode: Int)
 
@@ -193,11 +195,37 @@ interface SystemOperation {
      * 电量
      */
     val batteryLevel: Int
+
     /**
      * 充电状态
      * 脚本对应：
      */
     val isCharging: Boolean
 
+    /**
+     * 插入的sim卡数量
+     */
+    val simCount: Int
+
+    /**
+     * 获得联系人数组  元素：Pair(contactName,phone)
+     */
+    val contacts: Array<Pair<String, String?>>
+
+    /**
+     * 保存到标记联系人
+     * @param name String
+     * @param regex String?
+     * @param phone String
+     */
+    fun saveMarkedContact(name: String, regex: String, phone: String): Boolean
+
+    /**
+     * 保存到标记应用
+     * @param name String
+     * @param regex String?
+     * @param pkg String
+     */
+    fun saveMarkedApp(name: String, regex: String, pkg: String): Boolean
 
 }

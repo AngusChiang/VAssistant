@@ -45,7 +45,6 @@ import android.os.*
 import cn.vove7.common.utils.TextHelper
 import cn.vove7.common.utils.formatNow
 import cn.vove7.common.utils.runOnNewHandlerThread
-import cn.vove7.jarvis.tools.AppConfig
 
 
 /**

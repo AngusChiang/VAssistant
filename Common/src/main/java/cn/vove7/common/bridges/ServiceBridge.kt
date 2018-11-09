@@ -30,7 +30,7 @@ interface ServiceBridge : OnExecutorResult {
     fun showAlert(r: ShowAlertEvent)
 
     fun speak(text: String?)
-    fun speakSync(text: String?):Boolean
+    fun speakSync(text: String?): Boolean
 }
 
 class ShowAlertEvent(
@@ -55,7 +55,8 @@ open class ChoiceData(
         val title: String,
         val iconDrawable: Drawable? = null,
         val subtitle: String? = null,
-        val originalData: Any
+        val originalData: Any? = null,
+        var index: Int = 0
 ) : Serializable, Comparable<ChoiceData> {
 
     companion object {
