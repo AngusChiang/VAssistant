@@ -36,6 +36,11 @@ object RootHelper {
         return isRoot()
     }
 
+    /**
+     * 执行无root命令
+     * @param cmd String 命令
+     * @return String 结果
+     */
     fun exec(cmd: String): String {
         val result = StringBuilder()
         Vog.d(this, "execRootCmd ---> $cmd")
@@ -62,29 +67,35 @@ object RootHelper {
     }
 
     /**
-     * 执行命令并且输出结果
+     * 执行root命令
+     * @return String 结果
      */
-    @Throws(Exception::class)
-    fun execWithSu(cmd: String): String {
-        val result = StringBuilder()
-        Vog.d(this, "execWithSu ---> $cmd")
-        val p = Runtime.getRuntime().exec("su")// 经过Root处理的android系统即有su命令
-        DataOutputStream(p.outputStream).use { dos ->
-            DataInputStream(p.inputStream).use { dis ->
-                dos.writeBytes(cmd + "\n")
-                dos.flush()
-                dos.writeBytes("exit\n")
-                dos.flush()
+    fun execWithSu(cmd: String): String? {
+        val result: StringBuilder
+        try {
+            result = StringBuilder()
+            Vog.d(this, "execWithSu ---> $cmd")
+            val p = Runtime.getRuntime().exec("su")// 经过Root处理的android系统即有su命令
+            DataOutputStream(p.outputStream).use { dos ->
+                DataInputStream(p.inputStream).use { dis ->
+                    dos.writeBytes(cmd + "\n")
+                    dos.flush()
+                    dos.writeBytes("exit\n")
+                    dos.flush()
 
-                var line: String? = null
-                while ((dis.readLine().also { line = it }) != null) {
-                    result.append(line).append("\n")
+                    var line: String? = null
+                    while ((dis.readLine().also { line = it }) != null) {
+                        result.append(line).append("\n")
+                    }
+                    p.waitFor()
                 }
-                p.waitFor()
             }
+            return result.toString()
+
+        } catch (e: Exception) {
+            return e.message
         }
 
-        return result.toString()
     }
 
     /**
@@ -112,6 +123,7 @@ object RootHelper {
         openAppAccessService(GlobalApp.APP.packageName,
                 "cn.vove7.jarvis.services.MyAccessibilityService")
     }
+
     fun openAppAccessService(pkg: String, serviceName: String) {
         Vog.d(this, "openAppAccessService ---> $serviceName")
         //同时不关闭其他
@@ -121,7 +133,7 @@ object RootHelper {
             GlobalLog.err(e)
             GlobalApp.toastShort("无障碍自动开启失败")
         }
-        Vog.d(this,"openAppAccessService ---> 申请结束")
+        Vog.d(this, "openAppAccessService ---> 申请结束")
     }
 
     private fun buildList(s: String): String {

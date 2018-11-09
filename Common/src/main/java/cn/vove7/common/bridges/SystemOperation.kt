@@ -16,6 +16,11 @@ interface SystemOperation {
      */
     fun openAppDetail(pkg: String): Boolean
 
+    /**
+     * 获得App启动的Intent
+     * @param pkg String
+     * @return Intent?
+     */
     fun getLaunchIntent(pkg: String): Intent?
     /**
      * 根据App名，获取应用包名
@@ -198,7 +203,7 @@ interface SystemOperation {
 
     /**
      * 充电状态
-     * 脚本对应：
+     * 脚本对应：isCharging()
      */
     val isCharging: Boolean
 

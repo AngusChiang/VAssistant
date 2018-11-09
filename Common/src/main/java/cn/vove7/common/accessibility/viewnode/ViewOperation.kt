@@ -52,6 +52,13 @@ interface ViewOperation {
     fun click(): Boolean
 
     /**
+     * 使用全局函数click进行点击操作，如点击网页控件
+     * 需要7.0+
+     * @return Boolean
+     */
+    fun globalClick(): Boolean
+
+    /**
      * 以此Node中心滑动到dx,dy的地方
      * setScreenSize() 对此有效
      * @param dx Int x方向 移动距离 ±
