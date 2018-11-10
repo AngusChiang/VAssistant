@@ -72,20 +72,17 @@ end
 function gesture(durtion, points)
     return automator.gesture(0, durtion, points)
 end
---
---function scaleTable(points)
---    log('points size: ' .. #points)
---    local ps = {}
---    for i, v in ipairs(points) do
---        local x = (v.first)
---        local y = (v.second)
---        ps[i] = Pair(x, y)
---    end
---    return ps
---end
+function gestures(durtion, points)
+    return automator.gestures(durtion, points)
+end
+
 
 function gestureAsync(durtion, points)
     return automator.gestureAsync(0, durtion, points)
+end
+
+function gesturesAsync(durtion, points)
+    return automator.gesturesAsync(durtion, points)
 end
 
 function powerDialog()

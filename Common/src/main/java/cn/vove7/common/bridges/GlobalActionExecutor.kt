@@ -2,25 +2,21 @@ package cn.vove7.common.bridges
 
 import android.accessibilityservice.AccessibilityService
 import android.accessibilityservice.GestureDescription
-import android.annotation.SuppressLint
 import android.graphics.Path
 import android.os.Build
-import android.os.Handler
-import android.os.Looper
 import android.support.annotation.RequiresApi
 import android.util.Log
 import android.util.Pair
 import android.view.ViewConfiguration
 import cn.vove7.common.accessibility.AccessibilityApi
 import cn.vove7.common.app.GlobalApp
+import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.model.ResultBox
 import cn.vove7.common.utils.ScreenAdapter
-import cn.vove7.common.view.toast.ColorfulToast
 import cn.vove7.vtp.log.Vog
 import java.util.*
 
 
-@SuppressLint("StaticFieldLeak")
 /**
  * 无障碍全局执行器
  */
@@ -77,11 +73,23 @@ object GlobalActionExecutor : GlobalActionExecutorI {
 //            false
 //        }
 //    }
-
+    /**
+     * 手势 一条路径
+     * @param duration Long
+     * @param points Array<Pair<Int, Int>>
+     * @return Boolean
+     */
     fun gesture(duration: Long, points: Array<Pair<Int, Int>>): Boolean {
         return gesture(0, duration, points)
     }
 
+    /**
+     * 手势 一条路径
+     * @param start Long
+     * @param duration Long
+     * @param points Array<Pair<Int, Int>>
+     * @return Boolean
+     */
     override fun gesture(start: Long, duration: Long, points: Array<Pair<Int, Int>>): Boolean {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N || mService == null) {
             return false
@@ -90,13 +98,57 @@ object GlobalActionExecutor : GlobalActionExecutorI {
         return playGestures(GestureDescription.StrokeDescription(path, start, duration))
     }
 
+    /**
+     * api 异步手势
+     * @param start Long
+     * @param duration Long
+     * @param points Array<Pair<Int, Int>>
+     */
     @RequiresApi(api = Build.VERSION_CODES.N)
     override fun gestureAsync(start: Long, duration: Long, points: Array<Pair<Int, Int>>) {
-
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
+            return
+        }
         val path = pointsToPath(points)
-        gesturesAsync(GestureDescription.StrokeDescription(path, start, duration))
+        doGesturesAsync(GestureDescription.StrokeDescription(path, 0, duration))
     }
 
+    /**
+     * api 多路径手势
+     * @param duration Long
+     * @param ppss Array<Array<Pair<Int, Int>>>
+     */
+    override fun gestures(duration: Long, ppss: Array<Array<Pair<Int, Int>>>) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
+            return
+        }
+        val list = mutableListOf<GestureDescription.StrokeDescription>()
+        ppss.forEach {
+            list.add(GestureDescription.StrokeDescription(pointsToPath(it), 0, duration))
+        }
+        playGestures(*list.toTypedArray())
+    }
+
+    /**
+     * api 多路径手势 异步
+     * @param duration Long
+     * @param ppss Array<Array<Pair<Int, Int>>>
+     */
+    override fun gesturesAsync(duration: Long, ppss: Array<Array<Pair<Int, Int>>>) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
+            return
+        }
+        val list = mutableListOf<GestureDescription.StrokeDescription>()
+        ppss.forEach {
+            list.add(GestureDescription.StrokeDescription(pointsToPath(it), 0, duration))
+        }
+        doGesturesAsync(*list.toTypedArray())
+    }
+    /**
+     * 同步
+     * @param strokes Array<out StrokeDescription>
+     * @return Boolean
+     */
     @RequiresApi(api = Build.VERSION_CODES.N)
     override fun playGestures(vararg strokes: GestureDescription.StrokeDescription): Boolean {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
@@ -106,15 +158,19 @@ object GlobalActionExecutor : GlobalActionExecutorI {
         for (stroke in strokes) {
             builder.addStroke(stroke)
         }
-
         return gesturesWithoutHandler(builder.build())
     }
 
+    /**
+     * 点转路径
+     * @param points Array<Pair<Int, Int>>
+     * @return Path
+     */
     private fun pointsToPath(points: Array<Pair<Int, Int>>): Path {
         val path = Path()
         if (points.isEmpty()) return path
-        var x = points[0].first
-        var y = points[0].second
+        var x = points[0].first.toInt()
+        var y = points[0].second.toInt()
         path.moveTo(ScreenAdapter.scaleX(x), ScreenAdapter.scaleY(y))
 
         for (i in 1 until points.size) {
@@ -122,12 +178,15 @@ object GlobalActionExecutor : GlobalActionExecutorI {
             x = point.first
             y = point.second
             path.lineTo(ScreenAdapter.scaleX(x), ScreenAdapter.scaleY(y))
-
         }
-        Log.d("Debug :", "pointsToPath  ----> ${Arrays.toString(points)}\n$path")
         return path
     }
 
+    /**
+     * 同步手势
+     * @param description GestureDescription
+     * @return Boolean
+     */
     @RequiresApi(api = Build.VERSION_CODES.N)
     private fun gesturesWithoutHandler(description: GestureDescription): Boolean {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N || mService == null) {
@@ -142,12 +201,16 @@ object GlobalActionExecutor : GlobalActionExecutorI {
             override fun onCancelled(gestureDescription: GestureDescription) {
                 result.setAndNotify(false)
             }
-        },null)
+        }, null)
         return result.blockedGet() ?: false
     }
 
+    /**
+     * 异步手势
+     * @param strokes Array<out StrokeDescription>
+     */
     @RequiresApi(api = Build.VERSION_CODES.N)
-    override fun gesturesAsync(vararg strokes: GestureDescription.StrokeDescription) {
+    override fun doGesturesAsync(vararg strokes: GestureDescription.StrokeDescription) {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N || mService == null) {
             return
         }
@@ -167,7 +230,7 @@ object GlobalActionExecutor : GlobalActionExecutorI {
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             press(x, y, ViewConfiguration.getTapTimeout() + 50)
         } else {
-            Vog.d(this, "需SDK版本->N")
+            GlobalLog.log("click 需SDK版本->N")
             false
         }
     }
@@ -181,7 +244,7 @@ object GlobalActionExecutor : GlobalActionExecutorI {
             gesture(0, (ViewConfiguration.getLongPressTimeout() + 200).toLong(),
                     arrayOf(Pair(x, y)))
         } else {
-            Vog.d(this, "需SDK版本->N")
+            GlobalLog.log("longClick 需SDK版本->N")
             false
         }
     }
@@ -216,22 +279,16 @@ object GlobalActionExecutor : GlobalActionExecutorI {
 }
 
 interface GlobalActionExecutorI {
-    @RequiresApi(api = Build.VERSION_CODES.N)
     fun swipe(x1: Int, y1: Int, x2: Int, y2: Int, dur: Int): Boolean
 
-    @RequiresApi(api = Build.VERSION_CODES.N)
     fun press(x: Int, y: Int, delay: Int): Boolean
 
-    @RequiresApi(api = Build.VERSION_CODES.N)
     fun longClick(x: Int, y: Int): Boolean
 
-    @RequiresApi(api = Build.VERSION_CODES.N)
     fun scrollDown(): Boolean
 
-    @RequiresApi(api = Build.VERSION_CODES.N)
     fun click(x: Int, y: Int): Boolean
 
-    @RequiresApi(api = Build.VERSION_CODES.N)
     fun scrollUp(): Boolean
 
     fun back(): Boolean
@@ -246,18 +303,44 @@ interface GlobalActionExecutorI {
 
     fun recents(): Boolean
     fun splitScreen(): Boolean
-
+    /**
+     * 单手势同步
+     * @param start Long
+     * @param duration Long
+     * @param points Array<Pair<Int, Int>>
+     * @return Boolean
+     */
     @RequiresApi(api = Build.VERSION_CODES.N)
     fun gesture(start: Long, duration: Long, points: Array<Pair<Int, Int>>): Boolean
 
+    /**
+     * 多手势同步
+     * @param duration Long
+     * @param ppss Array<Array<Pair<Int, Int>>>
+     */
+    fun gestures(duration: Long, ppss: Array<Array<Pair<Int, Int>>>)
+
+    /**
+     * 单手势异步
+     * @param start Long
+     * @param duration Long
+     * @param points Array<Pair<Int, Int>>
+     */
     @RequiresApi(api = Build.VERSION_CODES.N)
     fun gestureAsync(start: Long, duration: Long, points: Array<Pair<Int, Int>>)
+
+    /**
+     * 多手势异步
+     * @param duration Long
+     * @param ppss Array<Array<Pair<Int, Int>>>
+     */
+    fun gesturesAsync(duration: Long, ppss: Array<Array<Pair<Int, Int>>>)
 
     @RequiresApi(api = Build.VERSION_CODES.N)
     fun playGestures(vararg strokes: GestureDescription.StrokeDescription): Boolean
 
     @RequiresApi(api = Build.VERSION_CODES.N)
-    fun gesturesAsync(vararg strokes: GestureDescription.StrokeDescription)
+    fun doGesturesAsync(vararg strokes: GestureDescription.StrokeDescription)
 
 
     /**

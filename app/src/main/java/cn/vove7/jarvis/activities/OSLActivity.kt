@@ -48,7 +48,6 @@ class OSLActivity : OneFragmentActivity() {
                     , OslItem("Material Dialogs", "https://github.com/afollestad/material-dialogs", "")
                     , OslItem("DiscreteSeekBar", "https://github.com/AnderWeb/discreteSeekBar", "")
                     , OslItem("AndroidDonate", "https://github.com/didikee/AndroidDonate", "")
-                    , OslItem("Secured-Preference-Store", "https://github.com/iamMehedi/Secured-Preference-Store", "A SharedPreferences wrapper for Android that encrypts the content with 256 bit AES encryption. The Encryption key is securely stored in device's KeyStore. You can also use the EncryptionManager class to encrypt & decrypt data out of the box.")
                     , OslItem("CodeView (Android)", "https://github.com/kbiakov/CodeView-android", "CodeView helps to show code content with syntax highlighting in native way.")
                     , OslItem("Jsoup", "https://jsoup.org/", "jsoup is a Java library for working with real-world HTML. It provides a very convenient API for extracting and manipulating data, using the best of DOM, CSS, and jquery-like methods.")
                     , OslItem("TapTargetView", "https://github.com/KeepSafe/TapTargetView", "")

@@ -14,12 +14,11 @@ import cn.vove7.vtp.log.Vog
 import cn.vove7.vtp.sharedpreference.SpHelper
 import com.afollestad.materialdialogs.MaterialDialog
 import com.google.gson.Gson
-import devliving.online.securedpreferencestore.DefaultRecoveryHandler
-import devliving.online.securedpreferencestore.SecuredPreferenceStore
 import org.jsoup.Jsoup
 import kotlin.concurrent.thread
 import android.content.Intent
 import android.net.Uri
+import cn.vove7.common.utils.secure.SecuritySharedPreference
 import com.afollestad.materialdialogs.checkbox.checkBoxPrompt
 
 
@@ -77,30 +76,29 @@ object AppConfig {
     var execSuccessFeedback = true//执行成功反馈
     var fixVoiceMico = true//麦克风冲突
     var notifyCloseMico = true//通知唤醒状态/麦克风
-//    var disableAdKillerOnLowBattery = true//低电量关闭去广告
+    //    var disableAdKillerOnLowBattery = true//低电量关闭去广告
     var disableAccessibilityOnLowBattery = true//低电量关闭无障碍
 
-    fun init(context: Context) {
-        val storeFileName = "wdasfd"
-        val keyPrefix = ""
-        val seedKey = "fddfouafpiua".toByteArray()
-        SecuredPreferenceStore.init(context, storeFileName, keyPrefix, seedKey, DefaultRecoveryHandler())
+    fun init() {
         checkUserInfo()
     }
 
+    val context get() = GlobalApp.APP
+    private val ssp: SecuritySharedPreference by lazy { SecuritySharedPreference(context, "xka", Context.MODE_PRIVATE) }
     private fun checkUserInfo() {
-        val sp = SecuredPreferenceStore.getSharedInstance()
         //用户信息
-        if (sp.contains(R.string.key_login_info)) {
+        val key = context.getString(R.string.key_login_info)
+        if (ssp.contains(key)) {
             try {
-                val info = Gson().fromJson(sp.getString(R.string.key_login_info),
+                val info = Gson().fromJson(ssp.getString(key, null),
                         UserInfo::class.java)
                 Vog.d(this, "init user info ---> $info")
-                info.success()//设置登陆后，读取配置
+                info.success()//设置登陆后，读取配置  null 抛出空指针
                 NetHelper.postJson<Any>(ApiUrls.VERIFY_TOKEN)
             } catch (e: Exception) {
+                GlobalLog.err(e)
                 GlobalApp.toastShort("用户信息提取失败，请重新登陆")
-                sp.Editor().remove(R.string.key_login_info)
+                ssp.remove(context.getString(R.string.key_login_info))
             }
         } else {
             Vog.d(this, "init ---> not login")
@@ -112,12 +110,11 @@ object AppConfig {
         userInfo.success()
         //保存->sp
         val infoJson = Gson().toJson(userInfo)
-        val ssp = SecuredPreferenceStore.getSharedInstance()
-        ssp.edit().putString(GlobalApp.getString(R.string.key_login_info), infoJson).apply()
+        ssp.edit().putString(context.getString(R.string.key_login_info), infoJson).apply()
     }
 
     fun logout() {
-        SecuredPreferenceStore.getSharedInstance().Editor().remove(R.string.key_login_info)
+        ssp.remove(context.getString(R.string.key_login_info))
         UserInfo.logout()
     }
 
@@ -320,9 +317,3 @@ object AppConfig {
     }
 
 }
-
-//
-fun SecuredPreferenceStore.Editor.remove(i: Int) = remove(GlobalApp.getString(i)).apply()
-
-fun SecuredPreferenceStore.contains(i: Int): Boolean = contains(GlobalApp.getString(i))
-fun SecuredPreferenceStore.getString(i: Int): String? = getString(GlobalApp.getString(i), null)

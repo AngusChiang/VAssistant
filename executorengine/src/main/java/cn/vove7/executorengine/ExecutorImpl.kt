@@ -118,7 +118,7 @@ open class ExecutorImpl(
     /**
      * 执行队列
      */
-    private fun pollActionQueue(): Boolean {
+    private fun pollActionQueue(): Boolean? {
         var r: PartialResult
         while (actionQueue.isNotEmpty()) {
             currentActionIndex++
@@ -133,7 +133,7 @@ open class ExecutorImpl(
                         currentAction = null
                         actionQueue.clear()
                         serviceBridge?.onExecuteFailed(r.msg)
-                        return false
+                        return null
                     }
                 }
             } else {
@@ -173,15 +173,16 @@ open class ExecutorImpl(
     }
 
     override fun executeFailed(msg: String?) {
-        Vog.d(this,"executeFailed ---> $msg")
+        Vog.d(this, "executeFailed ---> $msg")
         userInterrupted = true //设置用户中断标志
         //pollActionQueue -> false
     }
 
-    override fun onFinish(result: Boolean) {
+    override fun onFinish(result: Boolean?) {
         running = false
         ScreenAdapter.reSet()
-        serviceBridge?.onExecuteFinished(result)
+        if (result != null)
+            serviceBridge?.onExecuteFinished(result)
         accessApi?.removeAllNotifier(this)
     }
 

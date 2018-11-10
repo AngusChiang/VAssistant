@@ -79,22 +79,14 @@ function splitScreen(){
 function gesture(duration, points){
     return automator.gesture(0, duration, points)
 }
-//
 
-//function scaleTable(points){
-//    log('points size: ' + points.length)
-//    var ps = []
-//    points.forEach( function(element, index) {
-//        var x = scaleX(element.first)
-//        var y = scaleY(element.second)
-//        ps[index] = new Pair(x, y)
-//    });
-//    return ps
-//}
-//
+function gestures(duration, points){
+    return automator.gestures(duration, points)
+}
 
-function gestureAsync(duration, points){
-    return automator.gestureAsync(0, duration, points)
+
+function gesturesAsync(duration, points){
+    return automator.gesturesAsync(duration, points)
 }
 //
 

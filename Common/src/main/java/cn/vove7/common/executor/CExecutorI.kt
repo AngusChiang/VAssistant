@@ -62,7 +62,7 @@ interface CExecutorI : ViewShowListener, ActivityShowListener, RuntimeArgs, Spea
 
     fun notifySync()
     fun sleep(millis: Long)
-    fun onFinish(result: Boolean)
+    fun onFinish(result: Boolean?)
 
     fun smartOpen(data: String): Boolean
     fun smartClose(data: String): Boolean

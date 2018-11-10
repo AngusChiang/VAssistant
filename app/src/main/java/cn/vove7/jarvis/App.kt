@@ -11,7 +11,6 @@ import cn.vove7.common.appbus.MessageEvent
 import cn.vove7.common.bridges.RootHelper
 import cn.vove7.common.utils.runOnNewHandlerThread
 import cn.vove7.jarvis.receivers.AppInstallReceiver
-import cn.vove7.jarvis.receivers.BTConnectListener
 import cn.vove7.jarvis.receivers.PowerEventReceiver
 import cn.vove7.jarvis.receivers.ScreenStatusListener
 import cn.vove7.jarvis.services.AssistSessionService
@@ -40,7 +39,7 @@ class App : LuaApp() {
         CrashHandler.init()
 
         services = arrayOf(mainService)
-        AppConfig.init(this)
+        AppConfig.init()//加载配置
         Vog.d(this, "onCreate ---> 配置加载完成")
         HandlerThread("app_load").apply {
             start()

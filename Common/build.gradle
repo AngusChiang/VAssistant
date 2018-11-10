@@ -39,6 +39,7 @@ dependencies {
     api "org.greenrobot:greendao:$greendao_version"
     api "com.android.support:support-annotations:${support_version}"
     api 'com.google.code.gson:gson:2.8.5'
+    api 'com.android.support:multidex:1.0.1'
     api 'com.squareup.okhttp3:okhttp:3.11.0'
     api files('libs/aip-java-sdk-4.4.1.jar')
     api files('libs/json-20160810.jar')

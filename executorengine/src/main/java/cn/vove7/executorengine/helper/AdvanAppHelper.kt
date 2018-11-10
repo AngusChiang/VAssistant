@@ -98,6 +98,7 @@ object AdvanAppHelper {
     }
 
     fun getPkgList(): ArrayList<String> {
+        if (APP_LIST.isEmpty()) updateAppList()
         val li = arrayListOf<String>()
         synchronized(APP_LIST) {
             APP_LIST.forEach {
