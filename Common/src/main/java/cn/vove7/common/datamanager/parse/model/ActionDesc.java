@@ -11,7 +11,7 @@ import org.greenrobot.greendao.annotation.Id;
  * Date: 2018/9/17
  */
 @Entity
-public class ActionDesc {
+public class ActionDesc implements Cloneable {
     @Expose(serialize = false)
     @Id
     private Long id;
@@ -23,6 +23,15 @@ public class ActionDesc {
     public ActionDesc(String desc, String example) {
         this.instructions = desc;
         this.example = example;
+    }
+
+    @Override
+    public ActionDesc clone() throws CloneNotSupportedException {
+        super.clone();
+        ActionDesc desc = new ActionDesc();
+        desc.example = example;
+        desc.instructions = instructions;
+        return desc;
     }
 
     public ActionDesc() {

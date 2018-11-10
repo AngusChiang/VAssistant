@@ -719,7 +719,7 @@ public class ActionNode implements Serializable, DataFrom {
     //"if(!a) return\n";
     private static final String PreOpen_LUA = "smartOpen('%s')\n" +
             "a = waitForApp('%s',3000)\n" +
-            "if(not a) then return\n";
+            "if(not a) then return end\n";
 
     /**
      * 从inApp复制一个全局Node
@@ -746,7 +746,7 @@ public class ActionNode implements Serializable, DataFrom {
         String newS = p + newNode.action.getActionScript();
         Vog.INSTANCE.d(this, "cloneGlobal ---> \n" + newS);
         newNode.action.setActionScript(newS);
-        newNode.desc = this.desc;
+        newNode.desc = this.desc.clone();
 
         newNode.actionScopeType = ActionNode.NODE_SCOPE_GLOBAL;
         if (containChild)
@@ -760,6 +760,7 @@ public class ActionNode implements Serializable, DataFrom {
 
     /**
      * 比较tagId
+     *
      * @param o
      * @return
      */

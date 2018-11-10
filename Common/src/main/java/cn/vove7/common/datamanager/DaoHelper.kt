@@ -42,16 +42,16 @@ object DaoHelper {
      * @param node ActionNode
      * @return Int
      */
-    fun insertNewActionNodeInTx(node: ActionNode): Int {
-        try {
+    fun insertNewActionNodeInTx(node: ActionNode): Boolean {
+        return try {
             DAO.daoSession.runInTx {
                 insertNewActionNode(node)
             }
+            true
         } catch (e: Exception) {
             GlobalLog.err("${e.message} code:dh48")
-            return R.string.text_an_err_happened
+            false
         }
-        return R.string.text_have_done
     }
 
 
@@ -188,7 +188,7 @@ object DaoHelper {
 //                    }
                     deleteActionNode(it.id)
                 }
-                newNodes.filter { userSharedDataSet.contains(it)||localSyncedDataSet.contains(it) }.forEach {
+                newNodes.filter { userSharedDataSet.contains(it) || localSyncedDataSet.contains(it) }.forEach {
                     //up 交集 new and user
                     //交集
 //                    if (!userDataSet.contains(it)) {

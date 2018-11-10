@@ -17,7 +17,7 @@ system = bridges.getSystemBridge()
 automator = bridges.getAutomator()
 
 function notifyFailed(s)
-    serviceBridge.onExecuteFailed(s)
+    executor.executeFailed(s)
 end
 
 function log(msg)

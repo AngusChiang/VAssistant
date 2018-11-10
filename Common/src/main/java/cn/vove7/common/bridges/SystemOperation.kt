@@ -97,6 +97,12 @@ interface SystemOperation {
     fun mediaPre()
     fun volumeMute()
     fun volumeUnmute()
+    /**
+     * 勿扰模式
+     */
+    fun  doNotDisturbMode()
+
+
     fun volumeUp()
     fun volumeDown()
     fun setMusicVolume(index: Int)

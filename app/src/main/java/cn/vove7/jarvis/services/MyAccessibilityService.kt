@@ -452,7 +452,7 @@ class MyAccessibilityService : AccessibilityApi() {
 
     private fun postLongDelay(runnable: Runnable) {
         v3 = true
-        delayHandler.postDelayed(runnable, AppConfig.volumeKeyDelayUp)
+        delayHandler.postDelayed(runnable, AppConfig.volumeKeyDelayUp.toLong())
     }
 
     private fun removeDelayIfInterrupt(event: KeyEvent, runnable: Runnable): Boolean {
@@ -465,7 +465,7 @@ class MyAccessibilityService : AccessibilityApi() {
             return true
         }
         Vog.d(this, "removeDelayIfInterrupt ---> $runnable")
-        if ((event.eventTime - event.downTime) < (AppConfig.volumeKeyDelayUp - 100)) {//时间短 移除runner 调节音量
+        if ((event.eventTime - event.downTime) < (AppConfig.volumeKeyDelayUp)) {//时间短 移除runner 调节音量
             delayHandler.removeCallbacks(runnable)
             when (event.keyCode) {
                 KEYCODE_VOLUME_UP -> SystemBridge.volumeUp()

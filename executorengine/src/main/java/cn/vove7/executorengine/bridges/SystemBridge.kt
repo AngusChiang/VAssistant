@@ -2,6 +2,7 @@ package cn.vove7.executorengine.bridges
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.app.NotificationManager
 import android.app.SearchManager
 import android.bluetooth.BluetoothAdapter
 import android.content.*
@@ -401,20 +402,48 @@ object SystemBridge : SystemOperation {
     }
 
     /**
-     * 当前音量静音
+     * 震动
      */
     override fun volumeMute() {
-        setMute(true)
+        setRingMode(AudioManager.RINGER_MODE_VIBRATE)
     }
 
-    fun setMute(state: Boolean) {
-        val direction = if (state) ADJUST_MUTE else ADJUST_UNMUTE
+    /**
+     * 设置静音
+     * @param b Boolean
+     */
+    fun setMute(b: Boolean) {
+        if (b) volumeMute()
+        else volumeUnmute()
+    }
+
+    fun setRingMode(mode: Int) {
+//        val direction = if (state) ADJUST_MUTE else ADJUST_UNMUTE
         val mAudioManager = GlobalApp.APP.getSystemService(Context.AUDIO_SERVICE) as AudioManager
-        mAudioManager.adjustSuggestedStreamVolume(direction, AudioManager.USE_DEFAULT_STREAM_TYPE, 0)
+//        mAudioManager.adjustSuggestedStreamVolume(direction, AudioManager.USE_DEFAULT_STREAM_TYPE, 0)
+
+        val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+
+        try {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && !notificationManager.isNotificationPolicyAccessGranted()) {
+                GlobalApp.toastShort("请先授予权限")
+                val intent = Intent(android.provider.Settings.ACTION_NOTIFICATION_POLICY_ACCESS_SETTINGS);
+                context.startActivity(intent)
+            } else {
+                mAudioManager.ringerMode = mode
+            }
+        } catch (e: Exception) {
+            GlobalLog.err(e)
+            GlobalApp.toastShort("设置失败")
+        }
+    }
+
+    override fun doNotDisturbMode() {
+        setRingMode(AudioManager.RINGER_MODE_SILENT)
     }
 
     override fun volumeUnmute() {
-        setMute(false)
+        setRingMode(AudioManager.RINGER_MODE_NORMAL)
     }
 
     override fun volumeUp() {

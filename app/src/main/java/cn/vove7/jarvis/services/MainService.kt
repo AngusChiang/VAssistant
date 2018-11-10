@@ -125,8 +125,8 @@ class MainService : BusService(),
 
     var speechEngineLoaded = false
     fun init() {
-        loadSpeechService()
         loadChatSystem()
+        loadSpeechService()
         cExecutor = MultiExecutorEngine()
         speechEngineLoaded = true
         GlobalApp.toastShort("启动完成")
@@ -345,8 +345,10 @@ class MainService : BusService(),
     override fun onExecuteFinished(result: Boolean) {//
         Vog.d(this, "onExecuteFinished  --> $result")
         listeningToast.hideImmediately()
-        if (AppConfig.execSuccessFeedback && result) executeAnimation.success()
-        else executeAnimation.hideDelay()
+        if (AppConfig.execSuccessFeedback) {
+            if (result) executeAnimation.success()
+            else executeAnimation.failedAndHideDelay()
+        } else executeAnimation.hideDelay()
     }
 
     //from executor 线程
@@ -562,17 +564,27 @@ class MainService : BusService(),
 
         val recoIsListening: Boolean
             get() {
-                return instance?.speechRecoService?.isListening == true
+                return if (instance?.speechEngineLoaded != true) {//未加载
+                    GlobalApp.toastShort("引擎未就绪")
+                    false
+                } else instance?.speechRecoService?.isListening == true
             }
         val exEngineRunning: Boolean
             get() {
-                return instance?.cExecutor?.running == true
+                return if (instance?.speechEngineLoaded != true) {//未加载
+                    GlobalApp.toastShort("引擎未就绪")
+                    false
+                } else instance?.cExecutor?.running == true
             }
 
         /**
          * 切换识别
          */
         fun switchReco() {
+            if (instance?.speechEngineLoaded != true) {//未加载
+                GlobalApp.toastShort("引擎未就绪")
+                return
+            }
             if (recoIsListening) {//配置
                 instance?.onCommand(AppBus.ORDER_CANCEL_RECO)
             } else
@@ -698,6 +710,7 @@ class MainService : BusService(),
                 checkMusic()//检查后台播放
             listeningAni.begin()//
             //todo 音效
+            //响应词
             if (AppConfig.openResponseWord && !AppConfig.speakResponseWordOnVoiceWakeup) {
                 speakResponseWord()
             }

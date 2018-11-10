@@ -27,11 +27,9 @@ class VoiceAssistActivity : Activity() {
         super.onCreate(savedInstanceState)
         val action = intent.action
         Vog.d(this, "VoiceAssist ---> $action")
-        GlobalLog.log("VoiceAssist ---> $action")
         when (action) {
             Intent.ACTION_ASSIST, Intent.ACTION_VOICE_COMMAND, "android.intent.action.VOICE_ASSIST", "wakeup" -> {
                 Vog.d(this, "onCreate ---> ASSIST wakeup")
-
                 MainService.switchReco()
             }
             else -> {

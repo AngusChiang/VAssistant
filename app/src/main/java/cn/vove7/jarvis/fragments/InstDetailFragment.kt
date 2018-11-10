@@ -294,8 +294,10 @@ class InstDetailFragment(val node: ActionNode, val onUpdate: () -> Unit) : BaseB
             val cloneNode: ActionNode?
             try {
                 cloneNode = node.cloneGlobal(containSub)
-                val s = DaoHelper.insertNewActionNodeInTx(cloneNode)
-                toast.showLong(s)
+                DaoHelper.insertNewActionNodeInTx(cloneNode).also {
+                    toast.showLong(if (it) R.string.text_have_done
+                    else R.string.text_an_err_happened)
+                }
 
             } catch (e: Exception) {
                 GlobalLog.err("${e.message} code:id230")

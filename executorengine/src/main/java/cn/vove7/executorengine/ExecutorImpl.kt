@@ -168,6 +168,16 @@ open class ExecutorImpl(
         return PartialResult.fatal("not implement onRhinoExec")
     }
 
+    fun executeFailed() {
+        executeFailed(null)
+    }
+
+    override fun executeFailed(msg: String?) {
+        Vog.d(this,"executeFailed ---> $msg")
+        userInterrupted = true //设置用户中断标志
+        //pollActionQueue -> false
+    }
+
     override fun onFinish(result: Boolean) {
         running = false
         ScreenAdapter.reSet()

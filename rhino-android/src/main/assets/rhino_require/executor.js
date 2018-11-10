@@ -6,6 +6,9 @@ checkService = function(){
     return executor.checkAccessibilityService(false)
 }
 
+notifyFailed = function(s){
+    executor.executeFailed(s)
+}
 
 accessibility = function(){
     return executor.checkAccessibilityService(true)

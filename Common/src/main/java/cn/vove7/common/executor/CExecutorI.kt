@@ -23,6 +23,8 @@ interface CExecutorI : ViewShowListener, ActivityShowListener, RuntimeArgs, Spea
     fun runScript(script: String, args: Array<String>? = null): PartialResult
     fun setScreenSize(width: Int, height: Int)
 
+    fun executeFailed(msg: String?)
+
     fun checkAccessibilityService(jump: Boolean = true): Boolean
 
     fun alert(title: String, msg: String): Boolean

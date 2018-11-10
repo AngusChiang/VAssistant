@@ -62,7 +62,10 @@ abstract class SpeechRecoService(val event: SpeechEvent) : SpeechRecoI {
      */
     abstract fun doStartRecog()
 
-
+    /**
+     * 取消识别
+     * @param notify Boolean
+     */
     override fun cancelRecog(notify: Boolean) {
         isListening = false
         doCancelRecog()
@@ -79,8 +82,6 @@ abstract class SpeechRecoService(val event: SpeechEvent) : SpeechRecoI {
 
     override fun stopWakeUp() {
         wakeupStatusAni.failedAndHideDelay("语音唤醒关闭", 5000)
-        doStopRecog()
-        event.onStopRecog()
     }
 
     abstract fun doStopRecog()
@@ -90,6 +91,7 @@ abstract class SpeechRecoService(val event: SpeechEvent) : SpeechRecoI {
     override fun stopRecog() {
         isListening = false
         doStopRecog()
+        event.onStopRecog()
     }
 
     /**

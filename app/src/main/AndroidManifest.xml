@@ -11,40 +11,30 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-
-    <uses-permission android:name="android.permission.BROADCAST_STICKY"/>
-    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS"/>
-    <uses-permission android:name="android.permission.USE_FINGERPRINT" />
-    <!-- 闪光灯，相机 -->
+    <uses-permission android:name="android.permission.BROADCAST_STICKY" />
+    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
+    <uses-permission android:name="android.permission.USE_FINGERPRINT" /> <!-- 闪光灯，相机 -->
     <uses-permission android:name="android.permission.FLASHLIGHT" />
     <uses-permission android:name="android.permission.CAMERA" />
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" /> <!-- 设置勿扰 -->
+    <uses-permission android:name="android.permission.ACCESS_NOTIFICATION_POLICY" />
 
     <uses-feature android:name="android.hardware.camera" />
-    <uses-feature android:name="android.hardware.autofocus" />
-    <!-- 悬浮窗 -->
-    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
-    <!-- 拨打电话 -->
-    <uses-permission android:name="android.permission.CALL_PHONE" />
-    <!-- 联系人 -->
+    <uses-feature android:name="android.hardware.autofocus" /> <!-- 悬浮窗 -->
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" /> <!-- 拨打电话 -->
+    <uses-permission android:name="android.permission.CALL_PHONE" /> <!-- 联系人 -->
     <uses-permission android:name="android.permission.READ_CONTACTS" />
-
     <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
     <uses-permission android:name="android.permission.BLUETOOTH" />
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
-
     <uses-permission android:name="android.permission.WAKE_LOCK" />
-
     <uses-permission android:name="android.permission.INSTALL_SHORTCUT" />
     <uses-permission android:name="android.permission.UNINSTALL_SHORTCUT" />
-
     <uses-permission android:name="com.android.alarm.permission.SET_ALARM" />
     <uses-permission android:name="android.permission.WRITE_CALENDAR" />
-    <uses-permission android:name="android.permission.READ_CALENDAR" />
-
-    <!--???-->
+    <uses-permission android:name="android.permission.READ_CALENDAR" /> <!-- ??? -->
     <permission
         android:name="android.permission.INTERACT_ACROSS_USERS_FULL"
         android:protectionLevel="signature" />
@@ -66,6 +56,16 @@
         android:supportsRtl="true"
         android:theme="@style/NoActionBar"
         tools:ignore="GoogleAppIndexingWarning">
+        <receiver android:name=".widget.QuickWakeupWidget">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/quick_wakeup_widget_info" />
+        </receiver>
+
         <meta-data
             android:name="com.baidu.speech.APP_ID"
             android:value="10922901" />
@@ -89,32 +89,31 @@
         <activity android:name=".activities.VoiceTestActivity" />
         <activity
             android:name=".activities.RealMainActivity"
-            android:excludeFromRecents="true"
             android:autoRemoveFromRecents="true"
+            android:excludeFromRecents="true"
             android:launchMode="singleTask"
             android:theme="@style/TranslucentStatus.NoActionBar"
             android:windowSoftInputMode="adjustPan">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-            <!--<meta-data android:name="android.app.shortcuts"-->
-            <!--android:resource="@xml/shortcuts" />-->
-        </activity>
-        <!--<activity android:name=".activities.MainActivity" />-->
-
+            <!-- <meta-data android:name="android.app.shortcuts" -->
+            <!-- android:resource="@xml/shortcuts" /> -->
+        </activity> <!-- <activity android:name=".activities.MainActivity" /> -->
         <activity
             android:name=".activities.base.VoiceAssistActivity"
             android:launchMode="singleInstance"
             android:theme="@style/TransparentBackground">
             <intent-filter>
-                <!--搜索助手 触发辅助应用-->
-                <action android:name="android.intent.action.ASSIST" />
 
-                <action android:name="android.search.action.GLOBAL_SEARCH"/>
-                <!--语音搜索 触发 语音识别-->
+                <!-- 搜索助手 触发辅助应用 -->
+                <action android:name="android.intent.action.ASSIST" />
+                <action android:name="android.search.action.GLOBAL_SEARCH" />
+                <!-- 语音搜索 触发 语音识别 -->
                 <action android:name="android.intent.action.VOICE_ASSIST" />
-                <!--蓝牙耳机触发-->
+                <!-- 蓝牙耳机触发 -->
                 <action android:name="android.intent.action.VOICE_COMMAND" />
 
                 <category android:name="android.intent.category.DEFAULT" />
@@ -137,7 +136,6 @@
                 android:name="android.accessibilityservice"
                 android:resource="@xml/accessibility_config" />
         </service>
-
         <service
             android:name="com.baidu.speech.VoiceRecognitionService"
             android:exported="false" />
@@ -151,25 +149,22 @@
             <meta-data
                 android:name="android.voice_interaction"
                 android:resource="@xml/assist_service" />
-
             <meta-data
                 android:name="com.android.systemui.action_assist_icon"
                 android:resource="@mipmap/ic_launcher_vassist" />
+
             <intent-filter>
                 <action android:name="android.service.voice.VoiceInteractionService" />
             </intent-filter>
-
         </service>
 
         <activity
             android:name=".activities.PermissionManagerActivity"
             android:label="@string/text_permission_manager" />
         <activity android:name=".activities.RegexParseTestActivity" />
-
         <activity
             android:name=".activities.InstManagerActivity"
             android:windowSoftInputMode="adjustPan" />
-
         <activity
             android:name=".activities.SettingsActivity"
             android:label="@string/title_activity_settings"
@@ -223,7 +218,6 @@
             android:launchMode="singleInstance"
             android:theme="@style/ScreenPicker" />
         <activity android:name=".activities.CrashInfoActivity" />
-
     </application>
 
 </manifest>

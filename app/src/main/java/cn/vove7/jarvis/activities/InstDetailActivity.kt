@@ -84,7 +84,7 @@ class InstDetailActivity : AppCompatActivity() {
                 .where(ActionNodeDao.Properties.Id.eq(nodeId))
                 .unique()
         if (n == null) {
-            toast.showShort("不存在")
+            GlobalApp.toastShort("不存在")
             finish()
             return
         }
@@ -101,7 +101,6 @@ class InstDetailActivity : AppCompatActivity() {
 
     var nodeId: Long = -1
     lateinit var node: ActionNode
-    val toast: ColorfulToast by lazy { ColorfulToast(this) }
     private var load = false
 //    private val instructions_text: TextView by lazy { findViewById<TextView>(R.id.instructions_text) }
 //    private val examples_text: TextView by lazy { findViewById<TextView>(R.id.examples_text) }
@@ -175,7 +174,7 @@ class InstDetailActivity : AppCompatActivity() {
             if (node.action != null) {
                 copy_script.setOnClickListener {
                     SystemBridge.setClipText(node.action?.actionScript ?: "")
-                    toast.showShort(R.string.text_copied)
+                    GlobalApp.toastShort(R.string.text_copied)
                 }
                 val settingsHeader = RegUtils.getRegisterSettingsTextAndName(node.action.actionScript)
                 if (settingsHeader != null) {
@@ -300,7 +299,7 @@ class InstDetailActivity : AppCompatActivity() {
                     ), waitForPositiveButton = false) { _, i, s ->
                         when (i) {
                             0 -> addFollowFromNew()
-                            1 -> toast.showShort(R.string.text_coming_soon)//todo
+                            1 -> GlobalApp.toastShort(R.string.text_coming_soon)//todo
                         }
                     }.show()
                 }
@@ -317,12 +316,12 @@ class InstDetailActivity : AppCompatActivity() {
                                     if (s == "") 0
                                     else s.toString().toInt()
                                 } catch (e: Exception) {
-                                    toast.showShort("输入整数值")
+                                    GlobalApp.toastShort("输入整数值")
                                     return@input
                                 }
                                 node.priority = p
                                 node.update()
-                                toast.showShort("设置完成")
+                                GlobalApp.toastShort("设置完成")
                                 ParseEngine.updateNode()
                                 DAO.clear()
                                 d.dismiss()
@@ -332,9 +331,9 @@ class InstDetailActivity : AppCompatActivity() {
                 }
                 R.id.menu_share -> {
                     if (UserInfo.isLogin().not()) {
-                        toast.red().showShort("请登录")
+                        GlobalApp.toastShort("请登录")
                     } else if (node.parentId != null && node.parent.tagId == null) {//检查parent
-                        toast.red().showShort("请先上传上级操作")
+                        GlobalApp.toastShort("请先上传上级操作")
                     } else
                         showShareDialog()
                 }
@@ -366,7 +365,7 @@ class InstDetailActivity : AppCompatActivity() {
                     var d: DialogWithList? = null
                     d = DialogWithList(this, InstSettingListAdapter(this,
                             settingName ?: "") {
-                        toast.showLong("设置加载失败")
+                        GlobalApp.toastShort("设置加载失败")
                         d?.dismiss()
                     })
                     d.setTitle(title ?: "")
@@ -430,7 +429,7 @@ class InstDetailActivity : AppCompatActivity() {
     lateinit var p: ProgressDialog
     private fun doCopy2Global(containSub: Boolean) {
         if (node.parentId != null) {
-            toast.showLong("跟随操作不允许此操作")
+            GlobalApp.toastShort("跟随操作不允许此操作")
             return
         }
         p = ProgressDialog(this)
@@ -438,12 +437,16 @@ class InstDetailActivity : AppCompatActivity() {
             val cloneNode: ActionNode?
             try {
                 cloneNode = node.cloneGlobal(containSub)
-                val s = DaoHelper.insertNewActionNodeInTx(cloneNode)
-                toast.showLong(s)
-
+                if (DaoHelper.insertNewActionNodeInTx(cloneNode)) {
+                    GlobalApp.toastLong(R.string.text_have_done)
+                    DAO.clear()
+                    ParseEngine.updateGlobal()
+                } else {
+                    GlobalApp.toastLong(R.string.text_an_err_happened)
+                }
             } catch (e: Exception) {
                 GlobalLog.err("${e.message} code:id230")
-                toast.showLong("复制失败")
+                GlobalApp.toastShort("复制失败${e.message}")
             }
             p.dismiss()
         }
@@ -508,7 +511,7 @@ class InstDetailActivity : AppCompatActivity() {
         NetHelper.postJson<Int>(ApiUrls.UPGRADE_INST, BaseRequestModel(node), type = type, callback = { _, bean ->
             if (bean != null) {
                 if (bean.isOk()) {
-                    toast.blue().showShort(R.string.text_share_success)
+                    GlobalApp.toastShort(R.string.text_share_success)
                     //sign tag
                     val s = bean.data ?: -1
                     if (s < 0) {
@@ -521,10 +524,10 @@ class InstDetailActivity : AppCompatActivity() {
                         node.update()
                     }
                 } else {
-                    toast.red().showShort(bean.message)
+                    GlobalApp.toastShort(bean.message)
                 }
             } else {
-                toast.red().showShort(R.string.text_net_err)
+                GlobalApp.toastShort(R.string.text_net_err)
             }
         })
     }
@@ -537,7 +540,7 @@ class InstDetailActivity : AppCompatActivity() {
         NetHelper.postJson<String>(ApiUrls.SHARE_INST, BaseRequestModel(node), type = type, callback = { _, bean ->
             if (bean != null) {
                 if (bean.isOk()) {
-                    toast.blue().showShort(R.string.text_share_success)
+                    GlobalApp.toastShort(R.string.text_share_success)
                     //sign tag
                     val s = bean.data
                     thread {
@@ -552,10 +555,10 @@ class InstDetailActivity : AppCompatActivity() {
 //                        }
                     }
                 } else {
-                    toast.red().showShort(bean.message)
+                    GlobalApp.toastShort(bean.message)
                 }
             } else {
-                toast.red().showShort(R.string.text_net_err)
+                GlobalApp.toastShort(R.string.text_net_err)
             }
         })
     }

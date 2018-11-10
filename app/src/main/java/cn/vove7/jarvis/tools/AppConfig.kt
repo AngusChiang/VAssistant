@@ -53,14 +53,14 @@ object AppConfig {
     var WAKEUP_FILE_NHXV = "assets:///bd/WakeUp_nhxv.bin"
     var WAKEUP_FILE_XVTX = "assets:///bd/WakeUp_xvtx.bin"
     var DEFAULT_WAKEUP_FILE = WAKEUP_FILE_NHXV
-    var openResponseWord = true
+    var openResponseWord = false
     var responseWord = "我在"
     var speakResponseWordOnVoiceWakeup = true
     var volumeWakeUpWhenScreenOff = true
     //    var onlyCloudServiceParse = false //云服务解析
     var synStreamIndex: Int = 0//合成输出通道 对应 R.array.list_stream_syn_output
 
-    var volumeKeyDelayUp = 600L//音量长按延迟
+    var volumeKeyDelayUp = 600//音量长按延迟
     var wakeUpFilePath = DEFAULT_WAKEUP_FILE
 
     var openVoiceWakeUpIfAutoSleep = true// 自动休眠后，亮屏自动开启语音唤醒
@@ -158,7 +158,7 @@ object AppConfig {
         userExpPlan = getBooleanAndInit(R.string.key_user_exp_plan, true)
         isAutoVoiceWakeupCharging = getBooleanAndInit(R.string.key_auto_open_voice_wakeup_charging, false)
         useSmartOpenIfParseFailed = getBooleanAndInit(R.string.key_use_smartopen_if_parse_failed, true)
-        openResponseWord = getBooleanAndInit(R.string.key_open_response_word, true)
+        openResponseWord = getBooleanAndInit(R.string.key_open_response_word, false)
         speakResponseWordOnVoiceWakeup = getBooleanAndInit(R.string.key_speak_response_word_on_voice_wakeup, true)
         autoOpenASWithRoot = getBooleanAndInit(R.string.key_auto_open_as_with_root, false)
         openChatSystem = getBooleanAndInit(R.string.key_open_chat_system, true)
@@ -215,6 +215,9 @@ object AppConfig {
         wakeUpFilePath = sp.getString(R.string.key_wakeup_file_path) ?: wakeUpFilePath
         sp.getInt(R.string.key_ad_wait_secs).also {
             adWaitSecs = if (it == -1) 17 else it
+        }
+        sp.getInt(R.string.key_long_key_press_delay).also {
+            volumeKeyDelayUp = if (it == -1) volumeKeyDelayUp else it
         }
 
         Vog.d(this, "reload ---> AppConfig")

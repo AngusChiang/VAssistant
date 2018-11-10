@@ -80,14 +80,17 @@ abstract class StatusAnimation {
     var hideThread: Thread? = null
     fun hideDelay(delay: Long = 500) {
         Vog.d(this, "hideDelay ---> $delay")
-        hideThread = thread {
-            try {
-                sleep(delay)
-                (GlobalApp.APP.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager)
-                        .cancel(nId)
-            } catch (e: Exception) {
-            } finally {
-                hideThread = null
+        synchronized(StatusAnimation::class.java) {
+            if (hideThread != null) return
+            hideThread = thread {
+                try {
+                    sleep(delay)
+                    (GlobalApp.APP.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager)
+                            .cancel(nId)
+                } catch (e: Exception) {
+                } finally {
+                    hideThread = null
+                }
             }
         }
     }
