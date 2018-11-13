@@ -1,6 +1,5 @@
 package cn.vove7.jarvis.plugins
 
-import android.view.accessibility.AccessibilityNodeInfo
 import cn.vove7.common.accessibility.AccessibilityApi
 import cn.vove7.common.appbus.AppBus
 import cn.vove7.common.appbus.SpeechAction
@@ -27,9 +26,6 @@ import cn.vove7.vtp.log.Vog
 object VoiceWakeupStrategy : AccPluginsService() {
     private val statusAni: StatusAnimation by lazy { MicroToggleAnimation() }
 
-
-    override fun onUiUpdate(root: AccessibilityNodeInfo?) {}
-
     //是否关闭唤醒 by VoiceWakeupStrategy
     var closed = false
 
@@ -39,23 +35,35 @@ object VoiceWakeupStrategy : AccPluginsService() {
             //case 1 进入App 自动休眠 ->  ORDER_STOP_VOICE_WAKEUP_WITHOUT_NOTIFY
             //wakeupI?.opened开启时，在内关闭唤醒
             if (MainService.instance?.speechRecoService?.wakeupI?.opened == true) {
-                MainService.instance?.onCommand(AppBus.ORDER_STOP_VOICE_WAKEUP_WITHOUT_NOTIFY)
-                Vog.d(this, "VoiceWakeupStrategy ---> 关闭语音唤醒")
-                closed = true
-                if (AppConfig.notifyCloseMico) {
-                    statusAni.failedAndHideDelay("关闭语音唤醒", 2000)
-                }
+                closeWakeup()
             }
         } else if (closed && MainService.instance?.speechRecoService?.timerEnd == false) {//已自动关闭 并且定时器有效
-            Vog.d(this, "VoiceWakeupStrategy ---> 开启语音唤醒")
-            closed = false
-
-            if (AppConfig.notifyCloseMico) {
-                statusAni.begin()
-                statusAni.hideDelay(2000)
-            }
-            MainService.instance?.onCommand(AppBus.ORDER_START_VOICE_WAKEUP_WITHOUT_NOTIFY)
+            startWakeup()
         }
+    }
+
+    fun closeWakeup() {
+        MainService.instance?.onCommand(AppBus.ORDER_STOP_VOICE_WAKEUP_WITHOUT_NOTIFY)
+        Vog.d(this, "VoiceWakeupStrategy ---> 关闭语音唤醒")
+        closed = true
+        if (AppConfig.notifyCloseMico) {
+            statusAni.failedAndHideDelay("关闭语音唤醒", 2000)
+        }
+    }
+
+    override fun onUnBind() {
+        closed = false//关闭 / 初始标志
+    }
+
+    fun startWakeup() {
+        Vog.d(this, "VoiceWakeupStrategy ---> 开启语音唤醒")
+        closed = false
+
+        if (AppConfig.notifyCloseMico) {
+            statusAni.begin()
+            statusAni.hideDelay(2000)
+        }
+        MainService.instance?.onCommand(AppBus.ORDER_START_VOICE_WAKEUP_WITHOUT_NOTIFY)
     }
 
     override fun unBindServer() {

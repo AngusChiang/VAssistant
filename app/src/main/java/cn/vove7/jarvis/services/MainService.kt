@@ -526,8 +526,10 @@ class MainService : BusService(),
     }
 
     override fun onDestroy() {
-        speechRecoService.release()
-        speechSynService.release()
+        if (speechEngineLoaded) {
+            speechRecoService.release()
+            speechSynService.release()
+        }
         super.onDestroy()
     }
 

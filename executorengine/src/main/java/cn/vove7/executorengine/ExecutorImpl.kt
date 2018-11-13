@@ -394,30 +394,26 @@ open class ExecutorImpl(
 
     /**
      * 锁定线程
-     * @param millis 等待时限 -1 无限
+     * @param millis 等待时限 -1 默认30s
      */
     override fun waitForUnlock(millis: Long): Boolean {
+        val mm = if (millis < 0) 30000 else millis
         synchronized(lock) {
             val begin = System.currentTimeMillis() // 开始等待时间
-            Vog.d(this, "执行器-等待 time: $millis   begin: $begin")
+            Vog.d(this, "执行器-等待 time: $mm   begin: $begin")
 
             //等待结果
             try {
-                if (millis < 0) {
-                    lock.wait(30000)//30s
-                    Vog.d(this, "执行器-解锁")
-                    return true
-                } else {
-                    lock.wait(millis)
-                    val end = System.currentTimeMillis()
-                    Vog.d(this, "执行器-解锁")
-                    if (end - begin >= millis) {//自动超时 终止执行
-                        Vog.d(this, "等待超时")
-                        accessApi?.removeAllNotifier(this)//移除监听器
-                        return false
-                    }
-                    return true
+                lock.wait(mm)
+                val end = System.currentTimeMillis()
+                Vog.d(this, "执行器-解锁")
+                if (end - begin >= mm) {//自动超时 终止执行
+                    Vog.d(this, "等待超时")
+                    accessApi?.removeAllNotifier(this)//移除监听器
+                    return false
                 }
+                return true
+
             } catch (e: InterruptedException) {
                 e.printStackTrace()
                 //必须强行stop

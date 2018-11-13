@@ -1,5 +1,6 @@
 package cn.vove7.jarvis.plugins
 
+import android.view.accessibility.AccessibilityEvent
 import android.view.accessibility.AccessibilityNodeInfo
 import cn.vove7.common.accessibility.AccessibilityApi
 import cn.vove7.common.app.GlobalLog
@@ -41,7 +42,7 @@ object AdKillerService : AccPluginsService() {
 
     override fun onBind() {
         thread {
-            if(!AccessibilityApi.isOpen()) return@thread
+            if (!AccessibilityApi.isOpen()) return@thread
             locked = true
             finderCaches.clear()
             val appAdInfoDao = DAO.daoSession.appAdInfoDao
@@ -66,7 +67,8 @@ object AdKillerService : AccPluginsService() {
      * 只允许一个线程操作
      * @param root AccessibilityNodeInfo?
      */
-    override fun onUiUpdate(root: AccessibilityNodeInfo?) {// 浪费资源..
+    override fun onUiUpdate(root: AccessibilityNodeInfo?, event: AccessibilityEvent?) {
+        // 浪费资源..
         val now = System.currentTimeMillis()
         if (now - changedTime > (AppConfig.adWaitSecs * 1000)) return //7s等待时间
         if (locked) {
@@ -82,7 +84,7 @@ object AdKillerService : AccPluginsService() {
                 b.second == 0 -> Vog.d(this, "onUiUpdate ---> 发现广告，清除失败")
                 else -> {
                     Vog.d(this, "onUiUpdate ---> 发现广告，清除成功")
-                    if (AppConfig.isToastWhenRemoveAd){
+                    if (AppConfig.isToastWhenRemoveAd) {
                         removeAdAnimation.begin()
                         removeAdAnimation.hideDelay(3500)
                     }
@@ -139,7 +141,7 @@ object AdKillerService : AccPluginsService() {
         }
         Vog.v(this, "当前界面广告数--->${finders?.size} $appScope $finders")
 
-        onUiUpdate(null)
+        onUiUpdate(null, null)
     }
 
     /**

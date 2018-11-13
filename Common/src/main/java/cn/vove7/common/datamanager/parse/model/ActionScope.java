@@ -116,7 +116,9 @@ public class ActionScope {
         return packageName != null && packageName.startsWith(that.packageName) &&
                 (that.activity == null || activity == null ||
                         activity.endsWith("." + that.activity) ||
-                        that.activity.endsWith("." + activity));
+                        activity.endsWith("$" + that.activity) ||
+                        that.activity.endsWith("." + activity)) ||
+                that.activity.endsWith("$" + activity);
     }
 
 
@@ -130,7 +132,7 @@ public class ActionScope {
     }
 
     public boolean eqPkg(ActionScope o) {
-        if(o.packageName==null) return false;
+        if (o.packageName == null) return false;
         return o.packageName.startsWith(this.packageName) ||
                 packageName.startsWith(o.packageName);
     }

@@ -140,7 +140,7 @@ class SettingsActivity : ReturnableActivity() {
 //                            keyId = R.string.key_resume_bkg_music,defaultValue = {true})
             )),
             SettingGroupItem(R.color.cyan_500, titleId = R.string.text_wakeup_way, childItems = listOf(
-                    SwitchItem(R.string.text_open_voice_wakeup, summary = "以 \"你好小V\" 唤醒" +
+                    SwitchItem(R.string.text_open_voice_wakeup, summary = "以 \"你好小V\" 唤醒\n提示: 目前语音唤醒十分耗电,请三思" +
                             (if (AppConfig.voiceWakeup && WakeupI.instance?.opened == false) "\n已自动关闭" else ""),
                             keyId = R.string.key_open_voice_wakeup, callback = { _, it ->
                         when (it as Boolean) {

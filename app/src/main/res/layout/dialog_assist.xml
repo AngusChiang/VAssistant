@@ -15,6 +15,7 @@
         app:behavior_peekHeight="500dp"
         app:cardCornerRadius="6dp"
         app:cardElevation="2dp"
+        android:fitsSystemWindows="true"
         app:layout_behavior="@string/bottom_sheet_behavior">
 
         <LinearLayout

@@ -3,6 +3,8 @@ package cn.vove7.common.accessibility
 import android.accessibilityservice.AccessibilityService
 import android.os.Build
 import android.support.v4.view.accessibility.AccessibilityNodeInfoCompat.FOCUS_INPUT
+import android.view.accessibility.AccessibilityEvent
+import android.view.accessibility.AccessibilityNodeInfo
 import cn.vove7.common.accessibility.viewnode.ViewNode
 import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.datamanager.parse.model.ActionScope
@@ -24,10 +26,21 @@ abstract class AccessibilityApi : AccessibilityService(),
         private set
         get() = currentScope.activity
 
+    val rootInWindow: AccessibilityNodeInfo?
+        get() {
+            return try {
+                rootInActiveWindow //will occur exception
+            } catch (e: Exception) {
+                null
+            }
+        }
+
     override fun onCreate() {
         super.onCreate()
         accessibilityService = this
     }
+    var lastScreenEvent: AccessibilityEvent? = null
+
 
     val currentFocusedEditor: ViewNode?
         get() = findFocus(FOCUS_INPUT).let {

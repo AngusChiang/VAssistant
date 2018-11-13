@@ -2,6 +2,8 @@ package cn.vove7.jarvis.speech.baiduspeech.synthesis.util
 
 import android.content.Context
 import android.content.res.AssetManager
+import cn.vove7.common.app.GlobalApp
+import cn.vove7.common.app.GlobalLog
 import cn.vove7.jarvis.services.SpeechSynService.Companion.VOICE_DUXY
 import cn.vove7.jarvis.services.SpeechSynService.Companion.VOICE_DUYY
 import cn.vove7.jarvis.services.SpeechSynService.Companion.VOICE_FEMALE
@@ -15,8 +17,8 @@ import java.io.IOException
 
 class OfflineResource(context: Context, voiceType: String) {
 
-    private val assets: AssetManager
-    private val destPath: String
+    private var assets: AssetManager?=null
+    private var destPath: String?=null
 
     var textFilename: String? = null
         private set
@@ -24,11 +26,17 @@ class OfflineResource(context: Context, voiceType: String) {
         private set
 
     private val mapInitied = HashMap<String, Boolean>()
+
     init {
-        val context = context.applicationContext
-        this.assets = context.applicationContext.assets
-        this.destPath = FileUtil.createTmpDir(context)
-        setOfflineVoiceType(voiceType)
+        try {
+            val context = context.applicationContext
+            this.assets = context.applicationContext.assets
+            this.destPath = FileUtil.createTmpDir(context)
+            setOfflineVoiceType(voiceType)
+        } catch (e: Exception) {
+            GlobalLog.err(e)
+            GlobalApp.toastShort("离线资源加载失败 ${e.message}")
+        }
     }
 
     fun setOfflineVoiceType(voiceType: String) {
@@ -53,7 +61,7 @@ class OfflineResource(context: Context, voiceType: String) {
     private fun copyAssetsFile(sourceFilename: String): String {
         val destFilename = "$destPath/$sourceFilename"
         var recover = false
-        val existed = mapInitied[sourceFilename]?:false // 启动时完全覆盖一次
+        val existed = mapInitied[sourceFilename] ?: false // 启动时完全覆盖一次
         if (!existed) {
             recover = true
         }

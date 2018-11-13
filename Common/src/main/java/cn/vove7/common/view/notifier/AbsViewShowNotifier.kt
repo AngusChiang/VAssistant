@@ -6,8 +6,8 @@ import cn.vove7.common.view.finder.ViewFinder
 import cn.vove7.vtp.log.Vog
 
 /**
- * 通知View/Activity出现 基类 -- id  desc  pkg  通知器
- *
+ * 通知View/Activity出现
+ * 基类 -- id  desc  pkg  通知器
  *
  */
 abstract class AbsViewShowNotifier(private val finders: MutableSet<ViewFinder>) : ShowListener {

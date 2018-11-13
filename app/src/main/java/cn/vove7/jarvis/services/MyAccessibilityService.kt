@@ -11,12 +11,16 @@ import android.content.pm.PackageManager
 import android.graphics.Rect
 import android.os.Build
 import android.os.Handler
+import android.support.v4.view.accessibility.AccessibilityEventCompat
+import android.support.v4.view.accessibility.AccessibilityRecordCompat
 import android.view.KeyEvent
 import android.view.KeyEvent.*
 import android.view.ViewGroup
 import android.view.accessibility.AccessibilityEvent
 import android.view.accessibility.AccessibilityEvent.*
+import android.view.accessibility.AccessibilityEventSource
 import android.view.accessibility.AccessibilityNodeInfo
+import android.view.accessibility.AccessibilityRecord
 import cn.vove7.common.accessibility.AccessibilityApi
 import cn.vove7.common.accessibility.viewnode.ViewNode
 import cn.vove7.common.app.GlobalApp
@@ -33,9 +37,8 @@ import cn.vove7.common.view.notifier.ViewShowListener
 import cn.vove7.common.view.toast.ColorfulToast
 import cn.vove7.executorengine.bridges.SystemBridge
 import cn.vove7.executorengine.helper.AdvanAppHelper
-import cn.vove7.jarvis.plugins.AccPluginsService
-import cn.vove7.jarvis.plugins.AdKillerService
-import cn.vove7.jarvis.plugins.VoiceWakeupStrategy
+import cn.vove7.jarvis.BuildConfig
+import cn.vove7.jarvis.plugins.*
 import cn.vove7.jarvis.receivers.PowerEventReceiver
 import cn.vove7.jarvis.tools.AppConfig
 import cn.vove7.jarvis.view.statusbar.AccessibilityStatusAnimation
@@ -63,44 +66,34 @@ class MyAccessibilityService : AccessibilityApi() {
         startPluginService()
     }
 
+    /**
+     * # 等待app|Activity表
+     * - [CExecutorI] 执行器
+     * - pair.first pkg
+     * - pair.second activity
+     */
+    private val locksWaitForActivity = mutableMapOf<ActivityShowListener, ActionScope>()
+
+    /**
+     *  Notifier By [currentScope]
+     */
+    private val activityNotifier = AppChangNotifier(locksWaitForActivity)
+
     private fun startPluginService() {
         thread {
+            //注册无障碍组件
             registerPlugin(activityNotifier)
             if (AppConfig.isAdBlockService)
                 registerPlugin(AdKillerService)
             if (AppConfig.fixVoiceMico) {
                 registerPlugin(VoiceWakeupStrategy)
             }
-        }
-    }
-
-    fun fingerprintGesture() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            fingerprintGestureController.isGestureDetectionAvailable.also {
-                Vog.d(this, "onServiceConnected ---> isGestureDetectionAvailable $it")
-                if (it) {
-                    fingerprintGestureController.registerFingerprintGestureCallback(
-                            object : FingerprintGestureController.FingerprintGestureCallback() {
-                                override fun onGestureDetected(gesture: Int) {
-                                    Vog.d(this, "onGestureDetected ---> $gesture")
-                                    when (gesture) {
-                                        FINGERPRINT_GESTURE_SWIPE_RIGHT -> {
-
-                                        }
-                                        FINGERPRINT_GESTURE_SWIPE_DOWN -> {
-
-                                        }
-                                        else -> {
-                                        }
-                                    }
-
-                                }
-                            }, Handler())
-                }
+            if (BuildConfig.DEBUG) {
+                registerPlugin(AutoLearnService)
             }
         }
-
     }
+
 
     private fun updateCurrentApp(pkg: String, activityName: String) {
         if (currentScope.packageName == pkg && activityName == currentActivity) return
@@ -129,14 +122,6 @@ class MyAccessibilityService : AccessibilityApi() {
         else ViewNode(root)
     }
 
-
-    /**
-     * # 等待Activity表
-     * - [CExecutorI] 执行器
-     * - pair.first pkg
-     * - pair.second activity
-     */
-    private val locksWaitForActivity = mutableMapOf<ActivityShowListener, ActionScope>()
 
     override fun waitForActivity(executor: CExecutorI, scope: ActionScope) {
         locksWaitForActivity[executor] = scope
@@ -197,22 +182,13 @@ class MyAccessibilityService : AccessibilityApi() {
     /**
      * 通知UI更新（UI驱动事件）
      */
-    private fun callAllNotifier() {
+    private fun callAllNotifier(event: AccessibilityEvent) {
         viewNotifierThread?.interrupt()
         viewNotifierThread = thread {
             viewNotifier.notifyIfShow()
         }
-        dispatchPluginsEvent(ON_UI_UPDATE, rootInWindow)
+        dispatchPluginsEvent(ON_UI_UPDATE, event)
     }
-
-    private val rootInWindow: AccessibilityNodeInfo?
-        get() {
-            return try {
-                rootInActiveWindow
-            } catch (e: Exception) {
-                null
-            }
-        }
 
     /**
      *
@@ -234,22 +210,21 @@ class MyAccessibilityService : AccessibilityApi() {
             GlobalLog.err(e.message)
             return
         }
+
         Vog.v(this, "class :$currentAppInfo - $currentActivity ${event.className} \n" +
                 AccessibilityEvent.eventTypeToString(event.eventType))
         val eventType = event.eventType
         if (eventType == AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED) {//界面切换
             val classNameStr = event.className
             val pkg = event.packageName as String?
-            Vog.v(this, "onAccessibilityEvent WINDOW_STATE_CHANGED ---> $classNameStr $pkg")
+            Vog.v(this, "WINDOW_STATE_CHANGED ---> $classNameStr $pkg")
 //            if (packageName == pkg) {//fix 悬浮窗造成阻塞
 //                Vog.d(this, "onAccessibilityEvent ---> 自身(屏蔽悬浮窗)")
 //                return
 //            }
-//            Vog.d(this, "TYPE_WINDOW_STATE_CHANGED --->\n $pkg ${event.className}")
             if (classNameStr != null && pkg != null)
                 updateCurrentApp(pkg, classNameStr.toString())
-
-            callAllNotifier()
+            callAllNotifier(event)
         }
         if (blackPackage.contains(currentScope.packageName)) {//black list
             Vog.v(this, "onAccessibilityEvent ---> in black")
@@ -262,22 +237,19 @@ class MyAccessibilityService : AccessibilityApi() {
 //                callAllNotifier()
             }
             TYPE_WINDOWS_CHANGED -> {
-                callAllNotifier()
+                callAllNotifier(event)
             }
             TYPE_WINDOW_CONTENT_CHANGED -> {//"帧"刷新
 //                val node = event.source
-                callAllNotifier()
-            }
-            AccessibilityEvent.TYPE_VIEW_HOVER_ENTER -> {
-//                startTraverse(rootInActiveWindow)
-//                callAllNotifier()
-            }
-            AccessibilityEvent.TYPE_VIEW_HOVER_EXIT -> {
-//                startTraverse(rootInActiveWindow)
-//                callAllNotifier()
+                callAllNotifier(event)
             }
             TYPE_VIEW_SCROLLED -> {
-                callAllNotifier()
+                callAllNotifier(event)
+            }
+            TYPE_VIEW_CLICKED -> {
+                lastScreenEvent = event
+                callAllNotifier(event)
+                Vog.d(this, "onAccessibilityEvent ---> 点击 :${ViewNode(event.source)}")
             }
 
         }
@@ -326,19 +298,6 @@ class MyAccessibilityService : AccessibilityApi() {
         }
     }
 
-
-    private fun nodeSummary(node: AccessibilityNodeInfo?): String {
-        if (node == null) return "null\n"
-        val clsName = node.className
-        val id = node.viewIdResourceName
-        val rect = Rect()
-        node.getBoundsInScreen(rect)
-        val cls = clsName.substring(clsName.lastIndexOf('.') + 1)
-        return String.format("[%-20s] [%-20s] [%-20s] [%-20s] [%-20s] %n",
-                cls, (id),//?.substring(viewId.lastIndexOf('/') + 1) ?: "null"),
-                node.contentDescription, node.text, rect
-        )
-    }
 
     private fun getT(d: Int): String {
         val builder = StringBuilder()
@@ -490,40 +449,6 @@ class MyAccessibilityService : AccessibilityApi() {
 
     override fun getService(): AccessibilityService = this
 
-    /**
-     *  Notifier By [currentScope]
-     */
-    private val activityNotifier = object : AccPluginsService() {
-        override fun onUiUpdate(root: AccessibilityNodeInfo?) {
-//            onAppChanged(currentScope)//...
-        }
-
-        fun fill(data: ActionScope): Boolean {
-            Vog.v(this, "filter $currentScope - $data")
-            return currentScope == data
-        }
-
-        override fun onAppChanged(appScope: ActionScope) {
-            synchronized(locksWaitForActivity) {
-                val removes = mutableListOf<ActivityShowListener>()
-                kotlin.run out@{
-                    locksWaitForActivity.forEach { it ->
-                        if (fill(it.value)) {
-                            it.key.notifyShow(currentScope)
-                            removes.add(it.key)
-                        }
-                        if (Thread.currentThread().isInterrupted) {
-                            Vog.d(this, "activityNotifier 线程关闭")
-                            return@out
-                        }
-                    }
-                }
-                removes.forEach { locksWaitForActivity.remove(it) }
-                removes.clear()
-            }
-        }
-    }
-
     companion object {
 
         private val absCls = arrayOf("AbsListView", "ViewGroup", "CategoryPairLayout")
@@ -574,10 +499,11 @@ class MyAccessibilityService : AccessibilityApi() {
                 when (what) {
                     ON_UI_UPDATE -> {
                         pluginsServices.forEach {
-                            thread { it.onUiUpdate(data as AccessibilityNodeInfo?) }
+                            thread { it.onUiUpdate(accessibilityService?.rootInWindow, data as AccessibilityEvent?) }
                         }
                     }
                     ON_APP_CHANGED -> {
+                        Vog.d(this, "dispatchPluginsEvent ---> ON_APP_CHANGED")
                         pluginsServices.forEach {
                             thread { it.onAppChanged(data as ActionScope) }
                         }
@@ -592,6 +518,20 @@ class MyAccessibilityService : AccessibilityApi() {
                 }
             }
         }
+
+        fun nodeSummary(node: AccessibilityNodeInfo?): String {
+            if (node == null) return "null\n"
+            val clsName = node.className
+            val id = node.viewIdResourceName
+            val rect = Rect()
+            node.getBoundsInScreen(rect)
+            val cls = clsName.substring(clsName.lastIndexOf('.') + 1)
+            return String.format("[%-20s] [%-20s] [%-20s] [%-20s] [%-20s] %n",
+                    cls, (id),//?.substring(viewId.lastIndexOf('/') + 1) ?: "null"),
+                    node.contentDescription, node.text, rect
+            )
+        }
+
     }
 
     override fun powerSavingMode() {
