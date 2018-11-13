@@ -92,6 +92,7 @@ class EditorFunsHelper(
                         , ApiFunction("scrollable()", "匹配可滑动")
                         , ApiFunction("type(types)", "匹配控件的className")
                         , ApiFunction("await()", "同waitFor()")
+                        , ApiFunction("waitHide()", "等待消失 常用于加载View的消失,参数:([waitMs: Int])\n(可选)waitMs:等待时间,最长30s,\n返回Boolean: false:超时; true:该ViewNode消失")
                 )),
                 ApiCategory("网络", listOf(
                         ApiFunction("get(url)", "发起get请求，参数:(url [, params:Map])", insertText = "http.get()")
@@ -100,9 +101,9 @@ class EditorFunsHelper(
                         , ApiFunction("getAsPc(url, json)", "模拟Pc发起get请求, 参数:(url [params:Map])", insertText = "http.getAsPc()")
                 )),
                 ApiCategory("全局", listOf(
-                        ApiFunction("waitForId(id,m)", "等待指定视图id的出现，m:等待时长")
-                        , ApiFunction("waitForDesc(desc,m)", "等待desc出现")
-                        , ApiFunction("waitForText(text,m)", "等待text出现")
+                        ApiFunction("waitForId(id,m)", "等待指定视图id的出现，m:等待时长,返回ViewNode")
+                        , ApiFunction("waitForDesc(desc,m)", "等待desc出现,返回ViewNode")
+                        , ApiFunction("waitForText(text,m)", "等待text出现,返回ViewNode")
                         , ApiFunction("smartOpen(s)", "s:可以为应用包名，应用名，打开标记的记录")
                         , ApiFunction("smartClose(s)", "关闭应用、标记的记录")
                         , ApiFunction("sleep(m)", "睡眠m毫秒")

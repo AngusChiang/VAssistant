@@ -27,7 +27,7 @@ interface VApi {
                 "containsText()", "matchesText()", "equalsText()",
                 "similaryText()", "id()", "desc()",
                 "editable()", "scrollable()", "type()", "await()",
-                "findFirst()", "find()", "containsDesc()"
+                "findFirst()", "find()", "containsDesc()","waitHide()"
         )
         val utilFuns = arrayOf(
                 "toPinyin()", "arr2String()", "print()", "matches()", "matchValues()",

@@ -117,8 +117,8 @@ public class ActionScope {
                 (that.activity == null || activity == null ||
                         activity.endsWith("." + that.activity) ||
                         activity.endsWith("$" + that.activity) ||
-                        that.activity.endsWith("." + activity)) ||
-                that.activity.endsWith("$" + activity);
+                        that.activity.endsWith("." + activity) ||
+                        that.activity.endsWith("$" + activity));
     }
 
 

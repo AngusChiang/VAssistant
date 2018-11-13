@@ -49,7 +49,7 @@ open class FindBuilder : ViewOperation {
     }
 
     /**
-     * 等待消失  常用于等待加载View的消失
+     * 等待消失  常用于加载View的消失
      * @param waitMs max 60s
      * @return Boolean false 超时 true 消失
      */
