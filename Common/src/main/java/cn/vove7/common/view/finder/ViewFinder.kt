@@ -19,7 +19,16 @@ abstract class ViewFinder(var accessibilityService: AccessibilityApi) {
         }
 
     open fun findFirst(): ViewNode? {
-        val r = traverseAllNode(rootNode)
+        return findFirst(false)
+    }
+
+    /**
+     * @param includeInvisible Boolean 是否包含不可见
+     * @return ViewNode?
+     */
+    fun findFirst(includeInvisible: Boolean = false): ViewNode? {
+        //不可见
+        val r = traverseAllNode(rootNode, includeInvisible = includeInvisible)
         Vog.i(this, "findFirst ${r != null}")
         return r
     }
@@ -31,8 +40,12 @@ abstract class ViewFinder(var accessibilityService: AccessibilityApi) {
     }
 
     fun findAll(): Array<ViewNode> {
+        return findAll(false)
+    }
+
+    fun findAll(includeInvisible: Boolean = false): Array<ViewNode> {
         list.clear()
-        traverseAllNode(rootNode, true)
+        traverseAllNode(rootNode, true, includeInvisible)
         val l = mutableListOf<ViewNode>()
         l.addAll(list)
         return l.toTypedArray()
@@ -43,15 +56,17 @@ abstract class ViewFinder(var accessibilityService: AccessibilityApi) {
      *
      * @param node AccessibilityNodeInfo?
      * @param all Boolean true 搜索全部返回list else return first
+     * @param includeInvisible Boolean 包含不可见节点
      * @return ViewNode?
      */
-    private fun traverseAllNode(node: AccessibilityNodeInfo?, all: Boolean = false): ViewNode? {
+    private fun traverseAllNode(node: AccessibilityNodeInfo?, all: Boolean = false,
+                                includeInvisible: Boolean = false): ViewNode? {
         if (node == null) return null
         (0 until node.childCount).forEach { index ->
             Vog.v(this, "traverseAllNode ${node.className} $index/${node.childCount}")
             val childNode = node.getChild(index)
             if (childNode != null) {
-                if (!childNode.isVisibleToUser) {//TODO check it
+                if (!includeInvisible && !childNode.isVisibleToUser) {//TODO check it
                     Vog.d(this, "unVisibleToUser ---> ${childNode.text}")
                     return@forEach
                 }

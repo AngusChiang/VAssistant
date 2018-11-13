@@ -51,7 +51,8 @@ class SpeechStatusListener(private val handler: Handler) : StatusRecogListener()
     override fun onAsrFinishError(errorCode: Int, subErrorCode: Int, errorMessage: String?, descMessage: String?,
                                   recogResult: RecogResult) {
         super.onAsrFinishError(errorCode, subErrorCode, errorMessage, descMessage, recogResult)
-        val message = "识别错误, 错误码：$errorCode,$subErrorCode"
+        val message = "识别错误, 错误码：$errorCode,$subErrorCode,$descMessage,$errorMessage"
+        GlobalLog.err(message)
         val errMsg = when (errorCode) {
             9 -> {
                 AppBus.post(RequestPermission("麦克风权限"))
@@ -63,8 +64,7 @@ class SpeechStatusListener(private val handler: Handler) : StatusRecogListener()
             8 -> "引擎忙"
             1 -> "网络超时"
             else -> {
-                GlobalLog.err(message)
-                "位置错误"
+                "未知错误"
             }
         }
 

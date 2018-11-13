@@ -67,7 +67,7 @@ object AdKillerService : AccPluginsService() {
      * 只允许一个线程操作
      * @param root AccessibilityNodeInfo?
      */
-    override fun onUiUpdate(root: AccessibilityNodeInfo?, event: AccessibilityEvent?) {
+    override fun onUiUpdate(root: AccessibilityNodeInfo?, eventData: Pair<Int, AccessibilityNodeInfo?>) {
         // 浪费资源..
         val now = System.currentTimeMillis()
         if (now - changedTime > (AppConfig.adWaitSecs * 1000)) return //7s等待时间
@@ -141,7 +141,7 @@ object AdKillerService : AccPluginsService() {
         }
         Vog.v(this, "当前界面广告数--->${finders?.size} $appScope $finders")
 
-        onUiUpdate(null, null)
+        onUiUpdate(null, Pair(0, null))
     }
 
     /**

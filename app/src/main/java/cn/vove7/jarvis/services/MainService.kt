@@ -872,7 +872,8 @@ class MainService : BusService(),
                         listeningToast.showAndHideDelay("获取失败")
                         parseAnimation.failedAndHideDelay()
                     } else {
-                        listeningToast.hideDelay()
+                        listeningToast.show(if (data.contains("="))
+                            data.replace("=", "\n=") else data)
                         executeAnimation.begin()
                         speakWithCallback(data, object : SpeakCallback {
                             override fun speakCallback(result: String?) {

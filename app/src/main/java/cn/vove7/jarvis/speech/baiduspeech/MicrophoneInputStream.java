@@ -46,7 +46,7 @@ public class MicrophoneInputStream extends InputStream {
         //initSCO();
         //initBlueToothHeadset();
 
-        initAudioSource();
+        //initAudioSource();
     }
 
     private void initAudioSource() {
@@ -60,7 +60,7 @@ public class MicrophoneInputStream extends InputStream {
                     16000, AudioFormat.CHANNEL_IN_MONO,
                     AudioFormat.ENCODING_PCM_16BIT, bufferSize);
         }
-        mAudioManager.setMode(AudioManager.MODE_IN_CALL);
+        //mAudioManager.setMode(AudioManager.MODE_IN_CALL);
     }
 
     public static MicrophoneInputStream getInstance() {

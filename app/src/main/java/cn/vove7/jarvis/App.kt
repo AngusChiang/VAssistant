@@ -51,8 +51,7 @@ class App : LuaApp() {
                 startBroadcastReceivers()
                 thread {
                     if (AppConfig.autoOpenASWithRoot && !PermissionUtils.accessibilityServiceEnabled(this@App)) {
-                        RootHelper.openAppAccessService(packageName,
-                                "${MyAccessibilityService::class.qualifiedName}")
+                        RootHelper.openSelfAccessService()
                     }
                 }
                 Vog.d(this, "onCreate ---> 结束 ${System.currentTimeMillis() / 1000}")

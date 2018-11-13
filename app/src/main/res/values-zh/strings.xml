@@ -141,7 +141,8 @@
         6.操作、标记分享，且可同步恢复\n
         7.无限制屏幕识别/文字识别
     </string>
-    <string name="text_recharege_pre_read">在支付前，请先阅读高级教程，确保它对你有用。</string> <string name="text_email_copy_to_clip">你的邮箱已复制到剪切板</string>
+    <string name="text_recharege_pre_read">在支付前，请先阅读高级教程，确保它对你有用。</string>
+    <string name="text_email_copy_to_clip">你的邮箱已复制到剪切板</string>
     <string name="text_understand">知道了</string>
     <string name="text_continue">继续</string>
     <string name="text_debug_service_starting">调试服务在空闲2分钟后自动关闭</string>
@@ -221,7 +222,13 @@
     <string name="text_js_editor">Js编辑器</string>
     <string name="text_select_nothing">未选择任何内容</string>
     <string name="text_copied">已复制</string>
-    <string name="desc_accessibility">开启后将后的技能\n1.使用音量快捷键\n2.操作界面\n3.根据当前界面响应指令</string>
+    <string name="desc_accessibility">
+        开启后将获得的技能\n
+        1.使用音量快捷唤醒\n
+        2.操作界面\n
+        3.根据当前界面响应指令\n
+        4.麦克风占用问题
+    </string>
     <string name="text_update_log">更新日志</string>
     <string name="text_set_priority">设置优先级</string>
     <string name="desc_new_account">新用户将获得7天高级用户免费体验资格</string>

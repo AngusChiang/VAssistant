@@ -14,7 +14,6 @@ import cn.vove7.common.app.GlobalApp
 import cn.vove7.executorengine.bridges.SystemBridge
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.activities.PermissionManagerActivity.PermissionStatus.Companion.allPerStr
-import cn.vove7.jarvis.activities.PermissionManagerActivity.PermissionStatus.Companion.permissions
 import cn.vove7.jarvis.activities.base.OneFragmentActivity
 import cn.vove7.jarvis.adapters.RecAdapterWithFooter
 import cn.vove7.jarvis.fragments.VListFragment
@@ -52,8 +51,8 @@ class PermissionManagerActivity : OneFragmentActivity() {
 
 
         override fun initView(contentView: View) {
-            PermissionStatus.refreshStatus()
             adapter = buildAdapter()
+            refreshStatus()
             recyclerView.isVerticalScrollBarEnabled = false
             buildHeader()
         }
@@ -69,7 +68,7 @@ class PermissionManagerActivity : OneFragmentActivity() {
         }
 
         override fun onGetData(pageIndex: Int) {
-            PermissionStatus.refreshStatus()
+            refreshStatus()
             notifyLoadSuccess(true)
             adapter.hideFooterView()
         }
@@ -150,11 +149,6 @@ class PermissionManagerActivity : OneFragmentActivity() {
             refreshStatus()
         }
 
-        private fun refreshStatus() {
-            PermissionStatus.refreshStatus()
-            adapter.notifyDataSetChanged()
-        }
-
         override fun onRequestPermissionsResult(requestCode: Int, perm: Array<out String>, grantResults: IntArray) {
             if (PermissionUtils.isAllGranted(grantResults)) {
                 permissions[requestCode].isOpen = true
@@ -162,6 +156,35 @@ class PermissionManagerActivity : OneFragmentActivity() {
             }
         }
 
+        val permissions by lazy{ listOf(
+                PermissionStatus(arrayOf("android.permission.BIND_ACCESSIBILITY_SERVICE"), "无障碍", getString(R.string.desc_accessibility)),
+                PermissionStatus(arrayOf("android.permission.SYSTEM_ALERT_WINDOW"), "悬浮窗", "显示全局对话框、语音面板"),
+                PermissionStatus(arrayOf("android.permission.READ_CONTACTS"), "联系人", "用于检索联系人"),
+                PermissionStatus(arrayOf("android.permission.CALL_PHONE"), "电话", "用于拨打电话"),
+                PermissionStatus(arrayOf("android.permission.RECORD_AUDIO"), "录音", "用于语音识别"),
+                PermissionStatus(arrayOf("android.permission.ACCESS_NETWORK_STATE"), "获取网络状态", "用于获取网络状态"),
+                PermissionStatus(arrayOf("android.permission.INTERNET"), "网络", ""),
+                PermissionStatus(arrayOf("android.permission.READ_PHONE_STATE"), "读取设备状态", ""),
+                PermissionStatus(arrayOf("android.permission.WRITE_EXTERNAL_STORAGE"), "写SD卡", ""),
+                PermissionStatus(arrayOf("android.permission.FLASHLIGHT"), "闪光灯", "打开闪光灯"),
+                PermissionStatus(arrayOf("android.permission.ACCESS_COARSE_LOCATION", "android.permission.ACCESS_FINE_LOCATION"), "位置信息", "不使用此类指令可不开启"),
+//                        PermissionStatus(arrayOf("android.permission.BLUETOOTH", "android.permission.BLUETOOTH_ADMIN"),
+//                                "蓝牙", "打开蓝牙"),
+                PermissionStatus(arrayOf("android.permission.CAMERA"), "相机", "打开闪光灯"),
+                PermissionStatus(arrayOf("android.permission.WRITE_CALENDAR",
+                        "android.permission.READ_CALENDAR"), "日历", "读写日历")
+        )}
+        fun refreshStatus() {
+            val context = GlobalApp.APP
+            permissions.forEach {
+                it.isOpen = when {
+                    it.permissionName == "悬浮窗" -> Build.VERSION.SDK_INT < Build.VERSION_CODES.M || PermissionUtils.canDrawOverlays(context)
+                    it.permissionName == "无障碍" -> PermissionUtils.accessibilityServiceEnabled(context)
+                    else -> PermissionUtils.isAllGranted(context, it.permissionString)
+                }
+            }
+            adapter.notifyDataSetChanged()
+        }
 
     }
 
@@ -193,35 +216,7 @@ class PermissionManagerActivity : OneFragmentActivity() {
                     "android.permission.ACCESS_FINE_LOCATION",
                     "android.permission.CAMERA"
             )
-            val permissions = listOf(
-                    PermissionStatus(arrayOf("android.permission.BIND_ACCESSIBILITY_SERVICE"), "无障碍", "1.使用音量快捷键\n2.操作界面\n3.根据当前界面响应指令"),
-                    PermissionStatus(arrayOf("android.permission.SYSTEM_ALERT_WINDOW"), "悬浮窗", "显示全局对话框、语音面板"),
-                    PermissionStatus(arrayOf("android.permission.READ_CONTACTS"), "联系人", "用于检索联系人"),
-                    PermissionStatus(arrayOf("android.permission.CALL_PHONE"), "电话", "用于拨打电话"),
-                    PermissionStatus(arrayOf("android.permission.RECORD_AUDIO"), "录音", "用于语音识别"),
-                    PermissionStatus(arrayOf("android.permission.ACCESS_NETWORK_STATE"), "获取网络状态", "用于获取网络状态"),
-                    PermissionStatus(arrayOf("android.permission.INTERNET"), "网络", ""),
-                    PermissionStatus(arrayOf("android.permission.READ_PHONE_STATE"), "读取设备状态", ""),
-                    PermissionStatus(arrayOf("android.permission.WRITE_EXTERNAL_STORAGE"), "写SD卡", ""),
-                    PermissionStatus(arrayOf("android.permission.FLASHLIGHT"), "闪光灯", "打开闪光灯"),
-                    PermissionStatus(arrayOf("android.permission.ACCESS_COARSE_LOCATION", "android.permission.ACCESS_FINE_LOCATION"), "位置信息", "不使用此类指令可不开启"),
-//                        PermissionStatus(arrayOf("android.permission.BLUETOOTH", "android.permission.BLUETOOTH_ADMIN"),
-//                                "蓝牙", "打开蓝牙"),
-                    PermissionStatus(arrayOf("android.permission.CAMERA"), "相机", "打开闪光灯"),
-                    PermissionStatus(arrayOf("android.permission.WRITE_CALENDAR",
-                            "android.permission.READ_CALENDAR"), "日历", "读写日历")
-            )
 
-            fun refreshStatus() {
-                val context = GlobalApp.APP
-                permissions.forEach {
-                    it.isOpen = when {
-                        it.permissionName == "悬浮窗" -> Build.VERSION.SDK_INT < Build.VERSION_CODES.M || PermissionUtils.canDrawOverlays(context)
-                        it.permissionName == "无障碍" -> PermissionUtils.accessibilityServiceEnabled(context)
-                        else -> PermissionUtils.isAllGranted(context, it.permissionString)
-                    }
-                }
-            }
         }
 
     }

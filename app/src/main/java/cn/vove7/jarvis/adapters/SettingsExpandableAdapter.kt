@@ -86,8 +86,8 @@ class SettingsExpandableAdapter(val context: Context,
                             if (i == gPos) {//展开行
                                 animationHelper.fromT2B(cv, getChildAboPos(i, j), true, 50f)
                             } else {
+                                animationHelper.fromT2B(cv, getChildAboPos(i, j))
                             }
-                            animationHelper.fromT2B(cv, getChildAboPos(i, j))
                         }
 //                        Vog.d(this, "Expand child ---> $i $j")
                     }

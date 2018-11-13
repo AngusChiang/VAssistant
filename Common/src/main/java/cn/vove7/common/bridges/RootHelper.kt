@@ -3,6 +3,7 @@ package cn.vove7.common.bridges
 import android.accessibilityservice.AccessibilityServiceInfo
 import android.content.Context
 import android.view.accessibility.AccessibilityManager
+import cn.vove7.common.accessibility.AccessibilityApi
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.app.GlobalLog
 import cn.vove7.vtp.log.Vog
@@ -120,6 +121,7 @@ object RootHelper {
     }
 
     fun openSelfAccessService() {
+//        AccessibilityApi.openServiceSelf()
         openAppAccessService(GlobalApp.APP.packageName,
                 "cn.vove7.jarvis.services.MyAccessibilityService")
     }

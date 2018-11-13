@@ -27,14 +27,18 @@ class UpdateLogDialog(context: Context, onDismiss: (() -> Unit)? = null) {
 
     private val logs: List<Pair<String, String>>
         get() = listOf(
-                Pair("1.3.5","修复引擎未就识别导致崩溃\n" +
+                Pair("1.3.6", "在其他App内由于麦克风占用关闭唤醒时, 熄屏开启唤醒\n" +
+                        "加入长按耳机中键唤醒设置\n" +
+                        "添加快捷方式，其他应用可通过此方式唤醒(如[悬浮菜单]中选择快捷方式唤醒)\n" +
+                        "悬浮面板显示语音回复内容"),
+                Pair("1.3.5", "修复引擎未就识别导致崩溃\n" +
                         "添加设置长按延时\n" +
                         "修复App内指令设为全局失败\n" +
                         "添加[快捷唤醒]桌面小部件\n" +
                         "静音功能适配\n" +
                         "添加api：\n" +
                         "  ViewFinder.waitHide()"),
-                Pair("1.3.4","支持选卡拨号\n" +
+                Pair("1.3.4", "支持选卡拨号\n" +
                         "支持VSCode将代码发送至App新建指令\n" +
                         "支持VSCode将文本复制至手机剪切板\n" +
                         "添加api\n" +

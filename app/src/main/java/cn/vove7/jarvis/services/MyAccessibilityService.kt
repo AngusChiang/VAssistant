@@ -45,6 +45,7 @@ import cn.vove7.jarvis.view.statusbar.AccessibilityStatusAnimation
 import cn.vove7.jarvis.view.statusbar.StatusAnimation
 import cn.vove7.vtp.log.Vog
 import cn.vove7.vtp.system.SystemHelper
+import java.io.FileReader
 import java.lang.Thread.sleep
 import kotlin.concurrent.thread
 
@@ -182,12 +183,20 @@ class MyAccessibilityService : AccessibilityApi() {
     /**
      * 通知UI更新（UI驱动事件）
      */
-    private fun callAllNotifier(event: AccessibilityEvent) {
+    private fun callAllNotifier(event: AccessibilityEvent, type: Int) {
         viewNotifierThread?.interrupt()
         viewNotifierThread = thread {
             viewNotifier.notifyIfShow()
         }
-        dispatchPluginsEvent(ON_UI_UPDATE, event)
+        val data = Pair(type, try {
+            event.source
+        } catch (e: Exception) {
+            e.printStackTrace()
+            null
+        })
+
+        dispatchPluginsEvent(ON_UI_UPDATE, data)
+
     }
 
     /**
@@ -224,7 +233,6 @@ class MyAccessibilityService : AccessibilityApi() {
 //            }
             if (classNameStr != null && pkg != null)
                 updateCurrentApp(pkg, classNameStr.toString())
-            callAllNotifier(event)
         }
         if (blackPackage.contains(currentScope.packageName)) {//black list
             Vog.v(this, "onAccessibilityEvent ---> in black")
@@ -237,18 +245,18 @@ class MyAccessibilityService : AccessibilityApi() {
 //                callAllNotifier()
             }
             TYPE_WINDOWS_CHANGED -> {
-                callAllNotifier(event)
+                callAllNotifier(event, eventType)
             }
             TYPE_WINDOW_CONTENT_CHANGED -> {//"帧"刷新
 //                val node = event.source
-                callAllNotifier(event)
+                callAllNotifier(event, eventType)
             }
             TYPE_VIEW_SCROLLED -> {
-                callAllNotifier(event)
+                callAllNotifier(event, eventType)
             }
             TYPE_VIEW_CLICKED -> {
                 lastScreenEvent = event
-                callAllNotifier(event)
+                callAllNotifier(event, eventType)
                 Vog.d(this, "onAccessibilityEvent ---> 点击 :${ViewNode(event.source)}")
             }
 
@@ -307,11 +315,6 @@ class MyAccessibilityService : AccessibilityApi() {
         return builder.toString()
     }
 
-    override fun onGesture(gestureId: Int): Boolean {
-        Vog.d(this, "onGesture  ----> $gestureId")
-        return super.onGesture(gestureId)
-    }
-
     private val delayHandler = Handler()
     private var startupRunner: Runnable = Runnable {
         MainService.instance?.onCommand(AppBus.ORDER_START_RECO)
@@ -331,19 +334,20 @@ class MyAccessibilityService : AccessibilityApi() {
     var lastEvent: KeyEvent? = null
     /**
      * 按键监听
+     * 熄屏时无法监听
      * @param event KeyEvent
      * @return Boolean
      */
     override fun onKeyEvent(event: KeyEvent): Boolean {
         Vog.v(this, "onKeyEvent  ----> " + event.toString())
-        try {
-            if (!AppConfig.volumeWakeUpWhenScreenOff &&
-                    !SystemHelper.isScreenOn(GlobalApp.APP))//(火)?息屏下
-                return super.onKeyEvent(event)
-        } catch (e: Exception) {
-            GlobalLog.err(e)
-            return super.onKeyEvent(event)
-        }
+//        try {
+//            if (!AppConfig.volumeWakeUpWhenScreenOff &&
+//                    !SystemHelper.isScreenOn(GlobalApp.APP))//(火)?息屏下
+//                return super.onKeyEvent(event)
+//        } catch (e: Exception) {
+//            GlobalLog.err(e)
+//            return super.onKeyEvent(event)
+//        }
         lastEvent = event
         when (event.action) {
             KeyEvent.ACTION_DOWN -> when (event.keyCode) {
@@ -366,7 +370,21 @@ class MyAccessibilityService : AccessibilityApi() {
                         else -> super.onKeyEvent(event)
                     }
                 }
-                KEYCODE_HEADSETHOOK, KEYCODE_VOLUME_UP -> {
+                KEYCODE_HEADSETHOOK -> {
+                    when {
+                        MainService.recoIsListening -> {//按下停止聆听
+                            v2 = true
+                            MainService.instance?.onCommand(AppBus.ORDER_STOP_RECO)
+                            return true
+                        }
+                        AppConfig.wakeUpWithHeadsetHook -> {//长按耳机中键唤醒
+                            postLongDelay(startupRunner)
+                            return true
+                        }
+                        else -> super.onKeyEvent(event)
+                    }
+                }
+                KEYCODE_VOLUME_UP -> {
                     when {
                         MainService.recoIsListening -> {//按下停止聆听
                             v2 = true
@@ -493,13 +511,14 @@ class MyAccessibilityService : AccessibilityApi() {
          * @param what Int
          * @param data Any?
          */
+        @SuppressWarnings("Unchecked")
         private fun dispatchPluginsEvent(what: Int, data: Any? = null) {
             if (data == null) return
             synchronized(pluginsServices) {
                 when (what) {
                     ON_UI_UPDATE -> {
                         pluginsServices.forEach {
-                            thread { it.onUiUpdate(accessibilityService?.rootInWindow, data as AccessibilityEvent?) }
+                            thread { it.onUiUpdate(accessibilityService?.rootInWindow, data as Pair<Int, AccessibilityNodeInfo?>) }
                         }
                     }
                     ON_APP_CHANGED -> {

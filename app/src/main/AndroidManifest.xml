@@ -47,7 +47,9 @@
     <uses-feature
         android:name="android.hardware.bluetooth_le"
         android:required="true" />
-
+    <uses-permission
+        android:name="android.permission.WRITE_SECURE_SETTINGS"
+        tools:ignore="ProtectedPermissions" />
     <application
         android:name=".App"
         android:allowBackup="true"
@@ -104,6 +106,17 @@
             <!-- <meta-data android:name="android.app.shortcuts" -->
             <!-- android:resource="@xml/shortcuts" /> -->
         </activity> <!-- <activity android:name=".activities.MainActivity" /> -->
+        <activity
+            android:name=".activities.base.CreateShortActivity"
+            android:exported="true"
+            android:launchMode="singleInstance"
+            android:theme="@style/TransparentBackground">
+            <intent-filter>
+                <!--快捷方式-->
+                <action android:name="android.intent.action.CREATE_SHORTCUT" />
+            </intent-filter>
+        </activity>
+
         <activity
             android:name=".activities.base.VoiceAssistActivity"
             android:launchMode="singleInstance"

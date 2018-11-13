@@ -61,6 +61,7 @@ object AppConfig {
 
     var volumeKeyDelayUp = 600//音量长按延迟
     var wakeUpFilePath = DEFAULT_WAKEUP_FILE
+    var wakeUpWithHeadsetHook = false//耳机中键唤醒
 
     var openVoiceWakeUpIfAutoSleep = true// 自动休眠后，亮屏自动开启语音唤醒
     var openChatSystem = true
@@ -174,6 +175,7 @@ object AppConfig {
         notifyCloseMico = getBooleanAndInit(R.string.key_close_wakeup_notification, true)
 //        disableAdKillerOnLowBattery = getBooleanAndInit(R.string.key_remove_ad_power_saving_mode, true)
         disableAccessibilityOnLowBattery = getBooleanAndInit(R.string.key_accessibility_service_power_saving_mode, true)
+        wakeUpWithHeadsetHook = getBooleanAndInit(R.string.key_wakeup_with_headsethook, wakeUpWithHeadsetHook)
 
         finishWord = sp.getString(R.string.key_finish_word)
 //        onlyCloudServiceParse = getBooleanAndInit(R.string.key_only_cloud_service_parse, false)

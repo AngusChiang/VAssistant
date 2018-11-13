@@ -175,6 +175,7 @@
     <string name="text_net_err">Network error</string>
     <string name="key_login_info" translatable="false">login_info</string>
     <string name="key_long_key_press_delay" translatable="false">long_key_press_delay</string>
+    <string name="key_wakeup_with_headsethook" translatable="false">wakeup_with_headsethook</string>
     <string name="key_show_prompt_inapp_as_global_dialog" translatable="false">show_prompt_inapp_as_global_dialog</string>
     <string name="text_action_title">Action title</string>
     <string name="hint_example">打电话给xxx \n呼叫xxx</string>
@@ -306,7 +307,13 @@
     <string name="key_response_word" translatable="false">response_word</string>
     <string name="key_speak_response_word_on_voice_wakeup" translatable="false">speak_response_word_on_voice_wakeup</string>
     <string name="key_stream_of_syn_output" translatable="false">stream_of_syn_output</string>
-    <string name="desc_accessibility">开启后将后的技能\n1.使用音量快捷键\n2.操作界面\n3.根据当前界面响应指令</string>
+    <string name="desc_accessibility">
+        开启后将获得的技能\n
+        1.使用音量快捷唤醒\n
+        2.操作界面\n
+        3.根据当前界面响应指令\n
+        4.麦克风占用问题
+    </string>
     <string name="key_auto_open_as_with_root" translatable="false">auto_open_as_with_root</string>
     <string name="key_volume_wakeup_when_screen_off" translatable="false">volume_wakeup_when_screen_off</string>
     <string name="key_auto_sleep_wakeup_duration" translatable="false">auto_sleep_wakeup_duration</string>

@@ -20,11 +20,11 @@ class ListItemAnimationHelper(val onlyFirstIn: Boolean, var dy: Float = 50f) {
         lastAnimatedPosition = 0
     }
 
-    fun fromB2T(view: View?, position: Int, fadeShow: Boolean = false, dyy: Float = dy, d: Long = 200) {
+    fun fromB2T(view: View?, position: Int, fadeShow: Boolean = true, dyy: Float = dy, d: Long = 200) {
         start(view, position, 1, dyy, d, fadeShow)
     }
 
-    fun fromT2B(view: View?, position: Int, fadeShow: Boolean = false, dyy: Float = dy, d: Long = 200) {
+    fun fromT2B(view: View?, position: Int, fadeShow: Boolean = true, dyy: Float = dy, d: Long = 200) {
         start(view, position, -1, dyy, d, fadeShow)
     }
 
@@ -64,9 +64,9 @@ class ListItemAnimationHelper(val onlyFirstIn: Boolean, var dy: Float = 50f) {
             view.alpha = 0f//完全透明
 
         view.animate()
-                .translationY(0.5f).alpha(1f)//设置最终效果为完全不透明，并且在原来的位置
+                .translationY(0.2f).alpha(1f)//设置最终效果为完全不透明，并且在原来的位置
                 .setStartDelay((10 * position).toLong())//根据item的位置设置延迟时间，达到依次动画一个接一个进行的效果
-                .setInterpolator(DecelerateInterpolator(0.5f))//设置动画效果为在动画开始的地方快然后慢
+                .setInterpolator(DecelerateInterpolator(0.8f))//设置动画效果为在动画开始的地方快然后慢
                 .setDuration(d)
                 .setListener(object : AnimatorListenerAdapter() {
                     override fun onAnimationEnd(animation: Animator) {

@@ -3,6 +3,7 @@ package cn.vove7.jarvis.plugins
 import android.view.accessibility.AccessibilityEvent
 import android.view.accessibility.AccessibilityNodeInfo
 import cn.vove7.common.datamanager.parse.model.ActionScope
+import cn.vove7.jarvis.services.MyAccessibilityService.Companion.nodeSummary
 import cn.vove7.vtp.log.Vog
 
 /**
@@ -12,16 +13,17 @@ import cn.vove7.vtp.log.Vog
  * 2018/11/12
  */
 object AutoLearnService : AccPluginsService() {
-    override fun onUiUpdate(root: AccessibilityNodeInfo?, event: AccessibilityEvent?) {
+    override fun onUiUpdate(root: AccessibilityNodeInfo?, eventData: Pair<Int, AccessibilityNodeInfo?>) {
         //解析record
-        try {
-            event?.apply {
-                Vog.d(this, "onAccessibilityEvent ---> ${toString()}")
-            }
-        } catch (e: Exception) {
-            e.printStackTrace()
+        eventData.apply {
+            if (first == AccessibilityEvent.TYPE_VIEW_CLICKED)
+                lastEventNodeInfo = second
+
+            Vog.d(this, "onUiUpdate ---> ${nodeSummary(this.second)}")
         }
     }
+
+    var lastEventNodeInfo: AccessibilityNodeInfo? = null
 
     var lastPkg: String? = null
     var lastScope: ActionScope? = null
