@@ -12,10 +12,10 @@ import cn.vove7.vtp.log.Vog
 object RegUtils {
     val REG_ALL_CHAR = "([\\S\\s]*?)"
     private val confirmWords = arrayOf(
-            "确([定认])".toRegex()
+            "确[定认]".toRegex()
             , "好(的)?".toRegex()
             , "可以".toRegex()
-            , "嗯$REG_ALL_CHAR".toRegex()
+            , "[嗯是]$REG_ALL_CHAR".toRegex()
             , "继续$REG_ALL_CHAR".toRegex()
             , "yes".toRegex()
             , "ok".toRegex()
@@ -24,6 +24,7 @@ object RegUtils {
             "取消".toRegex()
             , "停止".toRegex()
             , "不好".toRegex()
+            , "不要".toRegex()
             , "stop".toRegex()
             , "cancel".toRegex()
     )

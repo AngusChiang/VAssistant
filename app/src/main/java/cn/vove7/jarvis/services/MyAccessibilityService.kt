@@ -89,9 +89,9 @@ class MyAccessibilityService : AccessibilityApi() {
             if (AppConfig.fixVoiceMico) {
                 registerPlugin(VoiceWakeupStrategy)
             }
-            if (BuildConfig.DEBUG) {
-                registerPlugin(AutoLearnService)
-            }
+//            if (BuildConfig.DEBUG) {
+//                registerPlugin(AutoLearnService)
+//            }
         }
     }
 
@@ -183,20 +183,12 @@ class MyAccessibilityService : AccessibilityApi() {
     /**
      * 通知UI更新（UI驱动事件）
      */
-    private fun callAllNotifier(event: AccessibilityEvent, type: Int) {
+    private fun callAllNotifier() {
         viewNotifierThread?.interrupt()
         viewNotifierThread = thread {
             viewNotifier.notifyIfShow()
         }
-        val data = Pair(type, try {
-            event.source
-        } catch (e: Exception) {
-            e.printStackTrace()
-            null
-        })
-
-        dispatchPluginsEvent(ON_UI_UPDATE, data)
-
+        dispatchPluginsEvent(ON_UI_UPDATE, rootInWindow)
     }
 
     /**
@@ -245,18 +237,18 @@ class MyAccessibilityService : AccessibilityApi() {
 //                callAllNotifier()
             }
             TYPE_WINDOWS_CHANGED -> {
-                callAllNotifier(event, eventType)
+                callAllNotifier()
             }
             TYPE_WINDOW_CONTENT_CHANGED -> {//"帧"刷新
 //                val node = event.source
-                callAllNotifier(event, eventType)
+                callAllNotifier()
             }
             TYPE_VIEW_SCROLLED -> {
-                callAllNotifier(event, eventType)
+                callAllNotifier()
             }
             TYPE_VIEW_CLICKED -> {
-                lastScreenEvent = event
-                callAllNotifier(event, eventType)
+//                lastScreenEvent = event
+                callAllNotifier()
                 Vog.d(this, "onAccessibilityEvent ---> 点击 :${ViewNode(event.source)}")
             }
 
@@ -331,7 +323,6 @@ class MyAccessibilityService : AccessibilityApi() {
 
     private var v2 = false // 单击上下键 取消识别
     private var v3 = false // 是否触发长按唤醒
-    var lastEvent: KeyEvent? = null
     /**
      * 按键监听
      * 熄屏时无法监听
@@ -348,7 +339,6 @@ class MyAccessibilityService : AccessibilityApi() {
 //            GlobalLog.err(e)
 //            return super.onKeyEvent(event)
 //        }
-        lastEvent = event
         when (event.action) {
             KeyEvent.ACTION_DOWN -> when (event.keyCode) {
                 KEYCODE_VOLUME_DOWN -> {
@@ -518,7 +508,7 @@ class MyAccessibilityService : AccessibilityApi() {
                 when (what) {
                     ON_UI_UPDATE -> {
                         pluginsServices.forEach {
-                            thread { it.onUiUpdate(accessibilityService?.rootInWindow, data as Pair<Int, AccessibilityNodeInfo?>) }
+                            thread { it.onUiUpdate(data as AccessibilityNodeInfo) }
                         }
                     }
                     ON_APP_CHANGED -> {

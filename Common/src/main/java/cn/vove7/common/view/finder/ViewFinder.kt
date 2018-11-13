@@ -66,7 +66,7 @@ abstract class ViewFinder(var accessibilityService: AccessibilityApi) {
             Vog.v(this, "traverseAllNode ${node.className} $index/${node.childCount}")
             val childNode = node.getChild(index)
             if (childNode != null) {
-                if (!includeInvisible && !childNode.isVisibleToUser) {//TODO check it
+                if (!includeInvisible && !childNode.isVisibleToUser) {
                     Vog.d(this, "unVisibleToUser ---> ${childNode.text}")
                     return@forEach
                 }
@@ -76,9 +76,9 @@ abstract class ViewFinder(var accessibilityService: AccessibilityApi) {
                     } else return ViewNode(childNode)
                 } else {
                     if (all) {
-                        traverseAllNode(childNode, true)
+                        traverseAllNode(childNode, true, includeInvisible)
                     } else {
-                        val r = traverseAllNode(childNode)
+                        val r = traverseAllNode(childNode, includeInvisible)
                         if (r != null) return r
                     }
                     //深搜

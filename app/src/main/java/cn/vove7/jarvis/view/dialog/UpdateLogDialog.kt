@@ -27,6 +27,8 @@ class UpdateLogDialog(context: Context, onDismiss: (() -> Unit)? = null) {
 
     private val logs: List<Pair<String, String>>
         get() = listOf(
+                Pair("1.3.7", "修复卡顿问题\n" +
+                        "加快广告跳过速度"),
                 Pair("1.3.6", "在其他App内由于麦克风占用关闭唤醒时, 熄屏开启唤醒\n" +
                         "加入长按耳机中键唤醒设置\n" +
                         "添加快捷方式，其他应用可通过此方式唤醒(如[悬浮菜单]中选择快捷方式唤醒)\n" +

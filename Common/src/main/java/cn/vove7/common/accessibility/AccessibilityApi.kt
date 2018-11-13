@@ -39,12 +39,9 @@ abstract class AccessibilityApi : AccessibilityService(),
         }
 
     override fun onCreate() {
-        super.onCreate()
         accessibilityService = this
+        super.onCreate()
     }
-
-    var lastScreenEvent: AccessibilityEvent? = null
-
 
     val currentFocusedEditor: ViewNode?
         get() = findFocus(FOCUS_INPUT).let {

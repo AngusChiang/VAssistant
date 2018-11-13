@@ -13,14 +13,14 @@ import cn.vove7.vtp.log.Vog
  * 2018/11/12
  */
 object AutoLearnService : AccPluginsService() {
-    override fun onUiUpdate(root: AccessibilityNodeInfo?, eventData: Pair<Int, AccessibilityNodeInfo?>) {
+    override fun onUiUpdate(root: AccessibilityNodeInfo?) {
         //解析record
-        eventData.apply {
-            if (first == AccessibilityEvent.TYPE_VIEW_CLICKED)
-                lastEventNodeInfo = second
-
-            Vog.d(this, "onUiUpdate ---> ${nodeSummary(this.second)}")
-        }
+//        eventData.apply {
+//            if (first == AccessibilityEvent.TYPE_VIEW_CLICKED)
+//                lastEventNodeInfo = second
+//
+//            Vog.d(this, "onUiUpdate ---> ${nodeSummary(this.second)}")
+//        }
     }
 
     var lastEventNodeInfo: AccessibilityNodeInfo? = null
