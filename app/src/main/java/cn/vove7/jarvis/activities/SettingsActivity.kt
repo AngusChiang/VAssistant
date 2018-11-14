@@ -13,6 +13,7 @@ import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.appbus.AppBus
 import cn.vove7.common.appbus.SpeechAction
 import cn.vove7.common.bridges.RootHelper
+import cn.vove7.common.utils.ThreadPool
 import cn.vove7.executorengine.bridges.SystemBridge
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.activities.base.ReturnableActivity
@@ -232,7 +233,7 @@ class SettingsActivity : ReturnableActivity() {
                     CheckBoxItem(title = "自动开启无障碍服务", summary = "App启动时自动开启无障碍服务，需要root支持",
                             keyId = R.string.key_auto_open_as_with_root, defaultValue = { false }) { _, b ->
                         if (b as Boolean && !PermissionUtils.accessibilityServiceEnabled(this)) {
-                            thread {
+                            ThreadPool.runOnPool {
                                 RootHelper.openSelfAccessService()
                             }
                         }

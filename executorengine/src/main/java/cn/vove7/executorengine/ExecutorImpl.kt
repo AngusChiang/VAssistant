@@ -28,6 +28,7 @@ import cn.vove7.common.model.RequestPermission
 import cn.vove7.common.model.UserInfo
 import cn.vove7.common.utils.RegUtils
 import cn.vove7.common.utils.ScreenAdapter
+import cn.vove7.common.utils.ThreadPool.runOnPool
 import cn.vove7.common.view.finder.ViewFindBuilder
 import cn.vove7.executorengine.bridges.SystemBridge
 import cn.vove7.executorengine.helper.AdvanContactHelper
@@ -593,7 +594,7 @@ open class ExecutorImpl(
                 waitForSingleChoice("选择要标识的联系人", AdvanContactHelper.getChoiceData())
             if (choiceData != null) {
                 //开启线程
-                thread {
+                runOnPool {
                     //保存标记
 //                    val data = choiceData.originalData as ContactInfo
                     val marked = MarkedData(s, MarkedData.MARKED_TYPE_CONTACT, s, choiceData.subtitle, DataFrom.FROM_USER)

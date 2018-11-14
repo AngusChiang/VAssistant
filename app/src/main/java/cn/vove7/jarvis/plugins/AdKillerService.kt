@@ -9,6 +9,7 @@ import cn.vove7.common.datamanager.DAO
 import cn.vove7.common.datamanager.greendao.AppAdInfoDao
 import cn.vove7.common.datamanager.parse.model.ActionScope
 import cn.vove7.common.model.UserInfo
+import cn.vove7.common.utils.ThreadPool.runOnPool
 import cn.vove7.common.view.finder.ViewFindBuilder
 import cn.vove7.common.view.finder.ViewFinder
 import cn.vove7.common.view.notifier.AppAdBlockNotifier
@@ -41,8 +42,8 @@ object AdKillerService : AccPluginsService() {
     private val finderCaches = ConcurrentHashMap<ActionScope, MutableSet<ViewFinder>>()
 
     override fun onBind() {
-        thread {
-            if (!AccessibilityApi.isOpen()) return@thread
+        runOnPool {
+            if (!AccessibilityApi.isOpen()) return@runOnPool
             locked = true
             finderCaches.clear()
             val appAdInfoDao = DAO.daoSession.appAdInfoDao

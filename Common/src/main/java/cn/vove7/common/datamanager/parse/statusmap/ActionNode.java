@@ -714,10 +714,12 @@ public class ActionNode implements Serializable, DataFrom {
         }
     }
 
-    private static final String PreOpen_JS = "openAppByPkg('%s',true)\n" +
+    private static final String PreOpen_JS = "require 'accessibility'\n" +
+            "openAppByPkg('%s',true)\n" +
             "a = waitForApp('%s',3000)\n";// +
     //"if(!a) return\n";
-    private static final String PreOpen_LUA = "smartOpen('%s')\n" +
+    private static final String PreOpen_LUA = "require 'accessibility'\n" +
+            "smartOpen('%s')\n" +
             "a = waitForApp('%s',3000)\n" +
             "if(not a) then return end\n";
 

@@ -29,6 +29,7 @@ import cn.vove7.common.netacc.model.BaseRequestModel
 import cn.vove7.common.netacc.model.ResponseMessage
 import cn.vove7.common.utils.RegUtils
 import cn.vove7.common.utils.TextHelper
+import cn.vove7.common.utils.ThreadPool.runOnPool
 import cn.vove7.common.view.toast.ColorfulToast
 import cn.vove7.executorengine.bridges.SystemBridge
 import cn.vove7.executorengine.helper.AdvanAppHelper
@@ -392,8 +393,8 @@ class InstDetailActivity : AppCompatActivity() {
     }
 
     private fun delLocalNode() {
-        thread {
-            val b = DaoHelper.deleteActionNodeInTX(node?.id)
+        runOnPool {
+            val b = DaoHelper.deleteActionNodeInTX(node.id)
             GlobalApp.toastShort(
                     if (b) "删除成功" else "删除失败，可至帮助进行反馈"
             )
@@ -433,7 +434,7 @@ class InstDetailActivity : AppCompatActivity() {
             return
         }
         p = ProgressDialog(this)
-        thread {
+        runOnPool {
             val cloneNode: ActionNode?
             try {
                 cloneNode = node.cloneGlobal(containSub)
@@ -517,7 +518,7 @@ class InstDetailActivity : AppCompatActivity() {
                     if (s < 0) {
                         return@postJson
                     }
-                    thread {
+                    runOnPool {
                         //更新 tagId
                         node.versionCode = s
                         Vog.d(this, "new ver---> $s")
@@ -543,7 +544,7 @@ class InstDetailActivity : AppCompatActivity() {
                     GlobalApp.toastShort(R.string.text_share_success)
                     //sign tag
                     val s = bean.data
-                    thread {
+                    runOnPool {
                         //更新 tagId
                         Vog.d(this, "share new tag---> $s")
                         node.from = DataFrom.FROM_SHARED

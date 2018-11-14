@@ -84,8 +84,8 @@ class ScreenPickerActivity : Activity() {
                 }
                 setPadding(10, 0, 10, 0)
                 layoutParams = RelativeLayout.LayoutParams(
-                        (rect.right - rect.left) + 20, (rect.bottom - rect.top) + 20).also {
-                    it.setMargins(rect.left - 10, rect.top - statusbarHeight - 10, 0, 0)
+                        (rect.right - rect.left) + 10, (rect.bottom - rect.top) + 10).also {
+                    it.setMargins(rect.left - 5, rect.top - statusbarHeight - 5, 0, 0)
                 }
             }
             rootContent.addView(view)

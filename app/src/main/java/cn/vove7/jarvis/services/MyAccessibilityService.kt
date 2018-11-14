@@ -28,6 +28,8 @@ import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.appbus.AppBus
 import cn.vove7.common.datamanager.parse.model.ActionScope
 import cn.vove7.common.executor.CExecutorI
+import cn.vove7.common.utils.ThreadPool.runOnCachePool
+import cn.vove7.common.utils.ThreadPool.runOnPool
 import cn.vove7.common.utils.activities
 import cn.vove7.common.utils.isInputMethod
 import cn.vove7.common.view.finder.ViewFinder
@@ -81,7 +83,7 @@ class MyAccessibilityService : AccessibilityApi() {
     private val activityNotifier = AppChangNotifier(locksWaitForActivity)
 
     private fun startPluginService() {
-        thread {
+        runOnPool {
             //注册无障碍组件
             registerPlugin(activityNotifier)
             if (AppConfig.isAdBlockService)
@@ -126,7 +128,7 @@ class MyAccessibilityService : AccessibilityApi() {
 
     override fun waitForActivity(executor: CExecutorI, scope: ActionScope) {
         locksWaitForActivity[executor] = scope
-        thread {
+        runOnCachePool {
             sleep(200)
             activityNotifier.onAppChanged(currentScope)
         }
@@ -158,7 +160,7 @@ class MyAccessibilityService : AccessibilityApi() {
     }
 
     override fun removeAllNotifier(executor: CExecutorI) {
-        thread {
+        runOnCachePool {
             synchronized(locksWaitForActivity) {
                 val a = locksWaitForActivity.remove(executor)
                 Vog.d(this, "removeAllNotifier locksWaitForActivity ${a != null}")
@@ -249,7 +251,10 @@ class MyAccessibilityService : AccessibilityApi() {
             TYPE_VIEW_CLICKED -> {
 //                lastScreenEvent = event
                 callAllNotifier()
-                Vog.d(this, "onAccessibilityEvent ---> 点击 :${ViewNode(event.source)}")
+//                try {
+//                    Vog.d(this, "onAccessibilityEvent ---> 点击 :${ViewNode(event.source)}")
+//                } catch (e: Exception) {
+//                }
             }
 
         }
@@ -451,8 +456,13 @@ class MyAccessibilityService : AccessibilityApi() {
     }
 
     override fun onDestroy() {
-        accessibilityService = null
         super.onDestroy()
+        unregisterPlugin(activityNotifier)
+        if (AppConfig.isAdBlockService)
+            unregisterPlugin(AdKillerService)
+        if (AppConfig.fixVoiceMico) {
+            unregisterPlugin(VoiceWakeupStrategy)
+        }
     }
 
     override fun getService(): AccessibilityService = this
@@ -508,13 +518,13 @@ class MyAccessibilityService : AccessibilityApi() {
                 when (what) {
                     ON_UI_UPDATE -> {
                         pluginsServices.forEach {
-                            thread { it.onUiUpdate(data as AccessibilityNodeInfo) }
+                            runOnCachePool { it.onUiUpdate(data as AccessibilityNodeInfo) }
                         }
                     }
                     ON_APP_CHANGED -> {
                         Vog.d(this, "dispatchPluginsEvent ---> ON_APP_CHANGED")
                         pluginsServices.forEach {
-                            thread { it.onAppChanged(data as ActionScope) }
+                            runOnCachePool { it.onAppChanged(data as ActionScope) }
                         }
                     }
 //                    ON_BIND -> {

@@ -16,6 +16,7 @@ import cn.vove7.common.datamanager.parse.DataFrom
 import cn.vove7.common.datamanager.parse.statusmap.ActionNode
 import cn.vove7.common.model.UserInfo
 import cn.vove7.common.utils.GsonHelper
+import cn.vove7.common.utils.ThreadPool.runOnPool
 import cn.vove7.executorengine.parse.ParseEngine
 import cn.vove7.jarvis.BuildConfig
 import cn.vove7.jarvis.R
@@ -62,7 +63,7 @@ object BackupHelper {
                     positiveButton(text = "备份到本地") {
                         if (!checkSel(indices)) return@positiveButton
                         val p = ProgressDialog(activity)
-                        thread {
+                        runOnPool {
                             sleep(if (!UserInfo.isVip()) 500 else 500)
                             if (backup(indices, true)) {
                                 GlobalApp.toastShort("备份成功")
@@ -225,7 +226,7 @@ object BackupHelper {
             val nsleep = BuildConfig.DEBUG || !UserInfo.isVip()
             showModeDialog(activity) { mode ->
                 val dialog = ProgressTextDialog(activity, "正在恢复", cancelable = false)
-                thread {
+                runOnPool {
                     try {
                         DAO.daoSession.runInTx {
                             //指令

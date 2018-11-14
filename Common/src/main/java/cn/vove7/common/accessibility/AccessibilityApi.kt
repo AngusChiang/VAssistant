@@ -80,6 +80,12 @@ abstract class AccessibilityApi : AccessibilityService(),
      */
     abstract fun disablePowerSavingMode()
 
+
+    override fun onDestroy() {
+        accessibilityService = null
+        super.onDestroy()
+    }
+
     var currentAppInfo: AppInfo? = null
         protected set
 

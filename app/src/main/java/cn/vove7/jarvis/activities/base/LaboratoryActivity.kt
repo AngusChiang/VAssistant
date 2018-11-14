@@ -2,6 +2,7 @@ package cn.vove7.jarvis.activities.base
 
 import android.os.Bundle
 import cn.vove7.common.model.UserInfo
+import cn.vove7.common.utils.ThreadPool.runOnPool
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.adapters.SettingsExpandableAdapter
 import cn.vove7.jarvis.plugins.AdKillerService
@@ -72,7 +73,7 @@ class LaboratoryActivity : ReturnableActivity() {
                                 toast.showShort("设置无效")
                                 return@SingleChoiceItem false
                             }
-                            thread {
+                            runOnPool {
                                 sleep(500)//等待设置完成
                                 MainService.instance?.loadChatSystem(true)
                             }

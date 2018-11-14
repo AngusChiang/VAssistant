@@ -47,7 +47,7 @@ public class ViewFindBuilder extends FindBuilder {
         accessibilityService =
                 AccessibilityApi.Companion.getAccessibilityService();
         if (accessibilityService == null) {//没有运行
-            Vog.INSTANCE.d(this, "AccessibilityService is not running.");
+            GlobalLog.INSTANCE.err("AccessibilityService is not running.");
             return;
         }
         viewFinderX = new ViewFinderWithMultiCondition(accessibilityService);

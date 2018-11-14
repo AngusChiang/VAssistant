@@ -4,6 +4,7 @@ import android.os.Handler
 import android.os.Looper
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.utils.TextHelper
+import cn.vove7.common.utils.ThreadPool.runOnPool
 import java.io.File
 import kotlin.concurrent.thread
 
@@ -25,7 +26,7 @@ interface CodeEditorOperation {
     fun redo()
 
      fun openFile(fullPath: String) {
-        thread {
+         runOnPool {
             val s = TextHelper.readFile(fullPath)
             Handler(Looper.getMainLooper()).post {
                 if (s == null) {

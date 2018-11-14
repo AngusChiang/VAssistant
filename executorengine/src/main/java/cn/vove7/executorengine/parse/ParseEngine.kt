@@ -12,6 +12,7 @@ import cn.vove7.common.datamanager.parse.statusmap.ActionNode.NODE_SCOPE_GLOBAL
 import cn.vove7.common.datamanager.parse.statusmap.ActionNode.NODE_SCOPE_IN_APP
 import cn.vove7.common.datamanager.parse.statusmap.Reg
 import cn.vove7.common.datamanager.parse.statusmap.Reg.*
+import cn.vove7.common.utils.ThreadPool.runOnPool
 import cn.vove7.common.view.finder.ViewFindBuilder
 import cn.vove7.executorengine.exector.MultiExecutorEngine
 import cn.vove7.vtp.log.Vog
@@ -37,7 +38,7 @@ object ParseEngine {
      * 同步后，更新数据
      */
     fun updateNode() {
-        thread {
+        runOnPool {
             updateInApp()
             updateGlobal()
         }

@@ -3,6 +3,7 @@ package cn.vove7.jarvis.receivers
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import cn.vove7.common.utils.ThreadPool.runOnPool
 import cn.vove7.executorengine.helper.AdvanAppHelper
 import cn.vove7.vtp.log.Vog
 import kotlin.concurrent.thread
@@ -20,7 +21,7 @@ object AppInstallReceiver : DyBCReceiver() {
     }
 
     override fun onReceive(context: Context, intent: Intent) {
-        thread {
+        runOnPool {
             AdvanAppHelper.updateAppList()
         }
         val pkg = intent.data?.schemeSpecificPart

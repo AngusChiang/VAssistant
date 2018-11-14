@@ -43,6 +43,7 @@ import android.graphics.Matrix
 import android.net.Uri
 import android.os.*
 import cn.vove7.common.utils.TextHelper
+import cn.vove7.common.utils.ThreadPool.runOnPool
 import cn.vove7.common.utils.formatNow
 import cn.vove7.common.utils.runOnNewHandlerThread
 
@@ -307,7 +308,7 @@ class AssistSession(context: Context) : VoiceInteractionSession(context),
      */
     private fun imageClassify(path: String) {
         showProgressBar = true
-        thread {
+        runOnPool {
             val r = BaiduAipHelper.imageClassify(path)
             runOnUi {
                 showProgressBar = false

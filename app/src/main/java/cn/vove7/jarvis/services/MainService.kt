@@ -40,6 +40,8 @@ import cn.vove7.common.model.UserInfo
 import cn.vove7.common.netacc.NetHelper
 import cn.vove7.common.utils.RegUtils.checkCancel
 import cn.vove7.common.utils.RegUtils.checkConfirm
+import cn.vove7.common.utils.ThreadPool.runOnCachePool
+import cn.vove7.common.utils.ThreadPool.runOnPool
 import cn.vove7.common.utils.runOnNewHandlerThread
 import cn.vove7.common.utils.runOnUi
 import cn.vove7.executorengine.bridges.SystemBridge
@@ -555,7 +557,7 @@ class MainService : BusService(),
         var instance: MainService? = null
             get() {
                 return if (field == null) {
-                    thread {
+                    runOnPool {
                         GlobalApp.toastShort("正在启动服务")
                         App.startServices()
                         Vog.i(this, "instance ---> null")
@@ -662,7 +664,7 @@ class MainService : BusService(),
             "打开手电筒", "打开电灯" -> SystemBridge.openFlashlight()
             "关闭手电筒", "关闭电灯" -> SystemBridge.closeFlashlight()
             else -> {//"截屏分享", "文字提取" 等命令
-                thread {
+                runOnPool {
                     onParseCommand(w)
                 }
             }
@@ -866,7 +868,7 @@ class MainService : BusService(),
             } else if (AppConfig.openChatSystem) {//聊天
                 parseAnimation.begin()
                 listeningToast.showParseAni()
-                thread {
+                runOnCachePool {
                     val data = chatSystem.chatWithText(result)
                     if (data == null) {
                         listeningToast.showAndHideDelay("获取失败")

@@ -28,6 +28,7 @@ import cn.vove7.common.datamanager.parse.statusmap.ActionNode.NODE_SCOPE_IN_APP
 import cn.vove7.common.datamanager.parse.statusmap.Reg
 import cn.vove7.common.model.UserInfo
 import cn.vove7.common.utils.TextHelper
+import cn.vove7.common.utils.ThreadPool.runOnPool
 import cn.vove7.common.view.toast.ColorfulToast
 import cn.vove7.executorengine.helper.AdvanAppHelper
 import cn.vove7.executorengine.parse.ParseEngine
@@ -191,7 +192,7 @@ class NewInstActivity : AppCompatActivity(), View.OnClickListener {
 
     // TODO 分页
     private fun getAppList() {
-        thread {
+        runOnPool {
             apps.addAll(getInstalledApp())
             appHandler.sendEmptyMessage(0)
         }

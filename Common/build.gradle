@@ -44,4 +44,5 @@ dependencies {
     api files('libs/aip-java-sdk-4.4.1.jar')
     api files('libs/json-20160810.jar')
     api files('libs/log4j-1.2.17.jar')
+    api files('libs/ThreadPoolHelp-2.0.jar')
 }

@@ -9,6 +9,7 @@ import cn.vove7.androlua.LuaApp
 import cn.vove7.common.appbus.AppBus
 import cn.vove7.common.appbus.MessageEvent
 import cn.vove7.common.bridges.RootHelper
+import cn.vove7.common.utils.ThreadPool.runOnPool
 import cn.vove7.common.utils.runOnNewHandlerThread
 import cn.vove7.jarvis.receivers.AppInstallReceiver
 import cn.vove7.jarvis.receivers.PowerEventReceiver
@@ -49,7 +50,7 @@ class App : LuaApp() {
                 ShortcutUtil.addWakeUpShortcut()
 //                AdvanAppHelper.updateAppList()
                 startBroadcastReceivers()
-                thread {
+                runOnPool {
                     if (AppConfig.autoOpenASWithRoot && !PermissionUtils.accessibilityServiceEnabled(this@App)) {
                         RootHelper.openSelfAccessService()
                     }
@@ -65,7 +66,7 @@ class App : LuaApp() {
     }
 
     private fun startServices() {
-        thread {
+        runOnPool {
             services.forEach {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                     startForegroundService(it)

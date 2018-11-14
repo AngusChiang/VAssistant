@@ -8,6 +8,7 @@ import cn.vove7.common.datamanager.DAO
 import cn.vove7.common.datamanager.executor.entity.MarkedData
 import cn.vove7.common.datamanager.executor.entity.MarkedData.MARKED_TYPE_APP
 import cn.vove7.common.datamanager.greendao.MarkedDataDao
+import cn.vove7.common.utils.ThreadPool.runOnCachePool
 import cn.vove7.executorengine.bridges.SystemBridge
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.adapters.ViewModel
@@ -62,7 +63,7 @@ class MarkedAppFragment : BaseMarkedFragment<MarkedData>() {
     }
 
     override fun onGetData(pageIndex: Int) {
-        thread {
+        runOnCachePool {
             val builder = DAO.daoSession.markedDataDao
                     .queryBuilder()
                     .where(MarkedDataDao.Properties.Type.eq(MARKED_TYPE_APP))

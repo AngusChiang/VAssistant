@@ -8,6 +8,7 @@ import cn.vove7.common.datamanager.executor.entity.MarkedData
 import cn.vove7.common.datamanager.greendao.MarkedDataDao
 import cn.vove7.common.datamanager.parse.DataFrom
 import cn.vove7.common.model.UserInfo
+import cn.vove7.common.utils.ThreadPool.runOnCachePool
 import cn.vove7.executorengine.helper.AdvanContactHelper
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.adapters.ViewModel
@@ -58,7 +59,7 @@ class MarkedContractFragment : BaseMarkedFragment<MarkedData>() {
     }
 
     override fun onGetData(pageIndex: Int) {
-        thread {
+        runOnCachePool {
             val builder = DAO.daoSession.markedDataDao
                     .queryBuilder()
                     .where(MarkedDataDao.Properties.Type.eq(MarkedData.MARKED_TYPE_CONTACT))

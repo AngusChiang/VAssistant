@@ -10,6 +10,7 @@ import cn.vove7.common.appbus.AppBus
 import cn.vove7.common.datamanager.parse.model.Action
 import cn.vove7.common.datamanager.parse.statusmap.ActionNode
 import cn.vove7.common.executor.OnPrint
+import cn.vove7.common.utils.ThreadPool.runOnPool
 import cn.vove7.common.utils.startActivityOnNewTask
 import cn.vove7.executorengine.bridges.SystemBridge
 import cn.vove7.jarvis.BuildConfig
@@ -56,7 +57,7 @@ object RemoteDebugServer : Runnable {
     }
 
     fun stop() {
-        thread {
+        runOnPool {
             stopped = true
             server?.close()
             clients?.forEach {
@@ -97,7 +98,7 @@ object RemoteDebugServer : Runnable {
                         ?: "none"))
                     print.onPrint(0, "与PC[${client.inetAddress}]建立连接   --来自App")
                     //type -> script -> arg
-                    thread {
+                    runOnPool {
                         try {
                             while (!stopped) {
                                 val data = inputStream.readLine()
@@ -179,14 +180,14 @@ object RemoteDebugServer : Runnable {
     private fun onPostAction(actionJson: String) {
         Vog.d(this, "onPostAction ---> $actionJson")
 
-        thread {
+        runOnPool {
             val action: RemoteAction
             try {
                 action = Gson().fromJson<RemoteAction>(actionJson, RemoteAction::class.java)
             } catch (e: Exception) {
                 GlobalLog.err(e)
                 print.onPrint(0, "发生错误${e.message}")
-                return@thread
+                return@runOnPool
             }
             when (action.action) {
                 "run" -> {

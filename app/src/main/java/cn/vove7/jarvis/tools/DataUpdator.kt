@@ -17,6 +17,7 @@ import cn.vove7.common.netacc.model.BaseRequestModel
 import cn.vove7.common.netacc.model.LastDateInfo
 import cn.vove7.common.netacc.model.ResponseMessage
 import cn.vove7.common.utils.TextHelper
+import cn.vove7.common.utils.ThreadPool.runOnPool
 import cn.vove7.executorengine.helper.AdvanAppHelper
 import cn.vove7.executorengine.parse.ParseEngine
 import cn.vove7.jarvis.R
@@ -80,7 +81,7 @@ object DataUpdator {
      */
     fun oneKeyUpdate(activity: Activity, types: List<Int>, back: (() -> Unit)?=null) {
         val textDialog = ProgressTextDialog(activity, "正在更新", false)
-        thread {
+        runOnPool {
             types.forEach {
                 val result = ResultBox<Boolean>()
                 val onUpdate = object : OnUpdate {

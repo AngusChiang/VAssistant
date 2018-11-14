@@ -1,6 +1,7 @@
 package cn.vove7.jarvis.tools
 
 import android.graphics.Bitmap
+import cn.vove7.common.utils.ThreadPool.runOnPool
 import com.google.zxing.*
 import kotlin.concurrent.thread
 import com.google.zxing.common.GlobalHistogramBinarizer
@@ -15,7 +16,7 @@ import com.google.zxing.common.HybridBinarizer
  */
 object QRTools {
     fun parseBitmap(bitmap: Bitmap, onResult: (String?) -> Unit) {
-        thread {
+        runOnPool {
             val s = syncDecodeQRCode(bitmap)
             onResult.invoke(s)
         }

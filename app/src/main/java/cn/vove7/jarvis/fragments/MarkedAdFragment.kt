@@ -5,6 +5,7 @@ import android.view.View
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.datamanager.DAO
 import cn.vove7.common.model.UserInfo
+import cn.vove7.common.utils.ThreadPool.runOnCachePool
 import cn.vove7.executorengine.bridges.SystemBridge
 import cn.vove7.jarvis.activities.AppAdListActivity
 import cn.vove7.jarvis.adapters.SimpleListAdapter
@@ -108,7 +109,7 @@ class MarkedAdFragment : SimpleListFragment<String>(), OnSyncMarked {
     val maps = mutableMapOf<String, Int>()
 
     override fun onGetData(pageIndex: Int) {
-        thread {
+        runOnCachePool {
             val subSet = adAddPkgs.sub(pageIndex * pageSizeLimit, pageSizeLimit)
             dataSet.addAll(transData(subSet))
             resultHandler.sendEmptyMessage(subSet.size)

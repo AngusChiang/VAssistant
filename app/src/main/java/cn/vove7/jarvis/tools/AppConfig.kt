@@ -18,6 +18,8 @@ import org.jsoup.Jsoup
 import kotlin.concurrent.thread
 import android.content.Intent
 import android.net.Uri
+import cn.vove7.common.utils.ThreadPool.runOnCachePool
+import cn.vove7.common.utils.ThreadPool.runOnPool
 import cn.vove7.common.utils.secure.SecuritySharedPreference
 import com.afollestad.materialdialogs.checkbox.checkBoxPrompt
 
@@ -120,9 +122,11 @@ object AppConfig {
     }
 
     var lastCheckTime = 0L
-
+    /**
+     * 发送请求，验证时间
+     */
     fun checkDate() {
-        thread {
+        runOnCachePool {
             if (System.currentTimeMillis() - lastCheckTime > 600000) {
                 if (UserInfo.isLogin()) {
                     lastCheckTime = System.currentTimeMillis()
@@ -255,7 +259,7 @@ object AppConfig {
 //        if (BuildConfig.DEBUG) {
 //            return
 //        }
-        thread {
+        runOnPool {
             try {
                 val doc = Jsoup.connect("https://www.coolapk.com/apk/cn.vove7.vassistant")
                         .timeout(5000).get()

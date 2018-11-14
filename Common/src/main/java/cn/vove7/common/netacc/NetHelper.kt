@@ -21,6 +21,7 @@ import cn.vove7.common.netacc.model.RequestParseModel
 import cn.vove7.common.netacc.model.ResponseMessage
 import cn.vove7.common.utils.GsonHelper
 import cn.vove7.common.utils.TextHelper
+import cn.vove7.common.utils.ThreadPool
 import cn.vove7.vtp.log.Vog
 import cn.vove7.vtp.sharedpreference.SpHelper
 import com.google.gson.reflect.TypeToken
@@ -152,8 +153,8 @@ object NetHelper {
      * @param his CommandHistory
      */
     fun uploadUserCommandHistory(his: CommandHistory) {
-        thread {
-            if (BuildConfig.DEBUG /*|| !AppConfig.userExpPlan*/) return@thread
+        ThreadPool.runOnPool {
+            if (BuildConfig.DEBUG /*|| !AppConfig.userExpPlan*/) return@runOnPool
             Looper.prepare()
             postJson<Any>(ApiUrls.UPLOAD_CMD_HIS, BaseRequestModel(his)) { _, b ->
                 if (b?.isOk() == true) {

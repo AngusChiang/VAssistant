@@ -7,6 +7,7 @@ import cn.vove7.common.datamanager.DAO
 import cn.vove7.common.datamanager.parse.model.ActionScope
 import cn.vove7.common.datamanager.parse.statusmap.ActionNode.NODE_SCOPE_IN_APP
 import cn.vove7.common.model.UserInfo
+import cn.vove7.common.utils.ThreadPool.runOnPool
 import cn.vove7.jarvis.activities.InAppInstActivity
 import cn.vove7.jarvis.activities.NewInstActivity
 import cn.vove7.jarvis.activities.OnSyncInst
@@ -94,7 +95,7 @@ class InstAppListFragment : SimpleListFragment<ActionScope>(), OnSyncInst {
      * 获取支持App列表
      */
     override fun onGetData(pageIndex: Int) {
-        thread {
+        runOnPool {
             val list = DAO.daoSession.actionScopeDao
                     .queryBuilder()
                     .offset(pageSizeLimit * pageIndex)
