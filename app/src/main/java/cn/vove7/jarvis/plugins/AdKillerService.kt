@@ -71,7 +71,7 @@ object AdKillerService : AccPluginsService() {
     override fun onUiUpdate(root: AccessibilityNodeInfo?) {
         // 浪费资源..
         val now = System.currentTimeMillis()
-        if (now - changedTime > (AppConfig.adWaitSecs * 1000)) return //7s等待时间
+        if (now - changedTime > (AppConfig.adWaitSecs * 1000)) return //17s等待时间
         if (locked) {
             Vog.v(this, "onUiUpdate ---> locked")
             return
@@ -118,7 +118,7 @@ object AdKillerService : AccPluginsService() {
 
     private var finders: MutableSet<ViewFinder>? = null
     private var appInfo: AppInfo? = null
-
+    var lastPkg = ""//todo smart skip ad
     override fun onAppChanged(appScope: ActionScope) {
         locked = true
         if (!UserInfo.isVip() && AppAdBlockNotifier.useUp()) {//非vip且useUp

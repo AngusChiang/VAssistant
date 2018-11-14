@@ -15,13 +15,15 @@ import cn.vove7.vtp.sharedpreference.SpHelper
 import com.afollestad.materialdialogs.MaterialDialog
 import com.google.gson.Gson
 import org.jsoup.Jsoup
-import kotlin.concurrent.thread
 import android.content.Intent
 import android.net.Uri
 import cn.vove7.common.utils.ThreadPool.runOnCachePool
 import cn.vove7.common.utils.ThreadPool.runOnPool
 import cn.vove7.common.utils.secure.SecuritySharedPreference
+import cn.vove7.jarvis.BuildConfig
 import com.afollestad.materialdialogs.checkbox.checkBoxPrompt
+import java.text.SimpleDateFormat
+import java.util.*
 
 
 /**
@@ -81,6 +83,7 @@ object AppConfig {
     var notifyCloseMico = true//通知唤醒状态/麦克风
     //    var disableAdKillerOnLowBattery = true//低电量关闭去广告
     var disableAccessibilityOnLowBattery = true//低电量关闭无障碍
+    var translateLang = "auto"//翻译主语言
 
     fun init() {
         checkUserInfo()
@@ -215,6 +218,13 @@ object AppConfig {
         }
 
         responseWord = sp.getString(R.string.key_response_word) ?: responseWord
+        translateLang = sp.getString(R.string.key_translate_languages)?.let {
+            val i = GlobalApp.APP.resources.getStringArray(R.array.list_translate_languages).indexOf(it)
+            if (i == -1) translateLang
+            arrayOf("auto", "zh", "en", "yue", "wyw", "jp", "kor", "fra", "spa", "th", "ara", "ru",
+                    "pt", "de", "it", "el", "nl", "pl", "bul", "est", "dan", "fin", "cs", "rom", "slo",
+                    "swe", "hu", "cht", "vie")[i]
+        } ?: translateLang
         wakeUpFilePath = sp.getString(R.string.key_wakeup_file_path) ?: wakeUpFilePath
         sp.getInt(R.string.key_ad_wait_secs).also {
             adWaitSecs = if (it == -1) 17 else it
@@ -319,7 +329,58 @@ object AppConfig {
             e.printStackTrace()
             GlobalApp.toastShort("未安装酷安")
         }
-
     }
 
+    /**
+     * 文字提取翻译权限
+     * @return Boolean
+     */
+    fun haveTranslatePermission(): Boolean {
+        if (!UserInfo.isLogin()) {
+            GlobalApp.toastShort("使用翻译功能，请先登录")
+            return false
+        } else if (UserInfo.isVip())
+            return true
+
+        //已登陆/检查次数
+        val f = getTodayCount("translate_count")
+        Vog.d(this, "haveTranslatePermission ---> 翻译次数 $f")
+        return if (f < 10) {//免费10次
+            plusTodayCount("translate_count", f)
+            true
+        } else {
+            GlobalApp.toastShort("无免费使用次数")
+            false
+        }
+    }
+
+    /**
+     * 使用sp记录每天..的次数，不保留历史纪录
+     * 格式  key  ->  yyyyMMdd|count
+     * @param key String
+     */
+    private fun getTodayCount(key: String): Int {
+        val today = SimpleDateFormat("yyyyMMdd", Locale.getDefault()).format(Date())
+        try {
+            ssp.getString(key, null)?.split("|")?.apply {
+                return if (this[0] == today)
+                    this[1].toInt()
+                else 0
+            }
+        } catch (e: Exception) {
+            GlobalLog.err(e)
+            return 0
+        }
+        return 0
+    }
+
+    private fun plusTodayCount(key: String, d: Int? = null) {
+        val today = SimpleDateFormat("yyyyMMdd", Locale.getDefault()).format(Date())
+        val v = (d ?: getTodayCount(key)) + 1
+        ssp.edit().putString(key, "$today|$v").apply()
+    }
+
+    fun a() {
+
+    }
 }

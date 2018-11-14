@@ -18,6 +18,7 @@ import cn.vove7.common.appbus.AppBus.ORDER_BEGIN_SCREEN_PICKER
 import cn.vove7.common.appbus.AppBus.EVENT_FORCE_OFFLINE
 import cn.vove7.common.appbus.AppBus.EVENT_START_DEBUG_SERVER
 import cn.vove7.common.appbus.AppBus.EVENT_STOP_DEBUG_SERVER
+import cn.vove7.common.appbus.AppBus.ORDER_BEGIN_SCREEN_PICKER_TRANSLATE
 import cn.vove7.common.appbus.AppBus.ORDER_CANCEL_RECO
 import cn.vove7.common.appbus.AppBus.ORDER_START_RECO
 import cn.vove7.common.appbus.AppBus.ORDER_START_VOICE_WAKEUP_WITHOUT_NOTIFY
@@ -44,6 +45,7 @@ import cn.vove7.common.utils.ThreadPool.runOnCachePool
 import cn.vove7.common.utils.ThreadPool.runOnPool
 import cn.vove7.common.utils.runOnNewHandlerThread
 import cn.vove7.common.utils.runOnUi
+import cn.vove7.common.utils.startActivityOnNewTask
 import cn.vove7.executorengine.bridges.SystemBridge
 import cn.vove7.executorengine.exector.MultiExecutorEngine
 import cn.vove7.executorengine.parse.ParseEngine
@@ -505,10 +507,15 @@ class MainService : BusService(),
                     RemoteDebugServer.stop()
                 }
                 ORDER_BEGIN_SCREEN_PICKER -> {
-                    val intent = Intent(this, ScreenPickerActivity::class.java)
-                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or
-                            Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS)
-                    startActivity(intent)
+                    startActivityOnNewTask(Intent(this, ScreenPickerActivity::class.java).also {
+                        it.addFlags(Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS)
+                    })
+                }
+                ORDER_BEGIN_SCREEN_PICKER_TRANSLATE -> {
+                    startActivityOnNewTask(Intent(this, ScreenPickerActivity::class.java).also {
+                        it.putExtra("t", "t")
+                        it.addFlags(Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS)
+                    })
                 }
                 else -> {
                 }

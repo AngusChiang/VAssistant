@@ -84,6 +84,7 @@ class SpeechSynService(val event: SyncEvent) : SpeechSynthesizerListener {
      */
     fun stop(byUser: Boolean = false) {
         synthesizer.stop()
+        speaking = false
         if (byUser)
             event.onUserInterrupt()
         if (speaking)

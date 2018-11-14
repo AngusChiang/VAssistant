@@ -11,6 +11,7 @@ import java.util.*
 import kotlin.concurrent.thread
 import cn.vove7.jarvis.tools.baiduaip.BaiduAipHelper
 import cn.vove7.jarvis.chat.TulingChatSystem
+import cn.vove7.vtp.log.Vog
 
 
 /**
@@ -134,7 +135,7 @@ class ExampleUnitTest {
 
     @Test
     fun testReg() {
-        val m = TextHelper.matchValues("切换应用", "(使?用|打开)%")
+        val m = TextHelper.matches("翻译屏幕", "(翻译%屏幕%)|(屏幕翻译)")
         println(m)
     }
 
@@ -170,6 +171,11 @@ class ExampleUnitTest {
         if (a?.hasErr == false) {
             println(a.bestResult)
         }
+    }
+
+    @Test
+    fun testTranslate() {
+        println(BaiduAipHelper.translate("你好", "auto", "auto")?.dst)
 
     }
 }

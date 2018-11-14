@@ -20,6 +20,37 @@
         <item>第三个</item>
         <item>最后一个</item>
     </string-array>
+    <string-array name="list_translate_languages" translatable="false">
+        <item>自动检测</item>
+        <item>中文</item>
+        <item>英语</item>
+        <item>粤语</item>
+        <item>文言文</item>
+        <item>日语</item>
+        <item>韩语</item>
+        <item>法语</item>
+        <item>西班牙语</item>
+        <item>泰语</item>
+        <item>阿拉伯语</item>
+        <item>俄语</item>
+        <item>葡萄牙语</item>
+        <item>德语</item>
+        <item>意大利语</item>
+        <item>希腊语</item>
+        <item>荷兰语</item>
+        <item>波兰语</item>
+        <item>保加利亚语</item>
+        <item>爱沙尼亚语</item>
+        <item>丹麦语</item>
+        <item>芬兰语</item>
+        <item>捷克语</item>
+        <item>罗马尼亚语</item>
+        <item>斯洛文尼亚语</item>
+        <item>瑞典语</item>
+        <item>匈牙利语</item>
+        <item>繁体中文</item>
+        <item>越南语</item>
+    </string-array>
 
     <string-array name="voice_model_entities" translatable="false">
         <item>普通女声</item>
@@ -203,8 +234,9 @@
         4.本地代码测试\n
         5.无限制标记管理\n
         6.操作、标记分享，且可同步恢复\n
-        7.无限制屏幕识别/文字识别
-        8.图灵机器人聊天系统
+        7.无限制屏幕识别/文字识别\n
+        8.图灵机器人聊天系统\n
+        9.无限制屏幕文字翻译
     </string>
     <string name="text_recharege_pre_read">在支付前，请先阅读高级教程，确保它对你有用。</string>
     <string name="text_email_copy_to_clip">你的邮箱已复制到剪切板</string>
@@ -336,4 +368,5 @@
     <string name="key_close_wakeup_notification" translatable="false">close_wakeup_notification</string>
     <string name="key_remove_ad_power_saving_mode" translatable="false">remove_ad_power_saving_mode</string>
     <string name="key_accessibility_service_power_saving_mode" translatable="false">accessibility_service_power_saving_mode</string>
+    <string name="key_translate_languages" translatable="false">translate_languages</string>
 </resources>

@@ -104,7 +104,7 @@ class SingleChoiceItem(
         title: String? = null,
         summary: String? = null,
         keyId: Int? = null,
-        defaultValue: () -> Int,//pos
+        defaultValue: (() -> Int) = { 0 },//pos
         @ArrayRes entityArrId: Int? = null,
         items: List<String>? = null,
         callback: CallbackOnSet? = null

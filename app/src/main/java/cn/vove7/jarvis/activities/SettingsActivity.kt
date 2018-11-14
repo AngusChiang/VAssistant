@@ -227,9 +227,8 @@ class SettingsActivity : ReturnableActivity() {
 //                            keyId = R.string.key_resume_bkg_music,defaultValue = {true})
             )),
             SettingGroupItem(R.color.lime_600, titleId = R.string.text_other, childItems = listOf(
-                    CheckBoxItem(title = "用户体验计划", summary = "改善体验与完善功能",
-                            keyId = R.string.key_user_exp_plan, defaultValue = { true }
-                    ),
+                    SingleChoiceItem(title = "翻译主语言", entityArrId = R.array.list_translate_languages,
+                            keyId = R.string.key_translate_languages),
                     CheckBoxItem(title = "自动开启无障碍服务", summary = "App启动时自动开启无障碍服务，需要root支持",
                             keyId = R.string.key_auto_open_as_with_root, defaultValue = { false }) { _, b ->
                         if (b as Boolean && !PermissionUtils.accessibilityServiceEnabled(this)) {
@@ -242,7 +241,10 @@ class SettingsActivity : ReturnableActivity() {
                     IntentItem(title = "重置引导") {
                         Tutorials.resetTutorials()
                         toast.showShort("重置完成")
-                    }
+                    },
+                    CheckBoxItem(title = "用户体验计划", summary = "改善体验与完善功能",
+                            keyId = R.string.key_user_exp_plan, defaultValue = { true }
+                    )
             ))
             //todo shortcut 管理
     )
@@ -284,9 +286,7 @@ class SettingsActivity : ReturnableActivity() {
                 Thread.sleep(2000)
                 AppBus.postSpeechAction(SpeechAction.ActionCode.ACTION_START_WAKEUP_WITHOUT_SWITCH)
             }, 1000)
-        } else
-            toast.showShort("设置完成")
-
+        } else toast.showShort("设置完成")
     }
 
 }

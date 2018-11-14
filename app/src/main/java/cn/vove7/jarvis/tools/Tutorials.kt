@@ -42,6 +42,7 @@ object Tutorials {
     const val t_inst_detail_exp = "t_inst_detail_exp"
     const val t_inst_detail_regex = "t_inst_detail_regex"
     const val t_inst_detail_run = "t_inst_detail_run"
+    const val screen_translate_tips = "screen_translate_tips"
     val context: Context
         get() = GlobalApp.APP
 
@@ -161,6 +162,7 @@ object Tutorials {
                 , t_inst_detail_exp
                 , t_inst_detail_regex
                 , t_inst_detail_run
+                , screen_translate_tips
         ).forEach {
             sp.removeKey(it)
         }

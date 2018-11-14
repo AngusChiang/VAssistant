@@ -19,6 +19,7 @@ import cn.vove7.common.netacc.ApiUrls
 import cn.vove7.common.netacc.model.BaseRequestModel
 import cn.vove7.common.netacc.NetHelper
 import cn.vove7.common.view.toast.ColorfulToast
+import cn.vove7.executorengine.bridges.SystemBridge
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.tools.AppConfig
 import cn.vove7.jarvis.tools.pay.PurchaseHelper
@@ -210,29 +211,34 @@ class UserInfoDialog(val context: Activity, val onUpdate: () -> Unit) {
 
     var pd: ProgressDialog? = null
     private fun showActCodeDialog() {
-        var s = ""
+        val clipText = SystemBridge.getClipText()
+
         MaterialDialog(context).title(text = "使用充值码")
-                .input { materialDialog, charSequence ->
-                    s = charSequence.toString()
+                .input(prefill = if (clipText?.matches("[a-z0-9A-Z]+".toRegex()) == true) clipText else "",
+                        waitForPositiveButton = true) { materialDialog, charSequence ->
+                    useCode(charSequence.toString())
                 }.positiveButton { d ->
-                    if (s == "") return@positiveButton
-                    pd = ProgressDialog(context)
                     d.dismiss()
-                    NetHelper.postJson<String>(ApiUrls.ACTIVATE_VIP, BaseRequestModel(null, s)) { _, bean ->
-                        pd?.dismiss()
-                        if (bean != null) {
-                            if (bean.isOk()) {
-                                toast.showShort("${bean.data}")
-                            } else {
-                                toast.showShort(bean.message)
-                            }
-                        } else {
-                            toast.showShort(R.string.text_net_err)
-                        }
-                    }
                 }.negativeButton {
                     it.dismiss()
-                }.noAutoDismiss().show()
+                }.noAutoDismiss()
+                .show()
+    }
+
+    private fun useCode(s: String?) {
+        pd = ProgressDialog(context)
+        NetHelper.postJson<String>(ApiUrls.ACTIVATE_VIP, BaseRequestModel(null, s)) { _, bean ->
+            pd?.dismiss()
+            if (bean != null) {
+                if (bean.isOk()) {
+                    toast.showLong("${bean.data}")
+                } else {
+                    toast.showLong(bean.message)
+                }
+            } else {
+                toast.showShort(R.string.text_net_err)
+            }
+        }
     }
 
 }

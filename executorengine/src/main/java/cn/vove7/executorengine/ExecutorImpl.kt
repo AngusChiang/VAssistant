@@ -300,7 +300,7 @@ open class ExecutorImpl(
                 MarkedData.MARKED_TYPE_SCRIPT_LUA,
                 MarkedData.MARKED_TYPE_SCRIPT_JS
         )).list().forEach {
-            val result = it.regex.matchEntire(p)
+            val result = it.rawRegex().matchEntire(p)//标记功能 严格匹配
             if (result != null) {
                 return openByIdentifier(it, ParseEngine.getLastParam(result.groups))//执行
             }

@@ -1,13 +1,17 @@
 package cn.vove7.jarvis.tools.baiduaip
 
 import cn.vove7.common.app.GlobalLog
+import cn.vove7.common.bridges.HttpBridge
+import cn.vove7.common.netacc.tool.SecureHelper
 import cn.vove7.common.utils.GsonHelper
 import cn.vove7.jarvis.tools.BaiduKey
 import cn.vove7.jarvis.tools.baiduaip.model.ImageClassifyResult
+import cn.vove7.jarvis.tools.baiduaip.model.TranslateResult
 import cn.vove7.vtp.log.Vog
 import com.baidu.aip.imageclassify.AipImageClassify
 import com.baidu.aip.nlp.AipNlp
 import org.json.JSONObject
+import java.util.*
 
 /**
  * # BaiduAipHelper
@@ -66,4 +70,34 @@ object BaiduAipHelper {
         Vog.d(this, "imageClassify ---> $result")
         return GsonHelper.fromJson<ImageClassifyResult>(result.toString())
     }
+
+    /**
+     * aid:20180807000192209
+     * sk:O5HfygUvr_56vS6lwuo4
+     * @param text String
+     * @return String?
+     */
+    fun translate(text: String, from: String = "auto", to: String = "zh"): TranslateResult.Result? {
+        val appid = "20180807000192209"
+        val sk = "O5HfygUvr_56vS6lwuo4"
+        val salt = Random().nextInt()
+        val jData = HttpBridge.post("https://fanyi-api.baidu.com/api/trans/vip/translate", hashMapOf(
+                Pair("q", text)
+                , Pair("from", from)
+                , Pair("to", to)
+                , Pair("appid", appid)
+                , Pair("salt", salt)
+                , Pair("sign", SecureHelper.MD5(appid + text + salt + sk).toLowerCase())
+        ))
+        try {
+            val res = GsonHelper.fromJson<TranslateResult>(jData)
+            if (res?.haveResult == true) {
+                return res.results!![0]
+            }
+        } catch (e: Exception) {
+            GlobalLog.err(e)
+        }
+        return null
+    }
+
 }
