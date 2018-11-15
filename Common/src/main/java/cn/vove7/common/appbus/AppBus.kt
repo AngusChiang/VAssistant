@@ -18,6 +18,7 @@ object AppBus {
     const val EVENT_HIDE_FLOAT = "e_hide_float"
 
     const val ORDER_BEGIN_SCREEN_PICKER = "begin_screen_picker"
+    const val ORDER_BEGIN_SCREEN_PICKER_TRANSLATE = "begin_screen_picker_translate"
     const val ORDER_STOP_EXEC = "stop_exec"
     const val ORDER_STOP_VOICE_WAKEUP_WITHOUT_NOTIFY = "stop_voice_wp_without_notify"
     const val ORDER_START_VOICE_WAKEUP_WITHOUT_NOTIFY = "start_voice_wp_without_notify"

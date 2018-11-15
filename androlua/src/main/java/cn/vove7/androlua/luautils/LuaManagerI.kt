@@ -34,7 +34,7 @@ interface LuaManagerI {
 
     fun handleError(err: String)
 
-    fun handleError(e: Exception)
+    fun handleError(e: Throwable)
 
     fun handleMessage(l: Int, msg: String)
 

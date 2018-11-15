@@ -154,14 +154,9 @@ public class RhinoHelper extends ScriptableObject {
 
     public void evalString(String scriptText, String... args) {
         setArgs(args);
-        try {
-            Script script = rhinoContext.compileString(scriptText, "<script>", 1, null);
-            if (script != null) {
-                script.exec(rhinoContext, global);
-            }
-        } catch (Exception rex) {
-            //rex.printStackTrace();
-            RhinoApi.onException(rex);
+        Script script = rhinoContext.compileString(scriptText, "<script>", 1, null);
+        if (script != null) {
+            script.exec(rhinoContext, global);
         }
     }
 

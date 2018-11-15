@@ -27,6 +27,7 @@ class UpdateLogDialog(context: Context, onDismiss: (() -> Unit)? = null) {
 
     private val logs: List<Pair<String, String>>
         get() = listOf(
+                Pair("1.4.0", "修复7.0版本下脚本执行崩溃问题"),
                 Pair("1.3.8", "文字提取支持翻译\n修复一些导致崩溃的问题"),
                 Pair("1.3.7", "修复卡顿问题\n" +
                         "加快广告跳过速度"),

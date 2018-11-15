@@ -61,7 +61,7 @@ public class RhinoApi extends AbsApi {
         }
     }
 
-    public static void onException(Exception e) {
+    public static void onException(Throwable e) {
         GlobalLog.INSTANCE.err(e);
         notifyOutput(OnPrint.ERROR,e.getMessage());
     }

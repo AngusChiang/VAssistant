@@ -2,6 +2,7 @@
 -- @author Vove
 -- 2018/8/14 17:59
 -- GestureSample.lua
+-- 需要7.0+
 --
 require 'accessibility'
 local path = { Pair(100, 100), Pair(200, 100), Pair(200, 200), Pair(100, 200), Pair(100, 100) }

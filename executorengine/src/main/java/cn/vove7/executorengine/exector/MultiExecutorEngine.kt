@@ -38,10 +38,14 @@ class MultiExecutorEngine : ExecutorImpl() {
             rhinoHelper = RhinoHelper(bridgeManager)
         }
         val sc = RegUtils.replaceRhinoHeader(script)
-        rhinoHelper?.evalString(sc, *(args ?: arrayOf())) ?: GlobalApp.toastShort("执行器未就绪")
-        RhinoApi.doLog("主线程执行完毕\n")
-//        }
-        return PartialResult.success()
+        return try {
+            rhinoHelper?.evalString(sc, *(args ?: arrayOf())) ?: GlobalApp.toastShort("执行器未就绪")
+            RhinoApi.doLog("主线程执行完毕\n")
+             PartialResult.success()
+        } catch (e: Exception) {
+            GlobalLog.err(e)
+            PartialResult.fatal(e.message ?: "no message")
+        }
     }
 
     //didn't work fixme
@@ -66,8 +70,8 @@ class MultiExecutorEngine : ExecutorImpl() {
             luaHelper?.evalString(script, args)
             luaHelper?.handleMessage(OnPrint.INFO, "主线程执行完毕\n")
             PartialResult.success()
-        } catch (e: Exception) {
-            luaHelper?.handleError(e)
+        } catch (e: Throwable) {
+            GlobalLog.err(e)
             PartialResult.fatal(e.message ?: "no message")
         }
     }

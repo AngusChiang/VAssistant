@@ -124,6 +124,10 @@ public class MarkedData implements DataFrom, Markable, Serializable {
         return regex;
     }
 
+    public Regex rawRegex() {
+        return RegUtils.INSTANCE.dealRawReg(regStr);
+    }
+
     @Keep
     public MarkedData() {
     }

@@ -12,8 +12,10 @@
         android:layout_height="wrap_content"
         android:background="?attr/selectableItemBackground"
         android:padding="10dp"
-        android:text="1.当前支持快捷唤醒词(唤醒既执行)：播放,停止,暂停,上一首,下一首,打开手电筒,关闭手电筒,截屏分享,文字提取
-\n2.你可以选择 '小V同学'和'你好小V' 其中一个作为唤醒词\n3.另外你可以选择其他命令作为唤醒词，如：支付宝扫一扫，但是只有'小V同学'和'你好小V'可以激活聆听,注意的是，自定义唤醒词可能失去这些快捷功能。\n"
+        android:text="1.当前支持命令唤醒词(唤醒既执行)：播放,停止,暂停,上一首,下一首,打开手电筒,关闭手电筒,截屏分享,文字提取
+\n2.你可以选择 '小V同学'和'你好小V' 其中一个作为唤醒词。\n
+3.命令唤醒词：你可以选择其他命令作为唤醒词，如：支付宝扫一扫。\n
+4.唤醒词默认只有'小V同学'和'你好小V'可以激活聆听，自定义的需要在用户唤醒词中设置。\n"
         android:textColor="@color/google_blue" />
     <TextView
         android:id="@+id/wakeup_file_path"

@@ -155,7 +155,7 @@ object NetHelper {
     fun uploadUserCommandHistory(his: CommandHistory) {
         ThreadPool.runOnPool {
             if (BuildConfig.DEBUG /*|| !AppConfig.userExpPlan*/) return@runOnPool
-            Looper.prepare()
+            prepareIfNeeded()
             postJson<Any>(ApiUrls.UPLOAD_CMD_HIS, BaseRequestModel(his)) { _, b ->
                 if (b?.isOk() == true) {
                     Vog.d(this, "uploadUserCommandHistory ---> usccc")

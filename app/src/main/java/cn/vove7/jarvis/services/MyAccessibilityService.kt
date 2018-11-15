@@ -353,7 +353,7 @@ class MyAccessibilityService : AccessibilityApi() {
                             MainService.instance?.onCommand(AppBus.ORDER_CANCEL_RECO)//up speed
                             true
                         }
-                        MainService.instance?.speechSynService?.speaking == true -> {
+                        MainService.speaking -> {
                             postLongDelay(stopSpeakRunner)
                             true
                         }

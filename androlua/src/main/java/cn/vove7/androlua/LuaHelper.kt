@@ -258,7 +258,7 @@ class LuaHelper : LuaManagerI {
         handleMessage(OnPrint.ERROR, err)
     }
 
-    override fun handleError(e: Exception) {
+    override fun handleError(e: Throwable) {
         GlobalLog.err(e)
     }
 

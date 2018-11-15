@@ -13,6 +13,7 @@ import cn.vove7.common.view.editor.MultiSpan
 import cn.vove7.jarvis.R
 import com.afollestad.materialdialogs.DialogCallback
 import com.afollestad.materialdialogs.MaterialDialog
+import com.afollestad.materialdialogs.callbacks.onDismiss
 import com.afollestad.materialdialogs.customview.customView
 
 /**
@@ -22,7 +23,7 @@ import com.afollestad.materialdialogs.customview.customView
  * 2018/10/18
  */
 class ProgressTextDialog(val context: Context, val title: String? = null,
-                         val cancelable: Boolean = true, noAutoDismiss: Boolean = false) {
+                         val cancelable: Boolean = true, noAutoDismiss: Boolean = false, autoScroll: Boolean = false) {
     val dialog = MaterialDialog(context)
     val textView = TextView(context)
 
@@ -30,7 +31,11 @@ class ProgressTextDialog(val context: Context, val title: String? = null,
 
     init {
         textView.setPadding(60, 0, 60, 0)
-        textView.gravity = Gravity.TOP
+        //todo
+//        if (autoScroll) textView.gravity = Gravity.TOP
+//        else
+// textView.gravity = Gravity.BOTTOM
+
         textView.setTextColor(context.resources.getColor(R.color.primary_text))
         dialog.title(text = title)
                 .customView(view = textView, scrollable = true)
@@ -73,6 +78,13 @@ class ProgressTextDialog(val context: Context, val title: String? = null,
             click: DialogCallback? = null
     ): ProgressTextDialog {
         dialog.neutralButton(res, text, click)
+        return this
+    }
+
+    fun onDismiss(callback: DialogCallback): ProgressTextDialog {
+        dialog.onDismiss {
+            callback.invoke(it)
+        }
         return this
     }
 

@@ -587,6 +587,16 @@ class MainService : BusService(),
                     false
                 } else instance?.cExecutor?.running == true
             }
+        /**
+         * 语音合成speaking
+         */
+        val speaking: Boolean
+            get() {
+                return if (instance?.speechEngineLoaded != true) {//未加载
+                    GlobalApp.toastShort("引擎未就绪")
+                    false
+                } else instance?.speechSynService?.speaking == true
+            }
 
         /**
          * 切换识别

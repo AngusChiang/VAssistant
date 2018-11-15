@@ -225,7 +225,7 @@ object BackupHelper {
         showPreviewDialog(activity, data, "选择恢复模式") { _ ->
             val nsleep = BuildConfig.DEBUG || !UserInfo.isVip()
             showModeDialog(activity) { mode ->
-                val dialog = ProgressTextDialog(activity, "正在恢复", cancelable = false)
+                val dialog = ProgressTextDialog(activity, "正在恢复", cancelable = false, autoScroll = true)
                 runOnPool {
                     try {
                         DAO.daoSession.runInTx {

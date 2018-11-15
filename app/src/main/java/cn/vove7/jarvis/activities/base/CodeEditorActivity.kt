@@ -26,6 +26,7 @@ import cn.vove7.common.view.toast.ColorfulToast
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.tools.UriUtils
 import cn.vove7.jarvis.view.EditorFunsHelper
+import cn.vove7.jarvis.view.dialog.ProgressTextDialog
 import cn.vove7.vtp.log.Vog
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.callbacks.onDismiss
@@ -69,8 +70,8 @@ abstract class CodeEditorActivity : AppCompatActivity() {
                 logList.add(v.spanStr)
             }
             Handler(Looper.getMainLooper()).post {
-                logView?.append(i.spanStr)
-                logView?.append(v.spanStr)
+                logDialog?.append(i.spanStr)
+                logDialog?.append(v.spanStr)
             }
         }
     }
@@ -232,33 +233,19 @@ abstract class CodeEditorActivity : AppCompatActivity() {
         return super.onOptionsItemSelected(item)
     }
 
+    var logDialog: ProgressTextDialog? = null
     private fun showLog() {
-        MaterialDialog(this)
-                .title(text = "输出")
-                .customView(view = buildLogText(), scrollable = true)
+        logDialog = ProgressTextDialog(this, "输出", true, autoScroll = true)
                 .neutralButton(text = "清空") {
                     clearLog()
                     showLog()
                 }
                 .positiveButton()
                 .onDismiss {
-                    logView = null
+                    logDialog = null
                 }
-                .show()
     }
 
-    var logView: TextView? = null
-    private fun buildLogText(): TextView {
-        logView = TextView(this)
-        logView?.setPadding(50, 0, 50, 0)
-        logView?.gravity = Gravity.BOTTOM
-        synchronized(logList) {
-            listOf(*logList.toTypedArray()).forEach {
-                logView?.append(it)
-            }
-        }
-        return logView!!
-    }
 
     private fun openFile() {
         val selIntent = Intent(Intent.ACTION_GET_CONTENT)
@@ -361,7 +348,7 @@ abstract class CodeEditorActivity : AppCompatActivity() {
                 Symbol("!")
         ).also { it.addAll(commonSymbols) }
         val luaSymbols = mutableListOf(
-                Symbol("🚩", "require 'accessibility'"),
+                Symbol("🚩", "require 'accessibility'\n"),
                 Symbol("⇥", "  "),
                 Symbol("fun", "function ()\n  \nend\n"),
                 Symbol("not"), Symbol("end"), Symbol("then"),

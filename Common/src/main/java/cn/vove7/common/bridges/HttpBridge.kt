@@ -79,7 +79,7 @@ object HttpBridge {
 
 
     fun post(url: String, params: Map<String, Any>?): String? {
-        Vog.d(this, "post ---> $url $params")
+//        Vog.d(this, "post ---> $url $params")
         val client = OkHttpClient.Builder()
                 .readTimeout(timeout, TimeUnit.SECONDS).build()
         val requestBody = FormBody.Builder().apply {
@@ -115,7 +115,7 @@ object HttpBridge {
             override fun onResponse(call: Call, response: Response) {//响应成功更新UI
                 if (response.isSuccessful) {
                     val s = response.body()?.string()
-                    Vog.d(this, "onResponse ---> http bridge $s")
+//                    Vog.d(this, "onResponse ---> http bridge $s")
                     result.setAndNotify(s)
                 } else {
                     GlobalApp.toastShort("网络请求失败")

@@ -5,6 +5,7 @@ import android.content.Context
 import android.os.Build
 import android.support.v4.app.NotificationManagerCompat
 import cn.vove7.common.app.GlobalApp
+import cn.vove7.common.app.GlobalLog
 import cn.vove7.jarvis.R
 import cn.vove7.vtp.log.Vog
 import cn.vove7.vtp.notification.ChannelBuilder
@@ -38,7 +39,11 @@ abstract class StatusAnimation {
 
     fun begin() {
         hideThread?.interrupt()
-        notifier.showNotification(nId, title, "", NotificationIcons(beginAniId))
+        try {
+            notifier.showNotification(nId, title, "", NotificationIcons(beginAniId))
+        } catch (e: Exception) {
+            GlobalLog.err(e)
+        }
     }
 
     /**
@@ -46,7 +51,11 @@ abstract class StatusAnimation {
      * @param c String message
      */
     fun show(c: String) {
-        notifier.showNotification(nId, title, c, NotificationIcons(beginAniId))
+        try {
+            notifier.showNotification(nId, title, c, NotificationIcons(beginAniId))
+        } catch (e: Exception) {
+            GlobalLog.err(e)
+        }
     }
 
     fun showAndHideDelay(msg: String, delay: Long = 1500) {
@@ -66,14 +75,22 @@ abstract class StatusAnimation {
 
     fun failed(msg: String? = null) {
         hideThread?.interrupt()
-        notifier.showNotification(nId, title, msg ?: "", NotificationIcons(failedAniId))
+        try {
+            notifier.showNotification(nId, title, msg ?: "", NotificationIcons(failedAniId))
+        } catch (e: Exception) {
+            GlobalLog.err(e)
+        }
         onFailed()
     }
 
     open fun finish() {
         if (finishId == null) return
         hideThread?.interrupt()
-        notifier.showNotification(nId, title, "", NotificationIcons(finishId!!))
+        try {
+            notifier.showNotification(nId, title, "", NotificationIcons(finishId!!))
+        } catch (e: Exception) {
+            GlobalLog.err(e)
+        }
         hideDelay()
     }
 
@@ -97,8 +114,13 @@ abstract class StatusAnimation {
 
     fun success() {
         hideThread?.interrupt()
-        if (successId != -1)
-            notifier.showNotification(nId, title, "", NotificationIcons(successId))
+        if (successId != -1) {
+            try {
+                notifier.showNotification(nId, title, "", NotificationIcons(successId))
+            } catch (e: Exception) {
+                GlobalLog.err(e)
+            }
+        }
         hideDelay(1000)
     }
 }
