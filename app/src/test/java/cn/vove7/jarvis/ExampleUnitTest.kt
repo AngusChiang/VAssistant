@@ -175,7 +175,7 @@ class ExampleUnitTest {
 
     @Test
     fun testTranslate() {
-        println(BaiduAipHelper.translate("你好", "auto", "auto")?.dst)
+        println(BaiduAipHelper.translate("你好\nGood", "auto", "auto")?.transResult)
 
     }
 }

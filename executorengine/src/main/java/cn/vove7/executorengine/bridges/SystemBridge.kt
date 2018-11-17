@@ -279,7 +279,7 @@ object SystemBridge : SystemOperation {
         try {
             switchFlashlight(on)
         } catch (e: Exception) {
-            GlobalLog.err(e)
+            GlobalLog.err(e, "sfl282")
             GlobalApp.toastShort((if (on) "打开" else "关闭") + "手电失败")
             return false
         }
@@ -663,7 +663,11 @@ object SystemBridge : SystemOperation {
 
     override fun getClipText(): String? {
         prepareIfNeeded()
-        return SystemHelper.getClipBoardContent(context).toString()
+        return try {
+            SystemHelper.getClipBoardContent(context).toString()
+        } catch (e: Exception) {
+            null
+        }
     }
 
     override fun setClipText(text: String?) {

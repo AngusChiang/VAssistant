@@ -11,6 +11,8 @@ import cn.vove7.vtp.log.Vog
 import com.baidu.aip.imageclassify.AipImageClassify
 import com.baidu.aip.nlp.AipNlp
 import org.json.JSONObject
+import java.net.URL
+import java.net.URLEncoder
 import java.util.*
 
 /**
@@ -77,10 +79,11 @@ object BaiduAipHelper {
      * @param text String
      * @return String?
      */
-    fun translate(text: String, from: String = "auto", to: String = "zh"): TranslateResult.Result? {
+    fun translate(text: String, from: String = "auto", to: String = "auto"): TranslateResult? {
         val appid = "20180807000192209"
         val sk = "O5HfygUvr_56vS6lwuo4"
         val salt = Random().nextInt()
+
         val jData = HttpBridge.post("https://fanyi-api.baidu.com/api/trans/vip/translate", hashMapOf(
                 Pair("q", text)
                 , Pair("from", from)
@@ -89,15 +92,13 @@ object BaiduAipHelper {
                 , Pair("salt", salt)
                 , Pair("sign", SecureHelper.MD5(appid + text + salt + sk).toLowerCase())
         ))
-        try {
-            val res = GsonHelper.fromJson<TranslateResult>(jData)
-            if (res?.haveResult == true) {
-                return res.results!![0]
-            }
+        println(jData)
+        return try {
+            GsonHelper.fromJson<TranslateResult>(jData)
         } catch (e: Exception) {
             GlobalLog.err(e)
+            null
         }
-        return null
     }
 
 }

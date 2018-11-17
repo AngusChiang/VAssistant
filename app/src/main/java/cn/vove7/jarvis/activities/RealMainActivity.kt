@@ -55,14 +55,15 @@ class RealMainActivity : AppCompatActivity() {
     companion object {
         val ps = arrayOf(
                 android.Manifest.permission.WRITE_EXTERNAL_STORAGE,
-                android.Manifest.permission.RECORD_AUDIO
+                android.Manifest.permission.RECORD_AUDIO,
+                android.Manifest.permission.READ_PHONE_STATE
         )
     }
 
     private fun requestPermission() {
         if (!PermissionUtils.isAllGranted(this, ps)) {
             MaterialDialog(this).title(text = "请先授予必要的权限")
-                    .message(text = "1. 麦克风\n2. 存储权限\n需要其他权限可到权限管理开启").positiveButton {
+                    .message(text = "1. 麦克风\n2. 存储权限\n需要其他权限可到权限管理中开启").positiveButton {
                         PermissionUtils.autoRequestPermission(this, ps)
                     }.show()
         } else {

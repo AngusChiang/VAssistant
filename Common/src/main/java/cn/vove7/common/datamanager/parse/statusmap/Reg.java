@@ -141,7 +141,7 @@ public class Reg implements Serializable {
             }
             return paramPosArr;
         } catch (NumberFormatException e) {
-            GlobalLog.INSTANCE.err(e);
+            GlobalLog.INSTANCE.err(e,"gppa144");
             return null;
         }
     }

@@ -38,12 +38,11 @@ class MyRecognizer(
 
     init {
         if (isInited) {
-            Vog.e(this, "还未调用release()，请勿新建一个新类")
-            throw RuntimeException("还未调用release()，请勿新建一个新类")
+            release()//释放，重新加载
         }
-        isInited = true
         asr = EventManagerFactory.create(context, "asr")
         asr.registerListener(eventListener)
+        isInited = true
     }
 
     /**

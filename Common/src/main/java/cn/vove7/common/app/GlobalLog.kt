@@ -16,7 +16,6 @@ import java.util.*
  * 2018/8/11
  */
 object GlobalLog {
-    val tmpOutFile = GlobalApp.APP.cacheDir.absolutePath + "/err"
 
     private val logList = mutableListOf<LogInfo>()
     fun log(msg: String?) {
@@ -24,8 +23,15 @@ object GlobalLog {
         write(LEVEL_INFO, msg)
     }
 
-    fun err(e: Throwable) {
+    fun err(e: Throwable, tag: String = "") {
+        val tmpOutFile: String? = try {
+            GlobalApp.APP.cacheDir.absolutePath + "/err"
+        } catch (e: Exception) {
+            null
+        }
         val msg = try {
+            if (tmpOutFile == null)
+                throw Exception("cacheDir获取失败")
             val pw = PrintWriter(BufferedWriter(FileWriter(File(tmpOutFile))))
             e.printStackTrace(pw)
             pw.close()
@@ -35,12 +41,12 @@ object GlobalLog {
             e1.printStackTrace()
             e.message
         }
-        Vog.e(this, "err $msg")
-        write(LEVEL_ERROR, msg)
+        Vog.e(this, msg ?: "none")
+        write(LEVEL_ERROR, "$tag -- $msg")
     }
 
     fun err(msg: String?) {
-        Vog.e(this, "err $msg")
+        Vog.e(this, msg ?: "none")
         write(LEVEL_ERROR, msg)
     }
 

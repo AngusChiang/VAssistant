@@ -111,7 +111,7 @@ public class MicrophoneInputStream extends InputStream {
                 //closeBTHeadsetMicro();
 
             } catch (Exception e) {
-                GlobalLog.INSTANCE.err(e);
+                GlobalLog.INSTANCE.err(e,"mpis114");
             } finally {
                 isStarted = false;
             }
@@ -215,17 +215,17 @@ public class MicrophoneInputStream extends InputStream {
     private BroadcastReceiver mSCOHeadsetAudioState = new BroadcastReceiver() {
         public void onReceive(Context context, Intent intent) {
 
-                //if(DEBUG)
-                int state = intent.getIntExtra(AudioManager.EXTRA_SCO_AUDIO_STATE, -1);
-                Log.e("SCO", " mSCOHeadsetAudioState--->onReceive:" + state);
-                if (state == AudioManager.SCO_AUDIO_STATE_CONNECTED) {
-                    Log.i("SCO", "SCO_AUDIO_STATE_CONNECTED");
-                    lock.notify();
-                    GlobalApp.APP.unregisterReceiver(this);
-                } else if (state == AudioManager.SCO_AUDIO_STATE_DISCONNECTED) {
-                    Log.i("SCO  ", "SCO_AUDIO_STATE_DISCONNECTED");
-                }
+            //if(DEBUG)
+            int state = intent.getIntExtra(AudioManager.EXTRA_SCO_AUDIO_STATE, -1);
+            Log.e("SCO", " mSCOHeadsetAudioState--->onReceive:" + state);
+            if (state == AudioManager.SCO_AUDIO_STATE_CONNECTED) {
+                Log.i("SCO", "SCO_AUDIO_STATE_CONNECTED");
+                lock.notify();
+                GlobalApp.APP.unregisterReceiver(this);
+            } else if (state == AudioManager.SCO_AUDIO_STATE_DISCONNECTED) {
+                Log.i("SCO  ", "SCO_AUDIO_STATE_DISCONNECTED");
             }
+        }
     };
 
     private void openBTHeadsetMicro() {
@@ -263,7 +263,7 @@ public class MicrophoneInputStream extends InputStream {
                 mAudioManager.setBluetoothScoOn(false);
                 mAudioManager.stopBluetoothSco();
             } catch (Exception e) {
-                GlobalLog.INSTANCE.err(e);
+                GlobalLog.INSTANCE.err(e, "cbhm266");
             }
         }
     }

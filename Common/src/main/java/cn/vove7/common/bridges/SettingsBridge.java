@@ -160,7 +160,7 @@ public class SettingsBridge {
             String rawJson = DaoHelper.INSTANCE.getInsetSettingsByName(name).getRawJson();
             return new Gson().fromJson(rawJson, rawType);
         } catch (Exception e) {
-            GlobalLog.INSTANCE.err(e);
+            GlobalLog.INSTANCE.err(e, "gisi163");
             return null;
         }
     }
@@ -168,9 +168,9 @@ public class SettingsBridge {
     /**
      * 检查一个存在name实例
      */
-    public SettingsBridge getConfig(String name){
-        InstSettings inst=DaoHelper.INSTANCE.getInsetSettingsByName(name);
-        if(inst!=null){
+    public SettingsBridge getConfig(String name) {
+        InstSettings inst = DaoHelper.INSTANCE.getInsetSettingsByName(name);
+        if (inst != null) {
             return new SettingsBridge(name);
         }
         return null;

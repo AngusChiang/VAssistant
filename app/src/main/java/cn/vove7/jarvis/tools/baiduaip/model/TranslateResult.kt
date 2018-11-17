@@ -13,8 +13,14 @@ class TranslateResult {
     val to: String? = null
     @SerializedName("trans_result")
     val results: Array<Result>? = null
-
     val haveResult get() = results != null && results.isNotEmpty()
+
+    val transResult
+        get() = buildString {
+            results?.forEach {
+                appendln(it.dst)
+            }
+        }
 
     class Result {
         val src: String? = null

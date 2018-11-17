@@ -1,9 +1,11 @@
 package cn.vove7.common.appbus
 
+import cn.vove7.common.app.GlobalLog
 import cn.vove7.vtp.log.Vog
 import org.greenrobot.eventbus.EventBus
 import java.io.Serializable
 import java.lang.Thread.sleep
+import java.util.concurrent.ConcurrentSkipListSet
 import kotlin.concurrent.thread
 
 object AppBus {
@@ -32,32 +34,32 @@ object AppBus {
         EventBus.getDefault().post(data)
     }
 
-    private val threadList = mutableListOf<Thread>()
+    private val threadList = ConcurrentSkipListSet<Thread>()
     private fun removeByName(name: String) {
-        threadList.removeAll {
-            it.name == name
+        try {
+            threadList.filter {
+                it.name == name
+            }
+        } catch (e: Exception) {
+            GlobalLog.err(e)
         }
     }
 
     fun postDelay(tag: String, data: Any, delay: Long) {
-        synchronized(threadList) {
-            threadList.add(thread(name = tag) {
-                try {
-                    sleep(delay)
-                } catch (e: InterruptedException) {
-                    return@thread
-                }
-                post(data)
-                removeByName(tag)
-            })
-        }
+        threadList.add(thread(name = tag) {
+            try {
+                sleep(delay)
+            } catch (e: InterruptedException) {
+                return@thread
+            }
+            post(data)
+            removeByName(tag)
+        })
     }
 
     fun remove(tag: String) {
-        synchronized(threadList) {
-            threadList.filter { it.name == tag }.forEach {
-                it.interrupt()
-            }
+        threadList.filter { it.name == tag }.forEach {
+            it.interrupt()
         }
     }
 

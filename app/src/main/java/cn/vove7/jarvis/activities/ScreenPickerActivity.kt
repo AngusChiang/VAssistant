@@ -138,11 +138,12 @@ class ScreenPickerActivity : Activity() {
             runOnCachePool {
                 val r = BaiduAipHelper.translate(text, to = AppConfig.translateLang)
                 if (r != null) {
-                    if (text == r.dst) {//文本相同
+                    val res=r.transResult
+                    if (text == res) {//文本相同
                         count.countDown()
                         return@runOnCachePool
                     }
-                    it.subText = r.dst
+                    it.subText = res
                     runOnUi {
                         it.textView?.isChecked = true
                     }
@@ -245,12 +246,12 @@ class ScreenPickerActivity : Activity() {
                         d?.appendlnGreen("\n翻译中...")
                         val r = BaiduAipHelper.translate(text, to = AppConfig.translateLang)
                         if (r != null) {
-                            model.subText = r.dst
+                            model.subText = r.transResult
                             d?.apply {
                                 d?.clear()
                                 appendln(text)
                                 appendlnRed("\n翻译结果：")
-                                appendln(r.dst)
+                                appendln(model.subText)
                             }
                         } else d?.appendlnRed("翻译失败")
                     }

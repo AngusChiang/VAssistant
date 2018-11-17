@@ -171,6 +171,7 @@ class PermissionManagerActivity : OneFragmentActivity() {
 //                        PermissionStatus(arrayOf("android.permission.BLUETOOTH", "android.permission.BLUETOOTH_ADMIN"),
 //                                "蓝牙", "打开蓝牙"),
                 PermissionStatus(arrayOf("android.permission.CAMERA"), "相机", "打开闪光灯"),
+                PermissionStatus(arrayOf("android.permission.READ_PHONE_STATE"), "读取设备状态", "个别机型需要"),
                 PermissionStatus(arrayOf("android.permission.WRITE_CALENDAR",
                         "android.permission.READ_CALENDAR"), "日历", "读写日历")
         )}

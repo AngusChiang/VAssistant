@@ -1,5 +1,6 @@
 package cn.vove7.jarvis.chat
 
+import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.bridges.HttpBridge
 import cn.vove7.common.netacc.NetHelper
 import cn.vove7.vtp.log.Vog
@@ -18,7 +19,12 @@ class QykChatSystem : ChatSystem {
             Vog.d(this, "chatWithText ---> 失败")
             null
         } else {
-            Gson().fromJson<Map<String, String>>(data, NetHelper.MapType)["content"]?.replace("{br}"," ")
+            try {
+                Gson().fromJson<Map<String, String>>(data, NetHelper.MapType)["content"]?.replace("{br}", " ")
+            } catch (e: Exception) {
+                GlobalLog.err(e, "qcs25")
+                null
+            }
         }
     }
 }
