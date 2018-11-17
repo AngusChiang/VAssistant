@@ -41,7 +41,7 @@ object RemoteDebugServer : Runnable {
 
     var handler: Handler? = null
     fun start() {
-        if (!AppConfig.checkUser()) {
+        if (!AppConfig.checkLogin()) {
             return
         }
         if (!stopped && thread?.isAlive == true) {

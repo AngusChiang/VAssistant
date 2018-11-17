@@ -94,10 +94,10 @@ class AdvancedSettingActivity : ReturnableActivity() {
 
     override fun onResume() {
         super.onResume()
-        AppConfig.checkDate()
-        unlock_advan_fun.visibility = if (UserInfo.isVip()) {
-            View.GONE
-        } else View.VISIBLE
+//        AppConfig.checkDate()
+//        unlock_advan_fun.visibility = if (UserInfo.isVip()) {
+//            View.GONE
+//        } else View.VISIBLE
     }
 
     private fun startOnNewWin(cls: Class<*>) {
@@ -126,7 +126,7 @@ class AdvancedSettingActivity : ReturnableActivity() {
                         else ipText, defaultValue = {
                             !RemoteDebugServer.stopped
                         }, callback = { holder, it ->
-                            if (!AppConfig.checkUser()) {
+                            if (!AppConfig.checkLogin()) {
                                 (holder as SettingItemHelper.SwitchItemHolder).compoundWight.isChecked = false
                                 return@SwitchItem true
                             }
@@ -136,22 +136,23 @@ class AdvancedSettingActivity : ReturnableActivity() {
                             } else RemoteDebugServer.stop()
                             return@SwitchItem true
                         }),
+                        IntentItem(title = "远程调试示例") {
+                            SystemBridge.openUrl("https://vove.gitee.io/2018/09/29/App_Debugger/")
+                        },
                         IntentItem(R.string.text_test_code_lua, onClick = {
-                            if (AppConfig.checkUser()) {
+                            if (AppConfig.checkLogin()) {
                                 startOnNewWin(LuaEditorActivity::class.java)
                             }
                         }),
                         IntentItem(R.string.text_code_test_js, null, onClick = {
-                            if (AppConfig.checkUser())
+                            if (AppConfig.checkLogin())
                                 startOnNewWin(JsEditorActivity::class.java)
                         })
                 )),
                 SettingGroupItem(R.color.google_red, "备份", childItems = listOf(
                         IntentItem(title = "备份") {
-                            if (UserInfo.isLogin()) {
+                            if (AppConfig.checkLogin()) {
                                 BackupHelper.showBackupDialog(this)
-                            } else {
-                                toast.showShort("请登录后操作")
                             }
                         },
                         IntentItem(title = "从本地恢复") {

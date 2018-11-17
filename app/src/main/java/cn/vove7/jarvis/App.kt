@@ -30,6 +30,7 @@ import kotlin.concurrent.thread
 class App : LuaApp() {
 
     private val mainService: Intent by lazy { Intent(this, MainService::class.java) }
+    private val assistService: Intent by lazy { Intent(this, AssistSessionService::class.java) }
 
     lateinit var services: Array<Intent>
     override fun onCreate() {
@@ -39,7 +40,7 @@ class App : LuaApp() {
         AppBus.reg(this)
         CrashHandler.init()
 
-        services = arrayOf(mainService)
+        services = arrayOf(mainService, assistService)
         AppConfig.init()//加载配置
         Vog.d(this, "onCreate ---> 配置加载完成")
         HandlerThread("app_load").apply {

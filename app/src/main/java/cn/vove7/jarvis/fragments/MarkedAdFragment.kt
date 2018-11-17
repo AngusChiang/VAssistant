@@ -61,7 +61,7 @@ class MarkedAdFragment : SimpleListFragment<String>(), OnSyncMarked {
     }
 
     override var floatClickListener: View.OnClickListener? = View.OnClickListener {
-        if (!AppConfig.checkUser()) {
+        if (!AppConfig.checkLogin()) {
             return@OnClickListener
         }
         AdEditorDialog(context!!) {

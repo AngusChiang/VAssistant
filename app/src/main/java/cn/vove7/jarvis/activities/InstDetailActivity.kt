@@ -249,7 +249,7 @@ class InstDetailActivity : AppCompatActivity() {
         toolbar.setOnMenuItemClickListener { it ->
             when (it.itemId) {
                 R.id.menu_edit -> {//修改
-                    if (!AppConfig.checkUser()) {
+                    if (!AppConfig.checkLogin()) {
                         return@setOnMenuItemClickListener true
                     }
                     val editIntent = Intent(this, NewInstActivity::class.java)
@@ -360,9 +360,9 @@ class InstDetailActivity : AppCompatActivity() {
 //                    }
                 }
                 R.id.menu_settings -> {//显示设置
-                    if (!AppConfig.checkUser() && !BuildConfig.DEBUG) {
-                        return@setOnMenuItemClickListener true
-                    }
+//                    if (!AppConfig.checkLogin() && !BuildConfig.DEBUG) {
+//                        return@setOnMenuItemClickListener true
+//                    }
                     var d: DialogWithList? = null
                     d = DialogWithList(this, InstSettingListAdapter(this,
                             settingName ?: "") {
@@ -402,7 +402,7 @@ class InstDetailActivity : AppCompatActivity() {
     }
 
     private fun addFollowFromNew() {
-        if (!AppConfig.checkUser()) {
+        if (!AppConfig.checkLogin()) {
             return
         }
         val editIntent = Intent(this, NewInstActivity::class.java)

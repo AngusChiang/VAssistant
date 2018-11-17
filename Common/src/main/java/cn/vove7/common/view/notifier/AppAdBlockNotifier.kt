@@ -15,28 +15,10 @@ import java.util.*
  */
 class AppAdBlockNotifier(private val app: AppInfo?, finders: MutableSet<ViewFinder>)
     : AbsViewShowNotifier(finders) {
-    companion object {
-        private val KillCount = hashMapOf<String, Int>()
-        fun plusCount() {
-            KillCount[getToday()] = (KillCount[getToday()] ?: 0) + 1
-        }
-
-        private val formator = SimpleDateFormat("MM-dd", Locale.getDefault())
-        private fun getToday(): String {
-            return formator.format(Date())
-        }
-
-        fun getCount(): Int {
-            return KillCount[getToday()] ?: 0
-        }
-
-        fun useUp(): Boolean = getCount() >= 20
-    }
 
     override fun onShow(finder: ViewFinder, node: ViewNode): Boolean {
         Vog.i(this, " ${Thread.currentThread()} 发现广告 ---> ${app?.name} ${app?.versionCode} $finder")
         return node.tryClick().also {
-            plusCount()
             Vog.i(this, "Ad click ---> $it")
         }
     }

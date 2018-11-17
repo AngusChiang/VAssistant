@@ -139,6 +139,13 @@ object AppConfig {
         }
     }
 
+    fun checkLogin(): Boolean {
+        return if (!UserInfo.isLogin()) {
+            GlobalApp.toastShort(R.string.text_please_login_first)
+            false
+        } else true
+    }
+
     fun checkUser(): Boolean {
         checkDate()
         if (!UserInfo.isLogin()) {
@@ -345,11 +352,47 @@ object AppConfig {
         //已登陆/检查次数
         val f = getTodayCount("translate_count")
         Vog.d(this, "haveTranslatePermission ---> 翻译次数 $f")
-        return if (f < 10) {//免费10次
+        return if (f < 5) {//免费10次
             plusTodayCount("translate_count", f)
             true
         } else {
-            GlobalApp.toastShort("无免费使用次数")
+            GlobalApp.toastShort("免费使用次数已用尽")
+            false
+        }
+    }
+
+    /**
+     * 去广告次数
+     * @return Boolean
+     */
+    fun haveAdKillSurplus(): Boolean {
+        if (UserInfo.isVip())
+            return true
+        val f = getTodayCount("akc")
+        return f < 5
+    }
+
+    fun plusAdKillCount() {
+        runOnCachePool {
+            plusTodayCount("akc")
+        }
+    }
+
+    /**
+     * 文字提取
+     * @return Boolean
+     */
+    fun haveTextPickPermission(): Boolean {
+        if (UserInfo.isVip())
+            return true
+        val f = getTodayCount("tp")
+        return if (f < 5) {//免费5次
+            runOnCachePool {
+                plusTodayCount("tp", f)
+            }
+            true
+        } else {
+            GlobalApp.toastShort("免费使用次数已用尽")
             false
         }
     }
@@ -363,9 +406,9 @@ object AppConfig {
         val today = SimpleDateFormat("yyyyMMdd", Locale.getDefault()).format(Date())
         try {
             ssp.getString(key, null)?.split("|")?.apply {
-                return if (this[0] == today)
+                return if (this[0] == today) {
                     this[1].toInt()
-                else 0
+                } else 0
             }
         } catch (e: Exception) {
             GlobalLog.err(e)

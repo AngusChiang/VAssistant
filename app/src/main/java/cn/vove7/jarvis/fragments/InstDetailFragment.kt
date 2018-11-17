@@ -146,7 +146,7 @@ class InstDetailFragment(val node: ActionNode, val onUpdate: () -> Unit) : BaseB
         toolbar.setOnMenuItemClickListener { it ->
             when (it.itemId) {
                 R.id.menu_edit -> {//修改
-                    if (!AppConfig.checkUser()) {
+                    if (!AppConfig.checkLogin()) {
                         return@setOnMenuItemClickListener true
                     }
                     val editIntent = Intent(context, NewInstActivity::class.java)
@@ -258,7 +258,7 @@ class InstDetailFragment(val node: ActionNode, val onUpdate: () -> Unit) : BaseB
     }
 
     private fun addFollowFromNew() {
-        if (!AppConfig.checkUser()) {
+        if (!AppConfig.checkLogin()) {
             return
         }
         val editIntent = Intent(context, NewInstActivity::class.java)

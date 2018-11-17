@@ -23,6 +23,7 @@ import cn.vove7.common.executor.OnPrint
 import cn.vove7.common.interfaces.CodeEditorOperation
 import cn.vove7.common.view.editor.MultiSpan
 import cn.vove7.common.view.toast.ColorfulToast
+import cn.vove7.executorengine.bridges.SystemBridge
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.tools.UriUtils
 import cn.vove7.jarvis.view.EditorFunsHelper
@@ -166,6 +167,9 @@ abstract class CodeEditorActivity : AppCompatActivity() {
                 ac.param = ActionParam()
                 ac.param.value = runArgs?.split(',')?.toTypedArray()
                 AppBus.post(ac)
+            }
+            R.id.menu_api_doc -> {
+                SystemBridge.openUrl("https://vove.gitee.io/2018/09/25/Script-Api/")
             }
             R.id.menu_set_arg -> {
                 MaterialDialog(this)

@@ -9,6 +9,7 @@ import cn.vove7.common.datamanager.DAO
 import cn.vove7.common.datamanager.greendao.AppAdInfoDao
 import cn.vove7.common.datamanager.parse.model.ActionScope
 import cn.vove7.common.model.UserInfo
+import cn.vove7.common.utils.ThreadPool
 import cn.vove7.common.utils.ThreadPool.runOnPool
 import cn.vove7.common.view.finder.ViewFindBuilder
 import cn.vove7.common.view.finder.ViewFinder
@@ -84,6 +85,7 @@ object AdKillerService : AccPluginsService() {
                 b.first == 0 -> Vog.d(this, "onUiUpdate ---> 未发现广告")
                 b.second == 0 -> Vog.d(this, "onUiUpdate ---> 发现广告，清除失败")
                 else -> {
+                    AppConfig.plusAdKillCount()//+1
                     Vog.d(this, "onUiUpdate ---> 发现广告，清除成功")
                     if (AppConfig.isToastWhenRemoveAd) {
                         removeAdAnimation.begin()
@@ -95,7 +97,7 @@ object AdKillerService : AccPluginsService() {
             }
         }
         try {
-            sleep(200)
+            sleep(100)
         } catch (e: Exception) {
         }
         locked = false
@@ -121,9 +123,9 @@ object AdKillerService : AccPluginsService() {
     var lastPkg = ""//todo smart skip ad
     override fun onAppChanged(appScope: ActionScope) {
         locked = true
-        if (!UserInfo.isVip() && AppAdBlockNotifier.useUp()) {//非vip且useUp
+        if (!AppConfig.haveAdKillSurplus()) //用户去广告权限
             return
-        }
+
         locked = false
         changedTime = System.currentTimeMillis()
         appInfo = AdvanAppHelper.getAppInfo(appScope.packageName)

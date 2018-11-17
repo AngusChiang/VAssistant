@@ -65,7 +65,7 @@ class AppAdListActivity : OneFragmentActivity() {
                                 editDialog.show(item.extra)
                             }
                             positiveButton(R.string.text_share) {
-                                if (!AppConfig.checkUser()) {
+                                if (!AppConfig.checkLogin()) {
                                     return@positiveButton
                                 }
                                 share(data)
@@ -88,7 +88,7 @@ class AppAdListActivity : OneFragmentActivity() {
                 }
             }
         override var floatClickListener: View.OnClickListener? = View.OnClickListener {
-            if (!AppConfig.checkUser()) {
+            if (!AppConfig.checkLogin()) {
                 return@OnClickListener
             }
             editDialog.show(null, pkg)

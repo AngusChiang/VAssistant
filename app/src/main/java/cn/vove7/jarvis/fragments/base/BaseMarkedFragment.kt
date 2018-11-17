@@ -144,7 +144,7 @@ abstract class BaseMarkedFragment<T> : SimpleListFragment<T>(), OnSyncMarked {
      */
     @SuppressLint("CheckResult")
     fun showEditDialog(data: MarkedData? = null) {
-        if (!AppConfig.checkUser()) {
+        if (!AppConfig.checkLogin()) {
             return
         }
         editData = data

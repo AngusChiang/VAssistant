@@ -26,7 +26,7 @@ import kotlin.concurrent.thread
  */
 class InstAppListFragment : SimpleListFragment<ActionScope>(), OnSyncInst {
     override var floatClickListener: View.OnClickListener? = View.OnClickListener {
-        if (!AppConfig.checkUser()) {
+        if (!AppConfig.checkLogin()) {
             return@OnClickListener
         }
         val intent = Intent(context, NewInstActivity::class.java)

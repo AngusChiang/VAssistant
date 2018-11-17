@@ -56,6 +56,12 @@ class ScreenPickerActivity : Activity() {
             finish()
             return
         }
+
+        if (!AppConfig.haveTextPickPermission()) {//免费次数
+            finish()
+            return
+        }
+
         runOnNewHandlerThread {
             ScreenTextFinder(AccessibilityApi.accessibilityService!!)
                     .findAll().forEach { viewNodeList.add(Model(it)) }
@@ -138,7 +144,7 @@ class ScreenPickerActivity : Activity() {
             runOnCachePool {
                 val r = BaiduAipHelper.translate(text, to = AppConfig.translateLang)
                 if (r != null) {
-                    val res=r.transResult
+                    val res = r.transResult
                     if (text == res) {//文本相同
                         count.countDown()
                         return@runOnCachePool

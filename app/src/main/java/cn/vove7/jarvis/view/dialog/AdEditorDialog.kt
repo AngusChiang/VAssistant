@@ -175,7 +175,7 @@ class AdEditorDialog(val context: Context, val onUpdate: () -> Unit) {
     var editData: AppAdInfo? = null
     @SuppressLint("CheckResult")
     fun show(data: AppAdInfo? = null, pkg: String? = null) {
-        if (!AppConfig.checkUser()) {
+        if (!AppConfig.checkLogin()) {
             return
         }
         editData = data

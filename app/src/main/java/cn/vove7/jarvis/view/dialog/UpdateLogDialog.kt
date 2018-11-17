@@ -19,7 +19,6 @@ class UpdateLogDialog(context: Context, onDismiss: (() -> Unit)? = null) {
         logs.forEach {
             d.appendln()
             d.appendln(MultiSpan(context, it.first, fontSize = 20, bold = true).spanStr)
-//            d.appendln()
             d.appendln(it.second)
         }
         d.finish()
@@ -27,6 +26,7 @@ class UpdateLogDialog(context: Context, onDismiss: (() -> Unit)? = null) {
 
     private val logs: List<Pair<String, String>>
         get() = listOf(
+                Pair("1.5.0", "开放脚本编辑、新建指令、指令分享、新建标记等功能"),
                 Pair("1.4.1", "修复只翻译第一行文本\n" +
                         "修复部分三星拨打电话权限问题"),
                 Pair("1.4.0", "修复7.0版本下脚本执行崩溃问题"),
