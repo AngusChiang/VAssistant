@@ -2,7 +2,7 @@ package cn.vove7.jarvis.fragments
 
 import android.content.Intent
 import android.view.View
-import cn.vove7.common.app.GlobalApp
+import cn.vassistant.plugininterface.app.GlobalApp
 import cn.vove7.common.datamanager.DAO
 import cn.vove7.common.model.UserInfo
 import cn.vove7.common.utils.ThreadPool.runOnCachePool
@@ -16,7 +16,6 @@ import cn.vove7.jarvis.tools.AppConfig
 import cn.vove7.jarvis.tools.DataUpdator
 import cn.vove7.jarvis.view.dialog.AdEditorDialog
 import cn.vove7.vtp.log.Vog
-import kotlin.concurrent.thread
 
 /**
  * # MarkedAdFragment
@@ -93,9 +92,8 @@ class MarkedAdFragment : SimpleListFragment<String>(), OnSyncMarked {
     override fun transData(nodes: List<String>): List<ViewModel> {
         val ss = mutableListOf<ViewModel>()
         val sss = mutableListOf<ViewModel>()
-        val bridge = SystemBridge
         nodes.forEach {
-            val app = bridge.getAppInfo(it)
+            val app = SystemBridge.getAppInfo(it)
             if (app != null)
                 sss.add(ViewModel(app.name, "数量：${maps[it]}", app.getIcon(GlobalApp.APP), extra = it))
         }

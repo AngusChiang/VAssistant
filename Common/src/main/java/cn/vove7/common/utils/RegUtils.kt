@@ -1,6 +1,6 @@
 package cn.vove7.common.utils
 
-import cn.vove7.common.app.GlobalLog
+import cn.vassistant.plugininterface.app.GlobalLog
 import cn.vove7.common.datamanager.model.InstSettingInfo
 import cn.vove7.vtp.log.Vog
 

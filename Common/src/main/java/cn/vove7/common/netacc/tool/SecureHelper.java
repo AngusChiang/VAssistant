@@ -3,8 +3,7 @@ package cn.vove7.common.netacc.tool;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 
-import cn.vove7.common.app.GlobalLog;
-import cn.vove7.vtp.log.Vog;
+import cn.vassistant.plugininterface.app.GlobalLog;
 
 /**
  * Created by IntelliJ IDEA.

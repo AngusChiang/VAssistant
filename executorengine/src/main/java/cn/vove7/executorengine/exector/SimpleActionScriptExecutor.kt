@@ -3,7 +3,7 @@ package cn.vove7.executorengine.exector
 import android.content.Context
 import android.os.Build
 import cn.vove7.common.bridges.GlobalActionExecutor
-import cn.vove7.common.bridges.ServiceBridge
+import cn.vassistant.plugininterface.bridges.ServiceBridge
 import cn.vove7.common.executor.PartialResult
 import cn.vove7.executorengine.ExecutorImpl
 import cn.vove7.executorengine.bridges.SystemBridge

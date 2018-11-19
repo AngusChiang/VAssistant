@@ -226,13 +226,15 @@
         <activity
             android:name=".activities.JsEditorActivity"
             android:label="@string/text_js_editor"
-            android:theme="@style/Theme.Darcula"
-            android:windowSoftInputMode="adjustResize" />
+            android:theme="@style/Theme.Darcula" />
         <activity
             android:name=".activities.ScreenPickerActivity"
             android:launchMode="singleInstance"
             android:theme="@style/ScreenPicker" />
         <activity android:name=".activities.CrashInfoActivity" />
+        <activity
+            android:name=".activities.PluginManagerActivity"
+            android:label="@string/text_plugins_manager" />
     </application>
 
 </manifest>

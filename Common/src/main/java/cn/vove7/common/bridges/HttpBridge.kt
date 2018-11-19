@@ -1,13 +1,11 @@
 package cn.vove7.common.bridges
 
-import cn.vove7.common.BuildConfig
-import cn.vove7.common.app.GlobalApp
-import cn.vove7.common.app.GlobalLog
+import cn.vassistant.plugininterface.app.GlobalApp
+import cn.vassistant.plugininterface.app.GlobalLog
 import cn.vove7.common.model.ResultBox
 import cn.vove7.vtp.log.Vog
 import okhttp3.*
 import java.io.IOException
-import java.lang.Thread.sleep
 import java.util.concurrent.TimeUnit
 
 /**

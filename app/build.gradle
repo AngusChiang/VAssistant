@@ -64,12 +64,22 @@ android {
     }
 
 }
+
+apply plugin: 'replugin-host-gradle'
+repluginHostConfig {
+    /**
+     * 是否使用 AppCompat 库
+     * 不需要个性化配置时，无需添加
+     */
+    useAppCompat = true
+}
+
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     //    implementation 'com.l4digital.fastscroll:fastscroll:1.1.2'
     implementation "com.android.support:appcompat-v7:${support_version}"
     implementation "com.android.support:design:${support_version}"
-    implementation "com.android.support:support-v4:${support_version}@aar"
+    implementation "com.android.support:support-v4:${support_version}"
     testImplementation 'junit:junit:4.12'
     //    androidTestImplementation 'com.android.support.test:runner:1.0.2'
     //    androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
@@ -93,6 +103,8 @@ dependencies {
     implementation 'com.google.zxing:core:3.2.0'
     implementation 'com.github.bumptech.glide:glide:4.8.0'
     annotationProcessor 'com.github.bumptech.glide:compiler:4.8.0'
+    implementation "com.qihoo360.replugin:replugin-host-lib:${RP_VERSION}"
+    implementation 'net.dongliu:apk-parser:2.6.4'
 }
 repositories {
     maven { url 'https://jitpack.io' }

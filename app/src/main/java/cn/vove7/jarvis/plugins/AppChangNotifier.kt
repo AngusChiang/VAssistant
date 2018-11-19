@@ -1,6 +1,6 @@
 package cn.vove7.jarvis.plugins
 
-import android.view.accessibility.AccessibilityNodeInfo
+import cn.vove7.common.accessibility.component.AccPluginsService
 import cn.vove7.common.datamanager.parse.model.ActionScope
 import cn.vove7.common.view.notifier.ActivityShowListener
 import cn.vove7.vtp.log.Vog

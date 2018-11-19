@@ -32,9 +32,8 @@ greendao {
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
-    implementation "com.android.support:appcompat-v7:${support_version}"
-    implementation "com.android.support:support-v4:${support_version}@aar"
-    api "com.github.Vove7:VTP:$vtp_version"
+    api "com.android.support:appcompat-v7:${support_version}"
+    //    implementation "com.android.support:support-v4:${support_version}@aar"
     api 'org.greenrobot:eventbus:3.1.1'
     api "org.greenrobot:greendao:$greendao_version"
     api "com.android.support:support-annotations:${support_version}"
@@ -45,4 +44,6 @@ dependencies {
     api files('libs/json-20160810.jar')
     api files('libs/log4j-1.2.17.jar')
     api files('libs/ThreadPoolHelp-2.0.jar')
+    api "com.github.Vove7:VTP:$vtp_version"
+    api project(':plugininterface')
 }

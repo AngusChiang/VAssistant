@@ -4,10 +4,9 @@ import android.os.Handler
 import android.os.Looper
 import cn.vove7.common.BuildConfig
 import cn.vove7.common.accessibility.AccessibilityApi
-import cn.vove7.common.app.GlobalApp
-import cn.vove7.common.app.GlobalLog
+import cn.vassistant.plugininterface.app.GlobalApp
+import cn.vassistant.plugininterface.app.GlobalLog
 import cn.vove7.common.appbus.AppBus
-import cn.vove7.common.datamanager.DaoHelper
 import cn.vove7.common.datamanager.executor.entity.MarkedData
 import cn.vove7.common.datamanager.history.CommandHistory
 import cn.vove7.common.datamanager.parse.model.Action
@@ -20,16 +19,13 @@ import cn.vove7.common.netacc.model.LastDateInfo
 import cn.vove7.common.netacc.model.RequestParseModel
 import cn.vove7.common.netacc.model.ResponseMessage
 import cn.vove7.common.utils.GsonHelper
-import cn.vove7.common.utils.TextHelper
 import cn.vove7.common.utils.ThreadPool
 import cn.vove7.vtp.log.Vog
-import cn.vove7.vtp.sharedpreference.SpHelper
 import com.google.gson.reflect.TypeToken
 import okhttp3.*
 import java.io.IOException
 import java.lang.reflect.Type
 import java.util.concurrent.TimeUnit
-import kotlin.concurrent.thread
 
 
 /**

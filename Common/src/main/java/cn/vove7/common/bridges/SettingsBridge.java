@@ -16,7 +16,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
-import cn.vove7.common.app.GlobalLog;
+import cn.vassistant.plugininterface.app.GlobalLog;
 import cn.vove7.common.appbus.AppBus;
 import cn.vove7.common.datamanager.DAO;
 import cn.vove7.common.datamanager.DaoHelper;

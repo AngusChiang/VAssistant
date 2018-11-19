@@ -3,28 +3,22 @@ package cn.vove7.jarvis.services
 import android.accessibilityservice.AccessibilityButtonController
 import android.accessibilityservice.AccessibilityService
 import android.accessibilityservice.AccessibilityServiceInfo.FLAG_REQUEST_ACCESSIBILITY_BUTTON
-import android.accessibilityservice.FingerprintGestureController
-import android.accessibilityservice.FingerprintGestureController.FINGERPRINT_GESTURE_SWIPE_DOWN
-import android.accessibilityservice.FingerprintGestureController.FINGERPRINT_GESTURE_SWIPE_RIGHT
 import android.content.Context
 import android.content.pm.PackageManager
 import android.graphics.Rect
 import android.os.Build
 import android.os.Handler
-import android.support.v4.view.accessibility.AccessibilityEventCompat
-import android.support.v4.view.accessibility.AccessibilityRecordCompat
 import android.view.KeyEvent
 import android.view.KeyEvent.*
 import android.view.ViewGroup
 import android.view.accessibility.AccessibilityEvent
 import android.view.accessibility.AccessibilityEvent.*
-import android.view.accessibility.AccessibilityEventSource
 import android.view.accessibility.AccessibilityNodeInfo
-import android.view.accessibility.AccessibilityRecord
 import cn.vove7.common.accessibility.AccessibilityApi
 import cn.vove7.common.accessibility.viewnode.ViewNode
-import cn.vove7.common.app.GlobalApp
-import cn.vove7.common.app.GlobalLog
+import cn.vassistant.plugininterface.app.GlobalApp
+import cn.vassistant.plugininterface.app.GlobalLog
+import cn.vove7.common.accessibility.AccessibilityBridge
 import cn.vove7.common.appbus.AppBus
 import cn.vove7.common.datamanager.parse.model.ActionScope
 import cn.vove7.common.executor.CExecutorI
@@ -36,10 +30,8 @@ import cn.vove7.common.view.finder.ViewFinder
 import cn.vove7.common.view.notifier.ActivityShowListener
 import cn.vove7.common.view.notifier.UiViewShowNotifier
 import cn.vove7.common.view.notifier.ViewShowListener
-import cn.vove7.common.view.toast.ColorfulToast
 import cn.vove7.executorengine.bridges.SystemBridge
 import cn.vove7.executorengine.helper.AdvanAppHelper
-import cn.vove7.jarvis.BuildConfig
 import cn.vove7.jarvis.plugins.*
 import cn.vove7.jarvis.receivers.PowerEventReceiver
 import cn.vove7.jarvis.tools.AppConfig
@@ -47,7 +39,6 @@ import cn.vove7.jarvis.view.statusbar.AccessibilityStatusAnimation
 import cn.vove7.jarvis.view.statusbar.StatusAnimation
 import cn.vove7.vtp.log.Vog
 import cn.vove7.vtp.system.SystemHelper
-import java.io.FileReader
 import java.lang.Thread.sleep
 import kotlin.concurrent.thread
 
@@ -56,7 +47,7 @@ import kotlin.concurrent.thread
  * Created by Vove on 2018/1/13.
  * cn.vove7
  */
-class MyAccessibilityService : AccessibilityApi() {
+class MyAccessibilityService : AccessibilityApi(), AccessibilityBridge {
     private lateinit var pkgman: PackageManager
     private val accAni: StatusAnimation by lazy { AccessibilityStatusAnimation() }
     override fun onServiceConnected() {
@@ -478,65 +469,10 @@ class MyAccessibilityService : AccessibilityApi() {
             return false
         }
 
-        val blackPackage = hashSetOf("com.android.chrome", "com.android.systemui")
-        private const val ON_UI_UPDATE = 0
-        private const val ON_APP_CHANGED = 1
+        val blackPackage = hashSetOf("com.android.chrome", "com.android.systemui", GlobalApp.APP.packageName)
+
 //        private const val ON_BIND = 2
 
-        /**
-         * 注册放于静态变量，只用于通知事件。
-         */
-        private val pluginsServices = mutableSetOf<PluginsService>()
-
-        /**
-         * 注册无障碍插件服务
-         * @param e PluginsService
-         */
-        fun registerPlugin(e: PluginsService) {
-            synchronized(pluginsServices) {
-                pluginsServices.add(e)
-                e.bindService()
-            }
-        }
-
-        fun unregisterPlugin(e: PluginsService) {
-            synchronized(pluginsServices) {
-                pluginsServices.remove(e)
-                e.unBindServer()
-            }
-        }
-
-        /**
-         * 分发事件
-         * @param what Int
-         * @param data Any?
-         */
-        @SuppressWarnings("Unchecked")
-        private fun dispatchPluginsEvent(what: Int, data: Any? = null) {
-            if (data == null) return
-            synchronized(pluginsServices) {
-                when (what) {
-                    ON_UI_UPDATE -> {
-                        pluginsServices.forEach {
-                            runOnCachePool { it.onUiUpdate(data as AccessibilityNodeInfo) }
-                        }
-                    }
-                    ON_APP_CHANGED -> {
-                        Vog.d(this, "dispatchPluginsEvent ---> ON_APP_CHANGED")
-                        pluginsServices.forEach {
-                            runOnCachePool { it.onAppChanged(data as ActionScope) }
-                        }
-                    }
-//                    ON_BIND -> {
-//                        pluginsServices.forEach {
-//                            thread { it.onBind() }
-//                        }
-//                    }
-                    else -> {
-                    }
-                }
-            }
-        }
 
         fun nodeSummary(node: AccessibilityNodeInfo?): String {
             if (node == null) return "null\n"

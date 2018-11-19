@@ -3,7 +3,7 @@ package cn.vove7.jarvis.fragments
 import android.os.Bundle
 import android.view.View
 import android.widget.CompoundButton
-import cn.vove7.common.app.GlobalApp
+import cn.vassistant.plugininterface.app.GlobalApp
 import cn.vove7.common.datamanager.DAO
 import cn.vove7.common.datamanager.executor.entity.MarkedData
 import cn.vove7.common.datamanager.executor.entity.MarkedData.MARKED_TYPE_APP
@@ -14,7 +14,6 @@ import cn.vove7.jarvis.R
 import cn.vove7.jarvis.adapters.ViewModel
 import cn.vove7.jarvis.fragments.base.BaseMarkedFragment
 import cn.vove7.jarvis.tools.DialogUtil
-import kotlin.concurrent.thread
 
 /**
  * # MarkedAppFragment

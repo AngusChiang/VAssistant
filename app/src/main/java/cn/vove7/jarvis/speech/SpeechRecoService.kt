@@ -5,7 +5,7 @@ import android.content.pm.PackageManager
 import android.os.*
 import android.support.annotation.CallSuper
 import android.support.v4.app.ActivityCompat
-import cn.vove7.common.app.GlobalApp
+import cn.vassistant.plugininterface.app.GlobalApp
 import cn.vove7.common.appbus.AppBus
 import cn.vove7.common.appbus.VoiceData
 import cn.vove7.common.model.RequestPermission
@@ -81,7 +81,8 @@ abstract class SpeechRecoService(val event: SpeechEvent) : SpeechRecoI {
     }
 
     override fun stopWakeUp() {
-        wakeupStatusAni.failedAndHideDelay("语音唤醒关闭", 5000)
+        if (wakeupI.opened)
+            wakeupStatusAni.failedAndHideDelay("语音唤醒关闭", 5000)
     }
 
     abstract fun doStopRecog()

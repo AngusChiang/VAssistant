@@ -5,8 +5,8 @@ import android.content.pm.PackageManager
 import android.os.*
 import android.support.v4.app.ActivityCompat
 import cn.vove7.androlua.luabridge.LuaUtil
-import cn.vove7.common.app.GlobalApp
-import cn.vove7.common.app.GlobalLog
+import cn.vassistant.plugininterface.app.GlobalApp
+import cn.vassistant.plugininterface.app.GlobalLog
 import cn.vove7.executorengine.helper.AdvanAppHelper
 import cn.vove7.executorengine.helper.AdvanContactHelper
 import cn.vove7.jarvis.speech.SpeechEvent

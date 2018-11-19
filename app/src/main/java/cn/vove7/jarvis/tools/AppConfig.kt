@@ -1,9 +1,10 @@
 package cn.vove7.jarvis.tools
 
+import android.app.Activity
 import android.content.Context
 import android.os.Build
-import cn.vove7.common.app.GlobalApp
-import cn.vove7.common.app.GlobalLog
+import cn.vassistant.plugininterface.app.GlobalApp
+import cn.vassistant.plugininterface.app.GlobalLog
 import cn.vove7.common.model.UserInfo
 import cn.vove7.common.netacc.ApiUrls
 import cn.vove7.common.netacc.NetHelper
@@ -20,7 +21,6 @@ import android.net.Uri
 import cn.vove7.common.utils.ThreadPool.runOnCachePool
 import cn.vove7.common.utils.ThreadPool.runOnPool
 import cn.vove7.common.utils.secure.SecuritySharedPreference
-import cn.vove7.jarvis.BuildConfig
 import com.afollestad.materialdialogs.checkbox.checkBoxPrompt
 import java.text.SimpleDateFormat
 import java.util.*
@@ -272,7 +272,7 @@ object AppConfig {
             }
         }
 
-    fun checkAppUpdate(context: Context, byUser: Boolean, onUpdate: ((Boolean) -> Unit)? = null) {
+    fun checkAppUpdate(context: Activity, byUser: Boolean, onUpdate: ((Boolean) -> Unit)? = null) {
 //        if (BuildConfig.DEBUG) {
 //            return
 //        }
@@ -292,19 +292,21 @@ object AppConfig {
                     }
                     if (verName != AppConfig.versionName) {
                         onUpdate?.invoke(true)
-                        MaterialDialog(context).title(text = "发现新版本 v$verName")
-                                .message(text = log)
-                                .positiveButton(text = "用酷安下载") { _ ->
-                                    openCollapk(context)
-                                }
-                                .checkBoxPrompt(text = "不再提醒此版本") {
-                                    if (it) {
-                                        sp.set("no_update_ver_name", verName)
-                                    } else sp.removeKey("no_update_ver_name")
-                                }
-                                .negativeButton()
-                                .cancelable(false)
-                                .show()
+                        if (!context.isFinishing) {
+                            MaterialDialog(context).title(text = "发现新版本 v$verName")
+                                    .message(text = log)
+                                    .positiveButton(text = "用酷安下载") { _ ->
+                                        openCollapk(context)
+                                    }
+                                    .checkBoxPrompt(text = "不再提醒此版本") {
+                                        if (it) {
+                                            sp.set("no_update_ver_name", verName)
+                                        } else sp.removeKey("no_update_ver_name")
+                                    }
+                                    .negativeButton()
+                                    .cancelable(false)
+                                    .show()
+                        }
                     } else
                         onUpdate?.invoke(false)
                 }

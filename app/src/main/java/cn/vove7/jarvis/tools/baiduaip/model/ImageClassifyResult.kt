@@ -1,6 +1,6 @@
 package cn.vove7.jarvis.tools.baiduaip.model
 
-import cn.vove7.common.app.GlobalLog
+import cn.vassistant.plugininterface.app.GlobalLog
 import com.google.gson.annotations.SerializedName
 
 /**

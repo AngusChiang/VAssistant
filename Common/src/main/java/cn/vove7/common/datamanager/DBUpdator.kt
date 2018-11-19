@@ -2,7 +2,6 @@ package cn.vove7.common.datamanager
 
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase
-import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.datamanager.greendao.*
 import cn.vove7.vtp.log.Vog
 

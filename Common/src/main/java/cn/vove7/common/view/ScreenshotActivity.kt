@@ -13,15 +13,13 @@ import android.hardware.display.VirtualDisplay
 import android.media.ImageReader
 import android.media.projection.MediaProjection
 import android.media.projection.MediaProjectionManager
-import android.os.Build
 import android.os.Bundle
-import android.os.Looper
 import android.view.WindowManager
 import android.widget.ImageView
-import cn.vove7.common.app.GlobalApp
-import cn.vove7.common.app.GlobalLog
+import cn.vassistant.plugininterface.app.GlobalApp
+import cn.vassistant.plugininterface.app.GlobalLog
 import cn.vove7.common.model.ResultBox
-import cn.vove7.common.view.toast.ColorfulToast
+import cn.vassistant.plugininterface.toast.ColorfulToast
 import cn.vove7.vtp.log.Vog
 import java.lang.Thread.sleep
 

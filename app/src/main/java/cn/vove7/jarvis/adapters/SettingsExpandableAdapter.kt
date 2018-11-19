@@ -7,7 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.BaseExpandableListAdapter
 import android.widget.ExpandableListView
-import cn.vove7.common.app.GlobalLog
+import cn.vassistant.plugininterface.app.GlobalLog
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.view.SettingChildItem
 import cn.vove7.jarvis.view.animation.ListItemAnimationHelper

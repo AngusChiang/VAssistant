@@ -1,14 +1,13 @@
 package cn.vove7.jarvis.speech.baiduspeech.synthesis.control
 
-import android.content.Context
 import android.content.pm.PackageManager
 import android.media.AudioManager
 import android.os.Handler
 import android.os.HandlerThread
 import android.os.Message
 import android.util.Pair
-import cn.vove7.common.app.GlobalApp
-import cn.vove7.common.app.GlobalLog
+import cn.vassistant.plugininterface.app.GlobalApp
+import cn.vassistant.plugininterface.app.GlobalLog
 import cn.vove7.jarvis.BuildConfig
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.services.SpeechSynService

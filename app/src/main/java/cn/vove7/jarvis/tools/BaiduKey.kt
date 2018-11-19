@@ -1,7 +1,7 @@
 package cn.vove7.jarvis.tools
 
 import android.content.pm.PackageManager
-import cn.vove7.common.app.GlobalApp
+import cn.vassistant.plugininterface.app.GlobalApp
 import cn.vove7.jarvis.BuildConfig
 
 object BaiduKey {

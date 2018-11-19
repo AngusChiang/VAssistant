@@ -2,8 +2,8 @@ package cn.vove7.executorengine.exector
 
 import cn.vove7.androlua.LuaHelper
 import cn.vove7.common.BridgeManager
-import cn.vove7.common.app.GlobalApp
-import cn.vove7.common.app.GlobalLog
+import cn.vassistant.plugininterface.app.GlobalApp
+import cn.vassistant.plugininterface.app.GlobalLog
 import cn.vove7.common.bridges.GlobalActionExecutor
 import cn.vove7.common.datamanager.parse.model.Action
 import cn.vove7.common.executor.OnPrint
@@ -13,8 +13,6 @@ import cn.vove7.executorengine.ExecutorImpl
 import cn.vove7.executorengine.bridges.SystemBridge
 import cn.vove7.rhino.RhinoHelper
 import cn.vove7.rhino.api.RhinoApi
-import cn.vove7.vtp.log.Vog
-import java.util.*
 
 /**
  * # MultiExecutorEngine

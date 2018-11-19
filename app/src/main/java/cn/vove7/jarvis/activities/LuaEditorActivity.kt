@@ -11,7 +11,7 @@ import cn.vove7.jarvis.activities.base.CodeEditorActivity
 class LuaEditorActivity : CodeEditorActivity() {
 
     override val codeEditor: CodeEditorOperation
-            by lazy { findViewById<LuaEditor>(R.id.source) }
+            by lazy { findViewById<LuaEditor>(R.id.editor) }
     override val assetFolder: String = "lua_sample/"
     override val testFiles: Array<String> by lazy {
         assets.list("lua_sample")

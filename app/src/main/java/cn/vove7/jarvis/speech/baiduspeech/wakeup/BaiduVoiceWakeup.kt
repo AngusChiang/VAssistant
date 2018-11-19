@@ -1,10 +1,8 @@
 package cn.vove7.jarvis.speech.baiduspeech.wakeup
 
 import android.content.Context
-import android.content.pm.PackageManager
 import cn.vove7.androlua.luabridge.LuaUtil
-import cn.vove7.common.app.GlobalApp
-import cn.vove7.jarvis.BuildConfig
+import cn.vassistant.plugininterface.app.GlobalApp
 import cn.vove7.jarvis.speech.WakeupI
 import cn.vove7.jarvis.tools.AppConfig
 import cn.vove7.jarvis.tools.BaiduKey

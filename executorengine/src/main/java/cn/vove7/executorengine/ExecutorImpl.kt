@@ -4,11 +4,12 @@ import android.content.Context
 import android.support.annotation.CallSuper
 import cn.vove7.common.accessibility.AccessibilityApi
 import cn.vove7.common.accessibility.viewnode.ViewNode
-import cn.vove7.common.app.GlobalApp
-import cn.vove7.common.app.GlobalLog
+import cn.vassistant.plugininterface.app.GlobalApp
+import cn.vassistant.plugininterface.app.GlobalLog
 import cn.vove7.common.appbus.AppBus
-import cn.vove7.common.bridges.*
-import cn.vove7.common.bridges.ShowDialogEvent.Companion.WHICH_SINGLE
+import cn.vassistant.plugininterface.bridges.*
+import cn.vassistant.plugininterface.bridges.ShowDialogEvent.Companion.WHICH_SINGLE
+import cn.vove7.common.bridges.GlobalActionExecutor
 import cn.vove7.common.datamanager.DAO
 import cn.vove7.common.datamanager.executor.entity.MarkedData
 import cn.vove7.common.datamanager.executor.entity.MarkedData.MARKED_TYPE_SCRIPT_JS
@@ -26,6 +27,7 @@ import cn.vove7.common.executor.CExecutorI.Companion.DEBUG_SCRIPT
 import cn.vove7.common.executor.PartialResult
 import cn.vove7.common.model.RequestPermission
 import cn.vove7.common.model.UserInfo
+import cn.vove7.common.utils.LooperHelper
 import cn.vove7.common.utils.RegUtils
 import cn.vove7.common.utils.ScreenAdapter
 import cn.vove7.common.utils.ThreadPool.runOnPool
@@ -105,6 +107,7 @@ open class ExecutorImpl(
         this.actionQueue = actionQueue
         lock = Object()
         thread = thread(start = true, isDaemon = true, priority = Thread.MAX_PRIORITY) {
+            LooperHelper.prepareIfNeeded()
             running = true
             userInterrupted = false
             commandType = 0
@@ -205,6 +208,7 @@ open class ExecutorImpl(
     /**
      * 跟随打开解析App内操作
      * 接着打开应用
+     * always return true
      */
     private fun parseAppInnerOperation(cmd: String, pkg: String): Boolean {
         //解析跟随
@@ -223,15 +227,14 @@ open class ExecutorImpl(
         }
 
         val r = checkAccessibilityService()
-        return if (r) {
+        if (r) {
             //等待App打开
             AppBus.post(AppBus.EVENT_HIDE_FLOAT)//关闭助手dialog
             val waitR = waitForApp(pkg, null, 5000)
             if (!waitR) return false
             pollActionQueue()
-            true
-        } else
-            false
+        }
+        return true
     }
 
     /**
@@ -365,8 +368,7 @@ open class ExecutorImpl(
      * 等待语音参数
      */
     override fun waitForVoiceParam(askWord: String?): String? {
-
-        serviceBridge?.getVoiceParam(currentAction!!)
+        serviceBridge?.getVoiceParam()
         waitForUnlock()
         //得到结果 -> action.param
         return if (!currentAction!!.responseResult) {
@@ -485,7 +487,7 @@ open class ExecutorImpl(
      */
     override fun waitForSingleChoice(askTitle: String, choiceData: List<ChoiceData>): ChoiceData? {
         //通知显示单选框
-        AppBus.post(ShowDialogEvent(WHICH_SINGLE, currentAction!!, askTitle, choiceData))
+        serviceBridge?.showChoiceDialog(ShowDialogEvent(WHICH_SINGLE, askTitle, choiceData))
         waitForUnlock()
         return if (currentAction!!.responseResult) {
 
@@ -497,6 +499,12 @@ open class ExecutorImpl(
             Vog.d(this, "结果： 取消")
             null
         }.also { Vog.d(this, "waitForSingleChoice result : $it") }
+    }
+
+    override fun onSingleChoiceResult(index: Int, data: ChoiceData?) {
+        currentAction?.responseResult = data != null
+        currentAction?.responseBundle?.putSerializable("data", data)
+        notifySync()
     }
 
     override fun singleChoiceDialog(askTitle: String, choiceData: Array<String>): Int? {
@@ -534,11 +542,16 @@ open class ExecutorImpl(
      * @param msg 提示信息
      */
     override fun alert(title: String, msg: String): Boolean {
-        AppBus.post(ShowAlertEvent(title, msg, currentAction!!))
+        serviceBridge?.showAlert(title, msg)
         waitForUnlock()
         return currentAction!!.responseResult.also {
             Vog.d(this, "alert result > $it")
         }
+    }
+
+    override fun notifyAlertResult(result: Boolean) {
+        currentAction!!.responseResult = result
+        notifySync()
     }
 
     override fun speak(text: String) {

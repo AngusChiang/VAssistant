@@ -12,14 +12,14 @@ import android.widget.RelativeLayout
 import android.widget.TextView
 import cn.vove7.common.accessibility.AccessibilityApi
 import cn.vove7.common.accessibility.viewnode.ViewNode
-import cn.vove7.common.app.GlobalApp
+import cn.vassistant.plugininterface.app.GlobalApp
 import cn.vove7.jarvis.tools.baiduaip.BaiduAipHelper
 import cn.vove7.common.utils.LooperHelper
 import cn.vove7.common.utils.ThreadPool.runOnCachePool
 import cn.vove7.common.utils.runOnNewHandlerThread
 import cn.vove7.common.utils.runOnUi
 import cn.vove7.common.view.finder.ScreenTextFinder
-import cn.vove7.common.view.toast.ColorfulToast
+import cn.vassistant.plugininterface.toast.ColorfulToast
 import cn.vove7.executorengine.bridges.SystemBridge
 import cn.vove7.jarvis.BuildConfig
 import cn.vove7.jarvis.R
@@ -31,8 +31,6 @@ import cn.vove7.jarvis.view.dialog.WordSplitDialog
 import cn.vove7.vtp.log.Vog
 import cn.vove7.vtp.sharedpreference.SpHelper
 import com.afollestad.materialdialogs.MaterialDialog
-import com.afollestad.materialdialogs.customview.customView
-import java.lang.Thread.sleep
 import java.util.concurrent.CountDownLatch
 import kotlin.concurrent.thread
 

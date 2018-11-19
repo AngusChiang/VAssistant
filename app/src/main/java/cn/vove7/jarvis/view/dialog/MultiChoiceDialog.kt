@@ -8,7 +8,7 @@ import android.widget.CheckBox
 import android.widget.ImageView
 import android.widget.TextView
 import cn.vove7.jarvis.R
-import cn.vove7.common.bridges.ChoiceData
+import cn.vassistant.plugininterface.bridges.ChoiceData
 import cn.vove7.vtp.easyadapter.BaseListAdapter
 
 /**

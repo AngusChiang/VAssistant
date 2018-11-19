@@ -1,12 +1,10 @@
 package cn.vove7.androlua
 
 import cn.vove7.androlua.luabridge.LuaUtil
-import cn.vove7.common.app.GlobalApp
-import cn.vove7.common.app.GlobalLog
+import cn.vassistant.plugininterface.app.GlobalApp
+import cn.vassistant.plugininterface.app.GlobalLog
 import cn.vove7.common.utils.ThreadPool.runOnPool
-import java.io.File
 import java.io.IOException
-import kotlin.concurrent.thread
 
 
 /**

@@ -1,9 +1,7 @@
 package cn.vove7.common.datamanager
 
 import android.graphics.Color
-import cn.vove7.common.BuildConfig
-import cn.vove7.common.R
-import cn.vove7.common.app.GlobalLog
+import cn.vassistant.plugininterface.app.GlobalLog
 import cn.vove7.common.datamanager.executor.entity.MarkedData
 import cn.vove7.common.datamanager.greendao.*
 import cn.vove7.common.datamanager.parse.DataFrom

@@ -10,7 +10,7 @@ import android.support.v7.widget.Toolbar
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
-import cn.vove7.common.view.toast.ColorfulToast
+import cn.vassistant.plugininterface.toast.ColorfulToast
 import cn.vove7.jarvis.R
 
 /**

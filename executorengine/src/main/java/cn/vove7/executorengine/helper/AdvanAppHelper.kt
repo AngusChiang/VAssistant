@@ -1,7 +1,10 @@
 package cn.vove7.executorengine.helper
 
 import android.content.Context
-import cn.vove7.common.app.GlobalApp
+import cn.vassistant.plugininterface.app.GlobalApp
+import cn.vove7.common.datamanager.DAO
+import cn.vove7.common.datamanager.executor.entity.MarkedData
+import cn.vove7.common.datamanager.greendao.MarkedDataDao
 import cn.vove7.common.datamanager.parse.model.ActionScope
 import cn.vove7.common.model.MatchedData
 import cn.vove7.common.utils.isHomeApp
@@ -23,6 +26,7 @@ object AdvanAppHelper {
     //记录 pkg -> AppInfo
     val APP_LIST = hashMapOf<String, AppInfo>()
     private val ALL_APP_LIST = hashMapOf<String, AppInfo>()
+    private val MARKED_APP_LIST = hashMapOf<String, AppInfo>()
     private var limitRate = 0.75f
     val context: Context get() = GlobalApp.APP
 
@@ -33,26 +37,50 @@ object AdvanAppHelper {
     fun getAppInfo(pkg: String): AppInfo? = ALL_APP_LIST[pkg]
 
     /**
+     * 刷新标记应用
+     */
+    fun initMarkedAppInfo() {
+
+    }
+
+    /**
      * appWord -> pkg
      * 匹配机制：标识 -> 按匹配率排序，若无匹配，更新app列表再次匹配 -> 搜索历史匹配
      * 预解析跟随操作 ：  QQ扫一扫  QQ浏览器
      */
-
     fun matchAppName(appWord: String): List<MatchedData<AppInfo>> {
         val matchList = mutableListOf<MatchedData<AppInfo>>()
+        DAO.daoSession.markedDataDao.queryBuilder()
+                .where(MarkedDataDao.Properties.Type.eq(MarkedData.MARKED_TYPE_APP))
+                .list().filter {
+                    //过滤未安装
+                    getAppInfo(it.value) != null
+                }.forEach {
+                    val rate = if (it.regex.matches(appWord)) {
+                        Vog.d(this, "getPkgByWord match from marked ---> ${it.regStr} $appWord")
+                        0.9f
+                    } else 0f
+
+                    if (rate >= limitRate) {
+                        getAppInfo(it.value)?.also { info ->
+                            matchList.add(MatchedData(rate, info))
+                        }
+                    }
+                }
         synchronized(APP_LIST) {
             APP_LIST.values.forEach {
                 val rate = try {
                     if (appWord.startsWith(it.name, ignoreCase = true)) {
                         val follow = appWord.substring(it.name.length)
                         Vog.d(this, "预解析---> $follow")
-                        val aq = ParseEngine.matchAppAction(follow, ActionScope(it.packageName), false)
-                        if (aq.second.isEmpty()) {//无匹配
+                        val aq = ParseEngine.matchAppAction(follow,
+                                ActionScope(it.packageName), false)
+                        if (aq.second.isEmpty()) {//无跟随
                             Vog.d(this, "预解析---> 无匹配")
-                            TextHelper.compareSimilarityWithPinyin(context, appWord, it.name, replaceNumberWithPinyin = true)
-                        } else {//匹配ok
+                            TextHelper.compareSimilarityWithPinyin(context, appWord, it.name,
+                                    replaceNumberWithPinyin = true)
+                        } else //匹配ok
                             1f
-                        }
                     } else {
                         val f = TextHelper.compareSimilarityWithPinyin(context, appWord, it.name, replaceNumberWithPinyin = true)
                         Vog.v(this, "matchAppName $appWord ${it.name} $f")
@@ -62,7 +90,6 @@ object AdvanAppHelper {
                     e.printStackTrace()
                     0f
                 }
-
                 if (rate >= limitRate) {
                     matchList.add(MatchedData(rate, it))
                 }

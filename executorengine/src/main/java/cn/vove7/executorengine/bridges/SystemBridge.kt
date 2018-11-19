@@ -17,8 +17,6 @@ import android.location.LocationListener
 import android.location.LocationManager
 import android.media.AudioFocusRequest
 import android.media.AudioManager
-import android.media.AudioManager.ADJUST_MUTE
-import android.media.AudioManager.ADJUST_UNMUTE
 import android.net.Uri
 import android.net.wifi.WifiConfiguration
 import android.net.wifi.WifiManager
@@ -28,22 +26,18 @@ import android.provider.Settings
 import android.support.annotation.RequiresApi
 import android.support.v4.content.ContextCompat
 import android.support.v4.content.FileProvider
-import android.telecom.PhoneAccountHandle
 import android.telecom.TelecomManager
-import android.telephony.SmsManager
 import android.view.KeyEvent
 import cn.vove7.common.accessibility.AccessibilityApi
-import cn.vove7.common.app.GlobalApp
-import cn.vove7.common.app.GlobalLog
+import cn.vassistant.plugininterface.app.GlobalApp
+import cn.vassistant.plugininterface.app.GlobalLog
 import cn.vove7.common.appbus.AppBus
-import cn.vove7.common.bridges.RootHelper
-import cn.vove7.common.bridges.SystemOperation
-import cn.vove7.common.bridges.UtilBridge.bitmap2File
+import cn.vassistant.plugininterface.bridges.RootHelper
+import cn.vassistant.plugininterface.bridges.SystemOperation
+import cn.vassistant.plugininterface.bridges.UtilBridge.bitmap2File
 import cn.vove7.common.datamanager.DAO
-import cn.vove7.common.datamanager.DaoHelper
 import cn.vove7.common.datamanager.executor.entity.MarkedData
 import cn.vove7.common.datamanager.greendao.MarkedDataDao
-import cn.vove7.common.model.ExResult
 import cn.vove7.common.model.RequestPermission
 import cn.vove7.common.model.ResultBox
 import cn.vove7.common.netacc.ApiUrls
@@ -147,15 +141,6 @@ object SystemBridge : SystemOperation {
      * @return String?
      */
     override fun getPkgByWord(appWord: String): String? {
-        DAO.daoSession.markedDataDao.queryBuilder()
-                .where(MarkedDataDao.Properties.Type.eq(MarkedData.MARKED_TYPE_APP))
-                .list().forEach {
-                    if (it.regex.matches(appWord)) {
-                        Vog.d(this, "getPkgByWord match from marked ---> ${it.regStr} $appWord")
-                        return it.value
-                    }
-                }
-
         val list = AdvanAppHelper.matchAppName(appWord)
         return if (list.isNotEmpty()) {
             list[0].data.packageName.also {

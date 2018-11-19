@@ -13,7 +13,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import cn.vove7.androlua.luabridge.LuaUtil;
-import cn.vove7.common.app.GlobalApp;
+import cn.vassistant.plugininterface.app.GlobalApp;
 import dalvik.system.DexClassLoader;
 
 public class LuaDexLoader {

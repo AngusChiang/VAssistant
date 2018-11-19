@@ -1,6 +1,7 @@
 package cn.vove7.jarvis.plugins
 
 import cn.vove7.common.accessibility.AccessibilityApi
+import cn.vove7.common.accessibility.component.AccPluginsService
 import cn.vove7.common.appbus.AppBus
 import cn.vove7.common.appbus.SpeechAction
 import cn.vove7.common.datamanager.parse.model.ActionScope

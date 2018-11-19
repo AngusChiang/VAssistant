@@ -1,12 +1,5 @@
 package cn.vove7.common.receivers
 
-import android.app.admin.DeviceAdminReceiver
-import android.app.admin.DevicePolicyManager
-import android.content.ComponentName
-import android.content.Context
-import android.content.Intent
-import cn.vove7.common.app.GlobalApp
-
 /**
  * # DeviceAdmin
  *

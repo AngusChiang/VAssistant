@@ -1,15 +1,13 @@
 package cn.vove7.jarvis.plugins
 
-import android.view.accessibility.AccessibilityEvent
 import android.view.accessibility.AccessibilityNodeInfo
 import cn.vove7.common.accessibility.AccessibilityApi
-import cn.vove7.common.app.GlobalLog
+import cn.vove7.common.accessibility.component.AccPluginsService
+import cn.vassistant.plugininterface.app.GlobalLog
 import cn.vove7.common.datamanager.AppAdInfo
 import cn.vove7.common.datamanager.DAO
 import cn.vove7.common.datamanager.greendao.AppAdInfoDao
 import cn.vove7.common.datamanager.parse.model.ActionScope
-import cn.vove7.common.model.UserInfo
-import cn.vove7.common.utils.ThreadPool
 import cn.vove7.common.utils.ThreadPool.runOnPool
 import cn.vove7.common.view.finder.ViewFindBuilder
 import cn.vove7.common.view.finder.ViewFinder
@@ -21,7 +19,6 @@ import cn.vove7.vtp.app.AppInfo
 import cn.vove7.vtp.log.Vog
 import java.lang.Thread.sleep
 import java.util.concurrent.ConcurrentHashMap
-import kotlin.concurrent.thread
 
 /**
  * # AdKillerService

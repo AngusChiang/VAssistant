@@ -18,12 +18,9 @@ class OSLActivity : OneFragmentActivity() {
     override var fragments: Array<Fragment> = arrayOf(ListFragment())
 
     class ListFragment : SimpleListFragment<OslItem>() {
-        override fun transData(nodes: List<OslItem>): List<ViewModel> {
-            val list = mutableListOf<ViewModel>()
-            nodes.forEach {
-                list.add(ViewModel(it.name, it.desc.let { s -> if (s == "") it.url else s }, extra = it))
-            }
-            return list
+
+        override fun unification(it: OslItem): ViewModel {
+            return ViewModel(it.name, it.desc.let { s -> if (s == "") it.url else s }, extra = it)
         }
 
         override val itemClickListener: SimpleListAdapter.OnItemClickListener? =
@@ -53,7 +50,9 @@ class OSLActivity : OneFragmentActivity() {
                     , OslItem("TapTargetView", "https://github.com/KeepSafe/TapTargetView", "")
                     , OslItem("Zxing", "https://github.com/zxing/zxing", "ZXing (\"zebra crossing\") is an open-source, multi-format 1D/2D barcode image processing library implemented in Java, with ports to other languages.")
                     , OslItem("Glide", "https://bumptech.github.io/glide/", "Glide is a fast and efficient image loading library for Android focused on smooth scrolling. Glide offers an easy to use API, a performant and extensible resource decoding pipeline and automatic resource pooling.")
-//                    , OslItem("", "", "")
+                    , OslItem("RePlugin", "https://github.com/Qihoo360/RePlugin", "RePlugin is a complete Android plug-in solution which is suitable for general use.")
+                    , OslItem("apk-parser", "https://github.com/hsiafan/apk-parser", "Apk parser lib, for decoding binary xml file, getting apk meta info.")
+                    // , OslItem("", "", "")
 
             )))
             notifyLoadSuccess(true)

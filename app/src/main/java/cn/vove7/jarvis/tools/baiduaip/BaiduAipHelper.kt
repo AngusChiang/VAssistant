@@ -1,6 +1,6 @@
 package cn.vove7.jarvis.tools.baiduaip
 
-import cn.vove7.common.app.GlobalLog
+import cn.vassistant.plugininterface.app.GlobalLog
 import cn.vove7.common.bridges.HttpBridge
 import cn.vove7.common.netacc.tool.SecureHelper
 import cn.vove7.common.utils.GsonHelper
@@ -11,8 +11,6 @@ import cn.vove7.vtp.log.Vog
 import com.baidu.aip.imageclassify.AipImageClassify
 import com.baidu.aip.nlp.AipNlp
 import org.json.JSONObject
-import java.net.URL
-import java.net.URLEncoder
 import java.util.*
 
 /**

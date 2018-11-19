@@ -1,6 +1,6 @@
 package cn.vove7.jarvis.view.statusbar
 
-import cn.vove7.common.app.GlobalApp
+import cn.vassistant.plugininterface.app.GlobalApp
 import cn.vove7.jarvis.R
 
 /**

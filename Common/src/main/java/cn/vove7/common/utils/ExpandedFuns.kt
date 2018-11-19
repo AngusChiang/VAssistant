@@ -12,7 +12,7 @@ import cn.vove7.vtp.log.Vog
 import android.content.Intent
 import android.content.pm.ApplicationInfo
 import android.os.HandlerThread
-import cn.vove7.common.app.GlobalApp
+import cn.vassistant.plugininterface.app.GlobalApp
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -176,4 +176,12 @@ private fun getHomes(context: Context): List<String> {
         Vog.d("", "桌面应用 ---> ${it.activityInfo.packageName}")
     }
     return homeAppPkgs
+}
+
+fun View.toggleVisibility(toggleVisibility: Int = View.GONE) {
+    visibility = if (visibility == toggleVisibility) {
+        View.VISIBLE
+    } else {
+        toggleVisibility
+    }
 }

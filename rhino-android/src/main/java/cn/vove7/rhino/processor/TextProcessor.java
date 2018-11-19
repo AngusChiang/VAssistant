@@ -70,10 +70,10 @@ import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import cn.vove7.common.app.GlobalApp;
+import cn.vassistant.plugininterface.app.GlobalApp;
 import cn.vove7.common.interfaces.CodeEditorOperation;
 import cn.vove7.common.utils.TextHelper;
-import cn.vove7.common.view.toast.ColorfulToast;
+import cn.vassistant.plugininterface.toast.ColorfulToast;
 import cn.vove7.rhino.R;
 import cn.vove7.rhino.processor.commons.LineObject;
 import cn.vove7.rhino.processor.commons.LinesCollection;
@@ -88,7 +88,6 @@ import cn.vove7.rhino.processor.suggestions.SuggestionType;
 import cn.vove7.rhino.processor.text.SymbolsTokenizer;
 import cn.vove7.rhino.processor.text.TextChange;
 import cn.vove7.rhino.processor.text.UndoStack;
-import cn.vove7.vtp.log.Vog;
 
 /**
  * Special thanks:

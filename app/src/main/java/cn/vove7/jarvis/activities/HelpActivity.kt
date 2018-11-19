@@ -7,7 +7,7 @@ import android.view.Gravity
 import android.view.View
 import android.widget.AdapterView
 import android.widget.TextView
-import cn.vove7.common.app.GlobalLog
+import cn.vassistant.plugininterface.app.GlobalLog
 import cn.vove7.common.netacc.ApiUrls
 import cn.vove7.common.netacc.NetHelper
 import cn.vove7.common.netacc.model.BaseRequestModel

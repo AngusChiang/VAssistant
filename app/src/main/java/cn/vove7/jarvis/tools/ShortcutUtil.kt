@@ -9,9 +9,9 @@ import android.content.pm.ShortcutManager
 import android.graphics.drawable.Icon
 import android.os.Build
 import android.support.annotation.RequiresApi
-import cn.vove7.common.app.GlobalApp
-import cn.vove7.common.app.GlobalApp.Companion.getString
-import cn.vove7.common.app.GlobalLog
+import cn.vassistant.plugininterface.app.GlobalApp
+import cn.vassistant.plugininterface.app.GlobalApp.Companion.getString
+import cn.vassistant.plugininterface.app.GlobalLog
 import cn.vove7.common.datamanager.parse.statusmap.ActionNode
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.activities.base.VoiceAssistActivity

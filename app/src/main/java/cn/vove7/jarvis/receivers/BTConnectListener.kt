@@ -5,14 +5,10 @@ import android.bluetooth.BluetoothProfile
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
-import android.util.Log
-import cn.vove7.common.app.GlobalApp
+import cn.vassistant.plugininterface.app.GlobalApp
 import android.bluetooth.BluetoothDevice
-import android.speech.SpeechRecognizer
-import cn.vove7.common.appbus.AppBus
 import cn.vove7.jarvis.services.MainService
 import cn.vove7.vtp.log.Vog
-import kotlin.concurrent.thread
 
 
 /**

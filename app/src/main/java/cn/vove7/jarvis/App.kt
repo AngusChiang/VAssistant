@@ -8,15 +8,15 @@ import android.util.Log
 import cn.vove7.androlua.LuaApp
 import cn.vove7.common.appbus.AppBus
 import cn.vove7.common.appbus.MessageEvent
-import cn.vove7.common.bridges.RootHelper
+import cn.vassistant.plugininterface.bridges.RootHelper
 import cn.vove7.common.utils.ThreadPool.runOnPool
 import cn.vove7.common.utils.runOnNewHandlerThread
+import cn.vove7.jarvis.droidplugin.RePluginManager
 import cn.vove7.jarvis.receivers.AppInstallReceiver
 import cn.vove7.jarvis.receivers.PowerEventReceiver
 import cn.vove7.jarvis.receivers.ScreenStatusListener
 import cn.vove7.jarvis.services.AssistSessionService
 import cn.vove7.jarvis.services.MainService
-import cn.vove7.jarvis.services.MyAccessibilityService
 import cn.vove7.jarvis.tools.AppConfig
 import cn.vove7.jarvis.tools.CrashHandler
 import cn.vove7.jarvis.tools.ShortcutUtil
@@ -25,7 +25,6 @@ import cn.vove7.vtp.runtimepermission.PermissionUtils
 import io.github.kbiakov.codeview.classifier.CodeProcessor
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
-import kotlin.concurrent.thread
 
 class App : LuaApp() {
 
@@ -56,12 +55,13 @@ class App : LuaApp() {
                         RootHelper.openSelfAccessService()
                     }
                 }
+                //插件自启
+                RePluginManager().launchWithApp(this@App)
                 Vog.d(this, "onCreate ---> 结束 ${System.currentTimeMillis() / 1000}")
 
                 quitSafely()
             }
         }
-
         if (!BuildConfig.DEBUG)
             Vog.init(this, Log.ERROR)
     }
@@ -119,6 +119,8 @@ class App : LuaApp() {
             MessageEvent.WHAT_MSG_ERR -> Vog.e(this, event.toString())
         }
     }
+}
 
+class RePluginApp:LuaApp() {
 
 }

@@ -2,12 +2,10 @@ package cn.vove7.jarvis.view.floatwindows
 
 import android.graphics.drawable.AnimationDrawable
 import android.os.Handler
-import android.os.Looper
-import android.os.Message
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
-import cn.vove7.common.app.GlobalApp
+import cn.vassistant.plugininterface.app.GlobalApp
 import cn.vove7.common.appbus.AppBus
 import cn.vove7.common.appbus.SpeechAction
 import cn.vove7.common.model.RequestPermission

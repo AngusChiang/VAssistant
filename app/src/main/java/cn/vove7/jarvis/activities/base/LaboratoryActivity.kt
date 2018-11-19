@@ -1,9 +1,12 @@
 package cn.vove7.jarvis.activities.base
 
+import android.content.Intent
 import android.os.Bundle
 import cn.vove7.common.model.UserInfo
 import cn.vove7.common.utils.ThreadPool.runOnPool
+import cn.vove7.common.utils.startActivityOnNewTask
 import cn.vove7.jarvis.R
+import cn.vove7.jarvis.activities.PluginManagerActivity
 import cn.vove7.jarvis.adapters.SettingsExpandableAdapter
 import cn.vove7.jarvis.plugins.AdKillerService
 import cn.vove7.jarvis.plugins.VoiceWakeupStrategy
@@ -41,14 +44,19 @@ class LaboratoryActivity : ReturnableActivity() {
 
     private val groupItems: List<SettingGroupItem> by lazy {
         listOf(
+                SettingGroupItem(R.color.indigo_700, "插件管理", childItems = listOf(
+                        IntentItem(title = "插件管理", summary = "扩展功能") {
+                            startActivityOnNewTask(Intent(this, PluginManagerActivity::class.java))
+                        }
+                )),
                 SettingGroupItem(R.color.google_blue, getString(R.string.text_open_ad_killer_service), childItems = listOf(
                         SwitchItem(R.string.text_open, summary = if (UserInfo.isVip()) null
                         else getString(R.string.summary_not_vip_remove_ad), keyId = R.string.key_open_ad_block,
                                 defaultValue = { true }) { _, it ->
                             when (it as Boolean) {
-                                true -> MyAccessibilityService.registerPlugin(AdKillerService)
+                                true ->  AdKillerService.register()
                                 false ->
-                                    MyAccessibilityService.unregisterPlugin(AdKillerService)
+                                    AdKillerService.unregister()
                             }
                             return@SwitchItem true
                         },

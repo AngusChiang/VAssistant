@@ -1,6 +1,6 @@
 package cn.vove7.jarvis.services
 
-import cn.vove7.common.app.GlobalLog
+import cn.vassistant.plugininterface.app.GlobalLog
 import cn.vove7.jarvis.speech.SpeechSynthesizerI
 import cn.vove7.jarvis.speech.baiduspeech.synthesis.control.BaiduSynthesizer
 import cn.vove7.vtp.log.Vog

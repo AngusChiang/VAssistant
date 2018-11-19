@@ -8,7 +8,7 @@ import android.view.MotionEvent
 import android.view.View
 import android.widget.CheckedTextView
 import cn.vove7.common.utils.runOnUi
-import cn.vove7.common.view.toast.ColorfulToast
+import cn.vassistant.plugininterface.toast.ColorfulToast
 import cn.vove7.executorengine.bridges.SystemBridge
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.view.custom.WarpLinearLayout

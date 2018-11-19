@@ -5,15 +5,15 @@ import android.content.ComponentName
 import android.os.Build
 import android.provider.Settings
 import android.support.v4.view.accessibility.AccessibilityNodeInfoCompat.FOCUS_INPUT
-import android.view.accessibility.AccessibilityEvent
 import android.view.accessibility.AccessibilityNodeInfo
 import cn.vove7.common.accessibility.viewnode.ViewNode
-import cn.vove7.common.app.GlobalApp
-import cn.vove7.common.app.GlobalLog
+import cn.vassistant.plugininterface.app.GlobalApp
+import cn.vassistant.plugininterface.app.GlobalLog
 import cn.vove7.common.datamanager.parse.model.ActionScope
-import cn.vove7.common.executor.CExecutorI
-import cn.vove7.common.view.finder.ViewFinder
+import cn.vove7.common.accessibility.component.PluginsService
+import cn.vove7.common.utils.ThreadPool
 import cn.vove7.vtp.app.AppInfo
+import cn.vove7.vtp.log.Vog
 
 /**
  *
@@ -114,23 +114,64 @@ abstract class AccessibilityApi : AccessibilityService(),
             Settings.Secure.putInt(context.contentResolver,
                     Settings.Secure.ACCESSIBILITY_ENABLED, 1)
         }
+
+
+        /**
+         * 注册放于静态变量，只用于通知事件。
+         */
+        private val pluginsServices = mutableSetOf<PluginsService>()
+
+        /**
+         * 注册无障碍插件服务
+         * @param e PluginsService
+         */
+        fun registerPlugin(e: PluginsService) {
+            synchronized(pluginsServices) {
+                pluginsServices.add(e)
+                e.bindService()
+            }
+        }
+
+        fun unregisterPlugin(e: PluginsService) {
+            synchronized(pluginsServices) {
+                pluginsServices.remove(e)
+                e.unBindServer()
+            }
+        }
+
+        const val ON_UI_UPDATE = 0
+        const val ON_APP_CHANGED = 1
+        /**
+         * 分发事件
+         * @param what Int
+         * @param data Any?
+         */
+        @SuppressWarnings("Unchecked")
+        fun dispatchPluginsEvent(what: Int, data: Any? = null) {
+            if (data == null) return
+            synchronized(pluginsServices) {
+                when (what) {
+                    ON_UI_UPDATE -> {
+                        pluginsServices.forEach {
+                            ThreadPool.runOnCachePool { it.onUiUpdate(data as AccessibilityNodeInfo) }
+                        }
+                    }
+                    ON_APP_CHANGED -> {
+                        Vog.d(this, "dispatchPluginsEvent ---> ON_APP_CHANGED")
+                        pluginsServices.forEach {
+                            ThreadPool.runOnCachePool { it.onAppChanged(data as ActionScope) }
+                        }
+                    }
+//                    ON_BIND -> {
+//                        pluginsServices.forEach {
+//                            thread { it.onBind() }
+//                        }
+//                    }
+                    else -> {
+                    }
+                }
+            }
+        }
     }
 
 }
-
-interface AccessibilityBridge {
-    /**
-     * 等待出现指定View  with /id/text/desc
-     * 特殊标记
-     */
-    fun waitForView(executor: CExecutorI, finder: ViewFinder)
-
-    fun getRootViewNode(): ViewNode?
-    fun waitForActivity(executor: CExecutorI, scope: ActionScope)
-    /**
-     * remove all notifier when was interrupted
-     */
-    fun removeAllNotifier(executor: CExecutorI)
-}
-
-

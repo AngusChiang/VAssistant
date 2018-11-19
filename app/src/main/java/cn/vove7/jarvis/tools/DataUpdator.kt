@@ -2,8 +2,8 @@ package cn.vove7.jarvis.tools
 
 import android.app.Activity
 import android.graphics.Color
-import cn.vove7.common.app.GlobalApp
-import cn.vove7.common.app.GlobalLog
+import cn.vassistant.plugininterface.app.GlobalApp
+import cn.vassistant.plugininterface.app.GlobalLog
 import cn.vove7.common.datamanager.AppAdInfo
 import cn.vove7.common.datamanager.DAO
 import cn.vove7.common.datamanager.DaoHelper
@@ -27,7 +27,6 @@ import cn.vove7.vtp.log.Vog
 import cn.vove7.vtp.sharedpreference.SpHelper
 import com.afollestad.materialdialogs.MaterialDialog
 import com.google.gson.reflect.TypeToken
-import kotlin.concurrent.thread
 
 /**
  * # DataUpdator

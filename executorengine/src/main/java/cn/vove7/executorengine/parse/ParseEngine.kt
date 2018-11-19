@@ -1,7 +1,7 @@
 package cn.vove7.executorengine.parse
 
 import cn.vove7.common.accessibility.AccessibilityApi
-import cn.vove7.common.app.GlobalApp
+import cn.vassistant.plugininterface.app.GlobalApp
 import cn.vove7.common.appbus.AppBus
 import cn.vove7.common.datamanager.DAO
 import cn.vove7.common.datamanager.greendao.ActionNodeDao
@@ -18,7 +18,6 @@ import cn.vove7.executorengine.exector.MultiExecutorEngine
 import cn.vove7.vtp.log.Vog
 import cn.vove7.vtp.sharedpreference.SpHelper
 import java.util.*
-import kotlin.concurrent.thread
 
 /**
  * # ParseEngine

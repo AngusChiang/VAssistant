@@ -7,7 +7,7 @@ import android.view.View
 import com.getkeepsafe.taptargetview.TapTargetView
 import android.graphics.Typeface
 import android.widget.TextView
-import cn.vove7.common.app.GlobalApp
+import cn.vassistant.plugininterface.app.GlobalApp
 import cn.vove7.common.utils.boundsInScreen
 import com.getkeepsafe.taptargetview.TapTarget
 import cn.vove7.jarvis.R

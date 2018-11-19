@@ -1,6 +1,6 @@
 package cn.vove7.jarvis.activities.base
 
-import android.app.Activity
+import  android.app.Activity
 import android.app.AlertDialog
 import android.content.ActivityNotFoundException
 import android.content.Context
@@ -15,14 +15,14 @@ import android.view.*
 import android.view.inputmethod.InputMethodManager
 import android.widget.TextView
 import cn.vove7.androlua.luabridge.LuaUtil
-import cn.vove7.common.app.GlobalLog
+import cn.vassistant.plugininterface.app.GlobalLog
 import cn.vove7.common.appbus.AppBus
 import cn.vove7.common.datamanager.parse.model.Action
 import cn.vove7.common.datamanager.parse.model.ActionParam
 import cn.vove7.common.executor.OnPrint
 import cn.vove7.common.interfaces.CodeEditorOperation
 import cn.vove7.common.view.editor.MultiSpan
-import cn.vove7.common.view.toast.ColorfulToast
+import cn.vassistant.plugininterface.toast.ColorfulToast
 import cn.vove7.executorengine.bridges.SystemBridge
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.tools.UriUtils
@@ -30,8 +30,6 @@ import cn.vove7.jarvis.view.EditorFunsHelper
 import cn.vove7.jarvis.view.dialog.ProgressTextDialog
 import cn.vove7.vtp.log.Vog
 import com.afollestad.materialdialogs.MaterialDialog
-import com.afollestad.materialdialogs.callbacks.onDismiss
-import com.afollestad.materialdialogs.customview.customView
 import com.afollestad.materialdialogs.input.input
 import kotlinx.android.synthetic.main.editor_tool_bar.*
 
@@ -55,6 +53,7 @@ abstract class CodeEditorActivity : AppCompatActivity() {
 
     abstract val scriptType: String
 
+
     inner class MyPrinter : OnPrint {
         override fun onPrint(l: Int, output: String) {
             val pair = when (l) {
@@ -69,8 +68,6 @@ abstract class CodeEditorActivity : AppCompatActivity() {
             synchronized(logList) {
                 logList.add(i.spanStr)
                 logList.add(v.spanStr)
-            }
-            Handler(Looper.getMainLooper()).post {
                 logDialog?.append(i.spanStr)
                 logDialog?.append(v.spanStr)
             }
@@ -155,7 +152,6 @@ abstract class CodeEditorActivity : AppCompatActivity() {
             return
         } else super.onBackPressed()
     }
-
 
     private val logList = mutableListOf<SpannableStringBuilder>()
 
@@ -248,6 +244,11 @@ abstract class CodeEditorActivity : AppCompatActivity() {
                 .onDismiss {
                     logDialog = null
                 }
+        synchronized(logList) {
+            logList.forEach {
+                logDialog?.append(it)
+            }
+        }
     }
 
 

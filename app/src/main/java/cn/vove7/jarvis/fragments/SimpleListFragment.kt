@@ -28,7 +28,21 @@ abstract class SimpleListFragment<DataType> : VListFragment() {
     /**
      * 转类型
      */
-    abstract fun transData(nodes: List<DataType>): List<ViewModel>
+    open fun transData(nodes: List<DataType>): List<ViewModel> {
+        val list = mutableListOf<ViewModel>()
+        nodes.forEach {
+            list.add(unification(it))
+        }
+        return list
+    }
+
+    /**
+     * 统一化  DataType -> ViewModel
+     * @param data DataType
+     * @return ViewModel
+     */
+    open fun unification(data: DataType): ViewModel = ViewModel("")
+
 
     fun postLoadResult(allLoad: Boolean) {
         handler.sendEmptyMessage(if (allLoad) 1 else 0)

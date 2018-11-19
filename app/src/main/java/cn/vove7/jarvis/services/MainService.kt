@@ -6,13 +6,11 @@ import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
 import android.os.Binder
-import android.os.Handler
-import android.os.HandlerThread
 import android.os.IBinder
 import cn.vove7.androlua.luautils.LuaContext
 import cn.vove7.common.accessibility.AccessibilityApi
-import cn.vove7.common.app.GlobalApp
-import cn.vove7.common.app.GlobalLog
+import cn.vassistant.plugininterface.app.GlobalApp
+import cn.vassistant.plugininterface.app.GlobalLog
 import cn.vove7.common.appbus.AppBus
 import cn.vove7.common.appbus.AppBus.ORDER_BEGIN_SCREEN_PICKER
 import cn.vove7.common.appbus.AppBus.EVENT_FORCE_OFFLINE
@@ -27,10 +25,9 @@ import cn.vove7.common.appbus.AppBus.ORDER_STOP_RECO
 import cn.vove7.common.appbus.AppBus.ORDER_STOP_VOICE_WAKEUP_WITHOUT_NOTIFY
 import cn.vove7.common.appbus.SpeechAction
 import cn.vove7.common.appbus.VoiceData
-import cn.vove7.common.bridges.ChoiceData
-import cn.vove7.common.bridges.ServiceBridge
-import cn.vove7.common.bridges.ShowAlertEvent
-import cn.vove7.common.bridges.ShowDialogEvent
+import cn.vassistant.plugininterface.bridges.ChoiceData
+import cn.vassistant.plugininterface.bridges.ServiceBridge
+import cn.vassistant.plugininterface.bridges.ShowDialogEvent
 import cn.vove7.common.datamanager.history.CommandHistory
 import cn.vove7.common.datamanager.parse.model.Action
 import cn.vove7.common.executor.CExecutorI
@@ -173,33 +170,30 @@ class MainService : BusService(),
      */
     private var alertDialog: AlertDialog? = null
 
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    override fun showAlert(r: ShowAlertEvent) {
-        messengerAction = r.action
-        alertDialog = AlertDialog.Builder(this)
-                .setTitle(r.title)
-                .setMessage(r.msg)
-                .setCancelable(false)
-                .setPositiveButton(R.string.text_continue) { _, _ ->
-                    r.action.responseResult = true
-                    notifyAlertResult()
-                }.setNegativeButton(R.string.text_cancel) { _, _ ->
-                    r.action.responseResult = false
-                    notifyAlertResult()
-                }.create()
-        try {
-            DialogUtil.setFloat(alertDialog!!)
-            alertDialog?.show()
-            //语音控制
-            if (AppConfig.voiceControlDialog) {
-                voiceMode = MODE_ALERT
-                speechRecoService.startRecog()
+    override fun showAlert(title: String?, msg: String?) {
+        runOnUi {
+            alertDialog = AlertDialog.Builder(this)
+                    .setTitle(title)
+                    .setMessage(msg)
+                    .setCancelable(false)
+                    .setPositiveButton(R.string.text_continue) { _, _ ->
+                        notifyAlertResult(true)
+                    }.setNegativeButton(R.string.text_cancel) { _, _ ->
+                        notifyAlertResult(false)
+                    }.create()
+            try {
+                DialogUtil.setFloat(alertDialog!!)
+                alertDialog?.show()
+                //语音控制
+                if (AppConfig.voiceControlDialog) {
+                    voiceMode = MODE_ALERT
+                    speechRecoService.startRecog()
+                }
+            } catch (e: Exception) {
+                GlobalLog.err(e)
+                onRequestPermission(RequestPermission("悬浮窗权限"))
+                notifyAlertResult(false)
             }
-        } catch (e: Exception) {
-            GlobalLog.err(e)
-            onRequestPermission(RequestPermission("悬浮窗权限"))
-            r.action.responseResult = false
-            notifyAlertResult()
         }
     }
 
@@ -224,12 +218,12 @@ class MainService : BusService(),
      * Alert同步
      * 停止语音
      */
-    private fun notifyAlertResult() {
+    private fun notifyAlertResult(r: Boolean) {
         if (AppConfig.voiceControlDialog) {
             speechRecoService.cancelRecog()
         }
         voiceMode = MODE_VOICE
-        cExecutor.notifySync()
+        cExecutor.notifyAlertResult(r)
     }
 
     /**
@@ -249,18 +243,19 @@ class MainService : BusService(),
     /**
      * 选择对话框
      */
-    @Subscribe(threadMode = ThreadMode.MAIN)
+//    @Subscribe(threadMode = ThreadMode.MAIN)
     override fun showChoiceDialog(event: ShowDialogEvent) {
-        messengerAction = event.action
-        choiceDialog = when (event.whichDialog) {
-            ShowDialogEvent.WHICH_SINGLE -> {
-                SingleChoiceDialog(this, event.askTitle, event.choiceDataSet, this)
-            }
-            ShowDialogEvent.WHICH_MULTI -> {
-                MultiChoiceDialog(this, event.askTitle, event.choiceDataSet, this)
-            }
-            else -> return
-        }.show()
+        runOnUi {
+            choiceDialog = when (event.whichDialog) {
+                ShowDialogEvent.WHICH_SINGLE -> {
+                    SingleChoiceDialog(this, event.askTitle, event.choiceDataSet, this)
+                }
+                ShowDialogEvent.WHICH_MULTI -> {
+                    MultiChoiceDialog(this, event.askTitle, event.choiceDataSet, this)
+                }
+                else -> null
+            }?.show()
+        }
     }
 
     /**
@@ -268,11 +263,8 @@ class MainService : BusService(),
      */
     override fun onSingleSelect(pos: Int, data: ChoiceData?, msg: String) {
         Vog.d(this, "单选回调 $data")
-        messengerAction?.responseResult = data != null
-        messengerAction?.responseBundle?.putSerializable("data", data)
-        messengerAction?.responseBundle?.putString("errMsg", msg)
         hideDialog()
-        cExecutor.notifySync()
+        cExecutor.onSingleChoiceResult(pos, data)
     }
 
 
@@ -291,9 +283,7 @@ class MainService : BusService(),
      * 中途获取参数
      * @param action 执行动作
      */
-    override fun getVoiceParam(action: Action) {
-//        toast.showShort(action.param?.askText ?: "???")
-        messengerAction = action
+    override fun getVoiceParam() {
         voiceMode = MODE_GET_PARAM
         speechRecoService.startRecog()
     }
@@ -570,7 +560,8 @@ class MainService : BusService(),
                         Vog.i(this, "instance ---> null")
                     }
                     null
-                } else field
+                } else if (field?.speechEngineLoaded == true) field
+                else null
             }
 
         val recoIsListening: Boolean
@@ -765,7 +756,6 @@ class MainService : BusService(),
                     resumeMusicIf()
                     if (voiceResult == "") {//失败
                         //询问重新
-                        messengerAction?.responseResult = false
                         cExecutor.onGetVoiceParam(null)
                     } else {//通知
                         cExecutor.onGetVoiceParam(voiceResult)

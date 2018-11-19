@@ -9,10 +9,10 @@ import android.os.Handler
 import android.provider.Settings
 import android.view.View
 import android.widget.TextView
-import cn.vove7.common.app.GlobalLog
+import cn.vassistant.plugininterface.app.GlobalLog
 import cn.vove7.common.appbus.AppBus
 import cn.vove7.common.appbus.SpeechAction
-import cn.vove7.common.bridges.RootHelper
+import cn.vassistant.plugininterface.bridges.RootHelper
 import cn.vove7.common.utils.ThreadPool
 import cn.vove7.executorengine.bridges.SystemBridge
 import cn.vove7.jarvis.R
@@ -29,7 +29,6 @@ import cn.vove7.vtp.sharedpreference.SpHelper
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.customview.customView
 import kotlinx.android.synthetic.main.activity_expandable_settings.*
-import kotlin.concurrent.thread
 
 /**
  *

@@ -5,7 +5,7 @@ import android.content.Context
 import android.content.pm.PackageManager
 import android.media.AudioManager
 import android.support.v4.app.ActivityCompat
-import cn.vove7.common.app.GlobalApp
+import cn.vassistant.plugininterface.app.GlobalApp
 import cn.vove7.jarvis.tools.AppConfig
 import cn.vove7.vtp.log.Vog
 

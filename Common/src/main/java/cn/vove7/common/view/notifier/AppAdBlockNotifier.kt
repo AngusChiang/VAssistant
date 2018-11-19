@@ -4,8 +4,6 @@ import cn.vove7.common.accessibility.viewnode.ViewNode
 import cn.vove7.common.view.finder.ViewFinder
 import cn.vove7.vtp.app.AppInfo
 import cn.vove7.vtp.log.Vog
-import java.text.SimpleDateFormat
-import java.util.*
 
 /**
  * # AppAdBlockNotifier

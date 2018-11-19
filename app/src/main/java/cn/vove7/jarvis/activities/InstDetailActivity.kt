@@ -12,8 +12,8 @@ import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.TextView
-import cn.vove7.common.app.GlobalApp
-import cn.vove7.common.app.GlobalLog
+import cn.vassistant.plugininterface.app.GlobalApp
+import cn.vassistant.plugininterface.app.GlobalLog
 import cn.vove7.common.appbus.AppBus
 import cn.vove7.common.datamanager.DAO
 import cn.vove7.common.datamanager.DaoHelper
@@ -30,11 +30,9 @@ import cn.vove7.common.netacc.model.ResponseMessage
 import cn.vove7.common.utils.RegUtils
 import cn.vove7.common.utils.TextHelper
 import cn.vove7.common.utils.ThreadPool.runOnPool
-import cn.vove7.common.view.toast.ColorfulToast
 import cn.vove7.executorengine.bridges.SystemBridge
 import cn.vove7.executorengine.helper.AdvanAppHelper
 import cn.vove7.executorengine.parse.ParseEngine
-import cn.vove7.jarvis.BuildConfig
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.adapters.ExecuteQueueAdapter
 import cn.vove7.jarvis.adapters.InstSettingListAdapter
@@ -55,7 +53,6 @@ import com.google.gson.reflect.TypeToken
 import io.github.kbiakov.codeview.adapters.Options
 import kotlinx.android.synthetic.main.activity_inst_detail.*
 import java.util.*
-import kotlin.concurrent.thread
 
 /**
  * # InstDetailActivity

@@ -1,7 +1,7 @@
 package cn.vove7.common.executor
 
 import cn.vove7.common.accessibility.viewnode.ViewNode
-import cn.vove7.common.bridges.ChoiceData
+import cn.vassistant.plugininterface.bridges.ChoiceData
 import cn.vove7.common.datamanager.parse.model.Action
 import cn.vove7.common.datamanager.parse.model.ActionScope
 import cn.vove7.common.interfaces.SpeakCallback
@@ -28,12 +28,16 @@ interface CExecutorI : ViewShowListener, ActivityShowListener, RuntimeArgs, Spea
     fun checkAccessibilityService(jump: Boolean = true): Boolean
 
     fun alert(title: String, msg: String): Boolean
+
+    fun notifyAlertResult(result: Boolean)
+
     /**
      * 等待单选结果
      * @return if 调用成功 ChoiceData else null
      */
     fun waitForSingleChoice(askTitle: String, choiceData: List<ChoiceData>): ChoiceData?
 
+    fun onSingleChoiceResult(index: Int, data: ChoiceData?)
     //Api使用
     fun singleChoiceDialog(askTitle: String, choiceData: Array<String>): Int?
 //    fun multiChoiceDialog(askTitle: String, choiceData: Array<String>)

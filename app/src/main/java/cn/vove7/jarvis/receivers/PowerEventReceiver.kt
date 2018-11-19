@@ -7,7 +7,6 @@ import android.os.BatteryManager
 import cn.vove7.common.accessibility.AccessibilityApi
 import cn.vove7.common.appbus.AppBus
 import cn.vove7.common.appbus.SpeechAction
-import cn.vove7.common.bridges.RootHelper
 import cn.vove7.executorengine.bridges.SystemBridge
 import cn.vove7.jarvis.plugins.AdKillerService
 import cn.vove7.jarvis.plugins.VoiceWakeupStrategy
@@ -15,7 +14,6 @@ import cn.vove7.jarvis.services.MainService
 import cn.vove7.jarvis.speech.WakeupI
 import cn.vove7.jarvis.tools.AppConfig
 import cn.vove7.vtp.log.Vog
-import kotlin.concurrent.thread
 
 /**
  * # PowerEventReceiver
@@ -122,7 +120,7 @@ object PowerEventReceiver : DyBCReceiver(), OnPowerEvent {
         }
         //充电自动开启唤醒
         if (WakeupI.instance?.opened == false) {//开启 并 已自动关闭
-            Vog.d(this, "onReceive ---> 正在充电 开启语语音唤醒")
+            Vog.d(this, "onReceive ---> 正在充电 开启语音唤醒")
             //开启了无障碍
             if (VoiceWakeupStrategy.canOpenRecord())
                 AppBus.postSpeechAction(SpeechAction.ActionCode.ACTION_START_WAKEUP_WITHOUT_SWITCH)//不打开语音唤醒开关
@@ -135,10 +133,10 @@ object PowerEventReceiver : DyBCReceiver(), OnPowerEvent {
     }
 
     override fun onDischarging() {
+        if (!AppConfig.isAutoVoiceWakeupCharging) return
         if (!AppConfig.voiceWakeup) {//未开启
             //关闭
             Vog.d(this, "onReceive ---> 充电结束 语音唤醒关闭")
-
             AppBus.postSpeechAction(SpeechAction.ActionCode.ACTION_STOP_WAKEUP_WITHOUT_SWITCH)
         } else {//开启
             //开启定时器
