@@ -12,14 +12,14 @@ import android.widget.RelativeLayout
 import android.widget.TextView
 import cn.vove7.common.accessibility.AccessibilityApi
 import cn.vove7.common.accessibility.viewnode.ViewNode
-import cn.vassistant.plugininterface.app.GlobalApp
+import cn.vove7.common.app.GlobalApp
 import cn.vove7.jarvis.tools.baiduaip.BaiduAipHelper
 import cn.vove7.common.utils.LooperHelper
 import cn.vove7.common.utils.ThreadPool.runOnCachePool
 import cn.vove7.common.utils.runOnNewHandlerThread
 import cn.vove7.common.utils.runOnUi
 import cn.vove7.common.view.finder.ScreenTextFinder
-import cn.vassistant.plugininterface.toast.ColorfulToast
+import cn.vove7.common.view.toast.ColorfulToast
 import cn.vove7.executorengine.bridges.SystemBridge
 import cn.vove7.jarvis.BuildConfig
 import cn.vove7.jarvis.R

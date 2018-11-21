@@ -12,7 +12,7 @@ import cn.vove7.vtp.log.Vog
 import android.content.Intent
 import android.content.pm.ApplicationInfo
 import android.os.HandlerThread
-import cn.vassistant.plugininterface.app.GlobalApp
+import cn.vove7.common.app.GlobalApp
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -37,15 +37,15 @@ fun runOnUi(action: () -> Unit) {
 }
 
 fun runOnNewHandlerThread(name: String = "anonymous", autoQuit: Boolean = true,
-                          run: () -> Unit): HandlerThread {
+                          delay: Long = 0, run: () -> Unit): HandlerThread {
     return HandlerThread(name).apply {
         start()
         Vog.d(this, "runOnNewHandlerThread ---> $name")
-        Handler(looper).post {
+        Handler(looper).postDelayed({
             run.invoke()
             if (autoQuit)
                 quitSafely()
-        }
+        }, delay)
     }
 }
 

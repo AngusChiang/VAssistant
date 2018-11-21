@@ -69,7 +69,7 @@ open class CommonRecogParams(context: Context) {
             map[SpeechConstant.SOUND_END] = R.raw.bdspeech_speech_end
             map[SpeechConstant.SOUND_SUCCESS] = R.raw.bdspeech_recognition_success
             map[SpeechConstant.SOUND_ERROR] = R.raw.bdspeech_recognition_error
-            map[SpeechConstant.SOUND_CANCEL] = R.raw.bdspeech_recognition_cancel
+            map[SpeechConstant.SOUND_CANCEL] = R.raw.recog_cancel
         }
 
         if (sp.getBoolean("_outfile", false)) { // 保存录音文件

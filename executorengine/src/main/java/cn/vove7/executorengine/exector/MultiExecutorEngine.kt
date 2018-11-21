@@ -2,8 +2,8 @@ package cn.vove7.executorengine.exector
 
 import cn.vove7.androlua.LuaHelper
 import cn.vove7.common.BridgeManager
-import cn.vassistant.plugininterface.app.GlobalApp
-import cn.vassistant.plugininterface.app.GlobalLog
+import cn.vove7.common.app.GlobalApp
+import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.bridges.GlobalActionExecutor
 import cn.vove7.common.datamanager.parse.model.Action
 import cn.vove7.common.executor.OnPrint

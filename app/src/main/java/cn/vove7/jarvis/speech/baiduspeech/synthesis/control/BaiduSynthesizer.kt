@@ -6,13 +6,14 @@ import android.os.Handler
 import android.os.HandlerThread
 import android.os.Message
 import android.util.Pair
-import cn.vassistant.plugininterface.app.GlobalApp
-import cn.vassistant.plugininterface.app.GlobalLog
+import cn.vove7.common.app.GlobalApp
+import cn.vove7.common.app.GlobalLog
 import cn.vove7.jarvis.BuildConfig
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.services.SpeechSynService
 import cn.vove7.jarvis.speech.SpeechSynthesizerI
 import cn.vove7.jarvis.speech.baiduspeech.synthesis.util.OfflineResource
+import cn.vove7.jarvis.tools.AppConfig
 import cn.vove7.vtp.log.Vog
 import cn.vove7.vtp.sharedpreference.SpHelper
 import com.baidu.tts.chainofresponsibility.logger.LoggerProxy
@@ -197,6 +198,7 @@ class BaiduSynthesizer(val lis: SpeechSynthesizerListener) : SpeechSynthesizerI 
     }
 
     override fun reloadStreamType() {
+        val currentStreamType = AppConfig.currentStreamType
         Vog.d(this, "reloadStreamType ---> $currentStreamType")
         setAudioStream(currentStreamType)
     }

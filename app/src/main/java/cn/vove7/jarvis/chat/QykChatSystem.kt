@@ -1,6 +1,6 @@
 package cn.vove7.jarvis.chat
 
-import cn.vassistant.plugininterface.app.GlobalLog
+import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.bridges.HttpBridge
 import cn.vove7.common.netacc.NetHelper
 import cn.vove7.vtp.log.Vog

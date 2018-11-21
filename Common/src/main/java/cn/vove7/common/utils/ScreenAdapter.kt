@@ -2,7 +2,7 @@ package cn.vove7.common.utils
 
 import android.graphics.Point
 import android.util.Pair
-import cn.vassistant.plugininterface.bridges.SystemOperation
+import cn.vove7.common.bridges.SystemOperation
 
 /**
  * # ScreenAdapter

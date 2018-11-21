@@ -5,7 +5,7 @@ import android.bluetooth.BluetoothProfile
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
-import cn.vassistant.plugininterface.app.GlobalApp
+import cn.vove7.common.app.GlobalApp
 import android.bluetooth.BluetoothDevice
 import cn.vove7.jarvis.services.MainService
 import cn.vove7.vtp.log.Vog

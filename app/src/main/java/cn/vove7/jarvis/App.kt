@@ -8,7 +8,7 @@ import android.util.Log
 import cn.vove7.androlua.LuaApp
 import cn.vove7.common.appbus.AppBus
 import cn.vove7.common.appbus.MessageEvent
-import cn.vassistant.plugininterface.bridges.RootHelper
+import cn.vove7.common.bridges.RootHelper
 import cn.vove7.common.utils.ThreadPool.runOnPool
 import cn.vove7.common.utils.runOnNewHandlerThread
 import cn.vove7.jarvis.droidplugin.RePluginManager
@@ -55,7 +55,7 @@ class App : LuaApp() {
                         RootHelper.openSelfAccessService()
                     }
                 }
-                //插件自启
+                //插件自启 fixme
                 RePluginManager().launchWithApp(this@App)
                 Vog.d(this, "onCreate ---> 结束 ${System.currentTimeMillis() / 1000}")
 

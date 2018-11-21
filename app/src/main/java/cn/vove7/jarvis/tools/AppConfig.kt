@@ -3,8 +3,8 @@ package cn.vove7.jarvis.tools
 import android.app.Activity
 import android.content.Context
 import android.os.Build
-import cn.vassistant.plugininterface.app.GlobalApp
-import cn.vassistant.plugininterface.app.GlobalLog
+import cn.vove7.common.app.GlobalApp
+import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.model.UserInfo
 import cn.vove7.common.netacc.ApiUrls
 import cn.vove7.common.netacc.NetHelper
@@ -17,10 +17,12 @@ import com.afollestad.materialdialogs.MaterialDialog
 import com.google.gson.Gson
 import org.jsoup.Jsoup
 import android.content.Intent
+import android.media.AudioManager
 import android.net.Uri
 import cn.vove7.common.utils.ThreadPool.runOnCachePool
 import cn.vove7.common.utils.ThreadPool.runOnPool
 import cn.vove7.common.utils.secure.SecuritySharedPreference
+import cn.vove7.executorengine.bridges.SystemBridge
 import com.afollestad.materialdialogs.checkbox.checkBoxPrompt
 import java.text.SimpleDateFormat
 import java.util.*
@@ -84,6 +86,25 @@ object AppConfig {
     //    var disableAdKillerOnLowBattery = true//低电量关闭去广告
     var disableAccessibilityOnLowBattery = true//低电量关闭无障碍
     var translateLang = "auto"//翻译主语言
+    var voiceSynFeedback = true
+
+    val streamTypeArray = arrayOf(
+            AudioManager.STREAM_MUSIC
+            , AudioManager.STREAM_RING
+            , AudioManager.STREAM_NOTIFICATION
+    )
+
+    val currentStreamType: Int
+        get() {
+            val i = AppConfig.synStreamIndex.let { if (it in 0..2) it else 0 }
+            Vog.d(this, "currentStreamIndex ---> $i")
+            return streamTypeArray[i]
+        }
+
+    /**
+     * 当前合成通道音量
+     */
+    val currentStreamVolume get() = SystemBridge.getVolumeByType(AppConfig.currentStreamType)
 
     fun init() {
         checkUserInfo()
@@ -190,6 +211,7 @@ object AppConfig {
 //        disableAdKillerOnLowBattery = getBooleanAndInit(R.string.key_remove_ad_power_saving_mode, true)
         disableAccessibilityOnLowBattery = getBooleanAndInit(R.string.key_accessibility_service_power_saving_mode, true)
         wakeUpWithHeadsetHook = getBooleanAndInit(R.string.key_wakeup_with_headsethook, wakeUpWithHeadsetHook)
+        voiceSynFeedback = getBooleanAndInit(R.string.key_voice_syn_feedback, voiceSynFeedback)
 
         finishWord = sp.getString(R.string.key_finish_word)
 //        onlyCloudServiceParse = getBooleanAndInit(R.string.key_only_cloud_service_parse, false)

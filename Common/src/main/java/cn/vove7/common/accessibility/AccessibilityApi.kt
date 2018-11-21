@@ -7,8 +7,8 @@ import android.provider.Settings
 import android.support.v4.view.accessibility.AccessibilityNodeInfoCompat.FOCUS_INPUT
 import android.view.accessibility.AccessibilityNodeInfo
 import cn.vove7.common.accessibility.viewnode.ViewNode
-import cn.vassistant.plugininterface.app.GlobalApp
-import cn.vassistant.plugininterface.app.GlobalLog
+import cn.vove7.common.app.GlobalApp
+import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.datamanager.parse.model.ActionScope
 import cn.vove7.common.accessibility.component.PluginsService
 import cn.vove7.common.utils.ThreadPool

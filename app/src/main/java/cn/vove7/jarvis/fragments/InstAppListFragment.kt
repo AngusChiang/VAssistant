@@ -2,7 +2,7 @@ package cn.vove7.jarvis.fragments
 
 import android.content.Intent
 import android.view.View
-import cn.vassistant.plugininterface.app.GlobalApp
+import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.datamanager.DAO
 import cn.vove7.common.datamanager.parse.model.ActionScope
 import cn.vove7.common.datamanager.parse.statusmap.ActionNode.NODE_SCOPE_IN_APP

@@ -3,7 +3,7 @@ package cn.vove7.jarvis.plugins
 import android.view.accessibility.AccessibilityNodeInfo
 import cn.vove7.common.accessibility.AccessibilityApi
 import cn.vove7.common.accessibility.component.AccPluginsService
-import cn.vassistant.plugininterface.app.GlobalLog
+import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.datamanager.AppAdInfo
 import cn.vove7.common.datamanager.DAO
 import cn.vove7.common.datamanager.greendao.AppAdInfoDao

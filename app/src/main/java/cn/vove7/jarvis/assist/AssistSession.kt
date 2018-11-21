@@ -18,7 +18,7 @@ import cn.vove7.common.appbus.AppBus.EVENT_ERROR_RECO
 import cn.vove7.common.appbus.AppBus.EVENT_FINISH_RECO
 import cn.vove7.common.appbus.AppBus.EVENT_HIDE_FLOAT
 
-import cn.vassistant.plugininterface.bridges.UtilBridge
+import cn.vove7.common.bridges.UtilBridge
 import cn.vove7.jarvis.services.MainService
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.adapters.SimpleListAdapter
@@ -27,7 +27,7 @@ import cn.vove7.jarvis.view.BottomSheetController
 import cn.vove7.vtp.log.Vog
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
-import cn.vassistant.plugininterface.app.GlobalApp
+import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.appbus.AppBus.ORDER_BEGIN_SCREEN_PICKER
 import cn.vove7.jarvis.tools.baiduaip.BaiduAipHelper
 import cn.vove7.common.model.RequestPermission

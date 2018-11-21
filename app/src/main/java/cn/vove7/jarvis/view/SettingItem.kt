@@ -1,7 +1,7 @@
 package cn.vove7.jarvis.view
 
 import android.support.annotation.ArrayRes
-import cn.vassistant.plugininterface.app.GlobalApp
+import cn.vove7.common.app.GlobalApp
 import cn.vove7.jarvis.view.tools.SettingItemHelper
 
 /**

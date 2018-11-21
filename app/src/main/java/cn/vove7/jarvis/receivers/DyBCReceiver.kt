@@ -2,7 +2,7 @@ package cn.vove7.jarvis.receivers
 
 import android.content.BroadcastReceiver
 import android.content.IntentFilter
-import cn.vassistant.plugininterface.app.GlobalApp
+import cn.vove7.common.app.GlobalApp
 
 /**
  * # DyBCReceiver

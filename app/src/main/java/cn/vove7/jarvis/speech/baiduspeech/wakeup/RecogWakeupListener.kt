@@ -2,7 +2,7 @@ package cn.vove7.jarvis.speech.baiduspeech.wakeup
 
 import android.os.Handler
 import android.os.Message
-import cn.vassistant.plugininterface.app.GlobalApp
+import cn.vove7.common.app.GlobalApp
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.speech.baiduspeech.recognition.model.IStatus
 import cn.vove7.jarvis.tools.AppConfig

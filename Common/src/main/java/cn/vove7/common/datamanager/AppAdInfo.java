@@ -12,7 +12,7 @@ import java.util.Arrays;
 import java.util.Objects;
 
 import cn.vove7.common.BuildConfig;
-import cn.vassistant.plugininterface.app.GlobalLog;
+import cn.vove7.common.app.GlobalLog;
 import cn.vove7.common.datamanager.parse.DataFrom;
 import cn.vove7.common.interfaces.Markable;
 import cn.vove7.common.model.UserInfo;

@@ -1,8 +1,8 @@
 package cn.vove7.jarvis.speech.baiduspeech.recognition.listener
 
 import android.os.Handler
-import cn.vassistant.plugininterface.app.GlobalApp
-import cn.vassistant.plugininterface.app.GlobalLog
+import cn.vove7.common.app.GlobalApp
+import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.appbus.AppBus
 import cn.vove7.common.appbus.VoiceData
 import cn.vove7.common.model.RequestPermission

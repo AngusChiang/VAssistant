@@ -1,7 +1,7 @@
 package cn.vove7.common.executor
 
 import cn.vove7.common.accessibility.viewnode.ViewNode
-import cn.vassistant.plugininterface.bridges.ChoiceData
+import cn.vove7.common.bridges.ChoiceData
 import cn.vove7.common.datamanager.parse.model.Action
 import cn.vove7.common.datamanager.parse.model.ActionScope
 import cn.vove7.common.interfaces.SpeakCallback

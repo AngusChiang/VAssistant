@@ -24,7 +24,7 @@ import java.util.Arrays;
 import java.util.LinkedHashMap;
 
 import cn.vove7.common.BridgeManager;
-import cn.vassistant.plugininterface.app.GlobalApp;
+import cn.vove7.common.app.GlobalApp;
 import cn.vove7.rhino.api.RhinoApi;
 import cn.vove7.rhino.common.AndroidContextFactory;
 import cn.vove7.rhino.common.GcCollector;

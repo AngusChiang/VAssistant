@@ -9,10 +9,10 @@ import android.os.Handler
 import android.provider.Settings
 import android.view.View
 import android.widget.TextView
-import cn.vassistant.plugininterface.app.GlobalLog
+import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.appbus.AppBus
 import cn.vove7.common.appbus.SpeechAction
-import cn.vassistant.plugininterface.bridges.RootHelper
+import cn.vove7.common.bridges.RootHelper
 import cn.vove7.common.utils.ThreadPool
 import cn.vove7.executorengine.bridges.SystemBridge
 import cn.vove7.jarvis.R
@@ -97,6 +97,7 @@ class SettingsActivity : ReturnableActivity() {
                     }*/
             )),
             SettingGroupItem(R.color.google_green, "反馈", childItems = listOf(
+                    SwitchItem(title = "提示音", summary = "语音识别提示音", keyId = R.string.key_voice_syn_feedback, defaultValue = { AppConfig.voiceSynFeedback }),
                     CheckBoxItem(R.string.text_vibrate_reco_begin,
                             keyId = R.string.key_vibrate_reco_begin, defaultValue = { true }),
                     CheckBoxItem(title = "执行失败", keyId = R.string.key_exec_failed_voice_feedback,

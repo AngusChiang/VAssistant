@@ -2,7 +2,7 @@ package cn.vove7.common.netacc.model
 
 import android.annotation.SuppressLint
 import android.provider.Settings
-import cn.vassistant.plugininterface.app.GlobalApp
+import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.model.UserInfo
 import cn.vove7.common.netacc.tool.SecureHelper.signData
 import cn.vove7.common.utils.GsonHelper

@@ -3,7 +3,7 @@ package cn.vove7.jarvis.fragments
 import android.os.Bundle
 import android.view.View
 import android.widget.CompoundButton
-import cn.vassistant.plugininterface.app.GlobalApp
+import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.datamanager.DAO
 import cn.vove7.common.datamanager.executor.entity.MarkedData
 import cn.vove7.common.datamanager.executor.entity.MarkedData.MARKED_TYPE_APP

@@ -23,10 +23,11 @@ object TextDateParser {
      * "八天后"
      * )
      * @param s String
-     * @return Calendar
+     * @return Calendar? 解析失败返回空
      */
-    fun parseDateText(s: String): Calendar {
-        return Calendar.getInstance().apply {
+    fun parseDateText(s: String): Calendar? {
+        var haveTime = false//文字包含日期时间信息
+        val c = Calendar.getInstance().apply {
             //清空
             set(Calendar.MILLISECOND, 0)
             set(Calendar.MINUTE, 0)
@@ -34,17 +35,21 @@ object TextDateParser {
             set(Calendar.HOUR_OF_DAY, 8)//默认12:00
             val md = parseMonthAndDay(s)
             if (md != null) {
+                haveTime = true
                 set(Calendar.MONTH, md.first)
                 set(Calendar.DAY_OF_MONTH, md.second)
             } else {
-                val dd = parseOffsetDay(s)
-                add(Calendar.DAY_OF_MONTH, dd)
+                parseOffsetDay(s)?.also {
+                    haveTime = true
+                    add(Calendar.DAY_OF_MONTH, it)
+                }
             }
             parseHourAndTime(s).also { ht ->
                 //时分
                 if (ht != null) {
+                    haveTime = true
                     val h = ht.first
-                    //region a
+                    //region 调整时间
 //            if (h < 12) {
 //                Calendar.getInstance().also { c ->
 //                    if (get(Calendar.DAY_OF_MONTH) == c.get(Calendar.DAY_OF_MONTH) && get(Calendar.MONTH) == c.get(Calendar.MONTH)) {
@@ -62,6 +67,7 @@ object TextDateParser {
                     val c = Calendar.getInstance()
                     val offHt = parseOffsetHourTime(s) //与parseHourAndTime分开好处理
                     if (offHt != null) {
+                        haveTime = true
                         set(Calendar.HOUR_OF_DAY, offHt.first + c.get(Calendar.HOUR_OF_DAY))
                         set(Calendar.MINUTE, offHt.second + c.get(Calendar.MINUTE))
                     } /*else {// 没指定时分默认当前时分
@@ -71,6 +77,7 @@ object TextDateParser {
                 }
             }
         }
+        return if (haveTime) c else null
     }
 
     /**
@@ -112,7 +119,7 @@ object TextDateParser {
      * @param s String
      * @return Int
      */
-    private fun parseOffsetDay(s: String): Int {
+    private fun parseOffsetDay(s: String): Int? {
         mapOf(
                 Pair("明天", 1),
                 Pair("大后天", 3),//
@@ -144,7 +151,7 @@ object TextDateParser {
                 return toNum(it[1])
             }
         }
-        return 0// default today
+        return null// default today
     }
 
     /**
@@ -156,7 +163,7 @@ object TextDateParser {
             else it - 1
         }
 
-    //大写转小写
+    //数字大写转小写
     private fun u2l(s: Char): Int {
         return if (s == '两') 2
         else arrayOf('零', '一', '二', '三', '四', '五', '六', '七', '八', '九', '十')
@@ -180,7 +187,7 @@ object TextDateParser {
     }
 
     /**
-     * 万以下 中文大写转int
+     * 中文大写转int
      *
      * @param s String
      */
@@ -213,6 +220,10 @@ object TextDateParser {
      * 获得时分
      * prefix: 早上(8:00)|上午|中午(12:00)|下午|晚上|凌晨
      * or x点|x点半|x点xx(分)?
+     * 中午 默认12:00
+     * 下午 默认14:00
+     * 晚上 默认19:00
+     * 凌晨 默认05:00
      *
      * @param s String
      * @return Pair<Int, Int> default:null
@@ -250,17 +261,21 @@ object TextDateParser {
                     haveResult = true
                 }
             }
-        if (!haveResult && s.contains("中午")) {
-            return Pair(12, 0)
+        return if (!haveResult) {
+            when {
+                s.contains("中午") -> Pair(12, 0)
+                s.contains("下午") -> Pair(14, 0)
+                s.contains("晚上") -> Pair(19, 0)
+                s.contains("凌晨") -> Pair(5, 0)
+                else -> null//无结果 无(上下午)匹配
+            }
+        } else {
+            if (s.contains("(下午|晚上)".toRegex())) {
+                if (hour < 12) hour += 12
+            }
+            //else 早上|上午|中午|凌晨
+            Pair(hour, minute)//default
         }
-        if (!haveResult) {//无匹配 parseOffset
-            return null
-        }
-        if (s.contains("(下午|晚上)".toRegex())) {
-            if (hour < 12) hour += 12
-        }
-        //else 早上|上午|中午|凌晨
-        return Pair(hour, minute)//default
     }
 
 

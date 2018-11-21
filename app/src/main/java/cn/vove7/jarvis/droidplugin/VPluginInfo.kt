@@ -1,8 +1,8 @@
 package cn.vove7.jarvis.droidplugin
 
 import android.content.pm.PackageManager
-import cn.vassistant.plugininterface.app.GlobalApp
-import cn.vassistant.plugininterface.app.GlobalLog
+import cn.vove7.common.app.GlobalApp
+import cn.vove7.common.app.GlobalLog
 import cn.vove7.vtp.log.Vog
 import net.dongliu.apk.parser.ApkFile
 
@@ -11,6 +11,7 @@ import net.dongliu.apk.parser.ApkFile
  * 插件信息基类
  * 约定：入口Activity：MainActivity
  * 服务：MainService 自启服务 permission="LAUNCH_WITH_APP"
+ *
  * @author Administrator
  * 2018/11/18
  */
@@ -30,7 +31,8 @@ abstract class VPluginInfo {
     var authorEmail: String? = null
 
     val mainActivity: String? by lazy { getPluginMainActivity() }
-    val mainService: String? by lazy { getPluginMainService() }
+    var mainService: String? = null
+
     /**
      * 从Apk文件解析内容
      *
@@ -61,7 +63,7 @@ abstract class VPluginInfo {
         description = metas.getString("plugin_desc")
         author = metas.getString("author") ?: ""
         authorEmail = metas.getString("author_email")
-
+        mainService = getPluginMainService()
 //        description=meta
     }
 

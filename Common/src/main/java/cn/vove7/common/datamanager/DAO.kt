@@ -1,7 +1,7 @@
 package cn.vove7.common.datamanager
 
 import android.annotation.SuppressLint
-import cn.vassistant.plugininterface.app.GlobalApp
+import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.datamanager.greendao.DaoMaster
 import cn.vove7.common.datamanager.greendao.DaoSession
 

@@ -15,6 +15,8 @@ interface SpeechEvent {
 
     /**
      * 开始识别
+     * 反馈效果
+     * 未真正开始识别
      */
     fun onStartRecog()
 

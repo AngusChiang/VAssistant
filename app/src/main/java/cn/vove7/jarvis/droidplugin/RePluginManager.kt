@@ -1,8 +1,9 @@
 package cn.vove7.jarvis.droidplugin
 
 import android.content.Context
-import cn.vassistant.plugininterface.app.GlobalApp
-import cn.vassistant.plugininterface.app.GlobalLog
+import android.content.Intent
+import cn.vove7.common.app.GlobalApp
+import cn.vove7.common.app.GlobalLog
 import cn.vove7.vtp.log.Vog
 import com.qihoo360.replugin.RePlugin
 import com.qihoo360.replugin.component.service.PluginServiceClient
@@ -10,6 +11,13 @@ import com.qihoo360.replugin.component.service.PluginServiceClient
 /**
  * # RePluginManager
  *
+ * 插件提供接口：采用反射机制
+ * plugin host 通讯方式：
+ * 1. host -> plugin Service.onStartCommand 服务|广播
+ * 2. plugin -> host  广播|反射
+ * plugin 端 hook host
+ *
+ * 插件MainService 自启申请权限：LAUNCH_WITH_APP
  * @author Administrator
  * 2018/11/19
  */
@@ -47,7 +55,9 @@ class RePluginManager : PluginManager {
     override fun launchPluginMainActivity(context: Context, pluginInfo: VPluginInfo): Boolean {
         return try {
             RePlugin.startActivity(context, RePlugin
-                    .createIntent(pluginInfo.packageName, pluginInfo.mainActivity))
+                    .createIntent(pluginInfo.packageName, pluginInfo.mainActivity).also {
+                        it.addFlags(Intent.FLAG_ACTIVITY_NEW_DOCUMENT)
+                    })
         } catch (e: Exception) {
             GlobalLog.err(e, "lp41")
             false
@@ -94,6 +104,7 @@ class RePluginManager : PluginManager {
         RePlugin.getPluginInfoList().forEach {
             cacheList.add(RePluginInfo(reInfo = it).also { t -> t.parseApk() })
         }
+        Vog.d(this, "installList ---> 插件数量${cacheList.size}")
         return cacheList
     }
 }

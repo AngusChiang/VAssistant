@@ -2,7 +2,7 @@ package cn.vove7.common.interfaces
 
 import android.os.Handler
 import android.os.Looper
-import cn.vassistant.plugininterface.app.GlobalApp
+import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.utils.TextHelper
 import cn.vove7.common.utils.ThreadPool.runOnPool
 import java.io.File

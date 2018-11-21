@@ -1,6 +1,6 @@
 package cn.vove7.common.utils
 
-import cn.vassistant.plugininterface.app.GlobalLog
+import cn.vove7.common.app.GlobalLog
 import java.io.File
 
 /**

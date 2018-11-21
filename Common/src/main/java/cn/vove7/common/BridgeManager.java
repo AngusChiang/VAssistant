@@ -2,9 +2,9 @@ package cn.vove7.common;
 
 import cn.vove7.common.bridges.GlobalActionExecutor;
 import cn.vove7.common.bridges.HttpBridge;
-import cn.vassistant.plugininterface.bridges.RootHelper;
-import cn.vassistant.plugininterface.bridges.ServiceBridge;
-import cn.vassistant.plugininterface.bridges.SystemOperation;
+import cn.vove7.common.bridges.RootHelper;
+import cn.vove7.common.bridges.ServiceBridge;
+import cn.vove7.common.bridges.SystemOperation;
 import cn.vove7.common.executor.CExecutorI;
 
 /**

@@ -5,7 +5,7 @@ import android.content.Context
 import android.content.pm.PackageManager
 import android.media.AudioManager
 import android.support.v4.app.ActivityCompat
-import cn.vassistant.plugininterface.app.GlobalApp
+import cn.vove7.common.app.GlobalApp
 import cn.vove7.jarvis.tools.AppConfig
 import cn.vove7.vtp.log.Vog
 
@@ -26,21 +26,6 @@ interface SpeechSynthesizerI {
     fun stop()
     fun setStereoVolume(leftVolume: Float, rightVolume: Float)
     fun reloadStreamType()
-
-    companion object {
-        val streamTypeArray = arrayOf(
-                AudioManager.STREAM_MUSIC
-                , AudioManager.STREAM_RING
-                , AudioManager.STREAM_NOTIFICATION
-        )
-    }
-
-    val currentStreamType: Int
-        get() {
-            val i = AppConfig.synStreamIndex.let { if (it in 0..2) it else 0 }
-            Vog.d(this, "currentStreamIndex ---> $i")
-            return streamTypeArray[i]
-        }
 
     fun hasStoragePermission(): Boolean {
         return ActivityCompat.checkSelfPermission(context,

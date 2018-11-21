@@ -3,11 +3,11 @@ package cn.vove7.executorengine.helper
 import android.content.Context
 import android.content.pm.PackageManager
 import android.support.v4.app.ActivityCompat
-import cn.vassistant.plugininterface.app.GlobalApp
-import cn.vassistant.plugininterface.app.GlobalLog
+import cn.vove7.common.app.GlobalApp
+import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.appbus.AppBus
-import cn.vassistant.plugininterface.bridges.ChoiceData
-import cn.vassistant.plugininterface.bridges.GenChoiceData
+import cn.vove7.common.bridges.ChoiceData
+import cn.vove7.common.bridges.GenChoiceData
 import cn.vove7.common.datamanager.DAO
 import cn.vove7.common.datamanager.executor.entity.MarkedData
 import cn.vove7.common.datamanager.greendao.MarkedDataDao

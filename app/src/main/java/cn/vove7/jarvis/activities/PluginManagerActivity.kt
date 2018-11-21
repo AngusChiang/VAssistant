@@ -2,6 +2,7 @@ package cn.vove7.jarvis.activities
 
 import android.os.Bundle
 import android.support.v4.app.Fragment
+import android.view.Menu
 import android.view.MenuItem
 import cn.vove7.jarvis.droidplugin.PluginManager
 import cn.vove7.jarvis.droidplugin.RePluginManager
@@ -11,6 +12,7 @@ import cn.vove7.jarvis.activities.base.OneFragmentActivity
 import cn.vove7.jarvis.adapters.SimpleListAdapter
 import cn.vove7.jarvis.adapters.ViewModel
 import cn.vove7.jarvis.fragments.SimpleListFragment
+import com.afollestad.materialdialogs.MaterialDialog
 import com.qihoo360.replugin.model.PluginInfo
 
 /**
@@ -26,20 +28,28 @@ class PluginManagerActivity : OneFragmentActivity() {
     }
 
     var info: PluginInfo? = null
-    val pluginManager: PluginManager = RePluginManager()
+    private val pluginManager: PluginManager = RePluginManager()
     override var fragments: Array<Fragment> = arrayOf(ListFragment.newInstance(pluginManager))
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menu?.add("安装测试插件")
+        return true
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        ThreadPool.runOnCachePool {
-            pluginManager.installPlugin(storePath)
-        }
+
     }
 
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
         if (item?.itemId == android.R.id.home) {
             finish()
+            return true
+        }
+        if (item?.title == "安装测试插件") {
+            ThreadPool.runOnCachePool {
+                pluginManager.installPlugin(storePath)
+            }
             return true
         }
         return super.onOptionsItemSelected(item)
@@ -59,9 +69,17 @@ class PluginManagerActivity : OneFragmentActivity() {
 
         override val itemClickListener = object : SimpleListAdapter.OnItemClickListener {
             override fun onClick(holder: SimpleListAdapter.VHolder?, pos: Int, item: ViewModel) {
-                pluginManager.launchPluginMainActivity(context!!, item.extra as VPluginInfo).also {
-                    if (!it) toast.showShort("启动失败")
-                }
+                MaterialDialog(context!!).title(text = item.title)
+                        .message(text = item.subTitle)
+                        .positiveButton(text = "启动") {
+                            pluginManager.launchPluginMainActivity(context!!, item.extra as VPluginInfo).also {
+                                if (!it) toast.showShort("启动失败")
+                            }
+                        }.negativeButton(text = "卸载") {
+                            pluginManager.uninstallPlugin(item.extra as VPluginInfo).also {
+                                if (!it) toast.showShort("卸载失败")
+                            }
+                        }.show { }
             }
 
             var f = true

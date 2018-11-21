@@ -9,7 +9,7 @@ import android.view.ViewGroup
 import android.view.animation.DecelerateInterpolator
 import android.widget.LinearLayout
 import android.widget.TextView
-import cn.vassistant.plugininterface.app.GlobalLog
+import cn.vove7.common.app.GlobalLog
 import cn.vove7.jarvis.R
 import cn.vove7.vtp.log.Vog
 

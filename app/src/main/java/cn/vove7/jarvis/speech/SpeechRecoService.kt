@@ -5,7 +5,7 @@ import android.content.pm.PackageManager
 import android.os.*
 import android.support.annotation.CallSuper
 import android.support.v4.app.ActivityCompat
-import cn.vassistant.plugininterface.app.GlobalApp
+import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.appbus.AppBus
 import cn.vove7.common.appbus.VoiceData
 import cn.vove7.common.model.RequestPermission
@@ -49,9 +49,9 @@ abstract class SpeechRecoService(val event: SpeechEvent) : SpeechRecoI {
         Vog.d(this, "startRecog ---> 这里")
         Thread.sleep(80)
         if (!isListening) {
-            doStartRecog()
-            event.onStartRecog()
             isListening = true
+            event.onStartRecog()
+            doStartRecog()
         } else {
             Vog.d(this, "启动失败，正在识别")
         }

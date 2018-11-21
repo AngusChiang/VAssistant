@@ -4,8 +4,8 @@ import android.os.Handler
 import android.os.Looper
 import cn.vove7.common.BuildConfig
 import cn.vove7.common.accessibility.AccessibilityApi
-import cn.vassistant.plugininterface.app.GlobalApp
-import cn.vassistant.plugininterface.app.GlobalLog
+import cn.vove7.common.app.GlobalApp
+import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.appbus.AppBus
 import cn.vove7.common.datamanager.executor.entity.MarkedData
 import cn.vove7.common.datamanager.history.CommandHistory

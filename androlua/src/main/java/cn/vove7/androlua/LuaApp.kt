@@ -1,8 +1,8 @@
 package cn.vove7.androlua
 
 import cn.vove7.androlua.luabridge.LuaUtil
-import cn.vassistant.plugininterface.app.GlobalApp
-import cn.vassistant.plugininterface.app.GlobalLog
+import cn.vove7.common.app.GlobalApp
+import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.utils.ThreadPool.runOnPool
 import java.io.IOException
 

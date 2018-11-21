@@ -19,8 +19,8 @@ import android.util.Log;
 import java.io.IOException;
 import java.io.InputStream;
 
-import cn.vassistant.plugininterface.app.GlobalApp;
-import cn.vassistant.plugininterface.app.GlobalLog;
+import cn.vove7.common.app.GlobalApp;
+import cn.vove7.common.app.GlobalLog;
 import cn.vove7.vtp.log.Vog;
 
 /**

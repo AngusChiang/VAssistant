@@ -3,7 +3,7 @@ package cn.vove7.jarvis.view.custom
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
-import cn.vassistant.plugininterface.app.GlobalApp
+import cn.vove7.common.app.GlobalApp
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.view.SettingChildItem
 

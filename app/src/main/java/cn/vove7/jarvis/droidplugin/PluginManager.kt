@@ -1,6 +1,8 @@
 package cn.vove7.jarvis.droidplugin
 
 import android.content.Context
+import cn.vove7.common.utils.runOnNewHandlerThread
+import cn.vove7.vtp.log.Vog
 
 /**
  * # PluginManager
@@ -16,10 +18,18 @@ interface PluginManager {
     fun launchPluginMainActivity(context: Context, pluginInfo: VPluginInfo): Boolean
     fun startPluginService(context: Context, pluginInfo: VPluginInfo): Boolean
     fun stopPluginService(context: Context, pluginInfo: VPluginInfo): Boolean
+
+    /**
+     * 自启
+     * @param context Context
+     */
     fun launchWithApp(context: Context) {
-        installList(true).forEach {
-            if (it.launchWithApp) {
-                startPluginService(context, it)
+        runOnNewHandlerThread(delay = 5000) {
+            Vog.d(this, "launchWithApp ---> 自启插件服务")
+            installList(true).forEach {
+                if (it.launchWithApp) {
+                    startPluginService(context, it)
+                }
             }
         }
     }

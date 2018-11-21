@@ -3,7 +3,7 @@ package cn.vove7.jarvis.activities.base
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
-import cn.vassistant.plugininterface.app.GlobalApp
+import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.appbus.AppBus
 import cn.vove7.common.datamanager.DAO
 import cn.vove7.common.datamanager.parse.model.Action
