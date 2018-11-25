@@ -21,6 +21,7 @@ open class GlobalApp : RePluginApplication() {
         APP = this
         super.onCreate()
         colorfulToast = ColorfulToast(this).blue()
+
     }
 
     companion object {
@@ -95,17 +96,24 @@ open class GlobalApp : RePluginApplication() {
      * 宿主针对RePlugin的自定义行为
      */
     inner class HostCallbacks constructor(context: Context) : RePluginCallbacks(context) {
+
         override fun onPluginNotExistsForActivity(context: Context?, plugin: String?, intent: Intent?, process: Int): Boolean {
             return super.onPluginNotExistsForActivity(context, plugin, intent, process)
         }
+
+        /**
+         * 自定义PluginDexClassLoader
+         */
+//        override fun createPluginClassLoader(pi: PluginInfo?, dexPath: String?, optimizedDirectory: String?, librarySearchPath: String?, parent: ClassLoader?): PluginDexClassLoader {
+//            return MyPluginDexClassLoader(pi, dexPath, optimizedDirectory, librarySearchPath, parent)
+//        }
     }
 
     private inner class HostEventCallbacks(context: Context) : RePluginEventCallbacks(context) {
 
         override fun onInstallPluginFailed(path: String?, code: RePluginEventCallbacks.InstallResult?) {
-            // FIXME 当插件安装失败时触发此逻辑。您可以在此处做“打点统计”，也可以针对安装失败情况做“特殊处理”
             // 大部分可以通过RePlugin.install的返回值来判断是否成功
-            Vog.d(this, "onInstallPluginFailed: Failed! path=$path; r=$code")
+            GlobalLog.err("onInstallPluginFailed: Failed! path=$path; r=$code")
             super.onInstallPluginFailed(path, code)
         }
 

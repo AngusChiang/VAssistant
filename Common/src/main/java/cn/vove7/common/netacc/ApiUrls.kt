@@ -64,10 +64,11 @@ object ApiUrls {
 
     val UPLOAD_CMD_HIS: String get() = APP + "uch"
     val NEW_USER_FEEDBACK: String get() = APP + "ufb"
+    val CLOUD_PARSE: String get() = APP + "cp"
+    val PLUGIN_LIST get() = APP + "pls"
+    val DL_PLUGIN get() = SERVER_IP + "plugins/"
 
     val QQ_GROUP_1 = "http://qm.qq.com/cgi-bin/qm/qr?k=BKTXyMMmLDKS8SXOht71bKKbI9rdPAd3"
-
-    val CLOUD_PARSE :String get()= APP + "cp"
 
     fun switch() {
         SERVER_IP = if (SERVER_IP == debig_server) official_server else debig_server

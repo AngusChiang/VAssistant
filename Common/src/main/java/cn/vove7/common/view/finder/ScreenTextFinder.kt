@@ -12,11 +12,12 @@ import cn.vove7.common.accessibility.AccessibilityApi
 class ScreenTextFinder(accessibilityApi: AccessibilityApi) : ViewFinder(accessibilityApi) {
     var isWeb = false
     override fun findCondition(node: AccessibilityNodeInfo): Boolean {
-        if (node.className.endsWith("WebView")) {
+        if (node.className.endsWith("WebView", ignoreCase = true)) {
             isWeb = true
             return false
         }
-        return (node.text != null && node.text.trim() != "") || (isWeb && node.contentDescription ?: "" != "")
+        return node.childCount == 0 && (node.text != null && node.text.trim() != "")
+                || (isWeb && node.contentDescription ?: "" != "")
     }
 
 }

@@ -81,7 +81,7 @@ class LoginDialog(val context: Context, initEmail: String? = null,
             loadBar.visibility = View.VISIBLE
             //post
             NetHelper.postJson<UserInfo>(ApiUrls.LOGIN, BaseRequestModel(loginInfo),
-                    type = NetHelper.UserInfoType, callback = { _, bean ->
+                   callback = { _, bean ->
                 loadBar.visibility = View.INVISIBLE
                 if (bean != null) {
                     if (bean.isOk()) {

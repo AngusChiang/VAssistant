@@ -32,7 +32,7 @@ import com.afollestad.materialdialogs.customview.customView
  * @author Administrator
  * 2018/9/16
  */
-abstract class BaseMarkedFragment<T> : SimpleListFragment<T>(), OnSyncMarked {
+abstract class BaseMarkedFragment : SimpleListFragment<MarkedData>(), OnSyncMarked {
 
     override var floatClickListener: View.OnClickListener? = View.OnClickListener {
         showEditDialog()
@@ -168,10 +168,10 @@ abstract class BaseMarkedFragment<T> : SimpleListFragment<T>(), OnSyncMarked {
     }
 
     override val itemClickListener =
-        object : SimpleListAdapter.OnItemClickListener {
+        object : SimpleListAdapter.OnItemClickListener<MarkedData> {
 
             @SuppressLint("CheckResult")
-            override fun onClick(holder: SimpleListAdapter.VHolder?, pos: Int, item: ViewModel) {
+            override fun onClick(holder: SimpleListAdapter.VHolder?, pos: Int, item: ViewModel<MarkedData>) {
                 //dialog edit
                 val data = item.extra as MarkedData
                 MaterialDialog(context!!).show {
@@ -218,8 +218,7 @@ abstract class BaseMarkedFragment<T> : SimpleListFragment<T>(), OnSyncMarked {
             GlobalApp.toastShort(R.string.text_please_login_first)
             return
         }
-        NetHelper.postJson<String>(ApiUrls.SHARE_MARKED, BaseRequestModel(data),
-                type = NetHelper.StringType) { _, bean ->
+        NetHelper.postJson<String>(ApiUrls.SHARE_MARKED, BaseRequestModel(data)) { _, bean ->
             if (bean != null) {
                 if (bean.isOk()) {
                     //return tagId

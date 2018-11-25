@@ -49,7 +49,7 @@
                     android:gravity="center"
                     android:orientation="vertical" />
 
-                <android.support.v7.widget.RecyclerView
+                <cn.vove7.jarvis.view.RecyclerViewWithContextMenu
                     android:id="@+id/recycle_view"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"

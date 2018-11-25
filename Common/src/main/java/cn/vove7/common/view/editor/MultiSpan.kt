@@ -22,14 +22,15 @@ import cn.vove7.common.R
  */
 typealias OnClick = (String) -> Unit
 
-class MultiSpan
 /**
  * @param fontSize 单位sp
  */
-(var context: Context, val text: String,
- @ColorRes private val colorId: Int = defaultColor, private var fontSize: Int = -1,
- val underLine: Boolean = false, bold: Boolean = false,
- private val onClick: OnClick? = null) : ClickableSpan() {
+class MultiSpan(
+        var context: Context, val text: String,
+        @ColorRes private val colorId: Int = defaultColor, private var fontSize: Int = -1,
+        val underLine: Boolean = false, typeface: Int? = null,
+        private val onClick: OnClick? = null
+) : ClickableSpan() {
     var spanStr: SpannableStringBuilder
 
     init {
@@ -39,11 +40,13 @@ class MultiSpan
 
         spanStr = SpannableStringBuilder(text)
         spanStr.setSpan(this, 0, text.length, Spanned.SPAN_INCLUSIVE_EXCLUSIVE)
+
         if (underLine) {
             spanStr.setSpan(UnderlineSpan(), 0, text.length, Spanned.SPAN_INCLUSIVE_EXCLUSIVE)
         }
-        if (bold) {
-            spanStr.setSpan(StyleSpan(Typeface.BOLD),
+
+        if (typeface != null) {
+            spanStr.setSpan(StyleSpan(typeface),
                     0, text.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
         }
     }

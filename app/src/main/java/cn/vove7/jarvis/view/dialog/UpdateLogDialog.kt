@@ -1,6 +1,7 @@
 package cn.vove7.jarvis.view.dialog
 
 import android.content.Context
+import android.graphics.Typeface
 import cn.vove7.common.view.editor.MultiSpan
 import com.afollestad.materialdialogs.callbacks.onDismiss
 
@@ -18,7 +19,7 @@ class UpdateLogDialog(context: Context, onDismiss: (() -> Unit)? = null) {
         }
         logs.forEach {
             d.appendln()
-            d.appendln(MultiSpan(context, it.first, fontSize = 20, bold = true).spanStr)
+            d.appendln(MultiSpan(context, it.first, fontSize = 20, typeface = Typeface.BOLD).spanStr)
             d.appendln(it.second)
         }
         d.finish()
@@ -26,6 +27,13 @@ class UpdateLogDialog(context: Context, onDismiss: (() -> Unit)? = null) {
 
     private val logs: List<Pair<String, String>>
         get() = listOf(
+                Pair("1.5.1", "加入提示音\n" +
+                        "加入插件管理 可扩展更多功能\n" +
+                        "修复未安装标记应用匹配问题\n" +
+                        "修复未打开无障碍，使用聊天问题\n" +
+                        "修复一些问题\n" +
+                        "添加api：\n" +
+                        "  system.getContactByName()"),
                 Pair("1.5.0", "开放脚本编辑、新建指令、指令分享、新建标记等功能"),
                 Pair("1.4.1", "修复只翻译第一行文本\n" +
                         "修复部分三星拨打电话权限问题"),

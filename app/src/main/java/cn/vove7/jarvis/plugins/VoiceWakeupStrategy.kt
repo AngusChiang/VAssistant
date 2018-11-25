@@ -1,7 +1,7 @@
 package cn.vove7.jarvis.plugins
 
 import cn.vove7.common.accessibility.AccessibilityApi
-import cn.vove7.common.accessibility.component.AccPluginsService
+import cn.vove7.common.accessibility.component.AbsAccPluginService
 import cn.vove7.common.appbus.AppBus
 import cn.vove7.common.appbus.SpeechAction
 import cn.vove7.common.datamanager.parse.model.ActionScope
@@ -24,7 +24,7 @@ import cn.vove7.vtp.log.Vog
  * @author Administrator
  * 9/21/2018
  */
-object VoiceWakeupStrategy : AccPluginsService() {
+object VoiceWakeupStrategy : AbsAccPluginService() {
     private val statusAni: StatusAnimation by lazy { MicroToggleAnimation() }
 
     //是否关闭唤醒 by VoiceWakeupStrategy

@@ -93,8 +93,7 @@ class UserInfoDialog(val context: Activity, val onUpdate: () -> Unit) {
     private fun recharge() {
         val pd = ProgressDialog(context)
         Handler().postDelayed({
-            NetHelper.postJson<List<VipPrice>>(ApiUrls.GET_PRICES, BaseRequestModel(null),
-                    type = NetHelper.VipPriceListType) { _, bean ->
+            NetHelper.postJson<List<VipPrice>>(ApiUrls.GET_PRICES, BaseRequestModel(null)) { _, bean ->
                 pd.dismiss()
                 if (bean != null) {
                     if (bean.isOk()) {
@@ -111,8 +110,7 @@ class UserInfoDialog(val context: Activity, val onUpdate: () -> Unit) {
      * 获取数据
      */
     private fun loadInfo() {
-        NetHelper.postJson<UserInfo>(ApiUrls.GET_USER_INFO, BaseRequestModel<String>(),
-                type = NetHelper.UserInfoType) { _, bean ->
+        NetHelper.postJson<UserInfo>(ApiUrls.GET_USER_INFO, BaseRequestModel<String>()) { _, bean ->
             if (exit) return@postJson
             if (bean != null) {
                 if (bean.isOk()) {
@@ -123,7 +121,7 @@ class UserInfoDialog(val context: Activity, val onUpdate: () -> Unit) {
                         setData()
                     } catch (e: Exception) {
                         toast.showShort(R.string.text_error_occurred)
-                        GlobalLog.err(e.message + "--code: ui52")
+                        GlobalLog.err(e, "code: ui52")
                         return@postJson
                     }
                 } /*else toast.showShort(bean.message)*/
@@ -156,9 +154,9 @@ class UserInfoDialog(val context: Activity, val onUpdate: () -> Unit) {
         }
         val cView = View.inflate(context, R.layout.dialog_recharge, null)
         cView.findViewById<TextView>(R.id.prices_text).text = bu.toString()
-        cView.findViewById<Button>(R.id.btn_guide).setOnClickListener {
-            SystemHelper.openLink(context, ApiUrls.USER_GUIDE)
-        }
+//        cView.findViewById<Button>(R.id.btn_guide).setOnClickListener {
+//            SystemHelper.openLink(context, ApiUrls.USER_GUIDE)
+//        }
         MaterialDialog(context).title(R.string.text_purchase_recharge_code)
                 .customView(view = cView, scrollable = true)
                 .positiveButton(text = "支付宝") {

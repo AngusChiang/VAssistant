@@ -50,11 +50,11 @@ class MarkedAdFragment : SimpleListFragment<String>(), OnSyncMarked {
         updateAdApp()
     }
 
-    override val itemClickListener = object : SimpleListAdapter.OnItemClickListener {
-        override fun onClick(holder: SimpleListAdapter.VHolder?, pos: Int, item: ViewModel) {
+    override val itemClickListener = object : SimpleListAdapter.OnItemClickListener<String> {
+        override fun onClick(holder: SimpleListAdapter.VHolder?, pos: Int, item: ViewModel<String>) {
             val intent = Intent(context, AppAdListActivity::class.java)
             intent.putExtra("title", item.title)
-            intent.putExtra("pkg", (item.extra as String))
+            intent.putExtra("pkg", item.extra)
             startActivity(intent)
         }
     }
@@ -82,16 +82,16 @@ class MarkedAdFragment : SimpleListFragment<String>(), OnSyncMarked {
 
         DataUpdator.syncMarkedAd {
             hideProgressBar()
-            if(it){
+            if (it) {
                 refresh()
                 toast.showShort("同步完成")
             }
         }
     }
 
-    override fun transData(nodes: List<String>): List<ViewModel> {
-        val ss = mutableListOf<ViewModel>()
-        val sss = mutableListOf<ViewModel>()
+    override fun transData(nodes: List<String>): List<ViewModel<String>> {
+        val ss = mutableListOf<ViewModel<String>>()
+        val sss = mutableListOf<ViewModel<String>>()
         nodes.forEach {
             val app = SystemBridge.getAppInfo(it)
             if (app != null)
@@ -108,9 +108,7 @@ class MarkedAdFragment : SimpleListFragment<String>(), OnSyncMarked {
 
     override fun onGetData(pageIndex: Int) {
         runOnCachePool {
-            val subSet = adAddPkgs.sub(pageIndex * pageSizeLimit, pageSizeLimit)
-            dataSet.addAll(transData(subSet))
-            resultHandler.sendEmptyMessage(subSet.size)
+            notifyLoadSuccess(adAddPkgs.sub(pageIndex * pageSizeLimit, pageSizeLimit))
         }
     }
 }

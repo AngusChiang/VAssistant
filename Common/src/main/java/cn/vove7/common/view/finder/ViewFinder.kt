@@ -60,8 +60,12 @@ abstract class ViewFinder(var accessibilityService: AccessibilityApi) {
      * @return ViewNode?
      */
     private fun traverseAllNode(node: AccessibilityNodeInfo?, all: Boolean = false,
-                                includeInvisible: Boolean = false): ViewNode? {
+                                includeInvisible: Boolean = false, depth: Int = 0): ViewNode? {
         if (node == null) return null
+        if (depth > 50) {//防止出现无限递归（eg:QQ浏览器首页）
+            Vog.d(this, "traverseAllNode ---> 超过最大深度")
+            return null
+        }
         (0 until node.childCount).forEach { index ->
             Vog.v(this, "traverseAllNode ${node.className} $index/${node.childCount}")
             val childNode = node.getChild(index)
@@ -76,9 +80,9 @@ abstract class ViewFinder(var accessibilityService: AccessibilityApi) {
                     } else return ViewNode(childNode)
                 } else {
                     if (all) {
-                        traverseAllNode(childNode, true, includeInvisible)
+                        traverseAllNode(childNode, true, includeInvisible, depth = depth + 1)
                     } else {
-                        val r = traverseAllNode(childNode, includeInvisible)
+                        val r = traverseAllNode(childNode, includeInvisible, depth = depth + 1)
                         if (r != null) return r
                     }
                     //深搜

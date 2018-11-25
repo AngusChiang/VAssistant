@@ -60,6 +60,20 @@ object GsonHelper {
         return bean
     }
 
+    /**
+     * 服务返回Json解析
+     * @param s String?
+     * @param type Type
+     * @return ResponseMessage<T>?
+     */
+    inline fun <reified T> fromResponseJson(s: String?): ResponseMessage<T>? {
+        val type = NetHelper.getType<ResponseMessage<T>>()
+        val bean = GsonBuilder()
+                .setDateFormat("yyyy-MM-dd HH:mm:ss")
+                .create().fromJson<ResponseMessage<T>>(s, type)
+        return bean
+    }
+
     inline fun <reified T> fromJson(s: String?): T? {
         val type = NetHelper.getType<T>()
         val bean = GsonBuilder()

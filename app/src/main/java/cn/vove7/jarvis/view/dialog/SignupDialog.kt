@@ -70,7 +70,7 @@ class SignupDialog(context: Context, val r: OnLoginSuccess) : View.OnClickListen
                 loadBar.visibility = View.VISIBLE
 //                val p = NetParamsBuilder.of(Pair("emailAdd", userEmail)).sign()
                 NetHelper.postJson<String>(ApiUrls.SEND_SIGN_UP_EMAIL_VER_CODE, BaseRequestModel(userEmail),
-                        type = object : TypeToken<ResponseMessage<String>>() {}.type, callback = { _, bean ->
+                        callback = { _, bean ->
                     loadBar.visibility = View.INVISIBLE
                     if (bean != null) {
                         if (bean.isOk()) {
@@ -132,8 +132,8 @@ class SignupDialog(context: Context, val r: OnLoginSuccess) : View.OnClickListen
 
             loadBar.visibility = View.VISIBLE
             //post
-            NetHelper.postJson<String>(ApiUrls.REGISTER_BY_EMAIL, BaseRequestModel(userInfo, verCode), type = object
-                : TypeToken<ResponseMessage<String>>() {}.type, callback = { _, bean ->
+            NetHelper.postJson<String>(ApiUrls.REGISTER_BY_EMAIL, BaseRequestModel(userInfo, verCode),
+                    callback = { _, bean ->
                 //泛型
                 Vog.d(this, "onResponse ---> $bean")
                 loadBar.visibility = View.INVISIBLE

@@ -1,6 +1,6 @@
 package cn.vove7.jarvis.plugins
 
-import cn.vove7.common.accessibility.component.AccPluginsService
+import cn.vove7.common.accessibility.component.AbsAccPluginService
 import cn.vove7.common.datamanager.parse.model.ActionScope
 import cn.vove7.common.view.notifier.ActivityShowListener
 import cn.vove7.vtp.log.Vog
@@ -12,7 +12,7 @@ import cn.vove7.vtp.log.Vog
  * 2018/11/12
  */
 class AppChangNotifier(private val locksWaitForActivity: MutableMap<ActivityShowListener, ActionScope>)
-    : AccPluginsService() {
+    : AbsAccPluginService() {
 
     private var appScope: ActionScope? = null
 

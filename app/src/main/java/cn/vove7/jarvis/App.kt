@@ -15,6 +15,7 @@ import cn.vove7.jarvis.droidplugin.RePluginManager
 import cn.vove7.jarvis.receivers.AppInstallReceiver
 import cn.vove7.jarvis.receivers.PowerEventReceiver
 import cn.vove7.jarvis.receivers.ScreenStatusListener
+import cn.vove7.jarvis.receivers.UtilEventReceiver
 import cn.vove7.jarvis.services.AssistSessionService
 import cn.vove7.jarvis.services.MainService
 import cn.vove7.jarvis.tools.AppConfig
@@ -56,14 +57,18 @@ class App : LuaApp() {
                     }
                 }
                 //插件自启 fixme
-                RePluginManager().launchWithApp(this@App)
+                RePluginManager().launchWithApp()
                 Vog.d(this, "onCreate ---> 结束 ${System.currentTimeMillis() / 1000}")
 
                 quitSafely()
             }
         }
-        if (!BuildConfig.DEBUG)
-            Vog.init(this, Log.ERROR)
+        if (!BuildConfig.DEBUG) {
+            try {
+                Vog.init(this, Log.ERROR)
+            } catch (e: Exception) {
+            }
+        }
     }
 
     private fun startServices() {
@@ -84,6 +89,7 @@ class App : LuaApp() {
             PowerEventReceiver.start()
             ScreenStatusListener.start()
             AppInstallReceiver.start()
+            UtilEventReceiver.start()
 //            BTConnectListener.start()
         }
     }
@@ -91,6 +97,9 @@ class App : LuaApp() {
     private fun stopBroadcastReceivers() {
         PowerEventReceiver.stop()
         ScreenStatusListener.stop()
+        AppInstallReceiver.stop()
+        UtilEventReceiver.stop()
+
     }
 
     companion object {

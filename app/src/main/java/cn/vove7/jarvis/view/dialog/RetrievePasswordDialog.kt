@@ -73,7 +73,7 @@ class RetrievePasswordDialog(context: Context) {
 //                val p = NetParamsBuilder.of(Pair("emailAdd", userEmail)).sign()
 
                 NetHelper.postJson<String>(ApiUrls.SEND_RET_PASS_EMAIL_VER_CODE, BaseRequestModel(userEmail, "check"),
-                        type = object : TypeToken<ResponseMessage<String>>() {}.type, callback = { _, bean ->
+                        callback = { _, bean ->
                     loadBar.visibility = View.INVISIBLE
                     if (bean != null) {
                         if (bean.isOk()) {
@@ -133,8 +133,7 @@ class RetrievePasswordDialog(context: Context) {
 
             loadBar.visibility = View.VISIBLE
             //post
-            NetHelper.postJson<String>(ApiUrls.RET_PASS__BY_EMAIL, BaseRequestModel(userInfo, verCode), type = object
-                : TypeToken<ResponseMessage<String>>() {}.type, callback = { _, bean ->
+            NetHelper.postJson<String>(ApiUrls.RET_PASS__BY_EMAIL, BaseRequestModel(userInfo, verCode), callback = { _, bean ->
                 //泛型
                 Vog.d(this, "onResponse ---> $bean")
                 loadBar.visibility = View.INVISIBLE

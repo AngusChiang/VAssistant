@@ -9,9 +9,9 @@ import android.widget.TextView
 import cn.vove7.jarvis.R
 import cn.vove7.vtp.easyadapter.BaseListAdapter
 
-class BottomListAdapter(val context: Context, items: MutableList<ViewModel>,
-                        private val listener: SimpleListAdapter.OnItemClickListener)
-    : BaseListAdapter<BottomListAdapter.VHolder, ViewModel>(context, items) {
+class BottomListAdapter<Type>(val context: Context, items: List<ViewModel<Type>>,
+                        private val listener: SimpleListAdapter.OnItemClickListener<Type>)
+    : BaseListAdapter<BottomListAdapter.VHolder, ViewModel<Type>>(context, items) {
 
     override fun layoutId(position: Int): Int = R.layout.item_normal_icon_title
 
@@ -19,7 +19,7 @@ class BottomListAdapter(val context: Context, items: MutableList<ViewModel>,
         return VHolder(view)
     }
 
-    override fun onBindView(holder: VHolder, pos: Int, item: ViewModel) {
+    override fun onBindView(holder: VHolder, pos: Int, item: ViewModel<Type>) {
         holder.itemView.setOnClickListener { _ -> listener.onClick(null, pos, getItem(pos)) }
         holder.title.text = item.title
         if (item.icon != null) {

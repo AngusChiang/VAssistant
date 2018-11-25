@@ -181,4 +181,26 @@ class ExampleUnitTest {
         println(BaiduAipHelper.translate("你好\nGood", "auto", "auto")?.transResult)
 
     }
+
+    @Test
+    fun testKotlin() {
+        val click = {
+            if (1 == 2)
+                println("1==2")
+            else
+                println("1!=2")
+        }
+
+        fff(click)
+
+    }
+
+    fun fff(onClick: (() -> Unit)? = null) {
+        println(onClick)
+        thread(isDaemon = true) {
+            thread(isDaemon = true) {
+                onClick?.invoke()
+            }
+        }
+    }
 }

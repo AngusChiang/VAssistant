@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.os.Handler
 import android.view.View
 import android.widget.TextView
+import cn.vove7.common.bridges.RootHelper
 import cn.vove7.common.model.UserInfo
 import cn.vove7.common.netacc.ApiUrls
 import cn.vove7.common.netacc.NetHelper
@@ -199,6 +200,9 @@ class AdvancedSettingActivity : ReturnableActivity() {
                         },
                         IntentItem(title = "触发低电量") {
                             PowerEventReceiver.onLowBattery()
+                        },
+                        IntentItem(title = "无线调试") {
+                            RootHelper.execSuSilent("adb tcpip 5555")
                         }
                 )))
             }

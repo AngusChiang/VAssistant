@@ -97,7 +97,7 @@ class SettingsActivity : ReturnableActivity() {
                     }*/
             )),
             SettingGroupItem(R.color.google_green, "反馈", childItems = listOf(
-                    SwitchItem(title = "提示音", summary = "语音识别提示音", keyId = R.string.key_voice_syn_feedback, defaultValue = { AppConfig.voiceSynFeedback }),
+                    SwitchItem(title = "提示音", summary = "语音识别提示音", keyId = R.string.key_voice_recog_feedback, defaultValue = { AppConfig.voiceRecogFeedback }),
                     CheckBoxItem(R.string.text_vibrate_reco_begin,
                             keyId = R.string.key_vibrate_reco_begin, defaultValue = { true }),
                     CheckBoxItem(title = "执行失败", keyId = R.string.key_exec_failed_voice_feedback,

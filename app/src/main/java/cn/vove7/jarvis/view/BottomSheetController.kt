@@ -18,7 +18,7 @@ import cn.vove7.vtp.view.listview.BottomSheetListView
  * @author 17719247306
  * 2018/8/19
  */
-open class BottomSheetController(
+open class BottomSheetController<Type>(
         val context: Context, val bottomView: View
 ) {
     init {
@@ -30,7 +30,7 @@ open class BottomSheetController(
     var behavior: BottomSheetBehavior<*>? = null
 
     lateinit var bottomListView: BottomSheetListView
-    lateinit var listAdapter: BottomListAdapter
+    lateinit var listAdapter: BottomListAdapter<Type>
 
     val isBottomSheetShowing: Boolean
         get() = behavior?.state != BottomSheetBehavior.STATE_HIDDEN
@@ -59,7 +59,7 @@ open class BottomSheetController(
     }
 
     //设置BottomList数据
-    fun setBottomListData(dataSet: MutableList<ViewModel>, iClickListener: SimpleListAdapter.OnItemClickListener) {
+    fun setBottomListData(dataSet: List<ViewModel<Type>>, iClickListener: SimpleListAdapter.OnItemClickListener<Type>) {
         listAdapter = BottomListAdapter(context, dataSet, iClickListener)
         bottomListView.adapter = listAdapter
         listAdapter.notifyDataSetChanged()
@@ -68,17 +68,6 @@ open class BottomSheetController(
     fun notifyDataSetChanged() {
         listAdapter.notifyDataSetChanged()
     }
-
-    fun showSnack(parentView: ViewGroup, msg: String, hasAction: Boolean = false, listener: View.OnClickListener? = null) {
-        val bar = Snackbar.make(parentView, msg, if (hasAction) Snackbar.LENGTH_INDEFINITE else Snackbar.LENGTH_SHORT)
-        if (hasAction)
-            bar.setAction("OK") { bar.dismiss() }
-        if (listener != null) {
-            bar.setAction("DO", listener)
-        }
-        bar.show()
-    }
-
 
     fun <T : View> f(id: Int): T {
         return bottomView.findViewById(id)

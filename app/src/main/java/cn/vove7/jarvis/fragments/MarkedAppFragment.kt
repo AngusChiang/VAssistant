@@ -21,7 +21,7 @@ import cn.vove7.jarvis.tools.DialogUtil
  * @author 17719247306
  * 2018/9/7
  */
-class MarkedAppFragment : BaseMarkedFragment<MarkedData>() {
+class MarkedAppFragment : BaseMarkedFragment() {
 
     var showUninstall = false
 
@@ -47,9 +47,9 @@ class MarkedAppFragment : BaseMarkedFragment<MarkedData>() {
         }
     }
 
-    override fun transData(nodes: List<MarkedData>): List<ViewModel> {
-        val ss = mutableListOf<ViewModel>()
-        val sss = mutableListOf<ViewModel>()
+    override fun transData(nodes: List<MarkedData>): List<ViewModel<MarkedData>> {
+        val ss = mutableListOf<ViewModel<MarkedData>>()
+        val sss = mutableListOf<ViewModel<MarkedData>>()
         nodes.forEach {
             val app = SystemBridge.getAppInfo(it.value)
             if (app == null) {
@@ -70,9 +70,7 @@ class MarkedAppFragment : BaseMarkedFragment<MarkedData>() {
                     .limit(pageSizeLimit)
 
             val list = builder.list()
-
-            dataSet.addAll(transData(list))
-            resultHandler.sendEmptyMessage(list.size)
+            notifyLoadSuccess(list)
         }
     }
 }

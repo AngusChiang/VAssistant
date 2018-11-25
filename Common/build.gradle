@@ -29,6 +29,19 @@ greendao {
     targetGenDir 'src/main/java'
 }
 
+task makeJar(type: Jar) {
+    //指定生成的jar名
+    baseName 'vassist-plugin-api'
+    //从哪里打包class文件
+    from('build/tmp/kotlin-classes/debug/cn/vove7', 'build/intermediates/classes/debug/cn/vove7')
+    //打包到jar后的目录结构
+    into('cn/vove7/')
+    //去掉不需要打包的目录和文件
+    exclude('BuildConfig.class', 'R.class')
+    //去掉R$开头的文件
+    exclude { it.name.startsWith('R$'); }
+}
+
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
@@ -46,5 +59,20 @@ dependencies {
     api files('libs/ThreadPoolHelp-2.0.jar')
     api "com.github.Vove7:VTP:$vtp_version"
     implementation "com.qihoo360.replugin:replugin-host-lib:${RP_VERSION}"
+    implementation 'me.jessyan:progressmanager:1.5.0'
+    // core
+    api 'com.liulishuo.okdownload:okdownload:1.0.5'
+    // provide sqlite to store breakpoints
+    api 'com.liulishuo.okdownload:sqlite:1.0.5'
+    // provide okhttp to connect to backend
+    api 'com.liulishuo.okdownload:okhttp:1.0.5'
+}
 
+
+repositories {
+    maven { url 'https://jitpack.io' }
+    mavenCentral()
+    maven { url "https://dl.bintray.com/drummer-aidan/maven/" }
+
+    maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
 }

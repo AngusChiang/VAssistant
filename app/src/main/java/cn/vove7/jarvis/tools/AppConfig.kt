@@ -86,7 +86,7 @@ object AppConfig {
     //    var disableAdKillerOnLowBattery = true//低电量关闭去广告
     var disableAccessibilityOnLowBattery = true//低电量关闭无障碍
     var translateLang = "auto"//翻译主语言
-    var voiceSynFeedback = true
+    var voiceRecogFeedback = false //语音识别提示音
 
     val streamTypeArray = arrayOf(
             AudioManager.STREAM_MUSIC
@@ -211,7 +211,7 @@ object AppConfig {
 //        disableAdKillerOnLowBattery = getBooleanAndInit(R.string.key_remove_ad_power_saving_mode, true)
         disableAccessibilityOnLowBattery = getBooleanAndInit(R.string.key_accessibility_service_power_saving_mode, true)
         wakeUpWithHeadsetHook = getBooleanAndInit(R.string.key_wakeup_with_headsethook, wakeUpWithHeadsetHook)
-        voiceSynFeedback = getBooleanAndInit(R.string.key_voice_syn_feedback, voiceSynFeedback)
+        voiceRecogFeedback = getBooleanAndInit(R.string.key_voice_recog_feedback, voiceRecogFeedback)
 
         finishWord = sp.getString(R.string.key_finish_word)
 //        onlyCloudServiceParse = getBooleanAndInit(R.string.key_only_cloud_service_parse, false)

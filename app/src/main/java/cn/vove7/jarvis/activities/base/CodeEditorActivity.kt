@@ -242,7 +242,7 @@ abstract class CodeEditorActivity : AppCompatActivity() {
                 .positiveButton()
                 .onDismiss {
                     logDialog = null
-                }
+                } as ProgressTextDialog
         synchronized(logList) {
             logList.forEach {
                 logDialog?.append(it)

@@ -83,6 +83,10 @@ object SystemBridge : SystemOperation {
     }
 
     override fun getPhoneByName(name: String): String? {
+        return AdvanContactHelper.matchPhone(name)?.second
+    }
+
+    override fun getContactByName(name: String): Pair<String, String>? {
         return AdvanContactHelper.matchPhone(name)
     }
 

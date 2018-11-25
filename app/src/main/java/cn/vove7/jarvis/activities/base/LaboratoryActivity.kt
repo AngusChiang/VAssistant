@@ -46,7 +46,9 @@ class LaboratoryActivity : ReturnableActivity() {
         listOf(
                 SettingGroupItem(R.color.indigo_700, "插件管理", childItems = listOf(
                         IntentItem(title = "插件管理", summary = "扩展功能") {
-                            startActivityOnNewTask(Intent(this, PluginManagerActivity::class.java))
+                            startActivityOnNewTask(Intent(this, PluginManagerActivity::class.java).also {
+                                it.addFlags(Intent.FLAG_ACTIVITY_NEW_DOCUMENT)
+                            })
                         }
                 )),
                 SettingGroupItem(R.color.google_blue, getString(R.string.text_open_ad_killer_service), childItems = listOf(
@@ -54,7 +56,7 @@ class LaboratoryActivity : ReturnableActivity() {
                         else getString(R.string.summary_not_vip_remove_ad), keyId = R.string.key_open_ad_block,
                                 defaultValue = { true }) { _, it ->
                             when (it as Boolean) {
-                                true ->  AdKillerService.register()
+                                true -> AdKillerService.register()
                                 false ->
                                     AdKillerService.unregister()
                             }
@@ -78,7 +80,7 @@ class LaboratoryActivity : ReturnableActivity() {
                                 keyId = R.string.key_chat_system_type, entityArrId = R.array.list_chat_system,
                                 defaultValue = { 0 }) { _, d ->
                             if (!UserInfo.isVip() && (d as Pair<*, *>).first != 0) {
-                                toast.showShort("设置无效")
+                                toast.showShort("设置无效，仅高级用户可用")
                                 return@SingleChoiceItem false
                             }
                             runOnPool {

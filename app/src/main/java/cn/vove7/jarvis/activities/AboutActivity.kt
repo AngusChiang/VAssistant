@@ -2,6 +2,7 @@ package cn.vove7.jarvis.activities
 
 import android.content.Intent
 import android.os.Bundle
+import android.os.UserManager
 import android.support.v7.app.AppCompatActivity
 import android.view.MenuItem
 import android.view.View
@@ -43,7 +44,8 @@ class AboutActivity : AppCompatActivity(), AdapterView.OnItemClickListener {
 
         ver_name_view.text = AppConfig.versionName
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
-
+        root.setOnClickListener {
+        }
         list_view.adapter = IconTitleListAdapter(this, getData())
         list_view.onItemClickListener = this
     }

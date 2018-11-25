@@ -36,9 +36,9 @@ class InAppInstListFragment : SimpleListFragment<ActionNode>() {
         startActivity(intent)
     }
 
-    override val itemClickListener = object : SimpleListAdapter.OnItemClickListener {
-        override fun onClick(holder: SimpleListAdapter.VHolder?, pos: Int, item: ViewModel) {
-            val node = item.extra as ActionNode
+    override val itemClickListener = object : SimpleListAdapter.OnItemClickListener<ActionNode> {
+        override fun onClick(holder: SimpleListAdapter.VHolder?, pos: Int, item: ViewModel<ActionNode>) {
+            val node = item.extra
 
             val intent = Intent(context, InstDetailActivity::class.java)
             intent.putExtra("nodeId", node.id)
@@ -92,25 +92,17 @@ class InAppInstListFragment : SimpleListFragment<ActionNode>() {
         Vog.d(this, pkg)
     }
 
-    /**
-     * desc activity
-     */
-    override fun transData(nodes: List<ActionNode>): List<ViewModel> {
-        val tmp = mutableListOf<ViewModel>()
-        nodes.forEach {
-            val fs = it.follows?.size ?: 0
-            tmp.add(ViewModel((it).actionTitle, (it.desc?.instructions ?: "无介绍") +
-                    (if (fs == 0) "" else "\n跟随 $fs"), extra = it))
-        }
-        return tmp
+
+    override fun unification(it: ActionNode): ViewModel<ActionNode>? {
+        val fs = it.follows?.size ?: 0
+        return ViewModel((it).actionTitle, (it.desc?.instructions ?: "无介绍") +
+                (if (fs == 0) "" else "\n跟随 $fs"), extra = it)
     }
 
     override fun onGetData(pageIndex: Int) {
         val offsetDatas = getInstList(pkg)
         Vog.d(this, "onGetData $offsetDatas")
-        dataSet.addAll(transData(offsetDatas))
-        notifyLoadSuccess(true)
-
+        notifyLoadSuccess(offsetDatas, true)
     }
 
 }

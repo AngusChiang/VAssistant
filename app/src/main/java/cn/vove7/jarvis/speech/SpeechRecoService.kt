@@ -38,7 +38,7 @@ abstract class SpeechRecoService(val event: SpeechEvent) : SpeechRecoI {
     /**
      * 重写函数结尾处callSuper
      */
-    override fun startRecog() {
+    override fun startRecog(byVoice: Boolean) {
         //检查权限
         if (!checkRecoderPermission()) return
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && !PermissionUtils.canDrawOverlays(context)) {
@@ -50,7 +50,7 @@ abstract class SpeechRecoService(val event: SpeechEvent) : SpeechRecoI {
         Thread.sleep(80)
         if (!isListening) {
             isListening = true
-            event.onStartRecog()
+            event.onStartRecog(byVoice)
             doStartRecog()
         } else {
             Vog.d(this, "启动失败，正在识别")
@@ -121,8 +121,8 @@ abstract class SpeechRecoService(val event: SpeechEvent) : SpeechRecoI {
             return
         }
         stopAutoSleepWakeup()
-        val sleepTime = if (BuildConfig.DEBUG) AppConfig.autoSleepWakeupMillis / 60
-        else AppConfig.autoSleepWakeupMillis
+        val sleepTime = /*if (BuildConfig.DEBUG) AppConfig.autoSleepWakeupMillis / 60
+        else*/ AppConfig.autoSleepWakeupMillis
         Vog.d(this, "startAutoSleepWakeup ---> 开启自动休眠 $sleepTime")
         timerHandler.postDelayed(stopWakeUpTimer, sleepTime)
     }
@@ -152,16 +152,14 @@ abstract class SpeechRecoService(val event: SpeechEvent) : SpeechRecoI {
                 IStatus.CODE_WAKEUP_SUCCESS -> {//唤醒
                     val word = msg.data.getString("data")
                     startAutoSleepWakeup()//重新倒计时
-                    if (!event.onWakeup(word))
-                        return
+                    if (!isListening)
+                        event.onWakeup(word)
 //                    AppBus.postVoiceData(VoiceData(msg.what, word))
-                    cancelRecog(false)
-                    startRecog()
-                    return
                 }
                 IStatus.CODE_VOICE_TEMP -> {//中间结果
-                    val res = msg.data.getString("data") ?: "null"
-                    event.onTempResult(res)
+                    val res = msg.data.getString("data")
+                    if (res != null)
+                        event.onTempResult(res)
 //                    AppBus.postVoiceData(VoiceData(msg.what, res))
                 }
                 IStatus.CODE_VOICE_ERR -> {//出错
@@ -189,7 +187,7 @@ abstract class SpeechRecoService(val event: SpeechEvent) : SpeechRecoI {
 interface SpeechRecoI {
     val wakeupI: WakeupI
     var timerEnd: Boolean
-    fun startRecog()
+    fun startRecog(byVoice: Boolean = false)
     fun cancelRecog(notify: Boolean = true)
     /**
      * 重新计时

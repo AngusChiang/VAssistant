@@ -7,6 +7,7 @@ import cn.vove7.common.datamanager.DAO
 import cn.vove7.common.datamanager.parse.model.ActionScope
 import cn.vove7.common.datamanager.parse.statusmap.ActionNode.NODE_SCOPE_IN_APP
 import cn.vove7.common.model.UserInfo
+import cn.vove7.common.utils.ThreadPool.runOnCachePool
 import cn.vove7.common.utils.ThreadPool.runOnPool
 import cn.vove7.jarvis.activities.InAppInstActivity
 import cn.vove7.jarvis.activities.NewInstActivity
@@ -34,10 +35,10 @@ class InstAppListFragment : SimpleListFragment<ActionScope>(), OnSyncInst {
         startActivity(intent)
     }
 
-    override val itemClickListener: SimpleListAdapter.OnItemClickListener = object : SimpleListAdapter.OnItemClickListener {
-        override fun onClick(holder: SimpleListAdapter.VHolder?, pos: Int, item: ViewModel) {
+    override val itemClickListener: SimpleListAdapter.OnItemClickListener<ActionScope> = object : SimpleListAdapter.OnItemClickListener<ActionScope> {
+        override fun onClick(holder: SimpleListAdapter.VHolder?, pos: Int, item: ViewModel<ActionScope>) {
             val intent = Intent(context, InAppInstActivity::class.java)
-            intent.putExtra("pkg", item.extra as String)
+            intent.putExtra("pkg", item.extra.packageName)
             intent.putExtra("title", item.title)
             startActivity(intent)
         }
@@ -68,40 +69,34 @@ class InstAppListFragment : SimpleListFragment<ActionScope>(), OnSyncInst {
         pkgSet.clear()
     }
 
-    override fun transData(nodes: List<ActionScope>): List<ViewModel> {
-        val tmp = mutableListOf<ViewModel>()
-//        val notInstalled = mutableListOf<ViewModel>()
-        kotlin.run breaking@{
-            nodes.forEach goon@{
-                if (pkgSet.contains(it.packageName))
-                    return@goon
-                val app = AppHelper.getAppInfo(GlobalApp.APP, "", it.packageName)
-                if (app != null) {
-                    // TODO 优化
-                    val c = InAppInstListFragment.getInstList(it.packageName).size
-                    tmp.add(ViewModel(app.name, icon = app.getIcon(GlobalApp.APP), subTitle = "数量: $c", extra = it.packageName))
-                } else {//未安装 TODO app.info
+    override fun unification(it: ActionScope): ViewModel<ActionScope>? {
+        if (pkgSet.contains(it.packageName))
+            return null
+        val app = AppHelper.getAppInfo(GlobalApp.APP, "", it.packageName)
+        val node=if (app != null) {
+            // TODO 优化
+            val c = InAppInstListFragment.getInstList(it.packageName).size
+            ViewModel(app.name, icon = app.getIcon(GlobalApp.APP),
+                    subTitle = "数量: $c", extra = it)
+        } else {//未安装 TODO app.info
 //                    notInstalled.add(ViewModel(it.packageName, getString(R.string.text_not_installed), extra = it.packageName))
-                }
-                pkgSet.add(it.packageName)
-            }
+            null
         }
-//        tmp.addAll(notInstalled)
-        return tmp
+        pkgSet.add(it.packageName)
+        return node
     }
 
     /**
      * 获取支持App列表
      */
     override fun onGetData(pageIndex: Int) {
-        runOnPool {
+        runOnCachePool {
             val list = DAO.daoSession.actionScopeDao
                     .queryBuilder()
                     .offset(pageSizeLimit * pageIndex)
                     .limit(pageSizeLimit)
                     .list()
-            dataSet.addAll(transData(list))
-            postLoadResult(list.isEmpty())
+            notifyLoadSuccess(list)
         }
     }
 }

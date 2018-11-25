@@ -18,21 +18,21 @@ import cn.vove7.vtp.log.Vog
  *
  * Created by 17719 on 2018/8/13
  */
-abstract class RecAdapterWithFooter<V : RecAdapterWithFooter.RecViewHolder>
+abstract class RecAdapterWithFooter<V : RecAdapterWithFooter.RecViewHolder,DataType>
     : RecyclerView.Adapter<RecAdapterWithFooter.RecViewHolder>() {
 
     override fun getItemCount(): Int {
         return itemCount() + 1
     }
 
-    abstract fun getItem(pos: Int): Any?
+    abstract fun getItem(pos: Int): DataType?
 
     abstract fun itemCount(): Int
     override fun onBindViewHolder(holder: RecAdapterWithFooter.RecViewHolder, position: Int) {
         when (getItemViewType(position)) {
             TYPE_ITEM -> {
                 try {
-                    onBindView(holder as V, position, getItem(position))
+                    onBindView(holder as V, position, getItem(position)!!)
                 } catch (e: ClassCastException) {
                     GlobalLog.err(e.message + "code: ra37")
                 }
@@ -49,7 +49,7 @@ abstract class RecAdapterWithFooter<V : RecAdapterWithFooter.RecViewHolder>
             TYPE_FOOTER -> {
                 val footerView = LayoutInflater.from(parent.context).inflate(R.layout.footer_layout,
                         parent, false)
-                RecViewHolder(footerView, this as RecAdapterWithFooter<RecViewHolder>)
+                RecViewHolder(footerView, this as RecAdapterWithFooter<RecViewHolder,*>)
             }
             else -> {
                 onCreateHolder(parent, viewType)
@@ -81,7 +81,7 @@ abstract class RecAdapterWithFooter<V : RecAdapterWithFooter.RecViewHolder>
         const val STATUS_ALL_LOAD = 2
     }
 
-    abstract fun onBindView(holder: V, position: Int, item: Any?)
+    abstract fun onBindView(holder: V, position: Int, item: DataType)
 
     private var footerView: View? = null
     private lateinit var llLoading: LinearLayout  // 正在加载view
@@ -123,7 +123,7 @@ abstract class RecAdapterWithFooter<V : RecAdapterWithFooter.RecViewHolder>
         }
     }
 
-    open class RecViewHolder(view: View, adapter: RecAdapterWithFooter<RecViewHolder>?) : RecyclerView.ViewHolder(view) {
+    open class RecViewHolder(view: View, adapter: RecAdapterWithFooter<RecViewHolder,*>?) : RecyclerView.ViewHolder(view) {
         init {
             if (adapter != null) {
                 adapter.footerView = view

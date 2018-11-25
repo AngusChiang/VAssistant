@@ -13,6 +13,7 @@ import android.widget.TextView
 import cn.vove7.common.accessibility.AccessibilityApi
 import cn.vove7.common.accessibility.viewnode.ViewNode
 import cn.vove7.common.app.GlobalApp
+import cn.vove7.common.datamanager.parse.model.ActionScope
 import cn.vove7.jarvis.tools.baiduaip.BaiduAipHelper
 import cn.vove7.common.utils.LooperHelper
 import cn.vove7.common.utils.ThreadPool.runOnCachePool
@@ -23,6 +24,7 @@ import cn.vove7.common.view.toast.ColorfulToast
 import cn.vove7.executorengine.bridges.SystemBridge
 import cn.vove7.jarvis.BuildConfig
 import cn.vove7.jarvis.R
+import cn.vove7.jarvis.services.MainService
 import cn.vove7.jarvis.tools.AppConfig
 import cn.vove7.jarvis.tools.Tutorials
 import cn.vove7.jarvis.view.dialog.ProgressDialog
@@ -59,11 +61,18 @@ class ScreenPickerActivity : Activity() {
             finish()
             return
         }
+        if (unSupportPage.contains(AccessibilityApi.accessibilityService?.currentScope)) {
+            MainService.instance?.speak("不支持当前页")
+            finish()
+            return
+        }
 
         runOnNewHandlerThread {
             ScreenTextFinder(AccessibilityApi.accessibilityService!!)
                     .findAll().forEach { viewNodeList.add(Model(it)) }
             Vog.d(this, "onCreate ---> 提取数量 ${viewNodeList.size}")
+
+
             if (viewNodeList.isEmpty()) {
                 GlobalApp.toastShort("未提取到任何内容")
                 finish()
@@ -77,6 +86,10 @@ class ScreenPickerActivity : Activity() {
             }
         }
     }
+
+    val unSupportPage = hashSetOf(
+            ActionScope("com.tencent.mtt", "com.tencent.mtt.MainActivity")
+    )
 
     private fun showTips() {
         val sp = SpHelper(this, "tutorials")
@@ -222,11 +235,9 @@ class ScreenPickerActivity : Activity() {
 
     override fun onStop() {
         super.onStop()
-        onBackPressed()
         d?.dismiss()
         sd?.dismiss()
         finish()
-        onDestroy()
         Vog.d(this, "onStop ---> ")
     }
 
@@ -263,7 +274,7 @@ class ScreenPickerActivity : Activity() {
                 .neutralButton(text = "分词") {
                     showSplitWordDialog(text)
                     it.dismiss()
-                }
+                } as ProgressTextDialog
         d?.appendln(text)
         model.subText?.also {
             d?.appendlnRed("\n翻译结果：")

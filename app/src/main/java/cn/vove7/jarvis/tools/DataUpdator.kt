@@ -195,8 +195,7 @@ object DataUpdator {
      * @param back (Boolean) -> Unit
      */
     fun syncGlobalInst(onUpdate: OnUpdate? = null, back: (Boolean) -> Unit) {
-        NetHelper.postJson<List<ActionNode>>(ApiUrls.SYNC_GLOBAL_INST, BaseRequestModel(""),
-                type = NetHelper.ActionNodeListType) { _, bean ->
+        NetHelper.postJson<List<ActionNode>>(ApiUrls.SYNC_GLOBAL_INST, BaseRequestModel("")) { _, bean ->
             if (bean != null) {
                 if (bean.isOk()) {
                     val list = bean.data
@@ -234,8 +233,7 @@ object DataUpdator {
      */
     fun syncInAppInst(onUpdate: OnUpdate? = null, back: (Boolean) -> Unit) {
         NetHelper.postJson<List<ActionNode>>(ApiUrls.SYNC_IN_APP_INST,
-                BaseRequestModel(AdvanAppHelper.getPkgList()),
-                type = NetHelper.ActionNodeListType) { _, bean ->
+                BaseRequestModel(AdvanAppHelper.getPkgList())) { _, bean ->
             if (bean != null) {
                 if (bean.isOk()) {
                     val list = bean.data
@@ -280,8 +278,7 @@ object DataUpdator {
         val syncData = TextHelper.arr2String(types)
         val requestModel = BaseRequestModel(syncData)
 
-        NetHelper.postJson<List<MarkedData>>(ApiUrls.SYNC_MARKED, requestModel,
-                type = NetHelper.MarkedDataListType) { _, bean ->
+        NetHelper.postJson<List<MarkedData>>(ApiUrls.SYNC_MARKED, requestModel) { _, bean ->
             if (bean?.isOk() == true) {
                 DaoHelper.updateMarkedData(onUpdate, types, bean.data ?: emptyList())
                 SpHelper(GlobalApp.APP).set(lastKeyId, System.currentTimeMillis())
@@ -301,8 +298,8 @@ object DataUpdator {
     fun syncMarkedAd(onUpdate: OnUpdate? = null, back: (Boolean) -> Unit) {
 
         val syncPkgs = AdvanAppHelper.getPkgList()
-        NetHelper.postJson<List<AppAdInfo>>(ApiUrls.SYNC_APP_AD, BaseRequestModel(syncPkgs), type = object
-            : TypeToken<ResponseMessage<List<AppAdInfo>>>() {}.type) { _, bean ->
+
+        NetHelper.postJson<List<AppAdInfo>>(ApiUrls.SYNC_APP_AD, BaseRequestModel(syncPkgs)) { _, bean ->
             if (bean != null) {
                 if (bean.isOk()) {
                     //

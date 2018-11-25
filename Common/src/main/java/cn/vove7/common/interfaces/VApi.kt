@@ -27,7 +27,7 @@ interface VApi {
                 "containsText()", "matchesText()", "equalsText()",
                 "similaryText()", "id()", "desc()",
                 "editable()", "scrollable()", "type()", "await()",
-                "findFirst()", "find()", "containsDesc()","waitHide()"
+                "findFirst()", "find()", "containsDesc()", "waitHide()"
         )
         val utilFuns = arrayOf(
                 "toPinyin()", "arr2String()", "print()", "matches()", "matchValues()",
@@ -62,7 +62,7 @@ interface VApi {
                 "screen2File()", "shareText(text)", "shareImage(imgPah)", "location()",
                 "getLocalIpAddress()", "getNetAddress()", "createAlarm()", "createCalendarEvent()",
                 "startActivity(pkg,fullActivityName)", "screenOn()", "screenOff()", "sendKey()",
-                "sendSMS()", "getLaunchIntent()", "getPhoneByName()", "isCharging()", "batteryLevel",
+                "sendSMS()", "getLaunchIntent()", "getPhoneByName()", "getContactByName()", "isCharging()", "batteryLevel",
                 "simCount", "contacts", "saveMarkedContact()", "saveMarkedApp()"
         )
         val appFunctions = arrayOf(
@@ -120,6 +120,7 @@ interface VApi {
                 Pair("openAppByPkg(pkg, reset)", "打开指定app,reset:可选,跳转'首页'"),
                 Pair("openAppByWord(s)", "从标记和安装列表匹配，打开app"),
                 Pair("getPhoneByName()", "根据姓名查找手机号，搜索范围：标记数据、通讯录\n参数：(name: String)"),
+                Pair("getContactByName()","同getPhoneByName()\n返回值：Pair<String,String> first: 匹配的联系人姓名 second: 手机号"),
                 Pair("call(p)", "拨打电话\n参数：(s:String [,simId:Int])\ns可为纯数字电话或联系人姓名(此时phone根据getPhoneByName获取)，simId(可选)为卡号，0:卡1  1:卡2，出错将按默认卡呼出"),
                 Pair("openFlashlight()", "打开闪光灯"),
                 Pair("closeFlashlight()", "关闭闪光灯"),

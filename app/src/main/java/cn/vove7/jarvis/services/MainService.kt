@@ -33,7 +33,6 @@ import cn.vove7.common.datamanager.parse.model.Action
 import cn.vove7.common.executor.CExecutorI
 import cn.vove7.common.interfaces.SpeakCallback
 import cn.vove7.common.model.RequestPermission
-import cn.vove7.common.model.ResultBox
 import cn.vove7.common.model.UserInfo
 import cn.vove7.common.netacc.NetHelper
 import cn.vove7.common.utils.RegUtils.checkCancel
@@ -55,7 +54,6 @@ import cn.vove7.jarvis.chat.QykChatSystem
 import cn.vove7.jarvis.chat.TulingChatSystem
 import cn.vove7.jarvis.speech.SpeechEvent
 import cn.vove7.jarvis.speech.SpeechRecoService
-import cn.vove7.jarvis.speech.SpeechSynthesizerI
 import cn.vove7.jarvis.tools.AppConfig
 import cn.vove7.jarvis.tools.AudioController
 import cn.vove7.jarvis.tools.debugserver.RemoteDebugServer
@@ -106,8 +104,9 @@ class MainService : BusService(),
 
     private lateinit var chatSystem: ChatSystem
 
-    lateinit var speechRecoService: SpeechRecoService
-    lateinit var speechSynService: SpeechSynService
+    //启动过慢  lateinit 导致未初始化异常
+    var speechRecoService: SpeechRecoService? = null
+    var speechSynService: SpeechSynService? = null
 
     /**
      * 当前语音使用方式
@@ -191,7 +190,7 @@ class MainService : BusService(),
                 //语音控制
                 if (AppConfig.voiceControlDialog) {
                     voiceMode = MODE_ALERT
-                    speechRecoService.startRecog()
+                    speechRecoService?.startRecog()
                 }
             } catch (e: Exception) {
                 GlobalLog.err(e)
@@ -223,7 +222,7 @@ class MainService : BusService(),
      */
     private fun notifyAlertResult(r: Boolean) {
         if (AppConfig.voiceControlDialog) {
-            speechRecoService.cancelRecog()
+            speechRecoService?.cancelRecog()
         }
         voiceMode = MODE_VOICE
         cExecutor.notifyAlertResult(r)
@@ -288,7 +287,7 @@ class MainService : BusService(),
      */
     override fun getVoiceParam() {
         voiceMode = MODE_GET_PARAM
-        speechRecoService.startRecog()
+        speechRecoService?.startRecog()
     }
 
     private var speakSync = false
@@ -296,7 +295,7 @@ class MainService : BusService(),
         //关闭语音播报 toast
         if (AppConfig.audioSpeak && AppConfig.currentStreamVolume != 0) {
             speakSync = false
-            speechSynService.speak(text)
+            speechSynService?.speak(text)
         } else {
             GlobalApp.toastShort(text ?: "null")
         }
@@ -312,13 +311,13 @@ class MainService : BusService(),
     private fun speakWithCallback(text: String?, call: SpeakCallback) {
         speakCallbacks.add(call)
         speakSync = true
-        speechSynService.speak(text)
+        speechSynService?.speak(text) ?: notifySpeakFinish()
     }
 
     override fun speakSync(text: String?): Boolean {
         speakSync = true
         return if (AppConfig.audioSpeak && AppConfig.currentStreamVolume != 0) {//当前音量非静音
-            speechSynService.speak(text)
+            speechSynService?.speak(text) ?: notifySpeakFinish()
             true
         } else {
             GlobalApp.toastShort(text ?: "null")
@@ -376,34 +375,34 @@ class MainService : BusService(),
         }
         when (sAction.action) {
             SpeechAction.ActionCode.ACTION_START_RECO -> {
-                if (speechSynService.speaking) speechSynService.stop()
-                speechRecoService.startRecog()
+                speechSynService?.stopIfSpeaking()
+                speechRecoService?.startRecog()
             }
-            SpeechAction.ActionCode.ACTION_STOP_RECO -> speechRecoService.stopRecog()
+            SpeechAction.ActionCode.ACTION_STOP_RECO -> speechRecoService?.stopRecog()
             SpeechAction.ActionCode.ACTION_CANCEL_RECO -> {
                 hideAll()
-                speechRecoService.cancelRecog()
+                speechRecoService?.cancelRecog()
             }
             SpeechAction.ActionCode.ACTION_START_WAKEUP -> {
                 AppConfig.voiceWakeup = true
-                speechRecoService.startWakeUp()
+                speechRecoService?.startWakeUp()
             }
             SpeechAction.ActionCode.ACTION_START_WAKEUP_WITHOUT_SWITCH -> {
-                speechRecoService.startWakeUp()
+                speechRecoService?.startWakeUp()
             }
-            SpeechAction.ActionCode.ACTION_RELOAD_SYN_CONF -> speechSynService.reLoad()
+            SpeechAction.ActionCode.ACTION_RELOAD_SYN_CONF -> speechSynService?.reLoad()
             SpeechAction.ActionCode.ACTION_STOP_WAKEUP -> {
                 AppConfig.voiceWakeup = false
-                speechRecoService.stopWakeUp()
+                speechRecoService?.stopWakeUp()
             }
             SpeechAction.ActionCode.ACTION_STOP_WAKEUP_WITHOUT_SWITCH -> {
-                speechRecoService.stopWakeUp()
+                speechRecoService?.stopWakeUp()
             }
             SpeechAction.ActionCode.ACTION_STOP_WAKEUP_TIMER -> {
-                speechRecoService.stopAutoSleepWakeup()
+                speechRecoService?.stopAutoSleepWakeup()
             }
             SpeechAction.ActionCode.ACTION_START_WAKEUP_TIMER -> {
-                speechRecoService.startAutoSleepWakeup()
+                speechRecoService?.startAutoSleepWakeup()
             }
             else -> {
                 Vog.e(this, sAction)
@@ -448,8 +447,8 @@ class MainService : BusService(),
                         GlobalApp.toastShort("引擎未就绪")
                         return@thread
                     }
-                    speechRecoService.cancelRecog()
-                    speechSynService.stop()
+                    speechRecoService?.cancelRecog()
+                    speechSynService?.stop()
                     cExecutor.interrupt()
                     hideAll()
                 }
@@ -458,21 +457,21 @@ class MainService : BusService(),
                         GlobalApp.toastShort("引擎未就绪")
                         return@thread
                     }
-                    speechRecoService.stopRecog()
+                    speechRecoService?.stopRecog()
                 }
                 ORDER_CANCEL_RECO -> {
                     if (!speechEngineLoaded) {
                         GlobalApp.toastShort("引擎未就绪")
                         return@thread
                     }
-                    speechRecoService.cancelRecog()
+                    speechRecoService?.cancelRecog()
                 }
                 ORDER_START_RECO -> {
                     if (!speechEngineLoaded) {
                         GlobalApp.toastShort("引擎未就绪")
                         return@thread
                     }
-                    speechRecoService.startRecog()
+                    speechRecoService?.startRecog()
                 }
                 EVENT_FORCE_OFFLINE -> {
                     AppConfig.logout()
@@ -482,14 +481,14 @@ class MainService : BusService(),
                         GlobalApp.toastShort("引擎未就绪")
                         return@thread
                     }
-                    speechRecoService.startWakeUpSilently(false)
+                    speechRecoService?.startWakeUpSilently(false)
                 }
                 ORDER_STOP_VOICE_WAKEUP_WITHOUT_NOTIFY -> {
                     if (!speechEngineLoaded) {
                         GlobalApp.toastShort("引擎未就绪")
                         return@thread
                     }
-                    speechRecoService.stopWakeUpSilently()
+                    speechRecoService?.stopWakeUpSilently()
                 }
                 EVENT_START_DEBUG_SERVER -> {
                     RemoteDebugServer.start()
@@ -527,8 +526,8 @@ class MainService : BusService(),
 
     override fun onDestroy() {
         if (speechEngineLoaded) {
-            speechRecoService.release()
-            speechSynService.release()
+            speechRecoService?.release()
+            speechSynService?.release()
         }
         super.onDestroy()
     }
@@ -697,22 +696,29 @@ class MainService : BusService(),
     }
 
     fun playSoundEffect(rawId: Int) {//音效异步
-        if (AppConfig.voiceSynFeedback && AppConfig.currentStreamVolume != 0) {
+        if (AppConfig.voiceRecogFeedback && AppConfig.currentStreamVolume != 0) {
+            SystemBridge.getMusicFocus()
             AudioController.playOnce(rawId)
         }
     }
 
-    fun playSoundEffectSync(rawId: Int) {//音效同步
+    /**
+     *
+     * @param rawId Int
+     * @param lock CountDownLatch?
+     */
+    fun playSoundEffectSync(rawId: Int, lock: CountDownLatch? = null) {//音效同步
         Vog.d(this, "playSoundEffectSync ---> 音效开始")
-        if (AppConfig.voiceSynFeedback && AppConfig.currentStreamVolume != 0) {
-            val lock = CountDownLatch(1)
+        if (AppConfig.voiceRecogFeedback && AppConfig.currentStreamVolume != 0) {
+            SystemBridge.getMusicFocus()
+            val l = lock ?: CountDownLatch(1)
             runOnPool {
                 AudioController.playOnce(rawId) {
-                    lock.countDown()
+                    l.countDown()
                 }
             }
-            lock.await(2L, TimeUnit.SECONDS)
-        }
+            if (lock == null) l.await(2L, TimeUnit.SECONDS)
+        } else lock?.countDown()
         Vog.d(this, "playSoundEffectSync ---> 音效结束")
     }
 
@@ -720,54 +726,73 @@ class MainService : BusService(),
      * 语音识别事件监听
      */
     inner class RecgEventListener : SpeechEvent {
-        override fun onWakeup(word: String?): Boolean {
+        override fun onWakeup(word: String?) {
             //解析成功  不再唤醒
             parseWakeUpCommand(word ?: "").also {
-                if (it) return false
+                if (it) return
             }
             //唤醒词 你好小V，小V同学 ↓
-            checkMusic()
-            if (AppConfig.openResponseWord && AppConfig.speakResponseWordOnVoiceWakeup) {
-                speakResponseWord()
-            }
-            return true
+            speechRecoService?.cancelRecog(false)
+            speechRecoService?.startRecog(true)
+            return
         }
 
-        private fun speakResponseWord() {
+        private fun speakResponseWord(lock: CountDownLatch? = null) {
             continuePlay = false//不继续播放后台，
-            Vog.d(this, "onStartRecog 响应词 ---> ${AppConfig.responseWord}")
-            val resultBox = ResultBox<Boolean>()
+            Vog.d(this, "speakResponseWord 响应词 ---> ${AppConfig.responseWord}")
+            val l = lock ?: CountDownLatch(1)
             speakWithCallback(AppConfig.responseWord, object : SpeakCallback {
                 override fun speakCallback(result: String?) {
                     Vog.d(this, "speakWithCallback ---> $result")
-                    resultBox.setAndNotify(true)
+                    sleep(200)
+                    l.countDown()
                 }
             })
-            resultBox.blockedGet()
-            Vog.d(this, "onStartRecog ---> speak finish")
-            sleep(200)
+            if (lock == null) l.await()
+            Vog.d(this, "speakResponseWord ---> speak finish")
         }
 
-        override fun onStartRecog() {
-            if (speechSynService.speaking) {
-                speechSynService.stop()
+        //响应词 与 提示音
+        //语音唤醒时已播放  就不再播放
+
+        /**
+         *
+         * @param voiceWakeup Boolean true唤醒 false聆听
+         * @param sayWord Boolean 播放响应词
+         */
+        private fun recogEffect(byVoice: Boolean) {
+            if (voiceMode != MODE_VOICE) {
+                return
             }
+            if (byVoice) {//语音唤醒
+                val lock = CountDownLatch(2)
+
+                if (AppConfig.openResponseWord && AppConfig.speakResponseWordOnVoiceWakeup) {
+                    speakResponseWord(lock)
+                } else lock.countDown()
+                playSoundEffectSync(R.raw.recog_start, lock)
+                lock.await()
+            } else {//按键 快捷 等其他方式
+                val lock = CountDownLatch(2)
+                if (AppConfig.openResponseWord && !AppConfig.speakResponseWordOnVoiceWakeup) {
+                    speakResponseWord(lock)
+                } else lock.countDown()
+                playSoundEffectSync(R.raw.recog_start, lock)
+                lock.await()
+            }
+        }
+
+        override fun onStartRecog(byVoice: Boolean) {
+            speechSynService?.stopIfSpeaking()
             AppBus.post(AppBus.EVENT_BEGIN_RECO)
             Vog.d(this, "onStartRecog ---> 开始识别")
             if (continuePlay)//唤醒时检查过
                 checkMusic()//检查后台播放
             listeningAni.begin()//
-            //响应词
-            if (AppConfig.openResponseWord && !AppConfig.speakResponseWordOnVoiceWakeup) {
-                speakResponseWord()
-            }
-            //音效
-            if (voiceMode == MODE_VOICE) {
-                playSoundEffectSync(R.raw.recog_start)
-            }
+            recogEffect(byVoice)
             listeningToast.show("开始聆听")
             //震动
-            if (AppConfig.vibrateWhenStartReco) {
+            if (AppConfig.vibrateWhenStartReco || voiceMode != MODE_VOICE) {//询问参数时，震动
                 SystemBridge.vibrate(80L)
             }
 
@@ -781,6 +806,7 @@ class MainService : BusService(),
                         //fixme 播放结束不回调
                         playSoundEffectSync(R.raw.recog_finish)
                         if (it == null || it == "") {
+
                             onParseCommand(voiceResult)
                         } else if (voiceResult.endsWith(it)) {
                             onParseCommand(voiceResult.substring(0, voiceResult.length - it.length))

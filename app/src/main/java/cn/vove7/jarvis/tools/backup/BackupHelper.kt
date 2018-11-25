@@ -16,6 +16,7 @@ import cn.vove7.common.datamanager.parse.DataFrom
 import cn.vove7.common.datamanager.parse.statusmap.ActionNode
 import cn.vove7.common.model.UserInfo
 import cn.vove7.common.utils.GsonHelper
+import cn.vove7.common.utils.StorageHelper
 import cn.vove7.common.utils.ThreadPool.runOnPool
 import cn.vove7.executorengine.parse.ParseEngine
 import cn.vove7.jarvis.BuildConfig
@@ -139,7 +140,8 @@ object BackupHelper {
         return false
     }
 
-    private val backupPath: String by lazy { Environment.getExternalStorageDirectory().absolutePath + "/V Assist" }
+    private val backupPath: String by lazy { StorageHelper.backupPath }
+
     private fun toFile(json: String): Boolean {
         val format = SimpleDateFormat("yyyyMMdd_HH_mm", Locale.getDefault())
         return try {

@@ -2,17 +2,18 @@ package cn.vove7.common.utils
 
 import android.Manifest
 import android.content.Context
+import android.content.Intent
+import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
 import android.graphics.Rect
 import android.os.Handler
+import android.os.HandlerThread
 import android.os.Looper
 import android.view.View
+import cn.vove7.common.app.GlobalApp
+import cn.vove7.common.app.GlobalLog
 import cn.vove7.vtp.app.AppInfo
 import cn.vove7.vtp.log.Vog
-import android.content.Intent
-import android.content.pm.ApplicationInfo
-import android.os.HandlerThread
-import cn.vove7.common.app.GlobalApp
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -32,7 +33,11 @@ fun runOnUi(action: () -> Unit) {
     if (mainLoop == Looper.myLooper()) {
         action.invoke()
     } else {
-        Handler(mainLoop).post(action)
+        try {
+            Handler(mainLoop).post(action)
+        } catch (e: Exception) {
+            GlobalLog.err(e, "pmh39")
+        }
     }
 }
 
@@ -146,18 +151,23 @@ fun AppInfo.hasMicroPermission(): Boolean {
     if (packageName == GlobalApp.APP.packageName) return false//排除自身
     microPermissionCache[packageName]?.also {
         Vog.d(this, "hasMicroPermission ---> $name 麦克风权限 $it")
-        //若无权限 再次检查（可能动态申请）
-        if (it) return true
+//        //若无权限 再次检查（可能动态申请）
+//        if (it) return true
+        return it
     }
 
-    val pm = GlobalApp.APP.packageManager
-    val pkgInfo = pm.getPackageInfo(packageName, PackageManager.GET_PERMISSIONS)
-    pkgInfo.requestedPermissions?.forEach {
-        if (it.endsWith(".RECORD_AUDIO") && hasGrantedPermission(it)) {
-            Vog.d(this, "hasMicroPermission ---> $name 授权麦克风权限")
-            microPermissionCache[packageName] = true
-            return true
+    try {
+        val pm = GlobalApp.APP.packageManager
+        val pkgInfo = pm.getPackageInfo(packageName, PackageManager.GET_PERMISSIONS)
+        pkgInfo?.requestedPermissions?.forEach {
+            if (it.endsWith(".RECORD_AUDIO") && hasGrantedPermission(it)) {
+                Vog.d(this, "hasMicroPermission ---> $name 授权麦克风权限")
+                microPermissionCache[packageName] = true
+                return true
+            }
         }
+    } catch (e: Exception) {
+        GlobalLog.err(e, "ehm165")
     }
     Vog.d(this, "hasMicroPermission ---> $name 无麦克风权限")
     microPermissionCache[packageName] = false
@@ -184,4 +194,18 @@ fun View.toggleVisibility(toggleVisibility: Int = View.GONE) {
     } else {
         toggleVisibility
     }
+}
+
+fun View.isVisibility(): Boolean = visibility == View.VISIBLE
+
+fun View.gone() {
+    visibility = View.GONE
+}
+
+fun View.show() {
+    visibility = View.VISIBLE
+}
+
+fun View.inVisibility() {
+    visibility = View.INVISIBLE
 }

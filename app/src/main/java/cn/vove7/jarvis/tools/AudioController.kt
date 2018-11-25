@@ -22,14 +22,12 @@ object AudioController {
      */
     fun playOnce(rawId: Int, streamType: Int = AppConfig.currentStreamType,
                  onFinish: (() -> Unit)? = null) {
-        SystemBridge.getMusicFocus()
         val p = MediaPlayer.create(GlobalApp.APP, rawId, AudioAttributes.Builder()
                 .setLegacyStreamType(streamType).build(), 9)
         p.setOnCompletionListener {
             it?.release()
             onFinish?.invoke()
             Vog.d(this,"playOnce ---> 结束")
-            SystemBridge.removeMusicFocus()
         }
         p.start()
     }

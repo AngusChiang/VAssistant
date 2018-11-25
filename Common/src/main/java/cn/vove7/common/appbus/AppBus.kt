@@ -17,6 +17,8 @@ object AppBus {
     const val EVENT_FINISH_RECO = "e_finish_reco"
     const val EVENT_ERROR_RECO = "e_error_reco"
     const val EVENT_HIDE_FLOAT = "e_hide_float"
+    const val EVENT_PLUGIN_INSTALLED = "e_plugin_installed"
+    const val EVENT_PLUGIN_UNINSTALLED = "e_plugin_uninstalled"
 
     const val ORDER_BEGIN_SCREEN_PICKER = "begin_screen_picker"
     const val ORDER_BEGIN_SCREEN_PICKER_TRANSLATE = "begin_screen_picker_translate"

@@ -4,12 +4,12 @@ import android.view.accessibility.AccessibilityNodeInfo
 import cn.vove7.common.datamanager.parse.model.ActionScope
 
 /**
- * # PluginsService
- *
+ * # AccPluginService
+ * 无障碍 插件服务
  * @author 17719247306
  * 2018/9/3
  */
-interface PluginsService {
+interface AccPluginService {
     /**
      * 界面更新事件
      * @param root AccessibilityNodeInfo  根节点

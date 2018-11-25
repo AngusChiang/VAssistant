@@ -53,12 +53,11 @@ class AppAdListActivity : OneFragmentActivity() {
             }
         }
 
-        override val itemClickListener: SimpleListAdapter.OnItemClickListener? =
-            object : SimpleListAdapter.OnItemClickListener {
+        override val itemClickListener: SimpleListAdapter.OnItemClickListener<AppAdInfo>? =
+            object : SimpleListAdapter.OnItemClickListener<AppAdInfo> {
                 @SuppressLint("CheckResult")
-                override fun onClick(holder: SimpleListAdapter.VHolder?, pos: Int, item: ViewModel) {
-
-                    val data = item.extra as AppAdInfo
+                override fun onClick(holder: SimpleListAdapter.VHolder?, pos: Int, item: ViewModel<AppAdInfo>) {
+                    val data = item.extra!!
                     MaterialDialog(context!!).show {
                         if (data.belongUser()) {
                             neutralButton(R.string.text_edit) {
@@ -104,8 +103,7 @@ class AppAdListActivity : OneFragmentActivity() {
         }
 
         fun share(adInfo: AppAdInfo) {
-            NetHelper.postJson<String>(ApiUrls.SHARE_APP_AD_INFO, BaseRequestModel(adInfo),
-                    type = NetHelper.StringType) { _, bean ->
+            NetHelper.postJson<String>(ApiUrls.SHARE_APP_AD_INFO, BaseRequestModel(adInfo)) { _, bean ->
                 if (bean != null) {
                     if (bean.isOk()) {
                         //return tagId
@@ -133,21 +131,15 @@ class AppAdListActivity : OneFragmentActivity() {
             }
         }
 
-        override fun transData(nodes: List<AppAdInfo>): List<ViewModel> {
-            val list = mutableListOf<ViewModel>()
-            nodes.forEach {
-                list.add(ViewModel(it.descTitle, it.activity, extra = it))
-            }
-            return list
+        override fun unification(it: AppAdInfo): ViewModel<AppAdInfo>? {
+            return ViewModel(it.descTitle, it.activity, extra = it)
         }
 
         override fun onGetData(pageIndex: Int) {
             val list = DAO.daoSession.appAdInfoDao
                     .queryBuilder()
                     .where(AppAdInfoDao.Properties.Pkg.eq(pkg)).list()
-
-            dataSet.addAll(transData(list))
-            notifyLoadSuccess(true)
+            notifyLoadSuccess(list)
         }
     }
 

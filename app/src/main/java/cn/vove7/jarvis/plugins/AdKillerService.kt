@@ -2,7 +2,7 @@ package cn.vove7.jarvis.plugins
 
 import android.view.accessibility.AccessibilityNodeInfo
 import cn.vove7.common.accessibility.AccessibilityApi
-import cn.vove7.common.accessibility.component.AccPluginsService
+import cn.vove7.common.accessibility.component.AbsAccPluginService
 import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.datamanager.AppAdInfo
 import cn.vove7.common.datamanager.DAO
@@ -31,7 +31,7 @@ import java.util.concurrent.ConcurrentHashMap
  * @author 17719247306
  * 2018/9/3
  */
-object AdKillerService : AccPluginsService() {
+object AdKillerService : AbsAccPluginService() {
     //TO-DO fixed 猪八戒ad fixed
     private val removeAdAnimation: RemoveAdAnimation by lazy { RemoveAdAnimation() }
     /**
@@ -93,10 +93,10 @@ object AdKillerService : AccPluginsService() {
                 }
             }
         }
-        try {
-            sleep(100)
-        } catch (e: Exception) {
-        }
+//        try {
+//            sleep(100)
+//        } catch (e: Exception) {
+//        }
         locked = false
     }
 

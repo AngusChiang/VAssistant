@@ -6,19 +6,19 @@
     android:paddingStart="?attr/dialogPreferredPadding"
     android:paddingEnd="?attr/dialogPreferredPadding">
 
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/text_recharege_pre_read"
-        android:textColor="@color/primary_text"
-        android:textStyle="bold" />
+    <!--<TextView-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:text="@string/text_recharege_pre_read"-->
+        <!--android:textColor="@color/primary_text"-->
+        <!--android:textStyle="bold" />-->
 
-    <Button
-        android:id="@+id/btn_guide"
-        android:layout_width="wrap_content"
-        android:layout_height="40dp"
-        android:text="@string/text_guide"
-        android:theme="@style/MaterialButton.Blue" />
+    <!--<Button-->
+        <!--android:id="@+id/btn_guide"-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="40dp"-->
+        <!--android:text="@string/text_guide"-->
+        <!--android:theme="@style/MaterialButton.Blue" />-->
 
     <TextView
         android:layout_width="match_parent"

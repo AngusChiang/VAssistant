@@ -21,6 +21,7 @@ interface SystemOperation {
      * @return Intent?
      */
     fun getLaunchIntent(pkg: String): Intent?
+
     /**
      * 根据App名，获取应用包名
      * 标记 -> 应用列表
@@ -32,9 +33,16 @@ interface SystemOperation {
     /**
      * 模糊匹配 标记本地
      * @param name String
-     * @return String?
+     * @return String? first: 匹配的联系人姓名 or 纯数字 second: 手机号
      */
     fun getPhoneByName(name: String): String?
+
+    /**
+     * 模糊匹配联系人 包含实际联系人
+     * @param name String
+     * @return Pair<String,String>?
+     */
+    fun getContactByName(name: String): Pair<String, String>?
 
     /**
      * 通过包名打开App
@@ -99,7 +107,7 @@ interface SystemOperation {
     /**
      * 勿扰模式
      */
-    fun  doNotDisturbMode()
+    fun doNotDisturbMode()
 
 
     fun volumeUp()

@@ -14,6 +14,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
+import cn.vove7.common.utils.runOnUi
 import cn.vove7.common.view.toast.ColorfulToast
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.adapters.RecAdapterWithFooter
@@ -33,6 +34,7 @@ abstract class VListFragment : Fragment() {
     private var netErrView: View? = null
     private lateinit var swipeRefreshLayout: SwipeRefreshLayout
     open val pageSizeLimit = 50
+    open val itemCheckable: Boolean = false
 
     //    var onRefreshing = false//下拉正在刷新标志
     var loading = false
@@ -49,7 +51,7 @@ abstract class VListFragment : Fragment() {
     lateinit var recyclerView: RecyclerView
 
     var layManager: RecyclerView.LayoutManager? = null
-    lateinit var adapter: RecAdapterWithFooter<*>
+    lateinit var adapter: RecAdapterWithFooter<*, *>
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         toast = ColorfulToast(context!!)
         contentView = inflater.inflate(R.layout.fragment_base_list, container, false)
@@ -126,14 +128,6 @@ abstract class VListFragment : Fragment() {
         }
     }
 
-
-    class ResultHandler(val f: VListFragment) : Handler() {
-        override fun handleMessage(msg: Message?) {
-            f.notifyLoadSuccess((msg?.what ?: 999) < f.pageSizeLimit)// all load
-        }
-    }
-
-    val resultHandler = ResultHandler(this)
     abstract fun clearDataSet()
 
     abstract fun onGetData(pageIndex: Int)
@@ -241,17 +235,24 @@ abstract class VListFragment : Fragment() {
      * notifyDataSetChanged
      * @param allLoad 全部加载标志
      */
-    fun notifyLoadSuccess(allLoad: Boolean = false) {
-        recyclerView.visibility = View.VISIBLE
-        netErrViewContainer.visibility = View.GONE
-        pageIndex++
-        loading = false
+    protected fun notifyLoadSuccess(allLoad: Boolean = false) {
+        runOnUi {
+            recyclerView.visibility = View.VISIBLE
+            netErrViewContainer.visibility = View.GONE
+            pageIndex++
+            loading = false
+            stopRefreshing()
+            notifyDataSetChanged()
+            if (allLoad) {
+                setAllLoad()
+            } else
+                adapter.hideFooterView()
+        }
+    }
+
+    fun failedToLoad() {
         stopRefreshing()
-        notifyDataSetChanged()
-        if (allLoad) {
-            setAllLoad()
-        } else
-            adapter.hideFooterView()
+        showNetErr()
     }
 
     fun buildHeader(title: String, switchChecked: Boolean = false, lis: CompoundButton.OnCheckedChangeListener? = null) {

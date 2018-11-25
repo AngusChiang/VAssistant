@@ -53,8 +53,8 @@ import cn.vove7.common.utils.runOnNewHandlerThread
  */
 @RequiresApi(api = Build.VERSION_CODES.M)
 class AssistSession(context: Context) : VoiceInteractionSession(context),
-        SimpleListAdapter.OnItemClickListener {
-    lateinit var bottomSheetController: BottomSheetController
+        SimpleListAdapter.OnItemClickListener<AssistSession.SessionFunItem> {
+    lateinit var bottomSheetController: BottomSheetController<SessionFunItem>
     private var pb: ProgressBar? = null
     private var screenshot: Bitmap? = null
     var screenPath: String? = null
@@ -72,7 +72,7 @@ class AssistSession(context: Context) : VoiceInteractionSession(context),
         if (screenshot == null) return
         screenPath = "loading"
         showProgressBar = true
-        runOnNewHandlerThread("save_screen") {
+        runOnNewHandlerThread("save_screen", delay = 1000) {
             this@AssistSession.screenshot = screenshot
             val ss = compressMaterix(screenshot)
             Vog.d(this, "onHandleScreenshot ---> $screenshot")
@@ -123,7 +123,7 @@ class AssistSession(context: Context) : VoiceInteractionSession(context),
             field = value
         }
 
-    override fun onClick(holder: SimpleListAdapter.VHolder?, pos: Int, item: ViewModel) {
+    override fun onClick(holder: SimpleListAdapter.VHolder?, pos: Int, item: ViewModel<AssistSession.SessionFunItem>) {
         when (pos) {
             0 -> {
                 val path = screenPath
@@ -182,13 +182,22 @@ class AssistSession(context: Context) : VoiceInteractionSession(context),
     }
 
     private val items = mutableListOf(
-            ViewModel("屏幕识别", icon = context.getDrawable(R.drawable.ic_screen_content), subTitle = "识别屏幕内容"),
-            ViewModel("文字识别", icon = context.getDrawable(R.drawable.ic_screen_text), subTitle = "适用于图片中的文字识别"),
-            ViewModel("文字提取", icon = context.getDrawable(R.drawable.ic_tt), subTitle = "适用于屏幕内文本提取"),
-            ViewModel("分享屏幕", icon = context.getDrawable(R.drawable.ic_screenshot), subTitle = "分享截屏"),
-            ViewModel("二维码/条码识别", icon = context.getDrawable(R.drawable.ic_qr_code)),
-            ViewModel("保存截图", icon = context.getDrawable(R.drawable.ic_screenshot))
+            SessionFunItem("屏幕识别", R.drawable.ic_screen_content, "识别屏幕内容").viewModel(context),
+            SessionFunItem("文字识别", R.drawable.ic_screen_text, "适用于图片中的文字识别").viewModel(context),
+            SessionFunItem("文字提取", R.drawable.ic_tt, "适用于屏幕内文本提取").viewModel(context),
+            SessionFunItem("分享屏幕", R.drawable.ic_screenshot, "分享截屏").viewModel(context),
+            SessionFunItem("二维码/条码识别", R.drawable.ic_qr_code).viewModel(context),
+            SessionFunItem("保存截图", R.drawable.ic_screenshot).viewModel(context)
     )
+
+    class SessionFunItem(
+            val name: String,
+            val iconId: Int,
+            val desc: String? = null
+    ) {
+        fun viewModel(context: Context) =
+            ViewModel(name, icon = context.getDrawable(iconId), subTitle = desc, extra = this)
+    }
 
     /**
      * 带有动画，退出

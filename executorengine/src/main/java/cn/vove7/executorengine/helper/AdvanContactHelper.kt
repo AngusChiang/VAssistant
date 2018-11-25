@@ -71,21 +71,22 @@ object AdvanContactHelper : GenChoiceData, Markable {
 
     /**
      * 纯数字 -> 标记 -> 模糊匹配 -> 匹配提供
+     * @return Pair<S,S>  first: 匹配的联系人姓名 or 纯数字 second: 手机号
      */
-    fun matchPhone(s: String, update: Boolean = true): String? {
+    fun matchPhone(s: String, update: Boolean = true): Pair<String, String>? {
         if (phoneNum.matches(s)) {//数字
-            return s
+            return Pair(s, s)
         }
         val markedPhone = markedContactDao.queryBuilder()//by key
                 .where(MarkedDataDao.Properties.Key.eq(s), MarkedDataDao.Properties.Type.eq(MarkedData.MARKED_TYPE_CONTACT)).unique()
         if (markedPhone != null) {
             Vog.d(this, "Matched from MarkedData by key $s")
-            return markedPhone.value
+            return Pair(markedPhone.key, markedPhone.value)
         }
         //本地匹配
         val localMatched = LOCAL_CONTACT_LIST[s]
         if (localMatched != null) {
-            return localMatched.phones[0]
+            return Pair(localMatched.contactName, localMatched.phones[0])
         }
         //更新列表
         if (update) {
@@ -95,7 +96,7 @@ object AdvanContactHelper : GenChoiceData, Markable {
         //模糊匹配 -> 匹配提供
         val matchedList = fuzzyMatching(s)
         return if (matchedList.isNotEmpty()) {
-            matchedList[0].data.phones[0]
+            Pair(matchedList[0].data.contactName, matchedList[0].data.phones[0])
         } else {//匹配提供
             Vog.d(this, "match by regex")
 
@@ -104,11 +105,11 @@ object AdvanContactHelper : GenChoiceData, Markable {
                     .where(MarkedDataDao.Properties.Type.eq(MarkedData.MARKED_TYPE_CONTACT)).list()
             list.forEach {
                 if (TextHelper.compareSimilarityWithPinyin(GlobalApp.APP, s, it.key) >= 0.8) // key 模糊查询
-                    return it.value
+                    return Pair(it.key, it.value)
 
                 val regex = it.regex
                 if (regex.matches(s))
-                    return it.value
+                    return Pair(it.key, it.value)
             }
             Vog.d(this, "from server no one")
             null

@@ -1,7 +1,7 @@
 package cn.vove7.jarvis.plugins
 
 import android.view.accessibility.AccessibilityNodeInfo
-import cn.vove7.common.accessibility.component.AccPluginsService
+import cn.vove7.common.accessibility.component.AbsAccPluginService
 import cn.vove7.common.datamanager.parse.model.ActionScope
 import cn.vove7.vtp.log.Vog
 
@@ -11,7 +11,7 @@ import cn.vove7.vtp.log.Vog
  * @author Administrator
  * 2018/11/12
  */
-object AutoLearnService : AccPluginsService() {
+object AutoLearnService : AbsAccPluginService() {
     override fun onUiUpdate(root: AccessibilityNodeInfo?) {
         //解析record
 //        eventData.apply {

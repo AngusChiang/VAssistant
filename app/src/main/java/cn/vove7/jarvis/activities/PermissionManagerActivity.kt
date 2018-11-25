@@ -73,8 +73,8 @@ class PermissionManagerActivity : OneFragmentActivity() {
             adapter.hideFooterView()
         }
 
-        private fun buildAdapter(): RecAdapterWithFooter<Holder> {
-            return object : RecAdapterWithFooter<Holder>() {
+        private fun buildAdapter(): RecAdapterWithFooter<Holder,PermissionStatus> {
+            return object : RecAdapterWithFooter<Holder,PermissionStatus>() {
 
                 override fun itemCount(): Int = permissions.size
 
@@ -87,8 +87,7 @@ class PermissionManagerActivity : OneFragmentActivity() {
                     return Holder(view)
                 }
 
-                override fun onBindView(holder: Holder, position: Int, it: Any?) {
-                    val item = it as PermissionStatus
+                override fun onBindView(holder: Holder, position: Int, item: PermissionStatus) {
 
                     holder.title.text = item.permissionName
                     if (item.desc == "") {

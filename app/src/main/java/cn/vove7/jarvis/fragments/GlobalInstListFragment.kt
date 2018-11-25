@@ -36,11 +36,11 @@ class GlobalInstListFragment : SimpleListFragment<ActionNode>(), OnSyncInst {
         intent.putExtra("type", NODE_SCOPE_GLOBAL)
         startActivity(intent)
     }
-    override val itemClickListener: SimpleListAdapter.OnItemClickListener =
-        object : SimpleListAdapter.OnItemClickListener {
-            override fun onClick(holder: SimpleListAdapter.VHolder?, pos: Int, item: ViewModel) {
+    override val itemClickListener: SimpleListAdapter.OnItemClickListener<ActionNode> =
+        object : SimpleListAdapter.OnItemClickListener<ActionNode> {
+            override fun onClick(holder: SimpleListAdapter.VHolder?, pos: Int, item: ViewModel<ActionNode>) {
                 //显示详情
-                val node = item.extra as ActionNode
+                val node = item.extra
 
                 val intent = Intent(context, InstDetailActivity::class.java)
                 intent.putExtra("nodeId", node.id)
@@ -77,14 +77,10 @@ class GlobalInstListFragment : SimpleListFragment<ActionNode>(), OnSyncInst {
         }
     }
 
-    override fun transData(nodes: List<ActionNode>): List<ViewModel> {
-        val tmp = mutableListOf<ViewModel>()
-        nodes.forEach {
-            val fs = it.follows?.size ?: 0
-            tmp.add(ViewModel((it).actionTitle, (it.desc?.instructions ?: "无介绍") +
-                    (if (fs == 0) "" else "\n跟随 $fs"), extra = it))
-        }
-        return tmp
+    override fun unification(it: ActionNode): ViewModel<ActionNode>? {
+        val fs = it.follows?.size ?: 0
+        return ViewModel((it).actionTitle, (it.desc?.instructions ?: "无介绍") +
+                (if (fs == 0) "" else "\n跟随 $fs"), extra = it)
     }
 
     override fun onGetData(pageIndex: Int) {
@@ -100,8 +96,7 @@ class GlobalInstListFragment : SimpleListFragment<ActionNode>(), OnSyncInst {
             }
             val offsetDatas = builder.offset(pageIndex * pageSizeLimit)
                     .limit(pageSizeLimit).list()
-            dataSet.addAll(transData(offsetDatas))
-            postLoadResult(offsetDatas.isEmpty())
+            notifyLoadSuccess(offsetDatas)
         }
     }
 

@@ -3,6 +3,7 @@ package cn.vove7.jarvis.chat
 import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.bridges.HttpBridge
 import cn.vove7.common.netacc.NetHelper
+import cn.vove7.common.utils.GsonHelper
 import cn.vove7.vtp.log.Vog
 import com.google.gson.Gson
 
@@ -20,7 +21,7 @@ class QykChatSystem : ChatSystem {
             null
         } else {
             try {
-                Gson().fromJson<Map<String, String>>(data, NetHelper.MapType)["content"]?.replace("{br}", " ")
+                GsonHelper.fromJson<Map<String, String>>(data)!!["content"]?.replace("{br}", " ")
             } catch (e: Exception) {
                 GlobalLog.err(e, "qcs25")
                 null

@@ -33,6 +33,7 @@ import cn.vove7.common.view.toast.ColorfulToast
 import cn.vove7.executorengine.helper.AdvanAppHelper
 import cn.vove7.executorengine.parse.ParseEngine
 import cn.vove7.executorengine.parse.ParseResult
+import cn.vove7.jarvis.App
 import cn.vove7.jarvis.BuildConfig
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.adapters.SimpleListAdapter
@@ -59,7 +60,7 @@ import java.util.*
  * 2018/8/19
  */
 class NewInstActivity : AppCompatActivity(), View.OnClickListener {
-    var bsController: BottomSheetWithToolbarController? = null
+    var bsController: BottomSheetWithToolbarController<AppInfo>? = null
     var pkg: String? = null
     var parentId: Long? = null//上级命令MapNodeId
     private var instType: Int = NODE_SCOPE_GLOBAL
@@ -224,7 +225,7 @@ class NewInstActivity : AppCompatActivity(), View.OnClickListener {
                     val tmp = apps.filter {
                         it.title?.contains(nt, ignoreCase = true) == true
                     }
-                    bsController?.setBottomListData(tmp as MutableList<ViewModel>, onSelAppItemClick)
+                    bsController?.setBottomListData(tmp, onSelAppItemClick)
                 }
                 handler.postDelayed(sR, 500)
                 return true
@@ -240,7 +241,7 @@ class NewInstActivity : AppCompatActivity(), View.OnClickListener {
         return@Handler true
     }
 
-    private val apps = mutableListOf<ViewModel>()
+    private val apps = mutableListOf<ViewModel<AppInfo>>()
 
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
         when (item?.itemId) {
@@ -258,8 +259,8 @@ class NewInstActivity : AppCompatActivity(), View.OnClickListener {
     }
 
 
-    private fun getInstalledApp(): MutableList<ViewModel> {
-        val list = mutableListOf<ViewModel>()
+    private fun getInstalledApp(): MutableList<ViewModel<AppInfo>> {
+        val list = mutableListOf<ViewModel<AppInfo>>()
         AdvanAppHelper.APP_LIST.values.forEach {
             list.add(ViewModel(it.name, icon = it.getIcon(this), extra = it))
         }
@@ -292,9 +293,9 @@ class NewInstActivity : AppCompatActivity(), View.OnClickListener {
         //TODO 草稿
     }
 
-    private val onSelAppItemClick = object : SimpleListAdapter.OnItemClickListener {
-        override fun onClick(holder: SimpleListAdapter.VHolder?, pos: Int, item: ViewModel) {
-            val app = item.extra as AppInfo
+    private val onSelAppItemClick = object : SimpleListAdapter.OnItemClickListener<AppInfo> {
+        override fun onClick(holder: SimpleListAdapter.VHolder?, pos: Int, item: ViewModel<AppInfo>) {
+            val app = item.extra
             btn_sel_app.text = app.name
             pkg = app.packageName
             bsController?.hideBottom()

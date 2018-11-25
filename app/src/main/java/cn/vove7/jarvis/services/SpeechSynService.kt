@@ -78,6 +78,12 @@ class SpeechSynService(val event: SyncEvent) : SpeechSynthesizerListener {
         synthesizer.release()
     }
 
+    fun stopIfSpeaking(byUser: Boolean = false) {
+        if (speaking) {
+            stop(byUser)
+        }
+    }
+
     /**
      * 停止合成引擎。即停止播放，合成，清空内部合成队列。
      * @param byUser 是否用户

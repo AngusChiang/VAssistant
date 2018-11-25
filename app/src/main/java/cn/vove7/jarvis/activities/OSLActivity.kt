@@ -19,21 +19,21 @@ class OSLActivity : OneFragmentActivity() {
 
     class ListFragment : SimpleListFragment<OslItem>() {
 
-        override fun unification(it: OslItem): ViewModel {
+        override fun unification(it: OslItem): ViewModel<OslItem> {
             return ViewModel(it.name, it.desc.let { s -> if (s == "") it.url else s }, extra = it)
         }
 
-        override val itemClickListener: SimpleListAdapter.OnItemClickListener? =
-            object : SimpleListAdapter.OnItemClickListener {
-                override fun onClick(holder: SimpleListAdapter.VHolder?, pos: Int, item: ViewModel) {
-                    val it = item.extra as OslItem
+        override val itemClickListener: SimpleListAdapter.OnItemClickListener<OslItem> =
+            object : SimpleListAdapter.OnItemClickListener<OslItem> {
+                override fun onClick(holder: SimpleListAdapter.VHolder?, pos: Int, item: ViewModel<OslItem>) {
+                    val it = item.extra
                     if (it.url != null)
                         SystemBridge.openUrl(it.url)
                 }
             }
 
         override fun onGetData(pageIndex: Int) {
-            dataSet.addAll(transData(listOf(
+            val l = listOf(
                     OslItem("GreenDao", "https://github.com/greenrobot/greenDAO", "greenDAO is an open source Android ORM making development for SQLite databases fun again. It relieves developers from dealing with low-level database requirements while saving development time.")
                     , OslItem("EventBus", "https://github.com/greenrobot/EventBus", "EventBus is an open-source library for Android and Java using the publisher/subscriber pattern for loose coupling. EventBus enables central communication to decoupled classes with just a few lines of code – simplifying the code, removing dependencies, and speeding up app development.")
                     , OslItem("OkHttp", "https://github.com/square/okhttp", "HTTP is the way modern applications network. It’s how we exchange data & media. Doing HTTP efficiently makes your stuff load faster and saves bandwidth.")
@@ -53,9 +53,8 @@ class OSLActivity : OneFragmentActivity() {
                     , OslItem("RePlugin", "https://github.com/Qihoo360/RePlugin", "RePlugin is a complete Android plug-in solution which is suitable for general use.")
                     , OslItem("apk-parser", "https://github.com/hsiafan/apk-parser", "Apk parser lib, for decoding binary xml file, getting apk meta info.")
                     // , OslItem("", "", "")
-
-            )))
-            notifyLoadSuccess(true)
+            )
+            notifyLoadSuccess(l, true)
         }
     }
 }

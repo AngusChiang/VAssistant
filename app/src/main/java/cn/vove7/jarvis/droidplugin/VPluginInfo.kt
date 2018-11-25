@@ -1,9 +1,13 @@
 package cn.vove7.jarvis.droidplugin
 
 import android.content.pm.PackageManager
+import android.graphics.drawable.Drawable
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.app.GlobalLog
+import cn.vove7.jarvis.adapters.ViewModel
+import cn.vove7.jarvis.fragments.AwesomeItem
 import cn.vove7.vtp.log.Vog
+import cn.vove7.vtp.sharedpreference.SpHelper
 import net.dongliu.apk.parser.ApkFile
 
 /**
@@ -15,23 +19,45 @@ import net.dongliu.apk.parser.ApkFile
  * @author Administrator
  * 2018/11/18
  */
-abstract class VPluginInfo {
+abstract class VPluginInfo : AwesomeItem {
     /**
      * 是否安装
      */
     abstract val isInstalled: Boolean
 
+    abstract val pluginManager: PluginManager
+
     var name: String? = null
+    val sp get() = SpHelper(GlobalApp.APP, "disable_plugins")
 
     var packageName: String? = null
     var description: String? = null
+    var updateLog: String? = null
     var versionName: String? = null
     var versionCode: Long = 0
     var author: String? = null
     var authorEmail: String? = null
+    var fileName: String? = null
 
-    val mainActivity: String? by lazy { getPluginMainActivity() }
+    var mainActivity: String? = null
     var mainService: String? = null
+
+    var icon: Drawable? = null
+    /**
+     * 是否启用
+     */
+    var enabled: Boolean
+        get() {
+            return packageName?.let {
+                sp.getBoolean(it, false)
+            } ?: false
+        }
+        set(value) {
+            packageName?.let {
+                if (value) sp.set(it, true)
+                else sp.removeKey(it)
+            }
+        }
 
     /**
      * 从Apk文件解析内容
@@ -56,16 +82,29 @@ abstract class VPluginInfo {
         versionCode = meta.versionCode
         versionName = meta.versionName
 
+        mainActivity = meta.mainActivity?.name
+        Vog.d(this, "parseApk ---> $name mainActivity $mainActivity")
+
+//        val metas = info.applicationInfo.metaData ?: return
+        description = meta.metaDatas["plugin_desc"] ?: ""
+        author = meta.metaDatas["author"] ?: ""
+        authorEmail = meta.metaDatas["author_email"] ?: ""
+        updateLog = meta.metaDatas["update_log"] ?: ""
+        mainService = getPluginMainService()
+
         val pm = GlobalApp.APP.packageManager
         val info = pm.getPackageArchiveInfo(installApkPath,
                 PackageManager.GET_META_DATA)
-        val metas = info.applicationInfo.metaData ?: return
-        description = metas.getString("plugin_desc")
-        author = metas.getString("author") ?: ""
-        authorEmail = metas.getString("author_email")
-        mainService = getPluginMainService()
-//        description=meta
+
+        icon = info?.applicationInfo?.loadIcon(pm)
     }
+
+    fun uninstall(): Boolean {
+        enabled = false
+        return doUninstall()
+    }
+
+    protected abstract fun doUninstall(): Boolean
 
     /**
      * 是否跟随App自启
@@ -74,22 +113,19 @@ abstract class VPluginInfo {
 
     abstract val installApkPath: String?
 
-    private fun getPluginMainActivity(): String? {
-        if (installApkPath == null) return null
-        val pm = GlobalApp.APP.packageManager
-        val info = pm.getPackageArchiveInfo(installApkPath,
-                PackageManager.GET_ACTIVITIES)
-        info.activities.filter {
-            it != null
-        }.forEach {
-            if (it.name.endsWith(".MainActivity")) {
-                Vog.d(this, "getPluginMainActivity ---> ${it.name}")
-                return it.name
-            }
-        }
-        return null
-    }
 
+    /**
+     * 启动Activity 若有
+     */
+    abstract fun launch(): Boolean
+
+    abstract fun startService(): Boolean
+    abstract fun stopService(): Boolean
+
+    /**
+     * 约定 主服务名：PluginMainService
+     * @return String?
+     */
     private fun getPluginMainService(): String? {
         if (installApkPath == null) return null
 
@@ -99,7 +135,7 @@ abstract class VPluginInfo {
         info.services.filter {
             it != null
         }.forEach {
-            if (it.name.endsWith(".MainService")) {
+            if (it.name.endsWith(".PluginMainService")) {
                 if (it.permission == "LAUNCH_WITH_APP") {
                     Vog.d(this, "getPluginMainService ---> ${it.name} 服务自启")
                     launchWithApp = true
@@ -110,4 +146,24 @@ abstract class VPluginInfo {
         }
         return null
     }
+
+    override val viewIcon: Drawable? get() = icon
+    override val title: String? get() = name
+    override val subTitle: String?
+        get() = "$description\n作者：$author\n版本：$versionName"
+    override val isChecked: Boolean? get() = isInstalled && enabled
+
+    override fun isShow(code: Int?): Boolean {
+        when {
+            code == null -> return true
+            isInstalled -> {
+                pluginManager.getInfo(packageName)?.let { localVersion ->
+                    return localVersion.versionCode < versionCode//可更新
+                }
+                return true
+            }
+            else -> return true
+        }
+    }
+
 }

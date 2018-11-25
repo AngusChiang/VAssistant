@@ -362,8 +362,7 @@ class InstDetailFragment(val node: ActionNode, val onUpdate: () -> Unit) : BaseB
      * 更新返回版本号
      */
     private fun upgrade() {
-        val type = object : TypeToken<ResponseMessage<Int>>() {}.type
-        NetHelper.postJson<Int>(ApiUrls.UPGRADE_INST, BaseRequestModel(node), type = type, callback = { _, bean ->
+        NetHelper.postJson<Int>(ApiUrls.UPGRADE_INST, BaseRequestModel(node), callback = { _, bean ->
             if (bean != null) {
                 if (bean.isOk()) {
                     toast.blue().showShort(R.string.text_share_success)
@@ -391,8 +390,7 @@ class InstDetailFragment(val node: ActionNode, val onUpdate: () -> Unit) : BaseB
      * 首次分享返回tag
      */
     private fun firstShare() {
-        val type = object : TypeToken<ResponseMessage<String>>() {}.type
-        NetHelper.postJson<String>(ApiUrls.SHARE_INST, BaseRequestModel(node), type = type, callback = { _, bean ->
+        NetHelper.postJson<String>(ApiUrls.SHARE_INST, BaseRequestModel(node), callback = { _, bean ->
             if (bean != null) {
                 if (bean.isOk()) {
                     toast.blue().showShort(R.string.text_share_success)

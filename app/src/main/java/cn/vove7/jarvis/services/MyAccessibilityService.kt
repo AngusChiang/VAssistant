@@ -89,6 +89,7 @@ class MyAccessibilityService : AccessibilityApi(), AccessibilityBridge {
     }
 
 
+    @Synchronized
     private fun updateCurrentApp(pkg: String, activityName: String) {
         if (currentScope.packageName == pkg && activityName == currentActivity) return
         AdvanAppHelper.getAppInfo(pkg).also {
@@ -184,26 +185,31 @@ class MyAccessibilityService : AccessibilityApi(), AccessibilityBridge {
         dispatchPluginsEvent(ON_UI_UPDATE, rootInWindow)
     }
 
+    var lastContentChangedTime = 0L
     /**
-     *
+     * fixme 导致 FastHub 代码浏览异常卡顿
      * @param event AccessibilityEvent?
      */
     override fun onAccessibilityEvent(event: AccessibilityEvent?) {
-        //兼容<24 无法自动关闭无障碍
-        if (AppConfig.disableAccessibilityOnLowBattery && PowerEventReceiver.powerSavingMode &&
-                !PowerEventReceiver.isCharging)//开启低电量模式
-            return
-
-        if (!SystemHelper.isScreenOn(this))//(火)?息屏下
-            return
-        try {
-            if (null == event || null == event.source) {
-                return
-            }
+        val eventSource = try {
+            event?.source
         } catch (e: Exception) {// NullPoint in event.source
-            GlobalLog.err(e.message)
+            GlobalLog.err(e, "mas206")
             return
         }
+        //熄屏|低电量
+        if (AppConfig.disableAccessibilityOnLowBattery && PowerEventReceiver.powerSavingMode &&
+                !PowerEventReceiver.isCharging) {//开启低电量模式
+            Vog.d(this, "onAccessibilityEvent ---> 低电量")
+            return
+        }
+
+        if (!SystemHelper.isScreenOn(this)) {//(火)?息屏下
+            Vog.d(this, "onAccessibilityEvent ---> 熄屏")
+            return
+        }
+        if (null == event || null == eventSource)
+            return
 
         Vog.v(this, "class :$currentAppInfo - $currentActivity ${event.className} \n" +
                 AccessibilityEvent.eventTypeToString(event.eventType))
@@ -216,38 +222,48 @@ class MyAccessibilityService : AccessibilityApi(), AccessibilityBridge {
 //                Vog.d(this, "onAccessibilityEvent ---> 自身(屏蔽悬浮窗)")
 //                return
 //            }
-            if (classNameStr != null && pkg != null)
-                updateCurrentApp(pkg, classNameStr.toString())
+            runOnCachePool {
+                if (classNameStr != null && pkg != null)
+                    updateCurrentApp(pkg, classNameStr.toString())
+            }
         }
-        if (blackPackage.contains(currentScope.packageName)) {//black list
-            Vog.v(this, "onAccessibilityEvent ---> in black")
-            return
-        }
-        //根据事件回调类型进行处理
-        when (eventType) {
-            //通知栏发生改变
-            AccessibilityEvent.TYPE_NOTIFICATION_STATE_CHANGED -> {
+        runOnCachePool {
+            if (blackPackage.contains(currentScope.packageName)) {//black list
+                Vog.v(this, "onAccessibilityEvent ---> in black")
+                return@runOnCachePool
+            }
+            //根据事件回调类型进行处理
+            when (eventType) {
+                //通知栏发生改变
+                AccessibilityEvent.TYPE_NOTIFICATION_STATE_CHANGED -> {
 //                callAllNotifier()
-            }
-            TYPE_WINDOWS_CHANGED -> {
-                callAllNotifier()
-            }
-            TYPE_WINDOW_CONTENT_CHANGED -> {//"帧"刷新
-//                val node = event.source
-                callAllNotifier()
-            }
-            TYPE_VIEW_SCROLLED -> {
-                callAllNotifier()
-            }
-            TYPE_VIEW_CLICKED -> {
+                }
+                TYPE_WINDOWS_CHANGED -> {
+                    callAllNotifier()
+                }
+                TYPE_WINDOW_CONTENT_CHANGED -> {//"帧"刷新  限制频率
+                    System.currentTimeMillis().also {
+                        if (it - lastContentChangedTime < 300) {
+                            Vog.d(this, "onAccessibilityEvent ---> lock")
+                            return@runOnCachePool
+                        }
+                        lastContentChangedTime = it
+                    }
+                    callAllNotifier()
+                }
+//            TYPE_VIEW_SCROLLED -> {
+//                callAllNotifier()
+//            }
+                TYPE_VIEW_CLICKED -> {
 //                lastScreenEvent = event
-                callAllNotifier()
+                    callAllNotifier()
 //                try {
 //                    Vog.d(this, "onAccessibilityEvent ---> 点击 :${ViewNode(event.source)}")
 //                } catch (e: Exception) {
 //                }
-            }
+                }
 
+            }
         }
     }
 

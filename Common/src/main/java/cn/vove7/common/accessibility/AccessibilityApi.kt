@@ -10,7 +10,7 @@ import cn.vove7.common.accessibility.viewnode.ViewNode
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.datamanager.parse.model.ActionScope
-import cn.vove7.common.accessibility.component.PluginsService
+import cn.vove7.common.accessibility.component.AccPluginService
 import cn.vove7.common.utils.ThreadPool
 import cn.vove7.vtp.app.AppInfo
 import cn.vove7.vtp.log.Vog
@@ -119,20 +119,20 @@ abstract class AccessibilityApi : AccessibilityService(),
         /**
          * 注册放于静态变量，只用于通知事件。
          */
-        private val pluginsServices = mutableSetOf<PluginsService>()
+        private val pluginsServices = mutableSetOf<AccPluginService>()
 
         /**
          * 注册无障碍插件服务
-         * @param e PluginsService
+         * @param e AccPluginService
          */
-        fun registerPlugin(e: PluginsService) {
+        fun registerPlugin(e: AccPluginService) {
             synchronized(pluginsServices) {
                 pluginsServices.add(e)
                 e.bindService()
             }
         }
 
-        fun unregisterPlugin(e: PluginsService) {
+        fun unregisterPlugin(e: AccPluginService) {
             synchronized(pluginsServices) {
                 pluginsServices.remove(e)
                 e.unBindServer()

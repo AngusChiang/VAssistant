@@ -10,8 +10,8 @@ android {
         applicationId "cn.vove7.vassistant"
         minSdkVersion 21
         targetSdkVersion 27
-        versionCode 52
-        versionName "1.5.0"
+        versionCode 55
+        versionName "1.5.1"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         testApplicationId = 'cn.vove7.vassistant_test'
 
@@ -74,6 +74,18 @@ repluginHostConfig {
     useAppCompat = true
 }
 
+task makeJar(type: Jar) {
+    //指定生成的jar名
+    baseName 'vassist-plugin-api2'
+    //从哪里打包class文件
+    from('build/tmp/kotlin-classes/debug/cn/vove7')
+    //打包到jar后的目录结构
+    into('cn/vove7/')
+    //去掉不需要打包的目录和文件
+    exclude( 'BuildConfig.class', 'R.class')
+    //去掉R$开头的文件
+    exclude{ it.name.startsWith('R$');}
+}
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     //    implementation 'com.l4digital.fastscroll:fastscroll:1.1.2'
@@ -104,13 +116,15 @@ dependencies {
     implementation 'com.github.bumptech.glide:glide:4.8.0'
     annotationProcessor 'com.github.bumptech.glide:compiler:4.8.0'
     implementation "com.qihoo360.replugin:replugin-host-lib:${RP_VERSION}"
-    implementation 'net.dongliu:apk-parser:2.6.4'
+//    implementation 'net.dongliu:apk-parser:2.6.4'
+
 }
 repositories {
     maven { url 'https://jitpack.io' }
     mavenCentral()
     maven { url "https://dl.bintray.com/drummer-aidan/maven/" }
 
+    maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
     flatDir {
         dirs 'libs'
     }

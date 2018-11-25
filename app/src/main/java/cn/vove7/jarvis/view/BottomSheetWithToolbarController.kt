@@ -14,10 +14,10 @@ import cn.vove7.jarvis.R
  * @author Administrator
  * 2018/11/6
  */
-class BottomSheetWithToolbarController(
+class BottomSheetWithToolbarController<Type>(
         context: Context, bottomView: View, var bottomTitle: String? = null,
         @MenuRes val menuId: Int? = null
-) : BottomSheetController(context, bottomView) {
+) : BottomSheetController<Type>(context, bottomView) {
     init {
         bottomView.visibility = View.VISIBLE
         initBottomSheetView()

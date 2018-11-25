@@ -4,21 +4,24 @@ import android.graphics.drawable.Drawable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.CheckBox
 import android.widget.ImageView
 import android.widget.TextView
 import cn.vove7.jarvis.R
+import cn.vove7.jarvis.fragments.AwesomeItem
 
-class SimpleListAdapter(private val dataset: MutableList<ViewModel>
-                        , val itemClickListener: OnItemClickListener? = null) : RecAdapterWithFooter<SimpleListAdapter.VHolder>() {
+open class SimpleListAdapter<T>(private val dataset: MutableList<ViewModel<T>>
+                                , val itemClickListener: OnItemClickListener<T>? = null, val checkable: Boolean = false)
+    : RecAdapterWithFooter<SimpleListAdapter.VHolder, ViewModel<T>>() {
 
     override fun itemCount(): Int = dataset.size
-    override fun getItem(pos: Int): Any? {
+    override fun getItem(pos: Int): ViewModel<T>? {
         return dataset[pos]
     }
 
-    override fun onBindView(holder: VHolder, position: Int, item: Any?) {
-        val item = item as ViewModel
+    override fun onBindView(holder: VHolder, position: Int, item: ViewModel<T>) {
         holder.title?.text = item.title
+
         if (item.icon != null) {
             holder.icon?.visibility = View.VISIBLE
             holder.icon?.setImageDrawable(item.icon)
@@ -35,6 +38,23 @@ class SimpleListAdapter(private val dataset: MutableList<ViewModel>
         holder.itemView.setOnLongClickListener {
             itemClickListener?.onLongClick(holder, position, item) == true
         }
+        if (checkable) {
+            holder.checkBox?.visibility = View.VISIBLE
+            holder.checkBox?.isChecked = item.checked
+            holder.checkBox?.setOnCheckedChangeListener { buttonView, isChecked ->
+                itemClickListener?.onItemCheckedStatusChanged(holder, item, isChecked)
+            }
+        } else {
+            holder.checkBox?.visibility = View.GONE
+            holder.checkBox?.setOnCheckedChangeListener(null)
+        }
+
+        //背景色
+        item.extra.also {
+            if (it is AwesomeItem && it.bgColor != null) {
+                holder.itemView.setBackgroundColor(it.bgColor!!)
+            }
+        }
 
     }
 
@@ -43,32 +63,36 @@ class SimpleListAdapter(private val dataset: MutableList<ViewModel>
         return VHolder(view)
     }
 
-    class VHolder(v: View, adapter: RecAdapterWithFooter<RecAdapterWithFooter.RecViewHolder>? = null)
+    class VHolder(v: View, adapter: RecAdapterWithFooter<RecAdapterWithFooter.RecViewHolder, *>? = null)
         : RecAdapterWithFooter.RecViewHolder(v, adapter) {
         var icon: ImageView? = null
         var title: TextView? = null
         var subtitle: TextView? = null
+        var checkBox: CheckBox? = null
 
         init {
             if (adapter == null) {
                 icon = v.findViewById(R.id.icon)
                 title = v.findViewById(R.id.title)
                 subtitle = v.findViewById(R.id.sub_title)
+                checkBox = v.findViewById(R.id.check_box)
             }
         }
 
     }
 
-    interface OnItemClickListener {
-        fun onClick(holder: VHolder?, pos: Int, item: ViewModel)
-        fun onLongClick(holder: VHolder?, pos: Int, item: ViewModel): Boolean = false
+    interface OnItemClickListener<T> {
+        fun onClick(holder: VHolder?, pos: Int, item: ViewModel<T>)
+        fun onLongClick(holder: VHolder?, pos: Int, item: ViewModel<T>): Boolean = false
+        fun onItemCheckedStatusChanged(holder: VHolder?, item: ViewModel<T>, isChecked: Boolean) {}
     }
 
 }
 
-class ViewModel(
+class ViewModel<T> (
         val title: String?,
         val subTitle: String? = null,
         val icon: Drawable? = null,
-        val extra: Any? = null
+        val extra: T,
+        val checked: Boolean = false
 )

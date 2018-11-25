@@ -1,12 +1,15 @@
 package cn.vove7.jarvis.droidplugin
 
-import android.content.Context
 import android.content.Intent
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.app.GlobalLog
+import cn.vove7.jarvis.speech.baiduspeech.synthesis.util.FileUtil
+import cn.vove7.vtp.file.FileHelper
 import cn.vove7.vtp.log.Vog
 import com.qihoo360.replugin.RePlugin
+import com.qihoo360.replugin.base.IPC
 import com.qihoo360.replugin.component.service.PluginServiceClient
+import java.io.File
 
 /**
  * # RePluginManager
@@ -23,22 +26,24 @@ import com.qihoo360.replugin.component.service.PluginServiceClient
  */
 class RePluginManager : PluginManager {
 
-    override fun installPlugin(path: String): Boolean {
+    override fun installPlugin(path: String): VPluginInfo? {//先拷贝
+        val f = File(path)
         return try {
-            RePlugin.install(path).let {
+            val desf = File(context.cacheDir.absoluteFile, f.name)
+            FileHelper.easyCopy(f, desf)
+            RePlugin.install(desf.absolutePath).let {
                 if (it == null) {
-                    GlobalApp.toastShort("插件安装失败，详情见日志")
-                    GlobalLog.err("插件安装失败 $path")
-                    false
+                    GlobalLog.err("插件安装失败 ${desf.absolutePath}")
+                    null
                 } else {
-                    Vog.d(this, "installPlugin ---> 安装成功 $path")
-                    true
+                    Vog.d(this, "installPlugin ---> 安装成功 ${desf.absolutePath}")
+                    RePluginInfo(it)
                 }
             }
         } catch (e: Throwable) {
             GlobalApp.toastShort("插件安装失败，详情见日志")
             GlobalLog.err(e, "ip54")
-            false
+            null
         }
     }
 
@@ -52,7 +57,12 @@ class RePluginManager : PluginManager {
         }
     }
 
-    override fun launchPluginMainActivity(context: Context, pluginInfo: VPluginInfo): Boolean {
+    override fun launchPluginMainActivity(pluginInfo: VPluginInfo): Boolean {
+        if (pluginInfo.mainActivity == null) {
+            Vog.d(this, "launchPluginMainActivity ---> ")
+            GlobalApp.toastShort("无用户界面")
+            return false
+        }
         return try {
             RePlugin.startActivity(context, RePlugin
                     .createIntent(pluginInfo.packageName, pluginInfo.mainActivity).also {
@@ -64,7 +74,27 @@ class RePluginManager : PluginManager {
         }
     }
 
-    override fun stopPluginService(context: Context, pluginInfo: VPluginInfo): Boolean {
+//    override fun killAll() {
+//        RePlugin.getRunningPlugins().forEach {
+//            android.os.Process.killProcess(IPC.getPidByProcessName(it))
+//        }
+//    }
+//
+//    override fun kill(pluginInfo: VPluginInfo) {
+//        RePlugin.getRunningProcessesByPlugin(pluginInfo.packageName)?.forEach {
+//            android.os.Process.killProcess(IPC.getPidByProcessName(it))
+//
+//        }
+//    }
+
+    override fun getInfo(pkg: String?): VPluginInfo? {
+        if (pkg == null) return null
+        return RePlugin.getPluginInfo(pkg)?.let {
+            RePluginInfo(it)
+        }
+    }
+
+    override fun stopPluginService(pluginInfo: VPluginInfo): Boolean {
         if (pluginInfo.mainService == null) {
             Vog.d(this, "startPluginService ---> ${pluginInfo.name} 无主服务")
             return false
@@ -79,7 +109,7 @@ class RePluginManager : PluginManager {
         }
     }
 
-    override fun startPluginService(context: Context, pluginInfo: VPluginInfo): Boolean {
+    override fun startPluginService(pluginInfo: VPluginInfo): Boolean {
         if (pluginInfo.mainService == null) {
             Vog.d(this, "startPluginService ---> ${pluginInfo.name} 无主服务")
             return false
@@ -102,7 +132,7 @@ class RePluginManager : PluginManager {
         }
         cacheList.clear()
         RePlugin.getPluginInfoList().forEach {
-            cacheList.add(RePluginInfo(reInfo = it).also { t -> t.parseApk() })
+            cacheList.add(RePluginInfo(reInfo = it))
         }
         Vog.d(this, "installList ---> 插件数量${cacheList.size}")
         return cacheList

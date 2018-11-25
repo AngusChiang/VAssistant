@@ -1,5 +1,6 @@
 package cn.vove7.jarvis.activities
 
+import android.graphics.Typeface
 import android.os.Bundle
 import android.os.Handler
 import android.support.design.widget.TextInputLayout
@@ -79,7 +80,7 @@ class HelpActivity : ReturnableActivity(), AdapterView.OnItemClickListener {
                                 "4. 有线耳机适用,并且支持长按中键唤醒\n" +
                                 "5. 锁屏下可进行唤醒。\n\n")
                         append(MultiSpan(this@HelpActivity,
-                                "以上音量快捷键需要无障碍支持", bold = true).spanStr)
+                                "以上音量快捷键需要无障碍支持", typeface = Typeface.BOLD).spanStr)
                     }
                     customView(view = text, scrollable = true)
                 }

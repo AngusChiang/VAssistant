@@ -2,27 +2,35 @@ package cn.vove7.common.netacc
 
 import android.os.Handler
 import android.os.Looper
+import android.text.TextUtils
 import cn.vove7.common.BuildConfig
 import cn.vove7.common.accessibility.AccessibilityApi
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.appbus.AppBus
-import cn.vove7.common.datamanager.executor.entity.MarkedData
 import cn.vove7.common.datamanager.history.CommandHistory
 import cn.vove7.common.datamanager.parse.model.Action
 import cn.vove7.common.datamanager.parse.model.ActionScope
-import cn.vove7.common.datamanager.parse.statusmap.ActionNode
+import cn.vove7.common.interfaces.DownloadInfo
+import cn.vove7.common.interfaces.DownloadProgressListener
 import cn.vove7.common.model.UserInfo
-import cn.vove7.common.model.VipPrice
 import cn.vove7.common.netacc.model.BaseRequestModel
 import cn.vove7.common.netacc.model.LastDateInfo
 import cn.vove7.common.netacc.model.RequestParseModel
 import cn.vove7.common.netacc.model.ResponseMessage
 import cn.vove7.common.utils.GsonHelper
 import cn.vove7.common.utils.ThreadPool
+import cn.vove7.common.utils.runOnUi
 import cn.vove7.vtp.log.Vog
 import com.google.gson.reflect.TypeToken
+import com.liulishuo.okdownload.DownloadListener
+import com.liulishuo.okdownload.DownloadTask
+import com.liulishuo.okdownload.core.breakpoint.BreakpointInfo
+import com.liulishuo.okdownload.core.cause.EndCause
+import com.liulishuo.okdownload.core.cause.ResumeFailedCause
+
 import okhttp3.*
+import java.io.File
 import java.io.IOException
 import java.lang.reflect.Type
 import java.util.concurrent.TimeUnit
@@ -38,10 +46,18 @@ typealias OnResponse<T> = (Int, ResponseMessage<T>?) -> Unit
 
 object NetHelper {
 
-    private var timeout = 15L
-
-    fun <T> postJson(url: String, model: BaseRequestModel<*>? = BaseRequestModel<Any>(),
-                     type: Type = StringType, requestCode: Int = 0, callback: OnResponse<T>? = null) {
+    var timeout = 15L
+    /**
+     * 网络post请求 内容格式为json
+     * @param url String
+     * @param model BaseRequestModel<*>?
+     * @param requestCode Int
+     * @param callback OnResponse<T>
+     */
+    inline fun <reified T> postJson(
+            url: String, model: BaseRequestModel<*>? = BaseRequestModel<Any>(),
+            requestCode: Int = 0, crossinline callback: OnResponse<T> = { _, _ -> }
+    ) {
         val client = OkHttpClient.Builder()
                 .readTimeout(timeout, TimeUnit.SECONDS).build()
 
@@ -54,10 +70,11 @@ object NetHelper {
                 .post(requestBody)
                 .build()
         val call = client.newCall(request)
-        call(call, type, requestCode, callback)
+        call(call, requestCode, callback)
     }
 
-    private fun <T> call(call: Call, type: Type, requestCode: Int = 0, callback: OnResponse<T>?) {
+    inline fun <reified T> call(call: Call, requestCode: Int = 0,
+                                crossinline callback: OnResponse<T>) {
         prepareIfNeeded()
         val handler = Handler(Looper.getMainLooper())
         call.enqueue(object : Callback {
@@ -65,7 +82,7 @@ object NetHelper {
                 e.printStackTrace()
                 GlobalLog.err("net failure: " + e.message)
                 handler.post {
-                    callback?.invoke(requestCode, ResponseMessage.error(e.message))
+                    callback.invoke(requestCode, ResponseMessage.error(e.message))
                 }
             }
 
@@ -75,7 +92,7 @@ object NetHelper {
                     val s = response.body()?.string()
                     try {
                         Vog.d(this, "onResponse --->\n$s")
-                        val bean = GsonHelper.fromJsonObj<T>(s, type)
+                        val bean = GsonHelper.fromResponseJson<T>(s)
                         if (bean?.isInvalid() == true || bean?.tokenIsOutdate() == true) {//无效下线
                             if (UserInfo.isLogin()) {
                                 GlobalApp.toastShort("用户身份过期请重新登陆")
@@ -83,63 +100,113 @@ object NetHelper {
                             AppBus.post(AppBus.EVENT_FORCE_OFFLINE)
                         }
                         handler.post {
-                            callback?.invoke(requestCode, bean)
+                            callback.invoke(requestCode, bean)
                         }
                     } catch (e: Exception) {
                         e.printStackTrace()
                         GlobalLog.err(e.message)
                         handler.post {
                             GlobalLog.err("json err data: ${e.message}\n $s ")
-                            callback?.invoke(requestCode, ResponseMessage.error(e.message))
+                            callback.invoke(requestCode, ResponseMessage.error(e.message))
                         }
                     }
                 } else handler.post {
                     GlobalLog.err("net: " + response.message())
-                    callback?.invoke(requestCode, null)
+                    callback.invoke(requestCode, null)
                 }
             }
         })
     }
 
-    private fun prepareIfNeeded() {
+    fun prepareIfNeeded() {
         if (Looper.myLooper() == null)
             Looper.prepare()
     }
 
-    val StringType: Type by lazy {
-        object : TypeToken<ResponseMessage<String>>() {}.type
-    }
-    val IntType: Type by lazy {
-        object : TypeToken<ResponseMessage<Int>>() {}.type
-    }
-    val LastDateInfoType: Type by lazy {
-        object : TypeToken<ResponseMessage<LastDateInfo>>() {}.type
-    }
-    val UserInfoType: Type by lazy {
-        object : TypeToken<ResponseMessage<UserInfo>>() {}.type
-    }
-    val MarkedDataListType: Type by lazy {
-        object : TypeToken<ResponseMessage<List<MarkedData>>>() {}.type
-    }
-
-    val DoubleListType: Type by lazy {
-        object : TypeToken<ResponseMessage<List<Double>>>() {}.type
-    }
-    val ActionListType: Type by lazy {
-        object : TypeToken<ResponseMessage<List<Action>>>() {}.type
-    }
-    val VipPriceListType: Type by lazy {
-        object : TypeToken<ResponseMessage<List<VipPrice>>>() {}.type
-    }
-    val ActionNodeListType: Type by lazy {
-        object : TypeToken<ResponseMessage<List<ActionNode>>>() {}.type
-    }
-    val MapType: Type by lazy {
-        object : TypeToken<Map<String, Any>>() {}.type
-    }
-
     inline fun <reified T> getType(): Type {
         return object : TypeToken<T>() {}.type
+    }
+
+
+    /**
+     * @param url          下载连接
+     * @param destFileDir  下载的文件储存目录
+     * @param destFileName 下载文件名称
+     * @param listener     下载监听
+     * @return id
+     */
+    fun <T> download(url: String, destFileDir: String, destFileName: String, data: T? = null,
+                     listener: DownloadProgressListener): DownloadTask {
+        val taskId = url.hashCode()
+        val di = DownloadInfo(taskId,
+                "$destFileDir/$destFileName", data)
+
+        val task = DownloadTask.Builder(url, File(destFileDir))
+                .setFilename(destFileName)
+                // the minimal interval millisecond for callback progress
+                .setMinIntervalMillisCallbackProcess(500)
+                // do re-download even if the task has already been completed in the past.
+                .setPassIfAlreadyCompleted(true)
+                .setConnectionCount(1)
+                .build()
+
+        var total = 100L
+        var sum = 0L
+        listener.onStart(di)
+        task.enqueue(object : DownloadListener {
+            override fun connectTrialEnd(task: DownloadTask, responseCode: Int, responseHeaderFields: MutableMap<String, MutableList<String>>) {
+            }
+
+            override fun fetchEnd(task: DownloadTask, blockIndex: Int, contentLength: Long) {
+            }
+
+            override fun downloadFromBeginning(task: DownloadTask, info: BreakpointInfo, cause: ResumeFailedCause) {
+            }
+
+            override fun taskStart(task: DownloadTask) {
+            }
+
+            override fun taskEnd(task: DownloadTask, cause: EndCause, realCause: java.lang.Exception?) {
+                Vog.d(this, "taskEnd ---> ${cause}")
+                when (cause) {
+                    EndCause.CANCELED -> listener.onCancel(di)
+                    EndCause.COMPLETED -> listener.onSuccess(di, File(destFileDir, destFileName))
+                    EndCause.ERROR -> listener.onFailed(di, realCause
+                        ?: java.lang.Exception("unknown"))
+                    EndCause.FILE_BUSY -> listener.onFailed(di, Exception("文件忙"))
+                    EndCause.SAME_TASK_BUSY -> listener.onFailed(di, Exception("任务忙"))
+                    EndCause.PRE_ALLOCATE_FAILED -> listener.onFailed(di, Exception("申请失败"))
+                }
+
+                realCause?.printStackTrace()
+            }
+
+            override fun connectTrialStart(task: DownloadTask, requestHeaderFields: MutableMap<String, MutableList<String>>) {
+            }
+
+            override fun downloadFromBreakpoint(task: DownloadTask, info: BreakpointInfo) {
+            }
+
+            override fun fetchStart(task: DownloadTask, blockIndex: Int, contentLength: Long) {
+                total += contentLength
+                Vog.d(this, "fetchStart ---> ${contentLength}")
+            }
+
+            override fun fetchProgress(task: DownloadTask, blockIndex: Int, increaseBytes: Long) {
+                sum += increaseBytes
+
+                Vog.d(this, "fetchProgress ---> ${sum}/$total")
+                listener.onDownloading(di, (sum * 1.0f / total * 100).toInt())
+            }
+
+            override fun connectEnd(task: DownloadTask, blockIndex: Int, responseCode: Int, responseHeaderFields: MutableMap<String, MutableList<String>>) {
+            }
+
+            override fun connectStart(task: DownloadTask, blockIndex: Int, requestHeaderFields: MutableMap<String, MutableList<String>>) {
+            }
+        })
+        // 代码中使用
+        return task
     }
 
     /**
@@ -172,7 +239,7 @@ object NetHelper {
     fun cloudParse(cmd: String, scope: ActionScope? = AccessibilityApi
             .accessibilityService?.currentScope, onResult: (List<Action>?) -> Unit) {
 //        thread {
-        postJson<List<Action>>(ApiUrls.CLOUD_PARSE, type = ActionListType,
+        postJson<List<Action>>(ApiUrls.CLOUD_PARSE,
                 model = BaseRequestModel(RequestParseModel(cmd, scope))) { _, b ->
             if (b?.isOk() == true) {
                 Vog.d(this, "cloudParse ---> ${b.data}")
@@ -186,7 +253,7 @@ object NetHelper {
     }
 
     fun getLastInfo(back: (LastDateInfo?) -> Unit) {
-        NetHelper.postJson<LastDateInfo>(ApiUrls.GET_LAST_DATA_DATE, type = NetHelper.LastDateInfoType) { _, b ->
+        NetHelper.postJson<LastDateInfo>(ApiUrls.GET_LAST_DATA_DATE) { _, b ->
             if (b?.isOk() == true && b.data != null) {
                 back.invoke(b.data!!)
             } else {

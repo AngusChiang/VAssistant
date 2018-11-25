@@ -16,6 +16,9 @@ abstract class DyBCReceiver : BroadcastReceiver() {
 
     var open = false
 
+    /**
+     * 注册广播接收器
+     */
     open fun start() {
         open = true
         GlobalApp.APP.apply {
@@ -24,9 +27,15 @@ abstract class DyBCReceiver : BroadcastReceiver() {
         }
     }
 
+    /**
+     * 取消关闭注册
+     */
     fun stop() {
         open = false
-        GlobalApp.APP.unregisterReceiver(this)
+        try {
+            GlobalApp.APP.unregisterReceiver(this)
+        } catch (e: Exception) {
+        }
     }
 
 }

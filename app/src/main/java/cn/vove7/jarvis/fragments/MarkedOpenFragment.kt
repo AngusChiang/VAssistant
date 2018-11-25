@@ -21,7 +21,7 @@ import kotlin.concurrent.thread
  * @author 17719247306
  * 2018/9/7
  */
-class MarkedOpenFragment : BaseMarkedFragment<MarkedData>() {
+class MarkedOpenFragment : BaseMarkedFragment() {
 
     override var markedType: String = MarkedData.MARKED_TYPE_SCRIPT_LUA
     override val keyHint: Int = R.string.text_func_name
@@ -30,12 +30,8 @@ class MarkedOpenFragment : BaseMarkedFragment<MarkedData>() {
 
     override val showSel: Boolean = false
 
-    override fun transData(nodes: List<MarkedData>): List<ViewModel> {
-        val ss = mutableListOf<ViewModel>()
-        nodes.forEach {
-            ss.add(ViewModel(it.key, null, extra = it))
-        }
-        return ss
+    override fun unification(data: MarkedData): ViewModel<MarkedData>? {
+        return ViewModel(data.key, null, extra = data)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -63,9 +59,7 @@ class MarkedOpenFragment : BaseMarkedFragment<MarkedData>() {
                 )
             }
             val list = builder.list()
-
-            dataSet.addAll(transData(list))
-            resultHandler.sendEmptyMessage(list.size)
+            notifyLoadSuccess(list)
         }
     }
 }

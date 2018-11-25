@@ -4,13 +4,13 @@ import cn.vove7.common.accessibility.AccessibilityApi
 import cn.vove7.vtp.log.Vog
 
 /**
- * # AccPluginsService
- * 注册方式：MyAccessibilityService.registerPlugin(AccPluginsService)
+ * # AbsAccPluginService
+ * 注册方式：MyAccessibilityService.registerPlugin(AbsAccPluginService)
  * @author 17719247306
  * 2018/9/3
  */
 
-abstract class AccPluginsService : PluginsService {
+abstract class AbsAccPluginService : AccPluginService {
 
     var opened = false
 
@@ -30,7 +30,7 @@ abstract class AccPluginsService : PluginsService {
 
     /**
      * 不可主动调用
-     * 注册方式：MyAccessibilityService.registerPlugin(AccPluginsService)
+     * 注册方式：MyAccessibilityService.registerPlugin(AbsAccPluginService)
      */
     override fun bindService() {
         Vog.d(this, "bindService ---> $this")
