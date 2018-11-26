@@ -2,17 +2,14 @@ package cn.vove7.jarvis.view.dialog.base
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.os.Handler
-import android.os.Looper
 import android.support.annotation.StringRes
 import android.view.LayoutInflater
 import android.view.View
+import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.utils.runOnUi
-import cn.vove7.jarvis.view.dialog.ProgressTextDialog
 import com.afollestad.materialdialogs.DialogCallback
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.callbacks.onDismiss
-import com.afollestad.materialdialogs.callbacks.onPreShow
 import com.afollestad.materialdialogs.customview.customView
 
 /**
@@ -24,18 +21,17 @@ import com.afollestad.materialdialogs.customview.customView
 abstract class CustomizableDialog(
         val context: Context, val title: String? = null,
         val cancelable: Boolean = true,
-        noAutoDismiss: Boolean = false, autoShow: Boolean = true) {
+        noAutoDismiss: Boolean = false) {
     val dialog by lazy {
         MaterialDialog(context)
                 .title(text = title)
-                .customView(view = initView(), scrollable = true)
                 .cancelable(cancelable)
                 .apply {
                     if (noAutoDismiss)
                         noAutoDismiss()
-                    if (autoShow) show()
                 }
     }
+
     val layoutInflater get() = LayoutInflater.from(context)
 
     open var message: String? = null
@@ -92,6 +88,7 @@ abstract class CustomizableDialog(
     fun show() {
         runOnUi {
             try {
+                dialog.customView(view = initView(), scrollable = true)
                 dialog.show()
             } catch (e: Exception) {
             }
@@ -100,12 +97,15 @@ abstract class CustomizableDialog(
 
     open fun onFinish() {}
     fun finish(posText: String? = null, onClick: (() -> Unit)? = null) {
-        runOnUi {
-            onFinish()
+        onFinish()
+        try {
             dialog.positiveButton(text = posText) {
                 onClick?.invoke()
                 it.dismiss()
-            }
+            }.show()
+        } catch (e: Exception) {
+            GlobalLog.err(e, "cd107")
+            e.printStackTrace()
         }
     }
 }

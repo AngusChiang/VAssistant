@@ -5,12 +5,15 @@ import android.os.Handler
 import android.os.Looper
 import android.os.Message
 import android.text.SpannableStringBuilder
+import android.view.Gravity
 import android.view.View
 import android.widget.TextView
-import cn.vove7.common.utils.runOnUi
 import cn.vove7.common.view.editor.MultiSpan
 import cn.vove7.jarvis.R
+import cn.vove7.jarvis.tools.scrollToTop
 import cn.vove7.jarvis.view.dialog.base.CustomizableDialog
+import cn.vove7.vtp.log.Vog
+import com.afollestad.materialdialogs.callbacks.onPreShow
 
 /**
  * # ProgressTextDialog
@@ -20,31 +23,35 @@ import cn.vove7.jarvis.view.dialog.base.CustomizableDialog
  */
 open class ProgressTextDialog(context: Context, title: String? = null,
                               cancelable: Boolean = true, noAutoDismiss: Boolean = false,
-                              autoScroll: Boolean = false)
+                              val autoScroll: Boolean = false)
     : CustomizableDialog(context, title, cancelable, noAutoDismiss) {
     val textView by lazy { TextView(context) }
 
     val handler = UiHandler(textView, Looper.getMainLooper())
 
     init {
-        selectable(true)
+        show()
     }
 
     fun show(func: ProgressTextDialog.() -> Unit): ProgressTextDialog {
         this.func()
-        runOnUi {
-            dialog.show()
-        }
+        show()
         return this
     }
 
     override fun initView(): View {
-
         textView.setPadding(60, 0, 60, 0)
-        //todo
-//        if (autoScroll) textView.gravity = Gravity.TOP
-//        else
-// textView.gravity = Gravity.BOTTOM
+        Vog.d(this, "initView ---> 111111111")
+        selectable(true)
+        dialog.onPreShow {
+            if (!autoScroll) {//fixme don't work
+                textView.also {
+                    it.isFocusable = true
+                    it.requestFocus()
+                    it.gravity = Gravity.BOTTOM
+                }
+            }
+        }
 
         textView.setTextColor(context.resources.getColor(R.color.primary_text))
         return textView
@@ -116,6 +123,12 @@ open class ProgressTextDialog(context: Context, title: String? = null,
             }
 
         }
+    }
+
+    fun scrollToTop() {
+        Handler().postDelayed({
+            dialog.scrollToTop()
+        }, 1000)
     }
 
     companion object {

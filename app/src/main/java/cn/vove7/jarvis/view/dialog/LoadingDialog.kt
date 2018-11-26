@@ -29,8 +29,8 @@ class LoadingDialog(context: Context, title: String?,
                     cancelable: Boolean = false,
                     val horizontal: Boolean = false,
                     noAutoDismiss: Boolean = false,
-                    val msg: String? = null, autoShow: Boolean = false)
-    : CustomizableDialog(context, title, cancelable, noAutoDismiss, autoShow) {
+                    val msg: String? = null)
+    : CustomizableDialog(context, title, cancelable, noAutoDismiss) {
 
     lateinit var hBar: ProgressBar
     lateinit var rBar: ProgressBar

@@ -20,7 +20,6 @@ import kotlin.concurrent.thread
  * @author 17719247306
  * 2018/9/2
  */
-
 abstract class StatusAnimation {
 
     open val nId = 127

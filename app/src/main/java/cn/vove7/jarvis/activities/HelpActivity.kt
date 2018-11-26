@@ -65,9 +65,6 @@ class HelpActivity : ReturnableActivity(), AdapterView.OnItemClickListener {
         when (position) {
             0 -> {
                 SystemBridge.openUrl(ApiUrls.USER_GUIDE)
-                Handler().postDelayed({
-                    toast.showShort("请查阅文章：用户手册")
-                }, 4000)
             }
             1 -> {
                 MaterialDialog(this).show {

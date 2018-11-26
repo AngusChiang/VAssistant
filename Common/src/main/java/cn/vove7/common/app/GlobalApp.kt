@@ -3,6 +3,7 @@ package cn.vove7.common.app
 import android.app.Application
 import android.content.Context
 import android.content.Intent
+import android.support.multidex.MultiDex
 import cn.vove7.common.BuildConfig
 import cn.vove7.common.bridges.ServiceBridge
 import cn.vove7.common.view.toast.ColorfulToast
@@ -11,7 +12,7 @@ import com.qihoo360.replugin.*
 
 /**
  * # GlobalApp
- *
+ * 基础Application
  * @author 17719
  * 2018/8/8
  */
@@ -23,6 +24,7 @@ open class GlobalApp : RePluginApplication() {
         colorfulToast = ColorfulToast(this).blue()
 
     }
+
 
     companion object {
         //        var toastHandler: ColorfulToast.ToastHandler? = null
@@ -63,6 +65,7 @@ open class GlobalApp : RePluginApplication() {
     lateinit var colorfulToast: ColorfulToast
     override fun attachBaseContext(base: Context?) {
         super.attachBaseContext(base)
+        MultiDex.install(base)
         RePlugin.enableDebugger(base, BuildConfig.DEBUG)
     }
 
@@ -76,7 +79,7 @@ open class GlobalApp : RePluginApplication() {
         c.isUseHostClassIfNotFound = true
 
         // FIXME RePlugin默认会对安装的外置插件进行签名校验，这里先关掉，避免调试时出现签名错误
-        c.verifySign = !BuildConfig.DEBUG
+        c.verifySign = false
         c.isUseHostClassIfNotFound = true
         // 针对“安装失败”等情况来做进一步的事件处理
         c.eventCallbacks = HostEventCallbacks(this)

@@ -6,6 +6,7 @@ import android.os.Handler
 import android.os.HandlerThread
 import android.util.Log
 import cn.vove7.androlua.LuaApp
+import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.appbus.AppBus
 import cn.vove7.common.appbus.MessageEvent
 import cn.vove7.common.bridges.RootHelper
@@ -27,7 +28,7 @@ import io.github.kbiakov.codeview.classifier.CodeProcessor
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
 
-class App : LuaApp() {
+class App : GlobalApp() {
 
     private val mainService: Intent by lazy { Intent(this, MainService::class.java) }
     private val assistService: Intent by lazy { Intent(this, AssistSessionService::class.java) }
@@ -38,8 +39,9 @@ class App : LuaApp() {
         super.onCreate()
         ins = this
         AppBus.reg(this)
-        CrashHandler.init()
 
+        CrashHandler.init()
+        LuaApp.init(this)
         services = arrayOf(mainService, assistService)
         AppConfig.init()//加载配置
         Vog.d(this, "onCreate ---> 配置加载完成")
@@ -128,8 +130,4 @@ class App : LuaApp() {
             MessageEvent.WHAT_MSG_ERR -> Vog.e(this, event.toString())
         }
     }
-}
-
-class RePluginApp:LuaApp() {
-
 }

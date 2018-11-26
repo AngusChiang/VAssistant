@@ -148,6 +148,7 @@ object NetHelper {
                 // do re-download even if the task has already been completed in the past.
                 .setPassIfAlreadyCompleted(true)
                 .setConnectionCount(1)
+                .setFilenameFromResponse(true)
                 .build()
 
         var total = 100L
@@ -167,7 +168,7 @@ object NetHelper {
             }
 
             override fun taskEnd(task: DownloadTask, cause: EndCause, realCause: java.lang.Exception?) {
-                Vog.d(this, "taskEnd ---> ${cause}")
+                Vog.d(this, "taskEnd ---> $cause")
                 when (cause) {
                     EndCause.CANCELED -> listener.onCancel(di)
                     EndCause.COMPLETED -> listener.onSuccess(di, File(destFileDir, destFileName))

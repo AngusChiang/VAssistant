@@ -63,7 +63,9 @@ object RootHelper {
         } catch (e: Exception) {
             GlobalLog.err(e)
         }
-        return result.toString()
+        return result.toString().also {
+            GlobalLog.log("exec result -> $it")
+        }
     }
 
     /**
@@ -90,9 +92,12 @@ object RootHelper {
                     p.waitFor()
                 }
             }
-            return result.toString()
+            return result.toString().also {
+                GlobalLog.log("exec result -> $it")
+            }
 
         } catch (e: Exception) {
+            GlobalLog.err(e, "rs100")
             return e.message
         }
 

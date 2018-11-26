@@ -38,10 +38,10 @@
                 <TextView
                     android:id="@+id/title"
                     android:layout_width="0dp"
-                    android:minHeight="23dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:gravity="center_vertical"
+                    android:minHeight="23dp"
                     android:text="1234"
                     android:textColor="@color/primary_text"
                     android:textSize="16sp"
@@ -51,7 +51,8 @@
                     android:id="@+id/check_box"
                     android:layout_width="wrap_content"
                     android:layout_height="23dp"
-                    android:layout_marginEnd="7dp" />
+                    android:layout_marginEnd="7dp"
+                    android:visibility="gone" />
             </LinearLayout>
 
             <TextView

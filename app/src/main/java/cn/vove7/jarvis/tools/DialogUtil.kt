@@ -4,8 +4,10 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.support.annotation.StringRes
 import android.support.v7.widget.AppCompatCheckBox
+import android.widget.ScrollView
 import cn.vove7.executorengine.helper.AdvanAppHelper
 import cn.vove7.jarvis.R
+import cn.vove7.vtp.log.Vog
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.checkbox.BooleanCallback
 import com.afollestad.materialdialogs.checkbox.checkBoxPrompt
@@ -46,6 +48,15 @@ object DialogUtil {
 
 }
 
+/**
+ * 隐藏CheckBox按钮 仅显示文字
+ * @receiver MaterialDialog
+ * @param res Int
+ * @param text String?
+ * @param isCheckedDefault Boolean
+ * @param onToggle BooleanCallback
+ * @return MaterialDialog
+ */
 @SuppressLint("CheckResult")
 fun MaterialDialog.checkBoxText(
         @StringRes res: Int = 0,
@@ -59,4 +70,11 @@ fun MaterialDialog.checkBoxText(
         it.isClickable = false
     }
     return this
+}
+
+fun MaterialDialog.scrollToTop() {
+    findViewById<ScrollView>(R.id.md_scrollview_content)?.also {
+        Vog.d(this,"scrollToTop ---> 0")
+        it.fullScroll(ScrollView.FOCUS_UP)
+    }
 }

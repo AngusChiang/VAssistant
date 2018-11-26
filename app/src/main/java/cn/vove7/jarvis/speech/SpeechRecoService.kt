@@ -9,7 +9,6 @@ import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.appbus.AppBus
 import cn.vove7.common.appbus.VoiceData
 import cn.vove7.common.model.RequestPermission
-import cn.vove7.jarvis.BuildConfig
 import cn.vove7.jarvis.receivers.PowerEventReceiver
 import cn.vove7.jarvis.speech.baiduspeech.recognition.model.IStatus
 import cn.vove7.jarvis.tools.AppConfig
@@ -40,13 +39,7 @@ abstract class SpeechRecoService(val event: SpeechEvent) : SpeechRecoI {
      */
     override fun startRecog(byVoice: Boolean) {
         //检查权限
-        if (!checkRecoderPermission()) return
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && !PermissionUtils.canDrawOverlays(context)) {
-            Vog.d(this, "show ---> 无悬浮窗")
-            AppBus.post(RequestPermission("悬浮窗权限"))
-            return
-        }
-        Vog.d(this, "startRecog ---> 这里")
+        if (!checkRecoderPermission() || !checkFloat()) return
         Thread.sleep(80)
         if (!isListening) {
             isListening = true
@@ -55,6 +48,21 @@ abstract class SpeechRecoService(val event: SpeechEvent) : SpeechRecoI {
         } else {
             Vog.d(this, "启动失败，正在识别")
         }
+    }
+
+    override fun startRecogSilent() {
+        if (!checkRecoderPermission() || !checkFloat()) return
+        isListening = true
+        doStartRecog()
+    }
+
+    fun checkFloat(): Boolean {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && !PermissionUtils.canDrawOverlays(context)) {
+            Vog.d(this, "show ---> 无悬浮窗")
+            AppBus.post(RequestPermission("悬浮窗权限"))
+            return false
+        }
+        return true
     }
 
     /**
@@ -175,8 +183,10 @@ abstract class SpeechRecoService(val event: SpeechEvent) : SpeechRecoI {
                 }
                 IStatus.CODE_VOICE_RESULT -> {//结果
                     val result = msg.data.getString("data") ?: "null"
+                    event.onTempResult(result)
                     event.onResult(result)
-                    isListening = false
+                    if (!AppConfig.lastingVoiceCommand)
+                        isListening = false
 //                    AppBus.postVoiceData(VoiceData(msg.what, result))
                 }
             }
@@ -188,6 +198,7 @@ interface SpeechRecoI {
     val wakeupI: WakeupI
     var timerEnd: Boolean
     fun startRecog(byVoice: Boolean = false)
+    fun startRecogSilent()
     fun cancelRecog(notify: Boolean = true)
     /**
      * 重新计时

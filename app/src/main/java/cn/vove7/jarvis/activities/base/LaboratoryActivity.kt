@@ -88,9 +88,9 @@ class LaboratoryActivity : ReturnableActivity() {
                                 MainService.instance?.loadChatSystem(true)
                             }
                             return@SingleChoiceItem true
-                        },
+                        }/*,
                         CheckBoxItem(title = "连续对话", summary = "开启后可连续对话",
-                                keyId = R.string.key_continuous_dialogue)
+                                keyId = R.string.key_continuous_dialogue)*/
                 )),
                 SettingGroupItem(R.color.google_red, titleS = "屏幕助手", childItems = listOf(
                         SwitchItem(title = "助手模式", summary = "设为默认语音辅助应用后\n通过唤醒用系统语音助手触发\n可捕捉屏幕内容进行快捷操作\n关闭后只能使快速唤醒", keyId = R.string.key_use_assist_service,

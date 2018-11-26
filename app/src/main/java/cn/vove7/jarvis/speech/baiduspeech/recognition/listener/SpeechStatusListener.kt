@@ -13,6 +13,7 @@ import cn.vove7.jarvis.speech.baiduspeech.recognition.model.IStatus.Companion.CO
 import cn.vove7.jarvis.speech.baiduspeech.recognition.model.IStatus.Companion.CODE_VOICE_TEMP
 import cn.vove7.jarvis.speech.baiduspeech.recognition.model.IStatus.Companion.CODE_VOICE_VOL
 import cn.vove7.jarvis.speech.baiduspeech.recognition.model.RecogResult
+import cn.vove7.jarvis.tools.AppConfig
 import cn.vove7.vtp.log.Vog
 
 /**
@@ -43,8 +44,10 @@ class SpeechStatusListener(private val handler: Handler) : StatusRecogListener()
 
     override fun onAsrEnd() {
         super.onAsrEnd()
-        //立即停止识别 ，检测结果
-        MainService.instance?.onCommand(AppBus.ORDER_STOP_RECO)
+        if (!AppConfig.lastingVoiceCommand) {//非长语音
+            //立即停止识别 ，检测结果
+            MainService.instance?.onCommand(AppBus.ORDER_STOP_RECOG)
+        }
     }
 
     override fun onAsrFinishError(errorCode: Int, subErrorCode: Int, errorMessage: String?, descMessage: String?,

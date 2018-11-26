@@ -2,6 +2,9 @@ package cn.vove7.jarvis.tools
 
 import android.app.Activity
 import android.content.Context
+import android.content.Intent
+import android.media.AudioManager
+import android.net.Uri
 import android.os.Build
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.app.GlobalLog
@@ -9,21 +12,18 @@ import cn.vove7.common.model.UserInfo
 import cn.vove7.common.netacc.ApiUrls
 import cn.vove7.common.netacc.NetHelper
 import cn.vove7.common.netacc.model.BaseRequestModel
+import cn.vove7.common.utils.ThreadPool.runOnCachePool
+import cn.vove7.common.utils.ThreadPool.runOnPool
 import cn.vove7.common.utils.runOnUi
+import cn.vove7.common.utils.secure.SecuritySharedPreference
+import cn.vove7.executorengine.bridges.SystemBridge
 import cn.vove7.jarvis.R
 import cn.vove7.vtp.log.Vog
 import cn.vove7.vtp.sharedpreference.SpHelper
 import com.afollestad.materialdialogs.MaterialDialog
+import com.afollestad.materialdialogs.checkbox.checkBoxPrompt
 import com.google.gson.Gson
 import org.jsoup.Jsoup
-import android.content.Intent
-import android.media.AudioManager
-import android.net.Uri
-import cn.vove7.common.utils.ThreadPool.runOnCachePool
-import cn.vove7.common.utils.ThreadPool.runOnPool
-import cn.vove7.common.utils.secure.SecuritySharedPreference
-import cn.vove7.executorengine.bridges.SystemBridge
-import com.afollestad.materialdialogs.checkbox.checkBoxPrompt
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -74,7 +74,7 @@ object AppConfig {
     var autoSleepWakeupMillis: Long = 30 * 60 * 1000
     var chatSystem: String = ""
     var userWakeupWord: String = ""//用户唤醒词
-    var continuousDialogue = false//连续对话
+//    var continuousDialogue = false//连续对话
     var finishWord: String? = null
     //    var resumeMusic = true//继续播放
     var recoWhenWakeupAssist = false//立即识别
@@ -87,6 +87,7 @@ object AppConfig {
     var disableAccessibilityOnLowBattery = true//低电量关闭无障碍
     var translateLang = "auto"//翻译主语言
     var voiceRecogFeedback = false //语音识别提示音
+    var lastingVoiceCommand = false //长语音 连续命令
 
     val streamTypeArray = arrayOf(
             AudioManager.STREAM_MUSIC
@@ -196,7 +197,7 @@ object AppConfig {
         autoOpenASWithRoot = getBooleanAndInit(R.string.key_auto_open_as_with_root, false)
         openChatSystem = getBooleanAndInit(R.string.key_open_chat_system, true)
         openVoiceWakeUpIfAutoSleep = getBooleanAndInit(R.string.key_open_voice_wakeup_if_auto_sleep, true)
-        continuousDialogue = getBooleanAndInit(R.string.key_continuous_dialogue, false)
+//        continuousDialogue = getBooleanAndInit(R.string.key_continuous_dialogue, false)
 //  todo      cloudServiceParseIfLocalFailed = getBooleanAndInit(R.string.key_cloud_service_parse, true)
         sp.set(R.string.key_cloud_service_parse, false)
         autoUpdateData = getBooleanAndInit(R.string.key_auto_update_data, true)
@@ -212,6 +213,7 @@ object AppConfig {
         disableAccessibilityOnLowBattery = getBooleanAndInit(R.string.key_accessibility_service_power_saving_mode, true)
         wakeUpWithHeadsetHook = getBooleanAndInit(R.string.key_wakeup_with_headsethook, wakeUpWithHeadsetHook)
         voiceRecogFeedback = getBooleanAndInit(R.string.key_voice_recog_feedback, voiceRecogFeedback)
+        lastingVoiceCommand = getBooleanAndInit(R.string.key_lasting_voice_command, false)
 
         finishWord = sp.getString(R.string.key_finish_word)
 //        onlyCloudServiceParse = getBooleanAndInit(R.string.key_only_cloud_service_parse, false)

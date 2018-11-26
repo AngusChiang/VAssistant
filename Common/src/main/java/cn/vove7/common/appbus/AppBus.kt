@@ -25,9 +25,10 @@ object AppBus {
     const val ORDER_STOP_EXEC = "stop_exec"
     const val ORDER_STOP_VOICE_WAKEUP_WITHOUT_NOTIFY = "stop_voice_wp_without_notify"
     const val ORDER_START_VOICE_WAKEUP_WITHOUT_NOTIFY = "start_voice_wp_without_notify"
-    const val ORDER_STOP_RECO = "stop_reco"
-    const val ORDER_CANCEL_RECO = "cancel_reco"
-    const val ORDER_START_RECO = "start_reco"
+    const val ORDER_STOP_RECOG = "stop_recog"
+    const val ORDER_CANCEL_RECOG = "cancel_recog"
+    const val ORDER_START_RECOG = "start_recog"
+    const val ORDER_START_RECOG_SILENT = "start_recog_silent" //静默开启
 //    const val ORDER_STOP_DEBUG = "stop_debug"
 
     fun post(data: Any) {

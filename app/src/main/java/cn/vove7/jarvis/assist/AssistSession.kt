@@ -209,7 +209,7 @@ class AssistSession(context: Context) : VoiceInteractionSession(context),
     override fun onHide() {
         Vog.d(this, "onHide ---> ")
         AppBus.unreg(this)
-//        AppBus.post(AppBus.ORDER_CANCEL_RECO)
+//        AppBus.post(AppBus.ORDER_CANCEL_RECOG)
         dialog?.dismiss()
         finish()
     }

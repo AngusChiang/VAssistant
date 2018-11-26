@@ -17,15 +17,12 @@ import java.util.*
  */
 object AppNotification {
 
-    val channel by lazy {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+
+    private val notificationHelper by lazy {
+        NotificationHelper(GlobalApp.APP, if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             ChannelBuilder.with("应用通知", "应用通知", NotificationManagerCompat.IMPORTANCE_DEFAULT)
                     .build()
-        } else null
-    }
-
-    val notificationHelper by lazy {
-        NotificationHelper(GlobalApp.APP, channel)
+        } else null)
     }
 
     /**

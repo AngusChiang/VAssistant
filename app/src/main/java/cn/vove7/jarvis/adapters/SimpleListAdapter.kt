@@ -11,7 +11,8 @@ import cn.vove7.jarvis.R
 import cn.vove7.jarvis.fragments.AwesomeItem
 
 open class SimpleListAdapter<T>(private val dataset: MutableList<ViewModel<T>>
-                                , val itemClickListener: OnItemClickListener<T>? = null, val checkable: Boolean = false)
+                                , val itemClickListener: OnItemClickListener<T>? = null,
+                                val checkable: Boolean = false)
     : RecAdapterWithFooter<SimpleListAdapter.VHolder, ViewModel<T>>() {
 
     override fun itemCount(): Int = dataset.size

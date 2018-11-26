@@ -1,6 +1,8 @@
 package cn.vove7.jarvis.fragments
 
 import android.graphics.Typeface
+import android.os.Handler
+import android.os.Looper
 import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.interfaces.DownloadInfo
 import cn.vove7.common.interfaces.DownloadProgressListener
@@ -8,13 +10,13 @@ import cn.vove7.common.netacc.ApiUrls
 import cn.vove7.common.netacc.NetHelper
 import cn.vove7.common.utils.StorageHelper
 import cn.vove7.common.view.editor.MultiSpan
+import cn.vove7.jarvis.R
+import cn.vove7.jarvis.activities.PluginManagerActivity
 import cn.vove7.jarvis.adapters.SimpleListAdapter
 import cn.vove7.jarvis.adapters.ViewModel
 import cn.vove7.jarvis.droidplugin.PluginManager
 import cn.vove7.jarvis.droidplugin.RePluginInfo
 import cn.vove7.jarvis.droidplugin.VPluginInfo
-import cn.vove7.jarvis.R
-import cn.vove7.jarvis.activities.PluginManagerActivity
 import cn.vove7.jarvis.view.dialog.LoadingDialog
 import cn.vove7.jarvis.view.dialog.ProgressTextDialog
 import cn.vove7.vtp.log.Vog
@@ -92,15 +94,13 @@ class NotInstalledPluginFragment : SimpleListFragment<VPluginInfo>() {
 
             override fun onSuccess(info: DownloadInfo<*>, file: File) {
                 Vog.d(this, "onSuccess ---> $file")
-                dialog?.message = "下载完成"
-                dialog?.progress = 100
-                dialog?.finish("安装") {
-                    PluginManagerActivity.installPlugin(file.absolutePath)
-                }
-//                val intent = Intent(UtilEventReceiver.PLUGIN_DL_DONE)
-//                intent.putExtra("path", file.absolutePath)
-//                notificationHelper.showNotification(info.id, "插件下载完成 ${getName(info)}"
-//                        , "点击安装", NotificationIcons(R.drawable.ic_done), intent)
+                Handler(Looper.getMainLooper()).postDelayed( {
+                    dialog?.message = "下载完成"
+                    dialog?.progress = 100
+                    dialog?.finish("安装") {
+                        PluginManagerActivity.installPlugin(file.absolutePath)
+                    }
+                },800)
             }
 
             override fun onStart(info: DownloadInfo<*>) {
@@ -123,7 +123,7 @@ class NotInstalledPluginFragment : SimpleListFragment<VPluginInfo>() {
             }
 
             override fun onFailed(info: DownloadInfo<*>, e: Exception) {
-                dialog?.message = "下载出错"
+                dialog?.message = "下载出错 ${e.message}"
                 dialog?.finish()
 //                notificationHelper.removeAll()
 //                notificationHelper.showNotification(info.id, "插件下载失败", getName(info),

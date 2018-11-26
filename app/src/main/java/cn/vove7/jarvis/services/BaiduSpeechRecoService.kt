@@ -2,7 +2,7 @@ package cn.vove7.jarvis.services
 
 import android.content.Context
 import android.content.pm.PackageManager
-import android.os.*
+import android.os.HandlerThread
 import android.support.v4.app.ActivityCompat
 import cn.vove7.androlua.luabridge.LuaUtil
 import cn.vove7.common.app.GlobalApp
@@ -139,6 +139,8 @@ class BaiduSpeechRecoService(event: SpeechEvent) : SpeechRecoService(event) {
             if (!AppConfig.openResponseWord)//响应词打开则无效
                 it[SpeechConstant.AUDIO_MILLS] = System.currentTimeMillis() - 500
             //从指定时间开始识别，可以 - 指定ms 识别之前的内容
+            if (AppConfig.lastingVoiceCommand)
+                it[SpeechConstant.VAD_ENDPOINT_TIMEOUT] = 0
         }
 
 //    private val backTrackInMs = 1500
@@ -161,6 +163,7 @@ class BaiduSpeechRecoService(event: SpeechEvent) : SpeechRecoService(event) {
      */
 
     override fun doCancelRecog() {
+        isListening = false
         myRecognizer.cancel()
     }
 //    fun isListening(): Boolean {

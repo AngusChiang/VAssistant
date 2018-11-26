@@ -22,11 +22,15 @@ class UpdateLogDialog(context: Context, onDismiss: (() -> Unit)? = null) {
             d.appendln(MultiSpan(context, it.first, fontSize = 20, typeface = Typeface.BOLD).spanStr)
             d.appendln(it.second)
         }
+        d.scrollToTop()
         d.finish()
     }
 
     private val logs: List<Pair<String, String>>
         get() = listOf(
+                Pair("1.5.3","加入长语音（支持连续说出命令）[设置/语音识别/长语音]\n" +
+                        "修复开启提示音部分情况不识别问题"),
+                Pair("1.5.2", "修复插件安装失败"),
                 Pair("1.5.1", "加入提示音\n" +
                         "加入插件管理 可扩展更多功能\n" +
                         "修复未安装标记应用匹配问题\n" +

@@ -3,15 +3,15 @@ package cn.vove7.jarvis
 import cn.vove7.common.datamanager.parse.model.Action
 import cn.vove7.common.utils.TextDateParser
 import cn.vove7.common.utils.TextHelper
+import cn.vove7.jarvis.chat.TulingChatSystem
+import cn.vove7.jarvis.tools.baiduaip.BaiduAipHelper
 import org.jsoup.Jsoup
 import org.junit.Test
 import java.lang.Thread.sleep
 import java.text.SimpleDateFormat
 import java.util.*
+import java.util.concurrent.CountDownLatch
 import kotlin.concurrent.thread
-import cn.vove7.jarvis.tools.baiduaip.BaiduAipHelper
-import cn.vove7.jarvis.chat.TulingChatSystem
-import cn.vove7.vtp.log.Vog
 
 
 /**
@@ -202,5 +202,20 @@ class ExampleUnitTest {
                 onClick?.invoke()
             }
         }
+    }
+
+
+    @Test
+    fun testCountDown() {
+        val c = CountDownLatch(2)
+        c.countDown()
+        thread {
+            println(0)
+            sleep(1000)
+            println(1)
+            c.countDown()
+        }
+        c.await()
+        println("end")
     }
 }

@@ -321,7 +321,7 @@ class MyAccessibilityService : AccessibilityApi(), AccessibilityBridge {
 
     private val delayHandler = Handler()
     private var startupRunner: Runnable = Runnable {
-        MainService.instance?.onCommand(AppBus.ORDER_START_RECO)
+        MainService.instance?.onCommand(AppBus.ORDER_START_RECOG)
     }
 
     private var stopRunner: Runnable = Runnable {
@@ -357,7 +357,7 @@ class MyAccessibilityService : AccessibilityApi(), AccessibilityBridge {
                     return when {
                         MainService.recoIsListening -> {//下键取消聆听
                             v2 = true
-                            MainService.instance?.onCommand(AppBus.ORDER_CANCEL_RECO)//up speed
+                            MainService.instance?.onCommand(AppBus.ORDER_CANCEL_RECOG)//up speed
                             true
                         }
                         MainService.speaking -> {
@@ -376,7 +376,7 @@ class MyAccessibilityService : AccessibilityApi(), AccessibilityBridge {
                     when {
                         MainService.recoIsListening -> {//按下停止聆听
                             v2 = true
-                            MainService.instance?.onCommand(AppBus.ORDER_STOP_RECO)
+                            MainService.instance?.onCommand(AppBus.ORDER_STOP_RECOG)
                             return true
                         }
                         AppConfig.wakeUpWithHeadsetHook -> {//长按耳机中键唤醒
@@ -390,7 +390,7 @@ class MyAccessibilityService : AccessibilityApi(), AccessibilityBridge {
                     when {
                         MainService.recoIsListening -> {//按下停止聆听
                             v2 = true
-                            MainService.instance?.onCommand(AppBus.ORDER_STOP_RECO)
+                            MainService.instance?.onCommand(AppBus.ORDER_STOP_RECOG)
                             return true
                         }
                         AppConfig.isLongPressVolUpWakeUp -> {//长按唤醒

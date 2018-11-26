@@ -368,5 +368,6 @@
     <string name="key_remove_ad_power_saving_mode" translatable="false">remove_ad_power_saving_mode</string>
     <string name="key_accessibility_service_power_saving_mode" translatable="false">accessibility_service_power_saving_mode</string>
     <string name="key_translate_languages" translatable="false">translate_languages</string>
+    <string name="key_lasting_voice_command" translatable="false">lasting_voice_command</string>
     <string name="text_plugins_manager" translatable="false">插件管理</string>
 </resources>

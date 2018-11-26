@@ -90,11 +90,11 @@ class SpeechSynService(val event: SyncEvent) : SpeechSynthesizerListener {
      */
     fun stop(byUser: Boolean = false) {
         synthesizer.stop()
-        speaking = false
         if (byUser)
             event.onUserInterrupt()
         if (speaking)
             event.onFinish()
+        speaking = false
     }
 
     private fun initialTts() {
@@ -158,7 +158,7 @@ class SpeechSynService(val event: SyncEvent) : SpeechSynthesizerListener {
 }
 
 interface SyncEvent {
-    fun onError(err: String, requestText: String?)
+    fun onError(err: String, responseText: String?)
     /**
      * speaking is true
      */
