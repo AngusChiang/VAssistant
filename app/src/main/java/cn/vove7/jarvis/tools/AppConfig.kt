@@ -74,7 +74,7 @@ object AppConfig {
     var autoSleepWakeupMillis: Long = 30 * 60 * 1000
     var chatSystem: String = ""
     var userWakeupWord: String = ""//用户唤醒词
-//    var continuousDialogue = false//连续对话
+    //    var continuousDialogue = false//连续对话
     var finishWord: String? = null
     //    var resumeMusic = true//继续播放
     var recoWhenWakeupAssist = false//立即识别
@@ -88,6 +88,7 @@ object AppConfig {
     var translateLang = "auto"//翻译主语言
     var voiceRecogFeedback = false //语音识别提示音
     var lastingVoiceCommand = false //长语音 连续命令
+    var listeningToastAlignDirection = 0//对齐方向
 
     val streamTypeArray = arrayOf(
             AudioManager.STREAM_MUSIC
@@ -246,6 +247,18 @@ object AppConfig {
             }
         }.also {
             Vog.d(this, "reload ---> autoSleepWakeupMillis = $it")
+        }
+
+        listeningToastAlignDirection = sp.getString(R.string.key_float_voice_align).let {
+            if (it == null)
+                0
+            else {
+                val i = GlobalApp.APP.resources.getStringArray(R.array.list_float_voice_align).indexOf(it)
+                if (i < 0) 0
+                else i
+            }
+        }.also {
+            Vog.d(this, "悬浮依靠方向 $it")
         }
 
         responseWord = sp.getString(R.string.key_response_word) ?: responseWord

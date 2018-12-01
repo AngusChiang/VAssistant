@@ -86,6 +86,15 @@ class MainService : BusService(),
     private val listeningToast: ListeningToast by lazy {
         ListeningToast()
     }
+
+    /**
+     * 设置语音面板依靠
+     */
+    var toastAlign: Int = 0
+        set(v) {
+            listeningToast.align = v
+        }
+
     override val serviceId: Int
         get() = 126
 
@@ -175,7 +184,8 @@ class MainService : BusService(),
     private var alertDialog: AlertDialog? = null
 
     override fun showAlert(title: String?, msg: String?) {
-        afterSpeakResumeListen = true
+        if (AppConfig.lastingVoiceCommand)
+            afterSpeakResumeListen = true
         runOnUi {
             alertDialog = AlertDialog.Builder(this)
                     .setTitle(title)
@@ -246,7 +256,7 @@ class MainService : BusService(),
      * fixme 其他调用speak 也会触发
      */
     fun resumeListenCommandIfLasting() {//开启长语音时
-        if (afterSpeakResumeListen && AppConfig.lastingVoiceCommand)//防止长语音识别 继续
+        if (afterSpeakResumeListen && AppConfig.lastingVoiceCommand && !recoIsListening)//防止长语音识别 继续
             AppBus.postDelay("lastingVoiceCommand",
                     AppBus.ORDER_START_RECOG_SILENT, 1200)
     }
@@ -332,6 +342,7 @@ class MainService : BusService(),
             speechSynService?.speak(text)
         } else {
             GlobalApp.toastShort(text ?: "null")
+            notifySpeakFinish()
         }
     }
 
@@ -420,18 +431,10 @@ class MainService : BusService(),
                 speechRecoService?.cancelRecog()
             }
             SpeechAction.ActionCode.ACTION_START_WAKEUP -> {
-                if (AppConfig.lastingVoiceCommand) {
-                    GlobalApp.toastShort("暂不支持同时开启长语音和语音唤醒")
-                    return
-                }
                 AppConfig.voiceWakeup = true
                 speechRecoService?.startWakeUp()
             }
             SpeechAction.ActionCode.ACTION_START_WAKEUP_WITHOUT_SWITCH -> {
-                if (AppConfig.lastingVoiceCommand) {
-                    GlobalLog.log("长语音开启无法开启语音唤醒")
-                    return
-                }
                 speechRecoService?.startWakeUp()
             }
             SpeechAction.ActionCode.ACTION_RELOAD_SYN_CONF -> speechSynService?.reLoad()
@@ -530,11 +533,6 @@ class MainService : BusService(),
                 ORDER_START_VOICE_WAKEUP_WITHOUT_NOTIFY -> {//不重新计时
                     if (!speechEngineLoaded) {
                         GlobalApp.toastShort("引擎未就绪")
-                        return@thread
-                    }
-
-                    if (AppConfig.lastingVoiceCommand) {
-                        GlobalLog.log("长语音开启无法开启语音唤醒2")
                         return@thread
                     }
                     speechRecoService?.startWakeUpSilently(false)
@@ -937,11 +935,15 @@ class MainService : BusService(),
     }
 
     var isContinousDialogue = false
+
     /**
      * 解析指令
      * @param result String
+     * @param from Boolean
      */
-    fun onParseCommand(result: String, needCloud: Boolean = true, chat: Boolean = AppConfig.openChatSystem): Boolean {
+    fun onParseCommand(
+            result: String, needCloud: Boolean = true,
+            chat: Boolean = AppConfig.openChatSystem, from: Int = 0): Boolean {
         isContinousDialogue = false
         listeningToast.show(result)
         parseAnimation.begin()
@@ -962,6 +964,11 @@ class MainService : BusService(),
                     parseResult.msg)
             NetHelper.uploadUserCommandHistory(his)
             cExecutor.execQueue(result, parseResult.actionQueue)
+            runOnCachePool {
+                if (AppConfig.lastingVoiceCommand) {//开启长语音,重启定时
+                    speechRecoService?.restartLastingUpTimer()
+                }
+            }
             return true
         } else {// statistics
             //云解析

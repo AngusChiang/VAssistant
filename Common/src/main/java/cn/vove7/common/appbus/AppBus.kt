@@ -1,5 +1,6 @@
 package cn.vove7.common.appbus
 
+import cn.vove7.common.BuildConfig
 import cn.vove7.common.app.GlobalLog
 import cn.vove7.vtp.log.Vog
 import org.greenrobot.eventbus.EventBus
@@ -32,7 +33,15 @@ object AppBus {
 //    const val ORDER_STOP_DEBUG = "stop_debug"
 
     fun post(data: Any) {
-        Vog.d(this, "post ---> $data")
+        val m = if (BuildConfig.DEBUG) {//打印函数栈
+            val st = Thread.currentThread().stackTrace
+            buildString {
+                st.forEach {
+                    appendln("${it.fileName} -> ${it.lineNumber}: " + it.className + "." + it.methodName)
+                }
+            }
+        } else ""
+        Vog.d(this, "post ---> $data on $m")
         EventBus.getDefault().post(data)
     }
 

@@ -20,6 +20,11 @@
         <item>第三个</item>
         <item>最后一个</item>
     </string-array>
+    <string-array name="list_float_voice_align" translatable="false">
+        <item>居中</item>
+        <item>靠左</item>
+        <item>靠右</item>
+    </string-array>
     <string-array name="list_translate_languages" translatable="false">
         <item>自动检测</item>
         <item>中文</item>
@@ -226,7 +231,12 @@
     <string name="text_recharge_code">Recharge code</string>
     <string name="text_failed_to_get_user_info">Failed to get user info</string>
     <string name="text_purchase_recharge_code">Purchase Recharge code</string>
-    <string name="text_purchase_recharge_code_msg">1.联系qq获取（推荐）\n2.通过支付宝转账下方指定金额，在备注填写你的邮箱，不久你会收到含有充值码的邮件\n点击下方[使用充值码]继续操作即可。</string>
+    <string name="text_purchase_recharge_code_msg" translatable="false">
+        1.联系qq获取（推荐）\n
+        2.通过支付宝转账下方指定金额，在备注填写你的邮箱，不久你会收到含有充值码的邮件\n
+        3.点击下方[使用充值码]继续操作即可。\n
+        另外，如果你可以为VOSP做出贡献，可成为永久高级会员。
+    </string>
     <string name="text_advan_include_func" translatable="false">
         1.去广告次数跳无限制\n
         2.无限制标记管理\n
@@ -369,5 +379,6 @@
     <string name="key_accessibility_service_power_saving_mode" translatable="false">accessibility_service_power_saving_mode</string>
     <string name="key_translate_languages" translatable="false">translate_languages</string>
     <string name="key_lasting_voice_command" translatable="false">lasting_voice_command</string>
+    <string name="key_float_voice_align" translatable="false">float_voice_align</string>
     <string name="text_plugins_manager" translatable="false">插件管理</string>
 </resources>

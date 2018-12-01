@@ -98,12 +98,13 @@ class SettingsActivity : ReturnableActivity() {
             )),
             SettingGroupItem(R.color.indigo_700, titleS = "语音识别", childItems = listOf(
                     SwitchItem(title = "长语音模式", summary = "开启后，按键唤醒后可连续说出命令\n可以通过按音量下键终止\n" +
-                            "会占用麦克风\n开启会强制关闭语音唤醒(暂时有冲突)",
+                            "会占用麦克风\n无语音交互2分钟后将关闭识别\n现已支持语音唤醒与长语音同时开启",
                             keyId = R.string.key_lasting_voice_command, defaultValue = { AppConfig.lastingVoiceCommand }) { _, b ->
                         if (b as Boolean) {
-                            AppBus.postSpeechAction(SpeechAction.ActionCode.ACTION_STOP_WAKEUP)
-                            AppConfig.voiceWakeup = false
+//                            AppBus.postSpeechAction(SpeechAction.ActionCode.ACTION_STOP_WAKEUP)
+//                            AppConfig.voiceWakeup = false
                         } else {
+                            MainService.instance?.speechRecoService?.stopLastingUpTimer()//关闭长语音定时器
                             AppBus.postSpeechAction(SpeechAction.ActionCode.ACTION_CANCEL_RECO)
                             AppBus.postSpeechAction(SpeechAction.ActionCode.ACTION_STOP_RECO)
                         }
@@ -239,6 +240,13 @@ class SettingsActivity : ReturnableActivity() {
                             keyId = R.string.key_voice_control_dialog, defaultValue = { true })
 //                    CheckBoxItem(title = "继续播放", summary = "当后台有音乐时，执行结束后继续音乐",
 //                            keyId = R.string.key_resume_bkg_music,defaultValue = {true})
+            )),
+            SettingGroupItem(R.color.lime_600, titleS = "语音面板", childItems = listOf(
+                    SingleChoiceItem(title = "依靠方向", keyId = R.string.key_float_voice_align,
+                            entityArrId = R.array.list_float_voice_align){_,b->
+                        MainService.instance?.toastAlign=(b as Pair<*,*>).first as Int
+                        return@SingleChoiceItem true
+                    }
             )),
             SettingGroupItem(R.color.lime_600, titleId = R.string.text_other, childItems = listOf(
                     SingleChoiceItem(title = "翻译主语言", entityArrId = R.array.list_translate_languages,

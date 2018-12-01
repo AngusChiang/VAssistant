@@ -28,6 +28,9 @@ class UpdateLogDialog(context: Context, onDismiss: (() -> Unit)? = null) {
 
     private val logs: List<Pair<String, String>>
         get() = listOf(
+                Pair("1.5.5","支持[语音唤醒]和[长语音]同时开启\n" +
+                        "加入长语音定时关闭\n" +
+                        "加入语音悬浮窗位置设置[设置/语音面板]"),
                 Pair("1.5.4","修复任何开启长语音时，语音合成结束后，识别开启问题"),
                 Pair("1.5.3","加入长语音（支持连续说出命令）[设置/语音识别/长语音]\n" +
                         "修复开启提示音部分情况不识别问题"),

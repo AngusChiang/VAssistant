@@ -131,7 +131,6 @@
     <string name="text_recharge_code">充值码</string>
     <string name="text_failed_to_get_user_info">获取其个人信息失败</string>
     <string name="text_purchase_recharge_code">购买充值码</string>
-    <string name="text_purchase_recharge_code_msg">1.联系qq获取（推荐）\n2.通过支付宝转账下方指定金额，在备注填写你的邮箱，不久你会收到含有充值码的邮件\n点击下方[使用充值码]继续操作即可。</string>
 
     <string name="text_recharege_pre_read">在支付前，请先阅读高级教程，确保它对你有用。</string>
     <string name="text_email_copy_to_clip">你的邮箱已复制到剪切板</string>

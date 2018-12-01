@@ -50,6 +50,10 @@ abstract class SpeechRecoService(val event: SpeechEvent) : SpeechRecoI {
         }
     }
 
+    /**
+     * 静默开启
+     * 一般在speak完后再次开启
+     */
     override fun startRecogSilent() {
         if (!checkRecoderPermission() || !checkFloat()) return
         isListening = true
@@ -112,11 +116,23 @@ abstract class SpeechRecoService(val event: SpeechEvent) : SpeechRecoI {
         stopWakeUpSilently()//不通知
     }
 
-    val timerHandler: Handler by lazy {
+    protected val timerHandler: Handler by lazy {
         val t = HandlerThread("auto_sleep")
         t.start()
         Handler(t.looper)
     }
+
+    /**
+     * 长语音定时关闭  若支持
+     * 在识别成功后，重新定时
+     * speak后doStartRecog，操作后？？？
+     */
+    open fun restartLastingUpTimer() {}
+
+    /**
+     * 长语音关闭定时器  若支持
+     */
+    open fun stopLastingUpTimer() {}
 
     /**
      * 开启定时关闭

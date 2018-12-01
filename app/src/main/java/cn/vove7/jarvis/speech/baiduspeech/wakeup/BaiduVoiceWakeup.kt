@@ -57,6 +57,8 @@ class BaiduVoiceWakeup(private val eventListener: EventListener) : WakeupI() {
         params[SpeechConstant.SECRET] = secretKey
         params[SpeechConstant.IN_FILE] = "#cn.vove7.jarvis.speech.baiduspeech.MicrophoneInputStream.getInstance()"
 
+        if (AppConfig.lastingVoiceCommand)
+            params[SpeechConstant.VAD_ENDPOINT_TIMEOUT] = 0
         // "assets:///WakeUp_xvtx.bin" 表示WakeUp.bin文件定义在assets目录下
         // params.put(SpeechConstant.ACCEPT_AUDIO_DATA,true);
         // params.put(SpeechConstant.ACCEPT_AUDIO_VOLUME,true);

@@ -30,8 +30,11 @@ object VoiceWakeupStrategy : AbsAccPluginService() {
     //是否关闭唤醒 by VoiceWakeupStrategy
     var closed = false
 
+    var lastPkg = ""
     override fun onAppChanged(appScope: ActionScope) {//
+        if (lastPkg == appScope.packageName) return
         val appInfo = AdvanAppHelper.getAppInfo(appScope.packageName) ?: return
+        lastPkg = appScope.packageName
         if (appInfo.hasMicroPermission()) {//有麦克风权限的App
             //case 1 进入App 自动休眠 ->  ORDER_STOP_VOICE_WAKEUP_WITHOUT_NOTIFY
             //wakeupI?.opened开启时，在内关闭唤醒

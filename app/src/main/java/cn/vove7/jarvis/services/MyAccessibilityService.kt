@@ -191,21 +191,21 @@ class MyAccessibilityService : AccessibilityApi(), AccessibilityBridge {
      * @param event AccessibilityEvent?
      */
     override fun onAccessibilityEvent(event: AccessibilityEvent?) {
-        val eventSource = try {
-            event?.source
-        } catch (e: Exception) {// NullPoint in event.source
-            GlobalLog.err(e, "mas206")
-            return
-        }
         //熄屏|低电量
         if (AppConfig.disableAccessibilityOnLowBattery && PowerEventReceiver.powerSavingMode &&
                 !PowerEventReceiver.isCharging) {//开启低电量模式
             Vog.d(this, "onAccessibilityEvent ---> 低电量")
             return
         }
-
         if (!SystemHelper.isScreenOn(this)) {//(火)?息屏下
-            Vog.d(this, "onAccessibilityEvent ---> 熄屏")
+//            Vog.d(this, "onAccessibilityEvent ---> 熄屏")
+            return
+        }
+
+        val eventSource = try {
+            event?.source
+        } catch (e: Exception) {// NullPoint in event.source
+            GlobalLog.err(e, "mas206")
             return
         }
         if (null == event || null == eventSource)
@@ -244,7 +244,7 @@ class MyAccessibilityService : AccessibilityApi(), AccessibilityBridge {
                 TYPE_WINDOW_CONTENT_CHANGED -> {//"帧"刷新  限制频率
                     System.currentTimeMillis().also {
                         if (it - lastContentChangedTime < 300) {
-                            Vog.d(this, "onAccessibilityEvent ---> lock")
+                            Vog.v(this, "onAccessibilityEvent ---> lock")
                             return@runOnCachePool
                         }
                         lastContentChangedTime = it
@@ -309,7 +309,6 @@ class MyAccessibilityService : AccessibilityApi(), AccessibilityBridge {
             inAbs(className)
         }
     }
-
 
     private fun getT(d: Int): String {
         val builder = StringBuilder()

@@ -145,7 +145,36 @@ class BaiduSpeechRecoService(event: SpeechEvent) : SpeechRecoService(event) {
 
 //    private val backTrackInMs = 1500
 
+
+    private val autoCloseRecog = Runnable {
+        doCancelRecog()
+        doStopRecog()
+    }
+
+    /**
+     * 在识别成功后，重新定时
+     * speak后doStartRecog，操作后？？？
+     */
+    override fun restartLastingUpTimer() {//重启
+        Vog.d(this,"restartLastingUpTimer ---> 开启长语音定时")
+        timerHandler.removeCallbacks(autoCloseRecog)
+        timerHandler.postDelayed(autoCloseRecog, 120000)
+    }
+
+    override fun stopLastingUpTimer() {
+        Vog.d(this,"restartLastingUpTimer ---> 关闭长语音定时")
+        timerHandler.removeCallbacks(autoCloseRecog)
+    }
+
+    /**
+     * 检查百度长语音
+     * 然后定时关闭
+     */
     override fun doStartRecog() {
+        if (AppConfig.lastingVoiceCommand) {//开启长语音
+            restartLastingUpTimer()
+        }
+
         Vog.d(this, "doStartRecog ---> 开始识别")
         //震动 音效
         myRecognizer.start(recoParams)
