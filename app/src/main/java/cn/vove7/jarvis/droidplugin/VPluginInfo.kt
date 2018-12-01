@@ -132,9 +132,9 @@ abstract class VPluginInfo : AwesomeItem {
         val pm = GlobalApp.APP.packageManager
         val info = pm.getPackageArchiveInfo(installApkPath,
                 PackageManager.GET_SERVICES)
-        info.services.filter {
+        info.services?.filter {
             it != null
-        }.forEach {
+        }?.forEach {
             if (it.name.endsWith(".PluginMainService")) {
                 if (it.permission == "LAUNCH_WITH_APP") {
                     Vog.d(this, "getPluginMainService ---> ${it.name} 服务自启")

@@ -30,6 +30,7 @@ object PowerEventReceiver : DyBCReceiver(), OnPowerEvent {
         i.addAction(Intent.ACTION_POWER_CONNECTED)
         i.addAction(Intent.ACTION_POWER_DISCONNECTED)
         i.addAction(Intent.ACTION_BATTERY_LOW)
+        i.addAction(Intent.ACTION_BATTERY_OKAY)
         if (needBatteryLevelChanged)
             i.addAction(Intent.ACTION_BATTERY_CHANGED)
         i
@@ -60,6 +61,9 @@ object PowerEventReceiver : DyBCReceiver(), OnPowerEvent {
                 val maxLevel = intent.getIntExtra(BatteryManager.EXTRA_SCALE, -1) //最大
                 val l = level * 100 / maxLevel
                 event.onBatteryScaleChange(l)
+            }
+            Intent.ACTION_BATTERY_OKAY -> {
+                event.onFullBattery()
             }
         }
 
@@ -144,6 +148,9 @@ object PowerEventReceiver : DyBCReceiver(), OnPowerEvent {
         }
     }
 
+    override fun onFullBattery() {
+    }
+
     override fun onBatteryScaleChange(batteryLevel: Int) {
         Vog.d(this, "onBatteryScaleChange ---> $batteryLevel")
     }
@@ -164,6 +171,11 @@ interface OnPowerEvent {
      * 低电量
      */
     fun onLowBattery()
+
+    /**
+     * 满电
+     */
+    fun onFullBattery()
 
     fun onBatteryScaleChange(batteryLevel: Int)
 

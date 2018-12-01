@@ -10,8 +10,8 @@ android {
         applicationId "cn.vove7.vassistant"
         minSdkVersion 21
         targetSdkVersion 27
-        versionCode 57
-        versionName "1.5.3"
+        versionCode 58
+        versionName "1.5.4"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         testApplicationId = 'cn.vove7.vassistant_test'
 
@@ -84,9 +84,9 @@ task makeJar(type: Jar) {
     //打包到jar后的目录结构
     into('cn/vove7/')
     //去掉不需要打包的目录和文件
-    exclude( 'BuildConfig.class', 'R.class')
+    exclude( 'BuildConfig.class'/*, 'R.class'*/)
     //去掉R$开头的文件
-    exclude{ it.name.startsWith('R$');}
+    //exclude{ it.name.startsWith('R$');}
 }
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')

@@ -2,12 +2,10 @@ package cn.vove7.jarvis.services
 
 import android.app.AlertDialog
 import android.app.Dialog
-import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
 import android.os.Binder
 import android.os.IBinder
-import cn.vove7.androlua.luautils.LuaContext
 import cn.vove7.common.accessibility.AccessibilityApi
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.app.GlobalLog
@@ -24,6 +22,7 @@ import cn.vove7.common.appbus.AppBus.ORDER_START_VOICE_WAKEUP_WITHOUT_NOTIFY
 import cn.vove7.common.appbus.AppBus.ORDER_STOP_EXEC
 import cn.vove7.common.appbus.AppBus.ORDER_STOP_RECOG
 import cn.vove7.common.appbus.AppBus.ORDER_STOP_VOICE_WAKEUP_WITHOUT_NOTIFY
+import cn.vove7.common.appbus.BusService
 import cn.vove7.common.appbus.SpeechAction
 import cn.vove7.common.appbus.VoiceData
 import cn.vove7.common.bridges.ChoiceData
@@ -75,20 +74,21 @@ import java.lang.Thread.sleep
 import java.util.*
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
-import kotlin.collections.HashMap
 import kotlin.concurrent.thread
+
 
 /**
  * 主服务
  */
 class MainService : BusService(),
-        ServiceBridge, OnSelectListener, OnMultiSelectListener, LuaContext {
+        ServiceBridge, OnSelectListener, OnMultiSelectListener {
 
     private val listeningToast: ListeningToast by lazy {
         ListeningToast()
     }
     override val serviceId: Int
         get() = 126
+
     /**
      * 悬浮窗
      */
@@ -175,6 +175,7 @@ class MainService : BusService(),
     private var alertDialog: AlertDialog? = null
 
     override fun showAlert(title: String?, msg: String?) {
+        afterSpeakResumeListen = true
         runOnUi {
             alertDialog = AlertDialog.Builder(this)
                     .setTitle(title)
@@ -222,19 +223,30 @@ class MainService : BusService(),
      * 停止语音
      */
     private fun notifyAlertResult(r: Boolean) {
-        if (AppConfig.voiceControlDialog) {
-            speechRecoService?.cancelRecog()
-        }
         voiceMode = MODE_VOICE
+        if (AppConfig.voiceControlDialog) {
+            if (!afterSpeakResumeListen)// check 长语音
+                speechRecoService?.cancelRecog()
+        }
         cExecutor.notifyAlertResult(r)
         resumeListenCommandIfLasting()
     }
 
     /**
+     * 长语音时 speak或AlertDialog 会 [暂时]关闭识别
+     * 聊天对话说完(speak)后 继续标志（可能有其他调用speak，则不继续）
+     *
+     * 标志更改 ：开始聊天对话|showAlert set true  取消识别时 set false
+     *
+     */
+    var afterSpeakResumeListen: Boolean = false
+
+    /**
      * 长语音下继续语音识别
+     * fixme 其他调用speak 也会触发
      */
     fun resumeListenCommandIfLasting() {//开启长语音时
-        if (AppConfig.lastingVoiceCommand)//防止长语音识别 继续
+        if (afterSpeakResumeListen && AppConfig.lastingVoiceCommand)//防止长语音识别 继续
             AppBus.postDelay("lastingVoiceCommand",
                     AppBus.ORDER_START_RECOG_SILENT, 1200)
     }
@@ -248,6 +260,7 @@ class MainService : BusService(),
             speechRecoService?.doStopRecog()
         }
     }
+
     /**
      * 选择框
      */
@@ -407,7 +420,7 @@ class MainService : BusService(),
                 speechRecoService?.cancelRecog()
             }
             SpeechAction.ActionCode.ACTION_START_WAKEUP -> {
-                if(AppConfig.lastingVoiceCommand){
+                if (AppConfig.lastingVoiceCommand) {
                     GlobalApp.toastShort("暂不支持同时开启长语音和语音唤醒")
                     return
                 }
@@ -415,7 +428,8 @@ class MainService : BusService(),
                 speechRecoService?.startWakeUp()
             }
             SpeechAction.ActionCode.ACTION_START_WAKEUP_WITHOUT_SWITCH -> {
-                if(AppConfig.lastingVoiceCommand){
+                if (AppConfig.lastingVoiceCommand) {
+                    GlobalLog.log("长语音开启无法开启语音唤醒")
                     return
                 }
                 speechRecoService?.startWakeUp()
@@ -519,7 +533,8 @@ class MainService : BusService(),
                         return@thread
                     }
 
-                    if(AppConfig.lastingVoiceCommand){
+                    if (AppConfig.lastingVoiceCommand) {
+                        GlobalLog.log("长语音开启无法开启语音唤醒2")
                         return@thread
                     }
                     speechRecoService?.startWakeUpSilently(false)
@@ -591,7 +606,6 @@ class MainService : BusService(),
          * 语音事件数据类型
          */
 
-        private val data = HashMap<String, Any>()
         var instance: MainService? = null
             get() {
                 return when {
@@ -670,29 +684,6 @@ class MainService : BusService(),
         }
     }
 
-    override fun getGlobalData(): Map<*, *> {
-        return data
-    }
-
-    override fun get(name: String): Any? {
-        return data[name]
-    }
-
-    override fun getContext(): Context = this
-
-    override fun call(name: String, args: Array<Any>) {}
-
-    override fun set(name: String, `object`: Any) {
-        data[name] = `object`
-    }
-
-    override fun getWidth(): Int {
-        return resources.displayMetrics.widthPixels
-    }
-
-    override fun getHeight(): Int {
-        return resources.displayMetrics.heightPixels
-    }
 
     /**
      * 解析唤醒词
@@ -896,12 +887,12 @@ class MainService : BusService(),
             Vog.d(this, "onStopRecog ---> ")
             resumeMusicIf()
 //            listeningToast.hideImmediately()
-            parseAnimation.begin()
         }
 
         override fun onCancelRecog() {
             Vog.d(this, "onCancelRecog ---> ")
             continuePlay = true
+            afterSpeakResumeListen = false
             resumeMusicIf()
             hideAll(true)
             when (voiceMode) {
@@ -954,6 +945,7 @@ class MainService : BusService(),
         isContinousDialogue = false
         listeningToast.show(result)
         parseAnimation.begin()
+
         resumeMusicIf()
 //        if (UserInfo.isVip() && AppConfig.onlyCloudServiceParse) {//高级用户且仅云解析
 //            Vog.d(this, "onParseCommand ---> only云解析")
@@ -991,6 +983,7 @@ class MainService : BusService(),
                         listeningToast.show(if (data.contains("="))
                             data.replace("=", "\n=") else data)
                         executeAnimation.begin()
+                        afterSpeakResumeListen = true
                         speakWithCallback(data, object : SpeakCallback {
                             override fun speakCallback(result: String?) {
                                 hideAll()
