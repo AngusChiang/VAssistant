@@ -75,6 +75,8 @@ abstract class AccessibilityApi : AccessibilityService(),
      */
     abstract fun powerSavingMode()
 
+    abstract fun loadBlackList(ps:Set<String>?=null)
+
     /**
      * 关闭省电
      */

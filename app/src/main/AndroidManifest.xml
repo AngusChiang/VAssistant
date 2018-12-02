@@ -235,6 +235,8 @@
         <activity
             android:name=".activities.PluginManagerActivity"
             android:label="@string/text_plugins_manager" />
+        <activity android:name=".activities.AccServiceBlackListManagerActivity"
+            android:label="无障碍黑名单" />
     </application>
 
 </manifest>

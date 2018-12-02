@@ -43,7 +43,7 @@ class TulingChatSystem : ChatSystem {
     }
 
     companion object {
-        val url = "http://openapi.tuling123.com/openapi/api/v2"
+        const val url = "http://openapi.tuling123.com/openapi/api/v2"
     }
 }
 
@@ -67,9 +67,15 @@ class RequestData {
 }
 
 class UserI {
-    val apiKey = "2a4a7374cf1147759d70432237593c15"
+    val apiKey = {
+        UserInfo.getUserId().let {
+            if (it in 1..999) "2a4a7374cf1147759d70432237593c15"
+            else "5f9469a7021e463eb098a14026d380ba"
+        }
+    }.invoke()
     val userId = UserInfo.getEmail()?.let {
-        it.substring(0, it.indexOf('@')) } ?: "guest"
+        it.substring(0, it.indexOf('@'))
+    } ?: "guest"
 }
 
 class Perception {

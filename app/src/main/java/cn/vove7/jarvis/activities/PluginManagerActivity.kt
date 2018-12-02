@@ -12,15 +12,15 @@ import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.appbus.AppBus
 import cn.vove7.jarvis.BuildConfig
 import cn.vove7.jarvis.R
+import cn.vove7.jarvis.activities.base.BaseActivityWithViewPager
 import cn.vove7.jarvis.droidplugin.PluginManager
 import cn.vove7.jarvis.droidplugin.RePluginManager
-import cn.vove7.jarvis.activities.base.BaseActivityWithViewPager
 import cn.vove7.jarvis.fragments.InstalledPluginFragment
 import cn.vove7.jarvis.fragments.NotInstalledPluginFragment
 import cn.vove7.jarvis.fragments.SimpleListFragment
-import cn.vove7.jarvis.receivers.UtilEventReceiver
 import cn.vove7.jarvis.tools.AppNotification
 import cn.vove7.jarvis.tools.UriUtils
+import cn.vove7.jarvis.view.dialog.ProgressTextDialog
 import cn.vove7.vtp.app.AppHelper
 import cn.vove7.vtp.log.Vog
 import com.afollestad.materialdialogs.MaterialDialog
@@ -51,6 +51,7 @@ class PluginManagerActivity : BaseActivityWithViewPager() {
         if (BuildConfig.DEBUG)
             menu?.add("安装测试插件")
         menu?.add("从本地安装")
+        menu?.add("帮助")
         return true
     }
 
@@ -82,23 +83,29 @@ class PluginManagerActivity : BaseActivityWithViewPager() {
             finish()
             return true
         }
-        if (item?.title == "重启App") {
-//            MaterialDialog(this).title(text = "重启App")
-//                    .message(text = "确认重启?").positiveButton {
-            restartApp()
-//                    }.negativeButton().show()
-        }
-        if (item?.title == "安装测试插件") {
-            installPlugin("/sdcard/test.apk")
-        }
-        if (item?.title == "从本地安装") {
-            val selIntent = Intent(Intent.ACTION_GET_CONTENT)
-            selIntent.type = "*/*"
-            selIntent.addCategory(Intent.CATEGORY_OPENABLE)
-            try {
-                startActivityForResult(selIntent, 1)
-            } catch (e: ActivityNotFoundException) {
-                e.printStackTrace()
+        when (item?.title) {
+            "重启App" -> restartApp()
+            "安装测试插件" -> installPlugin("/sdcard/test.apk")
+                "从本地安装" -> {
+                val selIntent = Intent(Intent.ACTION_GET_CONTENT)
+                selIntent.type = "*/*"
+                selIntent.addCategory(Intent.CATEGORY_OPENABLE)
+                try {
+                    startActivityForResult(selIntent, 1)
+                } catch (e: ActivityNotFoundException) {
+                    e.printStackTrace()
+                }
+            }
+            "帮助" -> {
+                ProgressTextDialog(this,"帮助").apply {
+                    appendlnBold("功能")
+                    appendln("动态扩展更多功能")
+                    appendln()
+                    appendlnBold("如何使用")
+                    appendln("1. 下载安装插件后，勾选插件即可启动插件服务，并且跟随App启动而启动")
+                    appendln("2. 取消勾选即可禁用插件服务")
+                    appendln("注. 卸载或升级插件可能需要重启App才可生效")
+                }
             }
         }
         return super.onOptionsItemSelected(item)

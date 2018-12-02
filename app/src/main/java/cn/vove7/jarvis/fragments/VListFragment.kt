@@ -2,7 +2,6 @@ package cn.vove7.jarvis.fragments
 
 import android.os.Bundle
 import android.os.Handler
-import android.os.Message
 import android.support.annotation.LayoutRes
 import android.support.design.widget.FloatingActionButton
 import android.support.v4.app.Fragment
@@ -13,7 +12,10 @@ import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.*
+import android.widget.CompoundButton
+import android.widget.ProgressBar
+import android.widget.Switch
+import android.widget.TextView
 import cn.vove7.common.utils.runOnUi
 import cn.vove7.common.view.toast.ColorfulToast
 import cn.vove7.jarvis.R
@@ -226,6 +228,10 @@ abstract class VListFragment : Fragment() {
         Handler().postDelayed({
             swipeRefreshLayout.isRefreshing = false
         }, 500)
+    }
+
+    fun startRefreshing() {
+        swipeRefreshLayout.isRefreshing = true
     }
 
     /**

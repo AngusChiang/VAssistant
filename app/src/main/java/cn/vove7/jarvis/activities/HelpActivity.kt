@@ -2,7 +2,6 @@ package cn.vove7.jarvis.activities
 
 import android.graphics.Typeface
 import android.os.Bundle
-import android.os.Handler
 import android.support.design.widget.TextInputLayout
 import android.view.Gravity
 import android.view.View
@@ -21,6 +20,7 @@ import cn.vove7.jarvis.adapters.IconTitleEntity
 import cn.vove7.jarvis.adapters.IconTitleListAdapter
 import cn.vove7.jarvis.tools.ItemWrap
 import cn.vove7.jarvis.tools.Tutorials
+import cn.vove7.jarvis.view.dialog.ProgressTextDialog
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.customview.customView
 import kotlinx.android.synthetic.main.activity_abc_header.*
@@ -51,7 +51,7 @@ class HelpActivity : ReturnableActivity(), AdapterView.OnItemClickListener {
     }
 
     private fun startTutorials() {
-        list_view.post{
+        list_view.post {
             Tutorials.oneStep(this, list = arrayOf(
                     ItemWrap(Tutorials.h_t_1, adapter.holders[0]?.titleView, getString(R.string.text_service_manual), "自定义指令、脚本Api、远程调试都在这里")
                     , ItemWrap(Tutorials.h_t_2, adapter.holders[1]?.titleView, getString(R.string.text_hot_key_desc), "快速了解快捷键操作")
@@ -82,7 +82,15 @@ class HelpActivity : ReturnableActivity(), AdapterView.OnItemClickListener {
                     customView(view = text, scrollable = true)
                 }
             }
-            2 -> SystemBridge.openUrl(ApiUrls.USER_FAQ)
+            2 -> {
+                ProgressTextDialog(this, "常见问题").apply {
+                    faqs.forEach {
+                        appendlnBold("· " + it.first)
+                        appendln(it.second)
+                        appendln()
+                    }
+                }
+            }
             3 -> SystemBridge.openUrl(ApiUrls.QQ_GROUP_1)
             4 -> showFeedbackDialog()
             5 -> {
@@ -107,6 +115,13 @@ class HelpActivity : ReturnableActivity(), AdapterView.OnItemClickListener {
             }
         }
     }
+
+    private val faqs
+        get() = listOf(
+                Pair("突然按键失灵了?", "按键失灵一般是由于程序后台被杀导致的，目前也属于安卓系统的bug，解决方法就是进入App详情，将此应用强行停止。参考 如何为APP上锁")
+                , Pair("如何为App上锁?", "在App内进入最近任务，上锁；若此时最近任务没有出现，可尝试进入[例如插件管理、指令管理]页面再进入最近任务上锁。或者自带管家白名单")
+                , Pair("通知栏显示服务正在运行", "可尝试在应用设置中关闭此通知")
+        )
 
     private fun showFeedbackDialog() {
         MaterialDialog(this)

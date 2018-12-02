@@ -50,7 +50,6 @@ import cn.vove7.jarvis.R
 import cn.vove7.jarvis.activities.PermissionManagerActivity
 import cn.vove7.jarvis.activities.ScreenPickerActivity
 import cn.vove7.jarvis.chat.ChatSystem
-import cn.vove7.jarvis.chat.QykChatSystem
 import cn.vove7.jarvis.chat.TulingChatSystem
 import cn.vove7.jarvis.speech.SpeechEvent
 import cn.vove7.jarvis.speech.SpeechRecoService
@@ -152,15 +151,16 @@ class MainService : BusService(),
     }
 
     fun loadChatSystem(byUserSet: Boolean = false) {
-        val type = GlobalApp.APP.resources.getStringArray(R.array.list_chat_system)
+//        val type = GlobalApp.APP.resources.getStringArray(R.array.list_chat_system)
 
         if (!AppConfig.openChatSystem)
             return
-        chatSystem = when (AppConfig.chatSystem) {
-            type[0] -> QykChatSystem()
-            type[1] -> TulingChatSystem()
-            else -> QykChatSystem()
-        }
+//        chatSystem = when (AppConfig.chatSystem) {
+//            type[0] -> QykChatSystem()
+//            type[1] -> TulingChatSystem()
+//            else -> QykChatSystem()
+//        }
+        chatSystem = TulingChatSystem()
         if (byUserSet) {
             GlobalApp.toastShort("对话系统切换完成")
         }
@@ -185,7 +185,7 @@ class MainService : BusService(),
 
     override fun showAlert(title: String?, msg: String?) {
         if (AppConfig.lastingVoiceCommand)
-            afterSpeakResumeListen = true
+            afterSpeakResumeListen = recoIsListening//记录原状态
         runOnUi {
             alertDialog = AlertDialog.Builder(this)
                     .setTitle(title)
@@ -246,7 +246,7 @@ class MainService : BusService(),
      * 长语音时 speak或AlertDialog 会 [暂时]关闭识别
      * 聊天对话说完(speak)后 继续标志（可能有其他调用speak，则不继续）
      *
-     * 标志更改 ：开始聊天对话|showAlert set true  取消识别时 set false
+     * 标志更改 ：开始聊天对话|showAlert set 识别状态recogIsListening  取消识别时 set false
      *
      */
     var afterSpeakResumeListen: Boolean = false
@@ -256,6 +256,7 @@ class MainService : BusService(),
      * fixme 其他调用speak 也会触发
      */
     fun resumeListenCommandIfLasting() {//开启长语音时
+        Vog.d(this,"resumeListenCommandIfLasting ---> 检查长语音 afterSpeakResumeListen:$afterSpeakResumeListen IsListening:$recoIsListening")
         if (afterSpeakResumeListen && AppConfig.lastingVoiceCommand && !recoIsListening)//防止长语音识别 继续
             AppBus.postDelay("lastingVoiceCommand",
                     AppBus.ORDER_START_RECOG_SILENT, 1200)
@@ -266,6 +267,7 @@ class MainService : BusService(),
      */
     fun stopRecogTemp() {
         if (AppConfig.lastingVoiceCommand) {//防止长语音识别 speak聊天对话
+            afterSpeakResumeListen = recoIsListening
             speechRecoService?.doCancelRecog()
             speechRecoService?.doStopRecog()
         }
@@ -990,7 +992,7 @@ class MainService : BusService(),
                         listeningToast.show(if (data.contains("="))
                             data.replace("=", "\n=") else data)
                         executeAnimation.begin()
-                        afterSpeakResumeListen = true
+                        afterSpeakResumeListen = recoIsListening
                         speakWithCallback(data, object : SpeakCallback {
                             override fun speakCallback(result: String?) {
                                 hideAll()

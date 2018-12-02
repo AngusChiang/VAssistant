@@ -85,7 +85,7 @@
     </string-array>
 
     <string-array name="list_chat_system" translatable="false">
-        <item>青云客</item>
+        <!--<item>青云客</item>-->
         <item>图灵机器人</item>
     </string-array>
 
@@ -244,7 +244,6 @@
         4.无限制屏幕文字翻译\n
         5.操作、标记分享，且可同步恢复\n
         6.无限制屏幕识别/文字识别\n
-        7.更聪明更快的图灵机器人聊天系统
     </string>
     <string name="text_recharege_pre_read">在支付前，请先阅读高级教程，确保它对你有用。</string>
     <string name="text_email_copy_to_clip">你的邮箱已复制到剪切板</string>

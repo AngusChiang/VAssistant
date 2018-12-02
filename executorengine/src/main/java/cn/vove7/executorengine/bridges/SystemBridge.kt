@@ -217,56 +217,72 @@ object SystemBridge : SystemOperation {
      * 打开手电
      */
     override fun openFlashlight(): Boolean {
-        return switchFL(true)
+        return switchFLSafly(true)
     }
 
     /**
      * 关闭手电
      */
     override fun closeFlashlight(): Boolean {
-        return switchFL(false)
+        return switchFLSafly(false)
     }
 
     @Throws(Exception::class)
     private fun switchFlashlight(on: Boolean) {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {//<7.0
-            val camera: Camera
-            camera = Camera.open()
-            val parameters = camera.parameters
-            parameters.flashMode = if (!on) {
-                Camera.Parameters.FLASH_MODE_OFF
-            } else {
-                Camera.Parameters.FLASH_MODE_TORCH
-            }
-            camera.parameters = parameters
+            switchFlashlightLessL(on)
         } else {
-            //获取CameraManager
-            val mCameraManager = context.getSystemService(Context.CAMERA_SERVICE) as CameraManager;
-            //获取当前手机所有摄像头设备ID
-            val ids = mCameraManager.getCameraIdList();
-            var r = false
-            ids.forEach { id ->
-                val c = mCameraManager.getCameraCharacteristics(id);
-                //查询该摄像头组件是否包含闪光灯
-                val flashAvailable = c.get(CameraCharacteristics.FLASH_INFO_AVAILABLE);
-                val lensFacing = c.get(CameraCharacteristics.LENS_FACING);
-                if (flashAvailable != null && flashAvailable && lensFacing != null
-                        && lensFacing == CameraCharacteristics.LENS_FACING_BACK) {
-                    //打开或关闭手电筒
-                    mCameraManager.setTorchMode(id, on);
-                    r = true
-                }
-            }
-            if (!r) {
-                throw Exception("未找到可用闪光灯")
-            }
+            switchFlashlightAboveL(on)
         }
     }
 
-    private fun switchFL(on: Boolean): Boolean {
+    /**
+     * 低于7.0 切换手电
+     * @param on Boolean
+     */
+    private fun switchFlashlightLessL(on: Boolean) {
+        val camera: Camera
+        camera = Camera.open()
+        val parameters = camera.parameters
+        parameters.flashMode = if (!on) {
+            Camera.Parameters.FLASH_MODE_OFF
+        } else {
+            Camera.Parameters.FLASH_MODE_TORCH
+        }
+        camera.parameters = parameters
+    }
+
+    /**
+     * 高于7.0 切换手电
+     * @param on Boolean
+     */
+    private fun switchFlashlightAboveL(on: Boolean) {
+        //获取CameraManager
+        val mCameraManager = context.getSystemService(Context.CAMERA_SERVICE) as CameraManager;
+        //获取当前手机所有摄像头设备ID
+        val ids = mCameraManager.getCameraIdList();
+        var r = false
+        ids.forEach { id ->
+            val c = mCameraManager.getCameraCharacteristics(id);
+            //查询该摄像头组件是否包含闪光灯
+            val flashAvailable = c.get(CameraCharacteristics.FLASH_INFO_AVAILABLE);
+            val lensFacing = c.get(CameraCharacteristics.LENS_FACING);
+            if (flashAvailable != null && flashAvailable && lensFacing != null
+                    && lensFacing == CameraCharacteristics.LENS_FACING_BACK) {
+                //打开或关闭手电筒
+                mCameraManager.setTorchMode(id, on);
+                r = true
+            }
+        }
+        if (!r) {
+            throw Exception("未找到可用闪光灯")
+        }
+    }
+
+    private fun switchFLSafly(on: Boolean): Boolean {
         try {
             switchFlashlight(on)
-        } catch (e: Exception) {
+        } catch (e: Throwable) {
             GlobalLog.err(e, "sfl282")
             GlobalApp.toastShort((if (on) "打开" else "关闭") + "手电失败")
             return false

@@ -6,6 +6,7 @@ import cn.vove7.common.model.UserInfo
 import cn.vove7.common.utils.ThreadPool.runOnPool
 import cn.vove7.common.utils.startActivityOnNewTask
 import cn.vove7.jarvis.R
+import cn.vove7.jarvis.activities.AccServiceBlackListManagerActivity
 import cn.vove7.jarvis.activities.PluginManagerActivity
 import cn.vove7.jarvis.adapters.SettingsExpandableAdapter
 import cn.vove7.jarvis.plugins.AdKillerService
@@ -76,13 +77,13 @@ class LaboratoryActivity : ReturnableActivity() {
                             }
                             return@SwitchItem true
                         },
-                        SingleChoiceItem(title = "对话系统", summary = "由于每日调用次数有限，图灵机器人仅高级用户可用",
+                        SingleChoiceItem(title = "对话系统",
                                 keyId = R.string.key_chat_system_type, entityArrId = R.array.list_chat_system,
                                 defaultValue = { 0 }) { _, d ->
-                            if (!UserInfo.isVip() && (d as Pair<*, *>).first != 0) {
-                                toast.showShort("设置无效，仅高级用户可用")
-                                return@SingleChoiceItem false
-                            }
+//                            if (!UserInfo.isVip() && (d as Pair<*, *>).first != 0) {
+//                                toast.showShort("设置无效，仅高级用户可用")
+//                                return@SingleChoiceItem false
+//                            }
                             runOnPool {
                                 sleep(500)//等待设置完成
                                 MainService.instance?.loadChatSystem(true)
@@ -120,6 +121,13 @@ class LaboratoryActivity : ReturnableActivity() {
                         CheckBoxItem(title = "显示通知", summary = "关闭和打开时在状态栏显示通知",
                                 keyId = R.string.key_close_wakeup_notification, defaultValue = { true })
 
+                )),
+                SettingGroupItem(R.color.yellow_700, titleS = "其他", childItems = listOf(
+                    IntentItem(title="无障碍黑名单",summary = "如果开启无障碍后，在某个应用内卡顿，请将它添加进来"){
+                        startActivityOnNewTask(Intent(this,AccServiceBlackListManagerActivity::class.java).also{
+                            it.addFlags(Intent.FLAG_ACTIVITY_NEW_DOCUMENT)
+                        })
+                    }
                 ))
         )
     }

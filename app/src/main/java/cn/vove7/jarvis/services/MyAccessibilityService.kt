@@ -15,10 +15,10 @@ import android.view.accessibility.AccessibilityEvent
 import android.view.accessibility.AccessibilityEvent.*
 import android.view.accessibility.AccessibilityNodeInfo
 import cn.vove7.common.accessibility.AccessibilityApi
+import cn.vove7.common.accessibility.AccessibilityBridge
 import cn.vove7.common.accessibility.viewnode.ViewNode
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.app.GlobalLog
-import cn.vove7.common.accessibility.AccessibilityBridge
 import cn.vove7.common.appbus.AppBus
 import cn.vove7.common.datamanager.parse.model.ActionScope
 import cn.vove7.common.executor.CExecutorI
@@ -32,12 +32,15 @@ import cn.vove7.common.view.notifier.UiViewShowNotifier
 import cn.vove7.common.view.notifier.ViewShowListener
 import cn.vove7.executorengine.bridges.SystemBridge
 import cn.vove7.executorengine.helper.AdvanAppHelper
-import cn.vove7.jarvis.plugins.*
+import cn.vove7.jarvis.plugins.AdKillerService
+import cn.vove7.jarvis.plugins.AppChangNotifier
+import cn.vove7.jarvis.plugins.VoiceWakeupStrategy
 import cn.vove7.jarvis.receivers.PowerEventReceiver
 import cn.vove7.jarvis.tools.AppConfig
 import cn.vove7.jarvis.view.statusbar.AccessibilityStatusAnimation
 import cn.vove7.jarvis.view.statusbar.StatusAnimation
 import cn.vove7.vtp.log.Vog
+import cn.vove7.vtp.sharedpreference.SpHelper
 import cn.vove7.vtp.system.SystemHelper
 import java.lang.Thread.sleep
 import kotlin.concurrent.thread
@@ -58,6 +61,7 @@ class MyAccessibilityService : AccessibilityApi(), AccessibilityBridge {
         accAni.showAndHideDelay("服务开启", 5000L)
 
         startPluginService()
+        loadBlackList()
     }
 
     /**
@@ -89,26 +93,27 @@ class MyAccessibilityService : AccessibilityApi(), AccessibilityBridge {
     }
 
 
-    @Synchronized
     private fun updateCurrentApp(pkg: String, activityName: String) {
-        if (currentScope.packageName == pkg && activityName == currentActivity) return
-        AdvanAppHelper.getAppInfo(pkg).also {
-            // 系统界面??
-            currentAppInfo = try {//todo 防止阻塞
-                if (it == null || it.isInputMethod(this) || !it.activities().contains(activityName)) {//过滤输入法、非activity
-                    return
-                } else it
-            } catch (e: Exception) {
-                GlobalLog.err(e)
-                it
+        synchronized(MyAccessibilityService::class.java) {
+            if (currentScope.packageName == pkg && activityName == currentActivity) return
+            AdvanAppHelper.getAppInfo(pkg).also {
+                // 系统界面??
+                currentAppInfo = try {//todo 防止阻塞
+                    if (it == null || it.isInputMethod(this) || !it.activities().contains(activityName)) {//过滤输入法、非activity
+                        return
+                    } else it
+                } catch (e: Exception) {
+                    GlobalLog.err(e)
+                    it
+                }
             }
+            Vog.d(this, "updateCurrentApp ---> $pkg")
+            Vog.d(this, "updateCurrentApp ---> $activityName")
+            currentScope.activity = activityName
+            currentScope.packageName = pkg
+            Vog.d(this, currentScope.toString())
+            dispatchPluginsEvent(ON_APP_CHANGED, currentScope)//发送事件
         }
-        Vog.d(this, "updateCurrentApp ---> $pkg")
-        Vog.d(this, "updateCurrentApp ---> $activityName")
-        currentScope.activity = activityName
-        currentScope.packageName = pkg
-        Vog.d(this, currentScope.toString())
-        dispatchPluginsEvent(ON_APP_CHANGED, currentScope)//发送事件
     }
 
     override fun getRootViewNode(): ViewNode? {
@@ -202,26 +207,25 @@ class MyAccessibilityService : AccessibilityApi(), AccessibilityBridge {
             return
         }
 
-        val eventSource = try {
-            event?.source
-        } catch (e: Exception) {// NullPoint in event.source
-            GlobalLog.err(e, "mas206")
-            return
-        }
-        if (null == event || null == eventSource)
+//        val eventSource = try {
+//            event?.source
+//        } catch (e: Exception) {// NullPoint in event.source
+//            GlobalLog.err(e, "mas206")
+//            return
+//        }
+        if (null == event /*|| null == eventSource*/)
             return
 
-        Vog.v(this, "class :$currentAppInfo - $currentActivity ${event.className} \n" +
-                AccessibilityEvent.eventTypeToString(event.eventType))
         val eventType = event.eventType
-        if (eventType == AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED) {//界面切换
+
+        Vog.v(this, "class :$currentAppInfo - $currentActivity ${event.className} \n" +
+                AccessibilityEvent.eventTypeToString(eventType))
+        if (eventType == AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED) {
+            //界面切换
             val classNameStr = event.className
             val pkg = event.packageName as String?
             Vog.v(this, "WINDOW_STATE_CHANGED ---> $classNameStr $pkg")
-//            if (packageName == pkg) {//fix 悬浮窗造成阻塞
-//                Vog.d(this, "onAccessibilityEvent ---> 自身(屏蔽悬浮窗)")
-//                return
-//            }
+
             runOnCachePool {
                 if (classNameStr != null && pkg != null)
                     updateCurrentApp(pkg, classNameStr.toString())
@@ -473,6 +477,15 @@ class MyAccessibilityService : AccessibilityApi(), AccessibilityBridge {
 
     override fun getService(): AccessibilityService = this
 
+    private val blackPackage = hashSetOf<String>()
+    val baseBlackPackage = listOf(//初始黑名单
+            "com.android.chrome",
+            "com.android.systemui",
+            "net.oneplus.launcher",
+            "com.fastaccess.github",
+            GlobalApp.APP.packageName
+    )
+
     companion object {
 
         private val absCls = arrayOf("AbsListView", "ViewGroup", "CategoryPairLayout")
@@ -483,8 +496,6 @@ class MyAccessibilityService : AccessibilityApi(), AccessibilityBridge {
             }
             return false
         }
-
-        val blackPackage = hashSetOf("com.android.chrome", "com.android.systemui", GlobalApp.APP.packageName)
 
 //        private const val ON_BIND = 2
 
@@ -509,6 +520,16 @@ class MyAccessibilityService : AccessibilityApi(), AccessibilityBridge {
 //            disableSelf()
 //        }
         accAni.failed("省电模式，服务关闭")
+    }
+
+    @Synchronized
+    override fun loadBlackList(ps: Set<String>?) {
+        blackPackage.clear()
+        if (ps != null) blackPackage.addAll(ps)
+        else blackPackage.addAll(SpHelper(this)
+                .getStringSet("acc_black_list") ?: emptyList())
+        blackPackage.addAll(baseBlackPackage)
+        Vog.d(this,"loadBlackList ---> $blackPackage ${blackPackage.size}")
     }
 
     override fun disablePowerSavingMode() {

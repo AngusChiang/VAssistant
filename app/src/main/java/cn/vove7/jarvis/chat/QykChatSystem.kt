@@ -13,6 +13,7 @@ import com.google.gson.Gson
  * @author Administrator
  * 2018/10/28
  */
+@Deprecated("服务不可用")
 class QykChatSystem : ChatSystem {
     override fun chatWithText(s: String): String? {
         val data = HttpBridge.get("http://api.qingyunke.com/api.php?key=free&appid=0&msg=$s")

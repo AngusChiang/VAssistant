@@ -23,7 +23,9 @@ abstract class SimpleListFragment<DataType> : VListFragment() {
 
     val dataSet = mutableListOf<ViewModel<DataType>>()
     override fun clearDataSet() {
-        dataSet.clear()
+        synchronized(dataSet) {
+            dataSet.clear()
+        }
     }
 
     override fun initView(contentView: View) {
@@ -67,7 +69,9 @@ abstract class SimpleListFragment<DataType> : VListFragment() {
      * @param allLoad Boolean 是否加载全部，默认根据当前页数据量和pageSizeLimit比较
      */
     fun notifyLoadSuccess(list: List<DataType>, allLoad: Boolean = list.size < pageSizeLimit) {
-        dataSet.addAll(transData(list))
+        synchronized(dataSet) {
+            dataSet.addAll(transData(list))
+        }
         Vog.d(this, "notifyLoadSuccess ---> $allLoad")
         notifyLoadSuccess(allLoad)
     }

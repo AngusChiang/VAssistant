@@ -1,6 +1,7 @@
 package cn.vove7.jarvis.view.dialog
 
 import android.content.Context
+import android.graphics.Typeface
 import android.os.Handler
 import android.os.Looper
 import android.os.Message
@@ -61,6 +62,9 @@ open class ProgressTextDialog(context: Context, title: String? = null,
         textView.setTextIsSelectable(b)
     }
 
+    fun appendlnBold(text: String, fontSize: Int = 15) {
+        appendln(MultiSpan(context, text, fontSize = fontSize, typeface = Typeface.BOLD).spanStr)
+    }
 
     @Synchronized
     fun appendln(s: Any? = null): ProgressTextDialog {

@@ -1,6 +1,7 @@
 package cn.vove7.jarvis.adapters
 
 import android.graphics.drawable.Drawable
+import android.util.SparseArray
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -9,18 +10,21 @@ import android.widget.ImageView
 import android.widget.TextView
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.fragments.AwesomeItem
+import cn.vove7.vtp.log.Vog
 
 open class SimpleListAdapter<T>(private val dataset: MutableList<ViewModel<T>>
                                 , val itemClickListener: OnItemClickListener<T>? = null,
                                 val checkable: Boolean = false)
     : RecAdapterWithFooter<SimpleListAdapter.VHolder, ViewModel<T>>() {
 
+    private val holders = SparseArray<SimpleListAdapter.VHolder>()
     override fun itemCount(): Int = dataset.size
     override fun getItem(pos: Int): ViewModel<T>? {
         return dataset[pos]
     }
 
     override fun onBindView(holder: VHolder, position: Int, item: ViewModel<T>) {
+        holders.put(position, holder)
         holder.title?.text = item.title
 
         if (item.icon != null) {
@@ -42,8 +46,12 @@ open class SimpleListAdapter<T>(private val dataset: MutableList<ViewModel<T>>
         if (checkable) {
             holder.checkBox?.visibility = View.VISIBLE
             holder.checkBox?.isChecked = item.checked
-            holder.checkBox?.setOnCheckedChangeListener { buttonView, isChecked ->
-                itemClickListener?.onItemCheckedStatusChanged(holder, item, isChecked)
+            holder.checkBox?.setOnCheckedChangeListener { b, isChecked ->
+                if (b.isPressed) {//手动按时才执行
+                    Vog.d(this, "OnCheckedChangeListener ---> $position ${item.title} $isChecked")
+                    item.checked = isChecked//更新状态
+                    itemClickListener?.onItemCheckedStatusChanged(holder, item, isChecked)
+                }
             }
         } else {
             holder.checkBox?.visibility = View.GONE
@@ -56,8 +64,16 @@ open class SimpleListAdapter<T>(private val dataset: MutableList<ViewModel<T>>
                 holder.itemView.setBackgroundColor(it.bgColor!!)
             }
         }
-
     }
+
+    val checkedList: List<ViewModel<T>>
+        get() = {
+            val l = mutableListOf<ViewModel<T>>()
+//            for (k in holders) {
+//
+//            }
+            l
+        }.invoke()
 
     override fun onCreateHolder(parent: ViewGroup, viewType: Int): VHolder {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.item_normal_icon_title, parent, false)
@@ -90,10 +106,10 @@ open class SimpleListAdapter<T>(private val dataset: MutableList<ViewModel<T>>
 
 }
 
-class ViewModel<T> (
+class ViewModel<T>(
         val title: String?,
         val subTitle: String? = null,
         val icon: Drawable? = null,
         val extra: T,
-        val checked: Boolean = false
+        var checked: Boolean = false
 )
