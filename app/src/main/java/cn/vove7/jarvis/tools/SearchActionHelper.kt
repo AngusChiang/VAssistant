@@ -6,6 +6,11 @@ import android.support.v7.widget.SearchView
 import android.view.MenuItem
 import cn.vove7.vtp.log.Vog
 
+/**
+ * Toolbar 菜单搜索框
+ * @property lis Function1<String, Unit>
+ * @constructor
+ */
 class SearchActionHelper(searchMenuItem: MenuItem, val lis: (String) -> Unit) {
     init {
         val searchView = MenuItemCompat.getActionView(searchMenuItem) as SearchView

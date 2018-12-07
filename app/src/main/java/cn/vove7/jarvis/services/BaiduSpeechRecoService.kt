@@ -141,6 +141,13 @@ class BaiduSpeechRecoService(event: SpeechEvent) : SpeechRecoService(event) {
             //从指定时间开始识别，可以 - 指定ms 识别之前的内容
             if (AppConfig.lastingVoiceCommand)
                 it[SpeechConstant.VAD_ENDPOINT_TIMEOUT] = 0
+//            if(AppConfig.voiceRecogFeedback) {
+//                it[SpeechConstant.SOUND_START]= R.raw.recog_start
+//                it[SpeechConstant.SOUND_END]= R.raw.recog_finish
+//                it[SpeechConstant.SOUND_SUCCESS]= R.raw.recog_finish
+//                it[SpeechConstant.SOUND_ERROR]= R.raw.recog_failed
+//                it[SpeechConstant.SOUND_CANCEL]= R.raw.recog_cancel
+//            }
         }
 
 //    private val backTrackInMs = 1500
@@ -156,13 +163,14 @@ class BaiduSpeechRecoService(event: SpeechEvent) : SpeechRecoService(event) {
      * speak后doStartRecog，操作后？？？
      */
     override fun restartLastingUpTimer() {//重启
-        Vog.d(this,"restartLastingUpTimer ---> 开启长语音定时")
+        Vog.d(this, "restartLastingUpTimer ---> 开启长语音定时")
         timerHandler.removeCallbacks(autoCloseRecog)
-        timerHandler.postDelayed(autoCloseRecog, 120000)
+        timerHandler.postDelayed(autoCloseRecog,
+                (AppConfig.lastingVoiceMillis * 1000).toLong())
     }
 
     override fun stopLastingUpTimer() {
-        Vog.d(this,"restartLastingUpTimer ---> 关闭长语音定时")
+        Vog.d(this, "restartLastingUpTimer ---> 关闭长语音定时")
         timerHandler.removeCallbacks(autoCloseRecog)
     }
 

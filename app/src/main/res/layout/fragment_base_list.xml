@@ -63,6 +63,12 @@
                 <!--app:bubbleTextColor="#ffffff"-->
                 <!--app:handleColor="@color/colorAccent"-->
                 <!--app:hideScrollbar="false"-->
+                <com.pluscubed.recyclerfastscroll.RecyclerFastScroller
+                    android:id="@+id/fast_scroller"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                </com.pluscubed.recyclerfastscroll.RecyclerFastScroller>
             </RelativeLayout>
         </LinearLayout>
 

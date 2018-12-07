@@ -97,8 +97,8 @@ class SettingsActivity : ReturnableActivity() {
                     }*/
             )),
             SettingGroupItem(R.color.indigo_700, titleS = "语音识别", childItems = listOf(
-                    SwitchItem(title = "长语音模式", summary = "开启后，按键唤醒后可连续说出命令\n可以通过按音量下键终止\n" +
-                            "会占用麦克风\n无语音交互2分钟后将关闭识别\n现已支持语音唤醒与长语音同时开启",
+                    SwitchItem(title = "长语音模式", summary = "开启后，唤醒后可连续说出命令\n可以通过按音量下键终止\n" +
+                            "会占用麦克风\n支持语音唤醒与长语音同时开启",
                             keyId = R.string.key_lasting_voice_command, defaultValue = { AppConfig.lastingVoiceCommand }) { _, b ->
                         if (b as Boolean) {
 //                            AppBus.postSpeechAction(SpeechAction.ActionCode.ACTION_STOP_WAKEUP)
@@ -109,7 +109,10 @@ class SettingsActivity : ReturnableActivity() {
                             AppBus.postSpeechAction(SpeechAction.ActionCode.ACTION_STOP_RECO)
                         }
                         return@SwitchItem true
-                    }
+                    },
+                    NumberPickerItem(title = "长语音有效时长", summary = "指定时间（单位秒）取消长语音识别", range = Pair(10, 120),
+                            keyId = R.string.key_lasting_voice_millis,
+                            defaultValue = { AppConfig.lastingVoiceMillis })
             )),
             SettingGroupItem(R.color.google_green, "反馈", childItems = listOf(
                     SwitchItem(title = "提示音", summary = "语音识别提示音", keyId = R.string.key_voice_recog_feedback, defaultValue = { AppConfig.voiceRecogFeedback }),
@@ -243,8 +246,8 @@ class SettingsActivity : ReturnableActivity() {
             )),
             SettingGroupItem(R.color.lime_600, titleS = "语音面板", childItems = listOf(
                     SingleChoiceItem(title = "依靠方向", keyId = R.string.key_float_voice_align,
-                            entityArrId = R.array.list_float_voice_align){_,b->
-                        MainService.instance?.toastAlign=(b as Pair<*,*>).first as Int
+                            entityArrId = R.array.list_float_voice_align) { _, b ->
+                        MainService.instance?.toastAlign = (b as Pair<*, *>).first as Int
                         return@SingleChoiceItem true
                     }
             )),

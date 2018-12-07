@@ -379,5 +379,6 @@
     <string name="key_translate_languages" translatable="false">translate_languages</string>
     <string name="key_lasting_voice_command" translatable="false">lasting_voice_command</string>
     <string name="key_float_voice_align" translatable="false">float_voice_align</string>
+    <string name="key_lasting_voice_millis" translatable="false">lasting_voice_millis</string>
     <string name="text_plugins_manager" translatable="false">插件管理</string>
 </resources>

@@ -21,6 +21,7 @@ import cn.vove7.common.view.toast.ColorfulToast
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.adapters.RecAdapterWithFooter
 import cn.vove7.vtp.log.Vog
+import com.pluscubed.recyclerfastscroll.RecyclerFastScroller
 
 /**
  * # VListFragment
@@ -51,7 +52,7 @@ abstract class VListFragment : Fragment() {
      */
     var pageIndex = 0
     lateinit var recyclerView: RecyclerView
-
+    lateinit var fastScroller: RecyclerFastScroller
     var layManager: RecyclerView.LayoutManager? = null
     lateinit var adapter: RecAdapterWithFooter<*, *>
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -136,6 +137,8 @@ abstract class VListFragment : Fragment() {
 
     private fun initSelfView() {
         recyclerView = f(R.id.recycle_view)
+        fastScroller = f(R.id.fast_scroller)
+        fastScroller.attachRecyclerView(recyclerView)
         floatButton = f(R.id.fab)
         swipeRefreshLayout = f(R.id.swipe_refresh)
         netErrViewContainer = f(R.id.net_error_layout)

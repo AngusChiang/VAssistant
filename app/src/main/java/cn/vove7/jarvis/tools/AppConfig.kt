@@ -88,6 +88,8 @@ object AppConfig {
     var translateLang = "auto"//翻译主语言
     var voiceRecogFeedback = false //语音识别提示音
     var lastingVoiceCommand = false //长语音 连续命令
+    var lastingVoiceMillis: Int = 20 //长语音等待时间 单位秒
+
     var listeningToastAlignDirection = 0//对齐方向
 
     val streamTypeArray = arrayOf(
@@ -215,7 +217,9 @@ object AppConfig {
         wakeUpWithHeadsetHook = getBooleanAndInit(R.string.key_wakeup_with_headsethook, wakeUpWithHeadsetHook)
         voiceRecogFeedback = getBooleanAndInit(R.string.key_voice_recog_feedback, voiceRecogFeedback)
         lastingVoiceCommand = getBooleanAndInit(R.string.key_lasting_voice_command, false)
-
+        sp.getInt(R.string.key_lasting_voice_millis).also {
+            lastingVoiceMillis = if (it < 0) lastingVoiceMillis else it
+        }
         finishWord = sp.getString(R.string.key_finish_word)
 //        onlyCloudServiceParse = getBooleanAndInit(R.string.key_only_cloud_service_parse, false)
         userWakeupWord = sp.getString(R.string.key_user_wakeup_word) ?: ""

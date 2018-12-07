@@ -72,7 +72,7 @@ class AssistSession(context: Context) : VoiceInteractionSession(context),
         if (screenshot == null) return
         screenPath = "loading"
         showProgressBar = true
-        runOnNewHandlerThread("save_screen", delay = 1000) {
+        runOnNewHandlerThread("save_screen") {
             this@AssistSession.screenshot = screenshot
             val ss = compressMaterix(screenshot)
             Vog.d(this, "onHandleScreenshot ---> $screenshot")

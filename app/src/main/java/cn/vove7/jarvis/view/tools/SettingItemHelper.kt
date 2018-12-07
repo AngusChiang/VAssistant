@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.widget.CompoundButton
 import android.widget.TextView
+import cn.vove7.common.utils.ThreadPool
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.tools.AppConfig
 import cn.vove7.jarvis.view.*
@@ -114,7 +115,7 @@ class SettingItemHelper(val context: Context) {
                 if (item.callback?.invoke(holder, s) != false) {
                     if (item.keyId != null) {
                         sp.set(item.keyId, s)
-                        AppConfig.reload()
+                        loadConfigInCacheThread()
                     }
                     item.summary = s
                 }
@@ -124,13 +125,19 @@ class SettingItemHelper(val context: Context) {
                 neutralButton(text = "清空") {
                     if (item.keyId != null) {
                         sp.set(item.keyId, "")
-                        AppConfig.reload()
+                        loadConfigInCacheThread()
                     }
                     item.summary = backSummary
                     setBasic(holder, item)
                 }
                 negativeButton()
             }
+        }
+    }
+
+    private fun loadConfigInCacheThread() {
+        ThreadPool.runOnCachePool {
+            AppConfig.reload()
         }
     }
 
@@ -171,7 +178,7 @@ class SettingItemHelper(val context: Context) {
             holder.compoundWight.setOnCheckedChangeListener { _, isChecked ->
                 if (item.callback?.invoke(holder, isChecked) != false) {
                     sp.set(item.keyId, isChecked)
-                    AppConfig.reload()
+                    loadConfigInCacheThread()
                 }
             }
         } else {//withoutSp
@@ -216,7 +223,7 @@ class SettingItemHelper(val context: Context) {
                         if (item.callback?.invoke(holder, Pair(i, t)) != false) {
                             if (item.keyId != null) {
                                 sp.set(item.keyId, t)
-                                AppConfig.reload()
+                                loadConfigInCacheThread()
                             }
                             item.summary = t
                             setBasic(holder, item)
@@ -245,7 +252,7 @@ class SettingItemHelper(val context: Context) {
                     if (item.callback?.invoke(holder, ts) != false) {
                         if (item.keyId != null) {
                             sp.set(item.keyId, ts)
-                            AppConfig.reload()
+                            loadConfigInCacheThread()
                         }
                         item.summary = ts.toString()
                         setBasic(holder, item)
@@ -263,8 +270,11 @@ class SettingItemHelper(val context: Context) {
         val sp = SpHelper(context)
         var old = if (item.keyId == null) item.defaultValue.invoke() as Int
         else sp.getInt(item.keyId)
-        if (old == -1) old = item.defaultValue.invoke() as Int
-        item.summary = old.toString()
+        if (old == -1) {
+            old = item.defaultValue.invoke() as Int
+            item.summary = item.summary ?: old.toString()
+        } else
+            item.summary = old.toString()
 
         setBasic(holder, item) {
             val vv = buildNumberPickerView(item.range!!, old)
@@ -275,11 +285,12 @@ class SettingItemHelper(val context: Context) {
                             item.summary = old.toString()
                             if (item.keyId != null) {
                                 sp.set(item.keyId, old)
-                                AppConfig.reload()
+                                loadConfigInCacheThread()
                             }
                             setBasic(holder, item)
                         }
                     }
+                    .negativeButton()
                     .show()
 
             vv.second.setOnProgressChangeListener(object : DiscreteSeekBar.OnProgressChangeListener {
