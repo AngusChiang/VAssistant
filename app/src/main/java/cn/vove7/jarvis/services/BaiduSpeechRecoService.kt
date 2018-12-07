@@ -154,6 +154,7 @@ class BaiduSpeechRecoService(event: SpeechEvent) : SpeechRecoService(event) {
 
 
     private val autoCloseRecog = Runnable {
+        Vog.i(this, " ---> 长语音自动关闭识别")
         doCancelRecog()
         doStopRecog()
     }

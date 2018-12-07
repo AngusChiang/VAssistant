@@ -8,10 +8,10 @@ import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.appbus.AppBus
 import cn.vove7.common.bridges.ChoiceData
-import cn.vove7.common.bridges.ShowDialogEvent.Companion.WHICH_SINGLE
 import cn.vove7.common.bridges.GlobalActionExecutor
 import cn.vove7.common.bridges.ServiceBridge
 import cn.vove7.common.bridges.ShowDialogEvent
+import cn.vove7.common.bridges.ShowDialogEvent.Companion.WHICH_SINGLE
 import cn.vove7.common.datamanager.DAO
 import cn.vove7.common.datamanager.executor.entity.MarkedData
 import cn.vove7.common.datamanager.executor.entity.MarkedData.MARKED_TYPE_SCRIPT_JS
@@ -189,7 +189,7 @@ open class ExecutorImpl(
         ScreenAdapter.reSet()
         if (result != null)
             serviceBridge?.onExecuteFinished(result)
-        accessApi?.removeAllNotifier(this)
+//        accessApi?.removeAllNotifier(this)
     }
 
     /**
@@ -204,7 +204,7 @@ open class ExecutorImpl(
         } catch (e: Exception) {
             e.printStackTrace()
         }
-        accessApi?.removeAllNotifier(this)
+//        accessApi?.removeAllNotifier(this)
     }
 
     /**
@@ -342,21 +342,8 @@ open class ExecutorImpl(
         }
     }
 
-    private var waitNode: ViewNode? = null
-    override fun notifyShow(node: ViewNode) {
-        Vog.d(this, "notifyShow node: $node")
-        waitNode = node
-        notifySync()
-    }
-
-    override fun getViewNode(): ViewNode? {
-        val n = waitNode
-        waitNode = null
-        return n
-    }
-
-    override fun notifyShow(scope: ActionScope) {
-        Vog.d(this, "notifyShow $scope")
+    override fun notifyActivityShow(scope: ActionScope) {
+        Vog.d(this, "notifyActivityShow $scope")
         notifySync()
     }
 
@@ -414,7 +401,7 @@ open class ExecutorImpl(
                 Vog.d(this, "执行器-解锁")
                 if (end - begin >= mm) {//自动超时 终止执行
                     Vog.d(this, "等待超时")
-                    accessApi?.removeAllNotifier(this)//移除监听器
+//                    accessApi?.removeAllNotifier(this)//移除监听器
                     return false
                 }
                 return true
@@ -424,7 +411,7 @@ open class ExecutorImpl(
                 //必须强行stop
                 Vog.d(this, "被迫强行停止")
                 serviceBridge?.onExecuteInterrupt("终止执行")
-                accessApi?.removeAllNotifier(this)
+//                accessApi?.removeAllNotifier(this)
                 Thread.currentThread().interrupt()
                 Thread.currentThread().stop()//???
                 return false
@@ -446,31 +433,20 @@ open class ExecutorImpl(
     }
 
     override fun waitForViewId(id: String, m: Long): ViewNode? {
-        Vog.d(this, "waitForViewId $id")
-        if (!checkAccessibilityService()) {
-            return null
-        }
-        accessApi?.waitForView(this, ViewFindBuilder(this).id(id).viewFinderX)
-        waitForUnlock(m)
-        return getViewNode()
+        Vog.d(this, "waitForViewId $id $m")
+        return ViewFindBuilder(this).id(id).waitFor(m)
     }
 
     override fun waitForDesc(desc: String, m: Long): ViewNode? {
         Vog.d(this, "waitForDesc $desc")
-
-        accessApi?.waitForView(this, ViewFindBuilder(this).desc(desc).viewFinderX)
-        waitForUnlock(m)
-        return getViewNode()
+        return ViewFindBuilder(this).desc(desc).waitFor(m)
     }
 
     override fun waitForText(text: String, m: Long): ViewNode? {
         Vog.d(this, "waitForText $text")
-        if (!checkAccessibilityService()) {
-            return null
-        }
-        accessApi?.waitForView(this, ViewFindBuilder(this).containsText(text).viewFinderX)
-        waitForUnlock(m)
-        return getViewNode()
+        return ViewFindBuilder(this).containsText(text).waitFor(m)
+//        waitForUnlock(m)
+//         getViewNode()
     }
 
     override fun waitForText(text: Array<String>, m: Long): ViewNode? {
@@ -478,9 +454,7 @@ open class ExecutorImpl(
         if (!checkAccessibilityService()) {
             return null
         }
-        accessApi?.waitForView(this, ViewFindBuilder(this).containsText(*text).viewFinderX)
-        waitForUnlock(m)
-        return getViewNode()
+        return ViewFindBuilder(this).containsText(*text).waitFor(m)
     }
 
     /**

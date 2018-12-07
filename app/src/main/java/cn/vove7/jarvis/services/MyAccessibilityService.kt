@@ -12,7 +12,6 @@ import android.view.KeyEvent
 import android.view.KeyEvent.*
 import android.view.ViewGroup
 import android.view.accessibility.AccessibilityEvent
-import android.view.accessibility.AccessibilityEvent.*
 import android.view.accessibility.AccessibilityNodeInfo
 import cn.vove7.common.accessibility.AccessibilityApi
 import cn.vove7.common.accessibility.AccessibilityBridge
@@ -28,20 +27,16 @@ import cn.vove7.common.utils.activities
 import cn.vove7.common.utils.isInputMethod
 import cn.vove7.common.view.finder.ViewFinder
 import cn.vove7.common.view.notifier.ActivityShowListener
-import cn.vove7.common.view.notifier.UiViewShowNotifier
-import cn.vove7.common.view.notifier.ViewShowListener
 import cn.vove7.executorengine.bridges.SystemBridge
 import cn.vove7.executorengine.helper.AdvanAppHelper
 import cn.vove7.jarvis.plugins.AdKillerService
 import cn.vove7.jarvis.plugins.AppChangNotifier
 import cn.vove7.jarvis.plugins.VoiceWakeupStrategy
-import cn.vove7.jarvis.receivers.PowerEventReceiver
 import cn.vove7.jarvis.tools.AppConfig
 import cn.vove7.jarvis.view.statusbar.AccessibilityStatusAnimation
 import cn.vove7.jarvis.view.statusbar.StatusAnimation
 import cn.vove7.vtp.log.Vog
 import cn.vove7.vtp.sharedpreference.SpHelper
-import cn.vove7.vtp.system.SystemHelper
 import java.lang.Thread.sleep
 import kotlin.concurrent.thread
 
@@ -61,7 +56,6 @@ class MyAccessibilityService : AccessibilityApi(), AccessibilityBridge {
         accAni.showAndHideDelay("服务开启", 5000L)
 
         startPluginService()
-        loadBlackList()
     }
 
     /**
@@ -116,13 +110,6 @@ class MyAccessibilityService : AccessibilityApi(), AccessibilityBridge {
         }
     }
 
-    override fun getRootViewNode(): ViewNode? {
-        val root = rootInWindow
-        return if (root == null) null
-        else ViewNode(root)
-    }
-
-
     override fun waitForActivity(executor: CExecutorI, scope: ActionScope) {
         locksWaitForActivity[executor] = scope
         runOnCachePool {
@@ -136,90 +123,86 @@ class MyAccessibilityService : AccessibilityApi(), AccessibilityBridge {
      * 等待界面出现指定ViewId
      * viewId 特殊标记
      */
-    private val locksWaitForView = hashMapOf<ViewFinder, ViewShowListener>()
+//    private val locksWaitForView = hashMapOf<ViewFinder, ViewShowListener>()
 
     /**
      * notify when view show
      */
-    private val viewNotifier = UiViewShowNotifier(locksWaitForView)
+//    private val viewNotifier = UiViewShowNotifier(locksWaitForView)
 
-    override fun waitForView(executor: CExecutorI, finder: ViewFinder) {
-        locksWaitForView[finder] = executor
-        viewNotifierThread?.interrupt()
-        viewNotifierThread = thread {
-            try {
-                sleep(200)
-            } catch (e: InterruptedException) {
-                return@thread
-            }
-            viewNotifier.notifyIfShow()
-        }
-    }
+    /**
+     * 添加进locksWaitForView 等待事件驱动
+     * @param executor CExecutorI
+     * @param finder ViewFinder
+     */
+//    override fun waitForView(executor: CExecutorI, finder: ViewFinder) {
+//        locksWaitForView[finder] = executor
+//        viewNotifierThread?.interrupt()
+//        viewNotifierThread = thread {
+//            try {
+//                sleep(200)
+//            } catch (e: InterruptedException) {
+//                return@thread
+//            }
+//            viewNotifier.notifyIfShow()
+//        }
+//    }
 
-    override fun removeAllNotifier(executor: CExecutorI) {
-        runOnCachePool {
-            synchronized(locksWaitForActivity) {
-                val a = locksWaitForActivity.remove(executor)
-                Vog.d(this, "removeAllNotifier locksWaitForActivity ${a != null}")
-            }
-            synchronized(locksWaitForView) {
-                //                val success = values.remove(executor)
-                val removeList = mutableListOf<ViewFinder>()
-                locksWaitForView.forEach {
-                    if (it.value == executor) removeList.add(it.key)
-                }
-                Vog.d(this, "removeAllNotifier locksWaitForView ${removeList.size}")
-                removeList.forEach {
-                    locksWaitForView.remove(it)
-                }
-                removeList.clear()
-            }
-        }
-    }
+//    override fun removeAllNotifier(executor: CExecutorI) {
+//        runOnCachePool {
+//            synchronized(locksWaitForActivity) {
+//                val a = locksWaitForActivity.remove(executor)
+//                Vog.d(this, "removeAllNotifier locksWaitForActivity ${a != null}")
+//            }
+//            synchronized(locksWaitForView) {
+//                //                val success = values.remove(executor)
+//                val removeList = mutableListOf<ViewFinder>()
+//                locksWaitForView.forEach {
+//                    if (it.value == executor) removeList.add(it.key)
+//                }
+//                Vog.d(this, "removeAllNotifier locksWaitForView ${removeList.size}")
+//                removeList.forEach {
+//                    locksWaitForView.remove(it)
+//                }
+//                removeList.clear()
+//            }
+//        }
+//    }
 
-    var viewNotifierThread: Thread? = null
+//    var viewNotifierThread: Thread? = null
 
     /**
      * 通知UI更新（UI驱动事件）
      */
     private fun callAllNotifier() {
-        viewNotifierThread?.interrupt()
-        viewNotifierThread = thread {
-            viewNotifier.notifyIfShow()
-        }
-        dispatchPluginsEvent(ON_UI_UPDATE, rootInWindow)
+//        viewNotifierThread?.interrupt()
+//        viewNotifierThread = thread {
+//            viewNotifier.notifyIfShow()
+//        }
+//        dispatchPluginsEvent(ON_UI_UPDATE, rootInWindow)
     }
 
     var lastContentChangedTime = 0L
     /**
-     * fixme 导致 FastHub 代码浏览异常卡顿
      * @param event AccessibilityEvent?
      */
     override fun onAccessibilityEvent(event: AccessibilityEvent?) {
+        event ?: return
         //熄屏|低电量
-        if (AppConfig.disableAccessibilityOnLowBattery && PowerEventReceiver.powerSavingMode &&
-                !PowerEventReceiver.isCharging) {//开启低电量模式
-            Vog.d(this, "onAccessibilityEvent ---> 低电量")
-            return
-        }
-        if (!SystemHelper.isScreenOn(this)) {//(火)?息屏下
-//            Vog.d(this, "onAccessibilityEvent ---> 熄屏")
-            return
-        }
-
-//        val eventSource = try {
-//            event?.source
-//        } catch (e: Exception) {// NullPoint in event.source
-//            GlobalLog.err(e, "mas206")
+//        if (AppConfig.disableAccessibilityOnLowBattery && PowerEventReceiver.powerSavingMode &&
+//                !PowerEventReceiver.isCharging) {//开启低电量模式
+//            Vog.d(this, "onAccessibilityEvent ---> 低电量")
 //            return
 //        }
-        if (null == event /*|| null == eventSource*/)
-            return
+//        if (!SystemHelper.isScreenOn(this)) {//(火)?息屏下
+////            Vog.d(this, "onAccessibilityEvent ---> 熄屏")
+//            return
+//        }
 
         val eventType = event.eventType
-
-        Vog.v(this, "class :$currentAppInfo - $currentActivity ${event.className} \n" +
+        Vog.d(this, "class :$currentAppInfo - $currentActivity ${event.className} \n" +
                 AccessibilityEvent.eventTypeToString(eventType))
+
         if (eventType == AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED) {
             //界面切换
             val classNameStr = event.className
@@ -231,54 +214,53 @@ class MyAccessibilityService : AccessibilityApi(), AccessibilityBridge {
                     updateCurrentApp(pkg, classNameStr.toString())
             }
         }
-        runOnCachePool {
-            if (blackPackage.contains(currentScope.packageName)) {//black list
-                Vog.v(this, "onAccessibilityEvent ---> in black")
-                return@runOnCachePool
-            }
-            //根据事件回调类型进行处理
-            when (eventType) {
-                //通知栏发生改变
-                AccessibilityEvent.TYPE_NOTIFICATION_STATE_CHANGED -> {
-//                callAllNotifier()
-                }
-                TYPE_WINDOWS_CHANGED -> {
-                    callAllNotifier()
-                }
-                TYPE_WINDOW_CONTENT_CHANGED -> {//"帧"刷新  限制频率
-                    System.currentTimeMillis().also {
-                        if (it - lastContentChangedTime < 300) {
-                            Vog.v(this, "onAccessibilityEvent ---> lock")
-                            return@runOnCachePool
-                        }
-                        lastContentChangedTime = it
-                    }
-                    callAllNotifier()
-                }
-//            TYPE_VIEW_SCROLLED -> {
-//                callAllNotifier()
+//        runOnCachePool {
+//            if (blackPackage.contains(currentScope.packageName)) {//black list
+//                Vog.v(this, "onAccessibilityEvent ---> in black")
+//                return@runOnCachePool
 //            }
-                TYPE_VIEW_CLICKED -> {
-//                lastScreenEvent = event
-                    callAllNotifier()
-//                try {
-//                    Vog.d(this, "onAccessibilityEvent ---> 点击 :${ViewNode(event.source)}")
-//                } catch (e: Exception) {
+        //根据事件回调类型进行处理
+//            when (eventType) {
+//                //通知栏发生改变
+//                AccessibilityEvent.TYPE_NOTIFICATION_STATE_CHANGED -> {
+////                callAllNotifier()
 //                }
-                }
-
-            }
-        }
+//                TYPE_WINDOWS_CHANGED -> {
+//                    callAllNotifier()
+//                }
+//                TYPE_WINDOW_CONTENT_CHANGED -> {//"帧"刷新  限制频率
+//                    System.currentTimeMillis().also {
+//                        if (it - lastContentChangedTime < 300) {
+//                            Vog.v(this, "onAccessibilityEvent ---> lock")
+//                            return@runOnCachePool
+//                        }
+//                        lastContentChangedTime = it
+//                    }
+//                    callAllNotifier()
+//                }
+////            TYPE_VIEW_SCROLLED -> {
+////                callAllNotifier()
+////            }
+//                TYPE_VIEW_CLICKED -> {
+////                lastScreenEvent = event
+//                    callAllNotifier()
+////                try {
+////                    Vog.d(this, "onAccessibilityEvent ---> 点击 :${ViewNode(event.source)}")
+////                } catch (e: Exception) {
+////                }
+//                }
+//            }
+//        }
     }
 
-    private fun startTraverse(rootNode: AccessibilityNodeInfo?) {
-        return
+//    private fun startTraverse(rootNode: AccessibilityNodeInfo?) {
+//        return
 //        if (BuildConfig.DEBUG) {
 //            val builder = StringBuilder("\n" + rootNode?.packageName + "\n")
 //            traverseAllNode(builder, 0, rootNode)
 //            Vog.v(this, "onAccessibilityEvent  ---->" + builder.toString() + " \n\n\n")
 //        }
-    }
+//    }
 
     /**
      * is output ViewGroup
@@ -323,6 +305,10 @@ class MyAccessibilityService : AccessibilityApi(), AccessibilityBridge {
     }
 
     private val delayHandler = Handler()
+
+    /////////////////////////////////////////////////
+
+    //按键监听
     private var startupRunner: Runnable = Runnable {
         MainService.instance?.onCommand(AppBus.ORDER_START_RECOG)
     }
@@ -346,14 +332,6 @@ class MyAccessibilityService : AccessibilityApi(), AccessibilityBridge {
      */
     override fun onKeyEvent(event: KeyEvent): Boolean {
         Vog.v(this, "onKeyEvent  ----> " + event.toString())
-//        try {
-//            if (!AppConfig.volumeWakeUpWhenScreenOff &&
-//                    !SystemHelper.isScreenOn(GlobalApp.APP))//(火)?息屏下
-//                return super.onKeyEvent(event)
-//        } catch (e: Exception) {
-//            GlobalLog.err(e)
-//            return super.onKeyEvent(event)
-//        }
         when (event.action) {
             KeyEvent.ACTION_DOWN -> when (event.keyCode) {
                 KEYCODE_VOLUME_DOWN -> {
@@ -477,14 +455,14 @@ class MyAccessibilityService : AccessibilityApi(), AccessibilityBridge {
 
     override fun getService(): AccessibilityService = this
 
-    private val blackPackage = hashSetOf<String>()
-    val baseBlackPackage = listOf(//初始黑名单
-            "com.android.chrome",
-            "com.android.systemui",
-            "net.oneplus.launcher",
-            "com.fastaccess.github",
-            GlobalApp.APP.packageName
-    )
+//    private val blackPackage = hashSetOf<String>()
+//    val baseBlackPackage = listOf(//初始黑名单
+//            "com.android.chrome",
+//            "com.android.systemui",
+//            "net.oneplus.launcher",
+//            "com.fastaccess.github",
+//            GlobalApp.APP.packageName
+//    )
 
     companion object {
 
@@ -522,15 +500,15 @@ class MyAccessibilityService : AccessibilityApi(), AccessibilityBridge {
         accAni.failed("省电模式，服务关闭")
     }
 
-    @Synchronized
-    override fun loadBlackList(ps: Set<String>?) {
-        blackPackage.clear()
-        if (ps != null) blackPackage.addAll(ps)
-        else blackPackage.addAll(SpHelper(this)
-                .getStringSet("acc_black_list") ?: emptyList())
-        blackPackage.addAll(baseBlackPackage)
-        Vog.d(this,"loadBlackList ---> $blackPackage ${blackPackage.size}")
-    }
+//    @Synchronized
+//    override fun loadBlackList(ps: Set<String>?) {
+//        blackPackage.clear()
+//        if (ps != null) blackPackage.addAll(ps)
+//        else blackPackage.addAll(SpHelper(this)
+//                .getStringSet("acc_black_list") ?: emptyList())
+//        blackPackage.addAll(baseBlackPackage)
+//        Vog.d(this, "loadBlackList ---> $blackPackage ${blackPackage.size}")
+//    }
 
     override fun disablePowerSavingMode() {
         accAni.showAndHideDelay("服务恢复", 5000L)

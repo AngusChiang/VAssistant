@@ -6,11 +6,11 @@ import android.os.Build
 import android.provider.Settings
 import android.support.v4.view.accessibility.AccessibilityNodeInfoCompat.FOCUS_INPUT
 import android.view.accessibility.AccessibilityNodeInfo
+import cn.vove7.common.accessibility.component.AccPluginService
 import cn.vove7.common.accessibility.viewnode.ViewNode
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.datamanager.parse.model.ActionScope
-import cn.vove7.common.accessibility.component.AccPluginService
 import cn.vove7.common.utils.ThreadPool
 import cn.vove7.vtp.app.AppInfo
 import cn.vove7.vtp.log.Vog
@@ -37,6 +37,12 @@ abstract class AccessibilityApi : AccessibilityService(),
                 null
             }
         }
+
+    override fun getRootViewNode(): ViewNode? {
+        val root = rootInWindow
+        return if (root == null) null
+        else ViewNode(root)
+    }
 
     override fun onCreate() {
         accessibilityService = this
@@ -75,7 +81,7 @@ abstract class AccessibilityApi : AccessibilityService(),
      */
     abstract fun powerSavingMode()
 
-    abstract fun loadBlackList(ps:Set<String>?=null)
+//    abstract fun loadBlackList(ps: Set<String>? = null)
 
     /**
      * 关闭省电
@@ -154,14 +160,16 @@ abstract class AccessibilityApi : AccessibilityService(),
             synchronized(pluginsServices) {
                 when (what) {
                     ON_UI_UPDATE -> {
-                        pluginsServices.forEach {
-                            ThreadPool.runOnCachePool { it.onUiUpdate(data as AccessibilityNodeInfo) }
-                        }
+//                        pluginsServices.forEach {
+//                            ThreadPool.runOnCachePool { it.onUiUpdate(data as AccessibilityNodeInfo) }
+//                        }
                     }
                     ON_APP_CHANGED -> {
                         Vog.d(this, "dispatchPluginsEvent ---> ON_APP_CHANGED")
-                        pluginsServices.forEach {
-                            ThreadPool.runOnCachePool { it.onAppChanged(data as ActionScope) }
+                        ThreadPool.runOnCachePool {
+                            pluginsServices.forEach {
+                                it.onAppChanged(data as ActionScope)
+                            }
                         }
                     }
 //                    ON_BIND -> {

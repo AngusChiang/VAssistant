@@ -218,4 +218,18 @@ class ExampleUnitTest {
         c.await()
         println("end")
     }
+
+    @Test
+    fun testInterrupt() {
+        val t= thread {
+            while (Thread.currentThread().isInterrupted.not()) {
+                println(1)
+            }
+            println("isInterrupted")
+        }
+        sleep(1)
+        t.interrupt()
+        sleep(2000)
+        println("end")
+    }
 }

@@ -11,6 +11,7 @@ import cn.vove7.vtp.log.Vog
  * @author 17719247306
  * 2018/9/3
  */
+@Deprecated("弃用")
 class AppAdBlockNotifier(private val app: AppInfo?, finders: MutableSet<ViewFinder>)
     : AbsViewShowNotifier(finders) {
 

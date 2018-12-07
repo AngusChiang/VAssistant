@@ -9,9 +9,11 @@ import cn.vove7.vtp.log.Vog
  * 通知View/Activity出现
  * 基类 -- id  desc  pkg  通知器
  *
+ * 由无障碍 事件驱动
+ * 弃用
  */
+@Deprecated("ViewFinder被动通知 改用主动搜索")
 abstract class AbsViewShowNotifier(private val finders: MutableSet<ViewFinder>) : ShowListener {
-
     /**
      * 检查列表
      *

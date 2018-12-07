@@ -14,12 +14,39 @@ abstract class ViewFinder(var accessibilityService: AccessibilityApi) {
             return try {
                 accessibilityService.rootInActiveWindow
             } catch (e: Exception) {
+                e.printStackTrace()
                 null
             }
         }
 
     open fun findFirst(): ViewNode? {
         return findFirst(false)
+    }
+
+    /**
+     * 等待View出现 同步 耗时操作
+     * 主动搜索
+     * @param m Long 时限
+     */
+    fun waitFor(m: Long = 30000): ViewNode? {
+        val t = if (m < 0) 30000 else m
+        val beginTime = System.currentTimeMillis()
+        var sc = 0
+        val ct = Thread.currentThread()
+        Vog.d(this, "搜索线程 ---> $ct")
+        while (System.currentTimeMillis() - beginTime < t &&
+                !ct.isInterrupted) {
+            val node = findFirst()
+            if (node != null) {
+                Vog.d(this, "waitFor ---> 搜索到 $node")
+                return node
+            } else {
+                sc++
+                Vog.d(this, "waitFor ---> 搜索次数 $sc 打断: ${ct.isInterrupted}")
+            }
+        }
+        Vog.d(this, "waitFor ---> 搜索超时 or 中断")
+        return null
     }
 
     /**

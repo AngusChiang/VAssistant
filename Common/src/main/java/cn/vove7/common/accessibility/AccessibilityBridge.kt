@@ -10,14 +10,14 @@ interface AccessibilityBridge {
      * 等待出现指定View  with /id/text/desc
      * 特殊标记
      */
-    fun waitForView(executor: CExecutorI, finder: ViewFinder)
+//    fun waitForView(executor: CExecutorI, finder: ViewFinder)
 
     fun getRootViewNode(): ViewNode?
     fun waitForActivity(executor: CExecutorI, scope: ActionScope)
     /**
      * remove all notifier when was interrupted
      */
-    fun removeAllNotifier(executor: CExecutorI)
+//    fun removeAllNotifier(executor: CExecutorI)
 }
 
 

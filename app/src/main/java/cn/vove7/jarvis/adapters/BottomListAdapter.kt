@@ -3,14 +3,18 @@ package cn.vove7.jarvis.adapters
 //package cn.vove7.ctassistant.adapter
 
 import android.content.Context
+import android.view.Gravity
 import android.view.View
 import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.TextView
+import cn.vove7.common.utils.gone
+import cn.vove7.common.utils.show
 import cn.vove7.jarvis.R
 import cn.vove7.vtp.easyadapter.BaseListAdapter
 
 class BottomListAdapter<Type>(val context: Context, items: List<ViewModel<Type>>,
-                        private val listener: SimpleListAdapter.OnItemClickListener<Type>)
+                              private val listener: SimpleListAdapter.OnItemClickListener<Type>)
     : BaseListAdapter<BottomListAdapter.VHolder, ViewModel<Type>>(context, items) {
 
     override fun layoutId(position: Int): Int = R.layout.item_normal_icon_title
@@ -27,11 +31,12 @@ class BottomListAdapter<Type>(val context: Context, items: List<ViewModel<Type>>
             holder.icon.setImageDrawable(item.icon)
         } else
             holder.icon.visibility = View.INVISIBLE
-        if (item.subTitle != null) {
-            holder.subtitle.visibility = View.VISIBLE
+        if (item.subTitle != null && item.subTitle != "") {
+            holder.subtitle.show()
             holder.subtitle.text = item.subTitle
-        } else
-            holder.subtitle.visibility = View.GONE
+        } else {
+            holder.subtitle.gone()
+        }
         holder.itemView.setOnClickListener {
             listener.onClick(null, pos, item)
         }

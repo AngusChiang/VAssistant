@@ -9,5 +9,5 @@ import cn.vove7.common.datamanager.parse.model.ActionScope
  * 2018/8/7
  */
 interface ActivityShowListener {
-    fun notifyShow(scope: ActionScope)
+    fun notifyActivityShow(scope: ActionScope)
 }

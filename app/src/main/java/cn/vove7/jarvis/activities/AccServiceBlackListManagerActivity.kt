@@ -22,6 +22,7 @@ import cn.vove7.vtp.sharedpreference.SpHelper
  * @author Administrator
  * 2018/12/2
  */
+@Deprecated("无用")
 class AccServiceBlackListManagerActivity : OneFragmentActivity() {
 
     override var fragments: Array<Fragment> = arrayOf(
@@ -84,7 +85,7 @@ class AccServiceBlackListManagerActivity : OneFragmentActivity() {
                         blackSet.add(item.extra.packageName)
                     else
                         blackSet.remove(item.subTitle)
-                    AccessibilityApi.accessibilityService?.loadBlackList(blackSet)
+//                    AccessibilityApi.accessibilityService?.loadBlackList(blackSet)
                     sp.set("acc_black_list", blackSet)
                 }
             }

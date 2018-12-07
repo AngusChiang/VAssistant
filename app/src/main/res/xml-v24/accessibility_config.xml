@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <accessibility-service xmlns:android="http://schemas.android.com/apk/res/android"
-    android:accessibilityEventTypes="typeAllMask"
+    android:accessibilityEventTypes="typeWindowStateChanged"
     android:accessibilityFeedbackType="feedbackAllMask"
     android:accessibilityFlags="flagIncludeNotImportantViews|flagReportViewIds|flagRetrieveInteractiveWindows|flagRequestEnhancedWebAccessibility|flagRequestFilterKeyEvents"
     android:canPerformGestures="true"
@@ -10,3 +10,4 @@
     android:description="@string/desc_accessibility"
     android:notificationTimeout="0"
     android:settingsActivity="cn.vove7.jarvis.activities.SettingsActivity" />
+    <!--android:canRequestTouchExplorationMode="true"-->

@@ -248,7 +248,7 @@ class AssistSession(context: Context) : VoiceInteractionSession(context),
                         result.startsWith("http", ignoreCase = true) -> {
                             it.setNeutralButton("访问") { _, _ ->
                                 hide()
-                                SystemBridge.openUrl(result)
+                                SystemBridge.openUrl(result.toLowerCase())
                             }
                         }
                         TextHelper.isEmail(result) -> {

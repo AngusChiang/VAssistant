@@ -65,7 +65,11 @@ open class GlobalApp : RePluginApplication() {
     lateinit var colorfulToast: ColorfulToast
     override fun attachBaseContext(base: Context?) {
         super.attachBaseContext(base)
-        MultiDex.install(base)
+        try {
+            MultiDex.install(base)
+        } catch (e: Exception) {
+            GlobalLog.err(e,"ap71")
+        }
         RePlugin.enableDebugger(base, BuildConfig.DEBUG)
     }
 

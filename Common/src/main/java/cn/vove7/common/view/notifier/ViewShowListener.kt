@@ -10,5 +10,5 @@ import cn.vove7.common.accessibility.viewnode.ViewNode
  */
 interface ViewShowListener {
 
-    fun notifyShow(node: ViewNode)
+    fun notifyViewShow(node: ViewNode)
 }

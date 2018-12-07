@@ -121,14 +121,14 @@ class LaboratoryActivity : ReturnableActivity() {
                         CheckBoxItem(title = "显示通知", summary = "关闭和打开时在状态栏显示通知",
                                 keyId = R.string.key_close_wakeup_notification, defaultValue = { true })
 
-                )),
-                SettingGroupItem(R.color.yellow_700, titleS = "其他", childItems = listOf(
-                    IntentItem(title="无障碍黑名单",summary = "如果开启无障碍后，在某个应用内卡顿，请将它添加进来"){
-                        startActivityOnNewTask(Intent(this,AccServiceBlackListManagerActivity::class.java).also{
-                            it.addFlags(Intent.FLAG_ACTIVITY_NEW_DOCUMENT)
-                        })
-                    }
                 ))
+//                SettingGroupItem(R.color.yellow_700, titleS = "其他", childItems = listOf(
+//                    IntentItem(title="无障碍黑名单",summary = "如果开启无障碍后，在某个应用内卡顿，请将它添加进来"){
+//                        startActivityOnNewTask(Intent(this,AccServiceBlackListManagerActivity::class.java).also{
+//                            it.addFlags(Intent.FLAG_ACTIVITY_NEW_DOCUMENT)
+//                        })
+//                    }
+//                ))
         )
     }
 

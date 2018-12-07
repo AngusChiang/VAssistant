@@ -13,7 +13,7 @@ import java.util.*
  *
  *
  */
-interface CExecutorI : ViewShowListener, ActivityShowListener, RuntimeArgs, SpeakCallback {
+interface CExecutorI : ActivityShowListener, RuntimeArgs, SpeakCallback {
     companion object {
         val DEBUG_SCRIPT = "DEBUG"
     }
@@ -56,8 +56,6 @@ interface CExecutorI : ViewShowListener, ActivityShowListener, RuntimeArgs, Spea
     fun waitForDesc(desc: String, m: Long = -1): ViewNode?
     fun waitForText(text: String, m: Long = -1): ViewNode?
     fun waitForText(text: Array<String>, m: Long = -1): ViewNode?
-    //返回
-    fun getViewNode(): ViewNode?
 
     /**
      * @return true 等待成功 ; false 失败(超时,停止

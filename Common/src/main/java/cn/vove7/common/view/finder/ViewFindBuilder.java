@@ -55,7 +55,7 @@ public class ViewFindBuilder extends FindBuilder {
     }
 
     public ViewNode waitFor() {
-        return waitFor(-1L);
+        return waitFor(30000L);
     }
 
     /**
@@ -69,10 +69,8 @@ public class ViewFindBuilder extends FindBuilder {
             Vog.INSTANCE.d(this, "执行器 null");
             return null;
         }
-        if (accessibilityService != null) {
-            accessibilityService.waitForView(executor, viewFinderX);
-            executor.waitForUnlock(m);
-            return executor.getViewNode();
+        if (viewFinderX != null) {
+            return viewFinderX.waitFor(m);
         } else {
             GlobalLog.INSTANCE.err(GlobalApp.APP.getString(R.string.text_acc_service_not_running));
             return null;

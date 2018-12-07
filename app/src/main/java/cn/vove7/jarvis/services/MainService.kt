@@ -256,7 +256,7 @@ class MainService : BusService(),
      * fixme 其他调用speak 也会触发
      */
     fun resumeListenCommandIfLasting() {//开启长语音时
-        Vog.d(this,"resumeListenCommandIfLasting ---> 检查长语音 afterSpeakResumeListen:$afterSpeakResumeListen IsListening:$recoIsListening")
+        Vog.d(this, "resumeListenCommandIfLasting ---> 检查长语音 afterSpeakResumeListen:$afterSpeakResumeListen IsListening:$recoIsListening")
         if (afterSpeakResumeListen && AppConfig.lastingVoiceCommand && !recoIsListening)//防止长语音识别 继续
             AppBus.postDelay("lastingVoiceCommand",
                     AppBus.ORDER_START_RECOG_SILENT, 1200)
@@ -267,6 +267,7 @@ class MainService : BusService(),
      */
     fun stopRecogTemp() {
         if (AppConfig.lastingVoiceCommand) {//防止长语音识别 speak聊天对话
+            Vog.d(this, "stopRecogTemp ---> speak临时 $recoIsListening")
             afterSpeakResumeListen = recoIsListening
             speechRecoService?.doCancelRecog()
             speechRecoService?.doStopRecog()
@@ -351,12 +352,14 @@ class MainService : BusService(),
     private val speakCallbacks = mutableListOf<SpeakCallback>()
 
     /**
-     * 同步
+     * 同步 响应词
      * @param text String?
+     * @param resume Boolean speak结束是否继续(设置afterSpeakResumeListen) true
      * @param call SpeakCallback
      */
-    private fun speakWithCallback(text: String?, call: SpeakCallback) {
-        stopRecogTemp()
+    private fun speakWithCallback(text: String?, resume: Boolean = true, call: SpeakCallback) {
+        if (resume) stopRecogTemp()
+        else afterSpeakResumeListen = false
         speakCallbacks.add(call)
         speakSync = true
         speechSynService?.speak(text) ?: notifySpeakFinish()
@@ -688,20 +691,20 @@ class MainService : BusService(),
     /**
      * 解析唤醒词
      * @param w String
-     * @return Boolean 是否继续识别
+     * @return Boolean 是否继续识别 null 不继续 非null 继续
      */
-    fun parseWakeUpCommand(w: String): Boolean {
+    fun parseWakeUpCommand(w: String): Boolean? {
         if (recoIsListening) {
             Vog.d(this, "parseWakeUpCommand ---> 正在识别")
-            return true
+            return null
         }
         when (w) {
             "你好小V", "你好小v", "小V同学", "小v同学" -> { //唤醒词
-                return false
+                return true
             }
             in AppConfig.userWakeupWord.split('#') -> { //用户唤醒词
                 Vog.d(this, "parseWakeUpCommand ---> 用户唤醒词")
-                return false
+                return true
             }
             "增大音量" -> {
                 SystemBridge.volumeUp()
@@ -724,12 +727,11 @@ class MainService : BusService(),
                 }
             }
         }
-        return true
+        return null
     }
 
     fun playSoundEffect(rawId: Int) {//音效异步
         if (AppConfig.voiceRecogFeedback && AppConfig.currentStreamVolume != 0) {
-            SystemBridge.getMusicFocus()
             AudioController.playOnce(rawId)
         }
     }
@@ -745,11 +747,11 @@ class MainService : BusService(),
             SystemBridge.getMusicFocus()
             val l = lock ?: CountDownLatch(1)
             AudioController.playOnce(rawId) {
+                Vog.d(this, "playSoundEffectSync ---> 音效结束")
                 l.countDown()
             }
             if (lock == null) l.await(2L, TimeUnit.SECONDS)
         } else lock?.countDown()
-        Vog.d(this, "playSoundEffectSync ---> 音效结束")
     }
 
     /**
@@ -757,10 +759,10 @@ class MainService : BusService(),
      */
     inner class RecgEventListener : SpeechEvent {
         override fun onWakeup(word: String?) {
+            Vog.d(this, "onWakeup ---> 唤醒 -> $word")
             //解析成功  不再唤醒
-            parseWakeUpCommand(word ?: "").also {
-                if (it) return
-            }
+            parseWakeUpCommand(word ?: "") ?: return
+            Vog.d(this, "onWakeup ---> 开始聆听 -> $word")
             //唤醒词 你好小V，小V同学 ↓
             speechRecoService?.cancelRecog(false)
             speechRecoService?.startRecog(true)
@@ -768,10 +770,10 @@ class MainService : BusService(),
         }
 
         private fun speakResponseWord(lock: CountDownLatch? = null) {
-            continuePlay = false//不继续播放后台，
+            musicLock = false//不继续播放后台，
             Vog.d(this, "speakResponseWord 响应词 ---> ${AppConfig.responseWord}")
             val l = lock ?: CountDownLatch(1)
-            speakWithCallback(AppConfig.responseWord, object : SpeakCallback {
+            speakWithCallback(AppConfig.responseWord, false, object : SpeakCallback {
                 override fun speakCallback(result: String?) {
                     Vog.d(this, "speakWithCallback ---> $result")
                     sleep(200)
@@ -819,7 +821,7 @@ class MainService : BusService(),
             speechSynService?.stopIfSpeaking()
             AppBus.post(AppBus.EVENT_BEGIN_RECO)
             Vog.d(this, "onStartRecog ---> 开始识别")
-            if (continuePlay)//唤醒时检查过
+            if (musicLock)//唤醒时检查过
                 checkMusic()//检查后台播放
             listeningAni.begin()//
             recogEffect(byVoice)
@@ -891,7 +893,7 @@ class MainService : BusService(),
 
         override fun onCancelRecog() {
             Vog.d(this, "onCancelRecog ---> ")
-            continuePlay = true
+            musicLock = true
             afterSpeakResumeListen = false
             resumeMusicIf()
             hideAll(true)
@@ -984,6 +986,7 @@ class MainService : BusService(),
                 parseAnimation.begin()
                 listeningToast.showParseAni()
                 runOnCachePool {
+                    musicLock = true
                     val data = chatSystem.chatWithText(result)
                     if (data == null) {
                         listeningToast.showAndHideDelay("获取失败")
@@ -993,7 +996,7 @@ class MainService : BusService(),
                             data.replace("=", "\n=") else data)
                         executeAnimation.begin()
                         afterSpeakResumeListen = recoIsListening
-                        speakWithCallback(data, object : SpeakCallback {
+                        speakWithCallback(data, true, object : SpeakCallback {
                             override fun speakCallback(result: String?) {
                                 hideAll()
                             }
@@ -1048,7 +1051,7 @@ class MainService : BusService(),
         override fun onFinish() {
             Vog.d(this, "onSynData 结束")
             notifySpeakFinish()
-            if (continuePlay) {//
+            if (musicLock) {//
                 resumeMusicIf()
             }
         }
@@ -1059,7 +1062,7 @@ class MainService : BusService(),
 
         override fun onStart() {
             Vog.d(this, "onSynData 开始")
-            if (continuePlay)//不再检查 播放响应词
+            if (musicLock)//不再检查 播放响应词
                 checkMusic()
         }
     }
@@ -1088,39 +1091,12 @@ class MainService : BusService(),
      */
     fun checkMusic() {
         SystemBridge.getMusicFocus()
-
-//        if (!isContinousDialogue && continuePlay && SystemBridge.isMediaPlaying()
-//                && !speechSynService.speaking) {
-//            SystemBridge.getMusicFocus()
-//            GlobalLog.log("checkMusic ---> 有音乐播放")
-////            Vog.d(this, "checkMusic ---> 有音乐播放")
-//            haveMusicPlay = true
-//        } else {
-//            haveMusicPlay = false
-//            GlobalLog.log("checkMusic ---> 无音乐播放")
-////            Vog.d(this, "checkMusic ---> 无音乐播放")
-//        }
     }
 
-    //识别前是否有音乐播放
-    private var haveMusicPlay = false
-    var continuePlay = true//是否继续播放| 在说完响应词后，不改变haveMusicPlay
-//
+    var musicLock = true//是否获得音频焦点 | 在说完响应词后，不改变
 
     fun resumeMusicIf() {
         SystemBridge.removeMusicFocus()
-//        if() return
-//        Vog.d(this, "音乐继续 ---> HAVE: $haveMusicPlay CONTINUE: $continuePlay")
-//        synchronized(haveMusicPlay) {
-//            if (!isContinousDialogue && haveMusicPlay) {
-//                if (continuePlay) {//   speak响应词
-//                    SystemBridge.mediaResume()
-//                    haveMusicPlay = false
-//                } else continuePlay = true
-//            } else {
-//                continuePlay = true
-//            }
-//        }
     }
 
 }

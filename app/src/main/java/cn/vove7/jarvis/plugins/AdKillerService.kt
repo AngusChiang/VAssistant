@@ -1,8 +1,8 @@
 package cn.vove7.jarvis.plugins
 
-import android.view.accessibility.AccessibilityNodeInfo
 import cn.vove7.common.accessibility.AccessibilityApi
 import cn.vove7.common.accessibility.component.AbsAccPluginService
+import cn.vove7.common.accessibility.viewnode.ViewNode
 import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.datamanager.AppAdInfo
 import cn.vove7.common.datamanager.DAO
@@ -11,14 +11,13 @@ import cn.vove7.common.datamanager.parse.model.ActionScope
 import cn.vove7.common.utils.ThreadPool.runOnPool
 import cn.vove7.common.view.finder.ViewFindBuilder
 import cn.vove7.common.view.finder.ViewFinder
-import cn.vove7.common.view.notifier.AppAdBlockNotifier
 import cn.vove7.executorengine.helper.AdvanAppHelper
 import cn.vove7.jarvis.tools.AppConfig
 import cn.vove7.jarvis.view.statusbar.RemoveAdAnimation
 import cn.vove7.vtp.app.AppInfo
 import cn.vove7.vtp.log.Vog
-import java.lang.Thread.sleep
 import java.util.concurrent.ConcurrentHashMap
+import kotlin.concurrent.thread
 
 /**
  * # AdKillerService
@@ -32,7 +31,7 @@ import java.util.concurrent.ConcurrentHashMap
  * 2018/9/3
  */
 object AdKillerService : AbsAccPluginService() {
-    //TO-DO fixed 猪八戒ad fixed
+
     private val removeAdAnimation: RemoveAdAnimation by lazy { RemoveAdAnimation() }
     /**
      * 缓存
@@ -42,7 +41,6 @@ object AdKillerService : AbsAccPluginService() {
     override fun onBind() {
         runOnPool {
             if (!AccessibilityApi.isOpen()) return@runOnPool
-            locked = true
             finderCaches.clear()
             val appAdInfoDao = DAO.daoSession.appAdInfoDao
             val appAdInfos = appAdInfoDao.loadAll()
@@ -55,49 +53,39 @@ object AdKillerService : AbsAccPluginService() {
                 }
             }
             Vog.d(this, "AdOnBind ---> ${finderCaches.size}")
-            locked = false
         }
     }
 
-    var locked = false
-    var changedTime = 0L
+    private fun onAdShow(node:ViewNode) {
+        node.tryClick().also { clickResult ->
+            Vog.i(this, "Ad click ---> $clickResult")
+            if (clickResult) {
+                Vog.d(this, "startFind ---> 发现广告，清除成功")
+                AppConfig.plusAdKillCount()//+1
 
-    /**
-     * 只允许一个线程操作
-     * @param root AccessibilityNodeInfo?
-     */
-    override fun onUiUpdate(root: AccessibilityNodeInfo?) {
-        // 浪费资源..
-        val now = System.currentTimeMillis()
-        if (now - changedTime > (AppConfig.adWaitSecs * 1000)) return //17s等待时间
-        if (locked) {
-            Vog.v(this, "onUiUpdate ---> locked")
-            return
+                if (AppConfig.isToastWhenRemoveAd) {
+                    removeAdAnimation.begin()
+                    removeAdAnimation.hideDelay(3500)
+                }
+            } else
+                Vog.d(this, "startFind ---> 发现广告，清除失败")
         }
-        locked = true
-        if (finders?.isNotEmpty() == true) {
-            val s = AppAdBlockNotifier(appInfo, finders!!)
-            val b = s.notifyIfShow()
-            when {
-                b.first == 0 -> Vog.d(this, "onUiUpdate ---> 未发现广告")
-                b.second == 0 -> Vog.d(this, "onUiUpdate ---> 发现广告，清除失败")
-                else -> {
-                    AppConfig.plusAdKillCount()//+1
-                    Vog.d(this, "onUiUpdate ---> 发现广告，清除成功")
-                    if (AppConfig.isToastWhenRemoveAd) {
-                        removeAdAnimation.begin()
-                        removeAdAnimation.hideDelay(3500)
+    }
+
+    //搜索线程
+    private val sthreads = mutableSetOf<Thread>()
+    private fun startFind() {
+            finders?.forEach {
+                thread {
+                    it.waitFor((AppConfig.adWaitSecs * 1000).toLong())?.also { node ->
+                        Vog.i(this, " ${Thread.currentThread()} 发现广告 ---> ${appInfo?.name}  $it")
+                       onAdShow(node)
                     }
-//                        toast.showShortDelay("已为你关闭广告", 500L)
-                    finders = null
+                }.also { t ->
+                    Vog.d(this,"搜索线程 ---> $t")
+                    sthreads.add(t)
                 }
             }
-        }
-//        try {
-//            sleep(100)
-//        } catch (e: Exception) {
-//        }
-        locked = false
     }
 
     /**
@@ -119,12 +107,9 @@ object AdKillerService : AbsAccPluginService() {
     private var appInfo: AppInfo? = null
     var lastPkg = ""//todo smart skip ad
     override fun onAppChanged(appScope: ActionScope) {
-        locked = true
         if (!AppConfig.haveAdKillSurplus()) //用户去广告权限
             return
 
-        locked = false
-        changedTime = System.currentTimeMillis()
         appInfo = AdvanAppHelper.getAppInfo(appScope.packageName)
 
 //        finders = if (finderCaches.containsKey(appScope)) {
@@ -140,8 +125,20 @@ object AdKillerService : AbsAccPluginService() {
             }
         }
         Vog.v(this, "当前界面广告数--->${finders?.size} $appScope $finders")
-
-        onUiUpdate(null)
+        if (finders?.isNotEmpty() == true)
+            startFind()
+        else {//停止未结束的搜索
+            synchronized(sthreads) {
+                try {
+                    sthreads.forEach {
+                        Vog.d(this,"onAppChanged ---> 关闭搜索 $it")
+                        it.interrupt()
+                    }
+                } catch (e: Exception) {
+                }
+                sthreads.clear()
+            }
+        }
     }
 
     /**

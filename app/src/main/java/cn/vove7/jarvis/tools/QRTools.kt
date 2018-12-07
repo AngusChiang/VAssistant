@@ -1,11 +1,16 @@
 package cn.vove7.jarvis.tools
 
+import android.content.Context
 import android.graphics.Bitmap
-import cn.vove7.common.utils.ThreadPool.runOnPool
-import com.google.zxing.*
-import kotlin.concurrent.thread
-import com.google.zxing.common.GlobalHistogramBinarizer
-import com.google.zxing.common.HybridBinarizer
+import android.os.AsyncTask
+import android.util.AttributeSet
+import android.view.LayoutInflater
+import cn.bingoogolapple.qrcode.core.BGAQRCodeUtil
+import cn.bingoogolapple.qrcode.zbar.ZBarView
+import cn.vove7.common.app.GlobalApp
+import cn.vove7.jarvis.R
+import java.lang.Thread.sleep
+import java.lang.ref.WeakReference
 
 
 /**
@@ -15,65 +20,90 @@ import com.google.zxing.common.HybridBinarizer
  * 2018/11/6
  */
 object QRTools {
-    fun parseBitmap(bitmap: Bitmap, onResult: (String?) -> Unit) {
-        runOnPool {
-            val s = syncDecodeQRCode(bitmap)
-            onResult.invoke(s)
-        }
 
+    fun parseBitmap(bitmap: Bitmap, onResult: (String?) -> Unit) {
+        val av = LayoutInflater.from(GlobalApp.APP).inflate(R.layout.zbar, null)
+        val a = av.findViewById<MyBarView>(R.id.zbar)
+
+        ScanTask(bitmap, a, onResult).perform()
+        a.decodeQRCode(bitmap)
+    }
+}
+
+/**
+ * 改写Zbar
+ * @property mPicturePath String?
+ * @property mBitmap Bitmap?
+ * @property mQRCodeViewRef WeakReference<MyBarView>?
+ * @property onResult Function1<String?, Unit>
+ */
+class ScanTask : AsyncTask<Void, Void, String?> {
+    private var mPicturePath: String? = null
+    private var mBitmap: Bitmap? = null
+    private var mQRCodeViewRef: WeakReference<MyBarView>? = null
+    private var onResult: (String?) -> Unit
+
+    constructor(picturePath: String, qrCodeView: MyBarView, onResult: (String?) -> Unit) {
+        mPicturePath = picturePath
+        mQRCodeViewRef = WeakReference(qrCodeView)
+        this.onResult = onResult
     }
 
-    fun syncDecodeQRCode(bitmap: Bitmap): String? {
-        var result: Result?
-        var source: RGBLuminanceSource? = null
+    constructor(bitmap: Bitmap, qrCodeView: MyBarView, onResult: (String?) -> Unit) {
+        mBitmap = bitmap
+        mQRCodeViewRef = WeakReference(qrCodeView)
+        this.onResult = onResult
+    }
+
+    fun perform(): ScanTask {
+        executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
+        return this
+    }
+
+    fun cancelTask() {
+        if (status != AsyncTask.Status.FINISHED) {
+            cancel(true)
+        }
+    }
+
+    override fun onCancelled() {
+        super.onCancelled()
+        mQRCodeViewRef!!.clear()
+        mBitmap = null
+    }
+
+    override fun doInBackground(vararg params: Void): String? {
+        val qrCodeView = mQRCodeViewRef!!.get() ?: return null
+        sleep(300)
+        if (mPicturePath != null) {
+            return qrCodeView.process(BGAQRCodeUtil.getDecodeAbleBitmap(mPicturePath))
+        } else if (mBitmap != null) {
+            val result = qrCodeView.process(mBitmap!!)
+            mBitmap = null
+            return result
+        }
+        return null
+    }
+
+    override fun onPostExecute(result: String?) {
+        onResult.invoke(result)
+    }
+}
+
+class MyBarView(context: Context?, attributeSet: AttributeSet?)
+    : ZBarView(context, attributeSet) {
+
+    fun process(bitmap: Bitmap): String? {
+        val r = processBitmapData(bitmap)
         return try {
-            val width = bitmap.width
-            val height = bitmap.height
-            val pixels = IntArray(width * height)
-            bitmap.getPixels(pixels, 0, width, 0, 0, width, height)
-            source = RGBLuminanceSource(width, height, pixels)
-            result = MultiFormatReader().decode(BinaryBitmap(HybridBinarizer(source)), HINTS)
-            result?.text
+            r?.javaClass?.getDeclaredField("result")?.let {
+                it.isAccessible = true
+                it.get(r) as String?
+            }
         } catch (e: Exception) {
             e.printStackTrace()
-            if (source != null) {
-                try {
-                    result = MultiFormatReader().decode(BinaryBitmap(GlobalHistogramBinarizer(source)), HINTS)
-                    return result?.text
-                } catch (e2: Throwable) {
-                    e2.printStackTrace()
-                }
-            }
             null
         }
 
     }
-
-    private val HINTS: Map<DecodeHintType, Any>
-        get() {
-            val allFormats = ArrayList<BarcodeFormat>()
-            allFormats.add(BarcodeFormat.AZTEC)
-            allFormats.add(BarcodeFormat.CODABAR)
-            allFormats.add(BarcodeFormat.CODE_39)
-            allFormats.add(BarcodeFormat.CODE_93)
-            allFormats.add(BarcodeFormat.CODE_128)
-            allFormats.add(BarcodeFormat.DATA_MATRIX)
-            allFormats.add(BarcodeFormat.EAN_8)
-            allFormats.add(BarcodeFormat.EAN_13)
-            allFormats.add(BarcodeFormat.ITF)
-            allFormats.add(BarcodeFormat.MAXICODE)
-            allFormats.add(BarcodeFormat.PDF_417)
-            allFormats.add(BarcodeFormat.QR_CODE)
-            allFormats.add(BarcodeFormat.RSS_14)
-            allFormats.add(BarcodeFormat.RSS_EXPANDED)
-            allFormats.add(BarcodeFormat.UPC_A)
-            allFormats.add(BarcodeFormat.UPC_E)
-            allFormats.add(BarcodeFormat.UPC_EAN_EXTENSION)
-            val map = mutableMapOf<DecodeHintType, Any>()
-            map[DecodeHintType.TRY_HARDER] = BarcodeFormat.QR_CODE
-            map[DecodeHintType.POSSIBLE_FORMATS] = allFormats
-            map[DecodeHintType.CHARACTER_SET] = "utf-8"
-            return map
-        }
-
 }

@@ -10,11 +10,12 @@ import cn.vove7.vtp.log.Vog
  * @author 17719247306
  * 2018/9/3
  */
+@Deprecated("弃用")
 class UiViewShowNotifier(private val locks: MutableMap<ViewFinder, ViewShowListener>)
     : AbsViewShowNotifier(locks.keys) {
 
     override fun onShow(finder: ViewFinder, node: ViewNode): Boolean {
-        locks[finder]?.notifyShow(node)
+        locks[finder]?.notifyViewShow(node)
         return true
     }
 

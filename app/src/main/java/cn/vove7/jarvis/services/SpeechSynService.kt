@@ -119,28 +119,28 @@ class SpeechSynService(val event: SyncEvent) : SpeechSynthesizerListener {
 //    }
 
     override fun onSynthesizeStart(p0: String?) {
-        Vog.d(this, "onSynthesizeStart 准备开始合成,序列号:$p0")
+        Vog.v(this, "onSynthesizeStart 准备开始合成,序列号:$p0")
     }
 
     override fun onSynthesizeDataArrived(p0: String?, p1: ByteArray?, p2: Int) {
-        Vog.d(this, "onSpeechProgressChanged $p2 合成进度回调, progress：$p0")
+        Vog.v(this, "onSpeechProgressChanged $p2 合成进度回调, progress：$p0")
     }
 
     override fun onSynthesizeFinish(p0: String?) {
-        Vog.d(this, "onSynthesizeFinish 合成结束回调, 序列号:$p0")
+        Vog.v(this, "onSynthesizeFinish 合成结束回调, 序列号:$p0")
         speaking = true//
     }
 
     override fun onSpeechStart(p0: String?) {
-        Vog.d(this, "onSpeechStart 播放开始回调, 序列号:$p0")
+        Vog.v(this, "onSpeechStart 播放开始回调, 序列号:$p0")
     }
 
     override fun onSpeechProgressChanged(p0: String?, p1: Int) {
-        Vog.d(this, "播放进度回调,序列号: $p0 progress：$p1   ")
+        Vog.v(this, "播放进度回调,序列号: $p0 progress：$p1   ")
     }
 
     override fun onSpeechFinish(p0: String?) {
-        Vog.d(this, "onSpeechFinish 播放结束回调 $p0")
+        Vog.v(this, "onSpeechFinish 播放结束回调 $p0")
 //        AppBus.post(SpeechSynData(SpeechSynData.SYN_STATUS_FINISH))
         speaking = false
         event.onFinish() //speaking=false

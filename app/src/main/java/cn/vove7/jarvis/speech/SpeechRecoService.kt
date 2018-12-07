@@ -23,7 +23,7 @@ import cn.vove7.vtp.runtimepermission.PermissionUtils
  *
  * Created by Administrator on 2018/11/4
  */
-abstract class SpeechRecoService(val event: SpeechEvent) : SpeechRecoI {
+abstract class SpeechRecoService(val event: SpeechEvent) : SpeechRecogI {
     val context: Context
         get() = GlobalApp.APP
     //定时器关闭标志
@@ -87,11 +87,13 @@ abstract class SpeechRecoService(val event: SpeechEvent) : SpeechRecoI {
 
     abstract fun doCancelRecog()
 
-
+    @CallSuper
     override fun startWakeUp() {
-        wakeupStatusAni.showAndHideDelay("语音唤醒开启", 5000)
+        if (!wakeupI.opened)
+            wakeupStatusAni.showAndHideDelay("语音唤醒开启", 5000)
     }
 
+    @CallSuper
     override fun stopWakeUp() {
         if (wakeupI.opened)
             wakeupStatusAni.failedAndHideDelay("语音唤醒关闭", 5000)
@@ -175,9 +177,13 @@ abstract class SpeechRecoService(val event: SpeechEvent) : SpeechRecoI {
             when (msg?.what) {
                 IStatus.CODE_WAKEUP_SUCCESS -> {//唤醒
                     val word = msg.data.getString("data")
+                    Vog.d(this,"handleMessage ---> 唤醒 -> $word")
                     startAutoSleepWakeup()//重新倒计时
                     if (!isListening)
                         event.onWakeup(word)
+                    else {
+                        Vog.e(this, "正在聆听,暂停唤醒")
+                    }
 //                    AppBus.postVoiceData(VoiceData(msg.what, word))
                 }
                 IStatus.CODE_VOICE_TEMP -> {//中间结果
@@ -210,7 +216,7 @@ abstract class SpeechRecoService(val event: SpeechEvent) : SpeechRecoI {
     }
 }
 
-interface SpeechRecoI {
+interface SpeechRecogI {
     val wakeupI: WakeupI
     var timerEnd: Boolean
     fun startRecog(byVoice: Boolean = false)

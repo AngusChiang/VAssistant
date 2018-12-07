@@ -156,7 +156,7 @@ class SettingsActivity : ReturnableActivity() {
                         if (PowerEventReceiver.isCharging) {//充电中生效
                             if (b as Boolean) {//正在充电，开启
                                 AppBus.postSpeechAction(SpeechAction.ActionCode.ACTION_START_WAKEUP_WITHOUT_SWITCH)
-                            } else {
+                            } else if (!AppConfig.voiceWakeup) {
                                 AppBus.postSpeechAction(SpeechAction.ActionCode.ACTION_STOP_WAKEUP_WITHOUT_SWITCH)
                             }
                         }

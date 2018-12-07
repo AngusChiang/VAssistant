@@ -27,7 +27,7 @@ class AppChangNotifier(private val locksWaitForActivity: MutableMap<ActivityShow
             val removes = mutableListOf<ActivityShowListener>()
             kotlin.run out@{
                 locksWaitForActivity.filter { fill(it.value) }.forEach { it ->
-                    it.key.notifyShow(appScope)
+                    it.key.notifyActivityShow(appScope)
                     removes.add(it.key)
 //                    if (Thread.currentThread().isInterrupted) {
 //                        Vog.d(this, "activityNotifier 线程关闭")
