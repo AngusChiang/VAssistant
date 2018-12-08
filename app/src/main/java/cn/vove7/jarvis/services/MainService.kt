@@ -145,11 +145,18 @@ class MainService : BusService(),
         GlobalApp.toastShort("启动完成")
     }
 
+    /**
+     * 加载语音识别/合成服务
+     */
     private fun loadSpeechService() {
         speechRecoService = BaiduSpeechRecoService(RecgEventListener())
         speechSynService = SpeechSynService(SyncEventListener())
     }
 
+    /**
+     * 加载对话系统
+     * @param byUserSet Boolean
+     */
     fun loadChatSystem(byUserSet: Boolean = false) {
 //        val type = GlobalApp.APP.resources.getStringArray(R.array.list_chat_system)
 
@@ -835,6 +842,10 @@ class MainService : BusService(),
 
         override fun onResult(voiceResult: String) {//解析完成再 resumeMusicIf()?
             Vog.d(this, "结果 --------> $voiceResult")
+
+            if (AppConfig.lastingVoiceCommand) {//识别结束，开启长语音定时
+                speechRecoService?.restartLastingUpTimer()
+            }
             when (voiceMode) {
                 MODE_VOICE -> {//剪去结束词
                     AppConfig.finishWord.also {
@@ -873,6 +884,9 @@ class MainService : BusService(),
         }
 
         override fun onTempResult(temp: String) {
+            if (AppConfig.lastingVoiceCommand) {//临时结果 暂时关闭长语音定时器
+                speechRecoService?.stopLastingUpTimer()
+            }
             Vog.d(this, "onTempResult ---> 临时结果 $temp")
             listeningToast.show(temp)
             listeningAni.show(temp)
@@ -995,6 +1009,8 @@ class MainService : BusService(),
                         listeningToast.show(if (data.contains("="))
                             data.replace("=", "\n=") else data)
                         executeAnimation.begin()
+                        executeAnimation.show(data)
+
                         afterSpeakResumeListen = recoIsListening
                         speakWithCallback(data, true, object : SpeakCallback {
                             override fun speakCallback(result: String?) {

@@ -28,8 +28,12 @@ class UpdateLogDialog(context: Context, onDismiss: (() -> Unit)? = null) {
 
     private val logs: List<Pair<String, String>>
         get() = listOf(
-                Pair("1.5.8","优化无障碍服务\n" +
-                        "提示音问题\n" +
+                Pair("1.5.9-beta","修复长语音定时问题\n"+
+                        "去除无障碍低电量模式、无障碍黑名单\n" +
+                        "加入插件检查更新"),
+                Pair("1.5.8-beta","优化无障碍服务\n" +
+                        "加入长语音时间设置\n" +
+                        "优化提示音问题\n" +
                         "优化二维码识别"),
                 Pair("1.5.7","修复speak后开启识别及其他一些问题"),
                 Pair("1.5.6", "修复一加5/5t 安卓P版本在最近任务页面卡顿问题\n" +

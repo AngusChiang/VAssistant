@@ -149,13 +149,13 @@ abstract class SpeechRecoService(val event: SpeechEvent) : SpeechRecogI {
         stopAutoSleepWakeup()
         val sleepTime = /*if (BuildConfig.DEBUG) AppConfig.autoSleepWakeupMillis / 60
         else*/ AppConfig.autoSleepWakeupMillis
-        Vog.d(this, "startAutoSleepWakeup ---> 开启自动休眠 $sleepTime")
+        Vog.d(this, "startAutoSleepWakeup ---> 开启唤醒自动休眠 $sleepTime")
         timerHandler.postDelayed(stopWakeUpTimer, sleepTime)
     }
 
     //关闭定时器
     fun stopAutoSleepWakeup() {
-        Vog.d(this, "stopAutoSleepWakeup ---> 关闭自动休眠")
+        Vog.d(this, "stopAutoSleepWakeup ---> 关闭唤醒自动休眠")
         timerHandler.removeCallbacks(stopWakeUpTimer)
     }
 

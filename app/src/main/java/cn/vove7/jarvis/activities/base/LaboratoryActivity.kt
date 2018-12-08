@@ -6,19 +6,16 @@ import cn.vove7.common.model.UserInfo
 import cn.vove7.common.utils.ThreadPool.runOnPool
 import cn.vove7.common.utils.startActivityOnNewTask
 import cn.vove7.jarvis.R
-import cn.vove7.jarvis.activities.AccServiceBlackListManagerActivity
 import cn.vove7.jarvis.activities.PluginManagerActivity
 import cn.vove7.jarvis.adapters.SettingsExpandableAdapter
 import cn.vove7.jarvis.plugins.AdKillerService
 import cn.vove7.jarvis.plugins.VoiceWakeupStrategy
 import cn.vove7.jarvis.services.MainService
-import cn.vove7.jarvis.services.MyAccessibilityService
 import cn.vove7.jarvis.tools.AppConfig
 import cn.vove7.jarvis.view.*
 import cn.vove7.jarvis.view.custom.SettingGroupItem
 import kotlinx.android.synthetic.main.activity_expandable_settings.*
 import java.lang.Thread.sleep
-import kotlin.concurrent.thread
 
 /**
  * # LaboratoryActivity
@@ -50,7 +47,9 @@ class LaboratoryActivity : ReturnableActivity() {
                             startActivityOnNewTask(Intent(this, PluginManagerActivity::class.java).also {
                                 it.addFlags(Intent.FLAG_ACTIVITY_NEW_DOCUMENT)
                             })
-                        }
+                        },
+                        CheckBoxItem(title = "自动检查更新", keyId = R.string.key_auto_check_plugin_update,
+                                defaultValue = { AppConfig.autoCheckPluginUpdate })
                 )),
                 SettingGroupItem(R.color.google_blue, getString(R.string.text_open_ad_killer_service), childItems = listOf(
                         SwitchItem(R.string.text_open, summary = if (UserInfo.isVip()) null
@@ -80,7 +79,7 @@ class LaboratoryActivity : ReturnableActivity() {
                         SingleChoiceItem(title = "对话系统",
                                 keyId = R.string.key_chat_system_type, entityArrId = R.array.list_chat_system,
                                 defaultValue = { 0 }) { _, d ->
-//                            if (!UserInfo.isVip() && (d as Pair<*, *>).first != 0) {
+                            //                            if (!UserInfo.isVip() && (d as Pair<*, *>).first != 0) {
 //                                toast.showShort("设置无效，仅高级用户可用")
 //                                return@SingleChoiceItem false
 //                            }
@@ -101,14 +100,14 @@ class LaboratoryActivity : ReturnableActivity() {
                         InputItem(title = "设置结束词", summary = "在指令结尾可以快速结束聆听\n注意根据效果来设置结束词\n不使用，置空即可",
                                 keyId = R.string.key_finish_word)
                 )),
-                SettingGroupItem(R.color.teal_A700, titleS = "省电模式", childItems = listOf(
+                /*SettingGroupItem(R.color.teal_A700, titleS = "省电模式", childItems = listOf(
 //                        CheckBoxItem(title = "去广告服务", defaultValue = { true },
 //                                keyId = R.string.key_remove_ad_power_saving_mode,
 //                                summary = "在系统发出低电量提醒后，自动关闭去广告服务\n充电后自动开启"),
                         CheckBoxItem(title = "无障碍服务", summary = "在系统发出低电量提醒后，自动关闭无障碍服务\n依赖无障碍服务的部分功将无法使用，基础功能仍能使用\n充电后自动恢复服务",
                                 keyId = R.string.key_accessibility_service_power_saving_mode)
 
-                )),
+                )),*/
                 SettingGroupItem(R.color.yellow_700, titleS = "语音唤醒", childItems = listOf(
                         SwitchItem(title = "自动释放麦克风", summary = "在已授予麦克风权限的其他App内自动关闭语音唤醒\n需要无障碍",
                                 keyId = R.string.key_fix_voice_micro, defaultValue = { true }) { _, b ->

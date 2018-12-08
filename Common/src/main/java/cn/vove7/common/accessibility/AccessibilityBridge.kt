@@ -12,8 +12,7 @@ interface AccessibilityBridge {
      */
 //    fun waitForView(executor: CExecutorI, finder: ViewFinder)
 
-    fun getRootViewNode(): ViewNode?
-    fun waitForActivity(executor: CExecutorI, scope: ActionScope)
+//    fun waitForActivity(executor: CExecutorI, scope: ActionScope)
     /**
      * remove all notifier when was interrupted
      */

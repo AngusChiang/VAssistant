@@ -14,7 +14,6 @@ import cn.vove7.jarvis.tools.Tutorials
 import cn.vove7.jarvis.view.dialog.UpdateLogDialog
 import cn.vove7.jarvis.view.tools.FragmentSwitcher
 import cn.vove7.vtp.runtimepermission.PermissionUtils
-import cn.vove7.vtp.sharedpreference.SpHelper
 import com.afollestad.materialdialogs.MaterialDialog
 import kotlinx.android.synthetic.main.activity_real_main.*
 import kotlinx.android.synthetic.main.fragment_mine.*
@@ -45,8 +44,16 @@ class RealMainActivity : AppCompatActivity() {
         requestPermission()
     }
 
+    var firstIn = true
     override fun onResume() {
         super.onResume()
+        if (!firstIn) {
+            checkDataUpdate()
+            checkAppUpdate(this, false)
+        } else
+            firstIn = false
+        if (AppConfig.autoCheckPluginUpdate)// 插件更新
+            DataUpdator.checkPluginUpdate()
     }
 
     companion object {
@@ -55,6 +62,7 @@ class RealMainActivity : AppCompatActivity() {
                 android.Manifest.permission.RECORD_AUDIO,
                 android.Manifest.permission.READ_PHONE_STATE
         )
+        var showUpdate = true
     }
 
     private fun requestPermission() {
@@ -86,18 +94,14 @@ class RealMainActivity : AppCompatActivity() {
     }
 
     private fun showDataUpdateLog() {
-        val sp = SpHelper(this)
-        val lastCode = sp.getLong("v_code")
-        val nowCode = AppConfig.versionCode
-        if (lastCode < nowCode) {
+        if (AppConfig.FIRST_LAUNCH_NEW_VERSION && showUpdate) {
             UpdateLogDialog(this) {
                 checkDataUpdate()
             }
-            sp.set("v_code", nowCode)
+            showUpdate = false
         } else {
             checkDataUpdate()
             checkAppUpdate(this, false)
-
         }
     }
 

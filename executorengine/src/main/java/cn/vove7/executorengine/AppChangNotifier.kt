@@ -1,4 +1,4 @@
-package cn.vove7.jarvis.plugins
+package cn.vove7.executorengine
 
 import cn.vove7.common.accessibility.component.AbsAccPluginService
 import cn.vove7.common.datamanager.parse.model.ActionScope

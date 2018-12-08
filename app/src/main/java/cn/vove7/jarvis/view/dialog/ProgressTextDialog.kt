@@ -5,7 +5,10 @@ import android.graphics.Typeface
 import android.os.Handler
 import android.os.Looper
 import android.os.Message
+import android.support.v4.text.util.LinkifyCompat
 import android.text.SpannableStringBuilder
+import android.text.method.LinkMovementMethod
+import android.text.util.Linkify
 import android.view.Gravity
 import android.view.View
 import android.widget.TextView
@@ -24,7 +27,7 @@ import com.afollestad.materialdialogs.callbacks.onPreShow
  */
 open class ProgressTextDialog(context: Context, title: String? = null,
                               cancelable: Boolean = true, noAutoDismiss: Boolean = false,
-                              val autoScroll: Boolean = false)
+                              val autoScroll: Boolean = false,var autoLink:Boolean=false)
     : CustomizableDialog(context, title, cancelable, noAutoDismiss) {
     val textView by lazy { TextView(context) }
 
@@ -42,7 +45,10 @@ open class ProgressTextDialog(context: Context, title: String? = null,
 
     override fun initView(): View {
         textView.setPadding(60, 0, 60, 0)
-        Vog.d(this, "initView ---> 111111111")
+        if(autoLink) {
+            textView.autoLinkMask = Linkify.WEB_URLS
+            textView.movementMethod = LinkMovementMethod.getInstance()
+        }
         selectable(true)
         dialog.onPreShow {
             if (!autoScroll) {//fixme don't work

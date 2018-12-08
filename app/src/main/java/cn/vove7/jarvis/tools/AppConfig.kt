@@ -84,6 +84,7 @@ object AppConfig {
     var fixVoiceMico = true//麦克风冲突
     var notifyCloseMico = true//通知唤醒状态/麦克风
     //    var disableAdKillerOnLowBattery = true//低电量关闭去广告
+    @Deprecated("无障碍省电模式 弃用")
     var disableAccessibilityOnLowBattery = true//低电量关闭无障碍
     var translateLang = "auto"//翻译主语言
     var voiceRecogFeedback = false //语音识别提示音
@@ -91,6 +92,10 @@ object AppConfig {
     var lastingVoiceMillis: Int = 20 //长语音等待时间 单位秒
 
     var listeningToastAlignDirection = 0//对齐方向
+
+    var autoCheckPluginUpdate=true
+
+    var FIRST_LAUNCH_NEW_VERSION = false //新版本第一次启动
 
     val streamTypeArray = arrayOf(
             AudioManager.STREAM_MUSIC
@@ -111,11 +116,29 @@ object AppConfig {
     val currentStreamVolume get() = SystemBridge.getVolumeByType(AppConfig.currentStreamType)
 
     fun init() {
+        checkFirstLaunch()
         checkUserInfo()
+    }
+
+    /**
+     * 启动时执行一次
+     */
+    private fun checkFirstLaunch() {
+        val lastCode = sp.getLong("v_code")
+        val nowCode = AppConfig.versionCode
+        if (lastCode < nowCode) {
+            FIRST_LAUNCH_NEW_VERSION = true
+            sp.set("v_code", nowCode)
+        } else {
+            FIRST_LAUNCH_NEW_VERSION = false
+        }
     }
 
     val context get() = GlobalApp.APP
     private val ssp: SecuritySharedPreference by lazy { SecuritySharedPreference(context, "xka", Context.MODE_PRIVATE) }
+    /**
+     * checkUserInfo完reload
+     */
     private fun checkUserInfo() {
         //用户信息
         val key = context.getString(R.string.key_login_info)
@@ -217,6 +240,7 @@ object AppConfig {
         wakeUpWithHeadsetHook = getBooleanAndInit(R.string.key_wakeup_with_headsethook, wakeUpWithHeadsetHook)
         voiceRecogFeedback = getBooleanAndInit(R.string.key_voice_recog_feedback, voiceRecogFeedback)
         lastingVoiceCommand = getBooleanAndInit(R.string.key_lasting_voice_command, false)
+        autoCheckPluginUpdate = getBooleanAndInit(l, autoCheckPluginUpdate)
         sp.getInt(R.string.key_lasting_voice_millis).also {
             lastingVoiceMillis = if (it < 0) lastingVoiceMillis else it
         }

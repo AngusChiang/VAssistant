@@ -71,7 +71,7 @@ object ParseEngine {
      * App内   ↓ 二级命令 -> 扫一扫/ 不在指定Activity -> （有跟随指令）跳至首页
      *
      *
-     *
+     * todo 顺序 小 -> 大
      */
     fun parseAction(cmdWord: String, scope: ActionScope?): ParseResult {
         i = 0
@@ -86,8 +86,15 @@ object ParseEngine {
                 Vog.d(this, "开启 -- smartOpen")
                 if (cmdWord != "") {//使用smartOpen
 //                    val q = PriorityQueue<Action>()
-                    val result = MultiExecutorEngine().smartOpen(cmdWord)
+                    //设置command
+                    val engine = MultiExecutorEngine()
+                    val result = engine.let {
+                        it.command = cmdWord
+                        it.smartOpen(cmdWord)
+                    }
+                    engine.finalize()
                     if (result) {//成功打开
+                        Vog.d(this, "parseAction ---> MultiExecutorEngine().smartOpen(cmdWord) 成功打开")
                         return ParseResult(true, PriorityQueue(), "smartOpen $cmdWord")
                     }
                 }

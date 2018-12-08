@@ -69,22 +69,6 @@ object PowerEventReceiver : DyBCReceiver(), OnPowerEvent {
 
     }
 
-//    private var isDisableAdKillerService = false
-//        get() {
-//            val v = field
-//            field = false
-//            return v
-//        }
-    /**
-     * 关闭服务标记
-     */
-    private var isDisableAccessibilityService = false
-        get() {
-            val v = field
-            field = false
-            return v
-        }
-
     /**
      * 小于20算低电量
      */
@@ -98,12 +82,7 @@ object PowerEventReceiver : DyBCReceiver(), OnPowerEvent {
 
     override fun onLowBattery() {
         powerSavingMode = true
-        if (AppConfig.disableAccessibilityOnLowBattery &&
-                AccessibilityApi.accessibilityService != null) {//自动关闭无障碍
-            AccessibilityApi.accessibilityService?.powerSavingMode()
-            AdKillerService.gc()
-            isDisableAccessibilityService = true
-        }
+
         if (MainService.instance?.speechRecoService?.wakeupI?.opened == true) {
             AppBus.postSpeechAction(SpeechAction.ActionCode.ACTION_STOP_WAKEUP_WITHOUT_SWITCH)
         }
@@ -112,11 +91,6 @@ object PowerEventReceiver : DyBCReceiver(), OnPowerEvent {
     override fun onCharging() {
         //充电继续服务
         powerSavingMode = false
-
-        if (isDisableAccessibilityService) {//开启无障碍
-            Vog.d(this, "onCharging ---> 开启无障碍")
-            AccessibilityApi.accessibilityService?.disablePowerSavingMode()
-        }
 
         if (!AppConfig.isAutoVoiceWakeupCharging) {
             Vog.d(this, "onReceive ---> isAutoVoiceWakeupCharging 未开启")

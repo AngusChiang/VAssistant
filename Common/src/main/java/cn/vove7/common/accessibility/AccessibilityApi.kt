@@ -20,8 +20,7 @@ import cn.vove7.vtp.log.Vog
  *
  * Created by Vove on 2018/6/18
  */
-abstract class AccessibilityApi : AccessibilityService(),
-        AccessibilityBridge {
+abstract class AccessibilityApi : AccessibilityService() {
     abstract fun getService(): AccessibilityService
 
     val currentScope = ActionScope()
@@ -37,12 +36,12 @@ abstract class AccessibilityApi : AccessibilityService(),
                 null
             }
         }
-
-    override fun getRootViewNode(): ViewNode? {
-        val root = rootInWindow
-        return if (root == null) null
-        else ViewNode(root)
-    }
+//
+//    override fun getRootViewNode(): ViewNode? {
+//        val root = rootInWindow
+//        return if (root == null) null
+//        else ViewNode(root)
+//    }
 
     override fun onCreate() {
         accessibilityService = this
@@ -75,19 +74,6 @@ abstract class AccessibilityApi : AccessibilityService(),
             false
         }
     }
-
-    /**
-     * 省电模式
-     */
-    abstract fun powerSavingMode()
-
-//    abstract fun loadBlackList(ps: Set<String>? = null)
-
-    /**
-     * 关闭省电
-     */
-    abstract fun disablePowerSavingMode()
-
 
     override fun onDestroy() {
         accessibilityService = null

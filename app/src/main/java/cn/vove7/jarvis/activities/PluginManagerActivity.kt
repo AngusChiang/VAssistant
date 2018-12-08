@@ -30,7 +30,7 @@ import org.greenrobot.eventbus.Subscribe
 /**
  * # PluginManagerActivity
  * 插件管理
- *
+ * todo 自动检查插件更新
  * @author Administrator
  * 2018/11/18
  */
@@ -125,7 +125,6 @@ class PluginManagerActivity : BaseActivityWithViewPager() {
                     if (uri != null) {
                         try {
                             UriUtils.getPathFromUri(this, uri)?.also {
-
                                 installPlugin(it)
                             }
                         } catch (e: Exception) {

@@ -4,7 +4,6 @@ import android.content.pm.PackageManager
 import android.graphics.drawable.Drawable
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.app.GlobalLog
-import cn.vove7.jarvis.adapters.ViewModel
 import cn.vove7.jarvis.fragments.AwesomeItem
 import cn.vove7.vtp.log.Vog
 import cn.vove7.vtp.sharedpreference.SpHelper
@@ -153,16 +152,22 @@ abstract class VPluginInfo : AwesomeItem {
         get() = "$description\n作者：$author\n版本：$versionName"
     override val isChecked: Boolean? get() = isInstalled && enabled
 
+    /**
+     * 是否有更新
+     */
+    fun hasUpdate(): Boolean {
+        pluginManager.getInfo(packageName)?.let { localVersion ->
+            return localVersion.versionCode < versionCode//可更新
+        }
+        GlobalLog.err("未安装：$name")
+        return false
+    }
+
     override fun isShow(code: Int?): Boolean {
-        when {
-            code == null -> return true
-            isInstalled -> {
-                pluginManager.getInfo(packageName)?.let { localVersion ->
-                    return localVersion.versionCode < versionCode//可更新
-                }
-                return true
-            }
-            else -> return true
+        return when {
+            code == null -> true
+            isInstalled -> hasUpdate()
+            else -> true
         }
     }
 

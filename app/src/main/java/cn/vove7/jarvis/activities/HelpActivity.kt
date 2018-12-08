@@ -83,7 +83,7 @@ class HelpActivity : ReturnableActivity(), AdapterView.OnItemClickListener {
                 }
             }
             2 -> {
-                ProgressTextDialog(this, "常见问题").apply {
+                ProgressTextDialog(this, "常见问题",autoLink = true).apply {
                     faqs.forEach {
                         appendlnBold("· " + it.first)
                         appendln(it.second)
@@ -121,6 +121,13 @@ class HelpActivity : ReturnableActivity(), AdapterView.OnItemClickListener {
                 Pair("突然按键失灵了?", "按键失灵一般是由于程序后台被杀导致的，目前也属于安卓系统的bug，解决方法就是进入App详情，将此应用强行停止。参考 如何为APP上锁")
                 , Pair("如何为App上锁?", "在App内进入最近任务，上锁；若此时最近任务没有出现，可尝试进入[例如插件管理、指令管理]页面再进入最近任务上锁。或者自带管家白名单")
                 , Pair("通知栏显示服务正在运行", "可尝试在应用设置中关闭此通知")
+                , Pair("屏幕助手如何设置", "1. 先在App设置中 设为默认辅助应用(App重启需要重新设置)\n" +
+                "2. App里开启 实验室/屏幕助手\n" +
+                "3. 查看手机系统 唤出助手的方式\n" +
+                "  - 一般为长按Home键" +
+                "  - 一加氢OS安卓P版本可在[设置/按键和手势/快捷开启助手应用 开启]，" +
+                "氢OS8.0版本设置方式参考https://www.coolapk.com/feed/8889370\n" +
+                "4. 可能部分系统无法设置")
         )
 
     private fun showFeedbackDialog() {

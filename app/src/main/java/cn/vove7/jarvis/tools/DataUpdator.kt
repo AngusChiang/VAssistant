@@ -17,10 +17,12 @@ import cn.vove7.common.netacc.model.BaseRequestModel
 import cn.vove7.common.netacc.model.LastDateInfo
 import cn.vove7.common.netacc.model.ResponseMessage
 import cn.vove7.common.utils.TextHelper
+import cn.vove7.common.utils.ThreadPool.runOnCachePool
 import cn.vove7.common.utils.ThreadPool.runOnPool
 import cn.vove7.executorengine.helper.AdvanAppHelper
 import cn.vove7.executorengine.parse.ParseEngine
 import cn.vove7.jarvis.R
+import cn.vove7.jarvis.droidplugin.RePluginInfo
 import cn.vove7.jarvis.plugins.AdKillerService
 import cn.vove7.jarvis.view.dialog.ProgressTextDialog
 import cn.vove7.vtp.log.Vog
@@ -317,5 +319,27 @@ object DataUpdator {
                 back.invoke(false)
             }
         }
+    }
+
+    /**
+     * 检查插件更新
+     */
+    fun checkPluginUpdate() {
+        NetHelper.postJson<List<RePluginInfo>>(ApiUrls.PLUGIN_LIST) { _, b ->
+            if (b?.isOk() == true) {
+                runOnCachePool {
+                    b.data?.forEach {
+                        if(it.hasUpdate()) {
+                            Vog.i(this,"checkPluginUpdate ---> 检测到有插件更新")
+                            GlobalApp.toastLong("检测到有插件更新")
+                            return@runOnCachePool
+                        }
+                    }
+                }
+            } else {
+                GlobalLog.err(b?.message)
+            }
+        }
+        Vog.i(this,"checkPluginUpdate ---> 无插件更新")
     }
 }

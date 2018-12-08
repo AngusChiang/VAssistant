@@ -32,8 +32,10 @@ import cn.vove7.common.model.UserInfo
 import cn.vove7.common.utils.LooperHelper
 import cn.vove7.common.utils.RegUtils
 import cn.vove7.common.utils.ScreenAdapter
+import cn.vove7.common.utils.ThreadPool
 import cn.vove7.common.utils.ThreadPool.runOnPool
 import cn.vove7.common.view.finder.ViewFindBuilder
+import cn.vove7.common.view.notifier.ActivityShowListener
 import cn.vove7.executorengine.bridges.SystemBridge
 import cn.vove7.executorengine.helper.AdvanContactHelper
 import cn.vove7.executorengine.parse.ParseEngine
@@ -65,8 +67,22 @@ open class ExecutorImpl(
     override var running: Boolean = false
     override var userInterrupted: Boolean = false
 
+    /**
+     * # 等待app|Activity表
+     * - [CExecutorI] 执行器
+     * - pair.first pkg
+     * - pair.second activity
+     */
+    private val locksWaitForActivity = mutableMapOf<ActivityShowListener, ActionScope>()
+
+    /**
+     *  Notifier By [accessApi.currentScope]
+     */
+    private val activityNotifier = AppChangNotifier(locksWaitForActivity)
+
     init {
         ScreenAdapter.init(systemBridge)
+        activityNotifier.register()
     }
 
     private lateinit var actionQueue: PriorityQueue<Action>
@@ -290,6 +306,11 @@ open class ExecutorImpl(
         }
     }
 
+    @Override
+    fun finalize(){
+        activityNotifier.unregister()
+    }
+
     /**
      * 解析打开动作
      */
@@ -428,10 +449,19 @@ open class ExecutorImpl(
             return false
         }
 
-        accessApi?.waitForActivity(this, ActionScope(pkg, activityName))
+        waitForActivity(this, ActionScope(pkg, activityName))
         return waitForUnlock(m)
     }
 
+    private fun waitForActivity(executor: CExecutorI, scope: ActionScope) {
+        locksWaitForActivity[executor] = scope
+        ThreadPool.runOnCachePool {
+            Thread.sleep(200)
+            try {
+                activityNotifier.onAppChanged(accessApi?.currentScope!!)
+            } catch (e: Exception) { }
+        }
+    }
     override fun waitForViewId(id: String, m: Long): ViewNode? {
         Vog.d(this, "waitForViewId $id $m")
         return ViewFindBuilder(this).id(id).waitFor(m)

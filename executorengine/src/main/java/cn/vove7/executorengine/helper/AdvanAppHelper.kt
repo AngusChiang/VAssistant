@@ -50,6 +50,7 @@ object AdvanAppHelper {
      */
     fun matchAppName(appWord: String): List<MatchedData<AppInfo>> {
         val matchList = mutableListOf<MatchedData<AppInfo>>()
+        //匹配别名
         DAO.daoSession.markedDataDao.queryBuilder()
                 .where(MarkedDataDao.Properties.Type.eq(MarkedData.MARKED_TYPE_APP))
                 .list().filter {
@@ -75,10 +76,12 @@ object AdvanAppHelper {
                         Vog.d(this, "预解析---> $follow")
                         val aq = ParseEngine.matchAppAction(follow,
                                 ActionScope(it.packageName), false)
-                        if (aq.second.isEmpty()) {//无跟随
-                            Vog.d(this, "预解析---> 无匹配")
+                        if (aq.second.isEmpty()) {
                             TextHelper.compareSimilarityWithPinyin(context, appWord, it.name,
-                                    replaceNumberWithPinyin = true)
+                                    replaceNumberWithPinyin = true).let { f ->
+                                if (f < limitRate) limitRate
+                                else f
+                            }
                         } else //匹配ok
                             1f
                     } else {
@@ -95,6 +98,7 @@ object AdvanAppHelper {
                 }
             }
         }
+        Vog.d(this, "matchAppName ---> 匹配数 ${matchList.size}")
         matchList.sort()
         return matchList
     }

@@ -106,7 +106,7 @@ class BaiduSpeechRecoService(event: SpeechEvent) : SpeechRecoService(event) {
 
     private fun initOfflineWord() {
         LuaUtil.assetsToSD(context, "bd/baidu_speech_grammar.bsg",
-                offSpeechGrammarPath)
+        offSpeechGrammarPath)
         try {//gson error null of array.length
             myRecognizer.loadOfWord(offWordParams)
         } catch (e: Exception) {
