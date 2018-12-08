@@ -135,7 +135,7 @@ object TextDateParser {
             var week = hashMapOf(//解析周
                     Pair("一", 1), Pair("二", 2), Pair("三", 3),
                     Pair("四", 4), Pair("五", 5), Pair("六", 6),
-                    Pair("日", 7), Pair("天", 7)
+                    Pair("日", 7), Pair("天", 7), Pair("末", 7)
             )[ss[2].substring(0, 1)]
             val dNextWeek = if (s.contains("下周") || s.contains("下星期")) 7 else 0
 

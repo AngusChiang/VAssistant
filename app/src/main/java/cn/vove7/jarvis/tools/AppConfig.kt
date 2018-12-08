@@ -205,6 +205,8 @@ object AppConfig {
         }
         return true
     }
+    //todo map keyId -> value object 直接修改对应值 无需reload全部
+
 
     //load
     fun reload() {
