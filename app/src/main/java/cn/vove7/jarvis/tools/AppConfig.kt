@@ -240,7 +240,7 @@ object AppConfig {
         wakeUpWithHeadsetHook = getBooleanAndInit(R.string.key_wakeup_with_headsethook, wakeUpWithHeadsetHook)
         voiceRecogFeedback = getBooleanAndInit(R.string.key_voice_recog_feedback, voiceRecogFeedback)
         lastingVoiceCommand = getBooleanAndInit(R.string.key_lasting_voice_command, false)
-        autoCheckPluginUpdate = getBooleanAndInit(l, autoCheckPluginUpdate)
+        autoCheckPluginUpdate = getBooleanAndInit(R.string.key_auto_check_plugin_update, autoCheckPluginUpdate)
         sp.getInt(R.string.key_lasting_voice_millis).also {
             lastingVoiceMillis = if (it < 0) lastingVoiceMillis else it
         }
