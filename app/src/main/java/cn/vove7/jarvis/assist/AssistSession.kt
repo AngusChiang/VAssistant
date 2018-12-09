@@ -7,44 +7,45 @@ import android.app.assist.AssistStructure
 import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
+import android.graphics.Matrix
+import android.net.Uri
+import android.os.Build
+import android.os.Bundle
+import android.os.Environment
 import android.service.voice.VoiceInteractionSession
 import android.support.annotation.RequiresApi
 import android.support.design.widget.BottomSheetBehavior
 import android.view.View
 import android.widget.ProgressBar
+import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.appbus.AppBus
 import cn.vove7.common.appbus.AppBus.EVENT_BEGIN_RECO
 import cn.vove7.common.appbus.AppBus.EVENT_ERROR_RECO
 import cn.vove7.common.appbus.AppBus.EVENT_FINISH_RECO
 import cn.vove7.common.appbus.AppBus.EVENT_HIDE_FLOAT
-
-import cn.vove7.common.bridges.UtilBridge
-import cn.vove7.jarvis.services.MainService
-import cn.vove7.jarvis.R
-import cn.vove7.jarvis.adapters.SimpleListAdapter
-import cn.vove7.jarvis.adapters.ViewModel
-import cn.vove7.jarvis.view.BottomSheetController
-import cn.vove7.vtp.log.Vog
-import org.greenrobot.eventbus.Subscribe
-import org.greenrobot.eventbus.ThreadMode
-import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.appbus.AppBus.ORDER_BEGIN_SCREEN_PICKER
-import cn.vove7.jarvis.tools.baiduaip.BaiduAipHelper
+import cn.vove7.common.bridges.UtilBridge
 import cn.vove7.common.model.RequestPermission
 import cn.vove7.common.model.UserInfo
-import cn.vove7.common.utils.runOnUi
-import cn.vove7.executorengine.bridges.SystemBridge
-import cn.vove7.jarvis.tools.QRTools
-import cn.vove7.jarvis.view.dialog.ImageClassifyResultDialog
-import cn.vove7.vtp.dialog.DialogUtil
-import java.lang.Thread.sleep
-import android.graphics.Matrix
-import android.net.Uri
-import android.os.*
 import cn.vove7.common.utils.TextHelper
 import cn.vove7.common.utils.ThreadPool.runOnPool
 import cn.vove7.common.utils.formatNow
 import cn.vove7.common.utils.runOnNewHandlerThread
+import cn.vove7.common.utils.runOnUi
+import cn.vove7.executorengine.bridges.SystemBridge
+import cn.vove7.jarvis.R
+import cn.vove7.jarvis.adapters.SimpleListAdapter
+import cn.vove7.jarvis.adapters.ViewModel
+import cn.vove7.jarvis.services.MainService
+import cn.vove7.jarvis.tools.QRTools
+import cn.vove7.jarvis.tools.baiduaip.BaiduAipHelper
+import cn.vove7.jarvis.view.BottomSheetController
+import cn.vove7.jarvis.view.dialog.ImageClassifyResultDialog
+import cn.vove7.vtp.dialog.DialogUtil
+import cn.vove7.vtp.log.Vog
+import org.greenrobot.eventbus.Subscribe
+import org.greenrobot.eventbus.ThreadMode
+import java.lang.Thread.sleep
 
 
 /**
@@ -248,7 +249,8 @@ class AssistSession(context: Context) : VoiceInteractionSession(context),
                         result.startsWith("http", ignoreCase = true) -> {
                             it.setNeutralButton("访问") { _, _ ->
                                 hide()
-                                SystemBridge.openUrl(result.toLowerCase())
+                                SystemBridge.openUrl(result.substring(0, 5).toLowerCase() // 某些HTTP://
+                                        + result.substring(5))
                             }
                         }
                         TextHelper.isEmail(result) -> {

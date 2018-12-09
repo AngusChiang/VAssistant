@@ -23,7 +23,6 @@ import cn.vove7.jarvis.tools.UriUtils
 import cn.vove7.jarvis.view.dialog.ProgressTextDialog
 import cn.vove7.vtp.app.AppHelper
 import cn.vove7.vtp.log.Vog
-import com.afollestad.materialdialogs.MaterialDialog
 import com.qihoo360.replugin.model.PluginInfo
 import org.greenrobot.eventbus.Subscribe
 
@@ -46,12 +45,13 @@ class PluginManagerActivity : BaseActivityWithViewPager() {
             NotInstalledPluginFragment.newInstance(pluginManager)
     )
 
+    val menus = arrayOf("重启App", "从本地安装", "帮助")
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        menu?.add("重启App")
+        menus.forEach {
+            menu?.add(it)
+        }
         if (BuildConfig.DEBUG)
             menu?.add("安装测试插件")
-        menu?.add("从本地安装")
-        menu?.add("帮助")
         return true
     }
 
@@ -84,9 +84,9 @@ class PluginManagerActivity : BaseActivityWithViewPager() {
             return true
         }
         when (item?.title) {
-            "重启App" -> restartApp()
+            menus[0] -> restartApp()
             "安装测试插件" -> installPlugin("/sdcard/test.apk")
-                "从本地安装" -> {
+            menus[1] -> {
                 val selIntent = Intent(Intent.ACTION_GET_CONTENT)
                 selIntent.type = "*/*"
                 selIntent.addCategory(Intent.CATEGORY_OPENABLE)
@@ -96,8 +96,8 @@ class PluginManagerActivity : BaseActivityWithViewPager() {
                     e.printStackTrace()
                 }
             }
-            "帮助" -> {
-                ProgressTextDialog(this,"帮助").apply {
+            menus[2] -> {
+                ProgressTextDialog(this, "帮助").apply {
                     appendlnBold("功能")
                     appendln("动态扩展更多功能")
                     appendln()
