@@ -122,6 +122,7 @@ object TextDateParser {
     private fun parseOffsetDay(s: String): Int? {
         mapOf(
                 Pair("明天", 1),
+                Pair("明晚", 1),
                 Pair("大后天", 3),//
                 Pair("后天", 2),//
                 Pair("今天", 0),
@@ -267,10 +268,14 @@ object TextDateParser {
                 s.contains("下午") -> Pair(14, 0)
                 s.contains("晚上") -> Pair(19, 0)
                 s.contains("凌晨") -> Pair(5, 0)
+                s.contains("这个时[候|间]".toRegex()) -> {
+                    val p = Calendar.getInstance()
+                    Pair(p.get(Calendar.HOUR_OF_DAY), p.get(Calendar.MINUTE))
+                }
                 else -> null//无结果 无(上下午)匹配
             }
         } else {
-            if (s.contains("(下午|晚上)".toRegex())) {
+            if (s.contains("(下午|晚上|明晚)".toRegex())) {
                 if (hour < 12) hour += 12
             }
             //else 早上|上午|中午|凌晨
