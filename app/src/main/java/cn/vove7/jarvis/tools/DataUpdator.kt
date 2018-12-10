@@ -15,7 +15,6 @@ import cn.vove7.common.netacc.ApiUrls
 import cn.vove7.common.netacc.NetHelper
 import cn.vove7.common.netacc.model.BaseRequestModel
 import cn.vove7.common.netacc.model.LastDateInfo
-import cn.vove7.common.netacc.model.ResponseMessage
 import cn.vove7.common.utils.TextHelper
 import cn.vove7.common.utils.ThreadPool.runOnCachePool
 import cn.vove7.common.utils.ThreadPool.runOnPool
@@ -28,7 +27,6 @@ import cn.vove7.jarvis.view.dialog.ProgressTextDialog
 import cn.vove7.vtp.log.Vog
 import cn.vove7.vtp.sharedpreference.SpHelper
 import com.afollestad.materialdialogs.MaterialDialog
-import com.google.gson.reflect.TypeToken
 
 /**
  * # DataUpdator
@@ -80,7 +78,7 @@ object DataUpdator {
      * 根据type更新数据
      * @param types List<Int>
      */
-    fun oneKeyUpdate(activity: Activity, types: List<Int>, back: (() -> Unit)?=null) {
+    fun oneKeyUpdate(activity: Activity, types: List<Int>, back: (() -> Unit)? = null) {
         val textDialog = ProgressTextDialog(activity, "正在更新", false, autoScroll = true)
         runOnPool {
             types.forEach {
@@ -329,8 +327,8 @@ object DataUpdator {
             if (b?.isOk() == true) {
                 runOnCachePool {
                     b.data?.forEach {
-                        if(it.hasUpdate()) {
-                            Vog.i(this,"checkPluginUpdate ---> 检测到有插件更新")
+                        if (it.hasUpdate()) {
+                            Vog.i(this, "checkPluginUpdate ---> 检测到有插件更新")
                             GlobalApp.toastLong("检测到有插件更新")
                             return@runOnCachePool
                         }
@@ -340,6 +338,6 @@ object DataUpdator {
                 GlobalLog.err(b?.message)
             }
         }
-        Vog.i(this,"checkPluginUpdate ---> 无插件更新")
+        Vog.i(this, "checkPluginUpdate ---> 无插件更新")
     }
 }

@@ -2,6 +2,7 @@ package cn.vove7.jarvis.tools
 
 import android.app.Activity
 import android.content.Context
+import android.content.ContextWrapper
 import android.content.Intent
 import android.media.AudioManager
 import android.net.Uri
@@ -12,11 +13,13 @@ import cn.vove7.common.model.UserInfo
 import cn.vove7.common.netacc.ApiUrls
 import cn.vove7.common.netacc.NetHelper
 import cn.vove7.common.netacc.model.BaseRequestModel
+import cn.vove7.common.utils.StorageHelper
 import cn.vove7.common.utils.ThreadPool.runOnCachePool
 import cn.vove7.common.utils.ThreadPool.runOnPool
 import cn.vove7.common.utils.runOnUi
 import cn.vove7.common.utils.secure.SecuritySharedPreference
 import cn.vove7.executorengine.bridges.SystemBridge
+import cn.vove7.jarvis.BuildConfig
 import cn.vove7.jarvis.R
 import cn.vove7.vtp.log.Vog
 import cn.vove7.vtp.sharedpreference.SpHelper
@@ -24,6 +27,7 @@ import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.checkbox.checkBoxPrompt
 import com.google.gson.Gson
 import org.jsoup.Jsoup
+import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -93,7 +97,7 @@ object AppConfig {
 
     var listeningToastAlignDirection = 0//对齐方向
 
-    var autoCheckPluginUpdate=true
+    var autoCheckPluginUpdate = true
 
     var FIRST_LAUNCH_NEW_VERSION = false //新版本第一次启动
 
@@ -114,6 +118,26 @@ object AppConfig {
      * 当前合成通道音量
      */
     val currentStreamVolume get() = SystemBridge.getVolumeByType(AppConfig.currentStreamType)
+
+    /**
+     * 改变sp存储路径
+     * 重新安装
+     * todo: 新安装时无存储权限
+     */
+    fun changeStorePath() {
+        val filePath = StorageHelper.spPath
+        try {
+            var field = ContextWrapper::class.java.getDeclaredField("mBase")
+            field.isAccessible = true
+            val obj = field.get(GlobalApp.APP)
+            field = obj.javaClass.getDeclaredField("mPreferencesDir")
+            field.isAccessible = true
+            field.set(obj, File(filePath))
+        } catch (e: Exception) {
+            e.printStackTrace()
+            GlobalLog.err("配置存储重定向失败")
+        }
+    }
 
     fun init() {
         checkFirstLaunch()

@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.support.annotation.StringRes
 import android.support.v7.widget.AppCompatCheckBox
+import android.view.Gravity
 import android.widget.ScrollView
 import cn.vove7.executorengine.helper.AdvanAppHelper
 import cn.vove7.jarvis.R
@@ -72,9 +73,12 @@ fun MaterialDialog.checkBoxText(
     return this
 }
 
-fun MaterialDialog.scrollToTop() {
+fun MaterialDialog.noAutoScroll() {
     findViewById<ScrollView>(R.id.md_scrollview_content)?.also {
-        Vog.d(this,"scrollToTop ---> 0")
-        it.fullScroll(ScrollView.FOCUS_UP)
+        Vog.d(this, "noAutoScroll ---> 0")
+        it.isFocusable = true
+        it.isFocusableInTouchMode = true
+        it.requestFocus()
+//        it.fullScroll(ScrollView.FOCUS_UP)
     }
 }

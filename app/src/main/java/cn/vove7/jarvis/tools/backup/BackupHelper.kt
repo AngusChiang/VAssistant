@@ -4,7 +4,6 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.ActivityNotFoundException
 import android.content.Intent
-import android.os.Environment
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.datamanager.AppAdInfo
@@ -24,6 +23,7 @@ import cn.vove7.jarvis.R
 import cn.vove7.jarvis.tools.checkBoxText
 import cn.vove7.jarvis.view.dialog.ProgressDialog
 import cn.vove7.jarvis.view.dialog.ProgressTextDialog
+import cn.vove7.vtp.file.FileHelper
 import cn.vove7.vtp.log.Vog
 import com.afollestad.materialdialogs.DialogCallback
 import com.afollestad.materialdialogs.MaterialDialog
@@ -449,4 +449,43 @@ object BackupHelper {
         Vog.d(this, "getLocalInst 本地全局指令 ---> $list")
         return list
     }
+
+
+    //////////////////设置备份/////////////////
+    fun backupAppConfig(): Boolean {
+        return try {
+            val fList = arrayOf(GlobalApp.APP.packageName + "_preferences.xml", "tutorials.xml")
+            val spDir = File(GlobalApp.APP.cacheDir.parent, "shared_prefs")
+            fList.forEach {
+                FileHelper.easyCopy(File(spDir, it), File(StorageHelper.spPath, it))
+            }
+            true
+        } catch (e: Throwable) {
+            GlobalLog.err(e, "bac460")
+            false
+        }
+    }
+
+    /**
+     * 恢复设置
+     * @return String 结果
+     */
+    fun restoreAppConfig(): Pair<Boolean, String> {
+        return try {
+            val fList = arrayOf(GlobalApp.APP.packageName + "_preferences.xml", "tutorials.xml")
+            val spDir = File(GlobalApp.APP.cacheDir.parent, "shared_prefs")
+            fList.forEach {
+                val baF = File(StorageHelper.spPath, it)
+                if (baF.exists().not()) {
+                    return Pair(true, "未发现备份文件")
+                }
+                FileHelper.easyCopy(baF, File(spDir, it))
+            }
+            Pair(true, "恢复完成，请重启App")
+        } catch (e: Throwable) {
+            GlobalLog.err(e, "bac460")
+            Pair(false, "发生错误 ${e.message}")
+        }
+    }
+
 }

@@ -59,13 +59,13 @@ class MultiExecutorEngine : ExecutorImpl() {
 //    private val luaFunHelper = LuaFunHelper(luaHelper, luaHelper.L)
 
     //可提取ExecutorHelper 接口 handleMessage
-    override fun onLuaExec(src: String, args: Array<String>?): PartialResult {
+    override fun onLuaExec(script: String, args: Array<String>?): PartialResult {
 //        if (currentActionIndex <= 1) {//fixme ?????
         luaHelper = LuaHelper(context, bridgeManager)
 //        }
-        val script = RegUtils.replaceLuaHeader(src)
+        val newScript = RegUtils.replaceLuaHeader(script)
         return try {
-            luaHelper?.evalString(script, args)
+            luaHelper?.evalString(newScript, args)
             luaHelper?.handleMessage(OnPrint.INFO, "主线程执行完毕\n")
             PartialResult.success()
         } catch (e: Throwable) {

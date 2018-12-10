@@ -307,7 +307,7 @@ open class ExecutorImpl(
     }
 
     @Override
-    fun finalize(){
+    fun finalize() {
         activityNotifier.unregister()
     }
 
@@ -422,7 +422,6 @@ open class ExecutorImpl(
                 Vog.d(this, "执行器-解锁")
                 if (end - begin >= mm) {//自动超时 终止执行
                     Vog.d(this, "等待超时")
-//                    accessApi?.removeAllNotifier(this)//移除监听器
                     return false
                 }
                 return true
@@ -432,7 +431,6 @@ open class ExecutorImpl(
                 //必须强行stop
                 Vog.d(this, "被迫强行停止")
                 serviceBridge?.onExecuteInterrupt("终止执行")
-//                accessApi?.removeAllNotifier(this)
                 Thread.currentThread().interrupt()
                 Thread.currentThread().stop()//???
                 return false
@@ -459,9 +457,11 @@ open class ExecutorImpl(
             Thread.sleep(200)
             try {
                 activityNotifier.onAppChanged(accessApi?.currentScope!!)
-            } catch (e: Exception) { }
+            } catch (e: Exception) {
+            }
         }
     }
+
     override fun waitForViewId(id: String, m: Long): ViewNode? {
         Vog.d(this, "waitForViewId $id $m")
         return ViewFindBuilder(this).id(id).waitFor(m)
@@ -550,13 +550,13 @@ open class ExecutorImpl(
     override fun alert(title: String, msg: String): Boolean {
         serviceBridge?.showAlert(title, msg)
         waitForUnlock()
-        return currentAction!!.responseResult.also {
+        return currentAction?.responseResult.also {
             Vog.d(this, "alert result > $it")
-        }
+        } ?: false
     }
 
     override fun notifyAlertResult(result: Boolean) {
-        currentAction!!.responseResult = result
+        currentAction?.responseResult = result
         notifySync()
     }
 

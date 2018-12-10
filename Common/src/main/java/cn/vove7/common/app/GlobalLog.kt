@@ -42,11 +42,15 @@ object GlobalLog {
             e.message
         }
         Vog.e(this, msg ?: "none")
-        write(LEVEL_ERROR, "$tag -- $msg")
+        write(LEVEL_ERROR, "tag-$tag -- $msg")
     }
 
+    fun err(msg: String?, tag: String = "") {
+        Vog.e(this, "tag-$tag : $msg")
+        write(LEVEL_ERROR, msg)
+    }
     fun err(msg: String?) {
-        Vog.e(this, msg ?: "none")
+        Vog.e(this, "$msg")
         write(LEVEL_ERROR, msg)
     }
 

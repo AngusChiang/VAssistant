@@ -113,21 +113,21 @@ object CrashHandler : Thread.UncaughtExceptionHandler {
 }
 
 fun DeviceInfo.string(): String {
-    val b = StringBuilder()
-    b.append("userId: ").append(UserInfo.getUserId()).appendln()
-    b.append("userName: ").append(UserInfo.getUserName()).appendln()
-    b.append("email: ").append(UserInfo.getEmail()).appendln()
-    b.append("appVersion: ").append(AppConfig.versionName).appendln()
-    b.append("manufacturerName: ").append(manufacturerName).appendln()
-    b.append("productName: ").append(productName).appendln()
-    b.append("brandName: ").append(brandName).appendln()
-    b.append("model: ").append(model).appendln()
-    b.append("boardName: ").append(boardName).appendln()
-    b.append("deviceName: ").append(deviceName).appendln()
-    b.append("serial: ").append(serial).appendln()
-    b.append("sdkInt: ").append(sdkInt).appendln()
-    b.append("androidVersion: ").append(androidVersion).appendln()
-    b.append("ABI  : ").append(TextHelper.arr2String(Build.SUPPORTED_ABIS)).appendln()
-
-    return b.toString()
+    return buildString {
+        append("userId: ").append(UserInfo.getUserId()).appendln()
+        append("userName: ").append(UserInfo.getUserName()).appendln()
+        append("email: ").append(UserInfo.getEmail()).appendln()
+        append("appVersion: ").append(AppConfig.versionName).appendln()
+        append("manufacturerName: ").append(manufacturerName).appendln()
+        append("productName: ").append(productName).appendln()
+        append("brandName: ").append(brandName).appendln()
+        append("model: ").append(model).appendln()
+        append("boardName: ").append(boardName).appendln()
+        append("deviceName: ").append(deviceName).appendln()
+        append("serial: ").append(serial).appendln()
+        append("sdkInt: ").append(sdkInt).appendln()
+        append("androidVersion: ").append(androidVersion).appendln()
+        append("ABI  : ").append(TextHelper.arr2String(Build.SUPPORTED_ABIS)).appendln()
+        append("运行时间：" + (System.currentTimeMillis() - GlobalApp.launchTime) / 1000 + "s")
+    }
 }

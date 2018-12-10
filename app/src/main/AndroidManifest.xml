@@ -96,7 +96,6 @@
             android:autoRemoveFromRecents="true"
             android:excludeFromRecents="true"
             android:launchMode="singleTask"
-            android:theme="@style/TranslucentStatus.NoActionBar"
             android:windowSoftInputMode="adjustNothing">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

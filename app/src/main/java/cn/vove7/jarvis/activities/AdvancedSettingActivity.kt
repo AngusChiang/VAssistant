@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.os.Handler
 import android.view.View
 import android.widget.TextView
+import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.bridges.RootHelper
 import cn.vove7.common.model.UserInfo
 import cn.vove7.common.netacc.ApiUrls
@@ -28,6 +29,7 @@ import cn.vove7.jarvis.view.dialog.LoginDialog
 import cn.vove7.jarvis.view.dialog.ProgressDialog
 import cn.vove7.jarvis.view.dialog.UserInfoDialog
 import cn.vove7.jarvis.view.tools.SettingItemHelper
+import cn.vove7.vtp.app.AppHelper
 import cn.vove7.vtp.sharedpreference.SpHelper
 import cn.vove7.vtp.view.span.ColourTextClickableSpan
 import com.afollestad.materialdialogs.MaterialDialog
@@ -151,7 +153,7 @@ class AdvancedSettingActivity : ReturnableActivity() {
                         })
                 )),
                 SettingGroupItem(R.color.google_red, "备份", childItems = listOf(
-                        IntentItem(title = "备份") {
+                        IntentItem(title = "本机数据备份", summary = "备份用户指令、标记等数据") {
                             if (AppConfig.checkLogin()) {
                                 BackupHelper.showBackupDialog(this)
                             }
@@ -166,6 +168,18 @@ class AdvancedSettingActivity : ReturnableActivity() {
                         IntentItem(title = "查看云端备份") {
                             //todo
                             toast.showShort(R.string.text_coming_soon)
+                        },
+                        IntentItem(title = "备份设置", summary = "将设置备份到sd卡") {
+                            BackupHelper.backupAppConfig().also {
+                                GlobalApp.toastShort(if (it) "备份完成" else "备份失败，详情见日志")
+                            }
+                        },
+                        IntentItem(title = "恢复设置", summary = "从sd卡恢复设置\n需重启App") {
+                            BackupHelper.restoreAppConfig().also {
+                                GlobalApp.toastShort(it.second)
+                                if (it.first) //跳转重启
+                                    AppHelper.showPackageDetail(this, packageName)
+                            }
                         }
                 )),
                 SettingGroupItem(R.color.teal_A700, "命令解析", childItems = listOf(

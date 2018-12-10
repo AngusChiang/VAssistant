@@ -31,6 +31,7 @@ object Tutorials {
     const val h_t_2 = "h_t_2"
     const val h_t_3 = "h_t_3"
     const val h_t_4 = "h_t_4"
+    const val h_t_5 = "h_t_5"
     //高级页
     const val t_inst_man = "t_inst_man"
     const val t_mark_man = "t_mark_man"

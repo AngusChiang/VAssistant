@@ -14,20 +14,24 @@ import com.afollestad.materialdialogs.callbacks.onDismiss
 class UpdateLogDialog(context: Context, onDismiss: (() -> Unit)? = null) {
     init {
         val d = ProgressTextDialog(context, "更新日志", false)
-        d.dialog.onDismiss {
-            onDismiss?.invoke()
-        }
+
         logs.forEach {
             d.appendln()
             d.appendln(MultiSpan(context, it.first, fontSize = 20, typeface = Typeface.BOLD).spanStr)
             d.appendln(it.second)
         }
-        d.scrollToTop()
+        d.onDismiss {
+            onDismiss?.invoke()
+        }
         d.finish()
     }
 
     private val logs: List<Pair<String, String>>
         get() = listOf(
+                Pair("1.6.0","修复二维码识别链接访问问题\n" +
+                        "加入设置备份恢复[高级/备份]\n" +
+                        "修改首页亮色状态栏\n" +
+                        "修复设置文字过长右边部件不显示问题"),
                 Pair("1.5.9-beta","修复长语音定时问题\n"+
                         "去除无障碍低电量模式、无障碍黑名单\n" +
                         "加入插件检查更新"),

@@ -159,7 +159,7 @@ abstract class VPluginInfo : AwesomeItem {
         pluginManager.getInfo(packageName)?.let { localVersion ->
             return localVersion.versionCode < versionCode//可更新
         }
-        GlobalLog.err("未安装：$name")
+//        GlobalLog.err("未安装：$name")
         return false
     }
 

@@ -68,7 +68,7 @@ class NotInstalledPluginFragment : SimpleListFragment<VPluginInfo>() {
             override fun onClick(holder: SimpleListAdapter.VHolder?, pos: Int, item: ViewModel<VPluginInfo>) {
                 ProgressTextDialog(context!!, item.title).show {
                     positiveButton(text = "下载") {
-                        downloadTask = NetHelper.download(ApiUrls.DL_PLUGIN + "${item.extra.fileName}", StorageHelper.pliginsPath,
+                        downloadTask = NetHelper.download(ApiUrls.DL_PLUGIN + "${item.extra.fileName}", StorageHelper.pluginsPath,
                                 item.extra.fileName ?: (item.title + ".apk"),
                                 data = item.title, listener = lis)
                     }

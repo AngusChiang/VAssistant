@@ -7,7 +7,6 @@ import android.support.multidex.MultiDex
 import cn.vove7.common.BuildConfig
 import cn.vove7.common.bridges.ServiceBridge
 import cn.vove7.common.view.toast.ColorfulToast
-import cn.vove7.vtp.log.Vog
 import com.qihoo360.replugin.*
 
 /**
@@ -20,13 +19,15 @@ import com.qihoo360.replugin.*
 open class GlobalApp : RePluginApplication() {
     override fun onCreate() {
         APP = this
+        launchTime = System.currentTimeMillis()
         super.onCreate()
         colorfulToast = ColorfulToast(this).blue()
-
     }
 
 
     companion object {
+        var launchTime: Long = 0
+
         //        var toastHandler: ColorfulToast.ToastHandler? = null
         lateinit var APP: Application
         val GApp: Application
@@ -68,7 +69,7 @@ open class GlobalApp : RePluginApplication() {
         try {
             MultiDex.install(base)
         } catch (e: Exception) {
-            GlobalLog.err(e,"ap71")
+            GlobalLog.err(e, "ap71")
         }
         RePlugin.enableDebugger(base, BuildConfig.DEBUG)
     }
