@@ -13,7 +13,6 @@ android {
         versionCode 66
         versionName "1.6.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
-        testApplicationId = 'cn.vove7.vassistant_test'
 
         multiDexEnabled true
 
@@ -25,6 +24,7 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            resValue "string", "app_name", "V Assistant"
         }
         debug {
             minifyEnabled false
@@ -32,6 +32,7 @@ android {
             versionNameSuffix = '_debug'
             jniDebuggable = false
             debuggable = true
+            resValue "string", "app_name", "V Assistant-debug"
         }
 //        beta {
 //            versionNameSuffix = '_beta'

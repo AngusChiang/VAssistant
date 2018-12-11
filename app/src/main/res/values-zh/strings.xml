@@ -9,7 +9,6 @@
     </string-array>
 
     <string name="text_permission_manager">权限管理</string>
-    <string name="app_name">V Assistant</string>
     <string name="simple_test_script">简单顺序脚本测试</string>
     <string name="text_androlua_test">AndroLua 测试</string>
     <string name="no_net_refresh">没有网络，下拉刷新试试</string>

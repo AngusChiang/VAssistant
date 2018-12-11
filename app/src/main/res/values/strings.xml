@@ -1,5 +1,4 @@
 <resources>
-    <string name="app_name">V Assistant</string>
     <string name="simple_test_script">Simple Script Test</string>
     <string name="r" translatable="false"><![CDATA[>]]></string>
     <string name="l" translatable="false"><![CDATA[<]]></string>
