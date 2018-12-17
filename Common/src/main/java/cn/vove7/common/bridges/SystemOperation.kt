@@ -193,6 +193,7 @@ interface SystemOperation {
      * @param isAlarm Boolean
      */
     fun createCalendarEvent(title: String, content: String?, beginTime: Long, endTime: Long? = null, isAlarm: Boolean)
+    fun createCalendarEvent(title: String, content: String?, beginTime: Long, endTime: Long? = null, earlyAlarmMinute: Long? = null)
 
 //    fun hideInputMethod()
 

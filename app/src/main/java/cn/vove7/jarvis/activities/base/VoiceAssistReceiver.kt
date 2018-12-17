@@ -5,10 +5,12 @@ import android.content.Intent
 import android.os.Bundle
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.appbus.AppBus
+import cn.vove7.common.appbus.SpeechAction
 import cn.vove7.common.datamanager.DAO
 import cn.vove7.common.datamanager.parse.model.Action
-import cn.vove7.jarvis.services.MainService
 import cn.vove7.executorengine.parse.ParseEngine
+import cn.vove7.jarvis.services.MainService
+import cn.vove7.jarvis.tools.AppConfig
 import cn.vove7.vtp.log.Vog
 import java.util.*
 
@@ -28,6 +30,13 @@ class VoiceAssistActivity : Activity() {
             Intent.ACTION_ASSIST, Intent.ACTION_VOICE_COMMAND, "android.intent.action.VOICE_ASSIST", "wakeup" -> {
                 Vog.d(this, "onCreate ---> ASSIST wakeup")
                 MainService.switchReco()
+            }
+            SWITCH_VOICE_WAKEUP -> {
+                if (AppConfig.voiceWakeup) {
+                    AppBus.postSpeechAction(SpeechAction.ActionCode.ACTION_STOP_WAKEUP)
+                } else {
+                    AppBus.postSpeechAction(SpeechAction.ActionCode.ACTION_START_WAKEUP)
+                }
             }
             else -> {
                 try {
@@ -53,5 +62,9 @@ class VoiceAssistActivity : Activity() {
             }
         }
         finishAndRemoveTask()
+    }
+
+    companion object {
+        val SWITCH_VOICE_WAKEUP = "switch_voice_wakeup"
     }
 }

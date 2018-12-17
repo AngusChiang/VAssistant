@@ -51,7 +51,8 @@ object RegUtils {
      * @param r String regex with %
      * @return Regex
      */
-    fun dealRawReg(r: String): Regex = r.replace("%", REG_ALL_CHAR).toRegex()
+    fun dealRawReg(r: String): Regex = r.replace("%", REG_ALL_CHAR)
+            .replace("#", TextDateParser.REG_NUMBER_CHAR).toRegex()
 
     private val RegisterMatcher = "settings[\\S\\s\n]*registerSettings\\([ ]*%[\\\"'](%)[\"']%settings%([0-9]*)[ ]*\\)"
             .replace("%", "[\\S ]*?").toRegex()

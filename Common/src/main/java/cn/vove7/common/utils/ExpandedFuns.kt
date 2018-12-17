@@ -54,6 +54,51 @@ fun runOnNewHandlerThread(name: String = "anonymous", autoQuit: Boolean = true,
     }
 }
 
+/**
+ * 循环执行等待结果；超时返回空
+ * eg用于视图搜索
+ * @param waitMillis Long
+ * @param run () -> T 返回空时，重新执行，直到超时
+ * @return T
+ */
+fun <T> whileWaitTime(waitMillis: Long, run: () -> T?): T? {
+    val begin = System.currentTimeMillis()
+    var now: Long
+    do {
+        run.invoke()?.also {
+            //if 耗时操作
+            return it
+        }
+        now = System.currentTimeMillis()
+    } while (now - begin < waitMillis)
+    return null
+}
+
+/**
+ * 循环执行等待run结果；超过次数返回空
+ *
+ * @param waitCount Int
+ * @param run () -> T?
+ * @return T? 执行结果
+ */
+fun <T> whileWaitCount(waitCount: Int, run: () -> T?): T? {
+    var count = 0
+    while (count++ < waitCount) {
+        run.invoke()?.also {
+            //if 耗时操作
+            return it
+        }
+    }
+    return null
+}
+
+fun prints(vararg msgs: Any?) {
+    msgs.forEach {
+        print(it)
+        print(" ")
+    }
+}
+
 fun formatNow(pat: String): String = SimpleDateFormat(pat, Locale.getDefault()).format(Date())
 
 fun Context.startActivityOnNewTask(intent: Intent) {
@@ -111,7 +156,9 @@ fun AppInfo.isHomeApp(): Boolean {
 }
 
 val appActivityCache = hashMapOf<String, Array<String>>()
-fun AppInfo.activities(): Array<String> {//fixme packageManager died
+
+//fixme packageManager died
+fun AppInfo.activities(): Array<String> {
     synchronized(AppInfo::class) {
         appActivityCache[packageName]?.let {
             return it

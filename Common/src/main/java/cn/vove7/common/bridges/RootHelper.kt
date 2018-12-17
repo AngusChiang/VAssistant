@@ -124,6 +124,7 @@ object RootHelper {
         return result
     }
 
+    @Synchronized
     fun openSelfAccessService() {
 //        AccessibilityApi.openServiceSelf()
         openAppAccessService(GlobalApp.APP.packageName,
@@ -136,7 +137,7 @@ object RootHelper {
         try {
             execWithSu(buildList("$pkg/$serviceName"))
         } catch (e: Exception) {
-            GlobalLog.err(e)
+            GlobalLog.err(e.message)
             GlobalApp.toastShort("无障碍自动开启失败")
         }
         Vog.d(this, "openAppAccessService ---> 申请结束")

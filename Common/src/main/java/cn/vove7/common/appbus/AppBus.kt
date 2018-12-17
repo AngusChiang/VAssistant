@@ -128,19 +128,3 @@ data class SpeechAction(val action: ActionCode) {
 data class VoiceData(val what: Int = 0, val data: String? = null, val volumePercent: Int = 0)
     : Serializable
 
-
-/**
- * Log消息
- */
-open class MessageEvent(val msg: String, val what: Int) {
-    override fun toString(): String {
-        return "MessageEvent(errMsg='$msg', what=$what)"
-    }
-
-    companion object {
-        const val WHAT_MSG_INFO = 1
-        const val WHAT_MSG_ERR = 2
-    }
-}
-
-

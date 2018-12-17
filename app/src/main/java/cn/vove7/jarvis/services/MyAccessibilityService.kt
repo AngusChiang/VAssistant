@@ -77,7 +77,7 @@ class MyAccessibilityService : AccessibilityApi() {
                         return
                     } else it
                 } catch (e: Exception) {
-                    GlobalLog.err(e)
+                    GlobalLog.err(e.message,"acs80")
                     it
                 }
             }

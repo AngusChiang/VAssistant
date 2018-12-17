@@ -179,7 +179,7 @@ object TextDateParser {
      * 21 -> 21
      * @param s String
      */
-    private fun toNum(s: String): Int {
+    fun toNum(s: String): Int {
         return try {
             s.toInt()
         } catch (e: NumberFormatException) {
@@ -192,7 +192,7 @@ object TextDateParser {
      *
      * @param s String
      */
-    private fun parseChineseNumber(s: String): Long {
+    fun parseChineseNumber(s: String): Long {
         val cUnit = hashMapOf(
                 Pair('亿', 100000000L)
                 , Pair('万', 10000L)
@@ -310,7 +310,7 @@ object TextDateParser {
     }
 
     private val REG_ALL_CHAR = "([\\S\\s]*?)"
-    private val REG_NUMBER_CHAR = "([0-9零一二两三四五六七八九十]*)"
+    val REG_NUMBER_CHAR = "([0-9零一二两三四五六七八九十个百千万]*)"
     private fun dealRawReg(r: String): Regex = r.replace("%", REG_ALL_CHAR)
             .replace("#", REG_NUMBER_CHAR).toRegex()
 

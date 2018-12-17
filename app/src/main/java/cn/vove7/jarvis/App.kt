@@ -1,14 +1,11 @@
 package cn.vove7.jarvis
 
+import android.content.Context
 import android.content.Intent
 import android.os.Build
-import android.os.Handler
-import android.os.HandlerThread
 import android.util.Log
 import cn.vove7.androlua.LuaApp
 import cn.vove7.common.app.GlobalApp
-import cn.vove7.common.appbus.AppBus
-import cn.vove7.common.appbus.MessageEvent
 import cn.vove7.common.bridges.RootHelper
 import cn.vove7.common.utils.ThreadPool.runOnPool
 import cn.vove7.common.utils.runOnNewHandlerThread
@@ -24,9 +21,12 @@ import cn.vove7.jarvis.tools.CrashHandler
 import cn.vove7.jarvis.tools.ShortcutUtil
 import cn.vove7.vtp.log.Vog
 import cn.vove7.vtp.runtimepermission.PermissionUtils
+//import com.argusapm.android.api.Client
+//import com.argusapm.android.core.Config
+//import com.argusapm.android.network.cloudrule.RuleSyncRequest
+//import com.argusapm.android.network.upload.CollectDataSyncUpload
 import io.github.kbiakov.codeview.classifier.CodeProcessor
-import org.greenrobot.eventbus.Subscribe
-import org.greenrobot.eventbus.ThreadMode
+
 
 class App : GlobalApp() {
 
@@ -38,32 +38,28 @@ class App : GlobalApp() {
         Vog.d(this, "onCreate ---> begin ${System.currentTimeMillis() / 1000}")
         super.onCreate()
         ins = this
-        AppBus.reg(this)
 
         CrashHandler.init()
         LuaApp.init(this)
         services = arrayOf(mainService, assistService)
         AppConfig.init()//加载配置
         Vog.d(this, "onCreate ---> 配置加载完成")
-        HandlerThread("app_load").apply {
-            start()
-            Handler(looper).post {
-                startServices()
-                CodeProcessor.init(this@App)
-                ShortcutUtil.addWakeUpShortcut()
-//                AdvanAppHelper.updateAppList()
-                startBroadcastReceivers()
-                runOnPool {
-                    if (AppConfig.autoOpenASWithRoot && !PermissionUtils.accessibilityServiceEnabled(this@App)) {
-                        RootHelper.openSelfAccessService()
-                    }
-                }
-                //插件自启 fixme
-                RePluginManager().launchWithApp()
-                Vog.d(this, "onCreate ---> 结束 ${System.currentTimeMillis() / 1000}")
 
-                quitSafely()
+        runOnNewHandlerThread("app_load") {
+            startServices()
+            CodeProcessor.init(this@App)
+            ShortcutUtil.addWakeUpShortcut()
+//                AdvanAppHelper.updateAppList()
+            startBroadcastReceivers()
+            runOnPool {
+                if (AppConfig.autoOpenASWithRoot && !PermissionUtils.accessibilityServiceEnabled(this@App)) {
+                    RootHelper.openSelfAccessService()
+                }
             }
+            //插件自启 fixme
+            RePluginManager().launchWithApp()
+            Vog.d(this, "onCreate ---> 结束 ${System.currentTimeMillis() / 1000}")
+
         }
         if (!BuildConfig.DEBUG) {
             try {
@@ -120,14 +116,17 @@ class App : GlobalApp() {
         super.onTerminate()
     }
 
-
-    @Subscribe(threadMode = ThreadMode.BACKGROUND)
-    fun onMessageEvent(event: MessageEvent) {
-        when (event.what) {
-            MessageEvent.WHAT_MSG_INFO -> {
-                Vog.d(this, event.toString())
-            }
-            MessageEvent.WHAT_MSG_ERR -> Vog.e(this, event.toString())
-        }
+    override fun attachBaseContext(base: Context?) {
+        super.attachBaseContext(base)
+//        val builder = Config.ConfigBuilder()
+//                .setAppContext(this)
+//                .setAppName(getString(R.string.app_name))
+//                .setRuleRequest(RuleSyncRequest())
+//                .setUpload(CollectDataSyncUpload())
+//                .setAppVersion(BuildConfig.VERSION_NAME)
+//                .setApmid(if (BuildConfig.DEBUG) "j735c9gol8uw"
+//                else "nggjim4etqcq")
+//        Client.attach(builder.build())
+//        Client.startWork()
     }
 }

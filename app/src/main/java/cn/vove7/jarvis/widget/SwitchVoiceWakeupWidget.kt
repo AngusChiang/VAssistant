@@ -6,16 +6,17 @@ import android.appwidget.AppWidgetProvider
 import android.content.Context
 import android.content.Intent
 import android.widget.RemoteViews
-import cn.vove7.common.app.GlobalApp
-
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.activities.base.VoiceAssistActivity
 
 /**
- * 唤醒桌面快捷方式
+ * # SwitchVoiceWakeupWidget
+ *
+ * @author Administrator
+ * 2018/12/17
  */
 @Deprecated("使用CreateShortcutActivity")
-class QuickWakeupWidget : AppWidgetProvider() {
+class SwitchVoiceWakeupWidget : AppWidgetProvider() {
 
     override fun onUpdate(context: Context, appWidgetManager: AppWidgetManager, appWidgetIds: IntArray) {
         // There may be multiple widgets active, so update all of them
@@ -30,11 +31,12 @@ class QuickWakeupWidget : AppWidgetProvider() {
                                      appWidgetId: Int) {
             val views = RemoteViews(context.packageName, R.layout.quick_widget)
 
-            views.setTextViewText(R.id.appwidget_text,GlobalApp.getString(R.string.shortcut_wakeup))
-            views.setOnClickPendingIntent(R.id.widget_layout, PendingIntent.getActivity(context, 0,
-                    Intent(context, VoiceAssistActivity::class.java).also { it.action = Intent.ACTION_VOICE_COMMAND }, 0))
+            views.setTextViewText(R.id.appwidget_text, "语音唤醒")
+            views.setOnClickPendingIntent(R.id.widget_layout,
+                    PendingIntent.getActivity(context, 0,
+                            Intent(context, VoiceAssistActivity::class.java)
+                                    .also { it.action = Intent.ACTION_VOICE_COMMAND }, 0))
             appWidgetManager.updateAppWidget(appWidgetId, views)
         }
     }
 }
-

@@ -85,12 +85,14 @@ abstract class CustomizableDialog(
         dialog.dismiss()
     }
 
+    @SuppressLint("CheckResult")
     fun show() {
         runOnUi {
             try {
                 dialog.customView(view = initView(), scrollable = true)
                 dialog.show()
-            } catch (e: Exception) {
+            } catch (e: Throwable) {
+                GlobalLog.err(e.message, "csd94")
             }
         }
     }

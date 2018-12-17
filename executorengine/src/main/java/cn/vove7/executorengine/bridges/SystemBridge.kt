@@ -202,6 +202,7 @@ object SystemBridge : SystemOperation {
             }
         }
         return try {
+            callIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             context.startActivity(callIntent)
             true
         } catch (e: SecurityException) {
@@ -891,6 +892,18 @@ object SystemBridge : SystemOperation {
         }
     }
 
+    override fun createCalendarEvent(title: String, content: String?, beginTime: Long,
+                                     endTime: Long?, earlyAlarmMinute: Long?) {
+        try {
+            val account = CalendarAccount("V Assistant", "V Assistant", autoCreateContext = context)
+            val cal = CalendarHelper(context, account)
+            val end = endTime ?: (beginTime + 1000 * 60 * 10)//十分钟
+            cal.addCalendarEvent(title, content ?: "", beginTime, end, earlyAlarmMinute)
+        } catch (e: SecurityException) {
+            GlobalLog.err(e)
+            AppBus.post(RequestPermission("读写日历权限"))
+        }
+    }
     override fun createCalendarEvent(title: String, content: String?, beginTime: Long,
                                      endTime: Long?, isAlarm: Boolean) {
         try {

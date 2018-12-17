@@ -3,6 +3,8 @@ package cn.vove7.jarvis
 import cn.vove7.common.datamanager.parse.model.Action
 import cn.vove7.common.utils.TextDateParser
 import cn.vove7.common.utils.TextHelper
+import cn.vove7.common.utils.whileWaitCount
+import cn.vove7.common.utils.whileWaitTime
 import cn.vove7.jarvis.chat.TulingChatSystem
 import cn.vove7.jarvis.tools.baiduaip.BaiduAipHelper
 import org.jsoup.Jsoup
@@ -127,13 +129,36 @@ class ExampleUnitTest {
                 "一小时后", "一个半小时后", "半小时后", "两个半小时后", "45分钟后", "三十二分钟后",
                 "两个小时后", "两小时后", "二十小时后",
                 "八天后", "你好",
-                "明晚9点","明天这个时候","下个月2号这个时间"
+                "明晚9点", "明天这个时候", "下个月2号这个时间"
         ).forEach {
             //parse
             val ss = TextDateParser.parseDateText(it)?.time?.let { d ->
                 s.format(d)
             } ?: "解析失败"
             println("$ss   $it")
+        }
+    }
+
+    @Test
+    fun testParseDate2() {
+        val rs = arrayOf(
+                "%提前#分钟%"
+                , "%提前#小时%"
+                , "%提前#天%"
+        )
+        arrayOf("提前2分钟", "提前10分钟", "提前半小时", "提前一小时").forEach {
+            rs.forEach f@{ r ->
+                TextHelper.matchValues(it, r).also { re ->
+                    if (re != null) {
+                        println(it + " ${TextDateParser.toNum(re[1])}")
+                        return@f
+                    }
+                }
+            }
+            TextHelper.matchValues(it, "%提前半小时%").also { re ->
+                if (re != null)
+                    println(30)
+            }
         }
     }
 
@@ -222,7 +247,7 @@ class ExampleUnitTest {
 
     @Test
     fun testInterrupt() {
-        val t= thread {
+        val t = thread {
             while (Thread.currentThread().isInterrupted.not()) {
                 println(1)
             }
@@ -232,5 +257,27 @@ class ExampleUnitTest {
         t.interrupt()
         sleep(2000)
         println("end")
+    }
+
+    @Test
+    fun testWhileWait() {
+        var i = 0
+        whileWaitTime(10000) {
+            println(i++)
+            return@whileWaitTime if (i > 50) Unit else null
+        }
+
+        whileWaitTime(100) {
+            println(i++)
+            sleep(5)
+            return@whileWaitTime null
+        }
+        whileWaitCount(5) {
+            println("whileWaitCount")
+            return@whileWaitCount null //不反回结果
+        }
+
+        println("end")
+
     }
 }
