@@ -57,7 +57,7 @@ abstract class ViewFinder(var accessibilityService: AccessibilityApi) {
     fun findFirst(includeInvisible: Boolean = false): ViewNode? {
         //不可见
         val r = traverseAllNode(rootNode, includeInvisible = includeInvisible)
-        Vog.i(this, "findFirst ${r != null}")
+        Vog.v(this, "findFirst ${r != null}")
         return r
     }
 
@@ -99,7 +99,7 @@ abstract class ViewFinder(var accessibilityService: AccessibilityApi) {
             val childNode = node.getChild(index)
             if (childNode != null) {
                 if (!includeInvisible && !childNode.isVisibleToUser) {
-                    Vog.d(this, "unVisibleToUser ---> ${childNode.text}")
+                    Vog.v(this, "unVisibleToUser ---> ${childNode.text}")
                     return@forEach
                 }
                 if (findCondition(childNode)) {

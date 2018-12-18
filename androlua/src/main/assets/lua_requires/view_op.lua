@@ -10,7 +10,7 @@ local ViewFindBuilder = luajava.bindClass('cn.vove7.common.view.finder.ViewFindB
 --视图节点查找器
  ]]
 function ViewFinder()
-    return ViewFindBuilder(executor)
+    return ViewFindBuilder()
 end
 
 
@@ -18,7 +18,7 @@ import 'cn.vove7.common.accessibility.AccessibilityApi'
 function rootView()
     local s = AccessibilityApi.Companion.getAccessibilityService()
     if (s) then
-        return s.getRootInWindow()
+        return s.getRootViewNode()
     else return nil
     end
 end

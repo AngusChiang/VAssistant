@@ -21,7 +21,7 @@ object GlobalActionExecutor : GlobalActionExecutorI {
 //    var screenAdapter = ScreenAdapter()
 
     private val mService: AccessibilityService?
-        get() = AccessibilityApi.grstureService
+        get() = AccessibilityApi.gestureService
 
     override fun back(): Boolean {
         return performGlobalAction(AccessibilityService.GLOBAL_ACTION_BACK)

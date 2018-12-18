@@ -20,6 +20,7 @@ import cn.vove7.jarvis.adapters.IconTitleEntity
 import cn.vove7.jarvis.adapters.IconTitleListAdapter
 import cn.vove7.jarvis.tools.ItemWrap
 import cn.vove7.jarvis.tools.Tutorials
+import cn.vove7.jarvis.view.dialog.MarkDownDialog
 import cn.vove7.jarvis.view.dialog.ProgressTextDialog
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.customview.customView
@@ -84,12 +85,9 @@ class HelpActivity : ReturnableActivity(), AdapterView.OnItemClickListener {
                 }
             }
             2 -> {
-                ProgressTextDialog(this, "常见问题",autoLink = true).apply {
-                    faqs.forEach {
-                        appendlnBold("· " + it.first)
-                        appendln(it.second)
-                        appendln()
-                    }
+                MarkDownDialog(this,"常见问题").apply {
+                    loadFromAsset("files/faqs.md")
+                    show()
                 }
             }
             3 -> SystemBridge.openUrl(ApiUrls.QQ_GROUP_1)

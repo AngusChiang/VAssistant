@@ -94,7 +94,7 @@ object BaiduAipHelper {
         return try {
             GsonHelper.fromJson<TranslateResult>(jData)
         } catch (e: Exception) {
-            GlobalLog.err(e)
+            GlobalLog.err(e.message,"bah97")
             null
         }
     }

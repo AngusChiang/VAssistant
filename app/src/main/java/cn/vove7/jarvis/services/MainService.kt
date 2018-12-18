@@ -105,7 +105,7 @@ class MainService : BusService(),
     /**
      * 信使Action
      */
-    var messengerAction: Action? = null
+//    var messengerAction: Action? = null
     /**
      * 执行器
      */
@@ -326,8 +326,9 @@ class MainService : BusService(),
     /**
      * 多选回调
      */
+    //未使用 todo 结果回调
     override fun onMultiSelect(data: List<ChoiceData>?, msg: String) {
-        messengerAction?.responseResult = data != null
+//        messengerAction?.responseResult = data != null
         Vog.d(this, "多选回调 $data")
 //        messengerAction?.responseBundle?.putSerializable("data", data)
         hideDialog()
@@ -777,7 +778,7 @@ class MainService : BusService(),
         }
 
         private fun speakResponseWord(lock: CountDownLatch? = null) {
-            musicLock = false//不继续播放后台，
+            resumeMusicLock = false //不继续播放后台，
             Vog.d(this, "speakResponseWord 响应词 ---> ${AppConfig.responseWord}")
             val l = lock ?: CountDownLatch(1)
             speakWithCallback(AppConfig.responseWord, false, object : SpeakCallback {
@@ -828,8 +829,7 @@ class MainService : BusService(),
             speechSynService?.stopIfSpeaking()
             AppBus.post(AppBus.EVENT_BEGIN_RECO)
             Vog.d(this, "onStartRecog ---> 开始识别")
-            if (musicLock)//唤醒时检查过
-                checkMusic()//检查后台播放
+            checkMusic()//检查后台播放
             listeningAni.begin()//
             recogEffect(byVoice)
             listeningToast.show("开始聆听")
@@ -907,7 +907,7 @@ class MainService : BusService(),
 
         override fun onCancelRecog() {
             Vog.d(this, "onCancelRecog ---> ")
-            musicLock = true
+            resumeMusicLock = true
             afterSpeakResumeListen = false
             resumeMusicIf()
             hideAll(true)
@@ -1000,11 +1000,12 @@ class MainService : BusService(),
                 parseAnimation.begin()
                 listeningToast.showParseAni()
                 runOnCachePool {
-                    musicLock = true
+                    resumeMusicLock = true
                     val data = chatSystem.chatWithText(result)
                     if (data == null) {
                         listeningToast.showAndHideDelay("获取失败")
                         parseAnimation.failedAndHideDelay()
+                        resumeMusicIf()
                     } else {
                         listeningToast.show(if (data.contains("="))
                             data.replace("=", "\n=") else data)
@@ -1067,7 +1068,7 @@ class MainService : BusService(),
         override fun onFinish() {
             Vog.d(this, "onSynData 结束")
             notifySpeakFinish()
-            if (musicLock) {//
+            if (resumeMusicLock) {//
                 resumeMusicIf()
             }
         }
@@ -1078,8 +1079,7 @@ class MainService : BusService(),
 
         override fun onStart() {
             Vog.d(this, "onSynData 开始")
-            if (musicLock)//不再检查 播放响应词
-                checkMusic()
+            checkMusic()
         }
     }
 
@@ -1106,13 +1106,21 @@ class MainService : BusService(),
      * 连续 加上 speak 会误判
      */
     fun checkMusic() {
-        SystemBridge.getMusicFocus()
+        if (!isMusicFocus) {
+            SystemBridge.getMusicFocus()
+            isMusicFocus = true
+        }
     }
 
-    var musicLock = true//是否获得音频焦点 | 在说完响应词后，不改变
+    private var isMusicFocus = false
+
+    var resumeMusicLock = true//在获取后音频焦点后 是否 释放（speak后）
 
     fun resumeMusicIf() {
-        SystemBridge.removeMusicFocus()
+        if (isMusicFocus) {
+            SystemBridge.removeMusicFocus()
+            isMusicFocus = false
+        }
     }
 
 }

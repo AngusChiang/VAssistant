@@ -78,20 +78,17 @@ abstract class AccessibilityApi : AccessibilityService() {
         }
     }
 
-    override fun onDestroy() {
-        accessibilityService = null
-        super.onDestroy()
-    }
-
     var currentAppInfo: AppInfo? = null
         protected set
 
     companion object {
+        //无障碍基础服务
         var accessibilityService: AccessibilityApi? = null
-        var grstureService: AccessibilityApi? = null
-        fun isOpen(): Boolean {
-            return accessibilityService != null
-        }
+        //无障碍高级服务 执行手势等操作 fixme 开启后部分机型掉帧
+        var gestureService: AccessibilityApi? = null
+        val isBaseServiceOn: Boolean get() = accessibilityService != null
+        val isAdvanServiceOn: Boolean get() = gestureService != null
+
 
         /**
          * 执行开启无障碍,需要系统App权限

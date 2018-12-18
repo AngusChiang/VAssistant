@@ -51,7 +51,7 @@ class ScreenPickerActivity : Activity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        if (!AccessibilityApi.isOpen()) {
+        if (!AccessibilityApi.isBaseServiceOn) {
             toast.showLong("无障碍未开启，无法获取屏幕内容")
             finish()
             return
@@ -87,7 +87,10 @@ class ScreenPickerActivity : Activity() {
         }
     }
 
-    val unSupportPage = hashSetOf(
+    /**
+     * 不支持的页面
+     */
+    private val unSupportPage = hashSetOf(
             ActionScope("com.tencent.mtt", "com.tencent.mtt.MainActivity")
     )
 
@@ -181,7 +184,7 @@ class ScreenPickerActivity : Activity() {
     }
 
     override fun onKeyUp(keyCode: Int, event: KeyEvent?): Boolean {
-        if (keyCode == KeyEvent.KEYCODE_VOLUME_DOWN)
+        if (!hasT && keyCode == KeyEvent.KEYCODE_VOLUME_DOWN)
             return true
         return super.onKeyUp(keyCode, event)
     }

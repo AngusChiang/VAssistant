@@ -14,6 +14,7 @@ import android.view.ViewGroup
 import android.view.accessibility.AccessibilityManager
 import android.widget.Switch
 import android.widget.TextView
+import cn.vove7.common.accessibility.AccessibilityApi
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.executorengine.bridges.SystemBridge
 import cn.vove7.jarvis.R
@@ -185,13 +186,17 @@ class PermissionManagerActivity : OneFragmentActivity() {
             )
         }
 
-        fun refreshStatus() {
+        private fun refreshStatus() {
             val context = GlobalApp.APP
             permissions.forEach {
                 it.isOpen = when {
                     it.permissionName == "悬浮窗" -> Build.VERSION.SDK_INT < Build.VERSION_CODES.M || PermissionUtils.canDrawOverlays(context)
-                    it.permissionString[0] == "ACCESSIBILITY_SERVICE" -> PermissionUtils.accessibilityServiceEnabled(context,MyAccessibilityService::class.java as Class<AccessibilityService>)
-                    it.permissionString[0] == "ACCESSIBILITY_SERVICE2" -> PermissionUtils.accessibilityServiceEnabled(context,GestureService::class.java as Class<AccessibilityService>)
+                    it.permissionString[0] == "ACCESSIBILITY_SERVICE" ->
+                        AccessibilityApi.isBaseServiceOn
+//                        PermissionUtils.accessibilityServiceEnabled(context,MyAccessibilityService::class.java as Class<AccessibilityService>)
+                    it.permissionString[0] == "ACCESSIBILITY_SERVICE2" ->
+                        AccessibilityApi.isAdvanServiceOn
+//                    PermissionUtils.accessibilityServiceEnabled(context,GestureService::class.java as Class<AccessibilityService>)
                     else -> PermissionUtils.isAllGranted(context, it.permissionString)
                 }
             }

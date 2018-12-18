@@ -101,6 +101,8 @@ object AppConfig {
 
     var FIRST_LAUNCH_NEW_VERSION = false //新版本第一次启动
 
+    var smartKillAd = false // 跳过自动识别未标记的广告
+
     val streamTypeArray = arrayOf(
             AudioManager.STREAM_MUSIC
             , AudioManager.STREAM_RING
@@ -265,8 +267,10 @@ object AppConfig {
         disableAccessibilityOnLowBattery = getBooleanAndInit(R.string.key_accessibility_service_power_saving_mode, true)
         wakeUpWithHeadsetHook = getBooleanAndInit(R.string.key_wakeup_with_headsethook, wakeUpWithHeadsetHook)
         voiceRecogFeedback = getBooleanAndInit(R.string.key_voice_recog_feedback, voiceRecogFeedback)
-        lastingVoiceCommand = getBooleanAndInit(R.string.key_lasting_voice_command, false)
+        lastingVoiceCommand = getBooleanAndInit(R.string.key_lasting_voice_command, lastingVoiceCommand)
         autoCheckPluginUpdate = getBooleanAndInit(R.string.key_auto_check_plugin_update, autoCheckPluginUpdate)
+        smartKillAd = getBooleanAndInit(R.string.key_smart_find_and_kill_ad, smartKillAd)
+
         sp.getInt(R.string.key_lasting_voice_millis).also {
             lastingVoiceMillis = if (it < 0) lastingVoiceMillis else it
         }

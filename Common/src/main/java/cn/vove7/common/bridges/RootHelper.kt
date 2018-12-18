@@ -97,7 +97,7 @@ object RootHelper {
             }
 
         } catch (e: Exception) {
-            GlobalLog.err(e, "rs100")
+            GlobalLog.err(e.message, "rs100")
             return e.message
         }
 

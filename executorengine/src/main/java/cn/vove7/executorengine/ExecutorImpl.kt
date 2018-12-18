@@ -464,17 +464,17 @@ open class ExecutorImpl(
 
     override fun waitForViewId(id: String, m: Long): ViewNode? {
         Vog.d(this, "waitForViewId $id $m")
-        return ViewFindBuilder(this).id(id).waitFor(m)
+        return ViewFindBuilder().id(id).waitFor(m)
     }
 
     override fun waitForDesc(desc: String, m: Long): ViewNode? {
         Vog.d(this, "waitForDesc $desc")
-        return ViewFindBuilder(this).desc(desc).waitFor(m)
+        return ViewFindBuilder().desc(desc).waitFor(m)
     }
 
     override fun waitForText(text: String, m: Long): ViewNode? {
         Vog.d(this, "waitForText $text")
-        return ViewFindBuilder(this).containsText(text).waitFor(m)
+        return ViewFindBuilder().containsText(text).waitFor(m)
 //        waitForUnlock(m)
 //         getViewNode()
     }
@@ -484,7 +484,7 @@ open class ExecutorImpl(
         if (!checkAccessibilityService()) {
             return null
         }
-        return ViewFindBuilder(this).containsText(*text).waitFor(m)
+        return ViewFindBuilder().containsText(*text).waitFor(m)
     }
 
     /**

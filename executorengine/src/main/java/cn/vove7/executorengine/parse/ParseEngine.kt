@@ -118,7 +118,7 @@ object ParseEngine {
                             , Action.SCRIPT_TYPE_LUA))
                 }
             } else if (SpHelper(GlobalApp.APP).getBoolean("use_smartopen_if_parse_failed",
-                            true) && AccessibilityApi.isOpen()) {//失败,默认点击
+                            true) && AccessibilityApi.isBaseServiceOn) {//失败,默认点击
                 if (ViewFindBuilder().similaryText(cmdWord).tryClick())
                     return ParseResult(true, PriorityQueue(), "smart点击 $cmdWord")
             }

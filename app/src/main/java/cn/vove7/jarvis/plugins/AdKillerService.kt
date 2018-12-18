@@ -40,7 +40,7 @@ object AdKillerService : AbsAccPluginService() {
 
     override fun onBind() {
         runOnPool {
-            if (!AccessibilityApi.isOpen()) return@runOnPool
+            if (!AccessibilityApi.isBaseServiceOn) return@runOnPool
             finderCaches.clear()
             val appAdInfoDao = DAO.daoSession.appAdInfoDao
             val appAdInfos = appAdInfoDao.loadAll()
@@ -56,11 +56,11 @@ object AdKillerService : AbsAccPluginService() {
         }
     }
 
-    private fun onAdShow(node:ViewNode) {
+    private fun onSkipAd(node: ViewNode) {
         node.tryClick().also { clickResult ->
             Vog.i(this, "Ad click ---> $clickResult")
             if (clickResult) {
-                Vog.d(this, "startFind ---> 发现广告，清除成功")
+                Vog.d(this, "onSkipAd ---> 发现广告，清除成功")
                 AppConfig.plusAdKillCount()//+1
 
                 if (AppConfig.isToastWhenRemoveAd) {
@@ -68,24 +68,28 @@ object AdKillerService : AbsAccPluginService() {
                     removeAdAnimation.hideDelay(3500)
                 }
             } else
-                Vog.d(this, "startFind ---> 发现广告，清除失败")
+                Vog.d(this, "onSkipAd ---> 发现广告，清除失败")
         }
     }
 
     //搜索线程
     private val sthreads = mutableSetOf<Thread>()
+
+    /**
+     * 使用标记数据查找
+     */
     private fun startFind() {
-            finders?.forEach {
-                thread {
-                    it.waitFor((AppConfig.adWaitSecs * 1000).toLong())?.also { node ->
-                        Vog.i(this, " ${Thread.currentThread()} 发现广告 ---> ${appInfo?.name}  $it")
-                       onAdShow(node)
-                    }
-                }.also { t ->
-                    Vog.d(this,"搜索线程 ---> $t")
-                    sthreads.add(t)
+        finders?.forEach {
+            thread {
+                it.waitFor((AppConfig.adWaitSecs * 1000).toLong())?.also { node ->
+                    Vog.i(this, " ${Thread.currentThread()} 发现广告 ---> ${appInfo?.name}  $it")
+                    onSkipAd(node)
                 }
+            }.also { t ->
+                Vog.d(this, "搜索线程 ---> $t")
+                sthreads.add(t)
             }
+        }
     }
 
     /**
@@ -109,7 +113,6 @@ object AdKillerService : AbsAccPluginService() {
     override fun onAppChanged(appScope: ActionScope) {
         if (!AppConfig.haveAdKillSurplus()) //用户去广告权限
             return
-
         appInfo = AdvanAppHelper.getAppInfo(appScope.packageName)
 
 //        finders = if (finderCaches.containsKey(appScope)) {
@@ -128,16 +131,46 @@ object AdKillerService : AbsAccPluginService() {
         if (finders?.isNotEmpty() == true)
             startFind()
         else {//停止未结束的搜索
-            synchronized(sthreads) {
-                try {
-                    sthreads.forEach {
-                        Vog.d(this,"onAppChanged ---> 关闭搜索 $it")
-                        it.interrupt()
-                    }
-                } catch (e: Exception) {
+            stopSearchThreads()
+            //smart skip ad
+            if (AppConfig.smartKillAd && lastPkg != appScope.packageName)//切换页面
+                smartSkipAppSwitchAd()
+        }
+        lastPkg = appScope.packageName
+    }
+
+    //智能识别广告 页面缓存
+//    val appAdCache by lazy { mutableListOf<ActionScope>() } //??
+
+    /**
+     * 当App切换时搜索 包含‘跳过’,‘skip’ 点击
+     * 页面广告标记缓存? 一个页面5次未出现广告，标记无广告，出现过，必搜索。
+     */
+    @Synchronized
+    private fun smartSkipAppSwitchAd() {
+        Vog.i(this, "smartSkipAppSwitchAd ---> 寻找App切换广告")
+        sthreads.add(thread {
+            //寻找1.5s 频繁切换 耗电量?
+            ViewFindBuilder().containsText("跳过", "skip").waitFor(1500)?.also {
+                onSkipAd(it)
+            } ?: Vog.i(this, "smartSkipAppSwitchAd ---> 未发现广告")
+        })
+    }
+
+    /**
+     * 关闭搜索线程
+     */
+    @Synchronized
+    private fun stopSearchThreads() {
+        synchronized(sthreads) {
+            try {
+                sthreads.forEach {
+                    Vog.d(this, "onAppChanged ---> 关闭搜索 $it")
+                    it.interrupt()
                 }
-                sthreads.clear()
+            } catch (e: Exception) {
             }
+            sthreads.clear()
         }
     }
 

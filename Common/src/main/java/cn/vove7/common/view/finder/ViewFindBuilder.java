@@ -31,7 +31,6 @@ public class ViewFindBuilder extends FindBuilder {
     }
 
     private AccessibilityApi accessibilityService;
-    private CExecutorI executor;
 
     /**
      * wait使用
@@ -40,7 +39,6 @@ public class ViewFindBuilder extends FindBuilder {
      */
     public ViewFindBuilder(CExecutorI executor) {
         this();
-        this.executor = executor;
     }
 
     public ViewFindBuilder() {
@@ -65,10 +63,6 @@ public class ViewFindBuilder extends FindBuilder {
      * @return ViewNode which is returned until show in screen
      */
     public ViewNode waitFor(Long m) {
-        if (executor == null) {
-            Vog.INSTANCE.d(this, "执行器 null");
-            return null;
-        }
         if (viewFinderX != null) {
             return viewFinderX.waitFor(m);
         } else {

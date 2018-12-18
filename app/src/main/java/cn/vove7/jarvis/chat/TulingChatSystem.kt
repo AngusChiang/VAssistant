@@ -3,9 +3,8 @@ package cn.vove7.jarvis.chat
 import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.bridges.HttpBridge
 import cn.vove7.common.model.UserInfo
+import cn.vove7.common.utils.GsonHelper
 import com.google.gson.Gson
-import com.google.gson.reflect.TypeToken
-import java.lang.reflect.Type
 
 /**
  * # TulingChatSystem
@@ -15,25 +14,21 @@ import java.lang.reflect.Type
  */
 class TulingChatSystem : ChatSystem {
 
-    private val ResponseDataType: Type by lazy {
-        object : TypeToken<ResponseData>() {}.type
-    }
-
     override fun chatWithText(s: String): String? {
         val data = RequestData.withText(s)
         val res = HttpBridge.postJson(url, Gson().toJson(data))
         if (res != null) {
             try {
-                val obj = Gson().fromJson<ResponseData>(res, ResponseDataType)
-                if (!obj.parseError())
+                val obj = GsonHelper.fromJson<ResponseData>(res)
+                if (obj?.parseError() == false)
                     return null
-                if (obj.results?.isNotEmpty() == true) {
+                if (obj?.results?.isNotEmpty() == true) {
                     return obj.results!![0].values?.text
                 }
                 return null
             } catch (e: Exception) {
                 e.printStackTrace()
-//                GlobalLog.err(e)
+                GlobalLog.err(e.message)
                 return null
             }
 

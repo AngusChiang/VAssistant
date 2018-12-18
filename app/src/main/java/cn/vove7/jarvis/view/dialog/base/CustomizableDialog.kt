@@ -101,10 +101,12 @@ abstract class CustomizableDialog(
     fun finish(posText: String? = null, onClick: (() -> Unit)? = null) {
         onFinish()
         try {
-            dialog.positiveButton(text = posText) {
-                onClick?.invoke()
-                it.dismiss()
-            }.show()
+            runOnUi {
+                dialog.positiveButton(text = posText) {
+                    onClick?.invoke()
+                    it.dismiss()
+                }.show()
+            }
         } catch (e: Exception) {
             GlobalLog.err(e, "cd107")
             e.printStackTrace()

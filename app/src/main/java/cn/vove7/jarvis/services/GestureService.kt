@@ -16,12 +16,12 @@ class GestureService : AccessibilityApi() {
     }
 
     override fun onCreate() {
-        grstureService = this
+        gestureService = this
         super.onCreate()
     }
 
     override fun onDestroy() {
-        grstureService = null
+        gestureService = null
         super.onDestroy()
     }
 
