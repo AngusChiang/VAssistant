@@ -30,7 +30,7 @@ import cn.vove7.jarvis.view.statusbar.StatusAnimation
 import cn.vove7.vtp.log.Vog
 
 /**
- * 基于
+ * 无障碍基础服务
  * Created by Vove on 2018/1/13.
  * cn.vove7
  */

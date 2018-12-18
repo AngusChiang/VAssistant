@@ -166,7 +166,7 @@
 
         <service
             android:name=".services.MyAccessibilityService"
-            android:label="V Assist基础服务"
+            android:label="@string/base_acc_service_label"
             android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE">
             <intent-filter>
                 <action android:name="android.accessibilityservice.AccessibilityService" />
@@ -180,7 +180,7 @@
         <service
             android:name=".services.GestureService"
             android:description="@string/desc_gesc_accessibility"
-            android:label="V Assist高级服务（7.0+可用）"
+            android:label="@string/gesture_acc_service_label"
             android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE">
             <intent-filter>
                 <action android:name="android.accessibilityservice.AccessibilityService" />

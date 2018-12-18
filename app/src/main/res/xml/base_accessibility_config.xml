@@ -6,5 +6,6 @@
     android:canRetrieveWindowContent="true"
     android:description="@string/desc_accessibility"
     android:notificationTimeout="0"
+    android:canRequestFilterKeyEvents="true"
     android:settingsActivity="cn.vove7.jarvis.activities.SettingsActivity" />
     <!--android:canRequestTouchExplorationMode="true"-->
