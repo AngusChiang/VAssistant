@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<accessibility-service xmlns:android="http://schemas.android.com/apk/res/android"
+    android:accessibilityEventTypes="typeWindowStateChanged"
+    android:accessibilityFeedbackType="feedbackGeneric"
+    android:accessibilityFlags=""
+    android:canPerformGestures="true"
+    android:canRetrieveWindowContent="false"
+    android:description="@string/desc_gesc_accessibility"
+    android:notificationTimeout="0"
+    android:packageNames=""
+    android:settingsActivity="cn.vove7.jarvis.activities.SettingsActivity"
+    android:summary="@string/desc_gesc_accessibility" />
+

@@ -42,7 +42,8 @@ abstract class ViewFinder(var accessibilityService: AccessibilityApi) {
                 return node
             } else {
                 sc++
-                Vog.d(this, "waitFor ---> 搜索次数 $sc 打断: ${ct.isInterrupted}")
+                if (sc % 100 == 0)
+                    Vog.d(this, "waitFor ---> 搜索次数 $sc 打断: ${ct.isInterrupted}")
             }
         }
         Vog.d(this, "waitFor ---> 搜索超时 or 中断")

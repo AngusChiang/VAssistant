@@ -33,20 +33,23 @@ abstract class AccessibilityApi : AccessibilityService() {
             return try {
                 rootInActiveWindow //will occur exception
             } catch (e: Exception) {
+                e.printStackTrace()
                 null
             }
         }
+
+    val rootViewNode: ViewNode?
+        get() =
+            rootInWindow.let {
+                if (it == null) null
+                else ViewNode(it)
+            }
 //
 //    override fun getRootViewNode(): ViewNode? {
 //        val root = rootInWindow
 //        return if (root == null) null
 //        else ViewNode(root)
 //    }
-
-    override fun onCreate() {
-        accessibilityService = this
-        super.onCreate()
-    }
 
     val currentFocusedEditor: ViewNode?
         get() = findFocus(FOCUS_INPUT).let {
@@ -85,6 +88,7 @@ abstract class AccessibilityApi : AccessibilityService() {
 
     companion object {
         var accessibilityService: AccessibilityApi? = null
+        var grstureService: AccessibilityApi? = null
         fun isOpen(): Boolean {
             return accessibilityService != null
         }

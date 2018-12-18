@@ -7,6 +7,7 @@ import cn.vove7.jarvis.R
 import cn.vove7.jarvis.activities.base.VoiceAssistActivity.Companion.SWITCH_VOICE_WAKEUP
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.callbacks.onDismiss
+import com.afollestad.materialdialogs.list.listItems
 import com.afollestad.materialdialogs.list.listItemsSingleChoice
 
 /**
@@ -20,14 +21,13 @@ class CreateShortcutActivity : Activity() {
     val dialog: MaterialDialog by lazy {
         MaterialDialog(this)
                 .title(text = "选择快捷方式")
-                .listItemsSingleChoice(items = listOf("快速唤醒", "切换语音唤醒"),
-                        waitForPositiveButton = true) { d, i, _ ->
+                .listItems(items = listOf("快速唤醒", "切换语音唤醒"), waitForPositiveButton = false) { d, i, _ ->
                     when (i) {
                         0 -> createWakeupShortcut()
                         1 -> createSwitchVoiceWakeupShortcut()
                     }
+                    d.dismiss()
                 }
-                .positiveButton()
                 .negativeButton()
                 .onDismiss {
                     finishAndRemoveTask()

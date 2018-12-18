@@ -14,7 +14,6 @@ import cn.vove7.common.model.ResultBox
 import cn.vove7.common.utils.ScreenAdapter
 import cn.vove7.vtp.log.Vog
 
-
 /**
  * 无障碍全局执行器
  */
@@ -22,7 +21,7 @@ object GlobalActionExecutor : GlobalActionExecutorI {
 //    var screenAdapter = ScreenAdapter()
 
     private val mService: AccessibilityService?
-        get() = AccessibilityApi.accessibilityService
+        get() = AccessibilityApi.grstureService
 
     override fun back(): Boolean {
         return performGlobalAction(AccessibilityService.GLOBAL_ACTION_BACK)
@@ -193,7 +192,7 @@ object GlobalActionExecutor : GlobalActionExecutorI {
             return false
         }
         val result = ResultBox(false)
-        mService!!.dispatchGesture(description, object : AccessibilityService.GestureResultCallback() {
+        mService?.dispatchGesture(description, object : AccessibilityService.GestureResultCallback() {
             override fun onCompleted(gestureDescription: GestureDescription) {
                 result.setAndNotify(true)
             }
@@ -201,7 +200,14 @@ object GlobalActionExecutor : GlobalActionExecutorI {
             override fun onCancelled(gestureDescription: GestureDescription) {
                 result.setAndNotify(false)
             }
-        }, null)
+        }, null).also {
+            Vog.d(this, "gesturesWithoutHandler ---> 手势执行$it")
+
+            if (it == false) {
+                Vog.d(this, "gesturesWithoutHandler ---> 手势执行失败 ")
+                return false
+            }
+        }
         return result.blockedGet() ?: false
     }
 

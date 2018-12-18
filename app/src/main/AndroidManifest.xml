@@ -72,22 +72,22 @@
         android:theme="@style/NoActionBar"
         tools:ignore="GoogleAppIndexingWarning">
         <!--<receiver android:name=".widget.QuickWakeupWidget">-->
-            <!--<intent-filter>-->
-                <!--<action android:name="android.appwidget.action.APPWIDGET_UPDATE" />-->
-            <!--</intent-filter>-->
+        <!--<intent-filter>-->
+        <!--<action android:name="android.appwidget.action.APPWIDGET_UPDATE" />-->
+        <!--</intent-filter>-->
 
-            <!--<meta-data-->
-                <!--android:name="android.appwidget.provider"-->
-                <!--android:resource="@xml/quick_wakeup_widget_info" />-->
+        <!--<meta-data-->
+        <!--android:name="android.appwidget.provider"-->
+        <!--android:resource="@xml/quick_wakeup_widget_info" />-->
         <!--</receiver>-->
         <!--<receiver android:name=".widget.SwitchVoiceWakeupWidget">-->
-            <!--<intent-filter>-->
-                <!--<action android:name="android.appwidget.action.APPWIDGET_UPDATE" />-->
-            <!--</intent-filter>-->
+        <!--<intent-filter>-->
+        <!--<action android:name="android.appwidget.action.APPWIDGET_UPDATE" />-->
+        <!--</intent-filter>-->
 
-            <!--<meta-data-->
-                <!--android:name="android.appwidget.provider"-->
-                <!--android:resource="@xml/quick_wakeup_widget_info" />-->
+        <!--<meta-data-->
+        <!--android:name="android.appwidget.provider"-->
+        <!--android:resource="@xml/quick_wakeup_widget_info" />-->
         <!--</receiver>-->
 
         <meta-data
@@ -111,9 +111,9 @@
         </provider>
 
         <!--<provider-->
-            <!--android:name="com.argusapm.android.core.storage.ApmProvider"-->
-            <!--android:authorities="${applicationId}.apm.storage"-->
-            <!--android:exported="false" />-->
+        <!--android:name="com.argusapm.android.core.storage.ApmProvider"-->
+        <!--android:authorities="${applicationId}.apm.storage"-->
+        <!--android:exported="false" />-->
 
         <activity android:name=".activities.VoiceTestActivity" />
         <activity
@@ -166,6 +166,7 @@
 
         <service
             android:name=".services.MyAccessibilityService"
+            android:label="V Assist基础服务"
             android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE">
             <intent-filter>
                 <action android:name="android.accessibilityservice.AccessibilityService" />
@@ -173,8 +174,23 @@
 
             <meta-data
                 android:name="android.accessibilityservice"
-                android:resource="@xml/accessibility_config" />
+                android:resource="@xml/base_accessibility_config" />
         </service>
+
+        <service
+            android:name=".services.GestureService"
+            android:description="@string/desc_gesc_accessibility"
+            android:label="V Assist高级服务（7.0+可用）"
+            android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE">
+            <intent-filter>
+                <action android:name="android.accessibilityservice.AccessibilityService" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.accessibilityservice"
+                android:resource="@xml/gesture_accessibility_config" />
+        </service>
+
         <service
             android:name="com.baidu.speech.VoiceRecognitionService"
             android:exported="false" />

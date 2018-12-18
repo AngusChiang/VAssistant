@@ -1,13 +1,17 @@
 package cn.vove7.jarvis.activities
 
+import android.accessibilityservice.AccessibilityService
+import android.accessibilityservice.AccessibilityServiceInfo
 import android.app.Activity
 import android.content.ActivityNotFoundException
+import android.content.Context
 import android.os.Build
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v7.app.AppCompatActivity
 import android.view.View
 import android.view.ViewGroup
+import android.view.accessibility.AccessibilityManager
 import android.widget.Switch
 import android.widget.TextView
 import cn.vove7.common.app.GlobalApp
@@ -17,6 +21,9 @@ import cn.vove7.jarvis.activities.PermissionManagerActivity.PermissionStatus.Com
 import cn.vove7.jarvis.activities.base.OneFragmentActivity
 import cn.vove7.jarvis.adapters.RecAdapterWithFooter
 import cn.vove7.jarvis.fragments.VListFragment
+import cn.vove7.jarvis.services.GestureService
+import cn.vove7.jarvis.services.MyAccessibilityService
+import cn.vove7.vtp.log.Vog
 import cn.vove7.vtp.runtimepermission.PermissionUtils
 
 /**
@@ -73,8 +80,8 @@ class PermissionManagerActivity : OneFragmentActivity() {
             adapter.hideFooterView()
         }
 
-        private fun buildAdapter(): RecAdapterWithFooter<Holder,PermissionStatus> {
-            return object : RecAdapterWithFooter<Holder,PermissionStatus>() {
+        private fun buildAdapter(): RecAdapterWithFooter<Holder, PermissionStatus> {
+            return object : RecAdapterWithFooter<Holder, PermissionStatus>() {
 
                 override fun itemCount(): Int = permissions.size
 
@@ -125,7 +132,7 @@ class PermissionManagerActivity : OneFragmentActivity() {
                                             }
                                         }
                                     }
-                                item.permissionName == "无障碍" -> {
+                                item.permissionString[0].startsWith("ACCESSIBILITY_SERVICE") -> {
                                     try {
                                         PermissionUtils.gotoAccessibilitySetting(activity!!)
                                     } catch (e: ActivityNotFoundException) {
@@ -155,31 +162,36 @@ class PermissionManagerActivity : OneFragmentActivity() {
             }
         }
 
-        val permissions by lazy{ listOf(
-                PermissionStatus(arrayOf("android.permission.BIND_ACCESSIBILITY_SERVICE"), "无障碍", getString(R.string.desc_accessibility)),
-                PermissionStatus(arrayOf("android.permission.SYSTEM_ALERT_WINDOW"), "悬浮窗", "显示全局对话框、语音面板"),
-                PermissionStatus(arrayOf("android.permission.READ_CONTACTS"), "联系人", "用于检索联系人"),
-                PermissionStatus(arrayOf("android.permission.CALL_PHONE"), "电话", "用于拨打电话"),
-                PermissionStatus(arrayOf("android.permission.RECORD_AUDIO"), "录音", "用于语音识别"),
-                PermissionStatus(arrayOf("android.permission.ACCESS_NETWORK_STATE"), "获取网络状态", "用于获取网络状态"),
-                PermissionStatus(arrayOf("android.permission.INTERNET"), "网络", ""),
-                PermissionStatus(arrayOf("android.permission.READ_PHONE_STATE"), "读取设备状态", ""),
-                PermissionStatus(arrayOf("android.permission.WRITE_EXTERNAL_STORAGE"), "写SD卡", ""),
-                PermissionStatus(arrayOf("android.permission.FLASHLIGHT"), "闪光灯", "打开闪光灯"),
-                PermissionStatus(arrayOf("android.permission.ACCESS_COARSE_LOCATION", "android.permission.ACCESS_FINE_LOCATION"), "位置信息", "不使用此类指令可不开启"),
+        val permissions by lazy {
+            listOf(
+                    PermissionStatus(arrayOf("ACCESSIBILITY_SERVICE"), "基础无障碍服务", getString(R.string.desc_accessibility)),
+                    PermissionStatus(arrayOf("ACCESSIBILITY_SERVICE2"), "高级无障碍服务（执行手势 Android7.0+）", getString(R.string.desc_gesc_accessibility)),
+                    PermissionStatus(arrayOf("android.permission.SYSTEM_ALERT_WINDOW"), "悬浮窗", "显示全局对话框、语音面板"),
+                    PermissionStatus(arrayOf("android.permission.READ_CONTACTS"), "联系人", "用于检索联系人"),
+                    PermissionStatus(arrayOf("android.permission.CALL_PHONE"), "电话", "用于拨打电话"),
+                    PermissionStatus(arrayOf("android.permission.RECORD_AUDIO"), "录音", "用于语音识别"),
+                    PermissionStatus(arrayOf("android.permission.ACCESS_NETWORK_STATE"), "获取网络状态", "用于获取网络状态"),
+                    PermissionStatus(arrayOf("android.permission.INTERNET"), "网络", ""),
+                    PermissionStatus(arrayOf("android.permission.READ_PHONE_STATE"), "读取设备状态", ""),
+                    PermissionStatus(arrayOf("android.permission.WRITE_EXTERNAL_STORAGE"), "写SD卡", ""),
+                    PermissionStatus(arrayOf("android.permission.FLASHLIGHT"), "闪光灯", "打开闪光灯"),
+                    PermissionStatus(arrayOf("android.permission.ACCESS_COARSE_LOCATION", "android.permission.ACCESS_FINE_LOCATION"), "位置信息", "不使用此类指令可不开启"),
 //                        PermissionStatus(arrayOf("android.permission.BLUETOOTH", "android.permission.BLUETOOTH_ADMIN"),
 //                                "蓝牙", "打开蓝牙"),
-                PermissionStatus(arrayOf("android.permission.CAMERA"), "相机", "打开闪光灯"),
-                PermissionStatus(arrayOf("android.permission.READ_PHONE_STATE"), "读取设备状态", "个别机型需要"),
-                PermissionStatus(arrayOf("android.permission.WRITE_CALENDAR",
-                        "android.permission.READ_CALENDAR"), "日历", "读写日历")
-        )}
+                    PermissionStatus(arrayOf("android.permission.CAMERA"), "相机", "打开闪光灯"),
+                    PermissionStatus(arrayOf("android.permission.READ_PHONE_STATE"), "读取设备状态", "个别机型需要"),
+                    PermissionStatus(arrayOf("android.permission.WRITE_CALENDAR",
+                            "android.permission.READ_CALENDAR"), "日历", "读写日历")
+            )
+        }
+
         fun refreshStatus() {
             val context = GlobalApp.APP
             permissions.forEach {
                 it.isOpen = when {
                     it.permissionName == "悬浮窗" -> Build.VERSION.SDK_INT < Build.VERSION_CODES.M || PermissionUtils.canDrawOverlays(context)
-                    it.permissionName == "无障碍" -> PermissionUtils.accessibilityServiceEnabled(context)
+                    it.permissionString[0] == "ACCESSIBILITY_SERVICE" -> PermissionUtils.accessibilityServiceEnabled(context,MyAccessibilityService::class.java as Class<AccessibilityService>)
+                    it.permissionString[0] == "ACCESSIBILITY_SERVICE2" -> PermissionUtils.accessibilityServiceEnabled(context,GestureService::class.java as Class<AccessibilityService>)
                     else -> PermissionUtils.isAllGranted(context, it.permissionString)
                 }
             }
@@ -220,4 +232,16 @@ class PermissionManagerActivity : OneFragmentActivity() {
         }
 
     }
+}
+
+fun PermissionUtils.accessibilityServiceEnabled(context: Context, service: Class<AccessibilityService>):Boolean {
+    val pkg = context.packageName
+    val am = context.getSystemService(Context.ACCESSIBILITY_SERVICE) as AccessibilityManager
+    val enabledAccessibilityServiceList = am.getEnabledAccessibilityServiceList(AccessibilityServiceInfo.FEEDBACK_GENERIC)
+    for (info in enabledAccessibilityServiceList) {
+        Vog.v(this, "accessibilityServiceEnabled ---> ${info.id}")
+        if (info.id == "$pkg/${service.name}")
+            return true
+    }
+    return false
 }

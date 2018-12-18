@@ -2,9 +2,9 @@ package cn.vove7.jarvis.services
 
 import android.accessibilityservice.AccessibilityButtonController
 import android.accessibilityservice.AccessibilityService
+import android.accessibilityservice.AccessibilityServiceInfo
 import android.accessibilityservice.AccessibilityServiceInfo.FLAG_REQUEST_ACCESSIBILITY_BUTTON
 import android.content.Context
-import android.content.pm.PackageManager
 import android.graphics.Rect
 import android.os.Build
 import android.os.Handler
@@ -35,12 +35,14 @@ import cn.vove7.vtp.log.Vog
  * cn.vove7
  */
 class MyAccessibilityService : AccessibilityApi() {
-    private lateinit var pkgman: PackageManager
     private val accAni: StatusAnimation by lazy { AccessibilityStatusAnimation() }
-    override fun onServiceConnected() {
-//        accessibilityService = this
+    override fun onCreate() {
+        accessibilityService = this
+        super.onCreate()
+    }
 
-        pkgman = packageManager
+    override fun onServiceConnected() {
+
         updateCurrentApp(packageName, "")
         accAni.showAndHideDelay("服务开启", 5000L)
 
@@ -77,7 +79,7 @@ class MyAccessibilityService : AccessibilityApi() {
                         return
                     } else it
                 } catch (e: Exception) {
-                    GlobalLog.err(e.message,"acs80")
+                    GlobalLog.err(e.message, "acs80")
                     it
                 }
             }
@@ -360,6 +362,7 @@ class MyAccessibilityService : AccessibilityApi() {
         if (AppConfig.fixVoiceMico) {
             unregisterPlugin(VoiceWakeupStrategy)
         }
+        accessibilityService = null
     }
 
     override fun getService(): AccessibilityService = this

@@ -12,19 +12,23 @@
         <item name="actionModeStyle">@style/MyActionMode</item>
         <!--<item name="android:colorControlHighlight">@color/colorPrimary</item>-->
     </style>
+
     <style name="MyActionMode" parent="ThemeOverlay.AppCompat.Light">
 
         <item name="height">?attr/actionBarSize</item>
     </style>
+
     <style name="Dialog_Fullscreen">
         <item name="android:windowFullscreen">true</item>
         <item name="android:windowNoTitle">true</item>
         <item name="android:windowBackground">@android:color/transparent</item>
     </style>
+
     <style name="TransparentDialog" parent="Theme.MaterialComponents.Light.Dialog">
         <item name="android:windowNoTitle">true</item>
         <item name="android:windowBackground">@android:color/transparent</item>
     </style>
+
     <style name="TranslucentStatus" parent="AppTheme">
         <item name="android:windowTranslucentStatus">true</item>
         <item name="android:windowDrawsSystemBarBackgrounds">false</item>
@@ -53,6 +57,9 @@
     <style name="TransparentBackground" parent="Theme.AppCompat.Light.NoActionBar">
         <item name="android:windowBackground">@color/transparent</item>
         <item name="android:windowContentOverlay">@null</item>
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowAnimationStyle">@null</item>
+        <item name="md_corner_radius">16dp</item>
     </style>
 
     <style name="NoActionBar" parent="AppTheme">

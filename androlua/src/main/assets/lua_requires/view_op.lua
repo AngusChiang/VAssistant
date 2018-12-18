@@ -18,7 +18,7 @@ import 'cn.vove7.common.accessibility.AccessibilityApi'
 function rootView()
     local s = AccessibilityApi.Companion.getAccessibilityService()
     if (s) then
-        return s.getRootViewNode()
+        return s.getRootInWindow()
     else return nil
     end
 end

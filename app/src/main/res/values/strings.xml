@@ -353,6 +353,9 @@
         3.根据当前界面响应指令\n
         4.麦克风占用问题
     </string>
+    <string name="desc_gesc_accessibility" translatable="false">
+        可使用操作界面函数 7.0+\n由于系统原因，可能卡顿（掉帧）
+    </string>
     <string name="key_auto_open_as_with_root" translatable="false">auto_open_as_with_root</string>
     <string name="key_volume_wakeup_when_screen_off" translatable="false">volume_wakeup_when_screen_off</string>
     <string name="key_auto_sleep_wakeup_duration" translatable="false">auto_sleep_wakeup_duration</string>

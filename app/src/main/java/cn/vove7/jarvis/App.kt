@@ -40,12 +40,13 @@ class App : GlobalApp() {
         ins = this
 
         CrashHandler.init()
-        LuaApp.init(this)
         services = arrayOf(mainService, assistService)
         AppConfig.init()//加载配置
         Vog.d(this, "onCreate ---> 配置加载完成")
 
         runOnNewHandlerThread("app_load") {
+            if(AppConfig.FIRST_LAUNCH_NEW_VERSION || BuildConfig.DEBUG)
+                LuaApp.init(this)
             startServices()
             CodeProcessor.init(this@App)
             ShortcutUtil.addWakeUpShortcut()

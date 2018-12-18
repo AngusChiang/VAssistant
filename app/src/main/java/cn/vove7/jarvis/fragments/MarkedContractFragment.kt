@@ -13,9 +13,7 @@ import cn.vove7.executorengine.helper.AdvanContactHelper
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.adapters.ViewModel
 import cn.vove7.jarvis.fragments.base.BaseMarkedFragment
-import com.afollestad.materialdialogs.MaterialDialog
-import com.afollestad.materialdialogs.list.listItems
-import kotlin.concurrent.thread
+import cn.vove7.jarvis.view.dialog.SearchableListDialog
 
 /**
  * # MarkedContractFragment
@@ -28,17 +26,19 @@ class MarkedContractFragment : BaseMarkedFragment() {
     private var onlySelf = false
     override val keyHint: Int = R.string.text_show_name
     override val valueHint: Int = R.string.text_phone
-    override val lastKeyId: Int=R.string.key_last_sync_marked_contact_date
+    override val lastKeyId: Int = R.string.key_last_sync_marked_contact_date
 
     override fun onSelect() {
         //选择联系人
         val phoneList = AdvanContactHelper.getSimpleList()
-        MaterialDialog(context!!)
-                .title(R.string.text_select_contact)
-                .listItems(items = phoneList, waitForPositiveButton = false) { _, i, s ->
-                    setValue(s.split("\n")[1])
-                }.show()
+        SearchableListDialog(context!!, phoneList) { p, l ->
+            setValue(p.second.split("\n")[1])
+        }.show {
+            title(R.string.text_select_contact)
+        }
+
     }
+
 
     override var markedType: String = MarkedData.MARKED_TYPE_CONTACT
 
