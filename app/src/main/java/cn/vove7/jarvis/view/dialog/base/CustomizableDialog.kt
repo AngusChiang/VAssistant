@@ -15,6 +15,7 @@ import com.afollestad.materialdialogs.customview.customView
 /**
  * # CustomizableDialog
  * 可定制
+ * 封装的MaterialDialog
  * @author Administrator
  * 2018/11/25
  */

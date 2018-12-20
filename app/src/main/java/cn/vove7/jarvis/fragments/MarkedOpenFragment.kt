@@ -11,9 +11,8 @@ import cn.vove7.common.datamanager.parse.DataFrom
 import cn.vove7.common.model.UserInfo
 import cn.vove7.common.utils.ThreadPool.runOnCachePool
 import cn.vove7.jarvis.R
-import cn.vove7.jarvis.adapters.ViewModel
+import cn.vove7.jarvis.adapters.ListViewModel
 import cn.vove7.jarvis.fragments.base.BaseMarkedFragment
-import kotlin.concurrent.thread
 
 /**
  * # MarkedOpenFragment
@@ -30,8 +29,8 @@ class MarkedOpenFragment : BaseMarkedFragment() {
 
     override val showSel: Boolean = false
 
-    override fun unification(data: MarkedData): ViewModel<MarkedData>? {
-        return ViewModel(data.key, null, extra = data)
+    override fun unification(data: MarkedData): ListViewModel<MarkedData>? {
+        return ListViewModel(data.key, null, extra = data)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -44,7 +43,7 @@ class MarkedOpenFragment : BaseMarkedFragment() {
 
     var onlySelf = false
 
-    override fun onGetData(pageIndex: Int) {
+    override fun onLoadData(pageIndex: Int) {
         runOnCachePool {
             val builder = DAO.daoSession.markedDataDao
                     .queryBuilder()

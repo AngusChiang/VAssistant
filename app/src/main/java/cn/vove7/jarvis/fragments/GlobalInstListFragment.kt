@@ -15,10 +15,9 @@ import cn.vove7.jarvis.activities.InstDetailActivity
 import cn.vove7.jarvis.activities.NewInstActivity
 import cn.vove7.jarvis.activities.OnSyncInst
 import cn.vove7.jarvis.adapters.SimpleListAdapter
-import cn.vove7.jarvis.adapters.ViewModel
+import cn.vove7.jarvis.adapters.ListViewModel
 import cn.vove7.jarvis.tools.AppConfig
 import cn.vove7.jarvis.tools.DataUpdator
-import kotlin.concurrent.thread
 
 /**
  *
@@ -38,7 +37,7 @@ class GlobalInstListFragment : SimpleListFragment<ActionNode>(), OnSyncInst {
     }
     override val itemClickListener: SimpleListAdapter.OnItemClickListener<ActionNode> =
         object : SimpleListAdapter.OnItemClickListener<ActionNode> {
-            override fun onClick(holder: SimpleListAdapter.VHolder?, pos: Int, item: ViewModel<ActionNode>) {
+            override fun onClick(holder: SimpleListAdapter.VHolder?, pos: Int, item: ListViewModel<ActionNode>) {
                 //显示详情
                 val node = item.extra
 
@@ -77,13 +76,13 @@ class GlobalInstListFragment : SimpleListFragment<ActionNode>(), OnSyncInst {
         }
     }
 
-    override fun unification(it: ActionNode): ViewModel<ActionNode>? {
+    override fun unification(it: ActionNode): ListViewModel<ActionNode>? {
         val fs = it.follows?.size ?: 0
-        return ViewModel((it).actionTitle, (it.desc?.instructions ?: "无介绍") +
+        return ListViewModel((it).actionTitle, (it.desc?.instructions ?: "无介绍") +
                 (if (fs == 0) "" else "\n跟随 $fs"), extra = it)
     }
 
-    override fun onGetData(pageIndex: Int) {
+    override fun onLoadData(pageIndex: Int) {
         runOnPool {
             val builder = DAO.daoSession.actionNodeDao.queryBuilder()
                     .where(ActionNodeDao.Properties.ActionScopeType.eq(ActionNode.NODE_SCOPE_GLOBAL))

@@ -2,7 +2,6 @@ package cn.vove7.jarvis.services
 
 import android.accessibilityservice.AccessibilityButtonController
 import android.accessibilityservice.AccessibilityService
-import android.accessibilityservice.AccessibilityServiceInfo
 import android.accessibilityservice.AccessibilityServiceInfo.FLAG_REQUEST_ACCESSIBILITY_BUTTON
 import android.content.Context
 import android.graphics.Rect
@@ -14,6 +13,7 @@ import android.view.ViewGroup
 import android.view.accessibility.AccessibilityEvent
 import android.view.accessibility.AccessibilityNodeInfo
 import cn.vove7.common.accessibility.AccessibilityApi
+import cn.vove7.common.accessibility.viewnode.ViewNode
 import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.appbus.AppBus
 import cn.vove7.common.utils.ThreadPool.runOnCachePool
@@ -115,32 +115,39 @@ class MyAccessibilityService : AccessibilityApi() {
         Vog.d(this, "class :$currentAppInfo - $currentActivity ${event.className} \n" +
                 AccessibilityEvent.eventTypeToString(eventType))
 
-        if (eventType == AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED) {
-            //界面切换
-            val classNameStr = event.className
-            val pkg = event.packageName as String?
-            Vog.v(this, "WINDOW_STATE_CHANGED ---> $classNameStr $pkg")
+        when (eventType) {
+            AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED -> {
+                //界面切换
+                val classNameStr = event.className
+                val pkg = event.packageName as String?
+                Vog.v(this, "WINDOW_STATE_CHANGED ---> $classNameStr $pkg")
 
-            runOnCachePool {
-                if (classNameStr != null && pkg != null)
-                    updateCurrentApp(pkg, classNameStr.toString())
+                runOnCachePool {
+                    if (classNameStr != null && pkg != null)
+                        updateCurrentApp(pkg, classNameStr.toString())
+                }
+            }
+            AccessibilityEvent.TYPE_VIEW_CLICKED -> try {
+                Vog.i(this, "onAccessibilityEvent ---> 点击 :${ViewNode(event.source)}")
+            } catch (e: Exception) {
+            }
+            AccessibilityEvent.TYPE_WINDOWS_CHANGED -> try {
+                Vog.i(this, "onAccessibilityEvent ---> TYPE_WINDOWS_CHANGED :${event.source}")
+            } catch (e: Exception) {
             }
         }
-//        runOnCachePool {
-//            if (blackPackage.contains(currentScope.packageName)) {//black list
+
+        //        runOnCachePool {
+        //            if (blackPackage.contains(currentScope.packageName)) {//black list
 //                Vog.v(this, "onAccessibilityEvent ---> in black")
 //                return@runOnCachePool
 //            }
-        //根据事件回调类型进行处理
+//        根据事件回调类型进行处理
 //            when (eventType) {
-//                //通知栏发生改变
-//                AccessibilityEvent.TYPE_NOTIFICATION_STATE_CHANGED -> {
-////                callAllNotifier()
-//                }
-//                TYPE_WINDOWS_CHANGED -> {
+//                AccessibilityEvent.TYPE_WINDOWS_CHANGED -> {
 //                    callAllNotifier()
 //                }
-//                TYPE_WINDOW_CONTENT_CHANGED -> {//"帧"刷新  限制频率
+//                AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED -> {//"帧"刷新  限制频率
 //                    System.currentTimeMillis().also {
 //                        if (it - lastContentChangedTime < 300) {
 //                            Vog.v(this, "onAccessibilityEvent ---> lock")
@@ -150,17 +157,51 @@ class MyAccessibilityService : AccessibilityApi() {
 //                    }
 //                    callAllNotifier()
 //                }
-////            TYPE_VIEW_SCROLLED -> {
-////                callAllNotifier()
-////            }
-//                TYPE_VIEW_CLICKED -> {
-////                lastScreenEvent = event
-//                    callAllNotifier()
-////                try {
-////                    Vog.d(this, "onAccessibilityEvent ---> 点击 :${ViewNode(event.source)}")
-////                } catch (e: Exception) {
-////                }
+//            TYPE_VIEW_SCROLLED -> {
+//                callAllNotifier()
+//            }
+//                AccessibilityEvent.TYPE_VIEW_CLICKED -> {
+//                lastScreenEvent = event
+//            callAllNotifier()
+//                try {
+//                    Vog.d(this, "onAccessibilityEvent ---> 点击 :${ViewNode(event.source)}")
+//                } catch (e: Exception) {
 //                }
+//        }
+//            }
+//        }
+
+//        runOnCachePool {
+        //            if (blackPackage.contains(currentScope.packageName)) {//black list
+//                Vog.v(this, "onAccessibilityEvent ---> in black")
+//                return@runOnCachePool
+//            }
+//        根据事件回调类型进行处理
+//            when (eventType) {
+//                AccessibilityEvent.TYPE_WINDOWS_CHANGED -> {
+//                    callAllNotifier()
+//                }
+//                AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED -> {//"帧"刷新  限制频率
+//                    System.currentTimeMillis().also {
+//                        if (it - lastContentChangedTime < 300) {
+//                            Vog.v(this, "onAccessibilityEvent ---> lock")
+//                            return@runOnCachePool
+//                        }
+//                        lastContentChangedTime = it
+//                    }
+//                    callAllNotifier()
+//                }
+//            TYPE_VIEW_SCROLLED -> {
+//                callAllNotifier()
+//            }
+//                AccessibilityEvent.TYPE_VIEW_CLICKED -> {
+//                lastScreenEvent = event
+//            callAllNotifier()
+//                try {
+//                    Vog.d(this, "onAccessibilityEvent ---> 点击 :${ViewNode(event.source)}")
+//                } catch (e: Exception) {
+//                }
+//        }
 //            }
 //        }
     }

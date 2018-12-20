@@ -198,7 +198,7 @@
 
     <include
         android:id="@+id/bottom_sheet_view"
-        layout="@layout/bottom_sheet_list_whit_toolbar" />
+        layout="@layout/bottom_sheet_list_with_toolbar" />
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/fab"

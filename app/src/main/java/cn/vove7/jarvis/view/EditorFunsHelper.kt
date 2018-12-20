@@ -21,6 +21,7 @@ import cn.vove7.common.interfaces.VApi.Companion.runtimeMap
 import cn.vove7.common.interfaces.VApi.Companion.systemFunMap
 import cn.vove7.common.interfaces.VApi.Companion.systemFuncs
 import cn.vove7.jarvis.R
+import cn.vove7.jarvis.view.dialog.base.BottomDialogWithText
 import com.afollestad.materialdialogs.MaterialDialog
 
 /**
@@ -211,9 +212,7 @@ class GridAdapter(val c: Context, val functions: List<ApiFunction>, val onClick:
     override fun getItemCount(): Int = functions.size
 
     private fun showDetail(f: ApiFunction) {
-        MaterialDialog(c).title(text = f.name)
-                .message(text = f.doc)
-                .show()
+        BottomDialogWithText(c,f.name,f.doc).show()
     }
 
     private fun getItem(p: Int): ApiFunction = functions[p]

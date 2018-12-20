@@ -1,6 +1,8 @@
 package cn.vove7.jarvis.view.dialog
 
 import android.content.Context
+import cn.vove7.jarvis.fragments.base.SheetStatusListener
+import cn.vove7.jarvis.view.dialog.base.BottomDialogWithMarkdown
 
 /**
  * # UpdateLogDialog
@@ -10,14 +12,16 @@ import android.content.Context
  */
 class UpdateLogDialog(context: Context, onDismiss: (() -> Unit)? = null) {
     init {
-        val d = MarkDownDialog(context, "更新日志")
-        d.loadFromAsset("files/update_log.md")
-        d.show()
+        val d = BottomDialogWithMarkdown(context, "更新日志")
 
-        d.onDismiss {
-            onDismiss?.invoke()
+        d.show()
+        d.loadFromAsset("files/update_log.md")
+
+        d.listener = object : SheetStatusListener {
+            override fun onDismiss() {
+                onDismiss?.invoke()
+            }
         }
-        d.finish()
     }
 
 }

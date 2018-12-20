@@ -11,7 +11,7 @@ import cn.vove7.common.datamanager.parse.statusmap.ActionNode.NODE_SCOPE_IN_APP
 import cn.vove7.jarvis.activities.InstDetailActivity
 import cn.vove7.jarvis.activities.NewInstActivity
 import cn.vove7.jarvis.adapters.SimpleListAdapter
-import cn.vove7.jarvis.adapters.ViewModel
+import cn.vove7.jarvis.adapters.ListViewModel
 import cn.vove7.jarvis.tools.AppConfig
 import cn.vove7.vtp.builder.BundleBuilder
 import cn.vove7.vtp.log.Vog
@@ -37,7 +37,7 @@ class InAppInstListFragment : SimpleListFragment<ActionNode>() {
     }
 
     override val itemClickListener = object : SimpleListAdapter.OnItemClickListener<ActionNode> {
-        override fun onClick(holder: SimpleListAdapter.VHolder?, pos: Int, item: ViewModel<ActionNode>) {
+        override fun onClick(holder: SimpleListAdapter.VHolder?, pos: Int, item: ListViewModel<ActionNode>) {
             val node = item.extra
 
             val intent = Intent(context, InstDetailActivity::class.java)
@@ -93,15 +93,15 @@ class InAppInstListFragment : SimpleListFragment<ActionNode>() {
     }
 
 
-    override fun unification(it: ActionNode): ViewModel<ActionNode>? {
+    override fun unification(it: ActionNode): ListViewModel<ActionNode>? {
         val fs = it.follows?.size ?: 0
-        return ViewModel((it).actionTitle, (it.desc?.instructions ?: "无介绍") +
+        return ListViewModel((it).actionTitle, (it.desc?.instructions ?: "无介绍") +
                 (if (fs == 0) "" else "\n跟随 $fs"), extra = it)
     }
 
-    override fun onGetData(pageIndex: Int) {
+    override fun onLoadData(pageIndex: Int) {
         val offsetDatas = getInstList(pkg)
-        Vog.d(this, "onGetData $offsetDatas")
+        Vog.d(this, "onLoadData $offsetDatas")
         notifyLoadSuccess(offsetDatas, true)
     }
 

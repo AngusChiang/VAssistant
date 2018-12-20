@@ -35,7 +35,7 @@ import cn.vove7.common.utils.runOnUi
 import cn.vove7.executorengine.bridges.SystemBridge
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.adapters.SimpleListAdapter
-import cn.vove7.jarvis.adapters.ViewModel
+import cn.vove7.jarvis.adapters.ListViewModel
 import cn.vove7.jarvis.services.MainService
 import cn.vove7.jarvis.tools.QRTools
 import cn.vove7.jarvis.tools.baiduaip.BaiduAipHelper
@@ -124,7 +124,7 @@ class AssistSession(context: Context) : VoiceInteractionSession(context),
             field = value
         }
 
-    override fun onClick(holder: SimpleListAdapter.VHolder?, pos: Int, item: ViewModel<AssistSession.SessionFunItem>) {
+    override fun onClick(holder: SimpleListAdapter.VHolder?, pos: Int, item: ListViewModel<AssistSession.SessionFunItem>) {
         when (pos) {
             0 -> {
                 val path = screenPath
@@ -197,7 +197,7 @@ class AssistSession(context: Context) : VoiceInteractionSession(context),
             val desc: String? = null
     ) {
         fun viewModel(context: Context) =
-            ViewModel(name, icon = context.getDrawable(iconId), subTitle = desc, extra = this)
+            ListViewModel(name, icon = context.getDrawable(iconId), subTitle = desc, extra = this)
     }
 
     /**

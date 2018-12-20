@@ -6,7 +6,7 @@
         <item name="colorPrimaryDark">@color/p_green_dark</item>
         <item name="colorAccent">@color/google_blue</item>
         <item name="android:navigationBarColor">@color/p_green</item>
-        <item name="md_corner_radius">16dp</item>
+        <item name="md_corner_radius">10dp</item>
         <item name="dialogTheme">@style/Dialog_Fullscreen</item>
         <!--<item name="md_color_content">@color/your_color</item>-->
         <item name="actionModeStyle">@style/MyActionMode</item>
@@ -47,7 +47,7 @@
     <!--文字提取Activity-->
     <style name="ScreenPicker" parent="NoActionBar">
         <item name="android:windowBackground">@color/trans</item>
-        <item name="md_corner_radius">16dp</item>
+        <item name="md_corner_radius">10dp</item>
         <item name="android:statusBarColor">@color/trans</item>
         <item name="android:windowIsTranslucent">true</item>
 
@@ -59,7 +59,7 @@
         <item name="android:windowContentOverlay">@null</item>
         <item name="android:windowIsTranslucent">true</item>
         <item name="android:windowAnimationStyle">@null</item>
-        <item name="md_corner_radius">16dp</item>
+        <item name="md_corner_radius">10dp</item>
     </style>
 
     <style name="NoActionBar" parent="AppTheme">
@@ -89,4 +89,11 @@
         <item name="isFull">false</item>
     </style>
 
+    <style name="TransBottomSheetDialogStyle" parent="Theme.Design.Light.BottomSheetDialog">
+        <item name="android:windowFrame">@null</item>
+        <item name="android:windowIsFloating">true</item>
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:background">@android:color/transparent</item>
+        <item name="android:backgroundDimEnabled">false</item>
+    </style>
 </resources>

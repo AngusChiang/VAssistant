@@ -34,6 +34,11 @@ object StorageHelper {
         createDir(p)
         p
     }
+    val logPath: String by lazy {
+        val p = "$storePath/log"
+        createDir(p)
+        p
+    }
 
     /**
      * sp配置重定向目录

@@ -104,7 +104,7 @@ class WordSplitDialog(val context: Context, rawWords: String,
             rect.bottom = it.bottom
 //            Vog.d(this, "findViewByPos ---> ${it.text} ${rect2String(rect)}")
             if (rect.contains(x, y))
-                return it.also { _ ->
+                return it.also {
                     Vog.d(this, "findViewByPos --->  当前: ${it.text}")
                 }
         }

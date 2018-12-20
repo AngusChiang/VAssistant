@@ -49,24 +49,24 @@ open class ChoiceData(
         var index: Int = 0
 ) : Serializable, Comparable<ChoiceData> {
 
-    companion object {
-        var CollChina = Collator.getInstance(java.util.Locale.CHINA)
-    }
+        companion object {
+            var CollChina = Collator.getInstance(java.util.Locale.CHINA)
+        }
 
-    override fun compareTo(other: ChoiceData): Int {
-        var tt1 = CollChina.getCollationKey(this.title)
-        var tt2 = CollChina.getCollationKey(other.title)
-        val c = CollChina.compare(tt1.sourceString, tt2.sourceString)
-        return if (c == 0) {
-            tt1 = CollChina.getCollationKey(this.subtitle)
-            tt2 = CollChina.getCollationKey(other.subtitle)
-            CollChina.compare(tt1.sourceString, tt2.sourceString)
-        } else c
-    }
+        override fun compareTo(other: ChoiceData): Int {
+            var tt1 = CollChina.getCollationKey(this.title)
+            var tt2 = CollChina.getCollationKey(other.title)
+            val c = CollChina.compare(tt1.sourceString, tt2.sourceString)
+            return if (c == 0) {
+                tt1 = CollChina.getCollationKey(this.subtitle)
+                tt2 = CollChina.getCollationKey(other.subtitle)
+                CollChina.compare(tt1.sourceString, tt2.sourceString)
+            } else c
+        }
 
-    override fun toString(): String {
-        return "ChoiceData(title='$title', subtitle=$subtitle, originalData=$originalData)"
-    }
+        override fun toString(): String {
+            return "ChoiceData(title='$title', subtitle=$subtitle, originalData=$originalData)"
+        }
 
 }
 

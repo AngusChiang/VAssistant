@@ -311,7 +311,8 @@ abstract class CodeEditorActivity : AppCompatActivity() {
     private val editorText: String
         get() = codeEditor.getEditorContent() ?: ""
 
-    class SymbolsAdapter(val c: Context, val editor: CodeEditorOperation, val symbols: List<Symbol>) : RecyclerView.Adapter<V>() {
+    class SymbolsAdapter(val c: Context, val editor: CodeEditorOperation, val symbols: List<Symbol>)
+        : RecyclerView.Adapter<V>() {
         override fun onCreateViewHolder(p0: ViewGroup, p1: Int): V {
             val v = LayoutInflater.from(c).inflate(R.layout.item_of_symbols, null)
             return V(v)

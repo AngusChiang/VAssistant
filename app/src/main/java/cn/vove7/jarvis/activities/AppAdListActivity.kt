@@ -13,13 +13,13 @@ import cn.vove7.common.netacc.NetHelper
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.activities.base.OneFragmentActivity
 import cn.vove7.jarvis.adapters.SimpleListAdapter
-import cn.vove7.jarvis.adapters.ViewModel
+import cn.vove7.jarvis.adapters.ListViewModel
 import cn.vove7.jarvis.fragments.SimpleListFragment
 import cn.vove7.jarvis.tools.AppConfig
 import cn.vove7.jarvis.tools.DialogUtil
 import cn.vove7.jarvis.view.dialog.AdEditorDialog
+import cn.vove7.jarvis.view.dialog.base.BottomDialogWithText
 import cn.vove7.vtp.log.Vog
-import com.afollestad.materialdialogs.MaterialDialog
 
 /**
  * # AppAdListActivity
@@ -56,20 +56,21 @@ class AppAdListActivity : OneFragmentActivity() {
         override val itemClickListener: SimpleListAdapter.OnItemClickListener<AppAdInfo>? =
             object : SimpleListAdapter.OnItemClickListener<AppAdInfo> {
                 @SuppressLint("CheckResult")
-                override fun onClick(holder: SimpleListAdapter.VHolder?, pos: Int, item: ViewModel<AppAdInfo>) {
-                    val data = item.extra!!
-                    MaterialDialog(context!!).show {
-                        if (data.belongUser()) {
-                            neutralButton(R.string.text_edit) {
+                override fun onClick(holder: SimpleListAdapter.VHolder?, pos: Int, item: ListViewModel<AppAdInfo>) {
+                    val data = item.extra
+                    BottomDialogWithText(context!!,item.title?:"",data.toString()).apply {
+
+                    if (data.belongUser()) {
+                            neutralButton(getString(R.string.text_edit)) {
                                 editDialog.show(item.extra)
                             }
-                            positiveButton(R.string.text_share) {
+                            positiveButton(getString(R.string.text_share)) {
                                 if (!AppConfig.checkLogin()) {
                                     return@positiveButton
                                 }
                                 share(data)
                             }
-                            negativeButton(R.string.text_delete) {
+                            negativeButton(getString(R.string.text_delete)) {
                                 val tag = data.tagId
                                 DialogUtil.dataDelAlert(context) {
                                     if (tag != null) {
@@ -81,8 +82,7 @@ class AppAdListActivity : OneFragmentActivity() {
                                 }
                             }
                         }
-                        title(text = item.title)
-                        message(text = data.toString())
+                        show()
                     }
                 }
             }
@@ -131,11 +131,11 @@ class AppAdListActivity : OneFragmentActivity() {
             }
         }
 
-        override fun unification(it: AppAdInfo): ViewModel<AppAdInfo>? {
-            return ViewModel(it.descTitle, it.activity, extra = it)
+        override fun unification(it: AppAdInfo): ListViewModel<AppAdInfo>? {
+            return ListViewModel(it.descTitle, it.activity, extra = it)
         }
 
-        override fun onGetData(pageIndex: Int) {
+        override fun onLoadData(pageIndex: Int) {
             val list = DAO.daoSession.appAdInfoDao
                     .queryBuilder()
                     .where(AppAdInfoDao.Properties.Pkg.eq(pkg)).list()

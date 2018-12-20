@@ -1,7 +1,6 @@
 package cn.vove7.jarvis.droidplugin
 
 import cn.vove7.common.utils.ThreadPool
-import cn.vove7.jarvis.adapters.ViewModel
 import cn.vove7.vtp.log.Vog
 import com.qihoo360.replugin.RePlugin
 import com.qihoo360.replugin.model.PluginInfo

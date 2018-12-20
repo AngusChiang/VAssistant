@@ -9,11 +9,10 @@ import cn.vove7.common.datamanager.greendao.MarkedDataDao
 import cn.vove7.common.datamanager.parse.DataFrom
 import cn.vove7.common.model.UserInfo
 import cn.vove7.common.utils.ThreadPool.runOnCachePool
-import cn.vove7.executorengine.helper.AdvanContactHelper
 import cn.vove7.jarvis.R
-import cn.vove7.jarvis.adapters.ViewModel
+import cn.vove7.jarvis.adapters.ListViewModel
 import cn.vove7.jarvis.fragments.base.BaseMarkedFragment
-import cn.vove7.jarvis.view.dialog.SearchableListDialog
+import cn.vove7.jarvis.view.dialog.SelectContactDialog
 
 /**
  * # MarkedContractFragment
@@ -28,15 +27,15 @@ class MarkedContractFragment : BaseMarkedFragment() {
     override val valueHint: Int = R.string.text_phone
     override val lastKeyId: Int = R.string.key_last_sync_marked_contact_date
 
+    val selContactDialog: SelectContactDialog by lazy {
+        SelectContactDialog(context!!) {
+            setValue(it.second)
+        }
+    }
+
     override fun onSelect() {
         //选择联系人
-        val phoneList = AdvanContactHelper.getSimpleList()
-        SearchableListDialog(context!!, phoneList) { p, l ->
-            setValue(p.second.split("\n")[1])
-        }.show {
-            title(R.string.text_select_contact)
-        }
-
+        selContactDialog.show()
     }
 
 
@@ -50,11 +49,11 @@ class MarkedContractFragment : BaseMarkedFragment() {
         })
     }
 
-    override fun unification(data: MarkedData): ViewModel<MarkedData>? {
-        return ViewModel(data.key, data.value, null, data)
+    override fun unification(data: MarkedData): ListViewModel<MarkedData>? {
+        return ListViewModel(data.key, data.value, null, data)
     }
 
-    override fun onGetData(pageIndex: Int) {
+    override fun onLoadData(pageIndex: Int) {
         runOnCachePool {
             val builder = DAO.daoSession.markedDataDao
                     .queryBuilder()

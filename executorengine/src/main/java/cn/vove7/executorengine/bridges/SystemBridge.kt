@@ -83,10 +83,10 @@ object SystemBridge : SystemOperation {
     }
 
     override fun getPhoneByName(name: String): String? {
-        return AdvanContactHelper.matchPhone(name)?.second
+        return AdvanContactHelper.matchPhone(name)?.second?.let { it[0] }
     }
 
-    override fun getContactByName(name: String): Pair<String, String>? {
+    override fun getContactByName(name: String): Pair<String, Array<String>>? {
         return AdvanContactHelper.matchPhone(name)
     }
 
@@ -175,18 +175,19 @@ object SystemBridge : SystemOperation {
     }
 
     /**
-     * 输入 纯数字 | [标记]联系人
+     * 输入 纯数字
      * @param s String
      * @param simId Int? 卡号 0:卡1  1:卡2
      * @return Boolean
      */
     override fun call(s: String, simId: Int?): Boolean {
-        val ph = AdvanContactHelper.matchPhone(s)
-            ?: return {
-                GlobalLog.err("未找到该联系人 $s")
-                false
-            }.invoke()
-        val callIntent = Intent(Intent.ACTION_CALL, Uri.parse("tel:$ph"))
+//        val ph = AdvanContactHelper.matchPhone(s)?.let {
+//            it.second[0]
+//        } ?: return {
+//                GlobalLog.err("未找到该联系人 $s")
+//                false
+//            }.invoke()
+        val callIntent = Intent(Intent.ACTION_CALL, Uri.parse("tel:$s"))
         if (simId != null) {
             val telecomManager = context.getSystemService(Context.TELECOM_SERVICE) as TelecomManager
             val phoneAccountHandleList = telecomManager.getCallCapablePhoneAccounts();
@@ -904,6 +905,7 @@ object SystemBridge : SystemOperation {
             AppBus.post(RequestPermission("读写日历权限"))
         }
     }
+
     override fun createCalendarEvent(title: String, content: String?, beginTime: Long,
                                      endTime: Long?, isAlarm: Boolean) {
         try {

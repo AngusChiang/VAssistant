@@ -1,6 +1,7 @@
 package cn.vove7.common.app
 
 import android.os.Environment
+import cn.vove7.common.utils.StorageHelper
 import cn.vove7.vtp.log.Vog
 import java.io.BufferedWriter
 import java.io.File
@@ -108,19 +109,14 @@ object GlobalLog {
 
     fun export2Sd() {
         try {
-            val p = Environment.getExternalStorageDirectory().absolutePath + "/log"
-            File(p).let {
-                if (!it.exists()) {
-                    it.mkdirs()
-                }
-            }
+            val p = StorageHelper.logPath
             val f = File(p, "log_${df.format(Date())}.log")
             f.writeText(this.toString())
             GlobalApp.toastLong("日志已导出至${f.absolutePath}")
             clear()
         } catch (e: Exception) {
             GlobalLog.err(e)
-            GlobalApp.toastLong("导出失败，可能没有存储读写权限")
+            GlobalApp.toastLong("导出失败，请检查存储读写权限")
         }
     }
 

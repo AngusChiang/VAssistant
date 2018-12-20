@@ -2,8 +2,8 @@ package cn.vove7.jarvis.activities
 
 import android.graphics.Typeface
 import android.os.Bundle
+import android.os.Environment
 import android.support.design.widget.TextInputLayout
-import android.view.Gravity
 import android.view.View
 import android.widget.AdapterView
 import android.widget.TextView
@@ -14,17 +14,19 @@ import cn.vove7.common.netacc.model.BaseRequestModel
 import cn.vove7.common.netacc.model.UserFeedback
 import cn.vove7.common.view.editor.MultiSpan
 import cn.vove7.executorengine.bridges.SystemBridge
+import cn.vove7.jarvis.BuildConfig
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.activities.base.ReturnableActivity
 import cn.vove7.jarvis.adapters.IconTitleEntity
 import cn.vove7.jarvis.adapters.IconTitleListAdapter
 import cn.vove7.jarvis.tools.ItemWrap
 import cn.vove7.jarvis.tools.Tutorials
-import cn.vove7.jarvis.view.dialog.MarkDownDialog
-import cn.vove7.jarvis.view.dialog.ProgressTextDialog
+import cn.vove7.jarvis.view.dialog.base.BottomDialogWithMarkdown
+import cn.vove7.jarvis.view.dialog.base.BottomDialogWithText
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.customview.customView
 import kotlinx.android.synthetic.main.activity_abc_header.*
+import java.io.File
 
 /**
  * # HelpActivity
@@ -85,7 +87,7 @@ class HelpActivity : ReturnableActivity(), AdapterView.OnItemClickListener {
                 }
             }
             2 -> {
-                MarkDownDialog(this,"常见问题").apply {
+                BottomDialogWithMarkdown(this, "常见问题").apply {
                     loadFromAsset("files/faqs.md")
                     show()
                 }
@@ -93,41 +95,34 @@ class HelpActivity : ReturnableActivity(), AdapterView.OnItemClickListener {
             3 -> SystemBridge.openUrl(ApiUrls.QQ_GROUP_1)
             4 -> showFeedbackDialog()
             5 -> {
-                val logView = TextView(this)
-                logView.setPadding(50, 0, 50, 0)
-                logView.gravity = Gravity.BOTTOM
-                logView.text = GlobalLog.toString()
-                MaterialDialog(this).title(text = "日志")
-                        .customView(view = logView, scrollable = true)
-                        .positiveButton(text = "复制") {
-                            SystemBridge.setClipText(logView.text.toString())
-                            toast.showShort(R.string.text_copied)
-                        }
-                        .negativeButton(text = "清空") {
-                            GlobalLog.clear()
-                        }
-                        .neutralButton(text = "导出至文件") {
-                            GlobalLog.export2Sd()
-                        }
-                        .show()
+//                val logView = TextView(this)
+//                logView.setPadding(50, 0, 50, 0)
+//                logView.gravity = Gravity.BOTTOM
+                var text = GlobalLog.toString()
+                if (BuildConfig.DEBUG && text == "") {
+                    try {
+                        text = File(Environment.getExternalStorageDirectory().absolutePath + "/crash.log").readText()
+                    } catch (e: Exception) {
+                    }
+                }
+
+                BottomDialogWithText(this, "日志", text, true).apply {
+                    positiveButton(text = "复制") {
+                        SystemBridge.setClipText(text)
+                        toast.showShort(R.string.text_copied)
+                    }
+                    negativeButton(text = "清空") {
+                        GlobalLog.clear()
+                    }
+                    neutralButton(text = "导出至文件") {
+                        GlobalLog.export2Sd()
+                    }
+                    show()
+                }
 
             }
         }
     }
-
-    private val faqs
-        get() = listOf(
-                Pair("突然按键失灵了?", "按键失灵一般是由于程序后台被杀导致的，目前也属于安卓系统的bug，解决方法就是进入App详情，将此应用强行停止。参考 如何为APP上锁")
-                , Pair("如何为App上锁?", "在App内进入最近任务，上锁；若此时最近任务没有出现，可尝试进入[例如插件管理、指令管理]页面再进入最近任务上锁。或者自带管家白名单")
-                , Pair("通知栏显示服务正在运行", "可尝试在应用设置中关闭此通知")
-                , Pair("屏幕助手如何设置", "1. 先在App设置中 设为默认辅助应用(App重启需要重新设置)\n" +
-                "2. App里开启 实验室/屏幕助手\n" +
-                "3. 查看手机系统 唤出助手的方式\n" +
-                "  - 一般为长按Home键" +
-                "  - 一加氢OS安卓P版本可在[设置/按键和手势/快捷开启助手应用 开启]，" +
-                "氢OS8.0版本设置方式参考https://www.coolapk.com/feed/8889370\n" +
-                "4. 可能部分系统无法设置")
-        )
 
     private fun showFeedbackDialog() {
         MaterialDialog(this)

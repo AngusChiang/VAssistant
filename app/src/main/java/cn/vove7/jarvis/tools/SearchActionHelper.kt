@@ -12,6 +12,8 @@ import cn.vove7.vtp.log.Vog
  * @constructor
  */
 class SearchActionHelper(searchMenuItem: MenuItem, val lis: (String) -> Unit) {
+    var first = true
+
     init {
         val searchView = MenuItemCompat.getActionView(searchMenuItem) as SearchView
 
@@ -25,7 +27,10 @@ class SearchActionHelper(searchMenuItem: MenuItem, val lis: (String) -> Unit) {
             override fun onQueryTextChange(newText: String): Boolean {
                 Vog.d(this, "onQueryTextChange ----> $newText")
                 handler.removeCallbacks(sR)
-
+                if (first && newText == "") {
+                    first = false
+                    return true
+                }
                 val nt = newText.trim()
                 sR = Runnable {
                     lis.invoke(nt)

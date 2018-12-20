@@ -10,7 +10,7 @@
 
         <!--<item name="md_color_title">@color/google_blue</item>-->
         <!--<item name="md_color_content">@color/your_color</item>-->
-        <item name="md_corner_radius">16dp</item>
+        <item name="md_corner_radius">10dp</item>
         <item name="actionModeStyle">@style/MyActionMode</item>
 
         <item name="editTextStyle">@style/EditTextStyle</item>

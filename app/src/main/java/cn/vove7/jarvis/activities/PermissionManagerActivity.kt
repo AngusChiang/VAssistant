@@ -21,9 +21,7 @@ import cn.vove7.jarvis.R
 import cn.vove7.jarvis.activities.PermissionManagerActivity.PermissionStatus.Companion.allPerStr
 import cn.vove7.jarvis.activities.base.OneFragmentActivity
 import cn.vove7.jarvis.adapters.RecAdapterWithFooter
-import cn.vove7.jarvis.fragments.VListFragment
-import cn.vove7.jarvis.services.GestureService
-import cn.vove7.jarvis.services.MyAccessibilityService
+import cn.vove7.jarvis.fragments.SimpleListFragment
 import cn.vove7.vtp.log.Vog
 import cn.vove7.vtp.runtimepermission.PermissionUtils
 
@@ -42,12 +40,11 @@ class PermissionManagerActivity : OneFragmentActivity() {
         }
     }
 
-    class ManageFragment : VListFragment() {
+    class ManageFragment : SimpleListFragment<PermissionStatus>() {
         lateinit var pActivity: Activity
         //        lateinit var permissionList: List<PermissionStatus>
         //        lateinit var adapter: BaseAdapter
-        override fun clearDataSet() {
-        }
+
 
         companion object {
             fun newIns(acti: AppCompatActivity): ManageFragment {
@@ -75,9 +72,9 @@ class PermissionManagerActivity : OneFragmentActivity() {
             setHeader(v)
         }
 
-        override fun onGetData(pageIndex: Int) {
+        override fun onLoadData(pageIndex: Int) {
             refreshStatus()
-            notifyLoadSuccess(true)
+            changeViewOnLoadDone(true)
             adapter.hideFooterView()
         }
 
@@ -239,7 +236,7 @@ class PermissionManagerActivity : OneFragmentActivity() {
     }
 }
 
-fun PermissionUtils.accessibilityServiceEnabled(context: Context, service: Class<AccessibilityService>):Boolean {
+fun PermissionUtils.accessibilityServiceEnabled(context: Context, service: Class<AccessibilityService>): Boolean {
     val pkg = context.packageName
     val am = context.getSystemService(Context.ACCESSIBILITY_SERVICE) as AccessibilityManager
     val enabledAccessibilityServiceList = am.getEnabledAccessibilityServiceList(AccessibilityServiceInfo.FEEDBACK_GENERIC)

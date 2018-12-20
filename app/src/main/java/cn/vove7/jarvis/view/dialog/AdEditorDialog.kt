@@ -15,7 +15,6 @@ import cn.vove7.common.view.toast.ColorfulToast
 import cn.vove7.executorengine.helper.AdvanAppHelper
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.tools.AppConfig
-import cn.vove7.jarvis.tools.DialogUtil
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.customview.customView
 
@@ -165,11 +164,26 @@ class AdEditorDialog(val context: Context, val onUpdate: () -> Unit) {
                 }
             }
         }
-        dialog.findViewById<Button>(R.id.sel_app_btn).setOnClickListener { view ->
-            DialogUtil.showSelApp(context) {
-                pkgText.editText?.setText(it.second)
+        val d by lazy {
+            SelectAppDialog(context) {
+                pkgText.editText?.setText(it.packageName)
             }
         }
+        dialog.findViewById<Button>(R.id.sel_app_btn).setOnClickListener { view ->
+            d.show()
+            clearF()
+        }
+    }
+
+    fun clearF() {
+        showNameText.clearFocus()
+        pkgText.clearFocus()
+        activityText.clearFocus()
+        adViewIdText.clearFocus()
+        classText.clearFocus()
+        adTexts.clearFocus()
+        adDescs.clearFocus()
+        depthsText.clearFocus()
     }
 
     var editData: AppAdInfo? = null

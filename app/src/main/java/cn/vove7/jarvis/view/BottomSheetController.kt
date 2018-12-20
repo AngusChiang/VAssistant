@@ -2,13 +2,11 @@ package cn.vove7.jarvis.view
 
 import android.content.Context
 import android.support.design.widget.BottomSheetBehavior
-import android.support.design.widget.Snackbar
 import android.view.View
-import android.view.ViewGroup
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.adapters.BottomListAdapter
 import cn.vove7.jarvis.adapters.SimpleListAdapter
-import cn.vove7.jarvis.adapters.ViewModel
+import cn.vove7.jarvis.adapters.ListViewModel
 import cn.vove7.vtp.view.listview.BottomSheetListView
 
 /**
@@ -59,7 +57,7 @@ open class BottomSheetController<Type>(
     }
 
     //设置BottomList数据
-    fun setBottomListData(dataSet: List<ViewModel<Type>>, iClickListener: SimpleListAdapter.OnItemClickListener<Type>) {
+    fun setBottomListData(dataSet: List<ListViewModel<Type>>, iClickListener: SimpleListAdapter.OnItemClickListener<Type>) {
         listAdapter = BottomListAdapter(context, dataSet, iClickListener)
         bottomListView.adapter = listAdapter
         listAdapter.notifyDataSetChanged()

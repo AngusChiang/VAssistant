@@ -6,13 +6,10 @@ import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.os.Handler
-import android.support.v4.view.MenuItemCompat
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.SearchView
 import android.support.v7.widget.Toolbar
 import android.view.KeyEvent
-import android.view.MenuItem
 import android.view.View
 import android.widget.*
 import cn.vove7.common.app.GlobalLog
@@ -28,20 +25,16 @@ import cn.vove7.common.datamanager.parse.statusmap.ActionNode.NODE_SCOPE_IN_APP
 import cn.vove7.common.datamanager.parse.statusmap.Reg
 import cn.vove7.common.model.UserInfo
 import cn.vove7.common.utils.TextHelper
-import cn.vove7.common.utils.ThreadPool.runOnPool
 import cn.vove7.common.view.toast.ColorfulToast
 import cn.vove7.executorengine.helper.AdvanAppHelper
 import cn.vove7.executorengine.parse.ParseEngine
 import cn.vove7.executorengine.parse.ParseResult
-import cn.vove7.jarvis.App
 import cn.vove7.jarvis.BuildConfig
 import cn.vove7.jarvis.R
-import cn.vove7.jarvis.adapters.SimpleListAdapter
-import cn.vove7.jarvis.adapters.ViewModel
+import cn.vove7.jarvis.activities.base.ReturnableActivity
 import cn.vove7.jarvis.tools.UriUtils.getPathFromUri
-import cn.vove7.jarvis.view.BottomSheetWithToolbarController
 import cn.vove7.jarvis.view.dialog.InstRegexEditorDialog
-import cn.vove7.vtp.app.AppInfo
+import cn.vove7.jarvis.view.dialog.SelectAppDialog
 import cn.vove7.vtp.easyadapter.BaseListAdapter
 import cn.vove7.vtp.log.Vog
 import cn.vove7.vtp.view.span.ColourTextClickableSpan
@@ -59,8 +52,7 @@ import java.util.*
  * @author 17719247306
  * 2018/8/19
  */
-class NewInstActivity : AppCompatActivity(), View.OnClickListener {
-    var bsController: BottomSheetWithToolbarController<AppInfo>? = null
+class NewInstActivity : ReturnableActivity(), View.OnClickListener {
     var pkg: String? = null
     var parentId: Long? = null//上级命令MapNodeId
     private var instType: Int = NODE_SCOPE_GLOBAL
@@ -127,7 +119,6 @@ class NewInstActivity : AppCompatActivity(), View.OnClickListener {
     }
 
     private fun initData() {
-        initBottom()
         isReedit = intent.getBooleanExtra("reedit", false)
 
         val arr = resources.getStringArray(R.array.list_pos_of_regex_param)
@@ -153,7 +144,7 @@ class NewInstActivity : AppCompatActivity(), View.OnClickListener {
                 scriptText = intent.getStringExtra("remote_script")
                 scriptType = intent.getStringExtra("remote_script_type")
 
-                Vog.d(this,"initData ---> $scriptType\n$scriptText")
+                Vog.d(this, "initData ---> $scriptType\n$scriptText")
             }
         }
         instType = intent.getIntExtra("type", NODE_SCOPE_GLOBAL)
@@ -170,7 +161,6 @@ class NewInstActivity : AppCompatActivity(), View.OnClickListener {
                         btn_sel_app.text = app.name
                     }
                 }
-                getAppList()
             }
             0 -> {//新建
                 sel_app.visibility = View.GONE
@@ -190,94 +180,7 @@ class NewInstActivity : AppCompatActivity(), View.OnClickListener {
         }
     }
 
-    // TODO 分页
-    private fun getAppList() {
-        runOnPool {
-            apps.addAll(getInstalledApp())
-            appHandler.sendEmptyMessage(0)
-        }
-        bsController?.onLoading()
-    }
-
-    private fun initBottom() {
-        val bottomView = findViewById<LinearLayout>(R.id.bottom_sheet_view)
-        bsController = BottomSheetWithToolbarController(this, bottomView, getString(R.string.text_select_application), R.menu.menu_toolbar_with_search_refresh)
-        val searchItem = bsController!!.bottomToolbar.menu.findItem(R.id.menu_search)
-        bsController?.bottomToolbar?.setOnMenuItemClickListener(this::onOptionsItemSelected)
-        searchView = MenuItemCompat.getActionView(searchItem) as SearchView
-        searchView.queryHint = getString(R.string.text_search)
-
-        var sR: Runnable? = null
-        val handler = Handler()
-        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
-            override fun onQueryTextSubmit(query: String): Boolean {
-                return false
-            }
-
-            override fun onQueryTextChange(newText: String): Boolean {
-                Vog.d(this, "onQueryTextChange ----> $newText")
-                handler.removeCallbacks(sR)
-                val nt = newText.trim()
-                sR = Runnable {
-                    if (nt == "") {
-                        bsController?.setBottomListData(apps, onSelAppItemClick)
-                    }
-                    val tmp = apps.filter {
-                        it.title?.contains(nt, ignoreCase = true) == true
-                    }
-                    bsController?.setBottomListData(tmp, onSelAppItemClick)
-                }
-                handler.postDelayed(sR, 500)
-                return true
-            }
-        })
-        bsController?.hideBottom()
-        bsController?.setBottomListData(apps, onSelAppItemClick)
-    }
-
-    private val appHandler = Handler {
-        bsController?.notifyDataSetChanged()
-        bsController?.onSuccess()
-        return@Handler true
-    }
-
-    private val apps = mutableListOf<ViewModel<AppInfo>>()
-
-    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
-        when (item?.itemId) {
-            android.R.id.home -> onBackPressed()
-            R.id.menu_search -> {
-                bsController?.expandSheet()
-            }
-            R.id.menu_refresh -> {
-                apps.clear()
-                bsController?.notifyDataSetChanged()
-                getAppList()
-            }
-        }
-        return super.onOptionsItemSelected(item)
-    }
-
-
-    private fun getInstalledApp(): MutableList<ViewModel<AppInfo>> {
-        val list = mutableListOf<ViewModel<AppInfo>>()
-        AdvanAppHelper.APP_LIST.values.forEach {
-            list.add(ViewModel(it.name, icon = it.getIcon(this), extra = it))
-        }
-        return list
-    }
-
     override fun onBackPressed() {
-        if (bsController?.bottomToolbar?.hasExpandedActionView() == true) {
-            bsController?.bottomToolbar?.collapseActionView()
-            return
-        }
-
-        if (bsController?.isBottomSheetShowing == true) {
-            bsController?.hideBottom()
-            return
-        }
-
         val now = System.currentTimeMillis()
         if (now - enterTime < 5000) {
             super.onBackPressed()
@@ -291,15 +194,6 @@ class NewInstActivity : AppCompatActivity(), View.OnClickListener {
                 }.negativeButton()
                 .show()
         //TODO 草稿
-    }
-
-    private val onSelAppItemClick = object : SimpleListAdapter.OnItemClickListener<AppInfo> {
-        override fun onClick(holder: SimpleListAdapter.VHolder?, pos: Int, item: ViewModel<AppInfo>) {
-            val app = item.extra
-            btn_sel_app.text = app.name
-            pkg = app.packageName
-            bsController?.hideBottom()
-        }
     }
 
     private fun save() {
@@ -393,10 +287,17 @@ class NewInstActivity : AppCompatActivity(), View.OnClickListener {
         }
     }
 
+    val selAppDialog: SelectAppDialog by lazy {
+        SelectAppDialog(this) {
+            btn_sel_app.text = it.name
+            pkg = it.packageName
+        }
+    }
+
     override fun onClick(v: View?) {
         when (v?.id) {
             R.id.btn_sel_app -> {
-                bsController?.showBottom()
+                selAppDialog.show()
             }
             fab.id -> {
                 //check save insert

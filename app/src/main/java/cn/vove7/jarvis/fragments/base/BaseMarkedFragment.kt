@@ -17,11 +17,12 @@ import cn.vove7.common.netacc.NetHelper
 import cn.vove7.common.netacc.model.BaseRequestModel
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.adapters.SimpleListAdapter
-import cn.vove7.jarvis.adapters.ViewModel
+import cn.vove7.jarvis.adapters.ListViewModel
 import cn.vove7.jarvis.fragments.SimpleListFragment
 import cn.vove7.jarvis.tools.AppConfig
 import cn.vove7.jarvis.tools.DataUpdator
 import cn.vove7.jarvis.tools.DialogUtil
+import cn.vove7.jarvis.view.dialog.base.BottomDialogWithText
 import cn.vove7.vtp.log.Vog
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.customview.customView
@@ -155,6 +156,9 @@ abstract class BaseMarkedFragment : SimpleListFragment<MarkedData>(), OnSyncMark
         if (showSel)
             selectButton.setOnClickListener {
                 onSelect()
+                keyText.clearFocus()
+                regexText.clearFocus()
+                valueText.clearFocus()
             }
         else {
             selectButton.visibility = View.GONE
@@ -170,19 +174,19 @@ abstract class BaseMarkedFragment : SimpleListFragment<MarkedData>(), OnSyncMark
     override val itemClickListener =
         object : SimpleListAdapter.OnItemClickListener<MarkedData> {
 
-            @SuppressLint("CheckResult")
-            override fun onClick(holder: SimpleListAdapter.VHolder?, pos: Int, item: ViewModel<MarkedData>) {
+            override fun onClick(holder: SimpleListAdapter.VHolder?, pos: Int, item: ListViewModel<MarkedData>) {
                 //dialog edit
-                val data = item.extra as MarkedData
-                MaterialDialog(context!!).show {
+                val data = item.extra
+                //todo colorful
+                BottomDialogWithText(context!!,item.title?:"",data.toString()).apply {
                     if (data.belongUser()) {
-                        negativeButton(R.string.text_share) {
+                        negativeButton(getString(R.string.text_share)) {
                             share(data)
                         }
-                        positiveButton(R.string.text_edit) {
+                        positiveButton(getString(R.string.text_edit)) {
                             onEdit(item.extra)
                         }
-                        neutralButton(R.string.text_delete) {
+                        neutralButton(getString(R.string.text_delete)) {
                             DialogUtil.dataDelAlert(context) {
                                 if (data.tagId != null) {
                                     deleteShare(data.tagId)
@@ -192,10 +196,8 @@ abstract class BaseMarkedFragment : SimpleListFragment<MarkedData>(), OnSyncMark
                                 refresh()
                             }
                         }
-
                     }
-                    title(text = item.title)
-                    message(text = data.toString())
+                    show()
                 }
             }
         }

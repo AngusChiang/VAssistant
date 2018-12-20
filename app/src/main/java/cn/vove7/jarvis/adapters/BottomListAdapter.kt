@@ -3,19 +3,17 @@ package cn.vove7.jarvis.adapters
 //package cn.vove7.ctassistant.adapter
 
 import android.content.Context
-import android.view.Gravity
 import android.view.View
 import android.widget.ImageView
-import android.widget.LinearLayout
 import android.widget.TextView
 import cn.vove7.common.utils.gone
 import cn.vove7.common.utils.show
 import cn.vove7.jarvis.R
 import cn.vove7.vtp.easyadapter.BaseListAdapter
 
-class BottomListAdapter<Type>(val context: Context, items: List<ViewModel<Type>>,
+class BottomListAdapter<Type>(val context: Context, items: List<ListViewModel<Type>>,
                               private val listener: SimpleListAdapter.OnItemClickListener<Type>)
-    : BaseListAdapter<BottomListAdapter.VHolder, ViewModel<Type>>(context, items) {
+    : BaseListAdapter<BottomListAdapter.VHolder, ListViewModel<Type>>(context, items) {
 
     override fun layoutId(position: Int): Int = R.layout.item_normal_icon_title
 
@@ -23,7 +21,7 @@ class BottomListAdapter<Type>(val context: Context, items: List<ViewModel<Type>>
         return VHolder(view)
     }
 
-    override fun onBindView(holder: VHolder, pos: Int, item: ViewModel<Type>) {
+    override fun onBindView(holder: VHolder, pos: Int, item: ListViewModel<Type>) {
         holder.itemView.setOnClickListener { _ -> listener.onClick(null, pos, getItem(pos)) }
         holder.title.text = item.title
         if (item.icon != null) {

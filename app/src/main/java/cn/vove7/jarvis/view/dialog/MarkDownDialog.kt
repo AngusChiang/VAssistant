@@ -13,6 +13,7 @@ import java.io.File
  * @author Administrator
  * 2018/12/17
  */
+@Deprecated("use BottomDialogWithMarkdown")
 class MarkDownDialog(context: Context, title: String?)
     : CustomizableDialog(context, title) {
     val markDownView: MarkdownView by lazy {

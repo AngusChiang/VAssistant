@@ -13,6 +13,7 @@ import android.widget.TextView
 import cn.vove7.common.view.editor.MultiSpan
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.tools.noAutoScroll
+import cn.vove7.jarvis.view.custom.WrappedTextView
 import cn.vove7.jarvis.view.dialog.base.CustomizableDialog
 
 /**
@@ -25,9 +26,7 @@ open class ProgressTextDialog(context: Context, title: String? = null,
                               cancelable: Boolean = true, noAutoDismiss: Boolean = false,
                               autoScroll: Boolean = false, var autoLink: Boolean = false)
     : CustomizableDialog(context, title, cancelable, noAutoDismiss) {
-    val textView by lazy { TextView(context) }
-
-    val handler = UiHandler(textView, Looper.getMainLooper())
+    val textView by lazy { WrappedTextView(context) }
 
     init {
         show()
@@ -55,17 +54,16 @@ open class ProgressTextDialog(context: Context, title: String? = null,
     }
 
     fun selectable(b: Boolean) {
-        textView.setTextIsSelectable(b)
+        textView.selectable(b)
     }
 
     fun appendlnBold(text: String, fontSize: Int = 15) {
-        appendln(MultiSpan(context, text, fontSize = fontSize, typeface = Typeface.BOLD).spanStr)
+        textView.appendlnBold(text, fontSize)
     }
 
     @Synchronized
     fun appendln(s: Any? = null): ProgressTextDialog {
-        if (s != null) append(s)
-        append("\n")
+        if (s != null) textView.appendln(s)
         return this
     }
 
@@ -78,12 +76,15 @@ open class ProgressTextDialog(context: Context, title: String? = null,
         appendlnColor(s, R.color.red_900)
         return this
     }
+    fun append(s: Any): ProgressTextDialog {
+        textView.mappend(s)
+        return this
+    }
 
     fun appendlnAmber(s: String): ProgressTextDialog {
         appendlnColor(s, R.color.amber_A700)
         return this
     }
-
 
     private fun appendlnColor(s: String, color: Int): ProgressTextDialog {
         val ss = MultiSpan(context, s, color).spanStr
@@ -91,38 +92,8 @@ open class ProgressTextDialog(context: Context, title: String? = null,
         return this
     }
 
-    fun set(s: Any) {
-        handler.sendMessage(handler.obtainMessage(SET, s))
-    }
-
     fun clear() {
-        set("")
-    }
-
-    fun append(s: Any): ProgressTextDialog {
-        handler.sendMessage(handler.obtainMessage(APPEND, s))
-        return this
-    }
-
-    class UiHandler(private val textView: TextView, loop: Looper) : Handler(loop) {
-        override fun handleMessage(msg: Message?) {
-            val data = msg?.obj
-            when (msg?.what) {
-                APPEND -> {
-                    when (data) {
-                        is CharSequence -> textView.append(data)
-                        is SpannableStringBuilder -> textView.append(data)
-                    }
-                }
-                SET -> {
-                    when (data) {
-                        is CharSequence -> textView.text = data
-                        is SpannableStringBuilder -> textView.text = data
-                    }
-                }
-            }
-
-        }
+        textView.set("")
     }
 
     fun scrollToTop() {

@@ -4,7 +4,7 @@ import android.support.v4.app.Fragment
 import cn.vove7.executorengine.bridges.SystemBridge
 import cn.vove7.jarvis.activities.base.OneFragmentActivity
 import cn.vove7.jarvis.adapters.SimpleListAdapter
-import cn.vove7.jarvis.adapters.ViewModel
+import cn.vove7.jarvis.adapters.ListViewModel
 import cn.vove7.jarvis.fragments.SimpleListFragment
 
 /**
@@ -19,20 +19,20 @@ class OSLActivity : OneFragmentActivity() {
 
     class ListFragment : SimpleListFragment<OslItem>() {
 
-        override fun unification(it: OslItem): ViewModel<OslItem> {
-            return ViewModel(it.name, it.desc.let { s -> if (s == "") it.url else s }, extra = it)
+        override fun unification(it: OslItem): ListViewModel<OslItem> {
+            return ListViewModel(it.name, it.desc.let { s -> if (s == "") it.url else s }, extra = it)
         }
 
         override val itemClickListener: SimpleListAdapter.OnItemClickListener<OslItem> =
             object : SimpleListAdapter.OnItemClickListener<OslItem> {
-                override fun onClick(holder: SimpleListAdapter.VHolder?, pos: Int, item: ViewModel<OslItem>) {
+                override fun onClick(holder: SimpleListAdapter.VHolder?, pos: Int, item: ListViewModel<OslItem>) {
                     val it = item.extra
                     if (it.url != null)
                         SystemBridge.openUrl(it.url)
                 }
             }
 
-        override fun onGetData(pageIndex: Int) {
+        override fun onLoadData(pageIndex: Int) {
             val l = listOf(
                     OslItem("GreenDao", "https://github.com/greenrobot/greenDAO", "greenDAO is an open source Android ORM making development for SQLite databases fun again. It relieves developers from dealing with low-level database requirements while saving development time.")
                     , OslItem("EventBus", "https://github.com/greenrobot/EventBus", "EventBus is an open-source library for Android and Java using the publisher/subscriber pattern for loose coupling. EventBus enables central communication to decoupled classes with just a few lines of code – simplifying the code, removing dependencies, and speeding up app development.")
@@ -53,6 +53,7 @@ class OSLActivity : OneFragmentActivity() {
                     , OslItem("RePlugin", "https://github.com/Qihoo360/RePlugin", "RePlugin is a complete Android plug-in solution which is suitable for general use.")
                     , OslItem("apk-parser", "https://github.com/hsiafan/apk-parser", "Apk parser lib, for decoding binary xml file, getting apk meta info.")
                      , OslItem("Recycler Fast Scroll", "https://github.com/plusCubed/recycler-fast-scroll", "")
+                     , OslItem("MarkdownView", "https://github.com/tiagohm/MarkdownView", "Android library to display markdown text.")
                     // , OslItem("", "", "")
             )
             notifyLoadSuccess(l, true)

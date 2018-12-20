@@ -3,7 +3,7 @@ package cn.vove7.jarvis.fragments
 import android.view.*
 import cn.vove7.common.utils.ThreadPool
 import cn.vove7.jarvis.adapters.SimpleListAdapter
-import cn.vove7.jarvis.adapters.ViewModel
+import cn.vove7.jarvis.adapters.ListViewModel
 import cn.vove7.jarvis.droidplugin.PluginManager
 import cn.vove7.jarvis.droidplugin.VPluginInfo
 import com.afollestad.materialdialogs.MaterialDialog
@@ -32,7 +32,7 @@ class InstalledPluginFragment : SimpleListFragment<VPluginInfo>() {
         registerForContextMenu(recyclerView)
     }
 
-    override fun onItemPopupMenu(item: MenuItem?, pos: Int, viewItem: ViewModel<VPluginInfo>): Boolean {
+    override fun onItemPopupMenu(item: MenuItem?, pos: Int, viewItem: ListViewModel<VPluginInfo>): Boolean {
         when (item?.itemId) {
             12 -> {
                 MaterialDialog(context!!)
@@ -65,7 +65,7 @@ class InstalledPluginFragment : SimpleListFragment<VPluginInfo>() {
         return super.onItemPopupMenu(item, pos, viewItem)
     }
 
-    override fun onCreatePopupMenu(menu: ContextMenu, pos: Int, viewItem: ViewModel<VPluginInfo>) {
+    override fun onCreatePopupMenu(menu: ContextMenu, pos: Int, viewItem: ListViewModel<VPluginInfo>) {
 //        menu.addSubMenu(0, 0, 0, viewItem.extra.name ?: "...")
         menu.add(0, 10, 1, "启动")
         menu.add(0, 11, 1, "更新日志")
@@ -73,11 +73,11 @@ class InstalledPluginFragment : SimpleListFragment<VPluginInfo>() {
     }
 
     override val itemClickListener = object : SimpleListAdapter.OnItemClickListener<VPluginInfo> {
-        override fun onClick(holder: SimpleListAdapter.VHolder?, pos: Int, item: ViewModel<VPluginInfo>) {
+        override fun onClick(holder: SimpleListAdapter.VHolder?, pos: Int, item: ListViewModel<VPluginInfo>) {
             item.extra.launch()
         }
 
-        override fun onLongClick(holder: SimpleListAdapter.VHolder?, pos: Int, item: ViewModel<VPluginInfo>): Boolean {
+        override fun onLongClick(holder: SimpleListAdapter.VHolder?, pos: Int, item: ListViewModel<VPluginInfo>): Boolean {
             //pop菜单
             return false
 //            (item.extra as VPluginInfo).uninstall()also {
@@ -88,7 +88,7 @@ class InstalledPluginFragment : SimpleListFragment<VPluginInfo>() {
 //                        }
         }
 
-        override fun onItemCheckedStatusChanged(holder: SimpleListAdapter.VHolder?, item: ViewModel<VPluginInfo>, isChecked: Boolean) {
+        override fun onItemCheckedStatusChanged(holder: SimpleListAdapter.VHolder?, item: ListViewModel<VPluginInfo>, isChecked: Boolean) {
             item.extra.apply {
                 enabled = isChecked
                 if (isChecked) startService()
@@ -97,7 +97,7 @@ class InstalledPluginFragment : SimpleListFragment<VPluginInfo>() {
         }
     }
 
-    override fun onGetData(pageIndex: Int) {
+    override fun onLoadData(pageIndex: Int) {
         notifyLoadSuccess(pluginManager.installList(true), true)
     }
 }

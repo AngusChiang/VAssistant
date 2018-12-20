@@ -1,8 +1,11 @@
 package cn.vove7.jarvis.activities
 
+import android.os.Build
 import android.os.Bundle
 import android.support.design.widget.BottomNavigationView
 import android.support.v7.app.AppCompatActivity
+import android.view.View
+import android.view.Window
 import cn.vove7.common.model.UserInfo
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.fragments.HomeFragment
@@ -17,9 +20,6 @@ import cn.vove7.vtp.runtimepermission.PermissionUtils
 import com.afollestad.materialdialogs.MaterialDialog
 import kotlinx.android.synthetic.main.activity_real_main.*
 import kotlinx.android.synthetic.main.fragment_mine.*
-import android.os.Build
-import android.view.View
-import android.view.Window
 
 
 class RealMainActivity : AppCompatActivity() {
@@ -57,15 +57,21 @@ class RealMainActivity : AppCompatActivity() {
     }
 
     var firstIn = true
+    var lastCheck = 0L
     override fun onResume() {
         super.onResume()
         if (!firstIn) {
-            checkDataUpdate()
-            checkAppUpdate(this, false)
+            //检查数据更新
+            val now = System.currentTimeMillis()
+            if (now - lastCheck > 120000) {
+                checkDataUpdate()
+                checkAppUpdate(this, false)
+                if (AppConfig.autoCheckPluginUpdate)// 插件更新
+                    DataUpdator.checkPluginUpdate()
+                lastCheck = now
+            }
         } else
             firstIn = false
-        if (AppConfig.autoCheckPluginUpdate)// 插件更新
-            DataUpdator.checkPluginUpdate()
     }
 
     companion object {
@@ -106,6 +112,7 @@ class RealMainActivity : AppCompatActivity() {
     }
 
     private fun showDataUpdateLog() {
+        lastCheck = System.currentTimeMillis()
         if (AppConfig.FIRST_LAUNCH_NEW_VERSION && showUpdate) {
             UpdateLogDialog(this) {
                 checkDataUpdate()

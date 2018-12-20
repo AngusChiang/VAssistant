@@ -42,7 +42,7 @@ interface SystemOperation {
      * @param name String
      * @return Pair<String,String>?
      */
-    fun getContactByName(name: String): Pair<String, String>?
+    fun getContactByName(name: String): Pair<String, Array<String>>?
 
     /**
      * 通过包名打开App
@@ -62,7 +62,7 @@ interface SystemOperation {
 
     /**
      * 拨打电话
-     * @param s 纯数字电话/联系人/标记联系人
+     * @param s 纯数字电话
      */
     fun call(s: String): Boolean
 

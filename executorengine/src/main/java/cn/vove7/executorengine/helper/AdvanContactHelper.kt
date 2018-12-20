@@ -73,20 +73,20 @@ object AdvanContactHelper : GenChoiceData, Markable {
      * 纯数字 -> 标记 -> 模糊匹配 -> 匹配提供
      * @return Pair<S,S>  first: 匹配的联系人姓名 or 纯数字 second: 手机号
      */
-    fun matchPhone(s: String, update: Boolean = true): Pair<String, String>? {
+    fun matchPhone(s: String, update: Boolean = true): Pair<String, Array<String>>? {
         if (phoneNum.matches(s)) {//数字
-            return Pair(s, s)
+            return Pair(s, arrayOf(s))
         }
         val markedPhone = markedContactDao.queryBuilder()//by key
                 .where(MarkedDataDao.Properties.Key.eq(s), MarkedDataDao.Properties.Type.eq(MarkedData.MARKED_TYPE_CONTACT)).unique()
         if (markedPhone != null) {
             Vog.d(this, "Matched from MarkedData by key $s")
-            return Pair(markedPhone.key, markedPhone.value)
+            return Pair(markedPhone.key, arrayOf(markedPhone.value))
         }
         //本地匹配
         val localMatched = LOCAL_CONTACT_LIST[s]
         if (localMatched != null) {
-            return Pair(localMatched.contactName, localMatched.phones[0])
+            return Pair(localMatched.contactName, localMatched.phones.toTypedArray())
         }
         //更新列表
         if (update) {
@@ -96,7 +96,7 @@ object AdvanContactHelper : GenChoiceData, Markable {
         //模糊匹配 -> 匹配提供
         val matchedList = fuzzyMatching(s)
         return if (matchedList.isNotEmpty()) {
-            Pair(matchedList[0].data.contactName, matchedList[0].data.phones[0])
+            Pair(matchedList[0].data.contactName, matchedList[0].data.phones.toTypedArray())
         } else {//匹配提供
             Vog.d(this, "match by regex")
 
@@ -104,12 +104,12 @@ object AdvanContactHelper : GenChoiceData, Markable {
             val list = markedContactDao.queryBuilder()
                     .where(MarkedDataDao.Properties.Type.eq(MarkedData.MARKED_TYPE_CONTACT)).list()
             list.forEach {
-                if (TextHelper.compareSimilarityWithPinyin(GlobalApp.APP, s, it.key) >= 0.8) // key 模糊查询
-                    return Pair(it.key, it.value)
+                if (TextHelper.compareSimilarityWithPinyin(GlobalApp.APP, s, it.key) >= 0.75) // key 模糊查询
+                    return Pair(it.key, arrayOf(it.value))
 
                 val regex = it.regex
                 if (regex.matches(s))
-                    return Pair(it.key, it.value)
+                    return Pair(it.key, arrayOf(it.value))
             }
             Vog.d(this, "from server no one")
             null
@@ -154,10 +154,14 @@ object AdvanContactHelper : GenChoiceData, Markable {
         return choiceList
     }
 
-    fun getSimpleList(): List<String> {
-        val choiceList = mutableListOf<String>()
+    /**
+     * 数据格式：
+     * @return List<String>
+     */
+    fun getSimpleList(): List<Pair<String,String>> {
+        val choiceList = mutableListOf<Pair<String,String>>()
         getChoiceData().forEach {
-            choiceList.add("${it.title}\n${it.subtitle}")
+            choiceList.add(Pair(it.title,it.subtitle?:""))
         }
         return choiceList
     }

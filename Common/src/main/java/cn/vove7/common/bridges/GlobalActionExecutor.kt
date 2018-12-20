@@ -20,8 +20,11 @@ import cn.vove7.vtp.log.Vog
 object GlobalActionExecutor : GlobalActionExecutorI {
 //    var screenAdapter = ScreenAdapter()
 
-    private val mService: AccessibilityService?
+    private val gestureService: AccessibilityService?
         get() = AccessibilityApi.gestureService
+
+    private val baseService: AccessibilityService?
+        get() = AccessibilityApi.accessibilityService
 
     override fun back(): Boolean {
         return performGlobalAction(AccessibilityService.GLOBAL_ACTION_BACK)
@@ -46,10 +49,10 @@ object GlobalActionExecutor : GlobalActionExecutorI {
     }
 
     private fun performGlobalAction(globalAction: Int): Boolean {
-        if (mService == null) {
+        if (baseService == null) {
             return false
         }
-        return mService?.performGlobalAction(globalAction) == true
+        return baseService?.performGlobalAction(globalAction) == true
     }
 
     override fun recents(): Boolean {
@@ -88,7 +91,7 @@ object GlobalActionExecutor : GlobalActionExecutorI {
      * @return Boolean
      */
     override fun gesture(start: Long, duration: Long, points: Array<Pair<Int, Int>>): Boolean {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N || mService == null) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N || gestureService == null) {
             GlobalLog.log("版本低于7.0或无障碍未打开")
             return false
         }
@@ -104,7 +107,7 @@ object GlobalActionExecutor : GlobalActionExecutorI {
      */
     @RequiresApi(api = Build.VERSION_CODES.N)
     override fun gestureAsync(start: Long, duration: Long, points: Array<Pair<Int, Int>>) {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N || mService == null) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N || gestureService == null) {
             GlobalLog.log("版本低于7.0或无障碍未打开")
             return
         }
@@ -118,7 +121,7 @@ object GlobalActionExecutor : GlobalActionExecutorI {
      * @param ppss Array<Array<Pair<Int, Int>>>
      */
     override fun gestures(duration: Long, ppss: Array<Array<Pair<Int, Int>>>) {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N || mService == null) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N || gestureService == null) {
             GlobalLog.log("版本低于7.0或无障碍未打开")
             return
         }
@@ -135,7 +138,7 @@ object GlobalActionExecutor : GlobalActionExecutorI {
      * @param ppss Array<Array<Pair<Int, Int>>>
      */
     override fun gesturesAsync(duration: Long, ppss: Array<Array<Pair<Int, Int>>>) {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N || mService == null) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N || gestureService == null) {
             GlobalLog.log("版本低于7.0或无障碍未打开")
             return
         }
@@ -188,11 +191,11 @@ object GlobalActionExecutor : GlobalActionExecutorI {
      */
     @RequiresApi(api = Build.VERSION_CODES.N)
     private fun gesturesWithoutHandler(description: GestureDescription): Boolean {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N || mService == null) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N || gestureService == null) {
             return false
         }
         val result = ResultBox(false)
-        mService?.dispatchGesture(description, object : AccessibilityService.GestureResultCallback() {
+        gestureService?.dispatchGesture(description, object : AccessibilityService.GestureResultCallback() {
             override fun onCompleted(gestureDescription: GestureDescription) {
                 result.setAndNotify(true)
             }
@@ -221,7 +224,7 @@ object GlobalActionExecutor : GlobalActionExecutorI {
         for (stroke in strokeList) {
             builder.addStroke(stroke)
         }
-        mService?.dispatchGesture(builder.build(), null, null)
+        gestureService?.dispatchGesture(builder.build(), null, null)
     }
 
     override fun toast(msg: String?) {

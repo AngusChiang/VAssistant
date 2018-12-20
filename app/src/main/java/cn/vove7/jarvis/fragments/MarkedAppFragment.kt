@@ -11,9 +11,9 @@ import cn.vove7.common.datamanager.greendao.MarkedDataDao
 import cn.vove7.common.utils.ThreadPool.runOnCachePool
 import cn.vove7.executorengine.bridges.SystemBridge
 import cn.vove7.jarvis.R
-import cn.vove7.jarvis.adapters.ViewModel
+import cn.vove7.jarvis.adapters.ListViewModel
 import cn.vove7.jarvis.fragments.base.BaseMarkedFragment
-import cn.vove7.jarvis.tools.DialogUtil
+import cn.vove7.jarvis.view.dialog.SelectAppDialog
 
 /**
  * # MarkedAppFragment
@@ -38,30 +38,34 @@ class MarkedAppFragment : BaseMarkedFragment() {
     override val valueHint: Int = R.string.text_package_name
     override val lastKeyId: Int = R.string.key_last_sync_marked_app_date
 
-    override fun onSelect() {//app list
-        DialogUtil.showSelApp(context!!) {
-            setValue(it.second)
+    val d by lazy {
+        SelectAppDialog(context!!) {
+            setValue(it.packageName)
             if (getKey() != "") {
-                setKey(it.first)
+                setKey(it.name)
             }
         }
     }
 
-    override fun transData(nodes: List<MarkedData>): List<ViewModel<MarkedData>> {
-        val ss = mutableListOf<ViewModel<MarkedData>>()
-        val sss = mutableListOf<ViewModel<MarkedData>>()
+    override fun onSelect() {//app list
+        d.show()
+    }
+
+    override fun transData(nodes: Collection<MarkedData>): List<ListViewModel<MarkedData>> {
+        val ss = mutableListOf<ListViewModel<MarkedData>>()
+        val sss = mutableListOf<ListViewModel<MarkedData>>()
         nodes.forEach {
             val app = SystemBridge.getAppInfo(it.value)
             if (app == null) {
                 if (showUninstall)
-                    sss.add(ViewModel(it.key, it.value, null, it))
-            } else ss.add(ViewModel(it.key, app.name, app.getIcon(GlobalApp.APP), it))
+                    sss.add(ListViewModel(it.key, it.value, null, it))
+            } else ss.add(ListViewModel(it.key, app.name, app.getIcon(GlobalApp.APP), it))
         }
-        ss.addAll(sss)
+        ss.addAll(sss)// 显示在最后
         return ss
     }
 
-    override fun onGetData(pageIndex: Int) {
+    override fun onLoadData(pageIndex: Int) {
         runOnCachePool {
             val builder = DAO.daoSession.markedDataDao
                     .queryBuilder()

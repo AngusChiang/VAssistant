@@ -2,14 +2,13 @@ package cn.vove7.jarvis.activities
 
 import android.support.v4.app.Fragment
 import android.view.Menu
-import cn.vove7.common.accessibility.AccessibilityApi
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.utils.ThreadPool
 import cn.vove7.executorengine.helper.AdvanAppHelper
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.activities.base.OneFragmentActivity
 import cn.vove7.jarvis.adapters.SimpleListAdapter
-import cn.vove7.jarvis.adapters.ViewModel
+import cn.vove7.jarvis.adapters.ListViewModel
 import cn.vove7.jarvis.fragments.SimpleListFragment
 import cn.vove7.jarvis.tools.QueryListener
 import cn.vove7.jarvis.tools.SearchActionHelper
@@ -54,7 +53,7 @@ class AccServiceBlackListManagerActivity : OneFragmentActivity() {
                 }
                 clearDataSet()
                 dataSet.addAll(tmp)
-                notifyLoadSuccess(true)
+                changeViewOnLoadDone(true)
             }
         }
 
@@ -66,21 +65,21 @@ class AccServiceBlackListManagerActivity : OneFragmentActivity() {
 
         override val itemCheckable: Boolean = true
 
-        override fun unification(data: AppInfo): ViewModel<AppInfo>? {
-            return ViewModel(title = data.name, subTitle = data.packageName,
+        override fun unification(data: AppInfo): ListViewModel<AppInfo>? {
+            return ListViewModel(title = data.name, subTitle = data.packageName,
                     icon = data.getIcon(context!!), extra = data,
                     checked = blackSet.contains(data.packageName))
         }
 
         override val itemClickListener: SimpleListAdapter.OnItemClickListener<AppInfo> =
             object : SimpleListAdapter.OnItemClickListener<AppInfo> {
-                override fun onClick(holder: SimpleListAdapter.VHolder?, pos: Int, item: ViewModel<AppInfo>) {
+                override fun onClick(holder: SimpleListAdapter.VHolder?, pos: Int, item: ListViewModel<AppInfo>) {
                     holder?.checkBox?.toggle()
                     item.checked = holder?.checkBox?.isChecked ?: false //这里手动改状态
                     onItemCheckedStatusChanged(holder, item, holder?.checkBox?.isChecked ?: false)
                 }
 
-                override fun onItemCheckedStatusChanged(holder: SimpleListAdapter.VHolder?, item: ViewModel<AppInfo>, isChecked: Boolean) {
+                override fun onItemCheckedStatusChanged(holder: SimpleListAdapter.VHolder?, item: ListViewModel<AppInfo>, isChecked: Boolean) {
                     if (isChecked)
                         blackSet.add(item.extra.packageName)
                     else
@@ -90,7 +89,7 @@ class AccServiceBlackListManagerActivity : OneFragmentActivity() {
                 }
             }
 
-        override fun onGetData(pageIndex: Int) {
+        override fun onLoadData(pageIndex: Int) {
             ThreadPool.runOnCachePool {
                 notifyLoadSuccess(AdvanAppHelper.APP_LIST.values.toList(), true)
             }

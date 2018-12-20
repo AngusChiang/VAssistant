@@ -11,19 +11,21 @@ import android.widget.TextView
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.fragments.AwesomeItem
 import cn.vove7.vtp.log.Vog
+import java.io.Serializable
+import java.text.Collator
 
-open class SimpleListAdapter<T>(private val dataset: MutableList<ViewModel<T>>
+open class SimpleListAdapter<T>(private val dataset: MutableList<ListViewModel<T>>
                                 , val itemClickListener: OnItemClickListener<T>? = null,
                                 val checkable: Boolean = false)
-    : RecAdapterWithFooter<SimpleListAdapter.VHolder, ViewModel<T>>() {
+    : RecAdapterWithFooter<SimpleListAdapter.VHolder, ListViewModel<T>>() {
 
     private val holders = SparseArray<SimpleListAdapter.VHolder>()
     override fun itemCount(): Int = dataset.size
-    override fun getItem(pos: Int): ViewModel<T>? {
+    override fun getItem(pos: Int): ListViewModel<T>? {
         return dataset[pos]
     }
 
-    override fun onBindView(holder: VHolder, position: Int, item: ViewModel<T>) {
+    override fun onBindView(holder: VHolder, position: Int, item: ListViewModel<T>) {
         holders.put(position, holder)
         holder.title?.text = item.title
 
@@ -66,9 +68,9 @@ open class SimpleListAdapter<T>(private val dataset: MutableList<ViewModel<T>>
         }
     }
 
-    val checkedList: List<ViewModel<T>>
+    val checkedList: List<ListViewModel<T>>
         get() = {
-            val l = mutableListOf<ViewModel<T>>()
+            val l = mutableListOf<ListViewModel<T>>()
 //            for (k in holders) {
 //
 //            }
@@ -99,17 +101,38 @@ open class SimpleListAdapter<T>(private val dataset: MutableList<ViewModel<T>>
     }
 
     interface OnItemClickListener<T> {
-        fun onClick(holder: VHolder?, pos: Int, item: ViewModel<T>)
-        fun onLongClick(holder: VHolder?, pos: Int, item: ViewModel<T>): Boolean = false
-        fun onItemCheckedStatusChanged(holder: VHolder?, item: ViewModel<T>, isChecked: Boolean) {}
+        fun onClick(holder: VHolder?, pos: Int, item: ListViewModel<T>)
+        fun onLongClick(holder: VHolder?, pos: Int, item: ListViewModel<T>): Boolean = false
+        fun onItemCheckedStatusChanged(holder: VHolder?, item: ListViewModel<T>, isChecked: Boolean) {}
     }
 
 }
 
-class ViewModel<T>(
+class ListViewModel<T>(
         val title: String?,
         val subTitle: String? = null,
         val icon: Drawable? = null,
         val extra: T,
         var checked: Boolean = false
-)
+) : Serializable, Comparable<ListViewModel<*>> {
+
+    companion object {
+        var CollChina = Collator.getInstance(java.util.Locale.CHINA)!!
+    }
+
+    override fun compareTo(other: ListViewModel<*>): Int {
+        var tt1 = CollChina.getCollationKey(this.title)
+        var tt2 = CollChina.getCollationKey(other.title)
+        val c = CollChina.compare(tt1.sourceString, tt2.sourceString)
+        return if (c == 0) {
+            tt1 = CollChina.getCollationKey(this.subTitle)
+            tt2 = CollChina.getCollationKey(other.subTitle)
+            CollChina.compare(tt1.sourceString, tt2.sourceString)
+        } else c
+    }
+
+    override fun toString(): String {
+        return "ChoiceData(title='$title', subtitle=$subTitle, originalData=$extra)"
+    }
+
+}

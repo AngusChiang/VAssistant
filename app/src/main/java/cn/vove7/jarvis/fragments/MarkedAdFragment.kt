@@ -9,7 +9,7 @@ import cn.vove7.common.utils.ThreadPool.runOnCachePool
 import cn.vove7.executorengine.bridges.SystemBridge
 import cn.vove7.jarvis.activities.AppAdListActivity
 import cn.vove7.jarvis.adapters.SimpleListAdapter
-import cn.vove7.jarvis.adapters.ViewModel
+import cn.vove7.jarvis.adapters.ListViewModel
 import cn.vove7.jarvis.fragments.base.OnSyncMarked
 import cn.vove7.jarvis.plugins.AdKillerService
 import cn.vove7.jarvis.tools.AppConfig
@@ -51,7 +51,7 @@ class MarkedAdFragment : SimpleListFragment<String>(), OnSyncMarked {
     }
 
     override val itemClickListener = object : SimpleListAdapter.OnItemClickListener<String> {
-        override fun onClick(holder: SimpleListAdapter.VHolder?, pos: Int, item: ViewModel<String>) {
+        override fun onClick(holder: SimpleListAdapter.VHolder?, pos: Int, item: ListViewModel<String>) {
             val intent = Intent(context, AppAdListActivity::class.java)
             intent.putExtra("title", item.title)
             intent.putExtra("pkg", item.extra)
@@ -89,13 +89,13 @@ class MarkedAdFragment : SimpleListFragment<String>(), OnSyncMarked {
         }
     }
 
-    override fun transData(nodes: List<String>): List<ViewModel<String>> {
-        val ss = mutableListOf<ViewModel<String>>()
-        val sss = mutableListOf<ViewModel<String>>()
+    override fun transData(nodes: Collection<String>): List<ListViewModel<String>> {
+        val ss = mutableListOf<ListViewModel<String>>()
+        val sss = mutableListOf<ListViewModel<String>>()
         nodes.forEach {
             val app = SystemBridge.getAppInfo(it)
             if (app != null)
-                sss.add(ViewModel(app.name, "数量：${maps[it]}", app.getIcon(GlobalApp.APP), extra = it))
+                sss.add(ListViewModel(app.name, "数量：${maps[it]}", app.getIcon(GlobalApp.APP), extra = it))
         }
         ss.addAll(sss)
         return ss
@@ -106,7 +106,7 @@ class MarkedAdFragment : SimpleListFragment<String>(), OnSyncMarked {
      */
     val maps = mutableMapOf<String, Int>()
 
-    override fun onGetData(pageIndex: Int) {
+    override fun onLoadData(pageIndex: Int) {
         runOnCachePool {
             notifyLoadSuccess(adAddPkgs.sub(pageIndex * pageSizeLimit, pageSizeLimit))
         }

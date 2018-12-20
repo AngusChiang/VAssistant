@@ -13,7 +13,7 @@ import cn.vove7.common.view.editor.MultiSpan
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.activities.PluginManagerActivity
 import cn.vove7.jarvis.adapters.SimpleListAdapter
-import cn.vove7.jarvis.adapters.ViewModel
+import cn.vove7.jarvis.adapters.ListViewModel
 import cn.vove7.jarvis.droidplugin.PluginManager
 import cn.vove7.jarvis.droidplugin.RePluginInfo
 import cn.vove7.jarvis.droidplugin.VPluginInfo
@@ -41,15 +41,15 @@ class NotInstalledPluginFragment : SimpleListFragment<VPluginInfo>() {
         }
     }
 
-    override fun unification(data: VPluginInfo): ViewModel<VPluginInfo>? {
+    override fun unification(data: VPluginInfo): ListViewModel<VPluginInfo>? {
         return if (data.isShow(1))//有更新
             if (data.isInstalled)
-                ViewModel(data.name + " (可更新)", data.subTitle, extra = data)
-            else ViewModel(data.name, data.subTitle, extra = data)
+                ListViewModel(data.name + " (可更新)", data.subTitle, extra = data)
+            else ListViewModel(data.name, data.subTitle, extra = data)
         else null
     }
 
-    override fun onGetData(pageIndex: Int) {
+    override fun onLoadData(pageIndex: Int) {
         NetHelper.postJson<List<RePluginInfo>>(ApiUrls.PLUGIN_LIST) { _, b ->
             if (b?.isOk() == true) {
                 notifyLoadSuccess(b.data ?: emptyList())
@@ -65,7 +65,7 @@ class NotInstalledPluginFragment : SimpleListFragment<VPluginInfo>() {
     var downloadTask: DownloadTask? = null
     override val itemClickListener =
         object : SimpleListAdapter.OnItemClickListener<VPluginInfo> {
-            override fun onClick(holder: SimpleListAdapter.VHolder?, pos: Int, item: ViewModel<VPluginInfo>) {
+            override fun onClick(holder: SimpleListAdapter.VHolder?, pos: Int, item: ListViewModel<VPluginInfo>) {
                 ProgressTextDialog(context!!, item.title).show {
                     positiveButton(text = "下载") {
                         downloadTask = NetHelper.download(ApiUrls.DL_PLUGIN + "${item.extra.fileName}", StorageHelper.pluginsPath,

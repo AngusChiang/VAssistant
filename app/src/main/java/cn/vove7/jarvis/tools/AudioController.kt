@@ -25,18 +25,18 @@ object AudioController {
         ThreadPool.runOnCachePool {
             val p = MediaPlayer.create(GlobalApp.APP, rawId, AudioAttributes.Builder()
                     .setLegacyStreamType(streamType).build(), 9)
-            p.setOnCompletionListener {
+            p?.setOnCompletionListener {
                 onFinish?.invoke()
                 Vog.d(this, "playOnce ---> 结束")
                 it?.release()
-            }
-            p.setOnErrorListener { p, w, e ->
+            } ?: onFinish?.invoke()
+            p?.setOnErrorListener { p, w, e ->
                 p.release()
                 Vog.d(this, "playOnce 出错 ---> $w, $e")
                 onFinish?.invoke()
                 true
             }
-            p.start()
+            p?.start()
         }
     }
 
