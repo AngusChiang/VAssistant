@@ -57,19 +57,23 @@ object AdKillerService : AbsAccPluginService() {
     }
 
     private fun onSkipAd(node: ViewNode) {
-        node.tryClick().also { clickResult ->
-            Vog.i(this, "Ad click ---> $clickResult")
-            if (clickResult) {
-                Vog.d(this, "onSkipAd ---> 发现广告，清除成功")
-                AppConfig.plusAdKillCount()//+1
-
-                if (AppConfig.isToastWhenRemoveAd) {
-                    removeAdAnimation.begin()
-                    removeAdAnimation.hideDelay(3500)
-                }
-            } else
-                Vog.d(this, "onSkipAd ---> 发现广告，清除失败")
+        var clickResult = node.tryClick()
+        if (!clickResult) {
+            Vog.d(this, "onSkipAd ---> 发现广告点击失败 使用globalClick")
+            clickResult = node.globalClick()
         }
+        Vog.i(this, "Ad click ---> $clickResult")
+
+        if (clickResult) {
+            Vog.d(this, "onSkipAd ---> 发现广告，清除成功")
+            AppConfig.plusAdKillCount()//+1
+
+            if (AppConfig.isToastWhenRemoveAd) {
+                removeAdAnimation.begin()
+                removeAdAnimation.hideDelay(3500)
+            }
+        } else
+            Vog.d(this, "onSkipAd ---> 发现广告，清除失败")
     }
 
     //搜索线程

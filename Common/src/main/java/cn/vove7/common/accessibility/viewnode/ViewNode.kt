@@ -51,15 +51,14 @@ class ViewNode(val node: AccessibilityNodeInfo) : ViewOperation, Comparable<View
     }
 
     override fun tryClick(): Boolean {
-        val r = tryOp(AccessibilityNodeInfo.ACTION_CLICK)
-        if (r) return true
+        return tryOp(AccessibilityNodeInfo.ACTION_CLICK)
+//        if (r) return true
         // global op
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            //获得中心点
-            val relp = ScreenAdapter.getRelPoint(getCenterPoint())
-            return GlobalActionExecutor.click(relp.x, relp.y)
-        }
-        return false
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+//            //获得中心点
+//            return globalClick()
+//        }
+//        return false
     }
 
     override fun globalClick(): Boolean {

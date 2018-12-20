@@ -34,7 +34,6 @@ object GlobalActionExecutor : GlobalActionExecutorI {
         return performGlobalAction(AccessibilityService.GLOBAL_ACTION_HOME)
     }
 
-
     override fun powerDialog(): Boolean {
         return performGlobalAction(AccessibilityService.GLOBAL_ACTION_POWER_DIALOG)
     }

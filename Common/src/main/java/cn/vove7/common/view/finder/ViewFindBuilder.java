@@ -8,7 +8,6 @@ import cn.vove7.common.accessibility.viewnode.ViewNode;
 import cn.vove7.common.app.GlobalApp;
 import cn.vove7.common.app.GlobalLog;
 import cn.vove7.common.executor.CExecutorI;
-import cn.vove7.vtp.log.Vog;
 
 import static cn.vove7.common.view.finder.ViewFinderWithMultiCondition.TEXT_MATCH_MODE_CONTAIN;
 import static cn.vove7.common.view.finder.ViewFinderWithMultiCondition.TEXT_MATCH_MODE_EQUAL;
@@ -23,7 +22,7 @@ import static cn.vove7.common.view.finder.ViewFinderWithMultiCondition.TEXT_MATC
  * <p>
  * 2018/8/5
  */
-public class ViewFindBuilder extends FindBuilder {
+public class ViewFindBuilder extends FindBuilderWithOperation {
     private ViewFinderWithMultiCondition viewFinderX;
 
     public ViewFinderWithMultiCondition getViewFinderX() {
@@ -52,6 +51,7 @@ public class ViewFindBuilder extends FindBuilder {
         setFinder(viewFinderX);
     }
 
+    @Override
     public ViewNode waitFor() {
         return waitFor(30000L);
     }
@@ -62,7 +62,8 @@ public class ViewFindBuilder extends FindBuilder {
      * @param m 时限
      * @return ViewNode which is returned until show in screen
      */
-    public ViewNode waitFor(Long m) {
+    @Override
+    public ViewNode waitFor(long m) {
         if (viewFinderX != null) {
             return viewFinderX.waitFor(m);
         } else {

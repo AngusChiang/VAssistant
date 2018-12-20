@@ -64,13 +64,14 @@ fun runOnNewHandlerThread(name: String = "anonymous", autoQuit: Boolean = true,
 fun <T> whileWaitTime(waitMillis: Long, run: () -> T?): T? {
     val begin = System.currentTimeMillis()
     var now: Long
+    val ct = Thread.currentThread()
     do {
         run.invoke()?.also {
             //if 耗时操作
             return it
         }
         now = System.currentTimeMillis()
-    } while (now - begin < waitMillis)
+    } while (now - begin < waitMillis && !ct.isInterrupted)
     return null
 }
 
@@ -83,7 +84,8 @@ fun <T> whileWaitTime(waitMillis: Long, run: () -> T?): T? {
  */
 fun <T> whileWaitCount(waitCount: Int, run: () -> T?): T? {
     var count = 0
-    while (count++ < waitCount) {
+    val ct = Thread.currentThread()
+    while (count++ < waitCount && !ct.isInterrupted) {
         run.invoke()?.also {
             //if 耗时操作
             return it

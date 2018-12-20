@@ -407,8 +407,8 @@ class MainService : BusService(),
 
     //from executor 线程
     override fun onExecuteFailed(errMsg: String?) {//错误信息
-        Vog.e(this, "onExecuteFailed: $errMsg")
-        executeAnimation.failedAndHideDelay()
+        GlobalLog.log("执行出错：$errMsg")
+        executeAnimation.failedAndHideDelay(errMsg)
         if (AppConfig.execFailedVoiceFeedback)
             speakSync("执行失败")
         else GlobalApp.toastShort("执行失败")
