@@ -238,23 +238,31 @@ private fun getHomes(context: Context): List<String> {
 }
 
 fun View.toggleVisibility(toggleVisibility: Int = View.GONE) {
-    visibility = if (visibility == toggleVisibility) {
-        View.VISIBLE
-    } else {
-        toggleVisibility
+    runOnUi {
+        visibility = if (visibility == toggleVisibility) {
+            View.VISIBLE
+        } else {
+            toggleVisibility
+        }
     }
 }
 
 fun View.isVisibility(): Boolean = visibility == View.VISIBLE
 
 fun View.gone() {
-    visibility = View.GONE
+    runOnUi {
+        visibility = View.GONE
+    }
 }
 
 fun View.show() {
-    visibility = View.VISIBLE
+    runOnUi {
+        visibility = View.VISIBLE
+    }
 }
 
 fun View.inVisibility() {
-    visibility = View.INVISIBLE
+    runOnUi {
+        visibility = View.INVISIBLE
+    }
 }

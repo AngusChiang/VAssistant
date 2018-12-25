@@ -155,9 +155,12 @@ object AdKillerService : AbsAccPluginService() {
         Vog.i(this, "smartSkipAppSwitchAd ---> 寻找App切换广告")
         sthreads.add(thread {
             //寻找1.5s 频繁切换 耗电量?
-            ViewFindBuilder().containsText("跳过", "skip").waitFor(1500)?.also {
-                onSkipAd(it)
-            } ?: Vog.i(this, "smartSkipAppSwitchAd ---> 未发现广告")
+            ViewFindBuilder()
+                    .textLengthLimit(8)
+                    .containsText("跳过", "skip")
+                    .waitFor(1500)?.also {
+                        onSkipAd(it)
+                    } ?: Vog.i(this, "smartSkipAppSwitchAd ---> 未发现广告")
         })
     }
 

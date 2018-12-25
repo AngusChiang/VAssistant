@@ -47,6 +47,24 @@ object GlobalActionExecutor : GlobalActionExecutorI {
         return performGlobalAction(AccessibilityService.GLOBAL_ACTION_QUICK_SETTINGS)
     }
 
+    override fun lockScreen(): Boolean {
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            performGlobalAction(AccessibilityService.GLOBAL_ACTION_LOCK_SCREEN)
+        } else {
+            GlobalLog.err("lockScreen 仅支持Android9.0+")
+            false
+        }
+    }
+
+    override fun screenShot(): Boolean {
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            performGlobalAction(AccessibilityService.GLOBAL_ACTION_TAKE_SCREENSHOT)
+        } else {
+            GlobalLog.err("screenShot 仅支持Android9.0+")
+            false
+        }
+    }
+
     private fun performGlobalAction(globalAction: Int): Boolean {
         if (baseService == null) {
             return false
@@ -305,6 +323,16 @@ interface GlobalActionExecutorI {
     fun notificationBar(): Boolean
 
     fun quickSettings(): Boolean
+    /**
+     * 无障碍锁屏
+     * @return Boolean
+     */
+    fun lockScreen(): Boolean
+
+    /**
+     * 无障碍截屏
+     */
+    fun screenShot(): Boolean
 
     fun recents(): Boolean
     fun splitScreen(): Boolean
@@ -353,3 +381,4 @@ interface GlobalActionExecutorI {
      */
     fun toast(msg: String?)
 }
+

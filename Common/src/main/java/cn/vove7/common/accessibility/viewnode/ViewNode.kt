@@ -119,7 +119,7 @@ class ViewNode(val node: AccessibilityNodeInfo) : ViewOperation, Comparable<View
     override fun getChildCount(): Int = node.childCount
 
 
-    fun childAt(i: Int): ViewNode? {
+    override fun childAt(i: Int): ViewNode? {
         val cn = node.getChild(i)
         if (cn != null) {
             return ViewNode(cn)

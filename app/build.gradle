@@ -6,12 +6,13 @@ apply plugin: 'org.greenrobot.greendao'
 android {
     compileSdkVersion 28
     buildToolsVersion '28.0.2'
+
     defaultConfig {
         applicationId "cn.vove7.vassistant"
         minSdkVersion 21
         targetSdkVersion 27
-        versionCode 71
-        versionName "1.6.4"
+        versionCode 74
+        versionName "1.6.7"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
         multiDexEnabled true
@@ -90,7 +91,7 @@ task makeJar(type: Jar) {
     //打包到jar后的目录结构
     into('cn/vove7/')
     //去掉不需要打包的目录和文件
-    exclude('BuildConfig.class'/*, 'R.class'*/)
+    exclude('BuildConfig.class')
     //去掉R$开头的文件
     //exclude{ it.name.startsWith('R$');}
 }

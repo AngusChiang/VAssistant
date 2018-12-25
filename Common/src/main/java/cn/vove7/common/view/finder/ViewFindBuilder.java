@@ -1,5 +1,7 @@
 package cn.vove7.common.view.finder;
 
+import android.util.Range;
+
 import java.util.Arrays;
 
 import cn.vove7.common.R;
@@ -7,7 +9,6 @@ import cn.vove7.common.accessibility.AccessibilityApi;
 import cn.vove7.common.accessibility.viewnode.ViewNode;
 import cn.vove7.common.app.GlobalApp;
 import cn.vove7.common.app.GlobalLog;
-import cn.vove7.common.executor.CExecutorI;
 
 import static cn.vove7.common.view.finder.ViewFinderWithMultiCondition.TEXT_MATCH_MODE_CONTAIN;
 import static cn.vove7.common.view.finder.ViewFinderWithMultiCondition.TEXT_MATCH_MODE_EQUAL;
@@ -29,20 +30,8 @@ public class ViewFindBuilder extends FindBuilderWithOperation {
         return viewFinderX;
     }
 
-    private AccessibilityApi accessibilityService;
-
-    /**
-     * wait使用
-     *
-     * @param executor CExecutorI 执行器实例
-     */
-    public ViewFindBuilder(CExecutorI executor) {
-        this();
-    }
-
     public ViewFindBuilder() {
-        accessibilityService =
-                AccessibilityApi.Companion.getAccessibilityService();
+        AccessibilityApi accessibilityService = AccessibilityApi.Companion.getAccessibilityService();
         if (accessibilityService == null) {//没有运行
             GlobalLog.INSTANCE.err("AccessibilityService is not running.");
             return;
@@ -84,13 +73,13 @@ public class ViewFindBuilder extends FindBuilderWithOperation {
      * @return this
      */
     public ViewFindBuilder containsText(String... text) {
-        viewFinderX.getViewText().addAll(Arrays.asList(text));
+        viewFinderX.addViewTextCondition(text);
         viewFinderX.setTextMatchMode(TEXT_MATCH_MODE_CONTAIN);
         return this;
     }
 
     public ViewFindBuilder containsText(String text) {
-        viewFinderX.getViewText().add(text);
+        viewFinderX.addViewTextCondition(text);
         viewFinderX.setTextMatchMode(TEXT_MATCH_MODE_CONTAIN);
         return this;
     }
@@ -102,13 +91,13 @@ public class ViewFindBuilder extends FindBuilderWithOperation {
      * @return this
      */
     public ViewFindBuilder matchesText(String... regs) {
-        viewFinderX.getViewText().addAll(Arrays.asList(regs));
+        viewFinderX.addViewTextCondition(regs);
         viewFinderX.setTextMatchMode(TEXT_MATCH_MODE_MATCHES);
         return this;
     }
 
     public ViewFindBuilder matchesText(String regs) {
-        viewFinderX.getViewText().add(regs);
+        viewFinderX.addViewTextCondition(regs);
         viewFinderX.setTextMatchMode(TEXT_MATCH_MODE_MATCHES);
         return this;
     }
@@ -121,13 +110,13 @@ public class ViewFindBuilder extends FindBuilderWithOperation {
      * @return this
      */
     public ViewFindBuilder equalsText(String... text) {
-        viewFinderX.getViewText().addAll(Arrays.asList(text));
+        viewFinderX.addViewTextCondition(text);
         viewFinderX.setTextMatchMode(TEXT_MATCH_MODE_EQUAL);
         return this;
     }
 
     public ViewFindBuilder equalsText(String text) {
-        viewFinderX.getViewText().add(text);
+        viewFinderX.addViewTextCondition(text);
         viewFinderX.setTextMatchMode(TEXT_MATCH_MODE_EQUAL);
         return this;
     }
@@ -139,16 +128,27 @@ public class ViewFindBuilder extends FindBuilderWithOperation {
      * @return this
      */
     public ViewFindBuilder similaryText(String... text) {
-        viewFinderX.getViewText().addAll(Arrays.asList(text));
+        viewFinderX.addViewTextCondition(text);
         viewFinderX.setTextMatchMode(TEXT_MATCH_MODE_FUZZY_WITH_PINYIN);
         return this;
     }
 
     public ViewFindBuilder similaryText(String text) {
-        viewFinderX.getViewText().add(text);
+        viewFinderX.addViewTextCondition(text);
         viewFinderX.setTextMatchMode(TEXT_MATCH_MODE_FUZZY_WITH_PINYIN);
         return this;
     }
+
+    public ViewFindBuilder textLengthLimit(int limit) {
+        viewFinderX.setTextLengthLimit(Range.create(0, limit));
+        return this;
+    }
+
+    public ViewFindBuilder textLengthLimit(int lower, int upper) {
+        viewFinderX.setTextLengthLimit(Range.create(lower, upper));
+        return this;
+    }
+
 
     /**
      * 根据id 查找
