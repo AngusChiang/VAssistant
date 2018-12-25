@@ -101,6 +101,14 @@ function recents()
     return automator.recents()
 end
 
+function lockScreen()
+    return automator.lockScreen()
+end
+
+function screenShot()
+    return automator.lockScreen()
+end
+
 function toast(msg)
     automator.toast(msg)
 end

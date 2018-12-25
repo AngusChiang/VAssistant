@@ -80,6 +80,7 @@ interface ViewOperation {
      */
     fun getChildCount(): Int?
 
+    fun childAt(i: Int): ViewNode?
     /**
      * 长按操作
      * @return Boolean

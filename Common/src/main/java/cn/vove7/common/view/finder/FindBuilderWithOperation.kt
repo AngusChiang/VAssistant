@@ -71,44 +71,44 @@ abstract class FindBuilderWithOperation : ViewOperation {
     }
 
     override fun tryClick(): Boolean {
-        return (waitFor(2000) ?: throw ViewNodeNotFoundException(finder)).tryClick()
+        return (waitFor(WAIT_MILLIS) ?: throw ViewNodeNotFoundException(finder)).tryClick()
     }
 
     override fun click(): Boolean {
-        return (waitFor(2000) ?: throw ViewNodeNotFoundException(finder)).tryClick()
+        return (waitFor(WAIT_MILLIS) ?: throw ViewNodeNotFoundException(finder)).tryClick()
     }
 
     override fun globalClick(): Boolean {
-        return (waitFor(2000) ?: throw ViewNodeNotFoundException(finder)).globalClick()
+        return (waitFor(WAIT_MILLIS) ?: throw ViewNodeNotFoundException(finder)).globalClick()
     }
 
     override fun longClick(): Boolean {
-        return (waitFor(2000) ?: throw ViewNodeNotFoundException(finder)).longClick()
+        return (waitFor(WAIT_MILLIS) ?: throw ViewNodeNotFoundException(finder)).longClick()
     }
 
     override fun doubleClick(): Boolean {
-        return (waitFor(2000) ?: throw ViewNodeNotFoundException(finder)).doubleClick()
+        return (waitFor(WAIT_MILLIS) ?: throw ViewNodeNotFoundException(finder)).doubleClick()
     }
 
     override fun tryLongClick(): Boolean {
-        return (waitFor(2000) ?: throw ViewNodeNotFoundException(finder)).tryLongClick()
+        return (waitFor(WAIT_MILLIS) ?: throw ViewNodeNotFoundException(finder)).tryLongClick()
     }
 
     override fun getCenterPoint(): Point? {
-        return (waitFor(2000) ?: throw ViewNodeNotFoundException(finder)).getCenterPoint()
+        return (waitFor(WAIT_MILLIS) ?: throw ViewNodeNotFoundException(finder)).getCenterPoint()
     }
 
     override fun select(): Boolean {
-        return (waitFor(2000) ?: throw ViewNodeNotFoundException(finder)).select()
+        return (waitFor(WAIT_MILLIS) ?: throw ViewNodeNotFoundException(finder)).select()
     }
 
     override fun trySelect(): Boolean {
-        return (waitFor(2000) ?: throw ViewNodeNotFoundException(finder)).trySelect()
+        return (waitFor(WAIT_MILLIS) ?: throw ViewNodeNotFoundException(finder)).trySelect()
     }
 
     override fun scrollUp(): Boolean {
         return try {
-            (waitFor(2000) ?: throw ViewNodeNotFoundException(finder)).scrollUp()
+            (waitFor(WAIT_MILLIS) ?: throw ViewNodeNotFoundException(finder)).scrollUp()
         } catch (e: Exception) {
             e.printStackTrace()
             false
@@ -118,7 +118,7 @@ abstract class FindBuilderWithOperation : ViewOperation {
 
     override fun scrollDown(): Boolean {
         return try {
-            (waitFor(2000) ?: throw ViewNodeNotFoundException(finder)).scrollDown()
+            (waitFor(WAIT_MILLIS) ?: throw ViewNodeNotFoundException(finder)).scrollDown()
         } catch (e: Exception) {
             e.printStackTrace()
             false
@@ -126,78 +126,88 @@ abstract class FindBuilderWithOperation : ViewOperation {
     }
 
     override fun setText(text: String, ep: String?): Boolean {
-        return (waitFor(2000) ?: throw ViewNodeNotFoundException(finder)).setText(text, ep)
+        return (waitFor(WAIT_MILLIS) ?: throw ViewNodeNotFoundException(finder)).setText(text, ep)
     }
 
     override fun setText(text: String): Boolean {
-        return (waitFor(2000) ?: throw ViewNodeNotFoundException(finder)).setText(text)
+        return (waitFor(WAIT_MILLIS) ?: throw ViewNodeNotFoundException(finder)).setText(text)
     }
 
     override fun appendText(s: String): Boolean {
-        return (waitFor(2000) ?: throw ViewNodeNotFoundException(finder)).appendText(s)
+        return (waitFor(WAIT_MILLIS) ?: throw ViewNodeNotFoundException(finder)).appendText(s)
     }
 
     override fun desc(): String? {
-        return (waitFor(2000) ?: throw ViewNodeNotFoundException(finder)).desc()
+        return (waitFor(WAIT_MILLIS) ?: throw ViewNodeNotFoundException(finder)).desc()
     }
 
     override fun setTextWithInitial(text: String): Boolean {
-        return (waitFor(2000) ?: throw ViewNodeNotFoundException(finder)).setTextWithInitial(text)
+        return (waitFor(WAIT_MILLIS)
+            ?: throw ViewNodeNotFoundException(finder)).setTextWithInitial(text)
     }
 
     override fun trySetText(text: String): Boolean {
-        return (waitFor(2000) ?: throw ViewNodeNotFoundException(finder)).trySetText(text)
+        return (waitFor(WAIT_MILLIS) ?: throw ViewNodeNotFoundException(finder)).trySetText(text)
     }
 
     override fun getText(): String? {
-        return (waitFor(2000) ?: throw ViewNodeNotFoundException(finder)).getText()
+        return (waitFor(WAIT_MILLIS) ?: throw ViewNodeNotFoundException(finder)).getText()
     }
 
     override fun focus(): Boolean {
-        return (waitFor(2000) ?: throw ViewNodeNotFoundException(finder)).focus()
+        return (waitFor(WAIT_MILLIS) ?: throw ViewNodeNotFoundException(finder)).focus()
     }
 
     override fun scrollForward(): Boolean {
-        return (waitFor(2000) ?: throw ViewNodeNotFoundException(finder)).scrollForward()
+        return (waitFor(WAIT_MILLIS) ?: throw ViewNodeNotFoundException(finder)).scrollForward()
     }
 
     override fun scrollBackward(): Boolean {
-        return (waitFor(2000) ?: throw ViewNodeNotFoundException(finder)).scrollBackward()
+        return (waitFor(WAIT_MILLIS) ?: throw ViewNodeNotFoundException(finder)).scrollBackward()
     }
 
     override fun scrollLeft(): Boolean {
-        return (waitFor(2000) ?: throw ViewNodeNotFoundException(finder)).scrollLeft()
+        return (waitFor(WAIT_MILLIS) ?: throw ViewNodeNotFoundException(finder)).scrollLeft()
     }
 
     override fun swipe(dx: Int, dy: Int, delay: Int): Boolean {
-        return (waitFor(2000) ?: throw ViewNodeNotFoundException(finder)).swipe(dx, dy, delay)
+        return (waitFor(WAIT_MILLIS)
+            ?: throw ViewNodeNotFoundException(finder)).swipe(dx, dy, delay)
     }
 
     override fun scrollRight(): Boolean {
-        return (waitFor(2000) ?: throw ViewNodeNotFoundException(finder)).scrollRight()
+        return (waitFor(WAIT_MILLIS) ?: throw ViewNodeNotFoundException(finder)).scrollRight()
     }
 
     override fun getChilds(): Array<ViewNode>? {
-        return (waitFor(2000) ?: throw ViewNodeNotFoundException(finder)).getChilds()
+        return (waitFor(WAIT_MILLIS) ?: throw ViewNodeNotFoundException(finder)).getChilds()
+    }
+
+    override fun childAt(i: Int): ViewNode? {
+        return (waitFor(WAIT_MILLIS) ?: throw ViewNodeNotFoundException(finder)).childAt(i)
     }
 
     override fun getBounds(): Rect? {
-        return (waitFor(2000) ?: throw ViewNodeNotFoundException(finder)).getBounds()
+        return (waitFor(WAIT_MILLIS) ?: throw ViewNodeNotFoundException(finder)).getBounds()
     }
 
     override fun getBoundsInParent(): Rect? {
-        return (waitFor(2000) ?: throw ViewNodeNotFoundException(finder)).getBoundsInParent()
+        return (waitFor(WAIT_MILLIS) ?: throw ViewNodeNotFoundException(finder)).getBoundsInParent()
     }
 
     override fun getParent(): ViewNode? {
-        return (waitFor(2000) ?: throw ViewNodeNotFoundException(finder)).getParent()
+        return (waitFor(WAIT_MILLIS) ?: throw ViewNodeNotFoundException(finder)).getParent()
     }
 
     override fun getChildCount(): Int? {
-        return (waitFor(2000) ?: throw ViewNodeNotFoundException(finder)).getChildCount()
+        return (waitFor(WAIT_MILLIS) ?: throw ViewNodeNotFoundException(finder)).getChildCount()
     }
 
     override fun isClickable(): Boolean {
-        return (waitFor(2000) ?: throw ViewNodeNotFoundException(finder)).isClickable()
+        return (waitFor(WAIT_MILLIS) ?: throw ViewNodeNotFoundException(finder)).isClickable()
+    }
+
+    companion object {
+        val WAIT_MILLIS = 2000L
     }
 }

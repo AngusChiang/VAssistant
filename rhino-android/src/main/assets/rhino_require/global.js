@@ -110,6 +110,14 @@ function recents(){
 }
 //
 
+function lockScreen(){
+    return automator.lockScreen()
+}
+
+function screenShot(){
+    return automator.lockScreen()
+}
+
 function toast(msg){
     automator.toast(msg)
 }

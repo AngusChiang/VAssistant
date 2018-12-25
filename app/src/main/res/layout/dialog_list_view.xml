@@ -1,31 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:layout_height="match_parent">
 
-    <ProgressBar
-        android:id="@+id/p_bar"
-        style="?android:attr/progressBarStyleHorizontal"
+    <cn.vove7.jarvis.view.custom.WrappedRecyView
+        android:id="@+id/recycler_view"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:indeterminate="true"
-        android:paddingTop="2dp"
-        android:paddingBottom="2dp" />
+        android:layout_height="match_parent"
+        android:minHeight="400dp" />
 
-    <RelativeLayout
+    <com.pluscubed.recyclerfastscroll.RecyclerFastScroller
+        android:id="@+id/fast_scroller"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
-        <cn.vove7.jarvis.view.custom.WrappedRecyView
-            android:id="@+id/recycler_view"
-            android:layout_width="match_parent"
-            android:minHeight="400dp"
-            android:layout_height="match_parent" />
+        android:layout_height="wrap_content" />
 
-        <com.pluscubed.recyclerfastscroll.RecyclerFastScroller
-            android:id="@+id/fast_scroller"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
-
-    </RelativeLayout>
-    </LinearLayout>
+</RelativeLayout>

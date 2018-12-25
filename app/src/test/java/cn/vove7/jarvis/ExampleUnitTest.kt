@@ -1,5 +1,6 @@
 package cn.vove7.jarvis
 
+import android.util.Range
 import cn.vove7.common.datamanager.parse.model.Action
 import cn.vove7.common.utils.TextDateParser
 import cn.vove7.common.utils.TextHelper
@@ -279,5 +280,11 @@ class ExampleUnitTest {
 
         println("end")
 
+    }
+
+    @Test
+    fun rangeTest() {
+        val a=5
+        print(Range.create(0,10).contains(a))
     }
 }

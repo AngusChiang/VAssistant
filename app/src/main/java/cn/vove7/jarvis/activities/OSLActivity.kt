@@ -3,8 +3,8 @@ package cn.vove7.jarvis.activities
 import android.support.v4.app.Fragment
 import cn.vove7.executorengine.bridges.SystemBridge
 import cn.vove7.jarvis.activities.base.OneFragmentActivity
-import cn.vove7.jarvis.adapters.SimpleListAdapter
 import cn.vove7.jarvis.adapters.ListViewModel
+import cn.vove7.jarvis.adapters.SimpleListAdapter
 import cn.vove7.jarvis.fragments.SimpleListFragment
 
 /**
@@ -48,12 +48,12 @@ class OSLActivity : OneFragmentActivity() {
                     , OslItem("CodeView (Android)", "https://github.com/kbiakov/CodeView-android", "CodeView helps to show code content with syntax highlighting in native way.")
                     , OslItem("Jsoup", "https://jsoup.org/", "jsoup is a Java library for working with real-world HTML. It provides a very convenient API for extracting and manipulating data, using the best of DOM, CSS, and jquery-like methods.")
                     , OslItem("TapTargetView", "https://github.com/KeepSafe/TapTargetView", "")
-                    , OslItem("BGAQRCode-Android", "https://github.com/bingoogolapple/BGAQRCode-Android","")
+                    , OslItem("BGAQRCode-Android", "https://github.com/bingoogolapple/BGAQRCode-Android", "")
                     , OslItem("Glide", "https://bumptech.github.io/glide/", "Glide is a fast and efficient image loading library for Android focused on smooth scrolling. Glide offers an easy to use API, a performant and extensible resource decoding pipeline and automatic resource pooling.")
                     , OslItem("RePlugin", "https://github.com/Qihoo360/RePlugin", "RePlugin is a complete Android plug-in solution which is suitable for general use.")
                     , OslItem("apk-parser", "https://github.com/hsiafan/apk-parser", "Apk parser lib, for decoding binary xml file, getting apk meta info.")
-                     , OslItem("Recycler Fast Scroll", "https://github.com/plusCubed/recycler-fast-scroll", "")
-                     , OslItem("MarkdownView", "https://github.com/tiagohm/MarkdownView", "Android library to display markdown text.")
+                    , OslItem("Recycler Fast Scroll", "https://github.com/plusCubed/recycler-fast-scroll", "")
+                    , OslItem("MarkdownView", "https://github.com/tiagohm/MarkdownView", "Android library to display markdown text.")
                     // , OslItem("", "", "")
             )
             notifyLoadSuccess(l, true)

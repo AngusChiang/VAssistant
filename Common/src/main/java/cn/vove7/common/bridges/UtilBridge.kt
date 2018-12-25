@@ -6,6 +6,9 @@ import cn.vove7.common.app.GlobalLog
 import cn.vove7.vtp.log.Vog
 import java.io.File
 import java.io.FileOutputStream
+import android.content.Intent
+import android.net.Uri
+
 
 /**
  * # UtilBridge
@@ -24,6 +27,8 @@ object UtilBridge {
                 FileOutputStream(this).use {
                     bitmap.compress(Bitmap.CompressFormat.PNG, 80, it)
                 }
+                GlobalApp.APP.sendBroadcast(Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE,
+                        Uri.fromFile(this)))
             }
         } catch (se: SecurityException) {
             GlobalApp.toastShort("无存储权限")

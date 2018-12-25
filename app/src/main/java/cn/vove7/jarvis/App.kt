@@ -17,6 +17,7 @@ import cn.vove7.jarvis.receivers.UtilEventReceiver
 import cn.vove7.jarvis.services.AssistSessionService
 import cn.vove7.jarvis.services.MainService
 import cn.vove7.jarvis.tools.AppConfig
+import cn.vove7.jarvis.tools.AppNotification
 import cn.vove7.jarvis.tools.CrashHandler
 import cn.vove7.jarvis.tools.ShortcutUtil
 import cn.vove7.vtp.log.Vog
@@ -35,8 +36,8 @@ class App : GlobalApp() {
 
     lateinit var services: Array<Intent>
     override fun onCreate() {
-        Vog.d(this, "onCreate ---> begin ${System.currentTimeMillis() / 1000}")
         super.onCreate()
+        Vog.d(this, "onCreate ---> begin ${System.currentTimeMillis() / 1000}")
         ins = this
 
         CrashHandler.init()
@@ -44,7 +45,7 @@ class App : GlobalApp() {
         AppConfig.init()//加载配置
         Vog.d(this, "onCreate ---> 配置加载完成")
 
-        runOnNewHandlerThread("app_load") {
+        runOnNewHandlerThread("app_load",delay = 1000) {
             if(AppConfig.FIRST_LAUNCH_NEW_VERSION || BuildConfig.DEBUG)
                 LuaApp.init(this)
             startServices()
@@ -56,6 +57,7 @@ class App : GlobalApp() {
                 if (AppConfig.autoOpenASWithRoot && !PermissionUtils.accessibilityServiceEnabled(this@App)) {
                     RootHelper.openSelfAccessService()
                 }
+                AppNotification.updateNotificationChannel(this)
             }
             //插件自启 fixme
             RePluginManager().launchWithApp()

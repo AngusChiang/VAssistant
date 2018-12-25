@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <accessibility-service xmlns:android="http://schemas.android.com/apk/res/android"
-    android:accessibilityEventTypes="typeViewClicked|typeWindowStateChanged|typeViewLongClicked|typeWindowsChanged"
+    android:accessibilityEventTypes="typeViewClicked|typeWindowStateChanged"
     android:accessibilityFeedbackType="feedbackAllMask"
     android:accessibilityFlags="flagIncludeNotImportantViews|flagReportViewIds|flagRetrieveInteractiveWindows|flagRequestEnhancedWebAccessibility|flagRequestFilterKeyEvents"
     android:canRetrieveWindowContent="true"
     android:description="@string/desc_accessibility"
     android:notificationTimeout="0"
     android:canRequestFilterKeyEvents="true"
+    android:canRequestEnhancedWebAccessibility="true"
     android:settingsActivity="cn.vove7.jarvis.activities.SettingsActivity" />
     <!--android:canRequestTouchExplorationMode="true"-->

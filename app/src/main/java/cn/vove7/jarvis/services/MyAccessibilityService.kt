@@ -131,10 +131,10 @@ class MyAccessibilityService : AccessibilityApi() {
                 Vog.i(this, "onAccessibilityEvent ---> 点击 :${ViewNode(event.source)}")
             } catch (e: Exception) {
             }
-            AccessibilityEvent.TYPE_WINDOWS_CHANGED -> try {
-                Vog.i(this, "onAccessibilityEvent ---> TYPE_WINDOWS_CHANGED :${event.source}")
-            } catch (e: Exception) {
-            }
+//            AccessibilityEvent.TYPE_WINDOWS_CHANGED -> try {
+//                Vog.i(this, "onAccessibilityEvent ---> TYPE_WINDOWS_CHANGED :${event.source}")
+//            } catch (e: Exception) {
+//            }
         }
 
         //        runOnCachePool {

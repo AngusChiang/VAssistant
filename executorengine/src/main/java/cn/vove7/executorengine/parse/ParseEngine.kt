@@ -119,7 +119,7 @@ object ParseEngine {
                 }
             } else if (SpHelper(GlobalApp.APP).getBoolean("use_smartopen_if_parse_failed",
                             true) && AccessibilityApi.isBaseServiceOn) {//失败,默认点击
-                if (ViewFindBuilder().similaryText(cmdWord).tryClick())
+                if (ViewFindBuilder().similaryText(cmdWord).findFirst()?.tryClick() == true)
                     return ParseResult(true, PriorityQueue(), "smart点击 $cmdWord")
             }
             ParseResult(actionQueue.isNotEmpty(), actionQueue, inAppQue.first)

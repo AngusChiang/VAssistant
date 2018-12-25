@@ -75,7 +75,7 @@ object AppConfig {
 
     var openVoiceWakeUpIfAutoSleep = true// 自动休眠后，亮屏自动开启语音唤醒
     var openChatSystem = true
-    var autoSleepWakeupMillis: Long = 30 * 60 * 1000
+    var autoSleepWakeupMillis: Long = 10 * 60 * 1000
     var chatSystem: String = ""
     var userWakeupWord: String = ""//用户唤醒词
     //    var continuousDialogue = false//连续对话
@@ -99,7 +99,7 @@ object AppConfig {
 
     var autoCheckPluginUpdate = true
 
-    var FIRST_LAUNCH_NEW_VERSION = false //新版本第一次启动
+    var FIRST_LAUNCH_NEW_VERSION = false or BuildConfig.DEBUG //新版本第一次启动
 
     var smartKillAd = false // 跳过自动识别未标记的广告
 
@@ -150,6 +150,7 @@ object AppConfig {
      * 启动时执行一次
      */
     private fun checkFirstLaunch() {
+        if(BuildConfig.DEBUG) return
         val lastCode = sp.getLong("v_code")
         val nowCode = AppConfig.versionCode
         if (lastCode < nowCode) {
@@ -296,10 +297,12 @@ object AppConfig {
                 val oneHour: Long = 60 * 60 * 1000
                 val i = GlobalApp.APP.resources.getStringArray(R.array.list_auto_sleep_duration).indexOf(it)
                 when (i) {
-                    0 -> oneHour / 2
-                    1 -> oneHour
-                    2 -> 2 * oneHour
-                    3 -> 5 * oneHour
+                    0 -> oneHour / 6
+                    1 -> oneHour / 3
+                    2 -> oneHour / 2
+                    3 -> oneHour
+                    4 -> 2 * oneHour
+                    5 -> 5 * oneHour
                     else -> autoSleepWakeupMillis
                 }
             }

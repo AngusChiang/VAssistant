@@ -332,9 +332,8 @@ open class ExecutorImpl(
             }
         }
         AppBus.post(CommandHistory(UserInfo.getUserId(), "打开|关闭 $p", null))
-        GlobalLog.log("parseOpenOrCloseAction 未知操作: $p")
+        Vog.d(this,"parseOpenOrCloseAction ---> 未知操作: $p")
         return false
-//        }
     }
 
     /**

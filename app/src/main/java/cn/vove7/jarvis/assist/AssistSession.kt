@@ -233,6 +233,7 @@ class AssistSession(context: Context) : VoiceInteractionSession(context),
         }
     }
 
+    //todo 悬浮窗
     private fun onScanQRCodeSuccess(result: String?) {
         Vog.d(this, "onScanQRCodeSuccess ---> $result")
         if (result == null) {

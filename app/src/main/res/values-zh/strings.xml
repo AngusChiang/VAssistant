@@ -2,6 +2,8 @@
 <resources>
 
     <string-array name="list_auto_sleep_duration">
+        <item>10分钟</item>
+        <item>20分钟</item>
         <item>30分钟</item>
         <item>1小时</item>
         <item>2小时</item>

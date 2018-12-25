@@ -14,8 +14,6 @@ import cn.vove7.common.accessibility.AccessibilityApi
 import cn.vove7.common.accessibility.viewnode.ViewNode
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.datamanager.parse.model.ActionScope
-import cn.vove7.jarvis.tools.baiduaip.BaiduAipHelper
-import cn.vove7.common.utils.LooperHelper
 import cn.vove7.common.utils.ThreadPool.runOnCachePool
 import cn.vove7.common.utils.runOnNewHandlerThread
 import cn.vove7.common.utils.runOnUi
@@ -27,14 +25,12 @@ import cn.vove7.jarvis.R
 import cn.vove7.jarvis.services.MainService
 import cn.vove7.jarvis.tools.AppConfig
 import cn.vove7.jarvis.tools.Tutorials
-import cn.vove7.jarvis.view.dialog.ProgressDialog
-import cn.vove7.jarvis.view.dialog.ProgressTextDialog
+import cn.vove7.jarvis.tools.baiduaip.BaiduAipHelper
 import cn.vove7.jarvis.view.dialog.WordSplitDialog
+import cn.vove7.jarvis.view.dialog.base.BottomDialogWithText
 import cn.vove7.vtp.log.Vog
 import cn.vove7.vtp.sharedpreference.SpHelper
-import com.afollestad.materialdialogs.MaterialDialog
 import java.util.concurrent.CountDownLatch
-import kotlin.concurrent.thread
 
 /**
  * # ScreenPickerActivity
@@ -166,6 +162,7 @@ class ScreenPickerActivity : Activity() {
                     it.subText = res
                     runOnUi {
                         it.textView?.isChecked = true
+                        it.textView?.text = res
                     }
                 } else {
                     it.subText = "翻译失败"
@@ -202,7 +199,8 @@ class ScreenPickerActivity : Activity() {
             val view = CheckedTextView(this).apply {
                 setBackgroundResource(R.drawable.bg_screen_text_high_light)
                 val rect = it.getBounds()
-                gravity = Gravity.CENTER
+                gravity = Gravity.TOP
+                setTextColor(0xFFFFFF)
                 textSize = 15f
                 isVerticalScrollBarEnabled = true
                 setOnClickListener {
@@ -221,19 +219,8 @@ class ScreenPickerActivity : Activity() {
     }
 
     private fun showSplitWordDialog(s: String) {
-        val p = ProgressDialog(this)
-        thread {
-            LooperHelper.prepareIfNeeded()
-            val wordList = BaiduAipHelper.lexer(s)
-            p.dismiss()
-            if (wordList == null) {
-                toast.showLong("分词失败")
-            } else {
-                runOnUi {
-                    sd = WordSplitDialog(this, s, wordList).dialog
-                }
-            }
-        }
+        sd = WordSplitDialog(this, s)
+        sd?.show()
     }
 
     override fun onStop() {
@@ -244,44 +231,63 @@ class ScreenPickerActivity : Activity() {
         Vog.d(this, "onStop ---> ")
     }
 
-    var sd: MaterialDialog? = null
+    var sd: WordSplitDialog? = null
 
-    var d: ProgressTextDialog? = null
+    var d: BottomDialogWithText? = null
     private val onItemClick: (Model) -> Unit = { model ->
         val text = model.text
         Vog.d(this, " ---> $text")
-        d = ProgressTextDialog(this, "选择", true, true)
-                .positiveButton(text = "复制原文") {
-                    SystemBridge.setClipText(text)
-                    toast.showShort(R.string.text_copied)
-                    it.dismiss()
-                }
-                .negativeButton(text = "翻译") {
+        d = BottomDialogWithText(this, "文字操作").apply d@{
+            noAutoDismiss()
+            positiveButton(text = "复制原文") {
+                SystemBridge.setClipText(text)
+                toast.showShort(R.string.text_copied)
+            }
+            neutralButton(text = "分词") {
+                showSplitWordDialog(text)
+                dismiss()
+            }
+            if (model.subText == null)
+                negativeButton(text = "翻译") {
                     if (!AppConfig.haveTranslatePermission())
                         return@negativeButton
                     runOnCachePool {
-                        d?.clear()
-                        d?.appendlnGreen("\n翻译中...")
-                        val r = BaiduAipHelper.translate(text, to = AppConfig.translateLang)
-                        if (r != null) {
-                            model.subText = r.transResult
-                            d?.apply {
-                                d?.clear()
+                        textView.apply {
+                            appendlnGreen("\n翻译中...")
+                            val r = BaiduAipHelper.translate(text, to = AppConfig.translateLang)
+                            if (r != null) {
+                                model.subText = r.transResult
+                                clear()
                                 appendln(text)
                                 appendlnRed("\n翻译结果：")
                                 appendln(model.subText)
-                            }
-                        } else d?.appendlnRed("翻译失败")
+                                setCopyTranslationText(this@d, r.transResult)
+                            } else appendlnRed("翻译失败")
+                        }
                     }
                 }
-                .neutralButton(text = "分词") {
-                    showSplitWordDialog(text)
-                    it.dismiss()
-                } as ProgressTextDialog
-        d?.appendln(text)
-        model.subText?.also {
-            d?.appendlnRed("\n翻译结果：")
-            d?.appendln(it)
+            textView.apply {
+                setPadding(50, 20, 50, 20)
+                appendln(text)
+                model.subText?.also {
+                    appendlnRed("\n翻译结果：")
+                    appendln(it)
+                    setCopyTranslationText(this@d,it)
+                }
+            }
+            show()
+        }
+    }
+
+    /**
+     * 若翻译过 ，显示 复制原文
+     */
+    private fun setCopyTranslationText(bd:BottomDialogWithText, trans:String) {
+        runOnUi {
+            bd.negativeButton(text = "复制翻译") {
+                SystemBridge.setClipText(trans)
+                toast.showShort(R.string.text_copied)
+            }
         }
     }
 
@@ -291,7 +297,6 @@ class ScreenPickerActivity : Activity() {
             var subText: String? = null
     ) {
         val text: String get() = viewNode.getText() ?: viewNode.desc() ?: ""
-
     }
 
 }

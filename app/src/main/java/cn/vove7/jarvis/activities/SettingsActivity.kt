@@ -137,7 +137,7 @@ class SettingsActivity : ReturnableActivity() {
                         }
                         return@SwitchItem true
                     }, defaultValue = { false }),
-                    SingleChoiceItem(title = "自动休眠时长", summary = "在非充电状态下，为了节省电量，在无操作一段时间后将自动关闭唤醒",
+                    SingleChoiceItem(title = "自动休眠时长", summary = "在非充电状态下，为了节省电量，在无操作一段时间后将自动关闭唤醒\n默认10分钟",
                             keyId = R.string.key_auto_sleep_wakeup_duration,
                             entityArrId = R.array.list_auto_sleep_duration, defaultValue = { 0 }) { _, _ ->
                         if (AppConfig.voiceWakeup) {

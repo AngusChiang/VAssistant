@@ -95,6 +95,8 @@
     </string-array>
 
     <string-array name="list_auto_sleep_duration">
+        <item>10 minutes</item>
+        <item>20 minutes</item>
         <item>30 minutes</item>
         <item>1 hours</item>
         <item>2 hours</item>

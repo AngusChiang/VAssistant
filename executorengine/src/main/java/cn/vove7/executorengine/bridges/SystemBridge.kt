@@ -32,6 +32,7 @@ import cn.vove7.common.accessibility.AccessibilityApi
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.appbus.AppBus
+import cn.vove7.common.bridges.GlobalActionExecutor
 import cn.vove7.common.bridges.RootHelper
 import cn.vove7.common.bridges.SystemOperation
 import cn.vove7.common.bridges.UtilBridge.bitmap2File
@@ -936,7 +937,9 @@ object SystemBridge : SystemOperation {
 
     //发送电源按键
     override fun screenOff() {
-        sendKey(66)
+        if (AccessibilityApi.isBaseServiceOn && Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            GlobalActionExecutor.lockScreen()
+        } else sendKey(26)
     }
 
     override fun quickSearch(s: String?) {

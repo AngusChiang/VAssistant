@@ -136,8 +136,8 @@ class BaiduSpeechRecoService(event: SpeechEvent) : SpeechRecoService(event) {
                 Pair(SpeechConstant.IN_FILE, "#cn.vove7.jarvis.speech.baiduspeech.MicrophoneInputStream.getInstance()"),
                 Pair(SpeechConstant.PID, 1536)
         ).also {
-            if (!AppConfig.openResponseWord)//响应词打开则无效
-                it[SpeechConstant.AUDIO_MILLS] = System.currentTimeMillis() - 500
+            if (!AppConfig.openResponseWord)//唤醒即识别 响应词打开则无效
+                it[SpeechConstant.AUDIO_MILLS] = System.currentTimeMillis() - 200
             //从指定时间开始识别，可以 - 指定ms 识别之前的内容
             if (AppConfig.lastingVoiceCommand)
                 it[SpeechConstant.VAD_ENDPOINT_TIMEOUT] = 0

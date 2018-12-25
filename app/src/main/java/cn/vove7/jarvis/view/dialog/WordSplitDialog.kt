@@ -4,6 +4,8 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Color
 import android.graphics.Rect
+import android.os.Bundle
+import android.support.v7.widget.AppCompatCheckedTextView
 import android.view.MotionEvent
 import android.view.View
 import android.widget.CheckedTextView
@@ -11,10 +13,11 @@ import cn.vove7.common.utils.runOnUi
 import cn.vove7.common.view.toast.ColorfulToast
 import cn.vove7.executorengine.bridges.SystemBridge
 import cn.vove7.jarvis.R
+import cn.vove7.jarvis.fragments.base.BaseBottomDialogWithToolbar
+import cn.vove7.jarvis.tools.baiduaip.BaiduAipHelper
 import cn.vove7.jarvis.view.custom.WarpLinearLayout
 import cn.vove7.vtp.log.Vog
-import com.afollestad.materialdialogs.MaterialDialog
-import com.afollestad.materialdialogs.customview.customView
+import kotlin.concurrent.thread
 import kotlin.math.max
 import kotlin.math.min
 
@@ -22,66 +25,89 @@ import kotlin.math.min
  * # WordSplitDialog
  *  分词
  * @author Administrator
+ * @param type 滑动时 反转方式
  * 2018/10/28
  */
-class WordSplitDialog(val context: Context, rawWords: String,
-                      wordList: List<String>, val type: Int = 0) {
+class WordSplitDialog(context: Context, val rawWords: String, val type: Int = 0)
+    : BaseBottomDialogWithToolbar(context, "分词") {
+
     val toast: ColorfulToast by lazy { ColorfulToast(context) }
     private val checkedTextList = mutableListOf<CheckedTextView>()
-    val dialog: MaterialDialog
+    private var wordList = mutableListOf<String>()
+    override fun onCreateContentView(parent: View): View = layoutInflater.inflate(R.layout.dialog_pick_text, null)
 
-    init {
-        dialog = MaterialDialog(context).title(text = "选择")
-                .noAutoDismiss()
-                .customView(R.layout.dialog_pick_text, scrollable = true)
-                .positiveButton(text = "快速搜索") {
-                    val st = getCheckedText(checkedTextList)
-                    if (st.isEmpty()) {
-                        toast.showShort(R.string.text_select_nothing)
-                        return@positiveButton
-                    }
-                    SystemBridge.quickSearch(st)
+    private var lexerThread: Thread? = null
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        showLoadingBar()
+        lexerThread = thread {
+            BaiduAipHelper.lexer(rawWords).also {
+                if (Thread.currentThread().isInterrupted) return@thread
+                lexerThread = null
+                if (it == null) {
+                    wordList.add("分词失败")
+                } else {
+                    wordList.addAll(it)
                 }
-                .negativeButton(text = "复制") {
-                    val st = getCheckedText(checkedTextList)
-                    if (st.isEmpty()) {
-                        toast.showShort(R.string.text_select_nothing)
-                        return@negativeButton
-                    }
-                    SystemBridge.setClipText(rawWords)
-                    toast.showShort(R.string.text_copied)
-                    it.dismiss()
+                runOnUi {
+                    init()
                 }
-                .neutralButton(text = "分享") {
-                    val st = getCheckedText(checkedTextList)
-                    if (st.isEmpty()) {
-                        toast.showShort(R.string.text_select_nothing)
-                        return@neutralButton
-                    }
-                    SystemBridge.shareText(st)
-                    it.dismiss()
-                }
-                .show {
-                    val content = findViewById<WarpLinearLayout>(R.id.words_content)
-                    runOnUi {
-                        wordList.withIndex().forEach { kv ->
-                            val v = buildView(kv.index, kv.value)
-                            content.addView(v)
-                            checkedTextList.add(v)
-                        }
-                    }
-                    splitAndOnTouch(checkedTextList, content!!)
-                }
+                hideLoadingBar()
+            }
+        }
+        setOnDismissListener {
+            lexerThread?.interrupt()
+        }
+    }
+
+    fun init() {
+        noAutoDismiss()
+        positiveButton(text = "快速搜索") {
+            val st = getCheckedText(checkedTextList)
+            if (st.isEmpty()) {
+                toast.showShort(R.string.text_select_nothing)
+                return@positiveButton
+            }
+            SystemBridge.quickSearch(st)
+        }
+        negativeButton(text = "复制") {
+            val st = getCheckedText(checkedTextList)
+            if (st.isEmpty()) {
+                toast.showShort("已复制原文")
+                SystemBridge.setClipText(rawWords)
+                return@negativeButton
+            }
+            SystemBridge.setClipText(getCheckedText(checkedTextList))
+            toast.showShort(R.string.text_copied)
+        }
+        neutralButton(text = "分享") {
+            val st = getCheckedText(checkedTextList)
+            if (st.isEmpty()) {
+                toast.showShort(R.string.text_select_nothing)
+                return@neutralButton
+            }
+            SystemBridge.shareText(st)
+            dismiss()
+        }
+        val content = findViewById<WarpLinearLayout>(R.id.words_content)!!
+        runOnUi {
+            wordList.withIndex().forEach { kv ->
+                val v = buildView(kv.index, kv.value)
+                content.addView(v)
+                checkedTextList.add(v)
+            }
+        }
+        splitAndOnTouch(checkedTextList, content)
     }
 
 
     private fun buildView(index: Int, it: String): CheckedTextView {
-        return CheckedTextView(context).apply {
+        return AppCompatCheckedTextView(context).apply {
             setBackgroundResource(R.drawable.pickable_bg)
             text = it
             setPadding(20, 10, 20, 10)
-            textSize = 15f
-            setTextColor(Color.WHITE)
+            textSize = 16f
+            setTextColor(Color.BLACK)
             isChecked = false
             isFocusable = false
             tag = index
@@ -178,7 +204,10 @@ class WordSplitDialog(val context: Context, rawWords: String,
                     return@setOnTouchListener true//触发
                 }
                 MotionEvent.ACTION_UP -> {
-                    if (!isMove) startView?.toggle()
+                    if (!isMove) {//点击
+                        startView?.toggle()
+                        switchView(startView)
+                    }
                     startView = null
                     isMove = false
                     endView = null
@@ -210,6 +239,11 @@ class WordSplitDialog(val context: Context, rawWords: String,
         }
     }
 
+    fun switchView(view: CheckedTextView?) {
+        view?.apply {
+            setTextColor(if(isChecked) Color.WHITE else Color.BLACK)
+        }
+    }
 
     /**
      * 以初始位置 为 status，区间内全部按status 外部保持
@@ -250,6 +284,7 @@ class WordSplitDialog(val context: Context, rawWords: String,
             val index = it.tag as Int
             if (index in start..end) {
                 it.isChecked = !backStatus[index]//反向
+                switchView(it)
             } else {
                 try {//恢复
                     it.isChecked = backStatus[index]
@@ -257,6 +292,7 @@ class WordSplitDialog(val context: Context, rawWords: String,
                     e.printStackTrace()
                     it.isChecked = false
                 }
+                switchView(it)
             }
         }
     }

@@ -5,10 +5,7 @@ import android.os.Bundle
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.view.View
-import android.widget.ProgressBar
-import cn.vove7.common.utils.gone
 import cn.vove7.common.utils.runOnUi
-import cn.vove7.common.utils.show
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.ViewModelLoader
 import cn.vove7.jarvis.adapters.ListViewModel
@@ -25,7 +22,6 @@ import com.pluscubed.recyclerfastscroll.RecyclerFastScroller
 abstract class BottomDialogWithList<T>(context: Context, title: String)
     : BaseBottomDialogWithToolbar(context, title), ViewModelLoader<T>,
         SimpleListAdapter.OnItemClickListener<T> {
-    private val pbar by lazy { myView.findViewById<ProgressBar>(R.id.p_bar) }
     private val listAdapter by lazy { SimpleListAdapter(dataSet, this) }
     override var pageIndex: Int = 0
 
@@ -42,20 +38,18 @@ abstract class BottomDialogWithList<T>(context: Context, title: String)
 
     override fun changeViewOnLoadDone(allLoad: Boolean) {
         runOnUi {
-            pbar.gone()
+            hideLoadingBar()
             listAdapter.notifyDataSetChanged()
         }
     }
 
     override fun changeViewOnLoading() {
-        runOnUi {
-            pbar.show()
-        }
+        showLoadingBar()
     }
 
 
     override fun onBackPressed() {
-        if(toolbar.hasExpandedActionView()) {
+        if (toolbar.hasExpandedActionView()) {
             toolbar.collapseActionView()
             return
         }

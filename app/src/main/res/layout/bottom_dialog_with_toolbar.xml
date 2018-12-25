@@ -15,19 +15,24 @@
         app:popupTheme="@style/Theme.AppCompat.Light.DarkActionBar"
         app:title="" />
 
+    <ProgressBar
+        android:id="@+id/p_bar"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:indeterminate="true"
+        android:paddingTop="2dp"
+        android:visibility="gone"
+        android:paddingBottom="2dp" />
 
     <android.support.v4.widget.NestedScrollView
         android:id="@+id/content_container"
         android:layout_width="match_parent"
         android:layout_height="0dp"
+        android:minHeight="200dp"
         android:layout_weight="1"/>
+
     <!--按钮区-->
     <include layout="@layout/dialog_footer"/>
-    <!--<LinearLayout-->
-        <!--android:id="@+id/button_layout"-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:orientation="horizontal">-->
 
-    <!--</LinearLayout>-->
 </LinearLayout>

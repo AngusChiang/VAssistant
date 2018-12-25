@@ -1,5 +1,6 @@
 package cn.vove7.common.view.finder
 
+import android.util.Range
 import android.view.accessibility.AccessibilityNodeInfo
 import cn.vove7.common.accessibility.AccessibilityApi
 import cn.vove7.common.accessibility.viewnode.ViewNode
@@ -17,7 +18,11 @@ import java.util.*
  */
 class ViewFinderWithMultiCondition(accessibilityService: AccessibilityApi) : ViewFinder(accessibilityService) {
 
-    var viewText: MutableList<String> = mutableListOf()
+    var viewTextCondition: MutableList<String> = mutableListOf()
+    fun addViewTextCondition(vararg s: String) {
+        viewTextCondition.addAll(s)
+    }
+
     var textMatchMode: Int = 0
     var descMatchMode: Int = 0
     var viewId: String? = null
@@ -25,6 +30,7 @@ class ViewFinderWithMultiCondition(accessibilityService: AccessibilityApi) : Vie
     var editable: Boolean? = null
     var scrollable: Boolean? = null
     var typeNames: MutableList<String> = mutableListOf()
+    var textLengthLimit: Range<Int>? = null
     var depths: Array<Int> = arrayOf()
         set(value) {
             findBy = BY_DEPTHS
@@ -52,8 +58,8 @@ class ViewFinderWithMultiCondition(accessibilityService: AccessibilityApi) : Vie
      * @return ViewNode?
      */
     fun findByDepths(): ViewNode? {
-        var p: AccessibilityNodeInfo? = rootNode ?:{
-            Vog.d(this,"findByDepths ---> rootNode is null")
+        var p: AccessibilityNodeInfo? = rootNode ?: {
+            Vog.d(this, "findByDepths ---> rootNode is null")
             null
         }.invoke()
         depths.forEach {
@@ -64,12 +70,12 @@ class ViewFinderWithMultiCondition(accessibilityService: AccessibilityApi) : Vie
                 return null
             }
             if (p == null) {
-                Vog.v(this,"findByDepths ---> 搜索失败1")
+                Vog.v(this, "findByDepths ---> 搜索失败1")
                 return null
             }
         }
-        if (p == null){
-            Vog.v(this,"findByDepths ---> 搜索失败2")
+        if (p == null) {
+            Vog.v(this, "findByDepths ---> 搜索失败2")
             return null
         }
 
@@ -93,19 +99,28 @@ class ViewFinderWithMultiCondition(accessibilityService: AccessibilityApi) : Vie
      */
     override fun findCondition(node: AccessibilityNodeInfo): Boolean {
         //could not remove "$.." prevent cause null
-        if (viewId != null
-                && !"${node.viewIdResourceName}".endsWith("/$viewId"))// :id/view_id)
-            return false
-
-
-        if (!matchTextWithCondition(textMatchMode, "${node.text}", viewText)) {
-            return false
+        val vid = "${node.viewIdResourceName}"
+        if (viewId != null) {
+            if (!vid.endsWith("/$viewId") && vid != viewId)
+            // :id/view_id) //网页视图 id : id
+                return false
         }
 
+        val viewText = node.text
+        //文字长度
+        val tl = textLengthLimit
+        if (tl != null && viewText != null && !tl.contains(viewText.length)) {
+            return false
+        }
+        //匹配文字
+        if (!matchTextWithCondition(textMatchMode, "${node.text}", viewTextCondition)) {
+            return false
+        }
+        //匹配说明
         if (!matchTextWithCondition(descMatchMode, "${node.contentDescription}", descTexts)) {
             return false
         }
-
+        //匹配className
         if (typeNames.isNotEmpty()) {
             var ok = false
             for (it in typeNames) {
@@ -118,21 +133,21 @@ class ViewFinderWithMultiCondition(accessibilityService: AccessibilityApi) : Vie
             }
             if (!ok) return false
         }
-
+        //可滑动
         if (scrollable != null && node.isScrollable != scrollable) {
             return false
         }
-
+        //可编辑
         if (editable != null && node.isEditable != editable) {
             return false
         }
-        Vog.i(this, "findCondition  find it ")
+        Vog.i(this, "findCondition find it ")
         return true
     }
 
     override fun toString(): String {
         return "Condition(" +
-                (if (viewText.isNotEmpty()) "viewText=$viewText" else "") +
+                (if (viewTextCondition.isNotEmpty()) "viewTextCondition=$viewTextCondition" else "") +
                 ", textMatchMode=$textMatchMode" +
                 (if (viewId != null) ", viewId=$viewId" else "") +
                 (if (descTexts.isNotEmpty()) ", desc=$descTexts" else "") +
@@ -165,7 +180,7 @@ class ViewFinderWithMultiCondition(accessibilityService: AccessibilityApi) : Vie
                 when (type) {
                     TEXT_MATCH_MODE_EQUAL -> {
                         for (it in ms) {
-                            val b = text != null && "${text}".equals(it, ignoreCase = true)
+                            val b = it.equals(text, ignoreCase = true)
                             if (b) {
                                 ok = true
                                 break

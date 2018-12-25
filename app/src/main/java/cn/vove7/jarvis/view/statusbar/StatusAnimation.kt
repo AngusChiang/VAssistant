@@ -1,12 +1,15 @@
 package cn.vove7.jarvis.view.statusbar
 
+import android.app.Notification
 import android.app.NotificationManager
 import android.content.Context
 import android.os.Build
+import android.provider.Settings
 import android.support.v4.app.NotificationManagerCompat
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.app.GlobalLog
 import cn.vove7.jarvis.R
+import cn.vove7.jarvis.tools.AppConfig
 import cn.vove7.vtp.log.Vog
 import cn.vove7.vtp.notification.ChannelBuilder
 import cn.vove7.vtp.notification.NotificationHelper
@@ -21,11 +24,22 @@ import kotlin.concurrent.thread
  * 2018/9/2
  */
 abstract class StatusAnimation {
-
+    open val importLevel: Int = NotificationManagerCompat.IMPORTANCE_LOW
+    open val alert: Boolean = false
     open val nId = 127
-    val c = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-        ChannelBuilder.with("StatusBarIcon", "IconAnimation", NotificationManagerCompat.IMPORTANCE_LOW).build()
-    } else null
+    val channel get() =
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            ChannelBuilder.with("StatusBarIcon${AppConfig.versionName}${if (alert) "_alert" else ""}",
+                    "状态栏动画${if (alert) "_alert" else ""}", importLevel).build().apply {
+                Vog.d(this, "alert ---> $alert")
+                if (alert) {
+                    enableVibration(true)
+                    setSound(Settings.System.DEFAULT_NOTIFICATION_URI, Notification.AUDIO_ATTRIBUTES_DEFAULT)
+                    vibrationPattern = longArrayOf(0, 200)
+                }
+            }
+        } else null
+
 
     abstract var title: String
     abstract var beginAniId: Int
@@ -34,7 +48,7 @@ abstract class StatusAnimation {
     open var successId = -1
     open val finishId: Int? = null
 
-    private val notifier = NotificationHelper(GlobalApp.APP, c)
+    private val notifier by lazy {NotificationHelper(GlobalApp.APP, channel ,alert)}
 
     fun begin() {
         hideThread?.interrupt()
@@ -50,6 +64,7 @@ abstract class StatusAnimation {
      * @param c String message
      */
     fun show(c: String) {
+        Vog.d(this, "show ---> $c")
         try {
             notifier.showNotification(nId, title, c, NotificationIcons(beginAniId))
         } catch (e: Exception) {

@@ -104,7 +104,6 @@ public class MicrophoneInputStream extends InputStream {
         Log.i(TAG, " MicrophoneInputStream close");
         if (audioRecord != null) {
             try {
-                audioRecord.stop();
                 audioRecord.release();
                 audioRecord = null;
                 //closeBTHeadsetMicro();

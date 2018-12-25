@@ -9,6 +9,7 @@ import android.text.SpannableStringBuilder
 import android.util.AttributeSet
 import android.widget.TextView
 import cn.vove7.common.view.editor.MultiSpan
+import cn.vove7.jarvis.R
 
 /**
  * # WrappedTextView
@@ -37,6 +38,13 @@ class WrappedTextView : TextView {
         mappend("\n")
     }
 
+    fun appendlnRed(s: String) {
+        appendlnColor(s, R.color.red_900)
+    }
+
+    fun appendlnGreen(s: String) {
+        appendlnColor(s, R.color.green_700)
+    }
 
     private fun appendlnColor(s: String, color: Int) {
         val ss = MultiSpan(context, s, color).spanStr
