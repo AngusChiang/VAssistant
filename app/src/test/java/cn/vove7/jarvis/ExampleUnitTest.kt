@@ -284,7 +284,23 @@ class ExampleUnitTest {
 
     @Test
     fun rangeTest() {
-        val a=5
-        print(Range.create(0,10).contains(a))
+        val a = 5
+        print(Range.create(0, 10).contains(a))
+    }
+
+    @Test
+    fun subThreadTest() {
+        thread(isDaemon = true) { //父线程
+            thread { //子线程
+                sleep(1000)
+                if (!Thread.currentThread().isInterrupted)
+                    println("未中断")
+                else println("被中断")
+                println("子线程结束")
+            }
+            println("父线程结束")
+        }
+        sleep(5000)
+        println("end")
     }
 }

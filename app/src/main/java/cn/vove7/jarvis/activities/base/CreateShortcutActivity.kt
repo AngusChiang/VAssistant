@@ -4,11 +4,11 @@ import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import cn.vove7.jarvis.R
+import cn.vove7.jarvis.activities.base.VoiceAssistActivity.Companion.SET_ASSIST_APP
 import cn.vove7.jarvis.activities.base.VoiceAssistActivity.Companion.SWITCH_VOICE_WAKEUP
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.callbacks.onDismiss
 import com.afollestad.materialdialogs.list.listItems
-import com.afollestad.materialdialogs.list.listItemsSingleChoice
 
 /**
  * # CreateShortcutActivity
@@ -21,10 +21,11 @@ class CreateShortcutActivity : Activity() {
     val dialog: MaterialDialog by lazy {
         MaterialDialog(this)
                 .title(text = "选择快捷方式")
-                .listItems(items = listOf("快速唤醒", "切换语音唤醒"), waitForPositiveButton = false) { d, i, _ ->
+                .listItems(items = listOf("快速唤醒", "切换语音唤醒", "一键设为助手应用"), waitForPositiveButton = false) { d, i, _ ->
                     when (i) {
                         0 -> createWakeupShortcut()
                         1 -> createSwitchVoiceWakeupShortcut()
+                        2 -> createOneKeySetAssistApp()
                     }
                     d.dismiss()
                 }
@@ -45,6 +46,10 @@ class CreateShortcutActivity : Activity() {
 
     private fun createSwitchVoiceWakeupShortcut() {
         create(SWITCH_VOICE_WAKEUP, "语音唤醒")
+    }
+
+    private fun createOneKeySetAssistApp() {
+        create(SET_ASSIST_APP, "一键设为助手应用")
     }
 
     private fun create(action: String, text: String) {

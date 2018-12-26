@@ -90,7 +90,7 @@ object AdKillerService : AbsAccPluginService() {
                     onSkipAd(node)
                 }
             }.also { t ->
-                Vog.d(this, "搜索线程 ---> $t")
+//                Vog.d(this, "搜索线程 ---> $t")
                 sthreads.add(t)
             }
         }

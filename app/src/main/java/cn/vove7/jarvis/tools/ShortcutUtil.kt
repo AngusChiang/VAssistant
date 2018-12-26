@@ -15,6 +15,7 @@ import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.datamanager.parse.statusmap.ActionNode
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.activities.base.VoiceAssistActivity
+import cn.vove7.jarvis.activities.base.VoiceAssistActivity.Companion.SET_ASSIST_APP
 
 
 /**
@@ -38,12 +39,10 @@ object ShortcutUtil {
      * 添加快捷唤醒
      */
     fun addWakeUpPinShortcut() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            addPinedShortcut(wakeUpShortcut!!)
-        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1) {
-            addShortcut(wakeUpShortcut!!)
-        } else {
-            GlobalApp.toastShort("需要7.1+")
+        when {
+            Build.VERSION.SDK_INT >= Build.VERSION_CODES.O -> addPinedShortcut(wakeUpShortcut!!)
+            Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1 -> addShortcut(wakeUpShortcut!!)
+            else -> GlobalApp.toastShort("需要7.1+")
         }
     }
 
@@ -60,12 +59,26 @@ object ShortcutUtil {
                         .build()
             } else null
 
+    private val oneKeySetAssistShortcut: ShortcutInfo?
+        get() =
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1) {
+                ShortcutInfo.Builder(context, "one_key_set_assist")    //添加shortcut id
+                        .setIcon(Icon.createWithResource(context, R.mipmap.ic_launcher_vassist)) //添加标签图标
+                        .setShortLabel(getString(R.string.shortcut_label_set_assist_app)) // 短标签名
+                        .setLongLabel(getString(R.string.shortcut_label_set_assist_app))  //长标签名
+                        .setIntent(Intent(SET_ASSIST_APP, null, context, VoiceAssistActivity::class.java))  //action
+                        .setDisabledMessage(getString(R.string.text_not_enable)) //disable后提示
+                        .setRank(1) //位置
+                        .build()
+            } else null
+
     /**
      * 添加快捷唤醒
      */
-    fun addWakeUpShortcut() {
+    fun initShortcut() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1) {
             addShortcut(wakeUpShortcut!!)
+            addShortcut(oneKeySetAssistShortcut!!)
         }
 //        } else {
 //            GlobalApp.toastShort("需要8.0+")
@@ -74,12 +87,8 @@ object ShortcutUtil {
 
     @TargetApi(Build.VERSION_CODES.N_MR1)
     private fun addShortcut(shortCutInfo: ShortcutInfo) {
-        if (existsCut(shortCutInfo.id)) {
-            if (shortCutInfo.id != "fast_wakeup") {
-                GlobalApp.toastShort("已添加")
-            }
-            return
-        }
+        if (existsCut(shortCutInfo.id)) return
+
         addShortcut(listOf(shortCutInfo))
     }
 
@@ -92,7 +101,7 @@ object ShortcutUtil {
     }
 
     @RequiresApi(Build.VERSION_CODES.N_MR1)
-    private fun addShortcut(shortCutInfo: List<ShortcutInfo>):Boolean {
+    private fun addShortcut(shortCutInfo: List<ShortcutInfo>): Boolean {
         return try {
             checkLimit()
             shortManager?.addDynamicShortcuts(shortCutInfo) //创建2个快捷方式

@@ -241,10 +241,10 @@ class LuaHelper : LuaManagerI {
 
     fun checkErr(r: Int): String {
         var e = errorReason(r) + ": " + L.toString(-1)
-        var end = e.indexOf("stack traceback:")//隐藏stack traceback
-        if (end == -1) end = e.length
-        Vog.e(this, "checkErr ---> $e")
-        e = e.substring(0, end)
+//        var end = e.indexOf("stack traceback:")//隐藏stack traceback
+//        if (end == -1) end = e.length
+//        Vog.e(this, "checkErr ---> $e")
+//        e = e.substring(0, end)
         if (e.contains("java.lang.UnsupportedOperationException") ||
                 e.contains("java.lang.InterruptedException"))
             handleMessage(OnPrint.WARN, "强制终止\n")

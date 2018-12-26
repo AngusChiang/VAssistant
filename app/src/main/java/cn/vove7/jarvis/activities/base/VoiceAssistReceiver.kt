@@ -8,11 +8,14 @@ import cn.vove7.common.appbus.AppBus
 import cn.vove7.common.appbus.SpeechAction
 import cn.vove7.common.datamanager.DAO
 import cn.vove7.common.datamanager.parse.model.Action
+import cn.vove7.common.utils.ThreadPool
 import cn.vove7.executorengine.parse.ParseEngine
 import cn.vove7.jarvis.services.MainService
 import cn.vove7.jarvis.tools.AppConfig
 import cn.vove7.vtp.log.Vog
+import java.lang.Thread.sleep
 import java.util.*
+import kotlin.concurrent.thread
 
 /**
  * # VoiceAssistReceiver
@@ -38,6 +41,11 @@ class VoiceAssistActivity : Activity() {
                     AppBus.postSpeechAction(SpeechAction.ActionCode.ACTION_START_WAKEUP)
                 }
             }
+            SET_ASSIST_APP ->
+                thread(isDaemon = true) {
+                    MainService.parseCommand("设为默认助手", false)
+                    sleep(5000)
+                }
             else -> {
                 try {
                     val id = action!!.toLong()
@@ -66,5 +74,6 @@ class VoiceAssistActivity : Activity() {
 
     companion object {
         val SWITCH_VOICE_WAKEUP = "switch_voice_wakeup"
+        val SET_ASSIST_APP = "set_assist_app"
     }
 }

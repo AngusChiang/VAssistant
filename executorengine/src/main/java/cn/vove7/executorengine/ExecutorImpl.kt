@@ -124,7 +124,7 @@ open class ExecutorImpl(
 
         this.actionQueue = actionQueue
         lock = Object()
-        thread = thread(start = true, isDaemon = true, priority = Thread.MAX_PRIORITY) {
+        thread = thread(start = true,name = "脚本线程：$cmdWords", isDaemon = true, priority = Thread.MAX_PRIORITY) {
             LooperHelper.prepareIfNeeded()
             running = true
             userInterrupted = false

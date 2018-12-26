@@ -33,7 +33,7 @@ abstract class ViewFinder(var accessibilityService: AccessibilityApi) {
         val beginTime = System.currentTimeMillis()
         var sc = 0
         val ct = Thread.currentThread()
-        Vog.d(this, "搜索线程 ---> $ct")
+        Vog.d(this, "搜索线程 ---> $ct ${ct.hashCode()}")
         while (System.currentTimeMillis() - beginTime < t &&
                 !ct.isInterrupted) {
             val node = findFirst()
@@ -46,7 +46,7 @@ abstract class ViewFinder(var accessibilityService: AccessibilityApi) {
                     Vog.d(this, "waitFor ---> 搜索次数 $sc 打断: ${ct.isInterrupted}")
             }
         }
-        Vog.d(this, "waitFor ---> 搜索超时 or 中断")
+        Vog.d(this, "waitFor ---> 搜索超时${System.currentTimeMillis() - beginTime}/$m or 中断${ct.isInterrupted}")
         return null
     }
 

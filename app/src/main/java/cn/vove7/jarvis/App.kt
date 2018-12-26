@@ -50,7 +50,7 @@ class App : GlobalApp() {
                 LuaApp.init(this)
             startServices()
             CodeProcessor.init(this@App)
-            ShortcutUtil.addWakeUpShortcut()
+            ShortcutUtil.initShortcut()
 //                AdvanAppHelper.updateAppList()
             startBroadcastReceivers()
             runOnPool {

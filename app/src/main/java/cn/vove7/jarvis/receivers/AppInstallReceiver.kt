@@ -13,11 +13,12 @@ import kotlin.concurrent.thread
  */
 object AppInstallReceiver : DyBCReceiver() {
     override val intentFilter: IntentFilter by lazy {
-        val i = IntentFilter()
-        i.addAction(Intent.ACTION_PACKAGE_ADDED)
-        i.addAction(Intent.ACTION_PACKAGE_REMOVED)
-        i.addAction(Intent.ACTION_PACKAGE_REPLACED)
-        i
+        IntentFilter().apply {
+            addAction(Intent.ACTION_PACKAGE_ADDED)
+            addAction(Intent.ACTION_PACKAGE_REMOVED)
+            addAction(Intent.ACTION_PACKAGE_REPLACED)
+            addDataScheme("package")
+        }
     }
 
     override fun onReceive(context: Context, intent: Intent) {
