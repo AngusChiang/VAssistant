@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Context
 import android.content.ContextWrapper
 import android.content.Intent
+import android.content.pm.ApplicationInfo
 import android.media.AudioManager
 import android.net.Uri
 import android.os.Build
@@ -101,6 +102,7 @@ object AppConfig {
 
     var FIRST_LAUNCH_NEW_VERSION = false or BuildConfig.DEBUG //新版本第一次启动
 
+    var IS_SYS_APP = false
     var smartKillAd = false // 跳过自动识别未标记的广告
 
     val streamTypeArray = arrayOf(
@@ -143,6 +145,7 @@ object AppConfig {
 
     fun init() {
         checkFirstLaunch()
+        checkIsSystemApp()
         checkUserInfo()
     }
 
@@ -150,7 +153,7 @@ object AppConfig {
      * 启动时执行一次
      */
     private fun checkFirstLaunch() {
-        if(BuildConfig.DEBUG) return
+        if (BuildConfig.DEBUG) return
         val lastCode = sp.getLong("v_code")
         val nowCode = AppConfig.versionCode
         if (lastCode < nowCode) {
@@ -159,6 +162,14 @@ object AppConfig {
         } else {
             FIRST_LAUNCH_NEW_VERSION = false
         }
+    }
+
+    private fun checkIsSystemApp() {
+        val f = context.packageManager.getPackageInfo(context.packageName, 0)
+                ?.applicationInfo?.flags ?: 0
+
+        IS_SYS_APP = (f and ApplicationInfo.FLAG_SYSTEM) == 1
+        GlobalLog.log("是否系统应用：$IS_SYS_APP")
     }
 
     val context get() = GlobalApp.APP
@@ -262,7 +273,7 @@ object AppConfig {
         useAssistService = getBooleanAndInit(R.string.key_use_assist_service, useAssistService)
         execFailedVoiceFeedback = getBooleanAndInit(R.string.key_exec_failed_voice_feedback, true)
         execSuccessFeedback = getBooleanAndInit(R.string.key_exec_failed_voice_feedback, true)
-        fixVoiceMico = getBooleanAndInit(R.string.key_fix_voice_micro, true)
+        fixVoiceMico = getBooleanAndInit(R.string.key_fix_voice_micro, true) && !AppConfig.IS_SYS_APP
         notifyCloseMico = getBooleanAndInit(R.string.key_close_wakeup_notification, true)
 //        disableAdKillerOnLowBattery = getBooleanAndInit(R.string.key_remove_ad_power_saving_mode, true)
         disableAccessibilityOnLowBattery = getBooleanAndInit(R.string.key_accessibility_service_power_saving_mode, true)

@@ -1,12 +1,14 @@
 package cn.vove7.jarvis
 
+//import com.argusapm.android.api.Client
+//import com.argusapm.android.core.Config
+//import com.argusapm.android.network.cloudrule.RuleSyncRequest
+//import com.argusapm.android.network.upload.CollectDataSyncUpload
 import android.content.Context
 import android.content.Intent
 import android.os.Build
-import android.util.Log
 import cn.vove7.androlua.LuaApp
 import cn.vove7.common.app.GlobalApp
-import cn.vove7.common.bridges.RootHelper
 import cn.vove7.common.utils.ThreadPool.runOnPool
 import cn.vove7.common.utils.runOnNewHandlerThread
 import cn.vove7.jarvis.droidplugin.RePluginManager
@@ -20,12 +22,8 @@ import cn.vove7.jarvis.tools.AppConfig
 import cn.vove7.jarvis.tools.AppNotification
 import cn.vove7.jarvis.tools.CrashHandler
 import cn.vove7.jarvis.tools.ShortcutUtil
+import cn.vove7.jarvis.view.openAccessibilityServiceAuto
 import cn.vove7.vtp.log.Vog
-import cn.vove7.vtp.runtimepermission.PermissionUtils
-//import com.argusapm.android.api.Client
-//import com.argusapm.android.core.Config
-//import com.argusapm.android.network.cloudrule.RuleSyncRequest
-//import com.argusapm.android.network.upload.CollectDataSyncUpload
 import io.github.kbiakov.codeview.classifier.CodeProcessor
 
 
@@ -45,31 +43,22 @@ class App : GlobalApp() {
         AppConfig.init()//加载配置
         Vog.d(this, "onCreate ---> 配置加载完成")
 
-        runOnNewHandlerThread("app_load",delay = 1000) {
-            if(AppConfig.FIRST_LAUNCH_NEW_VERSION || BuildConfig.DEBUG)
+        runOnNewHandlerThread("app_load", delay = 1000) {
+            if (AppConfig.FIRST_LAUNCH_NEW_VERSION || BuildConfig.DEBUG)
                 LuaApp.init(this)
             startServices()
             CodeProcessor.init(this@App)
             ShortcutUtil.initShortcut()
-//                AdvanAppHelper.updateAppList()
             startBroadcastReceivers()
             runOnPool {
-                if (AppConfig.autoOpenASWithRoot && !PermissionUtils.accessibilityServiceEnabled(this@App)) {
-                    RootHelper.openSelfAccessService()
-                }
+                openAccessibilityServiceAuto(this@App)
                 AppNotification.updateNotificationChannel(this)
             }
-            //插件自启 fixme
             RePluginManager().launchWithApp()
             Vog.d(this, "onCreate ---> 结束 ${System.currentTimeMillis() / 1000}")
 
         }
-        if (!BuildConfig.DEBUG) {
-            try {
-                Vog.init(this, Log.ERROR)
-            } catch (e: Exception) {
-            }
-        }
+
     }
 
     private fun startServices() {

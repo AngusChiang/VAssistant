@@ -59,9 +59,6 @@ class ListeningToast : AbFloatWindow<ListeningToast.VHolder>(GlobalApp.APP) {
         AppBus.post(RequestPermission("悬浮窗权限"))
     }
 
-    init {
-    }
-
     var ani = R.drawable.listening_animation
     private fun setAniRes(resId: Int) {
         if (ani == resId) return

@@ -12,7 +12,6 @@ import android.widget.TextView
 import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.appbus.AppBus
 import cn.vove7.common.appbus.SpeechAction
-import cn.vove7.common.bridges.RootHelper
 import cn.vove7.common.utils.ThreadPool
 import cn.vove7.executorengine.bridges.SystemBridge
 import cn.vove7.jarvis.R
@@ -254,11 +253,11 @@ class SettingsActivity : ReturnableActivity() {
             SettingGroupItem(R.color.lime_600, titleId = R.string.text_other, childItems = listOf(
                     SingleChoiceItem(title = "翻译主语言", entityArrId = R.array.list_translate_languages,
                             keyId = R.string.key_translate_languages),
-                    CheckBoxItem(title = "自动开启无障碍服务", summary = "App启动时自动开启无障碍服务，需要root支持",
+                    CheckBoxItem(title = "自动开启无障碍服务", summary = "App启动时自动开启无障碍服务，需要root支持，或者转为系统应用",
                             keyId = R.string.key_auto_open_as_with_root, defaultValue = { false }) { _, b ->
                         if (b as Boolean && !PermissionUtils.accessibilityServiceEnabled(this)) {
                             ThreadPool.runOnPool {
-                                RootHelper.openSelfAccessService()
+                                openAccessibilityServiceAuto(this)
                             }
                         }
                         return@CheckBoxItem true

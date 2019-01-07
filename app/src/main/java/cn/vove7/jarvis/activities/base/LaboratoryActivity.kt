@@ -55,7 +55,7 @@ class LaboratoryActivity : ReturnableActivity() {
                         SwitchItem(R.string.text_open, summary = if (UserInfo.isVip()) null
                         else getString(R.string.summary_not_vip_remove_ad), keyId = R.string.key_open_ad_block,
                                 defaultValue = { true }) { _, it ->
-                            when (it as Boolean) {
+                            when (it) {
                                 true -> AdKillerService.register()
                                 false ->
                                     AdKillerService.unregister()
@@ -111,9 +111,9 @@ class LaboratoryActivity : ReturnableActivity() {
 
                 )),*/
                 SettingGroupItem(R.color.yellow_700, titleS = "语音唤醒", childItems = listOf(
-                        SwitchItem(title = "自动释放麦克风", summary = "在已授予麦克风权限的其他App内自动关闭语音唤醒\n需要无障碍",
+                        SwitchItem(title = "自动释放麦克风", summary = "在已授予麦克风权限的其他App内自动关闭语音唤醒\n需要无障碍\n设为系统应用后无效",
                                 keyId = R.string.key_fix_voice_micro, defaultValue = { true }) { _, b ->
-                            if (b as Boolean)
+                            if (b && !AppConfig.IS_SYS_APP)
                                 VoiceWakeupStrategy.register()
                             else
                                 VoiceWakeupStrategy.unregister()

@@ -21,6 +21,7 @@ import java.io.InputStream;
 
 import cn.vove7.common.app.GlobalApp;
 import cn.vove7.common.app.GlobalLog;
+import cn.vove7.jarvis.tools.AppConfig;
 import cn.vove7.vtp.log.Vog;
 
 /**
@@ -44,7 +45,6 @@ public class MicrophoneInputStream extends InputStream {
     public MicrophoneInputStream() {
         //initSCO();
         //initBlueToothHeadset();
-
         //initAudioSource();
     }
 
@@ -55,7 +55,8 @@ public class MicrophoneInputStream extends InputStream {
             int bufferSize = AudioRecord.getMinBufferSize(16000,
                     AudioFormat.CHANNEL_IN_MONO, AudioFormat.ENCODING_PCM_16BIT) * 16;
             audioRecord = new AudioRecord(
-                    MediaRecorder.AudioSource.DEFAULT,
+                    //AppConfig.INSTANCE.getIS_SYS_APP() ? MediaRecorder.AudioSource.VOICE_CALL :
+                            MediaRecorder.AudioSource.DEFAULT,
                     16000, AudioFormat.CHANNEL_IN_MONO,
                     AudioFormat.ENCODING_PCM_16BIT, bufferSize);
         }
@@ -109,7 +110,7 @@ public class MicrophoneInputStream extends InputStream {
                 //closeBTHeadsetMicro();
 
             } catch (Exception e) {
-                GlobalLog.INSTANCE.err(e,"mpis114");
+                GlobalLog.INSTANCE.err(e, "mpis114");
             } finally {
                 isStarted = false;
             }

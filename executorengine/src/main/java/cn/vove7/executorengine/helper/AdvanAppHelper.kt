@@ -117,7 +117,7 @@ object AdvanAppHelper {
                 val f = it.isUserApp() || it.isHomeApp() || SystemBridge.getLaunchIntent(it.packageName) != null
                 if (!f) {
                     ALL_APP_LIST[it.packageName] = it
-                    Vog.d(this, "updateAppList ---> 过滤 ${it.name} ${it.packageName}")
+                    Vog.v(this, "updateAppList ---> 过滤 ${it.name} ${it.packageName}")
                 }
                 f
             }.forEach {

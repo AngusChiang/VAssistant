@@ -7,7 +7,6 @@ import android.os.Handler
 import android.view.View
 import android.widget.TextView
 import cn.vove7.common.app.GlobalApp
-import cn.vove7.common.bridges.RootHelper
 import cn.vove7.common.model.UserInfo
 import cn.vove7.common.netacc.ApiUrls
 import cn.vove7.common.netacc.NetHelper
@@ -21,9 +20,7 @@ import cn.vove7.jarvis.receivers.PowerEventReceiver
 import cn.vove7.jarvis.tools.*
 import cn.vove7.jarvis.tools.backup.BackupHelper
 import cn.vove7.jarvis.tools.debugserver.RemoteDebugServer
-import cn.vove7.jarvis.view.CheckBoxItem
-import cn.vove7.jarvis.view.IntentItem
-import cn.vove7.jarvis.view.SwitchItem
+import cn.vove7.jarvis.view.*
 import cn.vove7.jarvis.view.custom.SettingGroupItem
 import cn.vove7.jarvis.view.dialog.LoginDialog
 import cn.vove7.jarvis.view.dialog.ProgressDialog
@@ -133,7 +130,7 @@ class AdvancedSettingActivity : ReturnableActivity() {
                                 (holder as SettingItemHelper.SwitchItemHolder).compoundWight.isChecked = false
                                 return@SwitchItem true
                             }
-                            if (it as Boolean) {
+                            if (it) {
                                 RemoteDebugServer.start()
                                 holder.summaryView.text = ipText
                             } else RemoteDebugServer.stop()
@@ -215,10 +212,12 @@ class AdvancedSettingActivity : ReturnableActivity() {
                         IntentItem(title = "触发低电量") {
                             PowerEventReceiver.onLowBattery()
                         },
-                        IntentItem(title = "无线调试") {
-                            RootHelper.execSuSilent("adb tcpip 5555")
+                        SwitchItem(title = "无线调试", defaultValue = { isWirelessDebugEnable() }) { _, i ->
+                            wirelessDebug(i)
+                            return@SwitchItem false
                         }
-                )))
+                )
+                ))
             }
         }
     }

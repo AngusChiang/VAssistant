@@ -87,7 +87,7 @@ class SettingItemHelper(val context: Context) {
 
     private fun initIntentItem(holder: ChildItemHolder, item: SettingChildItem) {
         setBasic(holder, item) {
-            item.callback?.invoke(holder, Any())
+            (item.callback as CallbackOnSet<Any>?)?.invoke(holder, Any())
         }
     }
 
@@ -112,7 +112,7 @@ class SettingItemHelper(val context: Context) {
             MaterialDialog(context).title(text = item.title()).input(prefill = prefill) { d, c ->
                 Vog.d(this, "initAndSetInputListener ---> $c")
                 val s = c.toString()
-                if (item.callback?.invoke(holder, s) != false) {
+                if ((item.callback as CallbackOnSet<String>?)?.invoke(holder, s) != false) {
                     if (item.keyId != null) {
                         sp.set(item.keyId, s)
                         loadConfigInCacheThread()
@@ -176,7 +176,7 @@ class SettingItemHelper(val context: Context) {
             val b = sp.getBoolean(item.keyId, item.defaultValue.invoke() as Boolean)
             holder.compoundWight.isChecked = b
             holder.compoundWight.setOnCheckedChangeListener { _, isChecked ->
-                if (item.callback?.invoke(holder, isChecked) != false) {
+                if ((item.callback as CallbackOnSet<Boolean>?)?.invoke(holder, isChecked) != false) {
                     sp.set(item.keyId, isChecked)
                     loadConfigInCacheThread()
                 }
@@ -184,7 +184,7 @@ class SettingItemHelper(val context: Context) {
         } else {//withoutSp
             holder.compoundWight.isChecked = item.defaultValue.invoke() as Boolean? ?: false
             holder.compoundWight.setOnCheckedChangeListener { _, isChecked ->
-                item.callback?.invoke(holder, isChecked)
+                (item.callback as CallbackOnSet<Boolean>?)?.invoke(holder, isChecked)
             }
         }
     }
@@ -220,7 +220,7 @@ class SettingItemHelper(val context: Context) {
             MaterialDialog(context)
                     .title(text = item.title())
                     .listItemsSingleChoice(items = items, initialSelection = initPos) { _, i, t ->
-                        if (item.callback?.invoke(holder, Pair(i, t)) != false) {
+                        if ((item.callback as CallbackOnSet<Pair<Int,String>>?)?.invoke(holder, Pair(i, t)) != false) {
                             if (item.keyId != null) {
                                 sp.set(item.keyId, t)
                                 loadConfigInCacheThread()
@@ -249,7 +249,7 @@ class SettingItemHelper(val context: Context) {
 
         MaterialDialog(context).title(text = item.title())
                 .listItemsMultiChoice(item.entityArrId) { d, iss, ts ->
-                    if (item.callback?.invoke(holder, ts) != false) {
+                    if ((item.callback as CallbackOnSet<List<String>>?)?.invoke(holder, ts) != false) {
                         if (item.keyId != null) {
                             sp.set(item.keyId, ts)
                             loadConfigInCacheThread()
@@ -281,7 +281,7 @@ class SettingItemHelper(val context: Context) {
             MaterialDialog(context).title(text = item.title())
                     .customView(null, vv.first)
                     .positiveButton {
-                        if (item.callback?.invoke(holder, old) != false) {
+                        if ((item.callback as CallbackOnSet<Int>?)?.invoke(holder, old) != false) {
                             item.summary = old.toString()
                             if (item.keyId != null) {
                                 sp.set(item.keyId, old)

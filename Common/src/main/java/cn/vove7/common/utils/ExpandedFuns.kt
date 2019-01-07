@@ -184,6 +184,9 @@ fun AppInfo.activities(): Array<String> {
 fun AppInfo.isUserApp(): Boolean {
     return (packageInfo.applicationInfo.flags and ApplicationInfo.FLAG_SYSTEM) == 0
 }
+fun AppInfo.isSysApp(): Boolean {
+    return (packageInfo.applicationInfo.flags and ApplicationInfo.FLAG_SYSTEM) == 1
+}
 
 fun AppInfo.hasGrantedPermission(p: String): Boolean {
     val pm = GlobalApp.APP.packageManager

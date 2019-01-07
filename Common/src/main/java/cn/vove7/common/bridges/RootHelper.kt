@@ -73,10 +73,10 @@ object RootHelper {
      * @return String 结果
      */
     fun execWithSu(cmd: String): String? {
+        GlobalLog.log("execWithSu ---> $cmd")
         val result: StringBuilder
         try {
             result = StringBuilder()
-            Vog.d(this, "execWithSu ---> $cmd")
             val p = Runtime.getRuntime().exec("su")// 经过Root处理的android系统即有su命令
             DataOutputStream(p.outputStream).use { dos ->
                 DataInputStream(p.inputStream).use { dis ->
@@ -119,6 +119,7 @@ object RootHelper {
                 result = p.exitValue()
             }
         } catch (e: Exception) {
+            GlobalLog.err(e, "rh122")
             e.printStackTrace()
         }
         return result

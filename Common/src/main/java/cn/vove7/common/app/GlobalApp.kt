@@ -4,9 +4,11 @@ import android.app.Application
 import android.content.Context
 import android.content.Intent
 import android.support.multidex.MultiDex
+import android.util.Log
 import cn.vove7.common.BuildConfig
 import cn.vove7.common.bridges.ServiceBridge
 import cn.vove7.common.view.toast.ColorfulToast
+import cn.vove7.vtp.log.Vog
 import com.qihoo360.replugin.*
 
 /**
@@ -22,6 +24,14 @@ open class GlobalApp : RePluginApplication() {
         launchTime = System.currentTimeMillis()
         super.onCreate()
         colorfulToast = ColorfulToast(this).blue()
+
+        if (!BuildConfig.DEBUG) {
+            try {
+                Vog.init(this, Log.ERROR)
+            } catch (e: Exception) {
+            }
+        }
+
     }
 
 

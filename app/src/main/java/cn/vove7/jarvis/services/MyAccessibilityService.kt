@@ -266,7 +266,7 @@ class MyAccessibilityService : AccessibilityApi() {
         MainService.instance?.onCommand(AppBus.ORDER_START_RECOG)
     }
 
-    private var stopRunner: Runnable = Runnable {
+    private var stopExecRunner: Runnable = Runnable {
         MainService.instance?.onCommand(AppBus.ORDER_STOP_EXEC)
     }
 
@@ -276,7 +276,18 @@ class MyAccessibilityService : AccessibilityApi() {
 //    private var delayUp = 600L
 
     private var v2 = false // 单击上下键 取消识别
-    private var v3 = false // 是否触发长按唤醒
+    private var v3 = false // 是否有触发长按
+
+    /**
+     * 点按音量加，再长按触发音量增大
+     */
+    private var v4: Long? = null
+        get() {
+            val v = field
+            field = null
+            return v
+        }
+
     /**
      * 按键监听
      * 熄屏时无法监听
@@ -300,7 +311,7 @@ class MyAccessibilityService : AccessibilityApi() {
                         }
                         MainService.exEngineRunning -> {//长按下键
                             //正在执行才会触发
-                            postLongDelay(stopRunner)
+                            postLongDelay(stopExecRunner)
                             true
                         }
                         else -> super.onKeyEvent(event)
@@ -321,6 +332,12 @@ class MyAccessibilityService : AccessibilityApi() {
                     }
                 }
                 KEYCODE_VOLUME_UP -> {
+                    v4?.apply {
+                        //点按后 长按
+                        if ((this + 1000) > System.currentTimeMillis())
+                            return super.onKeyEvent(event)
+
+                    }
                     when {
                         MainService.recoIsListening -> {//按下停止聆听
                             v2 = true
@@ -352,7 +369,7 @@ class MyAccessibilityService : AccessibilityApi() {
                                     return removeDelayIfInterrupt(event, stopSpeakRunner) || super.onKeyEvent(event)
                                 }
                                 MainService.exEngineRunning -> {//长按下键
-                                    return removeDelayIfInterrupt(event, stopRunner) || super.onKeyEvent(event)
+                                    return removeDelayIfInterrupt(event, stopExecRunner) || super.onKeyEvent(event)
                                 }
                             }
                         }
@@ -381,7 +398,11 @@ class MyAccessibilityService : AccessibilityApi() {
         if ((event.eventTime - event.downTime) < (AppConfig.volumeKeyDelayUp)) {//时间短 移除runner 调节音量
             delayHandler.removeCallbacks(runnable)
             when (event.keyCode) {
-                KEYCODE_VOLUME_UP -> SystemBridge.volumeUp()
+                KEYCODE_VOLUME_UP -> {
+                    //标记
+                    v4 = System.currentTimeMillis()
+                    SystemBridge.volumeUp()
+                }
                 KEYCODE_HEADSETHOOK -> {
                     SystemBridge.switchMusicStatus()//
                 }

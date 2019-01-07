@@ -47,9 +47,6 @@
     <uses-feature
         android:name="android.hardware.bluetooth_le"
         android:required="true" />
-    <uses-permission
-        android:name="android.permission.WRITE_SECURE_SETTINGS"
-        tools:ignore="ProtectedPermissions" />
 
     <!--ArgusAPM-->
     <uses-permission android:name="android.permission.INTERNET" />

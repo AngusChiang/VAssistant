@@ -9,6 +9,7 @@ import cn.vove7.common.datamanager.DAO
 import cn.vove7.common.datamanager.greendao.AppAdInfoDao
 import cn.vove7.common.datamanager.parse.model.ActionScope
 import cn.vove7.common.utils.ThreadPool.runOnPool
+import cn.vove7.common.utils.isUserApp
 import cn.vove7.common.view.finder.ViewFindBuilder
 import cn.vove7.common.view.finder.ViewFinder
 import cn.vove7.executorengine.helper.AdvanAppHelper
@@ -90,7 +91,7 @@ object AdKillerService : AbsAccPluginService() {
                     onSkipAd(node)
                 }
             }.also { t ->
-//                Vog.d(this, "搜索线程 ---> $t")
+                //                Vog.d(this, "搜索线程 ---> $t")
                 sthreads.add(t)
             }
         }
@@ -137,8 +138,10 @@ object AdKillerService : AbsAccPluginService() {
         else {//停止未结束的搜索
             stopSearchThreads()
             //smart skip ad
-            if (AppConfig.smartKillAd && lastPkg != appScope.packageName)//切换页面
+            if (AppConfig.smartKillAd && lastPkg != appScope.packageName
+                    && AdvanAppHelper.getAppInfo(appScope.packageName)?.isUserApp() == true)//切换页面
                 smartSkipAppSwitchAd()
+            else Vog.d(this,"onAppChanged smartSkipApp ---> 系统应用")
         }
         lastPkg = appScope.packageName
     }
@@ -195,8 +198,7 @@ object AdKillerService : AbsAccPluginService() {
                 .where(queryBuilder.and(AppAdInfoDao.Properties.Pkg.like(appScope.packageName),
                         queryBuilder.or(AppAdInfoDao.Properties.Activity.isNull,
                                 AppAdInfoDao.Properties.Activity.eq(appScope.activity))
-                )
-                ).list()
+                )).list()
         appAdInfos.forEach {
             finders.add(buildFinder(it))
         }

@@ -24,7 +24,7 @@ const val TYPE_INTENT = 9
 /**
  * 返回结果用于是否设置
  */
-typealias CallbackOnSet = (SettingItemHelper.ChildItemHolder, Any) -> Boolean
+typealias CallbackOnSet<T> = (SettingItemHelper.ChildItemHolder, T) -> Boolean
 
 /**
  * 基类
@@ -49,7 +49,7 @@ open class SettingChildItem(
         val defaultValue: (() -> Any),
 //        val autoSetValue: Boolean = keyId!=null,
         val range: Pair<Int, Int>? = null,
-        val callback: CallbackOnSet? = null,
+        val callback: CallbackOnSet<*>? = null,
         val entityArrId: Int? = null,
 //        val valueArrId: Int? = null,
         val items: List<String>? = null
@@ -74,7 +74,7 @@ class CheckBoxItem(
         summary: String? = null,
         keyId: Int? = null,
         defaultValue: (() -> Boolean)? = null,
-        callback: CallbackOnSet? = null
+        callback: CallbackOnSet<Boolean>? = null
 ) : SettingChildItem(titleId, title, summary, TYPE_CHECK_BOX, keyId, defaultValue ?: { false },
         callback = callback)
 
@@ -84,7 +84,7 @@ class SwitchItem(
         summary: String? = null,
         keyId: Int? = null,
         defaultValue: () -> Boolean,
-        callback: CallbackOnSet? = null
+        callback: CallbackOnSet<Boolean>? = null
 ) : SettingChildItem(titleId, title, summary, TYPE_SWITCH, keyId, defaultValue, callback = callback)
 
 
@@ -95,7 +95,7 @@ class NumberPickerItem(
         keyId: Int? = null,
         defaultValue: () -> Int,
         range: Pair<Int, Int>,
-        callback: CallbackOnSet? = null
+        callback: CallbackOnSet<Int>? = null
 ) : SettingChildItem(titleId, title, summary, TYPE_NUMBER, keyId, defaultValue, range = range,
         callback = callback)
 
@@ -107,7 +107,7 @@ class SingleChoiceItem(
         defaultValue: (() -> Int) = { 0 },//pos
         @ArrayRes entityArrId: Int? = null,
         items: List<String>? = null,
-        callback: CallbackOnSet? = null
+        callback: CallbackOnSet<Pair<Int,String>>? = null
 ) : SettingChildItem(titleId, title, summary, TYPE_SINGLE, keyId, defaultValue,
         entityArrId = entityArrId, callback = callback, items = items)
 
@@ -126,6 +126,6 @@ class InputItem(titleId: Int? = null,
                 summary: String? = null,
                 keyId: Int? = null,
                 defaultValue: () -> String = { "" },
-                callback: CallbackOnSet? = null)
+                callback: CallbackOnSet<String>? = null)
     : SettingChildItem(titleId, title, summary, itemType = TYPE_INPUT, keyId = keyId,
         defaultValue = defaultValue, callback = callback)
