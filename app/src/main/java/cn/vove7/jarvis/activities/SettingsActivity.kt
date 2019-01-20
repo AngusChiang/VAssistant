@@ -99,7 +99,7 @@ class SettingsActivity : ReturnableActivity() {
                     SwitchItem(title = "长语音模式", summary = "开启后，唤醒后可连续说出命令\n可以通过按音量下键终止\n" +
                             "会占用麦克风\n支持语音唤醒与长语音同时开启",
                             keyId = R.string.key_lasting_voice_command, defaultValue = { AppConfig.lastingVoiceCommand }) { _, b ->
-                        if (b as Boolean) {
+                        if (b) {
 //                            AppBus.postSpeechAction(SpeechAction.ActionCode.ACTION_STOP_WAKEUP)
 //                            AppConfig.voiceWakeup = false
                         } else {
@@ -128,7 +128,7 @@ class SettingsActivity : ReturnableActivity() {
                     SwitchItem(R.string.text_open_voice_wakeup, summary = "以 \"你好小V\" 唤醒\n提示: 目前语音唤醒十分耗电,请三思" +
                             (if (AppConfig.voiceWakeup && WakeupI.instance?.opened == false) "\n已自动关闭" else ""),
                             keyId = R.string.key_open_voice_wakeup, callback = { _, it ->
-                        when (it as Boolean) {
+                        when (it) {
                             true -> {
                                 AppBus.postSpeechAction(SpeechAction.ActionCode.ACTION_START_WAKEUP)
                             }
@@ -194,7 +194,8 @@ class SettingsActivity : ReturnableActivity() {
                                 }
                     },
                     InputItem(title = "用户唤醒词", summary = "如果不想把你的唤醒词被当作命令，把他写到这里\n多个词以'#'隔开",
-                            keyId = R.string.key_user_wakeup_word)
+                            keyId = R.string.key_user_wakeup_word),
+                    CheckBoxItem(title="兼容模式",summary = "语音唤醒无法使用时开启",keyId = R.string.key_smart_find_and_kill_ad)
             )),
 
             SettingGroupItem(R.color.google_green, titleS = "按键唤醒", childItems = listOf(
@@ -255,7 +256,7 @@ class SettingsActivity : ReturnableActivity() {
                             keyId = R.string.key_translate_languages),
                     CheckBoxItem(title = "自动开启无障碍服务", summary = "App启动时自动开启无障碍服务，需要root支持，或者转为系统应用",
                             keyId = R.string.key_auto_open_as_with_root, defaultValue = { false }) { _, b ->
-                        if (b as Boolean && !PermissionUtils.accessibilityServiceEnabled(this)) {
+                        if (b && !PermissionUtils.accessibilityServiceEnabled(this)) {
                             ThreadPool.runOnPool {
                                 openAccessibilityServiceAuto(this)
                             }

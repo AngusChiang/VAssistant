@@ -300,7 +300,7 @@ class MyAccessibilityService : AccessibilityApi() {
             KeyEvent.ACTION_DOWN -> when (event.keyCode) {
                 KEYCODE_VOLUME_DOWN -> {
                     return when {
-                        MainService.recoIsListening -> {//下键取消聆听
+                        MainService.recogIsListening -> {//下键取消聆听
                             v2 = true
                             MainService.instance?.onCommand(AppBus.ORDER_CANCEL_RECOG)//up speed
                             true
@@ -319,7 +319,7 @@ class MyAccessibilityService : AccessibilityApi() {
                 }
                 KEYCODE_HEADSETHOOK -> {
                     when {
-                        MainService.recoIsListening -> {//按下停止聆听
+                        MainService.recogIsListening -> {//按下停止聆听
                             v2 = true
                             MainService.instance?.onCommand(AppBus.ORDER_STOP_RECOG)
                             return true
@@ -339,7 +339,7 @@ class MyAccessibilityService : AccessibilityApi() {
 
                     }
                     when {
-                        MainService.recoIsListening -> {//按下停止聆听
+                        MainService.recogIsListening -> {//按下停止聆听
                             v2 = true
                             MainService.instance?.onCommand(AppBus.ORDER_STOP_RECOG)
                             return true
@@ -499,7 +499,7 @@ class MyAccessibilityService : AccessibilityApi() {
             accessibilityButtonController.registerAccessibilityButtonCallback(object : AccessibilityButtonController.AccessibilityButtonCallback() {
                 override fun onClicked(controller: AccessibilityButtonController?) {
                     super.onClicked(controller)
-                    MainService.switchReco()
+                    MainService.switchRecog()
                 }
             })
         }

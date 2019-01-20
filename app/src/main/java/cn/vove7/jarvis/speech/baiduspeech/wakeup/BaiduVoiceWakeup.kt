@@ -55,7 +55,9 @@ class BaiduVoiceWakeup(private val eventListener: EventListener) : WakeupI() {
         params[SpeechConstant.APP_ID] = appId
         params[SpeechConstant.APP_KEY] = appKey
         params[SpeechConstant.SECRET] = secretKey
-        params[SpeechConstant.IN_FILE] = "#cn.vove7.jarvis.speech.baiduspeech.MicrophoneInputStream.getInstance()"
+        if (!AppConfig.voiceRecogCompatibleMode) {
+            params[SpeechConstant.IN_FILE] = "#cn.vove7.jarvis.speech.baiduspeech.MicrophoneInputStream.getInstance()"
+        }
 
         if (AppConfig.lastingVoiceCommand)
             params[SpeechConstant.VAD_ENDPOINT_TIMEOUT] = 0

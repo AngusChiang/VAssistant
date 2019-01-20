@@ -269,3 +269,9 @@ fun View.inVisibility() {
         visibility = View.INVISIBLE
     }
 }
+
+
+fun Intent.newTask():Intent{
+    addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+    return this
+}

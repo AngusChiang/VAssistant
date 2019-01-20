@@ -39,7 +39,12 @@ object AdKillerService : AbsAccPluginService() {
      */
     private val finderCaches = ConcurrentHashMap<ActionScope, MutableSet<ViewFinder>>()
 
+    override fun onUnBind() {
+        GlobalLog.log("去广告服务下线")
+    }
+
     override fun onBind() {
+        GlobalLog.log("去广告服务上线")
         runOnPool {
             if (!AccessibilityApi.isBaseServiceOn) return@runOnPool
             finderCaches.clear()

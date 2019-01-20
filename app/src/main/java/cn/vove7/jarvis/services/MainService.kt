@@ -34,6 +34,7 @@ import cn.vove7.common.executor.CExecutorI
 import cn.vove7.common.interfaces.SpeakCallback
 import cn.vove7.common.model.RequestPermission
 import cn.vove7.common.model.UserInfo
+import cn.vove7.common.model.VoiceRecogResult
 import cn.vove7.common.netacc.NetHelper
 import cn.vove7.common.utils.RegUtils.checkCancel
 import cn.vove7.common.utils.RegUtils.checkConfirm
@@ -150,7 +151,7 @@ class MainService : BusService(),
      */
     private fun loadSpeechService() {
         speechRecoService = BaiduSpeechRecoService(RecgEventListener())
-        speechSynService = SpeechSynService(SyncEventListener())
+        speechSynService = SpeechSynService(SynthesisEventListener())
     }
 
     /**
@@ -192,7 +193,7 @@ class MainService : BusService(),
 
     override fun showAlert(title: String?, msg: String?) {
         if (AppConfig.lastingVoiceCommand)
-            afterSpeakResumeListen = recoIsListening//记录原状态
+            afterSpeakResumeListen = recogIsListening//记录原状态
         runOnUi {
             alertDialog = AlertDialog.Builder(this)
                     .setTitle(title)
@@ -263,8 +264,8 @@ class MainService : BusService(),
      * fixme 其他调用speak 也会触发
      */
     fun resumeListenCommandIfLasting() {//开启长语音时
-        Vog.d(this, "resumeListenCommandIfLasting ---> 检查长语音 afterSpeakResumeListen:$afterSpeakResumeListen IsListening:$recoIsListening")
-        if (afterSpeakResumeListen && AppConfig.lastingVoiceCommand && !recoIsListening)//防止长语音识别 继续
+        Vog.d(this, "resumeListenCommandIfLasting ---> 检查长语音 afterSpeakResumeListen:$afterSpeakResumeListen IsListening:$recogIsListening")
+        if (afterSpeakResumeListen && AppConfig.lastingVoiceCommand && !recogIsListening)//防止长语音识别 继续
             AppBus.postDelay("lastingVoiceCommand",
                     AppBus.ORDER_START_RECOG_SILENT, 1200)
     }
@@ -274,8 +275,8 @@ class MainService : BusService(),
      */
     fun stopRecogTemp() {
         if (AppConfig.lastingVoiceCommand) {//防止长语音识别 speak聊天对话
-            Vog.d(this, "stopRecogTemp ---> speak临时 $recoIsListening")
-            afterSpeakResumeListen = recoIsListening
+            Vog.d(this, "stopRecogTemp ---> speak临时 $recogIsListening")
+            afterSpeakResumeListen = recogIsListening
             speechRecoService?.doCancelRecog()
             speechRecoService?.doStopRecog()
         }
@@ -614,6 +615,11 @@ class MainService : BusService(),
         const val MODE_ALERT = 27
 
         /**
+         * 语音输入
+         */
+        const val MODE_INPUT = 127
+
+        /**
          * 语音事件数据类型
          */
 
@@ -633,7 +639,7 @@ class MainService : BusService(),
                 }
             }
 
-        val recoIsListening: Boolean
+        val recogIsListening: Boolean
             get() {
                 return if (instance?.speechEngineLoaded != true) {//未加载
                     GlobalApp.toastShort("引擎未就绪")
@@ -661,12 +667,12 @@ class MainService : BusService(),
         /**
          * 切换识别
          */
-        fun switchReco() {
+        fun switchRecog() {
             if (instance?.speechEngineLoaded != true) {//未加载
                 GlobalApp.toastShort("引擎未就绪")
                 return
             }
-            if (recoIsListening) {//配置
+            if (recogIsListening) {//配置
                 instance?.onCommand(AppBus.ORDER_CANCEL_RECOG)
             } else
                 instance?.onCommand(AppBus.ORDER_START_RECOG)
@@ -683,6 +689,15 @@ class MainService : BusService(),
             }
             instance?.onParseCommand(cmd, false, chat)
         }
+    }
+
+    /**
+     * 开启语音识别输入
+     */
+    fun startVoiceInput() {
+        if (recogIsListening) return
+        voiceMode = MODE_INPUT
+        onCommand(ORDER_START_RECOG)
     }
 
     private fun hideAll(immediately: Boolean = false) {
@@ -702,7 +717,7 @@ class MainService : BusService(),
      * @return Boolean 是否继续识别 null 不继续 非null 继续
      */
     fun parseWakeUpCommand(w: String): Boolean? {
-        if (recoIsListening) {
+        if (recogIsListening) {
             Vog.d(this, "parseWakeUpCommand ---> 正在识别")
             return null
         }
@@ -877,9 +892,20 @@ class MainService : BusService(),
                         checkCancel(voiceResult) -> {
                             performAlertClick(false)
                         }
-                        else -> onCommand(ORDER_START_RECOG)  //继续????
+                        else -> {
+                            listeningToast.show("重新识别")
+                            onCommand(ORDER_START_RECOG)  //继续????
+                        }
                     }
                 }
+                MODE_INPUT -> {
+                    hideAll()
+                    AppBus.post(VoiceRecogResult(0, voiceResult))
+                    voiceMode = MODE_VOICE
+                    if (AppConfig.lastingVoiceCommand)
+                        onCommand(ORDER_CANCEL_RECOG)
+                }
+
             }
         }
 
@@ -920,6 +946,11 @@ class MainService : BusService(),
                     //do nothing
                 }
                 MODE_VOICE -> playSoundEffect(R.raw.recog_cancel)//取消-音效
+
+                MODE_INPUT -> {
+                    AppBus.post(VoiceRecogResult(-1))
+                    voiceMode = MODE_VOICE
+                }
             }
         }
 
@@ -939,6 +970,12 @@ class MainService : BusService(),
                 }
                 MODE_ALERT -> {//fixme 网络错误，无限...
                     onCommand(ORDER_START_RECOG)  //继续????
+                }
+
+                MODE_INPUT -> {
+                    hideAll()
+                    AppBus.post(VoiceRecogResult(-1))
+                    voiceMode = MODE_VOICE
                 }
             }
         }
@@ -974,60 +1011,82 @@ class MainService : BusService(),
 //            }
 //            return
 //        }
-        val parseResult = ParseEngine
-                .parseAction(result, AccessibilityApi.accessibilityService?.currentScope)
-        if (parseResult.isSuccess) {
-            listeningToast.hideImmediately()//执行时 消失
-            val his = CommandHistory(UserInfo.getUserId(), result,
-                    parseResult.msg)
-            NetHelper.uploadUserCommandHistory(his)
-            cExecutor.execQueue(result, parseResult.actionQueue)
-            runOnCachePool {
-                if (AppConfig.lastingVoiceCommand) {//开启长语音,重启定时
-                    speechRecoService?.restartLastingUpTimer()
-                }
-            }
-            return true
-        } else {// statistics
-            //云解析
-            return if (needCloud && AppConfig.cloudServiceParseIfLocalFailed) {
-                Vog.d(this, "onParseCommand ---> 失败云解析")
-                NetHelper.cloudParse(result) {
-                    runFromCloud(result, it)
-                }
-                true
-            } else if (chat) {//聊天
-                parseAnimation.begin()
-                listeningToast.showParseAni()
+        runOnCachePool {
+            sleep(500)
+            val parseResult = ParseEngine
+                    .parseAction(result, AccessibilityApi.accessibilityService?.currentScope)
+            if (parseResult.isSuccess) {
+                listeningToast.hideImmediately()//执行时 消失
+                val his = CommandHistory(UserInfo.getUserId(), result,
+                        parseResult.msg)
+                NetHelper.uploadUserCommandHistory(his)
+                cExecutor.execQueue(result, parseResult.actionQueue)
                 runOnCachePool {
-                    resumeMusicLock = true
-                    val data = chatSystem.chatWithText(result)
-                    if (data == null) {
-                        listeningToast.showAndHideDelay("获取失败")
-                        parseAnimation.failedAndHideDelay()
-                        resumeMusicIf()
-                    } else {
-                        listeningToast.show(if (data.contains("="))
-                            data.replace("=", "\n=") else data)
-                        executeAnimation.begin()
-                        executeAnimation.show(data)
-
-                        afterSpeakResumeListen = recoIsListening
-                        speakWithCallback(data, true, object : SpeakCallback {
-                            override fun speakCallback(result: String?) {
-                                hideAll()
-                            }
-                        })
+                    if (AppConfig.lastingVoiceCommand) {//开启长语音,重启定时
+                        speechRecoService?.restartLastingUpTimer()
                     }
                 }
-                true
-            } else {
-                NetHelper.uploadUserCommandHistory(CommandHistory(UserInfo.getUserId(), result, null))
-                listeningToast.showAndHideDelay("解析失败")
+//                return true
+            } else {// statistics
+                //云解析
+//                return
+                if (needCloud && AppConfig.cloudServiceParseIfLocalFailed) {
+                    Vog.d(this, "onParseCommand ---> 失败云解析")
+                    NetHelper.cloudParse(result) {
+                        runFromCloud(result, it)
+                    }
+//                    true
+                } else if (chat) {//聊天
+                    doChat(result)
+//                    true
+                } else {
+                    onCommandParseFailed(result)
+//                    false
+                }
+            }
+
+        }
+        return true
+    }
+
+    /**
+     * 聊天
+     * @param result String
+     */
+    private fun doChat(result: String) {
+        parseAnimation.begin()
+        listeningToast.showParseAni()
+        runOnCachePool {
+            resumeMusicLock = true
+            val data = chatSystem.chatWithText(result)
+            if (data == null) {
+                listeningToast.showAndHideDelay("获取失败")
                 parseAnimation.failedAndHideDelay()
-                false
+                resumeMusicIf()
+            } else {
+                listeningToast.show(if (data.contains("="))
+                    data.replace("=", "\n=") else data)
+                executeAnimation.begin()
+                executeAnimation.show(data)
+
+                afterSpeakResumeListen = recogIsListening
+                speakWithCallback(data, true, object : SpeakCallback {
+                    override fun speakCallback(result: String?) {
+                        hideAll()
+                    }
+                })
             }
         }
+    }
+
+    /**
+     * 命令解析失败
+     * @param cmd String
+     */
+    private fun onCommandParseFailed(cmd: String) {
+        NetHelper.uploadUserCommandHistory(CommandHistory(UserInfo.getUserId(), cmd, null))
+        listeningToast.showAndHideDelay("解析失败")
+        parseAnimation.failedAndHideDelay()
     }
 
     private fun runFromCloud(command: String, actions: List<Action>?): Boolean {
@@ -1056,7 +1115,7 @@ class MainService : BusService(),
     /**
      * 语音合成事件监听
      */
-    inner class SyncEventListener : SyncEvent {
+    inner class SynthesisEventListener : SyncEvent {
 
         override fun onError(err: String, responseText: String?) {
             GlobalApp.toastShort(responseText ?: "")

@@ -8,7 +8,6 @@ import cn.vove7.common.appbus.AppBus
 import cn.vove7.common.appbus.SpeechAction
 import cn.vove7.common.datamanager.DAO
 import cn.vove7.common.datamanager.parse.model.Action
-import cn.vove7.common.utils.ThreadPool
 import cn.vove7.executorengine.parse.ParseEngine
 import cn.vove7.jarvis.services.MainService
 import cn.vove7.jarvis.tools.AppConfig
@@ -32,7 +31,7 @@ class VoiceAssistActivity : Activity() {
         when (action) {
             Intent.ACTION_ASSIST, Intent.ACTION_VOICE_COMMAND, "android.intent.action.VOICE_ASSIST", "wakeup" -> {
                 Vog.d(this, "onCreate ---> ASSIST wakeup")
-                MainService.switchReco()
+                MainService.switchRecog()
             }
             SWITCH_VOICE_WAKEUP -> {
                 if (AppConfig.voiceWakeup) {

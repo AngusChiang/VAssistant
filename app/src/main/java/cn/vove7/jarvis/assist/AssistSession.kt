@@ -95,7 +95,7 @@ class AssistSession(context: Context) : VoiceInteractionSession(context),
         val view = layoutInflater.inflate(R.layout.dialog_assist, null)
         pb = view.findViewById(R.id.progress_bar)
         view.findViewById<View>(R.id.voice_btn).setOnClickListener {
-            MainService.switchReco()
+            MainService.switchRecog()
             onBackPressed()
         }
         showProgressBar = showProgressBar

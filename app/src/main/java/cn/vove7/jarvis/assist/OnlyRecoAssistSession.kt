@@ -7,7 +7,6 @@ import android.os.Bundle
 import android.service.voice.VoiceInteractionSession
 import cn.vove7.common.utils.ThreadPool.runOnPool
 import cn.vove7.jarvis.services.MainService
-import kotlin.concurrent.thread
 
 /**
  * # OnlyRecoAssistSession
@@ -18,7 +17,7 @@ import kotlin.concurrent.thread
 class OnlyRecoAssistSession(context: Context) : VoiceInteractionSession(context) {
     override fun onHandleAssist(data: Bundle?, structure: AssistStructure?, content: AssistContent?) {
         runOnPool {
-            MainService.switchReco()
+            MainService.switchRecog()
         }
         finish()
     }

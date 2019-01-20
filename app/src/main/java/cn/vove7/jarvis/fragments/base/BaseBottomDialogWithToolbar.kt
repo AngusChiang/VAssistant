@@ -52,6 +52,7 @@ abstract class BaseBottomDialogWithToolbar(context: Context, title: String = "")
         contentContainer.addView(v)
 
         window?.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+        setOnDismissListener { listener?.onDismiss() }
     }
 
     fun showLoadingBar() {
@@ -72,10 +73,6 @@ abstract class BaseBottomDialogWithToolbar(context: Context, title: String = "")
 //        (BottomSheetDialogFragment.STYLE_NORMAL, R.style.TransBottomSheetDialogStyle)
 //    }
 
-    override fun setOnDismissListener(l: DialogInterface.OnDismissListener?) {
-        super.setOnDismissListener { listener?.onDismiss() }
-
-    }
 
     fun positiveButton(text: CharSequence? = null, click: (() -> Unit)? = null) {
         setButton(buttonPositive, text, click)

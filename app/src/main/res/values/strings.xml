@@ -113,7 +113,7 @@
     <string name="text_activity_name">Activity Name</string>
     <string name="text_activity_name_op">Activity Name(Optional)</string>
     <string name="text_choose_file">Choose File</string>
-    <string name="text_operation_need_permission">This operation needs %s</string>
+    <string name="text_operation_need_permission">This operation needs [%s]</string>
     <string name="text_opened">Opened</string>
     <string name="text_to_open">Open</string>
     <string name="text_regular_expression">Regular Expressions</string>
@@ -325,6 +325,7 @@
     <string name="key_last_sync_marked_open_date" translatable="false">last_sync_marked_open_date</string>
     <string name="key_last_sync_marked_ad_date" translatable="false">last_sync_marked_ad_date</string>
     <string name="shortcut_wakeup">WakeUp</string>
+    <string name="text_switch_voice_wp" translatable="false">切换语音唤醒</string>
     <string name="shortcut_label_set_assist_app">Set Assist App</string>
     <string name="text_not_enable">Not enable</string>
     <string name="text_add_wakeup_shortcut_to_launcher">添加桌面唤醒快捷方式</string>
@@ -387,5 +388,6 @@
     <string name="key_smart_find_and_kill_ad" translatable="false">smart_find_and_kill_ad</string>
     <string name="key_float_voice_align" translatable="false">float_voice_align</string>
     <string name="key_lasting_voice_millis" translatable="false">lasting_voice_millis</string>
+    <string name="key_voice_recog_compatible_mode" translatable="false">voice_recog_compatible_mode</string>
     <string name="text_plugins_manager" translatable="false">插件管理</string>
 </resources>

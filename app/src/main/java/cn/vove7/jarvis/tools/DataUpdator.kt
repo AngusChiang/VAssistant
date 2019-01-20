@@ -40,7 +40,15 @@ object DataUpdator {
      * 启动时检查更新
      * @param activity Activity
      */
+    private var lastCheck = 0L
+
     fun checkUpdate(activity: Activity, back: () -> Unit) {
+        val now = System.currentTimeMillis()
+        if (now - lastCheck < 30 * 60 * 1000) {//防止频繁请求
+            back.invoke()
+            return
+        }
+        lastCheck = now
         NetHelper.getLastInfo {
             if (it != null) {
                 val v = check(it)

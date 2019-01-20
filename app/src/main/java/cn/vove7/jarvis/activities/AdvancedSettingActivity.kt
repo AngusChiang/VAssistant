@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
+import android.speech.RecognizerIntent
 import android.view.View
 import android.widget.TextView
 import cn.vove7.common.app.GlobalApp
@@ -215,6 +216,12 @@ class AdvancedSettingActivity : ReturnableActivity() {
                         SwitchItem(title = "无线调试", defaultValue = { isWirelessDebugEnable() }) { _, i ->
                             wirelessDebug(i)
                             return@SwitchItem false
+                        },
+                        IntentItem(title = "语音搜索测试") {
+                            startActivity(Intent(RecognizerIntent.ACTION_WEB_SEARCH))
+                        },
+                        IntentItem(title = "语音输入测试") {
+                            startActivityForResult(Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH), 200)
                         }
                 )
                 ))
@@ -234,7 +241,16 @@ class AdvancedSettingActivity : ReturnableActivity() {
                         toast.showShort(getString(R.string.text_open_failed))
                     }
                 }
-
+                200 -> {
+                    if (resultCode == Activity.RESULT_OK && data != null) {
+                        try {
+                            val result = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS)
+                            toast.showShort(result[0])
+                        } catch (e: Exception) {
+                            toast.showShort(e.message?:"e")
+                        }
+                    }
+                }
             }
         }
     }

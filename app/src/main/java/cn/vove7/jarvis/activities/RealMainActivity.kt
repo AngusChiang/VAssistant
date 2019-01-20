@@ -16,6 +16,7 @@ import cn.vove7.jarvis.tools.DataUpdator
 import cn.vove7.jarvis.tools.Tutorials
 import cn.vove7.jarvis.view.dialog.UpdateLogDialog
 import cn.vove7.jarvis.view.tools.FragmentSwitcher
+import cn.vove7.vtp.log.Vog
 import cn.vove7.vtp.runtimepermission.PermissionUtils
 import com.afollestad.materialdialogs.MaterialDialog
 import kotlinx.android.synthetic.main.activity_real_main.*
@@ -115,6 +116,7 @@ class RealMainActivity : AppCompatActivity() {
         lastCheck = System.currentTimeMillis()
         if (AppConfig.FIRST_LAUNCH_NEW_VERSION && showUpdate) {
             UpdateLogDialog(this) {
+                Vog.d(this,"showDataUpdateLog ---> 检查数据更新")
                 checkDataUpdate()
             }
             showUpdate = false

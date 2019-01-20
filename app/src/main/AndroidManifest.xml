@@ -275,6 +275,17 @@
         <activity
             android:name=".activities.AccServiceBlackListManagerActivity"
             android:label="无障碍黑名单" />
+        <activity
+            android:name=".activities.VoiceInputRecogActivity"
+            android:theme="@style/ScreenShotTheme"
+            android:label="V Assist语音识别输入">
+            <intent-filter>
+                <action android:name="android.speech.action.RECOGNIZE_SPEECH" />
+                <action android:name="android.speech.action.WEB_SEARCH"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+            </intent-filter>
+
+        </activity>
     </application>
 
 </manifest>

@@ -8,14 +8,17 @@ import android.content.pm.ShortcutInfo
 import android.content.pm.ShortcutManager
 import android.graphics.drawable.Icon
 import android.os.Build
+import android.speech.RecognizerIntent
 import android.support.annotation.RequiresApi
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.app.GlobalApp.Companion.getString
 import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.datamanager.parse.statusmap.ActionNode
+import cn.vove7.common.utils.newTask
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.activities.base.VoiceAssistActivity
 import cn.vove7.jarvis.activities.base.VoiceAssistActivity.Companion.SET_ASSIST_APP
+import cn.vove7.jarvis.activities.base.VoiceAssistActivity.Companion.SWITCH_VOICE_WAKEUP
 
 
 /**
@@ -59,6 +62,19 @@ object ShortcutUtil {
                         .build()
             } else null
 
+    private val switchVoiceWpShortcut: ShortcutInfo?
+        get() =
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1) {
+                ShortcutInfo.Builder(context, "switch_voice_wp")    //添加shortcut id
+                        .setIcon(Icon.createWithResource(context, R.mipmap.ic_launcher_vassist)) //添加标签图标
+                        .setShortLabel(getString(R.string.text_switch_voice_wp)) // 短标签名
+                        .setLongLabel(getString(R.string.text_switch_voice_wp))  //长标签名
+                        .setIntent(Intent(SWITCH_VOICE_WAKEUP, null, context, VoiceAssistActivity::class.java))  //action
+                        .setDisabledMessage(getString(R.string.text_not_enable)) //disable后提示
+                        .setRank(0) //位置
+                        .build()
+            } else null
+
     private val oneKeySetAssistShortcut: ShortcutInfo?
         get() =
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1) {
@@ -71,6 +87,22 @@ object ShortcutUtil {
                         .setRank(1) //位置
                         .build()
             } else null
+    private val webSearchShortcut = buildShortcut("sc_web_search", "语音搜索",
+            Intent(RecognizerIntent.ACTION_WEB_SEARCH).newTask())
+
+    private fun buildShortcut(id: String, label: String, intent: Intent): ShortcutInfo? {
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1) {
+            ShortcutInfo.Builder(context, id)    //添加shortcut id
+                    .setIcon(Icon.createWithResource(context, R.mipmap.ic_launcher_vassist)) //添加标签图标
+                    .setShortLabel(label) // 短标签名
+                    .setLongLabel(label)  //长标签名
+                    .setIntent(intent)  //action
+                    .setDisabledMessage(getString(R.string.text_not_enable)) //disable后提示
+                    .setRank(1) //位置
+                    .build()
+        } else null
+
+    }
 
     /**
      * 添加快捷唤醒
@@ -78,7 +110,9 @@ object ShortcutUtil {
     fun initShortcut() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1) {
             addShortcut(wakeUpShortcut!!)
+            addShortcut(switchVoiceWpShortcut!!)
             addShortcut(oneKeySetAssistShortcut!!)
+            addShortcut(webSearchShortcut!!)
         }
 //        } else {
 //            GlobalApp.toastShort("需要8.0+")

@@ -27,7 +27,7 @@
     <string name="text_activity_name">Activity名称</string>
     <string name="text_activity_name_op">Activity名称(可选)</string>
     <string name="text_choose_file">选择文件</string>
-    <string name="text_operation_need_permission">此操作需要%s</string>
+    <string name="text_operation_need_permission">此操作需要[%s]</string>
     <string name="text_opened">已开启</string>
     <string name="text_to_open">去开启</string>
     <string name="text_regular_expression">正则表达式</string>
