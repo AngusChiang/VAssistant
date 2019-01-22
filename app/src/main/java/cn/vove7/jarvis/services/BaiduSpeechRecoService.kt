@@ -106,7 +106,7 @@ class BaiduSpeechRecoService(event: SpeechEvent) : SpeechRecoService(event) {
 
     private fun initOfflineWord() {
         LuaUtil.assetsToSD(context, "bd/baidu_speech_grammar.bsg",
-        offSpeechGrammarPath)
+                offSpeechGrammarPath)
         try {//gson error null of array.length
             myRecognizer.loadOfWord(offWordParams)
         } catch (e: Exception) {
@@ -133,9 +133,11 @@ class BaiduSpeechRecoService(event: SpeechEvent) : SpeechRecoService(event) {
 //            Pair(SpeechConstant.VAD_MODEL, "dnn"),
                 Pair(SpeechConstant.DISABLE_PUNCTUATION, false),//标点符号
                 Pair(SpeechConstant.ACCEPT_AUDIO_VOLUME, true),
-                Pair(SpeechConstant.IN_FILE, "#cn.vove7.jarvis.speech.baiduspeech.MicrophoneInputStream.getInstance()"),
                 Pair(SpeechConstant.PID, 1536)
         ).also {
+            if (!AppConfig.voiceRecogCompatibleMode) {//兼容模式
+                it[SpeechConstant.IN_FILE] = "#cn.vove7.jarvis.speech.baiduspeech.MicrophoneInputStream.getInstance()"
+            }
             if (!AppConfig.openResponseWord)//唤醒即识别 响应词打开则无效
                 it[SpeechConstant.AUDIO_MILLS] = System.currentTimeMillis() - 200
             //从指定时间开始识别，可以 - 指定ms 识别之前的内容

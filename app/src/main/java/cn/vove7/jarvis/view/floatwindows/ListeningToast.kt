@@ -55,7 +55,7 @@ class ListeningToast : AbFloatWindow<ListeningToast.VHolder>(GlobalApp.APP) {
             }
         }
     override val onNoPermission: () -> Unit = {
-        AppBus.postSpeechAction(SpeechAction.ActionCode.ACTION_CANCEL_RECO)
+        AppBus.postSpeechAction(SpeechAction.ActionCode.ACTION_CANCEL_RECOG)
         AppBus.post(RequestPermission("悬浮窗权限"))
     }
 

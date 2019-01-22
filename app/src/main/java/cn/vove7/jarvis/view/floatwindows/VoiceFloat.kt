@@ -150,11 +150,11 @@ class VoiceFloat : AbFloatWindow<VoiceFloat.Holder> {
     fun onClick() {
 //        if (MainService.instance?.isListening() == true) {
 //            holder.result.text = "stop"
-//            AppBus.postSpeechAction(SpeechAction.ActionCode.ACTION_CANCEL_RECO)
+//            AppBus.postSpeechAction(SpeechAction.ActionCode.ACTION_CANCEL_RECOG)
 //        } else {
             ServiceChecker(context).checkService()
             holder.result.text = "begin"
-            AppBus.postSpeechAction(SpeechAction.ActionCode.ACTION_START_RECO)
+            AppBus.postSpeechAction(SpeechAction.ActionCode.ACTION_START_RECOG)
 //        }
     }
 

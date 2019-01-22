@@ -209,6 +209,25 @@
                 <action android:name="android.service.voice.VoiceInteractionService" />
             </intent-filter>
         </service>
+        <service android:name=".services.VoiceWpTileService"
+            android:label="@string/text_voice_wp"
+            android:icon="@drawable/ic_hearing"
+            android:permission="android.permission.BIND_QUICK_SETTINGS_TILE">
+            <intent-filter>
+                <action android:name="android.service.quicksettings.action.QS_TILE" />
+            </intent-filter>
+        </service>
+        <!--<service-->
+            <!--android:name=".services.VoiceInputService"-->
+            <!--android:label="V Assist语音识别输入"-->
+            <!--android:permission="android.permission.BIND_VOICE_INTERACTION">-->
+            <!--<intent-filter>-->
+                <!--<action android:name="android.speech.action.RECOGNIZE_SPEECH" />-->
+                <!--<action android:name="android.speech.action.WEB_SEARCH" />-->
+
+                <!--<category android:name="android.intent.category.DEFAULT" />-->
+            <!--</intent-filter>-->
+        <!--</service>-->
 
         <activity
             android:name=".activities.PermissionManagerActivity"
@@ -277,12 +296,15 @@
             android:label="无障碍黑名单" />
         <activity
             android:name=".activities.VoiceInputRecogActivity"
-            android:theme="@style/ScreenShotTheme"
-            android:label="V Assist语音识别输入">
+            android:excludeFromRecents="true"
+            android:exported="true"
+            android:label="V Assist语音识别输入"
+            android:theme="@style/ScreenShotTheme">
             <intent-filter>
                 <action android:name="android.speech.action.RECOGNIZE_SPEECH" />
-                <action android:name="android.speech.action.WEB_SEARCH"/>
-                <category android:name="android.intent.category.DEFAULT"/>
+                <action android:name="android.speech.action.WEB_SEARCH" />
+
+                <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
 
         </activity>

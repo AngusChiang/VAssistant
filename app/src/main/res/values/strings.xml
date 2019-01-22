@@ -326,6 +326,7 @@
     <string name="key_last_sync_marked_ad_date" translatable="false">last_sync_marked_ad_date</string>
     <string name="shortcut_wakeup">WakeUp</string>
     <string name="text_switch_voice_wp" translatable="false">切换语音唤醒</string>
+    <string name="text_voice_wp" translatable="false">语音唤醒</string>
     <string name="shortcut_label_set_assist_app">Set Assist App</string>
     <string name="text_not_enable">Not enable</string>
     <string name="text_add_wakeup_shortcut_to_launcher">添加桌面唤醒快捷方式</string>

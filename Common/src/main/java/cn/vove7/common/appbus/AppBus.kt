@@ -109,14 +109,14 @@ data class SpeechAction(val action: ActionCode) {
     }
 
     enum class ActionCode {
-        ACTION_START_RECO,
+        ACTION_START_RECOG,
         ACTION_START_WAKEUP,
         ACTION_START_WAKEUP_WITHOUT_SWITCH,//不打开设置开关 @see[AppConfig.voiceWakeup]
         ACTION_STOP_WAKEUP,
         ACTION_STOP_WAKEUP_WITHOUT_SWITCH,
-        ACTION_STOP_RECO,
+        ACTION_STOP_RECOG,
         ACTION_RELOAD_SYN_CONF,
-        ACTION_CANCEL_RECO,
+        ACTION_CANCEL_RECOG,
         ACTION_START_WAKEUP_TIMER,
         ACTION_STOP_WAKEUP_TIMER
     }

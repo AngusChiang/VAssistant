@@ -5,6 +5,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.speech.RecognizerIntent
 import android.speech.RecognizerIntent.ACTION_WEB_SEARCH
+import android.speech.SpeechRecognizer
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.appbus.AppBus
 import cn.vove7.common.model.VoiceRecogResult
@@ -25,14 +26,9 @@ class VoiceInputRecogActivity : Activity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         AppBus.reg(this)
-        MainService.instance?.startVoiceInput() ?: {
+        MainService.instance?.startVoiceInput() ?: let {
             GlobalApp.toastShort("App未就绪")
             finishAndRemoveTask()
-
-        }.invoke()
-        Vog.d(this, "onCreate ---> ${intent}")
-        intent?.extras?.keySet()?.forEach {
-            Vog.d(this, "onCreate ---> $it : ${intent?.extras?.get(it)}")
         }
     }
 
@@ -49,8 +45,12 @@ class VoiceInputRecogActivity : Activity() {
             arr1.add(result)
 //            i.putExtra(RecognizerIntent.EXTRA_RESULTS, arr)
             i.putStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS,arr1)
+//            i.putExtra(RecognizerIntent.EXTRA_CONFIDENCE_SCORES, arrayListOf(1.0))
+            i.putExtra("android.speech.extra.LANGUAGE_RESULTS","cmn-hans-cn")
+            i.putExtra("query",voiceResult.result)
             setResult(RESULT_OK, i)
         }
+
 
         finishAndRemoveTask()
     }

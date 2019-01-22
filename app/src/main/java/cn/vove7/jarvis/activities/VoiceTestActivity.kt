@@ -95,11 +95,11 @@ class VoiceTestActivity : Activity() {
     }
 
     fun stop(v: View) {
-        AppBus.postSpeechAction(SpeechAction.ActionCode.ACTION_STOP_RECO)
+        AppBus.postSpeechAction(SpeechAction.ActionCode.ACTION_STOP_RECOG)
     }
 
     fun start(v: View) {
-        AppBus.postSpeechAction(SpeechAction.ActionCode.ACTION_START_RECO)
+        AppBus.postSpeechAction(SpeechAction.ActionCode.ACTION_START_RECOG)
     }
 
     var c: Animator? = null

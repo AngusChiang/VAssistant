@@ -79,7 +79,7 @@ class SpeechStatusListener(private val handler: Handler) : StatusRecogListener()
             7001 -> {
             }
             8001 -> {//引擎忙
-                AppBus.postSpeechAction(SpeechAction.ActionCode.ACTION_CANCEL_RECO)
+                AppBus.postSpeechAction(SpeechAction.ActionCode.ACTION_CANCEL_RECOG)
             }
             3001 -> {
                 handler.sendMessage(SpeechMessage.buildMessage(CODE_VOICE_ERR, "麦克风打开失败"))

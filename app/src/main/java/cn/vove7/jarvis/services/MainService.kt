@@ -435,12 +435,12 @@ class MainService : BusService(),
             return
         }
         when (sAction.action) {
-            SpeechAction.ActionCode.ACTION_START_RECO -> {
+            SpeechAction.ActionCode.ACTION_START_RECOG -> {
                 speechSynService?.stopIfSpeaking()
                 speechRecoService?.startRecog()
             }
-            SpeechAction.ActionCode.ACTION_STOP_RECO -> speechRecoService?.stopRecog()
-            SpeechAction.ActionCode.ACTION_CANCEL_RECO -> {
+            SpeechAction.ActionCode.ACTION_STOP_RECOG -> speechRecoService?.stopRecog()
+            SpeechAction.ActionCode.ACTION_CANCEL_RECOG -> {
                 hideAll()
                 speechRecoService?.cancelRecog()
             }

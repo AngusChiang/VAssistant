@@ -15,7 +15,9 @@ import android.os.Environment
 import android.service.voice.VoiceInteractionSession
 import android.support.annotation.RequiresApi
 import android.support.design.widget.BottomSheetBehavior
+import android.view.KeyEvent
 import android.view.View
+import android.view.animation.AlphaAnimation
 import android.widget.ProgressBar
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.appbus.AppBus
@@ -34,12 +36,10 @@ import cn.vove7.common.utils.runOnNewHandlerThread
 import cn.vove7.common.utils.runOnUi
 import cn.vove7.executorengine.bridges.SystemBridge
 import cn.vove7.jarvis.R
-import cn.vove7.jarvis.adapters.SimpleListAdapter
-import cn.vove7.jarvis.adapters.ListViewModel
 import cn.vove7.jarvis.services.MainService
 import cn.vove7.jarvis.tools.QRTools
 import cn.vove7.jarvis.tools.baiduaip.BaiduAipHelper
-import cn.vove7.jarvis.view.BottomSheetController
+import cn.vove7.jarvis.view.bottomsheet.AssistSessionGridController
 import cn.vove7.jarvis.view.dialog.ImageClassifyResultDialog
 import cn.vove7.vtp.dialog.DialogUtil
 import cn.vove7.vtp.log.Vog
@@ -53,12 +53,11 @@ import java.lang.Thread.sleep
  * 会话界面
  */
 @RequiresApi(api = Build.VERSION_CODES.M)
-class AssistSession(context: Context) : VoiceInteractionSession(context),
-        SimpleListAdapter.OnItemClickListener<AssistSession.SessionFunItem> {
-    lateinit var bottomSheetController: BottomSheetController<SessionFunItem>
+class AssistSession(context: Context) : VoiceInteractionSession(context) {
+    private lateinit var bottomController: AssistSessionGridController
     private var pb: ProgressBar? = null
     private var screenshot: Bitmap? = null
-    var screenPath: String? = null
+    private var screenPath: String? = null
     override fun onAssistStructureFailure(failure: Throwable) {
         failure.printStackTrace()
         Vog.d(this, "onAssistStructureFailure ---> ${failure.message}")
@@ -79,16 +78,17 @@ class AssistSession(context: Context) : VoiceInteractionSession(context),
             Vog.d(this, "onHandleScreenshot ---> $screenshot")
             screenPath = UtilBridge.bitmap2File(ss, context.cacheDir
                     .absolutePath + "/screen.png")?.absolutePath
-            if (!UserInfo.isVip())
-                sleep(500)
+            if (!UserInfo.isVip()) {
+            }
+            sleep(500)
             showProgressBar = false
         }
     }
 
     override fun onHandleAssist(data: Bundle?, structure: AssistStructure?, content: AssistContent?) {
-        data?.keySet()?.forEach {
-            Vog.d(this, "onHandleAssist ---> ${data.get(it)}")
-        }
+//        data?.keySet()?.forEach {
+//            Vog.d(this, "onHandleAssist ---> ${data.get(it)}")
+//        }
     }
 
     override fun onCreateContentView(): View {
@@ -99,18 +99,30 @@ class AssistSession(context: Context) : VoiceInteractionSession(context),
             onBackPressed()
         }
         showProgressBar = showProgressBar
-        bottomSheetController = BottomSheetController(context, view.findViewById(R.id.bottom_sheet))
-        bottomSheetController.setBottomListData(items, this)
-        bottomSheetController.bottomView.post {
-            bottomSheetController.showBottom()
-        }
-        bottomSheetController.behavior?.setBottomSheetCallback(object : BottomSheetBehavior.BottomSheetCallback() {
-            override fun onStateChanged(p0: View, p1: Int) {
-                if (p1 == BottomSheetBehavior.STATE_HIDDEN) finish()
-            }
+        bottomController = AssistSessionGridController(context, view.findViewById(R.id.bottom_sheet), itemClick)
+        bottomController.initView()
 
-            override fun onSlide(p0: View, p1: Float) {}
-        })
+        bottomController.hideBottom()
+        bottomController.bottomView.visibility = View.VISIBLE
+        bottomController.showBottom()
+
+        val animation = AlphaAnimation(0f, 1f)
+        animation.duration = 500
+        bottomController.bottomView.startAnimation(animation)
+
+        bottomController.bottomView.post {
+            bottomController.showBottom()
+            bottomController.behavior.setBottomSheetCallback(object : BottomSheetBehavior.BottomSheetCallback() {
+                override fun onStateChanged(p0: View, p1: Int) {
+                    if (p1 == BottomSheetBehavior.STATE_HIDDEN) {
+                        Vog.d(this,"onStateChanged ---> 隐藏")
+                        finish()
+                    }
+                }
+
+                override fun onSlide(p0: View, p1: Float) {}
+            })
+        }
         view.findViewById<View>(R.id.root).setOnClickListener { onBackPressed() }
         return view
     }
@@ -124,7 +136,7 @@ class AssistSession(context: Context) : VoiceInteractionSession(context),
             field = value
         }
 
-    override fun onClick(holder: SimpleListAdapter.VHolder?, pos: Int, item: ListViewModel<AssistSession.SessionFunItem>) {
+    private val itemClick: (Int) -> Unit = { pos ->
         when (pos) {
             0 -> {
                 val path = screenPath
@@ -182,32 +194,16 @@ class AssistSession(context: Context) : VoiceInteractionSession(context),
         }
     }
 
-    private val items = mutableListOf(
-            SessionFunItem("屏幕识别", R.drawable.ic_screen_content, "识别屏幕内容").viewModel(context),
-            SessionFunItem("文字识别", R.drawable.ic_screen_text, "适用于图片中的文字识别").viewModel(context),
-            SessionFunItem("文字提取", R.drawable.ic_tt, "适用于屏幕内文本提取").viewModel(context),
-            SessionFunItem("分享屏幕", R.drawable.ic_screenshot, "分享截屏").viewModel(context),
-            SessionFunItem("二维码/条码识别", R.drawable.ic_qr_code).viewModel(context),
-            SessionFunItem("保存截图", R.drawable.ic_screenshot).viewModel(context)
-    )
-
-    class SessionFunItem(
-            val name: String,
-            val iconId: Int,
-            val desc: String? = null
-    ) {
-        fun viewModel(context: Context) =
-            ListViewModel(name, icon = context.getDrawable(iconId), subTitle = desc, extra = this)
-    }
-
     /**
      * 带有动画，退出
      */
     override fun onBackPressed() {//ani
-        bottomSheetController.hideBottom()
+        bottomController.hideBottom()
     }
 
     override fun onHide() {
+        bottomController.hideBottom()
+
         Vog.d(this, "onHide ---> ")
         AppBus.unreg(this)
 //        AppBus.post(AppBus.ORDER_CANCEL_RECOG)

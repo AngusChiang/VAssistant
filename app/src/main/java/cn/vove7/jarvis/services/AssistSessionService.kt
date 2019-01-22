@@ -7,7 +7,7 @@ import android.service.voice.VoiceInteractionSessionService
 import android.support.annotation.RequiresApi
 
 import cn.vove7.jarvis.assist.AssistSession
-import cn.vove7.jarvis.assist.OnlyRecoAssistSession
+import cn.vove7.jarvis.assist.OnlyRecogAssistSession
 import cn.vove7.jarvis.tools.AppConfig
 import cn.vove7.vtp.log.Vog
 
@@ -18,7 +18,7 @@ class AssistSessionService : VoiceInteractionSessionService() {
         return if (AppConfig.useAssistService) {//开启
             AssistSession(this)
         } else {
-            return OnlyRecoAssistSession(this)
+            return OnlyRecogAssistSession(this)
         }
     }
 
