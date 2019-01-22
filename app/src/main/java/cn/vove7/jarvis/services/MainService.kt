@@ -928,7 +928,9 @@ class MainService : BusService(),
         override fun onStopRecog() {
             Vog.d(this, "onStopRecog ---> ")
             resumeMusicIf()
-//            listeningToast.hideImmediately()
+//            if (!haveResult) {//无结果时 使用停止  不会触发onResult
+//                hideAll()
+//            }
         }
 
         override fun onCancelRecog() {
