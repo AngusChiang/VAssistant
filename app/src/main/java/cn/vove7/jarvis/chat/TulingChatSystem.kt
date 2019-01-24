@@ -4,6 +4,7 @@ import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.bridges.HttpBridge
 import cn.vove7.common.model.UserInfo
 import cn.vove7.common.utils.GsonHelper
+import cn.vove7.jarvis.tools.AppConfig
 import com.google.gson.Gson
 
 /**
@@ -31,8 +32,6 @@ class TulingChatSystem : ChatSystem {
                 GlobalLog.err(e.message)
                 return null
             }
-
-
         }
         return null
     }
@@ -63,8 +62,8 @@ class RequestData {
 
 class UserI {
     val apiKey = {
-        UserInfo.getUserId().let {
-            if (it in 1..999) "2a4a7374cf1147759d70432237593c15"
+        AppConfig.chatStr ?: UserInfo.getUserId().let {
+            if (it in 1..999 || UserInfo.isVip()) "2a4a7374cf1147759d70432237593c15"
             else "5f9469a7021e463eb098a14026d380ba"
         }
     }.invoke()

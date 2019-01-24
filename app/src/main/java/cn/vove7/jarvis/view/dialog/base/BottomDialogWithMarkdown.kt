@@ -14,7 +14,7 @@ import java.io.File
  * @author Administrator
  * 2018/12/19
  */
-class BottomDialogWithMarkdown(context: Context, title: String) : BaseBottomDialogWithToolbar(context, title) {
+class BottomDialogWithMarkdown(context: Context, title: String?=null) : BaseBottomDialogWithToolbar(context, title) {
 
     private val markDownView: MarkdownView by lazy {
         contentView.findViewById<MarkdownView>(R.id.markdown_view).also {
@@ -28,29 +28,36 @@ class BottomDialogWithMarkdown(context: Context, title: String) : BaseBottomDial
     }
 
     override fun onCreateContentView(parent: View): View = contentView
-    fun loadFromAsset(path: String) {
+    fun loadFromAsset(path: String): BottomDialogWithMarkdown {
         markDownView.loadMarkdownFromAsset(path)
+        return this
     }
 
     fun loadText(md: String) {
         markDownView.loadMarkdown(md)
     }
 
-    fun loadFromFile(path: String) {
+    fun loadFromFile(path: String): BottomDialogWithMarkdown {
         val f = File(path)
         if (f.exists()) {
             markDownView.loadMarkdownFromFile(f)
         } else {
             loadText("文件不存在!")
         }
+        return this
     }
 
-    fun loadFromUrl(url: String) {
+    fun loadFromUrl(url: String): BottomDialogWithMarkdown {
         markDownView.loadMarkdownFromUrl(url)
+        return this
     }
 
 }
 
+/**
+ * 自定义主题
+ * 设置边距
+ */
 class MyStyle : Bootstrap() {
     init {
         this.addRule("body", "line-height: 1.6", "padding: 5px")

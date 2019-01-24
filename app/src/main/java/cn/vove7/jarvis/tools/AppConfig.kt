@@ -106,6 +106,8 @@ object AppConfig {
     var smartKillAd = false // 跳过自动识别未标记的广告
     var voiceRecogCompatibleMode = false
 
+    var chatStr: String? = null//对话系统 字符串
+
     val streamTypeArray = arrayOf(
             AudioManager.STREAM_MUSIC
             , AudioManager.STREAM_RING
@@ -284,6 +286,7 @@ object AppConfig {
         autoCheckPluginUpdate = getBooleanAndInit(R.string.key_auto_check_plugin_update, autoCheckPluginUpdate)
         smartKillAd = getBooleanAndInit(R.string.key_smart_find_and_kill_ad, smartKillAd)
         voiceRecogCompatibleMode = getBooleanAndInit(R.string.key_voice_recog_compatible_mode, voiceRecogCompatibleMode)
+        chatStr = sp.getString(R.string.key_chat_str)
 
         sp.getInt(R.string.key_lasting_voice_millis).also {
             lastingVoiceMillis = if (it < 0) lastingVoiceMillis else it

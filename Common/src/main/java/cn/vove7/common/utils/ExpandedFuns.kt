@@ -14,6 +14,7 @@ import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.app.GlobalLog
 import cn.vove7.vtp.app.AppInfo
 import cn.vove7.vtp.log.Vog
+import cn.vove7.vtp.sharedpreference.SpHelper
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -274,4 +275,9 @@ fun View.inVisibility() {
 fun Intent.newTask():Intent{
     addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
     return this
+}
+
+fun SpHelper.setStringNull(key:String){
+    val editor = preferences.edit()
+    editor.putString(key,null).apply()
 }

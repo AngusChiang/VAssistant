@@ -7,6 +7,7 @@ import android.view.View
 import android.widget.CompoundButton
 import android.widget.TextView
 import cn.vove7.common.utils.ThreadPool
+import cn.vove7.common.utils.setStringNull
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.tools.AppConfig
 import cn.vove7.jarvis.view.*
@@ -124,7 +125,7 @@ class SettingItemHelper(val context: Context) {
                 positiveButton()
                 neutralButton(text = "清空") {
                     if (item.keyId != null) {
-                        sp.set(item.keyId, "")
+                        sp.setStringNull(context.getString(item.keyId))
                         loadConfigInCacheThread()
                     }
                     item.summary = backSummary
@@ -220,7 +221,7 @@ class SettingItemHelper(val context: Context) {
             MaterialDialog(context)
                     .title(text = item.title())
                     .listItemsSingleChoice(items = items, initialSelection = initPos) { _, i, t ->
-                        if ((item.callback as CallbackOnSet<Pair<Int,String>>?)?.invoke(holder, Pair(i, t)) != false) {
+                        if ((item.callback as CallbackOnSet<Pair<Int, String>>?)?.invoke(holder, Pair(i, t)) != false) {
                             if (item.keyId != null) {
                                 sp.set(item.keyId, t)
                                 loadConfigInCacheThread()

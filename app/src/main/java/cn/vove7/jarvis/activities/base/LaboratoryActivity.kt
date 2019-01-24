@@ -5,6 +5,7 @@ import android.os.Bundle
 import cn.vove7.common.model.UserInfo
 import cn.vove7.common.utils.ThreadPool.runOnPool
 import cn.vove7.common.utils.startActivityOnNewTask
+import cn.vove7.executorengine.bridges.SystemBridge
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.activities.PluginManagerActivity
 import cn.vove7.jarvis.adapters.SettingsExpandableAdapter
@@ -14,6 +15,7 @@ import cn.vove7.jarvis.services.MainService
 import cn.vove7.jarvis.tools.AppConfig
 import cn.vove7.jarvis.view.*
 import cn.vove7.jarvis.view.custom.SettingGroupItem
+import cn.vove7.jarvis.view.dialog.base.BottomDialogWithMarkdown
 import kotlinx.android.synthetic.main.activity_expandable_settings.*
 import java.lang.Thread.sleep
 
@@ -73,7 +75,7 @@ class LaboratoryActivity : ReturnableActivity() {
                 SettingGroupItem(R.color.google_green, titleS = "聊天", childItems = listOf(
                         SwitchItem(title = "开启", summary = "指令匹配失败，调用聊天系统",
                                 keyId = R.string.key_open_chat_system, defaultValue = { true }) { _, b ->
-                            if (b as Boolean) {
+                            if (b) {
                                 MainService.instance?.loadChatSystem()
                             }
                             return@SwitchItem true
@@ -81,18 +83,17 @@ class LaboratoryActivity : ReturnableActivity() {
                         SingleChoiceItem(title = "对话系统",
                                 keyId = R.string.key_chat_system_type, entityArrId = R.array.list_chat_system,
                                 defaultValue = { 0 }) { _, d ->
-                            //                            if (!UserInfo.isVip() && (d as Pair<*, *>).first != 0) {
-//                                toast.showShort("设置无效，仅高级用户可用")
-//                                return@SingleChoiceItem false
-//                            }
                             runOnPool {
                                 sleep(500)//等待设置完成
                                 MainService.instance?.loadChatSystem(true)
                             }
                             return@SingleChoiceItem true
-                        }/*,
-                        CheckBoxItem(title = "连续对话", summary = "开启后可连续对话",
-                                keyId = R.string.key_continuous_dialogue)*/
+                        },
+                        InputItem(title = "自定义参数", keyId = R.string.key_chat_str),
+                        IntentItem(title = "自定义教程") {
+                            SystemBridge.openUrl("https://vove.gitee.io/2019/01/24/custom_chat_system/")
+                        }
+
                 )),
                 SettingGroupItem(R.color.google_red, titleS = "屏幕助手", childItems = listOf(
                         SwitchItem(title = "助手模式", summary = "设为默认语音辅助应用后\n通过唤醒用系统语音助手触发\n可捕捉屏幕内容进行快捷操作\n关闭后只能使快速唤醒", keyId = R.string.key_use_assist_service,

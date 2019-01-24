@@ -20,7 +20,7 @@ import cn.vove7.jarvis.R
  * @author Administrator
  * 9/21/2018
  */
-abstract class BaseBottomDialogWithToolbar(context: Context, title: String = "") : BottomSheetDialog(context) {
+abstract class BaseBottomDialogWithToolbar(context: Context, title: String? = null) : BottomSheetDialog(context) {
     //
     private val mContentView: View by lazy { View.inflate(context, R.layout.bottom_dialog_with_toolbar, null) }
     val contentContainer: ViewGroup by lazy { mContentView.findViewById<ViewGroup>(R.id.content_container) }
@@ -43,6 +43,10 @@ abstract class BaseBottomDialogWithToolbar(context: Context, title: String = "")
             toolbar.title = value
             field = value
         }
+
+    fun hideToolbar() {
+        toolbar.gone()
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         setContentView(mContentView)

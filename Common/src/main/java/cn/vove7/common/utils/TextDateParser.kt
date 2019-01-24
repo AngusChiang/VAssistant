@@ -297,9 +297,9 @@ object TextDateParser {
             val offsetM = if (it.contains("半")) 30 else 0
             return Pair(toNum(it[1]), offsetM)
         }
-        matchValues(s, "%#个?小时后#分钟(后|候)%")?.also {
+        matchValues(s, "%#个?小时#分钟(后|候)%")?.also {
             val offH = toNum(it[1])
-            val offM = toNum(it[3])
+            val offM = toNum(it[2])
             return Pair(offH, offM)
         }
         matchValues(s, "%#分钟(后|候)%")?.also {
@@ -310,7 +310,7 @@ object TextDateParser {
     }
 
     private val REG_ALL_CHAR = "([\\S\\s]*?)"
-    val REG_NUMBER_CHAR = "([0-9零一二两三四五六七八九十个百千万]*)"
+    val REG_NUMBER_CHAR = "([0-9零一二两三四五六七八九十百千万]*)"
     private fun dealRawReg(r: String): Regex = r.replace("%", REG_ALL_CHAR)
             .replace("#", REG_NUMBER_CHAR).toRegex()
 
