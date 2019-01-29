@@ -65,7 +65,7 @@ open class ExecutorImpl(
     override val focusView: ViewNode?
         get() = AccessibilityApi.accessibilityService?.currentFocusedEditor
     override var running: Boolean = false
-    override var userInterrupted: Boolean = false
+    override var userInterrupt: Boolean = false
 
     /**
      * # 等待app|Activity表
@@ -127,7 +127,7 @@ open class ExecutorImpl(
         thread = thread(start = true,name = "脚本线程：$cmdWords", isDaemon = true, priority = Thread.MAX_PRIORITY) {
             LooperHelper.prepareIfNeeded()
             running = true
-            userInterrupted = false
+            userInterrupt = false
             commandType = 0
             serviceBridge?.onExecuteStart(cmdWords)
             actionCount = actionQueue.size
@@ -165,7 +165,7 @@ open class ExecutorImpl(
                 return false
             }
         }
-        return !userInterrupted
+        return !userInterrupt
     }
 
     override fun runScript(script: String, args: Array<String>?): PartialResult {
@@ -196,13 +196,18 @@ open class ExecutorImpl(
 
     override fun executeFailed(msg: String?) {
         Vog.d(this, "executeFailed ---> $msg")
-        userInterrupted = true //设置用户中断标志
+        userInterrupt = true //设置用户中断标志
         //pollActionQueue -> false
     }
 
+    /**
+     * 资源释放
+     * @param result Boolean?
+     */
     override fun onFinish(result: Boolean?) {
         running = false
         ScreenAdapter.reSet()
+        SystemBridge.release()
         if (result != null)
             serviceBridge?.onExecuteFinished(result)
 //        accessApi?.removeAllNotifier(this)
@@ -213,7 +218,7 @@ open class ExecutorImpl(
      */
     @CallSuper
     override fun interrupt() {
-        userInterrupted = true
+        userInterrupt = true
         try {
             thread?.checkAccess()
             thread?.interrupt()//打破wait

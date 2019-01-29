@@ -17,6 +17,7 @@ import android.location.LocationListener
 import android.location.LocationManager
 import android.media.AudioFocusRequest
 import android.media.AudioManager
+import android.media.Image
 import android.net.Uri
 import android.net.wifi.WifiConfiguration
 import android.net.wifi.WifiManager
@@ -43,6 +44,8 @@ import cn.vove7.common.model.ResultBox
 import cn.vove7.common.netacc.ApiUrls
 import cn.vove7.common.netacc.NetHelper
 import cn.vove7.common.utils.RegUtils
+import cn.vove7.common.utils.ScreenCapturer
+import cn.vove7.common.utils.newTask
 import cn.vove7.common.view.ScreenshotActivity
 import cn.vove7.executorengine.R
 import cn.vove7.executorengine.helper.AdvanAppHelper
@@ -106,8 +109,9 @@ object SystemBridge : SystemOperation {
                 false
             } else {
                 launchIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                if (resetTask)
-                    launchIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK)
+                if (resetTask) {
+                }
+                launchIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK)
                 context.startActivity(launchIntent)
                 true
             }
@@ -631,7 +635,7 @@ object SystemBridge : SystemOperation {
         //cancelLocalOnlyHotspotRequest 是关闭热点
         //打开热
         try {
-            if (isEnable)
+            if (isEnable) {
                 manager.startLocalOnlyHotspot(object : WifiManager.LocalOnlyHotspotCallback() {
                     override fun onStarted(reservation: WifiManager.LocalOnlyHotspotReservation) {
                         super.onStarted(reservation)
@@ -653,7 +657,7 @@ object SystemBridge : SystemOperation {
                         Vog.d(this, "onFailed ---> ")
                     }
                 }, Handler())
-            else {
+            } else {
                 GlobalApp.toastShort("不支持关闭热点")
             }
         } catch (e: SecurityException) {
@@ -790,9 +794,9 @@ object SystemBridge : SystemOperation {
     override fun getNetAddress(): String? {
         val r = ResultBox<String?>()
         NetHelper.postJson<String>(ApiUrls.GET_IP) { _, b ->
-            if (b?.isOk() == true)
+            if (b?.isOk() == true) {
                 r.setAndNotify(b.data)
-            else r.setAndNotify(null)
+            } else r.setAndNotify(null)
         }
         return r.blockedGet()
     }
@@ -807,12 +811,53 @@ object SystemBridge : SystemOperation {
                 "." + ((i shr 16) and 0xFF) + "." + (i shr 24 and 0xFF)
     }
 
+    var screenData: Intent? = null
+    var cap: ScreenCapturer? = null
     override fun screenShot(): Bitmap? {
-        val resultBox = ResultBox<Bitmap?>()
-        val capIntent = ScreenshotActivity.getScreenshotIntent(context, resultBox)
-        context.startActivity(capIntent)
-        return resultBox.blockedGet()
+        if (screenData == null) {
+            val resultBox = ResultBox<Intent?>()
+            val capIntent = ScreenshotActivity.getScreenshotIntent(context, resultBox)
+            context.startActivity(capIntent)
+            screenData = resultBox.blockedGet() ?: return null
+        }
+        Vog.d(this, "screenShot ---> $screenData")
+        if (cap == null)
+            cap = ScreenCapturer(context, screenData, -1, DeviceInfo.getInfo(context).screenInfo.density
+                    , null)
+
+        try {
+            return cap?.capture()?.let {
+                Vog.d(this,"screenShot ---> $it")
+                val bm = processImg(it)
+                it.close()
+                bm
+            }
+//
+        } catch (e: Exception) {
+            e.printStackTrace()
+            return null
+        }
+//        val resultBox = ResultBox<Bitmap?>()
+//        val capIntent = ScreenshotActivity.getScreenshotIntent(context, resultBox)
+//        context.startActivity(capIntent)
+//        return resultBox.blockedGet()
     }
+
+    private fun processImg(image: Image): Bitmap? {
+        val width = image.width
+        val height = image.height
+        val planes = image.planes
+        val buffer = planes[0].buffer
+        val pixelStride = planes[0].pixelStride
+        val rowStride = planes[0].rowStride
+        val rowPadding = rowStride - pixelStride * width
+        var bitmap = Bitmap.createBitmap(width + rowPadding / pixelStride,
+                height, Bitmap.Config.ARGB_8888)
+        bitmap.copyPixelsFromBuffer(buffer)
+        bitmap = Bitmap.createBitmap(bitmap, 0, 0, width, height)
+        return bitmap
+    }
+
 
     override fun screen2File(): File? {
         val tmpPath = context.cacheDir.absolutePath + "/screen.png"
@@ -832,8 +877,7 @@ object SystemBridge : SystemOperation {
 //            intent.putExtra(Intent.EXTRA_SUBJECT, title)
             intent.putExtra(Intent.EXTRA_TEXT, content ?: "")
             intent.setType("text/plain");
-            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-            context.startActivity(Intent.createChooser(intent, "分享到"))
+            context.startActivity(Intent.createChooser(intent, "分享到").newTask())
         } catch (e: Exception) {
             GlobalLog.err(e)
             GlobalApp.toastShort("分享失败")
@@ -852,15 +896,14 @@ object SystemBridge : SystemOperation {
                 if (f.exists() && f.isFile) {
                     intent.type = "image/jpg"
 
-                    val imgUri = if (Build.VERSION.SDK_INT >= 24)
+                    val imgUri = if (Build.VERSION.SDK_INT >= 24) {
                         FileProvider.getUriForFile(context, "${context.packageName}.fileprovider", f)
-                    else Uri.fromFile(f)
+                    } else Uri.fromFile(f)
 
                     intent.putExtra(Intent.EXTRA_STREAM, imgUri)
                 }
             }
-            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-            context.startActivity(Intent.createChooser(intent, "分享到"))
+            context.startActivity(Intent.createChooser(intent, "分享到").newTask())
         } catch (e: Exception) {
             GlobalLog.err(e)
             GlobalApp.toastShort("分享失败")
@@ -1030,4 +1073,9 @@ object SystemBridge : SystemOperation {
         }
     }
 
+    fun release() {
+        cap?.release()
+        cap = null
+        screenData = null
+    }
 }

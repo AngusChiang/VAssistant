@@ -56,7 +56,7 @@ class HelpActivity : ReturnableActivity(), AdapterView.OnItemClickListener {
     private fun startTutorials() {
         list_view.post {
             Tutorials.oneStep(this, list = arrayOf(
-                    ItemWrap(Tutorials.h_t_1, adapter.holders[0]?.titleView, getString(R.string.text_advanced_user_guide), "自定义指令、脚本Api、远程调试都在这里")
+                    ItemWrap(Tutorials.h_t_1, adapter.holders[0]?.titleView, getString(R.string.text_user_manual), "自定义指令、脚本Api、远程调试都在这里")
                     , ItemWrap(Tutorials.h_t_2, adapter.holders[1]?.titleView, getString(R.string.text_hot_key_desc), "快速了解快捷键操作")
                     , ItemWrap(Tutorials.h_t_5, adapter.holders[2]?.titleView, getString(R.string.text_faq), "遇到问题可先查看常见问题再进行反馈")
                     , ItemWrap(Tutorials.h_t_3, adapter.holders[4]?.titleView, getString(R.string.text_feedback), "在这里进行反馈与建议，或者加入QQ群")

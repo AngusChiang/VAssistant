@@ -1,5 +1,7 @@
 package cn.vove7.jarvis
 
+import android.graphics.Bitmap
+import android.graphics.Color
 import android.util.Range
 import cn.vove7.common.datamanager.parse.model.Action
 import cn.vove7.common.utils.TextDateParser
@@ -8,6 +10,7 @@ import cn.vove7.common.utils.whileWaitCount
 import cn.vove7.common.utils.whileWaitTime
 import cn.vove7.jarvis.chat.TulingChatSystem
 import cn.vove7.jarvis.tools.baiduaip.BaiduAipHelper
+import io.github.kbiakov.codeview.highlight.hex
 import org.jsoup.Jsoup
 import org.junit.Test
 import java.lang.Thread.sleep
@@ -305,5 +308,14 @@ class ExampleUnitTest {
         }
         sleep(5000)
         println("end")
+    }
+
+    lateinit var bm: Bitmap
+    @Test
+    fun bitmap() {
+        888.hex()
+//        bm.getPixel(0,0)
+//        val a = Color.green(0xffffffff)
+//        print(a)
     }
 }

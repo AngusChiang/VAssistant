@@ -23,7 +23,7 @@ public class ExampleInstrumentedTest {
 
       assertEquals("cn.vove7.executorengine.test", appContext.getPackageName());
 
-      new ExecutorImpl().getUserInterrupted();
+      new ExecutorImpl().getUserInterrupt();
 
    }
 }

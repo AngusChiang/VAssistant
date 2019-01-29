@@ -7,9 +7,12 @@
 
     <style name="ScreenShotTheme" parent="Theme.AppCompat.Light.NoActionBar">
         <item name="android:windowBackground">@color/trans</item>
-        <item name="android:statusBarColor">@color/trans</item>
         <item name="android:windowIsTranslucent">true</item>
         <item name="android:windowAnimationStyle">@null</item>
+        <item name="android:windowContentOverlay">@null</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowIsFloating">true</item>
+        <item name="android:backgroundDimEnabled">false</item>
         <!--<item name="android:windowAnimationStyle">@style/InOut</item>-->
     </style>
 

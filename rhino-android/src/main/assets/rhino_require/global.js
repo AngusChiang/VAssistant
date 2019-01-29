@@ -115,7 +115,7 @@ function lockScreen(){
 }
 
 function screenShot(){
-    return automator.lockScreen()
+    return automator.screenShot()
 }
 
 function toast(msg){

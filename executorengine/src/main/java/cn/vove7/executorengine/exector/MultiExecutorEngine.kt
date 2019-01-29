@@ -42,6 +42,7 @@ class MultiExecutorEngine : ExecutorImpl() {
              PartialResult.success()
         } catch (e: Exception) {
             GlobalLog.err(e)
+            RhinoApi.doLog(e.message)
             PartialResult.fatal(e.message ?: "no message")
         }
     }

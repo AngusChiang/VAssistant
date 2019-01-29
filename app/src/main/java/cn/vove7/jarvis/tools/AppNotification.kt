@@ -35,15 +35,15 @@ object AppNotification {
     }
 
     fun updateNotificationChannel(context: Context) {
-        if (AppConfig.FIRST_LAUNCH_NEW_VERSION) {
-            (context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager).apply {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                    notificationChannels?.forEach {
-                        deleteNotificationChannel(it.id)
-                    }
-                }
-            }
-        }
+//        if (AppConfig.FIRST_LAUNCH_NEW_VERSION) {
+//            (context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager).apply {
+//                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+//                    notificationChannels?.forEach {
+//                        deleteNotificationChannel(it.id)
+//                    }
+//                }
+//            }
+//        }
     }
 
 

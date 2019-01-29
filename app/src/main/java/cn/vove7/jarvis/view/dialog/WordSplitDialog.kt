@@ -129,7 +129,7 @@ class WordSplitDialog(context: Context, val rawWords: String, val type: Int = 0)
             rect.top = it.top
             rect.bottom = it.bottom
 //            Vog.d(this, "findViewByPos ---> ${it.text} ${rect2String(rect)}")
-            if (rect.contains(x, y))
+            if (rect.contains(x, y - 20))//错位
                 return it.also {
                     Vog.d(this, "findViewByPos --->  当前: ${it.text}")
                 }
@@ -195,7 +195,7 @@ class WordSplitDialog(context: Context, val rawWords: String, val type: Int = 0)
                 MotionEvent.ACTION_DOWN -> {
                     startView = findViewByPos(checkedTextList,
                             event.x.toInt(), event.y.toInt())
-                            ?: return@setOnTouchListener false
+                        ?: return@setOnTouchListener false
                     Vog.d(this, "buildView ---> ACTION_DOWN")
                     lastCheckStatus = backupOldCheckStatus(checkedTextList)
                     requestDisIntercept(content, true)//阻止父级拦截
@@ -241,7 +241,7 @@ class WordSplitDialog(context: Context, val rawWords: String, val type: Int = 0)
 
     fun switchView(view: CheckedTextView?) {
         view?.apply {
-            setTextColor(if(isChecked) Color.WHITE else Color.BLACK)
+            setTextColor(if (isChecked) Color.WHITE else Color.BLACK)
         }
     }
 
