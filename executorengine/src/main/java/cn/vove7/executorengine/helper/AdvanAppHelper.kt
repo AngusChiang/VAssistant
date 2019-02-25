@@ -8,7 +8,6 @@ import cn.vove7.common.datamanager.greendao.MarkedDataDao
 import cn.vove7.common.datamanager.parse.model.ActionScope
 import cn.vove7.common.model.MatchedData
 import cn.vove7.common.utils.isHomeApp
-import cn.vove7.common.utils.isUserApp
 import cn.vove7.executorengine.bridges.SystemBridge
 import cn.vove7.executorengine.parse.ParseEngine
 import cn.vove7.vtp.app.AppHelper
@@ -71,13 +70,14 @@ object AdvanAppHelper {
         synchronized(APP_LIST) {
             APP_LIST.values.forEach {
                 val rate = try {
-                    if (appWord.startsWith(it.name, ignoreCase = true)) {
-                        val follow = appWord.substring(it.name.length)
+                    val name = it.name ?: ""
+                    if (appWord.startsWith(name, ignoreCase = true)) {
+                        val follow = appWord.substring(name.length)
                         Vog.d(this, "预解析---> $follow")
                         val aq = ParseEngine.matchAppAction(follow,
                                 ActionScope(it.packageName), false)
                         if (aq.second.isEmpty()) {
-                            TextHelper.compareSimilarityWithPinyin(context, appWord, it.name,
+                            TextHelper.compareSimilarityWithPinyin(context, appWord, name,
                                     replaceNumberWithPinyin = true).let { f ->
                                 if (f < limitRate) limitRate
                                 else f
@@ -85,7 +85,7 @@ object AdvanAppHelper {
                         } else //匹配ok
                             1f
                     } else {
-                        val f = TextHelper.compareSimilarityWithPinyin(context, appWord, it.name, replaceNumberWithPinyin = true)
+                        val f = TextHelper.compareSimilarityWithPinyin(context, appWord, name, replaceNumberWithPinyin = true)
                         Vog.v(this, "matchAppName $appWord ${it.name} $f")
                         f
                     }
@@ -114,7 +114,7 @@ object AdvanAppHelper {
             ALL_APP_LIST.clear()
             AppHelper.getAllInstallApp(context, false).filter {
                 //过滤
-                val f = it.isUserApp() || it.isHomeApp() || SystemBridge.getLaunchIntent(it.packageName) != null
+                val f = it.isUserApp || it.isHomeApp() || SystemBridge.getLaunchIntent(it.packageName) != null
                 if (!f) {
                     ALL_APP_LIST[it.packageName] = it
                     Vog.v(this, "updateAppList ---> 过滤 ${it.name} ${it.packageName}")
@@ -144,7 +144,7 @@ object AdvanAppHelper {
         val li = arrayListOf<String>()
         synchronized(APP_LIST) {
             APP_LIST.forEach {
-                li.add(it.value.name)
+                li.add(it.value.name ?: "")
             }
         }
         return li.toTypedArray()

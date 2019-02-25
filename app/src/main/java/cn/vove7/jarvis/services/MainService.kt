@@ -156,9 +156,8 @@ class MainService : BusService(),
 
     /**
      * 加载对话系统
-     * @param byUserSet Boolean
      */
-    fun loadChatSystem(byUserSet: Boolean = false) {
+    fun loadChatSystem() {
 //        val type = GlobalApp.APP.resources.getStringArray(R.array.list_chat_system)
 
         if (!AppConfig.openChatSystem)
@@ -169,9 +168,6 @@ class MainService : BusService(),
 //            else -> QykChatSystem()
 //        }
         chatSystem = TulingChatSystem()
-        if (byUserSet) {
-            GlobalApp.toastShort("对话系统切换完成")
-        }
     }
 
     override fun onBind(intent: Intent): IBinder {
@@ -909,7 +905,10 @@ class MainService : BusService(),
             }
         }
 
+        var temResult: String? = null
+
         override fun onTempResult(temp: String) {
+            temResult = temp
             if (AppConfig.lastingVoiceCommand) {//临时结果 暂时关闭长语音定时器
                 speechRecoService?.stopLastingUpTimer()
             }
@@ -928,9 +927,13 @@ class MainService : BusService(),
         override fun onStopRecog() {
             Vog.d(this, "onStopRecog ---> ")
             resumeMusicIf()
-//            if (!haveResult) {//无结果时 使用停止  不会触发onResult
-//                hideAll()
-//            }
+            //fix 百度长语音 在无结果stop，无回调
+            if (AppConfig.lastingVoiceCommand &&
+                    speechRecoService is BaiduSpeechRecoService && temResult == null) {
+                Vog.d(this,"onStopRecog ---> 长语音无结果")
+                speechRecoService?.cancelRecog()
+            }
+            temResult = null
         }
 
         override fun onCancelRecog() {
@@ -961,7 +964,7 @@ class MainService : BusService(),
             listeningToast.showAndHideDelay(err)
             when (voiceMode) {
                 MODE_VOICE -> {
-                    hideAll()
+                    listeningAni.hideDelay()
                     playSoundEffect(R.raw.recog_failed)
                     resumeMusicIf()
                 }
@@ -1062,7 +1065,7 @@ class MainService : BusService(),
             resumeMusicLock = true
             val data = chatSystem.chatWithText(result)
             if (data == null) {
-                listeningToast.showAndHideDelay("获取失败")
+                listeningToast.showAndHideDelay("获取失败,详情查看日志")
                 parseAnimation.failedAndHideDelay()
                 resumeMusicIf()
             } else {

@@ -150,6 +150,7 @@ abstract class SpeechRecoService(val event: SpeechEvent) : SpeechRecogI {
         val sleepTime = /*if (BuildConfig.DEBUG) AppConfig.autoSleepWakeupMillis / 60
         else*/ AppConfig.autoSleepWakeupMillis
         Vog.d(this, "startAutoSleepWakeup ---> 开启唤醒自动休眠 $sleepTime")
+        if (sleepTime < 0) return
         timerHandler.postDelayed(stopWakeUpTimer, sleepTime)
     }
 
@@ -177,7 +178,7 @@ abstract class SpeechRecoService(val event: SpeechEvent) : SpeechRecogI {
             when (msg?.what) {
                 IStatus.CODE_WAKEUP_SUCCESS -> {//唤醒
                     val word = msg.data.getString("data")
-                    Vog.d(this,"handleMessage ---> 唤醒 -> $word")
+                    Vog.d(this, "handleMessage ---> 唤醒 -> $word")
                     startAutoSleepWakeup()//重新倒计时
                     if (!isListening)
                         event.onWakeup(word)

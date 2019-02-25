@@ -8,6 +8,7 @@
         <item>1小时</item>
         <item>2小时</item>
         <item>5小时</item>
+        <item>不自动休眠</item>
     </string-array>
 
     <string name="text_permission_manager">权限管理</string>

@@ -7,7 +7,6 @@ import android.view.View
 import android.widget.CompoundButton
 import android.widget.TextView
 import cn.vove7.common.utils.ThreadPool
-import cn.vove7.common.utils.setStringNull
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.tools.AppConfig
 import cn.vove7.jarvis.view.*

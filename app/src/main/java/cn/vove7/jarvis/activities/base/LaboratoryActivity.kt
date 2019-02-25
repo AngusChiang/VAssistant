@@ -2,6 +2,7 @@ package cn.vove7.jarvis.activities.base
 
 import android.content.Intent
 import android.os.Bundle
+import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.model.UserInfo
 import cn.vove7.common.utils.ThreadPool.runOnPool
 import cn.vove7.common.utils.startActivityOnNewTask
@@ -84,8 +85,9 @@ class LaboratoryActivity : ReturnableActivity() {
                                 keyId = R.string.key_chat_system_type, entityArrId = R.array.list_chat_system,
                                 defaultValue = { 0 }) { _, d ->
                             runOnPool {
-                                sleep(500)//等待设置完成
-                                MainService.instance?.loadChatSystem(true)
+                                sleep(800)//等待设置完成
+                                MainService.instance?.loadChatSystem()
+                                GlobalApp.toastShort("对话系统切换完成")
                             }
                             return@SingleChoiceItem true
                         },
@@ -112,9 +114,9 @@ class LaboratoryActivity : ReturnableActivity() {
 
                 )),*/
                 SettingGroupItem(R.color.yellow_700, titleS = "语音唤醒", childItems = listOf(
-                        SwitchItem(title = "自动释放麦克风", summary = "在已授予麦克风权限的其他App内自动关闭语音唤醒\n需要无障碍\n设为系统应用后无效",
+                        SwitchItem(title = "自动释放麦克风", summary = "在已授予麦克风权限的其他App内自动关闭语音唤醒\n需要无障碍",/*设为系统应用后无效*/
                                 keyId = R.string.key_fix_voice_micro, defaultValue = { true }) { _, b ->
-                            if (b && !AppConfig.IS_SYS_APP)
+                            if (b /* TODO && !AppConfig.IS_SYS_APP*/)
                                 VoiceWakeupStrategy.register()
                             else
                                 VoiceWakeupStrategy.unregister()

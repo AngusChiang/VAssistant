@@ -4,6 +4,7 @@ import android.graphics.drawable.AnimationDrawable
 import android.os.Handler
 import android.view.Gravity
 import android.view.View
+import android.view.animation.AlphaAnimation
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
@@ -11,7 +12,9 @@ import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.appbus.AppBus
 import cn.vove7.common.appbus.SpeechAction
 import cn.vove7.common.model.RequestPermission
+import cn.vove7.common.utils.gone
 import cn.vove7.common.utils.runOnUi
+import cn.vove7.common.utils.show
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.tools.AppConfig
 import cn.vove7.vtp.log.Vog
@@ -53,6 +56,7 @@ class ListeningToast : AbFloatWindow<ListeningToast.VHolder>(GlobalApp.APP) {
                 }
                 else -> Gravity.CENTER
             }
+            field = v
         }
     override val onNoPermission: () -> Unit = {
         AppBus.postSpeechAction(SpeechAction.ActionCode.ACTION_CANCEL_RECOG)
@@ -87,8 +91,16 @@ class ListeningToast : AbFloatWindow<ListeningToast.VHolder>(GlobalApp.APP) {
         runOnUi {
             setAniRes(R.drawable.listening_animation)
             holder.text = text
-            if (!isShowing)
+            if (!isShowing) {
                 show()
+                contentView.gone()
+                contentView.show()
+                contentView.post {
+                    val animation = AlphaAnimation(0f, 1f)
+                    animation.duration = 1000
+                    contentView.startAnimation(animation)
+                }
+            }
         }
 
     }

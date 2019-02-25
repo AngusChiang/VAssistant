@@ -116,9 +116,7 @@ public class UserInfo implements Serializable {
         return INSTANCE == null ? null : INSTANCE.vipEndDate;
     }
 
-    public void setVipEndDate(Date vipEndDate) {
-        this.vipEndDate = vipEndDate;
-    }
+    public void setVipEndDate(Date vipEndDate) { }
 }
 
 

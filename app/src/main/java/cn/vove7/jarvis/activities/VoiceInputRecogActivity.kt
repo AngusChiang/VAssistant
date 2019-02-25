@@ -1,20 +1,20 @@
 package cn.vove7.jarvis.activities
 
 import android.app.Activity
+import android.app.VoiceInteractor
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.speech.RecognizerIntent
 import android.speech.RecognizerIntent.ACTION_WEB_SEARCH
-import android.speech.SpeechRecognizer
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.appbus.AppBus
 import cn.vove7.common.model.VoiceRecogResult
 import cn.vove7.executorengine.bridges.SystemBridge
 import cn.vove7.jarvis.services.MainService
-import cn.vove7.vtp.log.Vog
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
-import java.util.ArrayList
+import java.util.*
 
 /**
  * # VoiceInputRecogActivity
@@ -23,6 +23,8 @@ import java.util.ArrayList
  * 2019/1/20
  */
 class VoiceInputRecogActivity : Activity() {
+//    lateinit var vi: VoiceInteractor
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         AppBus.reg(this)
@@ -30,11 +32,18 @@ class VoiceInputRecogActivity : Activity() {
             GlobalApp.toastShort("App未就绪")
             finishAndRemoveTask()
         }
+
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+//            vi = voiceInteractor
+//        }
     }
 
+//
+//    override fun isVoiceInteraction(): Boolean = true
     @Subscribe(threadMode = ThreadMode.MAIN)
     fun onResult(voiceResult: VoiceRecogResult) {
 
+//        vi.activeRequests
         val i = Intent()
         val result = voiceResult.result
         if (intent?.action == ACTION_WEB_SEARCH) {
@@ -44,10 +53,10 @@ class VoiceInputRecogActivity : Activity() {
             val arr1 = ArrayList<String>()
             arr1.add(result)
 //            i.putExtra(RecognizerIntent.EXTRA_RESULTS, arr)
-            i.putStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS,arr1)
+            i.putStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS, arr1)
 //            i.putExtra(RecognizerIntent.EXTRA_CONFIDENCE_SCORES, arrayListOf(1.0))
-            i.putExtra("android.speech.extra.LANGUAGE_RESULTS","cmn-hans-cn")
-            i.putExtra("query",voiceResult.result)
+            i.putExtra("android.speech.extra.LANGUAGE_RESULTS", "cmn-hans-cn")
+            i.putExtra("query", voiceResult.result)
             setResult(RESULT_OK, i)
         }
 

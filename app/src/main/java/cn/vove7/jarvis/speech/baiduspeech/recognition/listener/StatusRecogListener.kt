@@ -25,6 +25,7 @@ open class StatusRecogListener : IRecogListener, IStatus {
 
     override fun onAsrEnd() {
         status = IStatus.STATUS_RECOGNITION
+        Vog.i(this, "说话结束")
     }
 
     override fun onAsrPartialResult(results: Array<String>?, recogResult: RecogResult) {

@@ -101,9 +101,8 @@
         <item>1 hours</item>
         <item>2 hours</item>
         <item>5 hours</item>
+        <item>Does not automatically sleep</item>
     </string-array>
-
-    <string-array name="multi_select_list_preference_default_value" />
 
     <string name="text_settings">Settings</string>
     <string name="text_search">Search</string>
@@ -359,7 +358,9 @@
         4.麦克风占用问题
     </string>
     <string name="desc_gesc_accessibility" translatable="false">
-        可使用操作界面函数 7.0+\n由于系统原因，可能卡顿（掉帧）
+        全局操作依赖服务 7.0+\n
+        用于屏幕点击，执行手势\n
+        由于系统原因，可能卡顿（掉帧）
     </string>
     <string name="key_auto_open_as_with_root" translatable="false">auto_open_as_with_root</string>
     <string name="key_volume_wakeup_when_screen_off" translatable="false">volume_wakeup_when_screen_off</string>

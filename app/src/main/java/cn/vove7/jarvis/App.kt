@@ -30,7 +30,6 @@ import io.github.kbiakov.codeview.classifier.CodeProcessor
 class App : GlobalApp() {
 
     private val mainService: Intent by lazy { Intent(this, MainService::class.java) }
-    private val assistService: Intent by lazy { Intent(this, AssistSessionService::class.java) }
 
     lateinit var services: Array<Intent>
     override fun onCreate() {
@@ -39,7 +38,7 @@ class App : GlobalApp() {
         ins = this
 
         CrashHandler.init()
-        services = arrayOf(mainService, assistService)
+        services = arrayOf(mainService)
         AppConfig.init()//加载配置
         Vog.d(this, "onCreate ---> 配置加载完成")
 
@@ -56,7 +55,7 @@ class App : GlobalApp() {
             }
             RePluginManager().launchWithApp()
             Vog.d(this, "onCreate ---> 结束 ${System.currentTimeMillis() / 1000}")
-
+            System.gc()
         }
 
     }

@@ -31,6 +31,7 @@ import org.jsoup.Jsoup
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*
+import kotlin.concurrent.thread
 
 
 /**
@@ -276,7 +277,7 @@ object AppConfig {
         useAssistService = getBooleanAndInit(R.string.key_use_assist_service, useAssistService)
         execFailedVoiceFeedback = getBooleanAndInit(R.string.key_exec_failed_voice_feedback, true)
         execSuccessFeedback = getBooleanAndInit(R.string.key_exec_failed_voice_feedback, true)
-        fixVoiceMico = getBooleanAndInit(R.string.key_fix_voice_micro, true) && !AppConfig.IS_SYS_APP
+        fixVoiceMico = getBooleanAndInit(R.string.key_fix_voice_micro, true) //TODO && !AppConfig.IS_SYS_APP
         notifyCloseMico = getBooleanAndInit(R.string.key_close_wakeup_notification, true)
 //        disableAdKillerOnLowBattery = getBooleanAndInit(R.string.key_remove_ad_power_saving_mode, true)
         disableAccessibilityOnLowBattery = getBooleanAndInit(R.string.key_accessibility_service_power_saving_mode, true)
@@ -319,6 +320,7 @@ object AppConfig {
                     3 -> oneHour
                     4 -> 2 * oneHour
                     5 -> 5 * oneHour
+                    6 -> -1 //不休眠
                     else -> autoSleepWakeupMillis
                 }
             }
@@ -502,14 +504,11 @@ object AppConfig {
         if (UserInfo.isVip())
             return true
         val f = getTodayCount("tp")
-        return if (f < 5) {//免费5次
-            runOnCachePool {
+        return (f < 5).also {
+            //免费5次
+            if (it) runOnCachePool {
                 plusTodayCount("tp", f)
             }
-            true
-        } else {
-            GlobalApp.toastShort("免费使用次数已用尽")
-            false
         }
     }
 

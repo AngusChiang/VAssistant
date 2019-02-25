@@ -208,9 +208,9 @@ open class ExecutorImpl(
         running = false
         ScreenAdapter.reSet()
         SystemBridge.release()
+        System.gc()
         if (result != null)
             serviceBridge?.onExecuteFinished(result)
-//        accessApi?.removeAllNotifier(this)
     }
 
     /**
@@ -225,7 +225,6 @@ open class ExecutorImpl(
         } catch (e: Exception) {
             e.printStackTrace()
         }
-//        accessApi?.removeAllNotifier(this)
     }
 
     /**

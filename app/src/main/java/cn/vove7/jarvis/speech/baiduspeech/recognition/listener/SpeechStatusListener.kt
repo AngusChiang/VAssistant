@@ -43,13 +43,13 @@ class SpeechStatusListener(private val handler: Handler) : StatusRecogListener()
         handler.sendMessage(SpeechMessage.buildMessage(CODE_VOICE_RESULT, tmp))
     }
 
-    override fun onAsrEnd() {
-        super.onAsrEnd()
-        if (!AppConfig.lastingVoiceCommand) {//非长语音
-            //立即停止识别 ，检测结果
-            MainService.instance?.onCommand(AppBus.ORDER_STOP_RECOG)
-        }
-    }
+//    override fun onAsrEnd() {
+//        super.onAsrEnd()
+////        if (!AppConfig.lastingVoiceCommand) {//非长语音
+////            //立即停止识别 ，检测结果
+////            MainService.instance?.onCommand(AppBus.ORDER_STOP_RECOG)
+////        }
+//    }
 
     override fun onAsrFinishError(errorCode: Int, subErrorCode: Int, errorMessage: String?, descMessage: String?,
                                   recogResult: RecogResult) {

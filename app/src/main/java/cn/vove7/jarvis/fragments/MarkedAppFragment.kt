@@ -42,7 +42,7 @@ class MarkedAppFragment : BaseMarkedFragment() {
         SelectAppDialog(context!!) {
             setValue(it.packageName)
             if (getKey() != "") {
-                setKey(it.name)
+                setKey(it.name ?: "")
             }
         }
     }
@@ -59,7 +59,7 @@ class MarkedAppFragment : BaseMarkedFragment() {
             if (app == null) {
                 if (showUninstall)
                     sss.add(ListViewModel(it.key, it.value, null, it))
-            } else ss.add(ListViewModel(it.key, app.name, app.getIcon(GlobalApp.APP), it))
+            } else ss.add(ListViewModel(it.key, app.name, app.icon, it))
         }
         ss.addAll(sss)// 显示在最后
         return ss

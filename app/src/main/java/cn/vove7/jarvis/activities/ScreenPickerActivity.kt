@@ -54,6 +54,7 @@ class ScreenPickerActivity : Activity() {
         }
 
         if (!AppConfig.haveTextPickPermission()) {//免费次数
+            toast.showLong("今日次数达到上限")
             finish()
             return
         }

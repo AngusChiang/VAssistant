@@ -14,4 +14,8 @@ abstract class OneFragmentActivity : BaseActivityWithViewPager() {
 
     override var titles: Array<String> = arrayOf()
 
+    override fun onDestroy() {
+        super.onDestroy()
+        System.gc()
+    }
 }

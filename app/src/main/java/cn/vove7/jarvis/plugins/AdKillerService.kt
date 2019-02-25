@@ -9,7 +9,6 @@ import cn.vove7.common.datamanager.DAO
 import cn.vove7.common.datamanager.greendao.AppAdInfoDao
 import cn.vove7.common.datamanager.parse.model.ActionScope
 import cn.vove7.common.utils.ThreadPool.runOnPool
-import cn.vove7.common.utils.isUserApp
 import cn.vove7.common.view.finder.ViewFindBuilder
 import cn.vove7.common.view.finder.ViewFinder
 import cn.vove7.executorengine.helper.AdvanAppHelper
@@ -144,9 +143,9 @@ object AdKillerService : AbsAccPluginService() {
             stopSearchThreads()
             //smart skip ad
             if (AppConfig.smartKillAd && lastPkg != appScope.packageName
-                    && AdvanAppHelper.getAppInfo(appScope.packageName)?.isUserApp() == true)//切换页面
+                    && AdvanAppHelper.getAppInfo(appScope.packageName)?.isUserApp == true)//切换页面
                 smartSkipAppSwitchAd()
-            else Vog.d(this,"onAppChanged smartSkipApp ---> 系统应用")
+            else Vog.d(this, "onAppChanged smartSkipApp ---> 系统应用")
         }
         lastPkg = appScope.packageName
     }

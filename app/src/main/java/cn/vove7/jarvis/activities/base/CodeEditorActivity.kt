@@ -52,6 +52,10 @@ abstract class CodeEditorActivity : AppCompatActivity() {
 
     abstract val scriptType: String
 
+    override fun onDestroy() {
+        super.onDestroy()
+        System.gc()
+    }
 
     inner class MyPrinter : OnPrint {
         override fun onPrint(l: Int, output: String) {

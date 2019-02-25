@@ -114,6 +114,7 @@ object CrashHandler : Thread.UncaughtExceptionHandler {
 
 fun DeviceInfo.string(): String {
     return buildString {
+        append("appId:").append(BuildConfig.APPLICATION_ID)
         append("userId: ").append(UserInfo.getUserId()).appendln()
         append("userName: ").append(UserInfo.getUserName()).appendln()
         append("email: ").append(UserInfo.getEmail()).appendln()

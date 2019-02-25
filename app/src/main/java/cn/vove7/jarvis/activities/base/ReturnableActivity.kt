@@ -29,4 +29,8 @@ open class ReturnableActivity : AppCompatActivity() {
         return super.onOptionsItemSelected(item)
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        System.gc()
+    }
 }

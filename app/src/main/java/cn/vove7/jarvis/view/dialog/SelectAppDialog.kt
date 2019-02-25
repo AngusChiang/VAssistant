@@ -39,7 +39,7 @@ class SelectAppDialog(
     }
 
     override fun unification(data: AppInfo): ListViewModel<AppInfo>? {
-        return ListViewModel(data.name, data.packageName, icon = data.getIcon(context),extra = data)
+        return ListViewModel(data.name, data.packageName, icon = data.icon,extra = data)
     }
 
     override fun onClick(holder: SimpleListAdapter.VHolder?, pos: Int, item: ListViewModel<AppInfo>) {

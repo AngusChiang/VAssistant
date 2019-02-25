@@ -75,7 +75,7 @@ class InstAppListFragment : SimpleListFragment<ActionScope>(), OnSyncInst {
         val node=if (app != null) {
             // TODO 优化
             val c = InAppInstListFragment.getInstList(it.packageName).size
-            ListViewModel(app.name, icon = app.getIcon(GlobalApp.APP),
+            ListViewModel(app.name, icon = app.icon,
                     subTitle = "数量: $c", extra = it)
         } else {//未安装 TODO app.info
 //                    notInstalled.add(ListViewModel(it.packageName, getString(R.string.text_not_installed), extra = it.packageName))

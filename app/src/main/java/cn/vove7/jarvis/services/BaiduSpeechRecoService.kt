@@ -228,34 +228,3 @@ class BaiduSpeechRecoService(event: SpeechEvent) : SpeechRecoService(event) {
     }
 
 }
-
-//    /**
-//     * 无间断唤醒，命令会带着唤醒词 '你好小V'
-//     * @param resultWithWakeupWord String
-//     * @return String
-//     */
-//    fun trimWakeupWord(resultWithWakeupWord: String): String {
-//        return when (wakeupNoInterruptType) {//减去头部唤醒词
-//            1 -> {
-//                var f = false
-//                resultWithWakeupWord.substring(resultWithWakeupWord.indexOfFirst {
-//                    when (it) {
-//                        '小' -> f = true
-//                        'v', 'V', '薇' -> if (f) return@indexOfFirst true
-//                    }
-//                    return@indexOfFirst false
-//                } + 1)
-//            }
-//            2 -> {
-//                var f = false
-//                resultWithWakeupWord.substring(resultWithWakeupWord.indexOfFirst {
-//                    when (it) {
-//                        '同' -> f = true
-//                        '学' -> if (f) return@indexOfFirst true
-//                    }
-//                    return@indexOfFirst false
-//                } + 1)
-//            }
-//            else -> resultWithWakeupWord
-//        }.also { Vog.d(this, "trimWakeupWord ---> $it") }
-//    }

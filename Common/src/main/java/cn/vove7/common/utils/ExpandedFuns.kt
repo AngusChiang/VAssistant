@@ -152,10 +152,9 @@ fun AppInfo.isInputMethod(context: Context): Boolean {
     return false
 }
 
-val homeAppPkgs = mutableListOf<String>()
 
 fun AppInfo.isHomeApp(): Boolean {
-    return getHomes(GlobalApp.APP).contains(packageName)
+    return AppInfo.getHomes(GlobalApp.APP).contains(packageName)
 }
 
 val appActivityCache = hashMapOf<String, Array<String>>()
@@ -182,20 +181,6 @@ fun AppInfo.activities(): Array<String> {
     }
 }
 
-fun AppInfo.isUserApp(): Boolean {
-    return (packageInfo.applicationInfo.flags and ApplicationInfo.FLAG_SYSTEM) == 0
-}
-fun AppInfo.isSysApp(): Boolean {
-    return (packageInfo.applicationInfo.flags and ApplicationInfo.FLAG_SYSTEM) == 1
-}
-
-fun AppInfo.hasGrantedPermission(p: String): Boolean {
-    val pm = GlobalApp.APP.packageManager
-
-    return (PackageManager.PERMISSION_GRANTED == pm.checkPermission(p, packageName)).also {
-        Vog.d(this, "hasPermission ---> $p $it")
-    }
-}
 
 //麦克风权限App缓存
 val microPermissionCache = hashMapOf<String, Boolean>()
@@ -227,19 +212,6 @@ fun AppInfo.hasMicroPermission(): Boolean {
     return false
 }
 
-private fun getHomes(context: Context): List<String> {
-    if (homeAppPkgs.isNotEmpty()) return homeAppPkgs
-    val packageManager = context.packageManager
-    val intent = Intent(Intent.ACTION_MAIN)
-    intent.addCategory(Intent.CATEGORY_HOME)
-    val resolveInfo = packageManager.queryIntentActivities(intent,
-            PackageManager.MATCH_DEFAULT_ONLY)
-    resolveInfo?.forEach {
-        homeAppPkgs.add(it.activityInfo.packageName)
-        Vog.d("", "桌面应用 ---> ${it.activityInfo.packageName}")
-    }
-    return homeAppPkgs
-}
 
 fun View.toggleVisibility(toggleVisibility: Int = View.GONE) {
     runOnUi {
@@ -277,7 +249,3 @@ fun Intent.newTask():Intent{
     return this
 }
 
-fun SpHelper.setStringNull(key:String){
-    val editor = preferences.edit()
-    editor.putString(key,null).apply()
-}

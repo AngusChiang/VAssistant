@@ -100,6 +100,10 @@ class RealMainActivity : AppCompatActivity() {
         showDataUpdateLog()
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        System.gc()
+    }
     private fun checkDataUpdate() {
         if (AppConfig.autoUpdateData) {
             DataUpdator.checkUpdate(this) {

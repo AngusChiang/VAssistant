@@ -66,9 +66,10 @@ class AccServiceBlackListManagerActivity : OneFragmentActivity() {
         override val itemCheckable: Boolean = true
 
         override fun unification(data: AppInfo): ListViewModel<AppInfo>? {
-            return ListViewModel(title = data.name, subTitle = data.packageName,
-                    icon = data.getIcon(context!!), extra = data,
-                    checked = blackSet.contains(data.packageName))
+            return ListViewModel(
+                    title = data.name, subTitle = data.packageName,
+                    icon = data.icon, extra = data, checked = blackSet.contains(data.packageName)
+            )
         }
 
         override val itemClickListener: SimpleListAdapter.OnItemClickListener<AppInfo> =
