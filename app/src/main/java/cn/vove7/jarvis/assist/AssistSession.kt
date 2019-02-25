@@ -18,6 +18,7 @@ import android.support.design.widget.BottomSheetBehavior
 import android.view.KeyEvent
 import android.view.View
 import android.view.animation.AlphaAnimation
+import android.widget.ImageView
 import android.widget.ProgressBar
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.appbus.AppBus
@@ -37,12 +38,14 @@ import cn.vove7.common.utils.runOnUi
 import cn.vove7.executorengine.bridges.SystemBridge
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.services.MainService
+import cn.vove7.jarvis.tools.AppConfig
 import cn.vove7.jarvis.tools.QRTools
 import cn.vove7.jarvis.tools.baiduaip.BaiduAipHelper
 import cn.vove7.jarvis.view.bottomsheet.AssistSessionGridController
 import cn.vove7.jarvis.view.dialog.ImageClassifyResultDialog
 import cn.vove7.vtp.dialog.DialogUtil
 import cn.vove7.vtp.log.Vog
+import cn.vove7.vtp.sharedpreference.SpHelper
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
 import java.lang.Thread.sleep
@@ -91,31 +94,38 @@ class AssistSession(context: Context) : VoiceInteractionSession(context) {
 //        }
     }
 
+    override fun onShow(args: Bundle?, showFlags: Int) {
+        val animation = AlphaAnimation(0f, 1f)
+        animation.duration = 500
+        bottomController.bottomView.startAnimation(animation)
+    }
+
     override fun onCreateContentView(): View {
         val view = layoutInflater.inflate(R.layout.dialog_assist, null)
         pb = view.findViewById(R.id.progress_bar)
         view.findViewById<View>(R.id.voice_btn).setOnClickListener {
-            MainService.switchRecog()
             onBackPressed()
+            MainService.switchRecog()
         }
         showProgressBar = showProgressBar
-        bottomController = AssistSessionGridController(context, view.findViewById(R.id.bottom_sheet), itemClick)
+        val bottomSheetView = view.findViewById<View>(R.id.bottom_sheet)
+        if (AppConfig.hasNavBar) {
+            bottomSheetView.fitsSystemWindows = true
+        }
+        bottomController = AssistSessionGridController(context, bottomSheetView, itemClick)
         bottomController.initView()
 
         bottomController.hideBottom()
         bottomController.bottomView.visibility = View.VISIBLE
         bottomController.showBottom()
 
-        val animation = AlphaAnimation(0f, 1f)
-        animation.duration = 500
-        bottomController.bottomView.startAnimation(animation)
 
         bottomController.bottomView.post {
             bottomController.showBottom()
             bottomController.behavior.setBottomSheetCallback(object : BottomSheetBehavior.BottomSheetCallback() {
                 override fun onStateChanged(p0: View, p1: Int) {
                     if (p1 == BottomSheetBehavior.STATE_HIDDEN) {
-                        Vog.d(this,"onStateChanged ---> 隐藏")
+                        Vog.d(this, "onStateChanged ---> 隐藏")
                         finish()
                     }
                 }

@@ -16,7 +16,6 @@ import cn.vove7.jarvis.services.MainService
 import cn.vove7.jarvis.tools.AppConfig
 import cn.vove7.jarvis.view.*
 import cn.vove7.jarvis.view.custom.SettingGroupItem
-import cn.vove7.jarvis.view.dialog.base.BottomDialogWithMarkdown
 import kotlinx.android.synthetic.main.activity_expandable_settings.*
 import java.lang.Thread.sleep
 
@@ -52,7 +51,7 @@ class LaboratoryActivity : ReturnableActivity() {
                             })
                         },
                         CheckBoxItem(title = "自动检查更新", keyId = R.string.key_auto_check_plugin_update,
-                                defaultValue = { AppConfig.autoCheckPluginUpdate })
+                                defaultValue = AppConfig.autoCheckPluginUpdate)
                 )),
                 SettingGroupItem(R.color.google_blue, getString(R.string.text_open_ad_killer_service), childItems = listOf(
                         SwitchItem(R.string.text_open, summary = if (UserInfo.isVip()) null
@@ -69,9 +68,9 @@ class LaboratoryActivity : ReturnableActivity() {
                                 keyId = R.string.key_ad_wait_secs, range = Pair(10, 100),
                                 defaultValue = { 17 }),
                         CheckBoxItem(title = "智能识别广告", summary = "[应用切换]时识别未标记的广告页并清除\n有效时间1.5s\n可能会增加耗电",
-                                keyId = R.string.key_smart_find_and_kill_ad, defaultValue = { AppConfig.smartKillAd }),
+                                keyId = R.string.key_smart_find_and_kill_ad, defaultValue = AppConfig.smartKillAd),
                         CheckBoxItem(R.string.text_show_toast_when_remove_ad, summary = getString(R.string.text_show_toast_when_remove_ad_summary)
-                                , keyId = R.string.key_show_toast_when_remove_ad, defaultValue = { true })
+                                , keyId = R.string.key_show_toast_when_remove_ad, defaultValue = true)
                 )),
                 SettingGroupItem(R.color.google_green, titleS = "聊天", childItems = listOf(
                         SwitchItem(title = "开启", summary = "指令匹配失败，调用聊天系统",
@@ -99,7 +98,8 @@ class LaboratoryActivity : ReturnableActivity() {
                 )),
                 SettingGroupItem(R.color.google_red, titleS = "屏幕助手", childItems = listOf(
                         SwitchItem(title = "助手模式", summary = "设为默认语音辅助应用后\n通过唤醒用系统语音助手触发\n可捕捉屏幕内容进行快捷操作\n关闭后只能使快速唤醒", keyId = R.string.key_use_assist_service,
-                                defaultValue = { AppConfig.useAssistService })
+                                defaultValue = { AppConfig.useAssistService }),
+                        CheckBoxItem(title = "适配导航栏", keyId = R.string.key_has_nav_bar, defaultValue = AppConfig.hasNavBar)
                 )),
                 SettingGroupItem(R.color.amber_A700, titleS = "结束词", childItems = listOf(
                         InputItem(title = "设置结束词", summary = "在指令结尾可以快速结束聆听\n注意根据效果来设置结束词\n不使用，置空即可",
@@ -123,7 +123,7 @@ class LaboratoryActivity : ReturnableActivity() {
                             return@SwitchItem true
                         },
                         CheckBoxItem(title = "显示通知", summary = "关闭和打开时在状态栏显示通知",
-                                keyId = R.string.key_close_wakeup_notification, defaultValue = { true })
+                                keyId = R.string.key_close_wakeup_notification, defaultValue = true)
 
                 ))
 //                SettingGroupItem(R.color.yellow_700, titleS = "其他", childItems = listOf(

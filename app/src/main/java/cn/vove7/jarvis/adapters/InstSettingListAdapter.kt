@@ -15,7 +15,7 @@ import cn.vove7.jarvis.view.tools.SettingItemHelper
  * @author Administrator
  * 9/26/2018
  */
-class InstSettingListAdapter(val context: Context, settingsName: String, val onFailed: () -> Unit) :
+class InstSettingListAdapter(val context: Context, settingsName: String, onFailed: () -> Unit) :
         BaseAdapter() {
     private val daset: MutableList<SettingChildItem> = mutableListOf()
 
@@ -58,15 +58,15 @@ class InstSettingListAdapter(val context: Context, settingsName: String, val onF
                 InstSettingItem.TYPE_CHECK_BOX -> {
                     CheckBoxItem(title = s.title, summary = s.summary,
                             callback = { _, d ->
-                                settingsBridge.set(key, d as Boolean)
+                                settingsBridge.set(key, d)
                                 return@CheckBoxItem false
-                            }, defaultValue = {
-                        settingsBridge.getBoolean(key) ?: s.defaultValue as Boolean? ?: false
-                    })
+                            }, defaultValue = settingsBridge.getBoolean(key)
+                        ?: s.defaultValue as Boolean? ?: false
+                    )
                 }
                 InstSettingItem.TYPE_SWITCH -> {
                     SwitchItem(title = s.title, summary = s.summary, callback = { _, d ->
-                        settingsBridge.set(key, d as Boolean)
+                        settingsBridge.set(key, d)
                         return@SwitchItem false
                     }, defaultValue = {
                         settingsBridge.getBoolean(key) ?: s.defaultValue as Boolean? ?: false
@@ -74,7 +74,7 @@ class InstSettingListAdapter(val context: Context, settingsName: String, val onF
                 }
                 InstSettingItem.TYPE_INT -> {
                     NumberPickerItem(title = s.title, summary = s.summary, callback = { _, d ->
-                        settingsBridge.set(key, d as Int)
+                        settingsBridge.set(key, d)
                         return@NumberPickerItem false
                     }, defaultValue = {
                         settingsBridge.getInt(key) ?: s.defaultValue as Int? ?: 0

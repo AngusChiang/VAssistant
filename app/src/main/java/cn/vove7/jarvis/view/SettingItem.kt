@@ -73,9 +73,9 @@ class CheckBoxItem(
         title: String? = null,
         summary: String? = null,
         keyId: Int? = null,
-        defaultValue: (() -> Boolean)? = null,
+        defaultValue:  Boolean = false,
         callback: CallbackOnSet<Boolean>? = null
-) : SettingChildItem(titleId, title, summary, TYPE_CHECK_BOX, keyId, defaultValue ?: { false },
+) : SettingChildItem(titleId, title, summary, TYPE_CHECK_BOX, keyId, { defaultValue },
         callback = callback)
 
 class SwitchItem(

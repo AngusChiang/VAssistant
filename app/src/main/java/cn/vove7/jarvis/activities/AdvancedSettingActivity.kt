@@ -120,7 +120,7 @@ class AdvancedSettingActivity : ReturnableActivity() {
                             showLastDataDate()
                         },
                         CheckBoxItem(title = "自动更新", summary = "在进入App后自动检查并更新最新数据",
-                                keyId = R.string.key_auto_update_data, defaultValue = { true })
+                                keyId = R.string.key_auto_update_data, defaultValue = true)
                 )),
                 SettingGroupItem(R.color.google_green, "脚本", childItems = listOf(
                         SwitchItem(R.string.text_remote_debug, summary = if (RemoteDebugServer.stopped) "使用Pc调试，请查阅使用手册"
@@ -247,7 +247,7 @@ class AdvancedSettingActivity : ReturnableActivity() {
                             val result = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS)
                             toast.showShort(result[0])
                         } catch (e: Exception) {
-                            toast.showShort(e.message?:"e")
+                            toast.showShort(e.message ?: "e")
                         }
                     }
                 }

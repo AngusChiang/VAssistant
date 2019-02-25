@@ -101,6 +101,7 @@ object AppConfig {
 
     var autoCheckPluginUpdate = true
 
+    var hasNavBar = false
     var FIRST_LAUNCH_NEW_VERSION = false or BuildConfig.DEBUG //新版本第一次启动
 
     var IS_SYS_APP = false
@@ -287,6 +288,7 @@ object AppConfig {
         autoCheckPluginUpdate = getBooleanAndInit(R.string.key_auto_check_plugin_update, autoCheckPluginUpdate)
         smartKillAd = getBooleanAndInit(R.string.key_smart_find_and_kill_ad, smartKillAd)
         voiceRecogCompatibleMode = getBooleanAndInit(R.string.key_voice_recog_compatible_mode, voiceRecogCompatibleMode)
+        hasNavBar = getBooleanAndInit(R.string.key_has_nav_bar, hasNavBar)
         chatStr = sp.getString(R.string.key_chat_str)
 
         sp.getInt(R.string.key_lasting_voice_millis).also {
