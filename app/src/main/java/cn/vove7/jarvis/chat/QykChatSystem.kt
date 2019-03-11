@@ -2,10 +2,7 @@ package cn.vove7.jarvis.chat
 
 import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.bridges.HttpBridge
-import cn.vove7.common.netacc.NetHelper
 import cn.vove7.common.utils.GsonHelper
-import cn.vove7.vtp.log.Vog
-import com.google.gson.Gson
 
 /**
  * # QykChatSystem
@@ -15,14 +12,15 @@ import com.google.gson.Gson
  */
 @Deprecated("服务不可用")
 class QykChatSystem : ChatSystem {
-    override fun chatWithText(s: String): String? {
+    override fun chatWithText(s: String): ChatResult? {
         val data = HttpBridge.get("http://api.qingyunke.com/api.php?key=free&appid=0&msg=$s")
         return if (data == null) {
-            Vog.d(this, "chatWithText ---> 失败")
+//            Vog.d(this, "chatWithText ---> 失败")
             null
         } else {
             try {
-                GsonHelper.fromJson<Map<String, String>>(data)!!["content"]?.replace("{br}", " ")
+                ChatResult(GsonHelper.fromJson<Map<String, String>>(data)!!["content"]?.replace("{br}", " ")
+                    ?: "", arrayListOf())
             } catch (e: Exception) {
                 GlobalLog.err(e, "qcs25")
                 null

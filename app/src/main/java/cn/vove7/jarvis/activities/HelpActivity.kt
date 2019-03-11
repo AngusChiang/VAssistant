@@ -60,7 +60,7 @@ class HelpActivity : ReturnableActivity(), AdapterView.OnItemClickListener {
                     , ItemWrap(Tutorials.h_t_2, adapter.holders[1]?.titleView, getString(R.string.text_hot_key_desc), "快速了解快捷键操作")
                     , ItemWrap(Tutorials.h_t_5, adapter.holders[2]?.titleView, getString(R.string.text_faq), "遇到问题可先查看常见问题再进行反馈")
                     , ItemWrap(Tutorials.h_t_3, adapter.holders[4]?.titleView, getString(R.string.text_feedback), "在这里进行反馈与建议，或者加入QQ群")
-                    , ItemWrap(Tutorials.h_t_4, adapter.holders[5]?.titleView, getString(R.string.text_explore_log), "当出现问题时，或非预想结果时可提供日志给作者")
+                    , ItemWrap(Tutorials.h_t_4, adapter.holders[5]?.titleView, getString(R.string.text_browse_log), "当出现问题时，或非预想结果时可提供日志给作者")
             ))
         }
     }
@@ -117,6 +117,8 @@ class HelpActivity : ReturnableActivity(), AdapterView.OnItemClickListener {
                     neutralButton(text = "导出至文件") {
                         GlobalLog.export2Sd()
                     }
+                    setCancelable(false)
+                    enableCloseIcon(true)
                     show()
                 }
 
@@ -172,7 +174,7 @@ class HelpActivity : ReturnableActivity(), AdapterView.OnItemClickListener {
                 , IconTitleEntity(R.drawable.ic_question_answer, R.string.text_faq)
                 , IconTitleEntity(R.drawable.ic_qq, R.string.text_add_qq_group)
                 , IconTitleEntity(R.drawable.ic_feedback_black_24dp, R.string.text_feedback)
-                , IconTitleEntity(R.drawable.ic_bug_report_24dp, titleId = R.string.text_explore_log,
+                , IconTitleEntity(R.drawable.ic_bug_report_24dp, titleId = R.string.text_browse_log,
                 summaryId = R.string.text_long_press_to_export_log)
         )
     }

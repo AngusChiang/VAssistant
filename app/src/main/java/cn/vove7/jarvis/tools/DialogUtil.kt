@@ -1,18 +1,16 @@
 package cn.vove7.jarvis.tools
 
 import android.annotation.SuppressLint
+import android.app.Dialog
 import android.content.Context
 import android.support.annotation.StringRes
 import android.support.v7.widget.AppCompatCheckBox
-import android.view.Gravity
 import android.widget.ScrollView
-import cn.vove7.executorengine.helper.AdvanAppHelper
 import cn.vove7.jarvis.R
 import cn.vove7.vtp.log.Vog
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.checkbox.BooleanCallback
 import com.afollestad.materialdialogs.checkbox.checkBoxPrompt
-import com.afollestad.materialdialogs.list.listItems
 
 /**
  * # DialogUtil
@@ -33,6 +31,19 @@ object DialogUtil {
                 .show()
     }
 
+}
+
+fun Dialog.setFloat() {
+    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
+        if (!cn.vove7.vtp.runtimepermission.PermissionUtils.canDrawOverlays(context)) {
+            throw Exception("无悬浮窗权限")
+        }
+    }
+    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+        window.setType(android.view.WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY)
+    } else {
+        window.setType(android.view.WindowManager.LayoutParams.TYPE_SYSTEM_ALERT)
+    }
 }
 
 /**

@@ -1,10 +1,10 @@
 package cn.vove7.jarvis.fragments.base
 
 import android.content.Context
-import android.content.DialogInterface
 import android.os.Bundle
 import android.support.design.widget.BottomSheetDialog
 import android.support.v7.widget.Toolbar
+import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ProgressBar
@@ -63,6 +63,23 @@ abstract class BaseBottomDialogWithToolbar(context: Context, title: String? = nu
         pbar.show()
     }
 
+    var menuCloseItem: MenuItem? = null
+    fun enableCloseIcon(b: Boolean) {
+        if (menuCloseItem == null) {
+            toolbar.inflateMenu(R.menu.menu_close_icon)
+            menuCloseItem = toolbar.menu.findItem(R.id.menu_item_close)
+            toolbar.setOnMenuItemClickListener {
+                return@setOnMenuItemClickListener if (it.itemId == menuCloseItem?.itemId) {
+                    dismiss()
+                    true
+                } else false
+            }
+
+        }
+        menuCloseItem?.isVisible = b
+    }
+
+
     fun hideLoadingBar() {
         pbar.gone()
     }
@@ -77,6 +94,14 @@ abstract class BaseBottomDialogWithToolbar(context: Context, title: String? = nu
 //        (BottomSheetDialogFragment.STYLE_NORMAL, R.style.TransBottomSheetDialogStyle)
 //    }
 
+
+    override fun onBackPressed() {
+        if (toolbar.hasExpandedActionView()) {
+            toolbar.collapseActionView()
+            return
+        }
+        super.onBackPressed()
+    }
 
     fun positiveButton(text: CharSequence? = null, click: (() -> Unit)? = null) {
         setButton(buttonPositive, text, click)

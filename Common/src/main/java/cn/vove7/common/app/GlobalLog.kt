@@ -51,7 +51,10 @@ object GlobalLog {
         write(LEVEL_ERROR, msg)
     }
     fun err(msg: String?) {
-        Vog.e(this, "$msg")
+        try {
+            Vog.e(this, "$msg")
+        } catch (e: Throwable) {
+        }
         write(LEVEL_ERROR, msg)
     }
 

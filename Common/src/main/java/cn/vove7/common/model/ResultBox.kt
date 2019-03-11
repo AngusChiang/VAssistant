@@ -53,7 +53,7 @@ class ResultBox<T> {
     }
 
     fun setAndNotify(value: T) {
-        Vog.d(this,"setAndNotify ---> $value")
+//        Vog.d(this,"setAndNotify ---> $value")
         mValue = value
         has = true
     }

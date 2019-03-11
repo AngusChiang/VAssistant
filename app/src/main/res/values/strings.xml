@@ -305,7 +305,7 @@
     <string name="text_long_press_to_export_log">Long press to export log</string>
     <string name="text_send">Send</string>
     <string name="text_feedback_title_hint">Question or suggestion</string>
-    <string name="text_explore_log">Explore logs</string>
+    <string name="text_browse_log">Browse logs</string>
     <string name="text_modify_user_name">Modify username</string>
     <string name="text_modify_failed">Modify failed</string>
     <string name="text_modify_pass">Modify password</string>
@@ -394,4 +394,5 @@
     <string name="key_has_nav_bar" translatable="false">has_nav_bar</string>
     <string name="text_plugins_manager" translatable="false">插件管理</string>
     <string name="key_chat_str" translatable="false">chat_str</string>
+    <string name="text_close">Close</string>
 </resources>

@@ -64,6 +64,7 @@
         android:icon="@mipmap/ic_launcher_vassist"
         android:label="@string/app_name"
         android:networkSecurityConfig="@xml/network_security_config"
+        android:persistent="true"
         android:roundIcon="@mipmap/ic_launcher_vassist"
         android:supportsRtl="true"
         android:theme="@style/NoActionBar"
@@ -209,24 +210,25 @@
                 <action android:name="android.service.voice.VoiceInteractionService" />
             </intent-filter>
         </service>
-        <service android:name=".services.VoiceWpTileService"
-            android:label="@string/text_voice_wp"
+        <service
+            android:name=".services.VoiceWpTileService"
             android:icon="@drawable/ic_hearing"
+            android:label="@string/text_voice_wp"
             android:permission="android.permission.BIND_QUICK_SETTINGS_TILE">
             <intent-filter>
                 <action android:name="android.service.quicksettings.action.QS_TILE" />
             </intent-filter>
         </service>
         <!--<service-->
-            <!--android:name=".services.VoiceInputService"-->
-            <!--android:label="V Assist语音识别输入"-->
-            <!--android:permission="android.permission.BIND_VOICE_INTERACTION">-->
-            <!--<intent-filter>-->
-                <!--<action android:name="android.speech.action.RECOGNIZE_SPEECH" />-->
-                <!--<action android:name="android.speech.action.WEB_SEARCH" />-->
+        <!--android:name=".services.VoiceInputService"-->
+        <!--android:label="V Assist语音识别输入"-->
+        <!--android:permission="android.permission.BIND_VOICE_INTERACTION">-->
+        <!--<intent-filter>-->
+        <!--<action android:name="android.speech.action.RECOGNIZE_SPEECH" />-->
+        <!--<action android:name="android.speech.action.WEB_SEARCH" />-->
 
-                <!--<category android:name="android.intent.category.DEFAULT" />-->
-            <!--</intent-filter>-->
+        <!--<category android:name="android.intent.category.DEFAULT" />-->
+        <!--</intent-filter>-->
         <!--</service>-->
 
         <activity
@@ -308,6 +310,11 @@
             </intent-filter>
 
         </activity>
+        <activity
+            android:name=".activities.ResultPickerActivity"
+            android:excludeFromRecents="true"
+            android:launchMode="singleInstance"
+            android:theme="@style/ScreenShotTheme" />
     </application>
 
 </manifest>

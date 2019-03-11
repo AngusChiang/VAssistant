@@ -1,10 +1,9 @@
-package cn.vove7.jarvis
+package cn.vove7.jarvis.adapters
 
 import android.view.MenuItem
 import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.utils.ThreadPool
 import cn.vove7.common.utils.runOnUi
-import cn.vove7.jarvis.adapters.ListViewModel
 import cn.vove7.jarvis.fragments.AwesomeItem
 import cn.vove7.jarvis.tools.SearchActionHelper
 import cn.vove7.vtp.log.Vog

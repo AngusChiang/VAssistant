@@ -2,6 +2,7 @@ package cn.vove7.executorengine.helper
 
 import android.content.Context
 import cn.vove7.common.app.GlobalApp
+import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.datamanager.DAO
 import cn.vove7.common.datamanager.executor.entity.MarkedData
 import cn.vove7.common.datamanager.greendao.MarkedDataDao
@@ -34,6 +35,7 @@ object AdvanAppHelper {
 //    }
 
     fun getAppInfo(pkg: String): AppInfo? = ALL_APP_LIST[pkg]
+
 
     /**
      * 刷新标记应用
@@ -148,6 +150,30 @@ object AdvanAppHelper {
             }
         }
         return li.toTypedArray()
+    }
+
+    /**
+     * 卸载删除缓存
+     * @param pkg String
+     */
+    fun removeAppCache(pkg: String) {
+        APP_LIST.remove(pkg)
+        ALL_APP_LIST.remove(pkg)
+    }
+
+    /**
+     * 安装添加缓存
+     * @param pkg String
+     */
+    fun addNewApp(pkg: String) {
+        val appInfo = try {
+            AppHelper.getAppInfo(context, "", pkg)
+        } catch (e: Exception) {
+            GlobalLog.err(e, "aa162")
+            return
+        } ?: return
+        APP_LIST[pkg] = appInfo
+        ALL_APP_LIST[pkg] = appInfo
     }
 
 }

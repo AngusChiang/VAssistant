@@ -1,5 +1,14 @@
 package cn.vove7.jarvis.chat
 
+import android.widget.ImageView
+import cn.vove7.common.app.GlobalApp
+import cn.vove7.common.utils.inVisibility
+import cn.vove7.common.utils.show
+import cn.vove7.jarvis.fragments.AwesomeItem
+import com.bumptech.glide.Glide
+import com.bumptech.glide.request.RequestOptions
+import java.io.Serializable
+
 /**
  * # ChatSystem
  *
@@ -7,5 +16,51 @@ package cn.vove7.jarvis.chat
  * 2018/10/28
  */
 interface ChatSystem {
-    fun chatWithText(s: String):String?
+    fun chatWithText(s: String): ChatResult?
+}
+
+interface ChatResultBuilder {
+    fun getChatResult(): ChatResult? {
+        val urls = getResultUrls()
+        var word = getWord()
+        if (word == null) {
+            if (urls.isEmpty()) return null
+            else word = "已为您找到如下结果"
+        }
+
+        return ChatResult(word, urls)
+    }
+
+    fun getWord(): String?
+    fun getResultUrls(): ArrayList<UrlItem>
+}
+
+data class ChatResult(
+        val word: String,
+        val resultUrls: ArrayList<UrlItem> //title url
+
+)
+
+data class UrlItem(
+        override val title: String,
+        val iconUrl: String? = null,
+        val url: String,
+        val info: String? = null,
+        val source: String? = null
+) : AwesomeItem, Serializable {
+    override val subTitle: String?
+        get() = info ?: if (source != null) "来源: $source" else null
+
+    override fun onLoadDrawable(imgView: ImageView) {
+        if (iconUrl == null || iconUrl == "") {
+            imgView.inVisibility()
+            return
+        }
+        imgView.show()
+        Glide.with(GlobalApp.APP).applyDefaultRequestOptions(RequestOptions().also {
+            it.centerCrop()
+        }).load(iconUrl).into(imgView)
+
+    }
+
 }

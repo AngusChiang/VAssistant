@@ -112,8 +112,11 @@ class MyAccessibilityService : AccessibilityApi() {
         //熄屏|低电量
 
         val eventType = event.eventType
-        Vog.d(this, "class :$currentAppInfo - $currentActivity ${event.className} \n" +
-                AccessibilityEvent.eventTypeToString(eventType))
+        try {
+            Vog.d(this, "class :$currentAppInfo - $currentActivity ${event.className} \n" +
+                    AccessibilityEvent.eventTypeToString(eventType))
+        } catch (e: Exception) {
+        }
 
         when (eventType) {
             AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED -> {

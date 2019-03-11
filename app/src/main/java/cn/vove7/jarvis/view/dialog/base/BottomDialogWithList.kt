@@ -7,7 +7,7 @@ import android.support.v7.widget.RecyclerView
 import android.view.View
 import cn.vove7.common.utils.runOnUi
 import cn.vove7.jarvis.R
-import cn.vove7.jarvis.ViewModelLoader
+import cn.vove7.jarvis.adapters.ViewModelLoader
 import cn.vove7.jarvis.adapters.ListViewModel
 import cn.vove7.jarvis.adapters.SimpleListAdapter
 import cn.vove7.jarvis.fragments.base.BaseBottomDialogWithToolbar
@@ -47,14 +47,6 @@ abstract class BottomDialogWithList<T>(context: Context, title: String)
         showLoadingBar()
     }
 
-
-    override fun onBackPressed() {
-        if (toolbar.hasExpandedActionView()) {
-            toolbar.collapseActionView()
-            return
-        }
-        super.onBackPressed()
-    }
 
     private val myView by lazy { layoutInflater.inflate(R.layout.dialog_list_view, null) }
     override fun onCreateContentView(parent: View): View = myView

@@ -22,14 +22,16 @@ object AppInstallReceiver : DyBCReceiver() {
     }
 
     override fun onReceive(context: Context, intent: Intent) {
-        runOnPool {
-            AdvanAppHelper.updateAppList()
-        }
-        val pkg = intent.data?.schemeSpecificPart
+//        runOnPool {
+//            AdvanAppHelper.updateAppList()
+//        }
+        val pkg = intent.data?.schemeSpecificPart ?: return
         Vog.d(this, "onReceive ---> $pkg")
         if (intent.action == Intent.ACTION_PACKAGE_ADDED) {
+            AdvanAppHelper.addNewApp(pkg)
         }
         if (intent.action == Intent.ACTION_PACKAGE_REMOVED) {
+            AdvanAppHelper.removeAppCache(pkg)
         }
         if (intent.action == Intent.ACTION_PACKAGE_REPLACED) {
         }

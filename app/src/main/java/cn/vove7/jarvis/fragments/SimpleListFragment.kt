@@ -11,17 +11,14 @@ import android.support.v7.widget.CardView
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.view.*
-import android.widget.CompoundButton
-import android.widget.ProgressBar
-import android.widget.Switch
-import android.widget.TextView
+import android.widget.*
 import cn.vove7.common.utils.runOnUi
 import cn.vove7.common.view.toast.ColorfulToast
 import cn.vove7.jarvis.R
-import cn.vove7.jarvis.ViewModelLoader
 import cn.vove7.jarvis.adapters.ListViewModel
 import cn.vove7.jarvis.adapters.RecAdapterWithFooter
 import cn.vove7.jarvis.adapters.SimpleListAdapter
+import cn.vove7.jarvis.adapters.ViewModelLoader
 import cn.vove7.jarvis.view.RecyclerViewWithContextMenu
 import cn.vove7.vtp.log.Vog
 import com.pluscubed.recyclerfastscroll.RecyclerFastScroller
@@ -350,4 +347,5 @@ interface AwesomeItem {
     val viewIcon: Drawable? get() = null
     val isChecked: Boolean? get() = null
     val bgColor: Int? get() = null
+    fun onLoadDrawable(imgView: ImageView){}
 }

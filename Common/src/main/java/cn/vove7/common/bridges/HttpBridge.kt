@@ -22,7 +22,7 @@ object HttpBridge {
     }
 
     fun get(url: String, params: Map<String, Any>?): String? {
-        Vog.d(this, "get ---> $url $params")
+        println("get ---> $url $params")
         val client = OkHttpClient.Builder()
                 .readTimeout(timeout, TimeUnit.SECONDS).build()
         val request = Request.Builder().url(url)
@@ -58,7 +58,8 @@ object HttpBridge {
     }
 
     fun postJson(url: String, json: String?): String? {
-        Vog.d(this, "get ---> $url \n$json")
+//        Vog.d(this, "get ---> $url \n$json")
+        println("get ---> $url \n$json")
         val client = OkHttpClient.Builder()
                 .readTimeout(timeout, TimeUnit.SECONDS).build()
         val requestBody = FormBody.create(MediaType
@@ -113,7 +114,7 @@ object HttpBridge {
             override fun onResponse(call: Call, response: Response) {//响应成功更新UI
                 if (response.isSuccessful) {
                     val s = response.body()?.string()
-                    Vog.d(this, "onResponse ---> http bridge $s")
+                    println("onResponse ---> http bridge $s")
                     result.setAndNotify(s)
                 } else {
                     GlobalApp.toastShort("网络请求失败")

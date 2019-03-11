@@ -62,8 +62,10 @@ open class SimpleListAdapter<T>(private val dataset: MutableList<ListViewModel<T
 
         //背景色
         item.extra.also {
-            if (it is AwesomeItem && it.bgColor != null) {
-                holder.itemView.setBackgroundColor(it.bgColor!!)
+            if (it is AwesomeItem) {
+                if (it.bgColor != null)
+                    holder.itemView.setBackgroundColor(it.bgColor!!)
+                it.onLoadDrawable(holder.icon!!)
             }
         }
     }

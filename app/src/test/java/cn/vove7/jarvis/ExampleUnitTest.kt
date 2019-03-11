@@ -1,7 +1,6 @@
 package cn.vove7.jarvis
 
 import android.graphics.Bitmap
-import android.graphics.Color
 import android.util.Range
 import cn.vove7.common.datamanager.parse.model.Action
 import cn.vove7.common.utils.TextDateParser
@@ -10,9 +9,9 @@ import cn.vove7.common.utils.whileWaitCount
 import cn.vove7.common.utils.whileWaitTime
 import cn.vove7.jarvis.chat.TulingChatSystem
 import cn.vove7.jarvis.tools.baiduaip.BaiduAipHelper
-import io.github.kbiakov.codeview.highlight.hex
 import org.jsoup.Jsoup
 import org.junit.Test
+import java.io.OutputStreamWriter
 import java.lang.Thread.sleep
 import java.text.SimpleDateFormat
 import java.util.*
@@ -186,8 +185,10 @@ class ExampleUnitTest {
 
     @Test
     fun tulingChat() {
-        val a = TulingChatSystem().chatWithText("你好")
-        println(a)
+        for( s in arrayOf("阿里巴巴股票","鱼香肉丝怎么做","今天穿什么衣服")) {
+            val a = TulingChatSystem().chatWithText(s)
+            System.err.println(a)
+        }
     }
 
     @Test
@@ -313,7 +314,7 @@ class ExampleUnitTest {
     lateinit var bm: Bitmap
     @Test
     fun bitmap() {
-        888.hex()
+//        888.hex()
 //        bm.getPixel(0,0)
 //        val a = Color.green(0xffffffff)
 //        print(a)

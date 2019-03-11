@@ -49,6 +49,7 @@ import cn.vove7.executorengine.parse.ParseEngine
 import cn.vove7.jarvis.App
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.activities.PermissionManagerActivity
+import cn.vove7.jarvis.activities.ResultPickerActivity
 import cn.vove7.jarvis.activities.ScreenPickerActivity
 import cn.vove7.jarvis.chat.ChatSystem
 import cn.vove7.jarvis.chat.TulingChatSystem
@@ -57,6 +58,7 @@ import cn.vove7.jarvis.speech.SpeechRecoService
 import cn.vove7.jarvis.tools.AppConfig
 import cn.vove7.jarvis.tools.AudioController
 import cn.vove7.jarvis.tools.debugserver.RemoteDebugServer
+import cn.vove7.jarvis.tools.setFloat
 import cn.vove7.jarvis.view.dialog.MultiChoiceDialog
 import cn.vove7.jarvis.view.dialog.OnMultiSelectListener
 import cn.vove7.jarvis.view.dialog.OnSelectListener
@@ -65,7 +67,7 @@ import cn.vove7.jarvis.view.floatwindows.ListeningToast
 import cn.vove7.jarvis.view.statusbar.ExecuteAnimation
 import cn.vove7.jarvis.view.statusbar.ListeningAnimation
 import cn.vove7.jarvis.view.statusbar.ParseAnimation
-import cn.vove7.vtp.dialog.DialogUtil
+import cn.vove7.vtp.builder.BundleBuilder
 import cn.vove7.vtp.log.Vog
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.SubscriberExceptionEvent
@@ -201,7 +203,7 @@ class MainService : BusService(),
                         notifyAlertResult(false)
                     }.create()
             try {
-                DialogUtil.setFloat(alertDialog!!)
+                alertDialog?.setFloat()
                 alertDialog?.show()
                 //语音控制
                 if (AppConfig.voiceControlDialog) {
@@ -930,7 +932,7 @@ class MainService : BusService(),
             //fix 百度长语音 在无结果stop，无回调
             if (AppConfig.lastingVoiceCommand &&
                     speechRecoService is BaiduSpeechRecoService && temResult == null) {
-                Vog.d(this,"onStopRecog ---> 长语音无结果")
+                Vog.d(this, "onStopRecog ---> 长语音无结果")
                 speechRecoService?.cancelRecog()
             }
             temResult = null
@@ -1069,17 +1071,30 @@ class MainService : BusService(),
                 parseAnimation.failedAndHideDelay()
                 resumeMusicIf()
             } else {
-                listeningToast.show(if (data.contains("="))
-                    data.replace("=", "\n=") else data)
-                executeAnimation.begin()
-                executeAnimation.show(data)
+                data.word.let { word ->
+                    listeningToast.show(if (word.contains("="))
+                        data.word.replace("=", "\n=") else word)
+                    executeAnimation.begin()
+                    executeAnimation.show(word)
 
-                afterSpeakResumeListen = recogIsListening
-                speakWithCallback(data, true, object : SpeakCallback {
-                    override fun speakCallback(result: String?) {
-                        hideAll()
+                    afterSpeakResumeListen = recogIsListening
+                    speakWithCallback(word, true, object : SpeakCallback {
+                        override fun speakCallback(result: String?) {
+                            hideAll()
+                        }
+                    })
+                }
+                data.resultUrls.also {
+                    when {
+                        it.isEmpty() -> return@also
+                        it.size == 1 -> SystemBridge.openUrl(it[0].url)
+                        else -> startActivity(Intent(this, ResultPickerActivity::class.java)
+                                .also { intent ->
+                                    intent.putExtra("title", data.word)
+                                    intent.putExtra("data", BundleBuilder().put("items", it).data)
+                                })
                     }
-                })
+                }
             }
         }
     }
