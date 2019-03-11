@@ -15,10 +15,8 @@ import android.os.Environment
 import android.service.voice.VoiceInteractionSession
 import android.support.annotation.RequiresApi
 import android.support.design.widget.BottomSheetBehavior
-import android.view.KeyEvent
 import android.view.View
 import android.view.animation.AlphaAnimation
-import android.widget.ImageView
 import android.widget.ProgressBar
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.appbus.AppBus
@@ -37,6 +35,7 @@ import cn.vove7.common.utils.runOnNewHandlerThread
 import cn.vove7.common.utils.runOnUi
 import cn.vove7.executorengine.bridges.SystemBridge
 import cn.vove7.jarvis.R
+import cn.vove7.jarvis.activities.TextOcrActivity
 import cn.vove7.jarvis.services.MainService
 import cn.vove7.jarvis.tools.AppConfig
 import cn.vove7.jarvis.tools.QRTools
@@ -45,10 +44,10 @@ import cn.vove7.jarvis.view.bottomsheet.AssistSessionGridController
 import cn.vove7.jarvis.view.dialog.ImageClassifyResultDialog
 import cn.vove7.vtp.dialog.DialogUtil
 import cn.vove7.vtp.log.Vog
-import cn.vove7.vtp.sharedpreference.SpHelper
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
 import java.lang.Thread.sleep
+import java.util.*
 
 
 /**
@@ -80,10 +79,10 @@ class AssistSession(context: Context) : VoiceInteractionSession(context) {
             val ss = compressMaterix(screenshot)
             Vog.d(this, "onHandleScreenshot ---> $screenshot")
             screenPath = UtilBridge.bitmap2File(ss, context.cacheDir
-                    .absolutePath + "/screen.png")?.absolutePath
+                    .absolutePath + "/screen-${Random().nextInt()}.png")?.absolutePath
             if (!UserInfo.isVip()) {
+                sleep(500)
             }
-            sleep(500)
             showProgressBar = false
         }
     }
@@ -156,12 +155,31 @@ class AssistSession(context: Context) : VoiceInteractionSession(context) {
                     else -> imageClassify(path)
                 }
             }
-            1 -> {//todo
-                GlobalApp.toastShort(R.string.text_coming_soon)
-//                if (!AppConfig.checkUser()) return
+            1 -> {
+                val path = screenPath
+                when (path) {
+                    "loading" -> GlobalApp.toastShort("等待加载完成")
+                    else -> {
+                        showProgressBar = true
+                        runOnNewHandlerThread {
+                            try {
+                                GlobalApp.APP.startActivity(Intent(GlobalApp.APP,
+                                        TextOcrActivity::class.java).also {
+                                    if (path != null)
+                                        it.putExtra("items", BaiduAipHelper.ocr(path))
+                                })
+                                showProgressBar = false
+                                onBackPressed()
+                            } catch (e: Exception) {
+                                e.printStackTrace()
+                                GlobalApp.toastShort(e.message!!)
+                            }
 
-
+                        }
+                    }
+                }
             }
+
             2 -> {
                 AppBus.postDelay("0_0", ORDER_BEGIN_SCREEN_PICKER, 800)
                 onBackPressed()
@@ -219,6 +237,7 @@ class AssistSession(context: Context) : VoiceInteractionSession(context) {
 //        AppBus.post(AppBus.ORDER_CANCEL_RECOG)
         dialog?.dismiss()
         finish()
+        System.gc()
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)

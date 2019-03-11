@@ -31,7 +31,6 @@ import org.jsoup.Jsoup
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*
-import kotlin.concurrent.thread
 
 
 /**
@@ -109,6 +108,8 @@ object AppConfig {
     var voiceRecogCompatibleMode = false
 
     var chatStr: String? = null//对话系统 字符串
+
+    var textOcrStr: String? = null
 
     val streamTypeArray = arrayOf(
             AudioManager.STREAM_MUSIC
@@ -290,6 +291,7 @@ object AppConfig {
         voiceRecogCompatibleMode = getBooleanAndInit(R.string.key_voice_recog_compatible_mode, voiceRecogCompatibleMode)
         hasNavBar = getBooleanAndInit(R.string.key_has_nav_bar, hasNavBar)
         chatStr = sp.getString(R.string.key_chat_str)
+        textOcrStr = sp.getString(R.string.key_text_ocr_key)
 
         sp.getInt(R.string.key_lasting_voice_millis).also {
             lastingVoiceMillis = if (it < 0) lastingVoiceMillis else it

@@ -99,7 +99,10 @@ class LaboratoryActivity : ReturnableActivity() {
                 SettingGroupItem(R.color.google_red, titleS = "屏幕助手", childItems = listOf(
                         SwitchItem(title = "助手模式", summary = "设为默认语音辅助应用后\n通过唤醒用系统语音助手触发\n可捕捉屏幕内容进行快捷操作\n关闭后只能使快速唤醒", keyId = R.string.key_use_assist_service,
                                 defaultValue = { AppConfig.useAssistService }),
-                        CheckBoxItem(title = "适配导航栏", keyId = R.string.key_has_nav_bar, defaultValue = AppConfig.hasNavBar)
+                        CheckBoxItem(title = "适配导航栏", keyId = R.string.key_has_nav_bar, defaultValue = AppConfig.hasNavBar),
+                        InputItem(title = "文字识别参数设置", summary = "自定义文字识别key", keyId = R.string.key_text_ocr_key,
+                                defaultValue = { AppConfig.textOcrStr ?: "" })
+
                 )),
                 SettingGroupItem(R.color.amber_A700, titleS = "结束词", childItems = listOf(
                         InputItem(title = "设置结束词", summary = "在指令结尾可以快速结束聆听\n注意根据效果来设置结束词\n不使用，置空即可",

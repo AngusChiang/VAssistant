@@ -392,6 +392,7 @@
     <string name="key_lasting_voice_millis" translatable="false">lasting_voice_millis</string>
     <string name="key_voice_recog_compatible_mode" translatable="false">voice_recog_compatible_mode</string>
     <string name="key_has_nav_bar" translatable="false">has_nav_bar</string>
+    <string name="key_text_ocr_key" translatable="false">text_ocr_key</string>
     <string name="text_plugins_manager" translatable="false">插件管理</string>
     <string name="key_chat_str" translatable="false">chat_str</string>
     <string name="text_close">Close</string>

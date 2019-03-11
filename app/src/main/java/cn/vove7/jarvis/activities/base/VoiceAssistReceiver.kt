@@ -3,6 +3,7 @@ package cn.vove7.jarvis.activities.base
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
+import android.speech.RecognizerIntent
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.appbus.AppBus
 import cn.vove7.common.appbus.SpeechAction
@@ -29,7 +30,8 @@ class VoiceAssistActivity : Activity() {
         val action = intent.action
         Vog.d(this, "VoiceAssist ---> $action")
         when (action) {
-            Intent.ACTION_ASSIST, Intent.ACTION_VOICE_COMMAND, "android.intent.action.VOICE_ASSIST", "wakeup" -> {
+            Intent.ACTION_ASSIST, Intent.ACTION_VOICE_COMMAND,
+            RecognizerIntent.ACTION_WEB_SEARCH, "android.intent.action.VOICE_ASSIST", "wakeup" -> {
                 Vog.d(this, "onCreate ---> ASSIST wakeup")
                 MainService.switchRecog()
             }

@@ -27,14 +27,15 @@ class CreateShortcutActivity : Activity() {
                 .listItems(items = listOf(
                         getString(R.string.shortcut_wakeup),
                         getString(R.string.text_switch_voice_wp),
-                        getString(R.string.shortcut_label_set_assist_app),
-                        "语音搜索"),
+                        getString(R.string.shortcut_label_set_assist_app)
+//                        "语音搜索"
+                ),
                         waitForPositiveButton = false) { d, i, _ ->
                     when (i) {
                         0 -> createWakeupShortcut()
                         1 -> createSwitchVoiceWakeupShortcut()
                         2 -> createOneKeySetAssistApp()
-                        3 -> createWebSearch()
+//                        3 -> createWebSearch()
                     }
                     d.dismiss()
                 }

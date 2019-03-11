@@ -4,12 +4,16 @@ import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.bridges.HttpBridge
 import cn.vove7.common.netacc.tool.SecureHelper
 import cn.vove7.common.utils.GsonHelper
+import cn.vove7.jarvis.tools.AppConfig
 import cn.vove7.jarvis.tools.BaiduKey
 import cn.vove7.jarvis.tools.baiduaip.model.ImageClassifyResult
+import cn.vove7.jarvis.tools.baiduaip.model.Point
+import cn.vove7.jarvis.tools.baiduaip.model.TextOcrItem
 import cn.vove7.jarvis.tools.baiduaip.model.TranslateResult
 import cn.vove7.vtp.log.Vog
 import com.baidu.aip.imageclassify.AipImageClassify
 import com.baidu.aip.nlp.AipNlp
+import com.baidu.aip.ocr.AipOcr
 import org.json.JSONObject
 import java.util.*
 
@@ -94,9 +98,59 @@ object BaiduAipHelper {
         return try {
             GsonHelper.fromJson<TranslateResult>(jData)
         } catch (e: Exception) {
-            GlobalLog.err(e.message,"bah97")
+            GlobalLog.err(e.message, "bah97")
             null
         }
+    }
+
+    /**
+     * 图片ocr
+     */
+    @Throws
+    fun ocr(imgPath: String): ArrayList<TextOcrItem> {
+        val ocrStr = AppConfig.textOcrStr
+        val baiduOcr = if (ocrStr?.isBlank() != false) {//null or true
+            AipOcr(BaiduKey.appId.toString(), BaiduKey.appKey, BaiduKey.sKey)
+        } else {
+            try {
+                val kkk = ocrStr.split("#")
+                AipOcr(kkk[0], kkk[1], kkk[2])
+            } catch (e: Exception) {
+                GlobalLog.err(e)
+                throw Exception("文字识别参数设置错误")
+            }
+        }
+
+
+        val options = HashMap<String, String>()
+        options["vertexes_location"] = "true"
+        options["recognize_granularity"] = "big"
+
+        val obj = baiduOcr.general(imgPath, options)
+
+        if (obj.has("error_code")) {//出错
+            val errMsg = "文字OCR错误：" + obj.getString("error_code") + obj.getString("error_msg")
+            GlobalLog.err(errMsg)
+            throw Exception(errMsg)
+        }
+        val ocrResult = arrayListOf<TextOcrItem>()
+
+        val words = obj.getJSONArray("words_result")
+        for (i in 0 until words.length()) {
+            val wordObj = words.getJSONObject(i)
+
+            val text = wordObj.getString("words")
+            val list = mutableListOf<Point>()
+            wordObj.getJSONArray("vertexes_location").apply {
+                for (j in 0 until length()) {
+                    getJSONObject(j).also {
+                        list.add(Point(it.getInt("x"), it.getInt("y")))
+                    }
+                }
+            }
+            ocrResult.add(TextOcrItem(text, list))
+        }
+        return ocrResult
     }
 
 }

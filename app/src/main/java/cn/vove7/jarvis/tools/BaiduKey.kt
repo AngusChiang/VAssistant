@@ -10,11 +10,11 @@ object BaiduKey {
     val sKey: String
 
     init {
-        val appInfo = GlobalApp.APP.let {
-            it.packageManager.getApplicationInfo(it.packageName,
-                    PackageManager.GET_META_DATA)
-        }
         if (!BuildConfig.DEBUG) {
+            val appInfo = GlobalApp.APP.let {
+                it.packageManager.getApplicationInfo(it.packageName,
+                        PackageManager.GET_META_DATA)
+            }
             appId = appInfo.metaData.getInt("com.baidu.speech.APP_ID")
             appKey = appInfo.metaData.getString("com.baidu.speech.API_KEY")!!
             sKey = appInfo.metaData.getString("com.baidu.speech.SECRET_KEY")!!

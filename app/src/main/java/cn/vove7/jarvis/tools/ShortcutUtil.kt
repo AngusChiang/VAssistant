@@ -87,7 +87,7 @@ object ShortcutUtil {
                         .setRank(1) //位置
                         .build()
             } else null
-    private val webSearchShortcut = buildShortcut("sc_web_search", "语音搜索",
+    private val webSearchShortcut get() = buildShortcut("sc_web_search", "语音搜索",
             Intent(RecognizerIntent.ACTION_WEB_SEARCH).newTask())
 
     private fun buildShortcut(id: String, label: String, intent: Intent): ShortcutInfo? {
@@ -112,7 +112,7 @@ object ShortcutUtil {
             addShortcut(wakeUpShortcut!!)
             addShortcut(switchVoiceWpShortcut!!)
             addShortcut(oneKeySetAssistShortcut!!)
-            addShortcut(webSearchShortcut!!)
+//            addShortcut(webSearchShortcut!!)
         }
 //        } else {
 //            GlobalApp.toastShort("需要8.0+")

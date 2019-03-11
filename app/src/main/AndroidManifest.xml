@@ -153,6 +153,9 @@
                 <!-- 蓝牙耳机触发 -->
                 <action android:name="android.intent.action.VOICE_COMMAND" />
 
+                <!--搜索，此处唤醒-->
+                <action android:name="android.speech.action.WEB_SEARCH" />
+
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.VOICE_LAUNCH" />
             </intent-filter>
@@ -304,7 +307,6 @@
             android:theme="@style/ScreenShotTheme">
             <intent-filter>
                 <action android:name="android.speech.action.RECOGNIZE_SPEECH" />
-                <action android:name="android.speech.action.WEB_SEARCH" />
 
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
@@ -315,6 +317,11 @@
             android:excludeFromRecents="true"
             android:launchMode="singleInstance"
             android:theme="@style/ScreenShotTheme" />
+        <activity
+            android:name=".activities.TextOcrActivity"
+            android:excludeFromRecents="true"
+            android:launchMode="singleInstance"
+            android:theme="@style/ScreenPicker" />
     </application>
 
 </manifest>

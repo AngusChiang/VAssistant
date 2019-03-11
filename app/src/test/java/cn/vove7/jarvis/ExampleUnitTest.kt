@@ -11,7 +11,6 @@ import cn.vove7.jarvis.chat.TulingChatSystem
 import cn.vove7.jarvis.tools.baiduaip.BaiduAipHelper
 import org.jsoup.Jsoup
 import org.junit.Test
-import java.io.OutputStreamWriter
 import java.lang.Thread.sleep
 import java.text.SimpleDateFormat
 import java.util.*
@@ -185,7 +184,7 @@ class ExampleUnitTest {
 
     @Test
     fun tulingChat() {
-        for( s in arrayOf("阿里巴巴股票","鱼香肉丝怎么做","今天穿什么衣服")) {
+        for (s in arrayOf("阿里巴巴股票", "鱼香肉丝怎么做", "今天穿什么衣服")) {
             val a = TulingChatSystem().chatWithText(s)
             System.err.println(a)
         }
@@ -318,5 +317,15 @@ class ExampleUnitTest {
 //        bm.getPixel(0,0)
 //        val a = Color.green(0xffffffff)
 //        print(a)
+    }
+
+    @Test
+    fun ocr() {
+        println(BaiduAipHelper.ocr("C:\\Users\\11324\\Desktop/demo-card-1.jpg"))
+    }
+
+    @Test
+    fun atan() {
+        println(Math.atan(1.0) / Math.PI * 180)
     }
 }

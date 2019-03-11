@@ -24,7 +24,6 @@ open class GlobalApp : RePluginApplication() {
         APP = this
         launchTime = System.currentTimeMillis()
         super.onCreate()
-        colorfulToast = ColorfulToast(this).blue()
         AppInfo.attachApplication(this)
         if (!BuildConfig.DEBUG) {
             try {
@@ -74,7 +73,8 @@ open class GlobalApp : RePluginApplication() {
         colorfulToast.showLong(msg)
     }
 
-    lateinit var colorfulToast: ColorfulToast
+    private val colorfulToast: ColorfulToast get() = ColorfulToast(this).blue()
+
     override fun attachBaseContext(base: Context?) {
         super.attachBaseContext(base)
         try {

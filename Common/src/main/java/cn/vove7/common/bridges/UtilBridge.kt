@@ -25,7 +25,7 @@ object UtilBridge {
                 if (!parentFile.exists())
                     parentFile.mkdirs()
                 FileOutputStream(this).use {
-                    bitmap.compress(Bitmap.CompressFormat.PNG, 80, it)
+                    bitmap.compress(Bitmap.CompressFormat.PNG, 100, it)
                 }
                 GlobalApp.APP.sendBroadcast(Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE,
                         Uri.fromFile(this)))
