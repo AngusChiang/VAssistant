@@ -118,7 +118,14 @@ function screenShot(){
     return automator.screenShot()
 }
 
-function toast(msg){
+function toast(msg) {
     automator.toast(msg)
 }
+
+
+importClass(Packages.cn.vove7.common.appbus.AppBus)
+function cancelRecog() {
+    AppBus.INSTANCE.post('cancel_recog')
+}
+
 //

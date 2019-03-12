@@ -19,7 +19,8 @@ class LuaApp {
          * 初始化lua资源
          * @param context Context
          */
-        fun init(context: Context) {
+        fun init(context: Context, update: Boolean) {
+            if(!update) return
             runOnPool {
                 initAsset(context)
             }

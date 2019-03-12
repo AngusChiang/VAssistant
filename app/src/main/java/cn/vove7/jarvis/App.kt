@@ -44,7 +44,7 @@ class App : GlobalApp() {
 
         runOnNewHandlerThread("app_load", delay = 1000) {
             if (AppConfig.FIRST_LAUNCH_NEW_VERSION || BuildConfig.DEBUG)
-                LuaApp.init(this)
+                LuaApp.init(this,AppConfig.FIRST_LAUNCH_NEW_VERSION)
             startServices()
             CodeProcessor.init(this@App)
             ShortcutUtil.initShortcut()

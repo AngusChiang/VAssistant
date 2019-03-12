@@ -113,3 +113,8 @@ function toast(msg)
     automator.toast(msg)
 end
 
+function cancelRecog()
+    AppBus.INSTANCE.post('cancel_recog')
+end
+
+

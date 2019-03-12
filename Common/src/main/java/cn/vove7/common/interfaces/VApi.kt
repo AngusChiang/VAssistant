@@ -63,7 +63,7 @@ interface VApi {
                 "getLocalIpAddress()", "getNetAddress()", "createAlarm()", "createCalendarEvent()",
                 "startActivity(pkg,fullActivityName)", "screenOn()", "screenOff()", "sendKey()",
                 "sendSMS()", "getLaunchIntent()", "getPhoneByName()", "getContactByName()", "isCharging()", "batteryLevel",
-                "simCount", "contacts", "saveMarkedContact()", "saveMarkedApp()"
+                "simCount", "contacts", "saveMarkedContact()", "saveMarkedApp()", "enableNfc()", "disableNfc()"
         )
         val appFunctions = arrayOf(
                 "startActivity()", "getSystemService()"
@@ -83,7 +83,7 @@ interface VApi {
             arrayOf("interrupt()", "setScreenSize()",
                     "checkService()", "alert()",
                     "singleChoiceDialog()", "waitForVoiceParam()", "waitForText()", "sleep()", "smartOpen()",
-                    "smartClose()", "speak()", "speakSync()"
+                    "smartClose()", "speak()", "speakSync()", "cancelRecog()"
             )
 
         val spFuncs = arrayOf(
@@ -120,7 +120,7 @@ interface VApi {
                 Pair("openAppByPkg(pkg, reset)", "打开指定app,reset:可选,跳转'首页'"),
                 Pair("openAppByWord(s)", "从标记和安装列表匹配，打开app"),
                 Pair("getPhoneByName()", "根据姓名查找手机号，搜索范围：标记数据、通讯录\n参数：getPhoneByName(name: String): String?"),
-                Pair("getContactByName()","同getPhoneByName()\n返回值：Pair<String,String[]> first: 匹配的联系人姓名 second: 手机号数组"),
+                Pair("getContactByName()", "同getPhoneByName()\n返回值：Pair<String,String[]> first: 匹配的联系人姓名 second: 手机号数组"),
                 Pair("call(p)", "拨打电话\n参数：call(s:String [,simId:Int])\ns:纯数字电话(此时phone根据getPhoneByName获取)，simId(可选)为卡号，0:卡1  1:卡2，出错将按默认卡呼出"),
                 Pair("openFlashlight()", "打开闪光灯"),
                 Pair("closeFlashlight()", "关闭闪光灯"),
@@ -263,7 +263,9 @@ interface VApi {
                 Pair("sendSMS()", "发送短信\n参数：(phone: String, content: String)"),
                 Pair("getLaunchIntent(pkg)", "根据pkg(包名)获取App的启动Intent,类似桌面启动App\n参数：(pkg:String)"),
                 Pair("batteryLevel", "返回当前电量，范围0-100(Int)"),
-                Pair("isCharging()", "返回是否在充电")
+                Pair("isCharging()", "返回是否在充电"),
+                Pair("enableNfc()", "开启nfc，由于系统限制，只会跳转至nfc设置界面"),
+                Pair("disableNfc()", "关闭nfc，由于系统限制，只会跳转至nfc设置界面")
         )
         val executorMap = hashMapOf(
                 Pair("interrupt()", "终止执行"),
@@ -276,7 +278,9 @@ interface VApi {
                 Pair("waitForVoiceParam()", "waitForVoiceParam():String\n等待用户说话，并返回识别结果，识别失败返回空"),
                 Pair("waitForApp()", "等待应用出现,参数：(pkg[,activity[,millis]]) 返回Boolean 出现：true 等待超时：false"),
                 Pair("speak()", "speak(text)\n语音合成（异步）无返回值"),
-                Pair("speakSync()", "语音合成（同步）\nspeakSync(text)参数:待合成text文本 返回是否成功")
+                Pair("speakSync()", "语音合成（同步）\nspeakSync(text)参数:待合成text文本 返回是否成功"),
+                Pair("cancelRecog()", "取消语音识别，可终止长语音")
+
         )
     }
 }
