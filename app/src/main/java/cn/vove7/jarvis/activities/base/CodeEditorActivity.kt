@@ -144,10 +144,10 @@ abstract class CodeEditorActivity : AppCompatActivity() {
         if (haveFileUnsaved) {
             MaterialDialog(this).title(text = "提示")
                     .message(text = "有未保存的文件，是否放弃保存")
-                    .positiveButton { _ ->
+                    .positiveButton {
                         finish()
                     }.negativeButton()
-                    .neutralButton(text = "保存退出") { _ ->
+                    .neutralButton(text = "保存退出") {
                         codeEditor.saveFile(openFile!!)
                         finish()
                     }
