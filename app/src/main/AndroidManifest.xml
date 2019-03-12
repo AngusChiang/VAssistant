@@ -321,7 +321,12 @@
             android:name=".activities.TextOcrActivity"
             android:excludeFromRecents="true"
             android:launchMode="singleInstance"
-            android:theme="@style/ScreenPicker" />
+            android:theme="@style/ScreenPicker">
+            <intent-filter>
+                <action android:name="${applicationId}.SCREEN_OCR" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
     </application>
 
 </manifest>

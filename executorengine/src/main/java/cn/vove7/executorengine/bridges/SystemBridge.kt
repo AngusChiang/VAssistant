@@ -21,6 +21,7 @@ import android.media.Image
 import android.net.Uri
 import android.net.wifi.WifiConfiguration
 import android.net.wifi.WifiManager
+import android.nfc.NfcManager
 import android.os.*
 import android.provider.AlarmClock
 import android.provider.Settings
@@ -814,6 +815,7 @@ object SystemBridge : SystemOperation {
     var screenData: Intent? = null
     var cap: ScreenCapturer? = null
     override fun screenShot(): Bitmap? {
+        Vog.d(this,"screenShot ---> 请求截屏")
         if (screenData == null) {
             val resultBox = ResultBox<Intent?>()
             val capIntent = ScreenshotActivity.getScreenshotIntent(context, resultBox)
@@ -827,7 +829,7 @@ object SystemBridge : SystemOperation {
 
         try {
             return cap?.capture()?.let {
-                Vog.d(this,"screenShot ---> $it")
+                Vog.d(this, "screenShot ---> $it")
                 val bm = processImg(it)
                 it.close()
                 bm
@@ -1073,9 +1075,33 @@ object SystemBridge : SystemOperation {
         }
     }
 
+    /**
+     * 在截屏后释放
+     */
     fun release() {
         cap?.release()
         cap = null
         screenData = null
+    }
+
+    override fun enableNfc() {
+        switchNFC(true)
+    }
+
+    override fun disableNfc() {
+        switchNFC(false)
+    }
+
+    /**
+     * 你不能以编程的方式启用NFC。用户只能通过设置或用键件按钮手动的启用。
+     * @param enable Boolean
+     */
+    private fun switchNFC(enable: Boolean) {
+        val nfcManager = context.getSystemService(Context.NFC_SERVICE) as NfcManager?
+
+        if (nfcManager == null || nfcManager.defaultAdapter == null) {
+            GlobalLog.err("此设备不支持nfc")
+        }
+        context.startActivity(Intent(Settings.ACTION_NFC_SETTINGS).newTask())
     }
 }

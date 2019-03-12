@@ -7,14 +7,19 @@ import android.widget.CheckedTextView
 import android.widget.RelativeLayout
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.utils.ThreadPool
+import cn.vove7.common.utils.gone
+import cn.vove7.common.utils.runOnNewHandlerThread
 import cn.vove7.common.utils.runOnUi
 import cn.vove7.executorengine.bridges.SystemBridge
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.tools.AppConfig
 import cn.vove7.jarvis.tools.baiduaip.BaiduAipHelper
 import cn.vove7.jarvis.tools.baiduaip.model.TextOcrItem
+import cn.vove7.jarvis.view.dialog.TextEditorDialog
+import cn.vove7.jarvis.view.dialog.base.BottomDialogWithMarkdown
 import cn.vove7.jarvis.view.dialog.base.BottomDialogWithText
 import cn.vove7.vtp.log.Vog
+import kotlinx.android.synthetic.main.activity_text_ocr.*
 
 /**
  * # TextOcrActivity
@@ -30,6 +35,7 @@ class TextOcrActivity : Activity() {
         intent?.let {
             if (it.hasExtra("items")) {
                 copy(it.getSerializableExtra("items") as List<TextOcrItem>)
+                setContentView(R.layout.activity_text_ocr)
                 buildContent()
             } else {//请求截屏
                 ocrWithScreenShot()
@@ -42,43 +48,7 @@ class TextOcrActivity : Activity() {
     var d: BottomDialogWithText? = null
     private val onItemClick: (Model) -> Unit = { model ->
         val text = model.item.text
-        Vog.d(this, " ---> $text")
-        d = BottomDialogWithText(this, "文字操作").apply d@{
-            noAutoDismiss()
-            positiveButton(text = "复制原文") {
-                SystemBridge.setClipText(text)
-                GlobalApp.toastShort(R.string.text_copied)
-            }
-            if (model.subText == null)
-                negativeButton(text = "翻译") {
-                    if (!AppConfig.haveTranslatePermission())
-                        return@negativeButton
-                    ThreadPool.runOnCachePool {
-                        textView.apply {
-                            appendlnGreen("\n翻译中...")
-                            val r = BaiduAipHelper.translate(text, to = AppConfig.translateLang)
-                            if (r != null) {
-                                model.subText = r.transResult
-                                clear()
-                                appendln(text)
-                                appendlnRed("\n翻译结果：")
-                                appendln(model.subText)
-                                setCopyTranslationText(this@d, r.transResult)
-                            } else appendlnRed("翻译失败")
-                        }
-                    }
-                }
-            textView.apply {
-                setPadding(50, 20, 50, 20)
-                appendln(text)
-                model.subText?.also {
-                    appendlnRed("\n翻译结果：")
-                    appendln(it)
-                    setCopyTranslationText(this@d, it)
-                }
-            }
-            show()
-        }
+        editDialog(text)
     }
 
     /**
@@ -101,17 +71,27 @@ class TextOcrActivity : Activity() {
         }
     }
 
+    var p = 2 //倍率
     private fun ocrWithScreenShot() {
-        try {
-            val path = SystemBridge.screen2File()!!.absolutePath
-            copy(BaiduAipHelper.ocr(path))
-            buildContent()
-        } catch (e: NullPointerException) {
-            GlobalApp.toastShort("截屏失败")
-            finish()
-        } catch (e: Exception) {
-            GlobalApp.toastShort(e.message!!)
-            finish()
+        p = 1
+        runOnNewHandlerThread {
+            //异步
+            try {
+                val path = SystemBridge.screen2File()!!.absolutePath
+                runOnUi {
+                    setContentView(R.layout.activity_text_ocr)
+                }
+                copy(BaiduAipHelper.ocr(path))
+                runOnUi {
+                    buildContent()
+                }
+            } catch (e: NullPointerException) {
+                GlobalApp.toastShort("截屏失败")
+                finish()
+            } catch (e: Exception) {
+                GlobalApp.toastShort(e.message!!)
+                finish()
+            }
         }
     }
 
@@ -120,11 +100,11 @@ class TextOcrActivity : Activity() {
         System.gc()
     }
 
-    private val rootContent by lazy { RelativeLayout(this) }
 
     private fun buildContent() {
-        rootContent.layoutParams = RelativeLayout.LayoutParams(
-                RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT)
+        loading_layout.gone()
+//        rootContent.layoutParams = RelativeLayout.LayoutParams(
+//                RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT)
         wordItems.forEach { model ->
             val item = model.item
             val view = CheckedTextView(this).apply {
@@ -136,7 +116,6 @@ class TextOcrActivity : Activity() {
                 isVerticalScrollBarEnabled = true
                 setOnClickListener {
                     (it as CheckedTextView).apply {
-                        GlobalApp.toastShort(text.toString())
                     }.toggle()
                 }
                 setOnLongClickListener {
@@ -144,10 +123,10 @@ class TextOcrActivity : Activity() {
                     true
                 }
                 text = item.text
-                val h = item.height * 2 + 10
-                val w = item.width * 2 + 10
-                val top = item.top * 2 - statusbarHeight
-                val left = item.left * 2
+                val h = item.height * p + 10
+                val w = item.width * p + 10
+                val top = item.top * p - statusbarHeight
+                val left = item.left * p
                 val rotationAngle = item.rotationAngle
                 Vog.d(this, "buildContent ---> ${item.text} top:$top ,left:$left ,w:$w h:$h rotationAngle:$rotationAngle")
                 setPadding(10, 0, 10, 0)
@@ -160,11 +139,47 @@ class TextOcrActivity : Activity() {
                 rotation = rotationAngle
                 model.textView = this
             }
-//            model.textView = view
+
             rootContent.addView(view)
         }
-        setContentView(rootContent)
 
+        helpIcon.setOnClickListener {
+            showHelp()
+        }
+
+        floatEditIcon.setOnClickListener {
+            editCheckedText()
+        }
+
+    }
+
+    /**
+     * 勾选的文字
+     */
+    private val checkedText
+        get() = buildString {
+            wordItems.forEach {
+                if (it.textView?.isChecked == true) {
+                    appendln(it.item.text)
+                }
+            }
+        }.let {
+            if (it.isEmpty()) buildString {
+                wordItems.forEach { m ->
+                    appendln(m.item.text)
+                }
+            } else it
+        }
+
+    private fun showHelp() {
+        BottomDialogWithMarkdown(this, "文字识别界面帮助").apply {
+            loadFromAsset("files/ocr_help.md")
+            show()
+        }
+    }
+
+    private fun editCheckedText() {
+        editDialog(checkedText)
     }
 
     private val statusbarHeight: Int by lazy {
@@ -178,6 +193,43 @@ class TextOcrActivity : Activity() {
         }
         Vog.d(this, "状态栏高度 ---> $statusBarHeight1")
         statusBarHeight1
+    }
+
+    private fun editDialog(text: String) {
+        Vog.d(this, " ---> $text")
+        d = BottomDialogWithText(this, "文字操作").apply d@{
+            noAutoDismiss()
+            positiveButton(text = "复制原文") {
+                SystemBridge.setClipText(text)
+                GlobalApp.toastShort(R.string.text_copied)
+            }
+            neutralButton("编辑") {
+                TextEditorDialog(this@TextOcrActivity, text)
+                dismiss()
+            }
+            negativeButton(text = "翻译") {
+                if (!AppConfig.haveTranslatePermission())
+                    return@negativeButton
+                ThreadPool.runOnCachePool {
+                    textView.apply {
+                        appendlnGreen("\n翻译中...")
+                        val r = BaiduAipHelper.translate(text, to = AppConfig.translateLang)
+                        if (r != null) {
+                            clear()
+                            appendln(text)
+                            appendlnRed("\n翻译结果：")
+                            appendln(r.transResult)
+                            setCopyTranslationText(this@d, r.transResult)
+                        } else appendlnRed("翻译失败")
+                    }
+                }
+            }
+            textView.apply {
+                setPadding(50, 20, 50, 20)
+                appendln(text)
+            }
+            show()
+        }
     }
 
     class Model(

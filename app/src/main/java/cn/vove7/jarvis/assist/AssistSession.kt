@@ -163,11 +163,15 @@ class AssistSession(context: Context) : VoiceInteractionSession(context) {
                         showProgressBar = true
                         runOnNewHandlerThread {
                             try {
-                                GlobalApp.APP.startActivity(Intent(GlobalApp.APP,
+                                val intent = Intent(GlobalApp.APP,
                                         TextOcrActivity::class.java).also {
-                                    if (path != null)
-                                        it.putExtra("items", BaiduAipHelper.ocr(path))
-                                })
+                                }
+                                if (path != null) {
+                                    val results = BaiduAipHelper.ocr(path)
+                                    intent.putExtra("items", results)
+                                }
+                                if (!isShowing) return@runOnNewHandlerThread
+                                GlobalApp.APP.startActivity(intent)
                                 showProgressBar = false
                                 onBackPressed()
                             } catch (e: Exception) {
@@ -229,9 +233,10 @@ class AssistSession(context: Context) : VoiceInteractionSession(context) {
         bottomController.hideBottom()
     }
 
+    var isShowing = true
     override fun onHide() {
         bottomController.hideBottom()
-
+        isShowing = false
         Vog.d(this, "onHide ---> ")
         AppBus.unreg(this)
 //        AppBus.post(AppBus.ORDER_CANCEL_RECOG)

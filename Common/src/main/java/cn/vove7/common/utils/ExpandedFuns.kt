@@ -244,6 +244,10 @@ fun View.inVisibility() {
 }
 
 
+fun View.setPadding(pad: Int) {
+    setPadding(pad, pad, pad, pad)
+}
+
 fun Intent.newTask():Intent{
     addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
     return this

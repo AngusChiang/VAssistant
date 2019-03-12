@@ -321,7 +321,9 @@ class ExampleUnitTest {
 
     @Test
     fun ocr() {
-        println(BaiduAipHelper.ocr("C:\\Users\\11324\\Desktop/demo-card-1.jpg"))
+        BaiduAipHelper.ocr("C:\\Users\\11324\\Desktop/demo-card-1.jpg").forEach {
+            println(it)
+        }
     }
 
     @Test

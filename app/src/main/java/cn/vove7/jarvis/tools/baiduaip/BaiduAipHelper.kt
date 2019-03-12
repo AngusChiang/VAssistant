@@ -107,8 +107,9 @@ object BaiduAipHelper {
      * 图片ocr
      */
     @Throws
-    fun ocr(imgPath: String): ArrayList<TextOcrItem> {
+    fun ocr(imgPath: String, minP: Double = 0.8): ArrayList<TextOcrItem> {
         val ocrStr = AppConfig.textOcrStr
+        Vog.d(this,"ocr ---> $ocrStr")
         val baiduOcr = if (ocrStr?.isBlank() != false) {//null or true
             AipOcr(BaiduKey.appId.toString(), BaiduKey.appKey, BaiduKey.sKey)
         } else {
@@ -121,9 +122,9 @@ object BaiduAipHelper {
             }
         }
 
-
         val options = HashMap<String, String>()
         options["vertexes_location"] = "true"
+        options["probability"] = "true"
         options["recognize_granularity"] = "big"
 
         val obj = baiduOcr.general(imgPath, options)
@@ -148,7 +149,9 @@ object BaiduAipHelper {
                     }
                 }
             }
-            ocrResult.add(TextOcrItem(text, list))
+            val p = wordObj.getJSONObject("probability").getDouble("average")
+            if (p >= minP)
+                ocrResult.add(TextOcrItem(text, list, p))
         }
         return ocrResult
     }

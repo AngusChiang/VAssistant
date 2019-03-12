@@ -193,6 +193,7 @@ interface SystemOperation {
      * @param isAlarm Boolean
      */
     fun createCalendarEvent(title: String, content: String?, beginTime: Long, endTime: Long? = null, isAlarm: Boolean)
+
     fun createCalendarEvent(title: String, content: String?, beginTime: Long, endTime: Long? = null, earlyAlarmMinute: Long? = null)
 
 //    fun hideInputMethod()
@@ -247,4 +248,7 @@ interface SystemOperation {
      */
     fun saveMarkedApp(name: String, regex: String, pkg: String): Boolean
 
+    fun enableNfc()
+
+    fun disableNfc()
 }

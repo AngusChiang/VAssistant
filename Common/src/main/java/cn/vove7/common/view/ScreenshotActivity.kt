@@ -9,6 +9,7 @@ import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.model.ResultBox
 import cn.vove7.common.view.toast.ColorfulToast
+import cn.vove7.vtp.log.Vog
 
 class ScreenshotActivity : Activity() {
 
@@ -16,8 +17,11 @@ class ScreenshotActivity : Activity() {
         // 全屏截屏 状态栏收起?
 //        window.setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
 //                WindowManager.LayoutParams.FLAG_FULLSCREEN)
+        Vog.d(this,"onCreate --->")
         super.onCreate(savedInstanceState)
+
         requestCap()
+
     }
 
     private fun requestCap() {//请求
@@ -34,6 +38,7 @@ class ScreenshotActivity : Activity() {
 
     override fun finish() {
         super.finish()
+        Vog.d(this,"finish --->")
         overridePendingTransition(0, 0)
     }
 
@@ -58,6 +63,7 @@ class ScreenshotActivity : Activity() {
         var resultBox: ResultBox<Intent?>? = null
 
         fun notifyResult(b: Intent? = null) {
+            Vog.d(this,"notifyResult ---> $b")
             resultBox?.setAndNotify(b)
             resultBox = null
         }

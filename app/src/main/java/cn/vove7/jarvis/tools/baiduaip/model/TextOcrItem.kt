@@ -13,7 +13,11 @@ data class TextOcrItem(
         /**
          * 坐标：左上 右上，右下，左下
          */
-        val points: List<Point>
+        val points: List<Point>,
+        /**
+         * 平均
+         */
+        val probability: Double
 ) : Serializable {
     /**
      * 中心坐标 1,3 点中心
