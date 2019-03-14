@@ -63,7 +63,7 @@ import cn.vove7.jarvis.view.dialog.MultiChoiceDialog
 import cn.vove7.jarvis.view.dialog.OnMultiSelectListener
 import cn.vove7.jarvis.view.dialog.OnSelectListener
 import cn.vove7.jarvis.view.dialog.SingleChoiceDialog
-import cn.vove7.jarvis.view.floatwindows.ListeningToast
+import cn.vove7.jarvis.view.floatwindows.FloatyPanel
 import cn.vove7.jarvis.view.statusbar.ExecuteAnimation
 import cn.vove7.jarvis.view.statusbar.ListeningAnimation
 import cn.vove7.jarvis.view.statusbar.ParseAnimation
@@ -85,8 +85,8 @@ import kotlin.concurrent.thread
 class MainService : BusService(),
         ServiceBridge, OnSelectListener, OnMultiSelectListener {
 
-    private val listeningToast: ListeningToast by lazy {
-        ListeningToast()
+    private val floatyPanel: FloatyPanel by lazy {
+        FloatyPanel()
     }
 
     /**
@@ -94,7 +94,7 @@ class MainService : BusService(),
      */
     var toastAlign: Int = 0
         set(v) {
-            listeningToast.align = v
+            floatyPanel.align = v
         }
 
     override val serviceId: Int
@@ -386,7 +386,7 @@ class MainService : BusService(),
 
     override fun onExecuteStart(tag: String) {//
         Vog.d(this, "开始执行 -> $tag")
-//        listeningToast.showAndHideDelay("开始执行")
+//        floatyPanel.showAndHideDelay("开始执行")
         executeAnimation.begin()
         executeAnimation.show(tag)
     }
@@ -397,7 +397,7 @@ class MainService : BusService(),
      */
     override fun onExecuteFinished(result: Boolean) {//
         Vog.d(this, "onExecuteFinished  --> $result")
-        listeningToast.hideImmediately()
+        floatyPanel.hideImmediately()
         if (AppConfig.execSuccessFeedback) {
             if (result) executeAnimation.success()
             else executeAnimation.failedAndHideDelay()
@@ -411,7 +411,7 @@ class MainService : BusService(),
         if (AppConfig.execFailedVoiceFeedback)
             speakSync("执行失败")
         else GlobalApp.toastShort("执行失败")
-        listeningToast.hideImmediately()
+        floatyPanel.hideImmediately()
     }
 
     override fun onExecuteInterrupt(errMsg: String) {
@@ -700,10 +700,10 @@ class MainService : BusService(),
 
     private fun hideAll(immediately: Boolean = false) {
         if (immediately) {
-            listeningToast.hideImmediately()
+            floatyPanel.hideImmediately()
             listeningAni.hideDelay(0)
         } else {
-            listeningToast.hideDelay()
+            floatyPanel.hideDelay()
             listeningAni.hideDelay()
         }
     }
@@ -845,7 +845,7 @@ class MainService : BusService(),
             checkMusic()//检查后台播放
             listeningAni.begin()//
             recogEffect(byVoice)
-            listeningToast.show("开始聆听")
+            floatyPanel.show("开始聆听")
             //震动
             if (AppConfig.vibrateWhenStartReco || voiceMode != MODE_VOICE) {//询问参数时，震动
                 SystemBridge.vibrate(80L)
@@ -891,7 +891,7 @@ class MainService : BusService(),
                             performAlertClick(false)
                         }
                         else -> {
-                            listeningToast.show("重新识别")
+                            floatyPanel.show("重新识别")
                             onCommand(ORDER_START_RECOG)  //继续????
                         }
                     }
@@ -915,7 +915,7 @@ class MainService : BusService(),
                 speechRecoService?.stopLastingUpTimer()
             }
             Vog.d(this, "onTempResult ---> 临时结果 $temp")
-            listeningToast.show(temp)
+            floatyPanel.show(temp)
             listeningAni.show(temp)
             AppConfig.finishWord.also {
                 if (it != null && it != "") {
@@ -963,7 +963,7 @@ class MainService : BusService(),
 
         override fun onRecogFailed(err: String) {
             AppBus.post(AppBus.EVENT_ERROR_RECO)
-            listeningToast.showAndHideDelay(err)
+            floatyPanel.showAndHideDelay(err)
             when (voiceMode) {
                 MODE_VOICE -> {
                     listeningAni.hideDelay()
@@ -1007,7 +1007,7 @@ class MainService : BusService(),
             result: String, needCloud: Boolean = true,
             chat: Boolean = AppConfig.openChatSystem, from: Int = 0): Boolean {
         isContinousDialogue = false
-        listeningToast.show(result)
+        floatyPanel.show(result)
         parseAnimation.begin()
 
         resumeMusicIf()
@@ -1023,7 +1023,7 @@ class MainService : BusService(),
             val parseResult = ParseEngine
                     .parseAction(result, AccessibilityApi.accessibilityService?.currentScope)
             if (parseResult.isSuccess) {
-                listeningToast.hideImmediately()//执行时 消失
+                floatyPanel.hideImmediately()//执行时 消失
                 val his = CommandHistory(UserInfo.getUserId(), result,
                         parseResult.msg)
                 NetHelper.uploadUserCommandHistory(his)
@@ -1062,17 +1062,17 @@ class MainService : BusService(),
      */
     private fun doChat(result: String) {
         parseAnimation.begin()
-        listeningToast.showParseAni()
+        floatyPanel.showParseAni()
         runOnCachePool {
             resumeMusicLock = true
             val data = chatSystem.chatWithText(result)
             if (data == null) {
-                listeningToast.showAndHideDelay("获取失败,详情查看日志")
+                floatyPanel.showAndHideDelay("获取失败,详情查看日志")
                 parseAnimation.failedAndHideDelay()
                 resumeMusicIf()
             } else {
                 data.word.let { word ->
-                    listeningToast.show(if (word.contains("="))
+                    floatyPanel.show(if (word.contains("="))
                         data.word.replace("=", "\n=") else word)
                     executeAnimation.begin()
                     executeAnimation.show(word)
@@ -1105,13 +1105,13 @@ class MainService : BusService(),
      */
     private fun onCommandParseFailed(cmd: String) {
         NetHelper.uploadUserCommandHistory(CommandHistory(UserInfo.getUserId(), cmd, null))
-        listeningToast.showAndHideDelay("解析失败")
+        floatyPanel.showAndHideDelay("解析失败")
         parseAnimation.failedAndHideDelay()
     }
 
     private fun runFromCloud(command: String, actions: List<Action>?): Boolean {
         if (actions == null || actions.isEmpty()) {
-            listeningToast.showAndHideDelay("解析失败")
+            floatyPanel.showAndHideDelay("解析失败")
             parseAnimation.failedAndHideDelay()
             return false
         }

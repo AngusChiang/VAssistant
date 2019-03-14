@@ -20,13 +20,12 @@ import cn.vove7.jarvis.tools.AppConfig
 import cn.vove7.vtp.log.Vog
 
 /**
- * # ListeningToast
+ * # FloatyPanel
  * 悬浮语音面板
- * todo rename
  * @author 17719247306
  * 2018/9/9
  */
-class ListeningToast : AbFloatWindow<ListeningToast.VHolder>(GlobalApp.APP) {
+class FloatyPanel : AbFloatWindow<FloatyPanel.VHolder>(GlobalApp.APP) {
     override var posY: Int = 80
 
     lateinit var rootView: LinearLayout

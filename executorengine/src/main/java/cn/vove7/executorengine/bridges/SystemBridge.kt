@@ -111,8 +111,8 @@ object SystemBridge : SystemOperation {
             } else {
                 launchIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                 if (resetTask) {
+                    launchIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK)
                 }
-                launchIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK)
                 context.startActivity(launchIntent)
                 true
             }
@@ -225,14 +225,14 @@ object SystemBridge : SystemOperation {
      * 打开手电
      */
     override fun openFlashlight(): Boolean {
-        return switchFLSafly(true)
+        return switchFLSafely(true)
     }
 
     /**
      * 关闭手电
      */
     override fun closeFlashlight(): Boolean {
-        return switchFLSafly(false)
+        return switchFLSafely(false)
     }
 
     @Throws(Exception::class)
@@ -287,7 +287,7 @@ object SystemBridge : SystemOperation {
         }
     }
 
-    private fun switchFLSafly(on: Boolean): Boolean {
+    private fun switchFLSafely(on: Boolean): Boolean {
         try {
             switchFlashlight(on)
         } catch (e: Throwable) {
