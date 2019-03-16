@@ -55,6 +55,7 @@ class OSLActivity : OneFragmentActivity() {
                     , OslItem("Recycler Fast Scroll", "https://github.com/plusCubed/recycler-fast-scroll", "")
                     , OslItem("MarkdownView", "https://github.com/tiagohm/MarkdownView", "Android library to display markdown text.")
                     , OslItem("Toasty", "https://github.com/GrenderG/Toasty", "The usual Toast, but with steroids.")
+                    , OslItem("Konfetti", "https://github.com/DanielMartinus/Konfetti", "Celebrate more with this lightweight confetti particle system \uD83C\uDF8A Create realistic confetti by implementing this easy to use library.")
                     // , OslItem("", "", "")
             )
             notifyLoadSuccess(l, true)

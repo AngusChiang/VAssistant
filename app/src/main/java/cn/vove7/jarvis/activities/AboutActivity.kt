@@ -1,16 +1,17 @@
 package cn.vove7.jarvis.activities
 
 import android.content.Intent
+import android.graphics.Color
 import android.os.Bundle
-import android.os.UserManager
 import android.support.v7.app.AppCompatActivity
 import android.view.MenuItem
 import android.view.View
 import android.widget.AdapterView
 import android.widget.TextView
 import cn.vove7.common.app.GlobalApp
-
 import cn.vove7.common.bridges.SystemBridge
+import cn.vove7.common.utils.gone
+import cn.vove7.common.utils.show
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.adapters.IconTitleEntity
 import cn.vove7.jarvis.adapters.IconTitleListAdapter
@@ -23,6 +24,8 @@ import cn.vove7.vtp.system.SystemHelper
 import cn.vove7.vtp.system.SystemHelper.APP_STORE_COLL_APK
 import kotlinx.android.synthetic.main.activity_abc_header.*
 import kotlinx.android.synthetic.main.header_about.*
+import nl.dionsegijn.konfetti.models.Shape
+import nl.dionsegijn.konfetti.models.Size
 
 
 /**
@@ -33,16 +36,27 @@ import kotlinx.android.synthetic.main.header_about.*
  */
 class AboutActivity : AppCompatActivity(), AdapterView.OnItemClickListener {
 
+    var clickTime = 0L
+    var clickCount = 0
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_abc_header)
 
         header_content.addView(layoutInflater.inflate(R.layout.header_about, null))
 
+        root.setOnClickListener {
+            val now = System.currentTimeMillis()
+            if (now - clickTime > 1000) {//开始点击
+                clickTime = now
+                clickCount = 0
+            }
+            clickCount++
+            if (clickCount > 5) {
+                showEgg()
+            }
+        }
         ver_name_view.text = AppConfig.versionName
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        root.setOnClickListener {
-        }
         list_view.adapter = IconTitleListAdapter(this, getData())
         list_view.onItemClickListener = this
     }
@@ -55,13 +69,35 @@ class AboutActivity : AppCompatActivity(), AdapterView.OnItemClickListener {
         return super.onOptionsItemSelected(item)
     }
 
+    override fun onBackPressed() {
+        if (konfettiView.visibility == View.VISIBLE) {
+            konfettiView.gone()
+        } else super.onBackPressed()
+    }
+
+    private fun showEgg() {//彩蛋
+        konfettiView.show()
+        konfettiView.build()
+                .addColors(Color.YELLOW, Color.GREEN, Color.MAGENTA)
+                .setDirection(0.0, 359.0)
+                .setSpeed(1f, 3f)
+                .setFadeOutEnabled(true)
+                .setTimeToLive(5000L)
+                .addShapes(Shape.RECT, Shape.CIRCLE)
+                .addSizes(Size(12))
+                .setPosition(-50f, konfettiView.width + 50f, -50f, -50f)
+                .streamFor(300, 7000L)
+
+
+    }
+
     override fun onItemClick(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
         when (position) {
             0 -> {
                 SystemHelper.openApplicationMarket(this, this.packageName, APP_STORE_COLL_APK)
             }
             1 -> {
-                val p = ProgressDialog(this){
+                val p = ProgressDialog(this) {
                     GlobalApp.toastError("检查失败")
                 }
                 AppConfig.checkAppUpdate(this, true) {

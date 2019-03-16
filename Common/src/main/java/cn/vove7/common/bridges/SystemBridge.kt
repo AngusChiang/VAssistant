@@ -144,7 +144,7 @@ object SystemBridge : SystemOperation {
      * @param appWord String
      * @return String?
      */
-    override fun getPkgByName(appWord: String): String? {
+    override fun getPkgByName(appWord: String, excludeUnstartable: Boolean): String? {
         val list = AdvanAppHelper.matchPkgByName(appWord)
         return if (list.isNotEmpty()) {
             list[0].data.packageName.also {
@@ -1143,7 +1143,7 @@ object SystemBridge : SystemOperation {
                 .equalsText("强行停止", "force stop")
                 .waitFor(3000)
 
-        return if (s?.tryClick() == true) {
+        val b = if (s?.tryClick() == true) {
             ViewFindBuilder().equalsText("确定", "OK")
                     .waitFor(600)?.let {
                         Thread.sleep(200)
@@ -1154,5 +1154,7 @@ object SystemBridge : SystemOperation {
             GlobalApp.toastInfo("应用未运行")
             false
         }
+        GlobalActionExecutor.home()
+        return b
     }
 }

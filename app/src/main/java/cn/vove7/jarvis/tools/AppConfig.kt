@@ -10,6 +10,7 @@ import android.net.Uri
 import android.os.Build
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.app.GlobalLog
+import cn.vove7.common.bridges.SystemBridge
 import cn.vove7.common.model.UserInfo
 import cn.vove7.common.netacc.ApiUrls
 import cn.vove7.common.netacc.NetHelper
@@ -19,7 +20,6 @@ import cn.vove7.common.utils.ThreadPool.runOnCachePool
 import cn.vove7.common.utils.ThreadPool.runOnPool
 import cn.vove7.common.utils.runOnUi
 import cn.vove7.common.utils.secure.SecuritySharedPreference
-import cn.vove7.common.bridges.SystemBridge
 import cn.vove7.jarvis.BuildConfig
 import cn.vove7.jarvis.R
 import cn.vove7.vtp.log.Vog
@@ -380,6 +380,7 @@ object AppConfig {
                         it.packageName, 0).versionName
             }
         }
+
     val versionCode: Long
         get() {
             return GlobalApp.APP.packageManager.getPackageInfo(
@@ -393,7 +394,7 @@ object AppConfig {
         }
 
     fun checkAppUpdate(context: Activity, byUser: Boolean, onUpdate: ((Boolean) -> Unit)? = null) {
-        if (BuildConfig.DEBUG) {
+        if (BuildConfig.DEBUG && !byUser) {
             return
         }
         runOnPool {

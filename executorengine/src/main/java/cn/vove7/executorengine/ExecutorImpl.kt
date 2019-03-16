@@ -26,6 +26,7 @@ import cn.vove7.common.executor.CExecutorI.Companion.DEBUG_SCRIPT
 import cn.vove7.common.executor.PartialResult
 import cn.vove7.common.helper.AdvanAppHelper
 import cn.vove7.common.helper.AdvanContactHelper
+import cn.vove7.common.helper.startable
 import cn.vove7.common.model.MatchedData
 import cn.vove7.common.model.RequestPermission
 import cn.vove7.common.model.UserInfo
@@ -367,6 +368,7 @@ open class ExecutorImpl(
         synchronized(AdvanAppHelper.ALL_APP_LIST) {
 
             AdvanAppHelper.ALL_APP_LIST.values.forEach {
+                if(!it.startable) return@forEach
                 try {
                     val name = it.name ?: ""
                     if (command.startsWith(name, ignoreCase = true)) { //如果startWith 并且解析到跟随操作. get it

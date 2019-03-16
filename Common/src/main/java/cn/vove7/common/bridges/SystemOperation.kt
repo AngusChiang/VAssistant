@@ -3,7 +3,6 @@ package cn.vove7.common.bridges
 import android.content.Intent
 import android.graphics.Bitmap
 import android.location.Location
-import cn.vove7.common.annotation.ScriptApi
 import cn.vove7.common.annotation.ScriptApiClass
 import cn.vove7.vtp.app.AppInfo
 import cn.vove7.vtp.system.DeviceInfo
@@ -31,7 +30,7 @@ interface SystemOperation {
      * @param appWord String App名/别名
      * @return String? 包名
      */
-    fun getPkgByName(appWord: String): String?
+    fun getPkgByName(appWord: String, excludeUnstartable: Boolean = true): String?
 
     /**
      * 同getPkgBName

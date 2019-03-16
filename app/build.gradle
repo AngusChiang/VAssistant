@@ -131,6 +131,8 @@ dependencies {
 
     implementation 'org.reflections:reflections:0.9.10'
 
+    implementation 'nl.dionsegijn:konfetti:1.1.2'
+
     // Material
 //    implementation "com.google.android.material:material:$material_version"
 
