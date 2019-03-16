@@ -241,7 +241,7 @@ fun PermissionUtils.accessibilityServiceEnabled(context: Context, service: Class
     val am = context.getSystemService(Context.ACCESSIBILITY_SERVICE) as AccessibilityManager
     val enabledAccessibilityServiceList = am.getEnabledAccessibilityServiceList(AccessibilityServiceInfo.FEEDBACK_GENERIC)
     for (info in enabledAccessibilityServiceList) {
-        Vog.v(this, "accessibilityServiceEnabled ---> ${info.id}")
+        Vog.v(info.id)
         if (info.id == "$pkg/${service.name}")
             return true
     }

@@ -72,7 +72,7 @@ fun MaterialDialog.checkBoxText(
 
 fun MaterialDialog.noAutoScroll() {
     findViewById<ScrollView>(R.id.md_scrollview_content)?.also {
-        Vog.d(this, "noAutoScroll ---> 0")
+        Vog.d("noAutoScroll ---> 0")
         it.isFocusable = true
         it.isFocusableInTouchMode = true
         it.requestFocus()

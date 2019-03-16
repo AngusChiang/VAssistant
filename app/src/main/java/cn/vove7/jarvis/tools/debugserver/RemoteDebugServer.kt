@@ -45,7 +45,7 @@ object RemoteDebugServer : Runnable {
             return
         }
         if (!stopped && thread?.isAlive == true) {
-            Vog.d(this, "start ---> thread is Alive")
+            Vog.d("start ---> thread is Alive")
             return
         }
         thread = thread {
@@ -126,17 +126,17 @@ object RemoteDebugServer : Runnable {
 
     private val sleepTime = if (BuildConfig.DEBUG) 100000L else 300000L //5min
     private val sleepRun = Runnable {
-        Vog.d(this, "sleep ---> 休眠")
+        Vog.d("sleep ---> 休眠")
         stop()
     }
 
     private fun startAutoSleep() {
-        Vog.d(this, "startAutoSleep ---> 开启自动休眠$sleepTime")
+        Vog.d("startAutoSleep ---> 开启自动休眠$sleepTime")
         handler?.postDelayed(sleepRun, sleepTime)
     }
 
     private fun stopAutoSleep() {
-        Vog.d(this, "stopAutoSleepWakeup ---> 关闭自动休眠")
+        Vog.d("stopAutoSleepWakeup ---> 关闭自动休眠")
 
         handler?.removeCallbacks(sleepRun)
     }
@@ -148,7 +148,7 @@ object RemoteDebugServer : Runnable {
 
     private val print = object : OnPrint {
         override fun onPrint(l: Int, output: String) {
-//            Vog.d(this, "onPrint ---> $output")
+//            Vog.d("onPrint ---> $output")
 
             val end = if (output.endsWith('\n')) "" else "\n"
             try {
@@ -178,7 +178,7 @@ object RemoteDebugServer : Runnable {
      * @param actionJson String
      */
     private fun onPostAction(actionJson: String) {
-        Vog.d(this, "onPostAction ---> $actionJson")
+        Vog.d("onPostAction ---> $actionJson")
 
         runOnPool {
             val action: RemoteAction
@@ -238,7 +238,7 @@ object RemoteDebugServer : Runnable {
     }
 
     private fun show(s: String) {
-        Vog.d(this, "show  ----> $s")
+        Vog.d("show  ----> $s")
     }
 
 }

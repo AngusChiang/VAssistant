@@ -19,7 +19,7 @@ import android.net.Uri
 object UtilBridge {
 
     fun bitmap2File(bitmap: Bitmap, fullPath: String): File? {//保存到本地
-        Vog.d(this, "bitmap2File ---> $fullPath")
+        Vog.d("bitmap2File ---> $fullPath")
         return try {
             File(fullPath).apply {
                 if (!parentFile.exists())

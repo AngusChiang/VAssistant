@@ -131,7 +131,7 @@ class RetrievePasswordDialog(context: Context) {
             //post
             NetHelper.postJson<String>(ApiUrls.RET_PASS__BY_EMAIL, BaseRequestModel(userInfo, verCode), callback = { _, bean ->
                 //泛型
-                Vog.d(this, "onResponse ---> $bean")
+                Vog.d("onResponse ---> $bean")
                 loadBar.visibility = View.INVISIBLE
                 if (bean != null) {
                     if (bean.isOk()) {

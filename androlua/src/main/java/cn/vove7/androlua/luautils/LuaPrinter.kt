@@ -53,7 +53,7 @@ class LuaPrinter @JvmOverloads constructor(Ls: LuaState, private val print: OnPr
         }
         output.append('\n')
         print?.onPrint(OnPrint.LOG, output.toString())
-        Vog.i("Vove :", "execute  ----> $output")
+        Vog.i(output)
         output.setLength(0)
         return 0
     }

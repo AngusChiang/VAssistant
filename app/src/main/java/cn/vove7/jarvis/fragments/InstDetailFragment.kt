@@ -119,7 +119,7 @@
 //                settingName = settingsHeader.name
 //                val instSetting = DaoHelper.getInsetSettingsByName(settingName!!)
 //                if (instSetting == null || instSetting.version < version) {//数据库不存在数据
-//                    Vog.d(this, "setData ---> 执行新建or升级")
+//                    Vog.d("setData ---> 执行新建or升级")
 ////                  //执行
 //                    val engine = MultiExecutorEngine()
 //                    when (node.action.scriptType) {
@@ -372,7 +372,7 @@
 //                    thread {
 //                        //更新 tagId
 //                        node.versionCode = s
-//                        Vog.d(this, "new ver---> $s")
+//                        Vog.d("new ver---> $s")
 //                        node.update()
 //                    }
 //                } else {
@@ -396,7 +396,7 @@
 //                    val s = bean.data
 //                    thread {
 //                        //更新 tagId
-//                        Vog.d(this, "share new tag---> $s")
+//                        Vog.d("share new tag---> $s")
 //                        node.from = DataFrom.FROM_SHARED
 //                        node.tagId = s
 //                        node.update()

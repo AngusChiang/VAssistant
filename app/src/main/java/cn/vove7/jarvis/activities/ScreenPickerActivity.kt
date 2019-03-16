@@ -65,7 +65,7 @@ class ScreenPickerActivity : Activity() {
         runOnNewHandlerThread {
             ScreenTextFinder(AccessibilityApi.accessibilityService!!)
                     .findAll().forEach { viewNodeList.add(Model(it)) }
-            Vog.d(this, "onCreate ---> 提取数量 ${viewNodeList.size}")
+            Vog.d("onCreate ---> 提取数量 ${viewNodeList.size}")
 
 
             if (viewNodeList.isEmpty()) {
@@ -126,12 +126,12 @@ class ScreenPickerActivity : Activity() {
             //根据资源ID获取响应的尺寸值
             statusBarHeight1 = resources.getDimensionPixelSize(resourceId)
         }
-        Vog.d(this, "状态栏高度 ---> $statusBarHeight1")
+        Vog.d("状态栏高度 ---> $statusBarHeight1")
         statusBarHeight1
     }
 
     override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
-        Vog.d(this, "onKeyDown ---> $keyCode")
+        Vog.d("onKeyDown ---> $keyCode")
         if (!hasT && keyCode == KeyEvent.KEYCODE_VOLUME_DOWN) {
             translateAll()
             return true
@@ -194,7 +194,7 @@ class ScreenPickerActivity : Activity() {
         rootContent.setBackgroundColor(resources.getColor(android.R.color.transparent))
         viewNodeList.forEach { model ->
             val it = model.viewNode
-            //            Vog.d(this, "---> ${it.getBounds()} ${it.getText()}")
+            //            Vog.d("---> ${it.getBounds()} ${it.getText()}")
             val view = CheckedTextView(this).apply {
                 setBackgroundResource(R.drawable.bg_screen_text_high_light)
                 val rect = it.getBounds()
@@ -227,7 +227,7 @@ class ScreenPickerActivity : Activity() {
         d?.dismiss()
         sd?.dismiss()
         finish()
-        Vog.d(this, "onStop ---> ")
+        Vog.d("onStop ---> ")
     }
 
     var sd: WordSplitDialog? = null
@@ -235,7 +235,7 @@ class ScreenPickerActivity : Activity() {
     var d: BottomDialogWithText? = null
     private val onItemClick: (Model) -> Unit = { model ->
         val text = model.text
-        Vog.d(this, " ---> $text")
+        Vog.d(" ---> $text")
         d = BottomDialogWithText(this, "文字操作").apply d@{
             noAutoDismiss()
             positiveButton(text = "复制原文") {

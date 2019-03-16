@@ -122,7 +122,7 @@ abstract class CodeEditorActivity : AppCompatActivity() {
 
     private val gloLis = ViewTreeObserver.OnGlobalLayoutListener {
         val heightDiff = activityRootView.rootView.height - activityRootView.height
-        Vog.d(this, "initView ---> $heightDiff")
+        Vog.d("initView ---> $heightDiff")
         if (heightDiff > 500) {
             functions_grid.visibility = View.GONE
         }

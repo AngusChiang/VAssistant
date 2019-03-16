@@ -141,14 +141,14 @@ class PluginManagerActivity : BaseActivityWithViewPager() {
     companion object {
         fun installPlugin(path: String) {
             RePluginManager().installPlugin(path).also {
-                Vog.d(this, "installPlugin ---> $path")
+                Vog.d("$path")
                 if (it != null) {
-                    Vog.d(this, "installPlugin ---> 插件安装成功")
+                    Vog.d("插件安装成功")
                     AppNotification.newNotification("插件安装成功", it.name, R.drawable.ic_done)
                     GlobalApp.toastSuccess("插件安装成功")
                     AppBus.post(AppBus.EVENT_PLUGIN_INSTALLED)
                 } else {
-                    Vog.d(this, "installPlugin ---> 插件安装失败")
+                    Vog.d("插件安装失败")
                     AppNotification.newNotification("插件安装失败", "详情见日志", R.drawable.ic_error_black_24dp)
                     GlobalApp.toastError("插件安装失败，详情见日志")
                 }

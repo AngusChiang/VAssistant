@@ -33,13 +33,13 @@ abstract class AbsAccPluginService : AccPluginService {
      * 注册方式：MyAccessibilityService.registerPlugin(AbsAccPluginService)
      */
     override fun bindService() {
-        Vog.d(this, "bindService ---> $this")
+        Vog.d("bindService ---> $this")
         onBind()
         opened = true
     }
 
     override fun unBindServer() {
-        Vog.d(this, "unBindServer ---> $this")
+        Vog.d("unBindServer ---> $this")
         onUnBind()
         opened = false
     }

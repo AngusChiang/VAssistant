@@ -121,7 +121,7 @@ fun <T> List<T>.sub(begin: Int, size: Int): List<T> {
     }
     val eee = if (end >= this.size) this.size else end
 
-    Vog.d(this, "sub ---> $begin --> $eee")
+    Vog.d("sub ---> $begin --> $eee")
     return subList(begin, eee)
 }
 //            val offMaps = mutableMapOf<String, ArrayList<AppAdInfo>>()

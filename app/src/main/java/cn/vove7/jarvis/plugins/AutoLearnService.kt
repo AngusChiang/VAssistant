@@ -19,13 +19,13 @@ object AutoLearnService : AbsAccPluginService() {
     var lastScope: ActionScope? = null
     override fun onAppChanged(appScope: ActionScope) {
 
-        Vog.d(this, "onAppChanged ---> $appScope")
+        Vog.d("onAppChanged ---> $appScope")
         if (appScope.packageName == lastPkg) {//app内切换
-            Vog.d(this, "onAppChanged ---> app内切换")
+            Vog.d("onAppChanged ---> app内切换")
 
         } else {//切换App
             lastPkg = appScope.packageName
-            Vog.d(this, "onAppChanged ---> 切换应用")
+            Vog.d("onAppChanged ---> 切换应用")
         }
         lastScope = appScope
     }

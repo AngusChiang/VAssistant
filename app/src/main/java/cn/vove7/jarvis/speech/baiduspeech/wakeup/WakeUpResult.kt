@@ -42,7 +42,7 @@ class WakeUpResult {
                 }
 
             } catch (e: JSONException) {
-                Vog.e(this, "Json parse error$jsonStr")
+                Vog.e("Json parse error$jsonStr")
                 e.printStackTrace()
             }
 

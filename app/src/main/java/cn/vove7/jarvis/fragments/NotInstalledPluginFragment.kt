@@ -94,7 +94,7 @@ class NotInstalledPluginFragment : SimpleListFragment<VPluginInfo>() {
             fun getName(info: DownloadInfo<*>): String = info.data as String? ?: "未知"
 
             override fun onSuccess(info: DownloadInfo<*>, file: File) {
-                Vog.d(this, "onSuccess ---> $file")
+                Vog.d("onSuccess ---> $file")
                 Handler(Looper.getMainLooper()).postDelayed( {
                     dialog?.message = "下载完成"
                     dialog?.progress = 100

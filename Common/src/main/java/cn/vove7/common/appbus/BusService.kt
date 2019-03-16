@@ -47,12 +47,12 @@ abstract class BusService : Service() {
             startForeground(serviceId, n)
         }
         AppBus.reg(this)
-        Vog.d(this, "开启服务 ${this.javaClass.simpleName}")
+        Vog.d("开启服务 ${this.javaClass.simpleName}")
     }
 
     override fun onDestroy() {
         AppBus.unreg(this)
-        Vog.d(this, "onDestroy ${this.javaClass.simpleName}")
+        Vog.d("onDestroy ${this.javaClass.simpleName}")
         super.onDestroy()
     }
 }

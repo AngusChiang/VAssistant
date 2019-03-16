@@ -193,12 +193,12 @@ public class SettingsBridge {
      */
     //public void save2Db(InstSettings instSettings) {
     //    if (instSettings.getRawJson() == null) {
-    //        Vog.INSTANCE.d(this, "set ---> create");
+    //        Vog.INSTANCE.d( "set ---> create");
     //
     //        //spHelper.set(name + "_raw_settings", settingItemsJson);
     //        //spHelper.set(name + "_version", version);
     //    } else {
-    //        Vog.INSTANCE.d(this, "set ---> set");
+    //        Vog.INSTANCE.d( "set ---> set");
     //        //settingItemsJson = spHelper.getString(name + "_raw_settings");
     //    }
     //    //save settingItemsJson
@@ -251,7 +251,7 @@ public class SettingsBridge {
     }
 
     public void set(String key, Object value) {//类型一致性？
-        Vog.INSTANCE.d(this, "set ---> " + key + " -- " + value);
+        Vog.INSTANCE.d( "set ---> " + key + " -- " + value);
         if (value instanceof Number) {
             value = ((Number) value).intValue();
         }

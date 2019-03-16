@@ -67,13 +67,13 @@ class LuaAsyncTask : AsyncTask<Any, Any, Any>, LuaGcable, LuaRunnableI, Comparab
     }
 
     override fun quit(self: Boolean) {
-        Vog.d(this, "quit $this $self")
+        Vog.d("quit $this $self")
         luaManager.removeGc(this)
         L.gc(LuaState.LUA_GCCOLLECT, 1)
         System.gc()
 //        L.close()
         if (status == AsyncTask.Status.RUNNING) {
-            Vog.d(this, "cancel")
+            Vog.d("cancel")
             cancel(true)
         }
     }
@@ -93,7 +93,7 @@ class LuaAsyncTask : AsyncTask<Any, Any, Any>, LuaGcable, LuaRunnableI, Comparab
     }
 
     fun exec(args: Array<Any>) {
-        Vog.d(this, "exec $args")
+        Vog.d("exec $args")
         super.execute(*args)
     }
 

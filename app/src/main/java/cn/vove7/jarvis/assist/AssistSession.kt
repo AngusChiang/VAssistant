@@ -62,7 +62,7 @@ class AssistSession(context: Context) : VoiceInteractionSession(context) {
     private var screenPath: String? = null
     override fun onAssistStructureFailure(failure: Throwable) {
         failure.printStackTrace()
-        Vog.d(this, "onAssistStructureFailure ---> ${failure.message}")
+        Vog.d("onAssistStructureFailure ---> ${failure.message}")
     }
 
     override fun onCreate() {
@@ -77,7 +77,7 @@ class AssistSession(context: Context) : VoiceInteractionSession(context) {
         runOnNewHandlerThread("save_screen") {
             this@AssistSession.screenshot = screenshot
             val ss = compressMaterix(screenshot)
-            Vog.d(this, "onHandleScreenshot ---> $screenshot")
+            Vog.d("onHandleScreenshot ---> $screenshot")
             screenPath = UtilBridge.bitmap2File(ss, context.cacheDir
                     .absolutePath + "/screen-${Random().nextInt()}.png")?.absolutePath
             if (!UserInfo.isVip()) {
@@ -89,7 +89,7 @@ class AssistSession(context: Context) : VoiceInteractionSession(context) {
 
     override fun onHandleAssist(data: Bundle?, structure: AssistStructure?, content: AssistContent?) {
 //        data?.keySet()?.forEach {
-//            Vog.d(this, "onHandleAssist ---> ${data.get(it)}")
+//            Vog.d("onHandleAssist ---> ${data.get(it)}")
 //        }
     }
 
@@ -124,7 +124,7 @@ class AssistSession(context: Context) : VoiceInteractionSession(context) {
             bottomController.behavior.setBottomSheetCallback(object : BottomSheetBehavior.BottomSheetCallback() {
                 override fun onStateChanged(p0: View, p1: Int) {
                     if (p1 == BottomSheetBehavior.STATE_HIDDEN) {
-                        Vog.d(this, "onStateChanged ---> 隐藏")
+                        Vog.d("onStateChanged ---> 隐藏")
                         finish()
                     }
                 }
@@ -237,7 +237,7 @@ class AssistSession(context: Context) : VoiceInteractionSession(context) {
     override fun onHide() {
         bottomController.hideBottom()
         isShowing = false
-        Vog.d(this, "onHide ---> ")
+        Vog.d("onHide ---> ")
         AppBus.unreg(this)
 //        AppBus.post(AppBus.ORDER_CANCEL_RECOG)
         dialog?.dismiss()
@@ -265,7 +265,7 @@ class AssistSession(context: Context) : VoiceInteractionSession(context) {
 
     //todo 悬浮窗
     private fun onScanQRCodeSuccess(result: String?) {
-        Vog.d(this, "onScanQRCodeSuccess ---> $result")
+        Vog.d("onScanQRCodeSuccess ---> $result")
         if (result == null) {
             GlobalApp.toastError("无识别结果")
             return
@@ -353,7 +353,7 @@ class AssistSession(context: Context) : VoiceInteractionSession(context) {
             val r = BaiduAipHelper.imageClassify(path)
             runOnUi {
                 showProgressBar = false
-                Vog.d(this, "imageClassify ---> ${r?.bestResult}")
+                Vog.d("imageClassify ---> ${r?.bestResult}")
                 val result = r?.bestResult
                 if (r?.hasErr == false && result != null) {
                     if (result.keyword == "屏幕截图") {

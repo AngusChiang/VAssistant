@@ -73,7 +73,7 @@ class InAppInstListFragment : SimpleListFragment<ActionNode>() {
                     .list().forEach {
                         sIds.add(it.id)
                     }
-            Vog.d(this, "getInstList sIds: $sIds")
+            Vog.d("sIds: $sIds")
 
             return DAO.daoSession.actionNodeDao.queryBuilder()
                     .where(ActionNodeDao.Properties.ActionScopeType.eq(ActionNode.NODE_SCOPE_IN_APP/*, ActionNode.NODE_SCOPE_IN_APP_2*/))
@@ -89,7 +89,7 @@ class InAppInstListFragment : SimpleListFragment<ActionNode>() {
         arguments?.getString("title").also {
             if (it != null && it != "") activity?.title = it
         }
-        Vog.d(this, pkg)
+        Vog.d(pkg)
     }
 
 
@@ -101,7 +101,7 @@ class InAppInstListFragment : SimpleListFragment<ActionNode>() {
 
     override fun onLoadData(pageIndex: Int) {
         val offsetDatas = getInstList(pkg)
-        Vog.d(this, "onLoadData $offsetDatas")
+        Vog.d(offsetDatas.toString())
         notifyLoadSuccess(offsetDatas, true)
     }
 

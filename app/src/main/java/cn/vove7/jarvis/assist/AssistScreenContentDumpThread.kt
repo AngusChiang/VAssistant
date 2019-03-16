@@ -49,7 +49,7 @@ internal class AssistScreenContentDumpThread(
             e.printStackTrace()
         }
 
-        Vog.d(this, "run ---> ${json.toString(2)}")
+        Vog.d("run ---> ${json.toString(2)}")
     }
 
     @Throws(JSONException::class)

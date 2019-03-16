@@ -71,7 +71,7 @@ object BaiduAipHelper {
         client.setConnectionTimeoutInMillis(5000)
         client.setSocketTimeoutInMillis(6000)
         val result = client.advancedGeneral(path, hashMapOf(Pair("baike_num", "1")))
-        Vog.d(this, "imageClassify ---> $result")
+        Vog.d("imageClassify ---> $result")
         return GsonHelper.fromJson<ImageClassifyResult>(result.toString())
     }
 
@@ -109,7 +109,7 @@ object BaiduAipHelper {
     @Throws
     fun ocr(imgPath: String, minP: Double = 0.8): ArrayList<TextOcrItem> {
         val ocrStr = AppConfig.textOcrStr
-        Vog.d(this,"ocr ---> $ocrStr")
+        Vog.d("ocr ---> $ocrStr")
         val baiduOcr = if (ocrStr?.isBlank() != false) {//null or true
             AipOcr(BaiduKey.appId.toString(), BaiduKey.appKey, BaiduKey.sKey)
         } else {

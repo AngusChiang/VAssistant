@@ -23,7 +23,7 @@ abstract class AbsViewShowNotifier(private val finders: MutableSet<ViewFinder>) 
     override fun notifyIfShow(): Pair<Int, Int> {
         val removeList = mutableListOf<ViewFinder>()
         if (finders.isNotEmpty())
-            Vog.d(this, "search View: ${finders.size}")
+            Vog.d("search View: ${finders.size}")
         else return Pair(0, 0)
         var succ = 0
 //        sleep(500)
@@ -32,17 +32,17 @@ abstract class AbsViewShowNotifier(private val finders: MutableSet<ViewFinder>) 
                 /*.filter {filter(it.value)}*/
                 finders.forEach {
                     if (Thread.currentThread().isInterrupted) {
-                        Vog.d(this, "AbsViewShowNotifier isInterrupted")
+                        Vog.d("AbsViewShowNotifier isInterrupted")
                         return@out
                     }
-                    Vog.d(this, " $it")
+                    Vog.d(" $it")
                     val node = it.findFirst()
                     if (Thread.currentThread().isInterrupted) {
-                        Vog.d(this, "AbsViewShowNotifier isInterrupted")
+                        Vog.d("AbsViewShowNotifier isInterrupted")
                         return@out
                     }
                     if (node != null) {
-                        Vog.i(this, "find $it successful")
+                        Vog.i("find $it successful")
                         if (onShow(it, node)) succ++
                         removeList.add(it)
                     }

@@ -63,7 +63,7 @@ abstract class FindBuilderWithOperation  : ViewOperation {
 //            if (now < enterTime + waitMs)
 //                sleep(100)
 //            else {
-//                Vog.d(this, "waitHide ---> 等待超时")
+//                Vog.d("waitHide ---> 等待超时")
 //                return false
 //            }
 //        }

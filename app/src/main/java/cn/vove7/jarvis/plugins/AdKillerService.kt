@@ -57,20 +57,20 @@ object AdKillerService : AbsAccPluginService() {
                     finderCaches[scope] = mutableSetOf(buildFinder(it))
                 }
             }
-            Vog.d(this, "AdOnBind ---> ${finderCaches.size}")
+            Vog.d("AdOnBind ---> ${finderCaches.size}")
         }
     }
 
     private fun onSkipAd(node: ViewNode) {
         var clickResult = node.tryClick()
         if (!clickResult) {
-            Vog.d(this, "onSkipAd ---> 发现广告点击失败 使用globalClick")
+            Vog.d("onSkipAd ---> 发现广告点击失败 使用globalClick")
             clickResult = node.globalClick()
         }
-        Vog.i(this, "Ad click ---> $clickResult")
+        Vog.i("Ad click ---> $clickResult")
 
         if (clickResult) {
-            Vog.d(this, "onSkipAd ---> 发现广告，清除成功")
+            Vog.d("onSkipAd ---> 发现广告，清除成功")
             AppConfig.plusAdKillCount()//+1
 
             if (AppConfig.isToastWhenRemoveAd) {
@@ -78,7 +78,7 @@ object AdKillerService : AbsAccPluginService() {
                 removeAdAnimation.hideDelay(3500)
             }
         } else
-            Vog.d(this, "onSkipAd ---> 发现广告，清除失败")
+            Vog.d("onSkipAd ---> 发现广告，清除失败")
     }
 
     //搜索线程
@@ -91,11 +91,11 @@ object AdKillerService : AbsAccPluginService() {
         finders?.forEach {
             thread {
                 it.waitFor((AppConfig.adWaitSecs * 1000).toLong())?.also { node ->
-                    Vog.i(this, " ${Thread.currentThread()} 发现广告 ---> ${appInfo?.name}  $it")
+                    Vog.i(" ${Thread.currentThread()} 发现广告 ---> ${appInfo?.name}  $it")
                     onSkipAd(node)
                 }
             }.also { t ->
-                //                Vog.d(this, "搜索线程 ---> $t")
+                //                Vog.d("搜索线程 ---> $t")
                 sthreads.add(t)
             }
         }
@@ -112,7 +112,7 @@ object AdKillerService : AbsAccPluginService() {
     }
 
     fun gc() {
-        Vog.d(this, "gc finderCaches.size ---> ${finderCaches.size}")
+        Vog.d("gc finderCaches.size ---> ${finderCaches.size}")
         finderCaches.clear()
     }
 
@@ -136,7 +136,7 @@ object AdKillerService : AbsAccPluginService() {
                 }
             }
         }
-        Vog.v(this, "当前界面广告数--->${finders?.size} $appScope $finders")
+        Vog.v("当前界面广告数--->${finders?.size} $appScope $finders")
         if (finders?.isNotEmpty() == true)
             startFind()
         else {//停止未结束的搜索
@@ -145,7 +145,7 @@ object AdKillerService : AbsAccPluginService() {
             if (AppConfig.smartKillAd && lastPkg != appScope.packageName
                     && AdvanAppHelper.getAppInfo(appScope.packageName)?.isUserApp == true)//切换页面
                 smartSkipAppSwitchAd()
-            else Vog.d(this, "onAppChanged smartSkipApp ---> 系统应用")
+            else Vog.d("onAppChanged smartSkipApp ---> 系统应用")
         }
         lastPkg = appScope.packageName
     }
@@ -159,7 +159,7 @@ object AdKillerService : AbsAccPluginService() {
      */
     @Synchronized
     private fun smartSkipAppSwitchAd() {
-        Vog.i(this, "smartSkipAppSwitchAd ---> 寻找App切换广告")
+        Vog.i("smartSkipAppSwitchAd ---> 寻找App切换广告")
         sthreads.add(thread {
             //寻找1.5s 频繁切换 耗电量?
             ViewFindBuilder()
@@ -167,7 +167,7 @@ object AdKillerService : AbsAccPluginService() {
                     .containsText("跳过", "skip")
                     .waitFor(1500)?.also {
                         onSkipAd(it)
-                    } ?: Vog.i(this, "smartSkipAppSwitchAd ---> 未发现广告")
+                    } ?: Vog.i("smartSkipAppSwitchAd ---> 未发现广告")
         })
     }
 
@@ -179,7 +179,7 @@ object AdKillerService : AbsAccPluginService() {
         synchronized(sthreads) {
             try {
                 sthreads.forEach {
-                    Vog.d(this, "onAppChanged ---> 关闭搜索 $it")
+                    Vog.d("onAppChanged ---> 关闭搜索 $it")
                     it.interrupt()
                 }
             } catch (e: Exception) {

@@ -72,7 +72,7 @@ open class ExecutorImpl(
     override var running: Boolean = false
     override var userInterrupt: Boolean = false
         set(value) {
-            Vog.d(this, "终止标志 ---> $value")
+            Vog.d("终止标志 ---> $value")
             field = value
         }
 
@@ -156,7 +156,7 @@ open class ExecutorImpl(
             if (!userInterrupt) {
                 currentAction = actionQueue.poll()
                 actionScope = currentAction?.actionScopeType
-                Vog.d(this, "pollActionQueue ---> $actionScope")
+                Vog.d("pollActionQueue ---> $actionScope")
                 r = runScript(currentAction!!.actionScript, currentAction!!.param.valueWithClear
                     ?: arrayOf())// 清除参数缓存
                 when {
@@ -168,7 +168,7 @@ open class ExecutorImpl(
                     }
                 }
             } else {
-                Vog.i(this, "pollActionQueue 终止")
+                Vog.i("pollActionQueue 终止")
                 actionQueue.clear()
                 serviceBridge?.onExecuteInterrupt("强行终止")
                 return false
@@ -178,7 +178,7 @@ open class ExecutorImpl(
     }
 
     override fun runScript(script: String, args: Array<String>?): PartialResult {
-        Vog.d(this, "runScript arg : ${Arrays.toString(args)}")
+        Vog.d("runScript arg : ${Arrays.toString(args)}")
         return when (currentAction?.scriptType) {
             SCRIPT_TYPE_LUA -> {
                 onLuaExec(script, args)
@@ -204,7 +204,7 @@ open class ExecutorImpl(
     }
 
     override fun executeFailed(msg: String?) {
-        Vog.d(this, "executeFailed ---> $msg")
+        Vog.d("executeFailed ---> $msg")
 //        userInterrupt = true //设置用户中断标志
         //pollActionQueue -> false
     }
@@ -230,7 +230,7 @@ open class ExecutorImpl(
     override fun interrupt() {
         userInterrupt = true
         thread?.interrupt()//打破wait
-        Vog.d(this, "外部终止运行")
+        Vog.d("外部终止运行")
 //        try {
 //            thread?.checkAccess()
 //            thread?.interrupt()//打破wait
@@ -256,10 +256,10 @@ open class ExecutorImpl(
     systemBridge.openAppByPkg(pkg, true)
     val his = CommandHistory(UserInfo.getUserId(), cmd, "打开$pkg -> ${appQ.first}")
     AppBus.post(his)
-    Vog.d(this, "parseAppInnerOperation app内操作")
+    Vog.d("parseAppInnerOperation app内操作")
     } else {
     systemBridge.openAppByPkg(pkg, false)
-    Vog.d(this, "parseAppInnerOperation 无后续操作")
+    Vog.d("parseAppInnerOperation 无后续操作")
     return true
     }
 
@@ -284,7 +284,7 @@ open class ExecutorImpl(
      * @return Boolean 是否解析成功
      */
     override fun smartOpen(cmd: String): Boolean {
-        Vog.d(this, "smartOpen: $cmd")
+        Vog.d("smartOpen: $cmd")
         //包名
         if (RegUtils.isPackage(cmd)) {//包名
             return systemBridge.openAppByPkg(cmd).also {
@@ -344,7 +344,7 @@ open class ExecutorImpl(
             val rs = TextHelper.matchValues(command, it.regexString())
             if (rs != null) {//匹配成功
                 val follow = rs[rs.size - 1]
-                Vog.d(this, "标记预解析---> $follow")
+                Vog.d("标记预解析---> $follow")
 
                 val aq = if (follow.isNotEmpty()) {
                     ParseEngine.parseAppActionWithScope(follow, scope, false)
@@ -371,7 +371,7 @@ open class ExecutorImpl(
                     val name = it.name ?: ""
                     if (command.startsWith(name, ignoreCase = true)) { //如果startWith 并且解析到跟随操作. get it
                         val follow = command.substring(name.length)
-                        Vog.d(this, "预解析---> $follow")
+                        Vog.d("预解析---> $follow")
                         val scope = ActionScope(it.packageName)
                         val aq = if (follow.isNotEmpty()) {
                             ParseEngine.parseAppActionWithScope(follow, scope, false)
@@ -436,7 +436,7 @@ open class ExecutorImpl(
             }
         }
         AppBus.post(CommandHistory(UserInfo.getUserId(), "打开|关闭 $p", null))
-        Vog.d(this, "parseOpenOrCloseAction ---> 未知操作: $p")
+        Vog.d("parseOpenOrCloseAction ---> 未知操作: $p")
         return false
     }
 
@@ -467,7 +467,7 @@ open class ExecutorImpl(
     }
 
     override fun notifyActivityShow(scope: ActionScope) {
-        Vog.d(this, "notifyActivityShow $scope")
+        Vog.d("notifyActivityShow $scope")
         notifySync()
     }
 
@@ -496,7 +496,7 @@ open class ExecutorImpl(
      * 得到语音参数,赋值
      */
     override fun onGetVoiceParam(param: String?) {
-        Vog.d(this, "onGetVoiceParam -> $param")
+        Vog.d("onGetVoiceParam -> $param")
         //设置参数
         if (param == null) {
             currentAction?.responseResult = false
@@ -516,15 +516,15 @@ open class ExecutorImpl(
         val mm = if (millis < 0) 30000 else millis
         synchronized(lock) {
             val begin = System.currentTimeMillis() // 开始等待时间
-            Vog.d(this, "执行器-等待 time: $mm   begin: $begin")
+            Vog.d("执行器-等待 time: $mm   begin: $begin")
 
             //等待结果
             try {
                 lock.wait(mm)
                 val end = System.currentTimeMillis()
-                Vog.d(this, "执行器-解锁")
+                Vog.d("执行器-解锁")
                 if (end - begin >= mm) {//自动超时 终止执行
-                    Vog.d(this, "等待超时")
+                    Vog.d("等待超时")
                     return false
                 }
                 return true
@@ -532,7 +532,7 @@ open class ExecutorImpl(
             } catch (e: InterruptedException) {
                 e.printStackTrace()
                 //必须强行stop
-                Vog.d(this, "被迫强行停止")
+                Vog.d("被迫强行停止")
                 serviceBridge?.onExecuteInterrupt("终止执行")
                 Thread.currentThread().interrupt()
                 Thread.currentThread().stop()//???
@@ -545,7 +545,7 @@ open class ExecutorImpl(
      * 等待指定App出现，解锁
      */
     override fun waitForApp(pkg: String, activityName: String?, m: Long): Boolean {
-        Vog.d(this, "waitForApp $pkg $activityName")
+        Vog.d("waitForApp $pkg $activityName")
         if (!checkAccessibilityService()) {
             return false
         }
@@ -567,24 +567,24 @@ open class ExecutorImpl(
     }
 
     override fun waitForViewId(id: String, m: Long): ViewNode? {
-        Vog.d(this, "waitForViewId $id $m")
+        Vog.d("waitForViewId $id $m")
         return ViewFindBuilder().id(id).waitFor(m)
     }
 
     override fun waitForDesc(desc: String, m: Long): ViewNode? {
-        Vog.d(this, "waitForDesc $desc")
+        Vog.d("waitForDesc $desc")
         return ViewFindBuilder().desc(desc).waitFor(m)
     }
 
     override fun waitForText(text: String, m: Long): ViewNode? {
-        Vog.d(this, "waitForText $text")
+        Vog.d("waitForText $text")
         return ViewFindBuilder().containsText(text).waitFor(m)
 //        waitForUnlock(m)
 //         getViewNode()
     }
 
     override fun waitForText(text: Array<String>, m: Long): ViewNode? {
-        Vog.d(this, "waitForText $text")
+        Vog.d("waitForText $text")
         if (!checkAccessibilityService()) {
             return null
         }
@@ -603,12 +603,12 @@ open class ExecutorImpl(
 
             val bundle = currentAction!!.responseBundle
             (bundle.getSerializable("data") as ChoiceData).also {
-                Vog.d(this, "结果： ${it.title}")
+                Vog.d("结果： ${it.title}")
             }
         } else {
-            Vog.d(this, "结果： 取消")
+            Vog.d("结果： 取消")
             null
-        }.also { Vog.d(this, "waitForSingleChoice result : $it") }
+        }.also { Vog.d("waitForSingleChoice result : $it") }
     }
 
     override fun onSingleChoiceResult(index: Int, data: ChoiceData?) {
@@ -655,7 +655,7 @@ open class ExecutorImpl(
         serviceBridge?.showAlert(title, msg)
         waitForUnlock()
         return currentAction?.responseResult.also {
-            Vog.d(this, "alert result > $it")
+            Vog.d("alert result > $it")
         } ?: false
     }
 
@@ -675,7 +675,7 @@ open class ExecutorImpl(
         waitForUnlock()
         return if (callbackVal == null) true
         else {
-            Vog.d(this, "回调结果失败 speakSync $callbackVal")
+            Vog.d("回调结果失败 speakSync $callbackVal")
             false
         }
     }
@@ -706,7 +706,7 @@ open class ExecutorImpl(
      * 拨打
      */
     fun smartCallPhone(s: String): Boolean {//todo 脚本内实现
-        Vog.d(this, "smartCallPhone $s")
+        Vog.d("smartCallPhone $s")
         val result = systemBridge.call(s)
         return if (!result) {
             if (!alert("未识别该联系人", "选择是否标记该联系人: $s")) {

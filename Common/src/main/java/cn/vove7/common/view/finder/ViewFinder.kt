@@ -33,20 +33,20 @@ abstract class ViewFinder(var accessibilityService: AccessibilityApi) {
         val beginTime = System.currentTimeMillis()
         var sc = 0
         val ct = Thread.currentThread()
-        Vog.d(this, "搜索线程 ---> $ct ${ct.hashCode()}")
+        Vog.d("搜索线程 ---> $ct ${ct.hashCode()}")
         while (System.currentTimeMillis() - beginTime < t &&
                 !ct.isInterrupted) {
             val node = findFirst()
             if (node != null) {
-                Vog.d(this, "waitFor ---> 搜索到 $node")
+                Vog.d("waitFor ---> 搜索到 $node")
                 return node
             } else {
                 sc++
                 if (sc % 100 == 0)
-                    Vog.d(this, "waitFor ---> 搜索次数 $sc 打断: ${ct.isInterrupted}")
+                    Vog.d("waitFor ---> 搜索次数 $sc 打断: ${ct.isInterrupted}")
             }
         }
-        Vog.d(this, "waitFor ---> 搜索超时${System.currentTimeMillis() - beginTime}/$m or 中断${ct.isInterrupted}")
+        Vog.d("waitFor ---> 搜索超时${System.currentTimeMillis() - beginTime}/$m or 中断${ct.isInterrupted}")
         return null
     }
 
@@ -57,7 +57,7 @@ abstract class ViewFinder(var accessibilityService: AccessibilityApi) {
     fun findFirst(includeInvisible: Boolean = false): ViewNode? {
         //不可见
         val r = traverseAllNode(rootNode, includeInvisible = includeInvisible)
-        Vog.v(this, "findFirst ${r != null}")
+        Vog.v("findFirst ${r != null}")
         return r
     }
 
@@ -91,15 +91,15 @@ abstract class ViewFinder(var accessibilityService: AccessibilityApi) {
                                 includeInvisible: Boolean = false, depth: Int = 0): ViewNode? {
         if (node == null) return null
         if (depth > 50) {//防止出现无限递归（eg:QQ浏览器首页）
-            Vog.d(this, "traverseAllNode ---> 超过最大深度")
+            Vog.d("traverseAllNode ---> 超过最大深度")
             return null
         }
         (0 until node.childCount).forEach { index ->
-            Vog.v(this, "traverseAllNode ${node.className} $index/${node.childCount}")
+            Vog.v("traverseAllNode ${node.className} $index/${node.childCount}")
             val childNode = node.getChild(index)
             if (childNode != null) {
                 if (!includeInvisible && !childNode.isVisibleToUser) {
-                    Vog.v(this, "unVisibleToUser ---> ${childNode.text}")
+                    Vog.v("unVisibleToUser ---> ${childNode.text}")
                     return@forEach
                 }
                 if (findCondition(childNode)) {

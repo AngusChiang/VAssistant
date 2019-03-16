@@ -21,7 +21,7 @@ object UtilEventReceiver : DyBCReceiver() {
     override fun onReceive(context: Context?, intent: Intent?) {
         when (intent?.action) {
             PLUGIN_DL_DONE -> {
-                Vog.d(this, "onReceive ---> PLUGIN_DL_DONE")
+                Vog.d("PLUGIN_DL_DONE")
                 intent.getStringExtra("path")?.apply {
                     PluginManagerActivity.installPlugin(this)
                 }

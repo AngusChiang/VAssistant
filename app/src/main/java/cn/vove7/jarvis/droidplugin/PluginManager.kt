@@ -32,7 +32,7 @@ interface PluginManager {
      */
     fun launchWithApp() {
         runOnNewHandlerThread(delay = 5000) {
-            Vog.d(this, "launchWithApp ---> 自启插件服务")
+            Vog.d("自启插件服务")
             installList(true).forEach {
                 if (it.launchWithApp && it.enabled) {
                     startPluginService(it)

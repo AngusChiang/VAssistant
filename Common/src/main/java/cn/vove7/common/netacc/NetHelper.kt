@@ -60,7 +60,7 @@ object NetHelper {
                 .readTimeout(timeout, TimeUnit.SECONDS).build()
 
         val json = GsonHelper.toJson(model)
-        Vog.d(this, "postJson ---> $url\n $json")
+        Vog.d("postJson ---> $url\n $json")
         val requestBody = FormBody.create(MediaType
                 .parse("application/json; charset=utf-8"), json)
 
@@ -68,17 +68,16 @@ object NetHelper {
                 .post(requestBody)
                 .build()
         val call = client.newCall(request)
-        call(call, requestCode, callback)
+        call(call, requestCode, callback, url)
     }
 
     inline fun <reified T> call(call: Call, requestCode: Int = 0,
-                                crossinline callback: OnResponse<T>) {
+                                crossinline callback: OnResponse<T>, url: String) {
         prepareIfNeeded()
         val handler = Handler(Looper.getMainLooper())
         call.enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
-                e.printStackTrace()
-                GlobalLog.err("net failure: " + e.message)
+                GlobalLog.err("网络错误: $url  " + e.message)
                 handler.post {
                     callback.invoke(requestCode, ResponseMessage.error(e.message))
                 }
@@ -89,7 +88,7 @@ object NetHelper {
                 if (response.isSuccessful) {
                     val s = response.body()?.string()
                     try {
-                        Vog.d(this, "onResponse --->\n$s")
+                        Vog.d("onResponse --->\n$s")
                         val bean = GsonHelper.fromResponseJson<T>(s)
                         if (bean?.isInvalid() == true || bean?.tokenIsOutdate() == true) {//无效下线
                             if (UserInfo.isLogin()) {
@@ -124,7 +123,6 @@ object NetHelper {
     inline fun <reified T> getType(): Type {
         return object : TypeToken<T>() {}.type
     }
-
 
     /**
      * @param url          下载连接
@@ -166,7 +164,7 @@ object NetHelper {
             }
 
             override fun taskEnd(task: DownloadTask, cause: EndCause, realCause: java.lang.Exception?) {
-                Vog.d(this, "taskEnd ---> $cause")
+                Vog.d("taskEnd ---> $cause")
                 when (cause) {
                     EndCause.CANCELED -> listener.onCancel(di)
                     EndCause.COMPLETED -> listener.onSuccess(di, File(destFileDir, destFileName))
@@ -188,13 +186,13 @@ object NetHelper {
 
             override fun fetchStart(task: DownloadTask, blockIndex: Int, contentLength: Long) {
                 total += contentLength
-                Vog.d(this, "fetchStart ---> ${contentLength}")
+                Vog.d("fetchStart ---> ${contentLength}")
             }
 
             override fun fetchProgress(task: DownloadTask, blockIndex: Int, increaseBytes: Long) {
                 sum += increaseBytes
 
-                Vog.d(this, "fetchProgress ---> ${sum}/$total")
+                Vog.d("fetchProgress ---> ${sum}/$total")
                 listener.onDownloading(di, (sum * 1.0f / total * 100).toInt())
             }
 
@@ -219,10 +217,8 @@ object NetHelper {
             if (BuildConfig.DEBUG /*|| !AppConfig.userExpPlan*/) return@runOnPool
             prepareIfNeeded()
             postJson<Any>(ApiUrls.UPLOAD_CMD_HIS, BaseRequestModel(his)) { _, b ->
-                if (b?.isOk() == true) {
-                    Vog.d(this, "uploadUserCommandHistory ---> usccc")
-                } else {
-                    Vog.d(this, "uploadUserCommandHistory ---> ${b?.message}")
+                if (b?.isOk() != true) {
+                    Vog.d("uploadUserCommandHistory ---> ${b?.message}")
                 }
             }
         }
@@ -241,7 +237,7 @@ object NetHelper {
         postJson<List<Action>>(ApiUrls.CLOUD_PARSE,
                 model = BaseRequestModel(RequestParseModel(cmd, scope))) { _, b ->
             if (b?.isOk() == true) {
-                Vog.d(this, "cloudParse ---> ${b.data}")
+                Vog.d("cloudParse ---> ${b.data}")
                 onResult.invoke(b.data)
             } else {
                 onResult.invoke(null)

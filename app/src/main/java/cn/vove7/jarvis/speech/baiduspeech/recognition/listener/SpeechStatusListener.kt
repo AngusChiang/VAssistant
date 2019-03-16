@@ -92,7 +92,7 @@ class SpeechStatusListener(private val handler: Handler) : StatusRecogListener()
     }
 
     override fun onAsrVolume(volumePercent: Int, volume: Int) {
-        Vog.v(this, "音量百分比$volumePercent ; 音量$volume")
+        Vog.v("音量百分比$volumePercent ; 音量$volume")
         handler.sendMessage(
                 SpeechMessage.buildMessage(
                         CODE_VOICE_VOL,
@@ -104,7 +104,7 @@ class SpeechStatusListener(private val handler: Handler) : StatusRecogListener()
     override fun onAsrExit() {
         super.onAsrExit()
 //        if (!isSuccess) {
-//            Vog.d(this, "识别失败")
+//            Vog.d("识别失败")
 //            handler.sendMessage(SpeechMessage.buildMessage(WHAT_VOICE_ERR, "无结果"))
 //        }
     }

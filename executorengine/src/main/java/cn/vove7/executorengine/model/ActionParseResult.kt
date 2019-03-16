@@ -25,7 +25,7 @@ class ActionParseResult(
             val ina = appScope?.inActivity(currentScope.activity) ?: true
 
             if (!ina) {//Activity 空 or Activity 不等 => 不同页面
-                Vog.d(this, "parseAction ---> 应用内不同页")
+                Vog.d("parseAction ---> 应用内不同页")
                 //插入跳转代码
                 val openAction by OpenAppAction(appScope?.packageName ?: "")
                 actionQueue?.add(openAction)

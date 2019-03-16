@@ -120,7 +120,7 @@ object AppConfig {
     val currentStreamType: Int
         get() {
             val i = AppConfig.synStreamIndex.let { if (it in 0..2) it else 0 }
-            Vog.d(this, "currentStreamIndex ---> $i")
+            Vog.d("currentStreamIndex ---> $i")
             return streamTypeArray[i]
         }
 
@@ -190,7 +190,7 @@ object AppConfig {
             try {
                 val info = Gson().fromJson(ssp.getString(key, null),
                         UserInfo::class.java)
-                Vog.d(this, "init user info ---> $info")
+                Vog.d("init user info ---> $info")
                 info.success()//设置登陆后，读取配置  null 抛出空指针
                 NetHelper.postJson<Any>(ApiUrls.VERIFY_TOKEN)
             } catch (e: Exception) {
@@ -199,7 +199,7 @@ object AppConfig {
                 ssp.remove(context.getString(R.string.key_login_info))
             }
         } else {
-            Vog.d(this, "init ---> not login")
+            Vog.d("init ---> not login")
         }
         reload()
     }
@@ -300,7 +300,7 @@ object AppConfig {
 //        onlyCloudServiceParse = getBooleanAndInit(R.string.key_only_cloud_service_parse, false)
         userWakeupWord = sp.getString(R.string.key_user_wakeup_word) ?: ""
         synStreamIndex = sp.getString(R.string.key_stream_of_syn_output).let {
-            Vog.d(this, "reload ---> $it")
+            Vog.d("reload ---> $it")
             if (it == null) 0
             else {
                 var i = GlobalApp.APP.resources.getStringArray(R.array.list_stream_syn_output).indexOf(it)
@@ -311,7 +311,7 @@ object AppConfig {
         chatSystem = sp.getString(R.string.key_chat_system_type).let {
             val i = GlobalApp.APP.resources.getStringArray(R.array.list_chat_system)
             if (!UserInfo.isVip()) i[0] else it ?: i[0]
-        }.also { Vog.d(this, "reload ---> chatSystem $it") }
+        }.also { Vog.d("reload ---> chatSystem $it") }
         autoSleepWakeupMillis = sp.getString(R.string.key_auto_sleep_wakeup_duration).let {
             if (it == null) autoSleepWakeupMillis
             else {
@@ -329,7 +329,7 @@ object AppConfig {
                 }
             }
         }.also {
-            Vog.d(this, "reload ---> autoSleepWakeupMillis = $it")
+            Vog.d("reload ---> autoSleepWakeupMillis = $it")
         }
 
         listeningToastAlignDirection = sp.getString(R.string.key_float_voice_align).let {
@@ -341,7 +341,7 @@ object AppConfig {
                 else i
             }
         }.also {
-            Vog.d(this, "悬浮依靠方向 $it")
+            Vog.d("悬浮依靠方向 $it")
         }
 
         responseWord = sp.getString(R.string.key_response_word) ?: responseWord
@@ -360,7 +360,7 @@ object AppConfig {
             volumeKeyDelayUp = if (it == -1) volumeKeyDelayUp else it
         }
 
-        Vog.d(this, "reload ---> AppConfig")
+        Vog.d("reload ---> AppConfig")
     }
 
     val sp: SpHelper by lazy { SpHelper(GlobalApp.APP) }
@@ -407,7 +407,7 @@ object AppConfig {
                 runOnUi {
                     val noUpdateName = sp.getString("no_update_ver_name") ?: ""
                     if (!byUser && noUpdateName == verName) {
-                        Vog.d(this, "checkAppUpdate ---> 忽略此版")
+                        Vog.d("checkAppUpdate ---> 忽略此版")
                         return@runOnUi
                     }
                     if (verName != AppConfig.versionName) {
@@ -473,7 +473,7 @@ object AppConfig {
 
         //已登陆/检查次数
         val f = getTodayCount("translate_count")
-        Vog.d(this, "haveTranslatePermission ---> 翻译次数 $f")
+        Vog.d("haveTranslatePermission ---> 翻译次数 $f")
         return if (f < 5) {//免费10次
             plusTodayCount("translate_count", f)
             true

@@ -142,7 +142,7 @@ public class RhinoHelper extends ScriptableObject {
 
 
     public void setArgs(String... args) {
-        Vog.INSTANCE.d(this, "args" + Arrays.toString(args));
+        Vog.INSTANCE.d( "args" + Arrays.toString(args));
         Object[] array = new Object[args.length];
         System.arraycopy(args, 0, array, 0, args.length);
         Scriptable argsObj = rhinoContext.newArray(global, array);

@@ -90,12 +90,12 @@ abstract class RecAdapterWithFooter<V : RecAdapterWithFooter.RecViewHolder,DataT
     private lateinit var errorTextOfFooter: TextView
     fun hideFooterView() {
         status = STATUS_HIDDEN
-        Vog.d(this, "hideFooterView footerView: ${footerView != null}")
+        Vog.d("hideFooterView footerView: ${footerView != null}")
         footerView?.visibility = View.GONE
     }
 
     fun setFooter(status: Int) {
-        Vog.d(this, "setFooter ---> $status")
+        Vog.d("setFooter ---> $status")
         this.status = status
         if (footerView == null)
             return

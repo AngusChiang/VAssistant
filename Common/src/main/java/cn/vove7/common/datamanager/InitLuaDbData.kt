@@ -17,7 +17,7 @@ object InitLuaDbData : InitDbData() {
         val scriptType = Action.SCRIPT_TYPE_LUA
 
 //        if (mapDao.queryBuilder().count() <= 12L) {
-        Vog.d(this, "更新数据")
+        Vog.d("更新数据")
         mapDao.deleteAll()
         DAO.daoSession.regDao.deleteAll()
         DAO.daoSession.actionDao.deleteAll()

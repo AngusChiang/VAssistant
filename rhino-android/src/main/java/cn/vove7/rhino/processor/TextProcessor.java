@@ -963,7 +963,7 @@ public class TextProcessor extends AppCompatMultiAutoCompleteTextView
                     tmp = offsetVertical - getDropDownHeight() - mCharHeight;
                     setDropDownVerticalOffset(tmp);
                 }
-                //Vog.INSTANCE.d(this, "onPopupChangePosition ---> " + tmp);
+                //Vog.INSTANCE.d( "onPopupChangePosition ---> " + tmp);
             }
         } catch (Exception e) {
             e.printStackTrace();

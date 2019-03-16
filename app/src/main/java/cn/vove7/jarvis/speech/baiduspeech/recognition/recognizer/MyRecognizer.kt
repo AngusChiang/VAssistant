@@ -50,7 +50,7 @@ class MyRecognizer(
      */
     fun loadOfflineEngine(params: Map<String, Any>) {
         val json = JSONObject(params).toString()
-        Vog.i(this, "loadOfflineEngine params:$json")
+        Vog.i("loadOfflineEngine params:$json")
         asr.send(SpeechConstant.ASR_KWS_LOAD_ENGINE, json, null, 0, 0)
         isOfflineEngineLoaded = true
         // 没有ASR_KWS_LOAD_ENGINE这个回调表试失败，如缺少第一次联网时下载的正式授权文件。
@@ -62,7 +62,7 @@ class MyRecognizer(
     }
 
     fun start(json: String) {
-        Vog.i(this, "asr params(反馈请带上此行日志):$json")
+        Vog.i("asr params(反馈请带上此行日志):$json")
         asr.send(SpeechConstant.ASR_START, json, null, 0, 0)
     }
 
@@ -71,7 +71,7 @@ class MyRecognizer(
      * @param param Map<String, Any>
      */
     fun loadOfWord(param: Map<String, Any>) {
-        Vog.d(this,"loadOfWord ---> 加载离线命令词 ${param}")
+        Vog.d("loadOfWord ---> 加载离线命令词 ${param}")
         asr.send(SpeechConstant.ASR_KWS_LOAD_ENGINE, JSONObject(param).toString(), null, 0, 0)
     }
 
@@ -79,7 +79,7 @@ class MyRecognizer(
      * 提前结束录音等待识别结果。
      */
     fun stop() {
-        Vog.i(this, "停止录音")
+        Vog.i("停止录音")
         asr.send(SpeechConstant.ASR_STOP, "{}", null, 0, 0)
     }
 
@@ -88,7 +88,7 @@ class MyRecognizer(
      * cancel 与stop的区别是 cancel在stop的基础上，完全停止整个识别流程，
      */
     fun cancel() {
-        Vog.i(this, "取消识别")
+        Vog.i("取消识别")
         asr.send(SpeechConstant.ASR_CANCEL, "{}", null, 0, 0)
     }
 

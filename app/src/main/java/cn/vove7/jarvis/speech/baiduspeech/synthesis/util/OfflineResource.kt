@@ -66,7 +66,7 @@ class OfflineResource(context: Context, voiceType: String) {
             recover = true
         }
         FileUtil.copyFromAssets(assets, "bd/$sourceFilename", destFilename, recover)
-//        Vog.d(this, "copyAssetsFile 文件复制成功：$destFilename")
+//        Vog.d("copyAssetsFile 文件复制成功：$destFilename")
         return destFilename
     }
 

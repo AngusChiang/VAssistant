@@ -111,7 +111,7 @@ class VoiceTestActivity : Activity() {
         end = false
         val oldR = (op.toFloat() / 100) * voice_bkg.width / 2
         val newR = (np.toFloat() / 100) * voice_bkg.width / 2
-        Vog.d(this, "updateCircle $oldR -> $newR")
+        Vog.d("$oldR -> $newR")
         voice_bkg.visibility = View.VISIBLE
 //        c?.cancel()
         c = ViewAnimationUtils.createCircularReveal(

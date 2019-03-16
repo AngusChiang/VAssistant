@@ -43,7 +43,7 @@ interface ViewModelLoader<DataType> {
             dataSet.addAll(transData(list))
         }
         if (sortData && allLoad) dataSet.sort()
-        Vog.d(this, "notifyLoadSuccess ---> $allLoad")
+        Vog.d("notifyLoadSuccess ---> $allLoad")
         runOnUi {
             changeViewOnLoadDone(allLoad)
         }

@@ -31,7 +31,7 @@ class RePluginInfo(var reInfo: PluginInfo? = null) : VPluginInfo() {
         return if (mainActivity != null)
             RePluginManager().launchPluginMainActivity(this)
         else {
-            Vog.d(this, "launch ---> 无主Activity")
+            Vog.d("launch ---> 无主Activity")
             false
         }
     }
@@ -47,7 +47,7 @@ class RePluginInfo(var reInfo: PluginInfo? = null) : VPluginInfo() {
             }
             true
         } else {
-            Vog.d(this, "launch ---> 无主Service")
+            Vog.d("launch ---> 无主Service")
             false
         }
     }
@@ -56,7 +56,7 @@ class RePluginInfo(var reInfo: PluginInfo? = null) : VPluginInfo() {
         return if (mainService != null)
             RePluginManager().stopPluginService(this)
         else {
-            Vog.d(this, "launch ---> 无主Service")
+            Vog.d("launch ---> 无主Service")
             false
         }
     }

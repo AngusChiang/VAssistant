@@ -93,18 +93,18 @@ object PowerEventReceiver : DyBCReceiver(), OnPowerEvent {
         powerSavingMode = false
 
         if (!AppConfig.isAutoVoiceWakeupCharging) {
-            Vog.d(this, "onReceive ---> isAutoVoiceWakeupCharging 未开启")
+            Vog.d("isAutoVoiceWakeupCharging 未开启")
             return
         }
         //充电自动开启唤醒
         if (WakeupI.instance?.opened == false) {//开启 并 已自动关闭
-            Vog.d(this, "onReceive ---> 正在充电 开启语音唤醒")
+            Vog.d("正在充电 开启语音唤醒")
             //开启了无障碍
             if (VoiceWakeupStrategy.canOpenRecord())
                 AppBus.postSpeechAction(SpeechAction.ActionCode.ACTION_START_WAKEUP_WITHOUT_SWITCH)//不打开语音唤醒开关
 
         } else {
-            Vog.d(this, "onReceive ---> 正在充电 语音唤醒已开启")
+            Vog.d("正在充电 语音唤醒已开启")
             //关闭定时器
             AppBus.postSpeechAction(SpeechAction.ActionCode.ACTION_STOP_WAKEUP_TIMER)
         }
@@ -114,7 +114,7 @@ object PowerEventReceiver : DyBCReceiver(), OnPowerEvent {
         if (!AppConfig.isAutoVoiceWakeupCharging) return
         if (!AppConfig.voiceWakeup) {//未开启
             //关闭
-            Vog.d(this, "onReceive ---> 充电结束 语音唤醒关闭")
+            Vog.d("充电结束 语音唤醒关闭")
             AppBus.postSpeechAction(SpeechAction.ActionCode.ACTION_STOP_WAKEUP_WITHOUT_SWITCH)
         } else {//开启
             //开启定时器
@@ -126,7 +126,7 @@ object PowerEventReceiver : DyBCReceiver(), OnPowerEvent {
     }
 
     override fun onBatteryScaleChange(batteryLevel: Int) {
-        Vog.d(this, "onBatteryScaleChange ---> $batteryLevel")
+        Vog.d("$batteryLevel")
     }
 }
 

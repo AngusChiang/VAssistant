@@ -154,7 +154,7 @@ abstract class AccessibilityApi : AccessibilityService() {
 //                        }
                     }
                     ON_APP_CHANGED -> {
-                        Vog.d(this, "dispatchPluginsEvent ---> ON_APP_CHANGED")
+                        Vog.d("dispatchPluginsEvent ---> ON_APP_CHANGED")
                         ThreadPool.runOnCachePool {
                             pluginsServices.forEach {
                                 it.onAppChanged(data as ActionScope)

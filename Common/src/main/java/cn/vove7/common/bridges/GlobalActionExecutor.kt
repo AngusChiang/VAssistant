@@ -244,9 +244,9 @@ object GlobalActionExecutor : GlobalActionExecutorI {
                 result.setAndNotify(false)
             }
         }, null).also {
-            Vog.d(this, "gesturesWithoutHandler ---> 手势执行$it")
+            Vog.d("gesturesWithoutHandler ---> 手势执行$it")
             if (!it) {
-                Vog.d(this, "gesturesWithoutHandler ---> 手势执行失败 ")
+                Vog.d("gesturesWithoutHandler ---> 手势执行失败 ")
                 return false
             }
         }
@@ -313,7 +313,7 @@ object GlobalActionExecutor : GlobalActionExecutorI {
             gesture(0, dur.toLong(), arrayOf(Pair(x1, y1),
                     Pair(x2, y2)))
         } else {
-            Vog.d(this, "需SDK版本 -> N")
+            Vog.d("需SDK版本 -> N")
             false
         }
     }

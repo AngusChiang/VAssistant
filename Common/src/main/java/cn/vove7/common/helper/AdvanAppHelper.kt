@@ -58,7 +58,7 @@ object AdvanAppHelper {
         //匹配别名
         MARKED_APP_PKG.forEach {
             val rate = if (it.regex.matches(name)) {
-                Vog.d(this, "匹配成功 from 标记 ---> ${it.regStr} $name")
+                Vog.d("匹配成功 from 标记 ---> ${it.regStr} $name")
                 0.9f
             } else 0f
 
@@ -75,12 +75,12 @@ object AdvanAppHelper {
                     val appName = it.name ?: ""
                     if (appName.startsWith(name, ignoreCase = true)) {//计算概率
                         (name.length.toFloat() / appName.length).also { f ->
-                            Vog.d(this, "matchPkgByName startsWith ---> $f")
+                            Vog.d("matchPkgByName startsWith ---> $f")
                         }
                     } else {
                         TextHelper.compareSimilarityWithPinyin(AdvanAppHelper.context, name,
                                 appName, replaceNumberWithPinyin = true).also { f ->
-                            Vog.d(this, "matchAppName 拼音匹配 $name ${it.name} $f")
+                            Vog.d("matchAppName 拼音匹配 $name ${it.name} $f")
                         }
                     }
                 } catch (e: Exception) {
@@ -94,7 +94,7 @@ object AdvanAppHelper {
                 }
             }
         }
-        Vog.d(this, "matchAppName ---> 匹配数 ${matchList.size}")
+        Vog.d("matchAppName ---> 匹配数 ${matchList.size}")
         matchList.sort()
         return matchList
     }
@@ -104,7 +104,7 @@ object AdvanAppHelper {
      */
     private fun updateAppList() {
         val context = GlobalApp.APP
-        Vog.v(this, "更新App列表")
+        Vog.v("更新App列表")
         synchronized(ALL_APP_LIST) {
             ALL_APP_LIST.clear()
             AppHelper.getAllInstallApp(context, false).forEach {

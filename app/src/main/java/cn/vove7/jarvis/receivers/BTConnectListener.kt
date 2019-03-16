@@ -36,7 +36,7 @@ object BTConnectListener : DyBCReceiver() {
         val bd = bluetoothDevice
 
         if (bh != null && bd != null) {//录音
-            Vog.d(this, "useBTRecorderIf ---> ok")
+            Vog.d("useBTRecorderIf ---> ok")
             bh.startVoiceRecognition(bd)
         }
     }
@@ -45,19 +45,19 @@ object BTConnectListener : DyBCReceiver() {
         val bd = bluetoothDevice
 
         if (bh != null && bd != null) {//录音
-            Vog.d(this, "useBTRecorderIf ---> ok")
+            Vog.d("useBTRecorderIf ---> ok")
             bh.stopVoiceRecognition(bd)
         }
     }
 
     override fun onReceive(context: Context?, intent: Intent?) {
-        Vog.d(this,"onReceive ---> ${intent?.action}")
+        Vog.d(intent?.action)
         when (intent?.action) {
             BluetoothHeadset.ACTION_CONNECTION_STATE_CHANGED -> {
                 val device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE) as BluetoothDevice?
                 val state = intent.getIntExtra(BluetoothProfile.EXTRA_STATE, -1)
 
-                Vog.d(this, "onReceive BluetoothHeadset ---> $state")
+                Vog.d("BluetoothHeadset ---> $state")
 
                 if (state == BluetoothProfile.STATE_CONNECTED) {
                     if (device == null) return
@@ -87,7 +87,7 @@ object BTConnectListener : DyBCReceiver() {
                     // we won't be able to continue voice dialing.
                     bluetoothDevice = null
                     bluetoothHeadset = null
-                    Vog.d(this, "onReceive ---> 断开连接")
+                    Vog.d("断开连接")
                 }
             }
         }

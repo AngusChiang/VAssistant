@@ -17,7 +17,7 @@ class AppChangNotifier(private val locksWaitForActivity: MutableMap<ActivityShow
     private var appScope: ActionScope? = null
 
     private fun fill(data: ActionScope): Boolean {
-        Vog.v(this, "fill $appScope - $data")
+        Vog.v("fill $appScope - $data")
         return data.equalsActivityNullable(appScope)
     }
 
@@ -30,7 +30,7 @@ class AppChangNotifier(private val locksWaitForActivity: MutableMap<ActivityShow
                     it.key.notifyActivityShow(appScope)
                     removes.add(it.key)
 //                    if (Thread.currentThread().isInterrupted) {
-//                        Vog.d(this, "activityNotifier 线程关闭")
+//                        Vog.d("activityNotifier 线程关闭")
 //                        return@out
 //                    }
                 }

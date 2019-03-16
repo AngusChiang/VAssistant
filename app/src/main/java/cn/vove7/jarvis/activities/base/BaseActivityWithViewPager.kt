@@ -60,7 +60,7 @@ abstract class BaseActivityWithViewPager : AppCompatActivity() {
     abstract var titles: Array<String>
 
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
-        Vog.d(this, "onOptionsItemSelected ${item?.itemId}")
+        Vog.d("${item?.itemId}")
         if (item?.itemId == android.R.id.home) {
             finish()
             return true

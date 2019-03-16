@@ -91,9 +91,9 @@ object ParseEngine {
             return globalResult
         }
         //smartOpen
-        Vog.d(this, "globalAction --无匹配")
+        Vog.d("globalAction --无匹配")
         if (SpHelper(GlobalApp.APP).getBoolean("use_smartopen_if_parse_failed", true)) {//智能识别打开操作
-            Vog.d(this, "开启 -- smartOpen")
+            Vog.d("开启 -- smartOpen")
             if (cmdWord != "") {//使用smartOpen
 //                    val q = PriorityQueue<Action>()
                 //设置command
@@ -103,11 +103,11 @@ object ParseEngine {
                     it.smartOpen(cmdWord)
                 }
                 if (result) {//成功打开
-                    Vog.d(this, "parseAction ---> MultiExecutorEngine().smartOpen(cmdWord) 成功打开")
+                    Vog.d("parseAction ---> MultiExecutorEngine().smartOpen(cmdWord) 成功打开")
                     return ActionParseResult(true, PriorityQueue(), "smartOpen $cmdWord")
                 }
             }
-            Vog.d(this, "smartOpen --无匹配")
+            Vog.d("smartOpen --无匹配")
         }
 
         //APP内
@@ -133,7 +133,7 @@ object ParseEngine {
      */
     fun parseAppActionWithScope(cmd: String, scope: ActionScope?, isFollow: Boolean = false): ActionParseResult {
         if (scope == null) {
-            Vog.d(this, "scope is null 无障碍未打开")
+            Vog.d("scope is null 无障碍未打开")
             return ActionParseResult(false, null, "无匹配(未匹配应用内操作)")
         }
 
@@ -278,7 +278,7 @@ object ParseEngine {
                 }
             }
             it.param = param
-//            Vog.d(this, "extractParam $param")
+//            Vog.d("extractParam $param")
         }
     }
 

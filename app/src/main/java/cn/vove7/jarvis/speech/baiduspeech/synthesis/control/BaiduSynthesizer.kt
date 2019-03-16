@@ -162,7 +162,7 @@ class BaiduSynthesizer(val lis: SpeechSynthesizerListener) : SpeechSynthesizerI 
      */
     protected fun load(config: InitConfig): Boolean {
         if (isInited) return true
-        Vog.d(this, "init ---> 初始化开始")
+        Vog.d("init ---> 初始化开始")
         val isMix = config.ttsMode == TtsMode.MIX
         mSpeechSynthesizer = SpeechSynthesizer.getInstance()
         mSpeechSynthesizer.setContext(context)
@@ -181,7 +181,7 @@ class BaiduSynthesizer(val lis: SpeechSynthesizerListener) : SpeechSynthesizerI 
                 GlobalLog.err("鉴权失败 =$errorMsg")
                 return false
             } else {
-                Vog.d(this, "init ---> 验证通过，离线正式授权文件存在。")
+                Vog.d("init ---> 验证通过，离线正式授权文件存在。")
             }
         }
         setParams(config.params)
@@ -193,13 +193,13 @@ class BaiduSynthesizer(val lis: SpeechSynthesizerListener) : SpeechSynthesizerI 
             return false
         }
         // 此时可以调用 speak和synthesize方法
-        Vog.d(this, "load ---> 合成引擎初始化成功")
+        Vog.d("load ---> 合成引擎初始化成功")
         return true
     }
 
     override fun reloadStreamType() {
         val currentStreamType = AppConfig.currentStreamType
-        Vog.d(this, "reloadStreamType ---> $currentStreamType")
+        Vog.d("reloadStreamType ---> $currentStreamType")
         setAudioStream(currentStreamType)
     }
 
@@ -289,7 +289,7 @@ class BaiduSynthesizer(val lis: SpeechSynthesizerListener) : SpeechSynthesizerI 
      */
     fun loadVoiceModel(modelFilename: String?, textFilename: String?): Int {
         val res = mSpeechSynthesizer.loadModel(modelFilename, textFilename)
-        Vog.d(this, "load ---> 切换离线发音人成功")
+        Vog.d("load ---> 切换离线发音人成功")
         return res
     }
 
@@ -311,7 +311,7 @@ class BaiduSynthesizer(val lis: SpeechSynthesizerListener) : SpeechSynthesizerI 
     }
 
     protected fun sendToUiThread(message: String) {
-        Vog.d(this, "合成器： $message")
+        Vog.d("合成器： $message")
     }
 
     companion object {

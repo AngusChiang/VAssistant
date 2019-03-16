@@ -46,7 +46,7 @@ abstract class SpeechRecoService(val event: SpeechEvent) : SpeechRecogI {
             event.onStartRecog(byVoice)
             doStartRecog()
         } else {
-            Vog.d(this, "启动失败，正在识别")
+            Vog.d("启动失败，正在识别")
         }
     }
 
@@ -62,7 +62,7 @@ abstract class SpeechRecoService(val event: SpeechEvent) : SpeechRecogI {
 
     fun checkFloat(): Boolean {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && !PermissionUtils.canDrawOverlays(context)) {
-            Vog.d(this, "show ---> 无悬浮窗")
+            Vog.d("show ---> 无悬浮窗")
             AppBus.post(RequestPermission("悬浮窗权限"))
             return false
         }
@@ -143,20 +143,20 @@ abstract class SpeechRecoService(val event: SpeechEvent) : SpeechRecogI {
     fun startAutoSleepWakeup() {
         timerEnd = false
         if (PowerEventReceiver.isCharging) {
-            Vog.d(this, "startAutoSleepWakeup ---> 充电中")
+            Vog.d("startAutoSleepWakeup ---> 充电中")
             return
         }
         stopAutoSleepWakeup()
         val sleepTime = /*if (BuildConfig.DEBUG) AppConfig.autoSleepWakeupMillis / 60
         else*/ AppConfig.autoSleepWakeupMillis
-        Vog.d(this, "startAutoSleepWakeup ---> 开启唤醒自动休眠 $sleepTime")
+        Vog.d("startAutoSleepWakeup ---> 开启唤醒自动休眠 $sleepTime")
         if (sleepTime < 0) return
         timerHandler.postDelayed(stopWakeUpTimer, sleepTime)
     }
 
     //关闭定时器
     fun stopAutoSleepWakeup() {
-        Vog.d(this, "stopAutoSleepWakeup ---> 关闭唤醒自动休眠")
+        Vog.d("stopAutoSleepWakeup ---> 关闭唤醒自动休眠")
         timerHandler.removeCallbacks(stopWakeUpTimer)
     }
 
@@ -178,12 +178,12 @@ abstract class SpeechRecoService(val event: SpeechEvent) : SpeechRecogI {
             when (msg?.what) {
                 IStatus.CODE_WAKEUP_SUCCESS -> {//唤醒
                     val word = msg.data.getString("data")
-                    Vog.d(this, "handleMessage ---> 唤醒 -> $word")
+                    Vog.d("handleMessage ---> 唤醒 -> $word")
                     startAutoSleepWakeup()//重新倒计时
                     if (!isListening)
                         event.onWakeup(word)
                     else {
-                        Vog.e(this, "正在聆听,暂停唤醒")
+                        Vog.e("正在聆听,暂停唤醒")
                     }
 //                    AppBus.postVoiceData(VoiceData(msg.what, word))
                 }

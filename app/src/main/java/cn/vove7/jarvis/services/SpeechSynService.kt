@@ -32,7 +32,7 @@ class SpeechSynService(val event: SyncEvent) : SpeechSynthesizerListener {
     lateinit var synthesizer: SpeechSynthesizerI
 
     fun reLoad() {
-        Vog.d(this, "reLoad ---> ")
+        Vog.d("reLoad ---> ")
         release()
         sleep(500)
         initialTts() // 初始化TTS引擎
@@ -111,7 +111,7 @@ class SpeechSynService(val event: SyncEvent) : SpeechSynthesizerListener {
 //    public fun reLoadVoiceModel(mode: String) {
 //        voiceModel = mode
 //        val offlineResource = OfflineResource(context, voiceModel)
-//        Vog.d(this, "reLoadVoiceModel 切换离线语音：" + offlineResource.modelFilename)
+//        Vog.d("reLoadVoiceModel 切换离线语音：" + offlineResource.modelFilename)
 //
 //        val result = synthesizer.loadVoiceModel(offlineResource.modelFilename,
 //                offlineResource.textFilename)
@@ -119,28 +119,28 @@ class SpeechSynService(val event: SyncEvent) : SpeechSynthesizerListener {
 //    }
 
     override fun onSynthesizeStart(p0: String?) {
-        Vog.v(this, "onSynthesizeStart 准备开始合成,序列号:$p0")
+        Vog.v("onSynthesizeStart 准备开始合成,序列号:$p0")
     }
 
     override fun onSynthesizeDataArrived(p0: String?, p1: ByteArray?, p2: Int) {
-        Vog.v(this, "onSpeechProgressChanged $p2 合成进度回调, progress：$p0")
+        Vog.v("onSpeechProgressChanged $p2 合成进度回调, progress：$p0")
     }
 
     override fun onSynthesizeFinish(p0: String?) {
-        Vog.v(this, "onSynthesizeFinish 合成结束回调, 序列号:$p0")
+        Vog.v("onSynthesizeFinish 合成结束回调, 序列号:$p0")
         speaking = true//
     }
 
     override fun onSpeechStart(p0: String?) {
-        Vog.v(this, "onSpeechStart 播放开始回调, 序列号:$p0")
+        Vog.v("onSpeechStart 播放开始回调, 序列号:$p0")
     }
 
     override fun onSpeechProgressChanged(p0: String?, p1: Int) {
-        Vog.v(this, "播放进度回调,序列号: $p0 progress：$p1   ")
+        Vog.v("播放进度回调,序列号: $p0 progress：$p1   ")
     }
 
     override fun onSpeechFinish(p0: String?) {
-        Vog.v(this, "onSpeechFinish 播放结束回调 $p0")
+        Vog.v("onSpeechFinish 播放结束回调 $p0")
 //        AppBus.post(SpeechSynData(SpeechSynData.SYN_STATUS_FINISH))
         speaking = false
         event.onFinish() //speaking=false
@@ -152,7 +152,7 @@ class SpeechSynService(val event: SyncEvent) : SpeechSynthesizerListener {
         speaking = false
         event.onError(e, sText)
         GlobalLog.err(e)
-        Vog.d(this, e)
+        Vog.d(e)
     }
 
 }

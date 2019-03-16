@@ -24,7 +24,7 @@ object AppInstallReceiver : DyBCReceiver() {
 //            AdvanAppHelper.updateAppList()
 //        }
         val pkg = intent.data?.schemeSpecificPart ?: return
-        Vog.d(this, "onReceive ---> $pkg")
+        Vog.d("$pkg")
         if (intent.action == Intent.ACTION_PACKAGE_ADDED) {
             AdvanAppHelper.addNewApp(pkg)
         }

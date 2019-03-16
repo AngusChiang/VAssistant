@@ -69,7 +69,7 @@ object Tutorials {
             val it = kv.value
             if (!debug && sp.getBoolean(it.key)) return@forEach
             if (it.v == null) {
-                Vog.e(this, "buildAfterShow ---> view is null")
+                Vog.e("buildAfterShow ---> view is null")
                 return@forEach
             }
             sp.set(it.key, true)

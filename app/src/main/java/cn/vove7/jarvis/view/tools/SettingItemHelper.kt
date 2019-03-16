@@ -110,7 +110,7 @@ class SettingItemHelper(val context: Context) {
 //        val prefill = if (item.keyId != null) sp.getString(item.keyId)
         setBasic(holder, item) {
             MaterialDialog(context).title(text = item.title()).input(prefill = prefill) { d, c ->
-                Vog.d(this, "initAndSetInputListener ---> $c")
+                Vog.d("initAndSetInputListener ---> $c")
                 val s = c.toString()
                 if ((item.callback as CallbackOnSet<String>?)?.invoke(holder, s) != false) {
                     if (item.keyId != null) {

@@ -25,7 +25,7 @@ open class StatusRecogListener : IRecogListener, IStatus {
 
     override fun onAsrEnd() {
         status = IStatus.STATUS_RECOGNITION
-        Vog.i(this, "说话结束")
+        Vog.i("说话结束")
     }
 
     override fun onAsrPartialResult(results: Array<String>?, recogResult: RecogResult) {
@@ -53,7 +53,7 @@ open class StatusRecogListener : IRecogListener, IStatus {
     }
 
     override fun onAsrVolume(volumePercent: Int, volume: Int) {
-        Vog.i(this, "音量百分比$volumePercent ; 音量$volume")
+        Vog.i("音量百分比$volumePercent ; 音量$volume")
     }
 
     override fun onAsrAudio(data: ByteArray?, offset: Int, length: Int) {
@@ -63,7 +63,7 @@ open class StatusRecogListener : IRecogListener, IStatus {
             System.arraycopy(data, 0, actualData, 0, length)
             data = actualData
         }
-        Vog.i(this, "音频数据回调, length:" + data.size)
+        Vog.i("音频数据回调, length:" + data.size)
     }
 
     override fun onAsrExit() {

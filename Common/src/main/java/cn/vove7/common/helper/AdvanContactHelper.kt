@@ -80,7 +80,7 @@ object AdvanContactHelper : GenChoiceData, Markable {
         val markedPhone = markedContactDao.queryBuilder()//by key
                 .where(MarkedDataDao.Properties.Key.eq(s), MarkedDataDao.Properties.Type.eq(MarkedData.MARKED_TYPE_CONTACT)).unique()
         if (markedPhone != null) {
-            Vog.d(this, "Matched from MarkedData by key $s")
+            Vog.d("Matched from MarkedData by key $s")
             return Pair(markedPhone.key, arrayOf(markedPhone.value))
         }
         //本地匹配
@@ -98,7 +98,7 @@ object AdvanContactHelper : GenChoiceData, Markable {
         return if (matchedList.isNotEmpty()) {
             Pair(matchedList[0].data.contactName, matchedList[0].data.phones.toTypedArray())
         } else {//匹配提供
-            Vog.d(this, "match by regex")
+            Vog.d("match by regex")
 
             //正则匹配
             val list = markedContactDao.queryBuilder()
@@ -111,7 +111,7 @@ object AdvanContactHelper : GenChoiceData, Markable {
                 if (regex.matches(s))
                     return Pair(it.key, arrayOf(it.value))
             }
-            Vog.d(this, "from server no one")
+            Vog.d("from server no one")
             null
         }
     }
@@ -129,11 +129,11 @@ object AdvanContactHelper : GenChoiceData, Markable {
                 else -> TextHelper.compareSimilarityWithPinyin(GlobalApp.APP, s, it.contactName)
             }
             if (rate >= limitRate) {
-                Vog.d(this, "${it.contactName}: $rate")
+                Vog.d("${it.contactName}: $rate")
                 matchList.add(MatchedData(rate, it))
             }
         }
-        Vog.d(this, "模糊匹配联系人: ${matchList.size}")
+        Vog.d("模糊匹配联系人: ${matchList.size}")
         return matchList
     }
 

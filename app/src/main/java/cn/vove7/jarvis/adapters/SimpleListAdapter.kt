@@ -50,7 +50,7 @@ open class SimpleListAdapter<T>(private val dataset: MutableList<ListViewModel<T
             holder.checkBox?.isChecked = item.checked
             holder.checkBox?.setOnCheckedChangeListener { b, isChecked ->
                 if (b.isPressed) {//手动按时才执行
-                    Vog.d(this, "OnCheckedChangeListener ---> $position ${item.title} $isChecked")
+                    Vog.d("OnCheckedChangeListener ---> $position ${item.title} $isChecked")
                     item.checked = isChecked//更新状态
                     itemClickListener?.onItemCheckedStatusChanged(holder, item, isChecked)
                 }

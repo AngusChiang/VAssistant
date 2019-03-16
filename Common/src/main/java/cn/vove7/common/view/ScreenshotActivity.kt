@@ -17,7 +17,7 @@ class ScreenshotActivity : Activity() {
         // 全屏截屏 状态栏收起?
 //        window.setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
 //                WindowManager.LayoutParams.FLAG_FULLSCREEN)
-        Vog.d(this, "onCreate --->")
+        Vog.d("onCreate --->")
         super.onCreate(savedInstanceState)
 
         requestCap()
@@ -38,7 +38,7 @@ class ScreenshotActivity : Activity() {
 
     override fun finish() {
         super.finish()
-        Vog.d(this, "finish --->")
+        Vog.d("finish --->")
         overridePendingTransition(0, 0)
     }
 
@@ -63,7 +63,7 @@ class ScreenshotActivity : Activity() {
         var resultBox: ResultBox<Intent?>? = null
 
         fun notifyResult(b: Intent? = null) {
-            Vog.d(this, "notifyResult ---> $b")
+            Vog.d("notifyResult ---> $b")
             resultBox?.setAndNotify(b)
             resultBox = null
         }

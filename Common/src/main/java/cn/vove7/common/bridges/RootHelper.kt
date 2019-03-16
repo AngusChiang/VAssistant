@@ -21,10 +21,10 @@ object RootHelper {
     fun isRoot(): Boolean {
         if (!mHaveRoot) {
             mHaveRoot = (execSuSilent("echo su") != -1).also {
-                Vog.d(this, "isRoot ---> ${if (it) "have" else "didn't"} root")
+                Vog.d("isRoot ---> ${if (it) "have" else "didn't"} root")
             } // 通过执行测试命令来检测
         } else {
-            Vog.d(this, "isRoot ---> have root")
+            Vog.d("isRoot ---> have root")
         }
         return mHaveRoot
     }
@@ -43,7 +43,7 @@ object RootHelper {
      */
     fun exec(cmd: String): String {
         val result = StringBuilder()
-        Vog.d(this, "execRootCmd ---> $cmd")
+        Vog.d("execRootCmd ---> $cmd")
         try {
             val p = Runtime.getRuntime().exec(cmd)
             DataOutputStream(p.outputStream).use { dos ->
@@ -133,7 +133,7 @@ object RootHelper {
     }
 
     fun openAppAccessService(pkg: String, serviceName: String) {
-        Vog.d(this, "openAppAccessService ---> $serviceName")
+        Vog.d("openAppAccessService ---> $serviceName")
         //同时不关闭其他
         try {
             execWithSu(buildList("$pkg/$serviceName"))
@@ -141,7 +141,7 @@ object RootHelper {
             GlobalLog.err(e.message)
             GlobalApp.toastError("无障碍自动开启失败")
         }
-        Vog.d(this, "openAppAccessService ---> 申请结束")
+        Vog.d("openAppAccessService ---> 申请结束")
     }
 
     private fun buildList(s: String): String {
@@ -157,7 +157,7 @@ object RootHelper {
             appendln()
             appendln("settings put secure accessibility_enabled 1")
         }.also {
-            Vog.d(this, "buildList ---> $it")
+            Vog.d("buildList ---> $it")
         }
     }
 

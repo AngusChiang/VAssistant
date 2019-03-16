@@ -28,7 +28,7 @@ class LuaAssetLoader(private val context: Context, L: LuaState) : JavaFunction(L
 
         val am = context.assets
         return try {
-            Vog.d(this, "assetLoader  ----> $name")
+            Vog.d("assetLoader  ----> $name")
             val `is` = am.open("lua_requires/$name.lua")
             val bytes = readAll(`is`)
             L.LloadBuffer(bytes, name)

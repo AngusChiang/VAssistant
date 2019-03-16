@@ -125,10 +125,10 @@ abstract class SimpleListFragment<DataType> : Fragment(), ViewModelLoader<DataTy
      */
 //    override fun setUserVisibleHint(isVisibleToUser: Boolean) {
 //        super.setUserVisibleHint(isVisibleToUser)
-//        Vog.d(this,"setUserVisibleHint ---> ${this} $firstLoad")
+//        Vog.d("setUserVisibleHint ---> ${this} $firstLoad")
 //        if (viewCreate && isVisibleToUser && !firstLoad) {
 //            firstLoad = true
-//            Vog.d(this,"setUserVisibleHint ---> refresh ${this}")
+//            Vog.d("setUserVisibleHint ---> refresh ${this}")
 //            refresh()
 //        }
 //    }
@@ -236,12 +236,12 @@ abstract class SimpleListFragment<DataType> : Fragment(), ViewModelLoader<DataTy
 
     fun refresh() {
         if (loading) {
-            Vog.d(this, "loading ")
+            Vog.d("loading ")
             swipeRefreshLayout.isRefreshing = false
             return
         }
         swipeRefreshLayout.isRefreshing = true
-        Vog.d(this, "refresh ")
+        Vog.d("refresh ")
         allLoadFlag = false
         adapter.animationsLocked = false
         pageIndex = 0
@@ -256,7 +256,7 @@ abstract class SimpleListFragment<DataType> : Fragment(), ViewModelLoader<DataTy
     private fun loadMore() {
         if (loading) return
         loading = true
-        Vog.d(this, "loadMore $pageIndex")
+        Vog.d("pageIndex $pageIndex")
         if (swipeRefreshLayout.isRefreshing) return
         onLoadData(pageIndex)
     }

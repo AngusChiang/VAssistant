@@ -15,7 +15,7 @@ class QykChatSystem : ChatSystem {
     override fun chatWithText(s: String): ChatResult? {
         val data = HttpBridge.get("http://api.qingyunke.com/api.php?key=free&appid=0&msg=$s")
         return if (data == null) {
-//            Vog.d(this, "chatWithText ---> 失败")
+//            Vog.d("chatWithText ---> 失败")
             null
         } else {
             try {

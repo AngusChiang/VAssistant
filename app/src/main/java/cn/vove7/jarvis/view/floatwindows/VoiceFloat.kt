@@ -50,7 +50,7 @@ class VoiceFloat : AbFloatWindow<VoiceFloat.Holder> {
         contentView.post {
             posX = screenInfo.width - contentView.width
         }
-        Vog.d(this, " $posX $posY")
+        Vog.d(" $posX $posY")
     }
 
     val screenInfo: ScreenInfo
@@ -97,8 +97,8 @@ class VoiceFloat : AbFloatWindow<VoiceFloat.Holder> {
                     onMoving = false
                     dx = event.rawX.toInt() - posX
                     dy = event.rawY.toInt() - posY
-//                    Vog.d(this, "ACTION_DOWN $posX $posY")
-//                    Vog.d(this, "ACTION_DOWN $dx $dy")
+//                    Vog.d("ACTION_DOWN $posX $posY")
+//                    Vog.d("ACTION_DOWN $dx $dy")
                     downPoint = Point(event.rawX.toInt(), event.rawY.toInt())
                 }
             }
@@ -125,7 +125,7 @@ class VoiceFloat : AbFloatWindow<VoiceFloat.Holder> {
     private fun isBigMove(raw: Point, rel: Point): Boolean {
         val dx = raw.x - rel.x
         val dy = raw.y - rel.y
-//        Vog.d(this, "isBigMove $dx $dy")
+//        Vog.d("isBigMove $dx $dy")
         return (dx * dx + dy * dy) > 400
     }
 

@@ -28,11 +28,11 @@ class VoiceAssistActivity : Activity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val action = intent.action
-        Vog.d(this, "VoiceAssist ---> $action")
+        Vog.d("VoiceAssist ---> $action")
         when (action) {
             Intent.ACTION_ASSIST, Intent.ACTION_VOICE_COMMAND,
             RecognizerIntent.ACTION_WEB_SEARCH, "android.intent.action.VOICE_ASSIST", "wakeup" -> {
-                Vog.d(this, "onCreate ---> ASSIST wakeup")
+                Vog.d("onCreate ---> ASSIST wakeup")
                 MainService.switchRecog()
             }
             SWITCH_VOICE_WAKEUP -> {

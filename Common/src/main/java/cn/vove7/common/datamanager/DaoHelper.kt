@@ -192,7 +192,7 @@ object DaoHelper {
 //                    if (!userDataSet.contains(it)) {
 //                        onUpdate?.invoke(Color.GREEN, "更新指令：${it.actionTitle}")
 //                        onUpdate?.invoke(Color.YELLOW, it.desc?.instructions ?: "无描述")
-//                        Vog.d(this, "updateGlobalInst 添加---> ${it.actionTitle}")
+//                        Vog.d("updateGlobalInst 添加---> ${it.actionTitle}")
 //                        insertNewActionNode(it)
 //                    } else {//存在
                     checkUpgradeNode(it, onUpdate)
@@ -218,14 +218,14 @@ object DaoHelper {
         val oldNode = getActionNodeByTag(node.tagId)
         if (oldNode == null || node.versionCode > oldNode.versionCode) {//更新
             if (oldNode != null) deleteActionNode(oldNode.id)//完全删除
-            Vog.d(this, "updateGlobalInst 更新---> ${node.actionTitle}")
+            Vog.d("updateGlobalInst 更新---> ${node.actionTitle}")
             onUpdate?.invoke(Color.GREEN, "升级指令：${node.actionTitle}")
             onUpdate?.invoke(Color.YELLOW, node.desc?.instructions ?: "无描述")
             insertNewActionNode(node) //插入
         } else {
             //更新follows  删除本地  插入
             //a1,b3  a1,c2
-            Vog.d(this, "updateGlobalInst 存在---> ${node.actionTitle}")
+            Vog.d("updateGlobalInst 存在---> ${node.actionTitle}")
 
             oldNode.follows.forEach {
                 //完全删除 old fs
@@ -255,7 +255,7 @@ object DaoHelper {
         onUpdate?.invoke(Color.GREEN, "添加：${newNode.actionTitle}")
         if (newNode.actionScope != null) {
             val scope = newNode.actionScope
-            Vog.d(this, "save sid: $newScopeId")
+            Vog.d("save sid: $newScopeId")
             newScopeId = getActionScopeId(scope)
         }
 
@@ -270,13 +270,13 @@ object DaoHelper {
         val action = newNode.action
         if (action != null) {
             DAO.daoSession.actionDao.insert(action)
-            Vog.d(this, "save sid: ${action.id}")
+            Vog.d("save sid: ${action.id}")
             newNode.setActionId(action.id)
         }
-        Vog.d(this, "insertNewActionNode ---> 插入 ${newNode.actionTitle}")
+        Vog.d("insertNewActionNode ---> 插入 ${newNode.actionTitle}")
 
         DAO.daoSession.actionNodeDao.insert(newNode)
-        Vog.d(this, "save nodeId: ${newNode.id}")
+        Vog.d("save nodeId: ${newNode.id}")
 
         newNode.regs.forEach {
             it.id = null
@@ -287,7 +287,7 @@ object DaoHelper {
         //childs
         if (newNode.follows?.isNotEmpty() == true)
             for (ci in newNode.follows) {//递归 深度
-                Vog.d(this, "insertNewActionNode ---> 检查 child ${ci.actionTitle}")
+                Vog.d("insertNewActionNode ---> 检查 child ${ci.actionTitle}")
                 ci.parentId = newNode.id
                 insertNewActionNode(ci)
             }
@@ -388,7 +388,7 @@ object DaoHelper {
                 it.id = null
                 onUpdate?.invoke(Color.GREEN, "更新标记广告：${it.descTitle}")
                 appAdInfoDao.insertInTx(it)
-                Vog.d(this, "updateAppAdInfo ---> ${it.descTitle} ${it.id}")
+                Vog.d("updateAppAdInfo ---> ${it.descTitle} ${it.id}")
             }
             true
         } catch (e: Exception) {

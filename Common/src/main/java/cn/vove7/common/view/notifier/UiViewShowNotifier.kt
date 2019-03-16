@@ -20,7 +20,7 @@ class UiViewShowNotifier(private val locks: MutableMap<ViewFinder, ViewShowListe
     }
 
     override fun onFinish(removeList: MutableList<ViewFinder>) {
-        if (removeList.isNotEmpty()) Vog.d(this, "UiViewShowNotifier remove ${removeList.size}")
+        if (removeList.isNotEmpty()) Vog.d("UiViewShowNotifier remove ${removeList.size}")
         removeList.forEach { locks.remove(it) }
         removeList.clear()
     }

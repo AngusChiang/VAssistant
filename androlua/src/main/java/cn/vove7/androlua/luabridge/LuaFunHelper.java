@@ -54,7 +54,7 @@ public class LuaFunHelper {
             require.call("bridges");
             LuaObject _import = L.getLuaObject("import");
             for (Object s : loadeds) {
-               Vog.INSTANCE.v(this, "load -- " + s.toString());
+               Vog.INSTANCE.v( "load -- " + s.toString());
                _import.call(s.toString());
             }
          }

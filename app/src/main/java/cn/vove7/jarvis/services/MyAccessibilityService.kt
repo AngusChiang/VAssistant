@@ -83,11 +83,11 @@ class MyAccessibilityService : AccessibilityApi() {
                     it
                 }
             }
-            Vog.d(this, "updateCurrentApp ---> $pkg")
-            Vog.d(this, "updateCurrentApp ---> $activityName")
+            Vog.d("updateCurrentApp ---> $pkg")
+            Vog.d("updateCurrentApp ---> $activityName")
             currentScope.activity = activityName
             currentScope.packageName = pkg
-            Vog.d(this, currentScope.toString())
+            Vog.d(currentScope.toString())
             dispatchPluginsEvent(ON_APP_CHANGED, currentScope)//发送事件
         }
     }
@@ -113,7 +113,7 @@ class MyAccessibilityService : AccessibilityApi() {
 
         val eventType = event.eventType
         try {
-            Vog.d(this, "class :$currentAppInfo - $currentActivity ${event.className} \n" +
+            Vog.d("class :$currentAppInfo - $currentActivity ${event.className} \n" +
                     AccessibilityEvent.eventTypeToString(eventType))
         } catch (e: Exception) {
         }
@@ -123,7 +123,7 @@ class MyAccessibilityService : AccessibilityApi() {
                 //界面切换
                 val classNameStr = event.className
                 val pkg = event.packageName as String?
-                Vog.v(this, "WINDOW_STATE_CHANGED ---> $classNameStr $pkg")
+                Vog.v("WINDOW_STATE_CHANGED ---> $classNameStr $pkg")
 
                 runOnCachePool {
                     if (classNameStr != null && pkg != null)
@@ -131,18 +131,18 @@ class MyAccessibilityService : AccessibilityApi() {
                 }
             }
             AccessibilityEvent.TYPE_VIEW_CLICKED -> try {
-                Vog.i(this, "onAccessibilityEvent ---> 点击 :${ViewNode(event.source)}")
+                Vog.i("onAccessibilityEvent ---> 点击 :${ViewNode(event.source)}")
             } catch (e: Exception) {
             }
 //            AccessibilityEvent.TYPE_WINDOWS_CHANGED -> try {
-//                Vog.i(this, "onAccessibilityEvent ---> TYPE_WINDOWS_CHANGED :${event.source}")
+//                Vog.i("onAccessibilityEvent ---> TYPE_WINDOWS_CHANGED :${event.source}")
 //            } catch (e: Exception) {
 //            }
         }
 
         //        runOnCachePool {
         //            if (blackPackage.contains(currentScope.packageName)) {//black list
-//                Vog.v(this, "onAccessibilityEvent ---> in black")
+//                Vog.v("onAccessibilityEvent ---> in black")
 //                return@runOnCachePool
 //            }
 //        根据事件回调类型进行处理
@@ -153,7 +153,7 @@ class MyAccessibilityService : AccessibilityApi() {
 //                AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED -> {//"帧"刷新  限制频率
 //                    System.currentTimeMillis().also {
 //                        if (it - lastContentChangedTime < 300) {
-//                            Vog.v(this, "onAccessibilityEvent ---> lock")
+//                            Vog.v("onAccessibilityEvent ---> lock")
 //                            return@runOnCachePool
 //                        }
 //                        lastContentChangedTime = it
@@ -167,7 +167,7 @@ class MyAccessibilityService : AccessibilityApi() {
 //                lastScreenEvent = event
 //            callAllNotifier()
 //                try {
-//                    Vog.d(this, "onAccessibilityEvent ---> 点击 :${ViewNode(event.source)}")
+//                    Vog.d("onAccessibilityEvent ---> 点击 :${ViewNode(event.source)}")
 //                } catch (e: Exception) {
 //                }
 //        }
@@ -176,7 +176,7 @@ class MyAccessibilityService : AccessibilityApi() {
 
 //        runOnCachePool {
         //            if (blackPackage.contains(currentScope.packageName)) {//black list
-//                Vog.v(this, "onAccessibilityEvent ---> in black")
+//                Vog.v("onAccessibilityEvent ---> in black")
 //                return@runOnCachePool
 //            }
 //        根据事件回调类型进行处理
@@ -187,7 +187,7 @@ class MyAccessibilityService : AccessibilityApi() {
 //                AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED -> {//"帧"刷新  限制频率
 //                    System.currentTimeMillis().also {
 //                        if (it - lastContentChangedTime < 300) {
-//                            Vog.v(this, "onAccessibilityEvent ---> lock")
+//                            Vog.v("onAccessibilityEvent ---> lock")
 //                            return@runOnCachePool
 //                        }
 //                        lastContentChangedTime = it
@@ -201,7 +201,7 @@ class MyAccessibilityService : AccessibilityApi() {
 //                lastScreenEvent = event
 //            callAllNotifier()
 //                try {
-//                    Vog.d(this, "onAccessibilityEvent ---> 点击 :${ViewNode(event.source)}")
+//                    Vog.d("onAccessibilityEvent ---> 点击 :${ViewNode(event.source)}")
 //                } catch (e: Exception) {
 //                }
 //        }
@@ -214,7 +214,7 @@ class MyAccessibilityService : AccessibilityApi() {
 //        if (BuildConfig.DEBUG) {
 //            val builder = StringBuilder("\n" + rootNode?.packageName + "\n")
 //            traverseAllNode(builder, 0, rootNode)
-//            Vog.v(this, "onAccessibilityEvent  ---->" + builder.toString() + " \n\n\n")
+//            Vog.v("onAccessibilityEvent  ---->" + builder.toString() + " \n\n\n")
 //        }
 //    }
 
@@ -247,7 +247,7 @@ class MyAccessibilityService : AccessibilityApi() {
             co.newInstance(this) is ViewGroup
 
         } catch (e: Exception) {
-            Vog.d(this, "error traverseAllNode  ----> ${e.message}")
+            Vog.d("error traverseAllNode  ----> ${e.message}")
             inAbs(className)
         }
     }
@@ -298,7 +298,7 @@ class MyAccessibilityService : AccessibilityApi() {
      * @return Boolean
      */
     override fun onKeyEvent(event: KeyEvent): Boolean {
-        Vog.v(this, "onKeyEvent  ----> " + event.toString())
+        Vog.v("onKeyEvent  ----> " + event.toString())
         when (event.action) {
             KeyEvent.ACTION_DOWN -> when (event.keyCode) {
                 KEYCODE_VOLUME_DOWN -> {
@@ -397,7 +397,7 @@ class MyAccessibilityService : AccessibilityApi() {
             v2 = false
             return true
         }
-        Vog.d(this, "removeDelayIfInterrupt ---> $runnable")
+        Vog.d("removeDelayIfInterrupt ---> $runnable")
         if ((event.eventTime - event.downTime) < (AppConfig.volumeKeyDelayUp)) {//时间短 移除runner 调节音量
             delayHandler.removeCallbacks(runnable)
             when (event.keyCode) {
@@ -417,7 +417,7 @@ class MyAccessibilityService : AccessibilityApi() {
     }
 
     override fun onInterrupt() {
-        Vog.d(this, "onInterrupt ")
+        Vog.d("onInterrupt ")
     }
 
     override fun onDestroy() {
@@ -484,7 +484,7 @@ class MyAccessibilityService : AccessibilityApi() {
 //        else blackPackage.addAll(SpHelper(this)
 //                .getStringSet("acc_black_list") ?: emptyList())
 //        blackPackage.addAll(baseBlackPackage)
-//        Vog.d(this, "loadBlackList ---> $blackPackage ${blackPackage.size}")
+//        Vog.d("loadBlackList ---> $blackPackage ${blackPackage.size}")
 //    }
 
 //    override fun disablePowerSavingMode() {

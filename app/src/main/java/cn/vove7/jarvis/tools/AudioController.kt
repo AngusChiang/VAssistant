@@ -27,12 +27,12 @@ object AudioController {
                     .setLegacyStreamType(streamType).build(), 9)
             p?.setOnCompletionListener {
                 onFinish?.invoke()
-                Vog.d(this, "playOnce ---> 结束")
+                Vog.d("playOnce ---> 结束")
                 it?.release()
             } ?: onFinish?.invoke()
             p?.setOnErrorListener { p, w, e ->
                 p.release()
-                Vog.d(this, "playOnce 出错 ---> $w, $e")
+                Vog.d("playOnce 出错 ---> $w, $e")
                 onFinish?.invoke()
                 true
             }

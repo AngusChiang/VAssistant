@@ -44,7 +44,7 @@ object PurchaseHelper {
                      * 对于支付结果，请商户依赖服务端的异步通知结果。同步通知结果，仅作为支付结束的通知。
                      */
                     val resultInfo = payResult.result// 同步返回需要验证的信息
-                    Vog.d(this, "resultInfo ---> $resultInfo")
+                    Vog.d("resultInfo ---> $resultInfo")
                     val resultStatus = payResult.resultStatus
                     // 判断resultStatus 为9000则代表支付成功
                     if (TextUtils.equals(resultStatus, "9000")) {

@@ -70,7 +70,7 @@ class BaiduVoiceWakeup(private val eventListener: EventListener) : WakeupI() {
 
     private fun send(params: Map<String, Any?>) {
         val json = JSONObject(params).toString()
-        Vog.i(this, "wakeup params(反馈请带上此行日志):$json")
+        Vog.i("wakeup params(反馈请带上此行日志):$json")
         wp?.send(SpeechConstant.WAKEUP_START, json, null, 0, 0)
     }
 

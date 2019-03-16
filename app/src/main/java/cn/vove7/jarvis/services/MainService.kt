@@ -180,7 +180,7 @@ class MainService : BusService(),
 
     @Subscribe(threadMode = ThreadMode.BACKGROUND)
     fun onSubException(e: SubscriberExceptionEvent) {
-        Vog.d(this, "onSubException ---> $e")
+        Vog.d("onSubException ---> $e")
 //        e.throwable?.printStackTrace()
         GlobalLog.err(e.throwable)
     }
@@ -263,7 +263,7 @@ class MainService : BusService(),
      * fixme 其他调用speak 也会触发
      */
     fun resumeListenCommandIfLasting() {//开启长语音时
-        Vog.d(this, "resumeListenCommandIfLasting ---> 检查长语音 afterSpeakResumeListen:$afterSpeakResumeListen IsListening:$recogIsListening")
+        Vog.d("resumeListenCommandIfLasting ---> 检查长语音 afterSpeakResumeListen:$afterSpeakResumeListen IsListening:$recogIsListening")
         if (afterSpeakResumeListen && AppConfig.lastingVoiceCommand && !recogIsListening)//防止长语音识别 继续
             AppBus.postDelay("lastingVoiceCommand",
                     AppBus.ORDER_START_RECOG_SILENT, 1200)
@@ -274,7 +274,7 @@ class MainService : BusService(),
      */
     fun stopRecogTemp() {
         if (AppConfig.lastingVoiceCommand) {//防止长语音识别 speak聊天对话
-            Vog.d(this, "stopRecogTemp ---> speak临时 $recogIsListening")
+            Vog.d("stopRecogTemp ---> speak临时 $recogIsListening")
             afterSpeakResumeListen = recogIsListening
             speechRecoService?.doCancelRecog()
             speechRecoService?.doStopRecog()
@@ -317,7 +317,7 @@ class MainService : BusService(),
      * 单选回调
      */
     override fun onSingleSelect(pos: Int, data: ChoiceData?, msg: String) {
-        Vog.d(this, "单选回调 $data")
+        Vog.d("单选回调 $data")
         hideDialog()
         cExecutor.onSingleChoiceResult(pos, data)
     }
@@ -329,7 +329,7 @@ class MainService : BusService(),
     //未使用 todo 结果回调
     override fun onMultiSelect(data: List<ChoiceData>?, msg: String) {
 //        messengerAction?.responseResult = data != null
-        Vog.d(this, "多选回调 $data")
+        Vog.d("多选回调 $data")
 //        messengerAction?.responseBundle?.putSerializable("data", data)
         hideDialog()
         cExecutor.notifySync()
@@ -386,7 +386,7 @@ class MainService : BusService(),
     }
 
     override fun onExecuteStart(tag: String) {//
-        Vog.d(this, "开始执行 -> $tag")
+        Vog.d("开始执行 -> $tag")
 //        floatyPanel.showAndHideDelay("开始执行")
         executeAnimation.begin()
         executeAnimation.show(tag)
@@ -397,7 +397,7 @@ class MainService : BusService(),
      * from executor 线程
      */
     override fun onExecuteFinished(result: Boolean) {//
-        Vog.d(this, "onExecuteFinished  --> $result")
+        Vog.d("onExecuteFinished  --> $result")
         floatyPanel.hideImmediately()
         if (AppConfig.execSuccessFeedback) {
             if (result) executeAnimation.success()
@@ -416,7 +416,7 @@ class MainService : BusService(),
     }
 
     override fun onExecuteInterrupt(errMsg: String) {
-        Vog.e(this, "onExecuteInterrupt: $errMsg")
+        Vog.e("onExecuteInterrupt: $errMsg")
         executeAnimation.failedAndHideDelay()
 //        GlobalApp.toastInfo("")
         executeAnimation.failedAndHideDelay()
@@ -465,7 +465,7 @@ class MainService : BusService(),
                 speechRecoService?.startAutoSleepWakeup()
             }
             else -> {
-                Vog.e(this, sAction)
+                Vog.e(sAction)
             }
         }
     }
@@ -499,7 +499,7 @@ class MainService : BusService(),
      */
     @Subscribe(threadMode = ThreadMode.BACKGROUND)
     fun onCommand(order: String) {//外部命令
-        Vog.d(this, "onCommand ---> $order")
+        Vog.d("onCommand ---> $order")
         thread(priority = Thread.MAX_PRIORITY) {
             when (order) {
                 ORDER_STOP_EXEC -> {
@@ -630,7 +630,7 @@ class MainService : BusService(),
                         runOnPool {
                             GlobalApp.toastInfo("正在启动服务")
                             App.startServices()
-                            Vog.i(this, "instance ---> null")
+                            Vog.i("instance ---> null")
                         }
                         null
                     }
@@ -718,7 +718,7 @@ class MainService : BusService(),
      */
     fun parseWakeUpCommand(w: String): Boolean? {
         if (recogIsListening) {
-            Vog.d(this, "parseWakeUpCommand ---> 正在识别")
+            Vog.d("parseWakeUpCommand ---> 正在识别")
             return null
         }
         when (w) {
@@ -726,7 +726,7 @@ class MainService : BusService(),
                 return true
             }
             in AppConfig.userWakeupWord.split('#') -> { //用户唤醒词
-                Vog.d(this, "parseWakeUpCommand ---> 用户唤醒词")
+                Vog.d("parseWakeUpCommand ---> 用户唤醒词")
                 return true
             }
             "增大音量" -> {
@@ -765,12 +765,12 @@ class MainService : BusService(),
      * @param lock CountDownLatch?
      */
     fun playSoundEffectSync(rawId: Int, lock: CountDownLatch? = null) {//音效同步
-        Vog.d(this, "playSoundEffectSync ---> 音效开始")
+        Vog.d("playSoundEffectSync ---> 音效开始")
         if (AppConfig.voiceRecogFeedback && AppConfig.currentStreamVolume != 0) {
             SystemBridge.requestMusicFocus()
             val l = lock ?: CountDownLatch(1)
             AudioController.playOnce(rawId) {
-                Vog.d(this, "playSoundEffectSync ---> 音效结束")
+                Vog.d("playSoundEffectSync ---> 音效结束")
                 l.countDown()
             }
             if (lock == null) l.await(2L, TimeUnit.SECONDS)
@@ -782,10 +782,10 @@ class MainService : BusService(),
      */
     inner class RecgEventListener : SpeechEvent {
         override fun onWakeup(word: String?) {
-            Vog.d(this, "onWakeup ---> 唤醒 -> $word")
+            Vog.d("onWakeup ---> 唤醒 -> $word")
             //解析成功  不再唤醒
             parseWakeUpCommand(word ?: "") ?: return
-            Vog.d(this, "onWakeup ---> 开始聆听 -> $word")
+            Vog.d("onWakeup ---> 开始聆听 -> $word")
             //唤醒词 你好小V，小V同学 ↓
             speechRecoService?.cancelRecog(false)
             speechRecoService?.startRecog(true)
@@ -794,11 +794,11 @@ class MainService : BusService(),
 
         private fun speakResponseWord(lock: CountDownLatch? = null) {
             resumeMusicLock = false //不继续播放后台，
-            Vog.d(this, "speakResponseWord 响应词 ---> ${AppConfig.responseWord}")
+            Vog.d("speakResponseWord 响应词 ---> ${AppConfig.responseWord}")
             val l = lock ?: CountDownLatch(1)
             speakWithCallback(AppConfig.responseWord, false, object : SpeakCallback {
                 override fun speakCallback(result: String?) {
-                    Vog.d(this, "speakWithCallback ---> $result")
+                    Vog.d("speakWithCallback ---> $result")
                     sleep(200)
                     l.countDown()
                 }
@@ -806,9 +806,9 @@ class MainService : BusService(),
             if (lock == null)
                 if (!l.await(5L, TimeUnit.SECONDS)) {
                     speechSynService?.stopIfSpeaking()
-                    Vog.d(this, "speakResponseWord ---> 等待超时")
+                    Vog.d("speakResponseWord ---> 等待超时")
                 }
-            Vog.d(this, "speakResponseWord ---> speak finish")
+            Vog.d("speakResponseWord ---> speak finish")
         }
 
         //响应词 与 提示音
@@ -837,14 +837,14 @@ class MainService : BusService(),
                 playSoundEffectSync(R.raw.recog_start, lock)
                 lock.await()
             }
-            Vog.d(this, "recogEffect ---> 结束")
+            Vog.d("recogEffect ---> 结束")
         }
 
         override fun onStartRecog(byVoice: Boolean) {
             speechSynService?.stopIfSpeaking()
 
             AppBus.post(AppBus.EVENT_BEGIN_RECO)
-            Vog.d(this, "onStartRecog ---> 开始识别")
+            Vog.d("onStartRecog ---> 开始识别")
             checkMusic()//检查后台播放
             listeningAni.begin()//
             recogEffect(byVoice)
@@ -857,7 +857,7 @@ class MainService : BusService(),
         }
 
         override fun onResult(voiceResult: String) {//解析完成再 resumeMusicIf()?
-            Vog.d(this, "结果 --------> $voiceResult")
+            Vog.d("结果 --------> $voiceResult")
 
             if (AppConfig.lastingVoiceCommand) {//识别结束，开启长语音定时
                 speechRecoService?.restartLastingUpTimer()
@@ -917,7 +917,7 @@ class MainService : BusService(),
             if (AppConfig.lastingVoiceCommand) {//临时结果 暂时关闭长语音定时器
                 speechRecoService?.stopLastingUpTimer()
             }
-            Vog.d(this, "onTempResult ---> 临时结果 $temp")
+            Vog.d("onTempResult ---> 临时结果 $temp")
             floatyPanel.show(temp)
             listeningAni.show(temp)
             AppConfig.finishWord.also {
@@ -930,19 +930,19 @@ class MainService : BusService(),
         }
 
         override fun onStopRecog() {
-            Vog.d(this, "onStopRecog ---> ")
+            Vog.d("onStopRecog ---> ")
             resumeMusicIf()
             //fix 百度长语音 在无结果stop，无回调
             if (AppConfig.lastingVoiceCommand &&
                     speechRecoService is BaiduSpeechRecoService && temResult == null) {
-                Vog.d(this, "onStopRecog ---> 长语音无结果")
+                Vog.d("onStopRecog ---> 长语音无结果")
                 speechRecoService?.cancelRecog()
             }
             temResult = null
         }
 
         override fun onCancelRecog() {
-            Vog.d(this, "onCancelRecog ---> ")
+            Vog.d("onCancelRecog ---> ")
             resumeMusicLock = true
             afterSpeakResumeListen = false
             resumeMusicIf()
@@ -1015,7 +1015,7 @@ class MainService : BusService(),
 
         resumeMusicIf()
 //        if (UserInfo.isVip() && AppConfig.onlyCloudServiceParse) {//高级用户且仅云解析
-//            Vog.d(this, "onParseCommand ---> only云解析")
+//            Vog.d("onParseCommand ---> only云解析")
 //            NetHelper.cloudParse(result) {
 //                runFromCloud(result, it)
 //            }
@@ -1025,7 +1025,7 @@ class MainService : BusService(),
             sleep(500)
             val parseResult = ParseEngine
                     .parseAction(result, AccessibilityApi.accessibilityService?.currentScope)
-            if (parseResult.isSuccess) {
+            if (parseResult.isSuccess && parseResult.actionQueue?.isNotEmpty() != null) {
                 floatyPanel.hideImmediately()//执行时 消失
                 cExecutor.execQueue(result, parseResult.actionQueue)
                 val his = CommandHistory(UserInfo.getUserId(), result,
@@ -1041,7 +1041,7 @@ class MainService : BusService(),
                 //云解析
 //                return
                 if (needCloud && AppConfig.cloudServiceParseIfLocalFailed) {
-                    Vog.d(this, "onParseCommand ---> 失败云解析")
+                    Vog.d("onParseCommand ---> 失败云解析")
                     NetHelper.cloudParse(result) {
                         runFromCloud(result, it)
                     }
@@ -1148,7 +1148,7 @@ class MainService : BusService(),
         }
 
         override fun onFinish() {
-            Vog.d(this, "onSynData 结束")
+            Vog.d("onSynData 结束")
             notifySpeakFinish()
             if (resumeMusicLock) {//
                 resumeMusicIf()
@@ -1160,13 +1160,13 @@ class MainService : BusService(),
         }
 
         override fun onStart() {
-            Vog.d(this, "onSynData 开始")
+            Vog.d("onSynData 开始")
             checkMusic()
         }
     }
 
     fun notifySpeakFinish() {
-        Vog.d(this, "notifySpeakFinish ---> $speakSync")
+        Vog.d("notifySpeakFinish ---> $speakSync")
         if (speakSync) {
             cExecutor.speakCallback()
             speakCallbacks.forEach {

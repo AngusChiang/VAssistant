@@ -82,14 +82,14 @@ class ViewNode(val node: AccessibilityNodeInfo) : ViewOperation, Comparable<View
         var i = 0
         while (i < tryNum && !p.performAction(action)) {
             if (p.parent == null) {
-                Vog.d(this, "尝试->$i p.parent == null")
+                Vog.d("尝试->$i p.parent == null")
                 return false
             }
             p = p.parent
             i++
         }
         val b = i != tryNum
-        Vog.d(this, "尝试->$i $b")
+        Vog.d("尝试->$i $b")
         return b
     }
 
@@ -204,7 +204,7 @@ class ViewNode(val node: AccessibilityNodeInfo) : ViewOperation, Comparable<View
 
     override fun getText(): String? {
         val text = node.text
-        Vog.d(this, "$text")
+        Vog.d("$text")
         return text?.toString()
     }
 
@@ -251,7 +251,7 @@ class ViewNode(val node: AccessibilityNodeInfo) : ViewOperation, Comparable<View
                 text
             }
         }.also {
-            Vog.d(this, "transText $ep $it")
+            Vog.d("transText $ep $it")
         }
     }
 
@@ -265,7 +265,7 @@ class ViewNode(val node: AccessibilityNodeInfo) : ViewOperation, Comparable<View
             i++
         }
         val b = i != tryNum
-        Vog.d(this, "尝试-> $b")
+        Vog.d("尝试-> $b")
         return b
     }
 

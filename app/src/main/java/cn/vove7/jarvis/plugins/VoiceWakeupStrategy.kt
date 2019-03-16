@@ -48,7 +48,7 @@ object VoiceWakeupStrategy : AbsAccPluginService() {
 
     fun closeWakeup() {
         MainService.instance?.onCommand(AppBus.ORDER_STOP_VOICE_WAKEUP_WITHOUT_NOTIFY)
-        Vog.d(this, "VoiceWakeupStrategy ---> 关闭语音唤醒")
+        Vog.d("VoiceWakeupStrategy ---> 关闭语音唤醒")
         closed = true
         if (AppConfig.notifyCloseMico) {
             statusAni.failedAndHideDelay("关闭语音唤醒", 2000)
@@ -60,7 +60,7 @@ object VoiceWakeupStrategy : AbsAccPluginService() {
     }
 
     fun startWakeup() {
-        Vog.d(this, "VoiceWakeupStrategy ---> 开启语音唤醒")
+        Vog.d("VoiceWakeupStrategy ---> 开启语音唤醒")
         closed = false
 
         if (AppConfig.notifyCloseMico) {
@@ -90,7 +90,7 @@ object VoiceWakeupStrategy : AbsAccPluginService() {
                     AppBus.postSpeechAction(SpeechAction.ActionCode.ACTION_START_WAKEUP_TIMER)
                     closed = true //设置标志
                 }
-                Vog.d(this, "canOpenRecord ---> 在有麦克风权限的App内/不打开唤醒")
+                Vog.d("canOpenRecord ---> 在有麦克风权限的App内/不打开唤醒")
                 false
             }
         } ?: true

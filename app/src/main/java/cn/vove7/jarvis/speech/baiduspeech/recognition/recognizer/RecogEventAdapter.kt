@@ -18,7 +18,7 @@ class RecogEventAdapter(private val listener: IRecogListener) : EventListener {
         currentJson = params
         val logMessage = "name:$name; params:$params"
 
-        Vog.v(this, logMessage)
+        Vog.v(logMessage)
 
         if (name == SpeechConstant.CALLBACK_EVENT_ASR_LOADED) {
             listener.onOfflineLoaded()
@@ -52,7 +52,7 @@ class RecogEventAdapter(private val listener: IRecogListener) : EventListener {
             if (recogResult.hasError()) {
                 val errorCode = recogResult.error
                 val subErrorCode = recogResult.subError
-                Vog.e(this, "asr error:$params")
+                Vog.e("asr error:$params")
                 listener.onAsrFinishError(errorCode, subErrorCode, ErrorTranslation.recogError(errorCode),
                         recogResult.desc, recogResult)
             } else {
@@ -68,7 +68,7 @@ class RecogEventAdapter(private val listener: IRecogListener) : EventListener {
             listener.onAsrVolume(vol.volumePercent, vol.volume)
         } else if (name == SpeechConstant.CALLBACK_EVENT_ASR_AUDIO) {
             if (data?.size != length) {
-                Vog.e(this, "internal error: asr.audio callback data length is not equal to length param")
+                Vog.e("internal error: asr.audio callback data length is not equal to length param")
             }
             listener.onAsrAudio(data, offset, length)
         }

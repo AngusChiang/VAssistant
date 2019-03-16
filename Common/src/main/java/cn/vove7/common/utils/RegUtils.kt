@@ -85,7 +85,7 @@ object RegUtils {
                 "if (not accessibility()) then return end")
                 ).also {
             //            print(it)
-            Vog.d(this,"replaceLuaHeader ---> $it")
+            Vog.d(it)
         }
     }
 
@@ -99,7 +99,7 @@ object RegUtils {
         if (newS != s) {
             newS += "\n}"
         }
-        Vog.d(this,"replaceRhinoHeader ---> $newS")
+        Vog.d(newS)
         return newS
     }
 

@@ -47,7 +47,7 @@ fun runOnNewHandlerThread(name: String = "anonymous", autoQuit: Boolean = true,
                           delay: Long = 0, run: () -> Unit): HandlerThread {
     return HandlerThread(name).apply {
         start()
-        Vog.d(this, "runOnNewHandlerThread ---> $name")
+        Vog.d("runOnNewHandlerThread ---> $name")
         Handler(looper).postDelayed({
             run.invoke()
             if (autoQuit)
@@ -144,7 +144,7 @@ fun AppInfo.isInputMethod(context: Context): Boolean {
     val pkgInfo = pm.getPackageInfo(packageName, PackageManager.GET_SERVICES)
     pkgInfo.services?.forEach {
         if (it.permission == Manifest.permission.BIND_INPUT_METHOD) {
-            Vog.d(this, "isInputMethod ---> 输入法：$packageName")
+            Vog.d("isInputMethod ---> 输入法：$packageName")
             inputMethodCache[packageName] = true
             return true
         }
@@ -176,7 +176,7 @@ fun AppInfo.activities(): Array<String> {
             }
         }
         return rList.toTypedArray().also {
-            Vog.d(this, "activities ---> ${Arrays.toString(it)}")
+            Vog.d("activities ---> ${Arrays.toString(it)}")
             appActivityCache[packageName] = it
         }
     }
@@ -189,7 +189,7 @@ val microPermissionCache = hashMapOf<String, Boolean>()
 fun AppInfo.hasMicroPermission(): Boolean {
     if (packageName == GlobalApp.APP.packageName) return false//排除自身
     microPermissionCache[packageName]?.also {
-        Vog.d(this, "hasMicroPermission ---> $name 麦克风权限 $it")
+        Vog.d("hasMicroPermission ---> $name 麦克风权限 $it")
 //        //若无权限 再次检查（可能动态申请）
 //        if (it) return true
         return it
@@ -200,7 +200,7 @@ fun AppInfo.hasMicroPermission(): Boolean {
         val pkgInfo = pm.getPackageInfo(packageName, PackageManager.GET_PERMISSIONS)
         pkgInfo?.requestedPermissions?.forEach {
             if (it.endsWith(".RECORD_AUDIO") && hasGrantedPermission(it)) {
-                Vog.d(this, "hasMicroPermission ---> $name 授权麦克风权限")
+                Vog.d("hasMicroPermission ---> $name 授权麦克风权限")
                 microPermissionCache[packageName] = true
                 return true
             }
@@ -208,7 +208,7 @@ fun AppInfo.hasMicroPermission(): Boolean {
     } catch (e: Exception) {
         GlobalLog.err(e)
     }
-    Vog.d(this, "hasMicroPermission ---> $name 无麦克风权限")
+    Vog.d("hasMicroPermission ---> $name 无麦克风权限")
     microPermissionCache[packageName] = false
     return false
 }

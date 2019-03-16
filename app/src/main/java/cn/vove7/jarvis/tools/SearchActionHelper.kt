@@ -25,7 +25,7 @@ class SearchActionHelper(searchMenuItem: MenuItem, val lis: (String) -> Unit) {
             }
 
             override fun onQueryTextChange(newText: String): Boolean {
-                Vog.d(this, "onQueryTextChange ----> $newText")
+                Vog.d("onQueryTextChange ----> $newText")
                 handler.removeCallbacks(sR)
                 if (first && newText == "") {
                     first = false

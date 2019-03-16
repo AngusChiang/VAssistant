@@ -49,7 +49,7 @@ public class MicrophoneInputStream extends InputStream {
     }
 
     private void initAudioSource() {
-        Vog.INSTANCE.d(this, "MicrophoneInputStream ---> load");
+        Vog.INSTANCE.d( "MicrophoneInputStream ---> load");
         //openBTHeadsetMicro();
         if (audioRecord == null) {
             int bufferSize = AudioRecord.getMinBufferSize(16000,
@@ -79,7 +79,7 @@ public class MicrophoneInputStream extends InputStream {
             throw new IllegalStateException(
                     "startRecording() called on an uninitialized AudioRecord.");
         }
-        Vog.INSTANCE.d(this, "start ---> " + toLogFriendlyAudioSource(audioRecord.getAudioSource()));
+        Vog.INSTANCE.d( "start ---> " + toLogFriendlyAudioSource(audioRecord.getAudioSource()));
         audioRecord.startRecording();
     }
 
@@ -90,7 +90,7 @@ public class MicrophoneInputStream extends InputStream {
 
     @Override
     public int read(@NonNull byte[] b, int off, int len) throws IOException {
-        //Vog.INSTANCE.d(this, "MicrophoneInputStream read ---> begin");
+        //Vog.INSTANCE.d( "MicrophoneInputStream read ---> begin");
         if (!isStarted) {
             start(); // 建议在CALLBACK_EVENT_ASR_READY事件中调用。
             isStarted = true;
@@ -238,7 +238,7 @@ public class MicrophoneInputStream extends InputStream {
                     if (end - b >= 2990) {//timeout
                         throw new InterruptedException("蓝牙通道开启失败");
                     } else {
-                        Vog.INSTANCE.d(this, "openBTHeadsetMicro ---> 蓝牙通道开启成功");
+                        Vog.INSTANCE.d( "openBTHeadsetMicro ---> 蓝牙通道开启成功");
                     }
                 } catch (InterruptedException e) {
                     GlobalApp.Companion.toastError("蓝牙通道开启失败", Toast.LENGTH_SHORT);
@@ -252,7 +252,7 @@ public class MicrophoneInputStream extends InputStream {
     private boolean isBTHSConnect() {
         BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();
         boolean is = BluetoothProfile.STATE_CONNECTED == adapter.getProfileConnectionState(BluetoothProfile.HEADSET);
-        Vog.INSTANCE.d(this, "isBTHSConnect ---> 蓝牙连接" + is);
+        Vog.INSTANCE.d( "isBTHSConnect ---> 蓝牙连接" + is);
         return is;
     }
 

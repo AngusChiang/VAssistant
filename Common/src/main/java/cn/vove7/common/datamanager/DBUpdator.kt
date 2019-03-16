@@ -18,7 +18,7 @@ class DBUpdator(context: Context,name:String): DaoMaster.OpenHelper(context, nam
 
     override fun onUpgrade(db: SQLiteDatabase?, oldVersion: Int, newVersion: Int) {
         super.onUpgrade(db, oldVersion, newVersion)
-        Vog.d(this, "onUpgrade ---> old $oldVersion - new $newVersion")
+        Vog.d("onUpgrade ---> old $oldVersion - new $newVersion")
         if (oldVersion < newVersion) {
             MigrationHelper.migrate(
                     db, RegDao::class.java, ActionDao::class.java,

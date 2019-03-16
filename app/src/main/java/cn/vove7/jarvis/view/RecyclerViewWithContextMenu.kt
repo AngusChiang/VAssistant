@@ -21,7 +21,7 @@ class RecyclerViewWithContextMenu : RecyclerView {
         val layoutManager = layoutManager
         if (layoutManager != null) {
             val position = layoutManager.getPosition(originalView)
-            Vog.d(this, "showContextMenuForChild ---> $position")
+            Vog.d("showContextMenuForChild ---> $position")
             mContextInfo.position = position
         }
         return super.showContextMenuForChild(originalView, x, y)

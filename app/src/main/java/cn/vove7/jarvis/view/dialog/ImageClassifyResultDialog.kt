@@ -68,7 +68,7 @@ class ImageClassifyResultDialog(val result: ImageClassifyResult.Rlt, context: Co
             else s.load(screen)).listener(getLis()).into(viewHolder.imgView)
 
             viewHolder.headerView.setOnClickListener {
-                Vog.d(this ?: "", "bindView ---> ${this?.baikeUrl}")
+                Vog.d(this?.baikeUrl)
                 SystemBridge.openUrl(this?.baikeUrl
                     ?: "https://baike.baidu.com/item/${result.keyword}").also { r ->
                     if (r) {

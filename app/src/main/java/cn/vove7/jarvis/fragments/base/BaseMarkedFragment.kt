@@ -124,7 +124,7 @@ abstract class BaseMarkedFragment : SimpleListFragment<MarkedData>(), OnSyncMark
                         0 -> markedType = MarkedData.MARKED_TYPE_SCRIPT_LUA
                         1 -> markedType = MarkedData.MARKED_TYPE_SCRIPT_JS
                     }
-                    Vog.d(this, "onItemSelected ---> $markedType")
+                    Vog.d(markedType)
                 }
             }
         }
@@ -205,9 +205,9 @@ abstract class BaseMarkedFragment : SimpleListFragment<MarkedData>(), OnSyncMark
     private fun deleteShare(tagId: String) {
         NetHelper.postJson<Any>(ApiUrls.DELETE_SHARE_MARKED, BaseRequestModel(tagId)) { _, bean ->
             if (bean?.isOk() == true) {
-                Vog.d(this, "deleteShare ---> 云端删除成功")
+                Vog.d("云端删除成功")
             } else
-                Vog.d(this, "deleteShare ---> 云端删除失败")
+                Vog.d("云端删除失败")
         }
     }
 

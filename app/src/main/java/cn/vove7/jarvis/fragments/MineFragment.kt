@@ -34,7 +34,7 @@ class MineFragment : Fragment() {
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     fun onEvent(code: String) {
-        Vog.d(this, "onEvent ---> $code")
+        Vog.d("onEvent ---> $code")
         if (code == AppBus.EVENT_LOGOUT) {
             loadUserInfo()
         }

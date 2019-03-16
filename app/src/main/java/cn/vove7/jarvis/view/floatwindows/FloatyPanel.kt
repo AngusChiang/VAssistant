@@ -43,7 +43,7 @@ class FloatyPanel : AbFloatWindow<FloatyPanel.VHolder>(GlobalApp.APP) {
 
     var align: Int = 0
         set(v) {
-            Vog.d(this,"align ---> $v")
+            Vog.d("align ---> $v")
             rootView.gravity = when (v) {
                 0 -> {//居中
                     Gravity.CENTER
@@ -123,7 +123,7 @@ class FloatyPanel : AbFloatWindow<FloatyPanel.VHolder>(GlobalApp.APP) {
             if (delayHandler == null) delayHandler = Handler()
             delayHandler?.postDelayed(delayHide, delay)
         }
-        Vog.d(this, "hideDelay ---> hide delay $delay")
+        Vog.d("hideDelay ---> hide delay $delay")
 
     }
 

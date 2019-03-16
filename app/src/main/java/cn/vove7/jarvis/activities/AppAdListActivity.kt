@@ -96,7 +96,7 @@ class AppAdListActivity : OneFragmentActivity() {
 
         companion object {
             fun newInstance(pkg: String): AppAdListFragment {
-                Vog.d(this, "newInstance ---> $pkg")
+                Vog.d(pkg)
                 return AppAdListFragment().also {
                     it.pkg = pkg
                 }
@@ -126,9 +126,9 @@ class AppAdListActivity : OneFragmentActivity() {
         fun delRemoteShare(tag: String) {
             NetHelper.postJson<Any>(ApiUrls.DELETE_SHARE_APP_AD, BaseRequestModel(tag)) { _, bean ->
                 if (bean?.isOk() == true) {
-                    Vog.d(this, "deleteShare ---> 云端删除成功")
+                    Vog.d("云端删除成功")
                 } else
-                    Vog.d(this, "deleteShare ---> 云端删除失败")
+                    Vog.d("云端删除失败")
             }
         }
 

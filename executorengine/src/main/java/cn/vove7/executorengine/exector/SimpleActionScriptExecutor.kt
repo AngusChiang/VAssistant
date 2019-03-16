@@ -43,14 +43,14 @@ class SimpleActionScriptExecutor(
             when {
                 partialResult.needTerminal -> {//出错
                     val msg = "执行终止-- on $line ${partialResult.msg}"
-                    Vog.d(this, msg)
+                    Vog.d(msg)
                     currentAction = null
                     serviceBridge?.onExecuteInterrupt(msg)
                     return partialResult
                 }
                 !partialResult.isSuccess -> {
                     execLog += "失败-- on $line ${partialResult.msg}\n"
-                    Vog.d(this, execLog)
+                    Vog.d(execLog)
                 }
             }
         }
@@ -72,7 +72,7 @@ class SimpleActionScriptExecutor(
      */
     private fun execAction(cmd: String): PartialResult {
         if (currentAction == null) {
-            Vog.d(this, "execAction currentAction is null")
+            Vog.d("execAction currentAction is null")
             return PartialResult.fatal("出错 code: sse75")
         }
         val action = currentAction!!
@@ -85,7 +85,7 @@ class SimpleActionScriptExecutor(
                 ps = param.substring(1, param.length - 1).split(",").toMutableList()//变量数组
                 @Deprecated("清空value ，不再改")
                 if (action.param != null && action.param!!.value != null) {//替换脚本变量
-                    Vog.d(this, "execAction 替换变量${action.param!!.value}")
+                    Vog.d("execAction 替换变量${action.param!!.value}")
                     replaceVar(ps, action.param!!.value[0])
                 }
                 cmd.substring(0, mResult.groups[1]?.range?.first ?: cmd.length)
@@ -93,7 +93,7 @@ class SimpleActionScriptExecutor(
                 ps = action.param?.value?.toMutableList()?: mutableListOf()
                 cmd
             }
-        Vog.d(this, "执行 - $c $ps")
+        Vog.d("执行 - $c $ps")
 
         val p = ps[0]
         when (c) {
@@ -121,7 +121,7 @@ class SimpleActionScriptExecutor(
                 } catch (e: NumberFormatException) {
                     sleep(1000)
                 }
-                Vog.d(this, "休眠结束")
+                Vog.d("休眠结束")
                 return PartialResult.success()
             }
             ACTION_SWIPE -> {
@@ -174,7 +174,7 @@ class SimpleActionScriptExecutor(
 //                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
 //                                    node.scrollUp()
 //                                } else {
-//                                    Vog.d(this, "operateViewOperation 版本M")
+//                                    Vog.d("operateViewOperation 版本M")
 //                                    false
 //                                }
 //                            }
@@ -182,7 +182,7 @@ class SimpleActionScriptExecutor(
 //                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
 //                                    node.scrollDown()
 //                                } else {
-//                                    Vog.d(this, "operateViewOperation 版本M")
+//                                    Vog.d("operateViewOperation 版本M")
 //                                    false
 //                                }
 //                            }
@@ -250,7 +250,7 @@ class SimpleActionScriptExecutor(
                     else PartialResult.fatal("无参数")
                 }
             } else {
-                Vog.d(this, "未知操作 - $c")
+                Vog.d("未知操作 - $c")
                 //调用聊天
                 PartialResult(false)
             }

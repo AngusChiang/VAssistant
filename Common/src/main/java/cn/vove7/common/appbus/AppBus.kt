@@ -41,7 +41,7 @@ object AppBus {
                 }
             }
         } else ""
-        Vog.d(this, "post ---> $data on $m")
+        Vog.d("post ---> $data on $m")
         EventBus.getDefault().post(data)
     }
 

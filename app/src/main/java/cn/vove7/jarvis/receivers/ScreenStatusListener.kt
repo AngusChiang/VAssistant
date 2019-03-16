@@ -31,15 +31,15 @@ object ScreenStatusListener : DyBCReceiver(), ScreenEvent {
 
         when (intent?.action) {
             Intent.ACTION_SCREEN_ON -> {
-                Vog.d(this, "onReceive ---> 亮屏")
+                Vog.d("亮屏")
                 event.onScreenOn()
             }
             Intent.ACTION_SCREEN_OFF -> {
-                Vog.d(this, "onReceive ---> 灭屏")
+                Vog.d("灭屏")
                 event.onScreenOff()
             }
             Intent.ACTION_USER_PRESENT -> {
-                Vog.d(this, "onReceive ---> 解锁")
+                Vog.d("解锁")
                 event.onUnlock()
             }
         }
@@ -47,7 +47,7 @@ object ScreenStatusListener : DyBCReceiver(), ScreenEvent {
 
     override fun onScreenOn() {
         if (PowerEventReceiver.lowBatteryLevel) {
-            Vog.d(this, "onScreenOn ---> 低电量模式")
+            Vog.d("低电量模式")
             return
         }
         if (AppConfig.openVoiceWakeUpIfAutoSleep && AppConfig.voiceWakeup && WakeupI.instance?.opened == false) {
@@ -59,7 +59,7 @@ object ScreenStatusListener : DyBCReceiver(), ScreenEvent {
 
     override fun onUnlock() {
         if (closeTag && AppConfig.fixVoiceMico) {//也许关屏已开启
-            Vog.d(this, "onScreenOn ---> 开屏关闭唤醒")
+            Vog.d("开屏关闭唤醒")
             VoiceWakeupStrategy.closeWakeup()
         }
     }

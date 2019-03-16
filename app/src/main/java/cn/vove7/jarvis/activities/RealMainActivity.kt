@@ -120,7 +120,7 @@ class RealMainActivity : AppCompatActivity() {
         lastCheck = System.currentTimeMillis()
         if (AppConfig.FIRST_LAUNCH_NEW_VERSION && showUpdate) {
             UpdateLogDialog(this) {
-                Vog.d(this,"showDataUpdateLog ---> 检查数据更新")
+                Vog.d("检查数据更新")
                 checkDataUpdate()
             }
             showUpdate = false

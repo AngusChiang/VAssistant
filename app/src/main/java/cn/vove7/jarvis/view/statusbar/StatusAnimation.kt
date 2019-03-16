@@ -31,7 +31,7 @@ abstract class StatusAnimation {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             ChannelBuilder.with("StatusBarIcon${AppConfig.versionName}${if (alert) "_alert" else ""}",
                     "状态栏动画${if (alert) "_alert" else ""}", importLevel).build().apply {
-                Vog.d(this, "alert ---> $alert")
+                Vog.d("alert ---> $alert")
                 if (alert) {
                     enableVibration(true)
                     setSound(Settings.System.DEFAULT_NOTIFICATION_URI, Notification.AUDIO_ATTRIBUTES_DEFAULT)
@@ -64,7 +64,7 @@ abstract class StatusAnimation {
      * @param c String message
      */
     fun show(c: String) {
-        Vog.d(this, "show ---> $c")
+        Vog.d("show ---> $c")
         try {
             notifier.showNotification(nId, title, c, NotificationIcons(beginAniId))
         } catch (e: Exception) {
@@ -110,7 +110,7 @@ abstract class StatusAnimation {
 
     var hideThread: Thread? = null
     fun hideDelay(delay: Long = 500) {
-        Vog.d(this, "hideDelay ---> $delay")
+        Vog.d("hideDelay ---> $delay")
         synchronized(StatusAnimation::class.java) {
             if (hideThread != null) return
             hideThread = thread {

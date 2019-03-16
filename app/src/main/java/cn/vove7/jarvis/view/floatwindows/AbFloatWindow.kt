@@ -50,7 +50,7 @@ abstract class AbFloatWindow<VH : AbFloatWindow.ViewHolder>(
 
     open fun show() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && !PermissionUtils.canDrawOverlays(context)) {
-            Vog.d(this, "show ---> 无悬浮窗")
+            Vog.d("show ---> 无悬浮窗")
             onNoPermission.invoke()
         } else {
             synchronized(isShowing) {
@@ -72,7 +72,7 @@ abstract class AbFloatWindow<VH : AbFloatWindow.ViewHolder>(
         synchronized(isShowing) {
             try {
                 windowManager.removeView(contentView)
-                Vog.d(this, "hide ---> remove float")
+                Vog.d("hide ---> remove float")
             } catch (e: Exception) {
             }
             isShowing = false

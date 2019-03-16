@@ -20,9 +20,9 @@ class ServiceChecker(val context: Context) {
         arrayOf(
                 MainService::class.java
         ).forEach {
-            Vog.i(this, "checkService ${it::class.java.simpleName}")
+            Vog.i("checkService ${it::class.java.simpleName}")
             if (ServiceHelper.isServiceRunning(context, it)) {
-                Vog.i(this, "checkService ${it::class.java.simpleName} not running")
+                Vog.i("checkService ${it::class.java.simpleName} not running")
                 context.startService(Intent(context, it))
                 b = true
             }

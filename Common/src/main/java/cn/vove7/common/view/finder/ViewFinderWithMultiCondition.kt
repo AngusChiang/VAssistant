@@ -59,23 +59,23 @@ class ViewFinderWithMultiCondition(accessibilityService: AccessibilityApi) : Vie
      */
     fun findByDepths(): ViewNode? {
         var p: AccessibilityNodeInfo? = rootNode ?: {
-            Vog.d(this, "findByDepths ---> rootNode is null")
+            Vog.d("findByDepths ---> rootNode is null")
             null
         }.invoke()
         depths.forEach {
             try {
                 p = p?.getChild(it)
             } catch (e: ArrayIndexOutOfBoundsException) {
-                Vog.e(this, "findByDepths ---> ArrayIndexOutOfBounds null")
+                Vog.e("findByDepths ---> ArrayIndexOutOfBounds null")
                 return null
             }
             if (p == null) {
-                Vog.v(this, "findByDepths ---> 搜索失败1")
+                Vog.v("findByDepths ---> 搜索失败1")
                 return null
             }
         }
         if (p == null) {
-            Vog.v(this, "findByDepths ---> 搜索失败2")
+            Vog.v("findByDepths ---> 搜索失败2")
             return null
         }
 
@@ -84,7 +84,7 @@ class ViewFinderWithMultiCondition(accessibilityService: AccessibilityApi) : Vie
             if ("${pp.className}".contains(typeNames[0], ignoreCase = true))
                 ViewNode(pp)
             else {
-                Vog.e(this, "findByDepths ---> typeNames not match")
+                Vog.e("findByDepths ---> typeNames not match")
                 null
             }
         } else ViewNode(pp)
@@ -127,7 +127,7 @@ class ViewFinderWithMultiCondition(accessibilityService: AccessibilityApi) : Vie
                 val v = "${node.className}".contains(it, ignoreCase = true)
                 if (v) {
                     ok = true
-                    Vog.d(this, "findCondition --->className contains $it")
+                    Vog.d("findCondition --->className contains $it")
                     break
                 }
             }
@@ -141,7 +141,7 @@ class ViewFinderWithMultiCondition(accessibilityService: AccessibilityApi) : Vie
         if (editable != null && node.isEditable != editable) {
             return false
         }
-        Vog.i(this, "findCondition find it ")
+        Vog.i("findCondition find it ")
         return true
     }
 
@@ -202,9 +202,9 @@ class ViewFinderWithMultiCondition(accessibilityService: AccessibilityApi) : Vie
                         for (it in ms) {
                             val f = TextHelper.compareSimilarityWithPinyin(GlobalApp.APP,
                                     "$text", it, replaceNumberWithPinyin = true)
-                            Vog.v(this, "findCondition $f")
+                            Vog.v("findCondition $f")
                             if (f > 0.75) {
-                                Vog.d(this, "find WITH_PINYIN $it")
+                                Vog.d("find WITH_PINYIN $it")
                                 ok = true
                                 break
                             }
@@ -214,7 +214,7 @@ class ViewFinderWithMultiCondition(accessibilityService: AccessibilityApi) : Vie
                     TEXT_MATCH_MODE_MATCHES -> {
                         for (it in ms) {
                             if (dealRawReg(it).matches("$text")) {
-                                Vog.d(this, "find MATCHS $it")
+                                Vog.d("find MATCHS $it")
                                 ok = true
                                 break
                             }
@@ -224,7 +224,7 @@ class ViewFinderWithMultiCondition(accessibilityService: AccessibilityApi) : Vie
                     TEXT_MATCH_MODE_FUZZY_WITHOUT_PINYIN -> {
                         for (it in ms) {
                             val f = TextHelper.compareSimilarity("$text", it)
-                            Vog.v(this, "findCondition $f")
+                            Vog.v("findCondition $f")
                             if (f >= 0.75) {
                                 ok = true
                                 break
@@ -233,7 +233,7 @@ class ViewFinderWithMultiCondition(accessibilityService: AccessibilityApi) : Vie
                         if (!ok) return false
                     }
                     else -> {
-                        Vog.v(this, "findCondition equal text 未知条件")
+                        Vog.v("findCondition equal text 未知条件")
                         return false
                     }
                 }

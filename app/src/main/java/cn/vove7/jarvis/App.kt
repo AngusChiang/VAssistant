@@ -34,13 +34,13 @@ class App : GlobalApp() {
     lateinit var services: Array<Intent>
     override fun onCreate() {
         super.onCreate()
-        Vog.d(this, "onCreate ---> begin ${System.currentTimeMillis() / 1000}")
+        Vog.d("onCreate ---> begin ${System.currentTimeMillis() / 1000}")
         ins = this
 
         CrashHandler.init()
         services = arrayOf(mainService)
         AppConfig.init()//加载配置
-        Vog.d(this, "onCreate ---> 配置加载完成")
+        Vog.d("onCreate ---> 配置加载完成")
 
         runOnNewHandlerThread("app_load", delay = 1000) {
             if (AppConfig.FIRST_LAUNCH_NEW_VERSION || BuildConfig.DEBUG)
@@ -54,7 +54,7 @@ class App : GlobalApp() {
                 AppNotification.updateNotificationChannel(this)
             }
             RePluginManager().launchWithApp()
-            Vog.d(this, "onCreate ---> 结束 ${System.currentTimeMillis() / 1000}")
+            Vog.d("onCreate ---> 结束 ${System.currentTimeMillis() / 1000}")
             System.gc()
         }
 

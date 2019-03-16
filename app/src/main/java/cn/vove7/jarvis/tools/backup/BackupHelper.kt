@@ -57,7 +57,7 @@ object BackupHelper {
                         "全局指令", "应用内指令", "标记联系人", "标记应用", "标记(打开)功能", "标记广告信息"
                 ), waitForPositiveButton = false, initialSelection = indices) { _, indexes, _ ->
                     indices = indexes
-                    Vog.d(this, "indexes ---> ${Arrays.toString(indexes)}")
+                    Vog.d("indexes ---> ${Arrays.toString(indexes)}")
                 }.show {
 
                     positiveButton(text = "备份到本地") {
@@ -125,7 +125,7 @@ object BackupHelper {
         return try {
             val data = wrapData(types)
             val json = GsonHelper.toJson(data, true)
-            Vog.d(this, "json ---> $json")
+            Vog.d("json ---> $json")
             if (local) toFile(json) else toCloud(json)
         } catch (e: Exception) {
             GlobalLog.err(e)
@@ -163,13 +163,13 @@ object BackupHelper {
             if (!it.exists()) emptyArray<File>()
             else it.listFiles()
         }
-        Vog.d(this, "showBackupFileList ---> ${Arrays.toString(localFileList)}")
+        Vog.d("showBackupFileList ---> ${Arrays.toString(localFileList)}")
 
         val fileList = mutableListOf<String>()
         localFileList.filter {
             it.exists() && it.isFile
         }.forEach { fileList.add(it.name) }
-        Vog.d(this, "showBackupFileList ---> $fileList")
+        Vog.d("showBackupFileList ---> $fileList")
         MaterialDialog(activity).title(text = "备份文件")
                 .listItemsSingleChoice(items = fileList) { dialog, index, text ->
                     restoreFromFile(activity, File(backupPath, text))
@@ -408,14 +408,14 @@ object BackupHelper {
     private fun getLocalMarkedContact(): List<MarkedData> {
         val list = DaoHelper.getLocalMarkedByType(
                 arrayOf(MarkedData.MARKED_TYPE_CONTACT))
-        Vog.d(this, "getLocalMarkedData 本地标记联系人 ---> $list")
+        Vog.d("getLocalMarkedData 本地标记联系人 ---> $list")
         return list
     }
 
     private fun getLocalMarkedApp(): List<MarkedData> {
         val list = DaoHelper.getLocalMarkedByType(
                 arrayOf(MarkedData.MARKED_TYPE_APP))
-        Vog.d(this, "getLocalMarkedData 本地标记应用 ---> $list")
+        Vog.d("getLocalMarkedData 本地标记应用 ---> $list")
         return list
     }
 
@@ -423,14 +423,14 @@ object BackupHelper {
         val list = DaoHelper.getLocalMarkedByType(
                 arrayOf(MarkedData.MARKED_TYPE_SCRIPT_LUA,
                         MarkedData.MARKED_TYPE_SCRIPT_JS))
-        Vog.d(this, "getLocalMarkedData 本地标记打开 ---> $list")
+        Vog.d("getLocalMarkedData 本地标记打开 ---> $list")
         return list
     }
 
     private fun getLocalMarkedAd(): List<AppAdInfo> {
         val list = DAO.daoSession.appAdInfoDao.queryBuilder()
                 .where(AppAdInfoDao.Properties.From.eq(DataFrom.FROM_USER)).list()
-        Vog.d(this, "getLocalMarkedAd 广告信息 ---> $list")
+        Vog.d("getLocalMarkedAd 广告信息 ---> $list")
         return list
     }
 
@@ -438,7 +438,7 @@ object BackupHelper {
     private fun getLocalInappInst(): List<ActionNode> {
         val list = DaoHelper
                 .getLocalInstByType(ActionNode.NODE_SCOPE_IN_APP)
-        Vog.d(this, "getLocalInst 本地应用内指令 ---> $list")
+        Vog.d("getLocalInst 本地应用内指令 ---> $list")
         return list
 
     }
@@ -446,7 +446,7 @@ object BackupHelper {
     private fun getLocalGlobalInst(): List<ActionNode> {
         val list = DaoHelper
                 .getLocalInstByType(ActionNode.NODE_SCOPE_GLOBAL)
-        Vog.d(this, "getLocalInst 本地全局指令 ---> $list")
+        Vog.d("getLocalInst 本地全局指令 ---> $list")
         return list
     }
 

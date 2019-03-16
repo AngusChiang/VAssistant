@@ -41,7 +41,7 @@ object HttpBridge {
     }
 
     fun getAsPc(url: String, params: Map<String, Any>?): String? {
-        Vog.d(this, "get ---> $url $params")
+        Vog.d("get ---> $url $params")
         val client = OkHttpClient.Builder()
                 .readTimeout(timeout, TimeUnit.SECONDS).build()
         val request = Request.Builder().url(url)
@@ -58,7 +58,7 @@ object HttpBridge {
     }
 
     fun postJson(url: String, json: String?): String? {
-//        Vog.d(this, "get ---> $url \n$json")
+//        Vog.d("get ---> $url \n$json")
         println("get ---> $url \n$json")
         val client = OkHttpClient.Builder()
                 .readTimeout(timeout, TimeUnit.SECONDS).build()
@@ -78,7 +78,7 @@ object HttpBridge {
 
 
     fun post(url: String, params: Map<String, Any>?): String? {
-//        Vog.d(this, "post ---> $url $params")
+//        Vog.d("post ---> $url $params")
         val client = OkHttpClient.Builder()
                 .readTimeout(timeout, TimeUnit.SECONDS).build()
         val requestBody = FormBody.Builder().apply {

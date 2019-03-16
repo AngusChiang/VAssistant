@@ -155,7 +155,7 @@ class LuaThread : Thread, LuaMetaTable, LuaGcable, LuaRunnableI, Comparable<LuaT
 
     override fun quit(self: Boolean) {
         synchronized(this) {
-            Vog.d(this, "quit $this $self")
+            Vog.d("quit $this $self")
             interrupt()
             L.gc(LuaState.LUA_GCCOLLECT, 1)
 //            L.close()

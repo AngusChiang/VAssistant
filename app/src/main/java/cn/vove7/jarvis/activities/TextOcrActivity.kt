@@ -109,7 +109,7 @@ class TextOcrActivity : Activity() {
             val item = model.item
             val view = CheckedTextView(this).apply {
                 setBackgroundResource(R.drawable.bg_screen_text_high_light)
-                Vog.d(this, "buildContent ---> $item")
+                Vog.d("buildContent ---> $item")
                 gravity = Gravity.TOP
                 setTextColor(0xFFFFFF)
                 textSize = 15f
@@ -128,7 +128,7 @@ class TextOcrActivity : Activity() {
                 val top = item.top * p - statusbarHeight
                 val left = item.left * p
                 val rotationAngle = item.rotationAngle
-                Vog.d(this, "buildContent ---> ${item.text} top:$top ,left:$left ,w:$w h:$h rotationAngle:$rotationAngle")
+                Vog.d("buildContent ---> ${item.text} top:$top ,left:$left ,w:$w h:$h rotationAngle:$rotationAngle")
                 setPadding(10, 0, 10, 0)
 
                 layoutParams = RelativeLayout.LayoutParams(w, h).also {
@@ -191,12 +191,12 @@ class TextOcrActivity : Activity() {
             //根据资源ID获取响应的尺寸值
             statusBarHeight1 = resources.getDimensionPixelSize(resourceId)
         }
-        Vog.d(this, "状态栏高度 ---> $statusBarHeight1")
+        Vog.d("状态栏高度 ---> $statusBarHeight1")
         statusBarHeight1
     }
 
     private fun editDialog(text: String) {
-        Vog.d(this, " ---> $text")
+        Vog.d(" ---> $text")
         d = BottomDialogWithText(this, "文字操作").apply d@{
             noAutoDismiss()
             positiveButton(text = "复制原文") {

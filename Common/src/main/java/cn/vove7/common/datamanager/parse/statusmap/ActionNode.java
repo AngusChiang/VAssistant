@@ -746,7 +746,7 @@ public class ActionNode implements Serializable, DataFrom {
             p = String.format(PreOpen_LUA, p, p);
 
         String newS = p + newNode.action.getActionScript();
-        Vog.INSTANCE.d(this, "cloneGlobal ---> \n" + newS);
+        Vog.INSTANCE.d("cloneGlobal ---> \n" + newS);
         newNode.action.setActionScript(newS);
         newNode.desc = this.desc.clone();
 

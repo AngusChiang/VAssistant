@@ -128,10 +128,10 @@ class WordSplitDialog(context: Context, val rawWords: String, val type: Int = 0)
             rect.right = it.right
             rect.top = it.top
             rect.bottom = it.bottom
-//            Vog.d(this, "findViewByPos ---> ${it.text} ${rect2String(rect)}")
+//            Vog.d("findViewByPos ---> ${it.text} ${rect2String(rect)}")
             if (rect.contains(x, y - 20))//错位
                 return it.also {
-                    Vog.d(this, "findViewByPos --->  当前: ${it.text}")
+                    Vog.d("findViewByPos --->  当前: ${it.text}")
                 }
         }
         return null
@@ -154,7 +154,7 @@ class WordSplitDialog(context: Context, val rawWords: String, val type: Int = 0)
             }
         }
         return b.toString().also {
-            Vog.d(this, "getCheckedText ---> $it")
+            Vog.d("getCheckedText ---> $it")
         }
     }
 
@@ -190,13 +190,13 @@ class WordSplitDialog(context: Context, val rawWords: String, val type: Int = 0)
         var initStatus = false
         var lastCheckStatus = Array(checkedTextList.size) { false }
         content.setOnTouchListener { _, event ->
-            Vog.v(this, " ---> ${event.x} ${event.y}")
+            Vog.v(" ---> ${event.x} ${event.y}")
             when (event.action) {
                 MotionEvent.ACTION_DOWN -> {
                     startView = findViewByPos(checkedTextList,
                             event.x.toInt(), event.y.toInt())
                         ?: return@setOnTouchListener false
-                    Vog.d(this, "buildView ---> ACTION_DOWN")
+                    Vog.d("buildView ---> ACTION_DOWN")
                     lastCheckStatus = backupOldCheckStatus(checkedTextList)
                     requestDisIntercept(content, true)//阻止父级拦截
                     endView = startView
@@ -229,7 +229,7 @@ class WordSplitDialog(context: Context, val rawWords: String, val type: Int = 0)
                         0 -> negateAll(checkedTextList, lastCheckStatus, b, e)
                         1 -> changeChecked(checkedTextList, lastCheckStatus, b, e, initStatus)
                     }
-                    Vog.d(this, "buildView ---> ACTION_MOVE ONE")
+                    Vog.d("buildView ---> ACTION_MOVE ONE")
                     return@setOnTouchListener true
                 }
                 else -> {

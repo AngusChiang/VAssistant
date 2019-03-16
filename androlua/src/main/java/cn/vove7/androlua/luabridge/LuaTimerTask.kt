@@ -61,7 +61,7 @@ class LuaTimerTask : TimerTaskX, LuaRunnableI {
     }
 
     override fun quit(self: Boolean) {
-        Vog.d(this, "quit $this $self")
+        Vog.d("quit $this $self")
         L.gc(LuaState.LUA_GCCOLLECT, 1)
 //        L.close()
         System.gc()

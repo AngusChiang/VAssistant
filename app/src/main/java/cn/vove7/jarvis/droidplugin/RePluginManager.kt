@@ -34,7 +34,7 @@ class RePluginManager : PluginManager {
                     GlobalLog.err("插件安装失败 ${desf.absolutePath}")
                     null
                 } else {
-                    Vog.d(this, "installPlugin ---> 安装成功 ${desf.absolutePath}")
+                    Vog.d("安装成功 ${desf.absolutePath}")
                     RePluginInfo(it)
                 }
             }
@@ -46,7 +46,7 @@ class RePluginManager : PluginManager {
     }
 
     override fun uninstallPlugin(pluginInfo: VPluginInfo): Boolean {
-        Vog.d(this, "uninstallPlugin ---> 卸载${pluginInfo.name}")
+        Vog.d("卸载${pluginInfo.name}")
         return try {
             RePlugin.uninstall(pluginInfo.packageName)
         } catch (e: Exception) {
@@ -57,7 +57,6 @@ class RePluginManager : PluginManager {
 
     override fun launchPluginMainActivity(pluginInfo: VPluginInfo): Boolean {
         if (pluginInfo.mainActivity == null) {
-            Vog.d(this, "launchPluginMainActivity ---> ")
             GlobalApp.toastWarning("无用户界面")
             return false
         }
@@ -94,7 +93,7 @@ class RePluginManager : PluginManager {
 
     override fun stopPluginService(pluginInfo: VPluginInfo): Boolean {
         if (pluginInfo.mainService == null) {
-            Vog.d(this, "startPluginService ---> ${pluginInfo.name} 无主服务")
+            Vog.d("${pluginInfo.name} 无主服务")
             return false
         }
         return try {
@@ -109,7 +108,7 @@ class RePluginManager : PluginManager {
 
     override fun startPluginService(pluginInfo: VPluginInfo): Boolean {
         if (pluginInfo.mainService == null) {
-            Vog.d(this, "startPluginService ---> ${pluginInfo.name} 无主服务")
+            Vog.d("${pluginInfo.name} 无主服务")
             return false
         }
         return try {
@@ -132,7 +131,7 @@ class RePluginManager : PluginManager {
         RePlugin.getPluginInfoList().forEach {
             cacheList.add(RePluginInfo(reInfo = it))
         }
-        Vog.d(this, "installList ---> 插件数量${cacheList.size}")
+        Vog.d("插件数量${cacheList.size}")
         return cacheList
     }
 }

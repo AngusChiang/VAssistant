@@ -75,7 +75,7 @@ open class CommonRecogParams(context: Context) {
         if (sp.getBoolean("_outfile", false)) { // 保存录音文件
             map[SpeechConstant.ACCEPT_AUDIO_DATA] = true // 目前必须开启此回掉才嫩保存音频
             map[SpeechConstant.OUT_FILE] = "$samplePath/outfile.pcm"
-            Vog.i(this, "语音录音文件将保存在：$samplePath/outfile.pcm")
+            Vog.i("语音录音文件将保存在：$samplePath/outfile.pcm")
         }
 
         return map

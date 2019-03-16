@@ -141,7 +141,7 @@ class NewInstActivity : ReturnableActivity(), View.OnClickListener {
                 scriptText = intent.getStringExtra("remote_script")
                 scriptType = intent.getStringExtra("remote_script_type")
 
-                Vog.d(this, "initData ---> $scriptType\n$scriptText")
+                Vog.d("initData ---> $scriptType\n$scriptText")
             }
         }
         instType = intent.getIntExtra("type", NODE_SCOPE_GLOBAL)
@@ -382,7 +382,7 @@ class NewInstActivity : ReturnableActivity(), View.OnClickListener {
                     if (uri != null) {
                         try {
                             val path = getPathFromUri(this, uri)
-                            Vog.d(this, "onActivityResult path: $path")
+                            Vog.d("onActivityResult path: $path")
                             scriptTextView.setText(File(path).readText())
                         } catch (e: Exception) {
                             e.printStackTrace()
@@ -422,7 +422,7 @@ class NewInstActivity : ReturnableActivity(), View.OnClickListener {
             testInputView = dView.findViewById(R.id.test_text)
             testInputView.setOnKeyListener { _, keyCode, event ->
                 if (keyCode == KeyEvent.KEYCODE_ENTER || keyCode == KeyEvent.KEYCODE_NUMPAD_ENTER) {
-                    Vog.d(this, "showTestParseDialog click")
+                    Vog.d("showTestParseDialog click")
                     if (event.action == KeyEvent.ACTION_UP)
                         parseButton.performClick()
                     return@setOnKeyListener true
@@ -463,7 +463,7 @@ class NewInstActivity : ReturnableActivity(), View.OnClickListener {
                 val t = String.format(getString(R.string.text_parse_result_placeholder),
                         p.matchWord, Arrays.toString(args)) // "匹配词: ${p.matchWord} 参数: ${p.param}\n")
                 val text = ColourTextClickableSpan(this, t, android.R.color.white, listener = null)
-//                Vog.d(this, "outputParseResult $t")
+//                Vog.d("outputParseResult $t")
                 resultOutput.append(text.spanStr)
                 resultOutput.append("\n")
             }
@@ -522,7 +522,7 @@ class NewInstActivity : ReturnableActivity(), View.OnClickListener {
      * @param posArr Array<Int>
      */
     private fun add2RegexList(reg: String, posArr: Array<Int>) {
-        Vog.d(this, "add2RegexList $reg ${Arrays.toString(posArr)}")
+        Vog.d("add2RegexList $reg ${Arrays.toString(posArr)}")
         if (editIndex > -1) {
             try {
                 regs[editIndex] = Pair(reg, posArr)

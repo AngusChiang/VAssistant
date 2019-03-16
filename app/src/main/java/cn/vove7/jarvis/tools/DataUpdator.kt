@@ -57,7 +57,7 @@ object DataUpdator {
                     back.invoke()
                 }
             } else {
-                Vog.d(this, "checkDataUpdate ---> 检查数据失败")
+                Vog.d("checkDataUpdate ---> 检查数据失败")
                 back.invoke()
             }
         }
@@ -335,7 +335,7 @@ object DataUpdator {
                 runOnCachePool {
                     b.data?.forEach {
                         if (it.hasUpdate()) {
-                            Vog.i(this, "checkPluginUpdate ---> 检测到有插件更新")
+                            Vog.i("checkPluginUpdate ---> 检测到有插件更新")
                             GlobalApp.toastInfo("检测到有插件更新")
                             return@runOnCachePool
                         }
@@ -345,6 +345,6 @@ object DataUpdator {
                 GlobalLog.err(b?.message)
             }
         }
-        Vog.i(this, "checkPluginUpdate ---> 无插件更新")
+        Vog.i("checkPluginUpdate ---> 无插件更新")
     }
 }

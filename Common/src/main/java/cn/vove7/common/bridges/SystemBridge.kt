@@ -148,7 +148,7 @@ object SystemBridge : SystemOperation {
         val list = AdvanAppHelper.matchPkgByName(appWord)
         return if (list.isNotEmpty()) {
             list[0].data.packageName.also {
-                Vog.i(this, "打开应用：$appWord -> $it")
+                Vog.i("打开应用：$appWord -> $it")
             }
         } else null
     }
@@ -369,9 +369,9 @@ object SystemBridge : SystemOperation {
                 val result = mAm.requestAudioFocus(null, AudioManager.STREAM_MUSIC,
                         AudioManager.AUDIOFOCUS_GAIN_TRANSIENT)
                 if (result == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
-                    Vog.d(this, "requestMusicFocus ---> successfully")
+                    Vog.d("requestMusicFocus ---> successfully")
                 } else {
-                    Vog.d(this, "requestMusicFocus ---> failed")
+                    Vog.d("requestMusicFocus ---> failed")
                 }
             }
         }
@@ -523,7 +523,7 @@ object SystemBridge : SystemOperation {
     override fun isMediaPlaying(): Boolean {
         val am = GlobalApp.APP.getSystemService(Context.AUDIO_SERVICE) as AudioManager?
         if (am == null) {
-            Vog.e(this, "isMusicActive：无法获取AudioManager引用")
+            Vog.e("isMusicActive：无法获取AudioManager引用")
             return false
         }
         return am.isMusicActive
@@ -648,12 +648,12 @@ object SystemBridge : SystemOperation {
                 manager.startLocalOnlyHotspot(object : WifiManager.LocalOnlyHotspotCallback() {
                     override fun onStarted(reservation: WifiManager.LocalOnlyHotspotReservation) {
                         super.onStarted(reservation)
-                        Vog.d(this, "onStarted ---> ")
+                        Vog.d("onStarted ---> ")
                     }
 
                     override fun onStopped() {
                         super.onStopped()
-                        Vog.d(this, "onStopped ---> ")
+                        Vog.d("onStopped ---> ")
                     }
 
                     override fun onFailed(reason: Int) {
@@ -663,7 +663,7 @@ object SystemBridge : SystemOperation {
                                 , ERROR_GENERIC
                                 , ERROR_INCOMPATIBLE_MODE
                                 , ERROR_TETHERING_DISALLOWED)[reason])
-                        Vog.d(this, "onFailed ---> ")
+                        Vog.d("onFailed ---> ")
                     }
                 }, Handler())
             } else {
@@ -744,7 +744,7 @@ object SystemBridge : SystemOperation {
         if (!providers.contains(LocationManager.NETWORK_PROVIDER)) {
             GlobalApp.toastInfo("无法获取位置信息")
             GlobalLog.log("未打开位置设置")
-            Vog.d(this, "location ---> 没有可用的位置提供器")
+            Vog.d("location ---> 没有可用的位置提供器")
             return null
         }
         prepareIfNeeded()
@@ -754,7 +754,7 @@ object SystemBridge : SystemOperation {
 
         val loLis = object : LocationListener {
             override fun onLocationChanged(location: Location?) {
-                Vog.d(this, "onLocationChanged ---> $location")
+                Vog.d("onLocationChanged ---> $location")
                 handler.removeCallbacks(block)
                 locationManager.removeUpdates(this)
                 resu.setAndNotify(location)
@@ -827,21 +827,21 @@ object SystemBridge : SystemOperation {
     var cap: ScreenCapturer? = null
 
     override fun screenShot(): Bitmap? {
-        Vog.d(this, "screenShot ---> 请求截屏")
+        Vog.d("screenShot ---> 请求截屏")
         if (screenData == null) {
             val resultBox = ResultBox<Intent?>()
             val capIntent = ScreenshotActivity.getScreenshotIntent(context, resultBox)
             context.startActivity(capIntent)
             screenData = resultBox.blockedGet(false) ?: return null
         }
-        Vog.d(this, "screenShot ---> $screenData")
+        Vog.d("screenShot ---> $screenData")
         if (cap == null)
             cap = ScreenCapturer(context, screenData, -1, DeviceInfo.getInfo(context).screenInfo.density
                     , null)
 
         try {
             return cap?.capture()?.let {
-                Vog.d(this, "screenShot ---> $it")
+                Vog.d("screenShot ---> $it")
                 val bm = processImg(it)
                 it.close()
                 bm
@@ -929,7 +929,7 @@ object SystemBridge : SystemOperation {
     }
 
     override fun createAlarm(message: String?, days: Array<Int>?, hour: Int, minutes: Int, noUi: Boolean): Boolean {
-        Vog.d(this, "createAlarm ---> $message ${Arrays.toString(days)} $hour : $minutes")
+        Vog.d("createAlarm ---> $message ${Arrays.toString(days)} $hour : $minutes")
         val intent = Intent(AlarmClock.ACTION_SET_ALARM)
                 .putExtra(AlarmClock.EXTRA_HOUR, hour)
                 .putExtra(AlarmClock.EXTRA_MINUTES, minutes)
@@ -1046,7 +1046,7 @@ object SystemBridge : SystemOperation {
 
             val i = intent?.getIntExtra(BatteryManager.EXTRA_STATUS,
                     BatteryManager.BATTERY_STATUS_UNKNOWN) == BatteryManager.BATTERY_STATUS_CHARGING
-            Vog.d(this, "isCharging ---> $i")
+            Vog.d("isCharging ---> $i")
             i
         }.invoke()
 

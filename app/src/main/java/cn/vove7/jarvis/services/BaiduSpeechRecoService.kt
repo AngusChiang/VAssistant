@@ -156,7 +156,7 @@ class BaiduSpeechRecoService(event: SpeechEvent) : SpeechRecoService(event) {
 
 
     private val autoCloseRecog = Runnable {
-        Vog.i(this, " ---> 长语音自动关闭识别")
+        Vog.i(" ---> 长语音自动关闭识别")
         doCancelRecog()
         doStopRecog()
     }
@@ -166,14 +166,14 @@ class BaiduSpeechRecoService(event: SpeechEvent) : SpeechRecoService(event) {
      * speak后doStartRecog，操作后？？？
      */
     override fun restartLastingUpTimer() {//重启
-        Vog.d(this, "restartLastingUpTimer ---> 开启长语音定时")
+        Vog.d("restartLastingUpTimer ---> 开启长语音定时")
         timerHandler.removeCallbacks(autoCloseRecog)
         timerHandler.postDelayed(autoCloseRecog,
                 (AppConfig.lastingVoiceMillis * 1000).toLong())
     }
 
     override fun stopLastingUpTimer() {
-        Vog.d(this, "restartLastingUpTimer ---> 关闭长语音定时")
+        Vog.d("restartLastingUpTimer ---> 关闭长语音定时")
         timerHandler.removeCallbacks(autoCloseRecog)
     }
 
@@ -186,7 +186,7 @@ class BaiduSpeechRecoService(event: SpeechEvent) : SpeechRecoService(event) {
             restartLastingUpTimer()
         }
 
-        Vog.d(this, "doStartRecog ---> 开始识别")
+        Vog.d("doStartRecog ---> 开始识别")
         //震动 音效
         myRecognizer.start(recoParams)
     }

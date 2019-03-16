@@ -35,7 +35,7 @@ class ResultBox<T> {
 
     fun loopGet(): T? {
         Looper.loop()
-        Vog.d(this, "loopGet ---> get it " + mValue!!)
+        Vog.d("loopGet ---> get it " + mValue!!)
         return mValue
     }
 
@@ -50,7 +50,7 @@ class ResultBox<T> {
     }
 
     fun setAndNotify(value: T) {
-//        Vog.d(this,"setAndNotify ---> $value")
+//        Vog.d("setAndNotify ---> $value")
         mValue = value
         has = true
     }

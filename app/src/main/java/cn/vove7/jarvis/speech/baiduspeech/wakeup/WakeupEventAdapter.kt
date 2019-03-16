@@ -15,7 +15,7 @@ class WakeupEventAdapter(private val listener: IWakeupListener) : EventListener 
 
     override fun onEvent(name: String?, params: String?, data: ByteArray?, offset: Int, length: Int) {
         // android studio日志Monitor 中搜索 WakeupEventAdapter即可看见下面一行的日志
-        Vog.i(this, "wakeup name:$name; params:$params")
+        Vog.i("wakeup name:$name; params:$params")
         when (name) {
             SpeechConstant.CALLBACK_EVENT_WAKEUP_SUCCESS -> {
                 // 识别唤醒词成功
@@ -42,7 +42,7 @@ class WakeupEventAdapter(private val listener: IWakeupListener) : EventListener 
             }
             SpeechConstant.CALLBACK_EVENT_WAKEUP_AUDIO -> {
                 // 音频回调
-                Vog.d(this,"onEvent ---> $params")
+                Vog.d("onEvent ---> $params")
                 listener.onASrAudio(data, offset, length)
             }
             CALLBACK_EVENT_WAKEUP_STARTED ->{

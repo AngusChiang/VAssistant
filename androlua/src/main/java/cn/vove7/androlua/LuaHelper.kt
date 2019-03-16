@@ -40,7 +40,7 @@ class LuaHelper : LuaManagerI {
         bridgeManager = sBridgeManager
         initPath()
         init()
-//        Vog.d(this, "constructor $sBridgeManager")
+//        Vog.d("constructor $sBridgeManager")
     }
 
     override var bridgeManager: BridgeManager?
@@ -49,7 +49,7 @@ class LuaHelper : LuaManagerI {
     constructor(context: Context, b: BridgeManager) : this(context) {
         bridgeManager = b
         sBridgeManager = b
-//        Vog.d(this, "constructor2 $sBridgeManager")
+//        Vog.d("constructor2 $sBridgeManager")
     }
 
     lateinit var L: LuaState
@@ -99,7 +99,7 @@ class LuaHelper : LuaManagerI {
 
     private fun initPath() {
         luaDir = context.filesDir.absolutePath
-        Vog.d(this, "initLua luaDir ----> " + luaDir!!)
+        Vog.d("initLua luaDir ----> " + luaDir!!)
         libDir = context.getDir("lib", Context.MODE_PRIVATE).absolutePath
         jniLibsPath = context.applicationInfo.nativeLibraryDir + "/lib?.so" + ";" + libDir + "/lib?.so;"
 
@@ -192,7 +192,7 @@ class LuaHelper : LuaManagerI {
             evalString(src)
         } catch (e: LuaException) {
             GlobalLog.err(e)
-            Vog.d(this, "safeEvalLua  ----> " + e.message)
+            Vog.d("safeEvalLua  ----> " + e.message)
         }
     }
 
@@ -244,7 +244,7 @@ class LuaHelper : LuaManagerI {
         val e = errorReason(r) + ": " + L.toString(-1)
 //        var end = e.indexOf("stack traceback:")//隐藏stack traceback
 //        if (end == -1) end = e.length
-//        Vog.e(this, "checkErr ---> $e")
+//        Vog.e("checkErr ---> $e")
 //        e = e.substring(0, end)
         if (e.contains("java.lang.UnsupportedOperationException") ||
                 e.contains("java.lang.InterruptedException")) {
@@ -266,7 +266,7 @@ class LuaHelper : LuaManagerI {
 
 
     fun autoRun(s: String, args: Array<Any>) {
-        Vog.d(this, "autoRun  ----> $s")
+        Vog.d("autoRun  ----> $s")
         when {
             Pattern.matches("^\\w+$", s) -> execFromAsset("$s.lua", args)
             Pattern.matches("^[\\w._/]+$", s) -> execFromFile(s, args)
@@ -299,7 +299,7 @@ class LuaHelper : LuaManagerI {
     }
 
     override fun regGc(obj: LuaGcable) {
-        Vog.d(this, "regGc $obj")
+        Vog.d("regGc $obj")
         synchronized(gcList) {
             gcList.add(obj)
         }
@@ -334,7 +334,7 @@ class LuaHelper : LuaManagerI {
     override fun removeGc(obj: LuaGcable): Boolean {
         synchronized(gcList) {
             return gcList.remove(obj).also {
-                Vog.d(this, "removeGc $obj $it")
+                Vog.d("removeGc $obj $it")
             }
         }
     }
@@ -342,7 +342,7 @@ class LuaHelper : LuaManagerI {
     private fun gcAll() {
         //清空线程..
         synchronized(gcList) {
-            Vog.d(this, "gcAll ${gcList.size}")
+            Vog.d("gcAll ${gcList.size}")
             for (gcable in gcList) {
                 gcable.gc()
             }
@@ -351,7 +351,7 @@ class LuaHelper : LuaManagerI {
     }
 
     override fun stop() {
-        Vog.d(this, "stop by external")
+        Vog.d("stop by external")
         gcAll()
         L.gc(LUA_GCSTOP, 0)
         L.close()

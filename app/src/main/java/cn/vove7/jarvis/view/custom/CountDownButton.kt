@@ -89,7 +89,7 @@ class CountDownButton : Button {
                     if (!btn.stoped) {
                         if (currentCount >= 0) {
                             btn.text = String.format(s, currentCount--)
-                            Vog.d(this, "handleMessage ---> $currentCount")
+                            Vog.d("handleMessage ---> $currentCount")
                             this.sendEmptyMessageDelayed(1, 1000)
                         } else {//结束
                             btn.stoped = true

@@ -17,7 +17,7 @@ object InitSimpleDbData : InitDbData() {
 
         val scriptType = "simple"
         if (mapDao.queryBuilder().count() <= 10L) {
-            Vog.d(this, "更新数据")
+            Vog.d("更新数据")
             mapDao.deleteAll()
             DAO.daoSession.regDao.deleteAll()
             DAO.daoSession.actionDao.deleteAll()
@@ -115,7 +115,7 @@ object InitSimpleDbData : InitDbData() {
             ).forEach {
                 mapDao.insert(it)
             }
-        } else Vog.d("mapDao", "mapDao存在数据")
+        } else Vog.d( "mapDao存在数据")
         //openActivity(com.tencent.mobileqq,com.tencent.mobileqq.activity.SplashActivity)
     }
 

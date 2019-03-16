@@ -82,7 +82,7 @@ abstract class VPluginInfo : AwesomeItem {
         versionName = meta.versionName
 
         mainActivity = meta.mainActivity?.name
-        Vog.d(this, "parseApk ---> $name mainActivity $mainActivity")
+        Vog.d("$name mainActivity $mainActivity")
 
 //        val metas = info.applicationInfo.metaData ?: return
         description = meta.metaDatas["plugin_desc"] ?: ""
@@ -136,10 +136,10 @@ abstract class VPluginInfo : AwesomeItem {
         }?.forEach {
             if (it.name.endsWith(".PluginMainService")) {
                 if (it.permission == "LAUNCH_WITH_APP") {
-                    Vog.d(this, "getPluginMainService ---> ${it.name} 服务自启")
+                    Vog.d("${it.name} 服务自启")
                     launchWithApp = true
                 }
-                Vog.d(this, "getPluginMainService ---> ${it.name}")
+                Vog.d(it.name)
                 return it.name
             }
         }
