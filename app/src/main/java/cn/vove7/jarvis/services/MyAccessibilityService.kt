@@ -20,8 +20,8 @@ import cn.vove7.common.utils.ThreadPool.runOnCachePool
 import cn.vove7.common.utils.ThreadPool.runOnPool
 import cn.vove7.common.utils.activities
 import cn.vove7.common.utils.isInputMethod
-import cn.vove7.executorengine.bridges.SystemBridge
-import cn.vove7.executorengine.helper.AdvanAppHelper
+import cn.vove7.common.bridges.SystemBridge
+import cn.vove7.common.helper.AdvanAppHelper
 import cn.vove7.jarvis.plugins.AdKillerService
 import cn.vove7.jarvis.plugins.VoiceWakeupStrategy
 import cn.vove7.jarvis.tools.AppConfig
@@ -79,7 +79,7 @@ class MyAccessibilityService : AccessibilityApi() {
                         return
                     } else it
                 } catch (e: Exception) {
-                    GlobalLog.err(e.message, "acs80")
+                    GlobalLog.err(e.message)
                     it
                 }
             }

@@ -33,7 +33,7 @@ import cn.vove7.common.utils.ThreadPool.runOnPool
 import cn.vove7.common.utils.formatNow
 import cn.vove7.common.utils.runOnNewHandlerThread
 import cn.vove7.common.utils.runOnUi
-import cn.vove7.executorengine.bridges.SystemBridge
+import cn.vove7.common.bridges.SystemBridge
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.activities.TextOcrActivity
 import cn.vove7.jarvis.services.MainService
@@ -150,15 +150,15 @@ class AssistSession(context: Context) : VoiceInteractionSession(context) {
             0 -> {
                 val path = screenPath
                 when (path) {
-                    null -> GlobalApp.toastShort("屏幕内容获取失败")
-                    "loading" -> GlobalApp.toastShort("等待加载完成")
+                    null -> GlobalApp.toastError("屏幕内容获取失败")
+                    "loading" -> GlobalApp.toastInfo("等待加载完成")
                     else -> imageClassify(path)
                 }
             }
             1 -> {
                 val path = screenPath
                 when (path) {
-                    "loading" -> GlobalApp.toastShort("等待加载完成")
+                    "loading" -> GlobalApp.toastInfo("等待加载完成")
                     else -> {
                         showProgressBar = true
                         runOnNewHandlerThread {
@@ -176,7 +176,7 @@ class AssistSession(context: Context) : VoiceInteractionSession(context) {
                                 onBackPressed()
                             } catch (e: Exception) {
                                 e.printStackTrace()
-                                GlobalApp.toastShort(e.message!!)
+                                GlobalApp.toastInfo(e.message!!)
                             }
 
                         }
@@ -194,8 +194,8 @@ class AssistSession(context: Context) : VoiceInteractionSession(context) {
             }
             4 -> {
                 when (screenPath) {
-                    null -> GlobalApp.toastShort("屏幕内容获取失败")
-                    "loading" -> GlobalApp.toastShort("等待加载完成")
+                    null -> GlobalApp.toastError("屏幕内容获取失败")
+                    "loading" -> GlobalApp.toastInfo("等待加载完成")
                     else -> {
                         showProgressBar = true
                         QRTools.parseBitmap(screenshot!!) {
@@ -210,13 +210,13 @@ class AssistSession(context: Context) : VoiceInteractionSession(context) {
             5 -> {
                 val ss = screenshot
                 when (ss) {
-                    null -> GlobalApp.toastShort("屏幕内容获取失败")
+                    null -> GlobalApp.toastInfo("屏幕内容获取失败")
                     else -> {
                         showProgressBar = true
                         runOnNewHandlerThread {
                             UtilBridge.bitmap2File(ss, Environment.getExternalStorageDirectory()
                                     .absolutePath + "/Pictures/Screenshots/Screenshot_${formatNow("yyyyMMdd-HHmmss")}.jpg").also {
-                                if (it != null) GlobalApp.toastLong("保存到 ${it.absolutePath}")
+                                if (it != null) GlobalApp.toastInfo("保存到 ${it.absolutePath}")
                             }
                             showProgressBar = false
                         }
@@ -267,7 +267,7 @@ class AssistSession(context: Context) : VoiceInteractionSession(context) {
     private fun onScanQRCodeSuccess(result: String?) {
         Vog.d(this, "onScanQRCodeSuccess ---> $result")
         if (result == null) {
-            GlobalApp.toastShort("无识别结果")
+            GlobalApp.toastError("无识别结果")
             return
         }
 
@@ -306,7 +306,7 @@ class AssistSession(context: Context) : VoiceInteractionSession(context) {
                                 val p = try {
                                     ss[1]
                                 } catch (e: Exception) {
-                                    GlobalApp.toastShort("无手机号")
+                                    GlobalApp.toastError("未发现手机号")
                                     return@setNeutralButton
                                 }
                                 hide()
@@ -357,14 +357,14 @@ class AssistSession(context: Context) : VoiceInteractionSession(context) {
                 val result = r?.bestResult
                 if (r?.hasErr == false && result != null) {
                     if (result.keyword == "屏幕截图") {
-                        GlobalApp.toastShort("无识别结果")
+                        GlobalApp.toastError("无识别结果")
                     } else {
                         dialog = ImageClassifyResultDialog(result, context, screenshot) {
                             onBackPressed()
                         }.also { it.show() }
                     }
                 } else {
-                    GlobalApp.toastShort("识别失败")
+                    GlobalApp.toastError("识别失败")
                 }
             }
         }

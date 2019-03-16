@@ -20,7 +20,7 @@ import java.lang.reflect.Field
  * @author 17719247306
  * 2018/9/9
  */
-
+@Deprecated("换用Toasty")
 class ColorfulToast(val context: Context, textColor: Int = R.color.fff) {
     var toast: Toast
 

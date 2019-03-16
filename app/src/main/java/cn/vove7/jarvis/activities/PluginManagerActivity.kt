@@ -145,12 +145,12 @@ class PluginManagerActivity : BaseActivityWithViewPager() {
                 if (it != null) {
                     Vog.d(this, "installPlugin ---> 插件安装成功")
                     AppNotification.newNotification("插件安装成功", it.name, R.drawable.ic_done)
-                    GlobalApp.toastLong("插件安装成功")
+                    GlobalApp.toastSuccess("插件安装成功")
                     AppBus.post(AppBus.EVENT_PLUGIN_INSTALLED)
                 } else {
                     Vog.d(this, "installPlugin ---> 插件安装失败")
                     AppNotification.newNotification("插件安装失败", "详情见日志", R.drawable.ic_error_black_24dp)
-                    GlobalApp.toastLong("插件安装失败，详情见日志")
+                    GlobalApp.toastError("插件安装失败，详情见日志")
                 }
             }
         }

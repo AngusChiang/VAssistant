@@ -8,11 +8,11 @@ import android.speech.RecognizerIntent
 import android.view.View
 import android.widget.TextView
 import cn.vove7.common.app.GlobalApp
+import cn.vove7.common.bridges.SystemBridge
 import cn.vove7.common.model.UserInfo
 import cn.vove7.common.netacc.ApiUrls
 import cn.vove7.common.netacc.NetHelper
 import cn.vove7.common.netacc.model.LastDateInfo
-import cn.vove7.executorengine.bridges.SystemBridge
 import cn.vove7.jarvis.BuildConfig
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.activities.base.ReturnableActivity
@@ -65,7 +65,7 @@ class AdvancedSettingActivity : ReturnableActivity() {
             if (UserInfo.isLogin()) {
                 UserInfoDialog(this) {}
             } else {
-                toast.showLong(R.string.text_please_login_first)
+                GlobalApp.toastInfo(R.string.text_please_login_first)
                 LoginDialog(this) {
                     if (UserInfo.isVip()) {
                         unlock_advan_fun.visibility = View.GONE
@@ -160,23 +160,31 @@ class AdvancedSettingActivity : ReturnableActivity() {
                             if (UserInfo.isLogin()) {
                                 BackupHelper.showBackupFileList(this)
                             } else {
-                                toast.showShort("请登录后操作")
+                                GlobalApp.toastInfo("请登录后操作")
                             }
                         },
                         IntentItem(title = "查看云端备份") {
                             //todo
-                            toast.showShort(R.string.text_coming_soon)
+                            (R.string.text_coming_soon)
                         },
                         IntentItem(title = "备份设置", summary = "将设置备份到sd卡") {
                             BackupHelper.backupAppConfig().also {
-                                GlobalApp.toastShort(if (it) "备份完成" else "备份失败，详情见日志")
+                                if (it) {
+                                    GlobalApp.toastSuccess("备份完成")
+                                } else {
+                                    GlobalApp.toastError("备份失败，详情见日志")
+                                }
                             }
                         },
                         IntentItem(title = "恢复设置", summary = "从sd卡恢复设置\n需重启App") {
                             BackupHelper.restoreAppConfig().also {
-                                GlobalApp.toastShort(it.second)
-                                if (it.first) //跳转重启
+                                GlobalApp.toastInfo(it.second)
+                                if (it.first) { //跳转重启
+                                    GlobalApp.toastSuccess(it.second)
                                     AppHelper.showPackageDetail(this, packageName)
+                                } else {
+                                    GlobalApp.toastError(it.second)
+                                }
                             }
                         }
                 )),
@@ -187,7 +195,7 @@ class AdvancedSettingActivity : ReturnableActivity() {
                                 keyId = R.string.key_use_smartopen_if_parse_failed),
                         CheckBoxItem(title = "云解析", summary = "本地解析失败时，使用云解析(暂未开放)",
                                 keyId = R.string.key_cloud_service_parse) { _, _ ->
-                            toast.showLong("暂未开放")
+                            GlobalApp.toastInfo("暂未开放")
                             return@CheckBoxItem false//todo true
                         }
 //                        ,
@@ -208,7 +216,7 @@ class AdvancedSettingActivity : ReturnableActivity() {
                         },
                         IntentItem(title = "切换引导debug") {
                             Tutorials.debug = !Tutorials.debug
-                            toast.showShort("${Tutorials.debug}")
+                            GlobalApp.toastInfo("${Tutorials.debug}")
                         },
                         IntentItem(title = "触发低电量") {
                             PowerEventReceiver.onLowBattery()
@@ -238,16 +246,16 @@ class AdvancedSettingActivity : ReturnableActivity() {
                         val path = UriUtils.getPathFromUri(this, uri)!!
                         BackupHelper.restoreFromFile(this, File(path))
                     } else {
-                        toast.showShort(getString(R.string.text_open_failed))
+                        GlobalApp.toastError(getString(R.string.text_open_failed))
                     }
                 }
-                200 -> {
+                200 -> {//语音
                     if (resultCode == Activity.RESULT_OK && data != null) {
                         try {
                             val result = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS)
-                            toast.showShort(result[0])
+                            GlobalApp.toastInfo(result[0])
                         } catch (e: Exception) {
-                            toast.showShort(e.message ?: "e")
+                            GlobalApp.toastError(e.message ?: "e")
                         }
                     }
                 }
@@ -262,7 +270,7 @@ class AdvancedSettingActivity : ReturnableActivity() {
             if (it != null) {
                 statistic(it)
             } else {
-                toast.showShort("获取失败")
+                GlobalApp.toastError("获取失败")
             }
         }
     }

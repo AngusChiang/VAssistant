@@ -1,8 +1,7 @@
 package cn.vove7.common.app
 
-import android.os.Environment
+import android.util.Log
 import cn.vove7.common.utils.StorageHelper
-import cn.vove7.vtp.log.Vog
 import java.io.BufferedWriter
 import java.io.File
 import java.io.FileWriter
@@ -20,41 +19,33 @@ object GlobalLog {
 
     private val logList = mutableListOf<LogInfo>()
     fun log(msg: String?) {
-        Vog.d(this, "log $msg")
         write(LEVEL_INFO, msg)
     }
 
-    fun err(e: Throwable, tag: String = "") {
+    fun err(e: Throwable) {
         val tmpOutFile: String? = try {
             GlobalApp.APP.cacheDir.absolutePath + "/err"
         } catch (e: Exception) {
             null
         }
-        val msg = try {
+        val msg = try {//先写入文件
             if (tmpOutFile == null)
-                throw Exception("cacheDir获取失败")
-            val pw = PrintWriter(BufferedWriter(FileWriter(File(tmpOutFile))))
-            e.printStackTrace(pw)
-            pw.close()
-            File(tmpOutFile).readText()
-        } catch (e1: Exception) {//文件读写
-            //
+                "cacheDir获取失败" + e.message
+            else {
+                PrintWriter(BufferedWriter(FileWriter(File(tmpOutFile)))).use {
+                    e.printStackTrace(it)
+                }
+                File(tmpOutFile).readText()
+            }
+        } catch (e1: Exception) {
             e1.printStackTrace()
-            e.message
+            e.message + "\n[[[[[[${e1.message}]]]]]]"
         }
-        Vog.e(this, msg ?: "none")
-        write(LEVEL_ERROR, "tag-$tag -- $msg")
-    }
-
-    fun err(msg: String?, tag: String = "") {
-        Vog.e(this, "tag-$tag : $msg")
         write(LEVEL_ERROR, msg)
     }
+
+
     fun err(msg: String?) {
-        try {
-            Vog.e(this, "$msg")
-        } catch (e: Throwable) {
-        }
         write(LEVEL_ERROR, msg)
     }
 
@@ -64,7 +55,7 @@ object GlobalLog {
         }
     }
 
-    fun clearIfNeed() {
+    private fun clearIfNeed() {
         if (logList.size > 500)
             clear()
     }
@@ -72,7 +63,47 @@ object GlobalLog {
     private fun write(level: Int, msg: String?) {
         synchronized<Unit>(logList) {
             clearIfNeed()
-            logList.add(LogInfo(level, msg ?: "null"))
+            val pre = findCaller(3)?.let {
+                (it.methodName + "(" + it.fileName +
+                        ":" + it.lineNumber + ")")
+
+            } ?: "find caller unsuccessfully"
+            val text = "$pre  >>  $msg"
+            logList.add(LogInfo(level, text))
+            try {
+                when (level) {
+                    LEVEL_INFO -> {
+                        Log.i("VOG", text)
+                    }
+                    LEVEL_ERROR -> {
+                        Log.e("VOG", text)
+                    }
+                }
+            } catch (e: Throwable) {
+                println(text)
+            }
+        }
+    }
+
+    private fun findCaller(upDepth: Int): StackTraceElement? {
+        // 获取堆栈信息
+        val callStack = Thread.currentThread().stackTrace
+        // 最原始被调用的堆栈信息
+        // 日志类名称
+        val logClassName = GlobalLog::class.java.name
+        // 循环遍历到日志类标识
+        var i = 0
+        val len = callStack.size
+        while (i < len) {
+            if (logClassName == callStack[i].className)
+                break
+            i++
+        }
+        return try {
+            callStack[i + upDepth]
+        } catch (e: Exception) {
+            e.printStackTrace()
+            null
         }
     }
 
@@ -115,11 +146,11 @@ object GlobalLog {
             val p = StorageHelper.logPath
             val f = File(p, "log_${df.format(Date())}.log")
             f.writeText(this.toString())
-            GlobalApp.toastLong("日志已导出至${f.absolutePath}")
+            GlobalApp.toastInfo("日志已导出至${f.absolutePath}")
             clear()
         } catch (e: Exception) {
             GlobalLog.err(e)
-            GlobalApp.toastLong("导出失败，请检查存储读写权限")
+            GlobalApp.toastError("导出失败，请检查存储读写权限")
         }
     }
 

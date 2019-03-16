@@ -2,10 +2,12 @@ package cn.vove7.common.accessibility.viewnode
 
 import android.graphics.Point
 import android.graphics.Rect
+import cn.vove7.common.annotation.ScriptApiClass
 
 /**
  *
  */
+@ScriptApiClass("ViewNode")
 interface ViewOperation {
     /**
      * 尝试点击

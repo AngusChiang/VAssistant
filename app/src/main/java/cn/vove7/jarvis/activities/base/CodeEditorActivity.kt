@@ -14,6 +14,7 @@ import android.view.*
 import android.view.inputmethod.InputMethodManager
 import android.widget.TextView
 import cn.vove7.androlua.luabridge.LuaUtil
+import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.appbus.AppBus
 import cn.vove7.common.datamanager.parse.model.Action
@@ -21,8 +22,7 @@ import cn.vove7.common.datamanager.parse.model.ActionParam
 import cn.vove7.common.executor.OnPrint
 import cn.vove7.common.interfaces.CodeEditorOperation
 import cn.vove7.common.view.editor.MultiSpan
-import cn.vove7.common.view.toast.ColorfulToast
-import cn.vove7.executorengine.bridges.SystemBridge
+import cn.vove7.common.bridges.SystemBridge
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.tools.UriUtils
 import cn.vove7.jarvis.view.EditorFunsHelper
@@ -44,9 +44,8 @@ abstract class CodeEditorActivity : AppCompatActivity() {
     abstract val codeEditor: CodeEditorOperation
 
     var openFile: String? = null
-    val toast: ColorfulToast by lazy {
-        ColorfulToast(this).bottom()
-    }
+
+
     abstract val testFiles: Array<String>
     abstract val assetFolder: String
 
@@ -175,7 +174,7 @@ abstract class CodeEditorActivity : AppCompatActivity() {
                         .title(text = "设置参数")
                         .input(prefill = runArgs, hint = "多参数可以以英文','分隔") { _, charSequence ->
                             runArgs = charSequence.toString()
-                            toast.showShort("参数已设置")
+                            GlobalApp.toastInfo("参数已设置")
                         }.positiveButton()
                         .show()
             }
@@ -210,7 +209,7 @@ abstract class CodeEditorActivity : AppCompatActivity() {
                 if (openFile != null) {
                     codeEditor.saveFile(openFile!!)
                 } else {
-                    toast.showShort("示例文件无法保存")
+                    GlobalApp.toastError("示例文件无法保存")
                 }
             }
             R.id.menu_log -> showLog()
@@ -263,7 +262,7 @@ abstract class CodeEditorActivity : AppCompatActivity() {
             startActivityForResult(selIntent, 1)
         } catch (e: ActivityNotFoundException) {
             e.printStackTrace()
-            toast.showShort(getString(R.string.text_cannot_open_file_manager))
+            GlobalApp.toastError(getString(R.string.text_cannot_open_file_manager))
         }
     }
 
@@ -280,10 +279,10 @@ abstract class CodeEditorActivity : AppCompatActivity() {
                             openFile = path
                         } catch (e: Exception) {
                             GlobalLog.err(e)
-                            toast.showShort(getString(R.string.text_open_failed))
+                            GlobalApp.toastError(getString(R.string.text_open_failed))
                         }
                     } else {
-                        toast.showShort(getString(R.string.text_open_failed))
+                        GlobalApp.toastError(getString(R.string.text_open_failed))
                     }
                 }
                 else -> {

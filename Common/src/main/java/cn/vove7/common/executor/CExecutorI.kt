@@ -88,8 +88,8 @@ interface RuntimeArgs {
     var actionCount: Int
 
     val focusView: ViewNode?
-    var currentApp: ActionScope?
-    var currentActivity: String?
+    val currentApp: ActionScope?
+    val currentActivity: String?
 
     var actionScope: Int?
 

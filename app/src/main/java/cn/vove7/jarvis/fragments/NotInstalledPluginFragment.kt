@@ -3,6 +3,7 @@ package cn.vove7.jarvis.fragments
 import android.graphics.Typeface
 import android.os.Handler
 import android.os.Looper
+import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.interfaces.DownloadInfo
 import cn.vove7.common.interfaces.DownloadProgressListener
@@ -55,7 +56,7 @@ class NotInstalledPluginFragment : SimpleListFragment<VPluginInfo>() {
                 notifyLoadSuccess(b.data ?: emptyList())
             } else {
                 GlobalLog.err(b?.message)
-                toast.showLong("获取失败")
+                GlobalApp.toastError("获取失败")
                 failedToLoad()
             }
         }

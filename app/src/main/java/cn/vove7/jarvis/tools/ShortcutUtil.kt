@@ -45,7 +45,7 @@ object ShortcutUtil {
         when {
             Build.VERSION.SDK_INT >= Build.VERSION_CODES.O -> addPinedShortcut(wakeUpShortcut!!)
             Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1 -> addShortcut(wakeUpShortcut!!)
-            else -> GlobalApp.toastShort("需要7.1+")
+            else -> GlobalApp.toastWarning("需要7.1+")
         }
     }
 
@@ -115,7 +115,7 @@ object ShortcutUtil {
 //            addShortcut(webSearchShortcut!!)
         }
 //        } else {
-//            GlobalApp.toastShort("需要8.0+")
+//            GlobalApp.toastInfo("需要8.0+")
 //        }
     }
 
@@ -142,11 +142,11 @@ object ShortcutUtil {
             true
         } catch (e: Exception) {
             GlobalLog.err(e)
-            GlobalApp.toastShort("添加失败，可能数量超出限制")
+            GlobalApp.toastWarning("添加失败，可能数量超出限制")
             false
         }
 //        } else {
-//            GlobalApp.toastShort("添加快捷方式需要7.1+")
+//            GlobalApp.toastInfo("添加快捷方式需要7.1+")
 //        }
     }
 
@@ -166,9 +166,9 @@ object ShortcutUtil {
                 pinnedShortcutCallbackIntent, 0)
 
         if (shortManager?.requestPinShortcut(info, successCallback.intentSender) == true) {
-//            GlobalApp.toastShort("添加完成")
+//            GlobalApp.toastInfo("添加完成")
         } else
-            GlobalApp.toastShort("添加失败")
+            GlobalApp.toastError("添加失败")
     }
 
     /**
@@ -195,7 +195,7 @@ object ShortcutUtil {
                 addShortcut(info)
             }
         } else {
-            GlobalApp.toastShort("需要7.1+")
+            GlobalApp.toastWarning("需要7.1+")
         }
     }
 }

@@ -9,8 +9,8 @@ import android.net.Uri
 import android.os.Handler
 import android.view.LayoutInflater
 import android.view.View
-import android.widget.Button
 import android.widget.TextView
+import android.widget.Toast
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.model.UserInfo
@@ -18,12 +18,11 @@ import cn.vove7.common.model.VipPrice
 import cn.vove7.common.netacc.ApiUrls
 import cn.vove7.common.netacc.model.BaseRequestModel
 import cn.vove7.common.netacc.NetHelper
-import cn.vove7.common.view.toast.ColorfulToast
-import cn.vove7.executorengine.bridges.SystemBridge
+
+import cn.vove7.common.bridges.SystemBridge
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.tools.AppConfig
 import cn.vove7.jarvis.tools.pay.PurchaseHelper
-import cn.vove7.vtp.system.SystemHelper
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.customview.customView
 import com.afollestad.materialdialogs.input.input
@@ -57,8 +56,6 @@ class UserInfoDialog(val context: Activity, val onUpdate: () -> Unit) {
                 onUpdate.invoke()
             }.customView(view = view)
 
-    val toast = ColorfulToast(context).yellow()
-
     private val dateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault())
 
     init {
@@ -74,13 +71,13 @@ class UserInfoDialog(val context: Activity, val onUpdate: () -> Unit) {
                             p.dismiss()
                             if (b?.isOk() == true) {
                                 UserInfo.INSTANCE.setUserName(s.toString())
-                                toast.showShort(R.string.text_modify_succ)
+                                GlobalApp.toastSuccess(R.string.text_modify_succ)
                                 Handler().postDelayed({
                                     onUpdate.invoke()
                                 }, 1000)
                                 materialDialog.dismiss()
                             } else {
-                                toast.showShort(b?.message
+                                GlobalApp.toastError(b?.message
                                     ?: GlobalApp.getString(R.string.text_modify_failed))
                             }
                         }
@@ -99,8 +96,8 @@ class UserInfoDialog(val context: Activity, val onUpdate: () -> Unit) {
                     if (bean.isOk()) {
                         showReChargeDialog(bean.data!!)
                         dialog.dismiss()
-                    } else toast.showShort(R.string.text_failed_to_get_data)
-                } else toast.showShort(R.string.text_failed_to_get_data)
+                    } else GlobalApp.toastError(R.string.text_failed_to_get_data)
+                } else GlobalApp.toastError(R.string.text_failed_to_get_data)
             }
         }, 500)
     }
@@ -120,12 +117,12 @@ class UserInfoDialog(val context: Activity, val onUpdate: () -> Unit) {
                         onUpdate.invoke()
                         setData()
                     } catch (e: Exception) {
-                        toast.showShort(R.string.text_error_occurred)
-                        GlobalLog.err(e, "code: ui52")
+                        GlobalApp.toastError(R.string.text_error_occurred)
+                        GlobalLog.err(e)
                         return@postJson
                     }
                 } /*else toast.showShort(bean.message)*/
-            } else toast.showShort(R.string.text_failed_to_get_user_info)
+            } else GlobalApp.toastError(R.string.text_failed_to_get_user_info)
         }
     }
 
@@ -162,10 +159,10 @@ class UserInfoDialog(val context: Activity, val onUpdate: () -> Unit) {
                 .positiveButton(text = "支付宝") {
                     val cs = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
                     cs.primaryClip = ClipData.newPlainText("", UserInfo.getEmail())
-                    toast.showLong(R.string.text_email_copy_to_clip)
+                    GlobalApp.toastInfo(R.string.text_email_copy_to_clip, Toast.LENGTH_LONG)
 
                     PurchaseHelper.openAliPay(context) { b, m ->
-                        if (!b) toast.showShort(m)
+                        if (!b) GlobalApp.toastInfo(m)
                     }
                 }.negativeButton(text = "联系QQ") {
                     val qqNum = "529545532"
@@ -175,7 +172,7 @@ class UserInfoDialog(val context: Activity, val onUpdate: () -> Unit) {
                     try {
                         context.startActivity(qqIntent)
                     } catch (e: Exception) {
-                        toast.showShort("唤起QQ失败")
+                        GlobalApp.toastError("唤起QQ失败")
                     }
                 }.neutralButton(text = "使用充值码") {
                     showActCodeDialog()
@@ -213,7 +210,7 @@ class UserInfoDialog(val context: Activity, val onUpdate: () -> Unit) {
 
         MaterialDialog(context).title(text = "使用充值码")
                 .input(prefill = if (clipText?.matches("[a-z0-9A-Z]+".toRegex()) == true) clipText else "",
-                        waitForPositiveButton = true) { materialDialog, charSequence ->
+                        waitForPositiveButton = true) { _, charSequence ->
                     useCode(charSequence.toString())
                 }.positiveButton { d ->
                     d.dismiss()
@@ -229,12 +226,12 @@ class UserInfoDialog(val context: Activity, val onUpdate: () -> Unit) {
             pd?.dismiss()
             if (bean != null) {
                 if (bean.isOk()) {
-                    toast.showLong("${bean.data}")
+                    GlobalApp.toastSuccess("${bean.data}",Toast.LENGTH_LONG)
                 } else {
-                    toast.showLong(bean.message)
+                    GlobalApp.toastInfo(bean.message)
                 }
             } else {
-                toast.showShort(R.string.text_net_err)
+                GlobalApp.toastError(R.string.text_net_err)
             }
         }
     }

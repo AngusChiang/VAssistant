@@ -6,6 +6,7 @@ import android.os.Build
 import android.provider.Settings
 import android.support.v4.view.accessibility.AccessibilityNodeInfoCompat.FOCUS_INPUT
 import android.view.accessibility.AccessibilityNodeInfo
+import cn.vove7.common.R
 import cn.vove7.common.accessibility.component.AccPluginService
 import cn.vove7.common.accessibility.viewnode.ViewNode
 import cn.vove7.common.app.GlobalApp
@@ -86,7 +87,8 @@ abstract class AccessibilityApi : AccessibilityService() {
         var accessibilityService: AccessibilityApi? = null
         //无障碍高级服务 执行手势等操作 fixme 开启后部分机型掉帧
         var gestureService: AccessibilityApi? = null
-        val isBaseServiceOn: Boolean get() = accessibilityService != null
+        val isBaseServiceOn: Boolean
+            get() = (accessibilityService != null)
         val isAdvanServiceOn: Boolean get() = gestureService != null
 
 

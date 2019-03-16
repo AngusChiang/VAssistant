@@ -28,7 +28,7 @@ class AssistSessionGridController(context: Context, bottomView: View, val click:
                 holder.imageView.apply {
                     setImageDrawable(context.getDrawable(item.iconId))
                     setOnClickListener { click.invoke(pos) }
-                    setOnLongClickListener { GlobalApp.toastLong(item.desc ?: item.name); true }
+                    setOnLongClickListener { GlobalApp.toastInfo(item.desc ?: item.name); true }
                 }
             }
 

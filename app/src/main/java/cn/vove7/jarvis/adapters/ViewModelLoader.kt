@@ -76,7 +76,7 @@ interface ViewModelLoader<DataType> {
                 ListViewModel(data.title, data.subTitle, icon = data.viewIcon, checked = data.isChecked
                     ?: false, extra = data)
             } catch (e: Exception) {
-                GlobalLog.err(e, "uni54")
+                GlobalLog.err(e)
                 null
             }
         } else throw RuntimeException("未继承AwesomeItem，并且未实现unification")

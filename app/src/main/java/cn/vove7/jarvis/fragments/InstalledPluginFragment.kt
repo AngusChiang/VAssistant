@@ -1,6 +1,7 @@
 package cn.vove7.jarvis.fragments
 
 import android.view.*
+import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.utils.ThreadPool
 import cn.vove7.jarvis.adapters.SimpleListAdapter
 import cn.vove7.jarvis.adapters.ListViewModel
@@ -42,7 +43,7 @@ class InstalledPluginFragment : SimpleListFragment<VPluginInfo>() {
                         .show {
                             positiveButton {
                                 viewItem.extra.uninstall().also {
-                                    if (!it) toast.showShort("卸载完成，重启App后生效")
+                                    if (!it) GlobalApp.toastInfo("卸载完成，重启App后生效")
                                 }
                                 refresh()
                             }

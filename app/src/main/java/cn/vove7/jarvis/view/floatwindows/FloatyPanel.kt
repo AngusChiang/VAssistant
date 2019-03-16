@@ -18,6 +18,7 @@ import cn.vove7.common.utils.show
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.tools.AppConfig
 import cn.vove7.vtp.log.Vog
+import kotlinx.android.synthetic.main.toast_listening_text.view.*
 
 /**
  * # FloatyPanel
@@ -31,7 +32,7 @@ class FloatyPanel : AbFloatWindow<FloatyPanel.VHolder>(GlobalApp.APP) {
     lateinit var rootView: LinearLayout
     override fun layoutResId(): Int = R.layout.toast_listening_text
     override fun onCreateViewHolder(view: View): VHolder {
-        rootView = view.findViewById(R.id.root)
+        rootView = view.root
         align = AppConfig.listeningToastAlignDirection
         return VHolder(view).also { v ->
             v.aniImg.post {

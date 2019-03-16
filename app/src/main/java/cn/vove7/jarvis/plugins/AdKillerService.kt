@@ -11,7 +11,7 @@ import cn.vove7.common.datamanager.parse.model.ActionScope
 import cn.vove7.common.utils.ThreadPool.runOnPool
 import cn.vove7.common.view.finder.ViewFindBuilder
 import cn.vove7.common.view.finder.ViewFinder
-import cn.vove7.executorengine.helper.AdvanAppHelper
+import cn.vove7.common.helper.AdvanAppHelper
 import cn.vove7.jarvis.tools.AppConfig
 import cn.vove7.jarvis.view.statusbar.RemoveAdAnimation
 import cn.vove7.vtp.app.AppInfo
@@ -130,7 +130,7 @@ object AdKillerService : AbsAccPluginService() {
         finders = null
         kotlin.run {
             finderCaches.forEach {
-                if (appScope == it.key) {
+                if (appScope.equalsActivityNullable(it.key)) {
                     finders = it.value
                     return@run
                 }

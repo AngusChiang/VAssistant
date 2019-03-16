@@ -1,7 +1,7 @@
 package cn.vove7.jarvis.activities
 
 import android.support.v4.app.Fragment
-import cn.vove7.executorengine.bridges.SystemBridge
+import cn.vove7.common.bridges.SystemBridge
 import cn.vove7.jarvis.activities.base.OneFragmentActivity
 import cn.vove7.jarvis.adapters.ListViewModel
 import cn.vove7.jarvis.adapters.SimpleListAdapter
@@ -54,6 +54,7 @@ class OSLActivity : OneFragmentActivity() {
                     , OslItem("apk-parser", "https://github.com/hsiafan/apk-parser", "Apk parser lib, for decoding binary xml file, getting apk meta info.")
                     , OslItem("Recycler Fast Scroll", "https://github.com/plusCubed/recycler-fast-scroll", "")
                     , OslItem("MarkdownView", "https://github.com/tiagohm/MarkdownView", "Android library to display markdown text.")
+                    , OslItem("Toasty", "https://github.com/GrenderG/Toasty", "The usual Toast, but with steroids.")
                     // , OslItem("", "", "")
             )
             notifyLoadSuccess(l, true)

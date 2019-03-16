@@ -106,7 +106,7 @@ object HttpBridge {
             override fun onFailure(call: Call, e: IOException) {
                 e.printStackTrace()
                 GlobalLog.err("请求失败: " + e.message)
-                GlobalApp.toastShort("网络请求失败")
+                GlobalApp.toastError("网络请求失败")
                 result.setAndNotify(null)
             }
 
@@ -117,7 +117,7 @@ object HttpBridge {
                     println("onResponse ---> http bridge $s")
                     result.setAndNotify(s)
                 } else {
-                    GlobalApp.toastShort("网络请求失败")
+                    GlobalApp.toastInfo("网络请求失败")
                     GlobalLog.err("网络错误：" + response.message())
                     result.setAndNotify(null)
                 }

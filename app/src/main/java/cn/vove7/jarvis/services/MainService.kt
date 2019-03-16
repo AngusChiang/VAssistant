@@ -28,6 +28,7 @@ import cn.vove7.common.appbus.VoiceData
 import cn.vove7.common.bridges.ChoiceData
 import cn.vove7.common.bridges.ServiceBridge
 import cn.vove7.common.bridges.ShowDialogEvent
+import cn.vove7.common.bridges.SystemBridge
 import cn.vove7.common.datamanager.history.CommandHistory
 import cn.vove7.common.datamanager.parse.model.Action
 import cn.vove7.common.executor.CExecutorI
@@ -43,7 +44,6 @@ import cn.vove7.common.utils.ThreadPool.runOnPool
 import cn.vove7.common.utils.runOnNewHandlerThread
 import cn.vove7.common.utils.runOnUi
 import cn.vove7.common.utils.startActivityOnNewTask
-import cn.vove7.executorengine.bridges.SystemBridge
 import cn.vove7.executorengine.exector.MultiExecutorEngine
 import cn.vove7.executorengine.parse.ParseEngine
 import cn.vove7.jarvis.App
@@ -139,13 +139,14 @@ class MainService : BusService(),
         }
     }
 
+
     var speechEngineLoaded = false
     fun init() {
         loadChatSystem()
         loadSpeechService()
         cExecutor = MultiExecutorEngine()
         speechEngineLoaded = true
-        GlobalApp.toastShort("启动完成")
+        GlobalApp.toastInfo("启动完成")
     }
 
     /**
@@ -351,7 +352,7 @@ class MainService : BusService(),
             speakSync = false
             speechSynService?.speak(text)
         } else {
-            GlobalApp.toastShort(text ?: "null")
+            GlobalApp.toastInfo(text ?: "null")
             notifySpeakFinish()
         }
     }
@@ -379,7 +380,7 @@ class MainService : BusService(),
             speechSynService?.speak(text) ?: notifySpeakFinish()
             true
         } else {
-            GlobalApp.toastShort(text ?: "null")
+            GlobalApp.toastInfo(text ?: "null")
             false
         }
     }
@@ -410,14 +411,14 @@ class MainService : BusService(),
         executeAnimation.failedAndHideDelay(errMsg)
         if (AppConfig.execFailedVoiceFeedback)
             speakSync("执行失败")
-        else GlobalApp.toastShort("执行失败")
+        else GlobalApp.toastError("执行失败")
         floatyPanel.hideImmediately()
     }
 
     override fun onExecuteInterrupt(errMsg: String) {
         Vog.e(this, "onExecuteInterrupt: $errMsg")
         executeAnimation.failedAndHideDelay()
-//        GlobalApp.toastShort("")
+//        GlobalApp.toastInfo("")
         executeAnimation.failedAndHideDelay()
     }
 
@@ -429,7 +430,7 @@ class MainService : BusService(),
     @Subscribe(threadMode = ThreadMode.BACKGROUND)
     fun onSpeechAction(sAction: SpeechAction) {
         if (!speechEngineLoaded) {
-            GlobalApp.toastShort("引擎未就绪")
+            GlobalApp.toastWarning("引擎未就绪")
             return
         }
         when (sAction.action) {
@@ -503,7 +504,7 @@ class MainService : BusService(),
             when (order) {
                 ORDER_STOP_EXEC -> {
                     if (!speechEngineLoaded) {
-                        GlobalApp.toastShort("引擎未就绪")
+                        GlobalApp.toastWarning("引擎未就绪")
                         return@thread
                     }
                     speechRecoService?.cancelRecog()
@@ -513,28 +514,28 @@ class MainService : BusService(),
                 }
                 ORDER_STOP_RECOG -> {
                     if (!speechEngineLoaded) {
-                        GlobalApp.toastShort("引擎未就绪")
+                        GlobalApp.toastWarning("引擎未就绪")
                         return@thread
                     }
                     speechRecoService?.stopRecog()
                 }
                 ORDER_CANCEL_RECOG -> {
                     if (!speechEngineLoaded) {
-                        GlobalApp.toastShort("引擎未就绪")
+                        GlobalApp.toastWarning("引擎未就绪")
                         return@thread
                     }
                     speechRecoService?.cancelRecog()
                 }
                 ORDER_START_RECOG -> {
                     if (!speechEngineLoaded) {
-                        GlobalApp.toastShort("引擎未就绪")
+                        GlobalApp.toastWarning("引擎未就绪")
                         return@thread
                     }
                     speechRecoService?.startRecog()
                 }
                 ORDER_START_RECOG_SILENT -> {
                     if (!speechEngineLoaded) {
-                        GlobalApp.toastShort("引擎未就绪")
+                        GlobalApp.toastWarning("引擎未就绪")
                         return@thread
                     }
                     speechRecoService?.startRecogSilent()
@@ -544,14 +545,14 @@ class MainService : BusService(),
                 }
                 ORDER_START_VOICE_WAKEUP_WITHOUT_NOTIFY -> {//不重新计时
                     if (!speechEngineLoaded) {
-                        GlobalApp.toastShort("引擎未就绪")
+                        GlobalApp.toastWarning("引擎未就绪")
                         return@thread
                     }
                     speechRecoService?.startWakeUpSilently(false)
                 }
                 ORDER_STOP_VOICE_WAKEUP_WITHOUT_NOTIFY -> {
                     if (!speechEngineLoaded) {
-                        GlobalApp.toastShort("引擎未就绪")
+                        GlobalApp.toastWarning("引擎未就绪")
                         return@thread
                     }
                     speechRecoService?.stopWakeUpSilently()
@@ -595,6 +596,7 @@ class MainService : BusService(),
             speechRecoService?.release()
             speechSynService?.release()
         }
+        GlobalApp.serviceBridge = null
         super.onDestroy()
     }
 
@@ -626,7 +628,7 @@ class MainService : BusService(),
                 return when {
                     field == null -> {
                         runOnPool {
-                            GlobalApp.toastShort("正在启动服务")
+                            GlobalApp.toastInfo("正在启动服务")
                             App.startServices()
                             Vog.i(this, "instance ---> null")
                         }
@@ -640,14 +642,14 @@ class MainService : BusService(),
         val recogIsListening: Boolean
             get() {
                 return if (instance?.speechEngineLoaded != true) {//未加载
-                    GlobalApp.toastShort("引擎未就绪")
+                    GlobalApp.toastWarning("引擎未就绪")
                     false
                 } else instance?.speechRecoService?.isListening == true
             }
         val exEngineRunning: Boolean
             get() {
                 return if (instance?.speechEngineLoaded != true) {//未加载
-                    GlobalApp.toastShort("引擎未就绪")
+                    GlobalApp.toastWarning("引擎未就绪")
                     false
                 } else instance?.cExecutor?.running == true
             }
@@ -657,7 +659,7 @@ class MainService : BusService(),
         val speaking: Boolean
             get() {
                 return if (instance?.speechEngineLoaded != true) {//未加载
-                    GlobalApp.toastShort("引擎未就绪")
+                    GlobalApp.toastWarning("引擎未就绪")
                     false
                 } else instance?.speechSynService?.speaking == true
             }
@@ -667,7 +669,7 @@ class MainService : BusService(),
          */
         fun switchRecog() {
             if (instance?.speechEngineLoaded != true) {//未加载
-                GlobalApp.toastShort("引擎未就绪")
+                GlobalApp.toastWarning("引擎未就绪")
                 return
             }
             if (recogIsListening) {//配置
@@ -682,7 +684,7 @@ class MainService : BusService(),
          */
         fun parseCommand(cmd: String, chat: Boolean) {
             if (instance?.speechEngineLoaded != true) {//未加载
-                GlobalApp.toastShort("引擎未就绪")
+                GlobalApp.toastWarning("引擎未就绪")
                 return
             }
             instance?.onParseCommand(cmd, false, chat)
@@ -765,7 +767,7 @@ class MainService : BusService(),
     fun playSoundEffectSync(rawId: Int, lock: CountDownLatch? = null) {//音效同步
         Vog.d(this, "playSoundEffectSync ---> 音效开始")
         if (AppConfig.voiceRecogFeedback && AppConfig.currentStreamVolume != 0) {
-            SystemBridge.getMusicFocus()
+            SystemBridge.requestMusicFocus()
             val l = lock ?: CountDownLatch(1)
             AudioController.playOnce(rawId) {
                 Vog.d(this, "playSoundEffectSync ---> 音效结束")
@@ -840,6 +842,7 @@ class MainService : BusService(),
 
         override fun onStartRecog(byVoice: Boolean) {
             speechSynService?.stopIfSpeaking()
+
             AppBus.post(AppBus.EVENT_BEGIN_RECO)
             Vog.d(this, "onStartRecog ---> 开始识别")
             checkMusic()//检查后台播放
@@ -1024,10 +1027,10 @@ class MainService : BusService(),
                     .parseAction(result, AccessibilityApi.accessibilityService?.currentScope)
             if (parseResult.isSuccess) {
                 floatyPanel.hideImmediately()//执行时 消失
+                cExecutor.execQueue(result, parseResult.actionQueue)
                 val his = CommandHistory(UserInfo.getUserId(), result,
                         parseResult.msg)
                 NetHelper.uploadUserCommandHistory(his)
-                cExecutor.execQueue(result, parseResult.actionQueue)
                 runOnCachePool {
                     if (AppConfig.lastingVoiceCommand) {//开启长语音,重启定时
                         speechRecoService?.restartLastingUpTimer()
@@ -1138,7 +1141,7 @@ class MainService : BusService(),
     inner class SynthesisEventListener : SyncEvent {
 
         override fun onError(err: String, responseText: String?) {
-            GlobalApp.toastShort(responseText ?: "")
+            GlobalApp.toastInfo(responseText ?: "")
             GlobalLog.err(err)
             notifySpeakFinish()
             resumeMusicIf()
@@ -1186,7 +1189,7 @@ class MainService : BusService(),
      */
     fun checkMusic() {
         if (!isMusicFocus) {
-            SystemBridge.getMusicFocus()
+            SystemBridge.requestMusicFocus()
             isMusicFocus = true
         }
     }

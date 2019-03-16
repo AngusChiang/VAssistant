@@ -3,11 +3,9 @@ package cn.vove7.jarvis.droidplugin
 import android.content.Intent
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.app.GlobalLog
-import cn.vove7.jarvis.speech.baiduspeech.synthesis.util.FileUtil
 import cn.vove7.vtp.file.FileHelper
 import cn.vove7.vtp.log.Vog
 import com.qihoo360.replugin.RePlugin
-import com.qihoo360.replugin.base.IPC
 import com.qihoo360.replugin.component.service.PluginServiceClient
 import java.io.File
 
@@ -41,8 +39,8 @@ class RePluginManager : PluginManager {
                 }
             }
         } catch (e: Throwable) {
-            GlobalApp.toastShort("插件安装失败，详情见日志")
-            GlobalLog.err(e, "ip54")
+            GlobalApp.toastError("插件安装失败，详情见日志")
+            GlobalLog.err(e)
             null
         }
     }
@@ -52,7 +50,7 @@ class RePluginManager : PluginManager {
         return try {
             RePlugin.uninstall(pluginInfo.packageName)
         } catch (e: Exception) {
-            GlobalLog.err(e, "rup41")
+            GlobalLog.err(e)
             false
         }
     }
@@ -60,7 +58,7 @@ class RePluginManager : PluginManager {
     override fun launchPluginMainActivity(pluginInfo: VPluginInfo): Boolean {
         if (pluginInfo.mainActivity == null) {
             Vog.d(this, "launchPluginMainActivity ---> ")
-            GlobalApp.toastShort("无用户界面")
+            GlobalApp.toastWarning("无用户界面")
             return false
         }
         return try {
@@ -69,7 +67,7 @@ class RePluginManager : PluginManager {
                         it.addFlags(Intent.FLAG_ACTIVITY_NEW_DOCUMENT)
                     })
         } catch (e: Exception) {
-            GlobalLog.err(e, "lp41")
+            GlobalLog.err(e)
             false
         }
     }
@@ -104,7 +102,7 @@ class RePluginManager : PluginManager {
                     .createIntent(pluginInfo.packageName, pluginInfo.mainService))
             true
         } catch (e: Exception) {
-            GlobalLog.err(e, "lp41")
+            GlobalLog.err(e)
             false
         }
     }
@@ -119,7 +117,7 @@ class RePluginManager : PluginManager {
                     .createIntent(pluginInfo.packageName, pluginInfo.mainService))
             true
         } catch (e: Exception) {
-            GlobalLog.err(e, "lp41")
+            GlobalLog.err(e)
             false
         }
     }

@@ -97,7 +97,7 @@ object RootHelper {
             }
 
         } catch (e: Exception) {
-            GlobalLog.err(e.message, "rs100")
+            GlobalLog.err(e.message)
             return e.message
         }
 
@@ -119,7 +119,7 @@ object RootHelper {
                 result = p.exitValue()
             }
         } catch (e: Exception) {
-            GlobalLog.err(e, "rh122")
+            GlobalLog.err(e)
             e.printStackTrace()
         }
         return result
@@ -139,7 +139,7 @@ object RootHelper {
             execWithSu(buildList("$pkg/$serviceName"))
         } catch (e: Exception) {
             GlobalLog.err(e.message)
-            GlobalApp.toastShort("无障碍自动开启失败")
+            GlobalApp.toastError("无障碍自动开启失败")
         }
         Vog.d(this, "openAppAccessService ---> 申请结束")
     }

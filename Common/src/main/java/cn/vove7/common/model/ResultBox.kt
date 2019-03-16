@@ -1,11 +1,8 @@
 package cn.vove7.common.model
 
 import android.os.Looper
-
-import org.greenrobot.greendao.annotation.NotNull
-
 import cn.vove7.vtp.log.Vog
-
+import org.greenrobot.greendao.annotation.NotNull
 import java.lang.Thread.sleep
 
 /**
@@ -59,13 +56,17 @@ class ResultBox<T> {
     }
 
     //等待结果
-    fun blockedGet(): T? {
-        try {
+    @Throws(InterruptedException::class)
+    fun blockedGet(safely: Boolean = true): T? {
+        if (safely) {
+            try {
+                while (!has) sleep(20)
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        } else {
             while (!has) sleep(20)
-        } catch (e: InterruptedException) {
-            e.printStackTrace()
         }
-
         return mValue
     }
 

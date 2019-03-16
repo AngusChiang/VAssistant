@@ -10,19 +10,16 @@ import android.widget.ProgressBar
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.model.UserInfo
 import cn.vove7.common.netacc.ApiUrls
+import cn.vove7.common.netacc.NetHelper
 import cn.vove7.common.netacc.model.BaseRequestModel
-import cn.vove7.common.netacc.model.ResponseMessage
 import cn.vove7.common.netacc.tool.SecureHelper
 import cn.vove7.common.utils.TextHelper
-import cn.vove7.common.view.toast.ColorfulToast
 import cn.vove7.jarvis.BuildConfig
 import cn.vove7.jarvis.R
-import cn.vove7.common.netacc.NetHelper
 import cn.vove7.jarvis.view.custom.CountDownButton
 import cn.vove7.vtp.log.Vog
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.customview.customView
-import com.google.gson.reflect.TypeToken
 
 /**
  * # RetrievePasswordDialog
@@ -40,7 +37,6 @@ class RetrievePasswordDialog(context: Context) {
     private var verCodeView: TextInputLayout
     private var signUpBtn: Button
     private var loadBar: ProgressBar
-    private val toast = ColorfulToast(context)
     private val countDownSecs = 30
 
     init {
@@ -74,20 +70,20 @@ class RetrievePasswordDialog(context: Context) {
 
                 NetHelper.postJson<String>(ApiUrls.SEND_RET_PASS_EMAIL_VER_CODE, BaseRequestModel(userEmail, "check"),
                         callback = { _, bean ->
-                    loadBar.visibility = View.INVISIBLE
-                    if (bean != null) {
-                        if (bean.isOk()) {
-                            toast.showShort(bean.data ?: "null")
-                            startDown(countDownSecs)
-                        } else {
-                            this.isEnabled = true
-                            toast.showShort(bean.message)
-                        }
-                    } else {
-                        this.isEnabled = true
-                        toast.showShort("出错")
-                    }
-                })
+                            loadBar.visibility = View.INVISIBLE
+                            if (bean != null) {
+                                if (bean.isOk()) {
+                                    GlobalApp.toastSuccess(bean.data ?: "null")
+                                    startDown(countDownSecs)
+                                } else {
+                                    this.isEnabled = true
+                                    (bean.message)
+                                }
+                            } else {
+                                this.isEnabled = true
+                                GlobalApp.toastError("出错")
+                            }
+                        })
             }
         }
         signUpBtn.text = "找回"
@@ -139,13 +135,13 @@ class RetrievePasswordDialog(context: Context) {
                 loadBar.visibility = View.INVISIBLE
                 if (bean != null) {
                     if (bean.isOk()) {
-                        toast.showShort(bean.data ?: "网络错误")
+                        GlobalApp.toastInfo(bean.data ?: "网络错误")
                         dialog.dismiss()
                     } else {
-                        toast.showShort(bean.message)
+                        GlobalApp.toastError(bean.message)
                     }
                 } else {
-                    toast.showShort("出错")
+                    GlobalApp.toastError("出错")
                 }
             })
         }

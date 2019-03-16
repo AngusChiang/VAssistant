@@ -9,6 +9,7 @@ import cn.vove7.common.accessibility.AccessibilityApi;
 import cn.vove7.common.accessibility.viewnode.ViewNode;
 import cn.vove7.common.app.GlobalApp;
 import cn.vove7.common.app.GlobalLog;
+import kotlin.Suppress;
 
 import static cn.vove7.common.view.finder.ViewFinderWithMultiCondition.TEXT_MATCH_MODE_CONTAIN;
 import static cn.vove7.common.view.finder.ViewFinderWithMultiCondition.TEXT_MATCH_MODE_EQUAL;
@@ -90,12 +91,14 @@ public class ViewFindBuilder extends FindBuilderWithOperation {
      * @param regs 表达式 %消息%
      * @return this
      */
+    @Suppress(names = "unused")
     public ViewFindBuilder matchesText(String... regs) {
         viewFinderX.addViewTextCondition(regs);
         viewFinderX.setTextMatchMode(TEXT_MATCH_MODE_MATCHES);
         return this;
     }
 
+    @Suppress(names = "unused")
     public ViewFindBuilder matchesText(String regs) {
         viewFinderX.addViewTextCondition(regs);
         viewFinderX.setTextMatchMode(TEXT_MATCH_MODE_MATCHES);
@@ -127,6 +130,7 @@ public class ViewFindBuilder extends FindBuilderWithOperation {
      * @param text 文本内容
      * @return this
      */
+    @Suppress(names = "unused")
     public ViewFindBuilder similaryText(String... text) {
         viewFinderX.addViewTextCondition(text);
         viewFinderX.setTextMatchMode(TEXT_MATCH_MODE_FUZZY_WITH_PINYIN);
@@ -144,6 +148,7 @@ public class ViewFindBuilder extends FindBuilderWithOperation {
         return this;
     }
 
+    @Suppress(names = "unused")
     public ViewFindBuilder textLengthLimit(int lower, int upper) {
         viewFinderX.setTextLengthLimit(Range.create(lower, upper));
         return this;
@@ -153,7 +158,7 @@ public class ViewFindBuilder extends FindBuilderWithOperation {
     /**
      * 根据id 查找
      *
-     * @param id
+     * @param id viewId
      * @return
      */
     public ViewFindBuilder id(String id) {

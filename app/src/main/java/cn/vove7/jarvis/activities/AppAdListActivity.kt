@@ -3,6 +3,7 @@ package cn.vove7.jarvis.activities
 import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.View
+import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.datamanager.AppAdInfo
 import cn.vove7.common.datamanager.DAO
 import cn.vove7.common.datamanager.greendao.AppAdInfoDao
@@ -77,7 +78,7 @@ class AppAdListActivity : OneFragmentActivity() {
                                         delRemoteShare(tag)
                                     }
                                     DAO.daoSession.appAdInfoDao.delete(data)
-                                    toast.showShort(R.string.text_delete_complete)
+                                    GlobalApp.toastSuccess(R.string.text_delete_complete)
                                     refresh()
                                 }
                             }
@@ -113,12 +114,12 @@ class AppAdListActivity : OneFragmentActivity() {
                             adInfo.tagId = tag
                             DAO.daoSession.appAdInfoDao.update(adInfo)
                         }
-                        toast.green().showLong(bean.message)
+                        GlobalApp.toastSuccess(bean.message)
                     } else {
-                        toast.showLong(bean.message)
+                        GlobalApp.toastInfo(bean.message)
                     }
                 } else
-                    toast.red().showShort(R.string.text_error_occurred)
+                    GlobalApp.toastError(R.string.text_error_occurred)
             }
         }
 

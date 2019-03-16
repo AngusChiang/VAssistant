@@ -2,6 +2,7 @@ package cn.vove7.jarvis
 
 import android.graphics.Bitmap
 import android.util.Range
+import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.datamanager.parse.model.Action
 import cn.vove7.common.utils.TextDateParser
 import cn.vove7.common.utils.TextHelper
@@ -329,5 +330,11 @@ class ExampleUnitTest {
     @Test
     fun atan() {
         println(Math.atan(1.0) / Math.PI * 180)
+    }
+
+    @Test
+    fun logTest() {
+        GlobalLog.log("12345")
+        GlobalLog.err("err test")
     }
 }

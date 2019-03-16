@@ -45,14 +45,14 @@ class InstAppListFragment : SimpleListFragment<ActionScope>(), OnSyncInst {
 
     override fun onSync() {
         if (!UserInfo.isLogin()) {
-            toast.blue().showShort("请登陆后操作")
+            GlobalApp.toastWarning("请登陆后操作")
             return
         }
         showProgressBar()
         DataUpdator.syncInAppInst {
             hideProgressBar()
             if (it) {
-                toast.showShort("同步完成")
+                GlobalApp.toastSuccess("同步完成")
                 refresh()
             }
         }

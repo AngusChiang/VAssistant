@@ -7,10 +7,7 @@ import cn.vove7.common.accessibility.viewnode.ViewNode
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.appbus.AppBus
-import cn.vove7.common.bridges.ChoiceData
-import cn.vove7.common.bridges.GlobalActionExecutor
-import cn.vove7.common.bridges.ServiceBridge
-import cn.vove7.common.bridges.ShowDialogEvent
+import cn.vove7.common.bridges.*
 import cn.vove7.common.bridges.ShowDialogEvent.Companion.WHICH_SINGLE
 import cn.vove7.common.datamanager.DAO
 import cn.vove7.common.datamanager.executor.entity.MarkedData
@@ -27,31 +24,39 @@ import cn.vove7.common.datamanager.parse.statusmap.ActionNode
 import cn.vove7.common.executor.CExecutorI
 import cn.vove7.common.executor.CExecutorI.Companion.DEBUG_SCRIPT
 import cn.vove7.common.executor.PartialResult
+import cn.vove7.common.helper.AdvanAppHelper
+import cn.vove7.common.helper.AdvanContactHelper
+import cn.vove7.common.model.MatchedData
 import cn.vove7.common.model.RequestPermission
 import cn.vove7.common.model.UserInfo
-import cn.vove7.common.utils.LooperHelper
-import cn.vove7.common.utils.RegUtils
-import cn.vove7.common.utils.ScreenAdapter
-import cn.vove7.common.utils.ThreadPool
+import cn.vove7.common.utils.*
 import cn.vove7.common.utils.ThreadPool.runOnPool
 import cn.vove7.common.view.finder.ViewFindBuilder
 import cn.vove7.common.view.notifier.ActivityShowListener
-import cn.vove7.executorengine.bridges.SystemBridge
-import cn.vove7.executorengine.helper.AdvanContactHelper
+import cn.vove7.executorengine.model.ActionParseResult
+import cn.vove7.executorengine.parse.OpenAppAction
 import cn.vove7.executorengine.parse.ParseEngine
 import cn.vove7.vtp.log.Vog
+import java.io.Closeable
 import java.util.*
 import kotlin.concurrent.thread
 
 /**
  *
  * 基础执行器
+ * 负责: waitFoeApp
+ * sleep()
+ * currentAction
+ * command
+ * DEBUG
+ * focusView
+ * userInterrupt
  * Created by Vove on 2018/6/20
  */
 open class ExecutorImpl(
         val context: Context = GlobalApp.APP,
         val serviceBridge: ServiceBridge? = GlobalApp.serviceBridge
-) : CExecutorI {
+) : CExecutorI, Closeable {
 
     private val systemBridge = SystemBridge
     val accessApi: AccessibilityApi?
@@ -66,6 +71,10 @@ open class ExecutorImpl(
         get() = AccessibilityApi.accessibilityService?.currentFocusedEditor
     override var running: Boolean = false
     override var userInterrupt: Boolean = false
+        set(value) {
+            Vog.d(this, "终止标志 ---> $value")
+            field = value
+        }
 
     /**
      * # 等待app|Activity表
@@ -93,13 +102,13 @@ open class ExecutorImpl(
     override var currentActionIndex: Int = -1
     override var actionScope: Int? = null
 
-    override var currentApp: ActionScope? = null
+    override val currentApp: ActionScope?
         get() = accessApi?.currentScope
 
     override fun isGlobal(): Boolean =
         globalScopeType.contains(actionScope)
 
-    override var currentActivity: String? = null
+    override val currentActivity: String?
         get() {
             val r = checkAccessibilityService(false)
             return if (r) {
@@ -115,23 +124,23 @@ open class ExecutorImpl(
     private var thread: Thread? = null
 
     override fun execQueue(cmdWords: String, actionQueue: PriorityQueue<Action>?) {
-        if (actionQueue == null) return
-        if (thread?.isAlive == true) {
-            thread!!.interrupt()
+        if (actionQueue?.isEmpty() != false) return
+        thread?.apply {
+            if (isAlive) this.interrupt()
         }
         this.command = cmdWords
         DEBUG = (cmdWords == DEBUG_SCRIPT) //DEBUG
 
         this.actionQueue = actionQueue
         lock = Object()
-        thread = thread(start = true,name = "脚本线程：$cmdWords", isDaemon = true, priority = Thread.MAX_PRIORITY) {
+        thread = thread(start = true, name = "脚本线程：$cmdWords", isDaemon = true, priority = Thread.MAX_PRIORITY) {
             LooperHelper.prepareIfNeeded()
             running = true
             userInterrupt = false
             commandType = 0
-            serviceBridge?.onExecuteStart(cmdWords)
-            actionCount = actionQueue.size
             currentActionIndex = 0
+            actionCount = actionQueue.size
+            serviceBridge?.onExecuteStart(cmdWords)
             onFinish(pollActionQueue())
             currentAction = null
         }
@@ -144,7 +153,7 @@ open class ExecutorImpl(
         var r: PartialResult
         while (actionQueue.isNotEmpty()) {
             currentActionIndex++
-            if (Thread.currentThread().isInterrupted.not()) {
+            if (!userInterrupt) {
                 currentAction = actionQueue.poll()
                 actionScope = currentAction?.actionScopeType
                 Vog.d(this, "pollActionQueue ---> $actionScope")
@@ -196,7 +205,7 @@ open class ExecutorImpl(
 
     override fun executeFailed(msg: String?) {
         Vog.d(this, "executeFailed ---> $msg")
-        userInterrupt = true //设置用户中断标志
+//        userInterrupt = true //设置用户中断标志
         //pollActionQueue -> false
     }
 
@@ -206,6 +215,7 @@ open class ExecutorImpl(
      */
     override fun onFinish(result: Boolean?) {
         running = false
+        thread = null
         ScreenAdapter.reSet()
         SystemBridge.release()
         System.gc()
@@ -219,12 +229,15 @@ open class ExecutorImpl(
     @CallSuper
     override fun interrupt() {
         userInterrupt = true
-        try {
-            thread?.checkAccess()
-            thread?.interrupt()//打破wait
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
+        thread?.interrupt()//打破wait
+        Vog.d(this, "外部终止运行")
+//        try {
+//            thread?.checkAccess()
+//            thread?.interrupt()//打破wait
+//        } catch (e: Exception) {
+//            e.printStackTrace()
+//        }
+
     }
 
     /**
@@ -232,40 +245,67 @@ open class ExecutorImpl(
      * 接着打开应用
      * always return true
      */
+    /**
+     *
     private fun parseAppInnerOperation(cmd: String, pkg: String): Boolean {
-        //解析跟随
-        val appQ = ParseEngine.matchAppAction(cmd, ActionScope(pkg), true)
-        actionQueue = appQ.second
-        //打开应用
-        if (actionQueue.isNotEmpty()) {//todo 检查App页面?
-            systemBridge.openAppByPkg(pkg, true)
-            val his = CommandHistory(UserInfo.getUserId(), cmd, "打开$pkg -> ${appQ.first}")
-            AppBus.post(his)
-            Vog.d(this, "parseAppInnerOperation app内操作")
-        } else {
-            systemBridge.openAppByPkg(pkg, false)
-            Vog.d(this, "parseAppInnerOperation 无后续操作")
-            return true
-        }
-
-        val r = checkAccessibilityService()
-        if (r) {
-            //等待App打开
-            AppBus.post(AppBus.EVENT_HIDE_FLOAT)//关闭助手dialog
-            val waitR = waitForApp(pkg, null, 5000)
-            if (!waitR) return false
-            pollActionQueue()
-        }
-        return true
+    //解析跟随
+    val appQ = ParseEngine.matchAppAction(cmd, ActionScope(pkg), true)
+    actionQueue = appQ.second
+    //打开应用
+    if (actionQueue.isNotEmpty()) {//todo 检查App页面?
+    systemBridge.openAppByPkg(pkg, true)
+    val his = CommandHistory(UserInfo.getUserId(), cmd, "打开$pkg -> ${appQ.first}")
+    AppBus.post(his)
+    Vog.d(this, "parseAppInnerOperation app内操作")
+    } else {
+    systemBridge.openAppByPkg(pkg, false)
+    Vog.d(this, "parseAppInnerOperation 无后续操作")
+    return true
     }
 
-    /**
-     * 返回解析成功
-     * @param data String
-     * @return Boolean
+    val r = checkAccessibilityService()
+    if (r) {
+    //等待App打开
+    //TODO check
+    //            AppBus.post(AppBus.EVENT_HIDE_FLOAT)//关闭助手dialog
+    val waitR = waitForApp(pkg, null, 5000)
+    if (!waitR) return false
+    pollActionQueue()
+    }
+    return true
+    }
      */
-    override fun smartOpen(data: String): Boolean {
-        return smartOpen(data, null)
+
+    /**
+     * @param cmd String 包名 应用名 标记功能
+     * 同时负责解析应用内跟随操作
+     * 往往: 打开网易云 | 打开QQ扫一扫 | 酷安下载微信
+     *
+     * @return Boolean 是否解析成功
+     */
+    override fun smartOpen(cmd: String): Boolean {
+        Vog.d(this, "smartOpen: $cmd")
+        //包名
+        if (RegUtils.isPackage(cmd)) {//包名
+            return systemBridge.openAppByPkg(cmd).also {
+                if (!it) GlobalApp.toastError(R.string.text_app_not_install)
+            }
+        }
+        //By App Name
+        //确定有跟随操作，clear task
+        //解析应用内操作
+
+        //先解析名称
+        val o = parseAppInCommand(cmd)
+        return if (o != null) {
+            //执行
+            execQueue(cmd, o.actionQueue)
+            true
+        } else {
+            //检查标记功能
+            commandType = 1
+            parseOpenOrCloseAction(cmd)
+        }
     }
 
     /**
@@ -276,47 +316,107 @@ open class ExecutorImpl(
     override fun smartClose(data: String): Boolean {
         val pkg =
             if (RegUtils.isPackage(data)) data
-            else systemBridge.getPkgByWord(data)
-        return if (pkg != null)
-            onLuaExec(CloseAppScript, arrayOf(pkg)).isSuccess//强制停止App
-        else {
+            else SystemBridge.getPkgByWord(data)
+        return if (pkg != null) {
+            SystemBridge.killApp(pkg)
+//            onLuaExec(CloseAppScript, arrayOf(pkg)).isSuccess//强制停止App
+        } else {
             //Marked打开
             commandType = -1
             parseOpenOrCloseAction(data)
         }
     }
 
-    private fun smartOpen(data: String, follow: String?): Boolean {
-        Vog.d(this, "smartOpen: $data follow:$follow")
-        //包名
-        if (RegUtils.isPackage(data)) {
-            systemBridge.openAppByPkg(data).also {
-                return if (it) {
-                    follow == null || parseAppInnerOperation(follow, data)
-                } else {
-                    GlobalApp.toastShort(R.string.text_app_not_install)
-                    false
+
+    /**
+     * 根据本地应用,解析用户指令内包含的应用信息
+     * 匹配机制：标识 -> 按匹配率排序
+     * 预解析跟随操作 ：  QQ扫一扫 (指令与APP名称) QQ浏览器  网易云播放(标记APP)
+     * @param command String 用户指令
+     * @return ActionParseResult
+     */
+    private fun parseAppInCommand(command: String): ActionParseResult? {
+        val list = mutableListOf<MatchedData<ActionParseResult>>()
+        //标记应用预解析匹配
+        AdvanAppHelper.MARKED_APP_PKG.forEach {
+            val scope = ActionScope(it.value)//
+
+            val rs = TextHelper.matchValues(command, it.regexString())
+            if (rs != null) {//匹配成功
+                val follow = rs[rs.size - 1]
+                Vog.d(this, "标记预解析---> $follow")
+
+                val aq = if (follow.isNotEmpty()) {
+                    ParseEngine.parseAppActionWithScope(follow, scope, false)
+                } else null
+                if (aq != null) {
+                    list.add(MatchedData(0.9f, aq))
+                } else {//无跟随操作
+                    val q = PriorityQueue<Action>()
+
+                    //加入打开操作
+                    val openAction by OpenAppAction(it.value)
+                    q.add(openAction)
+
+                    list.add(MatchedData(0.6f, ActionParseResult(true, q)))
                 }
             }
         }
-        //By App Name
-        //确定有跟随操作，clear task
-        val o = systemBridge.getPkgByWord(data)
-        return if (o != null) {//打开App 解析跟随操作
-            parseAppInnerOperation(data, o)
-        } else {//其他操作,打开网络,手电，网页
-            commandType = 1
-            parseOpenOrCloseAction(data)
+
+        //应用列表预解析匹配
+        synchronized(AdvanAppHelper.ALL_APP_LIST) {
+
+            AdvanAppHelper.ALL_APP_LIST.values.forEach {
+                try {
+                    val name = it.name ?: ""
+                    if (command.startsWith(name, ignoreCase = true)) { //如果startWith 并且解析到跟随操作. get it
+                        val follow = command.substring(name.length)
+                        Vog.d(this, "预解析---> $follow")
+                        val scope = ActionScope(it.packageName)
+                        val aq = if (follow.isNotEmpty()) {
+                            ParseEngine.parseAppActionWithScope(follow, scope, false)
+                        } else null
+
+                        if (aq != null) {
+                            list.add(MatchedData(0.91f, aq))
+                        } else {//无跟随操作
+                            val q = PriorityQueue<Action>()
+
+                            //加入打开操作
+                            val openAction by OpenAppAction(it.packageName)
+                            q.add(openAction)
+                            ActionParseResult(true, q)
+                            list.add(MatchedData(0.6f, ActionParseResult(true, q)))
+                        }
+                    }
+                } catch (e: Exception) {
+                    GlobalLog.err(e.message) //记录
+                    e.printStackTrace()
+                }
+            }
         }
+        if (list.isEmpty()) return null
+        list.sort()
+        return list[0].data
     }
+
+    /**
+     * 匹配率下限
+     */
+    private var limitRate = 0.75f
 
     @Override
     fun finalize() {
         activityNotifier.unregister()
     }
 
+    override fun close() {
+        finalize()
+    }
+
     /**
-     * 解析打开动作
+     * 解析标记功能
+     * 脚本内根据[commandType]分别 打开/关闭
      */
     private fun parseOpenOrCloseAction(p: String): Boolean {
         /*val marked = markedOpenDao.queryBuilder()
@@ -332,18 +432,18 @@ open class ExecutorImpl(
         )).list().forEach {
             val result = it.rawRegex().matchEntire(p)//标记功能 严格匹配
             if (result != null) {
-                return openByIdentifier(it, ParseEngine.getLastParam(result.groups))//执行
+                return openByIdentifier(it)//执行
             }
         }
         AppBus.post(CommandHistory(UserInfo.getUserId(), "打开|关闭 $p", null))
-        Vog.d(this,"parseOpenOrCloseAction ---> 未知操作: $p")
+        Vog.d(this, "parseOpenOrCloseAction ---> 未知操作: $p")
         return false
     }
 
     /**
      * 解析标识符
      */
-    private fun openByIdentifier(it: MarkedData, follow: String?): Boolean {
+    private fun openByIdentifier(it: MarkedData): Boolean {
         return when (it.type) {
             MARKED_TYPE_SCRIPT_LUA -> {
                 actionQueue = PriorityQueue()
@@ -450,15 +550,16 @@ open class ExecutorImpl(
             return false
         }
 
-        waitForActivity(this, ActionScope(pkg, activityName))
+        waitForActivity(ActionScope(pkg, activityName))
         return waitForUnlock(m)
     }
 
-    private fun waitForActivity(executor: CExecutorI, scope: ActionScope) {
-        locksWaitForActivity[executor] = scope
+    private fun waitForActivity(scope: ActionScope) {
+        locksWaitForActivity[this] = scope
         ThreadPool.runOnCachePool {
+            //开线程
             Thread.sleep(200)
-            try {
+            try {//主动调用一次
                 activityNotifier.onAppChanged(accessApi?.currentScope!!)
             } catch (e: Exception) {
             }
@@ -646,6 +747,22 @@ open class ExecutorImpl(
         private val globalScopeType = arrayListOf(ActionNode.NODE_SCOPE_GLOBAL/*, ActionNode.NODE_SCOPE_GLOBAL_2*/)
 
         //todo 脚本内实现
+        private fun closeAppByPkg(pkg: String) {
+            SystemBridge.openAppDetail(pkg)
+            AccessibilityApi.accessibilityService?.also { service ->
+                val stopButton = ViewFindBuilder()
+                        .equalsText("强行停止", "force stop")
+                        .waitFor(3000) ?: return
+
+                if (stopButton.tryClick()) {
+                    val okButton = ViewFindBuilder().equalsText("确定", "OK")
+                            .waitFor(600)
+                }
+
+            }
+
+        }
+
         private const val CloseAppScript = "require 'accessibility'\n" +
                 "system.openAppDetail(args[1])\n" +
                 "s = ViewFinder().equalsText({'强行停止','force stop'}).waitFor(3000)\n" +
@@ -668,17 +785,18 @@ open class ExecutorImpl(
     }
 
     override fun sleep(millis: Long) {
-        try {
-            Thread.sleep(millis)
-        } catch (e: InterruptedException) {
-            Thread.currentThread().interrupt()
-            //必须强行stop
-//            Thread.currentThread().stop()
-        }
+//        try {
+        Thread.sleep(millis)
+//        } catch (e: InterruptedException) {
+//            Thread.currentThread().interrupt()
+//            throw InterruptedException("sleep 休眠终止")
+//            //必须强行stop
+////            Thread.currentThread().stop()
+//        }
     }
 
     override fun checkAccessibilityService(jump: Boolean): Boolean {
-        return if (!bridgeIsAvailable()) {
+        return if (!AccessibilityApi.isBaseServiceOn) {
             if (jump) {
                 AppBus.post(RequestPermission("无障碍服务"))
             }
@@ -686,16 +804,5 @@ open class ExecutorImpl(
         } else true
     }
 
-    /**
-     * 检查无障碍服务
-     */
-    private fun bridgeIsAvailable(): Boolean {
-        val ac = accessApi
-        return if (ac != null) {
-            true
-        } else {
-            GlobalLog.log(context.getString(R.string.text_acc_service_not_running))
-            false
-        }
-    }
+
 }

@@ -35,7 +35,7 @@ class OfflineResource(context: Context, voiceType: String) {
             setOfflineVoiceType(voiceType)
         } catch (e: Exception) {
             GlobalLog.err(e)
-            GlobalApp.toastShort("离线资源加载失败 ${e.message}")
+            GlobalApp.toastError("离线资源加载失败 ${e.message}")
         }
     }
 

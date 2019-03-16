@@ -18,8 +18,8 @@ import cn.vove7.common.utils.ThreadPool.runOnCachePool
 import cn.vove7.common.utils.runOnNewHandlerThread
 import cn.vove7.common.utils.runOnUi
 import cn.vove7.common.view.finder.ScreenTextFinder
-import cn.vove7.common.view.toast.ColorfulToast
-import cn.vove7.executorengine.bridges.SystemBridge
+
+import cn.vove7.common.bridges.SystemBridge
 import cn.vove7.jarvis.BuildConfig
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.services.MainService
@@ -40,21 +40,19 @@ import java.util.concurrent.CountDownLatch
  */
 class ScreenPickerActivity : Activity() {
 
-    val toast: ColorfulToast by lazy { ColorfulToast(this) }
-
     private val viewNodeList = mutableListOf<Model>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         if (!AccessibilityApi.isBaseServiceOn) {
-            toast.showLong("无障碍未开启，无法获取屏幕内容")
+            GlobalApp.toastWarning("无障碍未开启，无法获取屏幕内容")
             finish()
             return
         }
 
         if (!AppConfig.haveTextPickPermission()) {//免费次数
-            toast.showLong("今日次数达到上限")
+            GlobalApp.toastWarning("今日次数达到上限")
             finish()
             return
         }
@@ -71,7 +69,7 @@ class ScreenPickerActivity : Activity() {
 
 
             if (viewNodeList.isEmpty()) {
-                GlobalApp.toastShort("未提取到任何内容")
+                GlobalApp.toastInfo("未提取到任何内容")
                 finish()
             } else runOnUi {
                 buildContent()
@@ -148,7 +146,7 @@ class ScreenPickerActivity : Activity() {
         }
 
         hasT = true
-        toast.showShort("开始翻译")
+        GlobalApp.toastInfo("开始翻译")
         val count = CountDownLatch(viewNodeList.size)
         viewNodeList.forEach {
             val text = it.text
@@ -174,7 +172,7 @@ class ScreenPickerActivity : Activity() {
                 //监听
                 count.await()
                 runOnUi {
-                    toast.showShort("翻译完成")
+                    GlobalApp.toastSuccess("翻译完成")
                 }
             }
         }
@@ -242,7 +240,7 @@ class ScreenPickerActivity : Activity() {
             noAutoDismiss()
             positiveButton(text = "复制原文") {
                 SystemBridge.setClipText(text)
-                toast.showShort(R.string.text_copied)
+                GlobalApp.toastInfo(R.string.text_copied)
             }
             neutralButton(text = "分词") {
                 showSplitWordDialog(text)
@@ -287,7 +285,7 @@ class ScreenPickerActivity : Activity() {
         runOnUi {
             bd.negativeButton(text = "复制翻译") {
                 SystemBridge.setClipText(trans)
-                toast.showShort(R.string.text_copied)
+                GlobalApp.toastInfo(R.string.text_copied)
             }
         }
     }

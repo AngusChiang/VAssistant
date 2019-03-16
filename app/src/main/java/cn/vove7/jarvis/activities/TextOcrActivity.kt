@@ -10,7 +10,7 @@ import cn.vove7.common.utils.ThreadPool
 import cn.vove7.common.utils.gone
 import cn.vove7.common.utils.runOnNewHandlerThread
 import cn.vove7.common.utils.runOnUi
-import cn.vove7.executorengine.bridges.SystemBridge
+import cn.vove7.common.bridges.SystemBridge
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.tools.AppConfig
 import cn.vove7.jarvis.tools.baiduaip.BaiduAipHelper
@@ -58,7 +58,7 @@ class TextOcrActivity : Activity() {
         runOnUi {
             bd.negativeButton(text = "复制翻译") {
                 SystemBridge.setClipText(trans)
-                GlobalApp.toastShort(R.string.text_copied)
+                GlobalApp.toastInfo(R.string.text_copied)
             }
         }
     }
@@ -86,10 +86,10 @@ class TextOcrActivity : Activity() {
                     buildContent()
                 }
             } catch (e: NullPointerException) {
-                GlobalApp.toastShort("截屏失败")
+                GlobalApp.toastError("截屏失败")
                 finish()
             } catch (e: Exception) {
-                GlobalApp.toastShort(e.message!!)
+                GlobalApp.toastError(e.message!!)
                 finish()
             }
         }
@@ -201,7 +201,7 @@ class TextOcrActivity : Activity() {
             noAutoDismiss()
             positiveButton(text = "复制原文") {
                 SystemBridge.setClipText(text)
-                GlobalApp.toastShort(R.string.text_copied)
+                GlobalApp.toastInfo(R.string.text_copied)
             }
             neutralButton("编辑") {
                 TextEditorDialog(this@TextOcrActivity, text)

@@ -66,10 +66,10 @@ object BackupHelper {
                         runOnPool {
                             sleep(if (!UserInfo.isVip()) 500 else 500)
                             if (backup(indices, true)) {
-                                GlobalApp.toastShort("备份成功")
+                                GlobalApp.toastSuccess("备份成功")
                                 it.dismiss()
                             } else {
-                                GlobalApp.toastShort("备份失败，详情请查看日志")
+                                GlobalApp.toastError("备份失败，详情请查看日志")
                             }
                             p.dismiss()
                         }
@@ -88,7 +88,7 @@ object BackupHelper {
 
     private fun checkSel(indices: IntArray): Boolean {
         return if (indices.isEmpty()) {
-            GlobalApp.toastShort("至少选择一项")
+            GlobalApp.toastInfo("至少选择一项")
             false
         } else true
     }
@@ -124,7 +124,7 @@ object BackupHelper {
     private fun backup(types: IntArray, local: Boolean): Boolean {
         return try {
             val data = wrapData(types)
-            val json = GsonHelper.prettyJson(data)
+            val json = GsonHelper.toJson(data, true)
             Vog.d(this, "json ---> $json")
             if (local) toFile(json) else toCloud(json)
         } catch (e: Exception) {
@@ -136,7 +136,7 @@ object BackupHelper {
 
     private fun toCloud(json: String): Boolean {
         //todo
-        GlobalApp.toastShort(R.string.text_coming_soon)
+        GlobalApp.toastInfo(R.string.text_coming_soon)
         return false
     }
 
@@ -183,7 +183,7 @@ object BackupHelper {
                             this.dismiss()
                         } catch (e: ActivityNotFoundException) {
                             e.printStackTrace()
-                            GlobalApp.toastShort(R.string.text_cannot_open_file_manager)
+                            GlobalApp.toastInfo(R.string.text_cannot_open_file_manager)
                         }
                     }
                     positiveButton(text = "下一步")
@@ -192,7 +192,7 @@ object BackupHelper {
 
     fun restoreFromFile(activity: Activity, file: File) {
         if (!file.exists() || file.isDirectory) {
-            GlobalApp.toastShort("文件错误")
+            GlobalApp.toastError("文件错误")
         } else {//读取
             val json = file.readText()
             restoreFromJsonData(activity, json)
@@ -203,13 +203,13 @@ object BackupHelper {
         try {
             val data = Gson().fromJson(json, BackupWrap::class.java)
             if (data == null) {
-                GlobalApp.toastShort("数据解析失败")
+                GlobalApp.toastError("数据解析失败")
                 return
             }
             restoreData(activity, data)
         } catch (e: JsonSyntaxException) {
             GlobalLog.err(e)
-            GlobalApp.toastShort("恢复失败，数据错误")
+            GlobalApp.toastError("恢复失败，数据错误")
         }
     }
 
@@ -461,7 +461,7 @@ object BackupHelper {
             }
             true
         } catch (e: Throwable) {
-            GlobalLog.err(e, "bac460")
+            GlobalLog.err(e)
             false
         }
     }
@@ -483,7 +483,7 @@ object BackupHelper {
             }
             Pair(true, "恢复完成，请重启App")
         } catch (e: Throwable) {
-            GlobalLog.err(e, "bac460")
+            GlobalLog.err(e)
             Pair(false, "发生错误 ${e.message}")
         }
     }

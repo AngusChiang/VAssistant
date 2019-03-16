@@ -57,7 +57,7 @@ object StorageHelper {
                     mkdirs()
                 }
             } catch (e: Exception) {
-                GlobalLog.err("目录创建失败" + e.message, "sh39")
+                GlobalLog.err("目录创建失败" + e.message)
             }
         }
     }

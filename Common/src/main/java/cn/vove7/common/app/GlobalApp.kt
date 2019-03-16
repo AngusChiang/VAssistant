@@ -5,12 +5,19 @@ import android.content.Context
 import android.content.Intent
 import android.support.multidex.MultiDex
 import android.util.Log
+import android.widget.Toast
 import cn.vove7.common.BuildConfig
 import cn.vove7.common.bridges.ServiceBridge
-import cn.vove7.common.view.toast.ColorfulToast
+import cn.vove7.common.helper.ToastyHelper
+import cn.vove7.common.helper.ToastyHelper.TYPE_ERROR
+import cn.vove7.common.helper.ToastyHelper.TYPE_INFO
+import cn.vove7.common.helper.ToastyHelper.TYPE_SUCCESS
+import cn.vove7.common.helper.ToastyHelper.TYPE_WARNING
+
 import cn.vove7.vtp.app.AppInfo
 import cn.vove7.vtp.log.Vog
 import com.qihoo360.replugin.*
+import es.dmoral.toasty.Toasty
 
 /**
  * # GlobalApp
@@ -31,7 +38,11 @@ open class GlobalApp : RePluginApplication() {
             } catch (e: Exception) {
             }
         }
-
+        Toasty.Config.getInstance()
+                .tintIcon(true) // optional (apply textColor also to the icon)
+                .allowQueue(false) // optional (prevents several Toastys from queuing)
+                .setTextSize(14)
+                .apply() // required
     }
 
 
@@ -40,47 +51,53 @@ open class GlobalApp : RePluginApplication() {
 
         //        var toastHandler: ColorfulToast.ToastHandler? = null
         lateinit var APP: Application
-        val GApp: Application
-            get() = APP
+        val GApp: GlobalApp
+            get() = APP as GlobalApp
 
         fun getString(id: Int): String = APP.getString(id)
 
-        fun toastShort(msg: String) {
-            (APP as GlobalApp).toastShort(msg)
+        fun toastInfo(rId: Int, duration: Int = Toast.LENGTH_SHORT) {
+            toastInfo(getString(rId), duration)
         }
 
-        fun toastShort(rId: Int) {
-            toastShort(getString(rId))
+        fun toastInfo(msg: String, duration: Int = Toast.LENGTH_SHORT) {
+            ToastyHelper.toast(TYPE_INFO, msg, duration)
         }
 
-        fun toastLong(msg: String) {
-            (APP as GlobalApp).toastLong(msg)
+        fun toastSuccess(sId: Int, duration: Int = Toast.LENGTH_SHORT) {
+            toastSuccess(getString(sId), duration)
         }
 
-        fun toastLong(rId: Int) {
-            toastLong(getString(rId))
+        fun toastSuccess(msg: String, duration: Int = Toast.LENGTH_SHORT) {
+            ToastyHelper.toast(TYPE_SUCCESS, msg, duration)
+        }
+
+        fun toastError(sId: Int, duration: Int = Toast.LENGTH_SHORT) {
+            toastError(getString(sId), duration)
+        }
+
+        fun toastError(msg: String, duration: Int = Toast.LENGTH_SHORT) {
+            ToastyHelper.toast(TYPE_ERROR, msg, duration)
+        }
+
+        fun toastWarning(sId: Int, duration: Int = Toast.LENGTH_SHORT) {
+            toastWarning(getString(sId), duration)
+        }
+
+        fun toastWarning(msg: String, duration: Int = Toast.LENGTH_SHORT) {
+            ToastyHelper.toast(TYPE_WARNING, msg, duration)
         }
 
         var serviceBridge: ServiceBridge? = null
 
     }
 
-    private fun toastShort(msg: String) {
-        colorfulToast.showShort(msg)
-    }
-
-    private fun toastLong(msg: String) {
-        colorfulToast.showLong(msg)
-    }
-
-    private val colorfulToast: ColorfulToast get() = ColorfulToast(this).blue()
-
     override fun attachBaseContext(base: Context?) {
         super.attachBaseContext(base)
         try {
             MultiDex.install(base)
         } catch (e: Exception) {
-            GlobalLog.err(e, "ap71")
+            GlobalLog.err(e)
         }
         RePlugin.enableDebugger(base, BuildConfig.DEBUG)
     }

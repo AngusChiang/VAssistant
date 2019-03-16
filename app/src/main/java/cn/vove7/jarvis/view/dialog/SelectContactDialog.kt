@@ -3,7 +3,7 @@ package cn.vove7.jarvis.view.dialog
 import android.content.Context
 import android.os.Bundle
 import cn.vove7.common.utils.ThreadPool
-import cn.vove7.executorengine.helper.AdvanContactHelper
+import cn.vove7.common.helper.AdvanContactHelper
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.adapters.ListViewModel
 import cn.vove7.jarvis.adapters.SimpleListAdapter

@@ -1,7 +1,7 @@
 package cn.vove7.jarvis.view.dialog
 
 import android.content.Context
-import cn.vove7.executorengine.bridges.SystemBridge
+import cn.vove7.common.bridges.SystemBridge
 import cn.vove7.jarvis.R
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.customview.customView

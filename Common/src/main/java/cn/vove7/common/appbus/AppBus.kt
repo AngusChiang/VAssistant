@@ -52,7 +52,7 @@ object AppBus {
                 it.name == name
             }
         } catch (e: Exception) {
-            GlobalLog.err(e, "pd43")
+            GlobalLog.err(e)
         }
     }
 

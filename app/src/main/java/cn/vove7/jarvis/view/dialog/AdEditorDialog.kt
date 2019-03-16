@@ -11,8 +11,8 @@ import cn.vove7.common.datamanager.AppAdInfo
 import cn.vove7.common.datamanager.DAO
 import cn.vove7.common.datamanager.parse.DataFrom
 import cn.vove7.common.model.UserInfo
-import cn.vove7.common.view.toast.ColorfulToast
-import cn.vove7.executorengine.helper.AdvanAppHelper
+
+import cn.vove7.common.helper.AdvanAppHelper
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.tools.AppConfig
 import com.afollestad.materialdialogs.MaterialDialog
@@ -25,9 +25,6 @@ import com.afollestad.materialdialogs.customview.customView
  * 9/22/2018
  */
 class AdEditorDialog(val context: Context, val onUpdate: () -> Unit) {
-    val toast: ColorfulToast by lazy {
-        ColorfulToast(context)
-    }
 
     private fun clearErr() {
         showNameText.error = ""
@@ -76,7 +73,7 @@ class AdEditorDialog(val context: Context, val onUpdate: () -> Unit) {
                             if (viewId == null && adText == null && adDesc == null) {
                                 adViewIdText.error = "."
                                 adTexts.error = "."
-                                toast.red().showShort("至少一个")
+                                GlobalApp.toastError("至少一个")
                                 return@positiveButton
                             }
 
@@ -129,7 +126,7 @@ class AdEditorDialog(val context: Context, val onUpdate: () -> Unit) {
                         }
                     }
                     DAO.clear()
-                    toast.green().showShort(R.string.text_complete)
+                    GlobalApp.toastSuccess(R.string.text_complete)
                     dia.dismiss()
                     onUpdate.invoke()
                 }.negativeButton { it.dismiss() }

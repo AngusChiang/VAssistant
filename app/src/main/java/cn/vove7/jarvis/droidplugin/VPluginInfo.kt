@@ -72,7 +72,7 @@ abstract class VPluginInfo : AwesomeItem {
         try {
             apkFile = ApkFile(p)
         } catch (e: Exception) {
-            GlobalLog.err(e, "vp39")
+            GlobalLog.err(e)
             return
         }
         val meta = apkFile.apkMeta

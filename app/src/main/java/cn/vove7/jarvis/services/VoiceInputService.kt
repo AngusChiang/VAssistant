@@ -25,7 +25,7 @@ class VoiceInputService : RecognitionService() {
         Vog.d(this, "onStartListening ---> 开始")
         AppBus.reg(this)
         MainService.instance?.startVoiceInput() ?: let {
-            GlobalApp.toastShort("App未就绪")
+            GlobalApp.toastWarning("App未就绪")
             stopSelf()
         }
     }

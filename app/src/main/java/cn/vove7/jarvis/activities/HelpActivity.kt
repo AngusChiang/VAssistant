@@ -7,13 +7,14 @@ import android.support.design.widget.TextInputLayout
 import android.view.View
 import android.widget.AdapterView
 import android.widget.TextView
+import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.netacc.ApiUrls
 import cn.vove7.common.netacc.NetHelper
 import cn.vove7.common.netacc.model.BaseRequestModel
 import cn.vove7.common.netacc.model.UserFeedback
 import cn.vove7.common.view.editor.MultiSpan
-import cn.vove7.executorengine.bridges.SystemBridge
+import cn.vove7.common.bridges.SystemBridge
 import cn.vove7.jarvis.BuildConfig
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.activities.base.ReturnableActivity
@@ -109,7 +110,7 @@ class HelpActivity : ReturnableActivity(), AdapterView.OnItemClickListener {
                 BottomDialogWithText(this, "日志", text, true).apply {
                     positiveButton(text = "复制") {
                         SystemBridge.setClipText(text)
-                        toast.showShort(R.string.text_copied)
+                        GlobalApp.toastInfo(R.string.text_copied)
                     }
                     negativeButton(text = "清空") {
                         GlobalLog.clear()
@@ -147,10 +148,10 @@ class HelpActivity : ReturnableActivity(), AdapterView.OnItemClickListener {
                     NetHelper.postJson<Any>(ApiUrls.NEW_USER_FEEDBACK, BaseRequestModel(f)) { _, b ->
                         bar.visibility = View.INVISIBLE
                         if (b?.isOk() == true) {
-                            toast.showShort("已收到您的反馈，感谢支持")
+                            GlobalApp.toastInfo("已收到您的反馈，感谢支持")
                             d.dismiss()
                         } else {
-                            toast.showShort(R.string.text_net_err)
+                            GlobalApp.toastError(R.string.text_net_err)
                         }
                     }
                 }.negativeButton { it.cancel() }

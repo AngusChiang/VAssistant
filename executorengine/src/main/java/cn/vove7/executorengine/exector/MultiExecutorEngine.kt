@@ -2,15 +2,16 @@ package cn.vove7.executorengine.exector
 
 import cn.vove7.androlua.LuaHelper
 import cn.vove7.common.BridgeManager
+import cn.vove7.common.MessageException
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.bridges.GlobalActionExecutor
+import cn.vove7.common.bridges.SystemBridge
 import cn.vove7.common.datamanager.parse.model.Action
 import cn.vove7.common.executor.OnPrint
 import cn.vove7.common.executor.PartialResult
 import cn.vove7.common.utils.RegUtils
 import cn.vove7.executorengine.ExecutorImpl
-import cn.vove7.executorengine.bridges.SystemBridge
 import cn.vove7.rhino.RhinoHelper
 import cn.vove7.rhino.api.RhinoApi
 
@@ -21,7 +22,8 @@ import cn.vove7.rhino.api.RhinoApi
  * 2018/8/28
  */
 class MultiExecutorEngine : ExecutorImpl() {
-    private val bridgeManager = BridgeManager(this, GlobalActionExecutor, SystemBridge, serviceBridge)
+    private val bridgeManager = BridgeManager(this, GlobalActionExecutor,
+            SystemBridge, serviceBridge)
 
     /**
      * Rhino impl
@@ -37,9 +39,9 @@ class MultiExecutorEngine : ExecutorImpl() {
         }
         val sc = RegUtils.replaceRhinoHeader(script)
         return try {
-            rhinoHelper?.evalString(sc, *(args ?: arrayOf())) ?: GlobalApp.toastShort("执行器未就绪")
+            rhinoHelper?.evalString(sc, *(args ?: arrayOf())) ?: GlobalApp.toastWarning("执行器未就绪")
             RhinoApi.doLog("主线程执行完毕\n")
-             PartialResult.success()
+            PartialResult.success()
         } catch (e: Exception) {
             GlobalLog.err(e)
             RhinoApi.doLog(e.message)
@@ -69,9 +71,12 @@ class MultiExecutorEngine : ExecutorImpl() {
             luaHelper?.evalString(newScript, args)
             luaHelper?.handleMessage(OnPrint.INFO, "主线程执行完毕\n")
             PartialResult.success()
+
+        } catch (me: MessageException) {//异常消息
+            PartialResult.fatal(me.message)
         } catch (e: Throwable) {
             GlobalLog.err(e)
-            PartialResult.fatal(e.message ?: "no message")
+            PartialResult.fatal(e.message)
         }
     }
 

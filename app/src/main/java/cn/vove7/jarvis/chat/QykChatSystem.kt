@@ -22,7 +22,7 @@ class QykChatSystem : ChatSystem {
                 ChatResult(GsonHelper.fromJson<Map<String, String>>(data)!!["content"]?.replace("{br}", " ")
                     ?: "", arrayListOf())
             } catch (e: Exception) {
-                GlobalLog.err(e, "qcs25")
+                GlobalLog.err(e)
                 null
             }
         }

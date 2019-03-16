@@ -1,4 +1,4 @@
-package cn.vove7.common.bridges;
+    package cn.vove7.common.bridges;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -160,7 +160,7 @@ public class SettingsBridge {
             String rawJson = DaoHelper.INSTANCE.getInsetSettingsByName(name).getRawJson();
             return new Gson().fromJson(rawJson, rawType);
         } catch (Exception e) {
-            GlobalLog.INSTANCE.err(e, "gisi163");
+            GlobalLog.INSTANCE.err(e);
             return null;
         }
     }

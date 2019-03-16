@@ -31,7 +31,7 @@ object UtilBridge {
                         Uri.fromFile(this)))
             }
         } catch (se: SecurityException) {
-            GlobalApp.toastShort("无存储权限")
+            GlobalApp.toastError("无存储权限")
             null
         } catch (e: Exception) {
             GlobalLog.err(e)

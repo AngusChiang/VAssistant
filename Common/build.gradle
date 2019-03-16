@@ -72,6 +72,9 @@ dependencies {
     api 'com.liulishuo.okdownload:sqlite:1.0.5'
     // provide okhttp to connect to backend
     api 'com.liulishuo.okdownload:okhttp:1.0.5'
+
+    api 'com.github.GrenderG:Toasty:1.4.1'
+
 }
 
 

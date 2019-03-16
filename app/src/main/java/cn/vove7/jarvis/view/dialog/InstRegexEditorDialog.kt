@@ -5,7 +5,7 @@ import android.view.View
 import android.widget.*
 import cn.vove7.common.datamanager.parse.statusmap.Reg
 import cn.vove7.common.netacc.ApiUrls
-import cn.vove7.executorengine.bridges.SystemBridge
+import cn.vove7.common.bridges.SystemBridge
 import cn.vove7.jarvis.R
 import cn.vove7.vtp.easyadapter.BaseListAdapter
 import com.afollestad.materialdialogs.MaterialDialog

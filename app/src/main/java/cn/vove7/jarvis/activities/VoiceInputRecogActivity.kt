@@ -1,16 +1,14 @@
 package cn.vove7.jarvis.activities
 
 import android.app.Activity
-import android.app.VoiceInteractor
 import android.content.Intent
-import android.os.Build
 import android.os.Bundle
 import android.speech.RecognizerIntent
 import android.speech.RecognizerIntent.ACTION_WEB_SEARCH
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.appbus.AppBus
 import cn.vove7.common.model.VoiceRecogResult
-import cn.vove7.executorengine.bridges.SystemBridge
+import cn.vove7.common.bridges.SystemBridge
 import cn.vove7.jarvis.services.MainService
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
@@ -29,7 +27,7 @@ class VoiceInputRecogActivity : Activity() {
         super.onCreate(savedInstanceState)
         AppBus.reg(this)
         MainService.instance?.startVoiceInput() ?: let {
-            GlobalApp.toastShort("App未就绪")
+            GlobalApp.toastWarning("App未就绪")
             finishAndRemoveTask()
         }
 

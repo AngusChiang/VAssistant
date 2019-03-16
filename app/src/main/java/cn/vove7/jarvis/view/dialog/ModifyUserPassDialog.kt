@@ -2,11 +2,12 @@ package cn.vove7.jarvis.view.dialog
 
 import android.content.Context
 import android.support.design.widget.TextInputLayout
+import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.netacc.ApiUrls
 import cn.vove7.common.netacc.model.BaseRequestModel
 import cn.vove7.common.netacc.tool.SecureHelper
 import cn.vove7.common.netacc.NetHelper
-import cn.vove7.common.view.toast.ColorfulToast
+
 import cn.vove7.jarvis.R
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.customview.customView
@@ -18,7 +19,6 @@ import com.afollestad.materialdialogs.customview.customView
  * 9/29/2018
  */
 class ModifyUserPassDialog(val context: Context) {
-    val toast = ColorfulToast(context).yellow()
 
     val dialog = MaterialDialog(context)
             .customView(R.layout.dialog_modify_pass, scrollable = true)
@@ -37,10 +37,10 @@ class ModifyUserPassDialog(val context: Context) {
                 NetHelper.postJson<Any>(ApiUrls.MODIFY_PASS, BaseRequestModel(old, newP1)) { _, b ->
                     p.dismiss()
                     if (b?.isOk() == true) {
-                        toast.showShort(R.string.text_modify_succ)
+                        GlobalApp.toastSuccess(R.string.text_modify_succ)
                         it.dismiss()
                     } else {
-                        toast.showShort(b?.message ?: context.getString(R.string.text_modify_failed))
+                        GlobalApp.toastInfo(b?.message ?: context.getString(R.string.text_modify_failed))
                     }
                 }
 

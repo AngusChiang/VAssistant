@@ -2,7 +2,7 @@ package cn.vove7.jarvis.view.dialog
 
 import android.content.Context
 import cn.vove7.common.utils.LooperHelper
-import cn.vove7.executorengine.bridges.SystemBridge
+import cn.vove7.common.bridges.SystemBridge
 import cn.vove7.jarvis.adapters.ListViewModel
 import cn.vove7.jarvis.adapters.SimpleListAdapter
 import cn.vove7.jarvis.chat.UrlItem

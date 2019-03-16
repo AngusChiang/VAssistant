@@ -29,7 +29,7 @@ interface CodeEditorOperation {
             val s = TextHelper.readFile(fullPath)
             Handler(Looper.getMainLooper()).post {
                 if (s == null) {
-                    GlobalApp.toastShort("打开失败")
+                    GlobalApp.toastError("打开失败")
                 }
                 setText(s ?: "")
             }
@@ -39,12 +39,12 @@ interface CodeEditorOperation {
     fun saveFile(fullPath: String) {//todo loading dialog
         val outputFile = File(fullPath)
         if (!outputFile.canWrite()) {
-            GlobalApp.toastShort("文件不可写")
+            GlobalApp.toastError("文件不可写")
         } else {
             if (TextHelper.writeFile(fullPath, getEditorContent() ?: "")) {
-                GlobalApp.toastShort("保存成功")
+                GlobalApp.toastSuccess("保存成功")
             } else {
-                GlobalApp.toastShort("保存失败，请查看日志")
+                GlobalApp.toastError("保存失败，请查看日志")
             }
         }
     }

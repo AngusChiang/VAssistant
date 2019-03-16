@@ -14,7 +14,7 @@ import cn.vove7.common.utils.whileWaitTime
  * @author 17719
  * 2018/8/10
  */
-abstract class FindBuilderWithOperation : ViewOperation {
+abstract class FindBuilderWithOperation  : ViewOperation {
     val accessibilityService: AccessibilityApi? = AccessibilityApi.accessibilityService
     var finder: ViewFinder? = null
 

@@ -15,13 +15,13 @@ import android.media.AudioRecord;
 import android.media.MediaRecorder;
 import android.support.annotation.NonNull;
 import android.util.Log;
+import android.widget.Toast;
 
 import java.io.IOException;
 import java.io.InputStream;
 
 import cn.vove7.common.app.GlobalApp;
 import cn.vove7.common.app.GlobalLog;
-import cn.vove7.jarvis.tools.AppConfig;
 import cn.vove7.vtp.log.Vog;
 
 /**
@@ -110,7 +110,7 @@ public class MicrophoneInputStream extends InputStream {
                 //closeBTHeadsetMicro();
 
             } catch (Exception e) {
-                GlobalLog.INSTANCE.err(e, "mpis114");
+                GlobalLog.INSTANCE.err(e);
             } finally {
                 isStarted = false;
             }
@@ -241,7 +241,7 @@ public class MicrophoneInputStream extends InputStream {
                         Vog.INSTANCE.d(this, "openBTHeadsetMicro ---> 蓝牙通道开启成功");
                     }
                 } catch (InterruptedException e) {
-                    GlobalApp.Companion.toastShort("蓝牙通道开启失败");
+                    GlobalApp.Companion.toastError("蓝牙通道开启失败", Toast.LENGTH_SHORT);
                     e.printStackTrace();
                 }
             }
@@ -262,7 +262,7 @@ public class MicrophoneInputStream extends InputStream {
                 mAudioManager.setBluetoothScoOn(false);
                 mAudioManager.stopBluetoothSco();
             } catch (Exception e) {
-                GlobalLog.INSTANCE.err(e, "cbhm266");
+                GlobalLog.INSTANCE.err(e);
             }
         }
     }

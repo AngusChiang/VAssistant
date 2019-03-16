@@ -12,7 +12,7 @@ import cn.vove7.common.datamanager.parse.statusmap.ActionNode
 import cn.vove7.common.executor.OnPrint
 import cn.vove7.common.utils.ThreadPool.runOnPool
 import cn.vove7.common.utils.startActivityOnNewTask
-import cn.vove7.executorengine.bridges.SystemBridge
+import cn.vove7.common.bridges.SystemBridge
 import cn.vove7.jarvis.BuildConfig
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.activities.NewInstActivity
@@ -84,7 +84,7 @@ object RemoteDebugServer : Runnable {
         server = ServerSocket(LISTEN_PORT)
         RhinoApi.regPrint(print)
         LuaHelper.regPrint(print)
-        GlobalApp.toastShort(GlobalApp.getString(R.string.text_debug_service_starting))
+        GlobalApp.toastInfo(R.string.text_debug_service_starting)
         server.use {
             while (!stopped) {
                 try {
@@ -94,8 +94,8 @@ object RemoteDebugServer : Runnable {
                     val o = PrintWriter(BufferedWriter(OutputStreamWriter(client.getOutputStream())), true)
                     val p = Pair(client, o)
                     clients?.add(p)
-                    GlobalApp.toastShort(String.format(GlobalApp.getString(R.string.text_establish_connection), client.inetAddress
-                        ?: "none"))
+                    GlobalApp.toastInfo(String.format(GlobalApp.getString(R.string.text_establish_connection), client.inetAddress
+                        ?: "null"))
                     print.onPrint(0, "与PC[${client.inetAddress}]建立连接   --来自App")
                     //type -> script -> arg
                     runOnPool {
@@ -113,7 +113,7 @@ object RemoteDebugServer : Runnable {
                         onDisConnect(p)
                     }
                 } catch (e: Exception) {
-                    GlobalApp.toastShort(GlobalApp.getString(R.string.text_disconnect_with_debugger))
+                    GlobalApp.toastInfo(R.string.text_disconnect_with_debugger)
                 }
             }
         }
@@ -165,7 +165,7 @@ object RemoteDebugServer : Runnable {
 
     private fun onDisConnect(client: Pair<Socket, PrintWriter>) {
         client.first.apply {
-            GlobalApp.toastShort("与${inetAddress}断开连接")
+            GlobalApp.toastInfo("与${inetAddress}断开连接")
             close()
         }
         clients?.remove(client)
@@ -215,7 +215,7 @@ object RemoteDebugServer : Runnable {
                 "copyText" -> {
                     SystemBridge.setClipText(action.text)
                     print.onPrint(0, "已复制")
-                    GlobalApp.toastShort("已复制")
+                    GlobalApp.toastInfo("已复制")
                 }
                 else -> {
                     if (action.action.startsWith("new_inst")) {

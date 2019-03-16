@@ -9,9 +9,10 @@ import android.support.v7.widget.AppCompatCheckedTextView
 import android.view.MotionEvent
 import android.view.View
 import android.widget.CheckedTextView
+import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.utils.runOnUi
-import cn.vove7.common.view.toast.ColorfulToast
-import cn.vove7.executorengine.bridges.SystemBridge
+
+import cn.vove7.common.bridges.SystemBridge
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.fragments.base.BaseBottomDialogWithToolbar
 import cn.vove7.jarvis.tools.baiduaip.BaiduAipHelper
@@ -31,7 +32,6 @@ import kotlin.math.min
 class WordSplitDialog(context: Context, val rawWords: String, val type: Int = 0)
     : BaseBottomDialogWithToolbar(context, "分词") {
 
-    val toast: ColorfulToast by lazy { ColorfulToast(context) }
     private val checkedTextList = mutableListOf<CheckedTextView>()
     private var wordList = mutableListOf<String>()
     override fun onCreateContentView(parent: View): View = layoutInflater.inflate(R.layout.dialog_pick_text, null)
@@ -65,7 +65,7 @@ class WordSplitDialog(context: Context, val rawWords: String, val type: Int = 0)
         positiveButton(text = "快速搜索") {
             val st = getCheckedText(checkedTextList)
             if (st.isEmpty()) {
-                toast.showShort(R.string.text_select_nothing)
+                GlobalApp.toastWarning(R.string.text_select_nothing)
                 return@positiveButton
             }
             SystemBridge.quickSearch(st)
@@ -73,17 +73,17 @@ class WordSplitDialog(context: Context, val rawWords: String, val type: Int = 0)
         negativeButton(text = "复制") {
             val st = getCheckedText(checkedTextList)
             if (st.isEmpty()) {
-                toast.showShort("已复制原文")
+                GlobalApp.toastSuccess("已复制原文")
                 SystemBridge.setClipText(rawWords)
                 return@negativeButton
             }
             SystemBridge.setClipText(getCheckedText(checkedTextList))
-            toast.showShort(R.string.text_copied)
+            GlobalApp.toastInfo(R.string.text_copied)
         }
         neutralButton(text = "分享") {
             val st = getCheckedText(checkedTextList)
             if (st.isEmpty()) {
-                toast.showShort(R.string.text_select_nothing)
+                GlobalApp.toastWarning(R.string.text_select_nothing)
                 return@neutralButton
             }
             SystemBridge.shareText(st)

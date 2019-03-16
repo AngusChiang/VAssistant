@@ -2,7 +2,6 @@ package cn.vove7.common.netacc
 
 import android.os.Handler
 import android.os.Looper
-import android.text.TextUtils
 import cn.vove7.common.BuildConfig
 import cn.vove7.common.accessibility.AccessibilityApi
 import cn.vove7.common.app.GlobalApp
@@ -20,7 +19,6 @@ import cn.vove7.common.netacc.model.RequestParseModel
 import cn.vove7.common.netacc.model.ResponseMessage
 import cn.vove7.common.utils.GsonHelper
 import cn.vove7.common.utils.ThreadPool
-import cn.vove7.common.utils.runOnUi
 import cn.vove7.vtp.log.Vog
 import com.google.gson.reflect.TypeToken
 import com.liulishuo.okdownload.DownloadListener
@@ -95,7 +93,7 @@ object NetHelper {
                         val bean = GsonHelper.fromResponseJson<T>(s)
                         if (bean?.isInvalid() == true || bean?.tokenIsOutdate() == true) {//无效下线
                             if (UserInfo.isLogin()) {
-                                GlobalApp.toastShort("用户身份过期请重新登陆")
+                                GlobalApp.toastWarning("用户身份过期请重新登陆")
                             }
                             AppBus.post(AppBus.EVENT_FORCE_OFFLINE)
                         }

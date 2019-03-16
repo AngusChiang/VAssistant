@@ -9,11 +9,12 @@ import android.os.Handler
 import android.provider.Settings
 import android.view.View
 import android.widget.TextView
+import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.appbus.AppBus
 import cn.vove7.common.appbus.SpeechAction
 import cn.vove7.common.utils.ThreadPool
-import cn.vove7.executorengine.bridges.SystemBridge
+import cn.vove7.common.bridges.SystemBridge
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.activities.base.ReturnableActivity
 import cn.vove7.jarvis.adapters.SettingsExpandableAdapter
@@ -83,7 +84,7 @@ class SettingsActivity : ReturnableActivity() {
                             }
                         } catch (e: Exception) {
                             GlobalLog.err(e)
-                            toast.showShort("跳转失败")
+                            GlobalApp.toastError("跳转失败")
                         }
                     })/*,
                     IntentItem(title = "唤醒测试") {
@@ -187,7 +188,7 @@ class SettingsActivity : ReturnableActivity() {
                                             this.dismiss()
                                         } catch (e: ActivityNotFoundException) {
                                             e.printStackTrace()
-                                            toast.showShort(R.string.text_cannot_open_file_manager)
+                                            GlobalApp.toastError(R.string.text_cannot_open_file_manager)
                                         }
                                     }
                                 }
@@ -265,7 +266,7 @@ class SettingsActivity : ReturnableActivity() {
                     },
                     IntentItem(title = "重置引导") {
                         Tutorials.resetTutorials()
-                        toast.showShort("重置完成")
+                        GlobalApp.toastInfo("重置完成")
                     },
                     CheckBoxItem(title = "用户体验计划", summary = "改善体验与完善功能",
                             keyId = R.string.key_user_exp_plan, defaultValue = true
@@ -282,16 +283,16 @@ class SettingsActivity : ReturnableActivity() {
                         try {
                             val path = UriUtils.getPathFromUri(this, uri)
                             when {
-                                path == null -> toast.showShort("路径获取失败")
+                                path == null -> GlobalApp.toastError("路径获取失败")
                                 path.endsWith(".bin") -> setPathAndReload(path)
-                                else -> toast.showShort("请选择.bin文件")
+                                else -> GlobalApp.toastInfo("请选择.bin文件")
                             }
                         } catch (e: Exception) {
                             GlobalLog.err(e)
-                            toast.showShort("设置失败")
+                            GlobalApp.toastError("设置失败")
                         }
                     } else {
-                        toast.showShort(getString(R.string.text_open_failed))
+                        GlobalApp.toastError(getString(R.string.text_open_failed))
                     }
                 }
                 else -> {
@@ -304,13 +305,13 @@ class SettingsActivity : ReturnableActivity() {
         SpHelper(this).set(R.string.key_wakeup_file_path, path)
         AppConfig.reload()
         if (AppConfig.voiceWakeup) {
-            toast.showShort("正在重载配置")
+            GlobalApp.toastInfo("正在重载配置")
             Handler().postDelayed({
                 AppBus.postSpeechAction(SpeechAction.ActionCode.ACTION_STOP_WAKEUP_WITHOUT_SWITCH)
                 Thread.sleep(2000)
                 AppBus.postSpeechAction(SpeechAction.ActionCode.ACTION_START_WAKEUP_WITHOUT_SWITCH)
             }, 1000)
-        } else toast.showShort("设置完成")
+        } else GlobalApp.toastSuccess("设置完成")
     }
 
 }

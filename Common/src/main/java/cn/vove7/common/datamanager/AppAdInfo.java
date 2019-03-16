@@ -14,7 +14,7 @@ import java.util.Objects;
 import cn.vove7.common.BuildConfig;
 import cn.vove7.common.app.GlobalLog;
 import cn.vove7.common.datamanager.parse.DataFrom;
-import cn.vove7.common.interfaces.Markable;
+import cn.vove7.common.interfaces.Signable;
 import cn.vove7.common.model.UserInfo;
 import cn.vove7.common.netacc.tool.SecureHelper;
 
@@ -22,7 +22,7 @@ import cn.vove7.common.netacc.tool.SecureHelper;
  * Created by 17719247306 on 2018/9/3
  */
 @Entity
-public class AppAdInfo implements Serializable, Markable, DataFrom {
+public class AppAdInfo implements Serializable, Signable, DataFrom {
     static final long serialVersionUID = 111L;
     @Expose(serialize = false)
     @Id

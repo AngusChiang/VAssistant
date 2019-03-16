@@ -18,7 +18,7 @@ class AppChangNotifier(private val locksWaitForActivity: MutableMap<ActivityShow
 
     private fun fill(data: ActionScope): Boolean {
         Vog.v(this, "fill $appScope - $data")
-        return appScope == data
+        return data.equalsActivityNullable(appScope)
     }
 
     override fun onAppChanged(appScope: ActionScope) {
@@ -26,7 +26,7 @@ class AppChangNotifier(private val locksWaitForActivity: MutableMap<ActivityShow
             this.appScope = appScope
             val removes = mutableListOf<ActivityShowListener>()
             kotlin.run out@{
-                locksWaitForActivity.filter { fill(it.value) }.forEach { it ->
+                locksWaitForActivity.filter { fill(it.value) }.forEach {
                     it.key.notifyActivityShow(appScope)
                     removes.add(it.key)
 //                    if (Thread.currentThread().isInterrupted) {

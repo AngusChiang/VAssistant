@@ -8,7 +8,7 @@ import android.os.Bundle
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.model.ResultBox
-import cn.vove7.common.view.toast.ColorfulToast
+
 import cn.vove7.vtp.log.Vog
 
 class ScreenshotActivity : Activity() {
@@ -17,7 +17,7 @@ class ScreenshotActivity : Activity() {
         // 全屏截屏 状态栏收起?
 //        window.setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
 //                WindowManager.LayoutParams.FLAG_FULLSCREEN)
-        Vog.d(this,"onCreate --->")
+        Vog.d(this, "onCreate --->")
         super.onCreate(savedInstanceState)
 
         requestCap()
@@ -30,7 +30,7 @@ class ScreenshotActivity : Activity() {
         try {
             startActivityForResult(mMediaProjectionManager.createScreenCaptureIntent(), REQUEST_MEDIA_PROJECTION)
         } catch (e: Exception) {
-            GlobalApp.toastShort("不支持截屏")
+            GlobalApp.toastWarning("不支持截屏")
             GlobalLog.err(e)
             notifyResult()
         }
@@ -38,7 +38,7 @@ class ScreenshotActivity : Activity() {
 
     override fun finish() {
         super.finish()
-        Vog.d(this,"finish --->")
+        Vog.d(this, "finish --->")
         overridePendingTransition(0, 0)
     }
 
@@ -50,7 +50,7 @@ class ScreenshotActivity : Activity() {
                     notifyResult(data)
                 } else {
                     notifyResult()
-                    ColorfulToast(this).red().showShort("无权限截屏")
+                    GlobalApp.toastError("无权限截屏")
                 }
             }
         }
@@ -63,7 +63,7 @@ class ScreenshotActivity : Activity() {
         var resultBox: ResultBox<Intent?>? = null
 
         fun notifyResult(b: Intent? = null) {
-            Vog.d(this,"notifyResult ---> $b")
+            Vog.d(this, "notifyResult ---> $b")
             resultBox?.setAndNotify(b)
             resultBox = null
         }

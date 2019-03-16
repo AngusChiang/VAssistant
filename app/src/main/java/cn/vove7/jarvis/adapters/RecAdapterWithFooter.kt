@@ -34,7 +34,7 @@ abstract class RecAdapterWithFooter<V : RecAdapterWithFooter.RecViewHolder,DataT
                 try {
                     onBindView(holder as V, position, getItem(position)!!)
                 } catch (e: ClassCastException) {
-                    GlobalLog.err(e.message + "code: ra37")
+                    GlobalLog.err(e.message)
                 }
             }
             TYPE_FOOTER -> {

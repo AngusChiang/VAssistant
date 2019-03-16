@@ -9,7 +9,7 @@ import cn.vove7.common.appbus.AppBus
 import cn.vove7.common.appbus.SpeechAction
 import cn.vove7.common.datamanager.DAO
 import cn.vove7.common.datamanager.parse.model.Action
-import cn.vove7.executorengine.parse.ParseEngine
+import cn.vove7.executorengine.parse.OpenAppAction
 import cn.vove7.jarvis.services.MainService
 import cn.vove7.jarvis.tools.AppConfig
 import cn.vove7.vtp.log.Vog
@@ -55,16 +55,16 @@ class VoiceAssistActivity : Activity() {
                         val que = PriorityQueue<Action>()
                         if (node.belongInApp()) {
                             val scope = node.actionScope
-                            if (scope != null)//App内 启动
-                                que.add(Action(-999,
-                                        String.format(ParseEngine.PRE_OPEN, scope.packageName),
-                                        Action.SCRIPT_TYPE_LUA))
+                            if (scope != null) {//App内 启动
+                                val openAction by OpenAppAction(scope.packageName)
+                                que.add(openAction)
+                            }
                         }
                         que.add(node.action)
                         node.action.param = null
                         AppBus.post(que)
                     } else {
-                        GlobalApp.toastShort("指令不存在")
+                        GlobalApp.toastError("指令不存在")
                     }
                 } catch (e: Exception) {
                 }

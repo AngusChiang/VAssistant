@@ -15,6 +15,7 @@ import android.widget.TextView
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.appbus.AppBus
+import cn.vove7.common.bridges.SystemBridge
 import cn.vove7.common.datamanager.DAO
 import cn.vove7.common.datamanager.DaoHelper
 import cn.vove7.common.datamanager.greendao.ActionNodeDao
@@ -22,16 +23,14 @@ import cn.vove7.common.datamanager.parse.DataFrom
 import cn.vove7.common.datamanager.parse.model.Action
 import cn.vove7.common.datamanager.parse.model.ActionDesc
 import cn.vove7.common.datamanager.parse.statusmap.ActionNode
+import cn.vove7.common.helper.AdvanAppHelper
 import cn.vove7.common.model.UserInfo
 import cn.vove7.common.netacc.ApiUrls
 import cn.vove7.common.netacc.NetHelper
 import cn.vove7.common.netacc.model.BaseRequestModel
-import cn.vove7.common.netacc.model.ResponseMessage
 import cn.vove7.common.utils.RegUtils
 import cn.vove7.common.utils.TextHelper
 import cn.vove7.common.utils.ThreadPool.runOnPool
-import cn.vove7.executorengine.bridges.SystemBridge
-import cn.vove7.executorengine.helper.AdvanAppHelper
 import cn.vove7.executorengine.parse.ParseEngine
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.adapters.ExecuteQueueAdapter
@@ -49,7 +48,6 @@ import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.customview.customView
 import com.afollestad.materialdialogs.input.input
 import com.afollestad.materialdialogs.list.listItems
-import com.google.gson.reflect.TypeToken
 import io.github.kbiakov.codeview.adapters.Options
 import kotlinx.android.synthetic.main.activity_inst_detail.*
 import java.util.*
@@ -82,7 +80,7 @@ class InstDetailActivity : AppCompatActivity() {
                 .where(ActionNodeDao.Properties.Id.eq(nodeId))
                 .unique()
         if (n == null) {
-            GlobalApp.toastShort("不存在")
+            GlobalApp.toastError("该指令不存在 $nodeId")
             finish()
             return
         }
@@ -172,7 +170,7 @@ class InstDetailActivity : AppCompatActivity() {
             if (node.action != null) {
                 copy_script.setOnClickListener {
                     SystemBridge.setClipText(node.action?.actionScript ?: "")
-                    GlobalApp.toastShort(R.string.text_copied)
+                    GlobalApp.toastInfo(R.string.text_copied)
                 }
                 val settingsHeader = RegUtils.getRegisterSettingsTextAndName(node.action.actionScript)
                 if (settingsHeader != null) {
@@ -297,7 +295,7 @@ class InstDetailActivity : AppCompatActivity() {
                     ), waitForPositiveButton = false) { _, i, s ->
                         when (i) {
                             0 -> addFollowFromNew()
-                            1 -> GlobalApp.toastShort(R.string.text_coming_soon)//todo
+                            1 -> GlobalApp.toastInfo(R.string.text_coming_soon)//todo
                         }
                     }.show()
                 }
@@ -314,12 +312,12 @@ class InstDetailActivity : AppCompatActivity() {
                                     if (s == "") 0
                                     else s.toString().toInt()
                                 } catch (e: Exception) {
-                                    GlobalApp.toastShort("输入整数值")
+                                    GlobalApp.toastError("输入整数值")
                                     return@input
                                 }
                                 node.priority = p
                                 node.update()
-                                GlobalApp.toastShort("设置完成")
+                                GlobalApp.toastSuccess("设置完成")
                                 ParseEngine.updateNode()
                                 DAO.clear()
                                 d.dismiss()
@@ -329,9 +327,9 @@ class InstDetailActivity : AppCompatActivity() {
                 }
                 R.id.menu_share -> {
                     if (UserInfo.isLogin().not()) {
-                        GlobalApp.toastShort("请登录")
+                        GlobalApp.toastInfo("请登录")
                     } else if (node.parentId != null && node.parent.tagId == null) {//检查parent
-                        GlobalApp.toastShort("请先上传上级操作")
+                        GlobalApp.toastWarning("请先上传上级操作")
                     } else
                         showShareDialog()
                 }
@@ -363,7 +361,7 @@ class InstDetailActivity : AppCompatActivity() {
                     var d: DialogWithList? = null
                     d = DialogWithList(this, InstSettingListAdapter(this,
                             settingName ?: "") {
-                        GlobalApp.toastShort("设置加载失败")
+                        GlobalApp.toastError("设置加载失败")
                         d?.dismiss()
                     })
                     d.setTitle(title ?: "")
@@ -392,9 +390,10 @@ class InstDetailActivity : AppCompatActivity() {
     private fun delLocalNode() {
         runOnPool {
             val b = DaoHelper.deleteActionNodeInTX(node.id)
-            GlobalApp.toastShort(
-                    if (b) "删除成功" else "删除失败，可至帮助进行反馈"
-            )
+            if (b) {
+                GlobalApp.toastSuccess("删除成功")
+            } else
+                GlobalApp.toastError("删除失败，可至帮助进行反馈")
         }
     }
 
@@ -408,7 +407,7 @@ class InstDetailActivity : AppCompatActivity() {
             ActionNode.belongInApp(node.actionScopeType) -> ActionNode.NODE_SCOPE_IN_APP
             else -> {
                 GlobalLog.log("maybe error")
-                GlobalApp.toastShort("maybe error")
+                GlobalApp.toastInfo("maybe error")
                 return
             }
         }*/
@@ -427,7 +426,7 @@ class InstDetailActivity : AppCompatActivity() {
     lateinit var p: ProgressDialog
     private fun doCopy2Global(containSub: Boolean) {
         if (node.parentId != null) {
-            GlobalApp.toastShort("跟随操作不允许此操作")
+            GlobalApp.toastWarning("跟随操作不允许此操作")
             return
         }
         p = ProgressDialog(this)
@@ -436,15 +435,15 @@ class InstDetailActivity : AppCompatActivity() {
             try {
                 cloneNode = node.cloneGlobal(containSub)
                 if (DaoHelper.insertNewActionNodeInTx(cloneNode)) {
-                    GlobalApp.toastLong(R.string.text_have_done)
+                    GlobalApp.toastSuccess(R.string.text_have_done)
                     DAO.clear()
-                    ParseEngine.updateGlobal()
+//                    ParseEngine.updateGlobal()
                 } else {
-                    GlobalApp.toastLong(R.string.text_an_err_happened)
+                    GlobalApp.toastError(R.string.text_an_err_happened)
                 }
             } catch (e: Exception) {
-                GlobalLog.err("${e.message} code:id230")
-                GlobalApp.toastShort("复制失败${e.message}")
+                GlobalLog.err(e.message)
+                GlobalApp.toastError("复制失败${e.message}")
             }
             p.dismiss()
         }
@@ -479,7 +478,7 @@ class InstDetailActivity : AppCompatActivity() {
                         val descStr = descText.text.toString()
                         val exStr = exText.text.toString()
                         if (descStr.trim() == "") {
-                            GlobalApp.toastShort("填写说明")
+                            GlobalApp.toastWarning("填写说明")
                             return@positiveButton
                         }
                         //set desc
@@ -508,7 +507,7 @@ class InstDetailActivity : AppCompatActivity() {
         NetHelper.postJson<Int>(ApiUrls.UPGRADE_INST, BaseRequestModel(node), callback = { _, bean ->
             if (bean != null) {
                 if (bean.isOk()) {
-                    GlobalApp.toastShort(R.string.text_share_success)
+                    GlobalApp.toastSuccess(R.string.text_share_success)
                     //sign tag
                     val s = bean.data ?: -1
                     if (s < 0) {
@@ -521,10 +520,10 @@ class InstDetailActivity : AppCompatActivity() {
                         node.update()
                     }
                 } else {
-                    GlobalApp.toastShort(bean.message)
+                    GlobalApp.toastInfo(bean.message)
                 }
             } else {
-                GlobalApp.toastShort(R.string.text_net_err)
+                GlobalApp.toastError(R.string.text_net_err)
             }
         })
     }
@@ -536,7 +535,7 @@ class InstDetailActivity : AppCompatActivity() {
         NetHelper.postJson<String>(ApiUrls.SHARE_INST, BaseRequestModel(node), callback = { _, bean ->
             if (bean != null) {
                 if (bean.isOk()) {
-                    GlobalApp.toastShort(R.string.text_share_success)
+                    GlobalApp.toastSuccess(R.string.text_share_success)
                     //sign tag
                     val s = bean.data
                     runOnPool {
@@ -551,10 +550,10 @@ class InstDetailActivity : AppCompatActivity() {
 //                        }
                     }
                 } else {
-                    GlobalApp.toastShort(bean.message)
+                    GlobalApp.toastInfo(bean.message)
                 }
             } else {
-                GlobalApp.toastShort(R.string.text_net_err)
+                GlobalApp.toastError(R.string.text_net_err)
             }
         })
     }

@@ -6,7 +6,7 @@ import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.model.UserInfo
 import cn.vove7.common.utils.ThreadPool.runOnPool
 import cn.vove7.common.utils.startActivityOnNewTask
-import cn.vove7.executorengine.bridges.SystemBridge
+import cn.vove7.common.bridges.SystemBridge
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.activities.PluginManagerActivity
 import cn.vove7.jarvis.adapters.SettingsExpandableAdapter
@@ -86,7 +86,7 @@ class LaboratoryActivity : ReturnableActivity() {
                             runOnPool {
                                 sleep(800)//等待设置完成
                                 MainService.instance?.loadChatSystem()
-                                GlobalApp.toastShort("对话系统切换完成")
+                                GlobalApp.toastInfo("对话系统切换完成")
                             }
                             return@SingleChoiceItem true
                         },

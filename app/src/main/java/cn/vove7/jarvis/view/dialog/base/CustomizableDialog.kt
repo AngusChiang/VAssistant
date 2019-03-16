@@ -93,7 +93,7 @@ abstract class CustomizableDialog(
                 dialog.customView(view = initView(), scrollable = true)
                 dialog.show()
             } catch (e: Throwable) {
-                GlobalLog.err(e.message, "csd94")
+                GlobalLog.err(e.message)
             }
         }
     }
@@ -109,7 +109,7 @@ abstract class CustomizableDialog(
                 }.show()
             }
         } catch (e: Exception) {
-            GlobalLog.err(e, "cd107")
+            GlobalLog.err(e)
             e.printStackTrace()
         }
     }

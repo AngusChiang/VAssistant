@@ -7,7 +7,7 @@ import cn.vove7.common.appbus.SpeechAction
 import cn.vove7.common.datamanager.parse.model.ActionScope
 import cn.vove7.common.utils.hasMicroPermission
 import cn.vove7.common.utils.microPermissionCache
-import cn.vove7.executorengine.helper.AdvanAppHelper
+import cn.vove7.common.helper.AdvanAppHelper
 import cn.vove7.jarvis.services.MainService
 import cn.vove7.jarvis.tools.AppConfig
 import cn.vove7.jarvis.view.statusbar.MicroToggleAnimation

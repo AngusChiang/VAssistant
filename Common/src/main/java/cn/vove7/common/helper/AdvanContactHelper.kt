@@ -1,4 +1,4 @@
-package cn.vove7.executorengine.helper
+package cn.vove7.common.helper
 
 import android.content.Context
 import android.content.pm.PackageManager
@@ -13,7 +13,7 @@ import cn.vove7.common.datamanager.executor.entity.MarkedData
 import cn.vove7.common.datamanager.greendao.MarkedDataDao
 import cn.vove7.common.model.MatchedData
 import cn.vove7.common.model.RequestPermission
-import cn.vove7.executorengine.model.Markable
+import cn.vove7.common.interfaces.Markable
 import cn.vove7.vtp.contact.ContactHelper
 import cn.vove7.vtp.contact.ContactInfo
 import cn.vove7.vtp.log.Vog

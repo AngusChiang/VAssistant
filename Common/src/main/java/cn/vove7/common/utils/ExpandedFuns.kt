@@ -3,28 +3,29 @@ package cn.vove7.common.utils
 import android.Manifest
 import android.content.Context
 import android.content.Intent
-import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
 import android.graphics.Rect
+import android.os.Build
 import android.os.Handler
 import android.os.HandlerThread
 import android.os.Looper
+import android.support.v4.app.ActivityCompat
 import android.view.View
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.app.GlobalLog
 import cn.vove7.vtp.app.AppInfo
 import cn.vove7.vtp.log.Vog
-import cn.vove7.vtp.sharedpreference.SpHelper
 import java.text.SimpleDateFormat
 import java.util.*
 
 
 /**
  * # ExpandedFuns
- * 扩展函数
+ * 扩展函数集合
  * @author Administrator
  * 2018/10/25
  */
+
 /**
  * 代码块运行于UI线程
  * @param action () -> Unit
@@ -37,7 +38,7 @@ fun runOnUi(action: () -> Unit) {
         try {
             Handler(mainLoop).post(action)
         } catch (e: Exception) {
-            GlobalLog.err(e, "pmh39")
+            GlobalLog.err(e)
         }
     }
 }
@@ -205,7 +206,7 @@ fun AppInfo.hasMicroPermission(): Boolean {
             }
         }
     } catch (e: Exception) {
-        GlobalLog.err(e, "ehm165")
+        GlobalLog.err(e)
     }
     Vog.d(this, "hasMicroPermission ---> $name 无麦克风权限")
     microPermissionCache[packageName] = false
@@ -248,8 +249,36 @@ fun View.setPadding(pad: Int) {
     setPadding(pad, pad, pad, pad)
 }
 
-fun Intent.newTask():Intent{
+fun Intent.newTask(): Intent {
     addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
     return this
 }
 
+/**
+ * 当没有key时,设置map[k] = v 并返回v
+ * @receiver Map<K, V>
+ * @param k K
+ * @param v V
+ * @return V
+ */
+inline fun <reified K, reified V> HashMap<K, V>.getOrSetDefault(k: K, v: V): V {
+    return if (containsKey(k)) {
+        get(k)!!
+    } else {
+        this[k] = v
+        v
+    }
+}
+
+/**
+ * 兼容检测权限
+ * @receiver Context
+ * @param p String
+ */
+fun Context.checkPermission(p: String): Boolean {
+    val result = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
+            checkSelfPermission(p)
+        else ActivityCompat.checkSelfPermission(this, p)
+
+    return result == PackageManager.PERMISSION_GRANTED
+}

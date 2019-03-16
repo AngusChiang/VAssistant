@@ -30,7 +30,7 @@ public class SecureHelper {
             byte[] bytes = md.digest(s.getBytes(StandardCharsets.UTF_8));
             return toHex(bytes);
         } catch (Exception e) {
-            GlobalLog.INSTANCE.err(e, "MD5");
+            GlobalLog.INSTANCE.err(e);
             throw new RuntimeException(e);
         }
     }

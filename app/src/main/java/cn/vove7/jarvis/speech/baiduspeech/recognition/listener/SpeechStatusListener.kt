@@ -7,14 +7,12 @@ import cn.vove7.common.appbus.AppBus
 import cn.vove7.common.appbus.SpeechAction
 import cn.vove7.common.appbus.VoiceData
 import cn.vove7.common.model.RequestPermission
-import cn.vove7.jarvis.services.MainService
 import cn.vove7.jarvis.speech.baiduspeech.recognition.message.SpeechMessage
 import cn.vove7.jarvis.speech.baiduspeech.recognition.model.IStatus.Companion.CODE_VOICE_ERR
 import cn.vove7.jarvis.speech.baiduspeech.recognition.model.IStatus.Companion.CODE_VOICE_RESULT
 import cn.vove7.jarvis.speech.baiduspeech.recognition.model.IStatus.Companion.CODE_VOICE_TEMP
 import cn.vove7.jarvis.speech.baiduspeech.recognition.model.IStatus.Companion.CODE_VOICE_VOL
 import cn.vove7.jarvis.speech.baiduspeech.recognition.model.RecogResult
-import cn.vove7.jarvis.tools.AppConfig
 import cn.vove7.vtp.log.Vog
 
 /**
@@ -74,7 +72,7 @@ class SpeechStatusListener(private val handler: Handler) : StatusRecogListener()
         handler.sendMessage(SpeechMessage.buildMessage(CODE_VOICE_ERR, errMsg))
         when (subErrorCode) {
             3101 -> {
-                GlobalApp.toastShort("?")
+                GlobalApp.toastInfo("?")
             }
             7001 -> {
             }
@@ -85,10 +83,10 @@ class SpeechStatusListener(private val handler: Handler) : StatusRecogListener()
                 handler.sendMessage(SpeechMessage.buildMessage(CODE_VOICE_ERR, "麦克风打开失败"))
             }
             2004, 2100 -> {
-                GlobalApp.toastShort("网络错误")
+                GlobalApp.toastError("网络错误")
             }
 //            else -> {
-//                GlobalApp.toastShort("未知错误")
+//                GlobalApp.toastInfo("未知错误")
 //            }
         }
     }

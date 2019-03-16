@@ -82,12 +82,12 @@ abstract class BaseMarkedFragment : SimpleListFragment<MarkedData>(), OnSyncMark
                             DAO.daoSession.markedDataDao.insert(markedData)
                         }
                         DAO.clear()
-                        toast.green().showLong(R.string.text_complete)
+                        GlobalApp.toastSuccess(R.string.text_complete)
                         refresh()
                         it.dismiss()
                     } catch (e: Exception) {
-                        GlobalLog.err(e.message + "code: mc63")
-                        toast.red().showLong(R.string.text_error_occurred)
+                        GlobalLog.err(e.message)
+                        GlobalApp.toastError(R.string.text_error_occurred)
                     }
                 }
         s
@@ -192,7 +192,7 @@ abstract class BaseMarkedFragment : SimpleListFragment<MarkedData>(), OnSyncMark
                                     deleteShare(data.tagId)
                                 }
                                 DAO.daoSession.markedDataDao.delete(data)
-                                toast.showShort(R.string.text_delete_complete)
+                                GlobalApp.toastSuccess(R.string.text_delete_complete)
                                 refresh()
                             }
                         }
@@ -217,7 +217,7 @@ abstract class BaseMarkedFragment : SimpleListFragment<MarkedData>(), OnSyncMark
      */
     private fun share(data: MarkedData) {
         if (!UserInfo.isLogin()) {
-            GlobalApp.toastShort(R.string.text_please_login_first)
+            GlobalApp.toastInfo(R.string.text_please_login_first)
             return
         }
         NetHelper.postJson<String>(ApiUrls.SHARE_MARKED, BaseRequestModel(data)) { _, bean ->
@@ -231,25 +231,25 @@ abstract class BaseMarkedFragment : SimpleListFragment<MarkedData>(), OnSyncMark
                         data.from = DataFrom.FROM_SHARED
                         DAO.daoSession.markedDataDao.update(data)
                     }
-                    toast.showLong(bean.message)
+                    GlobalApp.toastInfo(bean.message)
                 } else {
-                    toast.showLong(bean.message)
+                    GlobalApp.toastInfo(bean.message)
                 }
             } else
-                toast.red().showShort(R.string.text_error_occurred)
+                GlobalApp.toastError(R.string.text_error_occurred)
 
         }
     }
 
     override fun onSync(types: Array<String>) {
         if (!UserInfo.isLogin()) {
-            toast.blue().showShort("请登陆后操作")
+            GlobalApp.toastInfo("请登陆后操作")
             return
         }
         showProgressBar()
         DataUpdator.syncMarkedData(null, types, lastKeyId) {
             if (it) {
-                toast.showShort("同步完成")
+                GlobalApp.toastSuccess("同步完成")
                 refresh()
             }
             hideProgressBar()

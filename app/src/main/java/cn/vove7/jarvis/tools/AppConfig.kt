@@ -19,7 +19,7 @@ import cn.vove7.common.utils.ThreadPool.runOnCachePool
 import cn.vove7.common.utils.ThreadPool.runOnPool
 import cn.vove7.common.utils.runOnUi
 import cn.vove7.common.utils.secure.SecuritySharedPreference
-import cn.vove7.executorengine.bridges.SystemBridge
+import cn.vove7.common.bridges.SystemBridge
 import cn.vove7.jarvis.BuildConfig
 import cn.vove7.jarvis.R
 import cn.vove7.vtp.log.Vog
@@ -195,7 +195,7 @@ object AppConfig {
                 NetHelper.postJson<Any>(ApiUrls.VERIFY_TOKEN)
             } catch (e: Exception) {
                 GlobalLog.err(e)
-                GlobalApp.toastShort("用户信息提取失败，请重新登陆")
+                GlobalApp.toastError("用户信息提取失败，请重新登陆")
                 ssp.remove(context.getString(R.string.key_login_info))
             }
         } else {
@@ -233,7 +233,7 @@ object AppConfig {
 
     fun checkLogin(): Boolean {
         return if (!UserInfo.isLogin()) {
-            GlobalApp.toastShort(R.string.text_please_login_first)
+            GlobalApp.toastInfo(R.string.text_please_login_first)
             false
         } else true
     }
@@ -241,10 +241,10 @@ object AppConfig {
     fun checkUser(): Boolean {
         checkDate()
         if (!UserInfo.isLogin()) {
-            GlobalApp.toastShort(R.string.text_please_login_first)
+            GlobalApp.toastInfo(R.string.text_please_login_first)
             return false
         } else if (!UserInfo.isVip()) {
-            GlobalApp.toastShort(R.string.text_need_vip)
+            GlobalApp.toastWarning(R.string.text_need_vip)
             return false
         }
         return true
@@ -393,9 +393,9 @@ object AppConfig {
         }
 
     fun checkAppUpdate(context: Activity, byUser: Boolean, onUpdate: ((Boolean) -> Unit)? = null) {
-//        if (BuildConfig.DEBUG) {
-//            return
-//        }
+        if (BuildConfig.DEBUG) {
+            return
+        }
         runOnPool {
             try {
                 val doc = Jsoup.connect("https://www.coolapk.com/apk/cn.vove7.vassistant")
@@ -456,7 +456,7 @@ object AppConfig {
             context.startActivity(intent)
         } catch (e: Exception) {
             e.printStackTrace()
-            GlobalApp.toastShort("未安装酷安")
+            GlobalApp.toastWarning("未安装酷安")
         }
     }
 
@@ -466,7 +466,7 @@ object AppConfig {
      */
     fun haveTranslatePermission(): Boolean {
         if (!UserInfo.isLogin()) {
-            GlobalApp.toastShort("使用翻译功能，请先登录")
+            GlobalApp.toastWarning("使用翻译功能，请先登录")
             return false
         } else if (UserInfo.isVip())
             return true
@@ -478,7 +478,7 @@ object AppConfig {
             plusTodayCount("translate_count", f)
             true
         } else {
-            GlobalApp.toastShort("免费使用次数已用尽")
+            GlobalApp.toastInfo("免费使用次数已用尽")
             false
         }
     }

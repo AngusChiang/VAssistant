@@ -108,8 +108,18 @@ public class ActionScope {
         return "{" + packageName + ", " + activity + '}';
     }
 
-    @Override
-    public boolean equals(Object o) {
+    /**
+     * 比较规则
+     * A<->B
+     * pkg startWith
+     * activity 可空√ startWith
+     * activity A:null = B:""
+     * activity A:"a.b.ccc" = B:"ccc"
+     *
+     * @param o
+     * @return
+     */
+    public boolean equalsActivityNullable(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         ActionScope that = (ActionScope) o;
@@ -129,6 +139,18 @@ public class ActionScope {
                         activity.endsWith("." + that.activity) ||
                                 activity.endsWith("$" + that.activity)
                 ));
+    }
+
+    /**
+     * 此实例页面是否在指定activity
+     *
+     * @param fact
+     * @return
+     */
+    public boolean inActivity(String fact) {
+        if (this.activity == null || fact == null) return false;
+
+        return fact.endsWith(activity);
     }
 
     public boolean eqPkg(ActionScope o) {

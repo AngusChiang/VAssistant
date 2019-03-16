@@ -2,7 +2,7 @@ package cn.vove7.executorengine.parse
 
 import cn.vove7.common.accessibility.AccessibilityApi
 import cn.vove7.common.app.GlobalApp
-import cn.vove7.common.appbus.AppBus
+import cn.vove7.common.bridges.SystemBridge
 import cn.vove7.common.datamanager.DAO
 import cn.vove7.common.datamanager.greendao.ActionNodeDao
 import cn.vove7.common.datamanager.parse.model.Action
@@ -12,12 +12,13 @@ import cn.vove7.common.datamanager.parse.statusmap.ActionNode.NODE_SCOPE_GLOBAL
 import cn.vove7.common.datamanager.parse.statusmap.ActionNode.NODE_SCOPE_IN_APP
 import cn.vove7.common.datamanager.parse.statusmap.Reg
 import cn.vove7.common.datamanager.parse.statusmap.Reg.*
-import cn.vove7.common.utils.ThreadPool.runOnPool
 import cn.vove7.common.view.finder.ViewFindBuilder
 import cn.vove7.executorengine.exector.MultiExecutorEngine
+import cn.vove7.executorengine.model.ActionParseResult
 import cn.vove7.vtp.log.Vog
 import cn.vove7.vtp.sharedpreference.SpHelper
 import java.util.*
+import kotlin.reflect.KProperty
 
 /**
  * # ParseEngine
@@ -26,42 +27,51 @@ import java.util.*
  * Created by Vove on 2018/6/15
  */
 object ParseEngine {
-    var GlobalActionNodes: List<ActionNode>? = null
-    var AppActionNodes: List<ActionNode>? = null
-
-    //重置App
-    val PRE_OPEN = "openAppByPkg('%s',true)\n"
-    var i = 0
-
-    /**
-     * 同步后，更新数据
-     */
-    fun updateNode() {
-        runOnPool {
-            updateInApp()
-            updateGlobal()
-        }
-    }
-
-    fun updateInApp() {
-        AppActionNodes = DAO.daoSession.actionNodeDao.queryBuilder()
-                .where(ActionNodeDao.Properties.ActionScopeType
-                        .eq(NODE_SCOPE_IN_APP/*, NODE_SCOPE_IN_APP_2*/))
-                .orderDesc(ActionNodeDao.Properties.Priority)
-                .list()
-    }
-
-    fun updateGlobal() {
-        GlobalActionNodes = DAO.daoSession.actionNodeDao.queryBuilder()
+    private val GlobalActionNodes: List<ActionNode>
+        get() = DAO.daoSession.actionNodeDao.queryBuilder()
                 .where(ActionNodeDao.Properties.ActionScopeType
                         .eq(NODE_SCOPE_GLOBAL /*,NODE_SCOPE_GLOBAL_2*/))
                 .orderDesc(ActionNodeDao.Properties.Priority)//按优先级
                 .list()
+    private val AppActionNodes: List<ActionNode>
+        get() = DAO.daoSession.actionNodeDao.queryBuilder()
+                .where(ActionNodeDao.Properties.ActionScopeType
+                        .eq(NODE_SCOPE_IN_APP/*, NODE_SCOPE_IN_APP_2*/))
+                .orderDesc(ActionNodeDao.Properties.Priority)
+                .list()
+
+    var i = 0
+
+    //TODO 效率测试
+//    fun updateInApp() {
+//        AppActionNodes = DAO.daoSession.actionNodeDao.queryBuilder()
+//                .where(ActionNodeDao.Properties.ActionScopeType
+//                        .eq(NODE_SCOPE_IN_APP/*, NODE_SCOPE_IN_APP_2*/))
+//                .orderDesc(ActionNodeDao.Properties.Priority)
+//                .list()
+//    }
+//
+//    fun updateGlobal() {
+//        GlobalActionNodes = DAO.daoSession.actionNodeDao.queryBuilder()
+//                .where(ActionNodeDao.Properties.ActionScopeType
+//                        .eq(NODE_SCOPE_GLOBAL /*,NODE_SCOPE_GLOBAL_2*/))
+//                .orderDesc(ActionNodeDao.Properties.Priority)//按优先级
+//                .list()
+//    }
+    /**
+     * 同步后，更新数据
+     */
+    fun updateNode() {
+//        runOnPool {
+//            updateInApp()
+//            updateGlobal()
+//        }
     }
+
 
     /**
      * 匹配 ，返回操作
-     * @return @see [ParseResult]
+     * @return @see [ActionParseResult]
      * 语音命令转执行步骤顺序问题，方便排序
      * 0>1>..>9
      *
@@ -69,81 +79,79 @@ object ParseEngine {
      * 全局命令 ↓ 一级命令 -> ...
      * 使用打开 ->
      * App内   ↓ 二级命令 -> 扫一扫/ 不在指定Activity -> （有跟随指令）跳至首页
-     *
+     * 点击操作
      *
      * todo 顺序 小 -> 大
+     * @param scope 当前手机界面信息
      */
-    fun parseAction(cmdWord: String, scope: ActionScope?): ParseResult {
+    fun parseAction(cmdWord: String, scope: ActionScope?): ActionParseResult {
         i = 0
-        val actionQueue = PriorityQueue<Action>()
-        val gaq = globalActionMatch(cmdWord)
-        actionQueue.addAll(gaq.second)
-        return if (actionQueue.isNotEmpty()) {
-            ParseResult(true, actionQueue, gaq.first)
-        } else {
-            Vog.d(this, "globalAction --无匹配")
-            if (SpHelper(GlobalApp.APP).getBoolean("use_smartopen_if_parse_failed", true)) {
-                Vog.d(this, "开启 -- smartOpen")
-                if (cmdWord != "") {//使用smartOpen
+        val globalResult = globalActionMatch(cmdWord)
+        if (globalResult.isSuccess) {
+            return globalResult
+        }
+        //smartOpen
+        Vog.d(this, "globalAction --无匹配")
+        if (SpHelper(GlobalApp.APP).getBoolean("use_smartopen_if_parse_failed", true)) {//智能识别打开操作
+            Vog.d(this, "开启 -- smartOpen")
+            if (cmdWord != "") {//使用smartOpen
 //                    val q = PriorityQueue<Action>()
-                    //设置command
-                    val engine = MultiExecutorEngine()
-                    val result = engine.let {
-                        it.command = cmdWord
-                        it.smartOpen(cmdWord)
-                    }
-                    engine.finalize()
-                    if (result) {//成功打开
-                        Vog.d(this, "parseAction ---> MultiExecutorEngine().smartOpen(cmdWord) 成功打开")
-                        return ParseResult(true, PriorityQueue(), "smartOpen $cmdWord")
-                    }
+                //设置command
+                val engine = MultiExecutorEngine()
+                val result = engine.use {
+                    it.command = cmdWord
+                    it.smartOpen(cmdWord)
                 }
-                Vog.d(this, "smartOpen --无匹配")
-            }//结果?
-
-            if (scope == null) {
-                Vog.d(this, "scope is null 无障碍未打开")
-                return ParseResult(false, "无匹配")
-            }
-            val inAppQue = matchAppAction(cmdWord, scope, false)
-            actionQueue.addAll(inAppQue.second) //匹配应用内时
-            // 根据第一个action.scope 决定是否进入首页
-            if (actionQueue.isNotEmpty()) {//自动执行打开
-                AppBus.post(AppBus.EVENT_HIDE_FLOAT)//关闭助手dialog
-                val appScope = actionQueue.peek().scope
-                if (appScope?.activity ?: "" == "" || !scope.activity.endsWith(appScope.activity)) {//Activity 空 or Activity 不等 => 不同页面
-                    Vog.d(this, "parseAction ---> 应用内不同页")
-                    actionQueue.add(Action(-999,
-                            String.format(PRE_OPEN, scope.packageName)
-                            , Action.SCRIPT_TYPE_LUA))
+                if (result) {//成功打开
+                    Vog.d(this, "parseAction ---> MultiExecutorEngine().smartOpen(cmdWord) 成功打开")
+                    return ActionParseResult(true, PriorityQueue(), "smartOpen $cmdWord")
                 }
-            } else if (SpHelper(GlobalApp.APP).getBoolean("use_smartopen_if_parse_failed",
-                            true) && AccessibilityApi.isBaseServiceOn) {//失败,默认点击
-                if (ViewFindBuilder().similaryText(cmdWord).findFirst()?.tryClick() == true)
-                    return ParseResult(true, PriorityQueue(), "smart点击 $cmdWord")
             }
-            ParseResult(actionQueue.isNotEmpty(), actionQueue, inAppQue.first)
+            Vog.d(this, "smartOpen --无匹配")
         }
+
+        //APP内
+        val appResult = parseAppActionWithScope(cmdWord, scope)
+        if (appResult.isSuccess) return appResult
+
+        //点击
+        if (SpHelper(GlobalApp.APP).getBoolean("use_smartopen_if_parse_failed",
+                        true) && AccessibilityApi.isBaseServiceOn) {//失败,默认点击
+            if (ViewFindBuilder().similaryText(cmdWord).findFirst()?.tryClick() == true)
+                return ActionParseResult(true, PriorityQueue(), "smart点击 $cmdWord")
+        }
+        //失败
+        return ActionParseResult(false)
     }
 
     /**
-     * 全局命令
-     * 一级匹配
-     * 全局不存在follows
+     * 从指令解析应用内操作
+     *
+     * @param cmd String 指令
+     * @param scope ActionScope? 指定应用
+     * @return ActionParseResult
      */
-    private fun globalActionMatch(cmd: String): Pair<String?, PriorityQueue<Action>> {
-        val actionQueue = PriorityQueue<Action>()
-        if (GlobalActionNodes == null)
-            updateGlobal()
-        GlobalActionNodes?.forEach {
-            val r = regSearch(cmd, it, actionQueue, false)
-            if (r) return Pair(it.actionTitle, actionQueue)
+    fun parseAppActionWithScope(cmd: String, scope: ActionScope?, isFollow: Boolean = false): ActionParseResult {
+        if (scope == null) {
+            Vog.d(this, "scope is null 无障碍未打开")
+            return ActionParseResult(false, null, "无匹配(未匹配应用内操作)")
         }
-        return Pair(null, actionQueue)
+
+        val inAppQue = matchAppAction(cmd, scope, isFollow)
+        val actionQueue = inAppQue.second //匹配应用内时
+        // 根据第一个action.scope 决定是否进入首页
+        if (actionQueue.isNotEmpty()) {//自动执行打开
+            //TODO check
+//                AppBus.post(AppBus.EVENT_HIDE_FLOAT)//关闭助手dialog
+            return ActionParseResult(true, actionQueue, inAppQue.first,
+                    SystemBridge.getAppInfo(scope.packageName))
+                    .insertOpenAppAction(scope)
+        }
+        return ActionParseResult(false)
     }
 
     /**
-     * 全局命令解析失败 匹配App内指令  根据[包名]
+     * 匹配App内指令  根据[包名]
      * 或在执行打开应用后，解析跟随指令
      * eg:
      * 网易云 音乐 播放
@@ -152,26 +160,21 @@ object ParseEngine {
      * 深度搜索
      * @param isFollow 此时匹配应用内指令，指明是前面是否有指令，true: 有父级操作 false: 首个操作
      * 用于判断是否加前缀%
-     * @return  Pair<String?, PriorityQueue<Action> 匹配的标题
+     * @return  Pair<String?, PriorityQueue<Action> 匹配的actionTitle 运行队列
      */
     fun matchAppAction(cmd: String, matchScope: ActionScope, isFollow: Boolean = false): Pair<String?, PriorityQueue<Action>> {
 
-//        Log.d("Debug :", "matchAppAction  ----> $currentAppPkg")
-        if (AppActionNodes == null) {
-            updateInApp()
-        }
         val actionQueue = PriorityQueue<Action>()
-        AppActionNodes?.filter {
+        AppActionNodes.filter {
             //筛选当前App  根据pkg
             val sc = it.actionScope
             sc?.eqPkg(matchScope) == true
-        }?.forEach {
+        }.forEach {
             val r = regSearch(cmd, it, actionQueue, isFollow)
             if (r) return Pair(it.actionTitle, actionQueue)
         }
         return Pair(null, actionQueue)
     }
-
 
     /**
      * ActionNode正则匹配
@@ -198,6 +201,7 @@ object ParseEngine {
         }
         return false
     }
+
 
     /**
      * 指令深度搜索
@@ -244,6 +248,20 @@ object ParseEngine {
         return preAction?.param != null
     }
 
+    /**
+     * 全局命令
+     * 一级匹配
+     * 全局不存在follows
+     */
+    private fun globalActionMatch(cmd: String): ActionParseResult {
+        val actionQueue = PriorityQueue<Action>()
+        GlobalActionNodes.forEach {
+            val r = regSearch(cmd, it, actionQueue, false)
+            if (r) return ActionParseResult(true, actionQueue, it.actionTitle)
+        }
+        return ActionParseResult(false)
+    }
+
 
     //提取参数
     private fun extractParam(it: Action, reg: Reg, result: MatchResult) {
@@ -280,16 +298,26 @@ object ParseEngine {
      * 解析测试
      * @param testWord String
      * @param node ActionNode 节点
-     * @return ParseResult
+     * @return ActionParseResult
      */
-    fun testParse(testWord: String, node: ActionNode): ParseResult {
+    fun testParse(testWord: String, node: ActionNode): ActionParseResult {
         val actionQueue = PriorityQueue<Action>()
         regSearch(testWord, node, actionQueue, false)
-        return ParseResult(actionQueue.isNotEmpty(), actionQueue)
+        return ActionParseResult(actionQueue.isNotEmpty(), actionQueue)
     }
 
 }
 
+class OpenAppAction(val pkg: String) {
+
+    //重置App
+    val PRE_OPEN = "openAppByPkg('%s',true)\n"
+
+    operator fun getValue(thisRef: Any?, property: KProperty<*>): Action {
+        return Action(-999, String.format(PRE_OPEN, pkg)
+                , Action.SCRIPT_TYPE_LUA)
+    }
+}
 
 // val GlobalActionNodes = hashMapOf<Int, ActionNode>()
 //        println("${i++}. 匹配：$sufWord")

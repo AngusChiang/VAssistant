@@ -18,6 +18,7 @@ import kotlin.text.Regex;
 /**
  * 次节点以%开始
  * % -> ([\S\s]*)
+ * ActionReg
  * Created by Vove on 2018/6/23
  */
 @Entity
@@ -141,7 +142,7 @@ public class Reg implements Serializable {
             }
             return paramPosArr;
         } catch (NumberFormatException e) {
-            GlobalLog.INSTANCE.err(e,"gppa144");
+            GlobalLog.INSTANCE.err(e);
             return null;
         }
     }

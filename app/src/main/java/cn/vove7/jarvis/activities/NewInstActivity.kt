@@ -6,12 +6,12 @@ import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.SearchView
 import android.support.v7.widget.Toolbar
 import android.view.KeyEvent
 import android.view.View
 import android.widget.*
+import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.datamanager.DAO
 import cn.vove7.common.datamanager.DaoHelper
@@ -25,10 +25,10 @@ import cn.vove7.common.datamanager.parse.statusmap.ActionNode.NODE_SCOPE_IN_APP
 import cn.vove7.common.datamanager.parse.statusmap.Reg
 import cn.vove7.common.model.UserInfo
 import cn.vove7.common.utils.TextHelper
-import cn.vove7.common.view.toast.ColorfulToast
-import cn.vove7.executorengine.helper.AdvanAppHelper
+
+import cn.vove7.common.helper.AdvanAppHelper
 import cn.vove7.executorengine.parse.ParseEngine
-import cn.vove7.executorengine.parse.ParseResult
+import cn.vove7.executorengine.model.ActionParseResult
 import cn.vove7.jarvis.BuildConfig
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.activities.base.ReturnableActivity
@@ -63,7 +63,6 @@ class NewInstActivity : ReturnableActivity(), View.OnClickListener {
 
     private lateinit var searchView: SearchView
     private var enterTime = 0L
-    private lateinit var voast: ColorfulToast
 
     lateinit var scriptTextView: EditText
     private var scriptText: String? = null
@@ -90,8 +89,6 @@ class NewInstActivity : ReturnableActivity(), View.OnClickListener {
             return
         }
 
-
-        voast = ColorfulToast(this)
         setContentView(R.layout.activity_new_inst)
         toolbar = findViewById(R.id.toolbar)
         setSupportActionBar(toolbar)
@@ -131,7 +128,7 @@ class NewInstActivity : ReturnableActivity(), View.OnClickListener {
             scriptType = editNode!!.action.scriptType
             scriptText = editNode?.action?.actionScript
             if (editNode == null) {
-                voast.showShort(getString(R.string.text_error_occurred) + " code :n117")
+                GlobalApp.toastError(getString(R.string.text_error_occurred) + " code :n117")
             } else {//展示信息
                 activity_name.setText(editNode?.actionScope?.activity)
                 desc_text.setText(editNode?.actionTitle)
@@ -205,19 +202,19 @@ class NewInstActivity : ReturnableActivity(), View.OnClickListener {
             return
         }
         if ((scriptText ?: "") == "") {//script
-            voast.showShort(getString(R.string.text_tooltips_select_script))
+            GlobalApp.toastWarning(getString(R.string.text_tooltips_select_script))
             return
         }
         if ((scriptType ?: "") == "") {//scriptType
-            voast.showShort(getString(R.string.text_tooltips_select_script_type))
+            GlobalApp.toastWarning(getString(R.string.text_tooltips_select_script_type))
             return
         }
         if (ActionNode.belongInApp(instType) && pkg == null) {//type
-            voast.showShort(getString(R.string.text_tooltips_select_app))
+            GlobalApp.toastWarning(getString(R.string.text_tooltips_select_app))
             return
         }
         if (regs.isEmpty()) {//regs
-            voast.showShort(getString(R.string.text_at_last_one_regex))
+            GlobalApp.toastWarning(getString(R.string.text_at_last_one_regex))
         }
 
         var activityName: String? = null
@@ -228,8 +225,8 @@ class NewInstActivity : ReturnableActivity(), View.OnClickListener {
         }
         if (isReedit) {//保存编辑
             if (editNode == null) {
-                voast.showShort(getString(R.string.text_error_occurred))
-                GlobalLog.err(getString(R.string.text_error_occurred) + "code: na264")
+                GlobalApp.toastError(getString(R.string.text_error_occurred))
+                GlobalLog.err(getString(R.string.text_error_occurred))
                 return
             }
 
@@ -249,7 +246,7 @@ class NewInstActivity : ReturnableActivity(), View.OnClickListener {
             }
             DAO.daoSession.actionNodeDao.update(editNode)
             ParseEngine.updateNode()
-            voast.showShort(getString(R.string.text_save_success))
+            GlobalApp.toastSuccess(getString(R.string.text_save_success))
             DAO.clear()
             finish()
 
@@ -277,12 +274,12 @@ class NewInstActivity : ReturnableActivity(), View.OnClickListener {
             newNode.regs = wrapRegs()
 
             if (DaoHelper.insertNewActionNode(newNode) != null) {
-                voast.showShort(getString(R.string.text_save_success))
+                GlobalApp.toastSuccess(getString(R.string.text_save_success))
                 ParseEngine.updateNode()
                 DAO.clear()
                 finish()
             } else {
-                voast.showShort(getString(R.string.text_save_failed))
+                GlobalApp.toastError(getString(R.string.text_save_failed))
             }
         }
     }
@@ -304,8 +301,8 @@ class NewInstActivity : ReturnableActivity(), View.OnClickListener {
                 try {
                     save()
                 } catch (e: Exception) {
-                    e.printStackTrace()
-                    voast.showShort(getString(R.string.text_error_occurred) + e.message)
+                    GlobalLog.err(e)
+                    GlobalApp.toastError(getString(R.string.text_error_occurred) + e.message)
                 }
             }
             add_regex.id -> {
@@ -317,7 +314,7 @@ class NewInstActivity : ReturnableActivity(), View.OnClickListener {
             test_regex.id -> {
                 //模拟
                 if (regs.isEmpty()) {
-                    voast.showShort(getString(R.string.text_enter_at_last_one_regex))
+                    GlobalApp.toastError(getString(R.string.text_enter_at_last_one_regex))
                     return
                 }
                 showTestParseDialog()
@@ -368,7 +365,7 @@ class NewInstActivity : ReturnableActivity(), View.OnClickListener {
                             startActivityForResult(selIntent, 1)
                         } catch (e: ActivityNotFoundException) {
                             e.printStackTrace()
-                            voast.showShort(R.string.text_cannot_open_file_manager)
+                            GlobalApp.toastError(R.string.text_cannot_open_file_manager)
                         }
                     }
 
@@ -389,10 +386,10 @@ class NewInstActivity : ReturnableActivity(), View.OnClickListener {
                             scriptTextView.setText(File(path).readText())
                         } catch (e: Exception) {
                             e.printStackTrace()
-                            voast.showShort(getString(R.string.text_open_failed))
+                            GlobalApp.toastError(getString(R.string.text_open_failed))
                         }
                     } else {
-                        voast.showShort(getString(R.string.text_open_failed))
+                        GlobalApp.toastError(getString(R.string.text_open_failed))
                     }
                 }
                 else -> {
@@ -437,7 +434,7 @@ class NewInstActivity : ReturnableActivity(), View.OnClickListener {
             parseButton.setOnClickListener {
                 val testText = testInputView.text.toString()
                 if (testText == "") {
-                    voast.showLong(getString(R.string.test_tooltips_of_input_test_text))
+                    GlobalApp.toastWarning(getString(R.string.test_tooltips_of_input_test_text))
                     return@setOnClickListener
                 }
                 //  联合parentNode
@@ -456,7 +453,7 @@ class NewInstActivity : ReturnableActivity(), View.OnClickListener {
         testParseDialog?.show()
     }
 
-    private fun outputParseResult(result: ParseResult) {
+    private fun outputParseResult(result: ActionParseResult) {
         resultOutput.text = ""
         if (result.isSuccess) {
             val actions = result.actionQueue

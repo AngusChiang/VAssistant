@@ -9,6 +9,7 @@ import cn.vove7.androlua.luautils.LuaGcable
 import cn.vove7.androlua.luautils.LuaManagerI
 import cn.vove7.androlua.luautils.LuaPrinter
 import cn.vove7.common.BridgeManager
+import cn.vove7.common.MessageException
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.executor.OnPrint
@@ -234,22 +235,23 @@ class LuaHelper : LuaManagerI {
         val ok = L.pcall(l, 0, -2 - l)
         if (ok == 0) {
             return
-        } else {
-            throw Exception(checkErr(ok))
+        } else {//载入参数错误
+            throw MessageException(checkErr(ok))
         }
     }
 
     fun checkErr(r: Int): String {
-        var e = errorReason(r) + ": " + L.toString(-1)
+        val e = errorReason(r) + ": " + L.toString(-1)
 //        var end = e.indexOf("stack traceback:")//隐藏stack traceback
 //        if (end == -1) end = e.length
 //        Vog.e(this, "checkErr ---> $e")
 //        e = e.substring(0, end)
         if (e.contains("java.lang.UnsupportedOperationException") ||
-                e.contains("java.lang.InterruptedException"))
+                e.contains("java.lang.InterruptedException")) {
             handleMessage(OnPrint.WARN, "强制终止\n")
-        else
-            handleError(e)
+            return "强制终止"
+        }
+        else handleError(e)
         return e
     }
 

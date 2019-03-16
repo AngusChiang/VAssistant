@@ -13,7 +13,7 @@ import android.support.v7.widget.RecyclerView
 import android.view.*
 import android.widget.*
 import cn.vove7.common.utils.runOnUi
-import cn.vove7.common.view.toast.ColorfulToast
+
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.adapters.ListViewModel
 import cn.vove7.jarvis.adapters.RecAdapterWithFooter
@@ -93,7 +93,6 @@ abstract class SimpleListFragment<DataType> : Fragment(), ViewModelLoader<DataTy
 
     lateinit var floatButton: FloatingActionButton
     open var floatClickListener: View.OnClickListener? = null
-    lateinit var toast: ColorfulToast
 
     /**
      * 页码
@@ -104,7 +103,6 @@ abstract class SimpleListFragment<DataType> : Fragment(), ViewModelLoader<DataTy
     var layManager: RecyclerView.LayoutManager? = null
     lateinit var adapter: RecAdapterWithFooter<*, *>
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        toast = ColorfulToast(context!!)
         contentView = inflater.inflate(R.layout.fragment_base_list, container, false)
         initSelfView()
         initView(contentView)

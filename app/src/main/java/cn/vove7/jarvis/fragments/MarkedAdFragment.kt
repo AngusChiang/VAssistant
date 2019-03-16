@@ -3,13 +3,13 @@ package cn.vove7.jarvis.fragments
 import android.content.Intent
 import android.view.View
 import cn.vove7.common.app.GlobalApp
+import cn.vove7.common.bridges.SystemBridge
 import cn.vove7.common.datamanager.DAO
 import cn.vove7.common.model.UserInfo
 import cn.vove7.common.utils.ThreadPool.runOnCachePool
-import cn.vove7.executorengine.bridges.SystemBridge
 import cn.vove7.jarvis.activities.AppAdListActivity
-import cn.vove7.jarvis.adapters.SimpleListAdapter
 import cn.vove7.jarvis.adapters.ListViewModel
+import cn.vove7.jarvis.adapters.SimpleListAdapter
 import cn.vove7.jarvis.fragments.base.OnSyncMarked
 import cn.vove7.jarvis.plugins.AdKillerService
 import cn.vove7.jarvis.tools.AppConfig
@@ -75,7 +75,7 @@ class MarkedAdFragment : SimpleListFragment<String>(), OnSyncMarked {
      */
     override fun onSync(types: Array<String>) {
         if (!UserInfo.isLogin()) {
-            toast.blue().showShort("请登陆后操作")
+            GlobalApp.toastWarning("请登陆后操作")
             return
         }
         showProgressBar()
@@ -84,7 +84,7 @@ class MarkedAdFragment : SimpleListFragment<String>(), OnSyncMarked {
             hideProgressBar()
             if (it) {
                 refresh()
-                toast.showShort("同步完成")
+                GlobalApp.toastSuccess("同步完成")
             }
         }
     }

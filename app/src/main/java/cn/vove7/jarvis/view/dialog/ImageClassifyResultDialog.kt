@@ -12,7 +12,7 @@ import android.view.Window
 import android.widget.ImageView
 import android.widget.TextView
 import cn.vove7.common.app.GlobalApp
-import cn.vove7.executorengine.bridges.SystemBridge
+import cn.vove7.common.bridges.SystemBridge
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.tools.baiduaip.model.ImageClassifyResult
 import cn.vove7.vtp.log.Vog
@@ -56,7 +56,7 @@ class ImageClassifyResultDialog(val result: ImageClassifyResult.Rlt, context: Co
         viewHolder.subtitleView.text = "匹配率：${result.score?.times(100)}%"
         result.baikeInfo.apply {
             if (this == null || description == null) {
-                GlobalApp.toastShort("无详细信息")
+                GlobalApp.toastInfo("无详细信息")
             } else {
                 viewHolder.descView.text = description
             }
@@ -82,7 +82,7 @@ class ImageClassifyResultDialog(val result: ImageClassifyResult.Rlt, context: Co
 
     private fun getLis() = object : RequestListener<Drawable> {
         override fun onLoadFailed(e: GlideException?, model: Any?, target: Target<Drawable>?, isFirstResource: Boolean): Boolean {
-            GlobalApp.toastShort("图片加载失败")
+            GlobalApp.toastError("图片加载失败")
             return false
         }
 

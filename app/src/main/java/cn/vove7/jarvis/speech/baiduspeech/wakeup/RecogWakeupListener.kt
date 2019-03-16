@@ -31,11 +31,11 @@ class RecogWakeupListener(private val handler: Handler) : SimpleWakeupListener()
     override fun onError(errorCode: Int, errorMessage: String, result: WakeUpResult) {
         super.onError(errorCode, errorMessage, result)
         if (errorCode == 3) {
-            GlobalApp.toastShort("麦克风打开失败")
+            GlobalApp.toastError("麦克风打开失败")
 //            AppBus.post(RequestPermission("麦克风权限"))
         }
         else
-            GlobalApp.toastShort("语音唤醒错误")
+            GlobalApp.toastError("语音唤醒错误")
         SpHelper(GlobalApp.APP).set(R.string.key_open_voice_wakeup, false)
         AppConfig.reload()
     }

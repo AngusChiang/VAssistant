@@ -3,7 +3,7 @@ package cn.vove7.jarvis.view.dialog
 import android.content.Context
 import android.os.Bundle
 import cn.vove7.common.utils.ThreadPool
-import cn.vove7.executorengine.helper.AdvanAppHelper
+import cn.vove7.common.helper.AdvanAppHelper
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.adapters.ListViewModel
 import cn.vove7.jarvis.adapters.SimpleListAdapter
@@ -24,7 +24,7 @@ class SelectAppDialog(
 
     override fun onLoadData(pageIndex: Int) {
         ThreadPool.runOnCachePool {
-            notifyLoadSuccess(AdvanAppHelper.APP_LIST.values, true)
+            notifyLoadSuccess(AdvanAppHelper.ALL_APP_LIST.values, true)
         }
     }
 

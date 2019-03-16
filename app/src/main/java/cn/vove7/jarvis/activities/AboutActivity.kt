@@ -8,8 +8,9 @@ import android.view.MenuItem
 import android.view.View
 import android.widget.AdapterView
 import android.widget.TextView
-import cn.vove7.common.view.toast.ColorfulToast
-import cn.vove7.executorengine.bridges.SystemBridge
+import cn.vove7.common.app.GlobalApp
+
+import cn.vove7.common.bridges.SystemBridge
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.adapters.IconTitleEntity
 import cn.vove7.jarvis.adapters.IconTitleListAdapter
@@ -31,10 +32,6 @@ import kotlinx.android.synthetic.main.header_about.*
  * 9/23/2018
  */
 class AboutActivity : AppCompatActivity(), AdapterView.OnItemClickListener {
-
-    val toast: ColorfulToast by lazy {
-        ColorfulToast(this).blue()
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -65,12 +62,12 @@ class AboutActivity : AppCompatActivity(), AdapterView.OnItemClickListener {
             }
             1 -> {
                 val p = ProgressDialog(this){
-                    toast.showShort("检查失败")
+                    GlobalApp.toastError("检查失败")
                 }
                 AppConfig.checkAppUpdate(this, true) {
                     p.dismiss()
                     if (!it) {
-                        toast.showShort("未发现新版本")
+                        GlobalApp.toastSuccess("未发现新版本")
                     }
                 }
             }

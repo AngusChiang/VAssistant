@@ -47,7 +47,7 @@ object DaoHelper {
             }
             true
         } catch (e: Exception) {
-            GlobalLog.err("${e.message} code:dh48")
+            GlobalLog.err(e.message)
             false
         }
     }

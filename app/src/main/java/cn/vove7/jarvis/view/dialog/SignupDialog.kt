@@ -15,7 +15,7 @@ import cn.vove7.common.netacc.model.BaseRequestModel
 import cn.vove7.common.netacc.model.ResponseMessage
 import cn.vove7.common.netacc.tool.SecureHelper
 import cn.vove7.common.utils.TextHelper
-import cn.vove7.common.view.toast.ColorfulToast
+
 import cn.vove7.jarvis.BuildConfig
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.view.custom.CountDownButton
@@ -41,7 +41,6 @@ class SignupDialog(context: Context, val r: OnLoginSuccess) : View.OnClickListen
     private var verCodeView: TextInputLayout
     private var signUpBtn: Button
     private var loadBar: ProgressBar
-    private val toast = ColorfulToast(context)
     val countDownSecs = 30
 
     init {
@@ -74,15 +73,15 @@ class SignupDialog(context: Context, val r: OnLoginSuccess) : View.OnClickListen
                     loadBar.visibility = View.INVISIBLE
                     if (bean != null) {
                         if (bean.isOk()) {
-                            toast.showShort(bean.data ?: "null")
+                            GlobalApp.toastInfo(bean.data ?: "null")
                             startDown(countDownSecs)
                         } else {
                             this.isEnabled = true
-                            toast.showShort(bean.message)
+                            GlobalApp.toastInfo(bean.message)
                         }
                     } else {
                         this.isEnabled = true
-                        toast.showShort("出错")
+                        GlobalApp.toastError("出错")
                     }
                 })
             }
@@ -139,14 +138,14 @@ class SignupDialog(context: Context, val r: OnLoginSuccess) : View.OnClickListen
                 loadBar.visibility = View.INVISIBLE
                 if (bean != null) {
                     if (bean.isOk()) {
-                        toast.showShort(bean.data ?: "null")
+                        GlobalApp.toastInfo(bean.data ?: "null")
                         LoginDialog(context, userEmail, userPass, r)
                         dialog.dismiss()
                     } else {
-                        toast.showShort(bean.message)
+                        GlobalApp.toastInfo(bean.message)
                     }
                 } else {
-                    toast.showShort("出错")
+                    GlobalApp.toastError("出错")
                 }
             })
         }

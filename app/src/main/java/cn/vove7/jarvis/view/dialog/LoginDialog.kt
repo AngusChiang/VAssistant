@@ -15,7 +15,7 @@ import cn.vove7.common.netacc.model.BaseRequestModel
 import cn.vove7.common.netacc.tool.SecureHelper
 import cn.vove7.common.netacc.NetHelper
 import cn.vove7.common.utils.TextHelper
-import cn.vove7.common.view.toast.ColorfulToast
+
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.tools.AppConfig
 import com.afollestad.materialdialogs.MaterialDialog
@@ -41,7 +41,6 @@ class LoginDialog(val context: Context, initEmail: String? = null,
     private var userPassView: TextInputLayout
     private var loginBtn: Button
     private var loadBar: ProgressBar
-    private val toast = ColorfulToast(context)
 
     init {
         val view = LayoutInflater.from(context).inflate(R.layout.dialog_login, null)
@@ -89,18 +88,18 @@ class LoginDialog(val context: Context, initEmail: String? = null,
                             val userInfo = bean.data!!
                             AppConfig.login(userInfo)
                         } catch (e: Exception) {
-                            toast.showShort(R.string.text_error_occurred)
-                            GlobalLog.err(e.message + "--code: ld82")
+                            GlobalApp.toastInfo(R.string.text_error_occurred)
+                            GlobalLog.err(e.message)
                             return@postJson
                         }
-                        toast.showShort("登录成功")
+                        GlobalApp.toastSuccess("登录成功")
                         r.invoke()
                         dialog.dismiss()
                     } else {
-                        toast.showShort(bean.message)
+                        GlobalApp.toastInfo(bean.message)
                     }
                 } else {
-                    toast.showShort("出错")
+                    GlobalApp.toastError("出错")
                 }
             })
         }

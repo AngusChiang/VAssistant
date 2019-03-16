@@ -249,7 +249,7 @@
 //    private fun delLocalNode() {
 //        thread {
 //            val b = DaoHelper.deleteActionNodeInTX(node?.id)
-//            GlobalApp.toastShort(
+//            GlobalApp.toastInfo(
 //                    if (b) "删除成功" else "删除失败，可至帮助进行反馈"
 //            )
 //        }
@@ -265,7 +265,7 @@
 //            ActionNode.belongInApp(node.actionScopeType) -> ActionNode.NODE_SCOPE_IN_APP
 //            else -> {
 //                GlobalLog.log("maybe error")
-//                GlobalApp.toastShort("maybe error")
+//                GlobalApp.toastError("maybe error")
 //                return
 //            }
 //        }

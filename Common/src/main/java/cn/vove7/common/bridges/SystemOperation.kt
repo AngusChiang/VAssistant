@@ -3,10 +3,13 @@ package cn.vove7.common.bridges
 import android.content.Intent
 import android.graphics.Bitmap
 import android.location.Location
+import cn.vove7.common.annotation.ScriptApi
+import cn.vove7.common.annotation.ScriptApiClass
 import cn.vove7.vtp.app.AppInfo
 import cn.vove7.vtp.system.DeviceInfo
 import java.io.File
 
+@ScriptApiClass("system")
 interface SystemOperation {
     /**
      * 打开应用详情页
@@ -26,6 +29,14 @@ interface SystemOperation {
      * 根据App名，获取应用包名
      * 标记 -> 应用列表
      * @param appWord String App名/别名
+     * @return String? 包名
+     */
+    fun getPkgByName(appWord: String): String?
+
+    /**
+     * 同getPkgBName
+     * 已弃用
+     * @param appWord String
      * @return String?
      */
     fun getPkgByWord(appWord: String): String?
@@ -251,4 +262,11 @@ interface SystemOperation {
     fun enableNfc()
 
     fun disableNfc()
+
+    /**
+     * 强行停止应用
+     * @param pkg String
+     */
+    fun killApp(pkg: String): Boolean
+
 }

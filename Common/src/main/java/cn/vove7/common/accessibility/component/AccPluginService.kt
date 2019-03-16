@@ -1,6 +1,5 @@
 package cn.vove7.common.accessibility.component
 
-import android.view.accessibility.AccessibilityNodeInfo
 import cn.vove7.common.datamanager.parse.model.ActionScope
 
 /**
@@ -18,6 +17,10 @@ interface AccPluginService {
      */
 //    fun onUiUpdate(root: AccessibilityNodeInfo?/*, eventData: Pair<Int,AccessibilityNodeInfo?>*/) {}
 
+    /**
+     * 界面改变事件
+     * @param appScope ActionScope
+     */
     fun onAppChanged(appScope: ActionScope)
 
     fun onBind() {}

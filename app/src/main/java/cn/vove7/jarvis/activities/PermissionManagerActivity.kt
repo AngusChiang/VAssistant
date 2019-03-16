@@ -16,7 +16,7 @@ import android.widget.Switch
 import android.widget.TextView
 import cn.vove7.common.accessibility.AccessibilityApi
 import cn.vove7.common.app.GlobalApp
-import cn.vove7.executorengine.bridges.SystemBridge
+import cn.vove7.common.bridges.SystemBridge
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.activities.PermissionManagerActivity.PermissionStatus.Companion.allPerStr
 import cn.vove7.jarvis.activities.base.OneFragmentActivity
@@ -35,7 +35,7 @@ class PermissionManagerActivity : OneFragmentActivity() {
         super.onCreate(savedInstanceState)
         //执行时消息
         if (intent.hasExtra("pName")) {
-            GlobalApp.toastShort(String.format(getString(R.string.text_operation_need_permission)
+            GlobalApp.toastWarning(String.format(getString(R.string.text_operation_need_permission)
                     , intent.getStringExtra("pName")))
         }
     }
@@ -126,7 +126,7 @@ class PermissionManagerActivity : OneFragmentActivity() {
                                                 SystemBridge.openAppDetail(context?.packageName
                                                     ?: "")
                                             } catch (e: Exception) {
-                                                toast.showLong("跳转失败，请到应用详情手动开启")
+                                                GlobalApp.toastError("跳转失败，请到应用详情手动开启")
                                             }
                                         }
                                     }
@@ -134,7 +134,7 @@ class PermissionManagerActivity : OneFragmentActivity() {
                                     try {
                                         PermissionUtils.gotoAccessibilitySetting(activity!!)
                                     } catch (e: ActivityNotFoundException) {
-                                        toast.showShort("跳转失败，请自行开启")
+                                        GlobalApp.toastError("跳转失败，请自行开启")
                                     }
                                 }
                                 else ->

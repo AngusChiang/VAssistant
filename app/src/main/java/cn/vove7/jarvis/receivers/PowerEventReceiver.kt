@@ -7,7 +7,7 @@ import android.os.BatteryManager
 import cn.vove7.common.accessibility.AccessibilityApi
 import cn.vove7.common.appbus.AppBus
 import cn.vove7.common.appbus.SpeechAction
-import cn.vove7.executorengine.bridges.SystemBridge
+import cn.vove7.common.bridges.SystemBridge
 import cn.vove7.jarvis.plugins.AdKillerService
 import cn.vove7.jarvis.plugins.VoiceWakeupStrategy
 import cn.vove7.jarvis.services.MainService

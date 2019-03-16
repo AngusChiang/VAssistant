@@ -17,7 +17,7 @@ import java.util.Objects;
 
 import cn.vove7.common.BuildConfig;
 import cn.vove7.common.datamanager.parse.DataFrom;
-import cn.vove7.common.interfaces.Markable;
+import cn.vove7.common.interfaces.Signable;
 import cn.vove7.common.model.UserInfo;
 import cn.vove7.common.netacc.tool.SecureHelper;
 import cn.vove7.common.utils.RegUtils;
@@ -28,7 +28,7 @@ import kotlin.text.Regex;
  * Created by Vove on 2018/6/23
  */
 @Entity(indexes = {@Index(value = "key")})
-public class MarkedData implements DataFrom, Markable, Serializable {
+public class MarkedData implements DataFrom, Signable, Serializable {
 
     //打开/关闭...
     public static final String MARKED_TYPE_APP = "open_app";//应用 value -> pkg
@@ -150,10 +150,17 @@ public class MarkedData implements DataFrom, Markable, Serializable {
         this.from = DataFrom.FROM_USER;
     }
 
+    /**
+     * 在最后加上'%'
+     */
+    public String regexString() {
+        return (!regStr.endsWith("%") ? regStr + "%" : regStr)
+                .replace("%", RegUtils.INSTANCE.getREG_ALL_CHAR());
+
+    }
     @Keep
     private void buildRegex() {
-        String s = (!regStr.endsWith("%") ? regStr + "%" : regStr)
-                .replace("%", RegUtils.INSTANCE.getREG_ALL_CHAR());
+        String s = regexString();
         regex = new Regex(s);
     }
 

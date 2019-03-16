@@ -61,6 +61,7 @@ import android.widget.EditText;
 import android.widget.RadioGroup;
 import android.widget.Scroller;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -73,7 +74,6 @@ import java.util.regex.Pattern;
 import cn.vove7.common.app.GlobalApp;
 import cn.vove7.common.interfaces.CodeEditorOperation;
 import cn.vove7.common.utils.TextHelper;
-import cn.vove7.common.view.toast.ColorfulToast;
 import cn.vove7.rhino.R;
 import cn.vove7.rhino.processor.commons.LineObject;
 import cn.vove7.rhino.processor.commons.LinesCollection;
@@ -88,6 +88,8 @@ import cn.vove7.rhino.processor.suggestions.SuggestionType;
 import cn.vove7.rhino.processor.text.SymbolsTokenizer;
 import cn.vove7.rhino.processor.text.TextChange;
 import cn.vove7.rhino.processor.text.UndoStack;
+
+;
 
 /**
  * Special thanks:
@@ -1570,7 +1572,7 @@ public class TextProcessor extends AppCompatMultiAutoCompleteTextView
             String s = TextHelper.INSTANCE.readFile(fullPath);
             new Handler(Looper.getMainLooper()).post(() -> {
                 if (s == null) {
-                    GlobalApp.Companion.toastShort("打开失败");
+                    GlobalApp.Companion.toastError("打开失败", Toast.LENGTH_SHORT);
                 }
                 setText(s);
                 isEdited = false;
@@ -1583,12 +1585,12 @@ public class TextProcessor extends AppCompatMultiAutoCompleteTextView
         isEdited = false;
         File outputFile = new File(fullPath);
         if (!outputFile.canWrite()) {
-            GlobalApp.Companion.toastShort("文件不可写");
+            GlobalApp.Companion.toastWarning("文件不可写", Toast.LENGTH_SHORT);
         } else {
             if (TextHelper.INSTANCE.writeFile(fullPath, getEditorContent())) {
-                GlobalApp.Companion.toastShort("保存成功");
+                GlobalApp.Companion.toastSuccess("保存成功", Toast.LENGTH_SHORT);
             } else {
-                GlobalApp.Companion.toastShort("保存失败，请查看日志");
+                GlobalApp.Companion.toastError("保存失败，请查看日志", Toast.LENGTH_SHORT);
             }
         }
     }
@@ -1765,9 +1767,9 @@ public class TextProcessor extends AppCompatMultiAutoCompleteTextView
 
     public void showToast(String message, boolean isError) {
         if (isError)
-            new ColorfulToast(mContext, R.color.fff).red().showShort(message);
+            GlobalApp.Companion.toastError(message,Toast.LENGTH_SHORT);
         else
-            new ColorfulToast(mContext, R.color.fff).showShort(message);
+            GlobalApp.Companion.toastInfo(message,Toast.LENGTH_SHORT);
 
     }
 

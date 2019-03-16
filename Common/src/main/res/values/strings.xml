@@ -6,7 +6,11 @@
     <string name="text_select_script">Select Script</string>
     <string name="text_stop">Stop</string>
     <string name="text_run">Run</string>
-    <string name="text_err_not_belong_inapp_inst">失败：不属于App内指令</string>
     <string name="text_have_done">Done</string>
     <string name="text_an_err_happened">An error happened</string>
+
+    <string name="text_app_not_install" translatable="false">this app is not installed</string>
+    <string name="text_not_fount_email_app" translatable="false">Not found E-mail app</string>
+    <string name="text_failed_to_open_email_app" translatable="false">open E-mail app failure</string>
+
 </resources>

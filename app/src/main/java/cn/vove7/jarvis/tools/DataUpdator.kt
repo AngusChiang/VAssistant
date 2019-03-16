@@ -18,8 +18,7 @@ import cn.vove7.common.netacc.model.LastDateInfo
 import cn.vove7.common.utils.TextHelper
 import cn.vove7.common.utils.ThreadPool.runOnCachePool
 import cn.vove7.common.utils.ThreadPool.runOnPool
-import cn.vove7.executorengine.helper.AdvanAppHelper
-import cn.vove7.executorengine.parse.ParseEngine
+import cn.vove7.common.helper.AdvanAppHelper
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.droidplugin.RePluginInfo
 import cn.vove7.jarvis.plugins.AdKillerService
@@ -212,24 +211,24 @@ object DataUpdator {
                             if (it) {
                                 SpHelper(GlobalApp.APP).set(R.string.key_last_sync_global_date, System.currentTimeMillis())
                                 DAO.clear()
-                                ParseEngine.updateGlobal()
+//                                ParseEngine.updateGlobal()
                                 back.invoke(true)
                             } else {
-                                GlobalApp.toastShort("同步失败")
+                                GlobalApp.toastError("同步失败")
                                 back.invoke(false)
                             }
                         }
                     } else {
                         GlobalLog.err("code: GI57")
-                        GlobalApp.toastShort(R.string.text_error_occurred)
+                        GlobalApp.toastError(R.string.text_error_occurred)
                         back.invoke(false)
                     }
                 } else {
-                    GlobalApp.toastShort(R.string.text_net_err)
+                    GlobalApp.toastError(R.string.text_net_err)
                     back.invoke(false)
                 }
             } else {
-                GlobalApp.toastShort(R.string.text_net_err)
+                GlobalApp.toastError(R.string.text_net_err)
                 back.invoke(false)
             }
         }
@@ -251,25 +250,25 @@ object DataUpdator {
                                 SpHelper(GlobalApp.APP).set(R.string.key_last_sync_in_app_date,
                                         System.currentTimeMillis())
                                 DAO.clear()
-                                ParseEngine.updateInApp()
+//                                ParseEngine.updateInApp()
                                 back.invoke(true)
                             } else {
-                                GlobalApp.toastShort("同步失败")
+                                GlobalApp.toastError("同步失败")
                                 back.invoke(false)
                             }
                         }
                     } else {
                         GlobalLog.err("code: GI57")
-                        GlobalApp.toastShort(R.string.text_error_occurred)
+                        GlobalApp.toastError(R.string.text_error_occurred)
                         back.invoke(false)
                     }
                 } else {
-                    GlobalApp.toastShort(R.string.text_net_err)
+                    GlobalApp.toastError(R.string.text_net_err)
                     back.invoke(false)
                 }
 
             } else {
-                GlobalApp.toastShort(R.string.text_net_err)
+                GlobalApp.toastError(R.string.text_net_err)
                 back.invoke(false)
             }
 
@@ -293,7 +292,7 @@ object DataUpdator {
                 DAO.clear()
                 back.invoke(true)
             } else {
-                GlobalApp.toastShort(bean?.message ?: "未知错误")
+                GlobalApp.toastError(bean?.message ?: "未知错误")
                 back.invoke(false)
             }
         }
@@ -317,11 +316,11 @@ object DataUpdator {
                     DAO.clear()
                     back.invoke(true)
                 } else {
-                    GlobalApp.toastShort(bean.message)
+                    GlobalApp.toastInfo(bean.message)
                     back.invoke(false)
                 }
             } else {
-                GlobalApp.toastShort("出错")
+                GlobalApp.toastError("出错")
                 back.invoke(false)
             }
         }
@@ -337,7 +336,7 @@ object DataUpdator {
                     b.data?.forEach {
                         if (it.hasUpdate()) {
                             Vog.i(this, "checkPluginUpdate ---> 检测到有插件更新")
-                            GlobalApp.toastLong("检测到有插件更新")
+                            GlobalApp.toastInfo("检测到有插件更新")
                             return@runOnCachePool
                         }
                     }

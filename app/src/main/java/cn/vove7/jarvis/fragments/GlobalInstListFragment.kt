@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import android.widget.CompoundButton
+import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.datamanager.DAO
 import cn.vove7.common.datamanager.greendao.ActionNodeDao
 import cn.vove7.common.datamanager.parse.DataFrom
@@ -62,7 +63,7 @@ class GlobalInstListFragment : SimpleListFragment<ActionNode>(), OnSyncInst {
 
     override fun onSync() {
         if (!UserInfo.isLogin()) {
-            toast.blue().showShort("请登陆后操作")
+            GlobalApp.toastWarning("请登陆后操作")
             return
         }
         showProgressBar()
@@ -70,7 +71,7 @@ class GlobalInstListFragment : SimpleListFragment<ActionNode>(), OnSyncInst {
         DataUpdator.syncGlobalInst {
             hideProgressBar()
             if (it) {
-                toast.showShort("同步完成")
+                GlobalApp.toastSuccess("同步完成")
                 refresh()
             }
         }

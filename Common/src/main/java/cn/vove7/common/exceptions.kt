@@ -12,4 +12,11 @@ import cn.vove7.common.view.finder.ViewFinder
 /**
  * 视图搜索失败异常
  */
-class ViewNodeNotFoundException(finder: ViewFinder?) : Exception(finder?.toString()?:"finder is null")
+class ViewNodeNotFoundException(finder: ViewFinder?) : Exception(finder?.toString()
+    ?: "finder is null")
+
+/**
+ * 执行出错 返回信息
+ * @constructor
+ */
+class MessageException(msg: String) : Exception(msg)
