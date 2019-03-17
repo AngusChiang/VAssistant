@@ -29,7 +29,7 @@ abstract class StatusAnimation {
     open val nId = 127
     val channel get() =
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            ChannelBuilder.with("StatusBarIcon${AppConfig.versionName}${if (alert) "_alert" else ""}",
+            ChannelBuilder.with("StatusBarIcon${if (alert) "_alert" else ""}",
                     "状态栏动画${if (alert) "_alert" else ""}", importLevel).build().apply {
                 Vog.d("alert ---> $alert")
                 if (alert) {

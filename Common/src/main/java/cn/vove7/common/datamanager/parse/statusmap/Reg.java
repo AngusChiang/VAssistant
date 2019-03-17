@@ -1,5 +1,7 @@
 package cn.vove7.common.datamanager.parse.statusmap;
 
+import android.support.annotation.NonNull;
+
 import com.google.gson.annotations.Expose;
 
 import org.greenrobot.greendao.annotation.Entity;
@@ -55,6 +57,7 @@ public class Reg implements Serializable {
         this.paramPos = paramPos;
     }
 
+    @NonNull
     @Override
     public String toString() {
         return regStr;
@@ -64,7 +67,8 @@ public class Reg implements Serializable {
     private void buildRegex() {
         //结尾加上% ， 防止有[后续节点操作]匹配失败
         String s = (!regStr.endsWith("%") ? regStr + "%" : regStr)
-                .replace("%", RegUtils.INSTANCE.getREG_ALL_CHAR());
+                .replace("%", RegUtils.INSTANCE.getREG_ALL_CHAR())
+                .replace("#", RegUtils.INSTANCE.getREG_NUMBER_CHAR());
         regex = new Regex(s);
     }
 
@@ -85,7 +89,8 @@ public class Reg implements Serializable {
 
         //尾部
         s = (!s.endsWith("%") ? s + "%" : s)
-                .replace("%", RegUtils.INSTANCE.getREG_ALL_CHAR());
+                .replace("%", RegUtils.INSTANCE.getREG_ALL_CHAR())
+                .replace("#", RegUtils.INSTANCE.getREG_NUMBER_CHAR());
 
         regex = new Regex(s);
         return regex;

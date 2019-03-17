@@ -14,7 +14,6 @@ import cn.vove7.common.datamanager.executor.entity.MarkedData
 import cn.vove7.common.datamanager.executor.entity.MarkedData.MARKED_TYPE_SCRIPT_JS
 import cn.vove7.common.datamanager.executor.entity.MarkedData.MARKED_TYPE_SCRIPT_LUA
 import cn.vove7.common.datamanager.greendao.MarkedDataDao
-import cn.vove7.common.datamanager.history.CommandHistory
 import cn.vove7.common.datamanager.parse.DataFrom
 import cn.vove7.common.datamanager.parse.model.Action
 import cn.vove7.common.datamanager.parse.model.Action.SCRIPT_TYPE_JS
@@ -29,7 +28,6 @@ import cn.vove7.common.helper.AdvanContactHelper
 import cn.vove7.common.helper.startable
 import cn.vove7.common.model.MatchedData
 import cn.vove7.common.model.RequestPermission
-import cn.vove7.common.model.UserInfo
 import cn.vove7.common.utils.*
 import cn.vove7.common.utils.ThreadPool.runOnPool
 import cn.vove7.common.view.finder.ViewFindBuilder
@@ -71,10 +69,17 @@ open class ExecutorImpl(
     override val focusView: ViewNode?
         get() = AccessibilityApi.accessibilityService?.currentFocusedEditor
     override var running: Boolean = false
-    override var userInterrupt: Boolean = false
+
+    override var userInterrupted: Boolean = false
         set(value) {
             Vog.d("终止标志 ---> $value")
             field = value
+        }
+
+    var userInterrupt: Boolean
+        get() = userInterrupted
+        set(value) {
+            userInterrupted = value
         }
 
     /**
@@ -368,7 +373,7 @@ open class ExecutorImpl(
         synchronized(AdvanAppHelper.ALL_APP_LIST) {
 
             AdvanAppHelper.ALL_APP_LIST.values.forEach {
-                if(!it.startable) return@forEach
+                if (!it.startable) return@forEach
                 try {
                     val name = it.name ?: ""
                     if (command.startsWith(name, ignoreCase = true)) { //如果startWith 并且解析到跟随操作. get it
@@ -437,7 +442,6 @@ open class ExecutorImpl(
                 return openByIdentifier(it)//执行
             }
         }
-        AppBus.post(CommandHistory(UserInfo.getUserId(), "打开|关闭 $p", null))
         Vog.d("parseOpenOrCloseAction ---> 未知操作: $p")
         return false
     }
@@ -748,22 +752,6 @@ open class ExecutorImpl(
          */
         private val globalScopeType = arrayListOf(ActionNode.NODE_SCOPE_GLOBAL/*, ActionNode.NODE_SCOPE_GLOBAL_2*/)
 
-        //todo 脚本内实现
-        private fun closeAppByPkg(pkg: String) {
-            SystemBridge.openAppDetail(pkg)
-            AccessibilityApi.accessibilityService?.also { service ->
-                val stopButton = ViewFindBuilder()
-                        .equalsText("强行停止", "force stop")
-                        .waitFor(3000) ?: return
-
-                if (stopButton.tryClick()) {
-                    val okButton = ViewFindBuilder().equalsText("确定", "OK")
-                            .waitFor(600)
-                }
-
-            }
-
-        }
 
         private const val CloseAppScript = "require 'accessibility'\n" +
                 "system.openAppDetail(args[1])\n" +

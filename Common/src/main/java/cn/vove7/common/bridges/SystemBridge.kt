@@ -15,7 +15,6 @@ import android.hardware.camera2.CameraManager
 import android.location.Location
 import android.location.LocationListener
 import android.location.LocationManager
-import android.media.AudioFocusRequest
 import android.media.AudioManager
 import android.media.Image
 import android.net.Uri
@@ -341,12 +340,7 @@ object SystemBridge : SystemOperation {
     fun removeMusicFocus() {
         val mAm = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
         try {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                mAm.abandonAudioFocusRequest(AudioFocusRequest
-                        .Builder(AudioManager.AUDIOFOCUS_GAIN_TRANSIENT).build())
-            } else {
-                mAm.abandonAudioFocus(null)
-            }
+            mAm.abandonAudioFocus(null)
         } catch (e: NoClassDefFoundError) {//7.1.2- 异常
 
         }
@@ -355,25 +349,14 @@ object SystemBridge : SystemOperation {
 
     @Suppress("DEPRECATION")
     fun requestMusicFocus() {
+        Vog.d("暂停音乐")
         val mAm = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager;
-        val vIsActive = mAm.isMusicActive
-//        val mListener = MyOnAudioFocusChangeListener();
-//        val a= AudioFocusRequest.Builder(AudioManager.AUDIOFOCUS_GAIN_TRANSIENT)
-//                .setAudioAttributes()
-
-        if (vIsActive) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                mAm.abandonAudioFocusRequest(AudioFocusRequest
-                        .Builder(AudioManager.AUDIOFOCUS_GAIN_TRANSIENT).build())
-            } else {
-                val result = mAm.requestAudioFocus(null, AudioManager.STREAM_MUSIC,
-                        AudioManager.AUDIOFOCUS_GAIN_TRANSIENT)
-                if (result == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
-                    Vog.d("requestMusicFocus ---> successfully")
-                } else {
-                    Vog.d("requestMusicFocus ---> failed")
-                }
-            }
+        val result = mAm.requestAudioFocus(null, AudioManager.STREAM_MUSIC,
+                AudioManager.AUDIOFOCUS_GAIN_TRANSIENT)
+        if (result == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
+            Vog.d("requestMusicFocus ---> successfully")
+        } else {
+            Vog.d("requestMusicFocus ---> failed")
         }
     }
 
@@ -400,7 +383,6 @@ object SystemBridge : SystemOperation {
 
     override fun mediaResume() {
         sendMediaKey(KeyEvent.KEYCODE_MEDIA_PLAY)
-//        removeMusicFocus()
     }
 
     override fun mediaStop() {
@@ -730,7 +712,7 @@ object SystemBridge : SystemOperation {
         return false
     }
 
-    @SuppressLint("MissingPermission")
+    //TODO 测试
     override fun location(): Location? {
         if (ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             AppBus.post(RequestPermission("位置权限"))
@@ -748,7 +730,7 @@ object SystemBridge : SystemOperation {
             return null
         }
         prepareIfNeeded()
-        val resu = ResultBox<Location?>()
+        val result = ResultBox<Location?>()
         var block = Runnable {}
         val handler = Handler()
 
@@ -757,7 +739,7 @@ object SystemBridge : SystemOperation {
                 Vog.d("onLocationChanged ---> $location")
                 handler.removeCallbacks(block)
                 locationManager.removeUpdates(this)
-                resu.setAndNotify(location)
+                result.setAndNotify(location)
             }
 
             override fun onStatusChanged(provider: String?, status: Int, extras: Bundle?) {
@@ -772,12 +754,12 @@ object SystemBridge : SystemOperation {
         block = Runnable {
             locationManager.removeUpdates(loLis)
             GlobalLog.log("location ---> 获取位置超时,使用上次位置")
-            resu.setAndQuit(locationManager.getLastKnownLocation(locationProvider))
+            result.setAndQuit(locationManager.getLastKnownLocation(locationProvider))
         }
         val looper = Looper.myLooper()
         locationManager.requestLocationUpdates(locationProvider, 500L, 0f, loLis, looper)
         handler.postDelayed(block, 5000)//等待5秒
-        return resu.blockedGet(false)
+        return result.blockedGet(false)
     }
 
     private fun quitLoop() {

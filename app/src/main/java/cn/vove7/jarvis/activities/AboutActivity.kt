@@ -1,7 +1,6 @@
 package cn.vove7.jarvis.activities
 
 import android.content.Intent
-import android.graphics.Color
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.view.MenuItem
@@ -50,8 +49,8 @@ class AboutActivity : AppCompatActivity(), AdapterView.OnItemClickListener {
                 clickTime = now
                 clickCount = 0
             }
-            clickCount++
-            if (clickCount > 5) {
+            if (++clickCount > 4) {
+                clickTime = 0
                 showEgg()
             }
         }
@@ -78,7 +77,12 @@ class AboutActivity : AppCompatActivity(), AdapterView.OnItemClickListener {
     private fun showEgg() {//彩蛋
         konfettiView.show()
         konfettiView.build()
-                .addColors(Color.YELLOW, Color.GREEN, Color.MAGENTA)
+                .addColors(
+                        resources.getColor(R.color.google_green),
+                        resources.getColor(R.color.google_red),
+                        resources.getColor(R.color.google_blue),
+                        resources.getColor(R.color.google_yellow)
+                )
                 .setDirection(0.0, 359.0)
                 .setSpeed(1f, 3f)
                 .setFadeOutEnabled(true)

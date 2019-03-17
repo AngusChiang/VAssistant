@@ -1,7 +1,5 @@
 package cn.vove7.executorengine.parse
 
-import cn.vove7.common.accessibility.AccessibilityApi
-import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.bridges.SystemBridge
 import cn.vove7.common.datamanager.DAO
 import cn.vove7.common.datamanager.greendao.ActionNodeDao
@@ -12,11 +10,8 @@ import cn.vove7.common.datamanager.parse.statusmap.ActionNode.NODE_SCOPE_GLOBAL
 import cn.vove7.common.datamanager.parse.statusmap.ActionNode.NODE_SCOPE_IN_APP
 import cn.vove7.common.datamanager.parse.statusmap.Reg
 import cn.vove7.common.datamanager.parse.statusmap.Reg.*
-import cn.vove7.common.view.finder.ViewFindBuilder
-import cn.vove7.executorengine.exector.MultiExecutorEngine
 import cn.vove7.executorengine.model.ActionParseResult
 import cn.vove7.vtp.log.Vog
-import cn.vove7.vtp.sharedpreference.SpHelper
 import java.util.*
 import kotlin.reflect.KProperty
 
@@ -84,7 +79,10 @@ object ParseEngine {
      * todo 顺序 小 -> 大
      * @param scope 当前手机界面信息
      */
-    fun parseAction(cmdWord: String, scope: ActionScope?): ActionParseResult {
+    fun parseAction(cmdWord: String, scope: ActionScope?,
+                    smartOpen: (String) -> ActionParseResult,
+                    click: (String) -> ActionParseResult
+    ): ActionParseResult {
         i = 0
         val globalResult = globalActionMatch(cmdWord)
         if (globalResult.isSuccess) {
@@ -92,22 +90,10 @@ object ParseEngine {
         }
         //smartOpen
         Vog.d("globalAction --无匹配")
-        if (SpHelper(GlobalApp.APP).getBoolean("use_smartopen_if_parse_failed", true)) {//智能识别打开操作
-            Vog.d("开启 -- smartOpen")
-            if (cmdWord != "") {//使用smartOpen
-//                    val q = PriorityQueue<Action>()
-                //设置command
-                val engine = MultiExecutorEngine()
-                val result = engine.use {
-                    it.command = cmdWord
-                    it.smartOpen(cmdWord)
-                }
-                if (result) {//成功打开
-                    Vog.d("parseAction ---> MultiExecutorEngine().smartOpen(cmdWord) 成功打开")
-                    return ActionParseResult(true, PriorityQueue(), "smartOpen $cmdWord")
-                }
-            }
-            Vog.d("smartOpen --无匹配")
+
+        val sor = smartOpen.invoke(cmdWord)
+        if (sor.isSuccess) {
+            return sor
         }
 
         //APP内
@@ -115,11 +101,11 @@ object ParseEngine {
         if (appResult.isSuccess) return appResult
 
         //点击
-        if (SpHelper(GlobalApp.APP).getBoolean("use_smartopen_if_parse_failed",
-                        true) && AccessibilityApi.isBaseServiceOn) {//失败,默认点击
-            if (ViewFindBuilder().similaryText(cmdWord).findFirst()?.tryClick() == true)
-                return ActionParseResult(true, PriorityQueue(), "smart点击 $cmdWord")
+        val cr = click.invoke(cmdWord)
+        if (cr.isSuccess) {
+            return cr
         }
+
         //失败
         return ActionParseResult(false)
     }

@@ -44,7 +44,9 @@ import cn.vove7.common.utils.ThreadPool.runOnPool
 import cn.vove7.common.utils.runOnNewHandlerThread
 import cn.vove7.common.utils.runOnUi
 import cn.vove7.common.utils.startActivityOnNewTask
+import cn.vove7.common.view.finder.ViewFindBuilder
 import cn.vove7.executorengine.exector.MultiExecutorEngine
+import cn.vove7.executorengine.model.ActionParseResult
 import cn.vove7.executorengine.parse.ParseEngine
 import cn.vove7.jarvis.App
 import cn.vove7.jarvis.R
@@ -808,7 +810,7 @@ class MainService : BusService(),
                     speechSynService?.stopIfSpeaking()
                     Vog.d("speakResponseWord ---> 等待超时")
                 }
-            Vog.d("speakResponseWord ---> speak finish")
+            Vog.d("speak finish")
         }
 
         //响应词 与 提示音
@@ -1024,22 +1026,23 @@ class MainService : BusService(),
         runOnCachePool {
             sleep(500)
             val parseResult = ParseEngine
-                    .parseAction(result, AccessibilityApi.accessibilityService?.currentScope)
-            if (parseResult.isSuccess && parseResult.actionQueue?.isNotEmpty() != null) {
-                floatyPanel.hideImmediately()//执行时 消失
-                cExecutor.execQueue(result, parseResult.actionQueue)
-                val his = CommandHistory(UserInfo.getUserId(), result,
-                        parseResult.msg)
-                NetHelper.uploadUserCommandHistory(his)
-                runOnCachePool {
-                    if (AppConfig.lastingVoiceCommand) {//开启长语音,重启定时
-                        speechRecoService?.restartLastingUpTimer()
+                    .parseAction(result, AccessibilityApi.accessibilityService?.currentScope, smartOpen, onClick)
+            if (parseResult.isSuccess) {
+                if (parseResult.actionQueue?.isNotEmpty() == true) {
+                    floatyPanel.hideImmediately()//执行时 消失
+                    cExecutor.execQueue(result, parseResult.actionQueue)
+                    val his = CommandHistory(UserInfo.getUserId(), result,
+                            parseResult.msg)
+                    NetHelper.uploadUserCommandHistory(his)
+                    runOnCachePool {
+                        if (AppConfig.lastingVoiceCommand) {//开启长语音,重启定时
+                            speechRecoService?.restartLastingUpTimer()
+                        }
                     }
                 }
 //                return true
             } else {// statistics
                 //云解析
-//                return
                 if (needCloud && AppConfig.cloudServiceParseIfLocalFailed) {
                     Vog.d("onParseCommand ---> 失败云解析")
                     NetHelper.cloudParse(result) {
@@ -1060,43 +1063,81 @@ class MainService : BusService(),
     }
 
     /**
+     * 点击操作
+     */
+    private val onClick: (String) -> ActionParseResult = { cmdWord ->
+        var r: ActionParseResult? = null
+        if (AppConfig.useSmartOpenIfParseFailed && AccessibilityApi.isBaseServiceOn) {//失败,默认点击
+            Vog.d("查找点击 $cmdWord")
+            if (ViewFindBuilder().similaryText(cmdWord).findFirst()?.tryClick() == true)
+                r = ActionParseResult(true, null, "smart点击 $cmdWord")
+
+        }
+        r ?: ActionParseResult(false)
+    }
+
+    /**
+     * 使用smartOpen操作
+     */
+    private val smartOpen: (String) -> ActionParseResult = { cmdWord ->
+        var r: ActionParseResult? = null
+        if (AppConfig.useSmartOpenIfParseFailed) {//智能识别打开操作
+            Vog.d("开启 -- smartOpen")
+            if (cmdWord != "") {//使用smartOpen
+                //设置command
+                val engine = MultiExecutorEngine()
+                val result = engine.use {
+                    it.command = cmdWord
+                    it.smartOpen(cmdWord)
+                }
+                if (result) {//成功打开
+                    Vog.d("parseAction ---> MultiExecutorEngine().smartOpen(cmdWord) 成功打开")
+                    r = ActionParseResult(true, null, "smartOpen $cmdWord")
+                } else {
+                    Vog.d("smartOpen --无匹配")
+                }
+            }
+        }
+        r ?: ActionParseResult(false)
+    }
+
+    /**
      * 聊天
      * @param result String
      */
     private fun doChat(result: String) {
         parseAnimation.begin()
         floatyPanel.showParseAni()
-        runOnCachePool {
-            resumeMusicLock = true
-            val data = chatSystem.chatWithText(result)
-            if (data == null) {
-                floatyPanel.showAndHideDelay("获取失败,详情查看日志")
-                parseAnimation.failedAndHideDelay()
-                resumeMusicIf()
-            } else {
-                data.word.let { word ->
-                    floatyPanel.show(if (word.contains("="))
-                        data.word.replace("=", "\n=") else word)
-                    executeAnimation.begin()
-                    executeAnimation.show(word)
+        resumeMusicLock = true
+        val data = chatSystem.chatWithText(result)
+        if (data == null) {
+            floatyPanel.showAndHideDelay("获取失败,详情查看日志")
+            parseAnimation.failedAndHideDelay()
+            resumeMusicIf()
+        } else {
+            data.word.let { word ->
+                AppBus.post(CommandHistory(UserInfo.getUserId(), result, word))
+                floatyPanel.show(if (word.contains("="))
+                    data.word.replace("=", "\n=") else word)
+                executeAnimation.begin()
+                executeAnimation.show(word)
 
-                    afterSpeakResumeListen = recogIsListening
-                    speakWithCallback(word, true, object : SpeakCallback {
-                        override fun speakCallback(result: String?) {
-                            hideAll()
-                        }
-                    })
-                }
-                data.resultUrls.also {
-                    when {
-                        it.isEmpty() -> return@also
-                        it.size == 1 -> SystemBridge.openUrl(it[0].url)
-                        else -> startActivity(Intent(this, ResultPickerActivity::class.java)
-                                .also { intent ->
-                                    intent.putExtra("title", data.word)
-                                    intent.putExtra("data", BundleBuilder().put("items", it).data)
-                                })
+                afterSpeakResumeListen = recogIsListening
+                speakWithCallback(word, true, object : SpeakCallback {
+                    override fun speakCallback(result: String?) {
+                        hideAll()
                     }
+                })
+            }
+            data.resultUrls.also {
+                when {
+                    it.isEmpty() -> return@also
+                    it.size == 1 -> SystemBridge.openUrl(it[0].url)
+                    else -> startActivity(Intent(this, ResultPickerActivity::class.java)
+                            .also { intent ->
+                                intent.putExtra("title", data.word)
+                                intent.putExtra("data", BundleBuilder().put("items", it).data)
+                            })
                 }
             }
         }
@@ -1128,12 +1169,6 @@ class MainService : BusService(),
         return true
     }
 
-    var userInterrupted = false
-        get() {
-            val b = field
-            field = false
-            return b
-        }
 
     /**
      * 语音合成事件监听
@@ -1156,7 +1191,6 @@ class MainService : BusService(),
         }
 
         override fun onUserInterrupt() {
-            userInterrupted = true
         }
 
         override fun onStart() {
@@ -1166,7 +1200,6 @@ class MainService : BusService(),
     }
 
     fun notifySpeakFinish() {
-        Vog.d("notifySpeakFinish ---> $speakSync")
         if (speakSync) {
             cExecutor.speakCallback()
             speakCallbacks.forEach {

@@ -20,30 +20,32 @@ import cn.vove7.vtp.notification.NotificationIcons
  */
 object AppNotification {
 
-    val c get() =
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            ChannelBuilder.with("app_notification" + AppConfig.versionName, "应用通知", NotificationManagerCompat.IMPORTANCE_MAX)
-                    .build().apply {
-                        enableVibration(true)
-                        setSound(Settings.System.DEFAULT_NOTIFICATION_URI, Notification.AUDIO_ATTRIBUTES_DEFAULT)
-                        vibrationPattern = longArrayOf(0, 200)
-                    }
-        } else null
+    val c
+        get() =
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                ChannelBuilder.with("app_notification", "应用通知", NotificationManagerCompat.IMPORTANCE_MAX)
+                        .build().apply {
+                            enableVibration(true)
+                            setSound(Settings.System.DEFAULT_NOTIFICATION_URI, Notification.AUDIO_ATTRIBUTES_DEFAULT)
+                            vibrationPattern = longArrayOf(0, 200)
+                        }
+            } else null
 
     private val notificationHelper by lazy {
         NotificationHelper(GlobalApp.APP, c, true)
     }
 
     fun updateNotificationChannel(context: Context) {
-//        if (AppConfig.FIRST_LAUNCH_NEW_VERSION) {
-//            (context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager).apply {
-//                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-//                    notificationChannels?.forEach {
-//                        deleteNotificationChannel(it.id)
-//                    }
-//                }
-//            }
-//        }
+        if (AppConfig.FIRST_LAUNCH_NEW_VERSION) {
+            (context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager).apply {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    notificationChannels?.forEach {
+                        if (it.id !in arrayOf("app_notification", "StatusBarIcon", "StatusBarIcon_alert"))
+                            deleteNotificationChannel(it.id)
+                    }
+                }
+            }
+        }
     }
 
 

@@ -9,7 +9,7 @@ import cn.vove7.common.accessibility.AccessibilityApi
  * @author Administrator
  * 2018/10/14
  */
-class ScreenTextFinder(accessibilityApi: AccessibilityApi) : ViewFinder(accessibilityApi) {
+class ScreenTextFinder(startNode: AccessibilityNodeInfo?) : ViewFinder(startNode) {
     var isWeb = false
     override fun findCondition(node: AccessibilityNodeInfo): Boolean {
         if (node.className.endsWith("WebView", ignoreCase = true)) {

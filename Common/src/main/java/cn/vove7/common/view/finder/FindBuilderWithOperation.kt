@@ -207,6 +207,9 @@ abstract class FindBuilderWithOperation  : ViewOperation {
         return (waitFor(WAIT_MILLIS) ?: throw ViewNodeNotFoundException(finder)).isClickable()
     }
 
+    override fun finder(): ViewFindBuilder {
+        return (waitFor(WAIT_MILLIS) ?: throw ViewNodeNotFoundException(finder)).finder()
+    }
     companion object {
         val WAIT_MILLIS = 2000L
     }

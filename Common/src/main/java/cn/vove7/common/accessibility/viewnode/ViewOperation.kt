@@ -3,6 +3,7 @@ package cn.vove7.common.accessibility.viewnode
 import android.graphics.Point
 import android.graphics.Rect
 import cn.vove7.common.annotation.ScriptApiClass
+import cn.vove7.common.view.finder.ViewFindBuilder
 
 /**
  *
@@ -151,4 +152,6 @@ interface ViewOperation {
     fun scrollRight(): Boolean
 
     fun isClickable(): Boolean
+
+    fun finder(): ViewFindBuilder
 }

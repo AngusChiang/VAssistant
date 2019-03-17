@@ -11,6 +11,8 @@ import cn.vove7.vtp.log.Vog
  */
 object RegUtils {
     val REG_ALL_CHAR = "([\\S\\s]*?)"
+    val REG_NUMBER_CHAR = "([0-9零一二两三四五六七八九十百千万]*)"
+
     private val confirmWords = arrayOf(
             "确[定认]".toRegex()
             , "好(的)?".toRegex()

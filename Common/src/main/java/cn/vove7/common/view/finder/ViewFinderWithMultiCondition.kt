@@ -16,7 +16,7 @@ import java.util.*
  * @author 17719
  * 2018/8/5
  */
-class ViewFinderWithMultiCondition(accessibilityService: AccessibilityApi) : ViewFinder(accessibilityService) {
+class ViewFinderWithMultiCondition(startNode: AccessibilityNodeInfo?) : ViewFinder(startNode) {
 
     var viewTextCondition: MutableList<String> = mutableListOf()
     fun addViewTextCondition(vararg s: String) {
@@ -58,7 +58,7 @@ class ViewFinderWithMultiCondition(accessibilityService: AccessibilityApi) : Vie
      * @return ViewNode?
      */
     fun findByDepths(): ViewNode? {
-        var p: AccessibilityNodeInfo? = rootNode ?: {
+        var p: AccessibilityNodeInfo? = startNode ?: {
             Vog.d("findByDepths ---> rootNode is null")
             null
         }.invoke()

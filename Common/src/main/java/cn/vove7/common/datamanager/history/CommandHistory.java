@@ -1,5 +1,7 @@
 package cn.vove7.common.datamanager.history;
 
+import com.google.gson.annotations.Expose;
+
 import java.util.Date;
 
 /**
@@ -7,6 +9,7 @@ import java.util.Date;
  */
 
 public class CommandHistory {
+    @Expose
     private Long userId;
 
     private Date requestTime;

@@ -81,7 +81,7 @@ interface CExecutorI : ActivityShowListener, RuntimeArgs, SpeakCallback {
 
 interface RuntimeArgs {
     var DEBUG: Boolean
-    var userInterrupt: Boolean//用户中断
+    var userInterrupted: Boolean//用户中断
     var command: String?
     //Runtime
     var currentActionIndex: Int

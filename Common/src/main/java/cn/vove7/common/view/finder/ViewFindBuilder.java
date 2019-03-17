@@ -1,6 +1,9 @@
 package cn.vove7.common.view.finder;
 
 import android.util.Range;
+import android.view.accessibility.AccessibilityNodeInfo;
+
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
 
@@ -31,13 +34,20 @@ public class ViewFindBuilder extends FindBuilderWithOperation {
         return viewFinderX;
     }
 
+    private AccessibilityApi accessibilityService
+            = AccessibilityApi.Companion.getAccessibilityService();
+
     public ViewFindBuilder() {
-        AccessibilityApi accessibilityService = AccessibilityApi.Companion.getAccessibilityService();
         if (accessibilityService == null) {//没有运行
             GlobalLog.INSTANCE.err("AccessibilityService is not running.");
             return;
         }
-        viewFinderX = new ViewFinderWithMultiCondition(accessibilityService);
+        viewFinderX = new ViewFinderWithMultiCondition(accessibilityService.getRootInWindow());
+        setFinder(viewFinderX);
+    }
+
+    public ViewFindBuilder(AccessibilityNodeInfo startNode) {
+        viewFinderX = new ViewFinderWithMultiCondition(startNode);
         setFinder(viewFinderX);
     }
 

@@ -10,6 +10,7 @@ import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.bridges.GlobalActionExecutor
 import cn.vove7.common.utils.ScreenAdapter
+import cn.vove7.common.view.finder.ViewFindBuilder
 import cn.vove7.vtp.log.Vog
 import cn.vove7.vtp.text.TextTransHelper
 import java.lang.Thread.sleep
@@ -101,7 +102,7 @@ class ViewNode(val node: AccessibilityNodeInfo) : ViewOperation, Comparable<View
         synchronized(lastGetChildTime) {
             val now = System.currentTimeMillis()
             if (childss != null && now - lastGetChildTime < 10000L) {//10s有效期
-                return childss!!
+                return childss ?: emptyArray()
             }
             lastGetChildTime = now
             val cs = mutableListOf<ViewNode>()
@@ -111,8 +112,7 @@ class ViewNode(val node: AccessibilityNodeInfo) : ViewOperation, Comparable<View
                     cs.add(ViewNode(c))
                 }
             }
-            childss = cs.toTypedArray()
-            return childss!!
+            return cs.toTypedArray().also { childss = it }
         }
     }
 
@@ -320,6 +320,14 @@ class ViewNode(val node: AccessibilityNodeInfo) : ViewOperation, Comparable<View
                 (if (desc == null) "" else ", desc: $desc") +
                 (", bounds: ${getBounds()}" + ", childCount: ${getChildCount()}") +
                 (if (node.isClickable) ", Clickable" else "") + '}'
+    }
+
+    /**
+     * 从该节点搜索
+     * @return ViewFindBuilder
+     */
+    override fun finder(): ViewFindBuilder {
+        return ViewFindBuilder(this.node)
     }
 
     fun isVisibleToUser(): Boolean = node.isVisibleToUser

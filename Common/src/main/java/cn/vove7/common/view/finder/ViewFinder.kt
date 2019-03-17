@@ -8,16 +8,7 @@ import cn.vove7.vtp.log.Vog
 /**
  * 查找符合条件的AccessibilityNodeInfo
  */
-abstract class ViewFinder(var accessibilityService: AccessibilityApi) {
-    val rootNode: AccessibilityNodeInfo?
-        get() {
-            return try {
-                accessibilityService.rootInActiveWindow
-            } catch (e: Exception) {
-                e.printStackTrace()
-                null
-            }
-        }
+abstract class ViewFinder(var startNode: AccessibilityNodeInfo?) {
 
     open fun findFirst(): ViewNode? {
         return findFirst(false)
@@ -46,7 +37,7 @@ abstract class ViewFinder(var accessibilityService: AccessibilityApi) {
                     Vog.d("waitFor ---> 搜索次数 $sc 打断: ${ct.isInterrupted}")
             }
         }
-        Vog.d("waitFor ---> 搜索超时${System.currentTimeMillis() - beginTime}/$m or 中断${ct.isInterrupted}")
+        Vog.d("搜索超时${System.currentTimeMillis() - beginTime}/$m or 中断${ct.isInterrupted}")
         return null
     }
 
@@ -56,7 +47,7 @@ abstract class ViewFinder(var accessibilityService: AccessibilityApi) {
      */
     fun findFirst(includeInvisible: Boolean = false): ViewNode? {
         //不可见
-        val r = traverseAllNode(rootNode, includeInvisible = includeInvisible)
+        val r = traverseAllNode(startNode, includeInvisible = includeInvisible)
         Vog.v("findFirst ${r != null}")
         return r
     }
@@ -73,7 +64,7 @@ abstract class ViewFinder(var accessibilityService: AccessibilityApi) {
 
     fun findAll(includeInvisible: Boolean = false): Array<ViewNode> {
         list.clear()
-        traverseAllNode(rootNode, true, includeInvisible)
+        traverseAllNode(startNode, true, includeInvisible)
         val l = mutableListOf<ViewNode>()
         l.addAll(list)
         return l.toTypedArray()
