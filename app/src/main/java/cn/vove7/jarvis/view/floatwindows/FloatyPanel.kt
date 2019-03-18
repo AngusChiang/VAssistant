@@ -27,7 +27,7 @@ import kotlinx.android.synthetic.main.toast_listening_text.view.*
  * 2018/9/9
  */
 class FloatyPanel : AbFloatWindow<FloatyPanel.VHolder>(GlobalApp.APP) {
-    override var posY: Int = 80
+    override var posY: Int = 0
 
     lateinit var rootView: LinearLayout
     override fun layoutResId(): Int = R.layout.toast_listening_text
@@ -64,6 +64,10 @@ class FloatyPanel : AbFloatWindow<FloatyPanel.VHolder>(GlobalApp.APP) {
     }
 
     var ani = R.drawable.listening_animation
+    /**
+     * TODO 切换动画
+     * @param resId Int
+     */
     private fun setAniRes(resId: Int) {
         if (ani == resId) return
         ani = resId
@@ -82,6 +86,13 @@ class FloatyPanel : AbFloatWindow<FloatyPanel.VHolder>(GlobalApp.APP) {
             setAniRes(R.drawable.parsing_animation)
             if (!isShowing)
                 show()
+        }
+    }
+
+    override fun afterShow() {
+        contentView.post {
+            contentView.animate().alphaBy(0f).alpha(1f)
+                    .setDuration(2000).start()
         }
     }
 
@@ -123,8 +134,7 @@ class FloatyPanel : AbFloatWindow<FloatyPanel.VHolder>(GlobalApp.APP) {
             if (delayHandler == null) delayHandler = Handler()
             delayHandler?.postDelayed(delayHide, delay)
         }
-        Vog.d("hideDelay ---> hide delay $delay")
-
+        Vog.d("hide delay $delay")
     }
 
     fun hideImmediately() {//立即
@@ -133,8 +143,7 @@ class FloatyPanel : AbFloatWindow<FloatyPanel.VHolder>(GlobalApp.APP) {
         }
     }
 
-
-    class VHolder(val view: View) : AbFloatWindow.ViewHolder(view) {
+    class VHolder(view: View) : AbFloatWindow.ViewHolder(view) {
         var text: String
             get() = textView.text.toString()
             set(v) {

@@ -205,11 +205,12 @@ class AdvancedSettingActivity : ReturnableActivity() {
         ).also {
             if (BuildConfig.DEBUG) {
                 it.add(SettingGroupItem(R.color.google_red, "调试", childItems = listOf(
-                        SwitchItem(title = "切换服务器", defaultValue = { false },
+                        InputItem(title = "切换服务器", defaultValue = { ApiUrls.SERVER_IP },
                                 summary = ApiUrls.SERVER_IP) { h, b ->
                             ApiUrls.switch()
+                            ApiUrls.SERVER_IP=b
                             h.summaryView.text = ApiUrls.SERVER_IP
-                            return@SwitchItem true
+                            return@InputItem false
                         },
                         IntentItem(title = "触发崩溃") {
                             "a".toInt()

@@ -145,7 +145,7 @@ class LuaHelper : LuaManagerI {
 //        L.call(1, 0)
         LuaPrinter(L, object : OnPrint {
 
-            override fun onPrint(l: Int, output: String) {
+            override fun onPrint(l: Int, output: String?) {
                 notifyOutput(l, output)
             }
         })
@@ -196,7 +196,7 @@ class LuaHelper : LuaManagerI {
         }
     }
 
-    private fun notifyOutput(l: Int, o: String) {
+    private fun notifyOutput(l: Int, o: String?) {
         synchronized(printList) {
             for (p in printList) {
                 p.onPrint(l, o)
@@ -250,8 +250,7 @@ class LuaHelper : LuaManagerI {
                 e.contains("java.lang.InterruptedException")) {
             handleMessage(OnPrint.WARN, "强制终止\n")
             return "强制终止"
-        }
-        else handleError(e)
+        } else handleError(e)
         return e
     }
 

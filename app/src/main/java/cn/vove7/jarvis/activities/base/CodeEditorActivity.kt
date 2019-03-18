@@ -1,6 +1,6 @@
 package cn.vove7.jarvis.activities.base
 
-import  android.app.Activity
+import android.app.Activity
 import android.app.AlertDialog
 import android.content.ActivityNotFoundException
 import android.content.Context
@@ -17,12 +17,12 @@ import cn.vove7.androlua.luabridge.LuaUtil
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.appbus.AppBus
+import cn.vove7.common.bridges.SystemBridge
 import cn.vove7.common.datamanager.parse.model.Action
 import cn.vove7.common.datamanager.parse.model.ActionParam
 import cn.vove7.common.executor.OnPrint
 import cn.vove7.common.interfaces.CodeEditorOperation
 import cn.vove7.common.view.editor.MultiSpan
-import cn.vove7.common.bridges.SystemBridge
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.tools.UriUtils
 import cn.vove7.jarvis.view.EditorFunsHelper
@@ -57,7 +57,7 @@ abstract class CodeEditorActivity : AppCompatActivity() {
     }
 
     inner class MyPrinter : OnPrint {
-        override fun onPrint(l: Int, output: String) {
+        override fun onPrint(l: Int, output: String?) {
             val pair = when (l) {
                 OnPrint.ERROR -> Pair(cn.vove7.vtp.R.color.red_500, "ERROR: ")
                 OnPrint.WARN -> Pair(cn.vove7.vtp.R.color.orange_700, "WARN: ")
@@ -66,7 +66,7 @@ abstract class CodeEditorActivity : AppCompatActivity() {
             }
 
             val i = MultiSpan(this@CodeEditorActivity, pair.second, colorId = pair.first)
-            val v = MultiSpan(this@CodeEditorActivity, output, colorId = pair.first)
+            val v = MultiSpan(this@CodeEditorActivity, output ?: "", colorId = pair.first)
             synchronized(logList) {
                 logList.add(i.spanStr)
                 logList.add(v.spanStr)

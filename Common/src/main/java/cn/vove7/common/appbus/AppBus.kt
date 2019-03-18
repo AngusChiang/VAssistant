@@ -37,10 +37,11 @@ object AppBus {
             val st = Thread.currentThread().stackTrace
             buildString {
                 st.forEach {
-                    appendln("${it.fileName} -> ${it.lineNumber}: " + it.className + "." + it.methodName)
+                    appendln("(${it.fileName}:${it.lineNumber}) ${it.methodName}")
                 }
             }
         } else ""
+
         Vog.d("post ---> $data on $m")
         EventBus.getDefault().post(data)
     }

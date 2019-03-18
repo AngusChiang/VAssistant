@@ -2,6 +2,7 @@ package cn.vove7.executorengine
 
 import android.content.Context
 import android.support.annotation.CallSuper
+import cn.vove7.common.NeedAccessibilityException
 import cn.vove7.common.accessibility.AccessibilityApi
 import cn.vove7.common.accessibility.viewnode.ViewNode
 import cn.vove7.common.app.GlobalApp
@@ -62,7 +63,6 @@ open class ExecutorImpl(
         get() = AccessibilityApi.accessibilityService
     private var lock = Object()
     var currentAction: Action? = null
-    private val markedOpenDao = DAO.daoSession.markedDataDao
     //    val globalActionExecutor = GlobalActionExecutor()
     override var command: String? = null
     override var DEBUG: Boolean = false
@@ -82,6 +82,13 @@ open class ExecutorImpl(
             userInterrupted = value
         }
 
+    override fun requireAccessibility() {
+        if (accessApi == null) {
+            AppBus.post(RequestPermission("无障碍服务"))
+            throw NeedAccessibilityException()
+        }
+    }
+
     /**
      * # 等待app|Activity表
      * - [CExecutorI] 执行器
@@ -91,7 +98,7 @@ open class ExecutorImpl(
     private val locksWaitForActivity = mutableMapOf<ActivityShowListener, ActionScope>()
 
     /**
-     *  Notifier By [accessApi.currentScope]
+     *  Activity监听器
      */
     private val activityNotifier = AppChangNotifier(locksWaitForActivity)
 
@@ -125,7 +132,7 @@ open class ExecutorImpl(
         }
 
     /**
-     * enter
+     * 脚本线程
      */
     private var thread: Thread? = null
 
@@ -160,17 +167,20 @@ open class ExecutorImpl(
         while (actionQueue.isNotEmpty()) {
             currentActionIndex++
             if (!userInterrupt) {
-                currentAction = actionQueue.poll()
-                actionScope = currentAction?.actionScopeType
-                Vog.d("pollActionQueue ---> $actionScope")
-                r = runScript(currentAction!!.actionScript, currentAction!!.param.valueWithClear
-                    ?: arrayOf())// 清除参数缓存
-                when {
-                    r.needTerminal -> {//出错
-                        currentAction = null
-                        actionQueue.clear()
-                        serviceBridge?.onExecuteFailed(r.msg)
-                        return null
+                actionQueue.poll().apply {
+                    currentAction = this
+
+                    actionScope = this.actionScopeType
+                    Vog.d("pollActionQueue ---> $actionScope")
+                    r = runScript(this.actionScript, this.param.valueWithClear
+                        ?: arrayOf())// 清除参数缓存
+                    when {
+                        r.needTerminal -> {//出错
+                            currentAction = null
+                            actionQueue.clear()
+                            serviceBridge?.onExecuteFailed(r.msg)
+                            return null
+                        }
                     }
                 }
             } else {
@@ -237,50 +247,8 @@ open class ExecutorImpl(
         userInterrupt = true
         thread?.interrupt()//打破wait
         Vog.d("外部终止运行")
-//        try {
-//            thread?.checkAccess()
-//            thread?.interrupt()//打破wait
-//        } catch (e: Exception) {
-//            e.printStackTrace()
-//        }
 
     }
-
-    /**
-     * 跟随打开解析App内操作
-     * 接着打开应用
-     * always return true
-     */
-    /**
-     *
-    private fun parseAppInnerOperation(cmd: String, pkg: String): Boolean {
-    //解析跟随
-    val appQ = ParseEngine.matchAppAction(cmd, ActionScope(pkg), true)
-    actionQueue = appQ.second
-    //打开应用
-    if (actionQueue.isNotEmpty()) {//todo 检查App页面?
-    systemBridge.openAppByPkg(pkg, true)
-    val his = CommandHistory(UserInfo.getUserId(), cmd, "打开$pkg -> ${appQ.first}")
-    AppBus.post(his)
-    Vog.d("parseAppInnerOperation app内操作")
-    } else {
-    systemBridge.openAppByPkg(pkg, false)
-    Vog.d("parseAppInnerOperation 无后续操作")
-    return true
-    }
-
-    val r = checkAccessibilityService()
-    if (r) {
-    //等待App打开
-    //TODO check
-    //            AppBus.post(AppBus.EVENT_HIDE_FLOAT)//关闭助手dialog
-    val waitR = waitForApp(pkg, null, 5000)
-    if (!waitR) return false
-    pollActionQueue()
-    }
-    return true
-    }
-     */
 
     /**
      * @param cmd String 包名 应用名 标记功能
@@ -425,6 +393,8 @@ open class ExecutorImpl(
      * 解析标记功能
      * 脚本内根据[commandType]分别 打开/关闭
      */
+    private val markedOpenDao get() = DAO.daoSession.markedDataDao
+
     private fun parseOpenOrCloseAction(p: String): Boolean {
         /*val marked = markedOpenDao.queryBuilder()
                 .where(MarkedOpenDao.Properties.Key.like(p)).unique()
@@ -775,14 +745,7 @@ open class ExecutorImpl(
     }
 
     override fun sleep(millis: Long) {
-//        try {
         Thread.sleep(millis)
-//        } catch (e: InterruptedException) {
-//            Thread.currentThread().interrupt()
-//            throw InterruptedException("sleep 休眠终止")
-//            //必须强行stop
-////            Thread.currentThread().stop()
-//        }
     }
 
     override fun checkAccessibilityService(jump: Boolean): Boolean {
@@ -793,6 +756,5 @@ open class ExecutorImpl(
             false
         } else true
     }
-
 
 }

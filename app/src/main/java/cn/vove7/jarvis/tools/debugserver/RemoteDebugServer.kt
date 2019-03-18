@@ -3,16 +3,17 @@ package cn.vove7.jarvis.tools.debugserver
 import android.content.Intent
 import android.os.Handler
 import android.os.Looper
+import android.widget.Toast
 import cn.vove7.androlua.LuaHelper
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.appbus.AppBus
+import cn.vove7.common.bridges.SystemBridge
 import cn.vove7.common.datamanager.parse.model.Action
 import cn.vove7.common.datamanager.parse.statusmap.ActionNode
 import cn.vove7.common.executor.OnPrint
 import cn.vove7.common.utils.ThreadPool.runOnPool
 import cn.vove7.common.utils.startActivityOnNewTask
-import cn.vove7.common.bridges.SystemBridge
 import cn.vove7.jarvis.BuildConfig
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.activities.NewInstActivity
@@ -22,6 +23,7 @@ import cn.vove7.rhino.api.RhinoApi
 import cn.vove7.vtp.log.Vog
 import com.google.gson.Gson
 import java.io.*
+import java.net.BindException
 import java.net.ServerSocket
 import java.net.Socket
 import kotlin.concurrent.thread
@@ -81,10 +83,16 @@ object RemoteDebugServer : Runnable {
     override fun run() {
         stopped = false
         clients = mutableListOf()
-        server = ServerSocket(LISTEN_PORT)
+        try {
+            server = ServerSocket(LISTEN_PORT)
+        } catch (e: BindException) {//Address already in use
+            GlobalApp.toastError("无线调试开启失败：端口被占用")
+            stop()
+            return
+        }
         RhinoApi.regPrint(print)
         LuaHelper.regPrint(print)
-        GlobalApp.toastInfo(R.string.text_debug_service_starting)
+        GlobalApp.toastInfo(R.string.text_debug_service_starting, Toast.LENGTH_LONG)
         server.use {
             while (!stopped) {
                 try {
@@ -126,18 +134,17 @@ object RemoteDebugServer : Runnable {
 
     private val sleepTime = if (BuildConfig.DEBUG) 100000L else 300000L //5min
     private val sleepRun = Runnable {
-        Vog.d("sleep ---> 休眠")
+        Vog.d("休眠")
         stop()
     }
 
     private fun startAutoSleep() {
-        Vog.d("startAutoSleep ---> 开启自动休眠$sleepTime")
+        Vog.d("开启自动休眠$sleepTime")
         handler?.postDelayed(sleepRun, sleepTime)
     }
 
     private fun stopAutoSleep() {
-        Vog.d("stopAutoSleepWakeup ---> 关闭自动休眠")
-
+        Vog.d("关闭自动休眠")
         handler?.removeCallbacks(sleepRun)
     }
 
@@ -147,10 +154,10 @@ object RemoteDebugServer : Runnable {
     }
 
     private val print = object : OnPrint {
-        override fun onPrint(l: Int, output: String) {
+        override fun onPrint(l: Int, output: String?) {
 //            Vog.d("onPrint ---> $output")
 
-            val end = if (output.endsWith('\n')) "" else "\n"
+            val end = if (output?.endsWith('\n') == true) "" else "\n"
             try {
                 clients?.forEach {
                     it.second.print(output + end)

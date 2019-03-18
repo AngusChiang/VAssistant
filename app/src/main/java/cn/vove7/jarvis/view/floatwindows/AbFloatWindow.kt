@@ -48,6 +48,8 @@ abstract class AbFloatWindow<VH : AbFloatWindow.ViewHolder>(
      */
     abstract fun layoutResId(): Int
 
+    open fun afterShow() {}
+
     open fun show() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && !PermissionUtils.canDrawOverlays(context)) {
             Vog.d("show ---> 无悬浮窗")
@@ -58,6 +60,7 @@ abstract class AbFloatWindow<VH : AbFloatWindow.ViewHolder>(
                 if (!isShowing) {
                     try {
                         windowManager.addView(contentView, mParams)
+                        afterShow()
                     } catch (e: Exception) {
                         e.printStackTrace()
                     }

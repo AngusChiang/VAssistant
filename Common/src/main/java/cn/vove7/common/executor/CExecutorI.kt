@@ -6,7 +6,6 @@ import cn.vove7.common.datamanager.parse.model.Action
 import cn.vove7.common.datamanager.parse.model.ActionScope
 import cn.vove7.common.interfaces.SpeakCallback
 import cn.vove7.common.view.notifier.ActivityShowListener
-import cn.vove7.common.view.notifier.ViewShowListener
 import java.util.*
 
 /**
@@ -17,6 +16,13 @@ interface CExecutorI : ActivityShowListener, RuntimeArgs, SpeakCallback {
     companion object {
         val DEBUG_SCRIPT = "DEBUG"
     }
+
+    /**
+     * 脚本标记需要使用无障碍
+     * 若未开启，抛出异常终止
+     */
+    @Throws
+    fun requireAccessibility()
 
     fun execQueue(cmdWords: String, actionQueue: PriorityQueue<Action>?)
     fun interrupt()

@@ -26,15 +26,13 @@ object GlobalActionExecutor : GlobalActionExecutorI {
 
     private val gestureService: AccessibilityService?
         get() = (AccessibilityApi.isAdvanServiceOn
-                && Build.VERSION.SDK_INT < Build.VERSION_CODES.N).let {
+                && Build.VERSION.SDK_INT > Build.VERSION_CODES.N).let {
             if (it) AccessibilityApi.gestureService!!
             else {
                 GlobalLog.log("全局手势执行失败: 版本低于7.0或高级无障碍服务未开启")
                 null
             }
         }
-//    private val gestureService: AccessibilityService?
-//        get() = AccessibilityApi.gestureService
 
     private val baseService: AccessibilityService?
         get() = AccessibilityApi.accessibilityService
@@ -112,6 +110,7 @@ object GlobalActionExecutor : GlobalActionExecutorI {
 //            false
 //        }
 //    }
+
     /**
      * 手势 一条路径
      * @param duration Long
@@ -150,9 +149,7 @@ object GlobalActionExecutor : GlobalActionExecutorI {
      */
     @RequiresApi(api = Build.VERSION_CODES.N)
     override fun gestureAsync(start: Long, duration: Long, points: Array<Pair<Int, Int>>) {
-        if (gestureService == null) {
-            return
-        }
+        gestureService ?: return
         val path = pointsToPath(points)
         doGesturesAsync(listOf(GestureDescription.StrokeDescription(path, 0, duration)))
     }
@@ -164,9 +161,7 @@ object GlobalActionExecutor : GlobalActionExecutorI {
      */
     @RequiresApi(Build.VERSION_CODES.N)
     override fun gestures(duration: Long, ppss: Array<Array<Pair<Int, Int>>>) {
-        if (gestureService == null) {
-            return
-        }
+        gestureService ?: return
         val list = mutableListOf<GestureDescription.StrokeDescription>()
         ppss.forEach {
             list.add(GestureDescription.StrokeDescription(pointsToPath(it), 0, duration))
@@ -181,9 +176,7 @@ object GlobalActionExecutor : GlobalActionExecutorI {
      */
     @RequiresApi(Build.VERSION_CODES.N)
     override fun gesturesAsync(duration: Long, ppss: Array<Array<Pair<Int, Int>>>) {
-        if (gestureService == null) {
-            return
-        }
+        gestureService ?: return
         val list = mutableListOf<GestureDescription.StrokeDescription>()
         ppss.forEach {
             list.add(GestureDescription.StrokeDescription(pointsToPath(it), 0, duration))
@@ -233,7 +226,7 @@ object GlobalActionExecutor : GlobalActionExecutorI {
      */
     @RequiresApi(api = Build.VERSION_CODES.N)
     private fun gesturesWithoutHandler(description: GestureDescription): Boolean {
-        val gs=gestureService?:return false
+        val gs = gestureService ?: return false
         val result = ResultBox(false)
         gs.dispatchGesture(description, object : AccessibilityService.GestureResultCallback() {
             override fun onCompleted(gestureDescription: GestureDescription) {
@@ -317,6 +310,7 @@ object GlobalActionExecutor : GlobalActionExecutorI {
             false
         }
     }
+
     @ScriptApi
     override fun scrollUp(): Boolean {
         val mtop = (ScreenAdapter.relHeight * 0.1).toInt()

@@ -37,16 +37,11 @@ object GsonHelper {
         }).disableHtmlEscaping()
     }
 
-    fun toJson(model: Any?,pretty:Boolean=false): String {
+    fun toJson(model: Any?, pretty:Boolean=false): String {
         if (model == null) return ""
         val b= builder
         if(pretty) b.setPrettyPrinting()
         return b.create().toJson(model)
-    }
-
-    fun prettyJson(model: Any?): String {
-        if (model == null) return ""
-        return builder.setPrettyPrinting().create().toJson(model)
     }
 
     /**

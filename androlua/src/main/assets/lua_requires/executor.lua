@@ -17,6 +17,10 @@ function accessibility()
     return executor.checkAccessibilityService(true)
 end
 
+function requireAccessibility()
+    executor.requireAccessibility()
+end
+
 function checkService()
     return executor.checkAccessibilityService(false)
 end

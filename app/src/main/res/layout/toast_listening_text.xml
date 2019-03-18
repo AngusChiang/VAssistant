@@ -3,38 +3,25 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/root"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:gravity="start"
-    android:paddingStart="20dp"
-    android:paddingTop="5dp"
-    android:paddingEnd="20dp">
+    android:layout_height="50dp"
+    android:background="@color/green_900"
+    android:gravity="center"
+    android:padding="20dp">
 
-    <LinearLayout
+    <ImageView
+        android:id="@+id/ani_img"
+        android:layout_width="27dp"
+        android:layout_height="27dp"
+        android:layout_marginEnd="10dp"
+        android:src="@drawable/listening_animation" />
+
+    <TextView
+        android:id="@+id/text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:background="@drawable/round_bg_green"
-        android:gravity="center_vertical"
-        android:orientation="horizontal"
-        android:paddingStart="10dp"
-        android:paddingTop="5dp"
-        android:paddingEnd="10dp"
-        android:paddingBottom="5dp">
-
-        <ImageView
-            android:id="@+id/ani_img"
-            android:layout_width="20dp"
-            android:layout_height="20dp"
-            android:layout_marginEnd="10dp"
-            android:src="@drawable/listening_animation" />
-
-        <TextView
-            android:id="@+id/text"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text=""
-            android:minWidth="30dp"
-            android:textColor="@color/fff"
-            android:textSize="12sp"
-            android:textStyle="bold" />
-    </LinearLayout>
+        android:minWidth="30dp"
+        android:text="12345678"
+        android:textColor="@color/fff"
+        android:textSize="14sp"
+        android:textStyle="bold" />
 </LinearLayout>

@@ -35,10 +35,11 @@ public class Action implements Comparable<Action>, Serializable {
 
     @Transient
     private ActionScope scope;
+
     /**
      * 执行优先级
      */
-    private int priority;//无用？
+    private int priority;
     @Expose(serialize = false)
     private long nodeId;
 

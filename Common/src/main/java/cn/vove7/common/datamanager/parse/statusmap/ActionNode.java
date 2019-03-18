@@ -149,7 +149,9 @@ public class ActionNode implements Serializable, DataFrom {
     private String parentTagId;//
 
 
-    private int priority;//匹配优先级 bigger优先; 相对于action chain :(全局命令下: 返回主页>返回) (同一界面下)
+    //匹配优先级 bigger优先;
+    // 相对于action chain :(全局命令下: 返回主页>返回) (同一界面下)
+    private int priority;
 
     private String from = null;
     /**

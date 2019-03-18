@@ -4,6 +4,7 @@
 - 修复toast不显示问题
 - 重构代码
 - 完善脚本API文档
+- 脚本无障碍标志替换为‘requireAccessibility()’
 
 ### 1.7.1
 

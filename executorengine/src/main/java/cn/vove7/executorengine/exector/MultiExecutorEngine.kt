@@ -14,6 +14,7 @@ import cn.vove7.common.utils.RegUtils
 import cn.vove7.executorengine.ExecutorImpl
 import cn.vove7.rhino.RhinoHelper
 import cn.vove7.rhino.api.RhinoApi
+import org.mozilla.javascript.WrappedException
 
 /**
  * # MultiExecutorEngine
@@ -42,10 +43,15 @@ class MultiExecutorEngine : ExecutorImpl() {
             rhinoHelper?.evalString(sc, *(args ?: arrayOf())) ?: GlobalApp.toastWarning("执行器未就绪")
             RhinoApi.doLog("主线程执行完毕\n")
             PartialResult.success()
-        } catch (e: Exception) {
+        } catch (we: WrappedException) {
+            val e = we.wrappedException
             GlobalLog.err(e)
-            RhinoApi.doLog(e.message)
-            PartialResult.fatal(e.message ?: "no message")
+            if (e is InterruptedException) {
+                RhinoApi.doLog("强行终止")
+                PartialResult.fatal("强行终止")
+            } else {
+                PartialResult.fatal(e.message ?: "no message")
+            }
         }
     }
 
@@ -85,5 +91,7 @@ class MultiExecutorEngine : ExecutorImpl() {
         super.interrupt()
         rhinoHelper?.stop()
         luaHelper?.stop()
+        rhinoHelper = null
+        luaHelper = null
     }
 }

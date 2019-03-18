@@ -13,6 +13,10 @@ notifyFailed = function(s){
 accessibility = function(){
     return executor.checkAccessibilityService(true)
 }
+requireAccessibility = function(){
+    executor.requireAccessibility()
+}
+
 //  语音合成同步 ，说完再向下执行
 // @param text
 // @return booleam 是否成功

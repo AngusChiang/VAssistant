@@ -20,3 +20,10 @@ class ViewNodeNotFoundException(finder: ViewFinder?) : Exception(finder?.toStrin
  * @constructor
  */
 class MessageException(msg: String) : Exception(msg)
+
+/**
+ * 无障碍服务未运行异常
+ * @constructor
+ */
+class NeedAccessibilityException : RuntimeException("无障碍服务未运行")
+

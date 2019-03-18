@@ -1,7 +1,7 @@
 package cn.vove7.common.executor
 
 interface OnPrint {
-    fun onPrint(l: Int, output: String)
+    fun onPrint(l: Int, output: String?)
 
 
     companion object {

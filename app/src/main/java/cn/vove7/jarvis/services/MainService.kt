@@ -1183,7 +1183,7 @@ class MainService : BusService(),
         }
 
         override fun onFinish() {
-            Vog.d("onSynData 结束")
+            Vog.v("onSynData 结束")
             notifySpeakFinish()
             if (resumeMusicLock) {//
                 resumeMusicIf()
