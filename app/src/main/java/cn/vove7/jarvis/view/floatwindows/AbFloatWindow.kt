@@ -82,10 +82,16 @@ abstract class AbFloatWindow(
                 if (mParams == null) mParams = buildLayoutParams()
                 if (!isShowing) {
                     try {
-                        contentView = newView
-                        windowManager.addView(contentView, mParams)
-
-                        afterShow()
+                        if (contentView != null) hide {
+                            contentView = newView
+                            windowManager.addView(contentView, mParams)
+                            afterShow()
+                        }
+                        else {
+                            contentView = newView
+                            windowManager.addView(contentView, mParams)
+                            afterShow()
+                        }
                     } catch (e: Exception) {
                         e.printStackTrace()
                     }
@@ -97,7 +103,7 @@ abstract class AbFloatWindow(
 
     open val exitAni: Int? = null
 
-    open fun hide() {
+    open fun hide(onEnd: (() -> Unit)? = null) {
 //        windowManager.removeView()
         synchronized(isShowing) {
             val ei = exitAni
@@ -109,6 +115,7 @@ abstract class AbFloatWindow(
 
                     override fun onAnimationEnd(animation: Animation?) {
                         removeView()
+                        onEnd?.invoke()
                     }
 
                     override fun onAnimationStart(animation: Animation?) {

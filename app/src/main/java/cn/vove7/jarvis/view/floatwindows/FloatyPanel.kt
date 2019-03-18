@@ -8,7 +8,9 @@ import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.appbus.AppBus
 import cn.vove7.common.appbus.SpeechAction
 import cn.vove7.common.model.RequestPermission
+import cn.vove7.common.utils.gone
 import cn.vove7.common.utils.runOnUi
+import cn.vove7.common.utils.show
 import cn.vove7.jarvis.R
 import cn.vove7.vtp.log.Vog
 import kotlinx.android.synthetic.main.toast_listening_text.view.*
@@ -30,39 +32,30 @@ class FloatyPanel : AbFloatWindow(GlobalApp.APP) {
         AppBus.post(RequestPermission("悬浮窗权限"))
     }
 
-    private var ani = 0
-    /**
-     * TODO 切换动画
-     * @param resId Int
-     */
-    private fun setAniRes(resId: Int) {
-        if (ani == resId) return
-        ani = resId
-        contentView?.ani_img?.apply {
-            post {
-                setImageResource(resId)
-                (drawable as? AnimationDrawable)?.start()
-            }
+    fun showParseAni() {
+        if (contentView?.parse_ani?.isShown == true) return
+        contentView?.parse_ani?.apply {
+            (drawable as? AnimationDrawable)?.start()
+            show()
         }
+        contentView?.listening_ani?.gone()
     }
 
-    fun showParseAni() {
-        runOnUi {
-            setAniRes(R.drawable.parsing_animation)
-            if (!isShowing)
-                show()
-        }
+    fun showListeningAni() {
+        if (contentView?.listening_ani?.isShown == true) return
+        contentView?.parse_ani?.gone()
+        contentView?.listening_ani?.show()
     }
 
     override fun onCreateView(view: View) {
-        view.body.setPadding(0, statusbarHeight + 30, 0, 30)
+        view.body.setPadding(10, statusbarHeight + 20, 10, 20)
     }
 
     fun show(text: String) {
         removeDelayHide()
         runOnUi {
             show()
-            setAniRes(R.drawable.listening_animation)
+            showListeningAni()
             voiceText = text
             contentView?.voice_text?.text = text
         }
@@ -83,7 +76,6 @@ class FloatyPanel : AbFloatWindow(GlobalApp.APP) {
     override val exitAni: Int? = R.anim.pop_fade_out
 
     override fun onRemove() {
-        ani = 0
     }
 
     private fun removeDelayHide() {

@@ -25,6 +25,7 @@ import cn.vove7.jarvis.tools.ShortcutUtil
 import cn.vove7.jarvis.view.openAccessibilityServiceAuto
 import cn.vove7.vtp.log.Vog
 import io.github.kbiakov.codeview.classifier.CodeProcessor
+import java.util.concurrent.Executor
 
 
 class App : GlobalApp() {
@@ -109,15 +110,5 @@ class App : GlobalApp() {
 
     override fun attachBaseContext(base: Context?) {
         super.attachBaseContext(base)
-//        val builder = Config.ConfigBuilder()
-//                .setAppContext(this)
-//                .setAppName(getString(R.string.app_name))
-//                .setRuleRequest(RuleSyncRequest())
-//                .setUpload(CollectDataSyncUpload())
-//                .setAppVersion(BuildConfig.VERSION_NAME)
-//                .setApmid(if (BuildConfig.DEBUG) "j735c9gol8uw"
-//                else "nggjim4etqcq")
-//        Client.attach(builder.build())
-//        Client.startWork()
     }
 }

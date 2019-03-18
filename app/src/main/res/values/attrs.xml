@@ -10,5 +10,7 @@
         <attr name="vertical_Space" format="dimension" />
         <attr name="isFull" format="boolean" />
     </declare-styleable>
-
+    <declare-styleable name="WaveView">
+        <attr name="waveColor" format="color|reference" />
+    </declare-styleable>
 </resources>
