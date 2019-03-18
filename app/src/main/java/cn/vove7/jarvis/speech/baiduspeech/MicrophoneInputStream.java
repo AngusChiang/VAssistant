@@ -8,7 +8,6 @@ import android.bluetooth.BluetoothProfile;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.media.AudioFormat;
 import android.media.AudioManager;
 import android.media.AudioRecord;
@@ -43,24 +42,21 @@ public class MicrophoneInputStream extends InputStream {
     private AudioManager mAudioManager = (AudioManager) GlobalApp.APP.getSystemService(Context.AUDIO_SERVICE);
 
     public MicrophoneInputStream() {
-        //initSCO();
-        //initBlueToothHeadset();
-        //initAudioSource();
     }
 
     private void initAudioSource() {
-        Vog.INSTANCE.d( "MicrophoneInputStream ---> load");
-        //openBTHeadsetMicro();
+        Vog.INSTANCE.d("MicrophoneInputStream ---> load");
+        initSCO();
+
         if (audioRecord == null) {
             int bufferSize = AudioRecord.getMinBufferSize(16000,
                     AudioFormat.CHANNEL_IN_MONO, AudioFormat.ENCODING_PCM_16BIT) * 16;
             audioRecord = new AudioRecord(
                     //AppConfig.INSTANCE.getIS_SYS_APP() ? MediaRecorder.AudioSource.VOICE_CALL :
-                            MediaRecorder.AudioSource.DEFAULT,
+                    MediaRecorder.AudioSource.VOICE_CALL,
                     16000, AudioFormat.CHANNEL_IN_MONO,
                     AudioFormat.ENCODING_PCM_16BIT, bufferSize);
         }
-        //mAudioManager.setMode(AudioManager.MODE_IN_CALL);
     }
 
     public static MicrophoneInputStream getInstance() {
@@ -71,7 +67,6 @@ public class MicrophoneInputStream extends InputStream {
     }
 
     public void start() {
-        //openBTHeadsetMicro();
         initAudioSource();
         Log.i(TAG, " MicrophoneInputStream start recoding");
         if (audioRecord == null
@@ -79,7 +74,7 @@ public class MicrophoneInputStream extends InputStream {
             throw new IllegalStateException(
                     "startRecording() called on an uninitialized AudioRecord.");
         }
-        Vog.INSTANCE.d( "start ---> " + toLogFriendlyAudioSource(audioRecord.getAudioSource()));
+        Vog.INSTANCE.d("start ---> " + toLogFriendlyAudioSource(audioRecord.getAudioSource()));
         audioRecord.startRecording();
     }
 
@@ -108,6 +103,7 @@ public class MicrophoneInputStream extends InputStream {
                 audioRecord.release();
                 audioRecord = null;
                 //closeBTHeadsetMicro();
+                closeSCO();
 
             } catch (Exception e) {
                 GlobalLog.INSTANCE.err(e);
@@ -202,13 +198,23 @@ public class MicrophoneInputStream extends InputStream {
     }
 
     private void initSCO() {
-        if (!isBTHSConnect()) return;
-        Context app = GlobalApp.APP;
-        IntentFilter newintent = new IntentFilter();
-        newintent.addAction(AudioManager.ACTION_SCO_AUDIO_STATE_UPDATED);
-        newintent.addAction(BluetoothHeadset.ACTION_CONNECTION_STATE_CHANGED);
-        app.registerReceiver(mSCOHeadsetAudioState, newintent);
+        //if (!isBTHSConnect()) return;
+        //Context app = GlobalApp.APP;
+        //IntentFilter newintent = new IntentFilter();
+        //newintent.addAction(AudioManager.ACTION_SCO_AUDIO_STATE_UPDATED);
+        //newintent.addAction(BluetoothHeadset.ACTION_CONNECTION_STATE_CHANGED);
+        //app.registerReceiver(mSCOHeadsetAudioState, newintent);
 
+        AudioManager mAudioManager = (AudioManager) GlobalApp.APP.getSystemService(Context.AUDIO_SERVICE);
+        mAudioManager.setBluetoothScoOn(true);
+        mAudioManager.startBluetoothSco();
+
+    }
+
+    private void closeSCO() {
+        AudioManager mAudioManager = (AudioManager) GlobalApp.APP.getSystemService(Context.AUDIO_SERVICE);
+        mAudioManager.setBluetoothScoOn(false);
+        mAudioManager.stopBluetoothSco();
     }
 
     private BroadcastReceiver mSCOHeadsetAudioState = new BroadcastReceiver() {
@@ -238,7 +244,7 @@ public class MicrophoneInputStream extends InputStream {
                     if (end - b >= 2990) {//timeout
                         throw new InterruptedException("蓝牙通道开启失败");
                     } else {
-                        Vog.INSTANCE.d( "openBTHeadsetMicro ---> 蓝牙通道开启成功");
+                        Vog.INSTANCE.d("openBTHeadsetMicro ---> 蓝牙通道开启成功");
                     }
                 } catch (InterruptedException e) {
                     GlobalApp.Companion.toastError("蓝牙通道开启失败", Toast.LENGTH_SHORT);
@@ -252,7 +258,7 @@ public class MicrophoneInputStream extends InputStream {
     private boolean isBTHSConnect() {
         BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();
         boolean is = BluetoothProfile.STATE_CONNECTED == adapter.getProfileConnectionState(BluetoothProfile.HEADSET);
-        Vog.INSTANCE.d( "isBTHSConnect ---> 蓝牙连接" + is);
+        Vog.INSTANCE.d("isBTHSConnect ---> 蓝牙连接" + is);
         return is;
     }
 

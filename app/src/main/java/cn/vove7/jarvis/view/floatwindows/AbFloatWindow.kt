@@ -8,8 +8,11 @@ import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.WindowManager
+import android.view.animation.Animation
+import android.view.animation.AnimationUtils
 import cn.vove7.vtp.log.Vog
 import cn.vove7.vtp.runtimepermission.PermissionUtils
+import kotlinx.android.synthetic.main.toast_listening_text.view.*
 
 /**
  * 悬浮窗
@@ -17,31 +20,51 @@ import cn.vove7.vtp.runtimepermission.PermissionUtils
  *
  * Created by Vove on 2018/7/1
  */
-abstract class AbFloatWindow<VH : AbFloatWindow.ViewHolder>(
+abstract class AbFloatWindow(
         val context: Context,
         var mParams: WindowManager.LayoutParams? = null
 ) {
     open var posX: Int = 0
     open var posY: Int = 0
+
     abstract val onNoPermission: () -> Unit
 
-    val contentView: View
-    var windowManager: WindowManager = context.applicationContext.getSystemService(Context.WINDOW_SERVICE) as WindowManager
-    var holder: VH
+    var contentView: View? = null
+
+    private val newView: View
+        get() {
+            return LayoutInflater.from(context)
+                    .inflate(this.layoutResId(), null).also {
+                        contentView = it
+                        onCreateView(it)
+                    }
+        }
+
+    open fun onCreateView(view: View) {}
+
+    var windowManager: WindowManager = context.applicationContext.getSystemService(Context.WINDOW_SERVICE)
+            as WindowManager
 
     var isShowing = false
+
+    val statusbarHeight: Int by lazy {
+        var statusBarHeight1 = -1
+        //获取status_bar_height资源的ID
+        val resourceId = context.resources.getIdentifier("status_bar_height",
+                "dimen", "android")
+        if (resourceId > 0) {
+            //根据资源ID获取响应的尺寸值
+            statusBarHeight1 = context.resources.getDimensionPixelSize(resourceId)
+        }
+        Vog.d("状态栏高度 ---> $statusBarHeight1")
+        statusBarHeight1
+    }
 
     init {
         val size = Point()
         windowManager.defaultDisplay.getSize(size)
-        contentView = LayoutInflater.from(context).inflate(this.layoutResId(), null)
-        holder = this.onCreateViewHolder(contentView)
     }
 
-    /**
-     * 注册事件
-     */
-    abstract fun onCreateViewHolder(view: View): VH
 
     /**
      * 布局Id
@@ -59,7 +82,9 @@ abstract class AbFloatWindow<VH : AbFloatWindow.ViewHolder>(
                 if (mParams == null) mParams = buildLayoutParams()
                 if (!isShowing) {
                     try {
+                        contentView = newView
                         windowManager.addView(contentView, mParams)
+
                         afterShow()
                     } catch (e: Exception) {
                         e.printStackTrace()
@@ -70,17 +95,44 @@ abstract class AbFloatWindow<VH : AbFloatWindow.ViewHolder>(
         }
     }
 
+    open val exitAni: Int? = null
+
     open fun hide() {
 //        windowManager.removeView()
         synchronized(isShowing) {
-            try {
-                windowManager.removeView(contentView)
-                Vog.d("hide ---> remove float")
-            } catch (e: Exception) {
+            val ei = exitAni
+            if (ei != null) {
+                val ani = AnimationUtils.loadAnimation(context, ei)
+                ani.setAnimationListener(object : Animation.AnimationListener {
+                    override fun onAnimationRepeat(animation: Animation?) {
+                    }
+
+                    override fun onAnimationEnd(animation: Animation?) {
+                        removeView()
+                    }
+
+                    override fun onAnimationStart(animation: Animation?) {
+                    }
+                })
+                contentView?.body?.startAnimation(ani)
+            } else {
+                removeView()
             }
             isShowing = false
         }
     }
+
+    private fun removeView() {
+        try {
+            windowManager.removeView(contentView)
+            contentView = null
+            onRemove()
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+
+    open fun onRemove() {}
 
     fun update(params: WindowManager.LayoutParams) {
         synchronized(isShowing) {

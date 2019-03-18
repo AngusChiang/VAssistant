@@ -3,25 +3,33 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/root"
     android:layout_width="match_parent"
-    android:layout_height="50dp"
-    android:background="@color/green_900"
+    android:layout_height="wrap_content"
     android:gravity="center"
-    android:padding="20dp">
+    android:paddingBottom="100dp">
 
-    <ImageView
-        android:id="@+id/ani_img"
-        android:layout_width="27dp"
-        android:layout_height="27dp"
-        android:layout_marginEnd="10dp"
-        android:src="@drawable/listening_animation" />
-
-    <TextView
-        android:id="@+id/text"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:id="@+id/body"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:minWidth="30dp"
-        android:text="12345678"
-        android:textColor="@color/fff"
-        android:textSize="14sp"
-        android:textStyle="bold" />
+        android:background="@color/green_900"
+        android:elevation="2dp"
+        android:gravity="center">
+
+        <ImageView
+            android:id="@+id/ani_img"
+            android:layout_width="25dp"
+            android:layout_height="25dp"
+            android:layout_marginEnd="10dp"
+            android:src="@drawable/listening_animation" />
+
+        <TextView
+            android:id="@+id/voice_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:minWidth="30dp"
+            android:textColor="@color/fff"
+            android:textSize="14sp"
+            android:textStyle="bold" />
+
+    </LinearLayout>
 </LinearLayout>

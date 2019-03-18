@@ -96,7 +96,7 @@ class MainService : BusService(),
      */
     var toastAlign: Int = 0
         set(v) {
-            floatyPanel.align = v
+//            floatyPanel.align = v
         }
 
     override val serviceId: Int

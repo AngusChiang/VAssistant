@@ -2,21 +2,14 @@ package cn.vove7.jarvis.view.floatwindows
 
 import android.graphics.drawable.AnimationDrawable
 import android.os.Handler
-import android.view.Gravity
 import android.view.View
-import android.view.animation.AlphaAnimation
-import android.widget.ImageView
-import android.widget.LinearLayout
-import android.widget.TextView
+import android.view.animation.AnimationUtils
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.appbus.AppBus
 import cn.vove7.common.appbus.SpeechAction
 import cn.vove7.common.model.RequestPermission
-import cn.vove7.common.utils.gone
 import cn.vove7.common.utils.runOnUi
-import cn.vove7.common.utils.show
 import cn.vove7.jarvis.R
-import cn.vove7.jarvis.tools.AppConfig
 import cn.vove7.vtp.log.Vog
 import kotlinx.android.synthetic.main.toast_listening_text.view.*
 
@@ -26,44 +19,18 @@ import kotlinx.android.synthetic.main.toast_listening_text.view.*
  * @author 17719247306
  * 2018/9/9
  */
-class FloatyPanel : AbFloatWindow<FloatyPanel.VHolder>(GlobalApp.APP) {
+class FloatyPanel : AbFloatWindow(GlobalApp.APP) {
     override var posY: Int = 0
 
-    lateinit var rootView: LinearLayout
+    //    lateinit var rootView: LinearLayout
     override fun layoutResId(): Int = R.layout.toast_listening_text
-    override fun onCreateViewHolder(view: View): VHolder {
-        rootView = view.root
-        align = AppConfig.listeningToastAlignDirection
-        return VHolder(view).also { v ->
-            v.aniImg.post {
-                (v.aniImg.drawable as? AnimationDrawable)?.start()
-            }
-        }
-    }
 
-    var align: Int = 0
-        set(v) {
-            Vog.d("align ---> $v")
-            rootView.gravity = when (v) {
-                0 -> {//居中
-                    Gravity.CENTER
-                }
-                1 -> {//靠左
-                    Gravity.START
-                }
-                2 -> {//靠右
-                    Gravity.END
-                }
-                else -> Gravity.CENTER
-            }
-            field = v
-        }
     override val onNoPermission: () -> Unit = {
         AppBus.postSpeechAction(SpeechAction.ActionCode.ACTION_CANCEL_RECOG)
         AppBus.post(RequestPermission("悬浮窗权限"))
     }
 
-    var ani = R.drawable.listening_animation
+    private var ani = 0
     /**
      * TODO 切换动画
      * @param resId Int
@@ -71,12 +38,10 @@ class FloatyPanel : AbFloatWindow<FloatyPanel.VHolder>(GlobalApp.APP) {
     private fun setAniRes(resId: Int) {
         if (ani == resId) return
         ani = resId
-        runOnUi {
-            holder.aniImg.apply {
+        contentView?.ani_img?.apply {
+            post {
                 setImageResource(resId)
-                post {
-                    (drawable as? AnimationDrawable)?.start()
-                }
+                (drawable as? AnimationDrawable)?.start()
             }
         }
     }
@@ -89,31 +54,36 @@ class FloatyPanel : AbFloatWindow<FloatyPanel.VHolder>(GlobalApp.APP) {
         }
     }
 
-    override fun afterShow() {
-        contentView.post {
-            contentView.animate().alphaBy(0f).alpha(1f)
-                    .setDuration(2000).start()
-        }
+    override fun onCreateView(view: View) {
+        view.body.setPadding(0, statusbarHeight + 30, 0, 30)
     }
 
     fun show(text: String) {
-//        initIfNeed()
         removeDelayHide()
         runOnUi {
+            show()
             setAniRes(R.drawable.listening_animation)
-            holder.text = text
-            if (!isShowing) {
-                show()
-                contentView.gone()
-                contentView.show()
-                contentView.post {
-                    val animation = AlphaAnimation(0f, 1f)
-                    animation.duration = 1000
-                    contentView.startAnimation(animation)
-                }
-            }
+            voiceText = text
+            contentView?.voice_text?.text = text
+        }
+    }
+
+    var voiceText = ""
+
+    override fun afterShow() {
+        contentView?.voice_text?.text = voiceText
+
+        contentView?.body?.also {
+            it.startAnimation(AnimationUtils.loadAnimation(context,
+                    R.anim.pop_fade_in))
         }
 
+    }
+
+    override val exitAni: Int? = R.anim.pop_fade_out
+
+    override fun onRemove() {
+        ani = 0
     }
 
     private fun removeDelayHide() {
@@ -128,6 +98,7 @@ class FloatyPanel : AbFloatWindow<FloatyPanel.VHolder>(GlobalApp.APP) {
     var delayHide = Runnable {
         hide()
     }
+
     var delayHandler: Handler? = null
     fun hideDelay(delay: Long = 800) {
         runOnUi {
@@ -142,16 +113,5 @@ class FloatyPanel : AbFloatWindow<FloatyPanel.VHolder>(GlobalApp.APP) {
             hide()
         }
     }
-
-    class VHolder(view: View) : AbFloatWindow.ViewHolder(view) {
-        var text: String
-            get() = textView.text.toString()
-            set(v) {
-                textView.text = v
-            }
-        val aniImg = view.findViewById<ImageView>(R.id.ani_img)
-        var textView: TextView = view.findViewById(R.id.text)
-    }
-
 
 }
