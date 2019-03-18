@@ -124,6 +124,7 @@ abstract class AbFloatWindow(
                 contentView?.body?.startAnimation(ani)
             } else {
                 removeView()
+                onEnd?.invoke()
             }
             isShowing = false
         }
