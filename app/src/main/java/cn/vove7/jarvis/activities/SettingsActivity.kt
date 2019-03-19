@@ -243,13 +243,13 @@ class SettingsActivity : ReturnableActivity() {
 //                    CheckBoxItem(title = "继续播放", summary = "当后台有音乐时，执行结束后继续音乐",
 //                            keyId = R.string.key_resume_bkg_music,defaultValue = {true})
             )),
-            SettingGroupItem(R.color.lime_600, titleS = "语音面板", childItems = listOf(
-                    SingleChoiceItem(title = "依靠方向", keyId = R.string.key_float_voice_align,
-                            entityArrId = R.array.list_float_voice_align) { _, b ->
-                        MainService.instance?.toastAlign = (b as Pair<*, *>).first as Int
-                        return@SingleChoiceItem true
-                    }
-            )),
+//            SettingGroupItem(R.color.lime_600, titleS = "语音面板", childItems = listOf(
+//                    SingleChoiceItem(title = "依靠方向", keyId = R.string.key_float_voice_align,
+//                            entityArrId = R.array.list_float_voice_align) { _, b ->
+//                        MainService.instance?.toastAlign = (b as Pair<*, *>).first as Int
+//                        return@SingleChoiceItem true
+//                    }
+//            )),
             SettingGroupItem(R.color.lime_600, titleId = R.string.text_other, childItems = listOf(
                     SingleChoiceItem(title = "翻译主语言", entityArrId = R.array.list_translate_languages,
                             keyId = R.string.key_translate_languages),

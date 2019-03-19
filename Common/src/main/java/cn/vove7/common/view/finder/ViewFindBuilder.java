@@ -42,7 +42,7 @@ public class ViewFindBuilder extends FindBuilderWithOperation {
             GlobalLog.INSTANCE.err("AccessibilityService is not running.");
             return;
         }
-        viewFinderX = new ViewFinderWithMultiCondition(accessibilityService.getRootInWindow());
+        viewFinderX = new ViewFinderWithMultiCondition();
         setFinder(viewFinderX);
     }
 

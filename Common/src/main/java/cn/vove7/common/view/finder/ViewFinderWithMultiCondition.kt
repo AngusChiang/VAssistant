@@ -2,7 +2,6 @@ package cn.vove7.common.view.finder
 
 import android.util.Range
 import android.view.accessibility.AccessibilityNodeInfo
-import cn.vove7.common.accessibility.AccessibilityApi
 import cn.vove7.common.accessibility.viewnode.ViewNode
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.utils.RegUtils.dealRawReg
@@ -16,7 +15,8 @@ import java.util.*
  * @author 17719
  * 2018/8/5
  */
-class ViewFinderWithMultiCondition(startNode: AccessibilityNodeInfo?) : ViewFinder(startNode) {
+class ViewFinderWithMultiCondition(node: AccessibilityNodeInfo? = null) : ViewFinder(node) {
+
 
     var viewTextCondition: MutableList<String> = mutableListOf()
     fun addViewTextCondition(vararg s: String) {

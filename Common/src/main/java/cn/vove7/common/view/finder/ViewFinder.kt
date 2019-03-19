@@ -1,6 +1,7 @@
 package cn.vove7.common.view.finder
 
 import android.view.accessibility.AccessibilityNodeInfo
+import cn.vove7.common.NeedAccessibilityException
 import cn.vove7.common.accessibility.AccessibilityApi
 import cn.vove7.common.accessibility.viewnode.ViewNode
 import cn.vove7.vtp.log.Vog
@@ -8,7 +9,15 @@ import cn.vove7.vtp.log.Vog
 /**
  * 查找符合条件的AccessibilityNodeInfo
  */
-abstract class ViewFinder(var startNode: AccessibilityNodeInfo?) {
+abstract class ViewFinder(var node: AccessibilityNodeInfo?) {
+
+    val startNode
+        get() = if (node == null) {//fix 没有指定node的时候，每次startNode重新获取
+            val s = AccessibilityApi.accessibilityService ?: throw NeedAccessibilityException()
+            s.rootInWindow
+        } else {
+            node
+        }
 
     open fun findFirst(): ViewNode? {
         return findFirst(false)
