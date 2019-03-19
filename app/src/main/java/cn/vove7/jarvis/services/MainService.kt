@@ -1014,6 +1014,7 @@ class MainService : BusService(),
         isContinousDialogue = false
         floatyPanel.show(result)
         parseAnimation.begin()
+        floatyPanel.showParseAni()
 
         resumeMusicIf()
 
