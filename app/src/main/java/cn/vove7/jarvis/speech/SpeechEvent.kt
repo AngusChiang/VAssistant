@@ -53,4 +53,6 @@ interface SpeechEvent {
      * 手动取消
      */
     fun onCancelRecog()
+
+    fun onFinish() {}
 }

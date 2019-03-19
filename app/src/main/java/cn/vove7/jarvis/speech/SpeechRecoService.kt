@@ -2,6 +2,7 @@ package cn.vove7.jarvis.speech
 
 import android.content.Context
 import android.content.pm.PackageManager
+import android.media.AudioManager
 import android.os.*
 import android.support.annotation.CallSuper
 import android.support.v4.app.ActivityCompat
@@ -17,6 +18,7 @@ import cn.vove7.jarvis.view.statusbar.WakeupStatusAnimation
 import cn.vove7.vtp.log.Vog
 import cn.vove7.vtp.runtimepermission.PermissionUtils
 
+
 /**
  * #SpeechRecoService
  * 语音识别接口
@@ -29,26 +31,49 @@ abstract class SpeechRecoService(val event: SpeechEvent) : SpeechRecogI {
     //定时器关闭标志
     override var timerEnd: Boolean = false
     protected val wakeupStatusAni: StatusAnimation by lazy { WakeupStatusAnimation() }
-
+    val audioManager: AudioManager get() = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
     abstract var enableOffline: Boolean
 
     var isListening = false
 
     /**
      * 重写函数结尾处callSuper
+     * TODO 监听蓝牙
      */
     override fun startRecog(byVoice: Boolean) {
         //检查权限
         if (!checkRecoderPermission() || !checkFloat()) return
         Thread.sleep(80)
         if (!isListening) {
+            startSCO()
             isListening = true
             event.onStartRecog(byVoice)
-            doStartRecog()
+            checkAudioSource()
         } else {
             Vog.d("启动失败，正在识别")
         }
     }
+
+    private fun checkAudioSource() {
+        doStartRecog()
+    }
+
+    private fun startSCO() {
+        Vog.d("startSCO")
+//        val bm = context.getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
+//        val adapter = bm.adapter
+        audioManager.apply {
+            isBluetoothScoOn = true
+            mode = AudioManager.MODE_IN_CALL
+            startBluetoothSco()
+        }
+    }
+
+    fun closeSCO() {
+        audioManager.isBluetoothScoOn = false
+        audioManager.stopBluetoothSco()
+    }
+
 
     /**
      * 静默开启
@@ -57,10 +82,10 @@ abstract class SpeechRecoService(val event: SpeechEvent) : SpeechRecogI {
     override fun startRecogSilent() {
         if (!checkRecoderPermission() || !checkFloat()) return
         isListening = true
-        doStartRecog()
+        checkAudioSource()
     }
 
-    fun checkFloat(): Boolean {
+    private fun checkFloat(): Boolean {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && !PermissionUtils.canDrawOverlays(context)) {
             Vog.d("show ---> 无悬浮窗")
             AppBus.post(RequestPermission("悬浮窗权限"))
@@ -80,6 +105,7 @@ abstract class SpeechRecoService(val event: SpeechEvent) : SpeechRecogI {
      */
     override fun cancelRecog(notify: Boolean) {
         isListening = false
+        closeSCO()
         doCancelRecog()
         if (notify)
             event.onCancelRecog()
@@ -105,6 +131,7 @@ abstract class SpeechRecoService(val event: SpeechEvent) : SpeechRecogI {
     @CallSuper
     override fun stopRecog() {
         isListening = false
+        closeSCO()
         doStopRecog()
         event.onStopRecog()
     }
@@ -211,6 +238,10 @@ abstract class SpeechRecoService(val event: SpeechEvent) : SpeechRecogI {
                     if (!AppConfig.lastingVoiceCommand)
                         isListening = false
 //                    AppBus.postVoiceData(VoiceData(msg.what, result))
+                }
+                IStatus.STATUS_FINISHED -> {
+                    closeSCO()//关闭SCO
+                    event.onFinish()
                 }
             }
         }

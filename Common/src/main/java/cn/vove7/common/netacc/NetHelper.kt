@@ -213,8 +213,8 @@ object NetHelper {
      * @param his CommandHistory
      */
     fun uploadUserCommandHistory(his: CommandHistory) {
+        if (BuildConfig.DEBUG /*|| !AppConfig.userExpPlan*/) return
         ThreadPool.runOnPool {
-//            if (BuildConfig.DEBUG /*|| !AppConfig.userExpPlan*/) return@runOnPool
             prepareIfNeeded()
             postJson<Any>(ApiUrls.UPLOAD_CMD_HIS, BaseRequestModel(his)) { _, b ->
                 if (b?.isOk() != true) {

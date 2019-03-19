@@ -12,6 +12,8 @@ import cn.vove7.jarvis.speech.baiduspeech.recognition.model.IStatus.Companion.CO
 import cn.vove7.jarvis.speech.baiduspeech.recognition.model.IStatus.Companion.CODE_VOICE_RESULT
 import cn.vove7.jarvis.speech.baiduspeech.recognition.model.IStatus.Companion.CODE_VOICE_TEMP
 import cn.vove7.jarvis.speech.baiduspeech.recognition.model.IStatus.Companion.CODE_VOICE_VOL
+import cn.vove7.jarvis.speech.baiduspeech.recognition.model.IStatus.Companion.STATUS_EXIT
+import cn.vove7.jarvis.speech.baiduspeech.recognition.model.IStatus.Companion.STATUS_FINISHED
 import cn.vove7.jarvis.speech.baiduspeech.recognition.model.RecogResult
 import cn.vove7.vtp.log.Vog
 
@@ -99,6 +101,12 @@ class SpeechStatusListener(private val handler: Handler) : StatusRecogListener()
                         VoiceData(CODE_VOICE_VOL, volumePercent = volumePercent)
                 )
         )
+    }
+
+    override fun onAsrFinish(recogResult: RecogResult) {
+        super.onAsrFinish(recogResult)
+        handler.sendMessage(SpeechMessage.buildMessage(STATUS_FINISHED,""))
+
     }
 
     override fun onAsrExit() {

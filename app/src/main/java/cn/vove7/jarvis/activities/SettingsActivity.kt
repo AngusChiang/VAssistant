@@ -194,10 +194,8 @@ class SettingsActivity : ReturnableActivity() {
                                 }
                     },
                     InputItem(title = "用户唤醒词", summary = "如果不想把你的唤醒词被当作命令，把他写到这里\n多个词以'#'隔开",
-                            keyId = R.string.key_user_wakeup_word),
-                    CheckBoxItem(title = "兼容模式", summary = "语音唤醒无法使用时开启", keyId = R.string.key_voice_recog_compatible_mode,
-                            defaultValue = AppConfig.voiceRecogCompatibleMode)
-            )),
+                            keyId = R.string.key_user_wakeup_word)
+                    )),
 
             SettingGroupItem(R.color.google_green, titleS = "按键唤醒", childItems = listOf(
                     SwitchItem(title = "音量键唤醒",

@@ -28,7 +28,7 @@ import cn.vove7.vtp.log.Vog;
  * <p>
  * 保留Java 兼容
  */
-
+@Deprecated//"使用默认兼容蓝牙"
 public class MicrophoneInputStream extends InputStream {
     private static AudioRecord audioRecord;
 
@@ -46,14 +46,14 @@ public class MicrophoneInputStream extends InputStream {
 
     private void initAudioSource() {
         Vog.INSTANCE.d("MicrophoneInputStream ---> load");
-        initSCO();
+        //initSCO();
 
         if (audioRecord == null) {
             int bufferSize = AudioRecord.getMinBufferSize(16000,
                     AudioFormat.CHANNEL_IN_MONO, AudioFormat.ENCODING_PCM_16BIT) * 16;
             audioRecord = new AudioRecord(
                     //AppConfig.INSTANCE.getIS_SYS_APP() ? MediaRecorder.AudioSource.VOICE_CALL :
-                    MediaRecorder.AudioSource.VOICE_CALL,
+                    MediaRecorder.AudioSource.DEFAULT,
                     16000, AudioFormat.CHANNEL_IN_MONO,
                     AudioFormat.ENCODING_PCM_16BIT, bufferSize);
         }

@@ -7,6 +7,7 @@ import android.support.v7.app.AppCompatActivity
 import android.view.View
 import android.view.Window
 import cn.vove7.common.model.UserInfo
+import cn.vove7.jarvis.BuildConfig
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.fragments.HomeFragment
 import cn.vove7.jarvis.fragments.MineFragment
@@ -45,8 +46,8 @@ class RealMainActivity : AppCompatActivity() {
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             window.decorView.systemUiVisibility =
-                    View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN or
-                    View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
+                View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN or
+                        View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
             window.statusBarColor = resources.getColor(R.color.app_background)
         }
 
@@ -79,6 +80,7 @@ class RealMainActivity : AppCompatActivity() {
         val ps = arrayOf(
                 android.Manifest.permission.WRITE_EXTERNAL_STORAGE,
                 android.Manifest.permission.RECORD_AUDIO,
+                android.Manifest.permission.MODIFY_AUDIO_SETTINGS,
                 android.Manifest.permission.READ_PHONE_STATE
         )
         var showUpdate = true
@@ -104,6 +106,7 @@ class RealMainActivity : AppCompatActivity() {
         super.onDestroy()
         System.gc()
     }
+
     private fun checkDataUpdate() {
         if (AppConfig.autoUpdateData) {
             DataUpdator.checkUpdate(this) {
@@ -118,7 +121,7 @@ class RealMainActivity : AppCompatActivity() {
 
     private fun showDataUpdateLog() {
         lastCheck = System.currentTimeMillis()
-        if (AppConfig.FIRST_LAUNCH_NEW_VERSION && showUpdate) {
+        if (AppConfig.FIRST_LAUNCH_NEW_VERSION && showUpdate && !BuildConfig.DEBUG) {
             UpdateLogDialog(this) {
                 Vog.d("检查数据更新")
                 checkDataUpdate()

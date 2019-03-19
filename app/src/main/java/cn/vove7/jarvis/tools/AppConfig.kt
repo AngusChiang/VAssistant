@@ -105,7 +105,6 @@ object AppConfig {
 
     var IS_SYS_APP = false
     var smartKillAd = false // 跳过自动识别未标记的广告
-    var voiceRecogCompatibleMode = false
 
     var chatStr: String? = null//对话系统 字符串
 
@@ -288,7 +287,6 @@ object AppConfig {
         lastingVoiceCommand = getBooleanAndInit(R.string.key_lasting_voice_command, lastingVoiceCommand)
         autoCheckPluginUpdate = getBooleanAndInit(R.string.key_auto_check_plugin_update, autoCheckPluginUpdate)
         smartKillAd = getBooleanAndInit(R.string.key_smart_find_and_kill_ad, smartKillAd)
-        voiceRecogCompatibleMode = getBooleanAndInit(R.string.key_voice_recog_compatible_mode, voiceRecogCompatibleMode)
         hasNavBar = getBooleanAndInit(R.string.key_has_nav_bar, hasNavBar)
         chatStr = sp.getString(R.string.key_chat_str)
         textOcrStr = sp.getString(R.string.key_text_ocr_key)

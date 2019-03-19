@@ -29,7 +29,7 @@ object AdvanContactHelper : GenChoiceData, Markable {
     val context: Context
         get() = GlobalApp.APP
     //Dao
-    private val markedContactDao = DAO.daoSession.markedDataDao
+    private val markedContactDao get() = DAO.daoSession.markedDataDao
 
     override fun addMark(data: MarkedData) {
         //数据库

@@ -1,13 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/root"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:background="@color/trans"
     android:gravity="center"
-    android:orientation="vertical"
-    android:paddingBottom="100dp">
+    app:cardBackgroundColor="@color/trans"
+    app:cardCornerRadius="10dp"
+    app:cardElevation="0dp"
+    app:cardPreventCornerOverlap="true">
 
     <LinearLayout
         android:id="@+id/body"
@@ -20,7 +23,7 @@
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="33dp"
+            android:layout_height="37dp"
             android:gravity="center">
 
             <cn.vove7.jarvis.view.animation.WaveView
@@ -53,4 +56,4 @@
 
     </LinearLayout>
 
-</LinearLayout>
+</android.support.v7.widget.CardView>

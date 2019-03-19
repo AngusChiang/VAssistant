@@ -114,7 +114,7 @@ class MainService : BusService(),
     /**
      * 执行器
      */
-    private lateinit var cExecutor: CExecutorI
+    private val cExecutor: CExecutorI by lazy { MultiExecutorEngine() }
 
     private lateinit var chatSystem: ChatSystem
 
@@ -136,17 +136,16 @@ class MainService : BusService(),
         super.onCreate()
         instance = this
         GlobalApp.serviceBridge = this
-        runOnNewHandlerThread("load_speech_engine") {
+        runOnNewHandlerThread("load_speech_engine", delay = 2000) {
             init()
         }
     }
 
-
     var speechEngineLoaded = false
+
     fun init() {
         loadChatSystem()
         loadSpeechService()
-        cExecutor = MultiExecutorEngine()
         speechEngineLoaded = true
         GlobalApp.toastInfo("启动完成")
     }
@@ -966,6 +965,7 @@ class MainService : BusService(),
             }
         }
 
+
         override fun onRecogFailed(err: String) {
             AppBus.post(AppBus.EVENT_ERROR_RECO)
             floatyPanel.showAndHideDelay(err)
@@ -1016,13 +1016,7 @@ class MainService : BusService(),
         parseAnimation.begin()
 
         resumeMusicIf()
-//        if (UserInfo.isVip() && AppConfig.onlyCloudServiceParse) {//高级用户且仅云解析
-//            Vog.d("onParseCommand ---> only云解析")
-//            NetHelper.cloudParse(result) {
-//                runFromCloud(result, it)
-//            }
-//            return
-//        }
+
         runOnCachePool {
             sleep(500)
             val parseResult = ParseEngine
@@ -1040,7 +1034,6 @@ class MainService : BusService(),
                         }
                     }
                 }
-//                return true
             } else {// statistics
                 //云解析
                 if (needCloud && AppConfig.cloudServiceParseIfLocalFailed) {
@@ -1048,13 +1041,10 @@ class MainService : BusService(),
                     NetHelper.cloudParse(result) {
                         runFromCloud(result, it)
                     }
-//                    true
                 } else if (chat) {//聊天
                     doChat(result)
-//                    true
                 } else {
                     onCommandParseFailed(result)
-//                    false
                 }
             }
 
@@ -1092,6 +1082,7 @@ class MainService : BusService(),
                 }
                 if (result) {//成功打开
                     Vog.d("parseAction ---> MultiExecutorEngine().smartOpen(cmdWord) 成功打开")
+                    hideAll(true)
                     r = ActionParseResult(true, null, "smartOpen $cmdWord")
                 } else {
                     Vog.d("smartOpen --无匹配")

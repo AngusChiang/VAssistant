@@ -19,6 +19,7 @@ interface IStatus {
 
 
         const val STATUS_FINISHED = 6
+        const val STATUS_EXIT = 7
         const val STATUS_STOPPED = 10
 
         const val STATUS_WAITING_READY = 8001
