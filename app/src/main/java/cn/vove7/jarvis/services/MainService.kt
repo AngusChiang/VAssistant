@@ -1019,7 +1019,6 @@ class MainService : BusService(),
         resumeMusicIf()
 
         runOnCachePool {
-            sleep(500)
             val parseResult = ParseEngine
                     .parseAction(result, AccessibilityApi.accessibilityService?.currentScope, smartOpen, onClick)
             if (parseResult.isSuccess) {

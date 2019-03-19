@@ -9,8 +9,7 @@ import android.widget.AdapterView
 import android.widget.TextView
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.bridges.SystemBridge
-import cn.vove7.common.utils.gone
-import cn.vove7.common.utils.show
+import cn.vove7.common.utils.color
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.adapters.IconTitleEntity
 import cn.vove7.jarvis.adapters.IconTitleListAdapter
@@ -68,20 +67,13 @@ class AboutActivity : AppCompatActivity(), AdapterView.OnItemClickListener {
         return super.onOptionsItemSelected(item)
     }
 
-    override fun onBackPressed() {
-        if (konfettiView.visibility == View.VISIBLE) {
-            konfettiView.gone()
-        } else super.onBackPressed()
-    }
-
     private fun showEgg() {//彩蛋
-        konfettiView.show()
         konfettiView.build()
                 .addColors(
-                        resources.getColor(R.color.google_green),
-                        resources.getColor(R.color.google_red),
-                        resources.getColor(R.color.google_blue),
-                        resources.getColor(R.color.google_yellow)
+                        color(R.color.google_green),
+                        color(R.color.google_red),
+                        color(R.color.google_blue),
+                        color(R.color.google_yellow)
                 )
                 .setDirection(0.0, 359.0)
                 .setSpeed(1f, 3f)

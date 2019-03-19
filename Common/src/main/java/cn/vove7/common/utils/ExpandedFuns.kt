@@ -9,6 +9,7 @@ import android.os.Build
 import android.os.Handler
 import android.os.HandlerThread
 import android.os.Looper
+import android.support.annotation.ColorRes
 import android.support.v4.app.ActivityCompat
 import android.view.View
 import cn.vove7.common.app.GlobalApp
@@ -281,4 +282,12 @@ fun Context.checkPermission(p: String): Boolean {
         else ActivityCompat.checkSelfPermission(this, p)
 
     return result == PackageManager.PERMISSION_GRANTED
+}
+
+fun Context.color(@ColorRes id: Int) :Int{
+    return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+        getColor(id)
+    } else {
+        resources.getColor(id)
+    }
 }
