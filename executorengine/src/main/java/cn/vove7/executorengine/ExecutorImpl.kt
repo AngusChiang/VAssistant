@@ -265,6 +265,11 @@ open class ExecutorImpl(
                 if (!it) GlobalApp.toastError(R.string.text_app_not_install)
             }
         }
+        val pkg = SystemBridge.getPkgByName(cmd)
+        if (pkg != null) {
+            SystemBridge.openAppByPkg(pkg)
+            return true
+        }
         //By App Name
         //确定有跟随操作，clear task
         //解析应用内操作

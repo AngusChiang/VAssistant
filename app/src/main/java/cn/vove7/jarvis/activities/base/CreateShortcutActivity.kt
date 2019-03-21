@@ -51,7 +51,7 @@ class CreateShortcutActivity : Activity() {
     }
 
     private fun createWakeupShortcut() {
-        create(Intent.ACTION_VOICE_COMMAND, "唤醒")
+        create(VoiceAssistActivity.WAKE_UP, "唤醒")
     }
     private fun createWebSearch() {
         val intent = Intent(RecognizerIntent.ACTION_WEB_SEARCH)

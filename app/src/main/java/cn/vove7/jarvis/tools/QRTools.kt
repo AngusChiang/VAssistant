@@ -28,6 +28,13 @@ object QRTools {
         ScanTask(bitmap, a, onResult).perform()
         a.decodeQRCode(bitmap)
     }
+
+    fun parseFile(path: String, onResult: (String?) -> Unit) {
+        val av = LayoutInflater.from(GlobalApp.APP).inflate(R.layout.zbar, null)
+        val a = av.findViewById<MyBarView>(R.id.zbar)
+        ScanTask(path, a, onResult).perform()
+        a.decodeQRCode(path)
+    }
 }
 
 /**

@@ -1,8 +1,8 @@
 package cn.vove7.jarvis.view.dialog
 
 import android.annotation.SuppressLint
+import android.app.Dialog
 import android.content.Context
-import android.graphics.Bitmap
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
 import android.os.Bundle
@@ -15,13 +15,13 @@ import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.bridges.SystemBridge
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.tools.baiduaip.model.ImageClassifyResult
-import cn.vove7.vtp.log.Vog
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.DataSource
 import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.RequestOptions
 import com.bumptech.glide.request.target.Target
+import java.io.File
 
 
 /**
@@ -30,8 +30,10 @@ import com.bumptech.glide.request.target.Target
  * @author Administrator
  * 2018/11/7
  */
-class ImageClassifyResultDialog(val result: ImageClassifyResult.Rlt, context: Context,
-                                val screen: Bitmap?, val hideEvent: () -> Unit) : FloatAlertDialog(context, R.style.TransparentDialog) {
+class ImageClassifyResultDialog(
+        val result: ImageClassifyResult.Rlt, val activity: Context,
+        val path: String?, val hideEvent: () -> Unit)
+    : Dialog(activity, R.style.TransparentDialog) {
 
     init {
         requestWindowFeature(Window.FEATURE_NO_TITLE)
@@ -65,22 +67,21 @@ class ImageClassifyResultDialog(val result: ImageClassifyResult.Rlt, context: Co
             })
             (if (this?.imageUrl != null)
                 s.load(imageUrl)
-            else s.load(screen)).listener(getLis()).into(viewHolder.imgView)
+            else s.load(File(path))).listener(getLis).into(viewHolder.imgView)
 
-            viewHolder.headerView.setOnClickListener {
-                Vog.d(this?.baikeUrl)
-                SystemBridge.openUrl(this?.baikeUrl
-                    ?: "https://baike.baidu.com/item/${result.keyword}").also { r ->
-                    if (r) {
-                        dismiss()
-                        hideEvent.invoke()
-                    }
+        }
+        viewHolder.headerView.setOnClickListener {
+            SystemBridge.openUrl(result.baikeInfo?.baikeUrl
+                ?: "https://baike.baidu.com/item/${result.keyword}").also { r ->
+                if (r) {
+                    dismiss()
+                    hideEvent.invoke()
                 }
             }
         }
     }
 
-    private fun getLis() = object : RequestListener<Drawable> {
+    private val getLis = object : RequestListener<Drawable> {
         override fun onLoadFailed(e: GlideException?, model: Any?, target: Target<Drawable>?, isFirstResource: Boolean): Boolean {
             GlobalApp.toastError("图片加载失败")
             return false

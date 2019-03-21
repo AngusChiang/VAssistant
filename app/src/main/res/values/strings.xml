@@ -88,6 +88,11 @@
         <item>图灵机器人</item>
     </string-array>
 
+    <string-array name="list_home_funs" translatable="false">
+        <item>屏幕助手</item>
+        <item>语音识别</item>
+    </string-array>
+
     <string-array name="list_stream_syn_output" translatable="false">
         <item>媒体音量</item>
         <item>铃声音量</item>
@@ -370,6 +375,7 @@
     <string name="key_open_voice_wakeup_if_auto_sleep" translatable="false">open_voice_wakeup_if_auto_sleep</string>
     <string name="key_continuous_dialogue" translatable="false">continuous_dialogue</string>
     <string name="key_chat_system_type" translatable="false">chat_system_type</string>
+    <string name="key_home_fun" translatable="false">home_fun</string>
     <string name="text_set_priority">设置优先级</string>
     <string name="desc_new_account">新用户将获得7天高级用户免费体验资格</string>
     <string name="key_resume_bkg_music" translatable="false">resume_bkg_music</string>
@@ -396,4 +402,5 @@
     <string name="text_plugins_manager" translatable="false">插件管理</string>
     <string name="key_chat_str" translatable="false">chat_str</string>
     <string name="text_close">Close</string>
+    <string name="label_screen_assistant">Screen Assistant</string>
 </resources>

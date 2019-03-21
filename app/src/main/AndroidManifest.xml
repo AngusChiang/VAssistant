@@ -141,15 +141,15 @@
 
         <activity
             android:name=".activities.base.VoiceAssistActivity"
-            android:launchMode="singleInstance"
             android:exported="true"
+            android:launchMode="singleInstance"
             android:theme="@style/TransparentBackground">
             <intent-filter>
 
                 <!-- 一加按键设置(搜索助手) 触发辅助应用 -->
                 <action android:name="android.intent.action.ASSIST" />
                 <action android:name="android.search.action.GLOBAL_SEARCH" />
-                <!-- 一加按键设置(语音搜索) 触发 语音识别 -->
+                <!-- 一加按键设置(语音搜索) 触发 语音识别  安卓P长按HOME键-->
                 <action android:name="android.intent.action.VOICE_ASSIST" />
                 <!-- 蓝牙耳机触发 -->
                 <action android:name="android.intent.action.VOICE_COMMAND" />
@@ -289,10 +289,6 @@
             android:name=".activities.JsEditorActivity"
             android:label="@string/text_js_editor"
             android:theme="@style/Theme.Darcula" />
-        <activity
-            android:name=".activities.ScreenPickerActivity"
-            android:launchMode="singleInstance"
-            android:theme="@style/ScreenPicker" />
         <activity android:name=".activities.CrashInfoActivity" />
         <activity
             android:name=".activities.PluginManagerActivity"
@@ -318,9 +314,28 @@
             android:excludeFromRecents="true"
             android:launchMode="singleInstance"
             android:theme="@style/ScreenShotTheme" />
+
+        <!--屏幕助手-->
+        <activity
+            android:name=".activities.screenassistant.ScreenAssistActivity"
+            android:excludeFromRecents="true"
+            android:exported="true"
+            android:label="@string/label_screen_assistant"
+            android:launchMode="singleInstance"
+            android:theme="@style/ScreenPicker">
+            <intent-filter>
+                <action android:name="SCREEN_ASSIST" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+
+
+        <!--屏幕助手api-->
         <activity
             android:name=".activities.TextOcrActivity"
             android:excludeFromRecents="true"
+            android:exported="true"
+            android:label="屏幕助手-文字识别"
             android:launchMode="singleInstance"
             android:theme="@style/ScreenPicker">
             <intent-filter>
@@ -328,6 +343,31 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
+
+        <activity
+            android:name=".activities.screenassistant.ScreenShareActivity"
+            android:exported="true"
+            android:label="屏幕助手-截屏分享"
+            android:theme="@style/ScreenPicker" />
+
+        <activity
+            android:name=".activities.ScreenPickerActivity"
+            android:label="屏幕助手-文字提取"
+            android:launchMode="singleInstance"
+            android:theme="@style/ScreenPicker" />
+
+        <activity
+            android:name=".activities.screenassistant.QrCodeActivity"
+            android:exported="true"
+            android:label="屏幕助手-二维码识别"
+            android:launchMode="singleInstance"
+            android:theme="@style/ScreenPicker" />
+        <activity
+            android:name=".activities.screenassistant.SpotScreenActivity"
+            android:exported="true"
+            android:label="屏幕助手-屏幕内容识别"
+            android:launchMode="singleInstance"
+            android:theme="@style/ScreenPicker" />
     </application>
 
 </manifest>

@@ -834,7 +834,7 @@ object SystemBridge : SystemOperation {
                 it.close()
                 bm
             }
-    //
+            //
         } catch (e: Exception) {
             e.printStackTrace()
             null
@@ -1121,12 +1121,12 @@ object SystemBridge : SystemOperation {
      * @param pkg String
      */
     override fun killApp(pkg: String): Boolean {
-        AccessibilityApi.accessibilityService ?: {
-            AppBus.post(RequestPermission("基础无障碍服务"))
-            false
-        }.invoke()
-
         openAppDetail(pkg)
+        if (!AccessibilityApi.isBaseServiceOn) {
+            AppBus.post(RequestPermission("基础无障碍服务"))
+            return false
+        }
+
         val s = ViewFindBuilder()
                 .equalsText("强行停止", "force stop")
                 .waitFor(3000)

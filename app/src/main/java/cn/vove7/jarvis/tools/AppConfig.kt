@@ -80,6 +80,9 @@ object AppConfig {
     var openChatSystem = true
     var autoSleepWakeupMillis: Long = 10 * 60 * 1000
     var chatSystem: String = ""
+
+    var homeFun: String = "" //长按HOME键功能
+
     var userWakeupWord: String = ""//用户唤醒词
     //    var continuousDialogue = false//连续对话
     var finishWord: String? = null
@@ -324,6 +327,10 @@ object AppConfig {
             val i = GlobalApp.APP.resources.getStringArray(R.array.list_chat_system)
             if (!UserInfo.isVip()) i[0] else it ?: i[0]
         }.also { Vog.d("reload ---> chatSystem $it") }
+
+        homeFun = sp.getString(R.string.key_home_fun)?:
+                GlobalApp.APP.resources.getStringArray(R.array.list_home_funs)[0]
+
         autoSleepWakeupMillis = sp.getString(R.string.key_auto_sleep_wakeup_duration).let {
             if (it == null) autoSleepWakeupMillis
             else {

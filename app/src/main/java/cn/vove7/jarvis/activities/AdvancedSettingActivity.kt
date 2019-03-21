@@ -16,6 +16,9 @@ import cn.vove7.common.netacc.model.LastDateInfo
 import cn.vove7.jarvis.BuildConfig
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.activities.base.ReturnableActivity
+import cn.vove7.jarvis.activities.screenassistant.QrCodeActivity
+import cn.vove7.jarvis.activities.screenassistant.ScreenShareActivity
+import cn.vove7.jarvis.activities.screenassistant.SpotScreenActivity
 import cn.vove7.jarvis.adapters.SettingsExpandableAdapter
 import cn.vove7.jarvis.receivers.PowerEventReceiver
 import cn.vove7.jarvis.tools.*
@@ -231,6 +234,15 @@ class AdvancedSettingActivity : ReturnableActivity() {
                         },
                         IntentItem(title = "语音输入测试") {
                             startActivityForResult(Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH), 200)
+                        },
+                        IntentItem(title = "扫描屏幕二维码") {
+                            startActivity(Intent(this, QrCodeActivity::class.java))
+                        },
+                        IntentItem(title = "分享屏幕") {
+                            startActivity(Intent(this, ScreenShareActivity::class.java))
+                        },
+                        IntentItem(title = "屏幕识别") {
+                            startActivity(Intent(this, SpotScreenActivity::class.java))
                         }
                 )
                 ))

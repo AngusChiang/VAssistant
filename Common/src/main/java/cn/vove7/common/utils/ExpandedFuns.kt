@@ -16,6 +16,7 @@ import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.app.GlobalLog
 import cn.vove7.vtp.app.AppInfo
 import cn.vove7.vtp.log.Vog
+import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -278,16 +279,20 @@ inline fun <reified K, reified V> HashMap<K, V>.getOrSetDefault(k: K, v: V): V {
  */
 fun Context.checkPermission(p: String): Boolean {
     val result = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
-            checkSelfPermission(p)
-        else ActivityCompat.checkSelfPermission(this, p)
+        checkSelfPermission(p)
+    else ActivityCompat.checkSelfPermission(this, p)
 
     return result == PackageManager.PERMISSION_GRANTED
 }
 
-fun Context.color(@ColorRes id: Int) :Int{
+fun Context.color(@ColorRes id: Int): Int {
     return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
         getColor(id)
     } else {
         resources.getColor(id)
     }
+}
+
+fun compressImage(file: String) {
+
 }

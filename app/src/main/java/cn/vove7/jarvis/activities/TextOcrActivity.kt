@@ -71,13 +71,16 @@ class TextOcrActivity : Activity() {
         }
     }
 
-    var p = 2 //倍率
     private fun ocrWithScreenShot() {
-        p = 1
         runOnNewHandlerThread {
             //异步
             try {
-                val path = SystemBridge.screen2File()!!.absolutePath
+                val path = SystemBridge.screen2File()?.absolutePath
+                if (path == null) {
+                    GlobalApp.toastError("截图失败")
+                    finish()
+                    return@runOnNewHandlerThread
+                }
                 runOnUi {
                     setContentView(R.layout.activity_text_ocr)
                 }
@@ -123,10 +126,10 @@ class TextOcrActivity : Activity() {
                     true
                 }
                 text = item.text
-                val h = item.height * p + 10
-                val w = item.width * p + 10
-                val top = item.top * p - statusbarHeight
-                val left = item.left * p
+                val h = item.height + 10
+                val w = item.width  + 10
+                val top = item.top  - statusbarHeight
+                val left = item.left
                 val rotationAngle = item.rotationAngle
                 Vog.d("buildContent ---> ${item.text} top:$top ,left:$left ,w:$w h:$h rotationAngle:$rotationAngle")
                 setPadding(10, 0, 10, 0)

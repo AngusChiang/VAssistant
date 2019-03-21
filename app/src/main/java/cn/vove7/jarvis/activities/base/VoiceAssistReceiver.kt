@@ -10,6 +10,8 @@ import cn.vove7.common.appbus.SpeechAction
 import cn.vove7.common.datamanager.DAO
 import cn.vove7.common.datamanager.parse.model.Action
 import cn.vove7.executorengine.parse.OpenAppAction
+import cn.vove7.jarvis.R
+import cn.vove7.jarvis.activities.screenassistant.ScreenAssistActivity
 import cn.vove7.jarvis.services.MainService
 import cn.vove7.jarvis.tools.AppConfig
 import cn.vove7.vtp.log.Vog
@@ -31,10 +33,17 @@ class VoiceAssistActivity : Activity() {
         Vog.d("VoiceAssist ---> $action")
         when (action) {
             Intent.ACTION_ASSIST, Intent.ACTION_VOICE_COMMAND,
-            RecognizerIntent.ACTION_WEB_SEARCH, "android.intent.action.VOICE_ASSIST",
-            WAKE_UP -> {
+            RecognizerIntent.ACTION_WEB_SEARCH, WAKE_UP -> {
                 Vog.d("onCreate ---> ASSIST wakeup")
                 MainService.switchRecog()
+            }
+            "android.intent.action.VOICE_ASSIST" -> {//一加长按HOME键
+                val arr = resources.getStringArray(R.array.list_home_funs)
+                when (arr.indexOf(AppConfig.homeFun)) {
+                    0 -> startActivity(ScreenAssistActivity.createIntent())
+                    1 -> MainService.switchRecog()
+                    else -> startActivity(ScreenAssistActivity.createIntent())
+                }
             }
             SWITCH_VOICE_WAKEUP -> {
                 if (AppConfig.voiceWakeup) {
@@ -75,8 +84,8 @@ class VoiceAssistActivity : Activity() {
     }
 
     companion object {
-        val SWITCH_VOICE_WAKEUP = "switch_voice_wakeup"
-        val SET_ASSIST_APP = "set_assist_app"
-        val WAKE_UP = "wakeup"
+        const val SWITCH_VOICE_WAKEUP = "switch_voice_wakeup"
+        const val SET_ASSIST_APP = "set_assist_app"
+        const val WAKE_UP = "wakeup"
     }
 }

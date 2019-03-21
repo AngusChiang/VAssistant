@@ -227,5 +227,6 @@
     <string name="text_set_priority">设置优先级</string>
     <string name="desc_new_account">新用户将获得7天高级用户免费体验资格</string>
     <string name="text_close">关闭</string>
+    <string name="label_screen_assistant">屏幕助手</string>
 
 </resources>
