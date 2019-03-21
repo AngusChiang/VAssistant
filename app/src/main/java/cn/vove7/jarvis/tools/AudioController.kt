@@ -23,20 +23,22 @@ object AudioController {
     fun playOnce(rawId: Int, streamType: Int = AppConfig.currentStreamType,
                  onFinish: (() -> Unit)? = null) {
         ThreadPool.runOnCachePool {
-            val p = MediaPlayer.create(GlobalApp.APP, rawId, AudioAttributes.Builder()
-                    .setLegacyStreamType(streamType).build(), 9)
-            p?.setOnCompletionListener {
-                onFinish?.invoke()
-                Vog.d("playOnce ---> 结束")
-                it?.release()
+            MediaPlayer.create(GlobalApp.APP, rawId)?.apply {
+                setOnCompletionListener {
+                    release()
+                    onFinish?.invoke()
+                    Vog.d("playOnce ---> 结束")
+                }
+                setOnErrorListener { _, w, e ->
+                    release()
+                    Vog.d("playOnce 出错 ---> $w, $e")
+                    onFinish?.invoke()
+                    true
+                }
+                this.setAudioAttributes(AudioAttributes.Builder().setLegacyStreamType(streamType).build())
+
+                start()
             } ?: onFinish?.invoke()
-            p?.setOnErrorListener { p, w, e ->
-                p.release()
-                Vog.d("playOnce 出错 ---> $w, $e")
-                onFinish?.invoke()
-                true
-            }
-            p?.start()
         }
     }
 

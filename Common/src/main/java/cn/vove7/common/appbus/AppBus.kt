@@ -16,7 +16,6 @@ object AppBus {
     const val EVENT_INST_SAVE_COMPLETE = "inst_settings_save_complete"
     const val EVENT_BEGIN_RECO = "e_begin_reco"
     const val EVENT_FINISH_RECO = "e_finish_reco"
-    const val EVENT_ERROR_RECO = "e_error_reco"
     const val EVENT_HIDE_FLOAT = "e_hide_float"
     const val EVENT_PLUGIN_INSTALLED = "e_plugin_installed"
     const val EVENT_PLUGIN_UNINSTALLED = "e_plugin_uninstalled"
@@ -33,16 +32,12 @@ object AppBus {
 //    const val ORDER_STOP_DEBUG = "stop_debug"
 
     fun post(data: Any) {
-        val m = if (BuildConfig.DEBUG) {//打印函数栈
-            val st = Thread.currentThread().stackTrace
-            buildString {
-                st.forEach {
-                    appendln("(${it.fileName}:${it.lineNumber}) ${it.methodName}")
-                }
-            }
-        } else ""
+        if (BuildConfig.DEBUG) {//打印函数栈
+            val st = Thread.currentThread().stackTrace[3]
+            val m = "(${st.fileName}:${st.lineNumber}) ${st.methodName}"
 
-        Vog.d("post ---> $data on $m")
+            Vog.d("post ---> $data on $m")
+        }
         EventBus.getDefault().post(data)
     }
 

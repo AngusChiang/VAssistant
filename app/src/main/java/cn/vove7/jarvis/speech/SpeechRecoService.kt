@@ -45,9 +45,9 @@ abstract class SpeechRecoService(val event: SpeechEvent) : SpeechRecogI {
         if (!checkRecoderPermission() || !checkFloat()) return
         Thread.sleep(80)
         if (!isListening) {
-            startSCO()
             isListening = true
-            event.onStartRecog(byVoice)
+            event.onPreStartRecog(byVoice)
+            startSCO()
             checkAudioSource()
         } else {
             Vog.d("启动失败，正在识别")
@@ -60,8 +60,7 @@ abstract class SpeechRecoService(val event: SpeechEvent) : SpeechRecogI {
 
     private fun startSCO() {
         Vog.d("startSCO")
-//        val bm = context.getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
-//        val adapter = bm.adapter
+
         audioManager.apply {
             isBluetoothScoOn = true
             mode = AudioManager.MODE_IN_CALL
@@ -70,6 +69,7 @@ abstract class SpeechRecoService(val event: SpeechEvent) : SpeechRecogI {
     }
 
     fun closeSCO() {
+        Vog.d("关闭SCO")
         audioManager.isBluetoothScoOn = false
         audioManager.stopBluetoothSco()
     }
@@ -223,6 +223,7 @@ abstract class SpeechRecoService(val event: SpeechEvent) : SpeechRecogI {
                 IStatus.CODE_VOICE_ERR -> {//出错
                     val res = msg.data.getString("data") ?: "null"
                     isListening = false
+                    closeSCO()
                     event.onRecogFailed(res)
 //                    AppBus.postVoiceData(VoiceData(msg.what, res))
                 }
@@ -234,6 +235,7 @@ abstract class SpeechRecoService(val event: SpeechEvent) : SpeechRecogI {
                 IStatus.CODE_VOICE_RESULT -> {//结果
                     val result = msg.data.getString("data") ?: "null"
                     event.onTempResult(result)
+                    closeSCO()//关闭SCO
                     event.onResult(result)
                     if (!AppConfig.lastingVoiceCommand)
                         isListening = false

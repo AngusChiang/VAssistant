@@ -1,6 +1,8 @@
 package cn.vove7.jarvis.tools
 
 import android.app.Activity
+import android.bluetooth.BluetoothAdapter
+import android.bluetooth.BluetoothProfile
 import android.content.Context
 import android.content.ContextWrapper
 import android.content.Intent
@@ -93,6 +95,18 @@ object AppConfig {
     var disableAccessibilityOnLowBattery = true//低电量关闭无障碍
     var translateLang = "auto"//翻译主语言
     var voiceRecogFeedback = false //语音识别提示音
+        get() = field || isBlueToothConnect
+
+    val isBlueToothConnect: Boolean
+        get() {
+            val adapter = BluetoothAdapter.getDefaultAdapter()
+            return (BluetoothProfile.STATE_CONNECTED ==
+                    adapter.getProfileConnectionState(BluetoothProfile.HEADSET)).also {
+                Vog.d("蓝牙连接：$it")
+            }
+
+        }
+
     var lastingVoiceCommand = false //长语音 连续命令
     var lastingVoiceMillis: Int = 20 //长语音等待时间 单位秒
 
@@ -283,7 +297,7 @@ object AppConfig {
 //        disableAdKillerOnLowBattery = getBooleanAndInit(R.string.key_remove_ad_power_saving_mode, true)
         disableAccessibilityOnLowBattery = getBooleanAndInit(R.string.key_accessibility_service_power_saving_mode, true)
         wakeUpWithHeadsetHook = getBooleanAndInit(R.string.key_wakeup_with_headsethook, wakeUpWithHeadsetHook)
-        voiceRecogFeedback = getBooleanAndInit(R.string.key_voice_recog_feedback, voiceRecogFeedback)
+        voiceRecogFeedback = getBooleanAndInit(R.string.key_voice_recog_feedback, false)
         lastingVoiceCommand = getBooleanAndInit(R.string.key_lasting_voice_command, lastingVoiceCommand)
         autoCheckPluginUpdate = getBooleanAndInit(R.string.key_auto_check_plugin_update, autoCheckPluginUpdate)
         smartKillAd = getBooleanAndInit(R.string.key_smart_find_and_kill_ad, smartKillAd)

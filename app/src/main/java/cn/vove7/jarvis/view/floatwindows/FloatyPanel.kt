@@ -3,7 +3,6 @@ package cn.vove7.jarvis.view.floatwindows
 import android.graphics.drawable.AnimationDrawable
 import android.os.Handler
 import android.view.View
-import android.view.animation.AnimationUtils
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.appbus.AppBus
 import cn.vove7.common.appbus.SpeechAction
@@ -48,7 +47,7 @@ class FloatyPanel : AbFloatWindow(GlobalApp.APP) {
     }
 
     override fun onCreateView(view: View) {
-        view.body.setPadding(10, statusbarHeight + 20, 10, 20)
+        view.body.setPadding(10, statusbarHeight + 15, 10, 15)
     }
 
     fun show(text: String) {
@@ -61,22 +60,14 @@ class FloatyPanel : AbFloatWindow(GlobalApp.APP) {
         }
     }
 
+    override val windowsAnimation: Int = R.style.FloatyWindow
+
     var voiceText = ""
 
     override fun afterShow() {
         contentView?.voice_text?.text = voiceText
-
-        contentView?.body?.also {
-            it.startAnimation(AnimationUtils.loadAnimation(context,
-                    R.anim.pop_fade_in))
-        }
-
     }
 
-    override val exitAni: Int? = R.anim.pop_fade_out
-
-    override fun onRemove() {
-    }
 
     private fun removeDelayHide() {
         delayHandler?.removeCallbacks(delayHide)

@@ -51,6 +51,7 @@ class BaiduVoiceWakeup(private val eventListener: EventListener) : WakeupI() {
         initIfNeed()
         super.start()
         val params = HashMap<String, Any?>()
+        params[SpeechConstant.IN_FILE] = "#cn.vove7.jarvis.speech.baiduspeech.MicInputStream.instance()"
         params[SpeechConstant.WP_WORDS_FILE] = AppConfig.wakeUpFilePath
         params[SpeechConstant.APP_ID] = appId
         params[SpeechConstant.APP_KEY] = appKey

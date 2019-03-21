@@ -21,7 +21,6 @@ import android.widget.ProgressBar
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.appbus.AppBus
 import cn.vove7.common.appbus.AppBus.EVENT_BEGIN_RECO
-import cn.vove7.common.appbus.AppBus.EVENT_ERROR_RECO
 import cn.vove7.common.appbus.AppBus.EVENT_FINISH_RECO
 import cn.vove7.common.appbus.AppBus.EVENT_HIDE_FLOAT
 import cn.vove7.common.appbus.AppBus.ORDER_BEGIN_SCREEN_PICKER
@@ -253,9 +252,6 @@ class AssistSession(context: Context) : VoiceInteractionSession(context) {
 
             }
             EVENT_FINISH_RECO -> {
-
-            }
-            EVENT_ERROR_RECO -> {
 
             }
             else -> {

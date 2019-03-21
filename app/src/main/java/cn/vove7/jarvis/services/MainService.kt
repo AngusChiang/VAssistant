@@ -841,11 +841,11 @@ class MainService : BusService(),
             Vog.d("recogEffect ---> 结束")
         }
 
-        override fun onStartRecog(byVoice: Boolean) {
+        override fun onPreStartRecog(byVoice: Boolean) {
             speechSynService?.stopIfSpeaking()
 
             AppBus.post(AppBus.EVENT_BEGIN_RECO)
-            Vog.d("onStartRecog ---> 开始识别")
+            Vog.d("onPreStartRecog ---> 开始识别")
             checkMusic()//检查后台播放
             listeningAni.begin()//
             recogEffect(byVoice)
@@ -868,12 +868,11 @@ class MainService : BusService(),
                     AppConfig.finishWord.also {
                         //fixme 播放结束不回调
                         playSoundEffectSync(R.raw.recog_finish)
-                        if (it == null || it == "") {
-
-                            onParseCommand(voiceResult)
-                        } else if (voiceResult.endsWith(it)) {
-                            onParseCommand(voiceResult.substring(0, voiceResult.length - it.length))
-                        } else onParseCommand(voiceResult)
+                        when {
+                            it?.isEmpty() != false -> onParseCommand(voiceResult)
+                            voiceResult.endsWith(it) -> onParseCommand(voiceResult.substring(0, voiceResult.length - it.length))
+                            else -> onParseCommand(voiceResult)
+                        }
                     }
                 }
                 MODE_GET_PARAM -> {//中途参数
@@ -967,7 +966,6 @@ class MainService : BusService(),
 
 
         override fun onRecogFailed(err: String) {
-            AppBus.post(AppBus.EVENT_ERROR_RECO)
             floatyPanel.showAndHideDelay(err)
             when (voiceMode) {
                 MODE_VOICE -> {

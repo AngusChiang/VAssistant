@@ -96,4 +96,9 @@
         <item name="android:background">@android:color/transparent</item>
         <item name="android:backgroundDimEnabled">false</item>
     </style>
+
+    <style name="FloatyWindow" parent="android:Animation">
+        <item name="android:windowEnterAnimation">@anim/pop_fade_in</item>
+        <item name="android:windowExitAnimation">@anim/pop_fade_out</item>
+    </style>
 </resources>

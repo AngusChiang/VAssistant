@@ -31,7 +31,8 @@ class VoiceAssistActivity : Activity() {
         Vog.d("VoiceAssist ---> $action")
         when (action) {
             Intent.ACTION_ASSIST, Intent.ACTION_VOICE_COMMAND,
-            RecognizerIntent.ACTION_WEB_SEARCH, "android.intent.action.VOICE_ASSIST", "wakeup" -> {
+            RecognizerIntent.ACTION_WEB_SEARCH, "android.intent.action.VOICE_ASSIST",
+            WAKE_UP -> {
                 Vog.d("onCreate ---> ASSIST wakeup")
                 MainService.switchRecog()
             }
@@ -76,5 +77,6 @@ class VoiceAssistActivity : Activity() {
     companion object {
         val SWITCH_VOICE_WAKEUP = "switch_voice_wakeup"
         val SET_ASSIST_APP = "set_assist_app"
+        val WAKE_UP = "wakeup"
     }
 }

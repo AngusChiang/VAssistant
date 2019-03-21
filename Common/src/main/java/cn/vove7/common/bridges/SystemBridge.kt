@@ -808,6 +808,12 @@ object SystemBridge : SystemOperation {
     @SuppressLint("StaticFieldLeak")
     var cap: ScreenCapturer? = null
 
+    fun screenShotWithRelease(): Bitmap? {
+        return screenShot().also {
+            release()
+        }
+    }
+
     override fun screenShot(): Bitmap? {
         Vog.d("screenShot ---> 请求截屏")
         if (screenData == null) {
@@ -821,17 +827,17 @@ object SystemBridge : SystemOperation {
             cap = ScreenCapturer(context, screenData, -1, DeviceInfo.getInfo(context).screenInfo.density
                     , null)
 
-        try {
-            return cap?.capture()?.let {
+        return try {
+            cap?.capture()?.let {
                 Vog.d("screenShot ---> $it")
                 val bm = processImg(it)
                 it.close()
                 bm
             }
-//
+    //
         } catch (e: Exception) {
             e.printStackTrace()
-            return null
+            null
         }
 //        val resultBox = ResultBox<Bitmap?>()
 //        val capIntent = ScreenshotActivity.getScreenshotIntent(context, resultBox)
@@ -861,7 +867,7 @@ object SystemBridge : SystemOperation {
     }
 
     fun screen2File(p: String): File? {
-        val screenBitmap = screenShot()
+        val screenBitmap = screenShotWithRelease()
         return if (screenBitmap != null) {
             bitmap2File(screenBitmap, p)
         } else null

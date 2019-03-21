@@ -14,11 +14,11 @@ interface SpeechEvent {
     fun onWakeup(word: String?)
 
     /**
-     * 开始识别
+     * 开始识别前
      * 反馈效果
      * 未真正开始识别
      */
-    fun onStartRecog(byVoice: Boolean)
+    fun onPreStartRecog(byVoice: Boolean)
 
     /**
      * 识别成功结果

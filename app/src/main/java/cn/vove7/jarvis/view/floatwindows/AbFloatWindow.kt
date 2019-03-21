@@ -8,11 +8,8 @@ import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.WindowManager
-import android.view.animation.Animation
-import android.view.animation.AnimationUtils
 import cn.vove7.vtp.log.Vog
 import cn.vove7.vtp.runtimepermission.PermissionUtils
-import kotlinx.android.synthetic.main.toast_listening_text.view.*
 
 /**
  * 悬浮窗
@@ -31,6 +28,8 @@ abstract class AbFloatWindow(
 
     var contentView: View? = null
 
+    val winParams get() = mParams ?: buildLayoutParams().also { mParams = it }
+
     private val newView: View
         get() {
             return LayoutInflater.from(context)
@@ -45,7 +44,7 @@ abstract class AbFloatWindow(
     var windowManager: WindowManager = context.applicationContext.getSystemService(Context.WINDOW_SERVICE)
             as WindowManager
 
-    var isShowing = false
+    val isShowing get() = contentView != null
 
     val statusbarHeight: Int by lazy {
         var statusBarHeight1 = -1
@@ -73,64 +72,39 @@ abstract class AbFloatWindow(
 
     open fun afterShow() {}
 
+    val hasOverlayPermission
+        get() =
+            Build.VERSION.SDK_INT < Build.VERSION_CODES.M || PermissionUtils.canDrawOverlays(context)
+
     open fun show() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && !PermissionUtils.canDrawOverlays(context)) {
+        if (!hasOverlayPermission) {
             Vog.d("show ---> 无悬浮窗")
             onNoPermission.invoke()
         } else {
             synchronized(isShowing) {
-                if (mParams == null) mParams = buildLayoutParams()
                 if (!isShowing) {
                     try {
-                        if (contentView != null) hide {
-                            contentView = newView
-                            windowManager.addView(contentView, mParams)
-                            afterShow()
-                        }
-                        else {
-                            contentView = newView
-                            windowManager.addView(contentView, mParams)
-                            afterShow()
-                        }
+                        contentView = newView
+                        windowManager.addView(contentView, winParams)
+                        afterShow()
                     } catch (e: Exception) {
                         e.printStackTrace()
                     }
                 }
-                isShowing = true
             }
         }
     }
 
-    open val exitAni: Int? = null
-
-    open fun hide(onEnd: (() -> Unit)? = null) {
-//        windowManager.removeView()
+    open fun hide() {
+        Vog.d("隐藏悬浮窗")
         synchronized(isShowing) {
-            val ei = exitAni
-            if (ei != null) {
-                val ani = AnimationUtils.loadAnimation(context, ei)
-                ani.setAnimationListener(object : Animation.AnimationListener {
-                    override fun onAnimationRepeat(animation: Animation?) {
-                    }
-
-                    override fun onAnimationEnd(animation: Animation?) {
-                        removeView()
-                        onEnd?.invoke()
-                    }
-
-                    override fun onAnimationStart(animation: Animation?) {
-                    }
-                })
-                contentView?.body?.startAnimation(ani)
-            } else {
+            if (isShowing)
                 removeView()
-                onEnd?.invoke()
-            }
-            isShowing = false
         }
     }
 
     private fun removeView() {
+        Vog.d("移除悬浮窗")
         try {
             windowManager.removeView(contentView)
             contentView = null
@@ -154,6 +128,9 @@ abstract class AbFloatWindow(
         windowManager.updateViewLayout(contentView, buildLayoutParams(x, y))
     }
 
+    //进出动画
+    open val windowsAnimation: Int? = null
+
     private fun buildLayoutParams(x: Int = posX, y: Int = posY): WindowManager.LayoutParams {
         val params = WindowManager.LayoutParams()
         params.packageName = context.packageName
@@ -170,12 +147,13 @@ abstract class AbFloatWindow(
         params.x = x
         params.y = y
 
+        windowsAnimation?.also {
+            params.windowAnimations = it
+        }
         params.type = if (Build.VERSION.SDK_INT >= 26)
             WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY
         else WindowManager.LayoutParams.TYPE_SYSTEM_ALERT
         return params
     }
-
-    open class ViewHolder(val floatView: View)
 
 }

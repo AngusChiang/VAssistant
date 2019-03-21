@@ -135,6 +135,7 @@ class BaiduSpeechRecoService(event: SpeechEvent) : SpeechRecoService(event) {
                 Pair(SpeechConstant.ACCEPT_AUDIO_VOLUME, true),
                 Pair(SpeechConstant.PID, 1536)
         ).also {
+            it[SpeechConstant.IN_FILE] = "#cn.vove7.jarvis.speech.baiduspeech.MicInputStream.instance()"
             if (!AppConfig.openResponseWord)//唤醒即识别 响应词打开则无效
                 it[SpeechConstant.AUDIO_MILLS] = System.currentTimeMillis() - 200
             //从指定时间开始识别，可以 - 指定ms 识别之前的内容
@@ -154,8 +155,10 @@ class BaiduSpeechRecoService(event: SpeechEvent) : SpeechRecoService(event) {
 
     private val autoCloseRecog = Runnable {
         Vog.i(" ---> 长语音自动关闭识别")
-        doCancelRecog()
-        doStopRecog()
+        if(!isListening) {
+            doCancelRecog()
+            doStopRecog()
+        }
     }
 
     /**
