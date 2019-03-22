@@ -50,9 +50,14 @@
         <item name="md_corner_radius">10dp</item>
         <item name="android:statusBarColor">@color/trans</item>
         <item name="android:windowIsTranslucent">true</item>
-
+        <item name="android:navigationBarColor">@color/trans</item>
         <!--<item name="android:windowAnimationStyle">@style/InOut</item>-->
     </style>
+
+    <style name="ScreenAssist" parent="ScreenPicker">
+        <item name="android:navigationBarColor">#3B000000</item>
+    </style>
+
     <!--防止白色启动背景-->
     <style name="TransparentBackground" parent="Theme.AppCompat.Light.NoActionBar">
         <item name="android:windowBackground">@color/transparent</item>

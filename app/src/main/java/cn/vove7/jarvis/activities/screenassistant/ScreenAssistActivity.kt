@@ -37,12 +37,12 @@ import java.util.*
  */
 class ScreenAssistActivity : Activity() {
 
-    private var screenPath: String = "loading"
+    private lateinit var screenPath: String
     private lateinit var bottomController: AssistSessionGridController
 
     companion object {
         fun createIntent(path: String? = null): Intent {
-            return Intent("SCREEN_ASSIST").apply {
+            return Intent(GlobalApp.APP.packageName + ".SCREEN_ASSIST").apply {
                 newTask()
                 path?.also {
                     putExtra("path", it)
@@ -64,20 +64,13 @@ class ScreenAssistActivity : Activity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.dialog_assist)
-        voice_btn.setOnClickListener {
-            MainService.switchRecog()
-            bottomController.hideBottom()
-        }
         showProgressBar = true
-        handlerScreen()
-        if (AppConfig.hasNavBar) {
-            bottom_sheet.fitsSystemWindows = true
-        }
         bottomController = AssistSessionGridController(this, bottom_sheet, itemClick)
         bottomController.initView()
         bottomController.hideBottom()
         bottomController.bottomView.visibility = View.GONE
 
+        handlerScreen()
         bottomController.bottomView.post {
             bottomController.behavior.setBottomSheetCallback(object : BottomSheetBehavior.BottomSheetCallback() {
                 override fun onStateChanged(p0: View, p1: Int) {
@@ -89,6 +82,11 @@ class ScreenAssistActivity : Activity() {
 
                 override fun onSlide(p0: View, p1: Float) {}
             })
+        }
+
+        voice_btn.setOnClickListener {
+            MainService.switchRecog()
+            bottomController.hideBottom()
         }
         root.setOnClickListener {
             onBackPressed()
@@ -166,38 +164,28 @@ class ScreenAssistActivity : Activity() {
     private val itemClick: (Int) -> Unit = { pos ->
         when (pos) {
             0 -> {
-                when (screenPath) {
-                    "loading" -> GlobalApp.toastInfo("等待加载完成")
-                    else -> imageClassify(screenPath)
-                }
+                imageClassify(screenPath)
             }
             1 -> {
-                val path = screenPath
-                when (path) {
-                    "loading" -> GlobalApp.toastInfo("等待加载完成")
-                    else -> {
-                        showProgressBar = true
-                        runOnNewHandlerThread {
-                            try {
-                                val intent = Intent(GlobalApp.APP,
-                                        TextOcrActivity::class.java).also {
-                                    val results = BaiduAipHelper.ocr(path)
-                                    it.putExtra("items", results)
-                                }
-                                if (isFinishing) return@runOnNewHandlerThread
-                                startActivity(intent)
-                                showProgressBar = false
-                                finish()
-                            } catch (e: Exception) {
-                                e.printStackTrace()
-                                GlobalApp.toastInfo(e.message!!)
-                            }
-
+                showProgressBar = true
+                runOnNewHandlerThread {
+                    try {
+                        val intent = Intent(GlobalApp.APP,
+                                TextOcrActivity::class.java).also {
+                            val results = BaiduAipHelper.ocr(screenPath)
+                            it.putExtra("items", results)
                         }
+                        if (isFinishing) return@runOnNewHandlerThread
+                        startActivity(intent)
+                        showProgressBar = false
+                        finish()
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                        GlobalApp.toastInfo(e.message!!)
                     }
+
                 }
             }
-
             2 -> {
                 AppBus.postDelay("0_0", AppBus.ORDER_BEGIN_SCREEN_PICKER, 800)
                 finish()
@@ -207,16 +195,11 @@ class ScreenAssistActivity : Activity() {
                 finish()
             }
             4 -> {
-                when (screenPath) {
-                    "loading" -> GlobalApp.toastInfo("等待加载完成")
-                    else -> {
-                        showProgressBar = true
-                        QRTools.parseFile(screenPath) {
-                            runOnUi {
-                                showProgressBar = false
-                                onScanQRCodeSuccess(it)
-                            }
-                        }
+                showProgressBar = true
+                QRTools.parseFile(screenPath) {
+                    runOnUi {
+                        showProgressBar = false
+                        onScanQRCodeSuccess(it)
                     }
                 }
             }
@@ -240,9 +223,16 @@ class ScreenAssistActivity : Activity() {
         }
     }
 
+    private fun finishIfNotShowing() {
+        if (!bottomController.isBottomSheetShowing) {
+            finish()
+        }
+    }
+
     private fun onScanQRCodeSuccess(result: String?) {
         Vog.d("onScanQRCodeSuccess ---> $result")
         if (result == null) {
+            finishIfNotShowing()
             GlobalApp.toastError("无识别结果")
             return
         }
@@ -252,6 +242,9 @@ class ScreenAssistActivity : Activity() {
                 .setPositiveButton("复制") { _, _ -> SystemBridge.setClipText(result) }
                 .setNegativeButton("分享") { _, _ -> SystemBridge.shareText(result) }
                 .apply {
+                    setOnDismissListener {
+                        finishIfNotShowing()
+                    }
                     when {
                         result.startsWith("http", ignoreCase = true) -> {
                             setNeutralButton("访问") { _, _ ->

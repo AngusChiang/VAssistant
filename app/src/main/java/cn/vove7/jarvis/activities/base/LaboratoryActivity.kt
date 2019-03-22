@@ -99,7 +99,6 @@ class LaboratoryActivity : ReturnableActivity() {
                 SettingGroupItem(R.color.google_red, titleS = "屏幕助手", childItems = listOf(
                         SwitchItem(title = "助手模式", summary = "设为默认语音辅助应用后\n通过唤醒用系统语音助手触发\n可捕捉屏幕内容进行快捷操作\n关闭后只能使快速唤醒", keyId = R.string.key_use_assist_service,
                                 defaultValue = { AppConfig.useAssistService }),
-                        CheckBoxItem(title = "适配导航栏", keyId = R.string.key_has_nav_bar, defaultValue = AppConfig.hasNavBar),
                         InputItem(title = "文字识别参数设置", summary = "自定义文字识别key", keyId = R.string.key_text_ocr_key),
                         SingleChoiceItem(title = "长按HOME键操作",summary = "适用于一加",
                                 keyId = R.string.key_home_fun, entityArrId = R.array.list_home_funs)

@@ -211,7 +211,7 @@ class AdvancedSettingActivity : ReturnableActivity() {
                         InputItem(title = "切换服务器", defaultValue = { ApiUrls.SERVER_IP },
                                 summary = ApiUrls.SERVER_IP) { h, b ->
                             ApiUrls.switch()
-                            ApiUrls.SERVER_IP=b
+                            ApiUrls.SERVER_IP = b
                             h.summaryView.text = ApiUrls.SERVER_IP
                             return@InputItem false
                         },
@@ -234,6 +234,9 @@ class AdvancedSettingActivity : ReturnableActivity() {
                         },
                         IntentItem(title = "语音输入测试") {
                             startActivityForResult(Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH), 200)
+                        },
+                        IntentItem(title = "屏幕助手") {
+                            startActivity(Intent("$packageName.SCREEN_ASSIST"))
                         },
                         IntentItem(title = "扫描屏幕二维码") {
                             startActivity(Intent(this, QrCodeActivity::class.java))

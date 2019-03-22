@@ -322,9 +322,9 @@
             android:exported="true"
             android:label="@string/label_screen_assistant"
             android:launchMode="singleInstance"
-            android:theme="@style/ScreenPicker">
+            android:theme="@style/ScreenAssist">
             <intent-filter>
-                <action android:name="SCREEN_ASSIST" />
+                <action android:name="${applicationId}.SCREEN_ASSIST" />
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
@@ -352,6 +352,7 @@
 
         <activity
             android:name=".activities.ScreenPickerActivity"
+            android:exported="true"
             android:label="屏幕助手-文字提取"
             android:launchMode="singleInstance"
             android:theme="@style/ScreenPicker" />
@@ -361,13 +362,23 @@
             android:exported="true"
             android:label="屏幕助手-二维码识别"
             android:launchMode="singleInstance"
-            android:theme="@style/ScreenPicker" />
+            android:theme="@style/ScreenPicker">
+            <intent-filter>
+                <category android:name="android.intent.category.DEFAULT" />
+                <action android:name="SCAN_QR_CODE" />
+            </intent-filter>
+        </activity>
         <activity
             android:name=".activities.screenassistant.SpotScreenActivity"
             android:exported="true"
             android:label="屏幕助手-屏幕内容识别"
             android:launchMode="singleInstance"
-            android:theme="@style/ScreenPicker" />
+            android:theme="@style/ScreenPicker">
+            <intent-filter>
+                <category android:name="android.intent.category.DEFAULT" />
+                <action android:name="SCREEN_SPOT" />
+            </intent-filter>
+        </activity>
     </application>
 
 </manifest>

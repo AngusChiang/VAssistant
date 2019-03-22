@@ -8,6 +8,7 @@ import cn.vove7.common.app.GlobalApp
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.adapters.ListViewModel
 import cn.vove7.vtp.easyadapter.BaseListAdapter
+import kotlinx.android.synthetic.main.dialog_assist.view.*
 
 /**
  * # AssistSessionGridController
@@ -18,9 +19,10 @@ import cn.vove7.vtp.easyadapter.BaseListAdapter
 class AssistSessionGridController(context: Context, bottomView: View, val click: (Int) -> Unit)
     : BottomSheetController(context, bottomView) {
 
-    private val gridView: GridView = bottomView.findViewById(R.id.fun_grid)
+    private val gridView: GridView by lazy { bottomView.fun_grid }
+
     fun initView() {
-        gridView.numColumns=items.size
+        gridView.numColumns = items.size
         gridView.adapter = object : BaseListAdapter<VH, SessionFunItem>(context, items) {
             override fun layoutId(position: Int): Int = R.layout.image_view
 
