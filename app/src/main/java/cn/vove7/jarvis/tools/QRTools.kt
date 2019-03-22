@@ -2,6 +2,7 @@ package cn.vove7.jarvis.tools
 
 import android.content.Context
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.os.AsyncTask
 import android.util.AttributeSet
 import android.view.LayoutInflater
@@ -26,14 +27,12 @@ object QRTools {
         val a = av.findViewById<MyBarView>(R.id.zbar)
 
         ScanTask(bitmap, a, onResult).perform()
-        a.decodeQRCode(bitmap)
     }
 
     fun parseFile(path: String, onResult: (String?) -> Unit) {
         val av = LayoutInflater.from(GlobalApp.APP).inflate(R.layout.zbar, null)
         val a = av.findViewById<MyBarView>(R.id.zbar)
-        ScanTask(path, a, onResult).perform()
-        a.decodeQRCode(path)
+        ScanTask(BitmapFactory.decodeFile(path), a, onResult).perform()
     }
 }
 

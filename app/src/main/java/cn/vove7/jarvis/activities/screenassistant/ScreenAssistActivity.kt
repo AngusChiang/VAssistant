@@ -111,17 +111,16 @@ class ScreenAssistActivity : Activity() {
         get() = cacheDir.absolutePath +
                 "/screen-${Random().nextInt(999)}.png"
 
-    private fun afterHandeScreen() {
+    private fun afterHandleScreen() {
         runOnUi {
             checkFuns()
         }
-    }
-
-    override fun onDestroy() {
-        File(screenPath).apply {
-            if (exists()) delete()
+        //进入时清空缓存
+        ThreadPool.runOnCachePool {
+            cacheDir.listFiles()?.filter { it.isFile && it.absolutePath != screenPath }?.forEach {
+                it.delete()
+            }
         }
-        super.onDestroy()
     }
 
     private fun handlerScreen() {
@@ -129,7 +128,7 @@ class ScreenAssistActivity : Activity() {
             if (hasExtra("path")) {
                 screenPath = getStringExtra("path")
                 showProgressBar = false
-                afterHandeScreen()
+                afterHandleScreen()
             } else {
                 runOnNewHandlerThread {
                     val path = SystemBridge.screen2File(cachePath)?.absolutePath
@@ -139,7 +138,7 @@ class ScreenAssistActivity : Activity() {
                         finish()
                     } else screenPath = path
                     showProgressBar = false
-                    afterHandeScreen()
+                    afterHandleScreen()
                 }
             }
         }

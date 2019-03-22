@@ -177,10 +177,7 @@ fun AppInfo.activities(): Array<String> {
                 rList.add(it)
             }
         }
-        return rList.toTypedArray().also {
-            Vog.d("activities ---> ${Arrays.toString(it)}")
-            appActivityCache[packageName] = it
-        }
+        return rList.toTypedArray()
     }
 }
 
