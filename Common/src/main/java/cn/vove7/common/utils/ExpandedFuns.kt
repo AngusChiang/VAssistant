@@ -1,9 +1,11 @@
 package cn.vove7.common.utils
 
 import android.Manifest
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.Bitmap
 import android.graphics.Rect
 import android.os.Build
 import android.os.Handler
@@ -11,12 +13,12 @@ import android.os.HandlerThread
 import android.os.Looper
 import android.support.annotation.ColorRes
 import android.support.v4.app.ActivityCompat
+import android.util.DisplayMetrics
 import android.view.View
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.app.GlobalLog
 import cn.vove7.vtp.app.AppInfo
 import cn.vove7.vtp.log.Vog
-import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -290,6 +292,38 @@ fun Context.color(@ColorRes id: Int): Int {
     }
 }
 
-fun compressImage(file: String) {
+/**
+ * 截取Activity
+ * @param activity Activity
+ * @param removeStatusBar Boolean
+ * @return Bitmap?
+ */
+fun activityShot(activity: Activity, removeStatusBar: Boolean = false): Bitmap? {
+    Vog.d("$activity")
+    val view = activity.window.decorView
+    view.setWillNotCacheDrawing(false)
+    view.buildDrawingCache()
+    val rect = Rect()
+
+    view.getWindowVisibleDisplayFrame(rect)
+    val statusbarHeight = rect.top
+    val winManager = activity.windowManager
+
+    val outMetrics = DisplayMetrics()
+    winManager.defaultDisplay.getMetrics(outMetrics)
+
+    val w = outMetrics.widthPixels
+    val h = outMetrics.heightPixels
+
+    //去除状态栏
+    val bm = Bitmap.createBitmap(view.drawingCache, 0,
+            if (removeStatusBar) statusbarHeight else 0, w, h - statusbarHeight)
+
+    Vog.d("${bm?.width} x ${bm?.height}")
+
+    view.destroyDrawingCache()
+    view.setWillNotCacheDrawing(true)
+    return bm
+
 
 }
