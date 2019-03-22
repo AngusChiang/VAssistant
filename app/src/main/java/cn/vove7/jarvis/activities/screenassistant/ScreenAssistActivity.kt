@@ -18,7 +18,6 @@ import cn.vove7.common.utils.*
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.activities.TextOcrActivity
 import cn.vove7.jarvis.services.MainService
-import cn.vove7.jarvis.tools.AppConfig
 import cn.vove7.jarvis.tools.QRTools
 import cn.vove7.jarvis.tools.baiduaip.BaiduAipHelper
 import cn.vove7.jarvis.view.bottomsheet.AssistSessionGridController
@@ -51,6 +50,7 @@ class ScreenAssistActivity : Activity() {
         }
     }
 
+
     private var showProgressBar: Boolean = false
         set(value) {
             runOnUi {
@@ -70,7 +70,6 @@ class ScreenAssistActivity : Activity() {
         bottomController.hideBottom()
         bottomController.bottomView.visibility = View.GONE
 
-        handlerScreen()
         bottomController.bottomView.post {
             bottomController.behavior.setBottomSheetCallback(object : BottomSheetBehavior.BottomSheetCallback() {
                 override fun onStateChanged(p0: View, p1: Int) {
@@ -91,6 +90,8 @@ class ScreenAssistActivity : Activity() {
         root.setOnClickListener {
             onBackPressed()
         }
+        handlerScreen()
+
     }
 
 
@@ -104,6 +105,7 @@ class ScreenAssistActivity : Activity() {
             bottomController.bottomView.startAnimation(animation)
         }
     }
+
 
     private val cachePath
         get() = cacheDir.absolutePath +
@@ -134,6 +136,7 @@ class ScreenAssistActivity : Activity() {
                     if (path == null) {
                         GlobalApp.toastError("截图失败")
                         finish()
+                        return@runOnNewHandlerThread
                     } else screenPath = path
                     showProgressBar = false
                     afterHandleScreen()
