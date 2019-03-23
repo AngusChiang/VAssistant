@@ -7,6 +7,7 @@ import android.os.Build
 import android.service.voice.VoiceInteractionSession
 import android.support.annotation.RequiresApi
 import cn.vove7.common.bridges.UtilBridge
+import cn.vove7.common.utils.runOnNewHandlerThread
 import cn.vove7.jarvis.activities.screenassistant.ScreenAssistActivity
 import cn.vove7.vtp.log.Vog
 import java.util.*
@@ -25,10 +26,14 @@ class AssistSession(context: Context) : VoiceInteractionSession(context) {
             finish()
             return
         }
-        val screenPath = UtilBridge.bitmap2File(screenshot, context.cacheDir
-                .absolutePath + "/screen-${Random().nextInt()}.png")?.absolutePath
+        val p=context.cacheDir.absolutePath +
+                "/screen-${Random().nextInt()}.png"
+        context.startActivity(ScreenAssistActivity.createIntent(p))
 
-        context.startActivity(ScreenAssistActivity.createIntent(screenPath))
+        runOnNewHandlerThread {
+            UtilBridge.bitmap2File(screenshot, p)
+        }
+
         finish()
     }
 

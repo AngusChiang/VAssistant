@@ -24,7 +24,6 @@ import cn.vove7.common.appbus.AppBus.ORDER_STOP_RECOG
 import cn.vove7.common.appbus.AppBus.ORDER_STOP_VOICE_WAKEUP_WITHOUT_NOTIFY
 import cn.vove7.common.appbus.BusService
 import cn.vove7.common.appbus.SpeechAction
-import cn.vove7.common.appbus.VoiceData
 import cn.vove7.common.bridges.ChoiceData
 import cn.vove7.common.bridges.ServiceBridge
 import cn.vove7.common.bridges.ShowDialogEvent
@@ -57,6 +56,7 @@ import cn.vove7.jarvis.chat.ChatSystem
 import cn.vove7.jarvis.chat.TulingChatSystem
 import cn.vove7.jarvis.speech.SpeechEvent
 import cn.vove7.jarvis.speech.SpeechRecoService
+import cn.vove7.jarvis.speech.VoiceData
 import cn.vove7.jarvis.tools.AppConfig
 import cn.vove7.jarvis.tools.AudioController
 import cn.vove7.jarvis.tools.debugserver.RemoteDebugServer

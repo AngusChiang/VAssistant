@@ -1,6 +1,6 @@
 package cn.vove7.jarvis.speech
 
-import cn.vove7.common.appbus.VoiceData
+import java.io.Serializable
 
 /**
  * 语音识别事件interface
@@ -56,3 +56,9 @@ interface SpeechEvent {
 
     fun onFinish() {}
 }
+
+/**
+ * 语音识别数据
+ */
+data class VoiceData(val what: Int = 0, val data: String? = null, val volumePercent: Int = 0)
+    : Serializable

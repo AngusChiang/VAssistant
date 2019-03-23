@@ -8,7 +8,6 @@ import android.support.annotation.CallSuper
 import android.support.v4.app.ActivityCompat
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.appbus.AppBus
-import cn.vove7.common.appbus.VoiceData
 import cn.vove7.common.model.RequestPermission
 import cn.vove7.jarvis.receivers.PowerEventReceiver
 import cn.vove7.jarvis.speech.baiduspeech.recognition.model.IStatus
@@ -212,25 +211,21 @@ abstract class SpeechRecoService(val event: SpeechEvent) : SpeechRecogI {
                     else {
                         Vog.e("正在聆听,暂停唤醒")
                     }
-//                    AppBus.postVoiceData(VoiceData(msg.what, word))
                 }
                 IStatus.CODE_VOICE_TEMP -> {//中间结果
                     val res = msg.data.getString("data")
                     if (res != null)
                         event.onTempResult(res)
-//                    AppBus.postVoiceData(VoiceData(msg.what, res))
                 }
                 IStatus.CODE_VOICE_ERR -> {//出错
                     val res = msg.data.getString("data") ?: "null"
                     isListening = false
                     closeSCO()
                     event.onRecogFailed(res)
-//                    AppBus.postVoiceData(VoiceData(msg.what, res))
                 }
                 IStatus.CODE_VOICE_VOL -> {//音量反馈
                     val data = msg.data.getSerializable("data") as VoiceData
                     event.onVolume(data)
-//                    AppBus.postVoiceData(data)
                 }
                 IStatus.CODE_VOICE_RESULT -> {//结果
                     val result = msg.data.getString("data") ?: "null"
@@ -239,7 +234,6 @@ abstract class SpeechRecoService(val event: SpeechEvent) : SpeechRecogI {
                     event.onResult(result)
                     if (!AppConfig.lastingVoiceCommand)
                         isListening = false
-//                    AppBus.postVoiceData(VoiceData(msg.what, result))
                 }
                 IStatus.STATUS_FINISHED -> {
                     closeSCO()//关闭SCO

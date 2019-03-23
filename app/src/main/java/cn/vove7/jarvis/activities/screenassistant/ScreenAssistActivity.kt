@@ -13,6 +13,7 @@ import android.view.animation.AlphaAnimation
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.appbus.AppBus
 import cn.vove7.common.bridges.SystemBridge
+import cn.vove7.common.bridges.UtilBridge
 import cn.vove7.common.model.RequestPermission
 import cn.vove7.common.utils.*
 import cn.vove7.jarvis.R
@@ -64,6 +65,8 @@ class ScreenAssistActivity : Activity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.dialog_assist)
+
+        window.setWindowAnimations(R.style.ScreenAssist)
         showProgressBar = true
         bottomController = AssistSessionGridController(this, bottom_sheet, itemClick)
         bottomController.initView()
@@ -87,22 +90,24 @@ class ScreenAssistActivity : Activity() {
             MainService.switchRecog()
             bottomController.hideBottom()
         }
+        handlerScreen()
+
         root.setOnClickListener {
             onBackPressed()
         }
-        handlerScreen()
-
     }
 
 
     private fun showView() {
         runOnUi {
-            bottomController.bottomView.visibility = View.VISIBLE
-            bottomController.showBottom()
+            if(!bottomController.isBottomSheetShowing) {
+                bottomController.bottomView.visibility = View.VISIBLE
+                bottomController.showBottom()
 
-            val animation = AlphaAnimation(0f, 1f)
-            animation.duration = 500
-            bottomController.bottomView.startAnimation(animation)
+                val animation = AlphaAnimation(0f, 1f)
+                animation.duration = 300
+                bottomController.bottomView.startAnimation(animation)
+            }
         }
     }
 
@@ -131,7 +136,13 @@ class ScreenAssistActivity : Activity() {
                 afterHandleScreen()
             } else {
                 runOnNewHandlerThread {
-                    val path = SystemBridge.screen2File(cachePath)?.absolutePath
+                    val path = SystemBridge.screenShot()?.let {
+                        runOnUi {//截完图显示面板
+                            showView()
+                        }
+                        SystemBridge.release()
+                        UtilBridge.bitmap2File(it, cachePath)?.absolutePath
+                    }
 
                     if (path == null) {
                         GlobalApp.toastError("截图失败")

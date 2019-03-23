@@ -32,14 +32,12 @@ class MessageStatusRecogListener(private val handler: Handler) : StatusRecogList
 
     override fun onAsrVolume(volumePercent: Int, volume: Int) {
         super.onAsrVolume(volumePercent, volume = volume)
-//        AppBus.postVoiceData(VoiceData(CODE_VOICE_VOL, volumePercent = volumePercent))
     }
 
     override fun onAsrPartialResult(results: Array<String>?, recogResult: RecogResult) {
         sendStatusMessage("临时识别结果，结果是“" + results!![0] + "”；原始json：" + recogResult.originalJson)
         super.onAsrPartialResult(results, recogResult)
 
-//        AppBus.postVoiceData(VoiceData(CODE_VOICE_TEMP, results[0]))
     }
 
     override fun onAsrFinalResult(results: Array<String>?, recogResult: RecogResult) {
@@ -50,7 +48,6 @@ class MessageStatusRecogListener(private val handler: Handler) : StatusRecogList
             val diffTime = System.currentTimeMillis() - speechEndTime
             message += "；说话结束到识别结束耗时【" + diffTime + "ms】"
         }
-//        AppBus.postVoiceData(VoiceData(CODE_VOICE_RESULT, results[0]))
         speechEndTime = 0
         sendMessage(message, status, true)
     }

@@ -13,8 +13,8 @@ import android.widget.ImageView
 import android.widget.TextView
 import cn.vove7.common.appbus.AppBus
 import cn.vove7.common.appbus.SpeechAction
-import cn.vove7.common.appbus.VoiceData
 import cn.vove7.jarvis.R
+import cn.vove7.jarvis.speech.VoiceData
 import cn.vove7.jarvis.speech.baiduspeech.recognition.model.IStatus.Companion.CODE_VOICE_ERR
 import cn.vove7.jarvis.speech.baiduspeech.recognition.model.IStatus.Companion.CODE_VOICE_RESULT
 import cn.vove7.jarvis.speech.baiduspeech.recognition.model.IStatus.Companion.CODE_VOICE_TEMP
@@ -152,9 +152,9 @@ class VoiceFloat : AbFloatWindow<VoiceFloat.Holder> {
 //            holder.result.text = "stop"
 //            AppBus.postSpeechAction(SpeechAction.ActionCode.ACTION_CANCEL_RECOG)
 //        } else {
-            ServiceChecker(context).checkService()
-            holder.result.text = "begin"
-            AppBus.postSpeechAction(SpeechAction.ActionCode.ACTION_START_RECOG)
+        ServiceChecker(context).checkService()
+        holder.result.text = "begin"
+        AppBus.postSpeechAction(SpeechAction.ActionCode.ACTION_START_RECOG)
 //        }
     }
 

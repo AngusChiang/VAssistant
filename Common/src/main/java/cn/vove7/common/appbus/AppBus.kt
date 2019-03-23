@@ -81,10 +81,6 @@ object AppBus {
         EventBus.getDefault().post(SpeechAction(actionCode))
     }
 
-    fun postVoiceData(data: VoiceData) {
-        EventBus.getDefault().post(data)
-    }
-
     fun reg(a: Any) {
         if (!EventBus.getDefault().isRegistered(a))
             EventBus.getDefault().register(a)
@@ -117,10 +113,4 @@ data class SpeechAction(val action: ActionCode) {
         ACTION_STOP_WAKEUP_TIMER
     }
 }
-
-/**
- * 语音识别数据
- */
-data class VoiceData(val what: Int = 0, val data: String? = null, val volumePercent: Int = 0)
-    : Serializable
 
