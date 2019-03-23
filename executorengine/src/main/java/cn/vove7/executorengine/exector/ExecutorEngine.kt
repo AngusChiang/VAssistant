@@ -25,10 +25,6 @@ class ExecutorEngine : ExecutorImpl() {
     private val bridgeManager = BridgeManager(this, GlobalActionExecutor,
             SystemBridge, serviceBridge)
 
-    /**
-     * Rhino impl
-     */
-//    private var tHandler: HandlerThread? = null
     private var rhinoHelper: RhinoHelper? = null
 
     override fun onRhinoExec(script: String, args: Array<String>?): PartialResult {
@@ -38,7 +34,7 @@ class ExecutorEngine : ExecutorImpl() {
         }
         val sc = RegUtils.replaceRhinoHeader(script)
         return try {
-            rhinoHelper?.evalString(sc, *(args ?: arrayOf())) ?: GlobalApp.toastWarning("执行器未就绪")
+            rhinoHelper?.evalString(sc, *(args ?: arrayOf()))
             RhinoApi.doLog("主线程执行完毕\n")
             PartialResult.success()
         } catch (we: MessageException) {
