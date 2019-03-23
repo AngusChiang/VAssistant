@@ -45,7 +45,7 @@ import cn.vove7.common.utils.runOnNewHandlerThread
 import cn.vove7.common.utils.runOnUi
 import cn.vove7.common.utils.startActivityOnNewTask
 import cn.vove7.common.view.finder.ViewFindBuilder
-import cn.vove7.executorengine.exector.MultiExecutorEngine
+import cn.vove7.executorengine.exector.ExecutorEngine
 import cn.vove7.executorengine.model.ActionParseResult
 import cn.vove7.executorengine.parse.ParseEngine
 import cn.vove7.jarvis.App
@@ -114,7 +114,7 @@ class MainService : BusService(),
     /**
      * 执行器
      */
-    private val cExecutor: CExecutorI by lazy { MultiExecutorEngine() }
+    private val cExecutor: CExecutorI by lazy { ExecutorEngine() }
 
     private lateinit var chatSystem: ChatSystem
 
@@ -1073,7 +1073,7 @@ class MainService : BusService(),
             Vog.d("开启 -- smartOpen")
             if (cmdWord != "") {//使用smartOpen
                 //设置command
-                val engine = MultiExecutorEngine()
+                val engine = ExecutorEngine()
                 val result = engine.use {
                     it.command = cmdWord
                     it.smartOpen(cmdWord)

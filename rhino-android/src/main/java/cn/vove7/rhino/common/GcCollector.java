@@ -1,7 +1,5 @@
 package cn.vove7.rhino.common;
 
-import android.os.HandlerThread;
-
 import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.annotations.JSFunction;
 
@@ -52,11 +50,7 @@ public class GcCollector {
         if (gcs != null) {
             for (Object gc : gcs) {
                 if (gc instanceof Thread && ((Thread) gc).isAlive()) {
-                    try {
-                        ((Thread) gc).interrupt();
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
+                    ((Thread) gc).interrupt();
                 }
             }
             gcs.clear();

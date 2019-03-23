@@ -8,6 +8,7 @@ import org.mozilla.javascript.Script;
 import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.ScriptableObject;
 import org.mozilla.javascript.SecurityController;
+import org.mozilla.javascript.WrappedException;
 import org.mozilla.javascript.tools.SourceReader;
 import org.mozilla.javascript.tools.shell.Global;
 
@@ -24,6 +25,7 @@ import java.util.Arrays;
 import java.util.LinkedHashMap;
 
 import cn.vove7.common.BridgeManager;
+import cn.vove7.common.MessageException;
 import cn.vove7.common.app.GlobalApp;
 import cn.vove7.rhino.api.RhinoApi;
 import cn.vove7.rhino.common.AndroidContextFactory;
@@ -142,7 +144,7 @@ public class RhinoHelper extends ScriptableObject {
 
 
     public void setArgs(String... args) {
-        Vog.INSTANCE.d( "args" + Arrays.toString(args));
+        Vog.INSTANCE.d("args" + Arrays.toString(args));
         Object[] array = new Object[args.length];
         System.arraycopy(args, 0, array, 0, args.length);
         Scriptable argsObj = rhinoContext.newArray(global, array);
@@ -152,11 +154,25 @@ public class RhinoHelper extends ScriptableObject {
                 ScriptableObject.DONTENUM);
     }
 
-    public void evalString(String scriptText, String... args) {
-        setArgs(args);
-        Script script = rhinoContext.compileString(scriptText, "<script>", 1, null);
-        if (script != null) {
-            script.exec(rhinoContext, global);
+    public void evalString(String scriptText, String... args) throws MessageException {
+        try {
+            setArgs(args);
+            Script script = rhinoContext.compileString(scriptText, "<script>", 1, null);
+            if (script != null) {
+                script.exec(rhinoContext, global);
+            }
+        } catch (WrappedException we) {
+            Throwable e = we.getWrappedException();
+            if (e instanceof InterruptedException) {
+                RhinoApi.doLog("强行终止");
+                throw new MessageException("强行终止");
+            } else {
+                RhinoApi.doLog(e.getMessage());
+                throw new MessageException(e.getMessage());
+            }
+        } catch (Throwable t) {
+            RhinoApi.doLog(t.getMessage());
+            throw new MessageException(t.getMessage());
         }
     }
 

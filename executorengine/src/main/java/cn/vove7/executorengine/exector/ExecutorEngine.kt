@@ -14,7 +14,6 @@ import cn.vove7.common.utils.RegUtils
 import cn.vove7.executorengine.ExecutorImpl
 import cn.vove7.rhino.RhinoHelper
 import cn.vove7.rhino.api.RhinoApi
-import org.mozilla.javascript.WrappedException
 
 /**
  * # MultiExecutorEngine
@@ -22,7 +21,7 @@ import org.mozilla.javascript.WrappedException
  * @author 17719247306
  * 2018/8/28
  */
-class MultiExecutorEngine : ExecutorImpl() {
+class ExecutorEngine : ExecutorImpl() {
     private val bridgeManager = BridgeManager(this, GlobalActionExecutor,
             SystemBridge, serviceBridge)
 
@@ -33,7 +32,6 @@ class MultiExecutorEngine : ExecutorImpl() {
     private var rhinoHelper: RhinoHelper? = null
 
     override fun onRhinoExec(script: String, args: Array<String>?): PartialResult {
-
         rhinoHelper?.stop()
         if (currentActionIndex <= 1) {
             rhinoHelper = RhinoHelper(bridgeManager)
@@ -43,15 +41,9 @@ class MultiExecutorEngine : ExecutorImpl() {
             rhinoHelper?.evalString(sc, *(args ?: arrayOf())) ?: GlobalApp.toastWarning("执行器未就绪")
             RhinoApi.doLog("主线程执行完毕\n")
             PartialResult.success()
-        } catch (we: WrappedException) {
-            val e = we.wrappedException
-            GlobalLog.err(e)
-            if (e is InterruptedException) {
-                RhinoApi.doLog("强行终止")
-                PartialResult.fatal("强行终止")
-            } else {
-                PartialResult.fatal(e.message ?: "no message")
-            }
+        } catch (we: MessageException) {
+            GlobalLog.err(we)
+            PartialResult.fatal(we.message)
         }
     }
 
@@ -65,7 +57,6 @@ class MultiExecutorEngine : ExecutorImpl() {
      * Lua Impl
      */
     private var luaHelper: LuaHelper? = null
-//    private val luaFunHelper = LuaFunHelper(luaHelper, luaHelper.L)
 
     //可提取ExecutorHelper 接口 handleMessage
     override fun onLuaExec(script: String, args: Array<String>?): PartialResult {

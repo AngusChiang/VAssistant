@@ -61,7 +61,7 @@ class EditorFunsHelper(
                 }),
                 ApiCategory("ViewNode", listOf(
                         ApiFunction("tryClick()", "尝试点击"),
-                        ApiFunction("globalClick()", "使用全局函数click进行点击操作，如点击网页控件\n需要7.0+"),
+                        ApiFunction("globalClick()", "使用全局函数click进行点击操作，如点击网页控件\n需要高级无障碍服务"),
                         ApiFunction("swipe(dx, dy, delay)", "以此Node中心滑动到相对(dx,dy)的地方"),
                         ApiFunction("tryLongClick()", "长按"),
                         ApiFunction("longClick()", "长按")

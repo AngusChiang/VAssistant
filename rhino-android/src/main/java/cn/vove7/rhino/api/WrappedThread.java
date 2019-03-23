@@ -6,7 +6,8 @@ package cn.vove7.rhino.api;
 import android.os.Handler;
 import android.os.Looper;
 import android.support.annotation.Nullable;
-import android.util.Log;
+
+import org.mozilla.javascript.WrappedException;
 
 /**
  * Handy class for starting a new thread that has a looper. The looper can then be
@@ -49,6 +50,11 @@ public class WrappedThread extends Thread {
         onLooperPrepared();
         try {
             Looper.loop();
+        } catch (WrappedException ie) {
+            Throwable e = ie.getWrappedException();
+            if (!(e instanceof InterruptedException)) {
+                RhinoApi.onException(e);
+            }
         } catch (Exception e) {
 //            e.printStackTrace();
             RhinoApi.onException(e);

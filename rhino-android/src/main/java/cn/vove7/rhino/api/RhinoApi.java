@@ -48,7 +48,7 @@ public class RhinoApi extends AbsApi {
             String file = Context.toString(arg);
             try {
                 String sc = AssetHelper.INSTANCE.getStrFromAsset(GlobalApp.APP, file);
-                Log.d("17719247306 :", "loadAsset  ----> " + "load: " + file);
+                Log.d("RhinoApi :", "loadAsset  ----> " + file);
                 cx.evaluateString(thisObj, sc, "load_" + file, 1, null);
             } catch (Exception ex) {
                 // Treat StackOverflow and OutOfMemory as runtime errors

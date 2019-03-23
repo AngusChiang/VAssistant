@@ -19,7 +19,7 @@ class ViewNodeNotFoundException(finder: ViewFinder?) : Exception(finder?.toStrin
  * 执行出错 返回信息
  * @constructor
  */
-class MessageException(msg: String) : Exception(msg)
+class MessageException(msg: String?) : Exception(msg)
 
 /**
  * 无障碍服务未运行异常
