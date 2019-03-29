@@ -324,6 +324,14 @@ fun activityShot(activity: Activity, removeStatusBar: Boolean = false): Bitmap? 
     view.destroyDrawingCache()
     view.setWillNotCacheDrawing(true)
     return bm
-
-
 }
+
+
+operator fun String.times(number: Int): String {
+    return buildString {
+        for (i in 1..number) {
+            append(this@times)
+        }
+    }
+}
+

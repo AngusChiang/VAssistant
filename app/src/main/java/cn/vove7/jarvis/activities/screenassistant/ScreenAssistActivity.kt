@@ -51,14 +51,17 @@ class ScreenAssistActivity : Activity() {
         }
     }
 
+    private val isReady: Boolean?
+        get() =
+            if (showProgressBar) null else true
 
     private var showProgressBar: Boolean = false
         set(value) {
+            field = value
             runOnUi {
                 if (value) progress_bar.visibility = View.VISIBLE
                 else progress_bar.visibility = View.INVISIBLE
             }
-            field = value
         }
 
 
@@ -100,7 +103,7 @@ class ScreenAssistActivity : Activity() {
 
     private fun showView() {
         runOnUi {
-            if(!bottomController.isBottomSheetShowing) {
+            if (!bottomController.isBottomSheetShowing) {
                 bottomController.bottomView.visibility = View.VISIBLE
                 bottomController.showBottom()
 
@@ -128,6 +131,8 @@ class ScreenAssistActivity : Activity() {
         }
     }
 
+
+
     private fun handlerScreen() {
         intent?.apply {
             if (hasExtra("path")) {
@@ -137,7 +142,8 @@ class ScreenAssistActivity : Activity() {
             } else {
                 runOnNewHandlerThread {
                     val path = SystemBridge.screenShot()?.let {
-                        runOnUi {//截完图显示面板
+                        runOnUi {
+                            //截完图显示面板
                             showView()
                         }
                         SystemBridge.release()
@@ -175,65 +181,56 @@ class ScreenAssistActivity : Activity() {
         }
     }
 
-    private val itemClick: (Int) -> Unit = { pos ->
-        when (pos) {
-            0 -> {
-                imageClassify(screenPath)
-            }
-            1 -> {
-                showProgressBar = true
-                runOnNewHandlerThread {
-                    try {
-                        val intent = Intent(GlobalApp.APP,
-                                TextOcrActivity::class.java).also {
-                            val results = BaiduAipHelper.ocr(screenPath)
-                            it.putExtra("items", results)
-                        }
-                        if (isFinishing) return@runOnNewHandlerThread
-                        startActivity(intent)
-                        showProgressBar = false
-                        finish()
-                    } catch (e: Exception) {
-                        e.printStackTrace()
-                        GlobalApp.toastInfo(e.message!!)
-                    }
-
-                }
-            }
-            2 -> {
+    private val funMap = mapOf(
+            Pair(0, { imageClassify() }),
+            Pair(1, { screenOcr() }),
+            Pair(2, {
                 AppBus.postDelay("0_0", AppBus.ORDER_BEGIN_SCREEN_PICKER, 800)
                 finish()
-            }
-            3 -> {
-                SystemBridge.shareImage(screenPath)
-                finish()
-            }
-            4 -> {
-                showProgressBar = true
-                QRTools.parseFile(screenPath) {
-                    runOnUi {
-                        showProgressBar = false
-                        onScanQRCodeSuccess(it)
-                    }
-                }
-            }
-            5 -> {
-                showProgressBar = true
-                runOnNewHandlerThread {
-                    try {
-                        val path = Environment.getExternalStorageDirectory().absolutePath +
-                                "/Pictures/Screenshots/Screenshot_${formatNow("yyyyMMdd-HHmmss")}.jpg"
+            }),
+            Pair(3, { shareScreen() }),
+            Pair(4, { scanQrCode() }),
+            Pair(5, { save2Local() })
+    )
 
-                        File(screenPath).copyTo(File(path), true)
-                        GlobalApp.toastInfo("保存到 $path")
-                    } catch (e: SecurityException) {
-                        GlobalApp.toastError("保存失败：无存储权限")
-                    } catch (e: Exception) {
-                        GlobalApp.toastError("保存失败：${e.message}")
-                    }
-                    showProgressBar = false
-                }
+    private val itemClick: (Int) -> Unit = { pos ->
+        funMap[pos]?.invoke()
+    }
+
+    private fun scanQrCode() {
+        isReady ?: return
+        showProgressBar = true
+        QRTools.parseFile(screenPath) {
+            runOnUi {
+                showProgressBar = false
+                onScanQRCodeSuccess(it)
             }
+        }
+    }
+
+    private fun shareScreen() {
+        isReady ?: return
+        SystemBridge.shareImage(screenPath)
+        finish()
+    }
+
+    private fun save2Local() {
+        isReady ?: return
+
+        showProgressBar = true
+        runOnNewHandlerThread {
+            try {
+                val path = Environment.getExternalStorageDirectory().absolutePath +
+                        "/Pictures/Screenshots/Screenshot_${formatNow("yyyyMMdd-HHmmss")}.jpg"
+
+                File(screenPath).copyTo(File(path), true)
+                GlobalApp.toastInfo("保存到 $path")
+            } catch (e: SecurityException) {
+                GlobalApp.toastError("保存失败：无存储权限")
+            } catch (e: Exception) {
+                GlobalApp.toastError("保存失败：${e.message}")
+            }
+            showProgressBar = false
         }
     }
 
@@ -320,15 +317,41 @@ class ScreenAssistActivity : Activity() {
 
     }
 
+    /**
+     * 文字识别
+     */
+    private fun screenOcr() {
+        isReady ?: return
+        showProgressBar = true
+        runOnNewHandlerThread {
+            try {
+                val intent = Intent(GlobalApp.APP,
+                        TextOcrActivity::class.java).also {
+                    val results = BaiduAipHelper.ocr(screenPath)
+                    it.putExtra("items", results)
+                }
+                if (isFinishing) return@runOnNewHandlerThread
+                startActivity(intent)
+                showProgressBar = false
+                finish()
+            } catch (e: Exception) {
+                e.printStackTrace()
+                GlobalApp.toastInfo(e.message!!)
+            }
+        }
+    }
+
     var dialog: Dialog? = null
+
     /**
      * 图像识别
-     * @param path String
      */
-    private fun imageClassify(path: String) {
+    private fun imageClassify() {
+        isReady ?: return
+
         showProgressBar = true
         ThreadPool.runOnPool {
-            val r = BaiduAipHelper.imageClassify(path)
+            val r = BaiduAipHelper.imageClassify(screenPath)
             runOnUi {
                 showProgressBar = false
                 Vog.d("imageClassify ---> ${r?.bestResult}")
