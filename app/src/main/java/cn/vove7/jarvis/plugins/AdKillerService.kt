@@ -90,12 +90,15 @@ object AdKillerService : AbsAccPluginService() {
     private fun startFind() {
         finders?.forEach {
             thread {
-                it.waitFor((AppConfig.adWaitSecs * 1000).toLong())?.also { node ->
-                    Vog.i(" ${Thread.currentThread()} 发现广告 ---> ${appInfo?.name}  $it")
-                    onSkipAd(node)
+                try {
+                    it.waitFor((AppConfig.adWaitSecs * 1000).toLong())?.also { node ->
+                        Vog.i(" ${Thread.currentThread()} 发现广告 ---> ${appInfo?.name}  $it")
+                        onSkipAd(node)
+                    }
+                } catch (e: Throwable) {
+                    GlobalLog.err(e)
                 }
             }.also { t ->
-                //                Vog.d("搜索线程 ---> $t")
                 sthreads.add(t)
             }
         }
@@ -227,7 +230,7 @@ object AdKillerService : AbsAccPluginService() {
         val des = it.depthArr
         if (des != null) {
             finderBuilder.depths(des)
-            return finderBuilder.viewFinderX
+            return finderBuilder.finder
         }
 
         if (it.descs != null) {
@@ -239,6 +242,6 @@ object AdKillerService : AbsAccPluginService() {
             finderBuilder.containsText(*it.textArray)
         }
 
-        return finderBuilder.viewFinderX
+        return finderBuilder.finder
     }
 }

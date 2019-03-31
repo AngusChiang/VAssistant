@@ -70,6 +70,11 @@ open class ExecutorImpl(
         get() = AccessibilityApi.accessibilityService?.currentFocusedEditor
     override var running: Boolean = false
 
+    /**
+     * 存放运行传递参数
+     */
+    private val tmpMap = hashMapOf<String, Any?>()
+
     override var userInterrupted: Boolean = false
         set(value) {
             Vog.d("终止标志 ---> $value")
@@ -465,12 +470,7 @@ open class ExecutorImpl(
         serviceBridge?.getVoiceParam()
         waitForUnlock()
         //得到结果 -> action.param
-        return if (!currentAction!!.responseResult) {
-            null
-//                PartialResult.fatal("获取语音参数失败")
-        } else {
-            currentAction!!.param.valueWithClear[0]
-        }
+        return tmpMap[VOICE_RESULT] as String?
     }
 
     /**
@@ -479,12 +479,7 @@ open class ExecutorImpl(
     override fun onGetVoiceParam(param: String?) {
         Vog.d("onGetVoiceParam -> $param")
         //设置参数
-        if (param == null) {
-            currentAction?.responseResult = false
-        } else {
-            currentAction?.responseResult = true
-            currentAction?.param?.value = arrayOf(param)
-        }
+        tmpMap[VOICE_RESULT] = param
         //继续执行
         notifySync()
     }
@@ -580,21 +575,14 @@ open class ExecutorImpl(
         //通知显示单选框
         serviceBridge?.showChoiceDialog(ShowDialogEvent(WHICH_SINGLE, askTitle, choiceData))
         waitForUnlock()
-        return if (currentAction!!.responseResult) {
 
-            val bundle = currentAction!!.responseBundle
-            (bundle.getSerializable("data") as ChoiceData).also {
-                Vog.d("结果： ${it.title}")
-            }
-        } else {
-            Vog.d("结果： 取消")
-            null
-        }.also { Vog.d("waitForSingleChoice result : $it") }
+        return (tmpMap.getAndRemove(SINGLE_CHOICE_RESULT) as ChoiceData?).also {
+            Vog.d("结果： ${it?.title}")
+        }
     }
 
     override fun onSingleChoiceResult(index: Int, data: ChoiceData?) {
-        currentAction?.responseResult = data != null
-        currentAction?.responseBundle?.putSerializable("data", data)
+        tmpMap[SINGLE_CHOICE_RESULT] = data
         notifySync()
     }
 
@@ -635,13 +623,14 @@ open class ExecutorImpl(
     override fun alert(title: String, msg: String): Boolean {
         serviceBridge?.showAlert(title, msg)
         waitForUnlock()
-        return currentAction?.responseResult.also {
+
+        return (tmpMap[ALERT_RESULT] as Boolean?).also {
             Vog.d("alert result > $it")
         } ?: false
     }
 
     override fun notifyAlertResult(result: Boolean) {
-        currentAction?.responseResult = result
+        tmpMap[ALERT_RESULT] = result
         notifySync()
     }
 
@@ -727,25 +716,9 @@ open class ExecutorImpl(
          */
         private val globalScopeType = arrayListOf(ActionNode.NODE_SCOPE_GLOBAL/*, ActionNode.NODE_SCOPE_GLOBAL_2*/)
 
-
-        private const val CloseAppScript = "require 'accessibility'\n" +
-                "system.openAppDetail(args[1])\n" +
-                "s = ViewFinder().equalsText({'强行停止','force stop'}).waitFor(3000)\n" +
-                "if (s and s.tryClick()) then\n" +
-                "    ok = ViewFinder().containsText({\"确定\", \"OK\"}).waitFor(600)\n" +
-                "    if (ok) then\n" +
-                "        sleep(200)\n" +
-                "        print(ok.tryClick())\n" +
-                "    else\n" +
-                "        ok = ViewFinder().containsText(\"强行停止\").waitFor(600)\n" +
-                "        if(ok) then\n" +
-                "            ok.tryClick()\n" +
-                "        end\n" +
-                "    end\n" +
-                "else\n" +
-                "    speak(\"应用未运行\")\n" +
-                "end\n" +
-                "sleep(500)\nhome()\n"
+        const val ALERT_RESULT = "ALERT_RESULT"
+        const val VOICE_RESULT = "VOICE_RESULT"
+        const val SINGLE_CHOICE_RESULT = "SINGLE_CHOICE_RESULT"
 
     }
 
@@ -762,4 +735,10 @@ open class ExecutorImpl(
         } else true
     }
 
+}
+
+private fun <K, V> HashMap<K, V>.getAndRemove(k:K): V? {
+    return get(k)?.also {
+        remove(k)
+    }
 }

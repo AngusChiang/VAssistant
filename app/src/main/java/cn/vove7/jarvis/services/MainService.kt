@@ -6,6 +6,7 @@ import android.content.DialogInterface
 import android.content.Intent
 import android.os.Binder
 import android.os.IBinder
+import cn.vove7.common.MessageException
 import cn.vove7.common.accessibility.AccessibilityApi
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.app.GlobalLog
@@ -154,7 +155,7 @@ class MainService : BusService(),
      * 加载语音识别/合成服务
      */
     private fun loadSpeechService() {
-        speechRecoService = BaiduSpeechRecoService(RecgEventListener())
+        speechRecoService = BaiduSpeechRecoService(RecogEventListener())
         speechSynService = SpeechSynService(SynthesisEventListener())
     }
 
@@ -215,7 +216,7 @@ class MainService : BusService(),
             } catch (e: Exception) {
                 GlobalLog.err(e)
                 onRequestPermission(RequestPermission("悬浮窗权限"))
-                notifyAlertResult(false)
+                throw MessageException("无悬浮窗权限")
             }
         }
     }
@@ -251,7 +252,7 @@ class MainService : BusService(),
     }
 
     /**
-     * 长语音时 speak或AlertDialog 会 [暂时]关闭识别
+     * 长语音时 speak或AlertDialog 会 \[暂时]关闭识别
      * 聊天对话说完(speak)后 继续标志（可能有其他调用speak，则不继续）
      *
      * 标志更改 ：开始聊天对话|showAlert set 识别状态recogIsListening  取消识别时 set false
@@ -263,7 +264,7 @@ class MainService : BusService(),
      * 长语音下继续语音识别
      * fixme 其他调用speak 也会触发
      */
-    fun resumeListenCommandIfLasting() {//开启长语音时
+    private fun resumeListenCommandIfLasting() {//开启长语音时
         Vog.d("resumeListenCommandIfLasting ---> 检查长语音 afterSpeakResumeListen:$afterSpeakResumeListen IsListening:$recogIsListening")
         if (afterSpeakResumeListen && AppConfig.lastingVoiceCommand && !recogIsListening)//防止长语音识别 继续
             AppBus.postDelay("lastingVoiceCommand",
@@ -273,7 +274,7 @@ class MainService : BusService(),
     /**
      * speak时暂时关闭 语音识别（长语音）
      */
-    fun stopRecogTemp() {
+    private fun stopRecogTemp() {
         if (AppConfig.lastingVoiceCommand) {//防止长语音识别 speak聊天对话
             Vog.d("stopRecogTemp ---> speak临时 $recogIsListening")
             afterSpeakResumeListen = recogIsListening
@@ -338,7 +339,6 @@ class MainService : BusService(),
 
     /**
      * 中途获取参数
-     * @param action 执行动作
      */
     override fun getVoiceParam() {
         voiceMode = MODE_GET_PARAM
@@ -781,7 +781,7 @@ class MainService : BusService(),
     /**
      * 语音识别事件监听
      */
-    inner class RecgEventListener : SpeechEvent {
+    inner class RecogEventListener : SpeechEvent {
         override fun onWakeup(word: String?) {
             Vog.d("onWakeup ---> 唤醒 -> $word")
             //解析成功  不再唤醒
@@ -910,7 +910,7 @@ class MainService : BusService(),
             }
         }
 
-        var temResult: String? = null
+        private var temResult: String? = null
 
         override fun onTempResult(temp: String) {
             temResult = temp
@@ -999,7 +999,7 @@ class MainService : BusService(),
         NetHelper.uploadUserCommandHistory(his)
     }
 
-    var isContinousDialogue = false
+    private var isContinousDialogue = false
 
     /**
      * 解析指令

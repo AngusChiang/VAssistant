@@ -29,6 +29,8 @@ abstract class ViewFinder(var node: AccessibilityNodeInfo?) {
      * @param m Long 时限
      */
     fun waitFor(m: Long = 30000): ViewNode? {
+        if (!AccessibilityApi.isBaseServiceOn) return null
+
         val t = if (m < 0) 30000 else m
         val beginTime = System.currentTimeMillis()
         var sc = 0
