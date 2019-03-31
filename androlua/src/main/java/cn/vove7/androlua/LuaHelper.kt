@@ -13,12 +13,10 @@ import cn.vove7.common.MessageException
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.executor.OnPrint
+import cn.vove7.common.interfaces.ScriptEngine
 import cn.vove7.vtp.log.Vog
-import com.luajava.JavaFunction
-import com.luajava.LuaException
-import com.luajava.LuaState
+import com.luajava.*
 import com.luajava.LuaState.LUA_GCSTOP
-import com.luajava.LuaStateFactory
 import dalvik.system.DexClassLoader
 import java.io.IOException
 import java.util.*
@@ -32,7 +30,7 @@ import kotlin.collections.HashSet
  *
  * Created by Vove on 2018/7/30
  */
-class LuaHelper : LuaManagerI {
+class LuaHelper : LuaManagerI, ScriptEngine {
     private val context: Context
 
     constructor(context: Context) {
@@ -120,6 +118,7 @@ class LuaHelper : LuaManagerI {
 
         L.setGlobal("luaman")
         L.getGlobal("luaman")
+
         L.pushContext(context)
         //L.setGlobal("app");
 
@@ -140,11 +139,8 @@ class LuaHelper : LuaManagerI {
         L.setField(-2, "cpath")
         L.pop(1)
 
-//        L.getGlobal("require")
-//        L.pushString("bridges")
-//        L.call(1, 0)
-        LuaPrinter(L, object : OnPrint {
 
+        LuaPrinter(L, object : OnPrint {
             override fun onPrint(l: Int, output: String?) {
                 notifyOutput(l, output)
             }
@@ -187,14 +183,6 @@ class LuaHelper : LuaManagerI {
         notifyOutput(l, msg)
     }
 
-    internal fun safeEvalLua(src: String) {
-        try {
-            evalString(src)
-        } catch (e: LuaException) {
-            GlobalLog.err(e)
-            Vog.d("safeEvalLua  ----> " + e.message)
-        }
-    }
 
     private fun notifyOutput(l: Int, o: String?) {
         synchronized(printList) {
@@ -214,25 +202,38 @@ class LuaHelper : LuaManagerI {
         return L.LloadFile(fileName)
     }
 
-    fun evalString(src: String, args: Array<*>? = null) {
-        var r = 1
-        if (loadString(src).also { r = it } == 0) {
-            if (args != null)
-                loadAfterExec(args)
+    override fun evalString(script: String, args: Array<*>?) {
+        val r = loadString(script)
+        if (r == 0) {
+            setArgs(args)
+            exec(args?.size ?: 0)
         } else
             checkErr(r)
     }
 
-    private fun loadAfterExec(args: Array<*>) {
+
+    override fun evalString(script: String, argMap: Map<String, Any>?) {
+        evalFile(script, arrayOf(argMap))
+    }
+
+    override fun evalFile(file: String, argMap: Map<String, Any>?) {
+        evalFile(file, arrayOf(argMap))
+    }
+
+    private fun setArgs(args: Array<*>?) {
         L.getGlobal("debug")
         L.getField(-1, "traceback")
         L.remove(-2)
         L.insert(-2)
-        val l = args.size
+
+        args ?: return
         for (arg in args) {
             L.pushObjectValue(arg)
         }
-        val ok = L.pcall(l, 0, -2 - l)
+    }
+
+    private fun exec(argSize: Int) {
+        val ok = L.pcall(argSize, 0, -2 - argSize)
         if (ok == 0) {
             return
         } else {//载入参数错误
@@ -242,10 +243,7 @@ class LuaHelper : LuaManagerI {
 
     fun checkErr(r: Int): String {
         val e = errorReason(r) + ": " + L.toString(-1)
-//        var end = e.indexOf("stack traceback:")//隐藏stack traceback
-//        if (end == -1) end = e.length
-//        Vog.e("checkErr ---> $e")
-//        e = e.substring(0, end)
+
         if (e.contains("java.lang.UnsupportedOperationException") ||
                 e.contains("java.lang.InterruptedException")) {
             handleMessage(OnPrint.WARN, "强制终止\n")
@@ -268,20 +266,21 @@ class LuaHelper : LuaManagerI {
         Vog.d("autoRun  ----> $s")
         when {
             Pattern.matches("^\\w+$", s) -> execFromAsset("$s.lua", args)
-            Pattern.matches("^[\\w._/]+$", s) -> execFromFile(s, args)
+            Pattern.matches("^[\\w._/]+$", s) -> evalFile(s, args)
             else -> evalString(s, args)
         }
     }
 
-    fun execFromFile(filePath: String, args: Array<Any>) {
+    override fun evalFile(filePath: String, args: Array<*>?) {
         var r = 1
         if (loadFile(filePath).also { r = it } == 0) {
-            loadAfterExec(args)
+            setArgs(args)
+            exec(args?.size ?: 0)
         } else
             checkErr(r)
     }
 
-    fun execFromAsset(name: String, args: Array<Any>) {
+    fun execFromAsset(name: String, args: Array<Any>? = null) {
         val bytes: ByteArray
         try {
             bytes = LuaUtil.readAsset(context, name)
@@ -293,7 +292,8 @@ class LuaHelper : LuaManagerI {
         L.top = 0
         val ok = L.LloadBuffer(bytes, name)
         if (ok == 0) {
-            loadAfterExec(args)
+            setArgs(args)
+            exec(args?.size ?: 0)
         } else checkErr(ok)
     }
 

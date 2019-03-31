@@ -34,7 +34,7 @@ class ExecutorEngine : ExecutorImpl() {
         }
         val sc = RegUtils.replaceRhinoHeader(script)
         return try {
-            rhinoHelper?.evalString(sc, *(args ?: arrayOf()))
+            rhinoHelper?.evalString(sc, args)
             RhinoApi.doLog("主线程执行完毕\n")
             PartialResult.success()
         } catch (we: MessageException) {

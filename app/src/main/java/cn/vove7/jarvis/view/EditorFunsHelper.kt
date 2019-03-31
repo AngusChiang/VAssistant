@@ -102,6 +102,7 @@ class EditorFunsHelper(
                         , ApiFunction("getAsPc(url, json)", "模拟Pc发起get请求, 参数:(url [params:Map])", insertText = "http.getAsPc()")
                 )),
                 ApiCategory("全局", listOf(
+                        ApiFunction("requireAccessibility()", "标志需要无障碍服务，未开启时将终止脚本执行"),
                         ApiFunction("waitForId(id,m)", "等待指定视图id的出现，m:等待时长,返回ViewNode")
                         , ApiFunction("waitForDesc(desc,m)", "等待desc出现,返回ViewNode")
                         , ApiFunction("waitForText(text,m)", "等待text出现,返回ViewNode")

@@ -91,7 +91,6 @@ public class LuaTable<K, V> extends LuaObject implements Map<K, V> {
 
     @Override
     public boolean isEmpty() {
-        // TODO: Implement this method
         push();
         L.pushNil();
         boolean b = L.next(-2) == 0;
@@ -121,7 +120,6 @@ public class LuaTable<K, V> extends LuaObject implements Map<K, V> {
 
     @Override
     public V put(K key, V value) {
-        // TODO: Implement this method
         push();
         try {
             L.pushObjectValue(key);
@@ -133,14 +131,21 @@ public class LuaTable<K, V> extends LuaObject implements Map<K, V> {
         return null;
     }
 
+
     @Override
     public void putAll(Map p1) {
-        // TODO: Implement this method
+
+    }
+
+    public void putMap(Map<K, V> p1) {
+        if (p1 == null) return;
+        for (K k : p1.keySet()) {
+            put(k, p1.get(k));
+        }
     }
 
     @Override
     public V remove(Object key) {
-        // TODO: Implement this method
         push();
         try {
             L.pushObjectValue(key);

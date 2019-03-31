@@ -339,29 +339,32 @@ abstract class CodeEditorActivity : AppCompatActivity() {
     }
 
     companion object {
-        val commonSymbols = listOf(Symbol("("),
-                Symbol(")"), Symbol("<"),
-                Symbol(">"), Symbol("{"),
-                Symbol("}"), Symbol("["), Symbol("]"),
-                Symbol("\""), Symbol("'"), Symbol("/"),
-                Symbol("|"), Symbol("+"),
-                Symbol("-"), Symbol("\\"), Symbol("*"), Symbol("?"),
-                Symbol("&"), Symbol("="), Symbol("%"), Symbol("")
-        )
+        private val commonSymbols
+            get() = listOf(Symbol("("),
+                    Symbol(")"), Symbol("<"),
+                    Symbol(">"), Symbol("{"),
+                    Symbol("}"), Symbol("["), Symbol("]"),
+                    Symbol("\""), Symbol("'"), Symbol("/"),
+                    Symbol("|"), Symbol("+"),
+                    Symbol("-"), Symbol("\\"), Symbol("*"), Symbol("?"),
+                    Symbol("&"), Symbol("="), Symbol("%"), Symbol("")
+            )
 
-        val jsSymbols = mutableListOf(
-                Symbol("🚩", "require 'accessibility'\n"),
-                Symbol("⇥", "  "),
-                Symbol("fun", "function () {\n  \n}\n"),
-                Symbol("!")
-        ).also { it.addAll(commonSymbols) }
-        val luaSymbols = mutableListOf(
-                Symbol("🚩", "require 'accessibility'\n"),
-                Symbol("⇥", "  "),
-                Symbol("fun", "function ()\n  \nend\n"),
-                Symbol("not"), Symbol("end"), Symbol("then"),
-                Symbol("#")
-        ).also { it.addAll(commonSymbols) }
+        val jsSymbols
+            get() = mutableListOf(
+                    Symbol("🚩", "requireAccessibility()\n"),
+                    Symbol("⇥", "  "),
+                    Symbol("fun", "function () {\n  \n}\n"),
+                    Symbol("!")
+            ).also { it.addAll(commonSymbols) }
+        val luaSymbols
+            get() = mutableListOf(
+                    Symbol("🚩", "requireAccessibility()\n"),
+                    Symbol("⇥", "  "),
+                    Symbol("fun", "function ()\n  \nend\n"),
+                    Symbol("not"), Symbol("end"), Symbol("then"),
+                    Symbol("#")
+            ).also { it.addAll(commonSymbols) }
     }
 
     class Symbol(

@@ -22,6 +22,7 @@ function notifyFailed(s)
     executor.executeFailed(s)
 end
 
+
 function log(msg)
     luaman.log(msg)
 end
@@ -29,7 +30,6 @@ end
 require 'utils'
 require 'executor'
 require 'view_op'
-require 'system'
 require 'global_op'
 require 'storages'
 require 'settings'

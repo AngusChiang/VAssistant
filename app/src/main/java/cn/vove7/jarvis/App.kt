@@ -16,7 +16,6 @@ import cn.vove7.jarvis.receivers.AppInstallReceiver
 import cn.vove7.jarvis.receivers.PowerEventReceiver
 import cn.vove7.jarvis.receivers.ScreenStatusListener
 import cn.vove7.jarvis.receivers.UtilEventReceiver
-import cn.vove7.jarvis.services.AssistSessionService
 import cn.vove7.jarvis.services.MainService
 import cn.vove7.jarvis.tools.AppConfig
 import cn.vove7.jarvis.tools.AppNotification
@@ -25,7 +24,6 @@ import cn.vove7.jarvis.tools.ShortcutUtil
 import cn.vove7.jarvis.view.openAccessibilityServiceAuto
 import cn.vove7.vtp.log.Vog
 import io.github.kbiakov.codeview.classifier.CodeProcessor
-import java.util.concurrent.Executor
 
 
 class App : GlobalApp() {
@@ -45,7 +43,7 @@ class App : GlobalApp() {
 
         runOnNewHandlerThread("app_load", delay = 1000) {
             if (AppConfig.FIRST_LAUNCH_NEW_VERSION || BuildConfig.DEBUG)
-                LuaApp.init(this,AppConfig.FIRST_LAUNCH_NEW_VERSION)
+                LuaApp.init(this, AppConfig.FIRST_LAUNCH_NEW_VERSION)
             startServices()
             CodeProcessor.init(this@App)
             ShortcutUtil.initShortcut()
@@ -70,7 +68,6 @@ class App : GlobalApp() {
                     startService(it)
                 }
             }
-            startService(Intent(this, AssistSessionService::class.java))
         }
     }
 

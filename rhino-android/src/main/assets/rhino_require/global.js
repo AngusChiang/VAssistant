@@ -128,4 +128,7 @@ function cancelRecog() {
     AppBus.INSTANCE.post('cancel_recog')
 }
 
+function requireAccessibility(){
+    executor.requireAccessibility()
+}
 //

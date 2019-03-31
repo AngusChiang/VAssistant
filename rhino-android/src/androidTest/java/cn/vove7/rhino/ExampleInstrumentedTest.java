@@ -29,10 +29,7 @@ public class ExampleInstrumentedTest {
 
     @Test
     public void rhinoTest() {
-        Context appContext = InstrumentationRegistry.getTargetContext();
-        RhinoHelper helper = new RhinoHelper(appContext);
-        helper.execFile("/sdcard/s.js");
-
+        RhinoHelper helper = new RhinoHelper();
     }
 
 }

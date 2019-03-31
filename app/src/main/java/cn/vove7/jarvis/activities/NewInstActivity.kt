@@ -61,10 +61,9 @@ class NewInstActivity : ReturnableActivity(), View.OnClickListener {
     private var parentNode: ActionNode? = null
     private var isReedit = false
 
-    private lateinit var searchView: SearchView
     private var enterTime = 0L
 
-    lateinit var scriptTextView: EditText
+    private lateinit var scriptTextView: EditText
     private var scriptText: String? = null
         set(value) {
             field = value
@@ -103,9 +102,6 @@ class NewInstActivity : ReturnableActivity(), View.OnClickListener {
         regex_str_list.adapter = regAdapter
     }
 
-    private fun setTitle(title: String) {
-        this.title = title
-    }
 
     private fun getRegList(reg: Reg): List<String> {
         val list = mutableListOf<String>()

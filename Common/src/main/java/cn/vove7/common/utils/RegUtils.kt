@@ -76,16 +76,22 @@ object RegUtils {
         return null
     }
 
-    private const val rHeader = "require 'bridges'\nlocal args = { ... }\n"
-    private val luaHeaderReg = "require[ ]+[\"']accessibility[\"']".toRegex()
+    private const val rHeader = "require 'bridges'\n" +
+            "local t = {...}\n" +
+            "if t then\n" +
+            "  argMap = t[1]\n" +
+            "else\n" +
+            "  argMap = nil\n" +
+            "end\n"
+
+    //todo 弃用
+//    private val luaHeaderReg = "require[ ]+[\"']accessibility[\"']".toRegex()
 
     /**
      * 替换Lua 无障碍声明头部
      */
     fun replaceLuaHeader(s: String): String {
-        return (rHeader + s.replace(luaHeaderReg,
-                "if (not accessibility()) then return end")
-                ).also {
+        return (rHeader + s).also {
             //            print(it)
             Vog.d(it)
         }
@@ -95,14 +101,7 @@ object RegUtils {
      * Rhino 无障碍声明头部
      */
     fun replaceRhinoHeader(s: String): String {
-        var newS =
-            s.replace(luaHeaderReg,
-                    "if (accessibility()) {\n")
-        if (newS != s) {
-            newS += "\n}"
-        }
-        Vog.d(newS)
-        return newS
+        return s
     }
 
     val PACKAGE_REGEX = "[a-zA-Z]+[0-9a-zA-Z_]*(\\.[a-zA-Z]+[0-9a-zA-Z_]*)+".toRegex()
@@ -112,7 +111,7 @@ object RegUtils {
      * @param s String
      * @return Boolean
      */
-    fun isPackage(s:String) :Boolean{
+    fun isPackage(s: String): Boolean {
         return PACKAGE_REGEX.matches(s)
     }
 }

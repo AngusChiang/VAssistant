@@ -40,7 +40,7 @@ interface VApi {
                 "gesture()", "scrollDown()", "scrollUp()", "screenShot()"
                 , "notifyFailed()",
                 "waitForApp()", "waitForId()",
-                "waitForDesc()"
+                "waitForDesc()", "requireAccessibility()"
         )
         val JS_OPERATORS = charArrayOf('(', ')', '{', '}', ',', ';', '=',
                 '+', '-', '/', '*', '&', '!', '|', ':', '[', ']', '<', '>', '?', '~', '%', '^')
