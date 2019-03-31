@@ -88,13 +88,6 @@ public class Action implements Comparable<Action>, Serializable {
     private
     ActionParam param;
     /**
-     * 请求结果
-     */
-    @Transient
-    @Expose(serialize = false)
-    private
-    Boolean responseResult = true;
-    /**
      * 返回数据
      */
     @Expose(serialize = false)
@@ -161,14 +154,6 @@ public class Action implements Comparable<Action>, Serializable {
         this.param = param;
     }
 
-    public Bundle getResponseBundle() {
-        return responseBundle;
-    }
-
-    public void setResponseBundle(Bundle responseBundle) {
-        this.responseBundle = responseBundle;
-    }
-
     @Override
     public int compareTo(@NonNull Action o) {
         return priority - o.priority;
@@ -214,10 +199,6 @@ public class Action implements Comparable<Action>, Serializable {
         this.actionScript = actionScript;
     }
 
-    public Boolean getResponseResult() {
-        return this.responseResult;
-    }
-
     @Override
     public String toString() {
         return "{" +
@@ -226,7 +207,4 @@ public class Action implements Comparable<Action>, Serializable {
                 '}';
     }
 
-    public void setResponseResult(Boolean responseResult) {
-        this.responseResult = responseResult;
-    }
 }
