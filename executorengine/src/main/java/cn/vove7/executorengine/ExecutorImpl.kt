@@ -15,7 +15,6 @@ import cn.vove7.common.datamanager.executor.entity.MarkedData
 import cn.vove7.common.datamanager.executor.entity.MarkedData.MARKED_TYPE_SCRIPT_JS
 import cn.vove7.common.datamanager.executor.entity.MarkedData.MARKED_TYPE_SCRIPT_LUA
 import cn.vove7.common.datamanager.greendao.MarkedDataDao
-import cn.vove7.common.datamanager.parse.DataFrom
 import cn.vove7.common.datamanager.parse.model.Action
 import cn.vove7.common.datamanager.parse.model.Action.SCRIPT_TYPE_JS
 import cn.vove7.common.datamanager.parse.model.Action.SCRIPT_TYPE_LUA
@@ -25,12 +24,10 @@ import cn.vove7.common.executor.CExecutorI
 import cn.vove7.common.executor.CExecutorI.Companion.DEBUG_SCRIPT
 import cn.vove7.common.executor.PartialResult
 import cn.vove7.common.helper.AdvanAppHelper
-import cn.vove7.common.helper.AdvanContactHelper
 import cn.vove7.common.helper.startable
 import cn.vove7.common.model.MatchedData
 import cn.vove7.common.model.RequestPermission
 import cn.vove7.common.utils.*
-import cn.vove7.common.utils.ThreadPool.runOnPool
 import cn.vove7.common.view.finder.ViewFindBuilder
 import cn.vove7.common.view.notifier.ActivityShowListener
 import cn.vove7.executorengine.model.ActionParseResult
@@ -59,7 +56,7 @@ open class ExecutorImpl(
 ) : CExecutorI, Closeable {
 
     private val systemBridge = SystemBridge
-    val accessApi: AccessibilityApi?
+    private val accessApi: AccessibilityApi?
         get() = AccessibilityApi.accessibilityService
     private var lock = Object()
     var currentAction: Action? = null
@@ -672,35 +669,6 @@ open class ExecutorImpl(
      */
     fun goHome(): Boolean = GlobalActionExecutor.home()
 
-    /**
-     * 拨打
-     */
-    fun smartCallPhone(s: String): Boolean {//todo 脚本内实现
-        Vog.d("smartCallPhone $s")
-        val result = systemBridge.call(s)
-        return if (!result) {
-            if (!alert("未识别该联系人", "选择是否标记该联系人: $s")) {
-                return false
-            }
-            //标识联系人
-            val choiceData =
-                waitForSingleChoice("选择要标识的联系人", AdvanContactHelper.getChoiceData())
-            if (choiceData != null) {
-                //开启线程
-                runOnPool {
-                    //保存标记
-//                    val data = choiceData.originalData as ContactInfo
-                    val marked = MarkedData(s, MarkedData.MARKED_TYPE_CONTACT, s, choiceData.subtitle, DataFrom.FROM_USER)
-                    AdvanContactHelper.addMark(marked)
-                }
-                val sss = systemBridge.call(choiceData.subtitle!!)
-                sss
-            } else {
-                false
-            }
-        } else true
-    }
-
     override fun setScreenSize(width: Int, height: Int) {
         ScreenAdapter.setScreenSize(width, height)
     }
@@ -737,8 +705,4 @@ open class ExecutorImpl(
 
 }
 
-private fun <K, V> HashMap<K, V>.getAndRemove(k:K): V? {
-    return get(k)?.also {
-        remove(k)
-    }
-}
+

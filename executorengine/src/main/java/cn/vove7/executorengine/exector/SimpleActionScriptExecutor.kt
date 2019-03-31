@@ -5,7 +5,11 @@ import android.os.Build
 import cn.vove7.common.bridges.GlobalActionExecutor
 import cn.vove7.common.bridges.ServiceBridge
 import cn.vove7.common.bridges.SystemBridge
+import cn.vove7.common.datamanager.executor.entity.MarkedData
+import cn.vove7.common.datamanager.parse.DataFrom
 import cn.vove7.common.executor.PartialResult
+import cn.vove7.common.helper.AdvanContactHelper
+import cn.vove7.common.utils.ThreadPool
 import cn.vove7.executorengine.ExecutorImpl
 import cn.vove7.vtp.log.Vog
 import java.util.*
@@ -90,7 +94,7 @@ class SimpleActionScriptExecutor(
                 }
                 cmd.substring(0, mResult.groups[1]?.range?.first ?: cmd.length)
             } else {
-                ps = action.param?.value?.toMutableList()?: mutableListOf()
+                ps = action.param?.value?.toMutableList() ?: mutableListOf()
                 cmd
             }
         Vog.d("执行 - $c $ps")
@@ -143,6 +147,7 @@ class SimpleActionScriptExecutor(
                 else PartialResult.fatal("参数数量应为5")
             }
         }
+
 
         /**
          * 操作View
@@ -355,6 +360,37 @@ class SimpleActionScriptExecutor(
             }
         } else return PartialResult(false)
     }
+
+
+    /**
+     * 拨打
+     */
+    fun smartCallPhone(s: String): Boolean {//todo 脚本内实现
+        Vog.d("smartCallPhone $s")
+        val result = SystemBridge.call(s)
+        return if (!result) {
+            if (!alert("未识别该联系人", "选择是否标记该联系人: $s")) {
+                return false
+            }
+            //标识联系人
+            val choiceData =
+                waitForSingleChoice("选择要标识的联系人", AdvanContactHelper.getChoiceData())
+            if (choiceData != null) {
+                //开启线程
+                ThreadPool.runOnPool {
+                    //保存标记
+//                    val data = choiceData.originalData as ContactInfo
+                    val marked = MarkedData(s, MarkedData.MARKED_TYPE_CONTACT, s, choiceData.subtitle, DataFrom.FROM_USER)
+                    AdvanContactHelper.addMark(marked)
+                }
+                val sss = SystemBridge.call(choiceData.subtitle!!)
+                sss
+            } else {
+                false
+            }
+        } else true
+    }
+
 
     /**
      * 根据最后一位参数判断是否 需要失败终止

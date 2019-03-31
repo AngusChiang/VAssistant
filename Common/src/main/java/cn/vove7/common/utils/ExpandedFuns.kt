@@ -334,3 +334,9 @@ operator fun String.times(number: Int): String {
         }
     }
 }
+
+fun <K, V> HashMap<K, V>.getAndRemove(k:K): V? {
+    return get(k)?.also {
+        remove(k)
+    }
+}
