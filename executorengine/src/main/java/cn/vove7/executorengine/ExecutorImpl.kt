@@ -174,8 +174,7 @@ open class ExecutorImpl(
 
                     actionScope = this.actionScopeType
                     Vog.d("pollActionQueue ---> $actionScope")
-                    r = runScript(this.actionScript, this.param.valueWithClear
-                        ?: arrayOf())// 清除参数缓存
+                    r = runScript(this.actionScript, this.param)// 清除参数缓存
                     when {
                         r.needTerminal -> {//出错
                             currentAction = null
@@ -195,25 +194,25 @@ open class ExecutorImpl(
         return !userInterrupt
     }
 
-    override fun runScript(script: String, args: Array<String>?): PartialResult {
-        Vog.d("runScript arg : ${Arrays.toString(args)}")
+    override fun runScript(script: String, argMap: Map<String, Any?>?): PartialResult {
+        Vog.d("runScript arg : $argMap")
         return when (currentAction?.scriptType) {
             SCRIPT_TYPE_LUA -> {
-                onLuaExec(script, args)
+                onLuaExec(script, argMap)
             }
             SCRIPT_TYPE_JS -> {
-                onRhinoExec(script, args)
+                onRhinoExec(script, argMap)
             }
             else ->
                 PartialResult.fatal("未知脚本类型: " + currentAction?.scriptType)
         }
     }
 
-    open fun onLuaExec(script: String, args: Array<String>? = null): PartialResult {
+    open fun onLuaExec(script: String, argMap: Map<String, Any?>?): PartialResult {
         return PartialResult.fatal("not implement onLuaExec")
     }
 
-    open fun onRhinoExec(script: String, arg: Array<String>? = null): PartialResult {
+    open fun onRhinoExec(script: String, argMap: Map<String, Any?>?): PartialResult {
         return PartialResult.fatal("not implement onRhinoExec")
     }
 
@@ -253,21 +252,21 @@ open class ExecutorImpl(
     }
 
     /**
-     * @param cmd String 包名 应用名 标记功能
+     * @param data String 包名 应用名 标记功能
      * 同时负责解析应用内跟随操作
      * 往往: 打开网易云 | 打开QQ扫一扫 | 酷安下载微信
      *
      * @return Boolean 是否解析成功
      */
-    override fun smartOpen(cmd: String): Boolean {
-        Vog.d("smartOpen: $cmd")
+    override fun smartOpen(data: String): Boolean {
+        Vog.d("smartOpen: $data")
         //包名
-        if (RegUtils.isPackage(cmd)) {//包名
-            return systemBridge.openAppByPkg(cmd).also {
+        if (RegUtils.isPackage(data)) {//包名
+            return systemBridge.openAppByPkg(data).also {
                 if (!it) GlobalApp.toastError(R.string.text_app_not_install)
             }
         }
-        val pkg = SystemBridge.getPkgByName(cmd)
+        val pkg = SystemBridge.getPkgByName(data)
         if (pkg != null) {
             SystemBridge.openAppByPkg(pkg)
             return true
@@ -277,15 +276,15 @@ open class ExecutorImpl(
         //解析应用内操作
 
         //先解析名称
-        val o = parseAppInCommand(cmd)
+        val o = parseAppInCommand(data)
         return if (o != null) {
             //执行
-            execQueue(cmd, o.actionQueue)
+            execQueue(data, o.actionQueue)
             true
         } else {
             //检查标记功能
             commandType = 1
-            parseOpenOrCloseAction(cmd)
+            parseOpenOrCloseAction(data)
         }
     }
 

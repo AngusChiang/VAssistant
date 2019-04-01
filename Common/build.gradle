@@ -75,6 +75,7 @@ dependencies {
 
     api 'com.github.GrenderG:Toasty:1.4.1'
 
+    api 'com.github.Vove7:ParamRegexEngine:0.0.3'
 }
 
 

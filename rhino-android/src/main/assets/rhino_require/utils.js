@@ -14,6 +14,9 @@ function matches(s,regex){
 function matchValues(s,regex){
     return TextHelper.INSTANCE.matchValues(s,regex)
 }
+function matchParam(s,regex){
+    return TextHelper.INSTANCE.matchParam(s,regex)
+}
 function arr2String(arr){
     return TextHelper.INSTANCE.arr2String(arr,', ')
 }

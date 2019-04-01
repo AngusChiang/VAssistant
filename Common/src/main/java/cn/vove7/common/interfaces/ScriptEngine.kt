@@ -12,13 +12,13 @@ interface ScriptEngine {
     fun evalString(script: String, args: Array<*>? = null)
 
     @Throws(Exception::class)
-    fun evalString(script: String, argMap: Map<String, Any>? = null)
+    fun evalString(script: String, argMap: Map<String, *>? = null)
 
     @Throws(Exception::class)
     fun evalFile(file: String, args: Array<*>? = null)
 
     @Throws(Exception::class)
-    fun evalFile(file: String, argMap: Map<String, Any>? = null)
+    fun evalFile(file: String, argMap: Map<String, *>? = null)
 
     fun stop()
 

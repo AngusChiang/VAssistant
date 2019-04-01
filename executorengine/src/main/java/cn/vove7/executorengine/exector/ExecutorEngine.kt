@@ -3,7 +3,6 @@ package cn.vove7.executorengine.exector
 import cn.vove7.androlua.LuaHelper
 import cn.vove7.common.BridgeManager
 import cn.vove7.common.MessageException
-import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.bridges.GlobalActionExecutor
 import cn.vove7.common.bridges.SystemBridge
@@ -27,14 +26,14 @@ class ExecutorEngine : ExecutorImpl() {
 
     private var rhinoHelper: RhinoHelper? = null
 
-    override fun onRhinoExec(script: String, args: Array<String>?): PartialResult {
+    override fun onRhinoExec(script: String, argMap: Map<String, Any?>?): PartialResult {
         rhinoHelper?.stop()
         if (currentActionIndex <= 1) {
             rhinoHelper = RhinoHelper(bridgeManager)
         }
         val sc = RegUtils.replaceRhinoHeader(script)
         return try {
-            rhinoHelper?.evalString(sc, args)
+            rhinoHelper?.evalString(sc, argMap)
             RhinoApi.doLog("主线程执行完毕\n")
             PartialResult.success()
         } catch (we: MessageException) {
@@ -44,9 +43,9 @@ class ExecutorEngine : ExecutorImpl() {
     }
 
     //didn't work fixme
-    fun runActionSilent(action: Action, args: Array<String>? = null) {//静默
+    fun runActionSilent(action: Action, argMap: Map<String, Any?>?) {//静默
         currentAction = action
-        runScript(action.actionScript, args)
+        runScript(action.actionScript, argMap)
     }
 
     /**
@@ -55,16 +54,16 @@ class ExecutorEngine : ExecutorImpl() {
     private var luaHelper: LuaHelper? = null
 
     //可提取ExecutorHelper 接口 handleMessage
-    override fun onLuaExec(script: String, args: Array<String>?): PartialResult {
+    override fun onLuaExec(script: String, argMap: Map<String, Any?>?): PartialResult {
 //        if (currentActionIndex <= 1) {//fixme ?????
         luaHelper = LuaHelper(context, bridgeManager)
 //        }
         val newScript = RegUtils.replaceLuaHeader(script)
         return try {
-            luaHelper?.evalString(newScript, args)
+            luaHelper?.evalString(newScript, argMap)
             luaHelper?.handleMessage(OnPrint.INFO, "主线程执行完毕\n")
-            PartialResult.success()
 
+            PartialResult.success()
         } catch (me: MessageException) {//异常消息
             PartialResult.fatal(me.message)
         } catch (e: Throwable) {

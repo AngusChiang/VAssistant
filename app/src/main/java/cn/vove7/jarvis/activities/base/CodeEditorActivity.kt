@@ -19,7 +19,6 @@ import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.appbus.AppBus
 import cn.vove7.common.bridges.SystemBridge
 import cn.vove7.common.datamanager.parse.model.Action
-import cn.vove7.common.datamanager.parse.model.ActionParam
 import cn.vove7.common.executor.OnPrint
 import cn.vove7.common.interfaces.CodeEditorOperation
 import cn.vove7.common.view.editor.MultiSpan
@@ -78,7 +77,7 @@ abstract class CodeEditorActivity : AppCompatActivity() {
 
     var print: OnPrint = MyPrinter()
 
-    var runArgs: String? = null
+    private var runArgs: String? = null
 
     var loaded = false
     override fun onStart() {
@@ -162,8 +161,7 @@ abstract class CodeEditorActivity : AppCompatActivity() {
             R.id.menu_code_run -> {
                 clearLog()
                 val ac = Action(editorText, scriptType)
-                ac.param = ActionParam()
-                ac.param.value = runArgs?.split(',')?.toTypedArray()
+                ac.param = parseSimpleMap(runArgs)
                 AppBus.post(ac)
             }
             R.id.menu_api_doc -> {
@@ -172,7 +170,7 @@ abstract class CodeEditorActivity : AppCompatActivity() {
             R.id.menu_set_arg -> {
                 MaterialDialog(this)
                         .title(text = "设置参数")
-                        .input(prefill = runArgs, hint = "多参数可以以英文','分隔") { _, charSequence ->
+                        .input(prefill = runArgs, hint = "例如：n : 1234, k : sss") { _, charSequence ->
                             runArgs = charSequence.toString()
                             GlobalApp.toastInfo("参数已设置")
                         }.positiveButton()
@@ -365,10 +363,25 @@ abstract class CodeEditorActivity : AppCompatActivity() {
                     Symbol("not"), Symbol("end"), Symbol("then"),
                     Symbol("#")
             ).also { it.addAll(commonSymbols) }
+
+        fun parseSimpleMap(s: String?): Map<String, Any> {
+            s ?: return hashMapOf()
+            val ss = s.trim()
+
+            return ss.split(',').let {
+                mutableMapOf<String, Any>().apply {
+                    it.forEach {
+                        val ss = it.split(":")
+                        put(ss[0].trim(), ss[1].trim())
+                    }
+                }
+            }
+        }
     }
 
     class Symbol(
             val show: String,
             val fillText: String = show
     )
+
 }

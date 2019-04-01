@@ -13,8 +13,6 @@ interface DataFrom {
         const val FROM_SHARED = "from_shared"
         const val FROM_SERVER = "from_server"
 
-//        fun userCanEdit(from: String?): Boolean = from == DataFrom.FROM_USER
-
         fun translate(from: String?): String {
             return when (from) {
                 FROM_SERVER -> "服务"

@@ -564,7 +564,7 @@ class InstDetailActivity : AppCompatActivity() {
         var p: ActionNode? = node
         val execQueue = mutableListOf<ActionNode>()
         while (p != null) {
-            p.action.param.value = null
+            p.action.param = null
             execQueue.add(0, p)
             p = p.parent
         }

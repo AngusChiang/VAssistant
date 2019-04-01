@@ -13,8 +13,8 @@ import org.greenrobot.greendao.annotation.Transient;
 
 import java.io.Serializable;
 
-import cn.vove7.common.app.GlobalLog;
 import cn.vove7.common.utils.RegUtils;
+import cn.vove7.regEngine.ParamRegex;
 import kotlin.text.Regex;
 
 /**
@@ -34,27 +34,21 @@ public class Reg implements Serializable {
      */
     @NotNull
     private String regStr;
-    /**
-     * 数组 分隔 ','
-     */
-    private String paramPos = null;// String.valueOf(PARAM_NO);
 
     @Transient
     @Expose(serialize = false)
-    private Regex regex;
+    private ParamRegex regex;
     private long nodeId;
 
     @Keep
-    public Reg(String regStr, int paramPos, long nodeId) {
+    public Reg(String regStr, long nodeId) {
         this.regStr = regStr;
-        this.paramPos = String.valueOf(paramPos);
         this.nodeId = nodeId;
     }
 
     @Keep
-    public Reg(String regStr, String paramPos) {//Test need
+    public Reg(String regStr) {//Test need
         this.regStr = regStr;
-        this.paramPos = paramPos;
     }
 
     @NonNull
@@ -66,49 +60,44 @@ public class Reg implements Serializable {
     @Keep
     private void buildRegex() {
         //结尾加上% ， 防止有[后续节点操作]匹配失败
-        String s = (!regStr.endsWith("%") ? regStr + "%" : regStr)
-                .replace("%", RegUtils.INSTANCE.getREG_ALL_CHAR())
-                .replace("#", RegUtils.INSTANCE.getREG_NUMBER_CHAR());
-        regex = new Regex(s);
+        String s = (!regStr.endsWith("%") ? regStr + "%" : regStr);
+        regex = new ParamRegex(s);
     }
 
     public Reg() {
     }
 
+    @Generated(hash = 1232803860)
+    public Reg(Long id, @NotNull String regStr, long nodeId) {
+        this.id = id;
+        this.regStr = regStr;
+        this.nodeId = nodeId;
+    }
+
     @Keep
-    public Regex getRegex() {
+    public ParamRegex getRegex() {
         if (regex == null)
             buildRegex();
         return regex;
     }
 
     @Keep
-    public Regex getFollowRegex() {
+    public ParamRegex getFollowRegex() {
         //头部加上% ， 防止有前参数匹配失败
-        String s = (!regStr.startsWith("%") ? "[\\S\\s]*?" + regStr : regStr);
+        String s = (!regStr.startsWith("%") ? ("%" + regStr) : regStr);
 
         //尾部
-        s = (!s.endsWith("%") ? s + "%" : s)
-                .replace("%", RegUtils.INSTANCE.getREG_ALL_CHAR())
-                .replace("#", RegUtils.INSTANCE.getREG_NUMBER_CHAR());
+        s = !s.endsWith("%") ? (s + "%") : s;
 
-        regex = new Regex(s);
+        regex = new ParamRegex(s);
         return regex;
     }
 
-    public void setRegex(Regex regex) {
+    public void setRegex(ParamRegex regex) {
         this.regex = regex;
     }
 
-
-    @Generated(hash = 1266605423)
-    public Reg(Long id, @NotNull String regStr, String paramPos, long nodeId) {
-        this.id = id;
-        this.regStr = regStr;
-        this.paramPos = paramPos;
-        this.nodeId = nodeId;
-    }
-
+    
     public Long getId() {
         return this.id;
     }
@@ -123,37 +112,6 @@ public class Reg implements Serializable {
 
     public void setRegStr(String regStr) {
         this.regStr = regStr;
-    }
-
-    @Transient
-    @Expose(serialize = false)
-    private Integer[] paramPosArr;
-
-    public String getParamPos() {
-        return paramPos;
-    }
-
-    public Integer[] getParamPosArray() {
-        if (paramPosArr != null) return paramPosArr;
-        if (this.paramPos == null) return new Integer[0];
-        String[] ss = this.paramPos.split(",");
-        if (ss.length == 1 && ss[0].equals("")) return new Integer[0];;
-
-        paramPosArr = new Integer[ss.length];
-        try {
-            int i = 0;
-            for (String s : ss) {
-                paramPosArr[i++] = Integer.parseInt(s);
-            }
-            return paramPosArr;
-        } catch (NumberFormatException e) {
-            GlobalLog.INSTANCE.err(e);
-            return null;
-        }
-    }
-
-    public void setParamPos(String paramPos) {
-        this.paramPos = paramPos;
     }
 
     public long getNodeId() {

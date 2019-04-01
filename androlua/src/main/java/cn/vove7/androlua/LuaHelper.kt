@@ -212,11 +212,11 @@ class LuaHelper : LuaManagerI, ScriptEngine {
     }
 
 
-    override fun evalString(script: String, argMap: Map<String, Any>?) {
-        evalFile(script, arrayOf(argMap))
+    override fun evalString(script: String, argMap: Map<String, *>?) {
+        evalString(script, arrayOf(argMap))
     }
 
-    override fun evalFile(file: String, argMap: Map<String, Any>?) {
+    override fun evalFile(file: String, argMap: Map<String, *>?) {
         evalFile(file, arrayOf(argMap))
     }
 

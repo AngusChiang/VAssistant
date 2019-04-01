@@ -2,6 +2,7 @@ package cn.vove7.common.utils
 
 import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.datamanager.model.InstSettingInfo
+import cn.vove7.regEngine.toParamRegex
 import cn.vove7.vtp.log.Vog
 
 /**
@@ -10,43 +11,66 @@ import cn.vove7.vtp.log.Vog
  * Created by Vove on 2018/7/2
  */
 object RegUtils {
-    val REG_ALL_CHAR = "([\\S\\s]*?)"
-    val REG_NUMBER_CHAR = "([0-9零一二两三四五六七八九十百千万]*)"
+    //    val REG_ALL_CHAR = "([\\S\\s]*?)"
+    val REG_NUMBER_CHAR get() = "([0-9零一二两三四五六七八九十百千万]*)"
+    val REG_ALL_CHAR get() = "([\\S\\s]*?)"
 
-    private val confirmWords = arrayOf(
-            "确[定认]".toRegex()
-            , "好(的)?".toRegex()
-            , "可以".toRegex()
-            , "[嗯是]$REG_ALL_CHAR".toRegex()
-            , "继续$REG_ALL_CHAR".toRegex()
-            , "yes".toRegex()
-            , "ok".toRegex()
-    )
+    private val confirmWords
+        get() = arrayOf(
+                "确[定认]"
+                , "好(的)?"
+                , "可以"
+                , "[嗯是]%"
+                , "继续%"
+                , "yes"
+                , "ok"
+        )
     private val cancelWords = arrayOf(
-            "取消".toRegex()
-            , "停止".toRegex()
-            , "不好".toRegex()
-            , "不要".toRegex()
-            , "stop".toRegex()
-            , "cancel".toRegex()
+            "取消"
+            , "停止"
+            , "不好"
+            , "不要"
+            , "stop"
+            , "cancel"
     )
 
+    /**
+     * 确认命令
+     * @param word String
+     * @return Boolean
+     */
     fun checkConfirm(word: String): Boolean {
-        val word = word.toLowerCase()
-        confirmWords.forEach {
-            if (it.matches(word))
+        return check(word, confirmWords)
+    }
+
+    /**
+     * 取消命令
+     * @param word String
+     * @return Boolean
+     */
+    fun checkCancel(word: String): Boolean {
+        return check(word, cancelWords)
+    }
+
+    private fun check(w: String, arr: Array<String>): Boolean {
+        val word = w.toLowerCase()
+        arr.forEach {
+            if (it.toParamRegex().match(word) != null)
                 return true
         }
         return false
     }
 
-    fun checkCancel(word: String): Boolean {
-        cancelWords.forEach {
-            if (it.matches(word))
-                return true
-        }
-        return false
-    }
+
+    /**
+     *
+     * @param r String regex with %
+     * @return Regex
+     */
+    private val RegisterMatcher
+        get() = "settings[\\S\\s\n]*registerSettings\\([ ]*%[\\\"'](%)[\"']%settings%([0-9]*)[ ]*\\)"
+                .replace("%", "[\\S ]*?").toRegex()
+
 
     /**
      *
@@ -56,8 +80,6 @@ object RegUtils {
     fun dealRawReg(r: String): Regex = r.replace("%", REG_ALL_CHAR)
             .replace("#", TextDateParser.REG_NUMBER_CHAR).toRegex()
 
-    private val RegisterMatcher = "settings[\\S\\s\n]*registerSettings\\([ ]*%[\\\"'](%)[\"']%settings%([0-9]*)[ ]*\\)"
-            .replace("%", "[\\S ]*?").toRegex()
 
     fun getRegisterSettingsTextAndName(s: String): InstSettingInfo? {
         val r = RegisterMatcher.find(s)
@@ -77,9 +99,9 @@ object RegUtils {
     }
 
     private const val rHeader = "require 'bridges'\n" +
-            "local t = {...}\n" +
-            "if t then\n" +
-            "  argMap = t[1]\n" +
+            "local args = {...}\n" +
+            "if args then\n" +
+            "  argMap = args[1]\n" +
             "else\n" +
             "  argMap = nil\n" +
             "end\n"
@@ -91,20 +113,22 @@ object RegUtils {
      * 替换Lua 无障碍声明头部
      */
     fun replaceLuaHeader(s: String): String {
-        return (rHeader + s).also {
+        return (rHeader + s.replace(headerReg,"requireAccessibility()")).also {
             //            print(it)
             Vog.d(it)
         }
     }
 
+    private val headerReg get()= "require[ ]+[\"']accessibility[\"']".toRegex()
+
     /**
      * Rhino 无障碍声明头部
      */
     fun replaceRhinoHeader(s: String): String {
-        return s
+        return s.replace(headerReg,"requireAccessibility()")
     }
 
-    val PACKAGE_REGEX = "[a-zA-Z]+[0-9a-zA-Z_]*(\\.[a-zA-Z]+[0-9a-zA-Z_]*)+".toRegex()
+    val PACKAGE_REGEX get()= "[a-zA-Z]+[0-9a-zA-Z_]*(\\.[a-zA-Z]+[0-9a-zA-Z_]*)+".toRegex()
 
     /**
      * 是否为包名

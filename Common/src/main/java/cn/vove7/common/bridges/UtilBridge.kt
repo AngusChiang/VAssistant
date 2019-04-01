@@ -1,13 +1,17 @@
 package cn.vove7.common.bridges
 
+import android.content.Intent
 import android.graphics.Bitmap
+import android.net.Uri
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.app.GlobalLog
 import cn.vove7.vtp.log.Vog
+import com.google.gson.JsonArray
+import com.google.gson.JsonObject
+import com.google.gson.JsonParser
 import java.io.File
 import java.io.FileOutputStream
-import android.content.Intent
-import android.net.Uri
+import java.util.*
 
 
 /**
@@ -38,6 +42,58 @@ object UtilBridge {
             GlobalLog.err("bitmap2File 保存到失败")
             null
         }
+    }
+
+    /**
+     * json解析为Map
+     * @param json String?
+     * @return Map<String, Any?>?
+     */
+    fun parseJson(json: String?): Map<String, Any?>? {
+        json ?: return null
+        val jobj = JsonParser().parse(json).asJsonObject
+
+        return toMap(jobj)
+    }
+
+    /**
+     * 将JSONObjec对象转换成Map-List集合
+     * @param json
+     * @return
+     */
+    private fun toMap(json: JsonObject): Map<String, Any> {
+        val map = HashMap<String, Any>()
+        val entrySet = json.entrySet()
+        val iter = entrySet.iterator()
+        while (iter.hasNext()) {
+            val entry = iter.next()
+            val key = entry.key
+            val value = entry.value
+            map[key as String] = when (value) {
+                is JsonArray -> toList(value)
+                is JsonObject -> toMap(value)
+                else -> value
+            }
+        }
+        return map
+    }
+
+    /**
+     * 将JSONArray对象转换成List集合
+     * @param json
+     * @return
+     */
+    private fun toList(json: JsonArray): List<Any> {
+        val list = ArrayList<Any>()
+        for (i in 0 until json.size()) {
+            val value = json.get(i)
+            list.add(when (value) {
+                is JsonArray -> toList(value)
+                is JsonObject -> toMap(value)
+                else -> value
+            })
+        }
+        return list
     }
 
 }

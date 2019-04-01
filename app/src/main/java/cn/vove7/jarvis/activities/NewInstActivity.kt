@@ -6,13 +6,13 @@ import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.support.v7.widget.SearchView
 import android.support.v7.widget.Toolbar
 import android.view.KeyEvent
 import android.view.View
 import android.widget.*
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.app.GlobalLog
+import cn.vove7.common.bridges.SystemBridge
 import cn.vove7.common.datamanager.DAO
 import cn.vove7.common.datamanager.DaoHelper
 import cn.vove7.common.datamanager.greendao.ActionNodeDao
@@ -23,12 +23,10 @@ import cn.vove7.common.datamanager.parse.statusmap.ActionNode
 import cn.vove7.common.datamanager.parse.statusmap.ActionNode.NODE_SCOPE_GLOBAL
 import cn.vove7.common.datamanager.parse.statusmap.ActionNode.NODE_SCOPE_IN_APP
 import cn.vove7.common.datamanager.parse.statusmap.Reg
-import cn.vove7.common.model.UserInfo
-import cn.vove7.common.utils.TextHelper
-
 import cn.vove7.common.helper.AdvanAppHelper
-import cn.vove7.executorengine.parse.ParseEngine
+import cn.vove7.common.model.UserInfo
 import cn.vove7.executorengine.model.ActionParseResult
+import cn.vove7.executorengine.parse.ParseEngine
 import cn.vove7.jarvis.BuildConfig
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.activities.base.ReturnableActivity
@@ -40,6 +38,7 @@ import cn.vove7.vtp.log.Vog
 import cn.vove7.vtp.view.span.ColourTextClickableSpan
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.customview.customView
+import com.afollestad.materialdialogs.input.input
 import io.github.kbiakov.codeview.adapters.Options
 import kotlinx.android.synthetic.main.activity_new_inst.*
 import java.io.File
@@ -103,14 +102,6 @@ class NewInstActivity : ReturnableActivity(), View.OnClickListener {
     }
 
 
-    private fun getRegList(reg: Reg): List<String> {
-        val list = mutableListOf<String>()
-        reg.paramPosArray?.forEach {
-            list.add(posData[posArr.indexOf(it)])
-        }
-        return list
-    }
-
     private fun initData() {
         isReedit = intent.getBooleanExtra("reedit", false)
 
@@ -129,7 +120,7 @@ class NewInstActivity : ReturnableActivity(), View.OnClickListener {
                 activity_name.setText(editNode?.actionScope?.activity)
                 desc_text.setText(editNode?.actionTitle)
                 editNode?.regsWithoutCache?.forEach {
-                    regs.add(Pair(it.regStr, it.paramPosArray))
+                    regs.add(it.regStr)
                 }
             }
         } else {// 来自RemoteDebugServer
@@ -455,9 +446,9 @@ class NewInstActivity : ReturnableActivity(), View.OnClickListener {
             val actions = result.actionQueue
             while (actions?.isNotEmpty() == true) {
                 val p = actions.poll()
-                val args = p.param.value ?: arrayOf(getString(R.string.text_none))
+                val args = p.param ?: emptyMap()
                 val t = String.format(getString(R.string.text_parse_result_placeholder),
-                        p.matchWord, Arrays.toString(args)) // "匹配词: ${p.matchWord} 参数: ${p.param}\n")
+                        p.matchWord, args.toString()) // "匹配词: ${p.matchWord} 参数: ${p.param}\n")
                 val text = ColourTextClickableSpan(this, t, android.R.color.white, listener = null)
 //                Vog.d("outputParseResult $t")
                 resultOutput.append(text.spanStr)
@@ -479,8 +470,7 @@ class NewInstActivity : ReturnableActivity(), View.OnClickListener {
     //第三个
     //最后一个
 
-    private val posArr = arrayListOf(/*Reg.PARAM_NO,*/ /*Reg.PARAM_POS_0,*/ Reg.PARAM_POS_1, Reg.PARAM_POS_2, Reg.PARAM_POS_3, Reg.PARAM_POS_END)
-    private val regs = mutableListOf<Pair<String, Array<Int>>>()
+    private val regs = mutableListOf<String>()
     /**
      * 转换测试MapNode List
      * @return regs:List<Pair<String,String>> -> List<ActionNode>
@@ -505,7 +495,7 @@ class NewInstActivity : ReturnableActivity(), View.OnClickListener {
         val tregs = mutableListOf<Reg>()
         regs.forEach {
             //            val p = posArr[posData.indexOf(it.second)]
-            tregs.add(Reg(it.first, TextHelper.arr2String(it.second)))
+            tregs.add(Reg(it))
         }
         return tregs
     }
@@ -517,88 +507,50 @@ class NewInstActivity : ReturnableActivity(), View.OnClickListener {
      * @param reg String
      * @param posArr Array<Int>
      */
-    private fun add2RegexList(reg: String, posArr: Array<Int>) {
-        Vog.d("add2RegexList $reg ${Arrays.toString(posArr)}")
+    private fun add2RegexList(reg: String) {
+        Vog.d("add2RegexList $reg")
         if (editIndex > -1) {
             try {
-                regs[editIndex] = Pair(reg, posArr)
+                regs[editIndex] = reg
             } catch (e: Exception) {//index out
                 GlobalLog.err(e)
             }
             editIndex = -1
         } else {
-            regs.add(Pair(reg, posArr))
+            regs.add(reg)
         }
         regAdapter.notifyDataSetChanged()
     }
 
 
-    //    lateinit var regEditText: EditText
-//    lateinit var spinner: Spinner
     lateinit var posData: ArrayList<String>
 
-    //    private var inputDialog: Dialog? = null
-    private fun showInputRegDialog(reg: String? = null, pos: Array<Int>? = null) {
-        InstRegexEditorDialog(this, reg, pos) {
-            //on add
-            add2RegexList(it.first, it.second)
+    private fun showInputRegDialog(reg: String? = null) {
+
+        MaterialDialog(this).show {
+            input(hint = "正则式", prefill = reg) { _, t ->
+                add2RegexList(t.toString())
+            }
+            positiveButton(text = "确认")
+            negativeButton(text = "取消")
+            neutralButton(text = "帮助") { SystemBridge.openUrl("https://vove.gitee.io/2019/01/29/Customize_Instruction_Regex/") }
         }
-        //region
-//        if (inputDialog == null) {
-//            val dialogView = layoutInflater.inflate(R.layout.dialog_new_inst_regex, null)
-//
-//            regEditText = dialogView.findViewById(R.id.text_regex)
-//            spinner = dialogView.findViewById(R.id.pos_of_param_spinner)
-//
-//            //适配器
-//            val arrAdapter = ArrayAdapter<String>(this,
-//                    android.R.layout.simple_spinner_item, posData)
-//            //设置样式
-//            arrAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-//            //加载适配器
-//            spinner.adapter = arrAdapter
-//            regEditText.setText(reg)
-//            val p = if (pos != null) posData.indexOf(pos) else 0
-//            spinner.setSelection(p)
-//            inputDialog = AlertDialog.Builder(this)
-//                    .setTitle(R.string.text_add_regex)
-//                    .setView(dialogView)
-//                    .setPositiveButton("确认") { _, _ ->
-//                        val r = regEditText.text.trim().toString()
-//                        if (r == "") {
-//                            inputDialog?.hide()
-//                        } else
-//                            add2RegexList(r, posData[spinner.selectedItemPosition])
-//                    }.setNegativeButton("取消") { i, _ ->
-//                        editIndex = -1
-//                        inputDialog?.hide()
-//                    }.setOnDismissListener {
-//                        regEditText.text.clear()
-//                        editIndex = -1
-//                    }.show()
-//        } else {
-//            regEditText.setText(reg)
-//            val p = if (pos != null) posData.indexOf(pos) else 0
-//            spinner.setSelection(p)
-//            inputDialog?.show()
-//        }
-        //endregion
     }
 
-    inner class RegListAdapter(context: Context, val dataSet: MutableList<Pair<String, Array<Int>>>?)
-        : BaseListAdapter<Holder, Pair<String, Array<Int>>>(context, dataSet) {
+    inner class RegListAdapter(context: Context, val dataSet: MutableList<String>?)
+        : BaseListAdapter<Holder, String>(context, dataSet) {
 
         override fun onCreateViewHolder(view: View): Holder {
             return Holder(view)
         }
 
         override fun layoutId(position: Int): Int = R.layout.item_left_right_text
-        override fun onBindView(holder: Holder, pos: Int, item: Pair<String, Array<Int>>) {
-            holder.left.text = item.first
-            holder.right.text = Arrays.toString(item.second)
+        override fun onBindView(holder: Holder, pos: Int, item: String) {
+            holder.left.text = item
+//            holder.right.text = Arrays.toString(item.second)
             holder.itemView.setOnClickListener {
                 editIndex = pos
-                showInputRegDialog(item.first, item.second)
+                showInputRegDialog(item)
             }
             holder.itemView.setOnLongClickListener {
                 //长按删除
@@ -611,7 +563,7 @@ class NewInstActivity : ReturnableActivity(), View.OnClickListener {
 
     class Holder(itemView: View) : BaseListAdapter.ViewHolder(itemView) {
         val left = itemView.findViewById<TextView>(R.id.left_text)
-        val right = itemView.findViewById<TextView>(R.id.right_text)
+//        val right = itemView.findViewById<TextView>(R.id.right_text)
     }
 
 }

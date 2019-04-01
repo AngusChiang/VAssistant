@@ -20,6 +20,6 @@
         android:id="@+id/param_text"
         android:layout_width="100dp"
         android:layout_height="wrap_content"
-        android:hint="多个参数可以以,分隔"
+        android:hint="例如：n : 1234, k : sss"
         android:maxLines="1" />
 </LinearLayout>

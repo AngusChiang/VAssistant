@@ -8,6 +8,7 @@ import android.widget.EditText
 import android.widget.TextView
 import cn.vove7.common.datamanager.parse.statusmap.ActionNode
 import cn.vove7.jarvis.R
+import cn.vove7.jarvis.activities.base.CodeEditorActivity
 import cn.vove7.vtp.easyadapter.BaseListAdapter
 
 /**
@@ -31,7 +32,7 @@ class ExecuteQueueAdapter(context: Context, execQueue: MutableList<ActionNode>)
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 val action = item.action
-                action.param.value = s?.split(',')?.toTypedArray()
+                action.param = CodeEditorActivity.parseSimpleMap(s.toString())
             }
         })
 

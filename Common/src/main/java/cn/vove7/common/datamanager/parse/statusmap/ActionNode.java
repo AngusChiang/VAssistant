@@ -14,7 +14,9 @@ import org.greenrobot.greendao.annotation.ToOne;
 import org.greenrobot.greendao.annotation.Transient;
 
 import java.io.Serializable;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 import cn.vove7.common.datamanager.DAO;
@@ -27,7 +29,6 @@ import cn.vove7.common.datamanager.greendao.RegDao;
 import cn.vove7.common.datamanager.parse.DataFrom;
 import cn.vove7.common.datamanager.parse.model.Action;
 import cn.vove7.common.datamanager.parse.model.ActionDesc;
-import cn.vove7.common.datamanager.parse.model.ActionParam;
 import cn.vove7.common.datamanager.parse.model.ActionScope;
 import cn.vove7.common.model.UserInfo;
 import cn.vove7.vtp.log.Vog;
@@ -117,7 +118,7 @@ public class ActionNode implements Serializable, DataFrom {
     //@ToOne(joinProperty = "paramId")
     @Expose(serialize = false)
     @Transient
-    private ActionParam param;
+    private Map<String, Object> param;
     //private long paramId;
 
     /**
@@ -407,11 +408,11 @@ public class ActionNode implements Serializable, DataFrom {
      * To-one relationship, resolved on first access.
      */
     @Keep
-    public ActionParam getParam() {
+    public Map<String, Object> getParam() {
         if (this.param != null) {
             return this.param;
         }
-        this.param = new ActionParam();
+        this.param = new HashMap<>();
         return param;
     }
 
@@ -419,7 +420,7 @@ public class ActionNode implements Serializable, DataFrom {
      * called by internal mechanisms, do not call yourself.
      */
     @Keep//(hash = 1554982243)
-    public void setParam(@NotNull ActionParam param) {
+    public void setParam(@NotNull Map<String, Object> param) {
         this.param = param;
     }
 

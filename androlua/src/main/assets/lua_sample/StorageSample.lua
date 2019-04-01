@@ -15,5 +15,5 @@ sp.set('set', set.build())
 --
 print(sp.getInt('no'))
 print(sp.getString('name'))
-print(sp.getBoolean('b'))
+print(sp.getBoolean('b', false))
 print(sp.getStringSet('set'))

@@ -112,7 +112,7 @@ class RhinoHelper : ScriptableObject, ScriptEngine {
     }
 
     @Throws(Exception::class)
-    override fun evalString(script: String, argMap: Map<String, Any>?) {
+    override fun evalString(script: String, argMap: Map<String, *>?) {
         setMap(argMap)
         evalS(script)
     }
@@ -138,7 +138,7 @@ class RhinoHelper : ScriptableObject, ScriptEngine {
 
     }
 
-    override fun evalFile(file: String, argMap: Map<String, Any>?) {
+    override fun evalFile(file: String, argMap: Map<String, *>?) {
         setMap(argMap)
         processFileSecure(global, file, null)
     }

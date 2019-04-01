@@ -26,7 +26,9 @@ interface CExecutorI : ActivityShowListener, RuntimeArgs, SpeakCallback {
 
     fun execQueue(cmdWords: String, actionQueue: PriorityQueue<Action>?)
     fun interrupt()
-    fun runScript(script: String, args: Array<String>? = null): PartialResult
+    fun runScript(script: String, args: Array<String>? = null): PartialResult = PartialResult(false)
+
+    fun runScript(script: String, argMap: Map<String, Any?>? = null): PartialResult
     fun setScreenSize(width: Int, height: Int)
 
     fun executeFailed(msg: String?)

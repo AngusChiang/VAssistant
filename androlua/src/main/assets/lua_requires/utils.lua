@@ -31,6 +31,10 @@ function matchValues(s, regex)
     return TextHelper.INSTANCE.matchValues(s, regex)
 end
 
+function matchParam(s, regex)
+    return TextHelper.INSTANCE.matchParam(s, regex)
+end
+
 function arr2String(arr)
     return TextHelper.INSTANCE.arr2String(arr, ', ')
 end

@@ -1,6 +1,7 @@
 package cn.vove7.common.utils
 
 import cn.vove7.common.app.GlobalLog
+import cn.vove7.regEngine.toParamRegex
 import java.io.File
 
 /**
@@ -55,8 +56,7 @@ object TextHelper {
 
     fun matches(text: String?, regexStr: String?): Boolean {
         if (text == null || regexStr == null) return false
-        val reg = RegUtils.dealRawReg(regexStr)
-        return reg.matches(text)
+        return regexStr.toParamRegex().match(text) != null
     }
 
     /**
@@ -70,6 +70,18 @@ object TextHelper {
         val reg = RegUtils.dealRawReg(regexStr)
         val r = reg.matchEntire(text)
         return r?.groupValues?.subList(1, r.groupValues.size)?.toTypedArray()
+    }
+
+    /**
+     *
+     * @param text String?
+     * @param regexStr String?
+     * @return Map<String,Any>?
+     */
+    fun matchParam(text: String?, regexStr: String?) :Map<String,Any>? {
+        if (text == null || regexStr == null) return null
+
+        return regexStr.toParamRegex().match(text)
     }
 
     fun readFile(path: String): String? {

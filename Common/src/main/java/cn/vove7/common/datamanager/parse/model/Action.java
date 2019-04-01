@@ -13,6 +13,8 @@ import org.greenrobot.greendao.annotation.Id;
 import org.greenrobot.greendao.annotation.Transient;
 
 import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Map;
 
 import cn.vove7.common.datamanager.parse.statusmap.ActionNode;
 
@@ -86,7 +88,7 @@ public class Action implements Comparable<Action>, Serializable {
     @Transient
     @Expose(serialize = false)
     private
-    ActionParam param;
+    Map<String, Object> param;
     /**
      * 返回数据
      */
@@ -135,9 +137,9 @@ public class Action implements Comparable<Action>, Serializable {
         return newA;
     }
 
-    public ActionParam getParam() {
+    public Map<String, Object> getParam() {
         if (this.param == null) {
-            param = new ActionParam();
+            param = new HashMap<>();
         }
         return this.param;
     }
@@ -150,7 +152,7 @@ public class Action implements Comparable<Action>, Serializable {
         this.actionScopeType = actionScopeType;
     }
 
-    public void setParam(ActionParam param) {
+    public void setParam(Map<String, Object> param) {
         this.param = param;
     }
 

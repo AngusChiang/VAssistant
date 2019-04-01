@@ -8,8 +8,6 @@ import cn.vove7.common.datamanager.parse.model.ActionScope
 import cn.vove7.common.datamanager.parse.statusmap.ActionNode
 import cn.vove7.common.datamanager.parse.statusmap.ActionNode.NODE_SCOPE_GLOBAL
 import cn.vove7.common.datamanager.parse.statusmap.ActionNode.NODE_SCOPE_IN_APP
-import cn.vove7.common.datamanager.parse.statusmap.Reg
-import cn.vove7.common.datamanager.parse.statusmap.Reg.*
 import cn.vove7.executorengine.model.ActionParseResult
 import cn.vove7.vtp.log.Vog
 import java.util.*
@@ -172,13 +170,12 @@ object ParseEngine {
     private fun regSearch(cmd: String, it: ActionNode, actionQueue: PriorityQueue<Action>,
                           isFollow: Boolean): Boolean {
         it.regs.forEach { reg ->
-            val result = (if (isFollow) reg.followRegex else reg.regex).matchEntire(cmd)//？？？？
+            val result = (if (isFollow) reg.followRegex else reg.regex).match(cmd)//？？？？
             if (result != null) {
                 val ac = it.action
                 ac.scope = it.actionScope
-                ac.param = it.param
-                extractParam(ac, reg, result)//提取参数
-                ac.matchWord = result.groupValues[0]
+                ac.param = result
+                ac.matchWord = cmd
                 actionQueue.add(ac)
                 //深搜命令
 //                actionDsMatch(actionQueue, it, result.groupValues[result.groups.size - 1], ac)
@@ -199,35 +196,34 @@ object ParseEngine {
 //        println("${i++}. 匹配：$sufWord")
         node.follows.forEach FollowsForEach@{ it ->
             it?.regs?.forEach RegForEach@{ reg ->
-                val result = reg.followRegex.matchEntire(sufWord)
-                if (result != null && result.groups.isNotEmpty()) {//深搜
+                val result = reg.followRegex.match(sufWord)
+                if (result != null) {//深搜
+                    node.param = result
 //                    println("--匹配成功")
                     //匹配成功
                     if (preAction != null) {//修剪上一个匹配结果参数,第一个%即为上一个参数
-                        preAction.param?.value?.withIndex()?.forEach f@{ kv ->
-                            val p = kv.value ?: return@f
-                            if (result.groupValues[0].startsWith(p)) {//end
-                                val preParamLen = if (preAction.param == null) 0
-                                else result.groupValues[1].length
-                                val thisMatchLen = result.groupValues[0].length
-                                preAction.param?.value!![kv.index] = p.substring(0, preParamLen)
-                                val allLen = preAction.matchWord.length
-                                preAction.matchWord = preAction.matchWord
-                                        .substring(0, allLen - (thisMatchLen - preParamLen))
-                                return@RegForEach
-                            }
-                        }
+//                        preAction.param?.value?.withIndex()?.forEach f@{ kv ->
+//                            val p = kv.value ?: return@f
+//                            if (result.groupValues[0].startsWith(p)) {//end
+//                                val preParamLen = if (preAction.param == null) 0
+//                                else result.groupValues[1].length
+//                                val thisMatchLen = result.groupValues[0].length
+//                                preAction.param?.value!![kv.index] = p.substring(0, preParamLen)
+//                                val allLen = preAction.matchWord.length
+//                                preAction.matchWord = preAction.matchWord
+//                                        .substring(0, allLen - (thisMatchLen - preParamLen))
+//                                return@RegForEach
+//                            }
+//                        }
                     }
                     val itsAction = it.action
-                    extractParam(itsAction, reg, result)//提取参数
-                    //println("--临时提取参数：$param -${it.param!!.desc}")
 
-//                    itsAction.matchWord = result.groupValues[0]
-//                            .substring(preAction?.param?.value?.length ?: 0)//
                     actionQueue.add(itsAction)
-                    return if (it.follows.isNotEmpty()) {//不空
-                        actionDsMatch(actionQueue, it, result.groupValues[result.groupValues.size - 1], itsAction)//递归匹配
-                    } else true
+
+                    //TODO
+//                    return if (it.follows.isNotEmpty()) {//不空
+//                        actionDsMatch(actionQueue, it, result.groupValues[result.groupValues.size - 1], itsAction)//递归匹配
+//                    } else true
                 }
             }
         }
@@ -247,38 +243,6 @@ object ParseEngine {
         }
         return ActionParseResult(false)
     }
-
-
-    //提取参数
-    private fun extractParam(it: Action, reg: Reg, result: MatchResult) {
-        val param = it.param
-        if (param != null) {//设置参数
-            param.value = Array<String?>(reg.paramPosArray?.size ?: 0, init = { null })
-            reg.paramPosArray?.withIndex()?.forEach {
-                when (it.value) {
-                    PARAM_POS_END -> {
-                        param.value[it.index] = getLastParam(result.groups)
-                    }
-                    PARAM_POS_1, PARAM_POS_2, PARAM_POS_3 ->
-                        param.value[it.index] = result.groups[it.value]?.value
-                }
-            }
-            it.param = param
-//            Vog.d("extractParam $param")
-        }
-    }
-
-    fun getLastParam(colls: MatchGroupCollection): String? {
-        return colls.reversed()[0]?.value
-//        colls.reversed().withIndex().forEach { iv ->
-//            val it = iv.value
-//            if (it != null && it.value != "" && iv.index != colls.size - 1) {//不是第一个
-//                return it.value
-//            }
-//        }
-//        return null
-    }
-
 
     /**
      * 解析测试
