@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+import cn.vove7.common.app.GlobalLog;
 import cn.vove7.common.datamanager.DAO;
 import cn.vove7.common.datamanager.greendao.ActionDao;
 import cn.vove7.common.datamanager.greendao.ActionDescDao;
@@ -717,14 +718,13 @@ public class ActionNode implements Serializable, DataFrom {
         }
     }
 
-    private static final String PreOpen_JS = "require 'accessibility'\n" +
-            "openAppByPkg('%s',true)\n" +
-            "a = waitForApp('%s',3000)\n";// +
-    //"if(!a) return\n";
-    private static final String PreOpen_LUA = "require 'accessibility'\n" +
-            "smartOpen('%s')\n" +
-            "a = waitForApp('%s',3000)\n" +
-            "if(not a) then return end\n";
+    private static final String PreOpen_JS =
+            "openAppByPkg('%s', true)\n" +
+                    "sleep(1000)";
+
+    private static final String PreOpen_LUA =
+            "openAppByPkg('%s', true)\n" +
+                    "sleep(1000)\n";
 
     /**
      * 从inApp复制一个全局Node
@@ -733,7 +733,7 @@ public class ActionNode implements Serializable, DataFrom {
      *
      * @return
      */
-    public ActionNode cloneGlobal(boolean containChild) throws Exception {
+    public ActionNode cloneGlobal(boolean containChild) {
         ActionNode newNode = new ActionNode();
         this.assembly();
         newNode.regs = this.regs;
@@ -744,14 +744,20 @@ public class ActionNode implements Serializable, DataFrom {
         //newNode.actionScopeType = this.actionScopeType;
         String p = this.actionScope.getPackageName();
         if (Action.SCRIPT_TYPE_JS.equals(newNode.action.getScriptType()))
-            p = String.format(PreOpen_JS, p, p);
+            p = String.format(PreOpen_JS, p);
         else
-            p = String.format(PreOpen_LUA, p, p);
+            p = String.format(PreOpen_LUA, p);
 
         String newS = p + newNode.action.getActionScript();
         Vog.INSTANCE.d("cloneGlobal ---> \n" + newS);
         newNode.action.setActionScript(newS);
-        newNode.desc = this.desc.clone();
+        if (this.desc != null) {
+            try {
+                newNode.desc = this.desc.clone();
+            } catch (CloneNotSupportedException e) {
+                GlobalLog.INSTANCE.err(e);
+            }
+        }
 
         newNode.actionScopeType = ActionNode.NODE_SCOPE_GLOBAL;
         if (containChild)

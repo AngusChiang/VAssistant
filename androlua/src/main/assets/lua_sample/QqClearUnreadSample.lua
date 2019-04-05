@@ -4,7 +4,7 @@
 -- QqClearUnreadSample
 --
 
-require 'accessibility'
+requireAccessibility()
 smartOpen('QQ')
 ViewFinder().desc('返回消息').tryClick()
 

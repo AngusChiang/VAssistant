@@ -5,7 +5,7 @@
 -- 网易云播放歌曲
 --
 
-require 'accessibility'
+requireAccessibility()
 
 smartOpen('com.netease.cloudmusic')
 search = ViewFinder().desc({ '搜索', 'Search' }).await()

@@ -4,7 +4,7 @@
 -- ViewFinderSample.lua
 --
 
-require 'accessibility'
+requireAccessibility()
 
 a = ViewFinder().id('lua_args').findFirst()
 for i = 0, 9 do

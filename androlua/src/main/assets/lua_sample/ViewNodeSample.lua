@@ -4,7 +4,7 @@
 -- ViewNodeSample.lua
 --
 
-require 'accessibility'
+requireAccessibility()
 root = rootView() --Array
 
 print(#root.childs)

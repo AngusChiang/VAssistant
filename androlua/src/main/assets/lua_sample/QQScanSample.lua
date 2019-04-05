@@ -5,7 +5,7 @@
 --
 
 
-require 'accessibility'
+requireAccessibility()
 
 --进入App 首页
 openAppByWord('QQ',true)

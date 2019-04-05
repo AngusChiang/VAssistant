@@ -7,6 +7,7 @@ import android.os.Build
 import android.provider.Settings
 import android.support.v4.app.NotificationManagerCompat
 import cn.vove7.common.app.GlobalApp
+import cn.vove7.common.app.GlobalLog
 import cn.vove7.vtp.notification.ChannelBuilder
 import cn.vove7.vtp.notification.NotificationHelper
 import cn.vove7.vtp.notification.NotificationIcons
@@ -36,12 +37,16 @@ object AppNotification {
     }
 
     fun updateNotificationChannel(context: Context) {
-        if (AppConfig.FIRST_LAUNCH_NEW_VERSION) {
+        val aa = arrayOf("app_notification", "StatusBarIcon", "StatusBarIcon_alert")
+        if (AppConfig.FIRST_LAUNCH_NEW_VERSION && Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             (context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager).apply {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                    notificationChannels?.forEach {
-                        if (it.id !in arrayOf("app_notification", "StatusBarIcon", "StatusBarIcon_alert"))
+                notificationChannels?.forEach {
+                    if (it.id !in aa) {
+                        try {
                             deleteNotificationChannel(it.id)
+                        } catch (e: Exception) {
+                            GlobalLog.err(e)
+                        }
                     }
                 }
             }

@@ -380,7 +380,7 @@ public class LuaUtil {
         if (error >= 0 && error < reasons.length) {
             return reasons[error];
         }
-        return "Unknown error " + error;
+        return "Unknown error code: " + error;
     }
 
 }

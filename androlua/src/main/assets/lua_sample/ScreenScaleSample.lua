@@ -3,7 +3,7 @@
 -- 2018/8/16 1:45
 -- ScreenScaleSample
 --
-require 'accessibility'
+requireAccessibility()
 
 setScreenSize(100, 100)
 click(50, 50)

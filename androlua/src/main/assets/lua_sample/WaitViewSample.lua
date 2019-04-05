@@ -3,7 +3,7 @@
 -- 2018/8/6 15:48
 -- WaitViewSample.lua
 --
-require 'accessibility'
+requireAccessibility()
 smartOpen("com.eg.android.AlipayGphone")
 --waitForApp('com.eg.android.AlipayGphone')
 ViewFinder().equalsText({'首页','Home'}).id('tab_description').tryClick()

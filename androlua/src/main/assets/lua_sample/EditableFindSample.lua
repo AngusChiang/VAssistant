@@ -4,7 +4,7 @@
 -- EditableFindSample.lua
 --
 
-require 'accessibility'
+requireAccessibility()
 
 e = ViewFinder().editable().findFirst()
 if (e) then

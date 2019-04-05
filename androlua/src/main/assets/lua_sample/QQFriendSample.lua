@@ -3,7 +3,7 @@
 -- 2018/8/8 0:35
 -- QQFriendSample.lua
 --
-require 'accessibility'
+requireAccessibility()
 if (not smartOpen('QQ')) then
     toast('没安装QQ哦')
     return

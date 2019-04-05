@@ -194,7 +194,7 @@ object ParseEngine {
                               preAction: Action? = null): Boolean {
         if (sufWord.isEmpty()) return true
 //        println("${i++}. 匹配：$sufWord")
-        node.follows.forEach FollowsForEach@{ it ->
+        node.follows.forEach FollowsForEach@{
             it?.regs?.forEach RegForEach@{ reg ->
                 val result = reg.followRegex.match(sufWord)
                 if (result != null) {//深搜

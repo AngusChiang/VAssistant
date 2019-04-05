@@ -15,8 +15,11 @@ import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.executor.OnPrint
 import cn.vove7.common.interfaces.ScriptEngine
 import cn.vove7.vtp.log.Vog
-import com.luajava.*
+import com.luajava.JavaFunction
+import com.luajava.LuaException
+import com.luajava.LuaState
 import com.luajava.LuaState.LUA_GCSTOP
+import com.luajava.LuaStateFactory
 import dalvik.system.DexClassLoader
 import java.io.IOException
 import java.util.*
@@ -192,26 +195,28 @@ class LuaHelper : LuaManagerI, ScriptEngine {
         }
     }
 
-    fun loadString(s: String): Int {
+    private fun loadString(s: String): Int {
         L.top = 0
         return L.LloadString(s)
     }
 
-    fun loadFile(fileName: String): Int {
+    private fun loadFile(fileName: String): Int {
         L.top = 0
         return L.LloadFile(fileName)
     }
 
+    @Throws(Exception::class)
     override fun evalString(script: String, args: Array<*>?) {
         val r = loadString(script)
         if (r == 0) {
             setArgs(args)
             exec(args?.size ?: 0)
         } else
-            checkErr(r)
+            throw MessageException(checkErr(r))
     }
 
 
+    @Throws(Exception::class)
     override fun evalString(script: String, argMap: Map<String, *>?) {
         evalString(script, arrayOf(argMap))
     }
@@ -246,9 +251,8 @@ class LuaHelper : LuaManagerI, ScriptEngine {
 
         if (e.contains("java.lang.UnsupportedOperationException") ||
                 e.contains("java.lang.InterruptedException")) {
-            handleMessage(OnPrint.WARN, "强制终止\n")
             return "强制终止"
-        } else handleError(e)
+        }
         return e
     }
 
@@ -259,6 +263,7 @@ class LuaHelper : LuaManagerI, ScriptEngine {
 
     override fun handleError(e: Throwable) {
         GlobalLog.err(e)
+        handleMessage(OnPrint.ERROR, e.message ?: "")
     }
 
 

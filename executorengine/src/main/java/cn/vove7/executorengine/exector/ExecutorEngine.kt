@@ -38,7 +38,12 @@ class ExecutorEngine : ExecutorImpl() {
             PartialResult.success()
         } catch (we: MessageException) {
             GlobalLog.err(we)
+            RhinoApi.doLog(we.message)
             PartialResult.fatal(we.message)
+        } catch (e: Throwable) {
+            GlobalLog.err(e)
+            RhinoApi.doLog(e.message)
+            PartialResult.fatal(e.message)
         }
     }
 
@@ -56,6 +61,7 @@ class ExecutorEngine : ExecutorImpl() {
     //可提取ExecutorHelper 接口 handleMessage
     override fun onLuaExec(script: String, argMap: Map<String, Any?>?): PartialResult {
 //        if (currentActionIndex <= 1) {//fixme ?????
+        luaHelper?.stop()
         luaHelper = LuaHelper(context, bridgeManager)
 //        }
         val newScript = RegUtils.replaceLuaHeader(script)
@@ -65,8 +71,10 @@ class ExecutorEngine : ExecutorImpl() {
 
             PartialResult.success()
         } catch (me: MessageException) {//异常消息
+            luaHelper?.handleMessage(OnPrint.ERROR, me.message?: "")
             PartialResult.fatal(me.message)
         } catch (e: Throwable) {
+            luaHelper?.handleMessage(OnPrint.ERROR, e.message?: "")
             GlobalLog.err(e)
             PartialResult.fatal(e.message)
         }

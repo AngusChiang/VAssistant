@@ -4,6 +4,6 @@
 -- SwipeSample.lua
 --
 
-require 'accessibility'
+requireAccessibility()
 
 swipe(0, 0, 0,500, 500)

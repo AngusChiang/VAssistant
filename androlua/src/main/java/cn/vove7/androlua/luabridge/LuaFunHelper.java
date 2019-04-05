@@ -14,107 +14,105 @@ import cn.vove7.vtp.log.Vog;
  */
 public class LuaFunHelper {
 
-   private LuaHelper luaHelper;
-   private LuaState L;
+    private LuaHelper luaHelper;
+    private LuaState L;
 
-   public LuaFunHelper(LuaHelper luaHelper, LuaState l) {
-      this.luaHelper = luaHelper;
-      L = l;
-   }
+    public LuaFunHelper(LuaHelper luaHelper, LuaState l) {
+        this.luaHelper = luaHelper;
+        L = l;
+    }
 
-   public void newLuaThread(String str, Object... args) {
-      luaHelper.autoRun(str, args);
-   }
+    public void newLuaThread(String str, Object... args) {
+        luaHelper.autoRun(str, args);
+    }
 
-   /**
-    * 复制运行时信息：require，imported
-    *
-    * @param from 源
-    */
-   public void copyRuntimeFrom(LuaState from) {
-      try {
-         // fixme
-         //int G = from.getGlobal("_G");
-         //L.setField(G, "_G");
-         //int t = from.type(G);
-         //L.setGlobal("_G");
-         //L.getGlobal("_G");
-         //LuaObject GG = L.getLuaObject("_G");
-         //GG.setI(0,G);
+    /**
+     * 复制运行时信息：require，imported
+     *
+     * @param from 源
+     */
+    public void copyRuntimeFrom(LuaState from) {
+        try {
+            // fixme
+            //int G = from.getGlobal("_G");
+            //L.setField(G, "_G");
+            //int t = from.type(G);
+            //L.setGlobal("_G");
+            //L.getGlobal("_G");
+            //LuaObject GG = L.getLuaObject("_G");
+            //GG.setI(0,G);
 
-         Object[] loadeds;
-         LuaObject g = from.getLuaObject("luajava");
-         LuaObject loaded = g.getField("imported");
-         if (!loaded.isNil()) {
-            loadeds = loaded.asArray();
-         } else return;
-         if (loadeds != null) {
-            LuaObject require = L.getLuaObject("require");
-            //require "bridges"
-            require.call("bridges");
-            LuaObject _import = L.getLuaObject("import");
-            for (Object s : loadeds) {
-               Vog.INSTANCE.v( "load -- " + s.toString());
-               _import.call(s.toString());
+            Object[] loadeds;
+            LuaObject g = from.getLuaObject("luajava");
+            LuaObject loaded = g.getField("imported");
+            if (!loaded.isNil()) {
+                loadeds = loaded.asArray();
+            } else return;
+            if (loadeds != null) {
+                LuaObject require = L.getLuaObject("require");
+                //require "bridges"
+                require.call("bridges");
+                LuaObject _import = L.getLuaObject("import");
+                for (Object s : loadeds) {
+                    Vog.INSTANCE.v("load -- " + s.toString());
+                    _import.call(s.toString());
+                }
             }
-         }
-      } catch (LuaException e) {
-         e.printStackTrace();
-      }
-   }
+        } catch (LuaException e) {
+            e.printStackTrace();
+        }
+    }
 
-   public void newLuaThread(byte[] buf, Object... args) {
-      L.setTop(0);
-      int ok = L.LloadBuffer(buf, "Thread");
-      if (ok == 0) {
-         L.getGlobal("debug");
-         L.getField(-1, "traceback");
-         L.remove(-2);
-         L.insert(-2);
-         int l = args.length;
-         for (Object arg : args) {
-            try {
-               L.pushObjectValue(arg);
-            } catch (LuaException e) {
-               luaHelper.handleError(e);
+    public void newLuaThread(byte[] buf, Object... args) {
+        L.setTop(0);
+        int ok = L.LloadBuffer(buf, "Thread");
+        if (ok == 0) {
+            L.getGlobal("debug");
+            L.getField(-1, "traceback");
+            L.remove(-2);
+            L.insert(-2);
+            int l = args.length;
+            for (Object arg : args) {
+                try {
+                    L.pushObjectValue(arg);
+                } catch (LuaException e) {
+                    luaHelper.handleError(e);
+                }
             }
-         }
-         ok = L.pcall(l, 0, -2 - l);
-         if (ok == 0) {
-            return;
-         } else luaHelper.checkErr(ok);
-      }
-   }
+            ok = L.pcall(l, 0, -2 - l);
+            if (ok != 0) luaHelper.checkErr(ok);
+        }
+    }
 
 
-   public void runFunc(String funcName, Object... args) {
-      L.setTop(0);
-      L.getGlobal(funcName);
-      if (L.isFunction(-1)) {
-         L.getGlobal("debug");
-         L.getField(-1, "traceback");
-         L.remove(-2);
-         L.insert(-2);
+    public void runFunc(String funcName, Object... args) {
+        L.setTop(0);
+        L.getGlobal(funcName);
+        if (L.isFunction(-1)) {
+            L.getGlobal("debug");
+            L.getField(-1, "traceback");
+            L.remove(-2);
+            L.insert(-2);
 
-         int l = args.length;
-         for (Object arg : args) {
-            try {
-               L.pushObjectValue(arg);
-            } catch (LuaException e) {
-               luaHelper.handleError(e);
+            int l = args.length;
+            for (Object arg : args) {
+                try {
+                    L.pushObjectValue(arg);
+                } catch (LuaException e) {
+                    luaHelper.handleError(e);
+                }
             }
-         }
 
-         int ok = L.pcall(l, 1, -2 - l);
-         if (ok == 0) {
-            return;
-         } else luaHelper.checkErr(ok);
-      }
-   }
+            int ok = L.pcall(l, 1, -2 - l);
+            if (ok == 0) {
+                return;
+            } else luaHelper.checkErr(ok);
+        }
+    }
 
-   public void setField(String key, Object value) throws LuaException {
-      L.pushObjectValue(value);
-      L.setGlobal(key);
-   }
+    public void setField(String key, Object value) throws LuaException {
+        L.pushObjectValue(value);
+        L.setGlobal(key);
+    }
 }
 

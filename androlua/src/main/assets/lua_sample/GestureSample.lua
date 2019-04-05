@@ -4,7 +4,7 @@
 -- GestureSample.lua
 -- 需要7.0+
 --
-require 'accessibility'
+requireAccessibility()
 local path = { Pair(100, 100), Pair(200, 100), Pair(200, 200), Pair(100, 200), Pair(100, 100) }
 toast('开启 开发者模式/指针位置 才能看出效果哦')
 --gesture(4000, path)

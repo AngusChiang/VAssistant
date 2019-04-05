@@ -107,6 +107,7 @@ object SystemBridge : SystemOperation {
 //                false
             } else {
                 launchIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                launchIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_DOCUMENT)
                 if (resetTask) {
                     launchIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK)
                 }
