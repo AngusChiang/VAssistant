@@ -328,8 +328,8 @@ object AppConfig {
             if (!UserInfo.isVip()) i[0] else it ?: i[0]
         }.also { Vog.d("reload ---> chatSystem $it") }
 
-        homeFun = sp.getString(R.string.key_home_fun)?:
-                GlobalApp.APP.resources.getStringArray(R.array.list_home_funs)[0]
+        homeFun = sp.getString(R.string.key_home_fun)
+            ?: GlobalApp.APP.resources.getStringArray(R.array.list_home_funs)[0]
 
         autoSleepWakeupMillis = sp.getString(R.string.key_auto_sleep_wakeup_duration).let {
             if (it == null) autoSleepWakeupMillis
@@ -430,13 +430,13 @@ object AppConfig {
                         Vog.d("checkAppUpdate ---> 忽略此版")
                         return@runOnUi
                     }
-                    if (verName != AppConfig.versionName) {
+                    if (checkHasUpdate(verName)) {
                         onUpdate?.invoke(true)
                         if (!context.isFinishing) {
                             MaterialDialog(context).title(text = "发现新版本 v$verName")
                                     .message(text = log)
-                                    .positiveButton(text = "用酷安下载") { _ ->
-                                        openCollapk(context)
+                                    .positiveButton(text = "用酷安下载") {
+                                        openCoolapk(context)
                                     }
                                     .checkBoxPrompt(text = "不再提醒此版本") {
                                         if (it) {
@@ -458,15 +458,27 @@ object AppConfig {
         }
     }
 
-    val PACKAGE_COOL_MARKET = "com.coolapk.market"
-//    //小米应用商店
-//    val PACKAGE_MI_MARKET = "com.xiaomi.market"
-//    //应用宝
-//    val PACKAGE_TENCENT_MARKET = "com.tencent.android.qqdownloader"
-//    //豌豆荚
-//    val PACKAGE_WANDOUJIA_MARKET = "com.wandoujia.phoenix2"
+    private fun checkHasUpdate(coolVersion: String): Boolean {
+        return try {
+            version2Int(coolVersion) > version2Int(versionName)
+        } catch (e: Exception) {
+            coolVersion != AppConfig.versionName
+        }
+    }
 
-    private fun openCollapk(context: Context) {
+    private fun version2Int(s: String): Int {
+        var sum = 0
+        var t = 1
+        s.split('.').reversed().forEach {
+            sum += it.toInt() * t
+            t *= 100
+        }
+        return sum
+    }
+
+    val PACKAGE_COOL_MARKET = "com.coolapk.market"
+
+    private fun openCoolapk(context: Context) {
         val intent = Intent(Intent.ACTION_VIEW)
         intent.data = Uri.parse("market://details?id=${context.packageName}")
         //跳转酷市场

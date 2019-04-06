@@ -8,12 +8,11 @@ import cn.vove7.common.annotation.ScriptApiClass
 import cn.vove7.common.annotation.ScriptApiParamDesc
 import android.util.Pair
 
-@ScriptApiClass("全局操作")
-
+@ScriptApiClass("无障碍操作","accessibility")
 interface GlobalActionExecutorI {
 
     @ScriptApi("模拟直线滑动手势")
-    @ScriptApiParamDesc([""])
+    @ScriptApiParamDesc(["x1: Int", "y1: Int", "x2: Int", "y2: Int", "dur: Int"])
     fun swipe(x1: Int, y1: Int, x2: Int, y2: Int, dur: Int): Boolean
 
     fun press(x: Int, y: Int, delay: Int): Boolean

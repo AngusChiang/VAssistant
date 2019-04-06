@@ -13,7 +13,8 @@ package cn.vove7.common.annotation
 @Retention(AnnotationRetention.RUNTIME)
 @Target(AnnotationTarget.CLASS, AnnotationTarget.ANNOTATION_CLASS)
 annotation class ScriptApiClass(
-        val name: String = ""
+        val name: String = "_",
+        val prefix: String = ""//前缀 pre.fun()
 )
 
 

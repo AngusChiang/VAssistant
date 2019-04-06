@@ -28,7 +28,7 @@ class ReflectAnnotation {
         anoClass.forEach { clazz ->
             val classApi = clazz.getAnnotation(ScriptApiClass::class.java) ?: return@forEach
             //类文档展示名
-            val classDisplayName = classApi.name.let { n -> if (n.isEmpty()) clazz.simpleName else n }
+            val classDisplayName = classApi.name.let { n -> if (n == "_") clazz.simpleName else n }
 
             println("类: $classDisplayName")
             clazz.declaredMethods.forEach { m ->
@@ -46,7 +46,7 @@ class ReflectAnnotation {
                     } ?: generateFuncDocument(m, paramSescAno)
 
                     hashMap.getOrSetDefault(classDisplayName, mutableListOf())
-                            .add(FunctionDocument(apiFunName, funDoc))
+                            .add(FunctionDocument(classDisplayName, apiFunName, funDoc))
                 }
             }
 
@@ -55,7 +55,7 @@ class ReflectAnnotation {
         hashMap.keys.forEach {
             println("类:$it")
             hashMap[it]?.forEach {
-                println(it.document)
+                println(it)
             }
         }
 
@@ -92,6 +92,7 @@ class ReflectAnnotation {
 
 @ScriptApiClass
 class FunctionDocument(
+        val s: String,
         val summary: String,
         val document: String
 ) {

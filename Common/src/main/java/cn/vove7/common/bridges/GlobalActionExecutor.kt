@@ -20,9 +20,7 @@ import cn.vove7.vtp.log.Vog
 /**
  * 无障碍全局执行器
  */
-@ScriptApiClass
 object GlobalActionExecutor : GlobalActionExecutorI {
-//    var screenAdapter = ScreenAdapter()
 
     private val gestureService: AccessibilityService?
         get() = (AccessibilityApi.isAdvanServiceOn
