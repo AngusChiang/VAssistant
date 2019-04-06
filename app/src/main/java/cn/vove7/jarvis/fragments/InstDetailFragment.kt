@@ -428,7 +428,7 @@
 //        if (ActionNode.belongInApp(node.actionScopeType)) {
 //            val pkg = node.actionScope.packageName
 //            execQueue.add(0, ActionNode("打开App",
-//                    Action("openAppByPkg('$pkg',true)\n" +
+//                    Action("system.openAppByPkg('$pkg',true)\n" +
 //                            "waitForApp('$pkg')", Action.SCRIPT_TYPE_LUA)))
 //
 //        }

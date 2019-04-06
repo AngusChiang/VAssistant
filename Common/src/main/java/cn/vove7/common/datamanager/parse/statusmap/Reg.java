@@ -13,9 +13,7 @@ import org.greenrobot.greendao.annotation.Transient;
 
 import java.io.Serializable;
 
-import cn.vove7.common.utils.RegUtils;
-import cn.vove7.regEngine.ParamRegex;
-import kotlin.text.Regex;
+import cn.vove7.paramregexengine.ParamRegex;
 
 /**
  * 次节点以%开始
@@ -97,7 +95,7 @@ public class Reg implements Serializable {
         this.regex = regex;
     }
 
-    
+
     public Long getId() {
         return this.id;
     }

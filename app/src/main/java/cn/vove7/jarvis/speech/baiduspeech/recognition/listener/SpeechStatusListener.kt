@@ -6,6 +6,7 @@ import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.appbus.AppBus
 import cn.vove7.common.appbus.SpeechAction
 import cn.vove7.common.model.RequestPermission
+import cn.vove7.jarvis.services.MainService
 import cn.vove7.jarvis.speech.VoiceData
 import cn.vove7.jarvis.speech.baiduspeech.recognition.message.SpeechMessage
 import cn.vove7.jarvis.speech.baiduspeech.recognition.model.IStatus.Companion.CODE_VOICE_ERR
@@ -14,6 +15,7 @@ import cn.vove7.jarvis.speech.baiduspeech.recognition.model.IStatus.Companion.CO
 import cn.vove7.jarvis.speech.baiduspeech.recognition.model.IStatus.Companion.CODE_VOICE_VOL
 import cn.vove7.jarvis.speech.baiduspeech.recognition.model.IStatus.Companion.STATUS_FINISHED
 import cn.vove7.jarvis.speech.baiduspeech.recognition.model.RecogResult
+import cn.vove7.jarvis.tools.AppConfig
 import cn.vove7.vtp.log.Vog
 
 /**
@@ -42,13 +44,13 @@ class SpeechStatusListener(private val handler: Handler) : StatusRecogListener()
         handler.sendMessage(SpeechMessage.buildMessage(CODE_VOICE_RESULT, tmp))
     }
 
-//    override fun onAsrEnd() {
-//        super.onAsrEnd()
-////        if (!AppConfig.lastingVoiceCommand) {//非长语音
-////            //立即停止识别 ，检测结果
-////            MainService.instance?.onCommand(AppBus.ORDER_STOP_RECOG)
-////        }
-//    }
+    override fun onAsrEnd() {
+        super.onAsrEnd()
+        if (!AppConfig.lastingVoiceCommand) {//非长语音
+            //立即停止识别 ，检测结果
+            MainService.instance?.onCommand(AppBus.ORDER_STOP_RECOG)
+        }
+    }
 
     override fun onAsrFinishError(errorCode: Int, subErrorCode: Int, errorMessage: String?, descMessage: String?,
                                   recogResult: RecogResult) {

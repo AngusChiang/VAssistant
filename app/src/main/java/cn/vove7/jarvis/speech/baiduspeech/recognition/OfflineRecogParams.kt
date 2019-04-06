@@ -1,7 +1,14 @@
 package cn.vove7.jarvis.speech.baiduspeech.recognition
 
+import android.Manifest
 import android.app.Activity
 import android.content.SharedPreferences
+import android.content.pm.PackageManager
+import android.support.v4.app.ActivityCompat
+import cn.vove7.common.app.GlobalApp
+import cn.vove7.common.helper.AdvanAppHelper
+import cn.vove7.common.helper.AdvanContactHelper
+import cn.vove7.jarvis.services.BaiduSpeechRecogService
 import com.baidu.speech.asr.SpeechConstant
 import org.json.JSONArray
 import org.json.JSONException
@@ -13,37 +20,24 @@ import org.json.JSONObject
 
 class OfflineRecogParams(context: Activity) : CommonRecogParams(context) {
 
-
-    override fun fetch(sp: SharedPreferences): Map<String, Any> {
-
-        val map = super.fetch(sp) as HashMap
-        map[SpeechConstant.DECODER] = 2
-        return map
-
-    }
-
     companion object {
+        private val offlineWordParams: Map<String, Any>
+            get() = mapOf(
+                    Pair(SpeechConstant.DECODER, 2),
+                    Pair(SpeechConstant.ASR_OFFLINE_ENGINE_GRAMMER_FILE_PATH, "asset:///bd/baidu_speech_grammar.bsg"),
+                    Pair(SpeechConstant.SLOT_DATA, BaiduSpeechRecogService.OffWord(
+                            if (ActivityCompat.checkSelfPermission(GlobalApp.APP,
+                                            Manifest.permission.READ_CONTACTS)
+                                    != PackageManager.PERMISSION_GRANTED) //首次启动无权限 不做
+                                arrayOf() else AdvanContactHelper.getContactName()
+                            , AdvanAppHelper.getAppName()
+                    ).toString())
+            )
+
         fun fetchOfflineParams(): Map<String, Any> {
-            val map = HashMap<String, Any>()
-            map[SpeechConstant.DECODER] = 2
-            map[SpeechConstant.ASR_OFFLINE_ENGINE_GRAMMER_FILE_PATH] = "asset:///baidu_speech_grammar.bsg"
-            map.putAll(fetchSlotDataParam())
-            return map
+            return offlineWordParams
         }
 
-        fun fetchSlotDataParam(): Map<String, Any> {
-            val map = HashMap<String, Any>()
-            try {
-                val json = JSONObject()
-                json.put("name", JSONArray().put("赵六").put("赵六"))
-                        .put("appname", JSONArray().put("手百").put("度秘"))
-                map[SpeechConstant.SLOT_DATA] = json
-            } catch (e: JSONException) {
-                e.printStackTrace()
-            }
-
-            return map
-        }
     }
 
 }

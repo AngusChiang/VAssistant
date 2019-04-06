@@ -33,10 +33,6 @@ public class BridgeManager {
         return serviceBridge;
     }
 
-    public void setResultNotifier(ServiceBridge serviceBridge) {
-        this.serviceBridge = serviceBridge;
-    }
-
     public RootHelper getRootHelper() {
         return rootHelper;
     }

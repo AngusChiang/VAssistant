@@ -261,7 +261,7 @@ object ParseEngine {
 class OpenAppAction(val pkg: String) {
 
     //重置App
-    val PRE_OPEN = "openAppByPkg('%s',true)\n"
+    val PRE_OPEN = "system.openAppByPkg('%s',true)\n"
 
     operator fun getValue(thisRef: Any?, property: KProperty<*>): Action {
         return Action(-999, String.format(PRE_OPEN, pkg)

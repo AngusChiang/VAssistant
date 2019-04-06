@@ -4,11 +4,9 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.os.BatteryManager
-import cn.vove7.common.accessibility.AccessibilityApi
 import cn.vove7.common.appbus.AppBus
 import cn.vove7.common.appbus.SpeechAction
 import cn.vove7.common.bridges.SystemBridge
-import cn.vove7.jarvis.plugins.AdKillerService
 import cn.vove7.jarvis.plugins.VoiceWakeupStrategy
 import cn.vove7.jarvis.services.MainService
 import cn.vove7.jarvis.speech.WakeupI
@@ -83,7 +81,7 @@ object PowerEventReceiver : DyBCReceiver(), OnPowerEvent {
     override fun onLowBattery() {
         powerSavingMode = true
 
-        if (MainService.instance?.speechRecoService?.wakeupI?.opened == true) {
+        if (MainService.instance?.speechRecogService?.wakeupI?.opened == true) {
             AppBus.postSpeechAction(SpeechAction.ActionCode.ACTION_STOP_WAKEUP_WITHOUT_SWITCH)
         }
     }

@@ -15,6 +15,7 @@ import android.support.annotation.ColorRes
 import android.support.v4.app.ActivityCompat
 import android.util.DisplayMetrics
 import android.view.View
+import cn.vove7.common.BuildConfig
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.app.GlobalLog
 import cn.vove7.vtp.app.AppInfo
@@ -47,13 +48,15 @@ fun runOnUi(action: () -> Unit) {
     }
 }
 
-fun runOnNewHandlerThread(name: String = "anonymous", autoQuit: Boolean = true,
-                          delay: Long = 0, run: () -> Unit): HandlerThread {
+fun runOnNewHandlerThread(
+        name: String = "anonymous", delay: Long = 0,
+        autoQuit: Boolean = true, run: () -> Unit): HandlerThread {
+
     return HandlerThread(name).apply {
         start()
         Vog.d("runOnNewHandlerThread ---> $name")
         Handler(looper).postDelayed({
-            run.invoke()
+            runWithClock(name, run)
             if (autoQuit)
                 quitSafely()
         }, delay)
@@ -98,6 +101,32 @@ fun <T> whileWaitCount(waitCount: Int, run: () -> T?): T? {
         }
     }
     return null
+}
+
+fun runWithClock(tag: String? = null, block: () -> Unit) {
+    if (BuildConfig.DEBUG) {
+        val b = System.currentTimeMillis()
+        block.invoke()
+        val e = System.currentTimeMillis()
+        Vog.d("[$tag]执行结束 用时 ${prettyMillisTime(e - b)}")
+    } else {
+        block.invoke()
+    }
+}
+
+/**
+ * 解析x时x分x秒x毫秒
+ * @param millis Long
+ * @return String
+ */
+fun prettyMillisTime(millis: Long): String = buildString {
+    (millis / (60 * 60 * 1000)).also { if (it > 0) append("${it}h") }
+    var t = millis % (60 * 60 * 1000)
+    (t / (60 * 1000)).also { if (it > 0) append("${it}m") }
+    t %= 60 * 1000
+    (t / 1000).also { append("$it.") }
+    t %= 1000
+    append("${t}s")
 }
 
 fun prints(vararg msgs: Any?) {
@@ -335,7 +364,7 @@ operator fun String.times(number: Int): String {
     }
 }
 
-fun <K, V> HashMap<K, V>.getAndRemove(k:K): V? {
+fun <K, V> HashMap<K, V>.getAndRemove(k: K): V? {
     return get(k)?.also {
         remove(k)
     }

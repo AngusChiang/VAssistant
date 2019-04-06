@@ -7,6 +7,7 @@ import android.support.v7.app.AppCompatActivity
 import android.view.View
 import android.view.Window
 import cn.vove7.common.model.UserInfo
+import cn.vove7.common.utils.runOnNewHandlerThread
 import cn.vove7.jarvis.BuildConfig
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.fragments.HomeFragment
@@ -27,9 +28,9 @@ import kotlinx.android.synthetic.main.fragment_mine.*
 class RealMainActivity : AppCompatActivity() {
 
     private val fSwitcher = FragmentSwitcher(this, R.id.fragment)
-    private val homeF = HomeFragment.newInstance()
+    private val homeF by lazy { HomeFragment.newInstance() }
     //    val storeF = StoreFragment.newInstance()
-    private val mineF = MineFragment.newInstance()
+    private val mineF by lazy { MineFragment.newInstance() }
     private val mOnNavigationItemSelectedListener = BottomNavigationView.OnNavigationItemSelectedListener { item ->
         return@OnNavigationItemSelectedListener when (item.itemId) {
             R.id.nav_home -> fSwitcher.switchFragment(homeF)
@@ -53,7 +54,6 @@ class RealMainActivity : AppCompatActivity() {
 
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener)
         navigation.selectedItemId = R.id.nav_me
-        fSwitcher.switchFragment(mineF)
 
         requestPermission()
     }
@@ -128,8 +128,10 @@ class RealMainActivity : AppCompatActivity() {
             }
             showUpdate = false
         } else {
-            checkDataUpdate()
-            checkAppUpdate(this, false)
+            runOnNewHandlerThread(delay = 2000) {
+                checkDataUpdate()
+                checkAppUpdate(this, false)
+            }
         }
     }
 

@@ -148,7 +148,7 @@ object SystemBridge : SystemOperation {
         val list = AdvanAppHelper.matchPkgByName(appWord)
         return if (list.isNotEmpty()) {
             list[0].data.packageName.also {
-                Vog.i("打开应用：$appWord -> $it")
+                Vog.i("应用：$appWord -> $it")
             }
         } else null
     }

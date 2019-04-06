@@ -41,7 +41,6 @@ class LuaHelper : LuaManagerI, ScriptEngine {
         bridgeManager = sBridgeManager
         initPath()
         init()
-//        Vog.d("constructor $sBridgeManager")
     }
 
     override var bridgeManager: BridgeManager?
@@ -50,7 +49,6 @@ class LuaHelper : LuaManagerI, ScriptEngine {
     constructor(context: Context, b: BridgeManager) : this(context) {
         bridgeManager = b
         sBridgeManager = b
-//        Vog.d("constructor2 $sBridgeManager")
     }
 
     lateinit var L: LuaState
@@ -276,9 +274,9 @@ class LuaHelper : LuaManagerI, ScriptEngine {
         }
     }
 
-    override fun evalFile(filePath: String, args: Array<*>?) {
+    override fun evalFile(file: String, args: Array<*>?) {
         var r = 1
-        if (loadFile(filePath).also { r = it } == 0) {
+        if (loadFile(file).also { r = it } == 0) {
             setArgs(args)
             exec(args?.size ?: 0)
         } else

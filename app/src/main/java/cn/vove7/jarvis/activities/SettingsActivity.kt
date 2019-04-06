@@ -103,7 +103,7 @@ class SettingsActivity : ReturnableActivity() {
 //                            AppBus.postSpeechAction(SpeechAction.ActionCode.ACTION_STOP_WAKEUP)
 //                            AppConfig.voiceWakeup = false
                         } else {
-                            MainService.instance?.speechRecoService?.stopLastingUpTimer()//关闭长语音定时器
+                            MainService.instance?.speechRecogService?.stopLastingUpTimer()//关闭长语音定时器
                             AppBus.postSpeechAction(SpeechAction.ActionCode.ACTION_CANCEL_RECOG)
                             AppBus.postSpeechAction(SpeechAction.ActionCode.ACTION_STOP_RECOG)
                         }

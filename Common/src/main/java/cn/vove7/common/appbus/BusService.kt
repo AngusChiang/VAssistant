@@ -4,6 +4,7 @@ import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.Service
+import android.app.job.JobService
 import android.content.Context
 import android.content.Intent
 import android.os.Binder
@@ -55,4 +56,20 @@ abstract class BusService : Service() {
         Vog.d("onDestroy ${this.javaClass.simpleName}")
         super.onDestroy()
     }
+}
+
+abstract class BusJobService : JobService() {
+
+    override fun onCreate() {
+        super.onCreate()
+        AppBus.reg(this)
+        Vog.d("开启服务 ${this.javaClass.simpleName}")
+    }
+
+    override fun onDestroy() {
+        AppBus.unreg(this)
+        Vog.d(" ${this.javaClass.simpleName}")
+        super.onDestroy()
+    }
+
 }

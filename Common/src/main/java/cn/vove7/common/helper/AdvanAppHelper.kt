@@ -57,7 +57,7 @@ object AdvanAppHelper {
         val matchList = mutableListOf<MatchedData<AppInfo>>()
         //匹配别名
         MARKED_APP_PKG.forEach {
-            val rate = if (it.regex.matches(name)) {
+            val rate = if (it.rawRegex.matches(name)) {
                 Vog.d("匹配成功 from 标记 ---> ${it.regStr} $name")
                 0.9f
             } else 0f
@@ -80,7 +80,7 @@ object AdvanAppHelper {
                     } else {
                         TextHelper.compareSimilarityWithPinyin(AdvanAppHelper.context, name,
                                 appName, replaceNumberWithPinyin = true).also { f ->
-                            Vog.d("matchAppName 拼音匹配 $name ${it.name} $f")
+                            Vog.v("matchAppName 拼音匹配 $name ${it.name} $f")
                         }
                     }
                 } catch (e: Exception) {

@@ -572,7 +572,7 @@ class InstDetailActivity : AppCompatActivity() {
             val pkg = execQueue[0].actionScope.packageName
             val appName = AdvanAppHelper.getAppInfo(pkg)?.name
             execQueue.add(0, ActionNode("打开App: $appName",
-                    Action("openAppByPkg('$pkg',true)", Action.SCRIPT_TYPE_LUA)))
+                    Action("system.openAppByPkg('$pkg',true)", Action.SCRIPT_TYPE_LUA)))
 
         }
         val d = DialogWithList(this, ExecuteQueueAdapter(this, execQueue))

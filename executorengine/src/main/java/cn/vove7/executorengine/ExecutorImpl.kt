@@ -139,6 +139,7 @@ open class ExecutorImpl(
     private var thread: Thread? = null
 
     override fun execQueue(cmdWords: String, actionQueue: PriorityQueue<Action>?) {
+        Vog.d("执行队列 ${actionQueue?.size}")
         if (actionQueue?.isEmpty() != false) return
         thread?.apply {
             if (isAlive) this.interrupt()
@@ -358,7 +359,7 @@ open class ExecutorImpl(
                             ParseEngine.parseAppActionWithScope(follow, scope, false)
                         } else null
 
-                        if (aq != null) {
+                        if (aq?.isSuccess == true) {
                             list.add(MatchedData(0.91f, aq))
                         } else {//无跟随操作
                             val q = PriorityQueue<Action>()

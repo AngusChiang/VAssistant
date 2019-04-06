@@ -25,7 +25,7 @@ class ViewNode(val node: AccessibilityNodeInfo) : ViewOperation, Comparable<View
      */
     var similarityText: Float = 0f
 
-    private var childss: Array<ViewNode>? = null
+    private var childsCache: Array<ViewNode>? = null
 
     companion object {
         const val tryNum = 10
@@ -82,11 +82,10 @@ class ViewNode(val node: AccessibilityNodeInfo) : ViewOperation, Comparable<View
         var p = node
         var i = 0
         while (i < tryNum && !p.performAction(action)) {
-            if (p.parent == null) {
+            if (p.parent?.also { p = it } == null) {
                 Vog.d("尝试->$i p.parent == null")
                 return false
             }
-            p = p.parent
             i++
         }
         val b = i != tryNum
@@ -101,8 +100,8 @@ class ViewNode(val node: AccessibilityNodeInfo) : ViewOperation, Comparable<View
     override fun getChilds(): Array<ViewNode> {
         synchronized(lastGetChildTime) {
             val now = System.currentTimeMillis()
-            if (childss != null && now - lastGetChildTime < 10000L) {//10s有效期
-                return childss ?: emptyArray()
+            if (childsCache != null && now - lastGetChildTime < 10000L) {//10s有效期
+                return childsCache ?: emptyArray()
             }
             lastGetChildTime = now
             val cs = mutableListOf<ViewNode>()
@@ -112,7 +111,7 @@ class ViewNode(val node: AccessibilityNodeInfo) : ViewOperation, Comparable<View
                     cs.add(ViewNode(c))
                 }
             }
-            return cs.toTypedArray().also { childss = it }
+            return cs.toTypedArray().also { childsCache = it }
         }
     }
 

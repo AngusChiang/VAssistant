@@ -1,7 +1,7 @@
 package cn.vove7.common.utils
 
 import cn.vove7.common.app.GlobalLog
-import cn.vove7.regEngine.toParamRegex
+import cn.vove7.paramregexengine.toParamRegex
 import java.io.File
 
 /**
@@ -78,7 +78,7 @@ object TextHelper {
      * @param regexStr String?
      * @return Map<String,Any>?
      */
-    fun matchParam(text: String?, regexStr: String?) :Map<String,Any>? {
+    fun matchParam(text: String?, regexStr: String?): Map<String, Any>? {
         if (text == null || regexStr == null) return null
 
         return regexStr.toParamRegex().match(text)

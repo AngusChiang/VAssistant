@@ -6,11 +6,11 @@ package cn.vove7.jarvis
 //import com.argusapm.android.network.upload.CollectDataSyncUpload
 import android.content.Context
 import android.content.Intent
-import android.os.Build
 import cn.vove7.androlua.LuaApp
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.utils.ThreadPool.runOnPool
 import cn.vove7.common.utils.runOnNewHandlerThread
+import cn.vove7.common.utils.runWithClock
 import cn.vove7.jarvis.droidplugin.RePluginManager
 import cn.vove7.jarvis.receivers.AppInstallReceiver
 import cn.vove7.jarvis.receivers.PowerEventReceiver
@@ -28,7 +28,7 @@ import io.github.kbiakov.codeview.classifier.CodeProcessor
 
 class App : GlobalApp() {
 
-    private val mainService: Intent by lazy { Intent(this, MainService::class.java) }
+    private lateinit var mainService: MainService
 
     lateinit var services: Array<Intent>
     override fun onCreate() {
@@ -37,11 +37,11 @@ class App : GlobalApp() {
         ins = this
 
         CrashHandler.init()
-        services = arrayOf(mainService)
-        AppConfig.init()//加载配置
-        Vog.d("onCreate ---> 配置加载完成")
+        runWithClock("加载配置") {
+            AppConfig.init()
+        }
 
-        runOnNewHandlerThread("app_load", delay = 1000) {
+        runOnNewHandlerThread("app_load") {
             if (AppConfig.FIRST_LAUNCH_NEW_VERSION || BuildConfig.DEBUG)
                 LuaApp.init(this, AppConfig.FIRST_LAUNCH_NEW_VERSION)
             startServices()
@@ -60,19 +60,11 @@ class App : GlobalApp() {
     }
 
     private fun startServices() {
-        runOnPool {
-            services.forEach {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                    startForegroundService(it)
-                } else {
-                    startService(it)
-                }
-            }
-        }
+        mainService = MainService()
     }
 
     private fun startBroadcastReceivers() {
-        runOnNewHandlerThread("startBroadcastReceivers") {
+        runOnNewHandlerThread("startBroadcastReceivers", delay = 5000) {
             PowerEventReceiver.start()
             ScreenStatusListener.start()
             AppInstallReceiver.start()

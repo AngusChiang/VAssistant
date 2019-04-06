@@ -38,10 +38,10 @@ object VoiceWakeupStrategy : AbsAccPluginService() {
         if (appInfo.hasMicroPermission()) {//有麦克风权限的App
             //case 1 进入App 自动休眠 ->  ORDER_STOP_VOICE_WAKEUP_WITHOUT_NOTIFY
             //wakeupI?.opened开启时，在内关闭唤醒
-            if (MainService.instance?.speechRecoService?.wakeupI?.opened == true) {
+            if (MainService.instance?.speechRecogService?.wakeupI?.opened == true) {
                 closeWakeup()
             }
-        } else if (closed && MainService.instance?.speechRecoService?.timerEnd == false) {//已自动关闭 并且定时器有效
+        } else if (closed && MainService.instance?.speechRecogService?.timerEnd == false) {//已自动关闭 并且定时器有效
             startWakeup()
         }
     }

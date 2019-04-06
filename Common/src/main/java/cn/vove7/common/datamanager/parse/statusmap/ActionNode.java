@@ -719,11 +719,11 @@ public class ActionNode implements Serializable, DataFrom {
     }
 
     private static final String PreOpen_JS =
-            "openAppByPkg('%s', true)\n" +
+            "system.openAppByPkg('%s', true)\n" +
                     "sleep(1000)";
 
     private static final String PreOpen_LUA =
-            "openAppByPkg('%s', true)\n" +
+            "system.openAppByPkg('%s', true)\n" +
                     "sleep(1000)\n";
 
     /**

@@ -1,6 +1,7 @@
 package cn.vove7.jarvis.speech.baiduspeech.recognition.recognizer
 
 import android.content.Context
+import cn.vove7.common.app.GlobalLog
 import cn.vove7.jarvis.speech.baiduspeech.recognition.listener.IRecogListener
 import cn.vove7.vtp.log.Vog
 import com.baidu.speech.EventListener
@@ -38,7 +39,11 @@ class MyRecognizer(
 
     init {
         if (isInited) {
-            release()//释放，重新加载
+            try {
+                release()//释放，重新加载
+            } catch (e: Exception) {
+                GlobalLog.err(e)
+            }
         }
         asr = EventManagerFactory.create(context, "asr")
         asr.registerListener(eventListener)
@@ -50,7 +55,7 @@ class MyRecognizer(
      */
     fun loadOfflineEngine(params: Map<String, Any>) {
         val json = JSONObject(params).toString()
-        Vog.i("loadOfflineEngine params:$json")
+        Vog.v("loadOfflineEngine params:$json")
         asr.send(SpeechConstant.ASR_KWS_LOAD_ENGINE, json, null, 0, 0)
         isOfflineEngineLoaded = true
         // 没有ASR_KWS_LOAD_ENGINE这个回调表试失败，如缺少第一次联网时下载的正式授权文件。
@@ -61,17 +66,12 @@ class MyRecognizer(
         asr.send(SpeechConstant.ASR_START, json, null, 0, 0)
     }
 
-    fun start(json: String) {
-        Vog.i("asr params(反馈请带上此行日志):$json")
-        asr.send(SpeechConstant.ASR_START, json, null, 0, 0)
-    }
-
     /**
      * 加载离线词
      * @param param Map<String, Any>
      */
     fun loadOfWord(param: Map<String, Any>) {
-        Vog.d("loadOfWord ---> 加载离线命令词 ${param}")
+        Vog.v("加载离线命令词 $param")
         asr.send(SpeechConstant.ASR_KWS_LOAD_ENGINE, JSONObject(param).toString(), null, 0, 0)
     }
 

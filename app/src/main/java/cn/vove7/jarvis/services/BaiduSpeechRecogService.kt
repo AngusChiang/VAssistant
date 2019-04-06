@@ -1,14 +1,10 @@
 package cn.vove7.jarvis.services
 
 import android.content.Context
-import android.content.pm.PackageManager
 import android.os.HandlerThread
-import android.support.v4.app.ActivityCompat
-import cn.vove7.androlua.luabridge.LuaUtil
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.app.GlobalLog
-import cn.vove7.common.helper.AdvanAppHelper
-import cn.vove7.common.helper.AdvanContactHelper
+import cn.vove7.common.utils.runOnNewHandlerThread
 import cn.vove7.jarvis.speech.SpeechEvent
 import cn.vove7.jarvis.speech.SpeechRecoService
 import cn.vove7.jarvis.speech.WakeupI
@@ -27,7 +23,7 @@ import com.google.gson.annotations.SerializedName
 /**
  * 百度语音识别服务
  */
-class BaiduSpeechRecoService(event: SpeechEvent) : SpeechRecoService(event) {
+class BaiduSpeechRecogService(event: SpeechEvent) : SpeechRecoService(event) {
 
     /**
      * 识别控制器，使用MyRecognizer控制识别的流程
@@ -42,7 +38,7 @@ class BaiduSpeechRecoService(event: SpeechEvent) : SpeechRecoService(event) {
     /*
  * 本Activity中是否需要调用离线命令词功能。根据此参数，判断是否需要调用SDK的ASR_KWS_LOAD_ENGINE事件
  */
-    override var enableOffline = false
+    override var enableOffline = true
 
     /**
      * 分发事件
@@ -51,11 +47,10 @@ class BaiduSpeechRecoService(event: SpeechEvent) : SpeechRecoService(event) {
     private val offSpeechGrammarPath = context.filesDir.absolutePath + "/bd/baidu_speech_grammar.bsg"
 
     init {
-        val t = HandlerThread("reco")
+        val t = HandlerThread("recog")
         t.start()
         handler = RecogHandler(t.looper)
         initRecog()
-        initOfflineWord()
         //初始化唤醒器
         if (AppConfig.voiceWakeup) {
             startWakeUp()
@@ -97,37 +92,19 @@ class BaiduSpeechRecoService(event: SpeechEvent) : SpeechRecoService(event) {
         val context: Context = GlobalApp.APP
         myRecognizer = MyRecognizer(context, listener)
 
-//        wakeuper = BaiduVoiceWakeup(context, wakeLis)
-
         if (enableOffline) {
-            myRecognizer.loadOfflineEngine(OfflineRecogParams.fetchOfflineParams())
+            runOnNewHandlerThread {
+                try {
+                    myRecognizer.loadOfflineEngine(OfflineRecogParams.fetchOfflineParams())
+                } catch (e: Exception) {
+                    GlobalLog.err(e)
+                }
+            }
         }
     }
 
-    private fun initOfflineWord() {
-        LuaUtil.assetsToSD(context, "bd/baidu_speech_grammar.bsg",
-                offSpeechGrammarPath)
-        try {//gson error null of array.length
-            myRecognizer.loadOfWord(offWordParams)
-        } catch (e: Exception) {
-            GlobalLog.err(e)
-        }
-    }
 
-    private val offWordParams: Map<String, Any>
-        get() = mapOf(
-                Pair(SpeechConstant.DECODER, 0),
-                Pair(SpeechConstant.ASR_OFFLINE_ENGINE_GRAMMER_FILE_PATH, offSpeechGrammarPath),
-                Pair(SpeechConstant.SLOT_DATA, OffWord(
-                        if (ActivityCompat.checkSelfPermission(AdvanContactHelper.context,
-                                        android.Manifest.permission.READ_CONTACTS)
-                                != PackageManager.PERMISSION_GRANTED) //首次启动无权限 不做
-                            arrayOf() else AdvanContactHelper.getContactName()
-                        , AdvanAppHelper.getAppName()
-                ).toString())
-        )
-
-    private val recoParams
+    private val recogParams
         get() = mutableMapOf(
                 Pair(SpeechConstant.ACCEPT_AUDIO_DATA, false),
 //            Pair(SpeechConstant.VAD_MODEL, "dnn"),
@@ -141,6 +118,7 @@ class BaiduSpeechRecoService(event: SpeechEvent) : SpeechRecoService(event) {
             //从指定时间开始识别，可以 - 指定ms 识别之前的内容
             if (AppConfig.lastingVoiceCommand)
                 it[SpeechConstant.VAD_ENDPOINT_TIMEOUT] = 0
+            //TODO 音频改为此方式
 //            if(AppConfig.voiceRecogFeedback) {
 //                it[SpeechConstant.SOUND_START]= R.raw.recog_start
 //                it[SpeechConstant.SOUND_END]= R.raw.recog_finish
@@ -155,7 +133,7 @@ class BaiduSpeechRecoService(event: SpeechEvent) : SpeechRecoService(event) {
 
     private val autoCloseRecog = Runnable {
         Vog.i(" ---> 长语音自动关闭识别")
-        if(!isListening) {
+        if (!isListening) {
             doCancelRecog()
             doStopRecog()
         }
@@ -188,7 +166,7 @@ class BaiduSpeechRecoService(event: SpeechEvent) : SpeechRecoService(event) {
 
         Vog.d("doStartRecog ---> 开始识别")
         //震动 音效
-        myRecognizer.start(recoParams)
+        myRecognizer.start(recogParams)
     }
 
     /**

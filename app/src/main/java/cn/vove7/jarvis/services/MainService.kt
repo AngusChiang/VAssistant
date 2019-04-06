@@ -4,8 +4,6 @@ import android.app.AlertDialog
 import android.app.Dialog
 import android.content.DialogInterface
 import android.content.Intent
-import android.os.Binder
-import android.os.IBinder
 import cn.vove7.common.MessageException
 import cn.vove7.common.accessibility.AccessibilityApi
 import cn.vove7.common.app.GlobalApp
@@ -23,7 +21,6 @@ import cn.vove7.common.appbus.AppBus.ORDER_START_VOICE_WAKEUP_WITHOUT_NOTIFY
 import cn.vove7.common.appbus.AppBus.ORDER_STOP_EXEC
 import cn.vove7.common.appbus.AppBus.ORDER_STOP_RECOG
 import cn.vove7.common.appbus.AppBus.ORDER_STOP_VOICE_WAKEUP_WITHOUT_NOTIFY
-import cn.vove7.common.appbus.BusService
 import cn.vove7.common.appbus.SpeechAction
 import cn.vove7.common.bridges.ChoiceData
 import cn.vove7.common.bridges.ServiceBridge
@@ -43,6 +40,7 @@ import cn.vove7.common.utils.ThreadPool.runOnCachePool
 import cn.vove7.common.utils.ThreadPool.runOnPool
 import cn.vove7.common.utils.runOnNewHandlerThread
 import cn.vove7.common.utils.runOnUi
+import cn.vove7.common.utils.runWithClock
 import cn.vove7.common.utils.startActivityOnNewTask
 import cn.vove7.common.view.finder.ViewFindBuilder
 import cn.vove7.executorengine.exector.ExecutorEngine
@@ -85,33 +83,17 @@ import kotlin.concurrent.thread
 /**
  * 主服务
  */
-class MainService : BusService(),
-        ServiceBridge, OnSelectListener, OnMultiSelectListener {
+class MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
+
+    val context = GlobalApp.APP
 
     private val floatyPanel: FloatyPanel by lazy {
         FloatyPanel()
     }
 
-    /**
-     * 设置语音面板依靠
-     */
-    var toastAlign: Int = 0
-        set(v) {
-//            floatyPanel.align = v
-        }
+//    override val serviceId: Int
+//        get() = 126
 
-    override val serviceId: Int
-        get() = 126
-
-    /**
-     * 悬浮窗
-     */
-//    private lateinit var floatVoice: VoiceFloat
-
-    /**
-     * 信使Action
-     */
-//    var messengerAction: Action? = null
     /**
      * 执行器
      */
@@ -120,7 +102,7 @@ class MainService : BusService(),
     private lateinit var chatSystem: ChatSystem
 
     //启动过慢  lateinit 导致未初始化异常
-    var speechRecoService: SpeechRecoService? = null
+    var speechRecogService: SpeechRecoService? = null
     var speechSynService: SpeechSynService? = null
 
     /**
@@ -133,11 +115,11 @@ class MainService : BusService(),
     private val parseAnimation: ParseAnimation by lazy { ParseAnimation() }
     private val executeAnimation: ExecuteAnimation by lazy { ExecuteAnimation() }
 
-    override fun onCreate() {
-        super.onCreate()
+    init {
+//        super.onCreate()
         instance = this
         GlobalApp.serviceBridge = this
-        runOnNewHandlerThread("load_speech_engine", delay = 2000) {
+        runOnNewHandlerThread("load_speech_engine", delay = 1000) {
             init()
         }
     }
@@ -145,6 +127,7 @@ class MainService : BusService(),
     var speechEngineLoaded = false
 
     fun init() {
+        AppBus.reg(this)
         loadChatSystem()
         loadSpeechService()
         speechEngineLoaded = true
@@ -155,28 +138,25 @@ class MainService : BusService(),
      * 加载语音识别/合成服务
      */
     private fun loadSpeechService() {
-        speechRecoService = BaiduSpeechRecoService(RecogEventListener())
-        speechSynService = SpeechSynService(SynthesisEventListener())
+        runWithClock("加载语音识别/合成服务") {
+            speechRecogService = BaiduSpeechRecogService(RecogEventListener())
+            speechSynService = SpeechSynService(SynthesisEventListener())
+        }
     }
 
     /**
      * 加载对话系统
      */
-    fun loadChatSystem() {
+    fun loadChatSystem(open: Boolean = AppConfig.openChatSystem) {
 //        val type = GlobalApp.APP.resources.getStringArray(R.array.list_chat_system)
 
-        if (!AppConfig.openChatSystem)
-            return
+        if (!open) return
 //        chatSystem = when (AppConfig.chatSystem) {
 //            type[0] -> QykChatSystem()
 //            type[1] -> TulingChatSystem()
 //            else -> QykChatSystem()
 //        }
         chatSystem = TulingChatSystem()
-    }
-
-    override fun onBind(intent: Intent): IBinder {
-        return object : Binder() {}
     }
 
 
@@ -196,7 +176,7 @@ class MainService : BusService(),
         if (AppConfig.lastingVoiceCommand)
             afterSpeakResumeListen = recogIsListening//记录原状态
         runOnUi {
-            alertDialog = AlertDialog.Builder(this)
+            alertDialog = AlertDialog.Builder(context)
                     .setTitle(title)
                     .setMessage(msg)
                     .setCancelable(false)
@@ -211,7 +191,7 @@ class MainService : BusService(),
                 //语音控制
                 if (AppConfig.voiceControlDialog) {
                     voiceMode = MODE_ALERT
-                    speechRecoService?.startRecog()
+                    speechRecogService?.startRecog()
                 }
             } catch (e: Exception) {
                 GlobalLog.err(e)
@@ -245,7 +225,7 @@ class MainService : BusService(),
         voiceMode = MODE_VOICE
         if (AppConfig.voiceControlDialog) {
             if (!afterSpeakResumeListen)// check 长语音
-                speechRecoService?.cancelRecog()
+                speechRecogService?.cancelRecog()
         }
         cExecutor.notifyAlertResult(r)
         resumeListenCommandIfLasting()
@@ -278,8 +258,8 @@ class MainService : BusService(),
         if (AppConfig.lastingVoiceCommand) {//防止长语音识别 speak聊天对话
             Vog.d("stopRecogTemp ---> speak临时 $recogIsListening")
             afterSpeakResumeListen = recogIsListening
-            speechRecoService?.doCancelRecog()
-            speechRecoService?.doStopRecog()
+            speechRecogService?.doCancelRecog()
+            speechRecogService?.doStopRecog()
         }
     }
 
@@ -305,10 +285,10 @@ class MainService : BusService(),
         runOnUi {
             choiceDialog = when (event.whichDialog) {
                 ShowDialogEvent.WHICH_SINGLE -> {
-                    SingleChoiceDialog(this, event.askTitle, event.choiceDataSet, this)
+                    SingleChoiceDialog(context, event.askTitle, event.choiceDataSet, this)
                 }
                 ShowDialogEvent.WHICH_MULTI -> {
-                    MultiChoiceDialog(this, event.askTitle, event.choiceDataSet, this)
+                    MultiChoiceDialog(context, event.askTitle, event.choiceDataSet, this)
                 }
                 else -> null
             }?.show()
@@ -342,7 +322,7 @@ class MainService : BusService(),
      */
     override fun getVoiceParam() {
         voiceMode = MODE_GET_PARAM
-        speechRecoService?.startRecog()
+        speechRecogService?.startRecog()
     }
 
     private var speakSync = false
@@ -408,7 +388,7 @@ class MainService : BusService(),
 
     //from executor 线程
     override fun onExecuteFailed(errMsg: String?) {//错误信息
-        GlobalLog.log("执行出错：$errMsg")
+        GlobalLog.err("执行出错：$errMsg")
         executeAnimation.failedAndHideDelay(errMsg)
         if (AppConfig.execFailedVoiceFeedback)
             speakSync("执行失败")
@@ -437,33 +417,33 @@ class MainService : BusService(),
         when (sAction.action) {
             SpeechAction.ActionCode.ACTION_START_RECOG -> {
                 speechSynService?.stopIfSpeaking()
-                speechRecoService?.startRecog()
+                speechRecogService?.startRecog()
             }
-            SpeechAction.ActionCode.ACTION_STOP_RECOG -> speechRecoService?.stopRecog()
+            SpeechAction.ActionCode.ACTION_STOP_RECOG -> speechRecogService?.stopRecog()
             SpeechAction.ActionCode.ACTION_CANCEL_RECOG -> {
                 hideAll()
-                speechRecoService?.cancelRecog()
+                speechRecogService?.cancelRecog()
             }
             SpeechAction.ActionCode.ACTION_START_WAKEUP -> {
                 AppConfig.voiceWakeup = true
-                speechRecoService?.startWakeUp()
+                speechRecogService?.startWakeUp()
             }
             SpeechAction.ActionCode.ACTION_START_WAKEUP_WITHOUT_SWITCH -> {
-                speechRecoService?.startWakeUp()
+                speechRecogService?.startWakeUp()
             }
             SpeechAction.ActionCode.ACTION_RELOAD_SYN_CONF -> speechSynService?.reLoad()
             SpeechAction.ActionCode.ACTION_STOP_WAKEUP -> {
                 AppConfig.voiceWakeup = false
-                speechRecoService?.stopWakeUp()
+                speechRecogService?.stopWakeUp()
             }
             SpeechAction.ActionCode.ACTION_STOP_WAKEUP_WITHOUT_SWITCH -> {
-                speechRecoService?.stopWakeUp()
+                speechRecogService?.stopWakeUp()
             }
             SpeechAction.ActionCode.ACTION_STOP_WAKEUP_TIMER -> {
-                speechRecoService?.stopAutoSleepWakeup()
+                speechRecogService?.stopAutoSleepWakeup()
             }
             SpeechAction.ActionCode.ACTION_START_WAKEUP_TIMER -> {
-                speechRecoService?.startAutoSleepWakeup()
+                speechRecogService?.startAutoSleepWakeup()
             }
             else -> {
                 Vog.e(sAction)
@@ -508,7 +488,7 @@ class MainService : BusService(),
                         GlobalApp.toastWarning("引擎未就绪")
                         return@thread
                     }
-                    speechRecoService?.cancelRecog()
+                    speechRecogService?.cancelRecog()
                     speechSynService?.stop()
                     cExecutor.interrupt()
                     hideAll()
@@ -518,28 +498,28 @@ class MainService : BusService(),
                         GlobalApp.toastWarning("引擎未就绪")
                         return@thread
                     }
-                    speechRecoService?.stopRecog()
+                    speechRecogService?.stopRecog()
                 }
                 ORDER_CANCEL_RECOG -> {
                     if (!speechEngineLoaded) {
                         GlobalApp.toastWarning("引擎未就绪")
                         return@thread
                     }
-                    speechRecoService?.cancelRecog()
+                    speechRecogService?.cancelRecog()
                 }
                 ORDER_START_RECOG -> {
                     if (!speechEngineLoaded) {
                         GlobalApp.toastWarning("引擎未就绪")
                         return@thread
                     }
-                    speechRecoService?.startRecog()
+                    speechRecogService?.startRecog()
                 }
                 ORDER_START_RECOG_SILENT -> {
                     if (!speechEngineLoaded) {
                         GlobalApp.toastWarning("引擎未就绪")
                         return@thread
                     }
-                    speechRecoService?.startRecogSilent()
+                    speechRecogService?.startRecogSilent()
                 }
                 EVENT_FORCE_OFFLINE -> {
                     AppConfig.logout()
@@ -549,14 +529,14 @@ class MainService : BusService(),
                         GlobalApp.toastWarning("引擎未就绪")
                         return@thread
                     }
-                    speechRecoService?.startWakeUpSilently(false)
+                    speechRecogService?.startWakeUpSilently(false)
                 }
                 ORDER_STOP_VOICE_WAKEUP_WITHOUT_NOTIFY -> {
                     if (!speechEngineLoaded) {
                         GlobalApp.toastWarning("引擎未就绪")
                         return@thread
                     }
-                    speechRecoService?.stopWakeUpSilently()
+                    speechRecogService?.stopWakeUpSilently()
                 }
                 EVENT_START_DEBUG_SERVER -> {
                     RemoteDebugServer.start()
@@ -565,12 +545,12 @@ class MainService : BusService(),
                     RemoteDebugServer.stop()
                 }
                 ORDER_BEGIN_SCREEN_PICKER -> {
-                    startActivityOnNewTask(Intent(this, ScreenPickerActivity::class.java).also {
+                    context.startActivityOnNewTask(Intent(context, ScreenPickerActivity::class.java).also {
                         it.addFlags(Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS)
                     })
                 }
                 ORDER_BEGIN_SCREEN_PICKER_TRANSLATE -> {
-                    startActivityOnNewTask(Intent(this, ScreenPickerActivity::class.java).also {
+                    context.startActivityOnNewTask(Intent(context, ScreenPickerActivity::class.java).also {
                         it.putExtra("t", "t")
                         it.addFlags(Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS)
                     })
@@ -586,19 +566,19 @@ class MainService : BusService(),
      */
     @Subscribe(threadMode = ThreadMode.POSTING)
     fun onRequestPermission(r: RequestPermission) {
-        val intent = Intent(this, PermissionManagerActivity::class.java)
+        val intent = Intent(context, PermissionManagerActivity::class.java)
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         intent.putExtra("pName", r.permissionName)
         startActivity(intent)
     }
 
-    override fun onDestroy() {
+    fun destory() {
         if (speechEngineLoaded) {
-            speechRecoService?.release()
+            speechRecogService?.release()
             speechSynService?.release()
         }
+        AppBus.unreg(this)
         GlobalApp.serviceBridge = null
-        super.onDestroy()
     }
 
     companion object {
@@ -645,7 +625,7 @@ class MainService : BusService(),
                 return if (instance?.speechEngineLoaded != true) {//未加载
                     GlobalApp.toastWarning("引擎未就绪")
                     false
-                } else instance?.speechRecoService?.isListening == true
+                } else instance?.speechRecogService?.isListening == true
             }
         val exEngineRunning: Boolean
             get() {
@@ -788,8 +768,8 @@ class MainService : BusService(),
             parseWakeUpCommand(word ?: "") ?: return
             Vog.d("onWakeup ---> 开始聆听 -> $word")
             //唤醒词 你好小V，小V同学 ↓
-            speechRecoService?.cancelRecog(false)
-            speechRecoService?.startRecog(true)
+            speechRecogService?.cancelRecog(false)
+            speechRecogService?.startRecog(true)
             return
         }
 
@@ -861,7 +841,7 @@ class MainService : BusService(),
             Vog.d("结果 --------> $voiceResult")
 
             if (AppConfig.lastingVoiceCommand) {//识别结束，开启长语音定时
-                speechRecoService?.restartLastingUpTimer()
+                speechRecogService?.restartLastingUpTimer()
             }
             when (voiceMode) {
                 MODE_VOICE -> {//剪去结束词
@@ -915,7 +895,7 @@ class MainService : BusService(),
         override fun onTempResult(temp: String) {
             temResult = temp
             if (AppConfig.lastingVoiceCommand) {//临时结果 暂时关闭长语音定时器
-                speechRecoService?.stopLastingUpTimer()
+                speechRecogService?.stopLastingUpTimer()
             }
             Vog.d("onTempResult ---> 临时结果 $temp")
             floatyPanel.show(temp)
@@ -934,9 +914,9 @@ class MainService : BusService(),
             resumeMusicIf()
             //fix 百度长语音 在无结果stop，无回调
             if (AppConfig.lastingVoiceCommand &&
-                    speechRecoService is BaiduSpeechRecoService && temResult == null) {
+                    speechRecogService is BaiduSpeechRecogService && temResult == null) {
                 Vog.d("onStopRecog ---> 长语音无结果")
-                speechRecoService?.cancelRecog()
+                speechRecogService?.cancelRecog()
             }
             temResult = null
         }
@@ -1028,7 +1008,7 @@ class MainService : BusService(),
                     NetHelper.uploadUserCommandHistory(his)
                     runOnCachePool {
                         if (AppConfig.lastingVoiceCommand) {//开启长语音,重启定时
-                            speechRecoService?.restartLastingUpTimer()
+                            speechRecogService?.restartLastingUpTimer()
                         }
                     }
                 }
@@ -1122,7 +1102,7 @@ class MainService : BusService(),
                 when {
                     it.isEmpty() -> return@also
                     it.size == 1 -> SystemBridge.openUrl(it[0].url)
-                    else -> startActivity(Intent(this, ResultPickerActivity::class.java)
+                    else -> startActivity(Intent(context, ResultPickerActivity::class.java)
                             .also { intent ->
                                 intent.putExtra("title", data.word)
                                 intent.putExtra("data", BundleBuilder().put("items", it).data)
@@ -1131,6 +1111,11 @@ class MainService : BusService(),
             }
         }
     }
+
+    fun startActivity(intent: Intent) {
+        context.startActivity(intent)
+    }
+
 
     /**
      * 命令解析失败

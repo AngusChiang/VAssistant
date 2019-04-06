@@ -124,6 +124,10 @@ public class MarkedData implements DataFrom, Signable, Serializable {
         return regex;
     }
 
+    public Regex getRawRegex() {
+        return new Regex(regStr.replace("%", RegUtils.INSTANCE.getREG_ALL_CHAR()));
+    }
+
     public Regex rawRegex() {
         return RegUtils.INSTANCE.dealRawReg(regStr);
     }

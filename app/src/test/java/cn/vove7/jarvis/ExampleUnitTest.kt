@@ -2,12 +2,8 @@ package cn.vove7.jarvis
 
 import android.graphics.Bitmap
 import android.util.Range
-import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.datamanager.parse.model.Action
-import cn.vove7.common.utils.TextDateParser
-import cn.vove7.common.utils.TextHelper
-import cn.vove7.common.utils.whileWaitCount
-import cn.vove7.common.utils.whileWaitTime
+import cn.vove7.common.utils.*
 import cn.vove7.jarvis.chat.TulingChatSystem
 import cn.vove7.jarvis.tools.baiduaip.BaiduAipHelper
 import org.jsoup.Jsoup
@@ -333,8 +329,11 @@ class ExampleUnitTest {
     }
 
     @Test
-    fun logTest() {
-        GlobalLog.log("12345")
-        GlobalLog.err("err test")
+    fun clockTest() {
+        runWithClock {
+            sleep(1234)
+        }
+        println(prettyMillisTime(Date(2 * 60 * 60 * 1000 + 60 * 1000 * 5 + 5 * 1000 + 23).time))
+
     }
 }

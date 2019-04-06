@@ -1,10 +1,12 @@
 package cn.vove7.jarvis.fragments
 
-import android.view.*
+import android.view.ContextMenu
+import android.view.MenuItem
+import android.view.View
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.utils.ThreadPool
-import cn.vove7.jarvis.adapters.SimpleListAdapter
 import cn.vove7.jarvis.adapters.ListViewModel
+import cn.vove7.jarvis.adapters.SimpleListAdapter
 import cn.vove7.jarvis.droidplugin.PluginManager
 import cn.vove7.jarvis.droidplugin.VPluginInfo
 import com.afollestad.materialdialogs.MaterialDialog
@@ -17,7 +19,7 @@ import com.afollestad.materialdialogs.MaterialDialog
  */
 class InstalledPluginFragment : SimpleListFragment<VPluginInfo>() {
 
-    lateinit var pluginManager: PluginManager
+    var pluginManager: PluginManager? = null
     override val itemCheckable: Boolean = true
 
     companion object {
@@ -99,6 +101,6 @@ class InstalledPluginFragment : SimpleListFragment<VPluginInfo>() {
     }
 
     override fun onLoadData(pageIndex: Int) {
-        notifyLoadSuccess(pluginManager.installList(true), true)
+        notifyLoadSuccess(pluginManager?.installList(true) ?: emptyList(), true)
     }
 }
