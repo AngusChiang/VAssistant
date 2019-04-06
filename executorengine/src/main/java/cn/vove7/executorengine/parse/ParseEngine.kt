@@ -175,6 +175,7 @@ object ParseEngine {
                 val ac = it.action
                 ac.scope = it.actionScope
                 ac.param = result
+                it.param = result
                 ac.matchWord = cmd
                 actionQueue.add(ac)
                 //深搜命令

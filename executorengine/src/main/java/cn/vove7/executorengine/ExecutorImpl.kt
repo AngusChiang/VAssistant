@@ -429,17 +429,11 @@ open class ExecutorImpl(
     private fun openByIdentifier(it: MarkedData): Boolean {
         return when (it.type) {
             MARKED_TYPE_SCRIPT_LUA -> {
-                actionQueue = PriorityQueue()
-                actionQueue.add(Action(it.value, Action.SCRIPT_TYPE_LUA))
-                pollActionQueue()
+                onLuaExec(it.value, null)
                 true
-//                onLuaExec(it.value).isSuccess
             }
             MARKED_TYPE_SCRIPT_JS -> {
-//                onRhinoExec(it.value).isSuccess
-                actionQueue = PriorityQueue()
-                actionQueue.add(Action(it.value, Action.SCRIPT_TYPE_JS))
-                pollActionQueue()
+                onRhinoExec(it.value, null)
                 true
             }
             else -> {

@@ -194,7 +194,7 @@ fun StringBuilder.buildNode(list: MutableList<RegNode>) {
         val preNode = TextNode(toString())
         list.linkBack(preNode)
     }
-    delete(0, length)
+    setLength(0)
 }
 
 

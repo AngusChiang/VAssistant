@@ -9,10 +9,12 @@ import cn.vove7.common.bridges.SystemBridge
 import cn.vove7.common.datamanager.parse.model.Action
 import cn.vove7.common.executor.OnPrint
 import cn.vove7.common.executor.PartialResult
+import cn.vove7.common.interfaces.ScriptEngine
 import cn.vove7.common.utils.RegUtils
 import cn.vove7.executorengine.ExecutorImpl
 import cn.vove7.rhino.RhinoHelper
 import cn.vove7.rhino.api.RhinoApi
+import java.util.*
 
 /**
  * # MultiExecutorEngine
@@ -24,16 +26,15 @@ class ExecutorEngine : ExecutorImpl() {
     private val bridgeManager = BridgeManager(this, GlobalActionExecutor,
             SystemBridge, serviceBridge)
 
-    private var rhinoHelper: RhinoHelper? = null
 
     override fun onRhinoExec(script: String, argMap: Map<String, Any?>?): PartialResult {
-        rhinoHelper?.stop()
-        if (currentActionIndex <= 1) {
-            rhinoHelper = RhinoHelper(bridgeManager)
-        }
+
+        val rhinoHelper = RhinoHelper(bridgeManager)
+        engines.add(rhinoHelper)
+
         val sc = RegUtils.replaceRhinoHeader(script)
         return try {
-            rhinoHelper?.evalString(sc, argMap)
+            rhinoHelper.evalString(sc, argMap)
             RhinoApi.doLog("主线程执行完毕\n")
             PartialResult.success()
         } catch (we: MessageException) {
@@ -54,27 +55,26 @@ class ExecutorEngine : ExecutorImpl() {
     }
 
     /**
-     * Lua Impl
+     * 执行器
      */
-    private var luaHelper: LuaHelper? = null
+    private val engines =
+        Collections.synchronizedCollection(mutableListOf<ScriptEngine>())
 
     //可提取ExecutorHelper 接口 handleMessage
     override fun onLuaExec(script: String, argMap: Map<String, Any?>?): PartialResult {
-//        if (currentActionIndex <= 1) {//fixme ?????
-        luaHelper?.stop()
-        luaHelper = LuaHelper(context, bridgeManager)
-//        }
+        val luaHelper = LuaHelper(context, bridgeManager)
+        engines.add(luaHelper)
         val newScript = RegUtils.replaceLuaHeader(script)
         return try {
-            luaHelper?.evalString(newScript, argMap)
-            luaHelper?.handleMessage(OnPrint.INFO, "主线程执行完毕\n")
+            luaHelper.evalString(newScript, argMap)
+            luaHelper.handleMessage(OnPrint.INFO, "主线程执行完毕\n")
 
             PartialResult.success()
         } catch (me: MessageException) {//异常消息
-            luaHelper?.handleMessage(OnPrint.ERROR, me.message?: "")
+            luaHelper.handleMessage(OnPrint.ERROR, me.message ?: "")
             PartialResult.fatal(me.message)
         } catch (e: Throwable) {
-            luaHelper?.handleMessage(OnPrint.ERROR, e.message?: "")
+            luaHelper.handleMessage(OnPrint.ERROR, e.message ?: "")
             GlobalLog.err(e)
             PartialResult.fatal(e.message)
         }
@@ -83,9 +83,8 @@ class ExecutorEngine : ExecutorImpl() {
 
     override fun interrupt() {
         super.interrupt()
-        rhinoHelper?.stop()
-        luaHelper?.stop()
-        rhinoHelper = null
-        luaHelper = null
+
+        engines.forEach { it.stop() }
+        engines.clear()
     }
 }

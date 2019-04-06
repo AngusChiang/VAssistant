@@ -58,7 +58,7 @@ public class Reg implements Serializable {
     @Keep
     private void buildRegex() {
         //结尾加上% ， 防止有[后续节点操作]匹配失败
-        String s = (!regStr.endsWith("%") ? regStr + "%" : regStr);
+        String s = (!regStr.endsWith("%") && !regStr.endsWith("}")) ? (regStr + "%") : regStr;
         regex = new ParamRegex(s);
     }
 
@@ -85,7 +85,7 @@ public class Reg implements Serializable {
         String s = (!regStr.startsWith("%") ? ("%" + regStr) : regStr);
 
         //尾部
-        s = !s.endsWith("%") ? (s + "%") : s;
+        s = (!s.endsWith("%")  && !regStr.endsWith("}")) ? (s + "%") : s;
 
         regex = new ParamRegex(s);
         return regex;

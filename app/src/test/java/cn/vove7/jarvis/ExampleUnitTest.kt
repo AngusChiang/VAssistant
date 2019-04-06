@@ -6,6 +6,7 @@ import cn.vove7.common.datamanager.parse.model.Action
 import cn.vove7.common.utils.*
 import cn.vove7.jarvis.chat.TulingChatSystem
 import cn.vove7.jarvis.tools.baiduaip.BaiduAipHelper
+import cn.vove7.paramregexengine.toParamRegex
 import org.jsoup.Jsoup
 import org.junit.Test
 import java.lang.Thread.sleep
@@ -334,6 +335,13 @@ class ExampleUnitTest {
             sleep(1234)
         }
         println(prettyMillisTime(Date(2 * 60 * 60 * 1000 + 60 * 1000 * 5 + 5 * 1000 + 23).time))
+
+    }
+
+    @Test
+    fun singleTest() {
+
+        println("%呼叫@{name}".toParamRegex().match("呼叫123"))// true
 
     }
 }
