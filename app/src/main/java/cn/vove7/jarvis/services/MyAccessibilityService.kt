@@ -54,7 +54,7 @@ class MyAccessibilityService : AccessibilityApi() {
             //注册无障碍组件
             if (AppConfig.isAdBlockService)
                 registerPlugin(AdKillerService)
-            if (AppConfig.fixVoiceMico) {
+            if (AppConfig.fixVoiceMicro) {
                 registerPlugin(VoiceWakeupStrategy)
             }
 //            if (BuildConfig.DEBUG) {
@@ -424,7 +424,7 @@ class MyAccessibilityService : AccessibilityApi() {
         super.onDestroy()
         if (AppConfig.isAdBlockService)
             unregisterPlugin(AdKillerService)
-        if (AppConfig.fixVoiceMico) {
+        if (AppConfig.fixVoiceMicro) {
             unregisterPlugin(VoiceWakeupStrategy)
         }
         accessibilityService = null

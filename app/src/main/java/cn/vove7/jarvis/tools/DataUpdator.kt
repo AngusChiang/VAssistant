@@ -19,6 +19,7 @@ import cn.vove7.common.utils.TextHelper
 import cn.vove7.common.utils.ThreadPool.runOnCachePool
 import cn.vove7.common.utils.ThreadPool.runOnPool
 import cn.vove7.common.helper.AdvanAppHelper
+import cn.vove7.executorengine.parse.ParseEngine
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.droidplugin.RePluginInfo
 import cn.vove7.jarvis.plugins.AdKillerService
@@ -211,7 +212,7 @@ object DataUpdator {
                             if (it) {
                                 SpHelper(GlobalApp.APP).set(R.string.key_last_sync_global_date, System.currentTimeMillis())
                                 DAO.clear()
-//                                ParseEngine.updateGlobal()
+                                ParseEngine.updateGlobal()
                                 back.invoke(true)
                             } else {
                                 GlobalApp.toastError("同步失败")
@@ -250,7 +251,7 @@ object DataUpdator {
                                 SpHelper(GlobalApp.APP).set(R.string.key_last_sync_in_app_date,
                                         System.currentTimeMillis())
                                 DAO.clear()
-//                                ParseEngine.updateInApp()
+                                ParseEngine.updateInApp()
                                 back.invoke(true)
                             } else {
                                 GlobalApp.toastError("同步失败")

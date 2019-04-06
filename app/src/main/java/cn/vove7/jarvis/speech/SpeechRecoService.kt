@@ -47,15 +47,13 @@ abstract class SpeechRecoService(val event: SpeechEvent) : SpeechRecogI {
             isListening = true
             event.onPreStartRecog(byVoice)
             startSCO()
-            checkAudioSource()
+
+            doStartRecog(false)
         } else {
             Vog.d("启动失败，正在识别")
         }
     }
 
-    private fun checkAudioSource() {
-        doStartRecog()
-    }
 
     private fun startSCO() {
         Vog.d("startSCO")
@@ -81,7 +79,7 @@ abstract class SpeechRecoService(val event: SpeechEvent) : SpeechRecogI {
     override fun startRecogSilent() {
         if (!checkRecoderPermission() || !checkFloat()) return
         isListening = true
-        checkAudioSource()
+        doStartRecog(true)
     }
 
     private fun checkFloat(): Boolean {
@@ -96,7 +94,7 @@ abstract class SpeechRecoService(val event: SpeechEvent) : SpeechRecogI {
     /**
      * 开始识别
      */
-    abstract fun doStartRecog()
+    abstract fun doStartRecog(silent: Boolean = false)
 
     /**
      * 取消识别
@@ -211,6 +209,9 @@ abstract class SpeechRecoService(val event: SpeechEvent) : SpeechRecogI {
                     else {
                         Vog.e("正在聆听,暂停唤醒")
                     }
+                }
+                IStatus.CODE_VOICE_READY -> {
+                    event.onRecogReady()
                 }
                 IStatus.CODE_VOICE_TEMP -> {//中间结果
                     val res = msg.data.getString("data")

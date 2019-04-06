@@ -102,7 +102,7 @@ open class ExecutorImpl(
     /**
      *  Activity监听器
      */
-    private val activityNotifier = AppChangNotifier(locksWaitForActivity)
+    private val activityNotifier by lazy { AppChangNotifier(locksWaitForActivity) }
 
     init {
         ScreenAdapter.init(systemBridge)
@@ -249,7 +249,6 @@ open class ExecutorImpl(
         userInterrupt = true
         thread?.interrupt()//打破wait
         Vog.d("外部终止运行")
-
     }
 
     /**

@@ -58,7 +58,7 @@ object ScreenStatusListener : DyBCReceiver(), ScreenEvent {
     }
 
     override fun onUnlock() {
-        if (closeTag && AppConfig.fixVoiceMico) {//也许关屏已开启
+        if (closeTag && AppConfig.fixVoiceMicro) {//也许关屏已开启
             Vog.d("开屏关闭唤醒")
             VoiceWakeupStrategy.closeWakeup()
         }

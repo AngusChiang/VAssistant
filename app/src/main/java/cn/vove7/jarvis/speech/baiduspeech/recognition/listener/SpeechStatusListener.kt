@@ -10,6 +10,7 @@ import cn.vove7.jarvis.services.MainService
 import cn.vove7.jarvis.speech.VoiceData
 import cn.vove7.jarvis.speech.baiduspeech.recognition.message.SpeechMessage
 import cn.vove7.jarvis.speech.baiduspeech.recognition.model.IStatus.Companion.CODE_VOICE_ERR
+import cn.vove7.jarvis.speech.baiduspeech.recognition.model.IStatus.Companion.CODE_VOICE_READY
 import cn.vove7.jarvis.speech.baiduspeech.recognition.model.IStatus.Companion.CODE_VOICE_RESULT
 import cn.vove7.jarvis.speech.baiduspeech.recognition.model.IStatus.Companion.CODE_VOICE_TEMP
 import cn.vove7.jarvis.speech.baiduspeech.recognition.model.IStatus.Companion.CODE_VOICE_VOL
@@ -31,6 +32,11 @@ class SpeechStatusListener(private val handler: Handler) : StatusRecogListener()
         isSuccess = false
     }
 
+    override fun onAsrReady() {
+        super.onAsrReady()
+        Vog.d("ready")
+        handler.sendMessage(SpeechMessage.buildMessage(CODE_VOICE_READY))
+    }
     override fun onAsrPartialResult(results: Array<String>?, recogResult: RecogResult) {
         super.onAsrPartialResult(results, recogResult)
         val tmp = results?.get(0) ?: ""

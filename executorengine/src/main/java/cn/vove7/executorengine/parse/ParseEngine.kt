@@ -8,6 +8,7 @@ import cn.vove7.common.datamanager.parse.model.ActionScope
 import cn.vove7.common.datamanager.parse.statusmap.ActionNode
 import cn.vove7.common.datamanager.parse.statusmap.ActionNode.NODE_SCOPE_GLOBAL
 import cn.vove7.common.datamanager.parse.statusmap.ActionNode.NODE_SCOPE_IN_APP
+import cn.vove7.common.utils.ThreadPool.runOnPool
 import cn.vove7.executorengine.model.ActionParseResult
 import cn.vove7.vtp.log.Vog
 import java.util.*
@@ -20,45 +21,39 @@ import kotlin.reflect.KProperty
  * Created by Vove on 2018/6/15
  */
 object ParseEngine {
-    private val GlobalActionNodes: List<ActionNode>
-        get() = DAO.daoSession.actionNodeDao.queryBuilder()
-                .where(ActionNodeDao.Properties.ActionScopeType
-                        .eq(NODE_SCOPE_GLOBAL /*,NODE_SCOPE_GLOBAL_2*/))
-                .orderDesc(ActionNodeDao.Properties.Priority)//按优先级
-                .list()
-    private val AppActionNodes: List<ActionNode>
-        get() = DAO.daoSession.actionNodeDao.queryBuilder()
+    private lateinit var GlobalActionNodes: List<ActionNode>
+
+    private lateinit var AppActionNodes: List<ActionNode>
+
+    init {
+        updateNode()
+    }
+
+    var i = 0
+
+    fun updateInApp() {
+        AppActionNodes = DAO.daoSession.actionNodeDao.queryBuilder()
                 .where(ActionNodeDao.Properties.ActionScopeType
                         .eq(NODE_SCOPE_IN_APP/*, NODE_SCOPE_IN_APP_2*/))
                 .orderDesc(ActionNodeDao.Properties.Priority)
                 .list()
+    }
 
-    var i = 0
-
-    //TODO 效率测试
-//    fun updateInApp() {
-//        AppActionNodes = DAO.daoSession.actionNodeDao.queryBuilder()
-//                .where(ActionNodeDao.Properties.ActionScopeType
-//                        .eq(NODE_SCOPE_IN_APP/*, NODE_SCOPE_IN_APP_2*/))
-//                .orderDesc(ActionNodeDao.Properties.Priority)
-//                .list()
-//    }
-//
-//    fun updateGlobal() {
-//        GlobalActionNodes = DAO.daoSession.actionNodeDao.queryBuilder()
-//                .where(ActionNodeDao.Properties.ActionScopeType
-//                        .eq(NODE_SCOPE_GLOBAL /*,NODE_SCOPE_GLOBAL_2*/))
-//                .orderDesc(ActionNodeDao.Properties.Priority)//按优先级
-//                .list()
-//    }
+    fun updateGlobal() {
+        GlobalActionNodes = DAO.daoSession.actionNodeDao.queryBuilder()
+                .where(ActionNodeDao.Properties.ActionScopeType
+                        .eq(NODE_SCOPE_GLOBAL /*,NODE_SCOPE_GLOBAL_2*/))
+                .orderDesc(ActionNodeDao.Properties.Priority)//按优先级
+                .list()
+    }
     /**
      * 同步后，更新数据
      */
     fun updateNode() {
-//        runOnPool {
-//            updateInApp()
-//            updateGlobal()
-//        }
+        runOnPool {
+            updateInApp()
+            updateGlobal()
+        }
     }
 
 

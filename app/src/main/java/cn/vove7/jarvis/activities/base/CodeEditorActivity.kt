@@ -161,8 +161,12 @@ abstract class CodeEditorActivity : AppCompatActivity() {
             R.id.menu_code_run -> {
                 clearLog()
                 val ac = Action(editorText, scriptType)
-                ac.param = parseSimpleMap(runArgs)
-                AppBus.post(ac)
+                try {
+                    ac.param = parseSimpleMap(runArgs)
+                    AppBus.post(ac)
+                } catch (e: Exception) {
+                    GlobalApp.toastError("参数设置错误")
+                }
             }
             R.id.menu_api_doc -> {
                 SystemBridge.openUrl("https://vove.gitee.io/2018/09/25/Script-Api/")
@@ -364,6 +368,7 @@ abstract class CodeEditorActivity : AppCompatActivity() {
                     Symbol("#")
             ).also { it.addAll(commonSymbols) }
 
+        @Throws
         fun parseSimpleMap(s: String?): Map<String, Any> {
             s ?: return hashMapOf()
             val ss = s.trim()
@@ -371,8 +376,8 @@ abstract class CodeEditorActivity : AppCompatActivity() {
             return ss.split(',').let {
                 mutableMapOf<String, Any>().apply {
                     it.forEach {
-                        val ss = it.split(":")
-                        put(ss[0].trim(), ss[1].trim())
+                        val sss = it.split(":")
+                        put(sss[0].trim(), sss[1].trim())
                     }
                 }
             }

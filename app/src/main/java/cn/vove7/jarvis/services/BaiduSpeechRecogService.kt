@@ -5,6 +5,7 @@ import android.os.HandlerThread
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.utils.runOnNewHandlerThread
+import cn.vove7.jarvis.R
 import cn.vove7.jarvis.speech.SpeechEvent
 import cn.vove7.jarvis.speech.SpeechRecoService
 import cn.vove7.jarvis.speech.WakeupI
@@ -104,39 +105,36 @@ class BaiduSpeechRecogService(event: SpeechEvent) : SpeechRecoService(event) {
     }
 
 
-    private val recogParams
-        get() = mutableMapOf(
-                Pair(SpeechConstant.ACCEPT_AUDIO_DATA, false),
+    private fun recogParams(silent: Boolean) = mutableMapOf(
+            Pair(SpeechConstant.ACCEPT_AUDIO_DATA, false),
 //            Pair(SpeechConstant.VAD_MODEL, "dnn"),
-                Pair(SpeechConstant.DISABLE_PUNCTUATION, false),//标点符号
-                Pair(SpeechConstant.ACCEPT_AUDIO_VOLUME, true),
-                Pair(SpeechConstant.PID, 1536)
-        ).also {
-            it[SpeechConstant.IN_FILE] = "#cn.vove7.jarvis.speech.baiduspeech.MicInputStream.instance()"
-            if (!AppConfig.openResponseWord)//唤醒即识别 响应词打开则无效
-                it[SpeechConstant.AUDIO_MILLS] = System.currentTimeMillis() - 200
-            //从指定时间开始识别，可以 - 指定ms 识别之前的内容
-            if (AppConfig.lastingVoiceCommand)
-                it[SpeechConstant.VAD_ENDPOINT_TIMEOUT] = 0
-            //TODO 音频改为此方式
-//            if(AppConfig.voiceRecogFeedback) {
-//                it[SpeechConstant.SOUND_START]= R.raw.recog_start
-//                it[SpeechConstant.SOUND_END]= R.raw.recog_finish
-//                it[SpeechConstant.SOUND_SUCCESS]= R.raw.recog_finish
-//                it[SpeechConstant.SOUND_ERROR]= R.raw.recog_failed
-//                it[SpeechConstant.SOUND_CANCEL]= R.raw.recog_cancel
-//            }
+            Pair(SpeechConstant.DISABLE_PUNCTUATION, false),//标点符号
+            Pair(SpeechConstant.ACCEPT_AUDIO_VOLUME, true),
+            Pair(SpeechConstant.PID, 1536)
+    ).also {
+        it[SpeechConstant.IN_FILE] = "#cn.vove7.jarvis.speech.baiduspeech.MicInputStream.instance()"
+        if (!AppConfig.openResponseWord)//唤醒即识别 响应词打开则无效
+            it[SpeechConstant.AUDIO_MILLS] = System.currentTimeMillis() - 200
+        //从指定时间开始识别，可以 - 指定ms 识别之前的内容
+        if (AppConfig.lastingVoiceCommand)
+            it[SpeechConstant.VAD_ENDPOINT_TIMEOUT] = 0
+        if (AppConfig.voiceRecogFeedback && !silent)
+            it[SpeechConstant.SOUND_START] = R.raw.recog_start
+        if (AppConfig.voiceRecogFeedback) {
+            it[SpeechConstant.SOUND_END] = R.raw.recog_finish
+            it[SpeechConstant.SOUND_SUCCESS] = R.raw.recog_finish
+            it[SpeechConstant.SOUND_ERROR] = R.raw.recog_failed
+            it[SpeechConstant.SOUND_CANCEL] = R.raw.recog_cancel
         }
+
+    }
 
 //    private val backTrackInMs = 1500
 
 
     private val autoCloseRecog = Runnable {
         Vog.i(" ---> 长语音自动关闭识别")
-        if (!isListening) {
-            doCancelRecog()
-            doStopRecog()
-        }
+        doCancelRecog()
     }
 
     /**
@@ -159,14 +157,14 @@ class BaiduSpeechRecogService(event: SpeechEvent) : SpeechRecoService(event) {
      * 检查百度长语音
      * 然后定时关闭
      */
-    override fun doStartRecog() {
+    override fun doStartRecog(silent: Boolean) {
         if (AppConfig.lastingVoiceCommand) {//开启长语音
             restartLastingUpTimer()
         }
 
         Vog.d("doStartRecog ---> 开始识别")
         //震动 音效
-        myRecognizer.start(recogParams)
+        myRecognizer.start(recogParams(silent))
     }
 
     /**

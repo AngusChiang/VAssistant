@@ -10,6 +10,13 @@ import java.io.Serializable
  * Created by Vove on 2018/6/18
  */
 object SpeechMessage {
+
+    fun buildMessage(what: Int): Message {
+        val message = Message()
+        message.what = what
+        return message
+    }
+
     fun buildMessage(what: Int, msg: String): Message {
         val message = Message()
         message.what = what

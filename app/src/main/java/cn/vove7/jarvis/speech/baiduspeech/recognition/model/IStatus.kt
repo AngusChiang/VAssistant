@@ -12,6 +12,8 @@ interface IStatus {
         const val CODE_WAKEUP_SUCCESS = 7001
         const val CODE_WAKEUP_EXIT = 7003
 
+
+        const val CODE_VOICE_READY = 110 //准备识别
         const val CODE_VOICE_TEMP = 111 //临时结果
         const val CODE_VOICE_VOL = 112 //音量数据
         const val CODE_VOICE_ERR = 114 //出错

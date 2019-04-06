@@ -87,12 +87,11 @@ object AppConfig {
     //    var continuousDialogue = false//连续对话
     var finishWord: String? = null
     //    var resumeMusic = true//继续播放
-    var recoWhenWakeupAssist = false//立即识别
     var useAssistService = true//助手服务
     var execFailedVoiceFeedback = true//执行失败语音反馈
     var execSuccessFeedback = true//执行成功反馈
-    var fixVoiceMico = true//麦克风冲突
-    var notifyCloseMico = true//通知唤醒状态/麦克风
+    var fixVoiceMicro = true//麦克风冲突
+    var notifyCloseMicro = true//通知唤醒状态/麦克风
     //    var disableAdKillerOnLowBattery = true//低电量关闭去广告
     @Deprecated("无障碍省电模式 弃用")
     var disableAccessibilityOnLowBattery = true//低电量关闭无障碍
@@ -100,9 +99,13 @@ object AppConfig {
     var voiceRecogFeedback = false //语音识别提示音
         get() = field || isBlueToothConnect
 
+    //fixme 连接手表也为true
     val isBlueToothConnect: Boolean
         get() {
             val adapter = BluetoothAdapter.getDefaultAdapter()
+            adapter.bondedDevices?.forEach {
+                it.type
+            }
             return (BluetoothProfile.STATE_CONNECTED ==
                     adapter.getProfileConnectionState(BluetoothProfile.HEADSET)).also {
                 Vog.d("蓝牙连接：$it")
@@ -289,13 +292,12 @@ object AppConfig {
         sp.set(R.string.key_cloud_service_parse, false)
         autoUpdateData = getBooleanAndInit(R.string.key_auto_update_data, true)
 //        resumeMusic = getBooleanAndInit(R.string.key_resume_bkg_music, true)
-        recoWhenWakeupAssist = getBooleanAndInit(R.string.key_reco_when_wakeup_assist, false)
         volumeWakeUpWhenScreenOff = getBooleanAndInit(R.string.key_volume_wakeup_when_screen_off, true)
         useAssistService = getBooleanAndInit(R.string.key_use_assist_service, useAssistService)
         execFailedVoiceFeedback = getBooleanAndInit(R.string.key_exec_failed_voice_feedback, true)
         execSuccessFeedback = getBooleanAndInit(R.string.key_exec_failed_voice_feedback, true)
-        fixVoiceMico = getBooleanAndInit(R.string.key_fix_voice_micro, true) //TODO && !AppConfig.IS_SYS_APP
-        notifyCloseMico = getBooleanAndInit(R.string.key_close_wakeup_notification, true)
+        fixVoiceMicro = getBooleanAndInit(R.string.key_fix_voice_micro, true) //TODO && !AppConfig.IS_SYS_APP
+        notifyCloseMicro = getBooleanAndInit(R.string.key_close_wakeup_notification, true)
 //        disableAdKillerOnLowBattery = getBooleanAndInit(R.string.key_remove_ad_power_saving_mode, true)
         disableAccessibilityOnLowBattery = getBooleanAndInit(R.string.key_accessibility_service_power_saving_mode, true)
         wakeUpWithHeadsetHook = getBooleanAndInit(R.string.key_wakeup_with_headsethook, wakeUpWithHeadsetHook)

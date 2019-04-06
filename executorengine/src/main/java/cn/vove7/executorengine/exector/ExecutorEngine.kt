@@ -83,8 +83,17 @@ class ExecutorEngine : ExecutorImpl() {
 
     override fun interrupt() {
         super.interrupt()
+        release()
+    }
 
+    @Synchronized
+    private fun release() {
         engines.forEach { it.stop() }
         engines.clear()
+    }
+
+    override fun onFinish(result: Boolean?) {
+        super.onFinish(result)
+        release()
     }
 }

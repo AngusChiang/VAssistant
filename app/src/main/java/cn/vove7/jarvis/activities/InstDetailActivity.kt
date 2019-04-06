@@ -437,7 +437,7 @@ class InstDetailActivity : AppCompatActivity() {
                 if (DaoHelper.insertNewActionNodeInTx(cloneNode)) {
                     GlobalApp.toastSuccess(R.string.text_have_done)
                     DAO.clear()
-//                    ParseEngine.updateGlobal()
+                    ParseEngine.updateGlobal()
                 } else {
                     GlobalApp.toastError(R.string.text_an_err_happened)
                 }

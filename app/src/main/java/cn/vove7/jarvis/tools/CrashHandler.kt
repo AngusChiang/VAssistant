@@ -116,10 +116,9 @@ fun DeviceInfo.string(): String {
     return buildString {
         append("appId:").appendln(BuildConfig.APPLICATION_ID)
         append("userId: ").appendln(UserInfo.getUserId())
-        append("userName: ").appendln(UserInfo.getUserName())
-        append("email: ").appendln(UserInfo.getEmail())
-        append("appVersion: ").append(AppConfig.versionName)
+        append("appVersion: ").appendln(AppConfig.versionName)
         append("versionCode: ").appendln(AppConfig.versionCode)
+        append("email: ").appendln(UserInfo.getEmail())
         append("manufacturerName: ").appendln(manufacturerName)
         append("productName: ").appendln(productName)
         append("brandName: ").appendln(brandName)

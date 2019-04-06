@@ -30,9 +30,14 @@ class ExecuteQueueAdapter(context: Context, execQueue: MutableList<ActionNode>)
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
             }
 
+            //TODO 输入后解析
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 val action = item.action
-                action.param = CodeEditorActivity.parseSimpleMap(s.toString())
+                action.param = try {
+                    CodeEditorActivity.parseSimpleMap(s.toString())
+                } catch (e: Exception) {
+                    null
+                }
             }
         })
 

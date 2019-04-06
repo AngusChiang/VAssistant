@@ -57,7 +57,6 @@ import cn.vove7.jarvis.speech.SpeechEvent
 import cn.vove7.jarvis.speech.SpeechRecoService
 import cn.vove7.jarvis.speech.VoiceData
 import cn.vove7.jarvis.tools.AppConfig
-import cn.vove7.jarvis.tools.AudioController
 import cn.vove7.jarvis.tools.debugserver.RemoteDebugServer
 import cn.vove7.jarvis.tools.setFloat
 import cn.vove7.jarvis.view.dialog.MultiChoiceDialog
@@ -76,7 +75,6 @@ import org.greenrobot.eventbus.ThreadMode
 import java.lang.Thread.sleep
 import java.util.*
 import java.util.concurrent.CountDownLatch
-import java.util.concurrent.TimeUnit
 import kotlin.concurrent.thread
 
 
@@ -87,9 +85,7 @@ class MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
 
     val context = GlobalApp.APP
 
-    private val floatyPanel: FloatyPanel by lazy {
-        FloatyPanel()
-    }
+    private lateinit var floatyPanel: FloatyPanel
 
 //    override val serviceId: Int
 //        get() = 126
@@ -130,6 +126,7 @@ class MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
         AppBus.reg(this)
         loadChatSystem()
         loadSpeechService()
+        floatyPanel = FloatyPanel()
         speechEngineLoaded = true
         GlobalApp.toastInfo("启动完成")
     }
@@ -242,13 +239,15 @@ class MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
 
     /**
      * 长语音下继续语音识别
-     * fixme 其他调用speak 也会触发
      */
     private fun resumeListenCommandIfLasting() {//开启长语音时
         Vog.d("resumeListenCommandIfLasting ---> 检查长语音 afterSpeakResumeListen:$afterSpeakResumeListen IsListening:$recogIsListening")
-        if (afterSpeakResumeListen && AppConfig.lastingVoiceCommand && !recogIsListening)//防止长语音识别 继续
+        if (afterSpeakResumeListen && AppConfig.lastingVoiceCommand && !recogIsListening) {//防止长语音识别 继续
             AppBus.postDelay("lastingVoiceCommand",
                     AppBus.ORDER_START_RECOG_SILENT, 1200)
+
+            speechRecogService?.restartLastingUpTimer()
+        }
     }
 
     /**
@@ -734,29 +733,6 @@ class MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
         return null
     }
 
-    fun playSoundEffect(rawId: Int) {//音效异步
-        if (AppConfig.voiceRecogFeedback && AppConfig.currentStreamVolume != 0) {
-            AudioController.playOnce(rawId)
-        }
-    }
-
-    /**
-     *
-     * @param rawId Int
-     * @param lock CountDownLatch?
-     */
-    fun playSoundEffectSync(rawId: Int, lock: CountDownLatch? = null) {//音效同步
-        Vog.d("playSoundEffectSync ---> 音效开始")
-        if (AppConfig.voiceRecogFeedback && AppConfig.currentStreamVolume != 0) {
-            SystemBridge.requestMusicFocus()
-            val l = lock ?: CountDownLatch(1)
-            AudioController.playOnce(rawId) {
-                Vog.d("playSoundEffectSync ---> 音效结束")
-                l.countDown()
-            }
-            if (lock == null) l.await(2L, TimeUnit.SECONDS)
-        } else lock?.countDown()
-    }
 
     /**
      * 语音识别事件监听
@@ -773,10 +749,11 @@ class MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
             return
         }
 
-        private fun speakResponseWord(lock: CountDownLatch? = null) {
+        private fun speakResponseWord() {
             resumeMusicLock = false //不继续播放后台，
             Vog.d("speakResponseWord 响应词 ---> ${AppConfig.responseWord}")
-            val l = lock ?: CountDownLatch(1)
+            val l = CountDownLatch(1)
+
             speakWithCallback(AppConfig.responseWord, false, object : SpeakCallback {
                 override fun speakCallback(result: String?) {
                     Vog.d("speakWithCallback ---> $result")
@@ -784,18 +761,12 @@ class MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
                     l.countDown()
                 }
             })
-            if (lock == null)
-                if (!l.await(5L, TimeUnit.SECONDS)) {
-                    speechSynService?.stopIfSpeaking()
-                    Vog.d("speakResponseWord ---> 等待超时")
-                }
+            l.await()
             Vog.d("speak finish")
         }
 
-        //响应词 与 提示音
-        //语音唤醒时已播放  就不再播放
         /**
-         * 识别反馈
+         * 识别反馈  响应词
          * @param byVoice Boolean
          */
         private fun recogEffect(byVoice: Boolean) {
@@ -803,56 +774,53 @@ class MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
                 return
             }
             if (byVoice) {//语音唤醒
-                val lock = CountDownLatch(2)
-
                 if (AppConfig.openResponseWord && AppConfig.speakResponseWordOnVoiceWakeup) {
-                    speakResponseWord(lock)
-                } else lock.countDown()
-                playSoundEffectSync(R.raw.recog_start, lock)
-                lock.await()
+                    speakResponseWord()
+                }
             } else {//按键 快捷 等其他方式
-                val lock = CountDownLatch(2)
                 if (AppConfig.openResponseWord && !AppConfig.speakResponseWordOnVoiceWakeup) {
-                    speakResponseWord(lock)
-                } else lock.countDown()
-                playSoundEffectSync(R.raw.recog_start, lock)
-                lock.await()
+                    speakResponseWord()
+                }
             }
             Vog.d("recogEffect ---> 结束")
         }
 
+        /**
+         * 响应词，停止背景音乐
+         * @param byVoice Boolean
+         */
         override fun onPreStartRecog(byVoice: Boolean) {
-            speechSynService?.stopIfSpeaking()
-
             AppBus.post(AppBus.EVENT_BEGIN_RECO)
-            Vog.d("onPreStartRecog ---> 开始识别")
             checkMusic()//检查后台播放
             listeningAni.begin()//
             recogEffect(byVoice)
-            floatyPanel.show("开始聆听")
+        }
+
+        override fun onRecogReady() {
+            //长语音
+            if (afterSpeakResumeListen) return
             //震动
             if (AppConfig.vibrateWhenStartReco || voiceMode != MODE_VOICE) {//询问参数时，震动
                 SystemBridge.vibrate(80L)
             }
-
+            floatyPanel.show("开始聆听")
+            Vog.d("onPreStartRecog ---> 开始识别")
         }
 
         override fun onResult(voiceResult: String) {//解析完成再 resumeMusicIf()?
             Vog.d("结果 --------> $voiceResult")
 
-            if (AppConfig.lastingVoiceCommand) {//识别结束，开启长语音定时
-                speechRecogService?.restartLastingUpTimer()
-            }
             when (voiceMode) {
                 MODE_VOICE -> {//剪去结束词
                     AppConfig.finishWord.also {
-                        //fixme 播放结束不回调
-                        playSoundEffectSync(R.raw.recog_finish)
                         when {
                             it?.isEmpty() != false -> onParseCommand(voiceResult)
                             voiceResult.endsWith(it) -> onParseCommand(voiceResult.substring(0, voiceResult.length - it.length))
                             else -> onParseCommand(voiceResult)
                         }
+                    }
+                    if (AppConfig.lastingVoiceCommand) {//识别结束，开启长语音定时
+                        speechRecogService?.restartLastingUpTimer()
                     }
                 }
                 MODE_GET_PARAM -> {//中途参数
@@ -935,7 +903,8 @@ class MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
                 MODE_ALERT -> {
                     //do nothing
                 }
-                MODE_VOICE -> playSoundEffect(R.raw.recog_cancel)//取消-音效
+                MODE_VOICE -> {
+                }
 
                 MODE_INPUT -> {
                     AppBus.post(VoiceRecogResult(-1))
@@ -950,7 +919,6 @@ class MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
             when (voiceMode) {
                 MODE_VOICE -> {
                     listeningAni.hideDelay()
-                    playSoundEffect(R.raw.recog_failed)
                     resumeMusicIf()
                 }
                 MODE_GET_PARAM -> {//获取参数失败

@@ -106,7 +106,7 @@ class ResponseData : ChatResultBuilder {
                 Pair(4000, "请求参数格式错误"),
                 Pair(4001, "加密方式错误"),
                 Pair(4002, "无功能权限"),
-                Pair(4003, "该apikey没有可用请求次数"),
+                Pair(4003, "该apikey没有可用请求次数，请查看[帮助>常见问题]"),
                 Pair(4005, "无功能权限"),
                 Pair(4007, "apikey不合法"),
                 Pair(4100, "userid获取失败"),

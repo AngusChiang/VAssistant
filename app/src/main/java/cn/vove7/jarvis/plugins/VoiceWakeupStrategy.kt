@@ -50,7 +50,7 @@ object VoiceWakeupStrategy : AbsAccPluginService() {
         MainService.instance?.onCommand(AppBus.ORDER_STOP_VOICE_WAKEUP_WITHOUT_NOTIFY)
         Vog.d("VoiceWakeupStrategy ---> 关闭语音唤醒")
         closed = true
-        if (AppConfig.notifyCloseMico) {
+        if (AppConfig.notifyCloseMicro) {
             statusAni.failedAndHideDelay("关闭语音唤醒", 2000)
         }
     }
@@ -63,7 +63,7 @@ object VoiceWakeupStrategy : AbsAccPluginService() {
         Vog.d("VoiceWakeupStrategy ---> 开启语音唤醒")
         closed = false
 
-        if (AppConfig.notifyCloseMico) {
+        if (AppConfig.notifyCloseMicro) {
             statusAni.begin()
             statusAni.hideDelay(2000)
         }
@@ -83,7 +83,7 @@ object VoiceWakeupStrategy : AbsAccPluginService() {
     fun canOpenRecord(): Boolean {
         return AccessibilityApi.accessibilityService?.currentAppInfo?.let {
             //开启无障碍 并且开启麦克风冲突 and 当前有麦克风权限
-            if (!AppConfig.fixVoiceMico || !it.hasMicroPermission()) {
+            if (!AppConfig.fixVoiceMicro || !it.hasMicroPermission()) {
                 true
             } else {
                 if (opened) {//通知 开启定时器
