@@ -158,12 +158,12 @@ abstract class SpeechRecoService(val event: SpeechEvent) : SpeechRecogI {
      * 在识别成功后，重新定时
      * speak后doStartRecog，操作后？？？
      */
-    private fun restartLastingUpTimer() {//重启
-        Vog.d("restartLastingUpTimer ---> 开启长语音定时")
-        timerHandler.removeCallbacks(autoCloseRecog)
-        timerHandler.postDelayed(autoCloseRecog,
-                (AppConfig.lastingVoiceMillis * 1000).toLong())
-    }
+//    private fun restartLastingUpTimer() {//重启
+//        Vog.d("restartLastingUpTimer ---> 开启长语音定时")
+//        timerHandler.removeCallbacks(autoCloseRecog)
+//        timerHandler.postDelayed(autoCloseRecog,
+//                (AppConfig.lastingVoiceMillis * 1000).toLong())
+//    }
 
     private fun stopLastingUpTimer() {
         Vog.d("restartLastingUpTimer ---> 关闭长语音定时")
@@ -210,7 +210,6 @@ abstract class SpeechRecoService(val event: SpeechEvent) : SpeechRecogI {
         }
         if (AppConfig.lastingVoiceCommand && !lastingStoped) {
             startRecogSilent()
-            restartLastingUpTimer()
         } else {
             Vog.d("重启长语音： 长语音关闭或已停止")
         }
@@ -242,9 +241,6 @@ abstract class SpeechRecoService(val event: SpeechEvent) : SpeechRecogI {
                     val res = msg.data.getString("data")
                     if (res != null)
                         event.onTempResult(res)
-                    if (AppConfig.lastingVoiceCommand) {//临时结果 暂时关闭长语音定时器
-                        stopLastingUpTimer()
-                    }
                 }
                 IStatus.CODE_VOICE_ERR -> {//出错
                     val res = msg.data.getString("data") ?: "null"

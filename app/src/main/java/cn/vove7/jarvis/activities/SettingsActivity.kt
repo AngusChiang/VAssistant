@@ -97,7 +97,7 @@ class SettingsActivity : ReturnableActivity() {
             )),
             SettingGroupItem(R.color.indigo_700, titleS = "语音识别", childItems = listOf(
                     SwitchItem(title = "长语音模式", summary = "开启后，唤醒后可连续说出命令\n可以通过按音量下键终止\n" +
-                            "会占用麦克风\n支持语音唤醒与长语音同时开启",
+                            "会占用麦克风\n支持语音唤醒与长语音同时开启\n等待时间为8s",
                             keyId = R.string.key_lasting_voice_command, defaultValue = { AppConfig.lastingVoiceCommand }) { _, b ->
                         if (b) {
 //                            AppBus.postSpeechAction(SpeechAction.ActionCode.ACTION_STOP_WAKEUP)
@@ -107,11 +107,7 @@ class SettingsActivity : ReturnableActivity() {
                             AppBus.postSpeechAction(SpeechAction.ActionCode.ACTION_STOP_RECOG)
                         }
                         return@SwitchItem true
-                    },
-                    NumberPickerItem(title = "长语音有效时长", summary = "指定时间（单位秒）取消长语音识别 默认10s\n亦可通过指令'退下'关闭语音识别",
-                            range = Pair(5, 30),
-                            keyId = R.string.key_lasting_voice_millis,
-                            defaultValue = { AppConfig.lastingVoiceMillis })
+                    }
             )),
             SettingGroupItem(R.color.google_green, "反馈", childItems = listOf(
                     SwitchItem(title = "提示音", summary = "语音识别提示音", keyId = R.string.key_voice_recog_feedback, defaultValue = { AppConfig.voiceRecogFeedback }),

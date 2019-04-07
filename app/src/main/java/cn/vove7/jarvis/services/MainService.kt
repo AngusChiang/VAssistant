@@ -241,7 +241,7 @@ class MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
      * 长语音下继续语音识别
      */
     private fun resumeListenCommandIfLasting() {//开启长语音时
-        Vog.d("resumeListenCommandIfLasting ---> 检查长语音 afterSpeakResumeListen:$afterSpeakResumeListen IsListening:$recogIsListening")
+        Vog.d("resumeListenCommandIfLasting ---> 检查长语音 $afterSpeakResumeListen")
         if (afterSpeakResumeListen) {//防止长语音识别 继续
             speechRecogService?.startIfLastingVoice()
         }
@@ -337,7 +337,6 @@ class MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
     /**
      * 同步 响应词
      * @param text String?
-     * @param resume Boolean speak结束是否继续(设置afterSpeakResumeListen) true
      * @param call SpeakCallback
      */
     private fun speakWithCallback(text: String?, call: SpeakCallback) {

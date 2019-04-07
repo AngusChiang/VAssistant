@@ -110,15 +110,16 @@ class BaiduSpeechRecogService(event: SpeechEvent) : SpeechRecoService(event) {
 //            Pair(SpeechConstant.VAD_MODEL, "dnn"),
             Pair(SpeechConstant.DISABLE_PUNCTUATION, false),//标点符号
             Pair(SpeechConstant.ACCEPT_AUDIO_VOLUME, true),
-            Pair(SpeechConstant.PID, 1536)
+            Pair(SpeechConstant.PID, 1536),
+            Pair(SpeechConstant.NLU,"enable")
     ).also {
         it[SpeechConstant.IN_FILE] = "#cn.vove7.jarvis.speech.baiduspeech.MicInputStream.instance()"
-        if (!AppConfig.openResponseWord)//唤醒即识别 响应词打开则无效
-            it[SpeechConstant.AUDIO_MILLS] = System.currentTimeMillis() - 200
         //从指定时间开始识别，可以 - 指定ms 识别之前的内容
+        if (!AppConfig.openResponseWord && !AppConfig.voiceRecogFeedback)//唤醒即识别 音效和响应词关闭时开启
+            it[SpeechConstant.AUDIO_MILLS] = System.currentTimeMillis() - 100
         //长语音，不再依赖百度语音内置
 //        if (AppConfig.lastingVoiceCommand)
-//            it[SpeechConstant.VAD_ENDPOINT_TIMEOUT] = 0
+        //静音时长
         if (AppConfig.voiceRecogFeedback && !silent)
             it[SpeechConstant.SOUND_START] = R.raw.recog_start
         if (AppConfig.voiceRecogFeedback) {
