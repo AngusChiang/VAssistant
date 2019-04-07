@@ -185,6 +185,7 @@ abstract class SimpleListFragment<DataType> : Fragment(), ViewModelLoader<DataTy
         swipeRefreshLayout = f(R.id.swipe_refresh)
         netErrViewContainer = f(R.id.net_error_layout)
         progressBar = f(R.id.progress_bar)
+        progressBar.visibility = showBar
         swipeRefreshLayout.setOnRefreshListener {
             //下拉刷新
             refresh()
@@ -323,11 +324,20 @@ abstract class SimpleListFragment<DataType> : Fragment(), ViewModelLoader<DataTy
     private fun <V : View> f(id: Int): V = contentView.findViewById(id) as V
 
     fun showProgressBar() {
-        progressBar.visibility = View.VISIBLE
+        showBar = View.VISIBLE
     }
 
+    private var showBar = View.GONE
+        set(v) {
+            try {
+                progressBar.visibility = v
+            } catch (e: Exception) {
+            }
+            field = v
+        }
+
     fun hideProgressBar() {
-        progressBar.visibility = View.GONE
+        showBar = View.GONE
     }
 }
 
@@ -345,5 +355,5 @@ interface AwesomeItem {
     val viewIcon: Drawable? get() = null
     val isChecked: Boolean? get() = null
     val bgColor: Int? get() = null
-    fun onLoadDrawable(imgView: ImageView){}
+    fun onLoadDrawable(imgView: ImageView) {}
 }
