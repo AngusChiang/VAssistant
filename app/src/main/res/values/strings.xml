@@ -395,7 +395,6 @@
     <string name="key_auto_check_plugin_update" translatable="false">auto_check_plugin_update</string>
     <string name="key_smart_find_and_kill_ad" translatable="false">smart_find_and_kill_ad</string>
     <string name="key_float_voice_align" translatable="false">float_voice_align</string>
-    <string name="key_lasting_voice_millis" translatable="false">lasting_voice_millis</string>
     <string name="key_voice_recog_compatible_mode" translatable="false">voice_recog_compatible_mode</string>
     <string name="key_text_ocr_key" translatable="false">text_ocr_key</string>
     <string name="text_plugins_manager" translatable="false">插件管理</string>

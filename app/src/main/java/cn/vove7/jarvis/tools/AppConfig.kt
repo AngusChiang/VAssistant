@@ -114,7 +114,6 @@ object AppConfig {
         }
 
     var lastingVoiceCommand = false //长语音 连续命令
-    var lastingVoiceMillis: Int = 10 //长语音等待时间 单位秒
 
     var listeningToastAlignDirection = 0//对齐方向
 
@@ -308,9 +307,6 @@ object AppConfig {
         chatStr = sp.getString(R.string.key_chat_str)
         textOcrStr = sp.getString(R.string.key_text_ocr_key)
 
-        sp.getInt(R.string.key_lasting_voice_millis).also {
-            lastingVoiceMillis = if (it < 0) lastingVoiceMillis else it
-        }
         finishWord = sp.getString(R.string.key_finish_word)
 //        onlyCloudServiceParse = getBooleanAndInit(R.string.key_only_cloud_service_parse, false)
         userWakeupWord = sp.getString(R.string.key_user_wakeup_word) ?: ""
