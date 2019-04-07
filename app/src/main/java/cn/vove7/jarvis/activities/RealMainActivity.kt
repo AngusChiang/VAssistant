@@ -53,7 +53,7 @@ class RealMainActivity : AppCompatActivity() {
         }
 
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener)
-        navigation.selectedItemId = R.id.nav_me
+        navigation.selectedItemId = if (AppConfig.FIRST_LAUNCH_NEW_VERSION) R.id.nav_home else R.id.nav_me
 
         requestPermission()
     }

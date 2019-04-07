@@ -6,6 +6,7 @@ import android.support.v4.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import br.tiagohm.markdownview.css.styles.Bootstrap
 import cn.vove7.jarvis.R
 import kotlinx.android.synthetic.main.fragment_home.view.*
 
@@ -24,10 +25,19 @@ class HomeFragment : Fragment() {
                               savedInstanceState: Bundle?): View? {
 
         return inflater.inflate(R.layout.fragment_home, container, false).apply {
-            markdown_view.loadMarkdownFromAsset("files/introduction.md")
+            markdown_view.apply {
+                addStyleSheet(
+                        object : Bootstrap() {
+                            init {
+                                this.addRule("body", "line-height: 1.6", "padding: 5px",
+                                        "background: #f4f4f4")
+
+                            }
+                        })
+                loadMarkdownFromAsset("files/introduction.md")
+            }
         }
     }
-
 
     companion object {
 
