@@ -21,9 +21,17 @@ import kotlin.reflect.KProperty
  * Created by Vove on 2018/6/15
  */
 object ParseEngine {
-    private lateinit var GlobalActionNodes: List<ActionNode>
+    private var GlobalActionNodes: List<ActionNode> = mutableListOf()
+        get() {
+            if (field.isEmpty()) updateGlobal()
+            return field
+        }
 
-    private lateinit var AppActionNodes: List<ActionNode>
+    private var AppActionNodes: List<ActionNode> = mutableListOf()
+        get() {
+            if (field.isEmpty()) updateInApp()
+            return field
+        }
 
     init {
         updateNode()
@@ -46,6 +54,7 @@ object ParseEngine {
                 .orderDesc(ActionNodeDao.Properties.Priority)//按优先级
                 .list()
     }
+
     /**
      * 同步后，更新数据
      */

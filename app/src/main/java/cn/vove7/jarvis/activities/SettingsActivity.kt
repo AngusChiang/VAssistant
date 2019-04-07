@@ -103,13 +103,13 @@ class SettingsActivity : ReturnableActivity() {
 //                            AppBus.postSpeechAction(SpeechAction.ActionCode.ACTION_STOP_WAKEUP)
 //                            AppConfig.voiceWakeup = false
                         } else {
-                            MainService.instance?.speechRecogService?.stopLastingUpTimer()//关闭长语音定时器
                             AppBus.postSpeechAction(SpeechAction.ActionCode.ACTION_CANCEL_RECOG)
                             AppBus.postSpeechAction(SpeechAction.ActionCode.ACTION_STOP_RECOG)
                         }
                         return@SwitchItem true
                     },
-                    NumberPickerItem(title = "长语音有效时长", summary = "指定时间（单位秒）取消长语音识别", range = Pair(5, 120),
+                    NumberPickerItem(title = "长语音有效时长", summary = "指定时间（单位秒）取消长语音识别 默认10s\n亦可通过指令'退下'关闭语音识别",
+                            range = Pair(5, 30),
                             keyId = R.string.key_lasting_voice_millis,
                             defaultValue = { AppConfig.lastingVoiceMillis })
             )),

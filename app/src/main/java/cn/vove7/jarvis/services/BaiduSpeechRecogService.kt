@@ -116,8 +116,9 @@ class BaiduSpeechRecogService(event: SpeechEvent) : SpeechRecoService(event) {
         if (!AppConfig.openResponseWord)//唤醒即识别 响应词打开则无效
             it[SpeechConstant.AUDIO_MILLS] = System.currentTimeMillis() - 200
         //从指定时间开始识别，可以 - 指定ms 识别之前的内容
-        if (AppConfig.lastingVoiceCommand)
-            it[SpeechConstant.VAD_ENDPOINT_TIMEOUT] = 0
+        //长语音，不再依赖百度语音内置
+//        if (AppConfig.lastingVoiceCommand)
+//            it[SpeechConstant.VAD_ENDPOINT_TIMEOUT] = 0
         if (AppConfig.voiceRecogFeedback && !silent)
             it[SpeechConstant.SOUND_START] = R.raw.recog_start
         if (AppConfig.voiceRecogFeedback) {
@@ -129,40 +130,13 @@ class BaiduSpeechRecogService(event: SpeechEvent) : SpeechRecoService(event) {
 
     }
 
-//    private val backTrackInMs = 1500
-
-
-    private val autoCloseRecog = Runnable {
-        Vog.i(" ---> 长语音自动关闭识别")
-        doCancelRecog()
-    }
-
-    /**
-     * 在识别成功后，重新定时
-     * speak后doStartRecog，操作后？？？
-     */
-    override fun restartLastingUpTimer() {//重启
-        Vog.d("restartLastingUpTimer ---> 开启长语音定时")
-        timerHandler.removeCallbacks(autoCloseRecog)
-        timerHandler.postDelayed(autoCloseRecog,
-                (AppConfig.lastingVoiceMillis * 1000).toLong())
-    }
-
-    override fun stopLastingUpTimer() {
-        Vog.d("restartLastingUpTimer ---> 关闭长语音定时")
-        timerHandler.removeCallbacks(autoCloseRecog)
-    }
 
     /**
      * 检查百度长语音
      * 然后定时关闭
      */
     override fun doStartRecog(silent: Boolean) {
-        if (AppConfig.lastingVoiceCommand) {//开启长语音
-            restartLastingUpTimer()
-        }
-
-        Vog.d("doStartRecog ---> 开始识别")
+        Vog.d("doStartRecog ---> 开始聆听")
         //震动 音效
         myRecognizer.start(recogParams(silent))
     }
@@ -171,21 +145,18 @@ class BaiduSpeechRecogService(event: SpeechEvent) : SpeechRecoService(event) {
      * 开始录音后，手动停止录音。SDK会识别在此过程中的录音。点击“停止”按钮后调用。
      */
     override fun doStopRecog() {
+        Vog.d("doStartRecog ---> 停止聆听")
         myRecognizer.stop()
     }
 
     /**
      * 开始录音后，取消这次录音。SDK会取消本次识别，回到原始状态。点击“取消”按钮后调用。
      */
-
     override fun doCancelRecog() {
         isListening = false
         myRecognizer.cancel()
     }
-//    fun isListening(): Boolean {
-//        return !arrayOf(IStatus.STATUS_NONE, IStatus.STATUS_FINISHED, IStatus.CODE_WAKEUP_EXIT)
-//                .contains(listener.status)
-//    }
+
 
     override fun release() {
         myRecognizer.release()

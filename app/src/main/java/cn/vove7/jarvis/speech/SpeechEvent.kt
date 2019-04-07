@@ -20,7 +20,7 @@ interface SpeechEvent {
     fun onPreStartRecog(byVoice: Boolean)
 
     //准备 播放音效后
-    fun onRecogReady()
+    fun onRecogReady(silent: Boolean)
 
     /**
      * 识别成功结果

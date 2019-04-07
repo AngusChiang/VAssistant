@@ -114,7 +114,7 @@ object AppConfig {
         }
 
     var lastingVoiceCommand = false //长语音 连续命令
-    var lastingVoiceMillis: Int = 20 //长语音等待时间 单位秒
+    var lastingVoiceMillis: Int = 10 //长语音等待时间 单位秒
 
     var listeningToastAlignDirection = 0//对齐方向
 
@@ -323,6 +323,7 @@ object AppConfig {
                 i
             }
         }
+
         chatSystem = sp.getString(R.string.key_chat_system_type).let {
             val i = GlobalApp.APP.resources.getStringArray(R.array.list_chat_system)
             if (!UserInfo.isVip()) i[0] else it ?: i[0]

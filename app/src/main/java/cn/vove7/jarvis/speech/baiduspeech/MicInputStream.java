@@ -70,7 +70,7 @@ public class MicInputStream extends InputStream {
             throw new IOException("audio recorder is null");
         } else {
             int var4 = this.mAudioRecord.read(var1, var2, var3);
-            LogUtil.v(this.TAG, new String[]{" AudioRecord read: len:" + var4 + " byteOffset:" + var2 + " byteCount:" + var3});
+            LogUtil.v(this.TAG, " AudioRecord read: len:" + var4 + " byteOffset:" + var2 + " byteCount:" + var3);
             if (var4 >= 0 && var4 <= var3) {
                 return var4;
             } else {

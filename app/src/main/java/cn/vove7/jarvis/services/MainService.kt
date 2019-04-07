@@ -229,7 +229,7 @@ class MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
     }
 
     /**
-     * 长语音时 speak或AlertDialog 会 \[暂时]关闭识别
+     * 长语音后台识别时 speak或AlertDialog 会 \[暂时]关闭识别
      * 聊天对话说完(speak)后 继续标志（可能有其他调用speak，则不继续）
      *
      * 标志更改 ：开始聊天对话|showAlert set 识别状态recogIsListening  取消识别时 set false
@@ -242,23 +242,19 @@ class MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
      */
     private fun resumeListenCommandIfLasting() {//开启长语音时
         Vog.d("resumeListenCommandIfLasting ---> 检查长语音 afterSpeakResumeListen:$afterSpeakResumeListen IsListening:$recogIsListening")
-        if (afterSpeakResumeListen && AppConfig.lastingVoiceCommand && !recogIsListening) {//防止长语音识别 继续
-            AppBus.postDelay("lastingVoiceCommand",
-                    AppBus.ORDER_START_RECOG_SILENT, 1200)
-
-            speechRecogService?.restartLastingUpTimer()
+        if (afterSpeakResumeListen) {//防止长语音识别 继续
+            speechRecogService?.startIfLastingVoice()
         }
     }
 
     /**
-     * speak时暂时关闭 语音识别（长语音）
+     * speak时暂时关闭 长语音识别（长语音）
      */
-    private fun stopRecogTemp() {
-        if (AppConfig.lastingVoiceCommand) {//防止长语音识别 speak聊天对话
-            Vog.d("stopRecogTemp ---> speak临时 $recogIsListening")
-            afterSpeakResumeListen = recogIsListening
-            speechRecogService?.doCancelRecog()
-            speechRecogService?.doStopRecog()
+    private fun stopLastingRecogTemp() {
+        if (AppConfig.lastingVoiceCommand) {
+            Vog.d("stopLastingRecogTemp ---> speak临时 ${speechRecogService?.lastingStoped}")
+            //没有手动停止 并且 已停止识别
+            afterSpeakResumeListen = !(speechRecogService?.lastingStoped ?: true) && !recogIsListening
         }
     }
 
@@ -326,7 +322,6 @@ class MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
 
     private var speakSync = false
     override fun speak(text: String?) {
-        stopRecogTemp()
         //关闭语音播报 toast
         if (AppConfig.audioSpeak && AppConfig.currentStreamVolume != 0) {
             speakSync = false
@@ -345,16 +340,13 @@ class MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
      * @param resume Boolean speak结束是否继续(设置afterSpeakResumeListen) true
      * @param call SpeakCallback
      */
-    private fun speakWithCallback(text: String?, resume: Boolean = true, call: SpeakCallback) {
-        if (resume) stopRecogTemp()
-        else afterSpeakResumeListen = false
+    private fun speakWithCallback(text: String?, call: SpeakCallback) {
         speakCallbacks.add(call)
         speakSync = true
         speechSynService?.speak(text) ?: notifySpeakFinish()
     }
 
     override fun speakSync(text: String?): Boolean {
-        stopRecogTemp()
         speakSync = true
         return if (AppConfig.audioSpeak && AppConfig.currentStreamVolume != 0) {//当前音量非静音
             speechSynService?.speak(text) ?: notifySpeakFinish()
@@ -754,7 +746,7 @@ class MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
             Vog.d("speakResponseWord 响应词 ---> ${AppConfig.responseWord}")
             val l = CountDownLatch(1)
 
-            speakWithCallback(AppConfig.responseWord, false, object : SpeakCallback {
+            speakWithCallback(AppConfig.responseWord, object : SpeakCallback {
                 override fun speakCallback(result: String?) {
                     Vog.d("speakWithCallback ---> $result")
                     sleep(200)
@@ -796,9 +788,11 @@ class MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
             recogEffect(byVoice)
         }
 
-        override fun onRecogReady() {
-            //长语音
-            if (afterSpeakResumeListen) return
+        override fun onRecogReady(silent: Boolean) {
+            if (silent) {
+                Vog.d("静默识别")
+                return
+            }
             //震动
             if (AppConfig.vibrateWhenStartReco || voiceMode != MODE_VOICE) {//询问参数时，震动
                 SystemBridge.vibrate(80L)
@@ -819,9 +813,7 @@ class MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
                             else -> onParseCommand(voiceResult)
                         }
                     }
-                    if (AppConfig.lastingVoiceCommand) {//识别结束，开启长语音定时
-                        speechRecogService?.restartLastingUpTimer()
-                    }
+                    speechRecogService?.startIfLastingVoice()
                 }
                 MODE_GET_PARAM -> {//中途参数
                     resumeMusicIf()
@@ -862,9 +854,6 @@ class MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
 
         override fun onTempResult(temp: String) {
             temResult = temp
-            if (AppConfig.lastingVoiceCommand) {//临时结果 暂时关闭长语音定时器
-                speechRecogService?.stopLastingUpTimer()
-            }
             Vog.d("onTempResult ---> 临时结果 $temp")
             floatyPanel.show(temp)
             listeningAni.show(temp)
@@ -974,11 +963,6 @@ class MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
                     val his = CommandHistory(UserInfo.getUserId(), result,
                             parseResult.msg)
                     NetHelper.uploadUserCommandHistory(his)
-                    runOnCachePool {
-                        if (AppConfig.lastingVoiceCommand) {//开启长语音,重启定时
-                            speechRecogService?.restartLastingUpTimer()
-                        }
-                    }
                 }
             } else {// statistics
                 //云解析
@@ -1059,12 +1043,14 @@ class MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
                 executeAnimation.begin()
                 executeAnimation.show(word)
 
-                afterSpeakResumeListen = recogIsListening
-                speakWithCallback(word, true, object : SpeakCallback {
+                val l = CountDownLatch(1)
+                speakWithCallback(word, object : SpeakCallback {
                     override fun speakCallback(result: String?) {
                         hideAll()
+                        l.countDown()
                     }
                 })
+                l.await()
             }
             data.resultUrls.also {
                 when {
@@ -1137,6 +1123,7 @@ class MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
 
         override fun onStart() {
             Vog.d("onSynData 开始")
+            stopLastingRecogTemp()
             checkMusic()
         }
     }
