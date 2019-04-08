@@ -77,10 +77,12 @@ class HelpActivity : ReturnableActivity(), AdapterView.OnItemClickListener {
                     val text = TextView(this@HelpActivity).apply {
                         setPadding(50, 0, 50, 30)
                         append("1. 长按音量上键进行唤醒。\n" +
-                                "2. 在聆听时，可通过点按音量上键停止聆听，点按下音量下键取消聆听。\n" +
-                                "3. 在执行时，可长按下键，终止执行\n" +
-                                "4. 有线耳机适用,并且支持长按中键唤醒\n" +
-                                "5. 锁屏下可进行唤醒。\n\n")
+                                "2. 按下松开音量上键，再快速长按可持续加大音量。\n" +
+                                "3. 在聆听时，可通过点按音量上键停止聆听，点按下音量下键取消聆听。\n" +
+                                "4. 在执行时，可长按下键，终止执行\n" +
+                                "5. 在长语音聆听时，可长按下键，结束长语音\n" +
+                                "6. 有线耳机适用,并且支持长按中键唤醒\n" +
+                                "7. 锁屏下可进行唤醒。\n\n")
                         append(MultiSpan(this@HelpActivity,
                                 "以上音量快捷键需要无障碍支持", typeface = Typeface.BOLD).spanStr)
                     }

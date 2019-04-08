@@ -22,6 +22,7 @@ import cn.vove7.common.utils.activities
 import cn.vove7.common.utils.isInputMethod
 import cn.vove7.common.bridges.SystemBridge
 import cn.vove7.common.helper.AdvanAppHelper
+import cn.vove7.common.utils.MutableFlag
 import cn.vove7.jarvis.plugins.AdKillerService
 import cn.vove7.jarvis.plugins.VoiceWakeupStrategy
 import cn.vove7.jarvis.tools.AppConfig
@@ -284,12 +285,13 @@ class MyAccessibilityService : AccessibilityApi() {
     /**
      * 点按音量加，再长按触发音量增大
      */
-    private var v4: Long? = null
-        get() {
-            val v = field
-            field = null
-            return v
-        }
+    private var v4  by MutableFlag<Long?>(null,null)
+//    private var v4: Long? = null
+//        get() {
+//            val v = field
+//            field = null
+//            return v
+//        }
 
     /**
      * 按键监听

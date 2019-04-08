@@ -1,7 +1,6 @@
 package cn.vove7.common.view.finder
 
 import android.view.accessibility.AccessibilityNodeInfo
-import cn.vove7.common.accessibility.AccessibilityApi
 
 /**
  * # ScreenTextFinder
@@ -9,7 +8,7 @@ import cn.vove7.common.accessibility.AccessibilityApi
  * @author Administrator
  * 2018/10/14
  */
-class ScreenTextFinder(startNode: AccessibilityNodeInfo?) : ViewFinder(startNode) {
+class ScreenTextFinder(startNode: AccessibilityNodeInfo? = null) : ViewFinder(startNode) {
     var isWeb = false
     override fun findCondition(node: AccessibilityNodeInfo): Boolean {
         if (node.className.endsWith("WebView", ignoreCase = true)) {

@@ -344,4 +344,15 @@ class ExampleUnitTest {
         println("%呼叫@{name}".toParamRegex().match("呼叫123"))// true
 
     }
+
+    var onceFlag by MutableFlag(false, true)
+
+    @Test
+    fun onceTest() {
+        println(onceFlag)
+        println(onceFlag)
+        onceFlag=false
+        println(onceFlag)
+        println(onceFlag)
+    }
 }

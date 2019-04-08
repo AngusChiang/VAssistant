@@ -7,6 +7,7 @@ import android.support.v7.app.AppCompatActivity
 import android.view.View
 import android.view.Window
 import cn.vove7.common.model.UserInfo
+import cn.vove7.common.utils.MutableFlag
 import cn.vove7.common.utils.runOnNewHandlerThread
 import cn.vove7.jarvis.BuildConfig
 import cn.vove7.jarvis.R
@@ -53,13 +54,15 @@ class RealMainActivity : AppCompatActivity() {
         }
 
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener)
-        navigation.selectedItemId = if (AppConfig.FIRST_LAUNCH_NEW_VERSION) R.id.nav_home else R.id.nav_me
+        navigation.selectedItemId = if (AppConfig.FIRST_LAUNCH_NEW_VERSION&& inFlag) R.id.nav_home else R.id.nav_me
 
         requestPermission()
     }
 
-    var firstIn = true
-    var lastCheck = 0L
+
+    private var firstIn = true
+    private var lastCheck = 0L
+
     override fun onResume() {
         super.onResume()
         if (!firstIn) {
@@ -84,6 +87,7 @@ class RealMainActivity : AppCompatActivity() {
                 android.Manifest.permission.READ_PHONE_STATE
         )
         var showUpdate = true
+        var inFlag by MutableFlag(initValue = true, afterValue = false)
     }
 
     private fun requestPermission() {

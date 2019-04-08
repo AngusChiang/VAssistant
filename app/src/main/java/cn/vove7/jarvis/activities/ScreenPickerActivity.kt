@@ -63,8 +63,8 @@ class ScreenPickerActivity : Activity() {
         }
 
         runOnNewHandlerThread {
-            ScreenTextFinder(AccessibilityApi.accessibilityService?.rootInWindow!!)
-                    .findAll().forEach { viewNodeList.add(Model(it)) }
+            ScreenTextFinder().findAll()
+                    .forEach { viewNodeList.add(Model(it)) }
             Vog.d("onCreate ---> 提取数量 ${viewNodeList.size}")
 
 
