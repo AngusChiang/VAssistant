@@ -33,6 +33,7 @@ class VoiceAssistActivity : Activity() {
         Vog.d("VoiceAssist ---> $action")
         when (action) {
             Intent.ACTION_ASSIST, Intent.ACTION_VOICE_COMMAND,
+            RecognizerIntent.ACTION_VOICE_SEARCH_HANDS_FREE,
             RecognizerIntent.ACTION_WEB_SEARCH, WAKE_UP -> {
                 Vog.d("onCreate ---> ASSIST wakeup")
                 MainService.switchRecog()

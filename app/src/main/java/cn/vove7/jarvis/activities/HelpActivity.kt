@@ -129,6 +129,7 @@ class HelpActivity : ReturnableActivity(), AdapterView.OnItemClickListener {
         }
     }
 
+    //TODO
     private fun showFeedbackDialog() {
         MaterialDialog(this)
                 .title(R.string.text_feedback)

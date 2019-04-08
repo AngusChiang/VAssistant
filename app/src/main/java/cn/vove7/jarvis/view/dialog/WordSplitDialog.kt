@@ -40,6 +40,8 @@ class WordSplitDialog(context: Context, val rawWords: String, val type: Int = 0)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         showLoadingBar()
+        setCancelable(false)
+        enableCloseIcon(true)
         lexerThread = thread {
             BaiduAipHelper.lexer(rawWords).also {
                 if (Thread.currentThread().isInterrupted) return@thread
@@ -146,15 +148,11 @@ class WordSplitDialog(context: Context, val rawWords: String, val type: Int = 0)
      * @param list List<CheckedTextView>
      * @return String
      */
-    fun getCheckedText(list: List<CheckedTextView>): String {
-        val b = StringBuilder()
+    private fun getCheckedText(list: List<CheckedTextView>): String = buildString {
         list.forEach {
             if (it.isChecked) {
-                b.append(it.text)
+                append(it.text)
             }
-        }
-        return b.toString().also {
-            Vog.d("getCheckedText ---> $it")
         }
     }
 

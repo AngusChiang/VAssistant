@@ -157,6 +157,8 @@
                 <!--搜索，此处唤醒-->
                 <action android:name="android.speech.action.WEB_SEARCH" />
 
+                <action android:name="android.speech.action.VOICE.SEARCH_HANDS_FREE" />
+
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.VOICE_LAUNCH" />
             </intent-filter>
