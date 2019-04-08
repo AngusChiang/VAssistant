@@ -132,7 +132,6 @@ class ScreenAssistActivity : Activity() {
     }
 
 
-
     private fun handlerScreen() {
         intent?.apply {
             if (hasExtra("path")) {
@@ -327,16 +326,17 @@ class ScreenAssistActivity : Activity() {
             try {
                 val intent = Intent(GlobalApp.APP,
                         TextOcrActivity::class.java).also {
-                    val results = BaiduAipHelper.ocr(screenPath)
+                    val results = BaiduAipHelper.ocr(UtilBridge.compressImage(screenPath))
                     it.putExtra("items", results)
                 }
                 if (isFinishing) return@runOnNewHandlerThread
                 startActivity(intent)
-                showProgressBar = false
                 finish()
             } catch (e: Exception) {
                 e.printStackTrace()
-                GlobalApp.toastInfo(e.message!!)
+                GlobalApp.toastError(e.message ?: "")
+            } finally {
+                showProgressBar = false
             }
         }
     }
@@ -351,7 +351,7 @@ class ScreenAssistActivity : Activity() {
 
         showProgressBar = true
         ThreadPool.runOnPool {
-            val r = BaiduAipHelper.imageClassify(screenPath)
+            val r = BaiduAipHelper.imageClassify(UtilBridge.compressImage(screenPath))
             runOnUi {
                 showProgressBar = false
                 Vog.d("imageClassify ---> ${r?.bestResult}")
@@ -362,7 +362,7 @@ class ScreenAssistActivity : Activity() {
                         if (!bottomController.isBottomSheetShowing) {
                             finish()
                         }
-                    } else if(!isFinishing) {
+                    } else if (!isFinishing) {
                         dialog = ImageClassifyResultDialog(result, this, screenPath) {
                             finish()
                         }.also { it.show() }

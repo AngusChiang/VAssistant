@@ -73,6 +73,7 @@ dependencies {
     // provide okhttp to connect to backend
     api 'com.liulishuo.okdownload:okhttp:1.0.5'
     api 'com.github.GrenderG:Toasty:1.4.1'
+    api 'top.zibin:Luban:1.1.8'//鲁班 压缩图片
 
     api project(path: ':ParamRegexEngine')
 }

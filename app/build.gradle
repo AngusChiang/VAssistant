@@ -132,7 +132,6 @@ dependencies {
     testImplementation 'org.reflections:reflections:0.9.10'
 
     implementation 'nl.dionsegijn:konfetti:1.1.2'
-    implementation 'top.zibin:Luban:1.1.8'//鲁班 压缩图片
 
     // Material
 //    implementation "com.google.android.material:material:$material_version"

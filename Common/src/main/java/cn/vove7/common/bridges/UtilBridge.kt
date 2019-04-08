@@ -5,10 +5,13 @@ import android.graphics.Bitmap
 import android.net.Uri
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.app.GlobalLog
+import cn.vove7.common.model.ResultBox
 import cn.vove7.vtp.log.Vog
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser
+import top.zibin.luban.Luban
+import top.zibin.luban.OnCompressListener
 import java.io.File
 import java.io.FileOutputStream
 import java.util.*
@@ -22,8 +25,20 @@ import java.util.*
  */
 object UtilBridge {
 
-    fun bitmap2File(bitmap: Bitmap, fullPath: String): File? {//保存到本地
-        Vog.d("bitmap2File ---> $fullPath")
+    fun compressImage(file: String): File = UtilBridge.compressImage(File(file))
+
+    /**
+     * 压缩图片，使用Luban
+     * @param file File
+     * @return File
+     */
+    fun compressImage(file: File): File {
+        return Luban.with(GlobalApp.APP).load(file).ignoreBy(100)
+                .setTargetDir(file.parent)
+                .get()[0] ?:file
+    }
+
+    fun bitmap2File(bitmap: Bitmap, fullPath: String): File? {
         return try {
             File(fullPath).apply {
                 if (!parentFile.exists())

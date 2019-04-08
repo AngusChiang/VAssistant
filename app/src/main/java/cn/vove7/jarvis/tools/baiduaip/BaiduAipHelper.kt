@@ -15,6 +15,7 @@ import com.baidu.aip.imageclassify.AipImageClassify
 import com.baidu.aip.nlp.AipNlp
 import com.baidu.aip.ocr.AipOcr
 import org.json.JSONObject
+import java.io.File
 import java.util.*
 
 /**
@@ -61,6 +62,8 @@ object BaiduAipHelper {
 
     }
 
+    fun imageClassify(imgFile: File): ImageClassifyResult? = imageClassify(imgFile.absolutePath)
+
     /**
      * 图像识别
      * @param path String
@@ -103,8 +106,11 @@ object BaiduAipHelper {
         }
     }
 
+
+    fun ocr(imgFIle: File, minP: Double = 0.8): ArrayList<TextOcrItem> = BaiduAipHelper.ocr(imgFIle.absolutePath, minP)
+
     /**
-     * 图片ocr
+     * 图片文字ocr
      */
     @Throws
     fun ocr(imgPath: String, minP: Double = 0.8): ArrayList<TextOcrItem> {
