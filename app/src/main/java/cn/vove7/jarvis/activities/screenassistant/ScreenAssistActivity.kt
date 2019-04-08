@@ -362,7 +362,7 @@ class ScreenAssistActivity : Activity() {
                         if (!bottomController.isBottomSheetShowing) {
                             finish()
                         }
-                    } else {
+                    } else if(!isFinishing) {
                         dialog = ImageClassifyResultDialog(result, this, screenPath) {
                             finish()
                         }.also { it.show() }
