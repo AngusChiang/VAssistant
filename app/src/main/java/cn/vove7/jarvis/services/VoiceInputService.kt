@@ -19,6 +19,7 @@ import org.greenrobot.eventbus.ThreadMode
  */
 class VoiceInputService : RecognitionService() {
     var listener: Callback? = null
+
     override fun onStartListening(recognizerIntent: Intent?, listener: Callback?) {
         listener?.beginningOfSpeech()
         this.listener = listener
@@ -47,4 +48,8 @@ class VoiceInputService : RecognitionService() {
         Vog.d("onStopListening ---> 停止")
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        AppBus.unreg(this)
+    }
 }

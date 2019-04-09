@@ -7,9 +7,9 @@ import android.os.Build
 import android.support.annotation.RequiresApi
 import android.util.Pair
 import android.view.ViewConfiguration
+import cn.vove7.common.MessageException
 import cn.vove7.common.accessibility.AccessibilityApi
 import cn.vove7.common.annotation.ScriptApi
-import cn.vove7.common.annotation.ScriptApiClass
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.interfaces.api.GlobalActionExecutorI
@@ -27,8 +27,8 @@ object GlobalActionExecutor : GlobalActionExecutorI {
                 && Build.VERSION.SDK_INT > Build.VERSION_CODES.N).let {
             if (it) AccessibilityApi.gestureService!!
             else {
-                GlobalLog.log("全局手势执行失败: 版本低于7.0或高级无障碍服务未开启")
-                null
+                GlobalApp.toastError("全局手势执行失败: 版本低于7.0或高级无障碍服务未开启")
+                throw MessageException("高级无障碍服务未开启")
             }
         }
 
