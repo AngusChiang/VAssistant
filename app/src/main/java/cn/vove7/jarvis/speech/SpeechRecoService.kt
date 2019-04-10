@@ -38,7 +38,7 @@ abstract class SpeechRecoService(val event: SpeechEvent) : SpeechRecogI {
     var isSilent = false
 
     //长语音
-    var lastingStoped = true
+    var lastingStopped = true
 
     /**
      * 重写函数结尾处callSuper
@@ -48,7 +48,7 @@ abstract class SpeechRecoService(val event: SpeechEvent) : SpeechRecogI {
         if (!checkRecoderPermission() || !checkFloat()) return
         Thread.sleep(80)
         if (!isListening) {
-            lastingStoped = false
+            lastingStopped = false
             isListening = true
             isSilent = false
             event.onPreStartRecog(byVoice)
@@ -67,7 +67,7 @@ abstract class SpeechRecoService(val event: SpeechEvent) : SpeechRecogI {
         Vog.d("静默开启识别")
         if (!checkRecoderPermission() || !checkFloat()) return
         if (!isListening) {
-            lastingStoped = false
+            lastingStopped = false
             isListening = true
             isSilent = true
             doStartRecog(true)
@@ -95,7 +95,7 @@ abstract class SpeechRecoService(val event: SpeechEvent) : SpeechRecogI {
      * @param notify Boolean
      */
     override fun cancelRecog(notify: Boolean) {
-        lastingStoped = true
+        lastingStopped = true
         isListening = false
         closeSCO()
         doCancelRecog()
@@ -122,7 +122,7 @@ abstract class SpeechRecoService(val event: SpeechEvent) : SpeechRecogI {
 
     @CallSuper
     override fun stopRecog() {
-        lastingStoped = true
+        lastingStopped = true
         isListening = false
         closeSCO()
         doStopRecog()
@@ -150,7 +150,7 @@ abstract class SpeechRecoService(val event: SpeechEvent) : SpeechRecogI {
     private val autoCloseRecog = Runnable {
         Vog.i(" ---> 长语音自动关闭识别")
         doCancelRecog()
-        lastingStoped = true
+        lastingStopped = true
         closeSCO()
     }
 
@@ -208,7 +208,7 @@ abstract class SpeechRecoService(val event: SpeechEvent) : SpeechRecogI {
             Vog.d("重启长语音： 正在识别")
             return
         }
-        if (AppConfig.lastingVoiceCommand && !lastingStoped) {
+        if (AppConfig.lastingVoiceCommand && !lastingStopped) {
             startRecogSilent()
         } else {
             Vog.d("重启长语音： 长语音关闭或已停止")
@@ -245,7 +245,7 @@ abstract class SpeechRecoService(val event: SpeechEvent) : SpeechRecogI {
                 IStatus.CODE_VOICE_ERR -> {//出错
                     val res = msg.data.getString("data") ?: "null"
                     isListening = false
-                    lastingStoped = true
+                    lastingStopped = true
                     closeSCO()
                     event.onRecogFailed(res)
                 }
@@ -255,9 +255,9 @@ abstract class SpeechRecoService(val event: SpeechEvent) : SpeechRecogI {
                 }
                 IStatus.CODE_VOICE_RESULT -> {//结果
                     val result = msg.data.getString("data") ?: "null"
+                    isListening = false
                     event.onTempResult(result)
                     event.onResult(result)
-                    isListening = false
                     closeSCO()//关闭SCO
                 }
                 IStatus.STATUS_FINISHED -> {

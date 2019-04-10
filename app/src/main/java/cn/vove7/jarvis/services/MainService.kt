@@ -252,9 +252,9 @@ class MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
      */
     private fun stopLastingRecogTemp() {
         if (AppConfig.lastingVoiceCommand) {
-            Vog.d("stopLastingRecogTemp ---> speak临时 ${speechRecogService?.lastingStoped}")
+            Vog.d("stopLastingRecogTemp ---> speak临时 ${speechRecogService?.lastingStopped}")
             //没有手动停止 并且 已停止识别
-            afterSpeakResumeListen = !(speechRecogService?.lastingStoped ?: true) && !recogIsListening
+            afterSpeakResumeListen = !(speechRecogService?.lastingStopped ?: true) && !recogIsListening
         }
     }
 
@@ -812,7 +812,6 @@ class MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
                             else -> onParseCommand(voiceResult)
                         }
                     }
-                    speechRecogService?.startIfLastingVoice()
                 }
                 MODE_GET_PARAM -> {//中途参数
                     resumeMusicIf()
@@ -945,6 +944,7 @@ class MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
     fun onParseCommand(
             result: String, needCloud: Boolean = true,
             chat: Boolean = AppConfig.openChatSystem, from: Int = 0): Boolean {
+        Vog.d("解析命令：$result")
         isContinousDialogue = false
         floatyPanel.show(result)
         parseAnimation.begin()
@@ -976,6 +976,7 @@ class MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
                     onCommandParseFailed(result)
                 }
             }
+            speechRecogService?.startIfLastingVoice()
 
         }
         return true
