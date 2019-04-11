@@ -155,3 +155,8 @@ object GlobalLog {
     }
 
 }
+
+
+fun Throwable.log() {
+    GlobalLog.err(this)
+}

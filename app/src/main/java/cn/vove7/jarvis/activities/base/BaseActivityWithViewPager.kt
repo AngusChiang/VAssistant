@@ -22,6 +22,10 @@ abstract class BaseActivityWithViewPager : AppCompatActivity() {
 
     lateinit var toolbar: Toolbar
     lateinit var fragmentAdapter: FragmentAdapter
+
+    val currentFragment: Fragment
+        get() = fragments[view_pager.currentItem]
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_base_view_pager)
@@ -60,7 +64,7 @@ abstract class BaseActivityWithViewPager : AppCompatActivity() {
     abstract var titles: Array<String>
 
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
-        Vog.d("${item?.itemId}")
+        Vog.d("${item?.title}")
         if (item?.itemId == android.R.id.home) {
             finish()
             return true

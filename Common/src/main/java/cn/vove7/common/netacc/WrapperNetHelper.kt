@@ -1,38 +1,31 @@
 package cn.vove7.common.netacc
 
-import android.os.Handler
 import android.os.Looper
 import cn.vove7.common.BuildConfig
 import cn.vove7.common.accessibility.AccessibilityApi
-import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.app.GlobalLog
-import cn.vove7.common.appbus.AppBus
 import cn.vove7.common.datamanager.history.CommandHistory
 import cn.vove7.common.datamanager.parse.model.Action
 import cn.vove7.common.datamanager.parse.model.ActionScope
 import cn.vove7.common.interfaces.DownloadInfo
 import cn.vove7.common.interfaces.DownloadProgressListener
-import cn.vove7.common.model.UserInfo
 import cn.vove7.common.netacc.model.BaseRequestModel
 import cn.vove7.common.netacc.model.LastDateInfo
 import cn.vove7.common.netacc.model.RequestParseModel
 import cn.vove7.common.netacc.model.ResponseMessage
-import cn.vove7.common.utils.GsonHelper
+import cn.vove7.common.utils.LooperHelper
 import cn.vove7.common.utils.ThreadPool
 import cn.vove7.vtp.log.Vog
+import cn.vove7.vtp.net.NetHelper
+import cn.vove7.vtp.net.WrappedRequestCallback
 import com.google.gson.reflect.TypeToken
 import com.liulishuo.okdownload.DownloadListener
 import com.liulishuo.okdownload.DownloadTask
 import com.liulishuo.okdownload.core.breakpoint.BreakpointInfo
 import com.liulishuo.okdownload.core.cause.EndCause
 import com.liulishuo.okdownload.core.cause.ResumeFailedCause
-
-import okhttp3.*
 import java.io.File
-import java.io.IOException
 import java.lang.reflect.Type
-import java.util.concurrent.TimeUnit
-
 
 /**
  * # NetHelper
@@ -40,85 +33,27 @@ import java.util.concurrent.TimeUnit
  * @author 17719247306
  * 2018/9/12
  */
-typealias OnResponse<T> = (Int, ResponseMessage<T>?) -> Unit
 
-object NetHelper {
+/**
+ * 封装示例：请求体封装
+ * (RequestModel(sign, timestamp, [body]))
+ *        |
+ *        |
+ *       http
+ *        |
+ *        ↓
+ * ResponseMessage(code,message,[data])
+ */
+object WrapperNetHelper {
 
-    var timeout = 15L
-    /**
-     * 网络post请求 内容格式为json
-     * @param url String
-     * @param model BaseRequestModel<*>?
-     * @param requestCode Int
-     * @param callback OnResponse<T>
-     */
     inline fun <reified T> postJson(
-            url: String, model: BaseRequestModel<*>? = BaseRequestModel<Any>(),
-            requestCode: Int = 0, crossinline callback: OnResponse<T> = { _, _ -> }
-    ) {
-        val client = OkHttpClient.Builder()
-                .readTimeout(timeout, TimeUnit.SECONDS).build()
+            url: String, model: Any? = null, requestCode: Int = -1, arg1: String? = null,
+            crossinline callback: WrappedRequestCallback<ResponseMessage<T>>.() -> Unit) {
 
-        val json = GsonHelper.toJson(model)
-        Vog.d("postJson ---> $url\n $json")
-        val requestBody = FormBody.create(MediaType
-                .parse("application/json; charset=utf-8"), json)
+        NetHelper.postJson(url, BaseRequestModel(model, arg1), requestCode, callback)
 
-        val request = Request.Builder().url(url)
-                .post(requestBody)
-                .build()
-        val call = client.newCall(request)
-        call(call, requestCode, callback, url)
     }
 
-    inline fun <reified T> call(call: Call, requestCode: Int = 0,
-                                crossinline callback: OnResponse<T>, url: String) {
-        prepareIfNeeded()
-        val handler = Handler(Looper.getMainLooper())
-        call.enqueue(object : Callback {
-            override fun onFailure(call: Call, e: IOException) {
-                GlobalLog.err("网络错误: $url  " + e.message)
-                handler.post {
-                    callback.invoke(requestCode, ResponseMessage.error(e.message))
-                }
-            }
-
-            @Throws(IOException::class)
-            override fun onResponse(call: Call, response: Response) {//响应成功更新UI
-                if (response.isSuccessful) {
-                    val s = response.body()?.string()
-                    try {
-                        Vog.d("onResponse --->\n$s")
-                        val bean = GsonHelper.fromResponseJson<T>(s)
-                        if (bean?.isInvalid() == true || bean?.tokenIsOutdate() == true) {//无效下线
-                            if (UserInfo.isLogin()) {
-                                GlobalApp.toastWarning("用户身份过期请重新登陆")
-                            }
-                            AppBus.post(AppBus.EVENT_FORCE_OFFLINE)
-                        }
-                        handler.post {
-                            callback.invoke(requestCode, bean)
-                        }
-                    } catch (e: Exception) {
-                        e.printStackTrace()
-                        GlobalLog.err(e.message)
-                        handler.post {
-                            GlobalLog.err("json err data: ${e.message}\n $s ")
-                            callback.invoke(requestCode, ResponseMessage.error(e.message))
-                        }
-                    }
-                } else handler.post {
-                    GlobalLog.err("net: " + response.message())
-                    callback.invoke(requestCode, null)
-                }
-            }
-        })
-    }
-
-    fun prepareIfNeeded() {
-        if (Looper.myLooper() == null)
-            Looper.prepare()
-    }
 
     inline fun <reified T> getType(): Type {
         return object : TypeToken<T>() {}.type
@@ -186,13 +121,13 @@ object NetHelper {
 
             override fun fetchStart(task: DownloadTask, blockIndex: Int, contentLength: Long) {
                 total += contentLength
-                Vog.d("fetchStart ---> ${contentLength}")
+                Vog.d(contentLength)
             }
 
             override fun fetchProgress(task: DownloadTask, blockIndex: Int, increaseBytes: Long) {
                 sum += increaseBytes
 
-                Vog.d("fetchProgress ---> ${sum}/$total")
+                Vog.d("$sum/$total")
                 listener.onDownloading(di, (sum * 1.0f / total * 100).toInt())
             }
 
@@ -215,10 +150,12 @@ object NetHelper {
     fun uploadUserCommandHistory(his: CommandHistory) {
         if (BuildConfig.DEBUG /*|| !AppConfig.userExpPlan*/) return
         ThreadPool.runOnPool {
-            prepareIfNeeded()
-            postJson<Any>(ApiUrls.UPLOAD_CMD_HIS, BaseRequestModel(his)) { _, b ->
-                if (b?.isOk() != true) {
-                    Vog.d("uploadUserCommandHistory ---> ${b?.message}")
+            LooperHelper.prepareIfNeeded()
+            postJson<Any>(ApiUrls.UPLOAD_CMD_HIS, his) {
+                success { _, b ->
+                    if (!b.isOk()) {
+                        Vog.d(b.message)
+                    }
                 }
             }
         }
@@ -235,26 +172,39 @@ object NetHelper {
             .accessibilityService?.currentScope, onResult: (List<Action>?) -> Unit) {
 //        thread {
         postJson<List<Action>>(ApiUrls.CLOUD_PARSE,
-                model = BaseRequestModel(RequestParseModel(cmd, scope))) { _, b ->
-            if (b?.isOk() == true) {
-                Vog.d("cloudParse ---> ${b.data}")
-                onResult.invoke(b.data)
-            } else {
+                model = RequestParseModel(cmd, scope)) {
+            success { _, b ->
+                if (b.isOk()) {
+                    Vog.d("cloudParse ---> ${b.data}")
+                    onResult.invoke(b.data)
+                } else {
+                    onResult.invoke(null)
+                    GlobalLog.err(b.message)
+                }
+            }
+            fail { _, exception ->
                 onResult.invoke(null)
-                GlobalLog.err(b?.message)
+                GlobalLog.err(exception)
             }
         }
 //        }
     }
 
     fun getLastInfo(back: (LastDateInfo?) -> Unit) {
-        NetHelper.postJson<LastDateInfo>(ApiUrls.GET_LAST_DATA_DATE) { _, b ->
-            if (b?.isOk() == true && b.data != null) {
-                back.invoke(b.data!!)
-            } else {
+        WrapperNetHelper.postJson<LastDateInfo>(ApiUrls.GET_LAST_DATA_DATE) {
+            success { _, b ->
+                if (b.isOk()) {
+                    back.invoke(b.data)
+                } else {
+                    back.invoke(null)
+                }
+            }
+            fail { _, e ->
+                GlobalLog.err(e)
                 back.invoke(null)
             }
         }
     }
 
 }
+

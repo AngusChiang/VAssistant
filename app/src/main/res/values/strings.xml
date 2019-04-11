@@ -92,6 +92,10 @@
         <item>屏幕助手</item>
         <item>语音识别</item>
     </string-array>
+    <string-array name="list_fp_animation" translatable="false">
+        <item>默认</item>
+        <item>揭露</item>
+    </string-array>
 
     <string-array name="list_stream_syn_output" translatable="false">
         <item>媒体音量</item>
@@ -376,6 +380,9 @@
     <string name="key_continuous_dialogue" translatable="false">continuous_dialogue</string>
     <string name="key_chat_system_type" translatable="false">chat_system_type</string>
     <string name="key_home_fun" translatable="false">home_fun</string>
+    <string name="key_fp_animation" translatable="false">fp_animation</string>
+    <string name="key_notify_wp_on_screen_off" translatable="false">notify_wp_on_screen_off</string>
+    <string name="key_dev_mode" translatable="false">dev_mode</string>
     <string name="text_set_priority">设置优先级</string>
     <string name="desc_new_account">新用户将获得7天高级用户免费体验资格</string>
     <string name="key_resume_bkg_music" translatable="false">resume_bkg_music</string>
@@ -401,4 +408,5 @@
     <string name="key_chat_str" translatable="false">chat_str</string>
     <string name="text_close">Close</string>
     <string name="label_screen_assistant">Screen Assistant</string>
+    <string name="alias_regex">别名（正则式）</string>
 </resources>

@@ -13,11 +13,10 @@ import cn.vove7.common.datamanager.executor.entity.MarkedData
 import cn.vove7.common.datamanager.parse.DataFrom
 import cn.vove7.common.model.UserInfo
 import cn.vove7.common.netacc.ApiUrls
-import cn.vove7.common.netacc.NetHelper
-import cn.vove7.common.netacc.model.BaseRequestModel
+import cn.vove7.common.netacc.WrapperNetHelper
 import cn.vove7.jarvis.R
-import cn.vove7.jarvis.adapters.SimpleListAdapter
 import cn.vove7.jarvis.adapters.ListViewModel
+import cn.vove7.jarvis.adapters.SimpleListAdapter
 import cn.vove7.jarvis.fragments.SimpleListFragment
 import cn.vove7.jarvis.tools.AppConfig
 import cn.vove7.jarvis.tools.DataUpdator
@@ -178,7 +177,7 @@ abstract class BaseMarkedFragment : SimpleListFragment<MarkedData>(), OnSyncMark
                 //dialog edit
                 val data = item.extra
                 //todo colorful
-                BottomDialogWithText(context!!,item.title?:"",data.toString()).apply {
+                BottomDialogWithText(context!!, item.title ?: "", data.toString()).apply {
                     if (data.belongUser()) {
                         negativeButton(getString(R.string.text_share)) {
                             share(data)
@@ -203,11 +202,17 @@ abstract class BaseMarkedFragment : SimpleListFragment<MarkedData>(), OnSyncMark
         }
 
     private fun deleteShare(tagId: String) {
-        NetHelper.postJson<Any>(ApiUrls.DELETE_SHARE_MARKED, BaseRequestModel(tagId)) { _, bean ->
-            if (bean?.isOk() == true) {
-                Vog.d("云端删除成功")
-            } else
+        WrapperNetHelper.postJson<Any>(ApiUrls.DELETE_SHARE_MARKED, tagId) {
+            success { _, bean ->
+                if (bean.isOk()) {
+                    Vog.d("云端删除成功")
+                } else
+                    Vog.d("云端删除失败")
+            }
+            fail { _, e ->
+                e.printStackTrace()
                 Vog.d("云端删除失败")
+            }
         }
     }
 
@@ -220,8 +225,8 @@ abstract class BaseMarkedFragment : SimpleListFragment<MarkedData>(), OnSyncMark
             GlobalApp.toastInfo(R.string.text_please_login_first)
             return
         }
-        NetHelper.postJson<String>(ApiUrls.SHARE_MARKED, BaseRequestModel(data)) { _, bean ->
-            if (bean != null) {
+        WrapperNetHelper.postJson<String>(ApiUrls.SHARE_MARKED, data) {
+            success { _, bean ->
                 if (bean.isOk()) {
                     //return tagId
                     val tag = bean.data
@@ -235,9 +240,10 @@ abstract class BaseMarkedFragment : SimpleListFragment<MarkedData>(), OnSyncMark
                 } else {
                     GlobalApp.toastInfo(bean.message)
                 }
-            } else
-                GlobalApp.toastError(R.string.text_error_occurred)
-
+            }
+            fail { _, e ->
+                GlobalApp.toastError(e.message ?: "error")
+            }
         }
     }
 

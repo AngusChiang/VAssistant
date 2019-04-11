@@ -228,5 +228,6 @@
     <string name="desc_new_account">新用户将获得7天高级用户免费体验资格</string>
     <string name="text_close">关闭</string>
     <string name="label_screen_assistant">屏幕助手</string>
+    <string name="alias_regex">别名（正则式）</string>
 
 </resources>

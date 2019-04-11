@@ -116,13 +116,19 @@ class ListViewModel<T>(
         val icon: Drawable? = null,
         val extra: T,
         var checked: Boolean = false
-) : Serializable, Comparable<ListViewModel<*>> {
+) : Serializable, Comparable<ListViewModel<T>> {
 
     companion object {
         var CollChina = Collator.getInstance(java.util.Locale.CHINA)!!
     }
 
-    override fun compareTo(other: ListViewModel<*>): Int {
+    override fun compareTo(other: ListViewModel<T>): Int {
+
+        val e = extra
+        if (e is Comparable<*>) {
+            return (e as Comparable<T>).compareTo(other.extra)
+        }
+
         var tt1 = CollChina.getCollationKey(this.title)
         var tt2 = CollChina.getCollationKey(other.title)
         val c = CollChina.compare(tt1.sourceString, tt2.sourceString)

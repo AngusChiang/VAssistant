@@ -12,13 +12,13 @@ import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.view.*
 import android.widget.*
+import cn.vove7.common.interfaces.Searchable
 import cn.vove7.common.utils.runOnUi
-
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.adapters.ListViewModel
 import cn.vove7.jarvis.adapters.RecAdapterWithFooter
 import cn.vove7.jarvis.adapters.SimpleListAdapter
-import cn.vove7.jarvis.adapters.ViewModelLoader
+import cn.vove7.jarvis.adapters.ListViewModelLoader
 import cn.vove7.jarvis.view.RecyclerViewWithContextMenu
 import cn.vove7.vtp.log.Vog
 import com.pluscubed.recyclerfastscroll.RecyclerFastScroller
@@ -30,7 +30,7 @@ import com.pluscubed.recyclerfastscroll.RecyclerFastScroller
  * @author 17719247306
  * 2018/8/18
  */
-abstract class SimpleListFragment<DataType> : Fragment(), ViewModelLoader<DataType> {
+abstract class SimpleListFragment<DataType> : Fragment(), ListViewModelLoader<DataType> {
     override var sortData: Boolean = false
     open val itemClickListener: SimpleListAdapter.OnItemClickListener<DataType>? = null
     override val pageSizeLimit: Int = 50
@@ -40,6 +40,23 @@ abstract class SimpleListFragment<DataType> : Fragment(), ViewModelLoader<DataTy
         synchronized(dataSet) {
             dataSet.clear()
         }
+    }
+
+    fun search(text: String) {
+        when {
+            dataSet.isEmpty() -> return
+            text.trim().isEmpty() -> refresh()
+            else -> onSearch(text)
+        }
+    }
+
+    private fun onSearch(text: String) {
+        val l = dataSet.filter {
+            (it.extra is Searchable && it.extra.onSearch(text))
+        }
+        clearDataSet()
+        dataSet.addAll(l)
+        changeViewOnLoadDone(true)
     }
 
     open fun initView(contentView: View) {

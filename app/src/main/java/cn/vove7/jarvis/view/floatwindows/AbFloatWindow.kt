@@ -44,7 +44,7 @@ abstract class AbFloatWindow(
     var windowManager: WindowManager = context.applicationContext.getSystemService(Context.WINDOW_SERVICE)
             as WindowManager
 
-    val isShowing get() = contentView != null
+    protected val isShowing get() = contentView != null
 
     val statusbarHeight: Int by lazy {
         var statusBarHeight1 = -1
@@ -72,6 +72,7 @@ abstract class AbFloatWindow(
 
     open fun afterShow() {}
 
+
     val hasOverlayPermission
         get() =
             Build.VERSION.SDK_INT < Build.VERSION_CODES.M || PermissionUtils.canDrawOverlays(context)
@@ -81,12 +82,14 @@ abstract class AbFloatWindow(
             Vog.d("show ---> 无悬浮窗")
             onNoPermission.invoke()
         } else {
-            synchronized(isShowing) {
+            synchronized(this) {
                 if (!isShowing) {
                     try {
                         contentView = newView
                         windowManager.addView(contentView, winParams)
-                        afterShow()
+                        contentView?.post {
+                            afterShow()
+                        }
                     } catch (e: Exception) {
                         e.printStackTrace()
                     }
@@ -97,7 +100,7 @@ abstract class AbFloatWindow(
 
     open fun hide() {
         Vog.d("隐藏悬浮窗")
-        synchronized(isShowing) {
+        synchronized(this) {
             if (isShowing)
                 removeView()
         }
@@ -105,19 +108,25 @@ abstract class AbFloatWindow(
 
     private fun removeView() {
         Vog.d("移除悬浮窗")
+        onRemove()
+    }
+
+    /**
+     * 移除视图
+     * 可继承执行动画
+     */
+    @Synchronized
+    open fun onRemove() {
         try {
             windowManager.removeView(contentView)
             contentView = null
-            onRemove()
         } catch (e: Exception) {
             e.printStackTrace()
         }
     }
 
-    open fun onRemove() {}
-
     fun update(params: WindowManager.LayoutParams) {
-        synchronized(isShowing) {
+        synchronized(this) {
             if (isShowing) {
                 windowManager.updateViewLayout(contentView, params)
             }
@@ -127,9 +136,6 @@ abstract class AbFloatWindow(
     fun updatePoint(x: Int, y: Int) {
         windowManager.updateViewLayout(contentView, buildLayoutParams(x, y))
     }
-
-    //进出动画
-    open val windowsAnimation: Int? = null
 
     private fun buildLayoutParams(x: Int = posX, y: Int = posY): WindowManager.LayoutParams {
         val params = WindowManager.LayoutParams()
@@ -147,9 +153,7 @@ abstract class AbFloatWindow(
         params.x = x
         params.y = y
 
-        windowsAnimation?.also {
-            params.windowAnimations = it
-        }
+
         params.type = if (Build.VERSION.SDK_INT >= 26)
             WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY
         else WindowManager.LayoutParams.TYPE_SYSTEM_ALERT

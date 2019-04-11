@@ -2,11 +2,13 @@ package cn.vove7.common.view.finder
 
 import android.graphics.Point
 import android.graphics.Rect
+import cn.vove7.common.MessageException
 import cn.vove7.common.ViewNodeNotFoundException
 import cn.vove7.common.accessibility.AccessibilityApi
 import cn.vove7.common.accessibility.viewnode.ViewNode
 import cn.vove7.common.accessibility.viewnode.ViewOperation
 import cn.vove7.common.utils.whileWaitTime
+import cn.vove7.vtp.log.Vog
 
 /**
  * # FindBuilderWithOperation
@@ -56,9 +58,19 @@ abstract class FindBuilderWithOperation
      */
     fun waitHide(waitMs: Int): Boolean {
         return whileWaitTime(waitMs.toLong()) {
-            if (findFirst() != null) true
-            else null
+            if (findFirst() != null) {
+                Vog.d("未消失，等待")
+                null
+            }//显示，继续等待
+            else {
+                Vog.d("消失，停止等待")
+                true
+            } //消失
         } ?: false
+    }
+
+    fun waitHideUnsafely(waitMs: Int) {
+        if (!waitHide(waitMs)) throw MessageException("视图未消失")
     }
 
     private val node: ViewNode

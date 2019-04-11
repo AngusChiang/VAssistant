@@ -9,18 +9,15 @@ import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.model.UserInfo
 import cn.vove7.common.netacc.ApiUrls
-import cn.vove7.common.netacc.NetHelper
-import cn.vove7.common.netacc.model.BaseRequestModel
+import cn.vove7.common.netacc.WrapperNetHelper
 import cn.vove7.common.utils.TextHelper
+import cn.vove7.common.utils.TextPrinter
 import cn.vove7.jarvis.BuildConfig
 import cn.vove7.jarvis.activities.CrashInfoActivity
 import cn.vove7.vtp.sharedpreference.SpHelper
 import cn.vove7.vtp.system.DeviceInfo
 import cn.vove7.vtp.system.SystemHelper
-import java.io.BufferedWriter
 import java.io.File
-import java.io.FileWriter
-import java.io.PrintWriter
 import java.lang.Thread.sleep
 import java.text.SimpleDateFormat
 import java.util.*
@@ -86,26 +83,24 @@ object CrashHandler : Thread.UncaughtExceptionHandler {
         val log = GlobalLog.toString()
         val errFile = Environment.getExternalStorageDirectory().absolutePath + "/crash.log"
         try {
-            val outFile = context.cacheDir.absolutePath + "/crash.log"
-            PrintWriter(BufferedWriter(FileWriter(File(outFile)))).apply {
+            val info = TextPrinter().apply {
                 println(headerInfo)
                 println(SimpleDateFormat("MM-dd HH:mm:ss", Locale.getDefault()).format(Date()))
                 e.printStackTrace(this)
                 println(log)
-                close()
-            }
-            val info = File(outFile).readText()
+            }.toString()
+
             try {//输出和sd卡
                 File(errFile).writeText(info)
             } catch (e: Exception) {
                 e.printStackTrace()
             }
             if (!BuildConfig.DEBUG)
-                NetHelper.postJson<Any>(ApiUrls.CRASH_HANDLER, BaseRequestModel(info))
+                WrapperNetHelper.postJson<Any>(ApiUrls.CRASH_HANDLER, info) {}
         } catch (e1: Exception) {//文件读写
             if (!BuildConfig.DEBUG)
-                NetHelper.postJson<Any>(ApiUrls.CRASH_HANDLER,
-                        BaseRequestModel(headerInfo + e.message + log + "crash上传失败${e1.message}"))
+                WrapperNetHelper.postJson<Any>(ApiUrls.CRASH_HANDLER,
+                        headerInfo + e.message + log + "crash上传失败${e1.message}") {}
         }
 
         return true

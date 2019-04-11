@@ -7,7 +7,7 @@ import android.support.v7.widget.RecyclerView
 import android.view.View
 import cn.vove7.common.utils.runOnUi
 import cn.vove7.jarvis.R
-import cn.vove7.jarvis.adapters.ViewModelLoader
+import cn.vove7.jarvis.adapters.ListViewModelLoader
 import cn.vove7.jarvis.adapters.ListViewModel
 import cn.vove7.jarvis.adapters.SimpleListAdapter
 import cn.vove7.jarvis.fragments.base.BaseBottomDialogWithToolbar
@@ -20,7 +20,7 @@ import com.pluscubed.recyclerfastscroll.RecyclerFastScroller
  * 2018/12/20
  */
 abstract class BottomDialogWithList<T>(context: Context, title: String)
-    : BaseBottomDialogWithToolbar(context, title), ViewModelLoader<T>,
+    : BaseBottomDialogWithToolbar(context, title), ListViewModelLoader<T>,
         SimpleListAdapter.OnItemClickListener<T> {
     private val listAdapter by lazy { SimpleListAdapter(dataSet, this) }
     override var pageIndex: Int = 0

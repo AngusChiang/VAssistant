@@ -15,7 +15,7 @@ import cn.vove7.vtp.log.Vog
  * 2018/12/20
  */
 
-interface ViewModelLoader<DataType> {
+interface ListViewModelLoader<DataType> {
     val pageSizeLimit: Int
     val dataSet: MutableList<ListViewModel<DataType>>
 

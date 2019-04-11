@@ -31,6 +31,7 @@ import cn.vove7.common.datamanager.parse.DataFrom;
 import cn.vove7.common.datamanager.parse.model.Action;
 import cn.vove7.common.datamanager.parse.model.ActionDesc;
 import cn.vove7.common.datamanager.parse.model.ActionScope;
+import cn.vove7.common.interfaces.Searchable;
 import cn.vove7.common.model.UserInfo;
 import cn.vove7.vtp.log.Vog;
 
@@ -40,7 +41,7 @@ import cn.vove7.vtp.log.Vog;
  * Created by Vove on 2018/6/17
  */
 @Entity
-public class ActionNode implements Serializable, DataFrom {
+public class ActionNode implements Serializable, Searchable, DataFrom {
     public static final long serialVersionUID = 1210203;
     @Expose(serialize = false)
     @Id
@@ -60,6 +61,11 @@ public class ActionNode implements Serializable, DataFrom {
 
     public boolean belongInApp() {
         return actionScopeType == NODE_SCOPE_IN_APP;
+    }
+
+    @Override
+    public boolean onSearch(@org.jetbrains.annotations.NotNull String text) {
+        return actionTitle.contains(text);
     }
 
     /**

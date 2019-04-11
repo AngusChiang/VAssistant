@@ -4,17 +4,17 @@ import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.View
 import cn.vove7.common.app.GlobalApp
+import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.datamanager.AppAdInfo
 import cn.vove7.common.datamanager.DAO
 import cn.vove7.common.datamanager.greendao.AppAdInfoDao
 import cn.vove7.common.datamanager.parse.DataFrom
 import cn.vove7.common.netacc.ApiUrls
-import cn.vove7.common.netacc.model.BaseRequestModel
-import cn.vove7.common.netacc.NetHelper
+import cn.vove7.common.netacc.WrapperNetHelper
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.activities.base.OneFragmentActivity
-import cn.vove7.jarvis.adapters.SimpleListAdapter
 import cn.vove7.jarvis.adapters.ListViewModel
+import cn.vove7.jarvis.adapters.SimpleListAdapter
 import cn.vove7.jarvis.fragments.SimpleListFragment
 import cn.vove7.jarvis.tools.AppConfig
 import cn.vove7.jarvis.tools.DialogUtil
@@ -59,9 +59,9 @@ class AppAdListActivity : OneFragmentActivity() {
                 @SuppressLint("CheckResult")
                 override fun onClick(holder: SimpleListAdapter.VHolder?, pos: Int, item: ListViewModel<AppAdInfo>) {
                     val data = item.extra
-                    BottomDialogWithText(context!!,item.title?:"",data.toString()).apply {
+                    BottomDialogWithText(context!!, item.title ?: "", data.toString()).apply {
 
-                    if (data.belongUser()) {
+                        if (data.belongUser()) {
                             neutralButton(getString(R.string.text_edit)) {
                                 editDialog.show(item.extra)
                             }
@@ -104,8 +104,8 @@ class AppAdListActivity : OneFragmentActivity() {
         }
 
         fun share(adInfo: AppAdInfo) {
-            NetHelper.postJson<String>(ApiUrls.SHARE_APP_AD_INFO, BaseRequestModel(adInfo)) { _, bean ->
-                if (bean != null) {
+            WrapperNetHelper.postJson<String>(ApiUrls.SHARE_APP_AD_INFO, adInfo) {
+                success { _, bean ->
                     if (bean.isOk()) {
                         //return tagId
                         val tag = bean.data
@@ -118,17 +118,27 @@ class AppAdListActivity : OneFragmentActivity() {
                     } else {
                         GlobalApp.toastInfo(bean.message)
                     }
-                } else
+                }
+                fail { _, e ->
+                    GlobalLog.err(e)
                     GlobalApp.toastError(R.string.text_error_occurred)
+                }
             }
+
         }
 
         fun delRemoteShare(tag: String) {
-            NetHelper.postJson<Any>(ApiUrls.DELETE_SHARE_APP_AD, BaseRequestModel(tag)) { _, bean ->
-                if (bean?.isOk() == true) {
-                    Vog.d("云端删除成功")
-                } else
+            WrapperNetHelper.postJson<Any>(ApiUrls.DELETE_SHARE_APP_AD, tag) {
+                success { _, bean ->
+                    if (bean.isOk()) {
+                        Vog.d("云端删除成功")
+                    } else
+                        Vog.d("云端删除失败")
+                }
+                fail { _, e ->
+                    GlobalLog.err(e)
                     Vog.d("云端删除失败")
+                }
             }
         }
 

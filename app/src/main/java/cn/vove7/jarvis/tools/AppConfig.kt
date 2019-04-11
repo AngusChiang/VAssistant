@@ -15,8 +15,7 @@ import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.bridges.SystemBridge
 import cn.vove7.common.model.UserInfo
 import cn.vove7.common.netacc.ApiUrls
-import cn.vove7.common.netacc.NetHelper
-import cn.vove7.common.netacc.model.BaseRequestModel
+import cn.vove7.common.netacc.WrapperNetHelper
 import cn.vove7.common.utils.StorageHelper
 import cn.vove7.common.utils.ThreadPool.runOnCachePool
 import cn.vove7.common.utils.ThreadPool.runOnPool
@@ -61,7 +60,6 @@ object AppConfig {
     var isAutoVoiceWakeupCharging = false
     var useSmartOpenIfParseFailed = true
     var cloudServiceParseIfLocalFailed = false //云服务解析
-    var autoUpdateData = true //
     var WAKEUP_FILE_NHXV = "assets:///bd/WakeUp_nhxv.bin"
     var WAKEUP_FILE_XVTX = "assets:///bd/WakeUp_xvtx.bin"
     var DEFAULT_WAKEUP_FILE = WAKEUP_FILE_NHXV
@@ -80,6 +78,7 @@ object AppConfig {
     var openChatSystem = true
     var autoSleepWakeupMillis: Long = 10 * 60 * 1000
     var chatSystem: String = ""
+    var fpAnimation: String = ""
 
     var homeFun: String = "" //长按HOME键功能
 
@@ -98,6 +97,10 @@ object AppConfig {
     var translateLang = "auto"//翻译主语言
     var voiceRecogFeedback = false //语音识别提示音
         get() = field || isBlueToothConnect
+
+    var notifyWpOnScreenOff = true
+
+    var devMode = BuildConfig.DEBUG
 
     //fixme 连接手表也为true
     val isBlueToothConnect: Boolean
@@ -209,7 +212,7 @@ object AppConfig {
                         UserInfo::class.java)
                 Vog.d("init user info ---> $info")
                 info.success()//设置登陆后，读取配置  null 抛出空指针
-                NetHelper.postJson<Any>(ApiUrls.VERIFY_TOKEN)
+                WrapperNetHelper.postJson<Any>(ApiUrls.VERIFY_TOKEN) { }
             } catch (e: Exception) {
                 GlobalLog.err(e)
                 GlobalApp.toastError("用户信息提取失败，请重新登陆")
@@ -242,7 +245,7 @@ object AppConfig {
             if (System.currentTimeMillis() - lastCheckTime > 600000) {
                 if (UserInfo.isLogin()) {
                     lastCheckTime = System.currentTimeMillis()
-                    NetHelper.postJson<Any>(ApiUrls.CHECK_USER_DATE, BaseRequestModel(""))
+                    WrapperNetHelper.postJson<Any>(ApiUrls.CHECK_USER_DATE) { }
                 }
             }
         }
@@ -289,7 +292,6 @@ object AppConfig {
 //        continuousDialogue = getBooleanAndInit(R.string.key_continuous_dialogue, false)
 //  todo      cloudServiceParseIfLocalFailed = getBooleanAndInit(R.string.key_cloud_service_parse, true)
         sp.set(R.string.key_cloud_service_parse, false)
-        autoUpdateData = getBooleanAndInit(R.string.key_auto_update_data, true)
 //        resumeMusic = getBooleanAndInit(R.string.key_resume_bkg_music, true)
         volumeWakeUpWhenScreenOff = getBooleanAndInit(R.string.key_volume_wakeup_when_screen_off, true)
         useAssistService = getBooleanAndInit(R.string.key_use_assist_service, useAssistService)
@@ -304,6 +306,8 @@ object AppConfig {
         lastingVoiceCommand = getBooleanAndInit(R.string.key_lasting_voice_command, lastingVoiceCommand)
         autoCheckPluginUpdate = getBooleanAndInit(R.string.key_auto_check_plugin_update, autoCheckPluginUpdate)
         smartKillAd = getBooleanAndInit(R.string.key_smart_find_and_kill_ad, smartKillAd)
+        notifyWpOnScreenOff = getBooleanAndInit(R.string.key_notify_wp_on_screen_off, notifyWpOnScreenOff)
+        devMode = getBooleanAndInit(R.string.key_dev_mode, devMode)
         chatStr = sp.getString(R.string.key_chat_str)
         textOcrStr = sp.getString(R.string.key_text_ocr_key)
 
@@ -324,6 +328,10 @@ object AppConfig {
             val i = GlobalApp.APP.resources.getStringArray(R.array.list_chat_system)
             if (!UserInfo.isVip()) i[0] else it ?: i[0]
         }.also { Vog.d("reload ---> chatSystem $it") }
+
+        fpAnimation = sp.getString(R.string.key_fp_animation)
+            ?: GlobalApp.APP.resources.getStringArray(R.array.list_fp_animation)[0]
+
 
         homeFun = sp.getString(R.string.key_home_fun)
             ?: GlobalApp.APP.resources.getStringArray(R.array.list_home_funs)[0]

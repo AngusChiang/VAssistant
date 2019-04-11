@@ -21,9 +21,12 @@ import kotlinx.android.synthetic.main.toast_listening_text.view.*
  * 2018/9/9
  */
 class FloatyPanel : AbFloatWindow(GlobalApp.APP) {
+
     override var posY: Int = 0
 
-    //    lateinit var rootView: LinearLayout
+    internal lateinit var animationBody: View
+    internal val screenWidth = context.resources.displayMetrics.widthPixels
+
     override fun layoutResId(): Int = R.layout.toast_listening_text
 
     override val onNoPermission: () -> Unit = {
@@ -40,14 +43,16 @@ class FloatyPanel : AbFloatWindow(GlobalApp.APP) {
         contentView?.listening_ani?.gone()
     }
 
-    fun showListeningAni() {
+    private fun showListeningAni() {
         if (contentView?.listening_ani?.isShown == true) return
         contentView?.parse_ani?.gone()
         contentView?.listening_ani?.show()
     }
 
+
     override fun onCreateView(view: View) {
         view.body.setPadding(10, statusbarHeight + 15, 10, 15)
+        animationBody = view.body
     }
 
     fun show(text: String) {
@@ -60,17 +65,22 @@ class FloatyPanel : AbFloatWindow(GlobalApp.APP) {
         }
     }
 
-    override val windowsAnimation: Int = R.style.FloatyWindow
-
     var voiceText = ""
 
     override fun afterShow() {
+        showEnterAnimation()
         contentView?.voice_text?.text = voiceText
     }
 
+    override fun onRemove() {
+        showExitAnimation()
+    }
+
+    internal fun superRemove() = super.onRemove()
+
 
     private fun removeDelayHide() {
-        delayHandler?.removeCallbacks(delayHide)
+        delayHandler.removeCallbacks(delayHide)
     }
 
     fun showAndHideDelay(text: String) {
@@ -82,11 +92,11 @@ class FloatyPanel : AbFloatWindow(GlobalApp.APP) {
         hide()
     }
 
-    var delayHandler: Handler? = null
+    private val delayHandler: Handler by lazy { Handler() }
+
     fun hideDelay(delay: Long = 800) {
         runOnUi {
-            if (delayHandler == null) delayHandler = Handler()
-            delayHandler?.postDelayed(delayHide, delay)
+            delayHandler.postDelayed(delayHide, delay)
         }
         Vog.d("hide delay $delay")
     }

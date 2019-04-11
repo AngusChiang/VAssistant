@@ -17,6 +17,7 @@ import java.util.Objects;
 
 import cn.vove7.common.BuildConfig;
 import cn.vove7.common.datamanager.parse.DataFrom;
+import cn.vove7.common.interfaces.Searchable;
 import cn.vove7.common.interfaces.Signable;
 import cn.vove7.common.model.UserInfo;
 import cn.vove7.common.netacc.tool.SecureHelper;
@@ -28,7 +29,7 @@ import kotlin.text.Regex;
  * Created by Vove on 2018/6/23
  */
 @Entity(indexes = {@Index(value = "key")})
-public class MarkedData implements DataFrom, Signable, Serializable {
+public class MarkedData implements DataFrom, Signable, Searchable, Serializable, Comparable<MarkedData> {
 
     //打开/关闭...
     public static final String MARKED_TYPE_APP = "open_app";//应用 value -> pkg
@@ -57,6 +58,7 @@ public class MarkedData implements DataFrom, Signable, Serializable {
     @NotNull
     private String key;//alias
     private String type;
+
     /**
      * key的正则
      */
@@ -66,7 +68,18 @@ public class MarkedData implements DataFrom, Signable, Serializable {
     @Expose(serialize = false)
     @Transient
     private Regex regex;
+
+    @Expose(serialize = false)
+    @Transient
+    private int priority;//排序用
+
     private String value;//标识
+
+    @Override
+    public boolean onSearch(@org.jetbrains.annotations.NotNull String text) {
+        return key.contains(text) ||
+                regStr.contains(text);
+    }
 
     private String from = null;
 
@@ -99,17 +112,10 @@ public class MarkedData implements DataFrom, Signable, Serializable {
 
     public boolean belongUser() {
         Long uId = UserInfo.getUserId();
-        return DataFrom.FROM_USER.equals(from) ||
+        return from == null ||
+                DataFrom.FROM_USER.equals(from) ||
                 (DataFrom.FROM_SHARED.equals(from) && (publishUserId == null || publishUserId.equals(uId)));
-        //if (DataFrom.FROM_USER.equals(from)) return true;
-        //else if (publishUserId != null && publishUserId.equals(UserInfo.getUserId())) {
-        //    if (update) {
-        //        from = DataFrom.FROM_USER;
-        //        DAO.INSTANCE.getDaoSession().getMarkedDataDao().update(this);
-        //    }
-        //    return true;
-        //}
-        //return false;
+
     }
 
     //AppInfo data;
@@ -162,6 +168,7 @@ public class MarkedData implements DataFrom, Signable, Serializable {
                 .replace("%", RegUtils.INSTANCE.getREG_ALL_CHAR());
 
     }
+
     @Keep
     private void buildRegex() {
         String s = regexString();
@@ -266,6 +273,11 @@ public class MarkedData implements DataFrom, Signable, Serializable {
                 return "未知";
         }
 
+    }
+
+    @Override
+    public int compareTo(MarkedData o) {
+        return priority - o.priority;
     }
 
     public String getFrom() {

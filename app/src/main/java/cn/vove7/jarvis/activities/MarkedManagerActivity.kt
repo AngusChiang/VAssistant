@@ -7,11 +7,9 @@ import android.view.MenuItem
 import cn.vove7.common.datamanager.executor.entity.MarkedData
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.activities.base.BaseActivityWithViewPager
-import cn.vove7.jarvis.fragments.MarkedAdFragment
-import cn.vove7.jarvis.fragments.MarkedAppFragment
-import cn.vove7.jarvis.fragments.MarkedContractFragment
-import cn.vove7.jarvis.fragments.MarkedOpenFragment
+import cn.vove7.jarvis.fragments.*
 import cn.vove7.jarvis.fragments.base.OnSyncMarked
+import cn.vove7.jarvis.tools.SearchActionHelper
 import kotlinx.android.synthetic.main.activity_base_view_pager.*
 
 /**
@@ -26,8 +24,13 @@ class MarkedManagerActivity : BaseActivityWithViewPager() {
         get() = getString(R.string.text_mark_management)
         set(_) {}
 
-    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        MenuInflater(this).inflate(R.menu.menu_sync, menu)
+    override fun onCreateOptionsMenu(m: Menu?): Boolean {
+        toolbar.apply {
+            inflateMenu(R.menu.menu_sync)
+            SearchActionHelper(menu!!.findItem(R.id.menu_item_search)) { text ->
+                (currentFragment as SimpleListFragment<*>).search(text)
+            }
+        }
         return true
     }
 

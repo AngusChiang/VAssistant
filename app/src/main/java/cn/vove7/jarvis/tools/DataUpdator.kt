@@ -10,15 +10,14 @@ import cn.vove7.common.datamanager.DaoHelper
 import cn.vove7.common.datamanager.OnUpdate
 import cn.vove7.common.datamanager.executor.entity.MarkedData
 import cn.vove7.common.datamanager.parse.statusmap.ActionNode
+import cn.vove7.common.helper.AdvanAppHelper
 import cn.vove7.common.model.ResultBox
 import cn.vove7.common.netacc.ApiUrls
-import cn.vove7.common.netacc.NetHelper
-import cn.vove7.common.netacc.model.BaseRequestModel
+import cn.vove7.common.netacc.WrapperNetHelper
 import cn.vove7.common.netacc.model.LastDateInfo
 import cn.vove7.common.utils.TextHelper
 import cn.vove7.common.utils.ThreadPool.runOnCachePool
 import cn.vove7.common.utils.ThreadPool.runOnPool
-import cn.vove7.common.helper.AdvanAppHelper
 import cn.vove7.executorengine.parse.ParseEngine
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.droidplugin.RePluginInfo
@@ -26,7 +25,6 @@ import cn.vove7.jarvis.plugins.AdKillerService
 import cn.vove7.jarvis.view.dialog.ProgressTextDialog
 import cn.vove7.vtp.log.Vog
 import cn.vove7.vtp.sharedpreference.SpHelper
-import com.afollestad.materialdialogs.MaterialDialog
 
 /**
  * # DataUpdator
@@ -49,17 +47,23 @@ object DataUpdator {
             return
         }
         lastCheck = now
-        NetHelper.getLastInfo {
-            if (it != null) {
-                val v = check(it)
-                if (v.first.isNotEmpty()) {
-                    notifyUpdate(activity, v.first, v.second, back)
-                } else {
+
+        WrapperNetHelper.postJson<LastDateInfo>(ApiUrls.GET_LAST_DATA_DATE) {
+            success { _, b ->
+                val it = b.data
+                if (b.isOk() && it != null) {
+                    val v = check(it)
+                    if (v.first.isNotEmpty()) {
+                        notifyUpdate(activity, v.first, v.second, back)
+                    } else {
+                        back.invoke()
+                    }
+                }
+                fail { _, e ->
+                    GlobalLog.err(e)
+                    Vog.d("checkDataUpdate ---> 检查数据失败")
                     back.invoke()
                 }
-            } else {
-                Vog.d("checkDataUpdate ---> 检查数据失败")
-                back.invoke()
             }
         }
     }
@@ -71,47 +75,42 @@ object DataUpdator {
      * @param s String
      */
     private fun notifyUpdate(activity: Activity, needUpdateTypes: List<Int>, s: String, back: () -> Unit) {
-        val d = MaterialDialog(activity).title(text = "数据更新")
-                .message(text = "检查到以下数据有更新\n$s")
-                .positiveButton(text = "立即同步") {
-                    oneKeyUpdate(activity, needUpdateTypes, back)
+        if (activity.isFinishing) return
+        oneKeyUpdate(activity, needUpdateTypes, back, s)
+    }
+
+    class Updater(val textDialog: ProgressTextDialog) : OnUpdate {
+        override fun invoke(p1: Int, p2: String) {
+            when (p1) {
+                Color.GREEN ->
+                    textDialog.appendlnGreen(p2)
+                Color.RED -> {
+                    textDialog.appendlnRed(p2)
                 }
-                .cancelable(false)
-                .negativeButton()
-        if (!activity.isFinishing)//
-            d.show()
+                Color.YELLOW ->
+                    textDialog.appendlnAmber(p2)
+
+                else ->
+                    textDialog.appendln(p2)
+            }
+        }
     }
 
     /**
      * 根据type更新数据
      * @param types List<Int>
      */
-    fun oneKeyUpdate(activity: Activity, types: List<Int>, back: (() -> Unit)? = null) {
-        val textDialog = ProgressTextDialog(activity, "正在更新", false, autoScroll = true)
+    fun oneKeyUpdate(activity: Activity, types: List<Int>,
+                     back: (() -> Unit)? = null, t: String) {
+        val textDialog = ProgressTextDialog(activity, "$t\n\n正在更新", false, autoScroll = true)
         runOnPool {
             types.forEach {
                 val result = ResultBox<Boolean>()
-                val onUpdate = object : OnUpdate {
-                    override fun invoke(p1: Int, p2: String) {
-                        when (p1) {
-                            Color.GREEN ->
-                                textDialog.appendlnGreen(p2)
-                            Color.RED -> {
-                                textDialog.appendlnRed(p2)
-                            }
-                            Color.YELLOW ->
-                                textDialog.appendlnAmber(p2)
-
-                            else ->
-                                textDialog.appendln(p2)
-                        }
-                    }
-                }
-
+                val updater = Updater(textDialog)
                 when (it) {
                     0 -> {
                         textDialog.appendlnGreen("正在获取：全局指令")
-                        syncGlobalInst(onUpdate) { b ->
+                        syncGlobalInst(updater) { b ->
                             result.setAndNotify(b)
                         }
                         if (result.blockedGet() == true) {
@@ -122,7 +121,7 @@ object DataUpdator {
                     }
                     1 -> {
                         textDialog.appendlnGreen("正在获取：应用内指令")
-                        syncInAppInst(onUpdate) { b -> result.setAndNotify(b) }
+                        syncInAppInst(updater) { b -> result.setAndNotify(b) }
                         if (result.blockedGet() == true) {
                             textDialog.appendlnGreen("成功")
                         } else {
@@ -131,7 +130,7 @@ object DataUpdator {
                     }
                     2, 3, 4 -> {//marked data
                         textDialog.appendlnGreen("正在获取：" + arrayOf("标记联系人", "标记应用", "标记功能")[it - 2])
-                        syncMarkedData(onUpdate, getTypes(it), markedLastKeyId[it - 2]) { b ->
+                        syncMarkedData(updater, getTypes(it), markedLastKeyId[it - 2]) { b ->
                             result.setAndNotify(b)
                         }
                         if (result.blockedGet() == true) {
@@ -142,7 +141,7 @@ object DataUpdator {
                     }
                     5 -> {//ad
                         textDialog.appendlnGreen("正在获取：标记广告")
-                        syncMarkedAd(onUpdate) { b -> result.setAndNotify(b) }
+                        syncMarkedAd(updater) { b -> result.setAndNotify(b) }
                         if (result.blockedGet() == true) {
                             textDialog.appendlnGreen("成功")
                         } else {
@@ -203,8 +202,8 @@ object DataUpdator {
      * @param back (Boolean) -> Unit
      */
     fun syncGlobalInst(onUpdate: OnUpdate? = null, back: (Boolean) -> Unit) {
-        NetHelper.postJson<List<ActionNode>>(ApiUrls.SYNC_GLOBAL_INST, BaseRequestModel("")) { _, bean ->
-            if (bean != null) {
+        WrapperNetHelper.postJson<List<ActionNode>>(ApiUrls.SYNC_GLOBAL_INST) {
+            success { _, bean ->
                 if (bean.isOk()) {
                     val list = bean.data
                     if (list != null) {
@@ -228,7 +227,9 @@ object DataUpdator {
                     GlobalApp.toastError(R.string.text_net_err)
                     back.invoke(false)
                 }
-            } else {
+            }
+            fail { _, e ->
+                GlobalLog.err(e)
                 GlobalApp.toastError(R.string.text_net_err)
                 back.invoke(false)
             }
@@ -240,9 +241,9 @@ object DataUpdator {
      * @param back (Boolean)->Unit
      */
     fun syncInAppInst(onUpdate: OnUpdate? = null, back: (Boolean) -> Unit) {
-        NetHelper.postJson<List<ActionNode>>(ApiUrls.SYNC_IN_APP_INST,
-                BaseRequestModel(AdvanAppHelper.getPkgList())) { _, bean ->
-            if (bean != null) {
+        WrapperNetHelper.postJson<List<ActionNode>>(ApiUrls.SYNC_IN_APP_INST,
+                AdvanAppHelper.getPkgList()) {
+            success { _, bean ->
                 if (bean.isOk()) {
                     val list = bean.data
                     if (list != null) {
@@ -267,12 +268,11 @@ object DataUpdator {
                     GlobalApp.toastError(R.string.text_net_err)
                     back.invoke(false)
                 }
-
-            } else {
-                GlobalApp.toastError(R.string.text_net_err)
+            }
+            fail { _, e ->
+                GlobalLog.err(e)
                 back.invoke(false)
             }
-
         }
     }
 
@@ -284,16 +284,21 @@ object DataUpdator {
      */
     fun syncMarkedData(onUpdate: OnUpdate? = null, types: Array<String>, lastKeyId: Int, back: (Boolean) -> Unit) {
         val syncData = TextHelper.arr2String(types)
-        val requestModel = BaseRequestModel(syncData)
 
-        NetHelper.postJson<List<MarkedData>>(ApiUrls.SYNC_MARKED, requestModel) { _, bean ->
-            if (bean?.isOk() == true) {
-                DaoHelper.updateMarkedData(onUpdate, types, bean.data ?: emptyList())
-                SpHelper(GlobalApp.APP).set(lastKeyId, System.currentTimeMillis())
-                DAO.clear()
-                back.invoke(true)
-            } else {
-                GlobalApp.toastError(bean?.message ?: "未知错误")
+        WrapperNetHelper.postJson<List<MarkedData>>(ApiUrls.SYNC_MARKED, syncData) {
+            success { _, bean ->
+                if (bean.isOk()) {
+                    DaoHelper.updateMarkedData(onUpdate, types, bean.data ?: emptyList())
+                    SpHelper(GlobalApp.APP).set(lastKeyId, System.currentTimeMillis())
+                    DAO.clear()
+                    back.invoke(true)
+                } else {
+                    GlobalApp.toastError(bean.message)
+                    back.invoke(false)
+                }
+            }
+            fail { _, e ->
+                GlobalLog.err(e)
                 back.invoke(false)
             }
         }
@@ -307,8 +312,8 @@ object DataUpdator {
 
         val syncPkgs = AdvanAppHelper.getPkgList()
 
-        NetHelper.postJson<List<AppAdInfo>>(ApiUrls.SYNC_APP_AD, BaseRequestModel(syncPkgs)) { _, bean ->
-            if (bean != null) {
+        WrapperNetHelper.postJson<List<AppAdInfo>>(ApiUrls.SYNC_APP_AD, syncPkgs) {
+            success { _, bean ->
                 if (bean.isOk()) {
                     //
                     DaoHelper.updateAppAdInfo(bean.data ?: emptyList(), onUpdate)
@@ -320,8 +325,10 @@ object DataUpdator {
                     GlobalApp.toastInfo(bean.message)
                     back.invoke(false)
                 }
-            } else {
-                GlobalApp.toastError("出错")
+            }
+            fail { _, e ->
+                GlobalLog.err(e)
+                GlobalApp.toastInfo(e.message ?: "")
                 back.invoke(false)
             }
         }
@@ -331,19 +338,24 @@ object DataUpdator {
      * 检查插件更新
      */
     fun checkPluginUpdate() {
-        NetHelper.postJson<List<RePluginInfo>>(ApiUrls.PLUGIN_LIST) { _, b ->
-            if (b?.isOk() == true) {
-                runOnCachePool {
-                    b.data?.forEach {
-                        if (it.hasUpdate()) {
-                            Vog.i("checkPluginUpdate ---> 检测到有插件更新")
-                            GlobalApp.toastInfo("检测到有插件更新")
-                            return@runOnCachePool
+        WrapperNetHelper.postJson<List<RePluginInfo>>(ApiUrls.PLUGIN_LIST) {
+            success { _, b ->
+                if (b.isOk()) {
+                    runOnCachePool {
+                        b.data?.forEach {
+                            if (it.hasUpdate()) {
+                                Vog.i("checkPluginUpdate ---> 检测到有插件更新")
+                                GlobalApp.toastInfo("检测到有插件更新")
+                                return@runOnCachePool
+                            }
                         }
                     }
+                } else {
+                    GlobalLog.err(b.message)
                 }
-            } else {
-                GlobalLog.err(b?.message)
+            }
+            fail { _, e ->
+                GlobalLog.err(e)
             }
         }
         Vog.i("checkPluginUpdate ---> 无插件更新")

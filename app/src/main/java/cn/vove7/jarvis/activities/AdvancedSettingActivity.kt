@@ -8,10 +8,11 @@ import android.speech.RecognizerIntent
 import android.view.View
 import android.widget.TextView
 import cn.vove7.common.app.GlobalApp
+import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.bridges.SystemBridge
 import cn.vove7.common.model.UserInfo
 import cn.vove7.common.netacc.ApiUrls
-import cn.vove7.common.netacc.NetHelper
+import cn.vove7.common.netacc.WrapperNetHelper
 import cn.vove7.common.netacc.model.LastDateInfo
 import cn.vove7.jarvis.BuildConfig
 import cn.vove7.jarvis.R
@@ -130,7 +131,7 @@ class AdvancedSettingActivity : ReturnableActivity() {
                         else ipText, defaultValue = {
                             !RemoteDebugServer.stopped
                         }, callback = { holder, it ->
-                            if (!AppConfig.checkLogin()) {
+                            if (!BuildConfig.DEBUG && !AppConfig.checkLogin()) {
                                 (holder as SettingItemHelper.SwitchItemHolder).compoundWight.isChecked = false
                                 return@SwitchItem true
                             }
@@ -279,9 +280,25 @@ class AdvancedSettingActivity : ReturnableActivity() {
         }
     }
 
+    private fun getLastInfo(back: (LastDateInfo?) -> Unit) {
+        WrapperNetHelper.postJson<LastDateInfo>(ApiUrls.GET_LAST_DATA_DATE) {
+            success { _, b ->
+                if (b.isOk()) {
+                    back.invoke(b.data)
+                } else {
+                    back.invoke(null)
+                }
+            }
+            fail { _, e ->
+                GlobalLog.err(e)
+                back.invoke(null)
+            }
+        }
+    }
+
     private fun showLastDataDate() {
         val p = ProgressDialog(this)
-        NetHelper.getLastInfo {
+        getLastInfo {
             p.dismiss()
             if (it != null) {
                 statistic(it)
@@ -310,7 +327,7 @@ class AdvancedSettingActivity : ReturnableActivity() {
                         }
                     }
                     positiveButton(text = "一键同步") {
-                        DataUpdator.oneKeyUpdate(this@AdvancedSettingActivity, list)
+                        DataUpdator.oneKeyUpdate(this@AdvancedSettingActivity, list,null,"")
                     }
                 }
     }

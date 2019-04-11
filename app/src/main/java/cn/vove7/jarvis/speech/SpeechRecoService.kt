@@ -9,7 +9,10 @@ import android.support.v4.app.ActivityCompat
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.appbus.AppBus
 import cn.vove7.common.model.RequestPermission
+import cn.vove7.common.utils.runInCatch
+import cn.vove7.common.utils.runOnNewHandlerThread
 import cn.vove7.jarvis.receivers.PowerEventReceiver
+import cn.vove7.jarvis.receivers.ScreenStatusListener
 import cn.vove7.jarvis.speech.baiduspeech.recognition.model.IStatus
 import cn.vove7.jarvis.tools.AppConfig
 import cn.vove7.jarvis.view.statusbar.StatusAnimation
@@ -113,8 +116,10 @@ abstract class SpeechRecoService(val event: SpeechEvent) : SpeechRecogI {
 
     @CallSuper
     override fun stopWakeUp() {
-        if (wakeupI.opened)
-            wakeupStatusAni.failedAndHideDelay("语音唤醒关闭", 5000)
+        if (wakeupI.opened) {
+            if (ScreenStatusListener.screenOn || AppConfig.notifyWpOnScreenOff) //亮屏，或开启息屏通知
+                wakeupStatusAni.failedAndHideDelay("语音唤醒关闭", 5000)
+        }
     }
 
     abstract fun doStopRecog()
@@ -204,14 +209,16 @@ abstract class SpeechRecoService(val event: SpeechEvent) : SpeechRecogI {
     }
 
     fun startIfLastingVoice() {//长语音
-        if (isListening) {
-            Vog.d("重启长语音： 正在识别")
-            return
-        }
-        if (AppConfig.lastingVoiceCommand && !lastingStopped) {
-            startRecogSilent()
-        } else {
-            Vog.d("重启长语音： 长语音关闭或已停止")
+        runOnNewHandlerThread(delay = 500) {
+            if (isListening) {
+                Vog.d("重启长语音： 正在识别")
+                return@runOnNewHandlerThread
+            }
+            if (AppConfig.lastingVoiceCommand && !lastingStopped) {
+                startRecogSilent()
+            } else {
+                Vog.d("重启长语音： 长语音关闭或已停止")
+            }
         }
     }
 
@@ -271,18 +278,21 @@ abstract class SpeechRecoService(val event: SpeechEvent) : SpeechRecogI {
 
     private fun startSCO() {
         Vog.d("startSCO")
-
-        audioManager.apply {
-            isBluetoothScoOn = true
-            mode = AudioManager.MODE_IN_CALL
-            startBluetoothSco()
+        runInCatch {
+            audioManager.apply {
+                isBluetoothScoOn = true
+                mode = AudioManager.MODE_IN_CALL
+                startBluetoothSco()
+            }
         }
     }
 
     fun closeSCO() {
         Vog.d("关闭SCO")
-        audioManager.isBluetoothScoOn = false
-        audioManager.stopBluetoothSco()
+        runInCatch {
+            audioManager.isBluetoothScoOn = false
+            audioManager.stopBluetoothSco()
+        }
     }
 
 }

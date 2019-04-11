@@ -6,6 +6,7 @@ import org.greenrobot.greendao.annotation.Entity;
 import org.greenrobot.greendao.annotation.Generated;
 import org.greenrobot.greendao.annotation.Id;
 import org.greenrobot.greendao.annotation.Keep;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.Serializable;
 import java.util.Arrays;
@@ -14,6 +15,7 @@ import java.util.Objects;
 import cn.vove7.common.BuildConfig;
 import cn.vove7.common.app.GlobalLog;
 import cn.vove7.common.datamanager.parse.DataFrom;
+import cn.vove7.common.interfaces.Searchable;
 import cn.vove7.common.interfaces.Signable;
 import cn.vove7.common.model.UserInfo;
 import cn.vove7.common.netacc.tool.SecureHelper;
@@ -22,7 +24,7 @@ import cn.vove7.common.netacc.tool.SecureHelper;
  * Created by 17719247306 on 2018/9/3
  */
 @Entity
-public class AppAdInfo implements Serializable, Signable, DataFrom {
+public class AppAdInfo implements Serializable, Searchable, Signable, DataFrom {
     static final long serialVersionUID = 111L;
     @Expose(serialize = false)
     @Id
@@ -57,6 +59,11 @@ public class AppAdInfo implements Serializable, Signable, DataFrom {
 
     public void setTagId(String tagId) {
         this.tagId = tagId;
+    }
+
+    @Override
+    public boolean onSearch(@NotNull String text) {
+        return descTitle.contains(text);
     }
 
     @Override

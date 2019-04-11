@@ -13,8 +13,8 @@ import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.appbus.AppBus
 import cn.vove7.common.appbus.SpeechAction
-import cn.vove7.common.utils.ThreadPool
 import cn.vove7.common.bridges.SystemBridge
+import cn.vove7.common.utils.ThreadPool
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.activities.base.ReturnableActivity
 import cn.vove7.jarvis.adapters.SettingsExpandableAdapter
@@ -46,7 +46,6 @@ class SettingsActivity : ReturnableActivity() {
         try {
             expandableListView?.post {
                 expandableListView.apply {
-                    expandGroup(0)
                     expandGroup(1)
                     expandGroup(2)
                     expandGroup(3)
@@ -98,7 +97,11 @@ class SettingsActivity : ReturnableActivity() {
             SettingGroupItem(R.color.indigo_700, titleS = "语音识别", childItems = listOf(
                     SwitchItem(title = "长语音模式", summary = "开启后，唤醒后可连续说出命令\n可以通过按音量下键终止\n" +
                             "会占用麦克风\n等待指令时间为8s",
-                            keyId = R.string.key_lasting_voice_command, defaultValue = { AppConfig.lastingVoiceCommand })
+                            keyId = R.string.key_lasting_voice_command, defaultValue = { AppConfig.lastingVoiceCommand }),
+
+                    CheckBoxItem(R.string.text_voice_control_dialog, summary = "使用语言命令控制对话框",
+                            keyId = R.string.key_voice_control_dialog, defaultValue = true)
+
             )),
             SettingGroupItem(R.color.google_green, "反馈", childItems = listOf(
                     SwitchItem(title = "提示音", summary = "语音识别提示音", keyId = R.string.key_voice_recog_feedback, defaultValue = { AppConfig.voiceRecogFeedback }),
@@ -132,6 +135,9 @@ class SettingsActivity : ReturnableActivity() {
                         }
                         return@SingleChoiceItem true
                     },
+                    CheckBoxItem(title = "息屏显示通知", summary = "息屏是弹出语音唤醒关闭通知",
+                            defaultValue = AppConfig.notifyWpOnScreenOff, keyId = R.string.key_notify_wp_on_screen_off)
+                    ,
                     CheckBoxItem(title = "亮屏开启唤醒", summary = "自动休眠后，开屏自动打开语音唤醒",
                             keyId = R.string.key_open_voice_wakeup_if_auto_sleep, defaultValue = true),
 
@@ -182,53 +188,62 @@ class SettingsActivity : ReturnableActivity() {
                     },
                     InputItem(title = "用户唤醒词", summary = "如果不想把你的唤醒词被当作命令，把他写到这里\n多个词以'#'隔开",
                             keyId = R.string.key_user_wakeup_word)
-                    )),
+            )),
 
             SettingGroupItem(R.color.google_green, titleS = "按键唤醒", childItems = listOf(
                     SwitchItem(title = "音量键唤醒",
                             keyId = R.string.key_long_press_volume_up_wake_up, summary = "可通过长按音量上键唤醒\n需要无障碍模式开启",
-                            defaultValue = { AppConfig.isLongPressVolUpWakeUp }),
-                    NumberPickerItem(title = "长按延时", summary = "单位: ms", defaultValue = { AppConfig.volumeKeyDelayUp },
+                            defaultValue =
+                            { AppConfig.isLongPressVolUpWakeUp }),
+                    NumberPickerItem(title = "长按延时", summary = "单位: ms", defaultValue =
+                    { AppConfig.volumeKeyDelayUp },
                             keyId = R.string.key_long_key_press_delay, range = Pair(200, 1000)),
                     CheckBoxItem(title = "耳机中键唤醒", summary = "长按耳机中键进行唤醒", keyId = R.string.key_wakeup_with_headsethook,
                             defaultValue = AppConfig.wakeUpWithHeadsetHook),
                     IntentItem(R.string.text_add_wakeup_shortcut_to_launcher, summary = "添加需要8.0+\n" +
-                            "7.1+可直接在桌面长按图标使用Shortcut快捷唤醒\ntips:桌面可直接添加小部件") {
+                            "7.1+可直接在桌面长按图标使用Shortcut快捷唤醒\ntips:桌面可直接添加小部件")
+                    {
                         ShortcutUtil.addWakeUpPinShortcut()
                     }
             )),
             SettingGroupItem(R.color.indigo_700, "响应词", childItems = listOf(
                     SwitchItem(title = "开启", summary = "开始识别前，响应词反馈", keyId = R.string.key_open_response_word,
-                            defaultValue = { AppConfig.openResponseWord }),
+                            defaultValue =
+                            { AppConfig.openResponseWord }),
                     InputItem(title = "设置响应词", summary = AppConfig.responseWord,
-                            keyId = R.string.key_response_word, defaultValue = { AppConfig.responseWord }),
+                            keyId = R.string.key_response_word, defaultValue =
+                    { AppConfig.responseWord }),
                     CheckBoxItem(title = "仅在语音唤醒时响应", keyId = R.string.key_speak_response_word_on_voice_wakeup,
                             defaultValue = AppConfig.speakResponseWordOnVoiceWakeup)
             )),
             SettingGroupItem(R.color.google_yellow, "语音合成", childItems = listOf(
                     SwitchItem(R.string.text_play_voice_message, summary = "关闭后以弹窗形式提醒",
-                            keyId = R.string.key_audio_speak, defaultValue = { true }),
+                            keyId = R.string.key_audio_speak, defaultValue =
+                    { true }),
                     SingleChoiceItem(R.string.text_sound_model, summary = "在线声音模型", keyId = R.string.key_voice_syn_model,
-                            defaultValue = { 0 }, entityArrId = R.array.voice_model_entities, callback = { h, i ->
+                            defaultValue =
+                            { 0 }, entityArrId = R.array.voice_model_entities, callback =
+                    { h, i ->
                         AppBus.postSpeechAction(SpeechAction.ActionCode.ACTION_RELOAD_SYN_CONF)
                         return@SingleChoiceItem true
                     }),
                     NumberPickerItem(R.string.text_speak_speed, keyId = R.string.key_voice_syn_speed,
-                            defaultValue = { 5 }, range = Pair(1, 9), callback = { h, i ->
+                            defaultValue =
+                            { 5 }, range = Pair(1, 9), callback =
+                    { h, i ->
                         AppBus.postSpeechAction(SpeechAction.ActionCode.ACTION_RELOAD_SYN_CONF)
                         return@NumberPickerItem true
                     }),
                     SingleChoiceItem(title = "输出方式", summary = "选择音量跟随\n可能重启App生效", keyId = R.string.key_stream_of_syn_output,
-                            entityArrId = R.array.list_stream_syn_output, defaultValue = { 0 }) { _, b ->
+                            entityArrId = R.array.list_stream_syn_output, defaultValue =
+                    { 0 })
+                    { _, b ->
                         MainService.instance?.speechSynService?.reloadStreamType()
                         return@SingleChoiceItem true
                     }
             )),
-            SettingGroupItem(R.color.google_red, titleId = R.string.text_voice_control, childItems = listOf(
-                    CheckBoxItem(R.string.text_voice_control_dialog, summary = "使用语言命令控制对话框",
-                            keyId = R.string.key_voice_control_dialog, defaultValue = true)
-//                    CheckBoxItem(title = "继续播放", summary = "当后台有音乐时，执行结束后继续音乐",
-//                            keyId = R.string.key_resume_bkg_music,defaultValue = {true})
+            SettingGroupItem(R.color.google_red, titleS = "悬浮面板", childItems = listOf(
+                    SingleChoiceItem(title = "动画", entityArrId = R.array.list_fp_animation, keyId = R.string.key_fp_animation)
             )),
 //            SettingGroupItem(R.color.lime_600, titleS = "语音面板", childItems = listOf(
 //                    SingleChoiceItem(title = "依靠方向", keyId = R.string.key_float_voice_align,
@@ -241,7 +256,8 @@ class SettingsActivity : ReturnableActivity() {
                     SingleChoiceItem(title = "翻译主语言", entityArrId = R.array.list_translate_languages,
                             keyId = R.string.key_translate_languages),
                     CheckBoxItem(title = "自动开启无障碍服务", summary = "App启动时自动开启无障碍服务，需要root支持，或者转为系统应用",
-                            keyId = R.string.key_auto_open_as_with_root, defaultValue = false) { _, b ->
+                            keyId = R.string.key_auto_open_as_with_root, defaultValue = false)
+                    { _, b ->
                         if (b && !PermissionUtils.accessibilityServiceEnabled(this)) {
                             ThreadPool.runOnPool {
                                 openAccessibilityServiceAuto(this)
@@ -249,7 +265,8 @@ class SettingsActivity : ReturnableActivity() {
                         }
                         return@CheckBoxItem true
                     },
-                    IntentItem(title = "重置引导") {
+                    IntentItem(title = "重置引导")
+                    {
                         Tutorials.resetTutorials()
                         GlobalApp.toastInfo("重置完成")
                     },

@@ -45,7 +45,6 @@ class BaiduSpeechRecogService(event: SpeechEvent) : SpeechRecoService(event) {
      * 分发事件
      */
     private val handler: RecogHandler
-    private val offSpeechGrammarPath = context.filesDir.absolutePath + "/bd/baidu_speech_grammar.bsg"
 
     init {
         val t = HandlerThread("recog")

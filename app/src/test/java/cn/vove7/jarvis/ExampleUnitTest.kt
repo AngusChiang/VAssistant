@@ -7,6 +7,7 @@ import cn.vove7.common.utils.*
 import cn.vove7.jarvis.chat.TulingChatSystem
 import cn.vove7.jarvis.tools.baiduaip.BaiduAipHelper
 import cn.vove7.paramregexengine.toParamRegex
+import cn.vove7.vtp.net.NetHelper
 import org.jsoup.Jsoup
 import org.junit.Test
 import java.lang.Thread.sleep
@@ -351,8 +352,37 @@ class ExampleUnitTest {
     fun onceTest() {
         println(onceFlag)
         println(onceFlag)
-        onceFlag=false
+        onceFlag = false
         println(onceFlag)
         println(onceFlag)
     }
+
+    @Test
+    fun textWriterTest() {
+        try {
+            val a = 1 / 0
+        } catch (e: Exception) {
+            println(e.errMessage())
+        }
+
+        print(TextPrinter().also {
+            it.print(1)
+            it.print("二")
+            it.print(it)
+        })
+    }
+
+    @Test
+    fun netTest() {
+        NetHelper.get<String>("https://www.baidu.com"){
+            success{_,s->
+                print(s)
+            }
+            fail { _, e ->
+                e.printStackTrace()
+            }
+        }
+        sleep(10000)
+    }
+
 }

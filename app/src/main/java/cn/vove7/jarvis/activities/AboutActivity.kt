@@ -107,10 +107,10 @@ class AboutActivity : AppCompatActivity(), AdapterView.OnItemClickListener {
                 SystemBridge.openUrl("https://github.com/Vove7/VOSP")
             }
             3 -> startActivity(Intent(this, OSLActivity::class.java))
-            4 -> {
-                SystemBridge.sendEmail("vove7@qq.com", null,
-                        "\n\n\n\n\n\n\n- 来自" + getString(R.string.app_name))
-            }
+//            4 -> {
+//                SystemBridge.sendEmail("vove7@qq.com", null,
+//                        "\n\n\n\n\n\n\n- 来自" + getString(R.string.app_name))
+//            }
             5 -> {
                 UpdateLogDialog(this)
             }

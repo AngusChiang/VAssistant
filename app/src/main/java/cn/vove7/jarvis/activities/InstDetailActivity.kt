@@ -14,6 +14,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.app.GlobalLog
+import cn.vove7.common.app.log
 import cn.vove7.common.appbus.AppBus
 import cn.vove7.common.bridges.SystemBridge
 import cn.vove7.common.datamanager.DAO
@@ -26,8 +27,7 @@ import cn.vove7.common.datamanager.parse.statusmap.ActionNode
 import cn.vove7.common.helper.AdvanAppHelper
 import cn.vove7.common.model.UserInfo
 import cn.vove7.common.netacc.ApiUrls
-import cn.vove7.common.netacc.NetHelper
-import cn.vove7.common.netacc.model.BaseRequestModel
+import cn.vove7.common.netacc.WrapperNetHelper
 import cn.vove7.common.utils.RegUtils
 import cn.vove7.common.utils.TextHelper
 import cn.vove7.common.utils.ThreadPool.runOnPool
@@ -265,15 +265,20 @@ class InstDetailActivity : AppCompatActivity() {
                             .positiveButton(R.string.text_confirm) {
                                 val p = ProgressDialog(this)
                                 if (node.tagId != null) {
-                                    NetHelper.postJson<Any>(ApiUrls.DELETE_SHARE_INST,
-                                            BaseRequestModel(node.tagId)) { _, bean ->
-                                        if (bean?.isOk() == true) {
-                                            GlobalLog.log("云端删除成功$node")
-                                        } else {
-                                            GlobalLog.log("云端删除失败$node ${bean?.message}")
+                                    WrapperNetHelper.postJson<Any>(ApiUrls.DELETE_SHARE_INST, node.tagId) {
+                                        success { _, bean ->
+                                            if (bean.isOk()) {
+                                                GlobalLog.log("云端删除成功$node")
+                                                delLocalNode()
+                                            } else {
+                                                GlobalApp.toastError("云端删除失败$node ${bean.message} 请联系开发者")
+                                            }
+                                            p.dismiss()
                                         }
-                                        delLocalNode()
-                                        p.dismiss()
+                                        fail { _, e ->
+                                            GlobalLog.log("云端删除失败$node ${e.message}")
+                                            p.dismiss()
+                                        }
                                     }
                                 } else {
                                     GlobalLog.log("未分享至server$node")
@@ -504,14 +509,14 @@ class InstDetailActivity : AppCompatActivity() {
      * 更新返回版本号
      */
     private fun upgrade() {
-        NetHelper.postJson<Int>(ApiUrls.UPGRADE_INST, BaseRequestModel(node), callback = { _, bean ->
-            if (bean != null) {
+        WrapperNetHelper.postJson<Int>(ApiUrls.UPGRADE_INST, node) {
+            success { _, bean ->
                 if (bean.isOk()) {
                     GlobalApp.toastSuccess(R.string.text_share_success)
                     //sign tag
                     val s = bean.data ?: -1
                     if (s < 0) {
-                        return@postJson
+                        return@success
                     }
                     runOnPool {
                         //更新 tagId
@@ -522,18 +527,20 @@ class InstDetailActivity : AppCompatActivity() {
                 } else {
                     GlobalApp.toastInfo(bean.message)
                 }
-            } else {
+            }
+            fail { _, e ->
+                GlobalLog.err(e)
                 GlobalApp.toastError(R.string.text_net_err)
             }
-        })
+        }
     }
 
     /**
      * 首次分享返回tag
      */
     private fun firstShare() {
-        NetHelper.postJson<String>(ApiUrls.SHARE_INST, BaseRequestModel(node), callback = { _, bean ->
-            if (bean != null) {
+        WrapperNetHelper.postJson<String>(ApiUrls.SHARE_INST, node) {
+            success { _, bean ->
                 if (bean.isOk()) {
                     GlobalApp.toastSuccess(R.string.text_share_success)
                     //sign tag
@@ -552,10 +559,12 @@ class InstDetailActivity : AppCompatActivity() {
                 } else {
                     GlobalApp.toastInfo(bean.message)
                 }
-            } else {
+            }
+            fail { _, e ->
+                e.log()
                 GlobalApp.toastError(R.string.text_net_err)
             }
-        })
+        }
     }
 
     private fun showRunDialog() {

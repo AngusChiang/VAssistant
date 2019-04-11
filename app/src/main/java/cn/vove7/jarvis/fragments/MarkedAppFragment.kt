@@ -23,7 +23,9 @@ import cn.vove7.jarvis.view.dialog.SelectAppDialog
  */
 class MarkedAppFragment : BaseMarkedFragment() {
 
-    var showUninstall = false
+    private var showUninstall = false
+
+    override var sortData: Boolean = true
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -65,16 +67,19 @@ class MarkedAppFragment : BaseMarkedFragment() {
         return ss
     }
 
+    /**
+     * 加载用户应用列表、系统应用，
+     *
+     * @param pageIndex Int
+     */
     override fun onLoadData(pageIndex: Int) {
         runOnCachePool {
             val builder = DAO.daoSession.markedDataDao
                     .queryBuilder()
                     .where(MarkedDataDao.Properties.Type.eq(MARKED_TYPE_APP))
-                    .offset(pageSizeLimit * pageIndex)
-                    .limit(pageSizeLimit)
 
             val list = builder.list()
-            notifyLoadSuccess(list)
+            notifyLoadSuccess(list,true)
         }
     }
 }

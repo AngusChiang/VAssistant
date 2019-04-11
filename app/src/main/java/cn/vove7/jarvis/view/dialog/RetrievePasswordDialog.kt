@@ -8,10 +8,10 @@ import android.view.View
 import android.widget.Button
 import android.widget.ProgressBar
 import cn.vove7.common.app.GlobalApp
+import cn.vove7.common.app.log
 import cn.vove7.common.model.UserInfo
 import cn.vove7.common.netacc.ApiUrls
-import cn.vove7.common.netacc.NetHelper
-import cn.vove7.common.netacc.model.BaseRequestModel
+import cn.vove7.common.netacc.WrapperNetHelper
 import cn.vove7.common.netacc.tool.SecureHelper
 import cn.vove7.common.utils.TextHelper
 import cn.vove7.jarvis.BuildConfig
@@ -68,22 +68,23 @@ class RetrievePasswordDialog(context: Context) {
                 loadBar.visibility = View.VISIBLE
 //                val p = NetParamsBuilder.of(Pair("emailAdd", userEmail)).sign()
 
-                NetHelper.postJson<String>(ApiUrls.SEND_RET_PASS_EMAIL_VER_CODE, BaseRequestModel(userEmail, "check"),
-                        callback = { _, bean ->
-                            loadBar.visibility = View.INVISIBLE
-                            if (bean != null) {
-                                if (bean.isOk()) {
-                                    GlobalApp.toastSuccess(bean.data ?: "null")
-                                    startDown(countDownSecs)
-                                } else {
-                                    this.isEnabled = true
-                                    (bean.message)
-                                }
-                            } else {
-                                this.isEnabled = true
-                                GlobalApp.toastError("出错")
-                            }
-                        })
+                WrapperNetHelper.postJson<String>(ApiUrls.SEND_RET_PASS_EMAIL_VER_CODE, model = userEmail, arg1 = "check") {
+                    success { _, bean ->
+                        loadBar.visibility = View.INVISIBLE
+                        if (bean.isOk()) {
+                            GlobalApp.toastSuccess(bean.data ?: "null")
+                            startDown(countDownSecs)
+                        } else {
+                            this@apply.isEnabled = true
+                            (bean.message)
+                        }
+                    }
+                    fail { _, e ->
+                        e.log()
+                        this@apply.isEnabled = true
+                        GlobalApp.toastError("出错 ${e.message}")
+                    }
+                }
             }
         }
         signUpBtn.text = "找回"
@@ -129,21 +130,24 @@ class RetrievePasswordDialog(context: Context) {
 
             loadBar.visibility = View.VISIBLE
             //post
-            NetHelper.postJson<String>(ApiUrls.RET_PASS__BY_EMAIL, BaseRequestModel(userInfo, verCode), callback = { _, bean ->
-                //泛型
-                Vog.d("onResponse ---> $bean")
-                loadBar.visibility = View.INVISIBLE
-                if (bean != null) {
+            WrapperNetHelper.postJson<String>(ApiUrls.RET_PASS__BY_EMAIL, model = userInfo, arg1 = verCode) {
+                success { _, bean ->
+                    //泛型
+                    Vog.d("onResponse ---> $bean")
+                    loadBar.visibility = View.INVISIBLE
                     if (bean.isOk()) {
                         GlobalApp.toastInfo(bean.data ?: "网络错误")
                         dialog.dismiss()
                     } else {
                         GlobalApp.toastError(bean.message)
                     }
-                } else {
-                    GlobalApp.toastError("出错")
                 }
-            })
+                fail { _, e ->
+                    loadBar.visibility = View.INVISIBLE
+                    e.log()
+                    GlobalApp.toastError("出错 ${e.message}")
+                }
+            }
         }
         dialog.customView(view = view, scrollable = true).title(R.string.text_retrieve_password).show()
     }

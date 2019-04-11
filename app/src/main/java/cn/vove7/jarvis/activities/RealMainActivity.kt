@@ -54,7 +54,7 @@ class RealMainActivity : AppCompatActivity() {
         }
 
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener)
-        navigation.selectedItemId = if (AppConfig.FIRST_LAUNCH_NEW_VERSION&& inFlag) R.id.nav_home else R.id.nav_me
+        navigation.selectedItemId = if (AppConfig.FIRST_LAUNCH_NEW_VERSION && inFlag) R.id.nav_home else R.id.nav_me
 
         requestPermission()
     }
@@ -86,7 +86,9 @@ class RealMainActivity : AppCompatActivity() {
                 android.Manifest.permission.MODIFY_AUDIO_SETTINGS,
                 android.Manifest.permission.READ_PHONE_STATE
         )
-        var showUpdate = true
+
+        var showUpdate = true//显示更新日志
+
         var inFlag by MutableFlag(initValue = true, afterValue = false)
     }
 
@@ -112,14 +114,12 @@ class RealMainActivity : AppCompatActivity() {
     }
 
     private fun checkDataUpdate() {
-        if (AppConfig.autoUpdateData) {
-            DataUpdator.checkUpdate(this) {
-                if (!UserInfo.isLogin())
-                    text_login?.post {
-                        Tutorials.showForView(this, Tutorials.T_LOGIN, text_login,
-                                "新用户注册", getString(R.string.desc_new_account))
-                    }
-            }
+        DataUpdator.checkUpdate(this) {
+            if (!UserInfo.isLogin())
+                text_login?.post {
+                    Tutorials.showForView(this, Tutorials.T_LOGIN, text_login,
+                            "新用户注册", getString(R.string.desc_new_account))
+                }
         }
     }
 

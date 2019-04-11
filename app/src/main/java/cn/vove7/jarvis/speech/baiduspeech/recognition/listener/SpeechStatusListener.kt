@@ -81,7 +81,7 @@ class SpeechStatusListener(private val handler: Handler) : StatusRecogListener()
         handler.sendMessage(SpeechMessage.buildMessage(CODE_VOICE_ERR, errMsg))
         when (subErrorCode) {
             3101 -> {
-                GlobalApp.toastInfo("?")
+//                GlobalApp.toastInfo("?")
             }
             7001 -> {
             }

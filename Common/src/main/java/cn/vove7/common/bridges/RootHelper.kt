@@ -72,35 +72,28 @@ object RootHelper {
      * 执行root命令
      * @return String 结果
      */
+    @Throws
     fun execWithSu(cmd: String): String? {
         GlobalLog.log("execWithSu ---> $cmd")
-        val result: StringBuilder
-        try {
-            result = StringBuilder()
-            val p = Runtime.getRuntime().exec("su")// 经过Root处理的android系统即有su命令
-            DataOutputStream(p.outputStream).use { dos ->
-                DataInputStream(p.inputStream).use { dis ->
-                    dos.writeBytes(cmd + "\n")
-                    dos.flush()
-                    dos.writeBytes("exit\n")
-                    dos.flush()
+        val result = StringBuilder()
+        val p = Runtime.getRuntime().exec("su")// 经过Root处理的android系统即有su命令
+        DataOutputStream(p.outputStream).use { dos ->
+            DataInputStream(p.inputStream).use { dis ->
+                dos.writeBytes(cmd + "\n")
+                dos.flush()
+                dos.writeBytes("exit\n")
+                dos.flush()
 
-                    var line: String? = null
-                    while ((dis.readLine().also { line = it }) != null) {
-                        result.append(line).append("\n")
-                    }
-                    p.waitFor()
+                var line: String? = null
+                while ((dis.readLine().also { line = it }) != null) {
+                    result.append(line).append("\n")
                 }
+                p.waitFor()
             }
-            return result.toString().also {
-                GlobalLog.log("exec result -> $it")
-            }
-
-        } catch (e: Exception) {
-            GlobalLog.err(e.message)
-            return e.message
         }
-
+        return result.toString().also {
+            GlobalLog.log("exec result -> $it")
+        }
     }
 
     /**

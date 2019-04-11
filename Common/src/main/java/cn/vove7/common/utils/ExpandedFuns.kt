@@ -1,6 +1,7 @@
 package cn.vove7.common.utils
 
 import android.Manifest
+import android.animation.Animator
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
@@ -15,9 +16,11 @@ import android.support.annotation.ColorRes
 import android.support.v4.app.ActivityCompat
 import android.util.DisplayMetrics
 import android.view.View
+import android.view.animation.Animation
 import cn.vove7.common.BuildConfig
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.app.GlobalLog
+import cn.vove7.common.app.log
 import cn.vove7.vtp.app.AppInfo
 import cn.vove7.vtp.log.Vog
 import java.text.SimpleDateFormat
@@ -45,6 +48,14 @@ fun runOnUi(action: () -> Unit) {
         } catch (e: Exception) {
             GlobalLog.err(e)
         }
+    }
+}
+
+fun runInCatch(block: () -> Unit) {
+    try {
+        block.invoke()
+    } catch (e: Throwable) {
+        e.log()
     }
 }
 
@@ -367,5 +378,76 @@ operator fun String.times(number: Int): String {
 fun <K, V> HashMap<K, V>.getAndRemove(k: K): V? {
     return get(k)?.also {
         remove(k)
+    }
+}
+
+fun Animator.listener(lis: AnimatorListener.() -> Unit) {
+    val al = AnimatorListener()
+    lis.invoke(al)
+    addListener(object : Animator.AnimatorListener {
+        override fun onAnimationEnd(animation: Animator?) {
+            al._onEnd?.invoke()
+        }
+
+        override fun onAnimationRepeat(animation: Animator?) {
+            al._onRepeat?.invoke()
+        }
+
+        override fun onAnimationCancel(animation: Animator?) {
+            al._onCancel?.invoke()
+        }
+
+        override fun onAnimationStart(animation: Animator?) {
+            al._onStart?.invoke()
+        }
+    }
+    )
+}
+
+/**
+ *
+ * @receiver Animation
+ */
+fun Animation.listener(lis: AnimationListener.() -> Unit) {
+    val al = AnimationListener()
+    lis.invoke(al)
+    setAnimationListener(object : Animation.AnimationListener {
+        override fun onAnimationRepeat(animation: Animation?) {
+            al._onRepeat?.invoke()
+        }
+
+        override fun onAnimationEnd(animation: Animation?) {
+            al._onEnd?.invoke()
+        }
+
+        override fun onAnimationStart(animation: Animation?) {
+            al._onStart?.invoke()
+        }
+    })
+}
+
+class AnimatorListener : AnimationListener() {
+    var _onCancel: (() -> Unit)? = null
+
+    fun onCancel(c: () -> Unit) {
+        _onCancel = c
+    }
+}
+
+open class AnimationListener {
+    var _onEnd: (() -> Unit)? = null
+    var _onStart: (() -> Unit)? = null
+    var _onRepeat: (() -> Unit)? = null
+
+    fun onEnd(e: () -> Unit) {
+        _onEnd = e
+    }
+
+    fun onStart(s: () -> Unit) {
+        _onStart = s
+    }
+
+    fun onRepeat(r: () -> Unit) {
+        _onRepeat = r
     }
 }

@@ -252,6 +252,7 @@ open class ExecutorImpl(
     }
 
     /**
+     * 程序内及脚本api
      * @param data String 包名 应用名 标记功能
      * 同时负责解析应用内跟随操作
      * 往往: 打开网易云 | 打开QQ扫一扫 | 酷安下载微信
@@ -290,6 +291,7 @@ open class ExecutorImpl(
 
     /**
      * 返回解析成功
+     * 脚本api
      * @param data String
      * @return Boolean
      */

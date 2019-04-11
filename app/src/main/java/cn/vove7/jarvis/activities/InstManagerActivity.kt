@@ -8,6 +8,8 @@ import cn.vove7.jarvis.R
 import cn.vove7.jarvis.activities.base.BaseActivityWithViewPager
 import cn.vove7.jarvis.fragments.GlobalInstListFragment
 import cn.vove7.jarvis.fragments.InstAppListFragment
+import cn.vove7.jarvis.fragments.SimpleListFragment
+import cn.vove7.jarvis.tools.SearchActionHelper
 import kotlinx.android.synthetic.main.activity_base_view_pager.*
 
 /**
@@ -22,8 +24,14 @@ class InstManagerActivity : BaseActivityWithViewPager() {
             InstAppListFragment()
     )
 
-    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        MenuInflater(this).inflate(R.menu.menu_sync, menu)
+    override fun onCreateOptionsMenu(m: Menu?): Boolean {
+        toolbar.apply {
+            inflateMenu(R.menu.menu_sync)
+
+            SearchActionHelper(menu!!.findItem(R.id.menu_item_search)) { text ->
+                (currentFragment as SimpleListFragment<*>).search(text)
+            }
+        }
         return true
     }
 

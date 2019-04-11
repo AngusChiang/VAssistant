@@ -9,13 +9,12 @@ import android.widget.Button
 import android.widget.ProgressBar
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.app.GlobalLog
+import cn.vove7.common.app.log
 import cn.vove7.common.model.UserInfo
 import cn.vove7.common.netacc.ApiUrls
-import cn.vove7.common.netacc.model.BaseRequestModel
+import cn.vove7.common.netacc.WrapperNetHelper
 import cn.vove7.common.netacc.tool.SecureHelper
-import cn.vove7.common.netacc.NetHelper
 import cn.vove7.common.utils.TextHelper
-
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.tools.AppConfig
 import com.afollestad.materialdialogs.MaterialDialog
@@ -79,10 +78,9 @@ class LoginDialog(val context: Context, initEmail: String? = null,
 
             loadBar.visibility = View.VISIBLE
             //post
-            NetHelper.postJson<UserInfo>(ApiUrls.LOGIN, BaseRequestModel(loginInfo),
-                   callback = { _, bean ->
-                loadBar.visibility = View.INVISIBLE
-                if (bean != null) {
+            WrapperNetHelper.postJson<UserInfo>(ApiUrls.LOGIN, loginInfo) {
+                success { _, bean ->
+                    loadBar.visibility = View.INVISIBLE
                     if (bean.isOk()) {
                         try {
                             val userInfo = bean.data!!
@@ -90,7 +88,7 @@ class LoginDialog(val context: Context, initEmail: String? = null,
                         } catch (e: Exception) {
                             GlobalApp.toastInfo(R.string.text_error_occurred)
                             GlobalLog.err(e.message)
-                            return@postJson
+                            return@success
                         }
                         GlobalApp.toastSuccess("登录成功")
                         r.invoke()
@@ -98,10 +96,12 @@ class LoginDialog(val context: Context, initEmail: String? = null,
                     } else {
                         GlobalApp.toastInfo(bean.message)
                     }
-                } else {
-                    GlobalApp.toastError("出错")
                 }
-            })
+                fail { _, e ->
+                    e.log()
+                    GlobalApp.toastError("出错${e.message}")
+                }
+            }
         }
         dialog.customView(view = view, scrollable = true)
                 .title(R.string.text_login).show()

@@ -30,7 +30,6 @@ class App : GlobalApp() {
 
     private lateinit var mainService: MainService
 
-    lateinit var services: Array<Intent>
     override fun onCreate() {
         super.onCreate()
         Vog.d("onCreate ---> begin ${System.currentTimeMillis() / 1000}")
@@ -78,7 +77,6 @@ class App : GlobalApp() {
         ScreenStatusListener.stop()
         AppInstallReceiver.stop()
         UtilEventReceiver.stop()
-
     }
 
     companion object {
@@ -90,14 +88,9 @@ class App : GlobalApp() {
     }
 
     override fun onTerminate() {
-        services.forEach {
-            stopService(it)
-        }
+
         stopBroadcastReceivers()
         super.onTerminate()
     }
 
-    override fun attachBaseContext(base: Context?) {
-        super.attachBaseContext(base)
-    }
 }

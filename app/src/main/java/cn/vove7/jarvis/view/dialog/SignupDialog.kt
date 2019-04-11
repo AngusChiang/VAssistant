@@ -8,21 +8,18 @@ import android.view.View
 import android.widget.Button
 import android.widget.ProgressBar
 import cn.vove7.common.app.GlobalApp
+import cn.vove7.common.app.log
 import cn.vove7.common.model.UserInfo
 import cn.vove7.common.netacc.ApiUrls
-import cn.vove7.common.netacc.NetHelper
-import cn.vove7.common.netacc.model.BaseRequestModel
-import cn.vove7.common.netacc.model.ResponseMessage
+import cn.vove7.common.netacc.WrapperNetHelper
 import cn.vove7.common.netacc.tool.SecureHelper
 import cn.vove7.common.utils.TextHelper
-
 import cn.vove7.jarvis.BuildConfig
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.view.custom.CountDownButton
 import cn.vove7.vtp.log.Vog
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.customview.customView
-import com.google.gson.reflect.TypeToken
 
 /**
  * # SignupDialog
@@ -68,22 +65,24 @@ class SignupDialog(context: Context, val r: OnLoginSuccess) : View.OnClickListen
                 this.isEnabled = false
                 loadBar.visibility = View.VISIBLE
 //                val p = NetParamsBuilder.of(Pair("emailAdd", userEmail)).sign()
-                NetHelper.postJson<String>(ApiUrls.SEND_SIGN_UP_EMAIL_VER_CODE, BaseRequestModel(userEmail),
-                        callback = { _, bean ->
-                    loadBar.visibility = View.INVISIBLE
-                    if (bean != null) {
+                WrapperNetHelper.postJson<String>(ApiUrls.SEND_SIGN_UP_EMAIL_VER_CODE, userEmail) {
+                    success { _, bean ->
+                        loadBar.visibility = View.INVISIBLE
                         if (bean.isOk()) {
                             GlobalApp.toastInfo(bean.data ?: "null")
                             startDown(countDownSecs)
                         } else {
-                            this.isEnabled = true
+                            this@apply.isEnabled = true
                             GlobalApp.toastInfo(bean.message)
                         }
-                    } else {
-                        this.isEnabled = true
+                    }
+                    fail { _, e ->
+                        e.localizedMessage
+                        loadBar.visibility = View.INVISIBLE
+                        this@apply.isEnabled = true
                         GlobalApp.toastError("出错")
                     }
-                })
+                }
             }
         }
 
@@ -131,12 +130,11 @@ class SignupDialog(context: Context, val r: OnLoginSuccess) : View.OnClickListen
 
             loadBar.visibility = View.VISIBLE
             //post
-            NetHelper.postJson<String>(ApiUrls.REGISTER_BY_EMAIL, BaseRequestModel(userInfo, verCode),
-                    callback = { _, bean ->
-                //泛型
-                Vog.d("onResponse ---> $bean")
-                loadBar.visibility = View.INVISIBLE
-                if (bean != null) {
+            WrapperNetHelper.postJson<String>(ApiUrls.REGISTER_BY_EMAIL, model = userInfo, arg1 = verCode) {
+                success { _, bean ->
+                    //泛型
+                    Vog.d("onResponse ---> $bean")
+                    loadBar.visibility = View.INVISIBLE
                     if (bean.isOk()) {
                         GlobalApp.toastInfo(bean.data ?: "null")
                         LoginDialog(context, userEmail, userPass, r)
@@ -144,10 +142,13 @@ class SignupDialog(context: Context, val r: OnLoginSuccess) : View.OnClickListen
                     } else {
                         GlobalApp.toastInfo(bean.message)
                     }
-                } else {
+                }
+                fail { _, e ->
+                    loadBar.visibility = View.INVISIBLE
+                    e.log()
                     GlobalApp.toastError("出错")
                 }
-            })
+            }
         }
         dialog.customView(view = view, scrollable = true).title(R.string.text_sign_up).show()
     }

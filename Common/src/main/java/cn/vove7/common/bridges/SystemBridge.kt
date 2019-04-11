@@ -34,6 +34,7 @@ import cn.vove7.common.R
 import cn.vove7.common.accessibility.AccessibilityApi
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.app.GlobalLog
+import cn.vove7.common.app.log
 import cn.vove7.common.appbus.AppBus
 import cn.vove7.common.bridges.UtilBridge.bitmap2File
 import cn.vove7.common.datamanager.DAO
@@ -43,7 +44,7 @@ import cn.vove7.common.helper.AdvanContactHelper
 import cn.vove7.common.model.RequestPermission
 import cn.vove7.common.model.ResultBox
 import cn.vove7.common.netacc.ApiUrls
-import cn.vove7.common.netacc.NetHelper
+import cn.vove7.common.netacc.WrapperNetHelper
 import cn.vove7.common.utils.RegUtils
 import cn.vove7.common.utils.ScreenCapturer
 import cn.vove7.common.utils.checkPermission
@@ -325,6 +326,7 @@ object SystemBridge : SystemOperation {
         }
     }
 
+    @Throws()
     override fun sendKey(keyCode: Int) {
         try {
             RootHelper.execWithSu("input keyevent $keyCode")
@@ -787,10 +789,16 @@ object SystemBridge : SystemOperation {
 
     override fun getNetAddress(): String? {
         val r = ResultBox<String?>()
-        NetHelper.postJson<String>(ApiUrls.GET_IP) { _, b ->
-            if (b?.isOk() == true) {
-                r.setAndNotify(b.data)
-            } else r.setAndNotify(null)
+        WrapperNetHelper.postJson<String>(ApiUrls.GET_IP) {
+            success { _, b ->
+                if (b.isOk()) {
+                    r.setAndNotify(b.data)
+                } else r.setAndNotify(null)
+            }
+            fail { _, e ->
+                e.log()
+                r.setAndNotify(null)
+            }
         }
         return r.blockedGet(false)
     }
@@ -1122,6 +1130,19 @@ object SystemBridge : SystemOperation {
      * @param pkg String
      */
     override fun killApp(pkg: String): Boolean {
+        return if (RootHelper.isRoot()) {
+            killAppByRoot(pkg)
+        } else killAppByAS(pkg)
+    }
+
+    private fun killAppByRoot(pkg: String): Boolean {
+        RootHelper.execWithSu("am force-stop $pkg")
+        val name = AdvanAppHelper.getAppInfo(pkg)?.name ?: pkg
+        GlobalApp.toastInfo("已关闭：$name")
+        return true
+    }
+
+    private fun killAppByAS(pkg: String): Boolean {
         openAppDetail(pkg)
         if (!AccessibilityApi.isBaseServiceOn) {
             AppBus.post(RequestPermission("基础无障碍服务"))

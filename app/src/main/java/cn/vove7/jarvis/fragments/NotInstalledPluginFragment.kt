@@ -5,16 +5,17 @@ import android.os.Handler
 import android.os.Looper
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.app.GlobalLog
+import cn.vove7.common.app.log
 import cn.vove7.common.interfaces.DownloadInfo
 import cn.vove7.common.interfaces.DownloadProgressListener
 import cn.vove7.common.netacc.ApiUrls
-import cn.vove7.common.netacc.NetHelper
+import cn.vove7.common.netacc.WrapperNetHelper
 import cn.vove7.common.utils.StorageHelper
 import cn.vove7.common.view.editor.MultiSpan
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.activities.PluginManagerActivity
-import cn.vove7.jarvis.adapters.SimpleListAdapter
 import cn.vove7.jarvis.adapters.ListViewModel
+import cn.vove7.jarvis.adapters.SimpleListAdapter
 import cn.vove7.jarvis.droidplugin.PluginManager
 import cn.vove7.jarvis.droidplugin.RePluginInfo
 import cn.vove7.jarvis.droidplugin.VPluginInfo
@@ -51,12 +52,18 @@ class NotInstalledPluginFragment : SimpleListFragment<VPluginInfo>() {
     }
 
     override fun onLoadData(pageIndex: Int) {
-        NetHelper.postJson<List<RePluginInfo>>(ApiUrls.PLUGIN_LIST) { _, b ->
-            if (b?.isOk() == true) {
-                notifyLoadSuccess(b.data ?: emptyList())
-            } else {
-                GlobalLog.err(b?.message)
-                GlobalApp.toastError("获取失败")
+        WrapperNetHelper.postJson<List<RePluginInfo>>(ApiUrls.PLUGIN_LIST) {
+            success { _, b ->
+                if (b.isOk()) {
+                    notifyLoadSuccess(b.data ?: emptyList())
+                } else {
+                    GlobalLog.err(b.message)
+                    GlobalApp.toastError("获取失败 ${b.message}")
+                    failedToLoad()
+                }
+            }
+            fail { _, e ->
+                e.log()
                 failedToLoad()
             }
         }
@@ -69,7 +76,7 @@ class NotInstalledPluginFragment : SimpleListFragment<VPluginInfo>() {
             override fun onClick(holder: SimpleListAdapter.VHolder?, pos: Int, item: ListViewModel<VPluginInfo>) {
                 ProgressTextDialog(context!!, item.title).show {
                     positiveButton(text = "下载") {
-                        downloadTask = NetHelper.download(ApiUrls.DL_PLUGIN + "${item.extra.fileName}", StorageHelper.pluginsPath,
+                        downloadTask = WrapperNetHelper.download(ApiUrls.DL_PLUGIN + "${item.extra.fileName}", StorageHelper.pluginsPath,
                                 item.extra.fileName ?: (item.title + ".apk"),
                                 data = item.title, listener = lis)
                     }
@@ -95,13 +102,13 @@ class NotInstalledPluginFragment : SimpleListFragment<VPluginInfo>() {
 
             override fun onSuccess(info: DownloadInfo<*>, file: File) {
                 Vog.d("onSuccess ---> $file")
-                Handler(Looper.getMainLooper()).postDelayed( {
+                Handler(Looper.getMainLooper()).postDelayed({
                     dialog?.message = "下载完成"
                     dialog?.progress = 100
                     dialog?.finish("安装") {
                         PluginManagerActivity.installPlugin(file.absolutePath)
                     }
-                },800)
+                }, 800)
             }
 
             override fun onStart(info: DownloadInfo<*>) {

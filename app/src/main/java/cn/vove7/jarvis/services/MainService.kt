@@ -33,7 +33,7 @@ import cn.vove7.common.interfaces.SpeakCallback
 import cn.vove7.common.model.RequestPermission
 import cn.vove7.common.model.UserInfo
 import cn.vove7.common.model.VoiceRecogResult
-import cn.vove7.common.netacc.NetHelper
+import cn.vove7.common.netacc.WrapperNetHelper
 import cn.vove7.common.utils.RegUtils.checkCancel
 import cn.vove7.common.utils.RegUtils.checkConfirm
 import cn.vove7.common.utils.ThreadPool.runOnCachePool
@@ -931,7 +931,7 @@ class MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
 
     @Subscribe(threadMode = ThreadMode.BACKGROUND)
     fun upHis(his: CommandHistory) {
-        NetHelper.uploadUserCommandHistory(his)
+        WrapperNetHelper.uploadUserCommandHistory(his)
     }
 
     private var isContinousDialogue = false
@@ -961,13 +961,13 @@ class MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
                     cExecutor.execQueue(result, parseResult.actionQueue)
                     val his = CommandHistory(UserInfo.getUserId(), result,
                             parseResult.msg)
-                    NetHelper.uploadUserCommandHistory(his)
+                    WrapperNetHelper.uploadUserCommandHistory(his)
                 }
             } else {// statistics
                 //云解析
                 if (needCloud && AppConfig.cloudServiceParseIfLocalFailed) {
                     Vog.d("onParseCommand ---> 失败云解析")
-                    NetHelper.cloudParse(result) {
+                    WrapperNetHelper.cloudParse(result) {
                         runFromCloud(result, it)
                     }
                 } else if (chat) {//聊天
@@ -1076,7 +1076,7 @@ class MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
      * @param cmd String
      */
     private fun onCommandParseFailed(cmd: String) {
-        NetHelper.uploadUserCommandHistory(CommandHistory(UserInfo.getUserId(), cmd, null))
+        WrapperNetHelper.uploadUserCommandHistory(CommandHistory(UserInfo.getUserId(), cmd, null))
         floatyPanel.showAndHideDelay("解析失败")
         parseAnimation.failedAndHideDelay()
     }

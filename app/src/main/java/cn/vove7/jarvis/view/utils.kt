@@ -1,6 +1,7 @@
 package cn.vove7.jarvis.view
 
 import android.content.Context
+import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.bridges.RootHelper
 import cn.vove7.jarvis.tools.AppConfig
 import cn.vove7.vtp.log.Vog
@@ -32,9 +33,14 @@ fun openAccessibilityServiceAuto(context: Context) {
 }
 
 fun wirelessDebug(en: Boolean) {
-    RootHelper.execWithSu("setprop service.adb.tcp.port ${if (en) "5555" else "-1"}\n" +
-            "stop adbd\n" +
-            "start adbd")
+    try {
+        RootHelper.execWithSu("setprop service.adb.tcp.port ${if (en) "5555" else "-1"}\n" +
+                "stop adbd\n" +
+                "start adbd")
+    } catch (e: Exception) {
+        e.printStackTrace()
+        GlobalApp.toastError(e.message ?: "")
+    }
 }
 
 fun isWirelessDebugEnable(): Boolean {

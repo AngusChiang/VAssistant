@@ -47,7 +47,7 @@ object AdvanContactHelper : GenChoiceData, Markable {
      */
     private val LOCAL_CONTACT_LIST = HashMap<String, ContactInfo>()
 
-    fun updateContactList() {
+    private fun updateContactList() {
         if (ActivityCompat.checkSelfPermission(context, android.Manifest.permission.READ_CONTACTS)
                 != PackageManager.PERMISSION_GRANTED) {
             AppBus.post(RequestPermission("联系人权限"))
