@@ -5,6 +5,7 @@ import android.view.animation.AccelerateInterpolator
 import android.view.animation.AnimationUtils
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.utils.listener
+import cn.vove7.common.utils.runInCatch
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.tools.AppConfig
 
@@ -17,19 +18,21 @@ import cn.vove7.jarvis.tools.AppConfig
 
 
 fun FloatyPanel.showEnterAnimation() {
-    val arr = GlobalApp.APP.resources.getStringArray(R.array.list_fp_animation)
-    when (arr.indexOf(AppConfig.fpAnimation)) {
-        1 -> {//揭露动画
-            ViewAnimationUtils
-                    .createCircularReveal(animationBody, screenWidth / 2, 0, 0f, screenWidth.toFloat())
-                    .apply {
-                        interpolator = AccelerateInterpolator()
-                        duration = 400
-                        start()
-                    }
-        }
-        else -> {//默认
-            animationBody.startAnimation(AnimationUtils.loadAnimation(context, R.anim.pop_fade_in))
+    runInCatch {
+        val arr = GlobalApp.APP.resources.getStringArray(R.array.list_fp_animation)
+        when (arr.indexOf(AppConfig.fpAnimation)) {
+            1 -> {//揭露动画
+                ViewAnimationUtils
+                        .createCircularReveal(animationBody, screenWidth / 2, 0, 0f, screenWidth.toFloat())
+                        .apply {
+                            interpolator = AccelerateInterpolator()
+                            duration = 400
+                            start()
+                        }
+            }
+            else -> {//默认
+                animationBody.startAnimation(AnimationUtils.loadAnimation(context, R.anim.pop_fade_in))
+            }
         }
     }
 
@@ -43,20 +46,22 @@ private fun FloatyPanel.buildExitAnimation() {
     val arr = context.resources.getStringArray(R.array.list_fp_animation)
     when (arr.indexOf(AppConfig.fpAnimation)) {
         1 -> {//揭露动画
-            createCircularAnimation()
+            startCircularAnimation()
         }
         else -> {
             AnimationUtils.loadAnimation(context, R.anim.pop_fade_out).apply {
                 listener {
                     onEnd { superRemove() }
                 }
-                animationBody.startAnimation(this)
+                runInCatch {
+                    animationBody.startAnimation(this)
+                }
             }
         }
     }
 }
 
-private fun FloatyPanel.createCircularAnimation() {
+private fun FloatyPanel.startCircularAnimation() {
     try {
         ViewAnimationUtils.createCircularReveal(animationBody, screenWidth / 2, 0,
                 screenWidth.toFloat(), 0f)
