@@ -48,7 +48,7 @@ abstract class SpeechRecoService(val event: SpeechEvent) : SpeechRecogI {
      */
     override fun startRecog(byVoice: Boolean) {
         //检查权限
-        if (!checkRecoderPermission() || !checkFloat()) return
+        if (!checkRecorderPermission() || !checkFloat()) return
         Thread.sleep(80)
         if (!isListening) {
             lastingStopped = false
@@ -68,7 +68,7 @@ abstract class SpeechRecoService(val event: SpeechEvent) : SpeechRecogI {
      */
     override fun startRecogSilent() {
         Vog.d("静默开启识别")
-        if (!checkRecoderPermission() || !checkFloat()) return
+        if (!checkRecorderPermission() || !checkFloat()) return
         if (!isListening) {
             lastingStopped = false
             isListening = true
@@ -143,37 +143,12 @@ abstract class SpeechRecoService(val event: SpeechEvent) : SpeechRecogI {
         stopWakeUpSilently()//不通知
     }
 
-    protected val timerHandler: Handler by lazy {
+    private val timerHandler: Handler by lazy {
         val t = HandlerThread("auto_sleep")
         t.start()
         Handler(t.looper)
     }
 
-    /**
-     * 停止长语音
-     */
-    private val autoCloseRecog = Runnable {
-        Vog.i(" ---> 长语音自动关闭识别")
-        doCancelRecog()
-        lastingStopped = true
-        closeSCO()
-    }
-
-    /**
-     * 在识别成功后，重新定时
-     * speak后doStartRecog，操作后？？？
-     */
-//    private fun restartLastingUpTimer() {//重启
-//        Vog.d("restartLastingUpTimer ---> 开启长语音定时")
-//        timerHandler.removeCallbacks(autoCloseRecog)
-//        timerHandler.postDelayed(autoCloseRecog,
-//                (AppConfig.lastingVoiceMillis * 1000).toLong())
-//    }
-
-    private fun stopLastingUpTimer() {
-        Vog.d("restartLastingUpTimer ---> 关闭长语音定时")
-        timerHandler.removeCallbacks(autoCloseRecog)
-    }
 
     /**
      * 开启定时关闭
@@ -199,7 +174,7 @@ abstract class SpeechRecoService(val event: SpeechEvent) : SpeechRecogI {
         timerHandler.removeCallbacks(stopWakeUpTimer)
     }
 
-    fun checkRecoderPermission(jump: Boolean = true): Boolean {
+    private fun checkRecorderPermission(jump: Boolean = true): Boolean {
         return (ActivityCompat.checkSelfPermission(context,
                 android.Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED)
                 .also {
