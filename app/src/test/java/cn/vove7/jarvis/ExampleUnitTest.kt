@@ -13,6 +13,7 @@ import org.junit.Test
 import java.lang.Thread.sleep
 import java.text.SimpleDateFormat
 import java.util.*
+import java.util.concurrent.ConcurrentSkipListSet
 import java.util.concurrent.CountDownLatch
 import kotlin.concurrent.thread
 
@@ -374,8 +375,8 @@ class ExampleUnitTest {
 
     @Test
     fun netTest() {
-        NetHelper.get<String>("https://www.baidu.com"){
-            success{_,s->
+        NetHelper.get<String>("https://www.baidu.com") {
+            success { _, s ->
                 print(s)
             }
             fail { _, e ->
@@ -383,6 +384,34 @@ class ExampleUnitTest {
             }
         }
         sleep(10000)
+    }
+
+    @Test
+    @Suppress("NonAsciiCharacters")
+    fun test并发List() {
+        //并发
+        val list = ConcurrentSkipListSet<Int>()
+        for (i in 0..4) {
+            list.add(i)
+        }
+        val l = CountDownLatch(2)
+
+        thread {
+            list.forEach {
+                println(it)
+                sleep(500)
+            }
+            l.countDown()
+
+        }
+        thread {
+            println("add pre")
+            list.add(5)
+            println("add end")
+            l.countDown()
+        }
+
+        l.await()
     }
 
 }

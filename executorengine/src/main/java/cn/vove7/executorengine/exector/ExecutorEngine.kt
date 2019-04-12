@@ -14,7 +14,7 @@ import cn.vove7.common.utils.RegUtils
 import cn.vove7.executorengine.ExecutorImpl
 import cn.vove7.rhino.RhinoHelper
 import cn.vove7.rhino.api.RhinoApi
-import java.util.*
+import java.util.concurrent.ConcurrentSkipListSet
 
 /**
  * # MultiExecutorEngine
@@ -57,8 +57,7 @@ class ExecutorEngine : ExecutorImpl() {
     /**
      * 执行器
      */
-    private val engines =
-        Collections.synchronizedCollection(mutableListOf<ScriptEngine>())
+    private val engines = ConcurrentSkipListSet<ScriptEngine>()
 
     //可提取ExecutorHelper 接口 handleMessage
     override fun onLuaExec(script: String, argMap: Map<String, Any?>?): PartialResult {
@@ -88,7 +87,9 @@ class ExecutorEngine : ExecutorImpl() {
 
     @Synchronized
     private fun release() {
-        engines.forEach { it.stop() }
+        engines.forEach {
+            it.stop()
+        }
         engines.clear()
     }
 
