@@ -3,7 +3,7 @@ package cn.vove7.jarvis.tools.baiduaip
 import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.bridges.HttpBridge
 import cn.vove7.common.netacc.tool.SecureHelper
-import cn.vove7.common.utils.GsonHelper
+import cn.vove7.vtp.net.GsonHelper
 import cn.vove7.jarvis.tools.AppConfig
 import cn.vove7.jarvis.tools.BaiduKey
 import cn.vove7.jarvis.tools.baiduaip.model.ImageClassifyResult
@@ -107,7 +107,7 @@ object BaiduAipHelper {
     }
 
 
-    fun ocr(imgFIle: File, minP: Double = 0.8): ArrayList<TextOcrItem> = BaiduAipHelper.ocr(imgFIle.absolutePath, minP)
+    fun ocr(imgFIle: File, minP: Double = 0.7): ArrayList<TextOcrItem> = BaiduAipHelper.ocr(imgFIle.absolutePath, minP)
 
     /**
      * 图片文字ocr

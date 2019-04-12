@@ -15,10 +15,12 @@ import cn.vove7.common.netacc.ApiUrls
 import cn.vove7.common.netacc.WrapperNetHelper
 import cn.vove7.common.netacc.tool.SecureHelper
 import cn.vove7.common.utils.TextHelper
+import cn.vove7.common.utils.inVisibility
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.tools.AppConfig
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.customview.customView
+import kotlinx.android.synthetic.main.dialog_login.view.*
 
 /**
  * # LoginDialog
@@ -36,23 +38,23 @@ class LoginDialog(val context: Context, initEmail: String? = null,
         RetrievePasswordDialog(context)
     }
 
-    private var userAccountView: TextInputLayout
-    private var userPassView: TextInputLayout
-    private var loginBtn: Button
-    private var loadBar: ProgressBar
+    private val userAccountView: TextInputLayout
+            by lazy { view.user_account_view }
+    private val userPassView: TextInputLayout
+            by lazy { view.user_pass_view }
+    private val loginBtn: Button
+            by lazy { view.dialog_login_btn }
+    private val loadBar: ProgressBar
+            by lazy { view.loading_bar }
+
+    private val view: View by lazy { LayoutInflater.from(context).inflate(R.layout.dialog_login, null) }
 
     init {
-        val view = LayoutInflater.from(context).inflate(R.layout.dialog_login, null)
-        userAccountView = view.findViewById(R.id.user_account_view)
-        userPassView = view.findViewById(R.id.user_pass_view)
+
         if (initEmail != null)
             userAccountView.editText?.setText(initEmail)
         if (initPas != null)
             userPassView.editText?.setText(initPas)
-
-        loginBtn = view.findViewById(R.id.dialog_login_btn)
-        loadBar = view.findViewById(R.id.loading_bar)
-
 
         loginBtn.setOnClickListener {
             userAccountView.error = ""
@@ -80,7 +82,6 @@ class LoginDialog(val context: Context, initEmail: String? = null,
             //post
             WrapperNetHelper.postJson<UserInfo>(ApiUrls.LOGIN, loginInfo) {
                 success { _, bean ->
-                    loadBar.visibility = View.INVISIBLE
                     if (bean.isOk()) {
                         try {
                             val userInfo = bean.data!!
@@ -100,6 +101,9 @@ class LoginDialog(val context: Context, initEmail: String? = null,
                 fail { _, e ->
                     e.log()
                     GlobalApp.toastError("出错${e.message}")
+                }
+                end {
+                    loadBar.inVisibility()
                 }
             }
         }

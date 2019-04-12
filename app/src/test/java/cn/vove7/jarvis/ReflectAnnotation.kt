@@ -4,7 +4,7 @@ import cn.vove7.common.annotation.ScriptApi
 import cn.vove7.common.annotation.ScriptApiClass
 import cn.vove7.common.annotation.ScriptApiDocument
 import cn.vove7.common.annotation.ScriptApiParamDesc
-import cn.vove7.common.utils.GsonHelper
+import cn.vove7.vtp.net.GsonHelper
 import cn.vove7.common.utils.getOrSetDefault
 import org.junit.Test
 import org.reflections.Reflections

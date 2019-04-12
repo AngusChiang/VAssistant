@@ -4,6 +4,7 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 
 import cn.vove7.common.app.GlobalLog;
+import cn.vove7.vtp.log.Vog;
 
 /**
  * Created by IntelliJ IDEA.
@@ -16,12 +17,11 @@ public class SecureHelper {
 
     public static String signData(Object body, Long uId, Long time) {
 
-        //uid{data}time
         String content = String.valueOf(uId == null ? "" : uId) + (body == null ? "" : body)
                 + String.valueOf(time);
-        //Vog.INSTANCE.d("", "signData --->\n" + content);
-
-        return MD5(content + SECRET_KEY);
+        String md5 = MD5(content + SECRET_KEY);
+        Vog.INSTANCE.d("加密：" + content + "\n" + md5);
+        return md5;
     }
 
     public static String MD5(String s) {

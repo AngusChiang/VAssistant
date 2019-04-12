@@ -2,12 +2,11 @@ package cn.vove7.jarvis.view.dialog
 
 import android.content.Context
 import android.view.View
-import android.widget.ProgressBar
-import android.widget.TextView
 import cn.vove7.common.utils.gone
 import cn.vove7.common.utils.show
-import cn.vove7.jarvis.view.dialog.base.CustomizableDialog
 import cn.vove7.jarvis.R
+import cn.vove7.jarvis.view.dialog.base.CustomizableDialog
+import kotlinx.android.synthetic.main.dialog_loading.view.*
 
 /**
  * # LoadingDialog
@@ -32,9 +31,14 @@ class LoadingDialog(context: Context, title: String?,
                     val msg: String? = null)
     : CustomizableDialog(context, title, cancelable, noAutoDismiss) {
 
-    lateinit var hBar: ProgressBar
-    lateinit var rBar: ProgressBar
-    var msgView: TextView? = null
+    private val hBar
+            by lazy { v.horizontal_bar }
+    private val rBar
+            by lazy { v.round_bar }
+    private val msgView
+            by lazy { v.msg_view }
+    private val v
+            by lazy { layoutInflater.inflate(R.layout.dialog_loading, null) }
 
     var progress: Int = 0
         set(value) {
@@ -45,21 +49,17 @@ class LoadingDialog(context: Context, title: String?,
                 hBar.isIndeterminate = false
                 rBar.progress = value
             }
+            field = value
         }
 
     override var message: String?
-        get() = msgView?.text.toString()
+        get() = msgView.text.toString()
         set(value) {
-            msgView?.text = value
+            msgView.text = value
         }
 
     override fun initView(): View {
-        val v = layoutInflater.inflate(R.layout.dialog_loading, null)
-        hBar = v.findViewById(R.id.horizontal_bar)
-        rBar = v.findViewById(R.id.round_bar)
-        msgView = v.findViewById(R.id.msg_view)
-        msgView?.text = msg
-
+        msgView.text = msg
         if (horizontal) {
             hBar.show()
             rBar.gone()

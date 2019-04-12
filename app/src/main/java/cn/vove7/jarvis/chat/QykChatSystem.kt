@@ -2,7 +2,7 @@ package cn.vove7.jarvis.chat
 
 import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.bridges.HttpBridge
-import cn.vove7.common.utils.GsonHelper
+import cn.vove7.vtp.net.GsonHelper
 
 /**
  * # QykChatSystem

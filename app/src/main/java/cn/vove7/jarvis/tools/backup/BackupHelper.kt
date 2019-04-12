@@ -14,7 +14,7 @@ import cn.vove7.common.datamanager.greendao.AppAdInfoDao
 import cn.vove7.common.datamanager.parse.DataFrom
 import cn.vove7.common.datamanager.parse.statusmap.ActionNode
 import cn.vove7.common.model.UserInfo
-import cn.vove7.common.utils.GsonHelper
+import cn.vove7.vtp.net.GsonHelper
 import cn.vove7.common.utils.StorageHelper
 import cn.vove7.common.utils.ThreadPool.runOnPool
 import cn.vove7.executorengine.parse.ParseEngine

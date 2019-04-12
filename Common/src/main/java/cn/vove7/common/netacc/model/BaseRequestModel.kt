@@ -5,7 +5,7 @@ import android.provider.Settings
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.model.UserInfo
 import cn.vove7.common.netacc.tool.SecureHelper.signData
-import cn.vove7.common.utils.GsonHelper
+import cn.vove7.vtp.net.GsonHelper
 import java.io.Serializable
 
 /**
