@@ -32,6 +32,7 @@ import cn.vove7.jarvis.view.dialog.ProgressDialog
 import cn.vove7.jarvis.view.dialog.UserInfoDialog
 import cn.vove7.jarvis.view.tools.SettingItemHelper
 import cn.vove7.vtp.app.AppHelper
+import cn.vove7.vtp.log.Vog
 import cn.vove7.vtp.sharedpreference.SpHelper
 import cn.vove7.vtp.view.span.ColourTextClickableSpan
 import com.afollestad.materialdialogs.MaterialDialog
@@ -130,14 +131,14 @@ class AdvancedSettingActivity : ReturnableActivity() {
                         SwitchItem(R.string.text_remote_debug, summary = if (RemoteDebugServer.stopped) "使用Pc调试，请查阅使用手册"
                         else ipText, defaultValue = {
                             !RemoteDebugServer.stopped
-                        }, callback = { holder, it ->
+                        }, callback = { item, it ->
                             if (!BuildConfig.DEBUG && !AppConfig.checkLogin()) {
-                                (holder as SettingItemHelper.SwitchItemHolder).compoundWight.isChecked = false
+                                item.isChecked = false
                                 return@SwitchItem true
                             }
                             if (it) {
                                 RemoteDebugServer.start()
-                                holder.summaryView.text = ipText
+                                item.summary = ipText
                             } else RemoteDebugServer.stop()
                             return@SwitchItem true
                         }),
@@ -209,12 +210,11 @@ class AdvancedSettingActivity : ReturnableActivity() {
         ).also {
             if (BuildConfig.DEBUG) {
                 it.add(SettingGroupItem(R.color.google_red, "调试", childItems = listOf(
-                        InputItem(title = "切换服务器", defaultValue = { ApiUrls.SERVER_IP },
-                                summary = ApiUrls.SERVER_IP) { h, b ->
-                            ApiUrls.switch()
-                            ApiUrls.SERVER_IP = b
-                            h.summaryView.text = ApiUrls.SERVER_IP
-                            return@InputItem false
+                        InputItem(title = "切换服务器", defaultValue = { ApiUrls.anotherIp },
+                                summary = ApiUrls.SERVER_IP) { item, s ->
+                            ApiUrls.SERVER_IP = s
+                            Vog.d("切换服务器: ${ApiUrls.SERVER_IP}")
+                            return@InputItem true
                         },
                         IntentItem(title = "触发崩溃") {
                             "a".toInt()

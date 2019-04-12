@@ -106,22 +106,23 @@ open class GlobalApp : RePluginApplication() {
      * RePlugin允许提供各种“自定义”的行为，让您“无需修改源代码”，即可实现相应的功能
      */
     override fun createConfig(): RePluginConfig {
-        val c = RePluginConfig()
+        return RePluginConfig().apply {
 
-        // 允许“插件使用宿主类”。默认为“关闭”
-        c.isUseHostClassIfNotFound = true
+            // 允许“插件使用宿主类”。默认为“关闭”
+            isUseHostClassIfNotFound = true
 
-        // FIXME RePlugin默认会对安装的外置插件进行签名校验，这里先关掉，避免调试时出现签名错误
-        c.verifySign = false
-        c.isUseHostClassIfNotFound = true
-        // 针对“安装失败”等情况来做进一步的事件处理
-        c.eventCallbacks = HostEventCallbacks(this)
-        // FIXME 若宿主为Release，则此处应加上您认为"合法"的插件的签名，例如，可以写上"宿主"自己的。
-        // RePlugin.addCertSignature("AAAAAAAAA");
+            // FIXME RePlugin默认会对安装的外置插件进行签名校验，这里先关掉，避免调试时出现签名错误
+            verifySign = false
+            isUseHostClassIfNotFound = true
+            // 针对“安装失败”等情况来做进一步的事件处理
+            eventCallbacks = HostEventCallbacks()
+            // FIXME 若宿主为Release，则此处应加上您认为"合法"的插件的签名，例如，可以写上"宿主"自己的。
+            // RePlugin.addCertSignature("AAAAAAAAA");
 
-        // 在Art上，优化第一次loadDex的速度
-        // c.setOptimizeArtLoadDex(true);
-        return c
+            // 在Art上，优化第一次loadDex的速度
+            // setOptimizeArtLoadDex(true);
+
+        }
     }
 
     override fun createCallbacks(): RePluginCallbacks {
@@ -145,7 +146,7 @@ open class GlobalApp : RePluginApplication() {
 //        }
     }
 
-    private inner class HostEventCallbacks(context: Context) : RePluginEventCallbacks(context) {
+    private inner class HostEventCallbacks : RePluginEventCallbacks(this) {
 
         override fun onInstallPluginFailed(path: String?, code: RePluginEventCallbacks.InstallResult?) {
             // 大部分可以通过RePlugin.install的返回值来判断是否成功

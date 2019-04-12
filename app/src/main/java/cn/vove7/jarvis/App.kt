@@ -88,7 +88,7 @@ class App : GlobalApp() {
     }
 
     override fun onTerminate() {
-
+        MainService.instance?.destory()
         stopBroadcastReceivers()
         super.onTerminate()
     }

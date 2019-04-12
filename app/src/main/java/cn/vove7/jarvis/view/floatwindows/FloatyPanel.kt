@@ -7,6 +7,7 @@ import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.appbus.AppBus
 import cn.vove7.common.appbus.SpeechAction
 import cn.vove7.common.model.RequestPermission
+import cn.vove7.common.utils.LooperHelper
 import cn.vove7.common.utils.gone
 import cn.vove7.common.utils.runOnUi
 import cn.vove7.common.utils.show
@@ -92,7 +93,10 @@ class FloatyPanel : AbFloatWindow(GlobalApp.APP) {
         hide()
     }
 
-    private val delayHandler: Handler by lazy { Handler() }
+    private val delayHandler: Handler by lazy {
+        LooperHelper.prepareIfNeeded()
+        Handler()
+    }
 
     fun hideDelay(delay: Long = 800) {
         runOnUi {

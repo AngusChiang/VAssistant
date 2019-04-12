@@ -7,9 +7,9 @@ import android.view.MenuItem
 import android.view.View
 import android.widget.AdapterView
 import android.widget.TextView
+import android.widget.Toast
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.bridges.SystemBridge
-import cn.vove7.common.utils.color
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.adapters.IconTitleEntity
 import cn.vove7.jarvis.adapters.IconTitleListAdapter
@@ -18,12 +18,11 @@ import cn.vove7.jarvis.view.custom.IconView
 import cn.vove7.jarvis.view.dialog.ProgressDialog
 import cn.vove7.jarvis.view.dialog.UpdateLogDialog
 import cn.vove7.vtp.easyadapter.BaseListAdapter
+import cn.vove7.vtp.sharedpreference.SpHelper
 import cn.vove7.vtp.system.SystemHelper
 import cn.vove7.vtp.system.SystemHelper.APP_STORE_COLL_APK
 import kotlinx.android.synthetic.main.activity_abc_header.*
 import kotlinx.android.synthetic.main.header_about.*
-import nl.dionsegijn.konfetti.models.Shape
-import nl.dionsegijn.konfetti.models.Size
 
 
 /**
@@ -34,8 +33,9 @@ import nl.dionsegijn.konfetti.models.Size
  */
 class AboutActivity : AppCompatActivity(), AdapterView.OnItemClickListener {
 
-    var clickTime = 0L
-    var clickCount = 0
+    private var clickTime = 0L
+    private var clickCount = 0
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_abc_header)
@@ -50,7 +50,7 @@ class AboutActivity : AppCompatActivity(), AdapterView.OnItemClickListener {
             }
             if (++clickCount > 4) {
                 clickTime = 0
-                showEgg()
+                enterDevMode()
             }
         }
         ver_name_view.text = AppConfig.versionName
@@ -67,24 +67,15 @@ class AboutActivity : AppCompatActivity(), AdapterView.OnItemClickListener {
         return super.onOptionsItemSelected(item)
     }
 
-    private fun showEgg() {//彩蛋
-        konfettiView.build()
-                .addColors(
-                        color(R.color.google_green),
-                        color(R.color.google_red),
-                        color(R.color.google_blue),
-                        color(R.color.google_yellow)
-                )
-                .setDirection(0.0, 359.0)
-                .setSpeed(1f, 3f)
-                .setFadeOutEnabled(true)
-                .setTimeToLive(5000L)
-                .addShapes(Shape.RECT, Shape.CIRCLE)
-                .addSizes(Size(12))
-                .setPosition(-50f, konfettiView.width + 50f, -50f, -50f)
-                .streamFor(300, 7000L)
-
-
+    private fun enterDevMode() {//彩蛋
+        if (AppConfig.devMode) {
+            SpHelper(this).set(R.string.key_dev_mode, false)
+            GlobalApp.toastSuccess("关闭开发模式", Toast.LENGTH_LONG)
+        } else {
+            SpHelper(this).set(R.string.key_dev_mode, true)
+            GlobalApp.toastSuccess("进入开发模式", Toast.LENGTH_LONG)
+        }
+        AppConfig.reload()
     }
 
     override fun onItemClick(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {

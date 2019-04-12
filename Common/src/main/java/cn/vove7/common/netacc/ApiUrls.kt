@@ -1,7 +1,5 @@
 package cn.vove7.common.netacc
 
-import cn.vove7.common.BuildConfig
-
 /**
  * # ApiUrls
  *
@@ -9,10 +7,12 @@ import cn.vove7.common.BuildConfig
  * 2018/9/11
  */
 object ApiUrls {
-    val debig_server = "http://192.168.137.1:8080/"
-    val official_server = "http://115.159.155.25:8080/"
+    private const val DEBUG_SERVER = "http://192.168.137.1:8080/"
+    private const val OFFICIAL_SERVER = "http://115.159.155.25:8080/"
 
-    var SERVER_IP = /*if (BuildConfig.DEBUG) debig_server else*/ official_server
+    var SERVER_IP = /*if (BuildConfig.DEBUG) DEBUG_SERVER else*/ OFFICIAL_SERVER
+
+    val anotherIp get() = if (SERVER_IP == DEBUG_SERVER) OFFICIAL_SERVER else DEBUG_SERVER
 
     private val ACCOUNT: String get() = SERVER_IP + "account/"
     private val MARKED: String get() = SERVER_IP + "marked/"
@@ -70,8 +70,5 @@ object ApiUrls {
 
     val QQ_GROUP_1 = "http://qm.qq.com/cgi-bin/qm/qr?k=BKTXyMMmLDKS8SXOht71bKKbI9rdPAd3"
 
-    fun switch() {
-        SERVER_IP = if (SERVER_IP == debig_server) official_server else debig_server
-    }
 
 }

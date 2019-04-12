@@ -73,27 +73,9 @@ class SettingsActivity : ReturnableActivity() {
     }
 
     private fun initData(): List<SettingGroupItem> = listOf(
-            SettingGroupItem(R.color.google_blue, "辅助应用", childItems = listOf(
-                    IntentItem(R.string.text_set_as_default_assist, summary = "可以通过长按HOME键或蓝牙快捷键唤醒", onClick = {
-                        try {
-                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                                startActivity(Intent(Settings.ACTION_MANAGE_DEFAULT_APPS_SETTINGS))
-                            } else {
-                                startActivity(Intent("android.settings.MANAGE_DEFAULT_APPS_SETTINGS"))
-                            }
-                        } catch (e: Exception) {
-                            GlobalLog.err(e)
-                            GlobalApp.toastError("跳转失败")
-                        }
-                    })/*,
-                    IntentItem(title = "唤醒测试") {
-                        try {
-                            startActivity(Intent(Intent.ACTION_ASSIST))
-                        } catch (e: Exception) {
-                            toast.showShort("失败")
-                        }
-                    }*/
-            )),
+//            SettingGroupItem(R.color.google_blue, "辅助应用", childItems = listOf(
+//
+//            )),
             SettingGroupItem(R.color.indigo_700, titleS = "语音识别", childItems = listOf(
                     SwitchItem(title = "长语音模式", summary = "开启后，唤醒后可连续说出命令\n可以通过按音量下键终止\n" +
                             "会占用麦克风\n等待指令时间为8s",
@@ -135,7 +117,7 @@ class SettingsActivity : ReturnableActivity() {
                         }
                         return@SingleChoiceItem true
                     },
-                    CheckBoxItem(title = "息屏显示通知", summary = "息屏是弹出语音唤醒关闭通知",
+                    CheckBoxItem(title = "息屏显示通知", summary = "息屏时弹出语音唤醒关闭通知",
                             defaultValue = AppConfig.notifyWpOnScreenOff, keyId = R.string.key_notify_wp_on_screen_off)
                     ,
                     CheckBoxItem(title = "亮屏开启唤醒", summary = "自动休眠后，开屏自动打开语音唤醒",

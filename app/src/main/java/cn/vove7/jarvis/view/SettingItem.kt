@@ -1,6 +1,7 @@
 package cn.vove7.jarvis.view
 
 import android.support.annotation.ArrayRes
+import android.widget.CompoundButton
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.jarvis.view.tools.SettingItemHelper
 
@@ -24,7 +25,48 @@ const val TYPE_INTENT = 9
 /**
  * 返回结果用于是否设置
  */
-typealias CallbackOnSet<T> = (SettingItemHelper.ChildItemHolder, T) -> Boolean
+typealias CallbackOnSet<T> = (ItemOperation, T) -> Boolean
+
+/**
+ * SettingChildItem 操作
+ * @property holder ChildItemHolder
+ * @property summary String?
+ * @property title String?
+ * @property isChecked Boolean?
+ * @property compoundWight CompoundButton?
+ * @constructor
+ */
+class ItemOperation(val holder: SettingItemHelper.ChildItemHolder) {
+    var summary: String? = null
+        get() = holder.summaryView.text.toString()
+        set(value) {
+            holder.summaryView.text = value
+            field = value
+        }
+
+    var title: String? = null
+        get() = holder.titleView.text.toString()
+        set(value) {
+            holder.titleView.text = value
+            field = value
+        }
+
+    var isChecked: Boolean? = false
+        get() = compoundWight?.isChecked
+        set(value) {
+            compoundWight?.isChecked = value ?: false
+            field = value
+        }
+
+    private val compoundWight: CompoundButton?
+        get() {
+            return if (holder is SettingItemHelper.CompoundItemHolder)
+                holder.compoundWight
+            else null
+        }
+
+}
+
 
 /**
  * 基类
@@ -73,7 +115,7 @@ class CheckBoxItem(
         title: String? = null,
         summary: String? = null,
         keyId: Int? = null,
-        defaultValue:  Boolean = false,
+        defaultValue: Boolean = false,
         callback: CallbackOnSet<Boolean>? = null
 ) : SettingChildItem(titleId, title, summary, TYPE_CHECK_BOX, keyId, { defaultValue },
         callback = callback)
@@ -107,7 +149,7 @@ class SingleChoiceItem(
         defaultValue: (() -> Int) = { 0 },//pos
         @ArrayRes entityArrId: Int? = null,
         items: List<String>? = null,
-        callback: CallbackOnSet<Pair<Int,String>>? = null
+        callback: CallbackOnSet<Pair<Int, String>>? = null
 ) : SettingChildItem(titleId, title, summary, TYPE_SINGLE, keyId, defaultValue,
         entityArrId = entityArrId, callback = callback, items = items)
 

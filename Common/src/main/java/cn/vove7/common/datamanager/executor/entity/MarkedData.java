@@ -78,6 +78,7 @@ public class MarkedData implements DataFrom, Signable, Searchable, Serializable,
     @Override
     public boolean onSearch(@org.jetbrains.annotations.NotNull String text) {
         return key.contains(text) ||
+                value.contains(text) ||
                 regStr.contains(text);
     }
 
