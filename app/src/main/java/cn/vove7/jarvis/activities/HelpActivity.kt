@@ -22,7 +22,7 @@ import cn.vove7.jarvis.adapters.IconTitleListAdapter
 import cn.vove7.jarvis.tools.ItemWrap
 import cn.vove7.jarvis.tools.Tutorials
 import cn.vove7.jarvis.view.dialog.base.BottomDialogWithMarkdown
-import cn.vove7.jarvis.view.dialog.base.BottomDialogWithText
+import cn.vove7.jarvis.view.dialog.base.BottomDialogWithSmoothText
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.customview.customView
 import kotlinx.android.synthetic.main.activity_abc_header.*
@@ -97,18 +97,26 @@ class HelpActivity : ReturnableActivity(), AdapterView.OnItemClickListener {
             3 -> SystemBridge.openUrl(ApiUrls.QQ_GROUP_1)
             4 -> showFeedbackDialog()
             5 -> {
-//                val logView = TextView(this)
-//                logView.setPadding(50, 0, 50, 0)
-//                logView.gravity = Gravity.BOTTOM
-                var text = GlobalLog.toString()
-                if (BuildConfig.DEBUG && text == "") {
+                if(BuildConfig.DEBUG) {
+                    for (i in 0..100) {
+                        if (i % 2 == 0) {
+                            GlobalLog.err("err-$i")
+                        } else {
+                            GlobalLog.log("info-$i")
+                        }
+                    }
+                }
+
+                var text = GlobalLog.colorHtml()
+                if (BuildConfig.DEBUG && text.isEmpty()) {
                     try {
                         text = File(Environment.getExternalStorageDirectory().absolutePath + "/crash.log").readText()
                     } catch (e: Exception) {
                     }
                 }
 
-                BottomDialogWithText(this, "日志", text, true).apply {
+                BottomDialogWithSmoothText(this, "日志").apply {
+                    setHtml(text)
                     positiveButton(text = "复制") {
                         SystemBridge.setClipText(text)
                         GlobalApp.toastInfo(R.string.text_copied)

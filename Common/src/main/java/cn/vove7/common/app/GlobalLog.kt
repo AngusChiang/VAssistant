@@ -108,13 +108,23 @@ object GlobalLog {
     }
 
     override fun toString(): String {
-        val b = StringBuilder()
-        synchronized(logList) {
-            logList.forEach {
-                b.appendln(it.toString())
+        return buildString {
+            synchronized(logList) {
+                logList.forEach {
+                    appendln(it.toString())
+                }
             }
         }
-        return b.toString()
+    }
+
+    fun colorHtml(): String {
+        return buildString {
+            synchronized(logList) {
+                logList.forEach {
+                    appendln(it.colorfulHtml())
+                }
+            }
+        }
     }
 
     const val LEVEL_INFO = 0
@@ -134,14 +144,23 @@ object GlobalLog {
             return "${format.format(date)} $l -> $msg\n"
         }
 
+        fun colorfulHtml(): String {
+            val l = when (level) {
+                LEVEL_INFO -> "INFO"
+                LEVEL_ERROR -> "ERRO"
+                else -> ""
+            }
+            return "<div class='${l.toLowerCase()}'><xmp>${format.format(date)} $l -> $msg</xmp></div>\n"
+        }
+
         companion object {
             val format = SimpleDateFormat("MM-dd HH:mm:ss", Locale.CHINA)
         }
     }
 
-    val df = SimpleDateFormat("HH_mm", Locale.getDefault())
 
     fun export2Sd() {
+        val df = SimpleDateFormat("HH_mm", Locale.getDefault())
         try {
             val p = StorageHelper.logPath
             val f = File(p, "log_${df.format(Date())}.log")

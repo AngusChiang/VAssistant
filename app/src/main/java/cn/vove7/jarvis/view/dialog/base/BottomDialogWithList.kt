@@ -12,6 +12,7 @@ import cn.vove7.jarvis.adapters.ListViewModel
 import cn.vove7.jarvis.adapters.SimpleListAdapter
 import cn.vove7.jarvis.fragments.base.BaseBottomDialogWithToolbar
 import com.pluscubed.recyclerfastscroll.RecyclerFastScroller
+import kotlinx.android.synthetic.main.dialog_list_view.view.*
 
 /**
  * # BottomDialogWithList
@@ -25,9 +26,9 @@ abstract class BottomDialogWithList<T>(context: Context, title: String)
     private val listAdapter by lazy { SimpleListAdapter(dataSet, this) }
     override var pageIndex: Int = 0
 
-    val recyclerView: RecyclerView by lazy {
-        myView.findViewById<RecyclerView>(R.id.recycler_view).apply {
-            myView.findViewById<RecyclerFastScroller>(R.id.fast_scroller).attachRecyclerView(this)
+    private val recyclerView: RecyclerView by lazy {
+        myView.recycler_view.apply {
+            myView.fast_scroller.attachRecyclerView(this)
             layoutManager = LinearLayoutManager(context)
             this.adapter = listAdapter
         }
@@ -52,6 +53,7 @@ abstract class BottomDialogWithList<T>(context: Context, title: String)
     override fun onCreateContentView(parent: View): View = myView
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         recyclerView // init
         toolbar.setNavigationIcon(R.drawable.ic_close_black_24dp)
         toolbar.setNavigationOnClickListener { dismiss() }
