@@ -8,7 +8,6 @@ import cn.vove7.jarvis.view.custom.scmoothtextview.TextWebView
 
 /**
  * # BottomDialogWithSmoothText
- * TODO 滚动事件
  * @author 11324
  * 2019/4/13
  */
