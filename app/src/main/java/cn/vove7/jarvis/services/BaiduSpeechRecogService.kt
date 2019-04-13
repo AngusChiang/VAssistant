@@ -7,7 +7,7 @@ import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.utils.runOnNewHandlerThread
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.speech.SpeechEvent
-import cn.vove7.jarvis.speech.SpeechRecoService
+import cn.vove7.jarvis.speech.SpeechRecogService
 import cn.vove7.jarvis.speech.WakeupI
 import cn.vove7.jarvis.speech.baiduspeech.recognition.OfflineRecogParams
 import cn.vove7.jarvis.speech.baiduspeech.recognition.listener.SpeechStatusListener
@@ -24,7 +24,7 @@ import com.google.gson.annotations.SerializedName
 /**
  * 百度语音识别服务
  */
-class BaiduSpeechRecogService(event: SpeechEvent) : SpeechRecoService(event) {
+class BaiduSpeechRecogService(event: SpeechEvent) : SpeechRecogService(event) {
 
     /**
      * 识别控制器，使用MyRecognizer控制识别的流程
@@ -63,7 +63,7 @@ class BaiduSpeechRecogService(event: SpeechEvent) : SpeechRecoService(event) {
     }
 
     override fun startWakeUpSilently(resetTimer: Boolean) {
-        synchronized(SpeechRecoService::class.java) {
+        synchronized(SpeechRecogService::class.java) {
             wakeupI.start()
             if (resetTimer || timerEnd)//定时器结束
                 startAutoSleepWakeup()
@@ -77,7 +77,7 @@ class BaiduSpeechRecogService(event: SpeechEvent) : SpeechRecoService(event) {
     }
 
     override fun stopWakeUpSilently() {
-        synchronized(SpeechRecoService::class.java) {
+        synchronized(SpeechRecogService::class.java) {
             wakeupI.stop()
         }
     }

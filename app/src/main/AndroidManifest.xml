@@ -199,10 +199,6 @@
             android:name="com.baidu.speech.VoiceRecognitionService"
             android:exported="false" />
         <service
-            android:name=".services.MainService"
-            android:enabled="true"
-            android:exported="false" />
-        <service
             android:name=".services.AssistSessionService"
             android:permission="android.permission.BIND_VOICE_INTERACTION">
             <meta-data

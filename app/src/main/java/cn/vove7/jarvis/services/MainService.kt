@@ -54,7 +54,7 @@ import cn.vove7.jarvis.activities.ScreenPickerActivity
 import cn.vove7.jarvis.chat.ChatSystem
 import cn.vove7.jarvis.chat.TulingChatSystem
 import cn.vove7.jarvis.speech.SpeechEvent
-import cn.vove7.jarvis.speech.SpeechRecoService
+import cn.vove7.jarvis.speech.SpeechRecogService
 import cn.vove7.jarvis.speech.VoiceData
 import cn.vove7.jarvis.tools.AppConfig
 import cn.vove7.jarvis.tools.debugserver.RemoteDebugServer
@@ -98,7 +98,7 @@ class MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
     private lateinit var chatSystem: ChatSystem
 
     //启动过慢  lateinit 导致未初始化异常
-    var speechRecogService: SpeechRecoService? = null
+    var speechRecogService: SpeechRecogService? = null
     var speechSynService: SpeechSynService? = null
 
     /**

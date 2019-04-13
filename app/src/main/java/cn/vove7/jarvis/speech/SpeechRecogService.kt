@@ -27,7 +27,7 @@ import cn.vove7.vtp.runtimepermission.PermissionUtils
  *
  * Created by Administrator on 2018/11/4
  */
-abstract class SpeechRecoService(val event: SpeechEvent) : SpeechRecogI {
+abstract class SpeechRecogService(val event: SpeechEvent) : SpeechRecogI {
     val context: Context
         get() = GlobalApp.APP
     //定时器关闭标志
@@ -126,9 +126,10 @@ abstract class SpeechRecoService(val event: SpeechEvent) : SpeechRecogI {
 
 
     @CallSuper
-    override fun stopRecog() {
-        lastingStopped = true
+    override fun stopRecog(byUser: Boolean) {
+        //用户停止识别，关闭长语音
         isListening = false
+        if (byUser) lastingStopped = true
         closeSCO()
         doStopRecog()
         event.onStopRecog()
@@ -143,10 +144,25 @@ abstract class SpeechRecoService(val event: SpeechEvent) : SpeechRecogI {
         stopWakeUpSilently()//不通知
     }
 
-    private val timerHandler: Handler by lazy {
+    private val wpTimerHandler: Handler by lazy {
         val t = HandlerThread("auto_sleep")
         t.start()
         Handler(t.looper)
+    }
+
+    /**
+     * 0.8s后无消息自动停止识别
+     */
+    private val stopRecogHandler: Handler by lazy {
+        val t = HandlerThread("auto_stop_recog")
+        t.start()
+        Handler(t.looper)
+    }
+    private val stopRecogTimer = Runnable {
+        Vog.d("定时停止识别")
+        if(isListening) {
+            stopRecog(false)//不通知
+        }
     }
 
 
@@ -165,13 +181,13 @@ abstract class SpeechRecoService(val event: SpeechEvent) : SpeechRecogI {
         else*/ AppConfig.autoSleepWakeupMillis
         Vog.d("startAutoSleepWakeup ---> 开启唤醒自动休眠 $sleepTime")
         if (sleepTime < 0) return
-        timerHandler.postDelayed(stopWakeUpTimer, sleepTime)
+        wpTimerHandler.postDelayed(stopWakeUpTimer, sleepTime)
     }
 
     //关闭定时器
     fun stopAutoSleepWakeup() {
         Vog.d("stopAutoSleepWakeup ---> 关闭唤醒自动休眠")
-        timerHandler.removeCallbacks(stopWakeUpTimer)
+        wpTimerHandler.removeCallbacks(stopWakeUpTimer)
     }
 
     private fun checkRecorderPermission(jump: Boolean = true): Boolean {
@@ -220,6 +236,11 @@ abstract class SpeechRecoService(val event: SpeechEvent) : SpeechRecogI {
                     startSCO()
                 }
                 IStatus.CODE_VOICE_TEMP -> {//中间结果
+                    if(isListening) {
+                        stopRecogHandler.removeCallbacks(stopRecogTimer)
+                        stopRecogHandler.postDelayed(stopRecogTimer, 800)
+                    }
+
                     val res = msg.data.getString("data")
                     if (res != null)
                         event.onTempResult(res)
@@ -306,5 +327,5 @@ interface SpeechRecogI {
     /**
      * 开始录音后，手动停止录音。SDK会识别在此过程中的录音。点击“停止”按钮后调用。
      */
-    fun stopRecog()
+    fun stopRecog(byUser: Boolean = true)
 }
