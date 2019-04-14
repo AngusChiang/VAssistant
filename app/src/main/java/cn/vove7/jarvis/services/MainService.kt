@@ -528,7 +528,7 @@ class MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
                         GlobalApp.toastWarning("引擎未就绪")
                         return@thread
                     }
-                    speechRecogService?.doStopWakeUp()
+                    speechRecogService?.stopWakeUp(notify = false, stopTimer = false)
                 }
                 EVENT_START_DEBUG_SERVER -> {
                     RemoteDebugServer.start()

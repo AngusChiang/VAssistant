@@ -33,6 +33,7 @@ object VoiceWakeupStrategy : AbsAccPluginService() {
     override fun onAppChanged(appScope: ActionScope) {//
         if (MainService.wpTimerEnd) {
             Vog.d("已定时关闭")
+            closed = false
             return
         }
         if (lastPkg == appScope.packageName) return

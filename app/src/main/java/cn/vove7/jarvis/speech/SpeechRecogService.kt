@@ -126,12 +126,15 @@ abstract class SpeechRecogService(val event: SpeechEvent) : SpeechRecogI {
         wakeupI.stop()
     }
 
-    final override fun stopWakeUp() {
+    final override fun stopWakeUp(notify: Boolean, stopTimer: Boolean) {
         if (wakeupI.opened) {
-            if (ScreenStatusListener.screenOn || AppConfig.notifyWpOnScreenOff) //亮屏，或开启息屏通知
-                wakeupStatusAni.failedAndHideDelay("语音唤醒关闭", 5000)
+            if (stopTimer)
+                stopAutoSleepWakeup()
             doStopWakeUp()
         }
+        if (notify && ScreenStatusListener.screenOn || AppConfig.notifyWpOnScreenOff) //亮屏，或开启息屏通知
+            wakeupStatusAni.failedAndHideDelay("语音唤醒关闭", 5000)
+
     }
 
 
@@ -340,7 +343,7 @@ interface SpeechRecogI {
     /**
      * 关闭计时
      */
-    fun stopWakeUp()
+    fun stopWakeUp(notify: Boolean = true, stopTimer: Boolean = true)
 
     /**
      * 不重新计时
