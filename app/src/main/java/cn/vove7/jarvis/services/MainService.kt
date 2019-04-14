@@ -1039,6 +1039,17 @@ class MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
             parseAnimation.failedAndHideDelay()
             resumeMusicIf()
         } else {
+            data.resultUrls.also {
+                when {
+                    it.isEmpty() -> return@also
+                    it.size == 1 -> SystemBridge.openUrl(it[0].url)
+                    else -> startActivity(Intent(context, ResultPickerActivity::class.java)
+                            .also { intent ->
+                                intent.putExtra("title", data.word)
+                                intent.putExtra("data", BundleBuilder().put("items", it).data)
+                            })
+                }
+            }
             data.word.let { word ->
                 AppBus.post(CommandHistory(UserInfo.getUserId(), result, word))
                 floatyPanel.show(if (word.contains("="))
@@ -1054,17 +1065,6 @@ class MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
                     }
                 })
                 l.await()
-            }
-            data.resultUrls.also {
-                when {
-                    it.isEmpty() -> return@also
-                    it.size == 1 -> SystemBridge.openUrl(it[0].url)
-                    else -> startActivity(Intent(context, ResultPickerActivity::class.java)
-                            .also { intent ->
-                                intent.putExtra("title", data.word)
-                                intent.putExtra("data", BundleBuilder().put("items", it).data)
-                            })
-                }
             }
         }
     }
