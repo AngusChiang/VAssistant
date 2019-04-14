@@ -123,7 +123,6 @@ abstract class SpeechRecogService(val event: SpeechEvent) : SpeechRecogI {
     }
 
     override fun doStopWakeUp() {
-        stopAutoSleepWakeup()
         wakeupI.stop()
     }
 

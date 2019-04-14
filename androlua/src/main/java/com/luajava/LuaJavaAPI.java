@@ -37,7 +37,7 @@ import java.util.Map;
 
 /**
  * Class that contains functions accessed by lua.
- *
+ * TODO 适配kotlin object类
  * @author Thiago Ponte
  */
 public final class LuaJavaAPI {
