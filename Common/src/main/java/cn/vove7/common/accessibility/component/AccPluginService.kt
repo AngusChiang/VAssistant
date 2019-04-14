@@ -8,7 +8,7 @@ import cn.vove7.common.datamanager.parse.model.ActionScope
  * @author 17719247306
  * 2018/9/3
  */
-interface AccPluginService {
+interface AccPluginService : Comparable<Any?> {
     /**
      * 不再分发此事件
      * 界面更新事件
@@ -27,4 +27,7 @@ interface AccPluginService {
     fun bindService()
     fun onUnBind() {}
     fun unBindServer()
+    override fun compareTo(other: Any?): Int {
+        return hashCode() - (other?.hashCode() ?: 0)
+    }
 }

@@ -195,32 +195,7 @@ class UserInfoDialog(val context: Activity, val onUpdate: () -> Unit) {
                 }.show()
     }
 
-//    @Deprecated("unuse")
-//    private fun showPurchaseDialog(ps: List<VipPrice>) {
-//        val items = mutableListOf<String>()
-//        ps.forEach {
-//            items.add("${it.durationText} (${it.price})")
-//        }
-//        var pi = 0
-//        MaterialDialog(context).title(text = "充值会员")
-//                .listItemsSingleChoice(items = items, initialSelection = 0) { _, i, s ->
-//                    pi = i
-//                }.positiveButton(R.string.text_alipay_pay) {
-//                    PurchaseHelper.withAlipay(context, ps[pi].price) { succ, result ->
-//                        if (succ) {
-//                            loadInfo()
-//                        }
-//                        toast.showShort(result)
-//                    }
-//                }.negativeButton(R.string.text_wechat_pay) {
-//                    //
-//                }.neutralButton(R.string.text_recharge_code) {
-//                    showActCodeDialog()
-//                }
-//                .show()
-//    }
-
-    var pd: ProgressDialog? = null
+    private var pd: ProgressDialog? = null
     private fun showActCodeDialog() {
         val clipText = SystemBridge.getClipText()
 

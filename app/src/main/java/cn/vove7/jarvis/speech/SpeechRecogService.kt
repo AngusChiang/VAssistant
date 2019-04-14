@@ -23,15 +23,15 @@ import cn.vove7.vtp.runtimepermission.PermissionUtils
 
 /**
  * #SpeechRecoService
- * 语音识别接口
- *
+ * APP语音识别基类
+ * 负责识别|唤醒 逻辑
  * Created by Administrator on 2018/11/4
  */
 abstract class SpeechRecogService(val event: SpeechEvent) : SpeechRecogI {
     val context: Context
         get() = GlobalApp.APP
     //定时器关闭标志
-    override var timerEnd: Boolean = false
+    override var timerEnd: Boolean = true
     private val wakeupStatusAni: StatusAnimation
             by lazy { WakeupStatusAnimation() }
     private val audioManager: AudioManager
@@ -45,9 +45,6 @@ abstract class SpeechRecogService(val event: SpeechEvent) : SpeechRecogI {
     //长语音
     var lastingStopped = true
 
-    /**
-     * 重写函数结尾处callSuper
-     */
     override fun startRecog(byVoice: Boolean) {
         //检查权限
         if (!checkRecorderPermission() || !checkFloat()) return
@@ -91,11 +88,6 @@ abstract class SpeechRecogService(val event: SpeechEvent) : SpeechRecogI {
     }
 
     /**
-     * 开始识别
-     */
-    abstract fun doStartRecog(silent: Boolean = false)
-
-    /**
      * 取消识别
      * @param notify Boolean
      */
@@ -108,23 +100,25 @@ abstract class SpeechRecogService(val event: SpeechEvent) : SpeechRecogI {
             event.onCancelRecog()
     }
 
-    abstract fun doCancelRecog()
+    final override fun startWakeUp(notify: Boolean, resetTimer: Boolean) {
+        if (!wakeupI.opened) {
+            if (notify)
+                wakeupStatusAni.showAndHideDelay("语音唤醒开启", 5000)
+            doStartWakeup()
 
-    @CallSuper
-    override fun startWakeUp() {
-        if (!wakeupI.opened)
-            wakeupStatusAni.showAndHideDelay("语音唤醒开启", 5000)
-    }
-
-    @CallSuper
-    override fun stopWakeUp() {
-        if (wakeupI.opened) {
-            if (ScreenStatusListener.screenOn || AppConfig.notifyWpOnScreenOff) //亮屏，或开启息屏通知
-                wakeupStatusAni.failedAndHideDelay("语音唤醒关闭", 5000)
+            if (resetTimer || timerEnd)//定时器结束
+                startAutoSleepWakeup()
         }
     }
 
-    abstract fun doStopRecog()
+    final override fun stopWakeUp() {
+        if (wakeupI.opened) {
+            stopAutoSleepWakeup()
+            if (ScreenStatusListener.screenOn || AppConfig.notifyWpOnScreenOff) //亮屏，或开启息屏通知
+                wakeupStatusAni.failedAndHideDelay("语音唤醒关闭", 5000)
+            doStopWakeUp()
+        }
+    }
 
 
     @CallSuper
@@ -143,7 +137,7 @@ abstract class SpeechRecogService(val event: SpeechEvent) : SpeechRecogI {
     private val stopWakeUpAction = Runnable {
         timerEnd = true
         wakeupStatusAni.failed("语音唤醒已自动休眠")
-        stopWakeUpSilently()//不通知
+        doStopWakeUp()//不通知
     }
 
     private val wpTimerHandler: Handler by lazy {
@@ -161,7 +155,7 @@ abstract class SpeechRecogService(val event: SpeechEvent) : SpeechRecogI {
         Handler(t.looper)
     }
     private val stopRecogAction = Runnable {
-        Vog.d("定时停止识别")
+        Vog.e("定时停止识别")
         if (isListening) {
             stopRecog(false)//不通知
         }
@@ -303,20 +297,32 @@ abstract class SpeechRecogService(val event: SpeechEvent) : SpeechRecogI {
 interface SpeechRecogI {
     val wakeupI: WakeupI
     var timerEnd: Boolean
+
     fun startRecog(byVoice: Boolean = false)
     fun startRecogSilent()
     fun cancelRecog(notify: Boolean = true)
+
+
+    /**
+     * 开始识别
+     */
+    fun doStartRecog(silent: Boolean = false)
+
+    fun doCancelRecog()
+
+    fun doStopRecog()
+
+
     /**
      * 重新计时
      */
-    fun startWakeUp()
+    fun startWakeUp(notify: Boolean = true, resetTimer: Boolean = true)
 
     /**
-     * 不重新计时
      * 开启语音唤醒/暂时性
      * @param resetTimer Boolean
      */
-    fun startWakeUpSilently(resetTimer: Boolean = true)
+    fun doStartWakeup()
 
     /**
      * 关闭计时
@@ -327,7 +333,7 @@ interface SpeechRecogI {
      * 不重新计时
      * 关闭语音唤醒/暂时性
      */
-    fun stopWakeUpSilently()
+    fun doStopWakeUp()
 
     fun release()
 

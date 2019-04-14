@@ -57,29 +57,12 @@ class BaiduSpeechRecogService(event: SpeechEvent) : SpeechRecogService(event) {
         }
     }
 
-    override fun startWakeUp() {
-        super.startWakeUp()
-        startWakeUpSilently()
+    override fun doStartWakeup() {
+        wakeupI.start()
     }
 
-    override fun startWakeUpSilently(resetTimer: Boolean) {
-        synchronized(SpeechRecogService::class.java) {
-            wakeupI.start()
-            if (resetTimer || timerEnd)//定时器结束
-                startAutoSleepWakeup()
-        }
-    }
-
-    override fun stopWakeUp() {
-        super.stopWakeUp()
-        stopWakeUpSilently()
-        stopAutoSleepWakeup()
-    }
-
-    override fun stopWakeUpSilently() {
-        synchronized(SpeechRecogService::class.java) {
-            wakeupI.stop()
-        }
+    override fun doStopWakeUp() {
+        wakeupI.stop()
     }
 
     lateinit var listener: SpeechStatusListener
@@ -110,7 +93,7 @@ class BaiduSpeechRecogService(event: SpeechEvent) : SpeechRecogService(event) {
             Pair(SpeechConstant.DISABLE_PUNCTUATION, false),//标点符号
             Pair(SpeechConstant.ACCEPT_AUDIO_VOLUME, true),
             Pair(SpeechConstant.PID, 1536),
-            Pair(SpeechConstant.NLU,"enable")
+            Pair(SpeechConstant.NLU, "enable")
     ).also {
         it[SpeechConstant.IN_FILE] = "#cn.vove7.jarvis.speech.baiduspeech.MicInputStream.instance()"
         //从指定时间开始识别，可以 - 指定ms 识别之前的内容

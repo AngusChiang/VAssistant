@@ -521,14 +521,14 @@ class MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
                         GlobalApp.toastWarning("引擎未就绪")
                         return@thread
                     }
-                    speechRecogService?.startWakeUpSilently(false)
+                    speechRecogService?.startWakeUp(false)
                 }
                 ORDER_STOP_VOICE_WAKEUP_WITHOUT_NOTIFY -> {
                     if (!speechEngineLoaded) {
                         GlobalApp.toastWarning("引擎未就绪")
                         return@thread
                     }
-                    speechRecogService?.stopWakeUpSilently()
+                    speechRecogService?.stopWakeUp()
                 }
                 EVENT_START_DEBUG_SERVER -> {
                     RemoteDebugServer.start()
@@ -783,6 +783,7 @@ class MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
          * @param byVoice Boolean
          */
         override fun onPreStartRecog(byVoice: Boolean) {
+            speechSynService?.stop()
             AppBus.post(AppBus.EVENT_BEGIN_RECO)
             checkMusic()//检查后台播放
             listeningAni.begin()//

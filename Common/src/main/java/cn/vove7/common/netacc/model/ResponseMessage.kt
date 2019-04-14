@@ -1,5 +1,9 @@
 package cn.vove7.common.netacc.model
 
+import cn.vove7.common.app.GlobalApp
+import cn.vove7.common.appbus.AppBus
+import cn.vove7.common.appbus.AppBus.EVENT_FORCE_OFFLINE
+
 /**
  * User: Vove
  * Date: 2018/7/11
@@ -14,6 +18,10 @@ open class ResponseMessage<T> {
     var data: T? = null
 
     fun isOk(): Boolean {
+        if (tokenIsOutdate()||isInvalid()) {
+            GlobalApp.toastError(message)
+            AppBus.post(EVENT_FORCE_OFFLINE)
+        }
         return code == CODE_OK
     }
 
@@ -21,7 +29,7 @@ open class ResponseMessage<T> {
         return code == CODE_INVALID
     }
 
-    fun tokenIsOutdate():Boolean {
+    fun tokenIsOutdate(): Boolean {
         return code == CODE_TOKEN_OUT_DATE
     }
 

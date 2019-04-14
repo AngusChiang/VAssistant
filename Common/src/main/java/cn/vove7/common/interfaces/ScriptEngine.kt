@@ -7,7 +7,7 @@ package cn.vove7.common.interfaces
  * @author 11324
  * 2019/4/1
  */
-interface ScriptEngine {
+interface ScriptEngine : Comparable<Any?> {
     @Throws(Exception::class)
     fun evalString(script: String, args: Array<*>? = null)
 
@@ -22,4 +22,7 @@ interface ScriptEngine {
 
     fun stop()
 
+    override fun compareTo(other: Any?): Int {
+        return hashCode() - (other?.hashCode() ?: 0)
+    }
 }

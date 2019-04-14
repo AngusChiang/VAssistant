@@ -1,3 +1,5 @@
+@file:Suppress("unused")
+
 package cn.vove7.common.bridges
 
 import android.Manifest
@@ -61,6 +63,7 @@ import cn.vove7.vtp.system.SystemHelper
 import java.io.File
 import java.util.*
 
+@Suppress("unused", "MemberVisibilityCanBePrivate")
 object SystemBridge : SystemOperation {
     private val context: Context
         get() = GlobalApp.APP
@@ -888,7 +891,7 @@ object SystemBridge : SystemOperation {
 //            intent.putExtra(Intent.EXTRA_SUBJECT, title)
             intent.putExtra(Intent.EXTRA_TEXT, content ?: "")
             intent.type = "text/plain"
-            context.startActivity(Intent.createChooser(intent, "分享到").newTask())
+            context.startActivity(Intent.createChooser(intent, "分享到"))
         } catch (e: Exception) {
             GlobalLog.err(e)
             GlobalApp.toastInfo("分享失败")
@@ -898,10 +901,9 @@ object SystemBridge : SystemOperation {
     override fun shareImage(imgPath: String?) {
         try {
             val intent = Intent(Intent.ACTION_SEND)
-            if (imgPath ?: "" == "") {
+            if (imgPath?.isEmpty() != false) {
                 GlobalApp.toastInfo("图片不存在")
                 return
-                // 纯文本
             } else {
                 val f = File(imgPath)
                 if (f.exists() && f.isFile) {
@@ -914,7 +916,7 @@ object SystemBridge : SystemOperation {
                     intent.putExtra(Intent.EXTRA_STREAM, imgUri)
                 }
             }
-            context.startActivity(Intent.createChooser(intent, "分享到").newTask())
+            context.startActivity(Intent.createChooser(intent, "分享到"))
         } catch (e: Exception) {
             GlobalLog.err(e)
             GlobalApp.toastInfo("分享失败")
