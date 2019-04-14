@@ -25,6 +25,7 @@ import cn.vove7.common.datamanager.parse.statusmap.ActionNode.NODE_SCOPE_IN_APP
 import cn.vove7.common.datamanager.parse.statusmap.Reg
 import cn.vove7.common.helper.AdvanAppHelper
 import cn.vove7.common.model.UserInfo
+import cn.vove7.common.netacc.ApiUrls
 import cn.vove7.executorengine.model.ActionParseResult
 import cn.vove7.executorengine.parse.ParseEngine
 import cn.vove7.jarvis.BuildConfig
@@ -533,7 +534,7 @@ class NewInstActivity : ReturnableActivity(), View.OnClickListener {
             }
             positiveButton(text = "确认")
             negativeButton(text = "取消")
-            neutralButton(text = "帮助") { SystemBridge.openUrl("https://vove.gitee.io/2019/01/29/Customize_Instruction_Regex/") }
+            neutralButton(text = "帮助") { SystemBridge.openUrl(ApiUrls.INST_REGEX_GUIDE) }
         }
     }
 

@@ -13,7 +13,6 @@ import android.view.ViewGroup
 import android.view.accessibility.AccessibilityEvent
 import android.view.accessibility.AccessibilityNodeInfo
 import cn.vove7.common.accessibility.AccessibilityApi
-import cn.vove7.common.accessibility.viewnode.ViewNode
 import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.appbus.AppBus
 import cn.vove7.common.utils.ThreadPool.runOnCachePool
@@ -22,7 +21,7 @@ import cn.vove7.common.utils.activities
 import cn.vove7.common.utils.isInputMethod
 import cn.vove7.common.bridges.SystemBridge
 import cn.vove7.common.helper.AdvanAppHelper
-import cn.vove7.common.utils.MutableFlag
+import cn.vove7.common.utils.StubbornFlag
 import cn.vove7.jarvis.plugins.AdKillerService
 import cn.vove7.jarvis.plugins.VoiceWakeupStrategy
 import cn.vove7.jarvis.tools.AppConfig
@@ -131,10 +130,10 @@ class MyAccessibilityService : AccessibilityApi() {
                         updateCurrentApp(pkg, classNameStr.toString())
                 }
             }
-            AccessibilityEvent.TYPE_VIEW_CLICKED -> try {
-                Vog.i("onAccessibilityEvent ---> 点击 :${ViewNode(event.source)}")
-            } catch (e: Exception) {
-            }
+//            AccessibilityEvent.TYPE_VIEW_CLICKED -> try {
+//                Vog.i("onAccessibilityEvent ---> 点击 :${ViewNode(event.source)}")
+//            } catch (e: Exception) {
+//            }
 //            AccessibilityEvent.TYPE_WINDOWS_CHANGED -> try {
 //                Vog.i("onAccessibilityEvent ---> TYPE_WINDOWS_CHANGED :${event.source}")
 //            } catch (e: Exception) {
@@ -285,13 +284,8 @@ class MyAccessibilityService : AccessibilityApi() {
     /**
      * 点按音量加，再长按触发音量增大
      */
-    private var v4  by MutableFlag<Long?>(null,null)
-//    private var v4: Long? = null
-//        get() {
-//            val v = field
-//            field = null
-//            return v
-//        }
+    private var v4  by StubbornFlag<Long?>(null)
+
 
     /**
      * 按键监听

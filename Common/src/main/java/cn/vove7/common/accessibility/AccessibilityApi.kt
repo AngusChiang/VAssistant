@@ -6,7 +6,6 @@ import android.os.Build
 import android.provider.Settings
 import android.support.v4.view.accessibility.AccessibilityNodeInfoCompat.FOCUS_INPUT
 import android.view.accessibility.AccessibilityNodeInfo
-import cn.vove7.common.R
 import cn.vove7.common.accessibility.component.AccPluginService
 import cn.vove7.common.accessibility.viewnode.ViewNode
 import cn.vove7.common.app.GlobalApp
@@ -15,6 +14,7 @@ import cn.vove7.common.datamanager.parse.model.ActionScope
 import cn.vove7.common.utils.ThreadPool
 import cn.vove7.vtp.app.AppInfo
 import cn.vove7.vtp.log.Vog
+import java.util.concurrent.ConcurrentSkipListSet
 
 /**
  *
@@ -116,27 +116,22 @@ abstract class AccessibilityApi : AccessibilityService() {
         /**
          * 注册放于静态变量，只用于通知事件。
          */
-        private val pluginsServices = mutableSetOf<AccPluginService>()
+        private val pluginsServices = ConcurrentSkipListSet<AccPluginService>()
 
         /**
          * 注册无障碍插件服务
          * @param e AccPluginService
          */
         fun registerPlugin(e: AccPluginService) {
-            synchronized(pluginsServices) {
-                pluginsServices.add(e)
-                e.bindService()
-            }
+            pluginsServices.add(e)
+            e.bindService()
         }
 
         fun unregisterPlugin(e: AccPluginService) {
-            synchronized(pluginsServices) {
-                pluginsServices.remove(e)
-                e.unBindServer()
-            }
+            pluginsServices.remove(e)
+            e.unBindServer()
         }
 
-        const val ON_UI_UPDATE = 0
         const val ON_APP_CHANGED = 1
         /**
          * 分发事件
@@ -146,28 +141,17 @@ abstract class AccessibilityApi : AccessibilityService() {
         @SuppressWarnings("Unchecked")
         fun dispatchPluginsEvent(what: Int, data: Any? = null) {
             if (data == null) return
-            synchronized(pluginsServices) {
-                when (what) {
-                    ON_UI_UPDATE -> {
-//                        pluginsServices.forEach {
-//                            ThreadPool.runOnCachePool { it.onUiUpdate(data as AccessibilityNodeInfo) }
-//                        }
-                    }
-                    ON_APP_CHANGED -> {
-                        Vog.d("dispatchPluginsEvent ---> ON_APP_CHANGED")
-                        ThreadPool.runOnCachePool {
-                            pluginsServices.forEach {
-                                it.onAppChanged(data as ActionScope)
-                            }
+            when (what) {
+
+                ON_APP_CHANGED -> {
+                    Vog.d("dispatchPluginsEvent ---> ON_APP_CHANGED")
+                    ThreadPool.runOnCachePool {
+                        pluginsServices.forEach {
+                            it.onAppChanged(data as ActionScope)
                         }
                     }
-//                    ON_BIND -> {
-//                        pluginsServices.forEach {
-//                            thread { it.onBind() }
-//                        }
-//                    }
-                    else -> {
-                    }
+                }
+                else -> {
                 }
             }
         }

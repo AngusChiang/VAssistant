@@ -5,8 +5,12 @@ import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.appbus.AppBus
 import cn.vove7.common.appbus.SpeechAction
-import cn.vove7.common.model.RequestPermission
-import cn.vove7.jarvis.services.MainService
+import cn.vove7.jarvis.speech.SpeechEvent.Companion.CODE_ENGINE_BUSY
+import cn.vove7.jarvis.speech.SpeechEvent.Companion.CODE_NET_ERROR
+import cn.vove7.jarvis.speech.SpeechEvent.Companion.CODE_NO_RECORDER_PERMISSION
+import cn.vove7.jarvis.speech.SpeechEvent.Companion.CODE_NO_RESULT
+import cn.vove7.jarvis.speech.SpeechEvent.Companion.CODE_RECORDER_OPEN_FAIL
+import cn.vove7.jarvis.speech.SpeechEvent.Companion.CODE_UNKNOWN
 import cn.vove7.jarvis.speech.VoiceData
 import cn.vove7.jarvis.speech.baiduspeech.recognition.message.SpeechMessage
 import cn.vove7.jarvis.speech.baiduspeech.recognition.model.IStatus.Companion.CODE_VOICE_ERR
@@ -16,7 +20,6 @@ import cn.vove7.jarvis.speech.baiduspeech.recognition.model.IStatus.Companion.CO
 import cn.vove7.jarvis.speech.baiduspeech.recognition.model.IStatus.Companion.CODE_VOICE_VOL
 import cn.vove7.jarvis.speech.baiduspeech.recognition.model.IStatus.Companion.STATUS_FINISHED
 import cn.vove7.jarvis.speech.baiduspeech.recognition.model.RecogResult
-import cn.vove7.jarvis.tools.AppConfig
 import cn.vove7.vtp.log.Vog
 
 /**
@@ -37,6 +40,7 @@ class SpeechStatusListener(private val handler: Handler) : StatusRecogListener()
         Vog.d("ready")
         handler.sendMessage(SpeechMessage.buildMessage(CODE_VOICE_READY))
     }
+
     override fun onAsrPartialResult(results: Array<String>?, recogResult: RecogResult) {
         super.onAsrPartialResult(results, recogResult)
         val tmp = results?.get(0) ?: ""
@@ -50,54 +54,29 @@ class SpeechStatusListener(private val handler: Handler) : StatusRecogListener()
         handler.sendMessage(SpeechMessage.buildMessage(CODE_VOICE_RESULT, tmp))
     }
 
-    override fun onAsrEnd() {
-        super.onAsrEnd()
-        if (!AppConfig.lastingVoiceCommand) {//非长语音
-            //立即停止识别 ，检测结果
-            MainService.instance?.onCommand(AppBus.ORDER_STOP_RECOG)
-        }
-    }
-
     override fun onAsrFinishError(errorCode: Int, subErrorCode: Int, errorMessage: String?, descMessage: String?,
                                   recogResult: RecogResult) {
         super.onAsrFinishError(errorCode, subErrorCode, errorMessage, descMessage, recogResult)
         val message = "识别错误, 错误码：$errorCode,$subErrorCode,$descMessage,$errorMessage"
         GlobalLog.err(message)
-        val errMsg = when (errorCode) {
+        val errCode = when (errorCode) {
             9 -> {
-                AppBus.post(RequestPermission("麦克风权限"))
-                "需要麦克风权限"
+                CODE_NO_RECORDER_PERMISSION
             }
-            3 -> "没有检测到用户说话"
-            7 -> "无结果"
-            2 -> "网络错误"
-            8 -> "引擎忙"
-            1 -> "网络超时"
+            3 -> {
+                if (subErrorCode == 3001) CODE_RECORDER_OPEN_FAIL
+                else CODE_NO_RESULT
+            }
+            7 -> CODE_NO_RESULT
+            2 -> CODE_NET_ERROR
+            8 -> CODE_ENGINE_BUSY //"引擎忙"
+            1 -> CODE_NET_ERROR //"网络超时"
             else -> {
-                "未知错误"
+                CODE_UNKNOWN//"未知错误"
             }
         }
 
-        handler.sendMessage(SpeechMessage.buildMessage(CODE_VOICE_ERR, errMsg))
-        when (subErrorCode) {
-            3101 -> {
-//                GlobalApp.toastInfo("?")
-            }
-            7001 -> {
-            }
-            8001 -> {//引擎忙
-                AppBus.postSpeechAction(SpeechAction.ActionCode.ACTION_CANCEL_RECOG)
-            }
-            3001 -> {
-                handler.sendMessage(SpeechMessage.buildMessage(CODE_VOICE_ERR, "麦克风打开失败"))
-            }
-            2004, 2100 -> {
-                GlobalApp.toastError("网络错误")
-            }
-//            else -> {
-//                GlobalApp.toastInfo("未知错误")
-//            }
-        }
+        handler.sendMessage(SpeechMessage.buildMessage(CODE_VOICE_ERR, errCode))
     }
 
     override fun onAsrVolume(volumePercent: Int, volume: Int) {
@@ -112,7 +91,7 @@ class SpeechStatusListener(private val handler: Handler) : StatusRecogListener()
 
     override fun onAsrFinish(recogResult: RecogResult) {
         super.onAsrFinish(recogResult)
-        handler.sendMessage(SpeechMessage.buildMessage(STATUS_FINISHED,""))
+        handler.sendMessage(SpeechMessage.buildMessage(STATUS_FINISHED, ""))
 
     }
 

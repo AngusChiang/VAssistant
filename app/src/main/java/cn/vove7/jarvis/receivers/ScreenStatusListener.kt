@@ -5,7 +5,7 @@ import android.content.Intent
 import android.content.IntentFilter
 import cn.vove7.common.appbus.AppBus
 import cn.vove7.common.appbus.SpeechAction
-import cn.vove7.common.utils.MutableFlag
+import cn.vove7.common.utils.StubbornFlag
 import cn.vove7.jarvis.plugins.VoiceWakeupStrategy
 import cn.vove7.jarvis.speech.WakeupI
 import cn.vove7.jarvis.tools.AppConfig
@@ -19,7 +19,7 @@ import cn.vove7.vtp.log.Vog
  */
 object ScreenStatusListener : DyBCReceiver(), ScreenEvent {
 
-    var screenOn:Boolean =true
+    var screenOn: Boolean = true
 
     val event: ScreenEvent = this
     override val intentFilter: IntentFilter by lazy {
@@ -35,12 +35,12 @@ object ScreenStatusListener : DyBCReceiver(), ScreenEvent {
         when (intent?.action) {
             Intent.ACTION_SCREEN_ON -> {
                 Vog.d("亮屏")
-                screenOn=true
+                screenOn = true
                 event.onScreenOn()
             }
             Intent.ACTION_SCREEN_OFF -> {
                 Vog.d("灭屏")
-                screenOn=false
+                screenOn = false
                 event.onScreenOff()
             }
             Intent.ACTION_USER_PRESENT -> {
@@ -72,7 +72,7 @@ object ScreenStatusListener : DyBCReceiver(), ScreenEvent {
     /**
      * (在微信页面关闭唤醒时, 熄屏开启唤醒)标志
      */
-    private var closeTag by MutableFlag(false,false)
+    private var closeTag by StubbornFlag(false)
 
     override fun onScreenOff() {//在当前App 关闭唤醒时,熄屏 应开启唤醒
         if (VoiceWakeupStrategy.closed) {//被自动关闭,熄屏开启

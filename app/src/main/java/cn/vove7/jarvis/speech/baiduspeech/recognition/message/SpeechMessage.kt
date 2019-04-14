@@ -25,6 +25,14 @@ object SpeechMessage {
         message.data = data
         return message
     }
+    fun buildMessage(what: Int, code: Int): Message {
+        val message = Message()
+        message.what = what
+        val data = Bundle()
+        data.putInt("data", code)
+        message.data = data
+        return message
+    }
 
     fun buildMessage(what: Int, obj: Serializable): Message {
         val message = Message()

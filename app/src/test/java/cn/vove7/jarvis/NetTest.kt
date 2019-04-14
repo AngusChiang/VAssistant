@@ -100,7 +100,7 @@ class RequestModel<T : Any>(var body: T? = null, val arg1: String? = null)
     : Serializable {
     val timestamp = (System.currentTimeMillis() / 1000)
     val userId = -1L
-    var sign: String = "" //TODO 签名数据 signData(GsonHelper.toJson(body), userId, timestamp)
+    var sign: String = "" // 签名数据 signData(GsonHelper.toJson(body), userId, timestamp)
     val userToken = null
 
 }

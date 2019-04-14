@@ -7,7 +7,7 @@ import android.support.v7.app.AppCompatActivity
 import android.view.View
 import android.view.Window
 import cn.vove7.common.model.UserInfo
-import cn.vove7.common.utils.MutableFlag
+import cn.vove7.common.utils.StubbornFlag
 import cn.vove7.common.utils.runOnNewHandlerThread
 import cn.vove7.jarvis.BuildConfig
 import cn.vove7.jarvis.R
@@ -89,7 +89,7 @@ class RealMainActivity : AppCompatActivity() {
 
         var showUpdate = true//显示更新日志
 
-        var inFlag by MutableFlag(initValue = true, afterValue = false)
+        var inFlag by StubbornFlag(initValue = true, afterValue = false)
     }
 
     private fun requestPermission() {

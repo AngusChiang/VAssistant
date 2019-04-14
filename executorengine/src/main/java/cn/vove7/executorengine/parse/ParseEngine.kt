@@ -129,8 +129,6 @@ object ParseEngine {
         val actionQueue = inAppQue.second //匹配应用内时
         // 根据第一个action.scope 决定是否进入首页
         if (actionQueue.isNotEmpty()) {//自动执行打开
-            //TODO check
-//                AppBus.post(AppBus.EVENT_HIDE_FLOAT)//关闭助手dialog
             return ActionParseResult(true, actionQueue, inAppQue.first,
                     SystemBridge.getAppInfo(scope.packageName))
                     .insertOpenAppAction(scope)
@@ -225,7 +223,7 @@ object ParseEngine {
 
                     actionQueue.add(itsAction)
 
-                    //TODO
+                    //T-ODO
 //                    return if (it.follows.isNotEmpty()) {//不空
 //                        actionDsMatch(actionQueue, it, result.groupValues[result.groupValues.size - 1], itsAction)//递归匹配
 //                    } else true

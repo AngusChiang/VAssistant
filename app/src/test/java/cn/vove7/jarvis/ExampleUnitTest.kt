@@ -347,7 +347,7 @@ class ExampleUnitTest {
 
     }
 
-    var onceFlag by MutableFlag(false, true)
+    var onceFlag by StubbornFlag(false, true)
 
     @Test
     fun onceTest() {

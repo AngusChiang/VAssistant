@@ -171,7 +171,6 @@ fun View.boundsInScreen(): Rect {
     return rect
 }
 
-//todo --> VTP
 /**
  * 是否为输入法
  * @receiver AppInfo
@@ -207,19 +206,24 @@ val appActivityCache = hashMapOf<String, Array<String>>()
 //fixme packageManager died
 fun AppInfo.activities(): Array<String> {
     synchronized(AppInfo::class) {
-        appActivityCache[packageName]?.let {
-            return it
-        }
-        val pm = GlobalApp.APP.packageManager
-        val pkgInfo = pm.getPackageInfo(packageName, PackageManager.GET_ACTIVITIES)
-        val acs = pkgInfo.activities
-        val rList = mutableListOf<String>()
-        acs?.forEach { ac ->
-            ac.name?.also {
-                rList.add(it)
+        try {
+
+            appActivityCache[packageName]?.let {
+                return it
             }
+            val pm = GlobalApp.APP.packageManager
+            val pkgInfo = pm.getPackageInfo(packageName, PackageManager.GET_ACTIVITIES)
+            val acs = pkgInfo.activities
+            val rList = mutableListOf<String>()
+            acs?.forEach { ac ->
+                ac.name?.also {
+                    rList.add(it)
+                }
+            }
+            return rList.toTypedArray()
+        } catch (e: Throwable) {
+            return emptyArray()
         }
-        return rList.toTypedArray()
     }
 }
 

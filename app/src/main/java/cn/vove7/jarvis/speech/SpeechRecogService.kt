@@ -32,8 +32,10 @@ abstract class SpeechRecogService(val event: SpeechEvent) : SpeechRecogI {
         get() = GlobalApp.APP
     //定时器关闭标志
     override var timerEnd: Boolean = false
-    protected val wakeupStatusAni: StatusAnimation by lazy { WakeupStatusAnimation() }
-    val audioManager: AudioManager get() = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
+    private val wakeupStatusAni: StatusAnimation
+            by lazy { WakeupStatusAnimation() }
+    private val audioManager: AudioManager
+        get() = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
     abstract var enableOffline: Boolean
 
     var isListening = false
@@ -138,7 +140,7 @@ abstract class SpeechRecogService(val event: SpeechEvent) : SpeechRecogI {
     /**
      * 定时关闭语音唤醒任务
      */
-    private val stopWakeUpTimer = Runnable {
+    private val stopWakeUpAction = Runnable {
         timerEnd = true
         wakeupStatusAni.failed("语音唤醒已自动休眠")
         stopWakeUpSilently()//不通知
@@ -158,11 +160,19 @@ abstract class SpeechRecogService(val event: SpeechEvent) : SpeechRecogI {
         t.start()
         Handler(t.looper)
     }
-    private val stopRecogTimer = Runnable {
+    private val stopRecogAction = Runnable {
         Vog.d("定时停止识别")
-        if(isListening) {
+        if (isListening) {
             stopRecog(false)//不通知
         }
+    }
+
+    private fun restartStopTimer() {
+        stopRecogHandler.removeCallbacks(stopRecogAction)
+        if (isListening) {
+            stopRecogHandler.postDelayed(stopRecogAction, 800)
+        }
+
     }
 
 
@@ -181,13 +191,13 @@ abstract class SpeechRecogService(val event: SpeechEvent) : SpeechRecogI {
         else*/ AppConfig.autoSleepWakeupMillis
         Vog.d("startAutoSleepWakeup ---> 开启唤醒自动休眠 $sleepTime")
         if (sleepTime < 0) return
-        wpTimerHandler.postDelayed(stopWakeUpTimer, sleepTime)
+        wpTimerHandler.postDelayed(stopWakeUpAction, sleepTime)
     }
 
     //关闭定时器
     fun stopAutoSleepWakeup() {
         Vog.d("stopAutoSleepWakeup ---> 关闭唤醒自动休眠")
-        wpTimerHandler.removeCallbacks(stopWakeUpTimer)
+        wpTimerHandler.removeCallbacks(stopWakeUpAction)
     }
 
     private fun checkRecorderPermission(jump: Boolean = true): Boolean {
@@ -236,27 +246,24 @@ abstract class SpeechRecogService(val event: SpeechEvent) : SpeechRecogI {
                     startSCO()
                 }
                 IStatus.CODE_VOICE_TEMP -> {//中间结果
-                    if(isListening) {
-                        stopRecogHandler.removeCallbacks(stopRecogTimer)
-                        stopRecogHandler.postDelayed(stopRecogTimer, 800)
-                    }
-
+                    restartStopTimer()
                     val res = msg.data.getString("data")
                     if (res != null)
                         event.onTempResult(res)
                 }
                 IStatus.CODE_VOICE_ERR -> {//出错
-                    val res = msg.data.getString("data") ?: "null"
+                    val code = msg.data.getInt("data")
                     isListening = false
                     lastingStopped = true
                     closeSCO()
-                    event.onRecogFailed(res)
+                    event.onRecogFailed(code)
                 }
                 IStatus.CODE_VOICE_VOL -> {//音量反馈
                     val data = msg.data.getSerializable("data") as VoiceData
                     event.onVolume(data)
                 }
                 IStatus.CODE_VOICE_RESULT -> {//结果
+                    stopRecogHandler.removeCallbacks(stopRecogAction)
                     val result = msg.data.getString("data") ?: "null"
                     isListening = false
                     event.onTempResult(result)

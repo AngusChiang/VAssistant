@@ -254,7 +254,8 @@ class MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
         if (AppConfig.lastingVoiceCommand) {
             Vog.d("stopLastingRecogTemp ---> speak临时 ${speechRecogService?.lastingStopped}")
             //没有手动停止 并且 已停止识别
-            afterSpeakResumeListen = !(speechRecogService?.lastingStopped ?: true) && !recogIsListening
+            afterSpeakResumeListen = !(speechRecogService?.lastingStopped
+                ?: true) && !recogIsListening
         }
     }
 
@@ -275,6 +276,7 @@ class MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
     /**
      * 选择对话框
      */
+    //TODO 分离 DialogBridge
 //    @Subscribe(threadMode = ThreadMode.MAIN)
     override fun showChoiceDialog(event: ShowDialogEvent) {
         runOnUi {
@@ -900,9 +902,8 @@ class MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
             }
         }
 
-
-        override fun onRecogFailed(err: String) {
-            floatyPanel.showAndHideDelay(err)
+        override fun onRecogFailed(errCode: Int) {
+            floatyPanel.showAndHideDelay(SpeechEvent.codeString(errCode))
             when (voiceMode) {
                 MODE_VOICE -> {
                     listeningAni.hideDelay()
@@ -913,8 +914,9 @@ class MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
                     voiceMode = MODE_VOICE
                     executeAnimation.begin()//continue
                 }
-                MODE_ALERT -> {//fixme 网络错误，无限...
-                    onCommand(ORDER_START_RECOG)  //继续????
+                MODE_ALERT -> {
+                    if (errCode != SpeechEvent.CODE_NET_ERROR)
+                        onCommand(ORDER_START_RECOG)  //继续????
                 }
 
                 MODE_INPUT -> {

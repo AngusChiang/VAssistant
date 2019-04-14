@@ -35,33 +35,26 @@ object GlobalActionExecutor : GlobalActionExecutorI {
     private val baseService: AccessibilityService?
         get() = AccessibilityApi.accessibilityService
 
-    @ScriptApi
     override fun back(): Boolean {
         return performGlobalAction(AccessibilityService.GLOBAL_ACTION_BACK)
     }
 
-    @ScriptApi
     override fun home(): Boolean {
         return performGlobalAction(AccessibilityService.GLOBAL_ACTION_HOME)
     }
 
-    @ScriptApi
     override fun powerDialog(): Boolean {
         return performGlobalAction(AccessibilityService.GLOBAL_ACTION_POWER_DIALOG)
     }
 
-    @ScriptApi
     override fun notificationBar(): Boolean {
         return performGlobalAction(AccessibilityService.GLOBAL_ACTION_NOTIFICATIONS)
     }
 
-
-    @ScriptApi
     override fun quickSettings(): Boolean {
         return performGlobalAction(AccessibilityService.GLOBAL_ACTION_QUICK_SETTINGS)
     }
 
-    @ScriptApi
     override fun lockScreen(): Boolean {
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
             performGlobalAction(AccessibilityService.GLOBAL_ACTION_LOCK_SCREEN)
@@ -71,7 +64,6 @@ object GlobalActionExecutor : GlobalActionExecutorI {
         }
     }
 
-    @ScriptApi
     override fun screenShot(): Boolean {
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
             performGlobalAction(AccessibilityService.GLOBAL_ACTION_TAKE_SCREENSHOT)
@@ -88,26 +80,14 @@ object GlobalActionExecutor : GlobalActionExecutorI {
         return baseService?.performGlobalAction(globalAction) == true
     }
 
-    @ScriptApi
     override fun recents(): Boolean {
         return performGlobalAction(AccessibilityService.GLOBAL_ACTION_RECENTS)
     }
 
     @RequiresApi(api = Build.VERSION_CODES.N)
-    @ScriptApi
     override fun splitScreen(): Boolean {
         return performGlobalAction(AccessibilityService.GLOBAL_ACTION_TOGGLE_SPLIT_SCREEN)
     }
-
-//    override fun screenShot(): Boolean {
-//        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-//            performGlobalAction(AccessibilityService.GLOBAL_ACTION_TAKE_SCREENSHOT)
-//        } else {
-//            GlobalLog.err("截屏需要Android9.0+")
-//            //todo 手动截屏 other fun
-//            false
-//        }
-//    }
 
     /**
      * 手势 一条路径
@@ -115,7 +95,6 @@ object GlobalActionExecutor : GlobalActionExecutorI {
      * @param points Array<Pair<Int, Int>>
      * @return Boolean
      */
-    @ScriptApi
     @RequiresApi(Build.VERSION_CODES.N)
     fun gesture(duration: Long, points: Array<Pair<Int, Int>>): Boolean {
         return gesture(0, duration, points)
@@ -129,8 +108,6 @@ object GlobalActionExecutor : GlobalActionExecutorI {
      * @return Boolean
      */
     @RequiresApi(Build.VERSION_CODES.N)
-    @ScriptApi
-
     override fun gesture(start: Long, duration: Long, points: Array<Pair<Int, Int>>): Boolean {
         if (gestureService == null) {
             return false
@@ -287,7 +264,6 @@ object GlobalActionExecutor : GlobalActionExecutorI {
      * @param y Int
      * @return Boolean
      */
-    @ScriptApi
     override fun longClick(x: Int, y: Int): Boolean {
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             gesture(0, (ViewConfiguration.getLongPressTimeout() + 200).toLong(),
@@ -298,7 +274,6 @@ object GlobalActionExecutor : GlobalActionExecutorI {
         }
     }
 
-    @ScriptApi
     override fun swipe(x1: Int, y1: Int, x2: Int, y2: Int, dur: Int): Boolean {
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             gesture(0, dur.toLong(), arrayOf(Pair(x1, y1),
@@ -309,7 +284,6 @@ object GlobalActionExecutor : GlobalActionExecutorI {
         }
     }
 
-    @ScriptApi
     override fun scrollUp(): Boolean {
         val mtop = (ScreenAdapter.relHeight * 0.1).toInt()
         val mBottom = (ScreenAdapter.relHeight * 0.85).toInt()
@@ -318,7 +292,6 @@ object GlobalActionExecutor : GlobalActionExecutorI {
         return swipe(xCenter, mBottom, xCenter, mtop, 400)
     }
 
-    @ScriptApi
     override fun scrollDown(): Boolean {
         val mtop = (ScreenAdapter.relHeight * 0.15).toInt()
         val mBottom = (ScreenAdapter.relHeight * 0.9).toInt()

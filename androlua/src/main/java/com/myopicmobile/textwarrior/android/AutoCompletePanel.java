@@ -99,27 +99,19 @@ public class AutoCompletePanel {
         gd.setStroke(1, textColor);
         setTextColor(textColor);
         _autoCompletePanel.setBackgroundDrawable(gd);
-        _autoCompletePanel.setOnItemClickListener(new OnItemClickListener() {
-
-            @Override
-            public void onItemClick(AdapterView<?> p1, View p2, int p3, long p4) {
-                // TODO: Implement this method
-                _textField.replaceText(_textField.getCaretPosition() - _constraint.length(), _constraint.length(), ((TextView) p2).getText().toString());
-                _adapter.abort();
-                dismiss();
-            }
+        _autoCompletePanel.setOnItemClickListener((p1, p2, p3, p4) -> {
+            _textField.replaceText(_textField.getCaretPosition() - _constraint.length(), _constraint.length(), ((TextView) p2).getText().toString());
+            _adapter.abort();
+            dismiss();
         });
 
     }
 
     public void setWidth(int width) {
-        // TODO: Implement this method
         _autoCompletePanel.setWidth(width);
     }
 
     private void setHeight(int height) {
-        // TODO: Implement this method
-
         if (_height != height) {
             _height = height;
             _autoCompletePanel.setHeight(height);
@@ -127,7 +119,6 @@ public class AutoCompletePanel {
     }
 
     private void setHorizontalOffset(int horizontal) {
-        // TODO: Implement this method
         horizontal = Math.min(horizontal, _textField.getWidth() / 2);
         if (_horizontal != horizontal) {
             _horizontal = horizontal;
@@ -136,7 +127,6 @@ public class AutoCompletePanel {
     }
 
     private void setVerticalOffset(int verticalOffset) {
-        // TODO: Implement this method
         //verticalOffset=Math.min(verticalOffset,_textField.getWidth()/2);
         int max = 0 - _autoCompletePanel.getHeight();
         if (verticalOffset > max) {
@@ -190,13 +180,11 @@ public class AutoCompletePanel {
 
 
         private int dp(float n) {
-            // TODO: Implement this method
             return (int) TypedValue.applyDimension(1, n, dm);
         }
 
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
-            // TODO: Implement this method
             TextView view = (TextView) super.getView(position, convertView, parent);
 			/*TextView view=null;
 			if(convertView==null){
@@ -214,7 +202,6 @@ public class AutoCompletePanel {
 
 
         public void restart() {
-            // TODO: Implement this method
             _abort.clear();
         }
 

@@ -57,7 +57,7 @@ object ApiUrls {
     val GET_ALI_ORDER: String get() = PAY + "a"
 
     const val USER_GUIDE = "https://vove.gitee.io/"
-    const val INST_REGEX_GUIDE = "https://vove.gitee.io/"//todo
+    const val INST_REGEX_GUIDE = "https://vove.gitee.io/2019/01/29/Customize_Instruction_Regex//"
     const val USER_FAQ = "https://vove.gitee.io/2018/09/24/User_Manual/#faq常见问题"
 
     val HELP_DEL_INST: String get() = "$USER_GUIDE#del-inst"

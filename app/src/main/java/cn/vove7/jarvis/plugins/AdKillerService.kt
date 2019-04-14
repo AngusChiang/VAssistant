@@ -8,15 +8,16 @@ import cn.vove7.common.datamanager.AppAdInfo
 import cn.vove7.common.datamanager.DAO
 import cn.vove7.common.datamanager.greendao.AppAdInfoDao
 import cn.vove7.common.datamanager.parse.model.ActionScope
+import cn.vove7.common.helper.AdvanAppHelper
 import cn.vove7.common.utils.ThreadPool.runOnPool
 import cn.vove7.common.view.finder.ViewFindBuilder
 import cn.vove7.common.view.finder.ViewFinder
-import cn.vove7.common.helper.AdvanAppHelper
 import cn.vove7.jarvis.tools.AppConfig
 import cn.vove7.jarvis.view.statusbar.RemoveAdAnimation
 import cn.vove7.vtp.app.AppInfo
 import cn.vove7.vtp.log.Vog
 import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.ConcurrentSkipListSet
 import kotlin.concurrent.thread
 
 /**
@@ -82,12 +83,12 @@ object AdKillerService : AbsAccPluginService() {
     }
 
     //搜索线程
-    private val sthreads = mutableSetOf<Thread>()
+    private val sthreads = ConcurrentSkipListSet<Thread>()
 
     /**
      * 使用标记数据查找
      */
-    private fun startFind() {
+    private fun startFind(appInfo: AppInfo?) {
         finders?.forEach {
             thread {
                 try {
@@ -120,12 +121,13 @@ object AdKillerService : AbsAccPluginService() {
     }
 
     private var finders: MutableSet<ViewFinder>? = null
-    private var appInfo: AppInfo? = null
-    var lastPkg = ""//todo smart skip ad
+    //    private var appInfo: AppInfo? = null
+    private var lastPkg = ""
+
     override fun onAppChanged(appScope: ActionScope) {
         if (!AppConfig.haveAdKillSurplus()) //用户去广告权限
             return
-        appInfo = AdvanAppHelper.getAppInfo(appScope.packageName)
+        val appInfo = AdvanAppHelper.getAppInfo(appScope.packageName)
 
 //        finders = if (finderCaches.containsKey(appScope)) {
 //            finderCaches[appScope]!!
@@ -141,7 +143,7 @@ object AdKillerService : AbsAccPluginService() {
         }
         Vog.v("当前界面广告数--->${finders?.size} $appScope $finders")
         if (finders?.isNotEmpty() == true)
-            startFind()
+            startFind(appInfo)
         else {//停止未结束的搜索
             stopSearchThreads()
             //smart skip ad

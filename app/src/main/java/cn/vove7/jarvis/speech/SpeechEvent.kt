@@ -6,6 +6,26 @@ import java.io.Serializable
  * 语音识别事件interface
  */
 interface SpeechEvent {
+    companion object {
+        const val CODE_UNKNOWN = -1
+        const val CODE_NO_RESULT = 1
+        const val CODE_NET_ERROR = 2
+        const val CODE_NO_RECORDER_PERMISSION = 3
+        const val CODE_ENGINE_BUSY = 4
+        const val CODE_RECORDER_OPEN_FAIL = 5
+
+        fun codeString(code: Int): String {
+            return mapOf(
+                    Pair(CODE_UNKNOWN, "未知错误"),
+                    Pair(CODE_NO_RESULT, "无识别结果"),
+                    Pair(CODE_NET_ERROR, "网络错误"),
+                    Pair(CODE_NO_RECORDER_PERMISSION, "无麦克风权限"),
+                    Pair(CODE_ENGINE_BUSY, "引擎忙"),
+                    Pair(CODE_RECORDER_OPEN_FAIL, "麦克风打开失败")
+            )[code] ?: "未知错误"
+        }
+    }
+
     /**
      *
      * @param word String?
@@ -38,7 +58,7 @@ interface SpeechEvent {
      * 识别出错
      * @param err String
      */
-    fun onRecogFailed(err: String)
+    fun onRecogFailed(errCode: Int)
 
     /**
      * 音量事件

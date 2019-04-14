@@ -106,9 +106,6 @@ object RegUtils {
             "  argMap = nil\n" +
             "end\n"
 
-    //todo 弃用
-//    private val luaHeaderReg = "require[ ]+[\"']accessibility[\"']".toRegex()
-
     /**
      * 替换Lua 无障碍声明头部
      */

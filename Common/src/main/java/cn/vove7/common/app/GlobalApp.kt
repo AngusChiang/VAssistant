@@ -111,12 +111,12 @@ open class GlobalApp : RePluginApplication() {
             // 允许“插件使用宿主类”。默认为“关闭”
             isUseHostClassIfNotFound = true
 
-            // FIXME RePlugin默认会对安装的外置插件进行签名校验，这里先关掉，避免调试时出现签名错误
+            // RePlugin默认会对安装的外置插件进行签名校验，这里先关掉，避免调试时出现签名错误
             verifySign = false
             isUseHostClassIfNotFound = true
             // 针对“安装失败”等情况来做进一步的事件处理
             eventCallbacks = HostEventCallbacks()
-            // FIXME 若宿主为Release，则此处应加上您认为"合法"的插件的签名，例如，可以写上"宿主"自己的。
+            // 若宿主为Release，则此处应加上您认为"合法"的插件的签名，例如，可以写上"宿主"自己的。
             // RePlugin.addCertSignature("AAAAAAAAA");
 
             // 在Art上，优化第一次loadDex的速度
@@ -155,7 +155,7 @@ open class GlobalApp : RePluginApplication() {
         }
 
         override fun onStartActivityCompleted(plugin: String?, activity: String?, result: Boolean) {
-            // FIXME 当打开Activity成功时触发此逻辑，可在这里做一些APM、打点统计等相关工作
+            // 当打开Activity成功时触发此逻辑，可在这里做一些APM、打点统计等相关工作
             super.onStartActivityCompleted(plugin, activity, result)
         }
     }

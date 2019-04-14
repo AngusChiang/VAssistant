@@ -17,6 +17,7 @@ import com.afollestad.materialdialogs.customview.customView
  * @author Administrator
  * 2018/10/23
  */
+@Deprecated("无用")
 class InstRegexEditorDialog(
         val context: Context,
         private val reg: String? = null,//正则
