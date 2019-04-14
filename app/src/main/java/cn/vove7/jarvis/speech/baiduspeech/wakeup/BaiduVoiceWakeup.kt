@@ -29,7 +29,7 @@ class BaiduVoiceWakeup(private val eventListener: EventListener) : WakeupI() {
         get() = GlobalApp.APP
 
     private var wp: EventManager? = null
-    override var opened: Boolean = false
+
 
     init {
         initIfNeed()

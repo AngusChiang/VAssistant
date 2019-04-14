@@ -118,7 +118,7 @@ class LaboratoryActivity : ReturnableActivity() {
                 )),*/
                 SettingGroupItem(R.color.yellow_700, titleS = "语音唤醒", childItems = listOf(
                         SwitchItem(title = "自动释放麦克风", summary = "在已授予麦克风权限的其他App内自动关闭语音唤醒\n需要无障碍",/*设为系统应用后无效*/
-                                keyId = R.string.key_fix_voice_micro, defaultValue = { true }) { _, b ->
+                                keyId = R.string.key_fix_voice_micro, defaultValue = { AppConfig.fixVoiceMicro }) { _, b ->
                             if (b /* TODO && !AppConfig.IS_SYS_APP*/)
                                 VoiceWakeupStrategy.register()
                             else

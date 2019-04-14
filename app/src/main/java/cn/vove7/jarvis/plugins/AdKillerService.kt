@@ -83,7 +83,7 @@ object AdKillerService : AbsAccPluginService() {
     }
 
     //搜索线程
-    private val sthreads = ConcurrentSkipListSet<Thread>()
+    private val sthreads = mutableListOf<Thread>()
 
     /**
      * 使用标记数据查找
@@ -100,7 +100,9 @@ object AdKillerService : AbsAccPluginService() {
                     GlobalLog.err(e)
                 }
             }.also { t ->
-                sthreads.add(t)
+                synchronized(sthreads){
+                    sthreads.add(t)
+                }
             }
         }
     }
@@ -165,15 +167,17 @@ object AdKillerService : AbsAccPluginService() {
     @Synchronized
     private fun smartSkipAppSwitchAd() {
         Vog.i("smartSkipAppSwitchAd ---> 寻找App切换广告")
-        sthreads.add(thread {
-            //寻找1.5s 频繁切换 耗电量?
-            ViewFindBuilder()
-                    .textLengthLimit(8)
-                    .containsText("跳过", "skip")
-                    .waitFor(1500)?.also {
-                        onSkipAd(it)
-                    } ?: Vog.i("smartSkipAppSwitchAd ---> 未发现广告")
-        })
+        synchronized(sthreads) {
+            sthreads.add(thread {
+                //寻找1.5s 频繁切换 耗电量?
+                ViewFindBuilder()
+                        .textLengthLimit(8)
+                        .containsText("跳过", "skip")
+                        .waitFor(1500)?.also {
+                            onSkipAd(it)
+                        } ?: Vog.i("smartSkipAppSwitchAd ---> 未发现广告")
+            })
+        }
     }
 
     /**

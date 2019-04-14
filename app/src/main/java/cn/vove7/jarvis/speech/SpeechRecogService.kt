@@ -11,6 +11,7 @@ import cn.vove7.common.appbus.AppBus
 import cn.vove7.common.model.RequestPermission
 import cn.vove7.common.utils.runInCatch
 import cn.vove7.common.utils.runOnNewHandlerThread
+import cn.vove7.jarvis.BuildConfig
 import cn.vove7.jarvis.receivers.PowerEventReceiver
 import cn.vove7.jarvis.receivers.ScreenStatusListener
 import cn.vove7.jarvis.speech.baiduspeech.recognition.model.IStatus
@@ -30,8 +31,13 @@ import cn.vove7.vtp.runtimepermission.PermissionUtils
 abstract class SpeechRecogService(val event: SpeechEvent) : SpeechRecogI {
     val context: Context
         get() = GlobalApp.APP
-    //定时器关闭标志
-    override var timerEnd: Boolean = true
+
+    //语音唤醒定时器关闭标志
+    var wakeupTimerEnd: Boolean = false
+        set(v) {
+            Vog.d("语音唤醒定时器关闭标志：$v")
+            field = v
+        }
     private val wakeupStatusAni: StatusAnimation
             by lazy { WakeupStatusAnimation() }
     private val audioManager: AudioManager
@@ -106,14 +112,23 @@ abstract class SpeechRecogService(val event: SpeechEvent) : SpeechRecogI {
                 wakeupStatusAni.showAndHideDelay("语音唤醒开启", 5000)
             doStartWakeup()
 
-            if (resetTimer || timerEnd)//定时器结束
+            if (resetTimer)//定时器结束
                 startAutoSleepWakeup()
         }
     }
 
+
+    override fun doStartWakeup() {
+        wakeupI.start()
+    }
+
+    override fun doStopWakeUp() {
+        stopAutoSleepWakeup()
+        wakeupI.stop()
+    }
+
     final override fun stopWakeUp() {
         if (wakeupI.opened) {
-            stopAutoSleepWakeup()
             if (ScreenStatusListener.screenOn || AppConfig.notifyWpOnScreenOff) //亮屏，或开启息屏通知
                 wakeupStatusAni.failedAndHideDelay("语音唤醒关闭", 5000)
             doStopWakeUp()
@@ -135,7 +150,7 @@ abstract class SpeechRecogService(val event: SpeechEvent) : SpeechRecogI {
      * 定时关闭语音唤醒任务
      */
     private val stopWakeUpAction = Runnable {
-        timerEnd = true
+        wakeupTimerEnd = true
         wakeupStatusAni.failed("语音唤醒已自动休眠")
         doStopWakeUp()//不通知
     }
@@ -175,16 +190,15 @@ abstract class SpeechRecogService(val event: SpeechEvent) : SpeechRecogI {
      * 重启定时器
      */
     fun startAutoSleepWakeup() {
-        timerEnd = false
-        if (PowerEventReceiver.isCharging) {
-            Vog.d("startAutoSleepWakeup ---> 充电中")
+        stopAutoSleepWakeup()
+        if (PowerEventReceiver.isCharging && AppConfig.isAutoVoiceWakeupCharging) {
+            Vog.d("startAutoSleepWakeup ---> 充电中 不自动休眠")
             return
         }
-        stopAutoSleepWakeup()
-        val sleepTime = /*if (BuildConfig.DEBUG) AppConfig.autoSleepWakeupMillis / 60
-        else*/ AppConfig.autoSleepWakeupMillis
-        Vog.d("startAutoSleepWakeup ---> 开启唤醒自动休眠 $sleepTime")
-        if (sleepTime < 0) return
+        val sleepTime = if (BuildConfig.DEBUG) AppConfig.autoSleepWakeupMillis / 60
+        else AppConfig.autoSleepWakeupMillis
+        Vog.d(" ${sleepTime / 1000}s")
+        wakeupTimerEnd = false
         wpTimerHandler.postDelayed(stopWakeUpAction, sleepTime)
     }
 
@@ -296,7 +310,7 @@ abstract class SpeechRecogService(val event: SpeechEvent) : SpeechRecogI {
 
 interface SpeechRecogI {
     val wakeupI: WakeupI
-    var timerEnd: Boolean
+
 
     fun startRecog(byVoice: Boolean = false)
     fun startRecogSilent()

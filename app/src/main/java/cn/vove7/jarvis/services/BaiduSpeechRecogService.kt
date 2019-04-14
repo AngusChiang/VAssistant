@@ -31,10 +31,6 @@ class BaiduSpeechRecogService(event: SpeechEvent) : SpeechRecogService(event) {
      */
     private lateinit var myRecognizer: MyRecognizer
     override val wakeupI: WakeupI by lazy { BaiduVoiceWakeup(WakeupEventAdapter(RecogWakeupListener(handler))) }
-    //    /**
-//     * 唤醒器
-//     */
-//    var wakeuper= BaiduVoiceWakeup()
 
     /*
  * 本Activity中是否需要调用离线命令词功能。根据此参数，判断是否需要调用SDK的ASR_KWS_LOAD_ENGINE事件
@@ -55,14 +51,6 @@ class BaiduSpeechRecogService(event: SpeechEvent) : SpeechRecogService(event) {
         if (AppConfig.voiceWakeup) {
             startWakeUp()
         }
-    }
-
-    override fun doStartWakeup() {
-        wakeupI.start()
-    }
-
-    override fun doStopWakeUp() {
-        wakeupI.stop()
     }
 
     lateinit var listener: SpeechStatusListener

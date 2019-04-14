@@ -83,8 +83,8 @@ class MyAccessibilityService : AccessibilityApi() {
                     it
                 }
             }
-            Vog.d("updateCurrentApp ---> $pkg")
-            Vog.d("updateCurrentApp ---> $activityName")
+            Vog.v("updateCurrentApp ---> $pkg")
+            Vog.v("updateCurrentApp ---> $activityName")
             currentScope.activity = activityName
             currentScope.packageName = pkg
             Vog.d(currentScope.toString())

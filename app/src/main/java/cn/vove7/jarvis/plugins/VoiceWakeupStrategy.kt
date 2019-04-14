@@ -5,9 +5,8 @@ import cn.vove7.common.accessibility.component.AbsAccPluginService
 import cn.vove7.common.appbus.AppBus
 import cn.vove7.common.appbus.SpeechAction
 import cn.vove7.common.datamanager.parse.model.ActionScope
-import cn.vove7.common.utils.hasMicroPermission
-import cn.vove7.common.utils.microPermissionCache
 import cn.vove7.common.helper.AdvanAppHelper
+import cn.vove7.common.utils.hasMicroPermission
 import cn.vove7.jarvis.services.MainService
 import cn.vove7.jarvis.tools.AppConfig
 import cn.vove7.jarvis.view.statusbar.MicroToggleAnimation
@@ -32,6 +31,10 @@ object VoiceWakeupStrategy : AbsAccPluginService() {
 
     var lastPkg = ""
     override fun onAppChanged(appScope: ActionScope) {//
+        if (MainService.wpTimerEnd) {
+            Vog.d("已定时关闭")
+            return
+        }
         if (lastPkg == appScope.packageName) return
         val appInfo = AdvanAppHelper.getAppInfo(appScope.packageName) ?: return
         lastPkg = appScope.packageName
@@ -41,7 +44,7 @@ object VoiceWakeupStrategy : AbsAccPluginService() {
             if (MainService.instance?.speechRecogService?.wakeupI?.opened == true) {
                 closeWakeup()
             }
-        } else if (closed && MainService.instance?.speechRecogService?.timerEnd == false) {//已自动关闭 并且定时器有效
+        } else if (closed) {//已自动关闭 并且定时器有效
             startWakeup()
         }
     }
@@ -70,10 +73,6 @@ object VoiceWakeupStrategy : AbsAccPluginService() {
         MainService.instance?.onCommand(AppBus.ORDER_START_VOICE_WAKEUP_WITHOUT_NOTIFY)
     }
 
-    override fun unBindServer() {
-        super.unBindServer()
-        microPermissionCache.clear()
-    }
 
     /**
      * 充电/亮屏自动开启唤醒 前 判断当前App

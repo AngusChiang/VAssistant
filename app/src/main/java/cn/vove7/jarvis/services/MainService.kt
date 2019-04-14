@@ -112,7 +112,6 @@ class MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
     private val executeAnimation: ExecuteAnimation by lazy { ExecuteAnimation() }
 
     init {
-//        super.onCreate()
         instance = this
         GlobalApp.serviceBridge = this
         runOnNewHandlerThread("load_speech_engine", delay = 1000) {
@@ -124,9 +123,9 @@ class MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
 
     fun init() {
         AppBus.reg(this)
+        floatyPanel = FloatyPanel()
         loadChatSystem()
         loadSpeechService()
-        floatyPanel = FloatyPanel()
         speechEngineLoaded = true
         GlobalApp.toastInfo("启动完成")
     }
@@ -399,6 +398,7 @@ class MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
     /**
      * onSpeechAction
      * 无需立即执行，可延缓使用AppBus
+     * TODO remove
      */
     @Subscribe(threadMode = ThreadMode.BACKGROUND)
     fun onSpeechAction(sAction: SpeechAction) {
@@ -521,14 +521,14 @@ class MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
                         GlobalApp.toastWarning("引擎未就绪")
                         return@thread
                     }
-                    speechRecogService?.startWakeUp(false)
+                    speechRecogService?.startWakeUp(notify = false, resetTimer = false)
                 }
                 ORDER_STOP_VOICE_WAKEUP_WITHOUT_NOTIFY -> {
                     if (!speechEngineLoaded) {
                         GlobalApp.toastWarning("引擎未就绪")
                         return@thread
                     }
-                    speechRecogService?.stopWakeUp()
+                    speechRecogService?.doStopWakeUp()
                 }
                 EVENT_START_DEBUG_SERVER -> {
                     RemoteDebugServer.start()
@@ -611,6 +611,17 @@ class MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
                     else -> null
                 }
             }
+
+        val wpTimerEnd
+            get() = (instance?.speechRecogService?.wakeupTimerEnd == true).also {
+                Vog.d("语音唤醒定时器状态：${instance?.speechRecogService?.wakeupTimerEnd}")
+            }
+        val wakeupOpen
+            get() =
+                (instance?.speechRecogService?.wakeupI?.opened == true).also {
+                    Vog.d("语音唤醒状态：$it")
+                }
+
 
         val recogIsListening: Boolean
             get() {

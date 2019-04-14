@@ -102,8 +102,9 @@ object DataUpdator {
      */
     fun oneKeyUpdate(activity: Activity, types: List<Int>,
                      back: (() -> Unit)? = null, t: String) {
-        val textDialog = ProgressTextDialog(activity, "$t\n\n正在更新", false, autoScroll = true)
+        val textDialog = ProgressTextDialog(activity, "正在更新", false, autoScroll = true)
         runOnPool {
+            textDialog.appendlnBold("更新：\n$t\n")
             types.forEach {
                 val result = ResultBox<Boolean>()
                 val updater = Updater(textDialog)

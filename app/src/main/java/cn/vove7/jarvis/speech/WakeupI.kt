@@ -1,6 +1,7 @@
 package cn.vove7.jarvis.speech
 
 import android.support.annotation.CallSuper
+import cn.vove7.vtp.log.Vog
 
 /**
  * # WakeupI
@@ -12,25 +13,25 @@ abstract class WakeupI {
     /**
      * 唤醒开启状态
      */
-    abstract var opened: Boolean
+    var opened: Boolean = false
+        set(v) {
+            Vog.d("语音唤醒开启状态：$v")
+            field = v
+        }
 
-    init {
-        instance = this
-    }
 
     @CallSuper
     open fun stop() {
         opened = false
+        Vog.d("关闭语音唤醒")
     }
 
     @CallSuper
     open fun start() {
         opened = true
+        Vog.d("开启语音唤醒")
     }
 
     abstract fun release()
 
-    companion object {
-        var instance: WakeupI? = null
-    }
 }

@@ -95,7 +95,7 @@ object PowerEventReceiver : DyBCReceiver(), OnPowerEvent {
             return
         }
         //充电自动开启唤醒
-        if (WakeupI.instance?.opened == false) {//开启 并 已自动关闭
+        if (!MainService.wpTimerEnd) {//开启 并 已自动关闭
             Vog.d("正在充电 开启语音唤醒")
             //开启了无障碍
             if (VoiceWakeupStrategy.canOpenRecord())

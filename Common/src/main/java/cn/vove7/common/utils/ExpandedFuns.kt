@@ -207,7 +207,6 @@ val appActivityCache = hashMapOf<String, Array<String>>()
 fun AppInfo.activities(): Array<String> {
     synchronized(AppInfo::class) {
         try {
-
             appActivityCache[packageName]?.let {
                 return it
             }
@@ -228,34 +227,19 @@ fun AppInfo.activities(): Array<String> {
 }
 
 
-//麦克风权限App缓存
-val microPermissionCache = hashMapOf<String, Boolean>()
-
 fun AppInfo.hasMicroPermission(): Boolean {
     if (packageName == GlobalApp.APP.packageName) return false//排除自身
-    microPermissionCache[packageName]?.also {
-        Vog.d("hasMicroPermission ---> $name 麦克风权限 $it")
-//        //若无权限 再次检查（可能动态申请）
-//        if (it) return true
-        return it
-    }
 
-    try {
+    return try {
         val pm = GlobalApp.APP.packageManager
-        val pkgInfo = pm.getPackageInfo(packageName, PackageManager.GET_PERMISSIONS)
-        pkgInfo?.requestedPermissions?.forEach {
-            if (it.endsWith(".RECORD_AUDIO") && hasGrantedPermission(it)) {
-                Vog.d("hasMicroPermission ---> $name 授权麦克风权限")
-                microPermissionCache[packageName] = true
-                return true
-            }
-        }
+        (PackageManager.PERMISSION_GRANTED ==
+                pm.checkPermission(Manifest.permission.RECORD_AUDIO, packageName)).also {
+                    Vog.d("$name 麦克风权限: $it")
+                }
     } catch (e: Exception) {
         GlobalLog.err(e)
+        false
     }
-    Vog.d("hasMicroPermission ---> $name 无麦克风权限")
-    microPermissionCache[packageName] = false
-    return false
 }
 
 

@@ -21,6 +21,7 @@ import cn.vove7.jarvis.speech.baiduspeech.recognition.model.IStatus.Companion.CO
 import cn.vove7.jarvis.speech.baiduspeech.recognition.model.IStatus.Companion.STATUS_FINISHED
 import cn.vove7.jarvis.speech.baiduspeech.recognition.model.RecogResult
 import cn.vove7.vtp.log.Vog
+import kotlin.math.absoluteValue
 
 /**
  *
@@ -59,7 +60,7 @@ class SpeechStatusListener(private val handler: Handler) : StatusRecogListener()
         super.onAsrFinishError(errorCode, subErrorCode, errorMessage, descMessage, recogResult)
         val message = "识别错误, 错误码：$errorCode,$subErrorCode,$descMessage,$errorMessage"
         GlobalLog.err(message)
-        val errCode = when (errorCode) {
+        val errCode = when (errorCode.absoluteValue) {
             9 -> {
                 CODE_NO_RECORDER_PERMISSION
             }
