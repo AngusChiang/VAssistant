@@ -113,7 +113,7 @@ class MyAccessibilityService : AccessibilityApi() {
 
         val eventType = event.eventType
         try {
-            Vog.d("class :$currentAppInfo - $currentActivity ${event.className} \n" +
+            Vog.v("class :$currentAppInfo - $currentActivity ${event.className} \n" +
                     AccessibilityEvent.eventTypeToString(eventType))
         } catch (e: Exception) {
         }

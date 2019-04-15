@@ -153,8 +153,10 @@ abstract class SpeechRecogService(val event: SpeechEvent) : SpeechRecogI {
      */
     private val stopWakeUpAction = Runnable {
         wakeupTimerEnd = true
-        wakeupStatusAni.failed("语音唤醒已自动休眠")
-        doStopWakeUp()//不通知
+        if(wakeupI.opened) {
+            wakeupStatusAni.failed("语音唤醒已自动休眠")
+            doStopWakeUp()//不通知
+        }
     }
 
     private val wpTimerHandler: Handler by lazy {
