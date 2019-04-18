@@ -5,7 +5,6 @@ import android.os.Handler
 import android.view.View
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.appbus.AppBus
-import cn.vove7.common.appbus.SpeechAction
 import cn.vove7.common.model.RequestPermission
 import cn.vove7.common.utils.LooperHelper
 import cn.vove7.common.utils.gone
@@ -31,7 +30,7 @@ class FloatyPanel : AbFloatWindow(GlobalApp.APP) {
     override fun layoutResId(): Int = R.layout.toast_listening_text
 
     override val onNoPermission: () -> Unit = {
-        AppBus.postSpeechAction(SpeechAction.ActionCode.ACTION_CANCEL_RECOG)
+        AppBus.post(AppBus.ACTION_CANCEL_RECOG)
         AppBus.post(RequestPermission("悬浮窗权限"))
     }
 
@@ -56,7 +55,8 @@ class FloatyPanel : AbFloatWindow(GlobalApp.APP) {
         animationBody = view.body
     }
 
-    fun show(text: String) {
+    fun show(text: String?) {
+        Vog.d("显示：$text")
         removeDelayHide()
         runOnUi {
             show()
@@ -66,7 +66,7 @@ class FloatyPanel : AbFloatWindow(GlobalApp.APP) {
         }
     }
 
-    var voiceText = ""
+    var voiceText: String? = ""
 
     override fun afterShow() {
         showEnterAnimation()

@@ -32,7 +32,7 @@ class VoiceInputService : RecognitionService() {
     }
 
     override fun onCancel(listener: Callback?) {
-        MainService.instance?.onCommand(AppBus.ORDER_CANCEL_RECOG)
+        MainService.instance?.onCommand(AppBus.ACTION_CANCEL_RECOG)
         Vog.d("onCancel ---> 取消")
     }
 
@@ -44,7 +44,7 @@ class VoiceInputService : RecognitionService() {
 
 
     override fun onStopListening(listener: Callback?) {
-        MainService.instance?.onCommand(AppBus.ORDER_STOP_RECOG)
+        MainService.instance?.onCommand(AppBus.ACTION_STOP_RECOG)
         Vog.d("onStopListening ---> 停止")
     }
 

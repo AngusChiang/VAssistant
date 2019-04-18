@@ -1,8 +1,13 @@
 package cn.vove7.jarvis.tools
 
 import android.app.Activity
+import android.content.Intent
+import android.net.Uri
+import cn.vove7.common.app.GlobalApp
+import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.bridges.UtilBridge
 import cn.vove7.common.utils.activityShot
+import cn.vove7.common.utils.newTask
 import java.util.*
 
 /**
@@ -29,4 +34,15 @@ fun captureActivity2Cache(activity: Activity): String? {
         a
     }
 
+}
+
+fun openQQChat(qq: String) {
+    val qqIntent = Intent(Intent.ACTION_VIEW,
+            Uri.parse("mqqwpa://im/chat?chat_type=wpa&uin=$qq&version=1"))
+    try {
+        GlobalApp.APP.startActivity(qqIntent.newTask())
+    } catch (e: Exception) {
+        GlobalLog.err(e)
+        GlobalApp.toastError("唤起QQ失败")
+    }
 }

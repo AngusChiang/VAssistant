@@ -14,6 +14,7 @@ import cn.vove7.jarvis.R
 import cn.vove7.jarvis.adapters.IconTitleEntity
 import cn.vove7.jarvis.adapters.IconTitleListAdapter
 import cn.vove7.jarvis.tools.AppConfig
+import cn.vove7.jarvis.tools.openQQChat
 import cn.vove7.jarvis.view.custom.IconView
 import cn.vove7.jarvis.view.dialog.ProgressDialog
 import cn.vove7.jarvis.view.dialog.UpdateLogDialog
@@ -98,10 +99,11 @@ class AboutActivity : AppCompatActivity(), AdapterView.OnItemClickListener {
                 SystemBridge.openUrl("https://github.com/Vove7/VOSP")
             }
             3 -> startActivity(Intent(this, OSLActivity::class.java))
-//            4 -> {
+            4 -> {
+                openQQChat("529545532")
 //                SystemBridge.sendEmail("vove7@qq.com", null,
 //                        "\n\n\n\n\n\n\n- 来自" + getString(R.string.app_name))
-//            }
+            }
             5 -> {
                 UpdateLogDialog(this)
             }
@@ -120,7 +122,7 @@ class AboutActivity : AppCompatActivity(), AdapterView.OnItemClickListener {
                 , IconTitleEntity(R.drawable.ic_update_24dp, R.string.text_check_for_updates)
                 , IconTitleEntity(null, R.string.text_vosp, R.string.text_vosp_summary)
                 , IconTitleEntity(R.drawable.ic_github, R.string.text_open_source_libraries)
-                , IconTitleEntity(R.drawable.ic_email_24dp, R.string.text_contact_me, R.string.text_contact_email)
+                , IconTitleEntity(R.drawable.ic_qq, R.string.text_contact_me, R.string.text_contact_qq)
                 , IconTitleEntity(R.drawable.ic_update_24dp, R.string.text_update_log)
         )
     }

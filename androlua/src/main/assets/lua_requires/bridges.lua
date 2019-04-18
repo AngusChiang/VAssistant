@@ -6,9 +6,7 @@
 --
 
 require 'import'
-import 'cn.vove7.androlua.androbridge.*'
 import "cn.vove7.common.appbus.AppBus"
-import "cn.vove7.common.appbus.SpeechAction"
 --
 bridges = luaman.getBridgeManager()
 executor = bridges.getExecutor()

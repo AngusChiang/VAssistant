@@ -63,7 +63,7 @@ class VoiceInputRecogActivity : Activity() {
     }
 
     override fun onBackPressed() {
-        MainService.instance?.onCommand(AppBus.ORDER_CANCEL_RECOG)
+        MainService.instance?.onCommand(AppBus.ACTION_CANCEL_RECOG)
         return
     }
 

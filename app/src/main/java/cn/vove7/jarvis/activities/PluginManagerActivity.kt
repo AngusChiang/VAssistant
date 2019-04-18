@@ -141,7 +141,7 @@ class PluginManagerActivity : BaseActivityWithViewPager() {
     companion object {
         fun installPlugin(path: String) {
             RePluginManager().installPlugin(path).also {
-                Vog.d("$path")
+                Vog.d(path)
                 if (it != null) {
                     Vog.d("插件安装成功")
                     AppNotification.newNotification("插件安装成功", it.name, R.drawable.ic_done)

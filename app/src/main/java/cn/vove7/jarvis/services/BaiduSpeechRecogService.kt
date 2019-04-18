@@ -108,7 +108,6 @@ class BaiduSpeechRecogService(event: SpeechEvent) : SpeechRecogService(event) {
      */
     override fun doStartRecog(silent: Boolean) {
         Vog.d("doStartRecog ---> 开始聆听")
-        //震动 音效
         myRecognizer.start(recogParams(silent))
     }
 

@@ -6,7 +6,6 @@ import android.os.Bundle
 import android.speech.RecognizerIntent
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.appbus.AppBus
-import cn.vove7.common.appbus.SpeechAction
 import cn.vove7.common.datamanager.DAO
 import cn.vove7.common.datamanager.parse.model.Action
 import cn.vove7.executorengine.parse.OpenAppAction
@@ -48,9 +47,9 @@ class VoiceAssistActivity : Activity() {
             }
             SWITCH_VOICE_WAKEUP -> {
                 if (AppConfig.voiceWakeup) {
-                    AppBus.postSpeechAction(SpeechAction.ActionCode.ACTION_STOP_WAKEUP)
+                    AppBus.post(AppBus.ACTION_STOP_WAKEUP)
                 } else {
-                    AppBus.postSpeechAction(SpeechAction.ActionCode.ACTION_START_WAKEUP)
+                    AppBus.post(AppBus.ACTION_START_WAKEUP)
                 }
             }
             SET_ASSIST_APP ->

@@ -184,7 +184,7 @@ class ScreenAssistActivity : Activity() {
             Pair(0, { imageClassify() }),
             Pair(1, { screenOcr() }),
             Pair(2, {
-                AppBus.postDelay("0_0", AppBus.ORDER_BEGIN_SCREEN_PICKER, 800)
+                AppBus.postDelay("0_0", AppBus.ACTION_BEGIN_SCREEN_PICKER, 800)
                 finish()
             }),
             Pair(3, { shareScreen() }),

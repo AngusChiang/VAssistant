@@ -3,7 +3,6 @@ package cn.vove7.jarvis.plugins
 import cn.vove7.common.accessibility.AccessibilityApi
 import cn.vove7.common.accessibility.component.AbsAccPluginService
 import cn.vove7.common.appbus.AppBus
-import cn.vove7.common.appbus.SpeechAction
 import cn.vove7.common.datamanager.parse.model.ActionScope
 import cn.vove7.common.helper.AdvanAppHelper
 import cn.vove7.common.utils.hasMicroPermission
@@ -40,18 +39,18 @@ object VoiceWakeupStrategy : AbsAccPluginService() {
         val appInfo = AdvanAppHelper.getAppInfo(appScope.packageName) ?: return
         lastPkg = appScope.packageName
         if (appInfo.hasMicroPermission()) {//有麦克风权限的App
-            //case 1 进入App 自动休眠 ->  ORDER_STOP_VOICE_WAKEUP_WITHOUT_NOTIFY
+            //case 1 进入App 自动休眠 ->  ACTION_STOP_VOICE_WAKEUP_WITHOUT_NOTIFY
             //wakeupI?.opened开启时，在内关闭唤醒
             if (MainService.instance?.speechRecogService?.wakeupI?.opened == true) {
                 closeWakeup()
             }
-        } else if (closed) {//已自动关闭 并且定时器有效
+        } else if (closed && AppConfig.voiceWakeup) {//已自动关闭 并且定时器有效
             startWakeup()
         }
     }
 
     fun closeWakeup() {
-        MainService.instance?.onCommand(AppBus.ORDER_STOP_VOICE_WAKEUP_WITHOUT_NOTIFY)
+        MainService.instance?.onCommand(AppBus.ACTION_STOP_VOICE_WAKEUP_WITHOUT_NOTIFY)
         Vog.d("VoiceWakeupStrategy ---> 关闭语音唤醒")
         closed = true
         if (AppConfig.notifyCloseMicro) {
@@ -64,6 +63,7 @@ object VoiceWakeupStrategy : AbsAccPluginService() {
     }
 
     fun startWakeup() {
+        if(!AppConfig.voiceWakeup) return
         Vog.d("VoiceWakeupStrategy ---> 开启语音唤醒")
         closed = false
 
@@ -71,7 +71,7 @@ object VoiceWakeupStrategy : AbsAccPluginService() {
             statusAni.begin()
             statusAni.hideDelay(2000)
         }
-        MainService.instance?.onCommand(AppBus.ORDER_START_VOICE_WAKEUP_WITHOUT_NOTIFY)
+        MainService.instance?.onCommand(AppBus.ACTION_START_VOICE_WAKEUP_WITHOUT_NOTIFY)
     }
 
 
@@ -87,7 +87,7 @@ object VoiceWakeupStrategy : AbsAccPluginService() {
                 true
             } else {
                 if (opened) {//通知 开启定时器
-                    AppBus.postSpeechAction(SpeechAction.ActionCode.ACTION_START_WAKEUP_TIMER)
+                    AppBus.post(AppBus.ACTION_START_WAKEUP_TIMER)
                     closed = true //设置标志
                 }
                 Vog.d("canOpenRecord ---> 在有麦克风权限的App内/不打开唤醒")

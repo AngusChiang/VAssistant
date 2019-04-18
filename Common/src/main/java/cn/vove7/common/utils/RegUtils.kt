@@ -98,34 +98,29 @@ object RegUtils {
         return null
     }
 
-    private const val rHeader = "require 'bridges'\n" +
-            "local args = {...}\n" +
-            "if args then\n" +
-            "  argMap = args[1]\n" +
-            "else\n" +
-            "  argMap = nil\n" +
-            "end\n"
+    private const val rHeader = "require 'bridges'; " +
+            "local args = {...}; argMap = args[1]\n"
 
     /**
      * 替换Lua 无障碍声明头部
      */
     fun replaceLuaHeader(s: String): String {
-        return (rHeader + s.replace(headerReg,"requireAccessibility()")).also {
+        return (rHeader + s.replace(headerReg, "requireAccessibility()")).also {
             //            print(it)
             Vog.d(it)
         }
     }
 
-    private val headerReg get()= "require[ ]+[\"']accessibility[\"']".toRegex()
+    private val headerReg get() = "require[ ]+[\"']accessibility[\"']".toRegex()
 
     /**
      * Rhino 无障碍声明头部
      */
     fun replaceRhinoHeader(s: String): String {
-        return s.replace(headerReg,"requireAccessibility()")
+        return s.replace(headerReg, "requireAccessibility()")
     }
 
-    val PACKAGE_REGEX get()= "[a-zA-Z]+[0-9a-zA-Z_]*(\\.[a-zA-Z]+[0-9a-zA-Z_]*)+".toRegex()
+    val PACKAGE_REGEX get() = "[a-zA-Z]+[0-9a-zA-Z_]*(\\.[a-zA-Z]+[0-9a-zA-Z_]*)+".toRegex()
 
     /**
      * 是否为包名

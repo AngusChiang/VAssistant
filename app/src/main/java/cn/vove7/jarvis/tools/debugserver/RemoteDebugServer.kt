@@ -208,7 +208,7 @@ object RemoteDebugServer : Runnable {
                     AppBus.post(ac)
                 }
                 "stop" -> {
-                    AppBus.post(AppBus.ORDER_STOP_EXEC)
+                    AppBus.post(AppBus.ACTION_STOP_EXEC)
                 }
                 "command" -> {//文本指令
                     val cmd = action.text

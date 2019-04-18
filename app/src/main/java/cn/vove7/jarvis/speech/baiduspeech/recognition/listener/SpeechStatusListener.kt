@@ -1,10 +1,7 @@
 package cn.vove7.jarvis.speech.baiduspeech.recognition.listener
 
 import android.os.Handler
-import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.app.GlobalLog
-import cn.vove7.common.appbus.AppBus
-import cn.vove7.common.appbus.SpeechAction
 import cn.vove7.jarvis.speech.SpeechEvent.Companion.CODE_ENGINE_BUSY
 import cn.vove7.jarvis.speech.SpeechEvent.Companion.CODE_NET_ERROR
 import cn.vove7.jarvis.speech.SpeechEvent.Companion.CODE_NO_RECORDER_PERMISSION

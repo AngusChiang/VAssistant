@@ -5,11 +5,9 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.os.BatteryManager
 import cn.vove7.common.appbus.AppBus
-import cn.vove7.common.appbus.SpeechAction
 import cn.vove7.common.bridges.SystemBridge
 import cn.vove7.jarvis.plugins.VoiceWakeupStrategy
 import cn.vove7.jarvis.services.MainService
-import cn.vove7.jarvis.speech.WakeupI
 import cn.vove7.jarvis.tools.AppConfig
 import cn.vove7.vtp.log.Vog
 
@@ -82,7 +80,7 @@ object PowerEventReceiver : DyBCReceiver(), OnPowerEvent {
         powerSavingMode = true
 
         if (MainService.instance?.speechRecogService?.wakeupI?.opened == true) {
-            AppBus.postSpeechAction(SpeechAction.ActionCode.ACTION_STOP_WAKEUP_WITHOUT_SWITCH)
+            AppBus.post(AppBus.ACTION_STOP_WAKEUP_WITHOUT_SWITCH)
         }
     }
 
@@ -99,12 +97,12 @@ object PowerEventReceiver : DyBCReceiver(), OnPowerEvent {
             Vog.d("正在充电 开启语音唤醒")
             //开启了无障碍
             if (VoiceWakeupStrategy.canOpenRecord())
-                AppBus.postSpeechAction(SpeechAction.ActionCode.ACTION_START_WAKEUP_WITHOUT_SWITCH)//不打开语音唤醒开关
+                AppBus.post(AppBus.ACTION_START_WAKEUP_WITHOUT_SWITCH)//不打开语音唤醒开关
 
         } else {
             Vog.d("正在充电 语音唤醒已开启")
             //关闭定时器
-            AppBus.postSpeechAction(SpeechAction.ActionCode.ACTION_STOP_WAKEUP_TIMER)
+            AppBus.post(AppBus.ACTION_STOP_WAKEUP_TIMER)
         }
     }
 
@@ -113,10 +111,10 @@ object PowerEventReceiver : DyBCReceiver(), OnPowerEvent {
         if (!AppConfig.voiceWakeup) {//未开启
             //关闭
             Vog.d("充电结束 语音唤醒关闭")
-            AppBus.postSpeechAction(SpeechAction.ActionCode.ACTION_STOP_WAKEUP_WITHOUT_SWITCH)
+            AppBus.post(AppBus.ACTION_STOP_WAKEUP_WITHOUT_SWITCH)
         } else {//开启
             //开启定时器
-            AppBus.postSpeechAction(SpeechAction.ActionCode.ACTION_START_WAKEUP_TIMER)
+            AppBus.post(AppBus.ACTION_START_WAKEUP_TIMER)
         }
     }
 

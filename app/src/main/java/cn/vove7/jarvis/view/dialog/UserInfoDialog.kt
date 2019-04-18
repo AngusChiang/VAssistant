@@ -21,6 +21,7 @@ import cn.vove7.common.netacc.ApiUrls
 import cn.vove7.common.netacc.WrapperNetHelper
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.tools.AppConfig
+import cn.vove7.jarvis.tools.openQQChat
 import cn.vove7.jarvis.tools.pay.PurchaseHelper
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.customview.customView
@@ -181,15 +182,7 @@ class UserInfoDialog(val context: Activity, val onUpdate: () -> Unit) {
                         if (!b) GlobalApp.toastInfo(m)
                     }
                 }.negativeButton(text = "联系QQ") {
-                    val qqNum = "529545532"
-                    val qqIntent = Intent(Intent.ACTION_VIEW,
-                            Uri.parse("mqqwpa://im/chat?chat_type=wpa&uin=$qqNum&version=1"))
-                    qqIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                    try {
-                        context.startActivity(qqIntent)
-                    } catch (e: Exception) {
-                        GlobalApp.toastError("唤起QQ失败")
-                    }
+                    openQQChat("529545532")
                 }.neutralButton(text = "使用充值码") {
                     showActCodeDialog()
                 }.show()

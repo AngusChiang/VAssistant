@@ -182,7 +182,7 @@ abstract class CodeEditorActivity : AppCompatActivity() {
             }
 
             R.id.menu_code_stop -> {
-                AppBus.post(AppBus.ORDER_STOP_EXEC)
+                AppBus.post(AppBus.ACTION_STOP_EXEC)
             }
             R.id.menu_sel_code -> {
                 AlertDialog.Builder(this).setTitle(R.string.text_select_script).setItems(testFiles) { d, p ->

@@ -12,7 +12,6 @@ import android.view.animation.AccelerateDecelerateInterpolator
 import android.widget.ImageView
 import android.widget.TextView
 import cn.vove7.common.appbus.AppBus
-import cn.vove7.common.appbus.SpeechAction
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.speech.VoiceData
 import cn.vove7.jarvis.speech.baiduspeech.recognition.model.IStatus.Companion.CODE_VOICE_ERR
@@ -150,11 +149,11 @@ class VoiceFloat : AbFloatWindow<VoiceFloat.Holder> {
     fun onClick() {
 //        if (MainService.instance?.isListening() == true) {
 //            holder.result.text = "stop"
-//            AppBus.postSpeechAction(SpeechAction.ActionCode.ACTION_CANCEL_RECOG)
+//            AppBus.post(AppBus.ACTION_CANCEL_RECOG)
 //        } else {
         ServiceChecker(context).checkService()
         holder.result.text = "begin"
-        AppBus.postSpeechAction(SpeechAction.ActionCode.ACTION_START_RECOG)
+        AppBus.post(AppBus.ACTION_START_RECOG)
 //        }
     }
 

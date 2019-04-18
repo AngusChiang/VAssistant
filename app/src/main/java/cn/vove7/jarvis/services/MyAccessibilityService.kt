@@ -266,11 +266,11 @@ class MyAccessibilityService : AccessibilityApi() {
 
     //按键监听
     private var startupRunner: Runnable = Runnable {
-        MainService.instance?.onCommand(AppBus.ORDER_START_RECOG)
+        MainService.instance?.onCommand(AppBus.ACTION_START_RECOG)
     }
 
     private var stopExecRunner: Runnable = Runnable {
-        MainService.instance?.onCommand(AppBus.ORDER_STOP_EXEC)
+        MainService.instance?.onCommand(AppBus.ACTION_STOP_EXEC)
     }
 
     private var stopSpeakRunner: Runnable = Runnable {
@@ -301,7 +301,7 @@ class MyAccessibilityService : AccessibilityApi() {
                     return when {
                         MainService.recogIsListening -> {//下键取消聆听
                             v2 = true
-                            MainService.instance?.onCommand(AppBus.ORDER_CANCEL_RECOG)//up speed
+                            MainService.instance?.onCommand(AppBus.ACTION_CANCEL_RECOG)//up speed
                             true
                         }
                         MainService.speaking -> {
@@ -320,7 +320,7 @@ class MyAccessibilityService : AccessibilityApi() {
                     when {
                         MainService.recogIsListening -> {//按下停止聆听
                             v2 = true
-                            MainService.instance?.onCommand(AppBus.ORDER_STOP_RECOG)
+                            MainService.instance?.onCommand(AppBus.ACTION_STOP_RECOG)
                             return true
                         }
                         AppConfig.wakeUpWithHeadsetHook -> {//长按耳机中键唤醒
@@ -340,7 +340,7 @@ class MyAccessibilityService : AccessibilityApi() {
                     when {
                         MainService.recogIsListening -> {//按下停止聆听
                             v2 = true
-                            MainService.instance?.onCommand(AppBus.ORDER_STOP_RECOG)
+                            MainService.instance?.onCommand(AppBus.ACTION_STOP_RECOG)
                             return true
                         }
                         AppConfig.isLongPressVolUpWakeUp -> {//长按唤醒

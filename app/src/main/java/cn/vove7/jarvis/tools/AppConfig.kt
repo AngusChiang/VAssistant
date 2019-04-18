@@ -55,7 +55,6 @@ object AppConfig {
             sp.set(R.string.key_open_voice_wakeup, v)
         }
     var autoOpenASWithRoot = false
-    var audioSpeak = true//播报语音
     var userExpPlan = true
     var isAutoVoiceWakeupCharging = false
     var useSmartOpenIfParseFailed = true
@@ -280,7 +279,6 @@ object AppConfig {
         isLongPressVolUpWakeUp = getBooleanAndInit(R.string.key_long_press_volume_up_wake_up, true)
         voiceControlDialog = getBooleanAndInit(R.string.key_voice_control_dialog, true)
         voiceWakeup = getBooleanAndInit(R.string.key_open_voice_wakeup, false)
-        audioSpeak = getBooleanAndInit(R.string.key_audio_speak, true)
         userExpPlan = getBooleanAndInit(R.string.key_user_exp_plan, true)
         isAutoVoiceWakeupCharging = getBooleanAndInit(R.string.key_auto_open_voice_wakeup_charging, false)
         useSmartOpenIfParseFailed = getBooleanAndInit(R.string.key_use_smartopen_if_parse_failed, true)

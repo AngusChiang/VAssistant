@@ -10,13 +10,11 @@ import android.view.ViewAnimationUtils
 import android.view.animation.AccelerateDecelerateInterpolator
 import android.widget.TextView
 import cn.vove7.common.appbus.AppBus
-import cn.vove7.common.appbus.SpeechAction
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.speech.VoiceData
 import cn.vove7.jarvis.speech.baiduspeech.recognition.model.IStatus.Companion.CODE_VOICE_ERR
 import cn.vove7.jarvis.speech.baiduspeech.recognition.model.IStatus.Companion.CODE_VOICE_TEMP
 import cn.vove7.jarvis.speech.baiduspeech.recognition.model.IStatus.Companion.CODE_VOICE_VOL
-
 import cn.vove7.vtp.log.Vog
 import cn.vove7.vtp.runtimepermission.PermissionUtils
 import cn.vove7.vtp.toast.Voast
@@ -95,11 +93,11 @@ class VoiceTestActivity : Activity() {
     }
 
     fun stop(v: View) {
-        AppBus.postSpeechAction(SpeechAction.ActionCode.ACTION_STOP_RECOG)
+        AppBus.post(AppBus.ACTION_STOP_RECOG)
     }
 
     fun start(v: View) {
-        AppBus.postSpeechAction(SpeechAction.ActionCode.ACTION_START_RECOG)
+        AppBus.post(AppBus.ACTION_START_RECOG)
     }
 
     var c: Animator? = null

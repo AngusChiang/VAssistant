@@ -1,5 +1,7 @@
 package cn.vove7.executorengine.parse
 
+import cn.vove7.common.app.GlobalApp
+import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.bridges.SystemBridge
 import cn.vove7.common.datamanager.DAO
 import cn.vove7.common.datamanager.greendao.ActionNodeDao
@@ -172,7 +174,13 @@ object ParseEngine {
     private fun regSearch(cmd: String, it: ActionNode, actionQueue: PriorityQueue<Action>,
                           isFollow: Boolean): Boolean {
         it.regs.forEach { reg ->
-            val result = (if (isFollow) reg.followRegex else reg.regex).match(cmd)//？？？？
+            val result = try {//maybe 正则格式错误
+                (if (isFollow) reg.followRegex else reg.regex).match(cmd)
+            } catch (e: Exception) {
+                GlobalLog.err(e)
+                GlobalApp.toastError("正则解析错误，请查看日志")
+                null
+            }
             if (result != null) {
                 val ac = it.action
                 ac.scope = it.actionScope

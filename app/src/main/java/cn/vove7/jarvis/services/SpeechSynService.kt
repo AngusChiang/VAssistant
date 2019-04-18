@@ -1,6 +1,7 @@
 package cn.vove7.jarvis.services
 
 import cn.vove7.common.app.GlobalLog
+import cn.vove7.common.utils.StubbornFlag
 import cn.vove7.jarvis.speech.SpeechSynthesizerI
 import cn.vove7.jarvis.speech.baiduspeech.synthesis.control.BaiduSynthesizer
 import cn.vove7.vtp.log.Vog
@@ -45,20 +46,15 @@ class SpeechSynService(val event: SyncEvent) : SpeechSynthesizerListener {
 
     fun speak(text: String?) {
         if (text == null) {
-            event.onError("文本空", text)
+            onError(text, SpeechError().apply { description =  "文本空"})
             return
         }
         sText = text
-        event.onStart()//检测后台音乐
+        event.onStart(text)//检测后台音乐
         synthesizer.speak(text)
     }
 
-    var sText: String? = null
-        get() {
-            val v = field
-            field = null
-            return v
-        }
+    var sText by StubbornFlag<String?>(null)
 
     /**
      * 暂停播放。仅调用speak后生效
@@ -90,10 +86,11 @@ class SpeechSynService(val event: SyncEvent) : SpeechSynthesizerListener {
      */
     fun stop(byUser: Boolean = false) {
         synthesizer.stop()
+        val text=sText
         if (byUser)
-            event.onUserInterrupt()
+            event.onUserInterrupt(text)
         if (speaking)
-            event.onFinish()
+            event.onFinish(text)
         speaking = false
     }
 
@@ -141,16 +138,14 @@ class SpeechSynService(val event: SyncEvent) : SpeechSynthesizerListener {
 
     override fun onSpeechFinish(p0: String?) {
         Vog.v("onSpeechFinish 播放结束回调 $p0")
-//        AppBus.post(SpeechSynData(SpeechSynData.SYN_STATUS_FINISH))
         speaking = false
-        event.onFinish() //speaking=false
+        event.onFinish(p0) //speaking=false
     }
 
     override fun onError(p0: String?, p1: SpeechError?) {
-        val e = "错误发生：${p1?.description} ，错误编码: $p1?.code} 序列号: $p0 "
-//        AppBus.post(SpeechSynData(e))
+        val e = "错误发生：${p1?.description} ，错误编码: ${p1?.code} 序列号: $p0 "
         speaking = false
-        event.onError(e, sText)
+        event.onError(p0)
         GlobalLog.err(e)
         Vog.d(e)
     }
@@ -158,12 +153,13 @@ class SpeechSynService(val event: SyncEvent) : SpeechSynthesizerListener {
 }
 
 interface SyncEvent {
-    fun onError(err: String, responseText: String?)
+    fun onError(text: String?)
     /**
-     * speaking is true
+     * speaking is false
      */
-    fun onFinish()
+    fun onFinish(text: String?)
 
-    fun onUserInterrupt()
-    fun onStart()//检测音乐播放，在合成前！！！//上面监听器中概率误认为有音乐播放
+    fun onUserInterrupt(text: String?)
+    fun onStart(text: String?)
+    //检测音乐播放，在合成前
 }

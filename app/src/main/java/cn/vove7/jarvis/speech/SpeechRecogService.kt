@@ -51,34 +51,20 @@ abstract class SpeechRecogService(val event: SpeechEvent) : SpeechRecogI {
     //长语音
     var lastingStopped = true
 
-    override fun startRecog(byVoice: Boolean) {
+    override fun startRecog(byVoice: Boolean, notify: Boolean) {
         //检查权限
         if (!checkRecorderPermission() || !checkFloat()) return
         Thread.sleep(80)
         if (!isListening) {
             lastingStopped = false
             isListening = true
-            isSilent = false
-            event.onPreStartRecog(byVoice)
-            doStartRecog(false)
-        } else {
-            Vog.d("启动失败，正在识别")
-        }
-    }
-
-
-    /**
-     * 静默开启
-     * 一般在speak完后再次开启
-     */
-    override fun startRecogSilent() {
-        Vog.d("静默开启识别")
-        if (!checkRecorderPermission() || !checkFloat()) return
-        if (!isListening) {
-            lastingStopped = false
-            isListening = true
-            isSilent = true
-            doStartRecog(true)
+            isSilent = !notify
+            if (notify) {
+                event.onPreStartRecog(byVoice)
+            } else {
+                Vog.d("静默识别")
+            }
+            doStartRecog(!notify)
         } else {
             Vog.d("启动失败，正在识别")
         }
@@ -127,14 +113,15 @@ abstract class SpeechRecogService(val event: SpeechEvent) : SpeechRecogI {
     }
 
     final override fun stopWakeUp(notify: Boolean, stopTimer: Boolean) {
+        if (notify && (ScreenStatusListener.screenOn || AppConfig.notifyWpOnScreenOff)) //亮屏，或开启息屏通知
+            if (wakeupI.opened)
+                wakeupStatusAni.failedAndHideDelay("语音唤醒关闭", 5000)
+
         if (wakeupI.opened) {
             if (stopTimer)
                 stopAutoSleepWakeup()
             doStopWakeUp()
         }
-        if (notify && ScreenStatusListener.screenOn || AppConfig.notifyWpOnScreenOff) //亮屏，或开启息屏通知
-            wakeupStatusAni.failedAndHideDelay("语音唤醒关闭", 5000)
-
     }
 
 
@@ -153,7 +140,7 @@ abstract class SpeechRecogService(val event: SpeechEvent) : SpeechRecogI {
      */
     private val stopWakeUpAction = Runnable {
         wakeupTimerEnd = true
-        if(wakeupI.opened) {
+        if (wakeupI.opened) {
             wakeupStatusAni.failed("语音唤醒已自动休眠")
             doStopWakeUp()//不通知
         }
@@ -201,8 +188,9 @@ abstract class SpeechRecogService(val event: SpeechEvent) : SpeechRecogI {
         }
         val sleepTime = if (BuildConfig.DEBUG) AppConfig.autoSleepWakeupMillis / 60
         else AppConfig.autoSleepWakeupMillis
-        Vog.d(" ${sleepTime / 1000}s")
         wakeupTimerEnd = false
+        Vog.d("休眠定时${sleepTime / 1000}s")
+        if (sleepTime <= 0) return //不自动休眠
         wpTimerHandler.postDelayed(stopWakeUpAction, sleepTime)
     }
 
@@ -223,12 +211,16 @@ abstract class SpeechRecogService(val event: SpeechEvent) : SpeechRecogI {
 
     fun startIfLastingVoice() {//长语音
         runOnNewHandlerThread(delay = 500) {
+            //            if (SystemBridge.isMediaPlaying()) {
+//                Vog.d("重启长语音： 正在播放音乐")
+//                return@runOnNewHandlerThread
+//            }
             if (isListening) {
                 Vog.d("重启长语音： 正在识别")
                 return@runOnNewHandlerThread
             }
             if (AppConfig.lastingVoiceCommand && !lastingStopped) {
-                startRecogSilent()
+                startRecog(notify = false)
             } else {
                 Vog.d("重启长语音： 长语音关闭或已停止")
             }
@@ -316,8 +308,7 @@ interface SpeechRecogI {
     val wakeupI: WakeupI
 
 
-    fun startRecog(byVoice: Boolean = false)
-    fun startRecogSilent()
+    fun startRecog(byVoice: Boolean = false, notify: Boolean = true)
     fun cancelRecog(notify: Boolean = true)
 
 

@@ -60,8 +60,8 @@ open class GlobalApp : RePluginApplication() {
             toastInfo(getString(rId), duration)
         }
 
-        fun toastInfo(msg: String, duration: Int = Toast.LENGTH_SHORT) {
-            ToastyHelper.toast(TYPE_INFO, msg, duration)
+        fun toastInfo(msg: String?, duration: Int = Toast.LENGTH_SHORT) {
+            ToastyHelper.toast(TYPE_INFO, "$msg", duration)
         }
 
         fun toastSuccess(sId: Int, duration: Int = Toast.LENGTH_SHORT) {

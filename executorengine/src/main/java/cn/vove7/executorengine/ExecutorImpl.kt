@@ -635,44 +635,27 @@ open class ExecutorImpl(
             return true
         }
         waitForUnlock()
-        return if (callbackVal == null) true
+        return if (tmpMap[SPEAK_CALLBACK] == null) true
         else {
-            Vog.d("回调结果失败 speakSync $callbackVal")
+            Vog.d("回调结果失败 speakSync ${tmpMap[SPEAK_CALLBACK]}")
             false
         }
     }
 
-    private var callbackVal: Any? = null
-    override fun speakCallback(result: String?) {
-        callbackVal = result
+    /**
+     * 实现SpeakCallback
+     * @param p1 String?
+     */
+    override fun invoke(p1: String?) {
+        tmpMap[SPEAK_CALLBACK] = p1
         notifySync()
     }
-
-
-    /**
-     * 返回操作
-     */
-    fun pressBack(): Boolean = GlobalActionExecutor.back()
-
-    /**
-     * 最近界面
-     */
-    fun openRecent(): Boolean = GlobalActionExecutor.recents()
-
-    /**
-     * 主页
-     */
-    fun goHome(): Boolean = GlobalActionExecutor.home()
 
     override fun setScreenSize(width: Int, height: Int) {
         ScreenAdapter.setScreenSize(width, height)
     }
 
     companion object {
-        /**
-         * @return 参数可用
-         */
-        fun checkParam(p: String?): Boolean = (p != null && p.trim() != "")
 
         /**
          * 检测包名正则
@@ -680,6 +663,7 @@ open class ExecutorImpl(
         private val globalScopeType = arrayListOf(ActionNode.NODE_SCOPE_GLOBAL/*, ActionNode.NODE_SCOPE_GLOBAL_2*/)
 
         const val ALERT_RESULT = "ALERT_RESULT"
+        const val SPEAK_CALLBACK = "SPEAK_CALLBACK"
         const val VOICE_RESULT = "VOICE_RESULT"
         const val SINGLE_CHOICE_RESULT = "SINGLE_CHOICE_RESULT"
 

@@ -3,16 +3,13 @@ package cn.vove7.jarvis.activities
 import android.app.Activity
 import android.content.ActivityNotFoundException
 import android.content.Intent
-import android.os.Build
 import android.os.Bundle
 import android.os.Handler
-import android.provider.Settings
 import android.view.View
 import android.widget.TextView
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.appbus.AppBus
-import cn.vove7.common.appbus.SpeechAction
 import cn.vove7.common.bridges.SystemBridge
 import cn.vove7.common.utils.ThreadPool
 import cn.vove7.jarvis.R
@@ -20,7 +17,6 @@ import cn.vove7.jarvis.activities.base.ReturnableActivity
 import cn.vove7.jarvis.adapters.SettingsExpandableAdapter
 import cn.vove7.jarvis.receivers.PowerEventReceiver
 import cn.vove7.jarvis.services.MainService
-import cn.vove7.jarvis.speech.WakeupI
 import cn.vove7.jarvis.tools.*
 import cn.vove7.jarvis.view.*
 import cn.vove7.jarvis.view.custom.SettingGroupItem
@@ -102,9 +98,9 @@ class SettingsActivity : ReturnableActivity() {
                             keyId = R.string.key_open_voice_wakeup, callback = { _, it ->
                         when (it) {
                             true -> {
-                                AppBus.postSpeechAction(SpeechAction.ActionCode.ACTION_START_WAKEUP)
+                                AppBus.post(AppBus.ACTION_START_WAKEUP)
                             }
-                            false -> AppBus.postSpeechAction(SpeechAction.ActionCode.ACTION_STOP_WAKEUP)
+                            false -> AppBus.post(AppBus.ACTION_STOP_WAKEUP)
                         }
                         return@SwitchItem true
                     }, defaultValue = { false }),
@@ -112,8 +108,8 @@ class SettingsActivity : ReturnableActivity() {
                             keyId = R.string.key_auto_sleep_wakeup_duration,
                             entityArrId = R.array.list_auto_sleep_duration, defaultValue = { 0 }) { _, _ ->
                         if (AppConfig.voiceWakeup) {
-                            AppBus.postSpeechAction(SpeechAction.ActionCode.ACTION_STOP_WAKEUP_WITHOUT_SWITCH)
-                            AppBus.postSpeechAction(SpeechAction.ActionCode.ACTION_START_WAKEUP)
+                            AppBus.post(AppBus.ACTION_STOP_VOICE_WAKEUP_WITHOUT_NOTIFY)
+                            AppBus.post(AppBus.ACTION_START_WAKEUP_WITHOUT_SWITCH)
                         }
                         return@SingleChoiceItem true
                     },
@@ -129,9 +125,9 @@ class SettingsActivity : ReturnableActivity() {
                     CheckBoxItem(R.string.text_auto_open_voice_wakeup_charging, keyId = R.string.key_auto_open_voice_wakeup_charging) { _, b ->
                         if (PowerEventReceiver.isCharging) {//充电中生效
                             if (b) {//正在充电，开启
-                                AppBus.postSpeechAction(SpeechAction.ActionCode.ACTION_START_WAKEUP_WITHOUT_SWITCH)
+                                AppBus.post(AppBus.ACTION_START_WAKEUP_WITHOUT_SWITCH)
                             } else if (!AppConfig.voiceWakeup) {
-                                AppBus.postSpeechAction(SpeechAction.ActionCode.ACTION_STOP_WAKEUP_WITHOUT_SWITCH)
+                                AppBus.post(AppBus.ACTION_STOP_WAKEUP_WITHOUT_SWITCH)
                             }
                         }
                         return@CheckBoxItem true
@@ -199,21 +195,18 @@ class SettingsActivity : ReturnableActivity() {
                             defaultValue = AppConfig.speakResponseWordOnVoiceWakeup)
             )),
             SettingGroupItem(R.color.google_yellow, "语音合成", childItems = listOf(
-                    SwitchItem(R.string.text_play_voice_message, summary = "关闭后以弹窗形式提醒",
-                            keyId = R.string.key_audio_speak, defaultValue =
-                    { true }),
                     SingleChoiceItem(R.string.text_sound_model, summary = "在线声音模型", keyId = R.string.key_voice_syn_model,
                             defaultValue =
                             { 0 }, entityArrId = R.array.voice_model_entities, callback =
                     { h, i ->
-                        AppBus.postSpeechAction(SpeechAction.ActionCode.ACTION_RELOAD_SYN_CONF)
+                        AppBus.post(AppBus.ACTION_RELOAD_SYN_CONF)
                         return@SingleChoiceItem true
                     }),
                     NumberPickerItem(R.string.text_speak_speed, keyId = R.string.key_voice_syn_speed,
                             defaultValue =
                             { 5 }, range = Pair(1, 9), callback =
                     { h, i ->
-                        AppBus.postSpeechAction(SpeechAction.ActionCode.ACTION_RELOAD_SYN_CONF)
+                        AppBus.post(AppBus.ACTION_RELOAD_SYN_CONF)
                         return@NumberPickerItem true
                     }),
                     SingleChoiceItem(title = "输出方式", summary = "选择音量跟随\n可能重启App生效", keyId = R.string.key_stream_of_syn_output,
@@ -291,9 +284,9 @@ class SettingsActivity : ReturnableActivity() {
         if (AppConfig.voiceWakeup) {
             GlobalApp.toastInfo("正在重载配置")
             Handler().postDelayed({
-                AppBus.postSpeechAction(SpeechAction.ActionCode.ACTION_STOP_WAKEUP_WITHOUT_SWITCH)
+                AppBus.post(AppBus.ACTION_STOP_WAKEUP_WITHOUT_SWITCH)
                 Thread.sleep(2000)
-                AppBus.postSpeechAction(SpeechAction.ActionCode.ACTION_START_WAKEUP_WITHOUT_SWITCH)
+                AppBus.post(AppBus.ACTION_START_WAKEUP_WITHOUT_SWITCH)
             }, 1000)
         } else GlobalApp.toastSuccess("设置完成")
     }

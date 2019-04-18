@@ -9,19 +9,25 @@ import cn.vove7.common.accessibility.AccessibilityApi
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.appbus.AppBus
+import cn.vove7.common.appbus.AppBus.ACTION_BEGIN_SCREEN_PICKER
+import cn.vove7.common.appbus.AppBus.ACTION_BEGIN_SCREEN_PICKER_TRANSLATE
+import cn.vove7.common.appbus.AppBus.ACTION_CANCEL_RECOG
+import cn.vove7.common.appbus.AppBus.ACTION_RELOAD_SYN_CONF
+import cn.vove7.common.appbus.AppBus.ACTION_START_RECOG
+import cn.vove7.common.appbus.AppBus.ACTION_START_RECOG_SILENT
+import cn.vove7.common.appbus.AppBus.ACTION_START_VOICE_WAKEUP_WITHOUT_NOTIFY
+import cn.vove7.common.appbus.AppBus.ACTION_START_WAKEUP
+import cn.vove7.common.appbus.AppBus.ACTION_START_WAKEUP_TIMER
+import cn.vove7.common.appbus.AppBus.ACTION_START_WAKEUP_WITHOUT_SWITCH
+import cn.vove7.common.appbus.AppBus.ACTION_STOP_EXEC
+import cn.vove7.common.appbus.AppBus.ACTION_STOP_RECOG
+import cn.vove7.common.appbus.AppBus.ACTION_STOP_VOICE_WAKEUP_WITHOUT_NOTIFY
+import cn.vove7.common.appbus.AppBus.ACTION_STOP_WAKEUP
+import cn.vove7.common.appbus.AppBus.ACTION_STOP_WAKEUP_TIMER
+import cn.vove7.common.appbus.AppBus.ACTION_STOP_WAKEUP_WITHOUT_SWITCH
 import cn.vove7.common.appbus.AppBus.EVENT_FORCE_OFFLINE
 import cn.vove7.common.appbus.AppBus.EVENT_START_DEBUG_SERVER
 import cn.vove7.common.appbus.AppBus.EVENT_STOP_DEBUG_SERVER
-import cn.vove7.common.appbus.AppBus.ORDER_BEGIN_SCREEN_PICKER
-import cn.vove7.common.appbus.AppBus.ORDER_BEGIN_SCREEN_PICKER_TRANSLATE
-import cn.vove7.common.appbus.AppBus.ORDER_CANCEL_RECOG
-import cn.vove7.common.appbus.AppBus.ORDER_START_RECOG
-import cn.vove7.common.appbus.AppBus.ORDER_START_RECOG_SILENT
-import cn.vove7.common.appbus.AppBus.ORDER_START_VOICE_WAKEUP_WITHOUT_NOTIFY
-import cn.vove7.common.appbus.AppBus.ORDER_STOP_EXEC
-import cn.vove7.common.appbus.AppBus.ORDER_STOP_RECOG
-import cn.vove7.common.appbus.AppBus.ORDER_STOP_VOICE_WAKEUP_WITHOUT_NOTIFY
-import cn.vove7.common.appbus.SpeechAction
 import cn.vove7.common.bridges.ChoiceData
 import cn.vove7.common.bridges.ServiceBridge
 import cn.vove7.common.bridges.ShowDialogEvent
@@ -220,15 +226,14 @@ class MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
     private fun notifyAlertResult(r: Boolean) {
         voiceMode = MODE_VOICE
         if (AppConfig.voiceControlDialog) {
-            if (!afterSpeakResumeListen)// check 长语音
-                speechRecogService?.cancelRecog()
+            //取消识别，也会关闭长语音
+            speechRecogService?.cancelRecog()
         }
         cExecutor.notifyAlertResult(r)
-        resumeListenCommandIfLasting()
     }
 
     /**
-     * 长语音后台识别时 speak或AlertDialog 会 \[暂时]关闭识别
+     * 长语音后台识别时 speak或AlertDialog 会关闭长语音
      * 聊天对话说完(speak)后 继续标志（可能有其他调用speak，则不继续）
      *
      * 标志更改 ：开始聊天对话|showAlert set 识别状态recogIsListening  取消识别时 set false
@@ -240,7 +245,7 @@ class MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
      * 长语音下继续语音识别
      */
     private fun resumeListenCommandIfLasting() {//开启长语音时
-        Vog.d("resumeListenCommandIfLasting ---> 检查长语音 $afterSpeakResumeListen")
+        Vog.d("检查长语音 $afterSpeakResumeListen")
         if (afterSpeakResumeListen) {//防止长语音识别 继续
             speechRecogService?.startIfLastingVoice()
         }
@@ -251,10 +256,11 @@ class MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
      */
     private fun stopLastingRecogTemp() {
         if (AppConfig.lastingVoiceCommand) {
-            Vog.d("stopLastingRecogTemp ---> speak临时 ${speechRecogService?.lastingStopped}")
-            //没有手动停止 并且 已停止识别
+            Vog.d("speak临时 ${speechRecogService?.lastingStopped}")
+            //没有手动停止 即认为处于长语音状态
             afterSpeakResumeListen = !(speechRecogService?.lastingStopped
-                ?: true) && !recogIsListening
+                ?: true)
+            speechRecogService?.cancelRecog(false)
         }
     }
 
@@ -324,16 +330,17 @@ class MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
     private var speakSync = false
     override fun speak(text: String?) {
         //关闭语音播报 toast
-        if (AppConfig.audioSpeak && AppConfig.currentStreamVolume != 0) {
+        if (AppConfig.currentStreamVolume != 0) {
+            floatyPanel.show(text ?: "")
             speakSync = false
             speechSynService?.speak(text)
         } else {
             GlobalApp.toastInfo(text ?: "null")
-            notifySpeakFinish()
+            notifySpeakFinish(text)
         }
     }
 
-    private val speakCallbacks = mutableListOf<SpeakCallback>()
+    private val speakCallbacks = mutableListOf<SpeakCallback>(cExecutor)
 
     /**
      * 同步 响应词
@@ -342,17 +349,20 @@ class MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
      */
     private fun speakWithCallback(text: String?, call: SpeakCallback) {
         speakCallbacks.add(call)
+        floatyPanel.show(text)
         speakSync = true
-        speechSynService?.speak(text) ?: notifySpeakFinish()
+        speechSynService?.speak(text) ?: notifySpeakFinish(text)
     }
 
     override fun speakSync(text: String?): Boolean {
         speakSync = true
-        return if (AppConfig.audioSpeak && AppConfig.currentStreamVolume != 0) {//当前音量非静音
-            speechSynService?.speak(text) ?: notifySpeakFinish()
+        return if (AppConfig.currentStreamVolume != 0) {//当前音量非静音
+            floatyPanel.show(text)
+            speechSynService?.speak(text) ?: notifySpeakFinish(text)
             true
         } else {
-            GlobalApp.toastInfo(text ?: "null")
+            GlobalApp.toastInfo(text)
+            notifySpeakFinish(text)
             false
         }
     }
@@ -382,65 +392,17 @@ class MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
         GlobalLog.err("执行出错：$errMsg")
         executeAnimation.failedAndHideDelay(errMsg)
         if (AppConfig.execFailedVoiceFeedback)
-            speakSync("执行失败")
+            speakWithCallback("执行失败") {
+
+            }
         else GlobalApp.toastError("执行失败")
         floatyPanel.hideImmediately()
     }
 
     override fun onExecuteInterrupt(errMsg: String) {
-        Vog.e("onExecuteInterrupt: $errMsg")
+        Vog.e(errMsg)
         executeAnimation.failedAndHideDelay()
-//        GlobalApp.toastInfo("")
         executeAnimation.failedAndHideDelay()
-    }
-
-
-    /**
-     * onSpeechAction
-     * 无需立即执行，可延缓使用AppBus
-     * TODO remove
-     */
-    @Subscribe(threadMode = ThreadMode.BACKGROUND)
-    fun onSpeechAction(sAction: SpeechAction) {
-        if (!speechEngineLoaded) {
-            GlobalApp.toastWarning("引擎未就绪")
-            return
-        }
-        when (sAction.action) {
-            SpeechAction.ActionCode.ACTION_START_RECOG -> {
-                speechSynService?.stopIfSpeaking()
-                speechRecogService?.startRecog()
-            }
-            SpeechAction.ActionCode.ACTION_STOP_RECOG -> speechRecogService?.stopRecog()
-            SpeechAction.ActionCode.ACTION_CANCEL_RECOG -> {
-                hideAll()
-                speechRecogService?.cancelRecog()
-            }
-            SpeechAction.ActionCode.ACTION_START_WAKEUP -> {
-                AppConfig.voiceWakeup = true
-                speechRecogService?.startWakeUp()
-            }
-            SpeechAction.ActionCode.ACTION_START_WAKEUP_WITHOUT_SWITCH -> {
-                speechRecogService?.startWakeUp()
-            }
-            SpeechAction.ActionCode.ACTION_RELOAD_SYN_CONF -> speechSynService?.reLoad()
-            SpeechAction.ActionCode.ACTION_STOP_WAKEUP -> {
-                AppConfig.voiceWakeup = false
-                speechRecogService?.stopWakeUp()
-            }
-            SpeechAction.ActionCode.ACTION_STOP_WAKEUP_WITHOUT_SWITCH -> {
-                speechRecogService?.stopWakeUp()
-            }
-            SpeechAction.ActionCode.ACTION_STOP_WAKEUP_TIMER -> {
-                speechRecogService?.stopAutoSleepWakeup()
-            }
-            SpeechAction.ActionCode.ACTION_START_WAKEUP_TIMER -> {
-                speechRecogService?.startAutoSleepWakeup()
-            }
-            else -> {
-                Vog.e(sAction)
-            }
-        }
     }
 
     /**
@@ -473,61 +435,39 @@ class MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
     @Subscribe(threadMode = ThreadMode.BACKGROUND)
     fun onCommand(order: String) {//外部命令
         Vog.d("onCommand ---> $order")
+        if (order == EVENT_FORCE_OFFLINE) {
+            AppConfig.logout()
+            return
+        }
+        if (!speechEngineLoaded) {
+            GlobalApp.toastWarning("引擎未就绪")
+            return
+        }
         thread(priority = Thread.MAX_PRIORITY) {
             when (order) {
-                ORDER_STOP_EXEC -> {
-                    if (!speechEngineLoaded) {
-                        GlobalApp.toastWarning("引擎未就绪")
-                        return@thread
-                    }
+                ACTION_STOP_EXEC -> {
                     speechRecogService?.cancelRecog()
                     speechSynService?.stop()
                     cExecutor.interrupt()
-                    hideAll()
+                    hideAll(true)
                 }
-                ORDER_STOP_RECOG -> {
-                    if (!speechEngineLoaded) {
-                        GlobalApp.toastWarning("引擎未就绪")
-                        return@thread
-                    }
+                ACTION_STOP_RECOG -> {
                     speechRecogService?.stopRecog()
                 }
-                ORDER_CANCEL_RECOG -> {
-                    if (!speechEngineLoaded) {
-                        GlobalApp.toastWarning("引擎未就绪")
-                        return@thread
-                    }
+                ACTION_CANCEL_RECOG -> {
                     speechRecogService?.cancelRecog()
                 }
-                ORDER_START_RECOG -> {
-                    if (!speechEngineLoaded) {
-                        GlobalApp.toastWarning("引擎未就绪")
-                        return@thread
-                    }
+                ACTION_START_RECOG -> {
+                    speechSynService?.stopIfSpeaking(false)
                     speechRecogService?.startRecog()
                 }
-                ORDER_START_RECOG_SILENT -> {
-                    if (!speechEngineLoaded) {
-                        GlobalApp.toastWarning("引擎未就绪")
-                        return@thread
-                    }
-                    speechRecogService?.startRecogSilent()
+                ACTION_START_RECOG_SILENT -> {
+                    speechRecogService?.startRecog(notify = false)
                 }
-                EVENT_FORCE_OFFLINE -> {
-                    AppConfig.logout()
-                }
-                ORDER_START_VOICE_WAKEUP_WITHOUT_NOTIFY -> {//不重新计时
-                    if (!speechEngineLoaded) {
-                        GlobalApp.toastWarning("引擎未就绪")
-                        return@thread
-                    }
+                ACTION_START_VOICE_WAKEUP_WITHOUT_NOTIFY -> {//不重新计时
                     speechRecogService?.startWakeUp(notify = false, resetTimer = false)
                 }
-                ORDER_STOP_VOICE_WAKEUP_WITHOUT_NOTIFY -> {
-                    if (!speechEngineLoaded) {
-                        GlobalApp.toastWarning("引擎未就绪")
-                        return@thread
-                    }
+                ACTION_STOP_VOICE_WAKEUP_WITHOUT_NOTIFY -> {
                     speechRecogService?.stopWakeUp(notify = false, stopTimer = false)
                 }
                 EVENT_START_DEBUG_SERVER -> {
@@ -536,16 +476,39 @@ class MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
                 EVENT_STOP_DEBUG_SERVER -> {
                     RemoteDebugServer.stop()
                 }
-                ORDER_BEGIN_SCREEN_PICKER -> {
+                ACTION_BEGIN_SCREEN_PICKER -> {
                     context.startActivityOnNewTask(Intent(context, ScreenPickerActivity::class.java).also {
                         it.addFlags(Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS)
                     })
                 }
-                ORDER_BEGIN_SCREEN_PICKER_TRANSLATE -> {
+                ACTION_BEGIN_SCREEN_PICKER_TRANSLATE -> {
                     context.startActivityOnNewTask(Intent(context, ScreenPickerActivity::class.java).also {
                         it.putExtra("t", "t")
                         it.addFlags(Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS)
                     })
+                }
+                ACTION_START_WAKEUP -> {
+                    AppConfig.voiceWakeup = true
+                    speechRecogService?.startWakeUp()
+                }
+                ACTION_START_WAKEUP_WITHOUT_SWITCH -> {
+                    speechRecogService?.startWakeUp()
+                }
+                ACTION_STOP_WAKEUP -> {
+                    AppConfig.voiceWakeup = false
+                    speechRecogService?.stopWakeUp()
+                }
+                ACTION_STOP_WAKEUP_WITHOUT_SWITCH -> {
+                    speechRecogService?.stopWakeUp()
+                }
+                ACTION_RELOAD_SYN_CONF -> {
+                    speechSynService?.reLoad()
+                }
+                ACTION_START_WAKEUP_TIMER -> {
+                    speechRecogService?.startAutoSleepWakeup()
+                }
+                ACTION_STOP_WAKEUP_TIMER -> {
+                    speechRecogService?.stopAutoSleepWakeup()
                 }
                 else -> {
                 }
@@ -657,9 +620,9 @@ class MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
                 return
             }
             if (recogIsListening) {//配置
-                instance?.onCommand(AppBus.ORDER_CANCEL_RECOG)
+                instance?.onCommand(AppBus.ACTION_CANCEL_RECOG)
             } else
-                instance?.onCommand(AppBus.ORDER_START_RECOG)
+                instance?.onCommand(AppBus.ACTION_START_RECOG)
         }
 
         /**
@@ -681,7 +644,7 @@ class MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
     fun startVoiceInput() {
         if (recogIsListening) return
         voiceMode = MODE_INPUT
-        onCommand(ORDER_START_RECOG)
+        onCommand(ACTION_START_RECOG)
     }
 
     private fun hideAll(immediately: Boolean = false) {
@@ -758,13 +721,12 @@ class MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
             Vog.d("speakResponseWord 响应词 ---> ${AppConfig.responseWord}")
             val l = CountDownLatch(1)
 
-            speakWithCallback(AppConfig.responseWord, object : SpeakCallback {
-                override fun speakCallback(result: String?) {
-                    Vog.d("speakWithCallback ---> $result")
-                    sleep(200)
-                    l.countDown()
-                }
-            })
+            speakWithCallback(AppConfig.responseWord) { result ->
+                Vog.d("speakWithCallback ---> $result")
+                sleep(200)
+                l.countDown()
+            }
+
             l.await()
             Vog.d("speak finish")
         }
@@ -795,7 +757,6 @@ class MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
          */
         override fun onPreStartRecog(byVoice: Boolean) {
             speechSynService?.stop()
-            AppBus.post(AppBus.EVENT_BEGIN_RECO)
             checkMusic()//检查后台播放
             listeningAni.begin()//
             recogEffect(byVoice)
@@ -847,7 +808,7 @@ class MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
                         }
                         else -> {
                             floatyPanel.show("重新识别")
-                            onCommand(ORDER_START_RECOG)  //继续????
+                            onCommand(ACTION_START_RECOG)  //继续????
                         }
                     }
                 }
@@ -856,7 +817,7 @@ class MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
                     AppBus.post(VoiceRecogResult(0, voiceResult))
                     voiceMode = MODE_VOICE
                     if (AppConfig.lastingVoiceCommand)
-                        onCommand(ORDER_CANCEL_RECOG)
+                        onCommand(ACTION_CANCEL_RECOG)
                 }
 
             }
@@ -872,7 +833,7 @@ class MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
             AppConfig.finishWord.also {
                 if (it != null && it != "") {
                     if (temp.endsWith(it)) {
-                        onCommand(ORDER_STOP_RECOG)
+                        onCommand(ACTION_STOP_RECOG)
                     }
                 }
             }
@@ -928,7 +889,7 @@ class MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
                 }
                 MODE_ALERT -> {
                     if (errCode != SpeechEvent.CODE_NET_ERROR)
-                        onCommand(ORDER_START_RECOG)  //继续????
+                        onCommand(ACTION_START_RECOG)  //继续????
                 }
 
                 MODE_INPUT -> {
@@ -973,6 +934,9 @@ class MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
                 if (parseResult.actionQueue?.isNotEmpty() == true) {
                     floatyPanel.hideImmediately()//执行时 消失
                     cExecutor.execQueue(result, parseResult.actionQueue)
+                    if(!speaking) {//执行器 在未speak时启动长语音
+                        speechRecogService?.startIfLastingVoice()
+                    }
                     val his = CommandHistory(UserInfo.getUserId(), result,
                             parseResult.msg)
                     WrapperNetHelper.uploadUserCommandHistory(his)
@@ -990,8 +954,6 @@ class MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
                     onCommandParseFailed(result)
                 }
             }
-            speechRecogService?.startIfLastingVoice()
-
         }
         return true
     }
@@ -1063,19 +1025,12 @@ class MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
             }
             data.word.let { word ->
                 AppBus.post(CommandHistory(UserInfo.getUserId(), result, word))
+                speak(word)
                 floatyPanel.show(if (word.contains("="))
                     data.word.replace("=", "\n=") else word)
                 executeAnimation.begin()
                 executeAnimation.show(word)
 
-                val l = CountDownLatch(1)
-                speakWithCallback(word, object : SpeakCallback {
-                    override fun speakCallback(result: String?) {
-                        hideAll()
-                        l.countDown()
-                    }
-                })
-                l.await()
             }
         }
     }
@@ -1117,39 +1072,37 @@ class MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
      */
     inner class SynthesisEventListener : SyncEvent {
 
-        override fun onError(err: String, responseText: String?) {
-            GlobalApp.toastInfo(responseText ?: "")
-            GlobalLog.err(err)
-            notifySpeakFinish()
+        override fun onError(text: String?) {
+            notifySpeakFinish(text)
             resumeMusicIf()
         }
 
-        override fun onFinish() {
+        override fun onFinish(text: String?) {
             Vog.v("onSynData 结束")
-            notifySpeakFinish()
+            notifySpeakFinish(text)
             if (resumeMusicLock) {//
                 resumeMusicIf()
             }
         }
 
-        override fun onUserInterrupt() {
+        override fun onUserInterrupt(text: String?) {
         }
 
-        override fun onStart() {
+        override fun onStart(text: String?) {
             Vog.d("onSynData 开始")
             stopLastingRecogTemp()
             checkMusic()
         }
     }
 
-    fun notifySpeakFinish() {
+    fun notifySpeakFinish(text: String?) {
         if (speakSync) {
-            cExecutor.speakCallback()
             speakCallbacks.forEach {
-                it.speakCallback()
+                it.invoke(text)
             }
-            speakCallbacks.clear()
+            speakCallbacks.removeAll { it != cExecutor }
         }
+        hideAll()
         resumeListenCommandIfLasting()
     }
 
