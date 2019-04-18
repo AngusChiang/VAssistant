@@ -4,8 +4,6 @@ package cn.vove7.jarvis
 //import com.argusapm.android.core.Config
 //import com.argusapm.android.network.cloudrule.RuleSyncRequest
 //import com.argusapm.android.network.upload.CollectDataSyncUpload
-import android.content.Context
-import android.content.Intent
 import cn.vove7.androlua.LuaApp
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.utils.ThreadPool.runOnPool
@@ -88,7 +86,7 @@ class App : GlobalApp() {
     }
 
     override fun onTerminate() {
-        MainService.instance?.destory()
+        MainService.instance?.destroy()
         stopBroadcastReceivers()
         super.onTerminate()
     }

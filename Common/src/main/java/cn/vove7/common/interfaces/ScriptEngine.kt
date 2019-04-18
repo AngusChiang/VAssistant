@@ -22,6 +22,8 @@ interface ScriptEngine : Comparable<Any?> {
 
     fun stop()
 
+    fun release()
+
     override fun compareTo(other: Any?): Int {
         return hashCode() - (other?.hashCode() ?: 0)
     }

@@ -354,10 +354,13 @@ class LuaHelper : LuaManagerI, ScriptEngine {
 
     override fun stop() {
         Vog.d("stop by external")
+        release()
+    }
+
+    override fun release() {
         gcAll()
         L.gc(LUA_GCSTOP, 0)
         L.close()
-        init()
     }
 
     fun loadResources(path: String) {

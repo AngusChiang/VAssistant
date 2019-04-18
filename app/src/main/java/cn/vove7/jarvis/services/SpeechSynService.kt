@@ -1,7 +1,6 @@
 package cn.vove7.jarvis.services
 
 import cn.vove7.common.app.GlobalLog
-import cn.vove7.common.utils.StubbornFlag
 import cn.vove7.jarvis.speech.SpeechSynthesizerI
 import cn.vove7.jarvis.speech.baiduspeech.synthesis.control.BaiduSynthesizer
 import cn.vove7.vtp.log.Vog
@@ -45,8 +44,9 @@ class SpeechSynService(val event: SyncEvent) : SpeechSynthesizerListener {
     }
 
     fun speak(text: String?) {
+        speaking = true//标志放此
         if (text == null) {
-            onError(text, SpeechError().apply { description =  "文本空"})
+            onError(text, SpeechError().apply { description = "文本空" })
             return
         }
         sText = text
@@ -54,7 +54,7 @@ class SpeechSynService(val event: SyncEvent) : SpeechSynthesizerListener {
         synthesizer.speak(text)
     }
 
-    var sText by StubbornFlag<String?>(null)
+    var sText: String? = null
 
     /**
      * 暂停播放。仅调用speak后生效
@@ -86,12 +86,13 @@ class SpeechSynService(val event: SyncEvent) : SpeechSynthesizerListener {
      */
     fun stop(byUser: Boolean = false) {
         synthesizer.stop()
-        val text=sText
+        val text = sText
         if (byUser)
             event.onUserInterrupt(text)
         if (speaking)
             event.onFinish(text)
         speaking = false
+        sText = null
     }
 
     private fun initialTts() {
@@ -116,6 +117,7 @@ class SpeechSynService(val event: SyncEvent) : SpeechSynthesizerListener {
 //    }
 
     override fun onSynthesizeStart(p0: String?) {
+        speaking = true//标志放此
         Vog.v("onSynthesizeStart 准备开始合成,序列号:$p0")
     }
 
@@ -125,7 +127,6 @@ class SpeechSynService(val event: SyncEvent) : SpeechSynthesizerListener {
 
     override fun onSynthesizeFinish(p0: String?) {
         Vog.v("onSynthesizeFinish 合成结束回调, 序列号:$p0")
-        speaking = true//
     }
 
     override fun onSpeechStart(p0: String?) {
@@ -139,13 +140,13 @@ class SpeechSynService(val event: SyncEvent) : SpeechSynthesizerListener {
     override fun onSpeechFinish(p0: String?) {
         Vog.v("onSpeechFinish 播放结束回调 $p0")
         speaking = false
-        event.onFinish(p0) //speaking=false
+        event.onFinish(sText) //speaking=false
     }
 
     override fun onError(p0: String?, p1: SpeechError?) {
         val e = "错误发生：${p1?.description} ，错误编码: ${p1?.code} 序列号: $p0 "
         speaking = false
-        event.onError(p0)
+        event.onError(sText)
         GlobalLog.err(e)
         Vog.d(e)
     }

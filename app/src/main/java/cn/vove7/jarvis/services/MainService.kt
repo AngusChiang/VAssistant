@@ -260,7 +260,9 @@ class MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
             //没有手动停止 即认为处于长语音状态
             afterSpeakResumeListen = !(speechRecogService?.lastingStopped
                 ?: true)
-            speechRecogService?.cancelRecog(false)
+            if(recogIsListening) {
+                speechRecogService?.cancelRecog(false)
+            }
         }
     }
 
@@ -369,7 +371,6 @@ class MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
 
     override fun onExecuteStart(tag: String) {//
         Vog.d("开始执行 -> $tag")
-//        floatyPanel.showAndHideDelay("开始执行")
         executeAnimation.begin()
         executeAnimation.show(tag)
     }
@@ -379,8 +380,14 @@ class MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
      * from executor 线程
      */
     override fun onExecuteFinished(result: Boolean) {//
-        Vog.d("onExecuteFinished  --> $result")
-        floatyPanel.hideImmediately()
+        Vog.d("执行器执行结束 --> $result")
+        if (!speaking) {//执行完毕后，在未speak时启动长语音
+            Vog.d("执行器执行结束 移除悬浮窗")
+            floatyPanel.hideImmediately()
+            speechRecogService?.startIfLastingVoice()
+        } else {
+            Vog.d("执行器执行结束 speaking")
+        }
         if (AppConfig.execSuccessFeedback) {
             if (result) executeAnimation.success()
             else executeAnimation.failedAndHideDelay()
@@ -527,7 +534,7 @@ class MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
         startActivity(intent)
     }
 
-    fun destory() {
+    fun destroy() {
         if (speechEngineLoaded) {
             speechRecogService?.release()
             speechSynService?.release()
@@ -932,11 +939,9 @@ class MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
                     .parseAction(result, AccessibilityApi.accessibilityService?.currentScope, smartOpen, onClick)
             if (parseResult.isSuccess) {
                 if (parseResult.actionQueue?.isNotEmpty() == true) {
-                    floatyPanel.hideImmediately()//执行时 消失
+                    floatyPanel.hideDelay()//执行时 消失
                     cExecutor.execQueue(result, parseResult.actionQueue)
-                    if(!speaking) {//执行器 在未speak时启动长语音
-                        speechRecogService?.startIfLastingVoice()
-                    }
+
                     val his = CommandHistory(UserInfo.getUserId(), result,
                             parseResult.msg)
                     WrapperNetHelper.uploadUserCommandHistory(his)

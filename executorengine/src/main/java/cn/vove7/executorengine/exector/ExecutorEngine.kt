@@ -88,7 +88,7 @@ class ExecutorEngine : ExecutorImpl() {
     @Synchronized
     private fun release() {
         engines.forEach {
-            it.stop()
+            it.release()
         }
         engines.clear()
     }

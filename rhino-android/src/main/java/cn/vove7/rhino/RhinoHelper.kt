@@ -87,6 +87,9 @@ class RhinoHelper : ScriptableObject, ScriptEngine {
         quit(rhinoContext, global, null, null)
     }
 
+    override fun release() {
+        quit(rhinoContext, global, null, null)
+    }
 
     fun setArgs(args: Array<*>?) {
         args ?: return

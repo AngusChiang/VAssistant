@@ -59,6 +59,7 @@ class FloatyPanel : AbFloatWindow(GlobalApp.APP) {
         Vog.d("显示：$text")
         removeDelayHide()
         runOnUi {
+            if (isHiding) superRemove()
             show()
             showListeningAni()
             voiceText = text
@@ -73,14 +74,23 @@ class FloatyPanel : AbFloatWindow(GlobalApp.APP) {
         contentView?.voice_text?.text = voiceText
     }
 
+    var hideInterrupt = false
+
+    var isHiding = false
+
     override fun onRemove() {
+        isHiding = true
         showExitAnimation()
     }
 
-    internal fun superRemove() = super.onRemove()
+    internal fun superRemove() {
+        isHiding = false
+        super.onRemove()
+    }
 
 
     private fun removeDelayHide() {
+        hideInterrupt = true
         delayHandler.removeCallbacks(delayHide)
     }
 
@@ -89,8 +99,14 @@ class FloatyPanel : AbFloatWindow(GlobalApp.APP) {
         hideDelay(1000)
     }
 
-    var delayHide = Runnable {
-        hide()
+    private var delayHide = Runnable {
+        if (hideInterrupt) {
+            Vog.d("打断 ")
+            return@Runnable
+        } else {
+            Vog.d("delayHide执行")
+            hide()
+        }
     }
 
     private val delayHandler: Handler by lazy {
@@ -99,9 +115,8 @@ class FloatyPanel : AbFloatWindow(GlobalApp.APP) {
     }
 
     fun hideDelay(delay: Long = 800) {
-        runOnUi {
-            delayHandler.postDelayed(delayHide, delay)
-        }
+        hideInterrupt = false
+        delayHandler.postDelayed(delayHide, delay)
         Vog.d("hide delay $delay")
     }
 

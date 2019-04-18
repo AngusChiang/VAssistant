@@ -14,6 +14,7 @@ import cn.vove7.common.utils.runOnNewHandlerThread
 import cn.vove7.jarvis.BuildConfig
 import cn.vove7.jarvis.receivers.PowerEventReceiver
 import cn.vove7.jarvis.receivers.ScreenStatusListener
+import cn.vove7.jarvis.services.MainService
 import cn.vove7.jarvis.speech.baiduspeech.recognition.model.IStatus
 import cn.vove7.jarvis.tools.AppConfig
 import cn.vove7.jarvis.view.statusbar.StatusAnimation
@@ -215,6 +216,10 @@ abstract class SpeechRecogService(val event: SpeechEvent) : SpeechRecogI {
 //                Vog.d("重启长语音： 正在播放音乐")
 //                return@runOnNewHandlerThread
 //            }
+            if (MainService.speaking) {
+                Vog.d("重启长语音：speaking")
+                return@runOnNewHandlerThread
+            }
             if (isListening) {
                 Vog.d("重启长语音： 正在识别")
                 return@runOnNewHandlerThread
