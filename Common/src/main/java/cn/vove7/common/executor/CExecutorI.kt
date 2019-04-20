@@ -24,6 +24,12 @@ interface CExecutorI : ActivityShowListener, RuntimeArgs, SpeakCallback {
     @Throws
     fun requireAccessibility()
 
+    /**
+     * 等待无障碍开启
+     * @return Boolean 是否开启
+     */
+    fun waitAccessibility(waitMillis: Long): Boolean
+
     fun execQueue(cmdWords: String, actionQueue: PriorityQueue<Action>?)
     fun interrupt()
     fun runScript(script: String, args: Array<String>? = null): PartialResult = PartialResult(false)

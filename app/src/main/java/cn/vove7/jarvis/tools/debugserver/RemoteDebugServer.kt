@@ -13,12 +13,12 @@ import cn.vove7.common.datamanager.parse.model.Action
 import cn.vove7.common.datamanager.parse.statusmap.ActionNode
 import cn.vove7.common.executor.OnPrint
 import cn.vove7.common.utils.ThreadPool.runOnPool
+import cn.vove7.common.utils.runInCatch
 import cn.vove7.common.utils.startActivityOnNewTask
 import cn.vove7.jarvis.BuildConfig
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.activities.NewInstActivity
 import cn.vove7.jarvis.services.MainService
-import cn.vove7.jarvis.tools.AppConfig
 import cn.vove7.rhino.api.RhinoApi
 import cn.vove7.vtp.log.Vog
 import com.google.gson.Gson
@@ -31,21 +31,15 @@ import kotlin.concurrent.thread
 
 object RemoteDebugServer : Runnable {
 
-    //    companion object {
-    var server: ServerSocket? = null
+    private var server: ServerSocket? = null
 
-//    var out: MutableList<PrintWriter>? = null
-
-    var clients: MutableList<Pair<Socket, PrintWriter>>? = null
+    var clients: HashMap<Socket, PrintWriter>? = null
     var stopped: Boolean = true
     private const val LISTEN_PORT = 1527
     var thread: Thread? = null
 
     var handler: Handler? = null
     fun start() {
-        if (!AppConfig.checkLogin()) {
-            return
-        }
         if (!stopped && thread?.isAlive == true) {
             Vog.d("start ---> thread is Alive")
             return
@@ -64,8 +58,8 @@ object RemoteDebugServer : Runnable {
             server?.close()
             clients?.forEach {
                 try {
-                    it.first.close()
-                    it.second.close()
+                    it.key.close()
+                    it.value.close()
                 } catch (e: Exception) {
                 }
             }
@@ -82,7 +76,7 @@ object RemoteDebugServer : Runnable {
 
     override fun run() {
         stopped = false
-        clients = mutableListOf()
+        clients = hashMapOf()
         try {
             server = ServerSocket(LISTEN_PORT)
         } catch (e: BindException) {//Address already in use
@@ -93,15 +87,14 @@ object RemoteDebugServer : Runnable {
         RhinoApi.regPrint(print)
         LuaHelper.regPrint(print)
         GlobalApp.toastInfo(R.string.text_debug_service_starting, Toast.LENGTH_LONG)
-        server.use {
+        server?.use {
             while (!stopped) {
                 try {
-                    val client = server!!.accept()//等待
+                    val client = it.accept()//等待
                     stopAutoSleep()
-                    val inputStream = BufferedReader(InputStreamReader(client!!.getInputStream(), "UTF-8"))
+                    val inputStream = BufferedReader(InputStreamReader(client.getInputStream(), "UTF-8"))
                     val o = PrintWriter(BufferedWriter(OutputStreamWriter(client.getOutputStream())), true)
-                    val p = Pair(client, o)
-                    clients?.add(p)
+                    clients?.put(client, o)
                     GlobalApp.toastInfo(String.format(GlobalApp.getString(R.string.text_establish_connection), client.inetAddress
                         ?: "null"))
                     print.onPrint(0, "与PC[${client.inetAddress}]建立连接   --来自App")
@@ -118,7 +111,7 @@ object RemoteDebugServer : Runnable {
                         } catch (e: Exception) {//
                             GlobalLog.err(e)
                         }
-                        onDisConnect(p)
+                        onDisConnect(client, o)
                     }
                 } catch (e: Exception) {
                     GlobalApp.toastInfo(R.string.text_disconnect_with_debugger)
@@ -160,8 +153,8 @@ object RemoteDebugServer : Runnable {
             val end = if (output?.endsWith('\n') == true) "" else "\n"
             try {
                 clients?.forEach {
-                    it.second.print(output + end)
-                    it.second.flush()
+                    it.value.print(output + end)
+                    it.value.flush()
                 }
             } catch (e: Exception) {
                 e.printStackTrace()
@@ -170,14 +163,16 @@ object RemoteDebugServer : Runnable {
         }
     }
 
-    private fun onDisConnect(client: Pair<Socket, PrintWriter>) {
-        client.first.apply {
-            GlobalApp.toastInfo("与${inetAddress}断开连接")
-            close()
+    private fun onDisConnect(s: Socket, p: PrintWriter) {
+        runInCatch {
+            s.use {
+                GlobalApp.toastInfo("与${it.inetAddress}断开连接")
+            }
+            clients?.remove(s)
+            if (clients?.isEmpty() == true)
+                startAutoSleep()
+            p.close()
         }
-        clients?.remove(client)
-        if (clients?.isEmpty() == true)
-            startAutoSleep()
     }
 
     /**

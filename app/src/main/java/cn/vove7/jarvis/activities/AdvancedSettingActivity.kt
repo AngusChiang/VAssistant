@@ -30,7 +30,6 @@ import cn.vove7.jarvis.view.custom.SettingGroupItem
 import cn.vove7.jarvis.view.dialog.LoginDialog
 import cn.vove7.jarvis.view.dialog.ProgressDialog
 import cn.vove7.jarvis.view.dialog.UserInfoDialog
-import cn.vove7.jarvis.view.tools.SettingItemHelper
 import cn.vove7.vtp.app.AppHelper
 import cn.vove7.vtp.log.Vog
 import cn.vove7.vtp.sharedpreference.SpHelper
@@ -259,11 +258,15 @@ class AdvancedSettingActivity : ReturnableActivity() {
             when (requestCode) {
                 1 -> {
                     val uri = data?.data
-                    if (uri != null) {
-                        val path = UriUtils.getPathFromUri(this, uri)!!
-                        BackupHelper.restoreFromFile(this, File(path))
-                    } else {
-                        GlobalApp.toastError(getString(R.string.text_open_failed))
+                    try {
+                        if (uri != null) {
+                            val path: String = UriUtils.getPathFromUri(this, uri)!!
+                            BackupHelper.restoreFromFile(this, File(path))
+                        } else {
+                            GlobalApp.toastError(getString(R.string.text_open_failed))
+                        }
+                    } catch (e: Exception) {
+                        GlobalApp.toastError("获取失败：" + e.message)
                     }
                 }
                 200 -> {//语音
@@ -327,7 +330,7 @@ class AdvancedSettingActivity : ReturnableActivity() {
                         }
                     }
                     positiveButton(text = "一键同步") {
-                        DataUpdator.oneKeyUpdate(this@AdvancedSettingActivity, list,null,"")
+                        DataUpdator.oneKeyUpdate(this@AdvancedSettingActivity, list, null, "")
                     }
                 }
     }

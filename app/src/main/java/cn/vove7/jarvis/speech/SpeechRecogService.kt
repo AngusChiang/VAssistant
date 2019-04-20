@@ -142,7 +142,9 @@ abstract class SpeechRecogService(val event: SpeechEvent) : SpeechRecogI {
     private val stopWakeUpAction = Runnable {
         wakeupTimerEnd = true
         if (wakeupI.opened) {
-            wakeupStatusAni.failed("语音唤醒已自动休眠")
+            if(AppConfig.voiceWakeup) {
+                wakeupStatusAni.failed("语音唤醒已自动休眠")
+            }
             doStopWakeUp()//不通知
         }
     }

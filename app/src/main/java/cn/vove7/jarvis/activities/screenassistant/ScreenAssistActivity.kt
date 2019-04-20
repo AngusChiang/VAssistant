@@ -9,6 +9,7 @@ import android.os.Bundle
 import android.os.Environment
 import android.support.design.widget.BottomSheetBehavior
 import android.view.View
+import android.view.View.FIND_VIEWS_WITH_CONTENT_DESCRIPTION
 import android.view.animation.AlphaAnimation
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.appbus.AppBus
@@ -20,6 +21,7 @@ import cn.vove7.jarvis.R
 import cn.vove7.jarvis.activities.TextOcrActivity
 import cn.vove7.jarvis.services.MainService
 import cn.vove7.jarvis.tools.QRTools
+import cn.vove7.jarvis.tools.Tutorials
 import cn.vove7.jarvis.tools.baiduaip.BaiduAipHelper
 import cn.vove7.jarvis.view.bottomsheet.AssistSessionGridController
 import cn.vove7.jarvis.view.dialog.ImageClassifyResultDialog
@@ -71,7 +73,9 @@ class ScreenAssistActivity : Activity() {
 
         window.setWindowAnimations(R.style.ScreenAssist)
         showProgressBar = true
-        bottomController = AssistSessionGridController(this, bottom_sheet, itemClick)
+        bottomController = AssistSessionGridController(this, bottom_sheet, itemClick) {
+            if(isReady == true) screenPath else null
+        }
         bottomController.initView()
         bottomController.hideBottom()
         bottomController.bottomView.visibility = View.GONE
@@ -100,6 +104,10 @@ class ScreenAssistActivity : Activity() {
         }
     }
 
+    override fun onStop() {
+        super.onStop()
+        finish()
+    }
 
     private fun showView() {
         runOnUi {
@@ -110,7 +118,13 @@ class ScreenAssistActivity : Activity() {
                 val animation = AlphaAnimation(0f, 1f)
                 animation.duration = 300
                 bottomController.bottomView.startAnimation(animation)
-            }
+                bottomController.bottomView.post {
+                    val list = arrayListOf<View>()
+                    bottomController.bottomView.findViewsWithText(list, "二维码/条码识别", FIND_VIEWS_WITH_CONTENT_DESCRIPTION)
+                    Tutorials.showForView(this, Tutorials.screen_assistant_qrcode,
+                            list[0], "长按查看更多功能","使用微信扫一扫\n支付宝扫一扫")
+
+                }}
         }
     }
 

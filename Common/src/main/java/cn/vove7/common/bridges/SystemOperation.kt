@@ -58,10 +58,10 @@ interface SystemOperation {
      * 通过包名打开App
      *
      * @param pkg String
-     * @param resetTask Boolean 是否重置Activity栈（重置后可进入App首页）
+     * @param clearTask Boolean 是否重置Activity栈（重置后可进入App首页）
      * @return Boolean
      */
-    fun openAppByPkg(pkg: String, resetTask: Boolean = false): Boolean
+    fun openAppByPkg(pkg: String, clearTask: Boolean = false): Boolean
 
     /**
      * 通过getPkgByWord 打开pkg

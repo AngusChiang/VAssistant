@@ -27,25 +27,25 @@ interface ViewOperation {
      * 获取下级所有Node
      * @return Array<ViewNode>
      */
-    fun getChilds(): Array<ViewNode>?
+    val childs: Array<ViewNode>
 
     /**
      * 获取边界范围
      * @return Rect
      */
-    fun getBounds(): Rect?
+    val bounds: Rect?
 
     /**
      * 获取基于父级容器边界范围
      * @return Rect
      */
-    fun getBoundsInParent(): Rect?
+    val boundsInParent: Rect?
 
     /**
      * 获取父级Node
      * @return ViewNode?
      */
-    fun getParent(): ViewNode?
+    val parent: ViewNode?
 
     /**
      * 点击此Node
@@ -98,13 +98,6 @@ interface ViewOperation {
     fun doubleClick(): Boolean
 
     /**
-     * 设置文本,一般只能用于可编辑控件
-     * @param text String
-     * @return Boolean
-     */
-    fun setText(text: String): Boolean
-
-    /**
      * 尝试设置文本内容，机制同tryClick
      * @param text String
      * @return Boolean 是否成功
@@ -115,14 +108,14 @@ interface ViewOperation {
      * 获取Node包含文本
      * @return String?
      */
-    fun getText(): String?
+    var text: String?
 
     /**
      * 追加文本
      * @param s String
      * @return Boolean
      */
-    fun appendText(s: String): Boolean
+    fun appendText(s: String)
 
     fun desc(): String?
     //选择

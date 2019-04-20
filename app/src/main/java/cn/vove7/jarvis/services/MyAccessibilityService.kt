@@ -123,7 +123,7 @@ class MyAccessibilityService : AccessibilityApi() {
                 //界面切换
                 val classNameStr = event.className
                 val pkg = event.packageName as String?
-                Vog.v("WINDOW_STATE_CHANGED ---> $classNameStr $pkg")
+//                Vog.v("WINDOW_STATE_CHANGED ---> $classNameStr $pkg")
 
                 runOnCachePool {
                     if (classNameStr != null && pkg != null)
@@ -294,7 +294,7 @@ class MyAccessibilityService : AccessibilityApi() {
      * @return Boolean
      */
     override fun onKeyEvent(event: KeyEvent): Boolean {
-        Vog.v("onKeyEvent  ----> $event")
+//        Vog.v("onKeyEvent  ----> $event")
         when (event.action) {
             KeyEvent.ACTION_DOWN -> when (event.keyCode) {
                 KEYCODE_VOLUME_DOWN -> {

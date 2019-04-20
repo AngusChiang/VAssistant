@@ -101,18 +101,16 @@ object SystemBridge : SystemOperation {
         return openAppByPkg(pkg, false)
     }
 
-    override fun openAppByPkg(pkg: String, resetTask: Boolean): Boolean {
+    override fun openAppByPkg(pkg: String, clearTask: Boolean): Boolean {
         return try {
             val launchIntent = context.packageManager
                     .getLaunchIntentForPackage(pkg)
             if (launchIntent == null) {
                 throw Exception("启动失败 未找到此App: $pkg")
-//                GlobalLog.err("启动失败 未找到此App: $pkg")
-//                false
             } else {
                 launchIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                 launchIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_DOCUMENT)
-                if (resetTask) {
+                if (clearTask) {
                     launchIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK)
                 }
                 context.startActivity(launchIntent)

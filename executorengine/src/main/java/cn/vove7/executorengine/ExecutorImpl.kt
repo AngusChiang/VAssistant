@@ -8,8 +8,11 @@ import cn.vove7.common.accessibility.viewnode.ViewNode
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.appbus.AppBus
-import cn.vove7.common.bridges.*
+import cn.vove7.common.bridges.ChoiceData
+import cn.vove7.common.bridges.ServiceBridge
+import cn.vove7.common.bridges.ShowDialogEvent
 import cn.vove7.common.bridges.ShowDialogEvent.Companion.WHICH_SINGLE
+import cn.vove7.common.bridges.SystemBridge
 import cn.vove7.common.datamanager.DAO
 import cn.vove7.common.datamanager.executor.entity.MarkedData
 import cn.vove7.common.datamanager.executor.entity.MarkedData.MARKED_TYPE_SCRIPT_JS
@@ -48,6 +51,7 @@ import kotlin.concurrent.thread
  * DEBUG
  * focusView
  * userInterrupt
+ * TODO api 提取
  * Created by Vove on 2018/6/20
  */
 open class ExecutorImpl(
@@ -89,6 +93,14 @@ open class ExecutorImpl(
             AppBus.post(RequestPermission("无障碍服务"))
             throw NeedAccessibilityException()
         }
+    }
+
+    fun waitAccessibility(): Boolean {
+        return waitAccessibility(30000)
+    }
+
+    override fun waitAccessibility(waitMillis: Long): Boolean {
+        return AccessibilityApi.waitAccessibility(waitMillis)
     }
 
     /**

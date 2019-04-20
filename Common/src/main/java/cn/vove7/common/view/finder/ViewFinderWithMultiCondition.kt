@@ -146,7 +146,7 @@ class ViewFinderWithMultiCondition(node: AccessibilityNodeInfo? = null) : ViewFi
     }
 
     override fun toString(): String {
-        return "Condition(" +
+        return "ViewFinder(" +
                 (if (viewTextCondition.isNotEmpty()) "viewTextCondition=$viewTextCondition" else "") +
                 ", textMatchMode=$textMatchMode" +
                 (if (viewId != null) ", viewId=$viewId" else "") +

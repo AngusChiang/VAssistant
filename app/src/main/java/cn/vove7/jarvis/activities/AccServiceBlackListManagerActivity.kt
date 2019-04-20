@@ -5,6 +5,7 @@ import android.view.Menu
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.utils.ThreadPool
 import cn.vove7.common.helper.AdvanAppHelper
+import cn.vove7.common.helper.startable
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.activities.base.OneFragmentActivity
 import cn.vove7.jarvis.adapters.SimpleListAdapter
@@ -92,7 +93,7 @@ class AccServiceBlackListManagerActivity : OneFragmentActivity() {
 
         override fun onLoadData(pageIndex: Int) {
             ThreadPool.runOnCachePool {
-                notifyLoadSuccess(AdvanAppHelper.ALL_APP_LIST.values.toList(), true)
+                notifyLoadSuccess(AdvanAppHelper.ALL_APP_LIST.values.filter { it.startable }.toList(), true)
             }
         }
     }

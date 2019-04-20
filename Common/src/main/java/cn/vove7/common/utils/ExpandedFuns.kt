@@ -234,14 +234,22 @@ fun AppInfo.hasMicroPermission(): Boolean {
         val pm = GlobalApp.APP.packageManager
         (PackageManager.PERMISSION_GRANTED ==
                 pm.checkPermission(Manifest.permission.RECORD_AUDIO, packageName)).also {
-                    Vog.d("$name 麦克风权限: $it")
-                }
+            Vog.d("$name 麦克风权限: $it")
+        }
     } catch (e: Exception) {
         GlobalLog.err(e)
         false
     }
 }
 
+fun AppInfo.name(): String? {
+    return try {
+        name
+    } catch (e: Throwable) {
+        e.log()
+        null
+    }
+}
 
 fun View.toggleVisibility(toggleVisibility: Int = View.GONE) {
     runOnUi {
@@ -280,6 +288,11 @@ fun View.setPadding(pad: Int) {
 
 fun Intent.newTask(): Intent {
     addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+    return this
+}
+
+fun Intent.clearTask(): Intent {
+    addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK)
     return this
 }
 

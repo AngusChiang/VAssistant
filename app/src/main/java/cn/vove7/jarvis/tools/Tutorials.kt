@@ -2,18 +2,18 @@ package cn.vove7.jarvis.tools
 
 import android.app.Activity
 import android.content.Context
+import android.graphics.Typeface
 import android.support.annotation.DrawableRes
 import android.view.View
-import com.getkeepsafe.taptargetview.TapTargetView
-import android.graphics.Typeface
 import android.widget.TextView
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.utils.boundsInScreen
-import com.getkeepsafe.taptargetview.TapTarget
 import cn.vove7.jarvis.R
 import cn.vove7.vtp.log.Vog
 import cn.vove7.vtp.sharedpreference.SpHelper
+import com.getkeepsafe.taptargetview.TapTarget
 import com.getkeepsafe.taptargetview.TapTargetSequence
+import com.getkeepsafe.taptargetview.TapTargetView
 
 
 /**
@@ -44,6 +44,8 @@ object Tutorials {
     const val t_inst_detail_regex = "t_inst_detail_regex"
     const val t_inst_detail_run = "t_inst_detail_run"
     const val screen_translate_tips = "screen_translate_tips"
+    const val screen_assistant_qrcode = "screen_assistant_qrcode"
+
     val context: Context
         get() = GlobalApp.APP
 
@@ -164,6 +166,7 @@ object Tutorials {
                 , t_inst_detail_regex
                 , t_inst_detail_run
                 , screen_translate_tips
+                , screen_assistant_qrcode
         ).forEach {
             sp.removeKey(it)
         }

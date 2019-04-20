@@ -16,7 +16,7 @@ class AppAdBlockNotifier(private val app: AppInfo?, finders: MutableSet<ViewFind
     : AbsViewShowNotifier(finders) {
 
     override fun onShow(finder: ViewFinder, node: ViewNode): Boolean {
-        Vog.i(" ${Thread.currentThread()} 发现广告 ---> ${app?.name} ${app?.versionCode} $finder")
+        Vog.i("${Thread.currentThread()} 发现广告 ---> $app $finder")
         return node.tryClick().also {
             Vog.i("Ad click ---> $it")
         }

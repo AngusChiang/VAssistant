@@ -56,13 +56,13 @@ object ScreenStatusListener : DyBCReceiver(), ScreenEvent {
         }
         if (AppConfig.openVoiceWakeUpIfAutoSleep && AppConfig.voiceWakeup && !MainService.wakeupOpen) {
             if (VoiceWakeupStrategy.canOpenRecord())//判断当前App 是否使用麦克风
-                AppBus.post(AppBus.ACTION_START_WAKEUP_WITHOUT_SWITCH)//不打开语音唤醒开关
+                AppBus.post(AppBus.ACTION_START_WAKEUP_WITHOUT_SWITCH)//开启语音唤醒，不打开语音唤醒开关
 
         }
     }
 
     override fun onUnlock() {
-        if (closeTag && AppConfig.fixVoiceMicro) {//也许关屏已开启
+        if (closeTag && AppConfig.fixVoiceMicro && AppConfig.voiceWakeup) {//也许关屏已开启
             Vog.d("开屏关闭唤醒")
             VoiceWakeupStrategy.closeWakeup()
         }
@@ -74,7 +74,7 @@ object ScreenStatusListener : DyBCReceiver(), ScreenEvent {
     private var closeTag by StubbornFlag(false)
 
     override fun onScreenOff() {//在当前App 关闭唤醒时,熄屏 应开启唤醒
-        if (VoiceWakeupStrategy.closed) {//被自动关闭,熄屏开启
+        if (VoiceWakeupStrategy.closed && AppConfig.voiceWakeup) {//被自动关闭,熄屏开启
             VoiceWakeupStrategy.startWakeup()
             closeTag = true
         }

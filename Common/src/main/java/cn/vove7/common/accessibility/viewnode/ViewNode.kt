@@ -31,25 +31,29 @@ class ViewNode(val node: AccessibilityNodeInfo) : ViewOperation, Comparable<View
         const val tryNum = 10
     }
 
-    override fun getBoundsInParent(): Rect {
-        val out = Rect()
-        node.getBoundsInParent(out)
-        return out
-    }
+    override val boundsInParent: Rect
+        get() {
+            val out = Rect()
+            node.getBoundsInParent(out)
+            return out
+        }
 
-    override fun getBounds(): Rect {
-        val out = Rect()
-        node.getBoundsInScreen(out)
-        return out
-    }
 
-    override fun getParent(): ViewNode? {
-        val it = node.parent
-        return if (it != null) {
-            ViewNode(it)
-        } else
-            null
-    }
+    override val bounds: Rect
+        get() {
+            val out = Rect()
+            node.getBoundsInScreen(out)
+            return out
+        }
+
+
+    override val parent: ViewNode?
+        get() {
+            val it = node.parent
+            return if (it != null) {
+                ViewNode(it)
+            } else null
+        }
 
     override fun tryClick(): Boolean {
         return tryOp(AccessibilityNodeInfo.ACTION_CLICK)
@@ -97,23 +101,25 @@ class ViewNode(val node: AccessibilityNodeInfo) : ViewOperation, Comparable<View
     /**
      * @return node.childs
      */
-    override fun getChilds(): Array<ViewNode> {
-        synchronized(lastGetChildTime) {
-            val now = System.currentTimeMillis()
-            if (childsCache != null && now - lastGetChildTime < 10000L) {//10s有效期
-                return childsCache ?: emptyArray()
-            }
-            lastGetChildTime = now
-            val cs = mutableListOf<ViewNode>()
-            for (i in 0 until node.childCount) {
-                val c = node.getChild(i)
-                if (c != null) {
-                    cs.add(ViewNode(c))
+
+    override val childs: Array<ViewNode>
+        get() {
+            synchronized(lastGetChildTime) {
+                val now = System.currentTimeMillis()
+                if (childsCache != null && now - lastGetChildTime < 10000L) {//10s有效期
+                    return childsCache ?: emptyArray()
                 }
+                lastGetChildTime = now
+                val cs = mutableListOf<ViewNode>()
+                for (i in 0 until node.childCount) {
+                    val c = node.getChild(i)
+                    if (c != null) {
+                        cs.add(ViewNode(c))
+                    }
+                }
+                return cs.toTypedArray().also { childsCache = it }
             }
-            return cs.toTypedArray().also { childsCache = it }
         }
-    }
 
     override fun getChildCount(): Int = node.childCount
 
@@ -201,21 +207,27 @@ class ViewNode(val node: AccessibilityNodeInfo) : ViewOperation, Comparable<View
         }
     }
 
-    override fun getText(): String? {
-        val text = node.text
-        Vog.d("$text")
-        return text?.toString()
-    }
+    override var text: String?
+        get() {
+            val text = node.text
+            Vog.d("$text")
+            return text?.toString()
+        }
+        set(v) {
+            val arg = Bundle()
+            arg.putCharSequence(AccessibilityNodeInfo.ACTION_ARGUMENT_SET_TEXT_CHARSEQUENCE, v)
+            node.performAction(AccessibilityNodeInfo.ACTION_SET_TEXT, arg)
+        }
 
     override fun desc(): String? {
         return node.contentDescription?.toString()
     }
 
-    override fun appendText(s: String): Boolean {
-        return setText(buildString {
-            append(getText())
+    override fun appendText(s: String) {
+        text = buildString {
+            append(text)
             append(s)
-        })
+        }
     }
 
     /**
@@ -229,12 +241,6 @@ class ViewNode(val node: AccessibilityNodeInfo) : ViewOperation, Comparable<View
 
     override fun setTextWithInitial(text: String): Boolean {
         return setText(text, "1")
-    }
-
-    override fun setText(text: String): Boolean {
-        val arg = Bundle()
-        arg.putCharSequence(AccessibilityNodeInfo.ACTION_ARGUMENT_SET_TEXT_CHARSEQUENCE, text)
-        return node.performAction(AccessibilityNodeInfo.ACTION_SET_TEXT, arg)
     }
 
     /**
@@ -269,7 +275,7 @@ class ViewNode(val node: AccessibilityNodeInfo) : ViewOperation, Comparable<View
     }
 
     override fun getCenterPoint(): Point {
-        val rect = getBounds()
+        val rect = bounds
         val x = (rect.left + rect.right) / 2
         val y = (rect.top + rect.bottom) / 2
         return Point(x, y)
@@ -294,11 +300,11 @@ class ViewNode(val node: AccessibilityNodeInfo) : ViewOperation, Comparable<View
 
     fun sortOutInfo(): ViewInfo {
         return ViewInfo(
-                getText(),
+                text,
                 node.contentDescription,
                 classType,
-                getBoundsInParent(),
-                getBounds()
+                boundsInParent,
+                bounds
 //                node.isClickable,
 //                null,
 //                node.canOpenPopup()
@@ -317,7 +323,7 @@ class ViewNode(val node: AccessibilityNodeInfo) : ViewOperation, Comparable<View
                 (if (id == null) "" else ", id: " + id.substring(id.lastIndexOf('/') + 1)) +
                 (if (node.text == null) "" else ", text: ${node.text}") +
                 (if (desc == null) "" else ", desc: $desc") +
-                (", bounds: ${getBounds()}" + ", childCount: ${getChildCount()}") +
+                (", bounds: $bounds" + ", childCount: ${getChildCount()}") +
                 (if (node.isClickable) ", Clickable" else "") + '}'
     }
 

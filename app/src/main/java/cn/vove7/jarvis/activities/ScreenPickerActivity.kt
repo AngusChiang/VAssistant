@@ -197,7 +197,7 @@ class ScreenPickerActivity : Activity() {
             //            Vog.d("---> ${it.getBounds()} ${it.getText()}")
             val view = CheckedTextView(this).apply {
                 setBackgroundResource(R.drawable.bg_screen_text_high_light)
-                val rect = it.getBounds()
+                val rect = it.bounds
                 gravity = Gravity.TOP
                 setTextColor(0xFFFFFF)
                 textSize = 15f
@@ -295,7 +295,7 @@ class ScreenPickerActivity : Activity() {
             var textView: CheckedTextView? = null,
             var subText: String? = null
     ) {
-        val text: String get() = viewNode.getText() ?: viewNode.desc() ?: ""
+        val text: String get() = viewNode.text ?: viewNode.desc() ?: ""
     }
 
 }

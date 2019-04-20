@@ -124,12 +124,8 @@ abstract class FindBuilderWithOperation
         return node.setText(text, ep)
     }
 
-    override fun setText(text: String): Boolean {
-        return node.setText(text)
-    }
-
-    override fun appendText(s: String): Boolean {
-        return node.appendText(s)
+    override fun appendText(s: String) {
+        node.appendText(s)
     }
 
     override fun desc(): String? {
@@ -144,9 +140,12 @@ abstract class FindBuilderWithOperation
         return node.trySetText(text)
     }
 
-    override fun getText(): String? {
-        return node.getText()
-    }
+    override var text: String?
+        get() = node.text
+        set(v) {
+            node.text = v
+        }
+
 
     override fun focus(): Boolean {
         return node.focus()
@@ -172,25 +171,22 @@ abstract class FindBuilderWithOperation
         return node.scrollRight()
     }
 
-    override fun getChilds(): Array<ViewNode>? {
-        return node.getChilds()
-    }
+    override val childs: Array<ViewNode>
+        get() = node.childs
 
     override fun childAt(i: Int): ViewNode? {
         return node.childAt(i)
     }
 
-    override fun getBounds(): Rect? {
-        return node.getBounds()
-    }
+    override val bounds: Rect?
+        get() = node.bounds
 
-    override fun getBoundsInParent(): Rect? {
-        return node.getBoundsInParent()
-    }
+    override val boundsInParent: Rect?
+        get() = node.boundsInParent
 
-    override fun getParent(): ViewNode? {
-        return node.getParent()
-    }
+    override val parent: ViewNode?
+        get() = node.parent
+
 
     override fun getChildCount(): Int? {
         return node.getChildCount()

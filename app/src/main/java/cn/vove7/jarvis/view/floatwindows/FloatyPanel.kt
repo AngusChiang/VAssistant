@@ -2,6 +2,7 @@ package cn.vove7.jarvis.view.floatwindows
 
 import android.graphics.drawable.AnimationDrawable
 import android.os.Handler
+import android.os.Looper
 import android.view.View
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.appbus.AppBus
@@ -110,8 +111,7 @@ class FloatyPanel : AbFloatWindow(GlobalApp.APP) {
     }
 
     private val delayHandler: Handler by lazy {
-        LooperHelper.prepareIfNeeded()
-        Handler()
+        Handler(Looper.getMainLooper())
     }
 
     fun hideDelay(delay: Long = 800) {

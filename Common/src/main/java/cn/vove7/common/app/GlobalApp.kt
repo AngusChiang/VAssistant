@@ -76,8 +76,8 @@ open class GlobalApp : RePluginApplication() {
             toastError(getString(sId), duration)
         }
 
-        fun toastError(msg: String, duration: Int = Toast.LENGTH_SHORT) {
-            ToastyHelper.toast(TYPE_ERROR, msg, duration)
+        fun toastError(msg: String?, duration: Int = Toast.LENGTH_SHORT) {
+            ToastyHelper.toast(TYPE_ERROR, "$msg", duration)
         }
 
         fun toastWarning(sId: Int, duration: Int = Toast.LENGTH_SHORT) {

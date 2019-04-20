@@ -50,6 +50,7 @@ object VoiceWakeupStrategy : AbsAccPluginService() {
     }
 
     fun closeWakeup() {
+        if(!AppConfig.voiceWakeup) return
         MainService.instance?.onCommand(AppBus.ACTION_STOP_VOICE_WAKEUP_WITHOUT_NOTIFY)
         Vog.d("VoiceWakeupStrategy ---> 关闭语音唤醒")
         closed = true

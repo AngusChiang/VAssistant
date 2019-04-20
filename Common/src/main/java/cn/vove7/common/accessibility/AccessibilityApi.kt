@@ -6,12 +6,16 @@ import android.os.Build
 import android.provider.Settings
 import android.support.v4.view.accessibility.AccessibilityNodeInfoCompat.FOCUS_INPUT
 import android.view.accessibility.AccessibilityNodeInfo
+import cn.vove7.common.NeedAccessibilityException
 import cn.vove7.common.accessibility.component.AccPluginService
 import cn.vove7.common.accessibility.viewnode.ViewNode
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.app.GlobalLog
+import cn.vove7.common.appbus.AppBus
 import cn.vove7.common.datamanager.parse.model.ActionScope
+import cn.vove7.common.model.RequestPermission
 import cn.vove7.common.utils.ThreadPool
+import cn.vove7.common.utils.whileWaitTime
 import cn.vove7.vtp.app.AppInfo
 import cn.vove7.vtp.log.Vog
 import java.util.concurrent.ConcurrentSkipListSet
@@ -90,6 +94,24 @@ abstract class AccessibilityApi : AccessibilityService() {
         val isBaseServiceOn: Boolean
             get() = (accessibilityService != null)
         val isAdvanServiceOn: Boolean get() = gestureService != null
+
+        /**
+         * 等待无障碍开启，最长等待30s
+         * @param waitMillis Long
+         * @return Boolean
+         * @throws NeedAccessibilityException
+         */
+        @Throws(NeedAccessibilityException::class)
+        fun waitAccessibility(waitMillis: Long = 30000): Boolean {
+            if (AccessibilityApi.isBaseServiceOn) return true
+            else AppBus.post(RequestPermission("无障碍服务"))
+
+            return whileWaitTime(if (waitMillis > 30000) 30000 else waitMillis) {
+                if (AccessibilityApi.isBaseServiceOn)
+                    true
+                else null
+            } ?: throw NeedAccessibilityException()
+        }
 
 
         /**

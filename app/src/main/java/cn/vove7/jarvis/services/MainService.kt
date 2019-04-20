@@ -517,8 +517,7 @@ class MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
                 ACTION_STOP_WAKEUP_TIMER -> {
                     speechRecogService?.stopAutoSleepWakeup()
                 }
-                else -> {
-                }
+
             }
         }
     }

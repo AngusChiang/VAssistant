@@ -2,9 +2,7 @@ package cn.vove7.common.view.finder
 
 import android.util.Range
 import android.view.accessibility.AccessibilityNodeInfo
-import cn.vove7.common.accessibility.AccessibilityApi
 import cn.vove7.common.accessibility.viewnode.ViewNode
-import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.view.finder.ViewFinderWithMultiCondition.Companion.TEXT_MATCH_MODE_CONTAIN
 import cn.vove7.common.view.finder.ViewFinderWithMultiCondition.Companion.TEXT_MATCH_MODE_EQUAL
 import cn.vove7.common.view.finder.ViewFinderWithMultiCondition.Companion.TEXT_MATCH_MODE_FUZZY_WITH_PINYIN
@@ -210,4 +208,35 @@ class ViewFindBuilder : FindBuilderWithOperation {
         return waitFor(l)
     }
 
+    companion object {
+        fun id(id: String): ViewFindBuilder {
+            return ViewFindBuilder().apply {
+                id(id)
+            }
+        }
+
+        fun text(text: String): ViewFindBuilder {
+            return ViewFindBuilder().apply {
+                equalsText(text)
+            }
+        }
+
+        fun desc(desc: String): ViewFindBuilder {
+            return ViewFindBuilder().apply {
+                this.desc(desc)
+            }
+        }
+
+        fun depths(depths: Array<Int>): ViewFindBuilder {
+            return ViewFindBuilder().apply {
+                this.depths(depths)
+            }
+        }
+
+        fun types(vararg types: String): ViewFindBuilder {
+            return ViewFindBuilder().apply {
+                this.type(*types)
+            }
+        }
+    }
 }
