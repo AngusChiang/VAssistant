@@ -260,7 +260,7 @@ class MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
             //没有手动停止 即认为处于长语音状态
             afterSpeakResumeListen = !(speechRecogService?.lastingStopped
                 ?: true)
-            if(recogIsListening) {
+            if (recogIsListening) {
                 speechRecogService?.cancelRecog(false)
             }
         }
@@ -945,6 +945,8 @@ class MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
                     val his = CommandHistory(UserInfo.getUserId(), result,
                             parseResult.msg)
                     WrapperNetHelper.uploadUserCommandHistory(his)
+                } else {
+                    hideAll()
                 }
             } else {// statistics
                 //云解析

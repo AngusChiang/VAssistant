@@ -7,6 +7,8 @@
 
 - 开发者模式
 
+- 扫一扫高级功能
+
 - MyAppInfo(
 //  regexStr :Array<String> -- 多个正则
     name:String
