@@ -49,9 +49,6 @@ abstract class ViewFinder(var node: AccessibilityNodeInfo?) {
             }
         }
         Vog.d("搜索超时${System.currentTimeMillis() - beginTime}/$m or 中断${ct.isInterrupted}")
-        if (ct.isInterrupted) {
-            throw InterruptedException("搜索终止：$this")
-        }
         return null
     }
 

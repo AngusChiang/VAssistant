@@ -11,7 +11,7 @@ android {
         applicationId "cn.vove7.vassistant"
         minSdkVersion 21
         targetSdkVersion 27
-        versionCode 112
+        versionCode 113
         versionName "1.8.8"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
