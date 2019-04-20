@@ -1,8 +1,10 @@
 package cn.vove7.jarvis.view
 
 import android.content.Context
+import android.support.design.widget.TextInputLayout
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.bridges.RootHelper
+import cn.vove7.jarvis.R
 import cn.vove7.jarvis.tools.AppConfig
 import cn.vove7.vtp.log.Vog
 import cn.vove7.vtp.runtimepermission.PermissionUtils
@@ -61,4 +63,22 @@ fun isWirelessDebugEnable(): Boolean {
         e.printStackTrace()
         return false
     }
+}
+
+/**
+ * 检查TextInputLayout编辑框内容是否空
+ * @receiver TextInputLayout
+ * @param errMsgWhenEmpty String
+ * @return String?
+ */
+fun TextInputLayout.checkEmpty(
+        errMsgWhenEmpty: String = context.getString(R.string.text_not_empty), trim: Boolean = true): String? {
+    val s = editText?.text.toString()
+    if ((if (trim) s.trim() else s).isEmpty()) {
+        error = errMsgWhenEmpty
+        return null
+    }
+    error = ""
+    return s
+
 }

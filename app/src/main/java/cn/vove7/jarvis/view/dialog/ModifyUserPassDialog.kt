@@ -8,6 +8,7 @@ import cn.vove7.common.netacc.ApiUrls
 import cn.vove7.common.netacc.WrapperNetHelper
 import cn.vove7.common.netacc.tool.SecureHelper
 import cn.vove7.jarvis.R
+import cn.vove7.jarvis.view.checkEmpty
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.customview.customView
 
@@ -20,12 +21,13 @@ import com.afollestad.materialdialogs.customview.customView
 class ModifyUserPassDialog(val context: Context) {
 
     val dialog = MaterialDialog(context)
+            .title(R.string.text_modify_pass)
             .customView(R.layout.dialog_modify_pass, scrollable = true)
             .noAutoDismiss()
             .positiveButton {
-                var old = checkEmptyErr(oldPassIn) ?: return@positiveButton
-                var newP1 = checkEmptyErr(newPassIn1) ?: return@positiveButton
-                val newP2 = checkEmptyErr(newPassIn2) ?: return@positiveButton
+                var old = oldPassIn.checkEmpty() ?: return@positiveButton
+                var newP1 = newPassIn1.checkEmpty() ?: return@positiveButton
+                val newP2 = newPassIn2.checkEmpty() ?: return@positiveButton
                 if (newP1 != newP2) {
                     newPassIn2.error = "两次密码不一致"
                     return@positiveButton
@@ -35,7 +37,6 @@ class ModifyUserPassDialog(val context: Context) {
                 val p = ProgressDialog(context)
                 WrapperNetHelper.postJson<Any>(ApiUrls.MODIFY_PASS, model = old, arg1 = newP1) {
                     success { _, b ->
-                        p.dismiss()
                         if (b.isOk()) {
                             GlobalApp.toastSuccess(R.string.text_modify_succ)
                             it.dismiss()
@@ -44,10 +45,12 @@ class ModifyUserPassDialog(val context: Context) {
                         }
                     }
                     fail { _, e ->
-                        p.dismiss()
                         e.log()
-                        GlobalApp.toastInfo(e.message
+                        GlobalApp.toastError(e.message
                             ?: context.getString(R.string.text_modify_failed))
+                    }
+                    end {
+                        p.dismiss()
                     }
                 }
 
@@ -62,14 +65,4 @@ class ModifyUserPassDialog(val context: Context) {
     private val newPassIn1: TextInputLayout by lazy { dialog.findViewById<TextInputLayout>(R.id.new_pass1) }
     private val newPassIn2: TextInputLayout by lazy { dialog.findViewById<TextInputLayout>(R.id.new_pass2) }
 
-
-    private fun checkEmptyErr(it: TextInputLayout): String? {
-        val s = it.editText?.text.toString()
-        if (s.trim() == "") {
-            it.error = context.getString(R.string.text_not_empty)
-            return null
-        }
-        it.error = ""
-        return s
-    }
 }

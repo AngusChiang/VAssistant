@@ -509,7 +509,7 @@ object AppConfig {
         //已登陆/检查次数
         val f = getTodayCount("translate_count")
         Vog.d("haveTranslatePermission ---> 翻译次数 $f")
-        return if (f < 5) {//免费10次
+        return if (f < 10) {//免费10次
             plusTodayCount("translate_count", f)
             true
         } else {
@@ -543,8 +543,8 @@ object AppConfig {
         if (UserInfo.isVip())
             return true
         val f = getTodayCount("tp")
-        return (f < 5).also {
-            //免费5次
+        return (f < 10).also {
+            //免费10次
             if (it) runOnCachePool {
                 plusTodayCount("tp", f)
             }

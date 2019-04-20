@@ -4,8 +4,6 @@ import android.app.Activity
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
-import android.content.Intent
-import android.net.Uri
 import android.os.Handler
 import android.view.LayoutInflater
 import android.view.View
@@ -61,6 +59,11 @@ class UserInfoDialog(val context: Activity, val onUpdate: () -> Unit) {
     init {
         setData()
         loadInfo()
+        userEmailText.setOnClickListener {
+            //修改邮箱
+            ModifyUserMailDialog(context, onUpdate)
+            dialog.dismiss()
+        }
         //修改昵称
         dialog.findViewById<View>(R.id.name_lay).setOnClickListener {
             MaterialDialog(context).title(R.string.text_modify_user_name)

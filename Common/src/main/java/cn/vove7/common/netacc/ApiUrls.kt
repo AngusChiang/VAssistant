@@ -33,6 +33,7 @@ object ApiUrls {
     val GET_PRICES: String get() = ACCOUNT + "gp"
     val MODIFY_NAME: String get() = ACCOUNT + "mun"
     val MODIFY_PASS: String get() = ACCOUNT + "mup"
+    val MODIFY_MAIL: String get() = ACCOUNT + "mue"
     val CHECK_USER_DATE: String get() = ACCOUNT + "cud"
 
     val REGISTER_BY_EMAIL: String get() = ACCOUNT + "rbe"
