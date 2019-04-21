@@ -47,10 +47,7 @@ import cn.vove7.common.model.RequestPermission
 import cn.vove7.common.model.ResultBox
 import cn.vove7.common.netacc.ApiUrls
 import cn.vove7.common.netacc.WrapperNetHelper
-import cn.vove7.common.utils.RegUtils
-import cn.vove7.common.utils.ScreenCapturer
-import cn.vove7.common.utils.checkPermission
-import cn.vove7.common.utils.newTask
+import cn.vove7.common.utils.*
 import cn.vove7.common.view.ScreenshotActivity
 import cn.vove7.common.view.finder.ViewFindBuilder
 import cn.vove7.vtp.app.AppHelper
@@ -108,10 +105,9 @@ object SystemBridge : SystemOperation {
             if (launchIntent == null) {
                 throw Exception("启动失败 未找到此App: $pkg")
             } else {
-                launchIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                launchIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_DOCUMENT)
+                launchIntent.newDoc()
                 if (clearTask) {
-                    launchIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK)
+                    launchIntent.clearTask()
                 }
                 context.startActivity(launchIntent)
                 true

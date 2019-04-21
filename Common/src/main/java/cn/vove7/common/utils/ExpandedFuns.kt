@@ -291,6 +291,12 @@ fun Intent.newTask(): Intent {
     return this
 }
 
+fun Intent.newDoc(): Intent {
+    newTask()
+    addFlags(Intent.FLAG_ACTIVITY_NEW_DOCUMENT)
+    return this
+}
+
 fun Intent.clearTask(): Intent {
     addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK)
     return this

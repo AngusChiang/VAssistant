@@ -6,6 +6,7 @@ import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.bridges.SystemBridge
 import cn.vove7.common.model.UserInfo
 import cn.vove7.common.utils.ThreadPool.runOnPool
+import cn.vove7.common.utils.newDoc
 import cn.vove7.common.utils.startActivityOnNewTask
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.activities.PluginManagerActivity
@@ -47,7 +48,7 @@ class LaboratoryActivity : ReturnableActivity() {
                 SettingGroupItem(R.color.indigo_700, "插件管理", childItems = listOf(
                         IntentItem(title = "插件管理", summary = "扩展功能") {
                             startActivityOnNewTask(Intent(this, PluginManagerActivity::class.java).also {
-                                it.addFlags(Intent.FLAG_ACTIVITY_NEW_DOCUMENT)
+                                it.newDoc()
                             })
                         },
                         CheckBoxItem(title = "自动检查更新", keyId = R.string.key_auto_check_plugin_update,

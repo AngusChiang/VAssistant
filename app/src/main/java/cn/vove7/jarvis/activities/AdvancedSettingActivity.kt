@@ -14,6 +14,7 @@ import cn.vove7.common.model.UserInfo
 import cn.vove7.common.netacc.ApiUrls
 import cn.vove7.common.netacc.WrapperNetHelper
 import cn.vove7.common.netacc.model.LastDateInfo
+import cn.vove7.common.utils.newDoc
 import cn.vove7.jarvis.BuildConfig
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.activities.base.ReturnableActivity
@@ -107,7 +108,7 @@ class AdvancedSettingActivity : ReturnableActivity() {
 
     private fun startOnNewWin(cls: Class<*>) {
         startActivity(Intent(this, cls).also {
-            it.addFlags(Intent.FLAG_ACTIVITY_NEW_DOCUMENT)
+            it.newDoc()
         })
     }
 

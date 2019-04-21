@@ -2,6 +2,7 @@ package cn.vove7.jarvis.activities
 
 import android.app.Activity
 import android.content.Intent
+import android.content.Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS
 import android.os.Bundle
 import android.widget.Toast
 import cn.vove7.vtp.sharedpreference.SpHelper
@@ -31,7 +32,7 @@ class CrashInfoActivity : Activity() {
     private fun restart() {
         val intent = baseContext.packageManager
                 .getLaunchIntentForPackage(baseContext.packageName)
-        intent?.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK)
+        intent?.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK or FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS)
         startActivity(intent)
         finish()
     }

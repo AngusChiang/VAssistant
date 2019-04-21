@@ -1,9 +1,5 @@
 package cn.vove7.jarvis
 
-//import com.argusapm.android.api.Client
-//import com.argusapm.android.core.Config
-//import com.argusapm.android.network.cloudrule.RuleSyncRequest
-//import com.argusapm.android.network.upload.CollectDataSyncUpload
 import cn.vove7.androlua.LuaApp
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.utils.ThreadPool.runOnPool

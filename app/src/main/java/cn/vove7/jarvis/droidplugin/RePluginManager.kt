@@ -1,8 +1,8 @@
 package cn.vove7.jarvis.droidplugin
 
-import android.content.Intent
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.app.GlobalLog
+import cn.vove7.common.utils.newDoc
 import cn.vove7.vtp.file.FileHelper
 import cn.vove7.vtp.log.Vog
 import com.qihoo360.replugin.RePlugin
@@ -63,7 +63,7 @@ class RePluginManager : PluginManager {
         return try {
             RePlugin.startActivity(context, RePlugin
                     .createIntent(pluginInfo.packageName, pluginInfo.mainActivity).also {
-                        it.addFlags(Intent.FLAG_ACTIVITY_NEW_DOCUMENT)
+                        it.newDoc()
                     })
         } catch (e: Exception) {
             GlobalLog.err(e)

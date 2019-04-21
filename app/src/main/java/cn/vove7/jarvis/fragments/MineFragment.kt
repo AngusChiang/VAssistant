@@ -11,6 +11,8 @@ import android.widget.ListView
 import android.widget.TextView
 import cn.vove7.common.appbus.AppBus
 import cn.vove7.common.model.UserInfo
+import cn.vove7.common.utils.gone
+import cn.vove7.common.utils.show
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.activities.*
 import cn.vove7.jarvis.activities.base.LaboratoryActivity
@@ -35,11 +37,12 @@ class MineFragment : Fragment() {
     @Subscribe(threadMode = ThreadMode.MAIN)
     fun onEvent(code: String) {
         Vog.d("onEvent ---> $code")
-        if (code == AppBus.EVENT_LOGOUT) {
-            loadUserInfo()
+        when (code) {
+            AppBus.EVENT_FORCE_OFFLINE, AppBus.EVENT_LOGOUT -> {
+                loadUserInfo()
+            }
         }
     }
-
 
     lateinit var listView: ListView
     lateinit var loginView: View
@@ -82,12 +85,6 @@ class MineFragment : Fragment() {
         return view
     }
 
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    fun on(s: String) {
-        if (s == AppBus.EVENT_FORCE_OFFLINE) {
-            loadUserInfo()
-        }
-    }
 
     override fun onResume() {
         super.onResume()
@@ -105,10 +102,10 @@ class MineFragment : Fragment() {
             user_info_lay.visibility = View.VISIBLE
             user_name_text.text = UserInfo.getUserName()
             user_vip_text.text = if (UserInfo.isVip()) {
-                red_heard.visibility = View.VISIBLE
+                red_heard.show()
                 "高级用户"
             } else {
-                red_heard.visibility = View.GONE
+                red_heard.gone()
                 ""
             }
         } else {
@@ -117,22 +114,22 @@ class MineFragment : Fragment() {
         }
     }
 
-    val accs = listOf(
-            SettingsActivity::class.java,
-            AdvancedSettingActivity::class.java,
-            LaboratoryActivity::class.java,
-            PermissionManagerActivity::class.java,
-            HelpActivity::class.java,
-            AboutActivity::class.java
-    )
+    private val activities
+        get() = arrayOf(
+                SettingsActivity::class.java,
+                AdvancedSettingActivity::class.java,
+                LaboratoryActivity::class.java,
+                PermissionManagerActivity::class.java,
+                HelpActivity::class.java,
+                AboutActivity::class.java
+        )
 
     fun onItemClick(position: Int) {
         val intent = when (position) {
-            in 0..5 -> Intent(context, accs[position])
+            in 0..5 -> Intent(context, activities[position])
             else -> null
         }
         if (intent != null) {
-//            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_DOCUMENT)
             startActivity(intent)
         }
 
@@ -150,9 +147,9 @@ class MineFragment : Fragment() {
 
         @JvmStatic
         fun newInstance() = MineFragment().apply {
-            arguments = Bundle().apply {
-
-            }
+            //            arguments = Bundle().apply {
+//
+//            }
         }
     }
 }

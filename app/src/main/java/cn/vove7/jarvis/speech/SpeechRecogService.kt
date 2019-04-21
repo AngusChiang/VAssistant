@@ -7,6 +7,7 @@ import android.os.*
 import android.support.annotation.CallSuper
 import android.support.v4.app.ActivityCompat
 import cn.vove7.common.app.GlobalApp
+import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.appbus.AppBus
 import cn.vove7.common.model.RequestPermission
 import cn.vove7.common.utils.runInCatch
@@ -142,7 +143,7 @@ abstract class SpeechRecogService(val event: SpeechEvent) : SpeechRecogI {
     private val stopWakeUpAction = Runnable {
         wakeupTimerEnd = true
         if (wakeupI.opened) {
-            if(AppConfig.voiceWakeup) {
+            if (AppConfig.voiceWakeup) {
                 wakeupStatusAni.failed("语音唤醒已自动休眠")
             }
             doStopWakeUp()//不通知
@@ -227,6 +228,9 @@ abstract class SpeechRecogService(val event: SpeechEvent) : SpeechRecogI {
                 return@runOnNewHandlerThread
             }
             if (AppConfig.lastingVoiceCommand && !lastingStopped) {
+                if (BuildConfig.DEBUG) {
+                    GlobalLog.log("开始长语音")
+                }
                 startRecog(notify = false)
             } else {
                 Vog.d("重启长语音： 长语音关闭或已停止")
@@ -258,12 +262,15 @@ abstract class SpeechRecogService(val event: SpeechEvent) : SpeechRecogI {
                 }
                 IStatus.CODE_VOICE_TEMP -> {//中间结果
                     restartStopTimer()
-                    val res = msg.data.getString("data")
-                    if (res != null)
-                        event.onTempResult(res)
+                    val res = msg.data.getString("data") ?: return
+                    event.onTempResult(res)
                 }
                 IStatus.CODE_VOICE_ERR -> {//出错
                     val code = msg.data.getInt("data")
+                    if (BuildConfig.DEBUG) {
+                        GlobalLog.log("识别出错：" + SpeechEvent.codeString(code))
+                    }
+
                     isListening = false
                     lastingStopped = true
                     closeSCO()

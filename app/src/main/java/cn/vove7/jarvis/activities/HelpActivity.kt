@@ -97,16 +97,6 @@ class HelpActivity : ReturnableActivity(), AdapterView.OnItemClickListener {
             3 -> SystemBridge.openUrl(ApiUrls.QQ_GROUP_1)
             4 -> showFeedbackDialog()
             5 -> {
-                if(BuildConfig.DEBUG) {
-                    for (i in 0..100) {
-                        if (i % 2 == 0) {
-                            GlobalLog.err("err-$i")
-                        } else {
-                            GlobalLog.log("info-$i")
-                        }
-                    }
-                }
-
                 var text = GlobalLog.colorHtml()
                 if (BuildConfig.DEBUG && text.isEmpty()) {
                     try {
