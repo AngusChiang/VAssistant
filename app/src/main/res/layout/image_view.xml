@@ -2,12 +2,14 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="50dp"
     android:gravity="center"
+    android:clickable="false"
     android:layout_height="50dp">
 
     <ImageView
         android:id="@+id/image_view"
         android:layout_width="45dp"
         android:src="@drawable/ic_twotone_graphic_eq"
+        android:background="?android:selectableItemBackgroundBorderless"
         android:layout_height="50dp"
         android:padding="5dp" />
 </LinearLayout>

@@ -318,14 +318,7 @@ class ScreenAssistActivity : Activity() {
                             }
                         }
                     }
-                    create().apply {
-                        try {
-                            DialogUtil.setFloat(this)//悬浮权限
-                            show()
-                        } catch (e: Exception) {
-                            AppBus.post(RequestPermission("悬浮窗权限"))
-                        }
-                    }
+                    show()
                 }
 
     }
