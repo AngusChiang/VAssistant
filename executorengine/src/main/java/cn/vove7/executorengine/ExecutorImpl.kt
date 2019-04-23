@@ -30,6 +30,7 @@ import cn.vove7.common.helper.AdvanAppHelper
 import cn.vove7.common.helper.startable
 import cn.vove7.common.model.MatchedData
 import cn.vove7.common.model.RequestPermission
+import cn.vove7.common.model.ResultBox
 import cn.vove7.common.utils.*
 import cn.vove7.common.view.finder.ViewFindBuilder
 import cn.vove7.common.view.notifier.ActivityShowListener
@@ -644,15 +645,11 @@ open class ExecutorImpl(
     }
 
     override fun speakSync(text: String): Boolean {
-        if (serviceBridge?.speakSync(text) == false) {
-            return true
+        val resultBox = ResultBox<String?>()
+        serviceBridge?.speakWithCallback(text) {
+            resultBox.setAndNotify(it)
         }
-        waitForUnlock()
-        return if (tmpMap[SPEAK_CALLBACK] == null) true
-        else {
-            Vog.d("回调结果失败 speakSync ${tmpMap[SPEAK_CALLBACK]}")
-            false
-        }
+        return resultBox.blockedGet() != null
     }
 
     /**

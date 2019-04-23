@@ -758,7 +758,7 @@ object SystemBridge : SystemOperation {
         block = Runnable {
             locationManager.removeUpdates(loLis)
             GlobalLog.log("location ---> 获取位置超时,使用上次位置")
-            result.setAndQuit(locationManager.getLastKnownLocation(locationProvider))
+            result.setAndNotify(locationManager.getLastKnownLocation(locationProvider))
         }
         val looper = Looper.myLooper()
         locationManager.requestLocationUpdates(locationProvider, 500L, 0f, loLis, looper)

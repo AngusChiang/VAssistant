@@ -332,42 +332,21 @@ class MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
 
     private var speakSync = false
     override fun speak(text: String?) {
-        //关闭语音播报 toast
-        if (AppConfig.currentStreamVolume != 0) {
-            floatyPanel.show(text ?: "")
-            speakSync = false
-            speechSynService?.speak(text)
-        } else {
-            GlobalApp.toastInfo(text ?: "null")
-            notifySpeakFinish(text, false)
-        }
+        speakSync = false
+        speechSynService?.speak(text)
     }
 
-    private val speakCallbacks = mutableListOf<SpeakCallback>(cExecutor)
+    private val speakCallbacks = mutableListOf<SpeakCallback>()
 
     /**
      * 同步 响应词
      * @param text String?
      * @param call SpeakCallback
      */
-    private fun speakWithCallback(text: String?, call: SpeakCallback) {
+    override fun speakWithCallback(text: String?, call: SpeakCallback) {
         speakCallbacks.add(call)
-        floatyPanel.show(text)
         speakSync = true
         speechSynService?.speak(text) ?: notifySpeakFinish(text, false)
-    }
-
-    override fun speakSync(text: String?): Boolean {
-        speakSync = true
-        return if (AppConfig.currentStreamVolume != 0) {//当前音量非静音
-            floatyPanel.show(text)
-            speechSynService?.speak(text) ?: notifySpeakFinish(text, false)
-            true
-        } else {
-            GlobalApp.toastInfo(text)
-            notifySpeakFinish(text, false)
-            false
-        }
     }
 
     override fun onExecuteStart(tag: String) {//
@@ -1107,6 +1086,7 @@ class MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
 
         override fun onStart(text: String?) {
             Vog.d("onSynData 开始")
+            floatyPanel.show(text)
             stopLastingRecogTemp()
             checkMusic()
         }
@@ -1117,7 +1097,7 @@ class MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
             speakCallbacks.forEach {
                 it.invoke(text)
             }
-            speakCallbacks.removeAll { it != cExecutor }
+            speakCallbacks.clear()
         }
         Vog.d("通知speak结束 $isSpeak")
         hideAll()

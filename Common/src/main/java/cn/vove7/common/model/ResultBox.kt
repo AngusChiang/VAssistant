@@ -1,41 +1,24 @@
 package cn.vove7.common.model
 
-import android.os.Looper
+import cn.vove7.common.utils.runInCatch
 import cn.vove7.vtp.log.Vog
-import org.greenrobot.greendao.annotation.NotNull
-import java.lang.Thread.sleep
+import java.util.concurrent.CountDownLatch
 
 /**
  * Created by Vove on 2018/7/5
  */
 class ResultBox<T> {
     private var mValue: T? = null
-    var has = false
 
-    private var loop: Looper? = null
+    var lock = CountDownLatch(1)
 
     constructor()
 
-    @NotNull
-    fun prepare(): ResultBox<T> {
-        if (Looper.myLooper() == null) {
-            Looper.prepare()
-        }
-        loop = Looper.myLooper()
-        return this
-    }
-
-    constructor(mValue: T) {
-        this.mValue = mValue
+    constructor(initValue: T) {
+        this.mValue = initValue
     }
 
     fun get(): T? {
-        return mValue
-    }
-
-    fun loopGet(): T? {
-        Looper.loop()
-        Vog.d("loopGet ---> get it " + mValue!!)
         return mValue
     }
 
@@ -43,29 +26,21 @@ class ResultBox<T> {
         this.mValue = value
     }
 
-    fun setAndQuit(value: T) {
-        this.mValue = value
-        if (loop != null)
-            loop!!.quitSafely()
-    }
-
     fun setAndNotify(value: T) {
-//        Vog.d("setAndNotify ---> $value")
+        Vog.d("setAndNotify ---> $value")
         mValue = value
-        has = true
+        lock.countDown()
     }
 
     //等待结果
     @Throws(InterruptedException::class)
     fun blockedGet(safely: Boolean = true): T? {
         if (safely) {
-            try {
-                while (!has) sleep(20)
-            } catch (e: Exception) {
-                e.printStackTrace()
+            runInCatch {
+                lock.await()
             }
         } else {
-            while (!has) sleep(20)
+            lock.await()
         }
         return mValue
     }
