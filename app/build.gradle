@@ -11,8 +11,8 @@ android {
         applicationId "cn.vove7.vassistant"
         minSdkVersion 21
         targetSdkVersion 27
-        versionCode 113
-        versionName "1.8.8"
+        versionCode 115
+        versionName "1.8.9"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
         multiDexEnabled true

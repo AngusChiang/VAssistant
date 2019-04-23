@@ -674,9 +674,13 @@ object SystemBridge : SystemOperation {
 
     override fun setClipText(text: String?) {
         prepareIfNeeded()
-        val cm = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-        val mClipData = ClipData.newPlainText("", text)
-        cm.primaryClip = mClipData
+        try {
+            val cm = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+            val mClipData = ClipData.newPlainText("", text)
+            cm.primaryClip = mClipData
+        } catch (e: Throwable) {
+            GlobalApp.toastError("复制失败：" + e.message)
+        }
     }
 
     fun sendEmail(to: String) {

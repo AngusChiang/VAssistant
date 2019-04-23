@@ -40,14 +40,11 @@ import cn.vove7.common.model.RequestPermission
 import cn.vove7.common.model.UserInfo
 import cn.vove7.common.model.VoiceRecogResult
 import cn.vove7.common.netacc.WrapperNetHelper
+import cn.vove7.common.utils.*
 import cn.vove7.common.utils.RegUtils.checkCancel
 import cn.vove7.common.utils.RegUtils.checkConfirm
 import cn.vove7.common.utils.ThreadPool.runOnCachePool
 import cn.vove7.common.utils.ThreadPool.runOnPool
-import cn.vove7.common.utils.runOnNewHandlerThread
-import cn.vove7.common.utils.runOnUi
-import cn.vove7.common.utils.runWithClock
-import cn.vove7.common.utils.startActivityOnNewTask
 import cn.vove7.common.view.finder.ViewFindBuilder
 import cn.vove7.executorengine.exector.ExecutorEngine
 import cn.vove7.executorengine.model.ActionParseResult
@@ -254,13 +251,17 @@ class MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
     /**
      * speak时暂时关闭 长语音识别（长语音）
      */
-    private fun stopLastingRecogTemp() {
+    private fun stopLastingRecogTemp(cancelRecog:Boolean=true) {
+        if (isSpeakingResWord) {
+            afterSpeakResumeListen = false
+            return
+        }
         if (AppConfig.lastingVoiceCommand) {
             Vog.d("speak临时 ${speechRecogService?.lastingStopped}")
             //没有手动停止 即认为处于长语音状态
             afterSpeakResumeListen = !(speechRecogService?.lastingStopped
                 ?: true)
-            if (recogIsListening) {
+            if (cancelRecog&&recogIsListening) {
                 speechRecogService?.cancelRecog(false)
             }
         }
@@ -338,7 +339,7 @@ class MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
             speechSynService?.speak(text)
         } else {
             GlobalApp.toastInfo(text ?: "null")
-            notifySpeakFinish(text)
+            notifySpeakFinish(text, false)
         }
     }
 
@@ -353,18 +354,18 @@ class MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
         speakCallbacks.add(call)
         floatyPanel.show(text)
         speakSync = true
-        speechSynService?.speak(text) ?: notifySpeakFinish(text)
+        speechSynService?.speak(text) ?: notifySpeakFinish(text, false)
     }
 
     override fun speakSync(text: String?): Boolean {
         speakSync = true
         return if (AppConfig.currentStreamVolume != 0) {//当前音量非静音
             floatyPanel.show(text)
-            speechSynService?.speak(text) ?: notifySpeakFinish(text)
+            speechSynService?.speak(text) ?: notifySpeakFinish(text, false)
             true
         } else {
             GlobalApp.toastInfo(text)
-            notifySpeakFinish(text)
+            notifySpeakFinish(text, false)
             false
         }
     }
@@ -408,7 +409,6 @@ class MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
 
     override fun onExecuteInterrupt(errMsg: String) {
         Vog.e(errMsg)
-        executeAnimation.failedAndHideDelay()
         executeAnimation.failedAndHideDelay()
     }
 
@@ -707,6 +707,9 @@ class MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
     }
 
 
+    //是否在播放响应词
+    var isSpeakingResWord by StubbornFlag(false)
+
     /**
      * 语音识别事件监听
      */
@@ -726,7 +729,7 @@ class MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
             resumeMusicLock = false //不继续播放后台，
             Vog.d("speakResponseWord 响应词 ---> ${AppConfig.responseWord}")
             val l = CountDownLatch(1)
-
+            isSpeakingResWord = true
             speakWithCallback(AppConfig.responseWord) { result ->
                 Vog.d("speakWithCallback ---> $result")
                 sleep(200)
@@ -995,6 +998,7 @@ class MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
                 if (result) {//成功打开
                     Vog.d("parseAction ---> MultiExecutorEngine().smartOpen(cmdWord) 成功打开")
                     hideAll(true)
+                    speechRecogService?.startIfLastingVoice()
                     r = ActionParseResult(true, null, "smartOpen $cmdWord")
                 } else {
                     Vog.d("smartOpen --无匹配")
@@ -1017,6 +1021,8 @@ class MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
             floatyPanel.showAndHideDelay("获取失败,详情查看日志")
             parseAnimation.failedAndHideDelay()
             resumeMusicIf()
+            //检查长语音
+            speechRecogService?.startIfLastingVoice()
         } else {
             data.resultUrls.also {
                 when {
@@ -1079,13 +1085,13 @@ class MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
     inner class SynthesisEventListener : SyncEvent {
 
         override fun onError(text: String?) {
-            notifySpeakFinish(text)
+            notifySpeakFinish(text, true)
             resumeMusicIf()
         }
 
         override fun onFinish(text: String?) {
             Vog.v("onSynData 结束")
-            notifySpeakFinish(text)
+            notifySpeakFinish(text, true)
             if (resumeMusicLock) {//
                 resumeMusicIf()
             }
@@ -1101,15 +1107,20 @@ class MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
         }
     }
 
-    fun notifySpeakFinish(text: String?) {
+    fun notifySpeakFinish(text: String?, isSpeak: Boolean) {
         if (speakSync) {
             speakCallbacks.forEach {
                 it.invoke(text)
             }
             speakCallbacks.removeAll { it != cExecutor }
         }
+        Vog.d("通知speak结束 $isSpeak")
         hideAll()
-        resumeListenCommandIfLasting()
+        if (isSpeak) {
+            resumeListenCommandIfLasting()
+        } else {//未说话，直接
+            speechRecogService?.startIfLastingVoice()
+        }
     }
 
     /**

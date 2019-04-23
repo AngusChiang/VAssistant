@@ -3,7 +3,7 @@ package cn.vove7.common.utils
 import kotlin.reflect.KProperty
 
 /**
- * 一个初始化值，在第一次获取后变为第二个值
+ * 一个初始化值，在获取后变为第二个值
  * 固执
  * @param T
  * @property initValue T

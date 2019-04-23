@@ -108,7 +108,7 @@ class HelpActivity : ReturnableActivity(), AdapterView.OnItemClickListener {
                 BottomDialogWithSmoothText(this, "日志").apply {
                     setHtml(text)
                     positiveButton(text = "复制") {
-                        SystemBridge.setClipText(text)
+                        SystemBridge.setClipText(GlobalLog.toString())
                         GlobalApp.toastInfo(R.string.text_copied)
                     }
                     negativeButton(text = "清空") {
