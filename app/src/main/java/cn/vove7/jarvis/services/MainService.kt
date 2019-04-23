@@ -251,7 +251,7 @@ class MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
     /**
      * speak时暂时关闭 长语音识别（长语音）
      */
-    private fun stopLastingRecogTemp(cancelRecog:Boolean=true) {
+    private fun stopLastingRecogTemp(cancelRecog: Boolean = true) {
         if (isSpeakingResWord) {
             afterSpeakResumeListen = false
             return
@@ -261,7 +261,7 @@ class MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
             //没有手动停止 即认为处于长语音状态
             afterSpeakResumeListen = !(speechRecogService?.lastingStopped
                 ?: true)
-            if (cancelRecog&&recogIsListening) {
+            if (cancelRecog && recogIsListening) {
                 speechRecogService?.cancelRecog(false)
             }
         }
@@ -625,7 +625,11 @@ class MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
                 GlobalApp.toastWarning("引擎未就绪")
                 return
             }
-            if (recogIsListening) {//配置
+            if (instance?.isSpeakingResWord == true) {
+                Vog.d("正在响应词")
+                return
+            }
+            if (recogIsListening) {
                 instance?.onCommand(AppBus.ACTION_CANCEL_RECOG)
             } else
                 instance?.onCommand(AppBus.ACTION_START_RECOG)
@@ -708,7 +712,7 @@ class MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
 
 
     //是否在播放响应词
-    var isSpeakingResWord by StubbornFlag(false)
+    var isSpeakingResWord = false
 
     /**
      * 语音识别事件监听
@@ -732,6 +736,7 @@ class MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
             isSpeakingResWord = true
             speakWithCallback(AppConfig.responseWord) { result ->
                 Vog.d("speakWithCallback ---> $result")
+                isSpeakingResWord = false
                 sleep(200)
                 l.countDown()
             }
@@ -767,8 +772,8 @@ class MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
         override fun onPreStartRecog(byVoice: Boolean) {
             speechSynService?.stop()
             checkMusic()//检查后台播放
-            listeningAni.begin()//
             recogEffect(byVoice)
+            listeningAni.begin()//
         }
 
         override fun onRecogReady(silent: Boolean) {
