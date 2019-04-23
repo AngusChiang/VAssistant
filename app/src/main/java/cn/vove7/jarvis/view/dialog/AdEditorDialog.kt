@@ -14,6 +14,7 @@ import cn.vove7.common.model.UserInfo
 
 import cn.vove7.common.helper.AdvanAppHelper
 import cn.vove7.jarvis.R
+import cn.vove7.jarvis.plugins.AdKillerService
 import cn.vove7.jarvis.tools.AppConfig
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.customview.customView
@@ -126,6 +127,7 @@ class AdEditorDialog(val context: Context, val onUpdate: () -> Unit) {
                         }
                     }
                     DAO.clear()
+                    AdKillerService.update()
                     GlobalApp.toastSuccess(R.string.text_complete)
                     dia.dismiss()
                     onUpdate.invoke()
