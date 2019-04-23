@@ -40,11 +40,14 @@ import cn.vove7.common.model.RequestPermission
 import cn.vove7.common.model.UserInfo
 import cn.vove7.common.model.VoiceRecogResult
 import cn.vove7.common.netacc.WrapperNetHelper
-import cn.vove7.common.utils.*
 import cn.vove7.common.utils.RegUtils.checkCancel
 import cn.vove7.common.utils.RegUtils.checkConfirm
 import cn.vove7.common.utils.ThreadPool.runOnCachePool
 import cn.vove7.common.utils.ThreadPool.runOnPool
+import cn.vove7.common.utils.runOnNewHandlerThread
+import cn.vove7.common.utils.runOnUi
+import cn.vove7.common.utils.runWithClock
+import cn.vove7.common.utils.startActivityOnNewTask
 import cn.vove7.common.view.finder.ViewFindBuilder
 import cn.vove7.executorengine.exector.ExecutorEngine
 import cn.vove7.executorengine.model.ActionParseResult
@@ -433,7 +436,7 @@ class MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
             when (order) {
                 ACTION_STOP_EXEC -> {
                     speechRecogService?.cancelRecog()
-                    speechSynService?.stop()
+                    speechSynService?.stop(true)
                     cExecutor.interrupt()
                     hideAll(true)
                 }
@@ -604,9 +607,11 @@ class MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
                 GlobalApp.toastWarning("引擎未就绪")
                 return
             }
-            if (instance?.isSpeakingResWord == true) {
+            if (instance?.isSpeakingResWord == true && speaking) {
                 Vog.d("正在响应词")
                 return
+            } else {
+                instance?.isSpeakingResWord = false
             }
             if (recogIsListening) {
                 instance?.onCommand(AppBus.ACTION_CANCEL_RECOG)
@@ -1082,6 +1087,7 @@ class MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
         }
 
         override fun onUserInterrupt(text: String?) {
+            isSpeakingResWord = false
         }
 
         override fun onStart(text: String?) {
