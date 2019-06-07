@@ -17,6 +17,7 @@ import java.lang.Thread.sleep
 
 /**
  * 视图节点
+ * @property node 无障碍视图节点
  */
 class ViewNode(val node: AccessibilityNodeInfo) : ViewOperation, Comparable<ViewNode> {
 

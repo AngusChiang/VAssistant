@@ -15,7 +15,6 @@ import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.appbus.AppBus
 import cn.vove7.common.bridges.SystemBridge
 import cn.vove7.common.bridges.UtilBridge
-import cn.vove7.common.model.RequestPermission
 import cn.vove7.common.utils.*
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.activities.TextOcrActivity
@@ -25,7 +24,6 @@ import cn.vove7.jarvis.tools.Tutorials
 import cn.vove7.jarvis.tools.baiduaip.BaiduAipHelper
 import cn.vove7.jarvis.view.bottomsheet.AssistSessionGridController
 import cn.vove7.jarvis.view.dialog.ImageClassifyResultDialog
-import cn.vove7.vtp.dialog.DialogUtil
 import cn.vove7.vtp.log.Vog
 import kotlinx.android.synthetic.main.dialog_assist.*
 import java.io.File
@@ -74,7 +72,7 @@ class ScreenAssistActivity : Activity() {
         window.setWindowAnimations(R.style.ScreenAssist)
         showProgressBar = true
         bottomController = AssistSessionGridController(this, bottom_sheet, itemClick) {
-            if(isReady == true) screenPath else null
+            if (isReady == true) screenPath else null
         }
         bottomController.initView()
         bottomController.hideBottom()
@@ -122,9 +120,10 @@ class ScreenAssistActivity : Activity() {
                     val list = arrayListOf<View>()
                     bottomController.bottomView.findViewsWithText(list, "二维码/条码识别", FIND_VIEWS_WITH_CONTENT_DESCRIPTION)
                     Tutorials.showForView(this, Tutorials.screen_assistant_qrcode,
-                            list[0], "长按查看更多功能","使用微信扫一扫\n支付宝扫一扫")
+                            list[0], "长按查看更多功能", "使用微信扫一扫\n支付宝扫一扫")
 
-                }}
+                }
+            }
         }
     }
 
@@ -236,7 +235,11 @@ class ScreenAssistActivity : Activity() {
                 val path = Environment.getExternalStorageDirectory().absolutePath +
                         "/Pictures/Screenshots/Screenshot_${formatNow("yyyyMMdd-HHmmss")}.jpg"
 
-                File(screenPath).copyTo(File(path), true)
+                val f = File(path)
+                File(screenPath).copyTo(f, true)
+
+                GlobalApp.APP.sendBroadcast(Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE,
+                        Uri.fromFile(f)))
                 GlobalApp.toastInfo("保存到 $path")
             } catch (e: SecurityException) {
                 GlobalApp.toastError("保存失败：无存储权限")

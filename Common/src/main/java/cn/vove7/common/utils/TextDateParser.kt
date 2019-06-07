@@ -164,13 +164,6 @@ object TextDateParser {
             else it - 1
         }
 
-    //数字大写转小写
-    private fun u2l(s: Char): Int {
-        return if (s == '两') 2
-        else arrayOf('零', '一', '二', '三', '四', '五', '六', '七', '八', '九', '十')
-                .indexOf(s)
-    }
-
     /**
      * 大写数字转int
      * 八 -> 8
@@ -206,15 +199,11 @@ object TextDateParser {
             if (cu != null) {//单位
                 stack.push(stack.poolS(cu) * cu)
             } else {//数字
-                val n = u2l(c)
+                val n = c.toNumber()
                 stack.push(n.toLong())
             }
         }
-        var sum = 0L
-        stack.forEach {
-            sum += it
-        }
-        return sum
+        return stack.sum()
     }
 
     /**
@@ -326,6 +315,13 @@ object TextDateParser {
         val r = reg.matchEntire(text)
         return r?.groupValues?.subList(1, r.groupValues.size)?.toTypedArray()
     }
+}
+
+//数字大写转小写
+fun Char.toNumber(): Int {
+    return if (this == '两') 2
+    else arrayOf('零', '一', '二', '三', '四', '五', '六', '七', '八', '九', '十')
+            .indexOf(this)
 }
 
 private fun Stack<Long>.poolS(l: Long): Long {

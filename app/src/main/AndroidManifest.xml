@@ -130,6 +130,7 @@
         </activity> <!-- <activity android:name=".activities.MainActivity" /> -->
         <activity
             android:name=".activities.base.CreateShortcutActivity"
+            android:label="V Assistant快捷功能"
             android:exported="true"
             android:launchMode="singleInstance"
             android:theme="@style/TransparentBackground">

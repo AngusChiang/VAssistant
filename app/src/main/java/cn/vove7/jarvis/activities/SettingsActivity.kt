@@ -60,12 +60,7 @@ class SettingsActivity : ReturnableActivity() {
     }
 
     private fun startTutorials() {
-        Handler().postDelayed({
-            Tutorials.oneStep(this, list = arrayOf(
-                    ItemWrap(Tutorials.t_settings_set_assist, adapter.childHolders[0][0]?.titleView, "设为默认语音助手",
-                            "打开后支持长按HOME键快捷唤醒，未来将加入屏幕内容识别，快捷文字提取")
-            ))
-        }, 1000)
+
     }
 
     private fun initData(): List<SettingGroupItem> = listOf(

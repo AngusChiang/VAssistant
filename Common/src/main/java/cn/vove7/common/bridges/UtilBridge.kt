@@ -46,8 +46,6 @@ object UtilBridge {
                 FileOutputStream(this).use {
                     bitmap.compress(Bitmap.CompressFormat.PNG, 100, it)
                 }
-                GlobalApp.APP.sendBroadcast(Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE,
-                        Uri.fromFile(this)))
             }
         } catch (se: SecurityException) {
             GlobalApp.toastError("无存储权限")

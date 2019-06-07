@@ -1125,9 +1125,11 @@ class MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
      * 连续 加上 speak 会误判
      */
     fun checkMusic() {
-        if (!isMusicFocus) {
-            SystemBridge.requestMusicFocus()
-            isMusicFocus = true
+        synchronized(isMusicFocus) {
+            if (!isMusicFocus) {
+                SystemBridge.requestMusicFocus()
+                isMusicFocus = true
+            }
         }
     }
 
@@ -1136,9 +1138,11 @@ class MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
     var resumeMusicLock = true//在获取后音频焦点后 是否 释放（speak后）
 
     fun resumeMusicIf() {
-        if (isMusicFocus) {
-            SystemBridge.removeMusicFocus()
-            isMusicFocus = false
+        synchronized(isMusicFocus) {
+            if (isMusicFocus) {
+                SystemBridge.removeMusicFocus()
+                isMusicFocus = false
+            }
         }
     }
 

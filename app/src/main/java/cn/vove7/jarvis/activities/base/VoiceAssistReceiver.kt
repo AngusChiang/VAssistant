@@ -10,7 +10,10 @@ import cn.vove7.common.datamanager.DAO
 import cn.vove7.common.datamanager.parse.model.Action
 import cn.vove7.executorengine.parse.OpenAppAction
 import cn.vove7.jarvis.R
+import cn.vove7.jarvis.activities.screenassistant.QrCodeActivity
 import cn.vove7.jarvis.activities.screenassistant.ScreenAssistActivity
+import cn.vove7.jarvis.activities.screenassistant.ScreenShareActivity
+import cn.vove7.jarvis.activities.screenassistant.SpotScreenActivity
 import cn.vove7.jarvis.services.MainService
 import cn.vove7.jarvis.tools.AppConfig
 import cn.vove7.vtp.log.Vog
@@ -57,6 +60,21 @@ class VoiceAssistActivity : Activity() {
                     MainService.parseCommand("设为默认助手", false)
                     sleep(5000)
                 }
+            WAKEUP_SCREEN_ASSIST -> {
+                startActivity(ScreenAssistActivity.createIntent())
+            }
+            SCREEN_ASSIST_TEXT_PICKER -> {
+                AppBus.post(AppBus.ACTION_BEGIN_SCREEN_PICKER)
+            }
+            SCREEN_ASSIST_QR -> {
+                startActivity(Intent(this, QrCodeActivity::class.java))
+            }
+            SCREEN_ASSIST_SPOT_SCREEN -> {
+                startActivity(Intent(this, SpotScreenActivity::class.java))
+            }
+            SCREEN_ASSIST_SCREEN_SHARE -> {
+                startActivity(Intent(this, ScreenShareActivity::class.java))
+            }
             else -> {
                 try {
                     val id = action!!.toLong()
@@ -86,6 +104,12 @@ class VoiceAssistActivity : Activity() {
     companion object {
         const val SWITCH_VOICE_WAKEUP = "switch_voice_wakeup"
         const val SET_ASSIST_APP = "set_assist_app"
+        const val WAKEUP_SCREEN_ASSIST = "wakeup_screen_assist"
+        const val SCREEN_ASSIST_TEXT_PICKER = "screen_assist_text_picker"
+        const val SCREEN_ASSIST_QR = "screen_assist_qr"
+        const val SCREEN_ASSIST_SPOT_SCREEN = "screen_assist_spot_screen"
+        const val SCREEN_ASSIST_SCREEN_SHARE = "screen_assist_screen_share"
+
         const val WAKE_UP = "wakeup"
     }
 }

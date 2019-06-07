@@ -8,6 +8,7 @@ import cn.vove7.jarvis.chat.TulingChatSystem
 import cn.vove7.jarvis.tools.baiduaip.BaiduAipHelper
 import cn.vove7.paramregexengine.toParamRegex
 import cn.vove7.vtp.net.NetHelper
+import cn.vove7.vtp.text.TextHelper.compareSimilarityWithPinyin
 import org.jsoup.Jsoup
 import org.junit.Test
 import java.lang.Thread.sleep
@@ -122,12 +123,13 @@ class ExampleUnitTest {
     @Test
     fun testParseDate() {
         val s = SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
+        println("现在时间：${s.format(Date())}")
         arrayOf(
-//                "中午", "十二点", "八点四十五", "八点半", "晚上八点", "中午12点", "下午2点一刻",
-//                "明天中午", "后天下午3点", "大后天中午", "昨天下午2:21", "前天下午两点半",
-//                "周一下午", "下周二八点半", "周日晚上八点",
-//                "二十号晚上七点", "21号", "二十八号", "下个月十八号上午8点二十三", "十二月25号",
-//                "12月8号上午8点", "周二一点", "这周五八点", "周五晚上7点半",
+                "中午", "十二点", "八点四十五", "八点半", "晚上八点", "中午12点", "下午2点一刻",
+                "明天中午", "后天下午3点", "大后天中午", "昨天下午2:21", "前天下午两点半",
+                "周一下午", "下周二八点半", "周日晚上八点",
+                "二十号晚上七点", "21号", "二十八号", "下个月十八号上午8点二十三", "十二月25号",
+                "12月8号上午8点", "周二一点", "这周五八点", "周五晚上7点半",
                 "一小时后", "一个半小时后", "半小时后", "两个半小时后", "45分钟后", "三十二分钟后",
                 "两个小时后", "两小时后", "二十小时后",
                 "八天后", "你好",
@@ -135,7 +137,7 @@ class ExampleUnitTest {
                 "1小时24分钟后"
         ).forEach {
             //parse
-            val ss = TextDateParser.parseDateText(it)?.time?.let { d ->
+            val ss = TextDateParser.parseDateText(it)?.also { it.add(Calendar.DAY_OF_MONTH,-5) }?.time?.let { d ->
                 s.format(d)
             } ?: "解析失败"
             println("$ss   $it")
@@ -159,7 +161,7 @@ class ExampleUnitTest {
                 }
             }
             TextHelper.matchValues(it, "%提前半小时%").also { re ->
-                if (re != null)
+                if (re != null){}
                     println(30)
             }
         }
@@ -216,9 +218,9 @@ class ExampleUnitTest {
     @Test
     fun testKotlin() {
         val click = {
-            if (1 == 2)
-                println("1==2")
-            else
+            if (1 == 2){
+                println("1==2")}
+            else{}
                 println("1!=2")
         }
 
@@ -299,8 +301,8 @@ class ExampleUnitTest {
             thread {
                 //子线程
                 sleep(1000)
-                if (!Thread.currentThread().isInterrupted)
-                    println("未中断")
+                if (!Thread.currentThread().isInterrupted){
+                    println("未中断")}
                 else println("被中断")
                 println("子线程结束")
             }

@@ -59,6 +59,7 @@ import cn.vove7.vtp.system.DeviceInfo
 import cn.vove7.vtp.system.SystemHelper
 import java.io.File
 import java.util.*
+import kotlin.concurrent.thread
 
 @Suppress("unused", "MemberVisibilityCanBePrivate")
 object SystemBridge : SystemOperation {
@@ -977,16 +978,21 @@ object SystemBridge : SystemOperation {
 
     @Suppress("DEPRECATION")
     override fun screenOn() {
-        val pm = context.getSystemService(Context.POWER_SERVICE) as PowerManager
-        if (!pm.isInteractive) {
-            // 获取PowerManager.WakeLock对象,后面的参数|表示同时传入两个值,最后的是LogCat里用的Tag
-            val wl = pm.newWakeLock(
-                    PowerManager.ACQUIRE_CAUSES_WAKEUP or
-                            PowerManager.SCREEN_BRIGHT_WAKE_LOCK, SystemBridge::class.java.simpleName)
-            //点亮屏幕
-            wl.acquire(10000)
-            //释放
-            wl.release()
+        thread {
+            val pm = context.getSystemService(Context.POWER_SERVICE) as PowerManager
+            if (!pm.isInteractive) {
+                // 获取PowerManager.WakeLock对象,后面的参数|表示同时传入两个值,最后的是LogCat里用的Tag
+                val wl = pm.newWakeLock(
+                        PowerManager.ACQUIRE_CAUSES_WAKEUP or
+                                PowerManager.SCREEN_BRIGHT_WAKE_LOCK, SystemBridge::class.java.simpleName)
+                //点亮屏幕
+                try {
+                    wl.acquire(10 * 60 * 1000L /*10 minutes*/)
+                } finally {
+                    //释放
+                    wl.release()
+                }
+            }
         }
     }
 

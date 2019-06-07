@@ -36,7 +36,8 @@ abstract class ViewFinder(var node: AccessibilityNodeInfo?) {
         var sc = 0
         val ct = Thread.currentThread()
         Vog.d("搜索线程 ---> $ct ${ct.hashCode()}")
-        while (System.currentTimeMillis() - beginTime < t &&
+        val endTime = beginTime + t
+        while (System.currentTimeMillis()  < endTime &&
                 !ct.isInterrupted) {
             val node = findFirst()
             if (node != null) {

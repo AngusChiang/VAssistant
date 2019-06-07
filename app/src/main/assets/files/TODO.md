@@ -7,7 +7,7 @@
 
 - 开发者模式
 
-- 扫一扫高级功能
+- 唤醒屏幕 导致 卡死
 
 - MyAppInfo(
 //  regexStr :Array<String> -- 多个正则

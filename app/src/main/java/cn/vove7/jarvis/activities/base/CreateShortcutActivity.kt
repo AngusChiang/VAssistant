@@ -4,11 +4,14 @@ import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.speech.RecognizerIntent
-import cn.vove7.common.app.GlobalApp
-import cn.vove7.common.utils.newTask
 import cn.vove7.jarvis.R
+import cn.vove7.jarvis.activities.base.VoiceAssistActivity.Companion.SCREEN_ASSIST_QR
+import cn.vove7.jarvis.activities.base.VoiceAssistActivity.Companion.SCREEN_ASSIST_SCREEN_SHARE
+import cn.vove7.jarvis.activities.base.VoiceAssistActivity.Companion.SCREEN_ASSIST_SPOT_SCREEN
+import cn.vove7.jarvis.activities.base.VoiceAssistActivity.Companion.SCREEN_ASSIST_TEXT_PICKER
 import cn.vove7.jarvis.activities.base.VoiceAssistActivity.Companion.SET_ASSIST_APP
 import cn.vove7.jarvis.activities.base.VoiceAssistActivity.Companion.SWITCH_VOICE_WAKEUP
+import cn.vove7.jarvis.activities.base.VoiceAssistActivity.Companion.WAKEUP_SCREEN_ASSIST
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.callbacks.onDismiss
 import com.afollestad.materialdialogs.list.listItems
@@ -16,7 +19,7 @@ import com.afollestad.materialdialogs.list.listItems
 /**
  * # CreateShortcutActivity
  *
- * @author Administrator
+ * @author Vove
  * 2018/11/13
  */
 class CreateShortcutActivity : Activity() {
@@ -27,14 +30,23 @@ class CreateShortcutActivity : Activity() {
                 .listItems(items = listOf(
                         getString(R.string.shortcut_wakeup),
                         getString(R.string.text_switch_voice_wp),
-                        getString(R.string.shortcut_label_set_assist_app)
+                        getString(R.string.shortcut_label_set_assist_app),
+                        getString(R.string.label_screen_assistant),
+                        "文字提取",
+                        "二维码识别",
+                        "屏幕识别",
+                        "屏幕分享"
 //                        "语音搜索"
-                ),
-                        waitForPositiveButton = false) { d, i, _ ->
+                ), waitForPositiveButton = false) { d, i, text ->
                     when (i) {
-                        0 -> createWakeupShortcut()
-                        1 -> createSwitchVoiceWakeupShortcut()
-                        2 -> createOneKeySetAssistApp()
+                        0 -> create(VoiceAssistActivity.WAKE_UP, text)
+                        1 -> create(SWITCH_VOICE_WAKEUP, text)
+                        2 -> create(SET_ASSIST_APP, text)
+                        3 -> create(WAKEUP_SCREEN_ASSIST, text)
+                        4 -> create(SCREEN_ASSIST_TEXT_PICKER, text)
+                        5 -> create(SCREEN_ASSIST_QR, text)
+                        6 -> create(SCREEN_ASSIST_SPOT_SCREEN, text)
+                        7 -> create(SCREEN_ASSIST_SCREEN_SHARE, text)
 //                        3 -> createWebSearch()
                     }
                     d.dismiss()
@@ -50,9 +62,7 @@ class CreateShortcutActivity : Activity() {
         dialog.show()
     }
 
-    private fun createWakeupShortcut() {
-        create(VoiceAssistActivity.WAKE_UP, "唤醒")
-    }
+
     private fun createWebSearch() {
         val intent = Intent(RecognizerIntent.ACTION_WEB_SEARCH)
         intent.putExtra(Intent.EXTRA_SHORTCUT_NAME, "语音搜索")
@@ -61,14 +71,6 @@ class CreateShortcutActivity : Activity() {
                 .fromContext(this, R.mipmap.ic_launcher_vassist)
         intent.putExtra(Intent.EXTRA_SHORTCUT_ICON_RESOURCE, iconResource)
         setResult(RESULT_OK, intent)
-    }
-
-    private fun createSwitchVoiceWakeupShortcut() {
-        create(SWITCH_VOICE_WAKEUP, "语音唤醒")
-    }
-
-    private fun createOneKeySetAssistApp() {
-        create(SET_ASSIST_APP, "一键设为助手应用")
     }
 
     private fun create(action: String, text: String) {

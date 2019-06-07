@@ -12,12 +12,13 @@
 - [x] 设备信息
 - [x] 存储Api
 - [x] SpHelper
-- [ ] matchApp api
+- [x] matchApp api
 
 ## TODO
 - Core
   - [x] lua call java getter setter
   - [x] 完善Lua 
+  - 支持Kotlin object Companion 函数
   - [-] Rhino efficiency
 - 截屏api
 - 屏幕内容
@@ -37,13 +38,12 @@
  - [x] 语音唤醒
  - [x] 跳过广告
  - [-] 商店
- - [ ] Dashboard
  - [x] Me
  - [x] 登陆
  - [-] 欢迎界面
- - [-] 多参数支持
+ - [x] 多参数支持
  - [-] 在线解析?
- - [-] 语音唤醒冲突
+ - [x] 语音唤醒冲突
  - [x] 命令预览- 执行
  - [x] 指令共存规则
  - [x] 指令标识码
@@ -52,8 +52,8 @@
  - [x] inApp -> Global
  - [ ] 数据记录 使用频率，命令记录
  - [x] 检查登陆
- - [ ] 桌面快捷
- - [ ] ShortCut
+ - [x] 桌面快捷
+ - [x] ShortCut
  
 ## 未来
 
@@ -63,9 +63,9 @@
  - [ ] 代码编辑器，高亮，代码提示
  - [ ] ShortCut
  - [-] 在线解析?
- - [ ] 对话功能
- - [ ] VsCode 远程调试插件
- - [ ] 指令设置存储api
+ - [x] 对话功能
+ - [x] VsCode 远程调试插件
+ - [x] 指令设置存储api
  
 ## Marked
 

@@ -35,7 +35,6 @@ class ViewFindBuilder : FindBuilderWithOperation {
     }
 
     /**
-     * 需要CExecutorI
      *
      * @param m 时限
      * @return ViewNode which is returned until show in screen
