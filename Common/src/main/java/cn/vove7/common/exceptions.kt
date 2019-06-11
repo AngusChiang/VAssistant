@@ -27,3 +27,8 @@ class MessageException(msg: String?) : Exception(msg)
  */
 class NeedAccessibilityException : RuntimeException("无障碍服务未运行")
 
+/**
+ * 指令不支持的操作
+ */
+class NotSupportException : RuntimeException("指令无法完成该请求")
+

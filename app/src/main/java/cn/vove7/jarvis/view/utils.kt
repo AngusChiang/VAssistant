@@ -2,6 +2,7 @@ package cn.vove7.jarvis.view
 
 import android.content.Context
 import android.support.design.widget.TextInputLayout
+import cn.vove7.common.accessibility.AccessibilityApi
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.bridges.RootHelper
 import cn.vove7.jarvis.R
@@ -22,13 +23,14 @@ import java.io.InputStreamReader
 /**
  * root自动开启 or 系统应用
  */
-fun openAccessibilityServiceAuto(context: Context) {
+fun openAccessibilityServiceAuto() {
     Vog.d("打开无障碍")
-    if (PermissionUtils.accessibilityServiceEnabled(context)) return
+    if (AccessibilityApi.isBaseServiceOn) return
     /*if (AppConfig.IS_SYS_APP) {
         Vog.d("", "openAccessibilityService ---> 打开无障碍 as SYS_APP")
         AccessibilityApi.openServiceSelf()
-    } else */if (AppConfig.autoOpenASWithRoot) {
+    } else */
+    if (AppConfig.autoOpenASWithRoot) {
         Vog.d("打开无障碍 as su")
         RootHelper.openSelfAccessService()
     }

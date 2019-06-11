@@ -10,6 +10,7 @@ import cn.vove7.androlua.luautils.LuaManagerI
 import cn.vove7.androlua.luautils.LuaPrinter
 import cn.vove7.common.BridgeManager
 import cn.vove7.common.MessageException
+import cn.vove7.common.NotSupportException
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.executor.OnPrint
@@ -250,6 +251,8 @@ class LuaHelper : LuaManagerI, ScriptEngine {
         if (e.contains("java.lang.UnsupportedOperationException") ||
                 e.contains("java.lang.InterruptedException")) {
             return "强制终止"
+        } else if (e.contains("cn.vove7.common.NotSupportException")) {
+            return NotSupportException().message!!
         }
         return e
     }

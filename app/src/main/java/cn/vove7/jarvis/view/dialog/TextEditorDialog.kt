@@ -2,6 +2,7 @@ package cn.vove7.jarvis.view.dialog
 
 import android.content.Context
 import cn.vove7.common.bridges.SystemBridge
+import cn.vove7.common.utils.content
 import cn.vove7.jarvis.R
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.customview.customView
@@ -21,10 +22,15 @@ class TextEditorDialog(context: Context, val text: String) {
             customView(view = v, scrollable = true)
             v.editText.setText(text)
             positiveButton(text = "复制") {
-                SystemBridge.setClipText(v.editText.text.toString())
+                SystemBridge.setClipText(v.editText.content())
             }
             negativeButton(text = "分享") {
-                SystemBridge.shareText(v.editText.text.toString())
+                SystemBridge.shareText(v.editText.content())
+            }
+            neutralButton(text = "完成") {
+                TextOperationDialog(context,
+                        TextOperationDialog.TextModel(v.editText.content()))
+                dismiss()
             }
         }
     }

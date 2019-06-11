@@ -6,16 +6,14 @@ import android.view.Gravity
 import android.widget.CheckedTextView
 import android.widget.RelativeLayout
 import cn.vove7.common.app.GlobalApp
-import cn.vove7.common.utils.ThreadPool
+import cn.vove7.common.bridges.SystemBridge
 import cn.vove7.common.utils.gone
 import cn.vove7.common.utils.runOnNewHandlerThread
 import cn.vove7.common.utils.runOnUi
-import cn.vove7.common.bridges.SystemBridge
 import cn.vove7.jarvis.R
-import cn.vove7.jarvis.tools.AppConfig
 import cn.vove7.jarvis.tools.baiduaip.BaiduAipHelper
 import cn.vove7.jarvis.tools.baiduaip.model.TextOcrItem
-import cn.vove7.jarvis.view.dialog.TextEditorDialog
+import cn.vove7.jarvis.view.dialog.TextOperationDialog
 import cn.vove7.jarvis.view.dialog.base.BottomDialogWithMarkdown
 import cn.vove7.jarvis.view.dialog.base.BottomDialogWithText
 import cn.vove7.vtp.log.Vog
@@ -127,8 +125,8 @@ class TextOcrActivity : Activity() {
                 }
                 text = item.text
                 val h = item.height + 10
-                val w = item.width  + 10
-                val top = item.top  - statusbarHeight
+                val w = item.width + 10
+                val top = item.top - statusbarHeight
                 val left = item.left
                 val rotationAngle = item.rotationAngle
                 Vog.d("buildContent ---> ${item.text} top:$top ,left:$left ,w:$w h:$h rotationAngle:$rotationAngle")
@@ -199,46 +197,12 @@ class TextOcrActivity : Activity() {
     }
 
     private fun editDialog(text: String) {
-        Vog.d(" ---> $text")
-        d = BottomDialogWithText(this, "文字操作").apply d@{
-            noAutoDismiss()
-            positiveButton(text = "复制原文") {
-                SystemBridge.setClipText(text)
-                GlobalApp.toastInfo(R.string.text_copied)
-            }
-            neutralButton("编辑") {
-                TextEditorDialog(this@TextOcrActivity, text)
-                dismiss()
-            }
-            negativeButton(text = "翻译") {
-                if (!AppConfig.haveTranslatePermission())
-                    return@negativeButton
-                ThreadPool.runOnCachePool {
-                    textView.apply {
-                        appendlnGreen("\n翻译中...")
-                        val r = BaiduAipHelper.translate(text, to = AppConfig.translateLang)
-                        if (r != null) {
-                            clear()
-                            appendln(text)
-                            appendlnRed("\n翻译结果：")
-                            appendln(r.transResult)
-                            setCopyTranslationText(this@d, r.transResult)
-                        } else appendlnRed("翻译失败")
-                    }
-                }
-            }
-            textView.apply {
-                setPadding(50, 20, 50, 20)
-                appendln(text)
-            }
-            show()
-        }
+        TextOperationDialog(this, TextOperationDialog.TextModel(text))
     }
 
     class Model(
             val item: TextOcrItem,
-            var textView: CheckedTextView? = null,
-            var subText: String? = null
+            var textView: CheckedTextView? = null
     )
 
 }

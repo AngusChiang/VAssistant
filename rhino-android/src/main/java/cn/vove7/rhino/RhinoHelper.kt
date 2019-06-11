@@ -25,7 +25,6 @@ import java.nio.charset.Charset
 import java.security.MessageDigest
 import java.security.NoSuchAlgorithmException
 import java.util.*
-import kotlin.collections.HashMap
 
 
 class RhinoHelper : ScriptableObject, ScriptEngine {
@@ -104,7 +103,7 @@ class RhinoHelper : ScriptableObject, ScriptEngine {
 
     fun setMap(map: Map<String, *>?) {
         Vog.d("argMap" + map!!.toString())
-        global.defineProperty("argMap", MapScriptable(map),DONTENUM)
+        global.defineProperty("argMap", MapScriptable(map), DONTENUM)
     }
 
     @Throws(Exception::class)
@@ -162,9 +161,9 @@ class RhinoHelper : ScriptableObject, ScriptEngine {
         val source = readFileOrUrl(path, !isClass)
 
         val digest = getDigest(source)
-        val key = path + "_" + rhinoContext!!.getOptimizationLevel()
+        val key = path + "_" + rhinoContext!!.optimizationLevel
         val ref = scriptCache.get(key, digest)
-        var script: Script? = if (ref != null) ref!!.get() else null
+        var script: Script? = ref?.get()
 
         if (script == null) {
             if (isClass) {
@@ -244,7 +243,7 @@ class RhinoHelper : ScriptableObject, ScriptEngine {
             val loader = SecurityController.createLoader(rhinoContext!!.getApplicationClassLoader(), securityDomain)
             val clazz = loader.defineClass(name, data)
             loader.linkClass(clazz)
-            if (!Script::class.java!!.isAssignableFrom(clazz)) {
+            if (!Script::class.java.isAssignableFrom(clazz)) {
                 throw Context.reportRuntimeError("msg.must.implement.Script")
             }
             return clazz.newInstance() as Script

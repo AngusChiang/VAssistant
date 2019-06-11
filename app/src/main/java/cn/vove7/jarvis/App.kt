@@ -42,7 +42,7 @@ class App : GlobalApp() {
             ShortcutUtil.initShortcut()
             startBroadcastReceivers()
             runOnPool {
-                openAccessibilityServiceAuto(this@App)
+                openAccessibilityServiceAuto()
                 AppNotification.updateNotificationChannel(this)
             }
             RePluginManager().launchWithApp()

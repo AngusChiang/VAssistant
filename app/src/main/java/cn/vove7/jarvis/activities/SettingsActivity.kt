@@ -7,9 +7,11 @@ import android.os.Bundle
 import android.os.Handler
 import android.view.View
 import android.widget.TextView
+import cn.vove7.common.accessibility.AccessibilityApi
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.appbus.AppBus
+import cn.vove7.common.bridges.RootHelper
 import cn.vove7.common.bridges.SystemBridge
 import cn.vove7.common.utils.ThreadPool
 import cn.vove7.jarvis.R
@@ -17,10 +19,12 @@ import cn.vove7.jarvis.activities.base.ReturnableActivity
 import cn.vove7.jarvis.adapters.SettingsExpandableAdapter
 import cn.vove7.jarvis.receivers.PowerEventReceiver
 import cn.vove7.jarvis.services.MainService
-import cn.vove7.jarvis.tools.*
+import cn.vove7.jarvis.tools.AppConfig
+import cn.vove7.jarvis.tools.ShortcutUtil
+import cn.vove7.jarvis.tools.Tutorials
+import cn.vove7.jarvis.tools.UriUtils
 import cn.vove7.jarvis.view.*
 import cn.vove7.jarvis.view.custom.SettingGroupItem
-import cn.vove7.vtp.runtimepermission.PermissionUtils
 import cn.vove7.vtp.sharedpreference.SpHelper
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.customview.customView
@@ -228,15 +232,14 @@ class SettingsActivity : ReturnableActivity() {
                     CheckBoxItem(title = "自动开启无障碍服务", summary = "App启动时自动开启无障碍服务，需要root支持，或者转为系统应用",
                             keyId = R.string.key_auto_open_as_with_root, defaultValue = false)
                     { _, b ->
-                        if (b && !PermissionUtils.accessibilityServiceEnabled(this)) {
-                            ThreadPool.runOnPool {
-                                openAccessibilityServiceAuto(this)
-                            }
+                        if (b) ThreadPool.runOnPool {
+                            if (AccessibilityApi.isBaseServiceOn)
+                                return@runOnPool
+                            RootHelper.openSelfAccessService()
                         }
                         return@CheckBoxItem true
                     },
-                    IntentItem(title = "重置引导")
-                    {
+                    IntentItem(title = "重置引导") {
                         Tutorials.resetTutorials()
                         GlobalApp.toastInfo("重置完成")
                     },

@@ -7,7 +7,6 @@ buildscript {
     ext.vtp_version = '0.0.36'
     ext.support_version = '28.0.0'
     ext.RP_VERSION = '2.3.2'
-    ext.dokka_version='0.9.17'
 
     repositories {
         mavenCentral()
@@ -23,8 +22,6 @@ buildscript {
         //插件管理
         classpath "com.qihoo360.replugin:replugin-host-gradle:${RP_VERSION}" //RePlugin host
 
-//        kotlin文档生成
-        classpath "org.jetbrains.dokka:dokka-gradle-plugin:${dokka_version}"
 //        classpath 'com.qihoo360.argusapm:argus-apm-gradle:2.0.1.1006'
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files

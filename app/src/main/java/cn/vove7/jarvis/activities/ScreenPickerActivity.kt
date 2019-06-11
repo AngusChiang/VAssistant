@@ -18,14 +18,13 @@ import cn.vove7.common.utils.ThreadPool.runOnCachePool
 import cn.vove7.common.utils.runOnNewHandlerThread
 import cn.vove7.common.utils.runOnUi
 import cn.vove7.common.view.finder.ScreenTextFinder
-
-import cn.vove7.common.bridges.SystemBridge
 import cn.vove7.jarvis.BuildConfig
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.services.MainService
 import cn.vove7.jarvis.tools.AppConfig
 import cn.vove7.jarvis.tools.Tutorials
 import cn.vove7.jarvis.tools.baiduaip.BaiduAipHelper
+import cn.vove7.jarvis.view.dialog.TextOperationDialog
 import cn.vove7.jarvis.view.dialog.WordSplitDialog
 import cn.vove7.jarvis.view.dialog.base.BottomDialogWithText
 import cn.vove7.vtp.log.Vog
@@ -141,9 +140,7 @@ class ScreenPickerActivity : Activity() {
 
     private var hasT = false
     private fun translateAll() {
-        if (!AppConfig.haveTranslatePermission()) {
-            return
-        }
+        AppConfig.haveTranslatePermission() ?: return
 
         hasT = true
         GlobalApp.toastInfo("开始翻译")
@@ -234,61 +231,9 @@ class ScreenPickerActivity : Activity() {
 
     var d: BottomDialogWithText? = null
     private val onItemClick: (Model) -> Unit = { model ->
-        val text = model.text
-        Vog.d(" ---> $text")
-        d = BottomDialogWithText(this, "文字操作").apply d@{
-            noAutoDismiss()
-            positiveButton(text = "复制原文") {
-                SystemBridge.setClipText(text)
-                GlobalApp.toastInfo(R.string.text_copied)
-            }
-            neutralButton(text = "分词") {
-                showSplitWordDialog(text)
-                dismiss()
-            }
-            if (model.subText == null)
-                negativeButton(text = "翻译") {
-                    if (!AppConfig.haveTranslatePermission())
-                        return@negativeButton
-                    runOnCachePool {
-                        textView.apply {
-                            appendlnGreen("\n翻译中...")
-                            val r = BaiduAipHelper.translate(text, to = AppConfig.translateLang)
-                            if (r != null) {
-                                model.subText = r.transResult
-                                clear()
-                                appendln(text)
-                                appendlnRed("\n翻译结果：")
-                                appendln(model.subText)
-                                setCopyTranslationText(this@d, r.transResult)
-                            } else appendlnRed("翻译失败")
-                        }
-                    }
-                }
-            textView.apply {
-                setPadding(50, 20, 50, 20)
-                appendln(text)
-                model.subText?.also {
-                    appendlnRed("\n翻译结果：")
-                    appendln(it)
-                    setCopyTranslationText(this@d,it)
-                }
-            }
-            show()
-        }
+        TextOperationDialog(this, TextOperationDialog.TextModel(model.text))
     }
 
-    /**
-     * 若翻译过 ，显示 复制原文
-     */
-    private fun setCopyTranslationText(bd:BottomDialogWithText, trans:String) {
-        runOnUi {
-            bd.negativeButton(text = "复制翻译") {
-                SystemBridge.setClipText(trans)
-                GlobalApp.toastInfo(R.string.text_copied)
-            }
-        }
-    }
 
     class Model(
             val viewNode: ViewNode,

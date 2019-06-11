@@ -2,6 +2,7 @@ package cn.vove7.jarvis.speech.baiduspeech.recognition.recognizer
 
 import android.content.Context
 import cn.vove7.common.app.GlobalLog
+import cn.vove7.jarvis.speech.baiduspeech.recognition.OfflineRecogParams
 import cn.vove7.jarvis.speech.baiduspeech.recognition.listener.IRecogListener
 import cn.vove7.vtp.log.Vog
 import com.baidu.speech.EventListener
@@ -51,10 +52,10 @@ class MyRecognizer(
     }
 
     /**
-     * @param params
+     * 加载离线词
      */
-    fun loadOfflineEngine(params: Map<String, Any>) {
-        val json = JSONObject(params).toString()
+    fun loadOfflineEngine() {
+        val json = JSONObject(OfflineRecogParams.fetchOfflineParams()).toString()
         Vog.v("loadOfflineEngine params:$json")
         asr.send(SpeechConstant.ASR_KWS_LOAD_ENGINE, json, null, 0, 0)
         isOfflineEngineLoaded = true
@@ -64,15 +65,6 @@ class MyRecognizer(
     fun start(params: Map<String, Any>) {
         val json = JSONObject(params).toString()
         asr.send(SpeechConstant.ASR_START, json, null, 0, 0)
-    }
-
-    /**
-     * 加载离线词
-     * @param param Map<String, Any>
-     */
-    fun loadOfWord(param: Map<String, Any>) {
-        Vog.v("加载离线命令词 $param")
-        asr.send(SpeechConstant.ASR_KWS_LOAD_ENGINE, JSONObject(param).toString(), null, 0, 0)
     }
 
     /**

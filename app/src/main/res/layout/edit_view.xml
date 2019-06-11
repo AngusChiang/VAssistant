@@ -8,6 +8,7 @@
     android:minWidth="200dp"
     android:minHeight="200dp"
     android:orientation="vertical"
-    android:padding="10dp">
+    android:paddingStart="?attr/dialogPreferredPadding"
+    android:paddingEnd="?attr/dialogPreferredPadding">
 
 </EditText>

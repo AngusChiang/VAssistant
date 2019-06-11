@@ -26,9 +26,9 @@ abstract class BaseBottomDialogWithToolbar(context: Context, title: String? = nu
     val contentContainer: ViewGroup by lazy { mContentView.findViewById<ViewGroup>(R.id.content_container) }
     private val pbar by lazy { mContentView.findViewById<ProgressBar>(R.id.p_bar) }
 
-    private val buttonPositive: TextView by lazy { mContentView.findViewById<TextView>(R.id.dialog_button_positive) }
-    private val buttonNegative: TextView by lazy { mContentView.findViewById<TextView>(R.id.dialog_button_negative) }
-    private val buttonNeutral: TextView by lazy { mContentView.findViewById<TextView>(R.id.dialog_button_neutral) }
+    val buttonPositive: TextView by lazy { mContentView.findViewById<TextView>(R.id.dialog_button_positive) }
+    val buttonNegative: TextView by lazy { mContentView.findViewById<TextView>(R.id.dialog_button_negative) }
+    val buttonNeutral: TextView by lazy { mContentView.findViewById<TextView>(R.id.dialog_button_neutral) }
 
     var autoDismiss = true
 

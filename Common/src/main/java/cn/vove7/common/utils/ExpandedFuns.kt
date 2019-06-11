@@ -17,6 +17,7 @@ import android.support.v4.app.ActivityCompat
 import android.util.DisplayMetrics
 import android.view.View
 import android.view.animation.Animation
+import android.widget.EditText
 import cn.vove7.common.BuildConfig
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.app.GlobalLog
@@ -458,3 +459,5 @@ open class AnimationListener {
         _onRepeat = r
     }
 }
+
+fun EditText.content(): String = this.text.toString()

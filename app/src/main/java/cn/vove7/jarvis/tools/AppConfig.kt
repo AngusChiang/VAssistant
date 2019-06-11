@@ -499,10 +499,10 @@ object AppConfig {
      * 文字提取翻译权限
      * @return Boolean
      */
-    fun haveTranslatePermission(): Boolean {
+    fun haveTranslatePermission(): Boolean? {
         if (!UserInfo.isLogin()) {
             GlobalApp.toastWarning("使用翻译功能，请先登录")
-            return false
+            return null
         } else if (UserInfo.isVip())
             return true
 
@@ -514,7 +514,7 @@ object AppConfig {
             true
         } else {
             GlobalApp.toastInfo("免费使用次数已用尽")
-            false
+            null
         }
     }
 

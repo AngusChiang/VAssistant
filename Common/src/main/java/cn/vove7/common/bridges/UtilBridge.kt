@@ -1,17 +1,13 @@
 package cn.vove7.common.bridges
 
-import android.content.Intent
 import android.graphics.Bitmap
-import android.net.Uri
+import cn.vove7.common.NotSupportException
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.app.GlobalLog
-import cn.vove7.common.model.ResultBox
-import cn.vove7.vtp.log.Vog
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser
 import top.zibin.luban.Luban
-import top.zibin.luban.OnCompressListener
 import java.io.File
 import java.io.FileOutputStream
 import java.util.*
@@ -35,7 +31,7 @@ object UtilBridge {
     fun compressImage(file: File): File {
         return Luban.with(GlobalApp.APP).load(file).ignoreBy(100)
                 .setTargetDir(file.parent)
-                .get()[0] ?:file
+                .get()[0] ?: file
     }
 
     fun bitmap2File(bitmap: Bitmap, fullPath: String): File? {
@@ -107,6 +103,13 @@ object UtilBridge {
             })
         }
         return list
+    }
+
+    /**
+     * 当指令无法完成请求时，抛出该异常
+     */
+    fun notSupport() {
+        throw NotSupportException()
     }
 
 }

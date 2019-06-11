@@ -20,6 +20,8 @@ import cn.vove7.vtp.log.Vog
 import com.baidu.speech.asr.SpeechConstant
 import com.google.gson.Gson
 import com.google.gson.annotations.SerializedName
+import com.qihoo360.replugin.utils.AssetsUtils
+import java.io.File
 
 /**
  * 百度语音识别服务
@@ -66,11 +68,21 @@ class BaiduSpeechRecogService(event: SpeechEvent) : SpeechRecogService(event) {
         if (enableOffline) {
             runOnNewHandlerThread {
                 try {
-                    myRecognizer.loadOfflineEngine(OfflineRecogParams.fetchOfflineParams())
+                    copyFile()
+                    myRecognizer.loadOfflineEngine()
                 } catch (e: Exception) {
                     GlobalLog.err(e)
                 }
             }
+        }
+    }
+
+    private fun copyFile() {
+        val filesDir = context.filesDir.absolutePath + "/bd/"
+        val fName = "baidu_speech_grammar.bsg"
+        if (!File(filesDir, fName).exists()) {
+            AssetsUtils.extractTo(context, "bd/baidu_speech_grammar.bsg",
+                    filesDir, fName)
         }
     }
 
