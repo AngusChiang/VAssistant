@@ -3,7 +3,6 @@ package cn.vove7.jarvis.activities
 import android.os.Build
 import android.os.Bundle
 import android.support.design.widget.BottomNavigationView
-import android.support.v7.app.AppCompatActivity
 import android.view.View
 import android.view.Window
 import cn.vove7.common.model.UserInfo
@@ -11,6 +10,7 @@ import cn.vove7.common.utils.StubbornFlag
 import cn.vove7.common.utils.runOnNewHandlerThread
 import cn.vove7.jarvis.BuildConfig
 import cn.vove7.jarvis.R
+import cn.vove7.jarvis.activities.base.BaseActivity
 import cn.vove7.jarvis.fragments.HomeFragment
 import cn.vove7.jarvis.fragments.MineFragment
 import cn.vove7.jarvis.tools.AppConfig
@@ -26,7 +26,7 @@ import kotlinx.android.synthetic.main.activity_real_main.*
 import kotlinx.android.synthetic.main.fragment_mine.*
 
 
-class RealMainActivity : AppCompatActivity() {
+class RealMainActivity : BaseActivity() {
 
     private val fSwitcher = FragmentSwitcher(this, R.id.fragment)
     private val homeF by lazy { HomeFragment.newInstance() }

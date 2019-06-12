@@ -6,7 +6,6 @@ import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
 import android.os.Handler
-import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.text.SpannableStringBuilder
@@ -38,7 +37,7 @@ import kotlinx.android.synthetic.main.editor_tool_bar.*
  * @author Administrator
  * 2018/10/9
  */
-abstract class CodeEditorActivity : AppCompatActivity() {
+abstract class CodeEditorActivity : BaseActivity() {
 
     abstract val codeEditor: CodeEditorOperation
 

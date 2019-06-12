@@ -5,7 +5,6 @@ import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
-import android.support.v7.app.AppCompatActivity
 import android.text.InputType
 import android.view.View
 import android.view.ViewGroup
@@ -33,6 +32,7 @@ import cn.vove7.common.utils.TextHelper
 import cn.vove7.common.utils.ThreadPool.runOnPool
 import cn.vove7.executorengine.parse.ParseEngine
 import cn.vove7.jarvis.R
+import cn.vove7.jarvis.activities.base.BaseActivity
 import cn.vove7.jarvis.adapters.ExecuteQueueAdapter
 import cn.vove7.jarvis.adapters.InstSettingListAdapter
 import cn.vove7.jarvis.services.MainService
@@ -58,7 +58,7 @@ import java.util.*
  * @author Administrator
  * 2018/10/3
  */
-class InstDetailActivity : AppCompatActivity() {
+class InstDetailActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_inst_detail)

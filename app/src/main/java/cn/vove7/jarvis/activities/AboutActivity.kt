@@ -2,7 +2,6 @@ package cn.vove7.jarvis.activities
 
 import android.content.Intent
 import android.os.Bundle
-import android.support.v7.app.AppCompatActivity
 import android.view.MenuItem
 import android.view.View
 import android.widget.AdapterView
@@ -11,6 +10,7 @@ import android.widget.Toast
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.bridges.SystemBridge
 import cn.vove7.jarvis.R
+import cn.vove7.jarvis.activities.base.BaseActivity
 import cn.vove7.jarvis.adapters.IconTitleEntity
 import cn.vove7.jarvis.adapters.IconTitleListAdapter
 import cn.vove7.jarvis.tools.AppConfig
@@ -32,7 +32,7 @@ import kotlinx.android.synthetic.main.header_about.*
  * @author Administrator
  * 9/23/2018
  */
-class AboutActivity : AppCompatActivity(), AdapterView.OnItemClickListener {
+class AboutActivity : BaseActivity(), AdapterView.OnItemClickListener {
 
     private var clickTime = 0L
     private var clickCount = 0

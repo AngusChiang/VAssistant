@@ -242,7 +242,6 @@
         <activity
             android:name=".activities.PermissionManagerActivity"
             android:label="@string/text_permission_manager" />
-        <activity android:name=".activities.RegexParseTestActivity" />
         <activity
             android:name=".activities.InstManagerActivity"
             android:windowSoftInputMode="adjustPan" />

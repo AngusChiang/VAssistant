@@ -137,7 +137,7 @@ class ExampleUnitTest {
                 "1小时24分钟后"
         ).forEach {
             //parse
-            val ss = TextDateParser.parseDateText(it)?.also { it.add(Calendar.DAY_OF_MONTH,-5) }?.time?.let { d ->
+            val ss = TextDateParser.parseDateText(it)?.time?.let { d ->
                 s.format(d)
             } ?: "解析失败"
             println("$ss   $it")

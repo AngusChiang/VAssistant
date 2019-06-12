@@ -28,6 +28,7 @@ import cn.vove7.vtp.sharedpreference.SpHelper
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.checkbox.checkBoxPrompt
 import com.google.gson.Gson
+import com.umeng.analytics.MobclickAgent
 import org.jsoup.Jsoup
 import java.io.File
 import java.text.SimpleDateFormat
@@ -224,6 +225,7 @@ object AppConfig {
     }
 
     fun login(userInfo: UserInfo) {
+        MobclickAgent.onProfileSignIn("${UserInfo.getUserId()}")
         userInfo.success()
         //保存->sp
         val infoJson = Gson().toJson(userInfo)
@@ -231,6 +233,7 @@ object AppConfig {
     }
 
     fun logout() {
+        MobclickAgent.onProfileSignOff()
         ssp.remove(context.getString(R.string.key_login_info))
         UserInfo.logout()
     }

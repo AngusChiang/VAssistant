@@ -17,6 +17,7 @@ import cn.vove7.jarvis.tools.CrashHandler
 import cn.vove7.jarvis.tools.ShortcutUtil
 import cn.vove7.jarvis.view.openAccessibilityServiceAuto
 import cn.vove7.vtp.log.Vog
+import com.umeng.commonsdk.UMConfigure
 import io.github.kbiakov.codeview.classifier.CodeProcessor
 
 
@@ -48,6 +49,8 @@ class App : GlobalApp() {
             RePluginManager().launchWithApp()
             Vog.d("onCreate ---> 结束 ${System.currentTimeMillis() / 1000}")
             System.gc()
+
+            UMConfigure.init(this, "5d00ae230cafb2990c0000e4", "default", UMConfigure.DEVICE_TYPE_PHONE, "")
         }
 
     }

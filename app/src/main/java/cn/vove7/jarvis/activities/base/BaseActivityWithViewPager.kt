@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentManager
 import android.support.v4.app.FragmentPagerAdapter
-import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.Toolbar
 import android.view.MenuItem
 import android.view.View
@@ -18,7 +17,7 @@ import kotlinx.android.synthetic.main.activity_base_view_pager.*
  * @author 17719
  * 2018/8/14
  */
-abstract class BaseActivityWithViewPager : AppCompatActivity() {
+abstract class BaseActivityWithViewPager : BaseActivity() {
 
     lateinit var toolbar: Toolbar
     lateinit var fragmentAdapter: FragmentAdapter

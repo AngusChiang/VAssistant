@@ -1,8 +1,6 @@
 package cn.vove7.jarvis.activities.base
 
-import android.annotation.SuppressLint
 import android.os.Bundle
-import android.support.v7.app.AppCompatActivity
 import android.view.MenuItem
 
 
@@ -12,8 +10,7 @@ import android.view.MenuItem
  * @author Administrator
  * 9/24/2018
  */
-@SuppressLint("Registered")
-open class ReturnableActivity : AppCompatActivity() {
+abstract class ReturnableActivity : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
