@@ -252,7 +252,7 @@
         4.无限制屏幕识别/文字识别\n
     </string>
     <string name="text_recharege_pre_read">在支付前，请先阅读高级教程，确保它对你有用。</string>
-    <string name="text_email_copy_to_clip">你的邮箱已复制到剪切板</string>
+    <string name="text_email_copy_to_clip">你的邮箱已复制到剪切板，请填写至备注</string>
     <string name="text_understand">Understand</string>
     <string name="text_continue">Continue</string>
     <string name="text_debug_service_starting">Debug service will close automatically after 2 minutes of free time.</string>

@@ -27,9 +27,9 @@ import kotlinx.android.synthetic.main.dialog_sign_up.view.*
  * 2018/9/14
  */
 
-class SignupDialog(context: Context, val r: OnLoginSuccess) : View.OnClickListener {
+class SignupDialog(context: Context, val r: OnLoginSuccess) {
     val dialog: MaterialDialog = MaterialDialog(context)
-    val lastBit = 6
+    private val lastBit = 6
 
     private val userEmailView
             by lazy { view.user_email_view }
@@ -45,114 +45,66 @@ class SignupDialog(context: Context, val r: OnLoginSuccess) : View.OnClickListen
     val view: View by lazy { LayoutInflater.from(context).inflate(R.layout.dialog_sign_up, null) }
 
     init {
+        signUpBtn.setOnClickListener {
+            userEmailView.error = ""
+            userPassView.error = ""
+            confirmPassView.error = ""
+            verCodeView.error = ""
+            val userInfo = UserInfo()
+            val userEmail = userEmailView.editText?.text.toString()
+            val userPass = userPassView.editText?.text.toString()
+            val confirmPass = confirmPassView.editText?.text.toString()
 
-//        view.findViewById<CountDownButton>(R.id.get_ver_btn).apply {
-//            setCallBack(RecOnFinish)
-//            setOnClickListener {
-//                val userEmail = userEmailView.editText?.text.toString()
-//                if (BuildConfig.DEBUG && userEmail == "") {
-//                    startDown(5)
-//                    return@setOnClickListener
-//                }
-//                if (!TextHelper.isEmail(userEmail)) {//邮箱
-//                    userEmailView.error = GlobalApp.getString(R.string.text_email_format_err)
-//                    return@setOnClickListener
-//                }
-//                this.isEnabled = false
-//                loadBar.visibility = View.VISIBLE
-////                val p = NetParamsBuilder.of(Pair("emailAdd", userEmail)).sign()
-//                WrapperNetHelper.postJson<String>(ApiUrls.SEND_SIGN_UP_EMAIL_VER_CODE, userEmail) {
-//                    success { _, bean ->
-//                        loadBar.visibility = View.INVISIBLE
-//                        if (bean.isOk()) {
-//                            GlobalApp.toastInfo(bean.data ?: "null")
-//                            startDown(countDownSecs)
-//                        } else {
-//                            this@apply.isEnabled = true
-//                            GlobalApp.toastInfo(bean.message)
-//                        }
-//                    }
-//                    fail { _, e ->
-//                        e.localizedMessage
-//                        loadBar.visibility = View.INVISIBLE
-//                        this@apply.isEnabled = true
-//                        GlobalApp.toastError("出错")
-//                    }
-//                }
-//            }
-//        }
+            if (TextUtils.isEmpty(userEmail)) {
+                userEmailView.error = GlobalApp.getString(R.string.text_not_empty)
+                return@setOnClickListener
+            }
+            if (TextHelper.isEmail(userEmail)) {//邮箱
+                userInfo.setEmail(userEmail)
+                userInfo.setUserName(userEmail)
 
-            signUpBtn.setOnClickListener {
-                userEmailView.error = ""
-                userPassView.error = ""
-                confirmPassView.error = ""
-                verCodeView.error = ""
-//            val params = TreeMap<String, String>()
-                val userInfo = UserInfo()
-                val userEmail = userEmailView.editText?.text.toString()
-                val userPass = userPassView.editText?.text.toString()
-                val confirmPass = confirmPassView.editText?.text.toString()
-//            val verCode = verCodeView.editText?.text.toString()
+            } else {
+                userEmailView.error = GlobalApp.getString(R.string.text_email_format_err)
+                return@setOnClickListener
+            }
+            if (TextUtils.isEmpty(userPass)) {//密码
+                userPassView.error = GlobalApp.getString(R.string.text_not_empty)
+                return@setOnClickListener
+            }
+            if (userPass.length < lastBit) {//密码
+                userPassView.error = "密码长度至少${lastBit}位"
+                return@setOnClickListener
+            }
+            if (confirmPass != userPass) {//密码
+                confirmPassView.error = GlobalApp.getString(R.string.text_pass_not_same)
+                return@setOnClickListener
+            }
+            userInfo.userPass = SecureHelper.MD5(userPass)
 
-                if (TextUtils.isEmpty(userEmail)) {
-                    userEmailView.error = GlobalApp.getString(R.string.text_not_empty)
-                    return@setOnClickListener
-                }
-                if (TextHelper.isEmail(userEmail)) {//邮箱
-                    userInfo.setEmail(userEmail)
-                    userInfo.setUserName(userEmail)
-
-                } else {
-                    userEmailView.error = GlobalApp.getString(R.string.text_email_format_err)
-                    return@setOnClickListener
-                }
-                if (TextUtils.isEmpty(userPass)) {//密码
-                    userPassView.error = GlobalApp.getString(R.string.text_not_empty)
-                    return@setOnClickListener
-                }
-                if (userPass.length < lastBit) {//密码
-                    userPassView.error = "密码长度至少${lastBit}位"
-                    return@setOnClickListener
-                }
-                if (confirmPass != userPass) {//密码
-                    confirmPassView.error = GlobalApp.getString(R.string.text_pass_not_same)
-                    return@setOnClickListener
-                }
-                userInfo.userPass = SecureHelper.MD5(userPass)
-//            if (TextUtils.isEmpty(verCode)) {//验证码
-//                verCodeView.error = GlobalApp.getString(R.string.text_not_empty)
-//                return@setOnClickListener
-//            }
-
-                loadBar.visibility = View.VISIBLE
-                //post
-                WrapperNetHelper.postJson<String>(ApiUrls.REGISTER_BY_EMAIL, model = userInfo) {
-                    success { _, bean ->
-                        //泛型
-                        Vog.d("onResponse ---> $bean")
-                        loadBar.visibility = View.INVISIBLE
-                        if (bean.isOk()) {
-                            GlobalApp.toastInfo(bean.data ?: "null")
-                            LoginDialog(context, userEmail, userPass, r)
-                            dialog.dismiss()
-                        } else {
-                            GlobalApp.toastInfo(bean.message)
-                        }
+            loadBar.visibility = View.VISIBLE
+            //post
+            WrapperNetHelper.postJson<String>(ApiUrls.REGISTER_BY_EMAIL, model = userInfo) {
+                success { _, bean ->
+                    //泛型
+                    Vog.d("onResponse ---> $bean")
+                    loadBar.visibility = View.INVISIBLE
+                    if (bean.isOk()) {
+                        GlobalApp.toastInfo(bean.data ?: "null")
+                        LoginDialog(context, userEmail, userPass, r)
+                        dialog.dismiss()
+                    } else {
+                        GlobalApp.toastInfo(bean.message)
                     }
-                    fail { _, e ->
-                        loadBar.visibility = View.INVISIBLE
-                        e.log()
-                        GlobalApp.toastError("出错")
-                    }
+                }
+                fail { _, e ->
+                    loadBar.visibility = View.INVISIBLE
+                    e.log()
+                    GlobalApp.toastError("出错")
                 }
             }
+        }
         dialog.customView(view = view, scrollable = true).title(R.string.text_sign_up).show()
         dialog.findViewById<View>(R.id.get_ver_layout).gone()
     }
 
-    override fun onClick(v: View?) {
-        when (v?.id) {
-
-        }
-    }
 }

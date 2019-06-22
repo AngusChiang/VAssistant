@@ -23,6 +23,7 @@ import com.umeng.commonsdk.UMConfigure
 import io.github.kbiakov.codeview.classifier.CodeProcessor
 
 
+@Suppress("MemberVisibilityCanBePrivate")
 class App : GlobalApp() {
 
     private lateinit var mainService: MainService
@@ -97,6 +98,10 @@ class App : GlobalApp() {
         super.onTerminate()
     }
 
+    /**
+     * 是否为主进程
+     * 未配置主进程名 默认为包名
+     */
     val isMainProcess
         get() = this.packageName == currentProcessName
 

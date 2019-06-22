@@ -135,7 +135,7 @@
     <string name="text_purchase_recharge_code">购买充值码</string>
 
     <string name="text_recharege_pre_read">在支付前，请先阅读高级教程，确保它对你有用。</string>
-    <string name="text_email_copy_to_clip">你的邮箱已复制到剪切板</string>
+    <string name="text_email_copy_to_clip">你的邮箱已复制到剪切板，请填写至备注</string>
     <string name="text_understand">知道了</string>
     <string name="text_continue">继续</string>
     <string name="text_debug_service_starting">调试服务在空闲2分钟后自动关闭</string>
