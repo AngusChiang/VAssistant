@@ -1,5 +1,7 @@
 package cn.vove7.jarvis
 
+import android.app.ActivityManager
+import android.content.Context
 import cn.vove7.androlua.LuaApp
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.utils.ThreadPool.runOnPool
@@ -33,6 +35,11 @@ class App : GlobalApp() {
         CrashHandler.init()
         runWithClock("加载配置") {
             AppConfig.init()
+        }
+
+        if(!isMainProcess){
+            Vog.d("非主进程")
+            return
         }
 
         runOnNewHandlerThread("app_load") {
@@ -90,4 +97,19 @@ class App : GlobalApp() {
         super.onTerminate()
     }
 
+    val isMainProcess
+        get() = this.packageName == currentProcessName
+
+    val currentProcessName
+        get(): String? {
+            val pid = android.os.Process.myPid()
+            val manager = this.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
+            manager.runningAppProcesses.forEach { process ->
+                if (process.pid == pid)
+                    return process.processName.also {
+                        Vog.d("进程：${process.processName}")
+                    }
+            }
+            return null
+        }
 }
