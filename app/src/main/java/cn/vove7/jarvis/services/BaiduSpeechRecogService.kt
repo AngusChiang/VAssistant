@@ -9,7 +9,6 @@ import cn.vove7.jarvis.R
 import cn.vove7.jarvis.speech.SpeechEvent
 import cn.vove7.jarvis.speech.SpeechRecogService
 import cn.vove7.jarvis.speech.WakeupI
-import cn.vove7.jarvis.speech.baiduspeech.recognition.OfflineRecogParams
 import cn.vove7.jarvis.speech.baiduspeech.recognition.listener.SpeechStatusListener
 import cn.vove7.jarvis.speech.baiduspeech.recognition.recognizer.MyRecognizer
 import cn.vove7.jarvis.speech.baiduspeech.wakeup.BaiduVoiceWakeup
@@ -87,13 +86,13 @@ class BaiduSpeechRecogService(event: SpeechEvent) : SpeechRecogService(event) {
     }
 
 
-    private fun recogParams(silent: Boolean) = mutableMapOf(
-            Pair(SpeechConstant.ACCEPT_AUDIO_DATA, false),
-//            Pair(SpeechConstant.VAD_MODEL, "dnn"),
-            Pair(SpeechConstant.DISABLE_PUNCTUATION, false),//标点符号
-            Pair(SpeechConstant.ACCEPT_AUDIO_VOLUME, true),
-            Pair(SpeechConstant.PID, 1536),
-            Pair(SpeechConstant.NLU, "enable")
+    private fun recogParams(silent: Boolean) = mutableMapOf<String, Any>(
+            SpeechConstant.ACCEPT_AUDIO_DATA to false,
+//          SpeechConstant.VAD_MODEL to "dnn",
+            SpeechConstant.DISABLE_PUNCTUATION to false,//标点符号
+            SpeechConstant.ACCEPT_AUDIO_VOLUME to true,
+            SpeechConstant.PID to 1536,
+            SpeechConstant.NLU to "enable"
     ).also {
         it[SpeechConstant.IN_FILE] = "#cn.vove7.jarvis.speech.baiduspeech.MicInputStream.instance()"
         //从指定时间开始识别，可以 - 指定ms 识别之前的内容

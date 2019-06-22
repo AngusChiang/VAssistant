@@ -22,6 +22,7 @@ import cn.vove7.jarvis.BuildConfig
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.services.MainService
 import cn.vove7.jarvis.tools.AppConfig
+import cn.vove7.jarvis.tools.DataCollector
 import cn.vove7.jarvis.tools.Tutorials
 import cn.vove7.jarvis.tools.baiduaip.BaiduAipHelper
 import cn.vove7.jarvis.view.dialog.TextOperationDialog
@@ -49,6 +50,7 @@ class ScreenPickerActivity : Activity() {
             finish()
             return
         }
+        DataCollector.buriedPoint("sa_3")
 
         if (!AppConfig.haveTextPickPermission()) {//免费次数
             GlobalApp.toastWarning("今日次数达到上限")

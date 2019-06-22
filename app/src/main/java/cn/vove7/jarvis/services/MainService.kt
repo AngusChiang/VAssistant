@@ -63,6 +63,7 @@ import cn.vove7.jarvis.speech.SpeechEvent
 import cn.vove7.jarvis.speech.SpeechRecogService
 import cn.vove7.jarvis.speech.VoiceData
 import cn.vove7.jarvis.tools.AppConfig
+import cn.vove7.jarvis.tools.DataCollector
 import cn.vove7.jarvis.tools.debugserver.RemoteDebugServer
 import cn.vove7.jarvis.tools.setFloat
 import cn.vove7.jarvis.view.dialog.MultiChoiceDialog
@@ -588,6 +589,7 @@ class MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
                     false
                 } else instance?.cExecutor?.running == true
             }
+
         /**
          * 语音合成speaking
          */
@@ -614,9 +616,11 @@ class MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
                 instance?.isSpeakingResWord = false
             }
             if (recogIsListening) {
-                instance?.onCommand(AppBus.ACTION_CANCEL_RECOG)
-            } else
-                instance?.onCommand(AppBus.ACTION_START_RECOG)
+                instance?.onCommand(ACTION_CANCEL_RECOG)
+            } else {
+                DataCollector.buriedPoint("wakeup")
+                instance?.onCommand(ACTION_START_RECOG)
+            }
         }
 
         /**
@@ -754,6 +758,9 @@ class MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
          * @param byVoice Boolean
          */
         override fun onPreStartRecog(byVoice: Boolean) {
+            if (byVoice) {
+                DataCollector.buriedPoint("voice_wakeup")
+            }
             speechSynService?.stop()
             checkMusic()//检查后台播放
             recogEffect(byVoice)
@@ -1002,6 +1009,7 @@ class MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
      * @param result String
      */
     private fun doChat(result: String) {
+        DataCollector.buriedPoint("chat")
         parseAnimation.begin()
         floatyPanel.showParseAni()
         resumeMusicLock = true

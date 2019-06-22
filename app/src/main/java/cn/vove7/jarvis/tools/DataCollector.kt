@@ -2,6 +2,7 @@ package cn.vove7.jarvis.tools
 
 import android.content.Context
 import cn.vove7.common.app.GlobalApp
+import cn.vove7.common.model.UserInfo
 import com.umeng.analytics.MobclickAgent
 
 /**

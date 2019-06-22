@@ -1,6 +1,5 @@
 package cn.vove7.jarvis.activities.screenassistant
 
-import android.app.Activity
 import android.app.AlertDialog
 import android.app.Dialog
 import android.content.Intent
@@ -18,7 +17,9 @@ import cn.vove7.common.bridges.UtilBridge
 import cn.vove7.common.utils.*
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.activities.TextOcrActivity
+import cn.vove7.jarvis.activities.base.BaseActivity
 import cn.vove7.jarvis.services.MainService
+import cn.vove7.jarvis.tools.DataCollector
 import cn.vove7.jarvis.tools.QRTools
 import cn.vove7.jarvis.tools.Tutorials
 import cn.vove7.jarvis.tools.baiduaip.BaiduAipHelper
@@ -35,7 +36,7 @@ import java.util.*
  * @author 11324
  * 2019/3/21
  */
-class ScreenAssistActivity : Activity() {
+class ScreenAssistActivity : BaseActivity() {
 
     private lateinit var screenPath: String
     private lateinit var bottomController: AssistSessionGridController
@@ -194,15 +195,30 @@ class ScreenAssistActivity : Activity() {
     }
 
     private val funMap = mapOf(
-            Pair(0, { imageClassify() }),
-            Pair(1, { screenOcr() }),
+            Pair(0, {
+                DataCollector.buriedPoint("sa_1")
+                imageClassify()
+            }),
+            Pair(1, {
+                DataCollector.buriedPoint("sa_2")
+                screenOcr()
+            }),
             Pair(2, {
                 AppBus.postDelay("0_0", AppBus.ACTION_BEGIN_SCREEN_PICKER, 800)
                 finish()
             }),
-            Pair(3, { shareScreen() }),
-            Pair(4, { scanQrCode() }),
-            Pair(5, { save2Local() })
+            Pair(3, {
+                DataCollector.buriedPoint("sa_4")
+                shareScreen()
+            }),
+            Pair(4, {
+                DataCollector.buriedPoint("sa_5")
+                scanQrCode()
+            }),
+            Pair(5, {
+                DataCollector.buriedPoint("sa_6")
+                save2Local()
+            })
     )
 
     private val itemClick: (Int) -> Unit = { pos ->
