@@ -29,7 +29,6 @@ open class NestedWebView : WebView, NestedScrollingChild {
     @SuppressLint("ClickableViewAccessibility")
     override fun onTouchEvent(ev: MotionEvent): Boolean {
         if (y == 0f){
-            Vog.d("y: $y scrollX: $scrollX")
             return super.onTouchEvent(ev)
         }
         Vog.d("$y\n$ev")

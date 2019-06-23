@@ -11,8 +11,10 @@ import java.io.File
  * 2018/11/24
  */
 object StorageHelper {
+    val sdPath get() = Environment.getExternalStorageDirectory().absolutePath
+
     val storePath by lazy {
-        val p = Environment.getExternalStorageDirectory().absolutePath + "/V Assist"
+        val p = sdPath + "/V Assist"
         createDir(p)
         p
     }
@@ -34,6 +36,7 @@ object StorageHelper {
         createDir(p)
         p
     }
+
     val logPath: String by lazy {
         val p = "$storePath/log"
         createDir(p)
@@ -45,6 +48,15 @@ object StorageHelper {
      */
     val spPath: String by lazy {
         val p = "$storePath/sp_config"
+        createDir(p)
+        p
+    }
+
+    /**
+     * 离线资源路径
+     */
+    val offlineResPath: String by lazy {
+        val p = "$storePath/off_res"
         createDir(p)
         p
     }

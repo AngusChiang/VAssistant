@@ -7,6 +7,8 @@ import android.os.Message
 import android.util.Pair
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.app.GlobalLog
+import cn.vove7.common.app.log
+import cn.vove7.common.utils.StorageHelper
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.services.SpeechSynService
 import cn.vove7.jarvis.speech.SpeechSynthesizerI
@@ -20,16 +22,18 @@ import com.baidu.tts.client.SpeechSynthesizeBag
 import com.baidu.tts.client.SpeechSynthesizer
 import com.baidu.tts.client.SpeechSynthesizerListener
 import com.baidu.tts.client.TtsMode
+import java.io.File
 import java.util.*
 
 /**
  * 百度SpeechSynthesizer
  *
  */
-
-class BaiduSynthesizer(val lis: SpeechSynthesizerListener) : SpeechSynthesizerI {
+class BaiduSynthesizer(lis: SpeechSynthesizerListener) : SpeechSynthesizerI {
     private lateinit var mSpeechSynthesizer: SpeechSynthesizer
-    override var enableOffline: Boolean = false
+    override val enableOffline: Boolean
+        get() = File("${StorageHelper.sdPath}/baiduTTS", "bd_etts_text.dat")
+                .exists()
 
     private var appId: String = BaiduKey.appId.toString()
     private var appKey: String = BaiduKey.appKey
@@ -40,7 +44,8 @@ class BaiduSynthesizer(val lis: SpeechSynthesizerListener) : SpeechSynthesizerI 
 
 
     // TtsMode.MIX; 离在线融合，在线优先； TtsMode.ONLINE 纯在线； 没有纯离线
-    private var ttsMode = TtsMode.ONLINE
+    private val ttsMode
+        get() = if (enableOffline) TtsMode.MIX else TtsMode.ONLINE
 
     private var voiceModel = SpeechSynService.VOICE_FEMALE
     private var voiceSpeed = "5"
@@ -55,7 +60,7 @@ class BaiduSynthesizer(val lis: SpeechSynthesizerListener) : SpeechSynthesizerI 
 
         LoggerProxy.printable(false) // 日志打印在logcat中
 
-        val params = getParams()
+        val params = buildParams()
         val config = InitConfig(appId, appKey, secretKey, if (hasStoragePermission())
             ttsMode else TtsMode.ONLINE, params, lis)
         initThread()
@@ -77,14 +82,11 @@ class BaiduSynthesizer(val lis: SpeechSynthesizerListener) : SpeechSynthesizerI 
      *
      * @return
      */
-    private fun getParams(): Map<String, String> {
+    private fun buildParams(): Map<String, String> {
         val params = HashMap<String, String>()
         // 以下参数均为选填
+
         // 设置在线发声音人： 0 普通女声（默认） 1 普通男声 2 特别男声 3 情感男声<度逍遥> 4 情感儿童声<度丫丫>
-
-        // 不使用压缩传输
-//        mSpeechSynthesizer.setParam(SpeechSynthesizer.PARAM_AUDIO_ENCODE, SpeechSynthesizer.AUDIO_ENCODE_PCM);
-
         params[SpeechSynthesizer.PARAM_SPEAKER] = voiceModel
         // 设置合成的音量，0-9 ，默认 5
         params[SpeechSynthesizer.PARAM_VOLUME] = "9"
@@ -95,16 +97,17 @@ class BaiduSynthesizer(val lis: SpeechSynthesizerListener) : SpeechSynthesizerI 
 
 //         离线资源文件， 从assets目录中复制到临时目录，需要在initTTs方法前完成
         if (enableOffline) {
-            if (hasStoragePermission()) {
-                val offlineResource = OfflineResource(context, voiceModel)
-                try {// 声学模型文件路径 (离线引擎使用), 请确认下面两个文件存在
-//                    params[SpeechSynthesizer.PARAM_TTS_TEXT_MODEL_FILE] = offlineResource.offlineFile!!
-                    params[SpeechSynthesizer.PARAM_TTS_SPEECH_MODEL_FILE] = offlineResource.modelFilename!!
-                } catch (e: Exception) {
-                    e.printStackTrace()
-                }
+            GlobalLog.log("加载百度语音合成离线资源...")
+            val offlineResource = OfflineResource(voiceModel)
+            try {// 声学模型文件路径 (离线引擎使用), 请确认下面两个文件存在
+                params[SpeechSynthesizer.PARAM_TTS_TEXT_MODEL_FILE] = offlineResource.offlineFile
+                params[SpeechSynthesizer.PARAM_TTS_SPEECH_MODEL_FILE] = offlineResource.modelFilename
+            } catch (e: Exception) {
+                GlobalLog.log("语音合成离线资源加载失败：${e.message}")
+                e.log()
             }
         }
+        Vog.d("合成参数：$params")
         return params
     }
 
@@ -119,11 +122,8 @@ class BaiduSynthesizer(val lis: SpeechSynthesizerListener) : SpeechSynthesizerI 
                     INIT -> {
                         val config = msg.obj as InitConfig
                         val isSuccess = load(config)
-                        if (isSuccess) {
-                            sendToUiThread("合成引擎 初始化成功")
-                        } else {
-                            GlobalApp.toastError("合成引擎初始化失败")
-                            sendToUiThread("合成引擎初始化失败, 请查看日志")
+                        if (!isSuccess) {
+                            GlobalApp.toastError("语音合成引擎初始化失败")
                         }
                     }
                     RELEASE -> releaseA()
@@ -207,7 +207,7 @@ class BaiduSynthesizer(val lis: SpeechSynthesizerListener) : SpeechSynthesizerI 
      * 合成并播放
      * 需要合成的文本text的长度不能超过1024个GBK字节。
      * 合成前可以修改参数：
-     * Map<String, String> params = getParams();
+     * Map<String, String> params = buildParams();
      * synthesizer.setParams(params);
      * @param text 小于1024 GBK字节，即512个汉字或者字母数字
      * @return
@@ -253,11 +253,9 @@ class BaiduSynthesizer(val lis: SpeechSynthesizerListener) : SpeechSynthesizerI 
         return mSpeechSynthesizer.batchSpeak(bags)
     }
 
-    private fun setParams(params: Map<String, String>?) {
-        if (params != null) {
-            for ((key, value) in params) {
-                mSpeechSynthesizer.setParam(key, value)
-            }
+    private fun setParams(params: Map<String, String>) {
+        for ((key, value) in params) {
+            mSpeechSynthesizer.setParam(key, value)
         }
     }
 
@@ -302,9 +300,6 @@ class BaiduSynthesizer(val lis: SpeechSynthesizerListener) : SpeechSynthesizerI 
         isInited = false
     }
 
-    protected fun sendToUiThread(message: String) {
-        Vog.d("合成器： $message")
-    }
 
     companion object {
         private var isInited = false

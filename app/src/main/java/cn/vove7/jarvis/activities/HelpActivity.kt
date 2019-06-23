@@ -175,7 +175,7 @@ class HelpActivity : ReturnableActivity(), AdapterView.OnItemClickListener {
 
     private fun getData(): List<IconTitleEntity> {
         return listOf(
-                IconTitleEntity(R.drawable.ic_book_24dp, R.string.text_advanced_user_guide),
+                IconTitleEntity(R.drawable.ic_book_24dp, R.string.text_user_manual),
                 IconTitleEntity(R.drawable.ic_accessibility, R.string.text_hot_key_desc)
                 , IconTitleEntity(R.drawable.ic_question_answer, R.string.text_faq)
                 , IconTitleEntity(R.drawable.ic_qq, R.string.text_add_qq_group)

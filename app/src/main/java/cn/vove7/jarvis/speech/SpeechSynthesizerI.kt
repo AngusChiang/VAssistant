@@ -15,7 +15,7 @@ import cn.vove7.common.app.GlobalApp
 interface SpeechSynthesizerI {
     val context: Context get() = GlobalApp.APP
 
-    var enableOffline: Boolean
+    val enableOffline: Boolean
 
     fun release()
     fun setAudioStream(type: Int)
@@ -28,6 +28,6 @@ interface SpeechSynthesizerI {
 
     fun hasStoragePermission(): Boolean {
         return ActivityCompat.checkSelfPermission(context,
-                Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED
+                Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED
     }
 }
