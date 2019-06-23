@@ -1,4 +1,4 @@
-package cn.vove7.jarvis.speech.baiduspeech.recognition.model
+package cn.vove7.jarvis.speech
 
 interface SpeechConst {
     companion object {

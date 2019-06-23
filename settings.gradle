@@ -1,1 +1,1 @@
-include ':app', ':executorengine', ':androlua', ':Common', ':rhino-android', ':ParamRegexEngine', ':umlib'
+include ':app', ':executorengine', ':androlua', ':Common', ':rhino-android', ':ParamRegexEngine', ':umlib', ':speechLib'

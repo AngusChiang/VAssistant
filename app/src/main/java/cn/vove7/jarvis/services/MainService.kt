@@ -63,6 +63,9 @@ import cn.vove7.jarvis.speech.SpeechEvent
 import cn.vove7.jarvis.speech.SpeechRecogService
 import cn.vove7.jarvis.speech.VoiceData
 import cn.vove7.common.app.AppConfig
+import cn.vove7.jarvis.speech.baiduspeech.BaiduSpeechRecogService
+import cn.vove7.jarvis.speech.baiduspeech.BaiduSpeechSynService
+import cn.vove7.jarvis.speech.baiduspeech.SyncEvent
 import cn.vove7.jarvis.tools.DataCollector
 import cn.vove7.jarvis.tools.debugserver.RemoteDebugServer
 import cn.vove7.jarvis.tools.setFloat
@@ -106,7 +109,7 @@ class MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
 
     //启动过慢  lateinit 导致未初始化异常
     var speechRecogService: SpeechRecogService? = null
-    var speechSynService: SpeechSynService? = null
+    var speechSynService: BaiduSpeechSynService? = null
 
     /**
      * 当前语音使用方式
@@ -143,7 +146,7 @@ class MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
     private fun loadSpeechService() {
         runWithClock("加载语音识别/合成服务") {
             speechRecogService = BaiduSpeechRecogService(RecogEventListener())
-            speechSynService = SpeechSynService(SynthesisEventListener())
+            speechSynService = BaiduSpeechSynService(SynthesisEventListener())
         }
     }
 

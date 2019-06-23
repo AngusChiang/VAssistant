@@ -2,7 +2,7 @@ package cn.vove7.jarvis.speech.baiduspeech.recognition.listener
 
 import android.os.Handler
 import android.os.Message
-import cn.vove7.jarvis.speech.baiduspeech.recognition.model.SpeechConst
+import cn.vove7.jarvis.speech.SpeechConst
 
 import cn.vove7.jarvis.speech.baiduspeech.recognition.model.RecogResult
 

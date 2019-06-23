@@ -10,7 +10,7 @@ import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.app.log
 import cn.vove7.common.utils.StorageHelper
 import cn.vove7.jarvis.R
-import cn.vove7.jarvis.services.SpeechSynService
+import cn.vove7.jarvis.speech.baiduspeech.BaiduSpeechSynService
 import cn.vove7.jarvis.speech.SpeechSynthesizerI
 import cn.vove7.jarvis.speech.baiduspeech.synthesis.util.OfflineResource
 import cn.vove7.common.app.AppConfig
@@ -47,13 +47,13 @@ class BaiduSynthesizer(lis: SpeechSynthesizerListener) : SpeechSynthesizerI {
     private val ttsMode
         get() = if (enableOffline) TtsMode.MIX else TtsMode.ONLINE
 
-    private var voiceModel = SpeechSynService.VOICE_FEMALE
+    private var voiceModel = BaiduSpeechSynService.VOICE_FEMALE
     private var voiceSpeed = "5"
 
     init {
 
         val sp = SpHelper(context)
-        voiceModel = getTypeCode() ?: SpeechSynService.VOICE_FEMALE
+        voiceModel = getTypeCode() ?: BaiduSpeechSynService.VOICE_FEMALE
         var eed = sp.getInt(R.string.key_voice_syn_speed)
         if (eed == -1) eed = 5
         voiceSpeed = eed.toString()

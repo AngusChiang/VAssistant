@@ -4,7 +4,7 @@ package cn.vove7.jarvis.speech.baiduspeech.recognition.listener
  * Created by fujiayi on 2017/6/14.
  */
 
-import cn.vove7.jarvis.speech.baiduspeech.recognition.model.SpeechConst
+import cn.vove7.jarvis.speech.SpeechConst
 import cn.vove7.jarvis.speech.baiduspeech.recognition.model.RecogResult
 import cn.vove7.vtp.log.Vog
 

@@ -6,6 +6,7 @@ import android.media.AudioManager
 import android.os.*
 import android.support.annotation.CallSuper
 import android.support.v4.app.ActivityCompat
+import cn.vove7.common.app.AppConfig
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.appbus.AppBus
@@ -16,8 +17,6 @@ import cn.vove7.jarvis.BuildConfig
 import cn.vove7.jarvis.receivers.PowerEventReceiver
 import cn.vove7.jarvis.receivers.ScreenStatusListener
 import cn.vove7.jarvis.services.MainService
-import cn.vove7.jarvis.speech.baiduspeech.recognition.model.SpeechConst
-import cn.vove7.common.app.AppConfig
 import cn.vove7.jarvis.view.statusbar.StatusAnimation
 import cn.vove7.jarvis.view.statusbar.WakeupStatusAnimation
 import cn.vove7.vtp.log.Vog

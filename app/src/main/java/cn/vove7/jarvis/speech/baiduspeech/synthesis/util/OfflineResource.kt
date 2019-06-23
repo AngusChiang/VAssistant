@@ -1,10 +1,10 @@
 package cn.vove7.jarvis.speech.baiduspeech.synthesis.util
 
 import cn.vove7.common.utils.StorageHelper
-import cn.vove7.jarvis.services.SpeechSynService.Companion.VOICE_DUXY
-import cn.vove7.jarvis.services.SpeechSynService.Companion.VOICE_DUYY
-import cn.vove7.jarvis.services.SpeechSynService.Companion.VOICE_FEMALE
-import cn.vove7.jarvis.services.SpeechSynService.Companion.VOICE_MALE
+import cn.vove7.jarvis.speech.baiduspeech.BaiduSpeechSynService.Companion.VOICE_DUXY
+import cn.vove7.jarvis.speech.baiduspeech.BaiduSpeechSynService.Companion.VOICE_DUYY
+import cn.vove7.jarvis.speech.baiduspeech.BaiduSpeechSynService.Companion.VOICE_FEMALE
+import cn.vove7.jarvis.speech.baiduspeech.BaiduSpeechSynService.Companion.VOICE_MALE
 import java.io.File
 
 

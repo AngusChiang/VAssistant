@@ -1,4 +1,4 @@
-package cn.vove7.jarvis.services
+package cn.vove7.jarvis.speech.baiduspeech
 
 import android.os.HandlerThread
 import cn.vove7.common.app.GlobalApp

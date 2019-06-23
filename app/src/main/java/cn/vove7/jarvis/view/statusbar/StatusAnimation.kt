@@ -47,7 +47,7 @@ abstract class StatusAnimation {
     open var successId = -1
     open val finishId: Int? = null
 
-    private val notifier by lazy {NotificationHelper(GlobalApp.APP, channel ,alert)}
+    private val notifier by lazy { NotificationHelper(GlobalApp.APP, channel, alert) }
 
     fun begin() {
         hideThread?.interrupt()

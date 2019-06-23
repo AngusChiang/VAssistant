@@ -4,7 +4,7 @@ import android.os.Handler
 import android.os.Message
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.jarvis.R
-import cn.vove7.jarvis.speech.baiduspeech.recognition.model.SpeechConst
+import cn.vove7.jarvis.speech.SpeechConst
 import cn.vove7.common.app.AppConfig
 import cn.vove7.vtp.builder.BundleBuilder
 import cn.vove7.vtp.sharedpreference.SpHelper

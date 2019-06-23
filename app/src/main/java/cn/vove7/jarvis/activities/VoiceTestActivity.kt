@@ -12,9 +12,9 @@ import android.widget.TextView
 import cn.vove7.common.appbus.AppBus
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.speech.VoiceData
-import cn.vove7.jarvis.speech.baiduspeech.recognition.model.SpeechConst.Companion.CODE_VOICE_ERR
-import cn.vove7.jarvis.speech.baiduspeech.recognition.model.SpeechConst.Companion.CODE_VOICE_TEMP
-import cn.vove7.jarvis.speech.baiduspeech.recognition.model.SpeechConst.Companion.CODE_VOICE_VOL
+import cn.vove7.jarvis.speech.SpeechConst.Companion.CODE_VOICE_ERR
+import cn.vove7.jarvis.speech.SpeechConst.Companion.CODE_VOICE_TEMP
+import cn.vove7.jarvis.speech.SpeechConst.Companion.CODE_VOICE_VOL
 import cn.vove7.vtp.log.Vog
 import cn.vove7.vtp.runtimepermission.PermissionUtils
 import cn.vove7.vtp.toast.Voast

@@ -2,17 +2,13 @@ package cn.vove7.jarvis.speech.baiduspeech.recognition
 
 import android.Manifest
 import android.app.Activity
-import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.support.v4.app.ActivityCompat
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.helper.AdvanAppHelper
 import cn.vove7.common.helper.AdvanContactHelper
-import cn.vove7.jarvis.services.BaiduSpeechRecogService
+import cn.vove7.jarvis.speech.baiduspeech.BaiduSpeechRecogService
 import com.baidu.speech.asr.SpeechConstant
-import org.json.JSONArray
-import org.json.JSONException
-import org.json.JSONObject
 
 /**
  * Created by fujiayi on 2017/6/13.

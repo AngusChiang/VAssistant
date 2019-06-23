@@ -8,8 +8,8 @@ import cn.vove7.common.helper.AdvanAppHelper
 import cn.vove7.common.utils.hasMicroPermission
 import cn.vove7.jarvis.services.MainService
 import cn.vove7.common.app.AppConfig
-import cn.vove7.jarvis.view.statusbar.MicroToggleAnimation
 import cn.vove7.jarvis.view.statusbar.StatusAnimation
+import cn.vove7.jarvis.view.statusbar.MicroToggleAnimation
 import cn.vove7.vtp.log.Vog
 
 /**
