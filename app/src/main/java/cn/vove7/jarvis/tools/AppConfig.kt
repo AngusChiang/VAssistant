@@ -12,6 +12,7 @@ import android.net.Uri
 import android.os.Build
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.app.GlobalLog
+import cn.vove7.common.app.log
 import cn.vove7.common.bridges.SystemBridge
 import cn.vove7.common.model.UserInfo
 import cn.vove7.common.netacc.ApiUrls
@@ -482,19 +483,24 @@ object AppConfig {
         return sum
     }
 
-    val PACKAGE_COOL_MARKET = "com.coolapk.market"
 
     private fun openCoolapk(context: Context) {
+        val coolMarketPkg = "com.coolapk.market"
+
         val intent = Intent(Intent.ACTION_VIEW)
         intent.data = Uri.parse("market://details?id=${context.packageName}")
         //跳转酷市场
-        intent.setClassName(PACKAGE_COOL_MARKET, "com.coolapk.market.view.app.AppViewV8Activity")
-        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-        try {
-            context.startActivity(intent)
-        } catch (e: Exception) {
-            e.printStackTrace()
-            GlobalApp.toastWarning("未安装酷安")
+        if (SystemBridge.hasInstall(coolMarketPkg)) {
+            intent.setClassName(coolMarketPkg, "com.coolapk.market.view.app.AppViewV8Activity")
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            try {
+                context.startActivity(intent)
+            } catch (e: Exception) {
+                e.log()
+                SystemBridge.openUrl("https://www.coolapk.com/apk/cn.vove7.vassistant")
+            }
+        } else {
+            SystemBridge.openUrl("https://www.coolapk.com/apk/cn.vove7.vassistant")
         }
     }
 

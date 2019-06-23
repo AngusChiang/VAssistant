@@ -13,6 +13,7 @@ interface VApi {
                 "system",
                 "http"
         )
+
         val runtimeFunctions = arrayOf("currentApp",
                 "currentActivity", "actionCount", "currentActionIndex", "isGlobal()",
                 "commandType", "command", "DEBUG", "focusView", "userInterrupt","notSupport()")
@@ -48,7 +49,10 @@ interface VApi {
                 "openAppDetail(pkg)", "getPkgByWord(s)",
                 "openAppByPkg(pkg)", "openAppByWord(s)", "call(p)",
                 "openFlashlight()", "closeFlashlight()",
-                "getDeviceInfo()", "getAppInfo(s)", "openUrl(url)",
+                "getDeviceInfo()",
+                "hasInstall(pkg)",
+                "getAppInfo(s)",
+                "openUrl(url)",
                 "mediaPause()", "mediaStart()", "mediaResume()",
                 "mediaStop()", "mediaNext()", "mediaPre()", "volumeMute()",
                 "volumeUnmute()", "volumeUp()", "volumeDown()",
@@ -126,6 +130,7 @@ interface VApi {
                 Pair("openFlashlight()", "打开闪光灯"),
                 Pair("closeFlashlight()", "关闭闪光灯"),
                 Pair("getDeviceInfo()", "获取设备信息，返回DeviceInfo"),
+                Pair("hasInstall(pkg)", "是否安装此应用"),
                 Pair("getAppInfo(s)", "根据包名 或 App 名获取app信息"),
                 Pair("openUrl(url)", "使用系统打开链接"),
                 Pair("mediaPause()", "媒体暂停"),

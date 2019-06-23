@@ -301,7 +301,7 @@ object SystemBridge : SystemOperation {
     override fun openUrl(url: String): Boolean {
         return try {
             val intent = Intent(Intent.ACTION_VIEW)
-            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            intent.newTask()
             intent.data = Uri.parse(url)
             context.startActivity(intent)
             true
@@ -322,6 +322,10 @@ object SystemBridge : SystemOperation {
             val pkg = getPkgByWord(s)
             AppHelper.getAppInfo(context, s, pkg ?: s)
         }
+    }
+
+    override fun hasInstall(pkg: String): Boolean {
+        return AdvanAppHelper.ALL_APP_LIST[pkg] != null
     }
 
     @Throws()

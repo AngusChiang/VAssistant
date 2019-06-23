@@ -8,6 +8,7 @@ import cn.vove7.vtp.app.AppInfo
 import cn.vove7.vtp.system.DeviceInfo
 import java.io.File
 
+//TODO 注解API
 @ScriptApiClass("system")
 interface SystemOperation {
     /**
@@ -96,6 +97,12 @@ interface SystemOperation {
      */
     fun getAppInfo(s: String): AppInfo?
 
+    /**
+     * 是否安装此应用
+     * @param pkg String 包名
+     * @return Boolean
+     */
+    fun hasInstall(pkg: String): Boolean
 
     /**
      * 打开链接
