@@ -4,7 +4,7 @@ import android.os.Handler
 import android.os.Message
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.jarvis.R
-import cn.vove7.jarvis.speech.baiduspeech.recognition.model.IStatus
+import cn.vove7.jarvis.speech.baiduspeech.recognition.model.SpeechConst
 import cn.vove7.jarvis.tools.AppConfig
 import cn.vove7.vtp.builder.BundleBuilder
 import cn.vove7.vtp.sharedpreference.SpHelper
@@ -14,7 +14,7 @@ import cn.vove7.vtp.sharedpreference.SpHelper
  * Created by fujiayi on 2017/9/21.
  */
 
-class RecogWakeupListener(private val handler: Handler) : SimpleWakeupListener(), IStatus {
+class RecogWakeupListener(private val handler: Handler) : SimpleWakeupListener(), SpeechConst {
 
     override fun onStart() {
         super.onStart()
@@ -23,7 +23,7 @@ class RecogWakeupListener(private val handler: Handler) : SimpleWakeupListener()
     override fun onSuccess(word: String?, result: WakeUpResult) {
         super.onSuccess(word, result)
         val m = Message()
-        m.what = IStatus.CODE_WAKEUP_SUCCESS
+        m.what = SpeechConst.CODE_WAKEUP_SUCCESS
         m.data = BundleBuilder().put("data", word ?: "").build()
         handler.sendMessage(m)
     }

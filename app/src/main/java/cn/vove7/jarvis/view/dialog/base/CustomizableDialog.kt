@@ -6,6 +6,7 @@ import android.support.annotation.StringRes
 import android.view.LayoutInflater
 import android.view.View
 import cn.vove7.common.app.GlobalLog
+import cn.vove7.common.utils.runInCatch
 import cn.vove7.common.utils.runOnUi
 import com.afollestad.materialdialogs.DialogCallback
 import com.afollestad.materialdialogs.MaterialDialog
@@ -101,16 +102,14 @@ abstract class CustomizableDialog(
     open fun onFinish() {}
     fun finish(posText: String? = null, onClick: (() -> Unit)? = null) {
         onFinish()
-        try {
+        runInCatch {
             runOnUi {
+                dialog.cancelable(true)
                 dialog.positiveButton(text = posText) {
                     onClick?.invoke()
                     it.dismiss()
                 }.show()
             }
-        } catch (e: Exception) {
-            GlobalLog.err(e)
-            e.printStackTrace()
         }
     }
 }

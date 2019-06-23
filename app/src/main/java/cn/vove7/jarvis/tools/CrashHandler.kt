@@ -12,6 +12,7 @@ import cn.vove7.common.netacc.ApiUrls
 import cn.vove7.common.netacc.WrapperNetHelper
 import cn.vove7.common.utils.TextHelper
 import cn.vove7.common.utils.TextPrinter
+import cn.vove7.common.utils.formatNow
 import cn.vove7.jarvis.BuildConfig
 import cn.vove7.jarvis.activities.CrashInfoActivity
 import cn.vove7.vtp.sharedpreference.SpHelper
@@ -52,7 +53,7 @@ object CrashHandler : Thread.UncaughtExceptionHandler {
             val lastCrashTime = sp.getLong("last_crash_time")
             val now = System.currentTimeMillis()
             sp.set("last_crash_time", now)
-            sp.set("last_crash_data", SimpleDateFormat("yyyy-MM-dd HH:mm:ss",
+            sp.set("last_crash_date", SimpleDateFormat("yyyy-MM-dd HH:mm:ss",
                     Locale.getDefault()).format(Date()))
             if (now > lastCrashTime + 60 * 1000) {//restart
                 val intent = Intent(context, CrashInfoActivity::class.java)
@@ -85,7 +86,6 @@ object CrashHandler : Thread.UncaughtExceptionHandler {
         try {
             val info = TextPrinter().apply {
                 println(headerInfo)
-                println(SimpleDateFormat("MM-dd HH:mm:ss", Locale.getDefault()).format(Date()))
                 e.printStackTrace(this)
                 println(log)
             }.toString()
@@ -109,10 +109,11 @@ object CrashHandler : Thread.UncaughtExceptionHandler {
 
 fun DeviceInfo.string(): String {
     return buildString {
-        append("appId:").appendln(BuildConfig.APPLICATION_ID)
+        append("appId: ").appendln(BuildConfig.APPLICATION_ID)
         append("userId: ").appendln(UserInfo.getUserId())
         append("appVersion: ").appendln(AppConfig.versionName)
         append("versionCode: ").appendln(AppConfig.versionCode)
+        append("时间: ").appendln(formatNow())
         append("email: ").appendln(UserInfo.getEmail())
         append("manufacturerName: ").appendln(manufacturerName)
         append("productName: ").appendln(productName)

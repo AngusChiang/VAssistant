@@ -16,7 +16,7 @@ import cn.vove7.jarvis.BuildConfig
 import cn.vove7.jarvis.receivers.PowerEventReceiver
 import cn.vove7.jarvis.receivers.ScreenStatusListener
 import cn.vove7.jarvis.services.MainService
-import cn.vove7.jarvis.speech.baiduspeech.recognition.model.IStatus
+import cn.vove7.jarvis.speech.baiduspeech.recognition.model.SpeechConst
 import cn.vove7.jarvis.tools.AppConfig
 import cn.vove7.jarvis.view.statusbar.StatusAnimation
 import cn.vove7.jarvis.view.statusbar.WakeupStatusAnimation
@@ -174,7 +174,7 @@ abstract class SpeechRecogService(val event: SpeechEvent) : SpeechRecogI {
     private fun restartStopTimer() {
         stopRecogHandler.removeCallbacks(stopRecogAction)
         if (isListening) {
-            stopRecogHandler.postDelayed(stopRecogAction, 800)
+            stopRecogHandler.postDelayed(stopRecogAction, 1000)
         }
 
     }
@@ -246,7 +246,7 @@ abstract class SpeechRecogService(val event: SpeechEvent) : SpeechRecogI {
     inner class RecogHandler(looper: Looper) : Handler(looper) {
         override fun handleMessage(msg: Message?) {
             when (msg?.what) {
-                IStatus.CODE_WAKEUP_SUCCESS -> {//唤醒
+                SpeechConst.CODE_WAKEUP_SUCCESS -> {//唤醒
                     val word = msg.data.getString("data")
                     Vog.d("handleMessage ---> 唤醒 -> $word")
                     startAutoSleepWakeup()//重新倒计时
@@ -256,16 +256,16 @@ abstract class SpeechRecogService(val event: SpeechEvent) : SpeechRecogI {
                         Vog.e("正在聆听,暂停唤醒")
                     }
                 }
-                IStatus.CODE_VOICE_READY -> {
+                SpeechConst.CODE_VOICE_READY -> {
                     event.onRecogReady(isSilent)
                     startSCO()
                 }
-                IStatus.CODE_VOICE_TEMP -> {//中间结果
+                SpeechConst.CODE_VOICE_TEMP -> {//中间结果
                     restartStopTimer()
                     val res = msg.data.getString("data") ?: return
                     event.onTempResult(res)
                 }
-                IStatus.CODE_VOICE_ERR -> {//出错
+                SpeechConst.CODE_VOICE_ERR -> {//出错
                     val code = msg.data.getInt("data")
                     if (BuildConfig.DEBUG) {
                         GlobalLog.log("识别出错：" + SpeechEvent.codeString(code))
@@ -276,11 +276,11 @@ abstract class SpeechRecogService(val event: SpeechEvent) : SpeechRecogI {
                     closeSCO()
                     event.onRecogFailed(code)
                 }
-                IStatus.CODE_VOICE_VOL -> {//音量反馈
+                SpeechConst.CODE_VOICE_VOL -> {//音量反馈
                     val data = msg.data.getSerializable("data") as VoiceData
                     event.onVolume(data)
                 }
-                IStatus.CODE_VOICE_RESULT -> {//结果
+                SpeechConst.CODE_VOICE_RESULT -> {//结果
                     stopRecogHandler.removeCallbacks(stopRecogAction)
                     val result = msg.data.getString("data") ?: "null"
                     isListening = false
@@ -288,7 +288,7 @@ abstract class SpeechRecogService(val event: SpeechEvent) : SpeechRecogI {
                     event.onResult(result)
                     closeSCO()//关闭SCO
                 }
-                IStatus.STATUS_FINISHED -> {
+                SpeechConst.STATUS_FINISHED -> {
                     closeSCO()//关闭SCO
                     event.onFinish()
                 }

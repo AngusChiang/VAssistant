@@ -12,20 +12,27 @@ import java.io.IOException
 
 
 /**
+ * Baidu语音合成离线资源
  * Created by fujiayi on 2017/5/19.
  */
 
 class OfflineResource(context: Context, voiceType: String) {
 
-    private var assets: AssetManager?=null
-    private var destPath: String?=null
+    private var assets: AssetManager? = null
+    private var destPath: String? = null
 
-    var textFilename: String? = null
+    /**
+     * 离线文件  bd_etts_text.dat 位置
+     * 从assset 复制到sdcard
+     */
+    var offlineFile: String? = null
         private set
+
+    /**
+     * 离线发音人资源
+     */
     var modelFilename: String? = null
         private set
-
-    private val mapInitied = HashMap<String, Boolean>()
 
     init {
         try {
@@ -49,7 +56,7 @@ class OfflineResource(context: Context, voiceType: String) {
             else -> throw RuntimeException("voice type is not in list")
         }
         try {
-            textFilename = copyAssetsFile(text)
+            offlineFile = copyAssetsFile(text)
             modelFilename = copyAssetsFile(model)
         } catch (e: IOException) {
             e.printStackTrace()
@@ -60,13 +67,7 @@ class OfflineResource(context: Context, voiceType: String) {
     @Throws(IOException::class)
     private fun copyAssetsFile(sourceFilename: String): String {
         val destFilename = "$destPath/$sourceFilename"
-        var recover = false
-        val existed = mapInitied[sourceFilename] ?: false // 启动时完全覆盖一次
-        if (!existed) {
-            recover = true
-        }
-        FileUtil.copyFromAssets(assets, "bd/$sourceFilename", destFilename, recover)
-//        Vog.d("copyAssetsFile 文件复制成功：$destFilename")
+        FileUtil.copyFromAssets(assets, "bd/$sourceFilename", destFilename, false)
         return destFilename
     }
 

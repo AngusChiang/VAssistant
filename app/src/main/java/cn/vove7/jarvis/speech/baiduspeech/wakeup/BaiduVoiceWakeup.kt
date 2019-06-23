@@ -56,12 +56,9 @@ class BaiduVoiceWakeup(private val eventListener: EventListener) : WakeupI() {
         params[SpeechConstant.APP_ID] = appId
         params[SpeechConstant.APP_KEY] = appKey
         params[SpeechConstant.SECRET] = secretKey
-        if (AppConfig.lastingVoiceCommand)
-            params[SpeechConstant.VAD_ENDPOINT_TIMEOUT] = 0
-        // "assets:///WakeUp_xvtx.bin" 表示WakeUp.bin文件定义在assets目录下
+
         // params.put(SpeechConstant.ACCEPT_AUDIO_DATA,true);
         // params.put(SpeechConstant.ACCEPT_AUDIO_VOLUME,true);
-        // params.put(SpeechConstant.IN_FILE,"res:///com/baidu/android/voicedemo/wakeup.pcm");
         send(params)
     }
 

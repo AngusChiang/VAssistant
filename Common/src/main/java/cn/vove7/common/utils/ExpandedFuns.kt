@@ -17,6 +17,7 @@ import android.support.v4.app.ActivityCompat
 import android.util.DisplayMetrics
 import android.view.View
 import android.view.animation.Animation
+import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import cn.vove7.common.BuildConfig
 import cn.vove7.common.app.GlobalApp
@@ -52,11 +53,14 @@ fun runOnUi(action: () -> Unit) {
     }
 }
 
-fun runInCatch(block: () -> Unit) {
+fun runInCatch(log: Boolean = false, block: () -> Unit) {
     try {
         block.invoke()
     } catch (e: Throwable) {
         e.log()
+        if (log) {
+            GlobalLog.err(e)
+        }
     }
 }
 
@@ -148,7 +152,7 @@ fun prints(vararg msgs: Any?) {
     }
 }
 
-fun formatNow(pat: String): String = SimpleDateFormat(pat, Locale.getDefault()).format(Date())
+fun formatNow(pat: String = "yyyy-MM-dd HH:mm:ss"): String = SimpleDateFormat(pat, Locale.getDefault()).format(Date())
 
 fun Context.startActivityOnNewTask(intent: Intent) {
     intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
@@ -178,23 +182,18 @@ fun View.boundsInScreen(): Rect {
  * @param context Context
  * @return Boolean
  */
-val inputMethodCache = hashMapOf<String, Boolean>()
-
 fun AppInfo.isInputMethod(context: Context): Boolean {
-    inputMethodCache[packageName]?.also {
-        return it
+    return try {
+        //获取输入法列表
+        val imm = context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        val methodList = imm.inputMethodList
+        methodList.map {
+            it.packageName
+        }.contains(packageName)
+    } catch (e: Throwable) {
+        e.log()
+        false
     }
-    val pm = context.packageManager
-    val pkgInfo = pm.getPackageInfo(packageName, PackageManager.GET_SERVICES)
-    pkgInfo.services?.forEach {
-        if (it.permission == Manifest.permission.BIND_INPUT_METHOD) {
-            Vog.d("isInputMethod ---> 输入法：$packageName")
-            inputMethodCache[packageName] = true
-            return true
-        }
-    }
-    inputMethodCache[packageName] = false
-    return false
 }
 
 

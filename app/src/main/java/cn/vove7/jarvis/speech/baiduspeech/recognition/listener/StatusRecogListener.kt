@@ -4,27 +4,27 @@ package cn.vove7.jarvis.speech.baiduspeech.recognition.listener
  * Created by fujiayi on 2017/6/14.
  */
 
-import cn.vove7.jarvis.speech.baiduspeech.recognition.model.IStatus
+import cn.vove7.jarvis.speech.baiduspeech.recognition.model.SpeechConst
 import cn.vove7.jarvis.speech.baiduspeech.recognition.model.RecogResult
 import cn.vove7.vtp.log.Vog
 
-open class StatusRecogListener : IRecogListener, IStatus {
+open class StatusRecogListener : IRecogListener, SpeechConst {
 
     /**
      * 识别的引擎当前的状态
      */
-    var status = IStatus.STATUS_NONE
+    var status = SpeechConst.STATUS_NONE
 
     override fun onAsrReady() {
-        status = IStatus.STATUS_READY
+        status = SpeechConst.STATUS_READY
     }
 
     override fun onAsrBegin() {
-        status = IStatus.STATUS_SPEAKING
+        status = SpeechConst.STATUS_SPEAKING
     }
 
     override fun onAsrEnd() {
-        status = IStatus.STATUS_RECOGNITION
+        status = SpeechConst.STATUS_RECOGNITION
         Vog.i("说话结束")
     }
 
@@ -32,24 +32,24 @@ open class StatusRecogListener : IRecogListener, IStatus {
     }
 
     override fun onAsrFinalResult(results: Array<String>?, recogResult: RecogResult) {
-        status = IStatus.STATUS_FINISHED
+        status = SpeechConst.STATUS_FINISHED
     }
 
     override fun onAsrFinish(recogResult: RecogResult) {
-        status = IStatus.STATUS_FINISHED
+        status = SpeechConst.STATUS_FINISHED
     }
 
 
     override fun onAsrFinishError(errorCode: Int, subErrorCode: Int, errorMessage: String?, descMessage: String?,
                                   recogResult: RecogResult) {
-        status = IStatus.STATUS_FINISHED
+        status = SpeechConst.STATUS_FINISHED
     }
 
     /**
      * 长语音识别结束
      */
     override fun onAsrLongFinish() {
-        status = IStatus.STATUS_FINISHED
+        status = SpeechConst.STATUS_FINISHED
     }
 
     override fun onAsrVolume(volumePercent: Int, volume: Int) {
@@ -67,11 +67,11 @@ open class StatusRecogListener : IRecogListener, IStatus {
     }
 
     override fun onAsrExit() {
-        status = IStatus.STATUS_NONE
+        status = SpeechConst.STATUS_NONE
     }
 
     override fun onAsrOnlineNluResult(nluResult: String) {
-        status = IStatus.STATUS_FINISHED
+        status = SpeechConst.STATUS_FINISHED
     }
 
     override fun onOfflineLoaded() {

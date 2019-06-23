@@ -1081,9 +1081,17 @@ class MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
      */
     inner class SynthesisEventListener : SyncEvent {
 
+        /**
+         * 出错时，根据text长度指定展示时间
+         * 1000 + text.len * 500
+         * @param text String?
+         */
         override fun onError(text: String?) {
-            notifySpeakFinish(text, true)
-            resumeMusicIf()
+            thread {
+                sleep(((text?.length ?: 0) * 100).toLong())
+                notifySpeakFinish(text, true)
+                resumeMusicIf()
+            }
         }
 
         override fun onFinish(text: String?) {

@@ -1,6 +1,5 @@
 package cn.vove7.jarvis.speech.baiduspeech.synthesis.control
 
-import android.content.pm.PackageManager
 import android.media.AudioManager
 import android.os.Handler
 import android.os.HandlerThread
@@ -8,12 +7,12 @@ import android.os.Message
 import android.util.Pair
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.app.GlobalLog
-import cn.vove7.jarvis.BuildConfig
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.services.SpeechSynService
 import cn.vove7.jarvis.speech.SpeechSynthesizerI
 import cn.vove7.jarvis.speech.baiduspeech.synthesis.util.OfflineResource
 import cn.vove7.jarvis.tools.AppConfig
+import cn.vove7.jarvis.tools.BaiduKey
 import cn.vove7.vtp.log.Vog
 import cn.vove7.vtp.sharedpreference.SpHelper
 import com.baidu.tts.chainofresponsibility.logger.LoggerProxy
@@ -30,35 +29,23 @@ import java.util.*
 
 class BaiduSynthesizer(val lis: SpeechSynthesizerListener) : SpeechSynthesizerI {
     private lateinit var mSpeechSynthesizer: SpeechSynthesizer
+    override var enableOffline: Boolean = false
 
-    private var appId: String
-    private var appKey: String
-    private var secretKey: String
+    private var appId: String = BaiduKey.appId.toString()
+    private var appKey: String = BaiduKey.appKey
+    private var secretKey: String = BaiduKey.sKey
 
-    private val isCheckFile = true
     private lateinit var hThread: HandlerThread
     private lateinit var tHandler: Handler
 
 
     // TtsMode.MIX; 离在线融合，在线优先； TtsMode.ONLINE 纯在线； 没有纯离线
-    private var ttsMode = TtsMode.MIX
+    private var ttsMode = TtsMode.ONLINE
 
     private var voiceModel = SpeechSynService.VOICE_FEMALE
     private var voiceSpeed = "5"
 
     init {
-
-        val appInfo = context.packageManager.getApplicationInfo(context.packageName,
-                PackageManager.GET_META_DATA)
-        if (BuildConfig.DEBUG) {
-            appId = "11389525"
-            appKey = "ILdLUepG75UwwQVa0rqiEUVa"
-            secretKey = "di6djKXGGELgnCCusiQUlCBYRxXVrr46"
-        } else {
-            appId = appInfo.metaData.getInt("com.baidu.speech.APP_ID").toString()
-            appKey = appInfo.metaData.getString("com.baidu.speech.API_KEY")!!
-            secretKey = appInfo.metaData.getString("com.baidu.speech.SECRET_KEY")!!
-        }
 
         val sp = SpHelper(context)
         voiceModel = getTypeCode() ?: SpeechSynService.VOICE_FEMALE
@@ -95,6 +82,9 @@ class BaiduSynthesizer(val lis: SpeechSynthesizerListener) : SpeechSynthesizerI 
         // 以下参数均为选填
         // 设置在线发声音人： 0 普通女声（默认） 1 普通男声 2 特别男声 3 情感男声<度逍遥> 4 情感儿童声<度丫丫>
 
+        // 不使用压缩传输
+//        mSpeechSynthesizer.setParam(SpeechSynthesizer.PARAM_AUDIO_ENCODE, SpeechSynthesizer.AUDIO_ENCODE_PCM);
+
         params[SpeechSynthesizer.PARAM_SPEAKER] = voiceModel
         // 设置合成的音量，0-9 ，默认 5
         params[SpeechSynthesizer.PARAM_VOLUME] = "9"
@@ -104,13 +94,15 @@ class BaiduSynthesizer(val lis: SpeechSynthesizerListener) : SpeechSynthesizerI 
         params[SpeechSynthesizer.PARAM_PITCH] = "5"
 
 //         离线资源文件， 从assets目录中复制到临时目录，需要在initTTs方法前完成
-        if (hasStoragePermission()) {
-            val offlineResource = OfflineResource(context, voiceModel)
-            try {// 声学模型文件路径 (离线引擎使用), 请确认下面两个文件存在
-                params[SpeechSynthesizer.PARAM_TTS_TEXT_MODEL_FILE] = offlineResource.textFilename!!
-                params[SpeechSynthesizer.PARAM_TTS_SPEECH_MODEL_FILE] = offlineResource.modelFilename!!
-            } catch (e: Exception) {
-                e.printStackTrace()
+        if (enableOffline) {
+            if (hasStoragePermission()) {
+                val offlineResource = OfflineResource(context, voiceModel)
+                try {// 声学模型文件路径 (离线引擎使用), 请确认下面两个文件存在
+//                    params[SpeechSynthesizer.PARAM_TTS_TEXT_MODEL_FILE] = offlineResource.offlineFile!!
+                    params[SpeechSynthesizer.PARAM_TTS_SPEECH_MODEL_FILE] = offlineResource.modelFilename!!
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                }
             }
         }
         return params

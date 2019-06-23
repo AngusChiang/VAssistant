@@ -3,11 +3,8 @@ package cn.vove7.jarvis.speech
 import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager
-import android.media.AudioManager
 import android.support.v4.app.ActivityCompat
 import cn.vove7.common.app.GlobalApp
-import cn.vove7.jarvis.tools.AppConfig
-import cn.vove7.vtp.log.Vog
 
 /**
  * # SpeechSynthesizerI
@@ -17,6 +14,8 @@ import cn.vove7.vtp.log.Vog
  */
 interface SpeechSynthesizerI {
     val context: Context get() = GlobalApp.APP
+
+    var enableOffline: Boolean
 
     fun release()
     fun setAudioStream(type: Int)

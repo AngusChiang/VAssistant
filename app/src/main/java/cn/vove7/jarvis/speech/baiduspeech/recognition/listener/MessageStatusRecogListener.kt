@@ -2,7 +2,7 @@ package cn.vove7.jarvis.speech.baiduspeech.recognition.listener
 
 import android.os.Handler
 import android.os.Message
-import cn.vove7.jarvis.speech.baiduspeech.recognition.model.IStatus
+import cn.vove7.jarvis.speech.baiduspeech.recognition.model.SpeechConst
 
 import cn.vove7.jarvis.speech.baiduspeech.recognition.model.RecogResult
 
@@ -112,9 +112,9 @@ class MessageStatusRecogListener(private val handler: Handler) : StatusRecogList
     }
 
 
-    private fun sendMessage(message: String, what: Int = IStatus.WHAT_MESSAGE_STATUS, highlight: Boolean = false) {
+    private fun sendMessage(message: String, what: Int = SpeechConst.WHAT_MESSAGE_STATUS, highlight: Boolean = false) {
         var message = message
-        if (needTime && what != IStatus.STATUS_FINISHED) {
+        if (needTime && what != SpeechConst.STATUS_FINISHED) {
             message += "  ;time=" + System.currentTimeMillis()
         }
         val msg = Message.obtain()

@@ -1,6 +1,6 @@
 package cn.vove7.jarvis.speech.baiduspeech.recognition.model
 
-interface IStatus {
+interface SpeechConst {
     companion object {
 
         const val STATUS_NONE = 2

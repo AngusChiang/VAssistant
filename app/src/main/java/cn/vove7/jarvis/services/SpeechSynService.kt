@@ -112,7 +112,7 @@ class SpeechSynService(val event: SyncEvent) : SpeechSynthesizerListener {
 //        Vog.d("reLoadVoiceModel 切换离线语音：" + offlineResource.modelFilename)
 //
 //        val result = synthesizer.loadVoiceModel(offlineResource.modelFilename,
-//                offlineResource.textFilename)
+//                offlineResource.offlineFile)
 //        checkResult(result, "reLoadVoiceModel")
 //    }
 

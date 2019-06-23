@@ -1,9 +1,8 @@
 package cn.vove7.jarvis.services
 
-import android.content.Context
 import android.os.HandlerThread
 import cn.vove7.common.app.GlobalApp
-import cn.vove7.common.app.GlobalLog
+import cn.vove7.common.utils.runInCatch
 import cn.vove7.common.utils.runOnNewHandlerThread
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.speech.SpeechEvent
@@ -19,8 +18,6 @@ import cn.vove7.vtp.log.Vog
 import com.baidu.speech.asr.SpeechConstant
 import com.google.gson.Gson
 import com.google.gson.annotations.SerializedName
-import com.qihoo360.replugin.utils.AssetsUtils
-import java.io.File
 
 /**
  * 百度语音识别服务
@@ -30,60 +27,43 @@ class BaiduSpeechRecogService(event: SpeechEvent) : SpeechRecogService(event) {
     /**
      * 识别控制器，使用MyRecognizer控制识别的流程
      */
-    private lateinit var myRecognizer: MyRecognizer
-    override val wakeupI: WakeupI by lazy { BaiduVoiceWakeup(WakeupEventAdapter(RecogWakeupListener(handler))) }
+    private val myRecognizer: MyRecognizer by lazy {
+        MyRecognizer(GlobalApp.APP, listener)
+    }
 
-    /*
- * 本Activity中是否需要调用离线命令词功能。根据此参数，判断是否需要调用SDK的ASR_KWS_LOAD_ENGINE事件
- */
+    override val wakeupI: WakeupI by lazy {
+        BaiduVoiceWakeup(WakeupEventAdapter(RecogWakeupListener(handler)))
+    }
+
+    /**
+     * 本Activity中是否需要调用离线命令词功能。根据此参数，判断是否需要调用SDK的ASR_KWS_LOAD_ENGINE事件
+     */
     override var enableOffline = true
 
     /**
      * 分发事件
      */
-    private val handler: RecogHandler
-
-    init {
+    private val handler: RecogHandler by lazy {
         val t = HandlerThread("recog")
         t.start()
-        handler = RecogHandler(t.looper)
-        initRecog()
-        //初始化唤醒器
+        RecogHandler(t.looper)
+    }
+
+    init {
+        if (enableOffline) {
+            runOnNewHandlerThread {
+                runInCatch(true) {
+                    myRecognizer.loadOfflineEngine()
+                }
+            }
+        }
+        //初始化语音唤醒器
         if (AppConfig.voiceWakeup) {
             startWakeUp()
         }
     }
 
-    lateinit var listener: SpeechStatusListener
-
-    /**
-     * 在onCreate中调用。初始化识别控制类MyRecognizer
-     */
-    private fun initRecog() {
-        listener = SpeechStatusListener(handler)
-        val context: Context = GlobalApp.APP
-        myRecognizer = MyRecognizer(context, listener)
-
-        if (enableOffline) {
-            runOnNewHandlerThread {
-                try {
-                    copyFile()
-                    myRecognizer.loadOfflineEngine()
-                } catch (e: Exception) {
-                    GlobalLog.err(e)
-                }
-            }
-        }
-    }
-
-    private fun copyFile() {
-        val filesDir = context.filesDir.absolutePath + "/bd/"
-        val fName = "baidu_speech_grammar.bsg"
-        if (!File(filesDir, fName).exists()) {
-            AssetsUtils.extractTo(context, "bd/baidu_speech_grammar.bsg",
-                    filesDir, fName)
-        }
-    }
+    val listener: SpeechStatusListener by lazy { SpeechStatusListener(handler) }
 
 
     private fun recogParams(silent: Boolean) = mutableMapOf<String, Any>(

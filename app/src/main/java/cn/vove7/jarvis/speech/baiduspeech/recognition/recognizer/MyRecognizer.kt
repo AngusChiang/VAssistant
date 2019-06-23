@@ -9,7 +9,9 @@ import com.baidu.speech.EventListener
 import com.baidu.speech.EventManager
 import com.baidu.speech.EventManagerFactory
 import com.baidu.speech.asr.SpeechConstant
+import com.qihoo360.replugin.utils.AssetsUtils
 import org.json.JSONObject
+import java.io.File
 import java.lang.Thread.sleep
 
 /**
@@ -19,9 +21,9 @@ import java.lang.Thread.sleep
  * @param eventListener
  */
 class MyRecognizer(
-        context: Context,
+        val context: Context,
         /**
-         * SDK 内部核心 事件回调类， 用于开发者写自己的识别回调逻辑
+         * SDK 内部核心 事件回调类
          */
         private val eventListener: EventListener
 ) {
@@ -55,11 +57,21 @@ class MyRecognizer(
      * 加载离线词
      */
     fun loadOfflineEngine() {
+        copyFile()
         val json = JSONObject(OfflineRecogParams.fetchOfflineParams()).toString()
         Vog.v("loadOfflineEngine params:$json")
         asr.send(SpeechConstant.ASR_KWS_LOAD_ENGINE, json, null, 0, 0)
         isOfflineEngineLoaded = true
         // 没有ASR_KWS_LOAD_ENGINE这个回调表试失败，如缺少第一次联网时下载的正式授权文件。
+    }
+
+    private fun copyFile() {
+        val filesDir = context.filesDir.absolutePath + "/bd/"
+        val fName = "baidu_speech_grammar.bsg"
+        if (!File(filesDir, fName).exists()) {
+            AssetsUtils.extractTo(context, "bd/baidu_speech_grammar.bsg",
+                    filesDir, fName)
+        }
     }
 
     fun start(params: Map<String, Any>) {
