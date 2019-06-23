@@ -16,7 +16,7 @@ import cn.vove7.jarvis.activities.base.OneFragmentActivity
 import cn.vove7.jarvis.adapters.ListViewModel
 import cn.vove7.jarvis.adapters.SimpleListAdapter
 import cn.vove7.jarvis.fragments.SimpleListFragment
-import cn.vove7.jarvis.tools.AppConfig
+import cn.vove7.common.app.AppConfig
 import cn.vove7.jarvis.tools.DialogUtil
 import cn.vove7.jarvis.view.dialog.AdEditorDialog
 import cn.vove7.jarvis.view.dialog.base.BottomDialogWithText

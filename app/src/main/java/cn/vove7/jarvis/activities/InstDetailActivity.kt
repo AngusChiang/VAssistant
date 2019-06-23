@@ -36,7 +36,7 @@ import cn.vove7.jarvis.activities.base.BaseActivity
 import cn.vove7.jarvis.adapters.ExecuteQueueAdapter
 import cn.vove7.jarvis.adapters.InstSettingListAdapter
 import cn.vove7.jarvis.services.MainService
-import cn.vove7.jarvis.tools.AppConfig
+import cn.vove7.common.app.AppConfig
 import cn.vove7.jarvis.tools.ItemWrap
 import cn.vove7.jarvis.tools.ShortcutUtil
 import cn.vove7.jarvis.tools.Tutorials

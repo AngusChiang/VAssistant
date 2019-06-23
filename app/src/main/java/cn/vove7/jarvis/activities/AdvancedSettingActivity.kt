@@ -7,6 +7,7 @@ import android.os.Handler
 import android.speech.RecognizerIntent
 import android.view.View
 import android.widget.TextView
+import cn.vove7.common.app.AppConfig
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.bridges.SystemBridge

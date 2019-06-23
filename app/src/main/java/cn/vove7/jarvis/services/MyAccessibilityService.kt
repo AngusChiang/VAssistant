@@ -24,7 +24,7 @@ import cn.vove7.common.helper.AdvanAppHelper
 import cn.vove7.common.utils.StubbornFlag
 import cn.vove7.jarvis.plugins.AdKillerService
 import cn.vove7.jarvis.plugins.VoiceWakeupStrategy
-import cn.vove7.jarvis.tools.AppConfig
+import cn.vove7.common.app.AppConfig
 import cn.vove7.jarvis.view.statusbar.AccessibilityStatusAnimation
 import cn.vove7.jarvis.view.statusbar.StatusAnimation
 import cn.vove7.vtp.log.Vog

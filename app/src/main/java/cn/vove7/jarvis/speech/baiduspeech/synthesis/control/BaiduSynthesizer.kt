@@ -13,7 +13,7 @@ import cn.vove7.jarvis.R
 import cn.vove7.jarvis.services.SpeechSynService
 import cn.vove7.jarvis.speech.SpeechSynthesizerI
 import cn.vove7.jarvis.speech.baiduspeech.synthesis.util.OfflineResource
-import cn.vove7.jarvis.tools.AppConfig
+import cn.vove7.common.app.AppConfig
 import cn.vove7.jarvis.tools.BaiduKey
 import cn.vove7.vtp.log.Vog
 import cn.vove7.vtp.sharedpreference.SpHelper

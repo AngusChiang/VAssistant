@@ -11,4 +11,20 @@
     <string name="text_not_fount_email_app" translatable="false">未找到邮件应用</string>
     <string name="text_failed_to_open_email_app" translatable="false">唤起邮件应用失败</string>
 
+    <string name="text_need_vip">此操作需要高级用户</string>
+    <string name="text_please_login_first">请先登录</string>
+
+
+    <string-array name="list_auto_sleep_duration">
+        <item>10分钟</item>
+        <item>20分钟</item>
+        <item>30分钟</item>
+        <item>1小时</item>
+        <item>2小时</item>
+        <item>5小时</item>
+        <item>不自动休眠</item>
+    </string-array>
+
+
+
 </resources>

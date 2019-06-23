@@ -12,12 +12,11 @@ import cn.vove7.common.helper.AdvanAppHelper
 import cn.vove7.common.utils.ThreadPool.runOnPool
 import cn.vove7.common.view.finder.ViewFindBuilder
 import cn.vove7.common.view.finder.ViewFinder
-import cn.vove7.jarvis.tools.AppConfig
+import cn.vove7.common.app.AppConfig
 import cn.vove7.jarvis.view.statusbar.RemoveAdAnimation
 import cn.vove7.vtp.app.AppInfo
 import cn.vove7.vtp.log.Vog
 import java.util.concurrent.ConcurrentHashMap
-import java.util.concurrent.ConcurrentSkipListSet
 import kotlin.concurrent.thread
 
 /**

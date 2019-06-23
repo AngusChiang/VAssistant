@@ -19,42 +19,6 @@
         <item>第三个</item>
         <item>最后一个</item>
     </string-array>
-    <string-array name="list_float_voice_align" translatable="false">
-        <item>居中</item>
-        <item>靠左</item>
-        <item>靠右</item>
-    </string-array>
-    <string-array name="list_translate_languages" translatable="false">
-        <item>自动检测</item>
-        <item>中文</item>
-        <item>英语</item>
-        <item>粤语</item>
-        <item>文言文</item>
-        <item>日语</item>
-        <item>韩语</item>
-        <item>法语</item>
-        <item>西班牙语</item>
-        <item>泰语</item>
-        <item>阿拉伯语</item>
-        <item>俄语</item>
-        <item>葡萄牙语</item>
-        <item>德语</item>
-        <item>意大利语</item>
-        <item>希腊语</item>
-        <item>荷兰语</item>
-        <item>波兰语</item>
-        <item>保加利亚语</item>
-        <item>爱沙尼亚语</item>
-        <item>丹麦语</item>
-        <item>芬兰语</item>
-        <item>捷克语</item>
-        <item>罗马尼亚语</item>
-        <item>斯洛文尼亚语</item>
-        <item>瑞典语</item>
-        <item>匈牙利语</item>
-        <item>繁体中文</item>
-        <item>越南语</item>
-    </string-array>
 
     <string-array name="voice_model_entities" translatable="false">
         <item>普通女声</item>
@@ -83,35 +47,7 @@
         <item>3</item>
     </string-array>
 
-    <string-array name="list_chat_system" translatable="false">
-        <!--<item>青云客</item>-->
-        <item>图灵机器人</item>
-    </string-array>
 
-    <string-array name="list_home_funs" translatable="false">
-        <item>屏幕助手</item>
-        <item>语音识别</item>
-    </string-array>
-    <string-array name="list_fp_animation" translatable="false">
-        <item>默认</item>
-        <item>揭露</item>
-    </string-array>
-
-    <string-array name="list_stream_syn_output" translatable="false">
-        <item>媒体音量</item>
-        <item>铃声音量</item>
-        <item>通知音量</item>
-    </string-array>
-
-    <string-array name="list_auto_sleep_duration">
-        <item>10 minutes</item>
-        <item>20 minutes</item>
-        <item>30 minutes</item>
-        <item>1 hours</item>
-        <item>2 hours</item>
-        <item>5 hours</item>
-        <item>Does not automatically sleep</item>
-    </string-array>
 
     <string name="text_settings">Settings</string>
     <string name="text_search">Search</string>
@@ -182,15 +118,6 @@
     <string name="text_sound_model">Voice model</string>
     <string name="text_volume">Volume</string>
     <string name="text_speak_speed">Speed of Speak</string>
-    <string name="key_show_toast_when_remove_ad" translatable="false">show_toast_when_remove_ad</string>
-    <string name="key_vibrate_reco_begin" translatable="false">vibrate_reco_begin</string>
-    <string name="key_voice_syn_model" translatable="false">voice_syn_model</string>
-    <string name="key_open_ad_block" translatable="false">open_ad_block</string>
-    <string name="key_ad_wait_secs" translatable="false">ad_wait_secs</string>
-    <string name="key_voice_control_dialog" translatable="false">voice_control_dialog</string>
-    <string name="key_open_voice_wakeup" translatable="false">open_voice_wakeup</string>
-    <string name="key_voice_syn_speed" translatable="false">voice_syn_speed</string>
-    <string name="key_voice_syn_volume" translatable="false">voice_syn_volume</string>
     <string name="text_open_ad_killer_service">AdKiller service</string>
     <string name="text_remote_debug">Remote debug</string>
     <string name="text_open_voice_wakeup">Voice wakeup</string>
@@ -217,10 +144,6 @@
     <string name="text_sync">Synchronize</string>
     <string name="text_vibrate_reco_begin">开始识别时震动</string>
     <string name="text_net_err">Network error</string>
-    <string name="key_login_info" translatable="false">login_info</string>
-    <string name="key_long_key_press_delay" translatable="false">long_key_press_delay</string>
-    <string name="key_wakeup_with_headsethook" translatable="false">wakeup_with_headsethook</string>
-    <string name="key_show_prompt_inapp_as_global_dialog" translatable="false">show_prompt_inapp_as_global_dialog</string>
     <string name="text_action_title">Action title</string>
     <string name="hint_example">打电话给xxx \n呼叫xxx</string>
     <string name="hint_action_desc">拨打电话，可用别名标记联系人，见 标记管理/联系人</string>
@@ -275,8 +198,6 @@
     <string name="hint_depths_array">Depths array</string>
     <string name="hint_depths_array_helper">split with \',\' like: 1,2,3</string>
     <string name="text_ad_texts">Texts</string>
-    <string name="text_need_vip">此操作需要高级用户</string>
-    <string name="text_please_login_first">Please login first</string>
     <string name="text_unlock">Unlock</string>
     <string name="text_need_unlock">Partial function need to unlock.</string>
     <string name="text_add_regex">Add regex</string>
@@ -301,7 +222,6 @@
     <string name="text_user_manual">User manual</string>
     <string name="text_laboratory">Laboratory</string>
     <string name="text_feedback">Feedback</string>
-    <string name="key_long_press_volume_up_wake_up" translatable="false">long_press_volume_up_wake_up</string>
     <string name="text_wakeup_way">The way of wake up</string>
     <string name="text_long_press_volume_up">Long press vol up</string>
     <string name="text_as_global_inst">As global inst</string>
@@ -319,17 +239,10 @@
     <string name="text_modify_succ">Successfully modified</string>
     <string name="text_add_qq_group">加入讨论群</string>
     <string name="text_purchase_ways">Purchase way</string>
-    <string name="key_user_exp_plan" translatable="false">user_exp_plan</string>
     <string name="text_other">Other</string>
     <string name="text_faq">FAQ</string>
     <string name="text_check_last_data">检查最新数据</string>
 
-    <string name="key_last_sync_global_date" translatable="false">last_sync_global_date</string>
-    <string name="key_last_sync_in_app_date" translatable="false">last_sync_in_app_date</string>
-    <string name="key_last_sync_marked_contact_date" translatable="false">last_sync_marked_contact_date</string>
-    <string name="key_last_sync_marked_app_date" translatable="false">last_sync_marked_app_date</string>
-    <string name="key_last_sync_marked_open_date" translatable="false">last_sync_marked_open_date</string>
-    <string name="key_last_sync_marked_ad_date" translatable="false">last_sync_marked_ad_date</string>
     <string name="shortcut_wakeup">WakeUp</string>
     <string name="text_switch_voice_wp" translatable="false">切换语音唤醒</string>
     <string name="text_voice_wp" translatable="false">语音唤醒</string>
@@ -338,25 +251,15 @@
     <string name="text_add_wakeup_shortcut_to_launcher">添加桌面唤醒快捷方式</string>
     <string name="text_add_shortcut_to_launcher">添加到桌面快捷方式</string>
     <string name="text_auto_open_voice_wakeup_charging">充电时自动开启语音唤醒</string>
-    <string name="key_auto_open_voice_wakeup_charging" translatable="false">auto_open_voice_wakeup_charging</string>
-    <string name="key_use_smartopen_if_parse_failed" translatable="false">use_smartopen_if_parse_failed</string>
-    <string name="key_cloud_service_parse" translatable="false">cloud_service_parse</string>
     <string name="text_only_cloud_parse">仅使用云解析</string>
-    <string name="key_only_cloud_service_parse" translatable="false">only_cloud_service_parse</string>
     <string name="text_hot_key_desc">快捷键</string>
     <string name="text_customize_wakeup_words">自定义唤醒词</string>
-    <string name="key_wakeup_file_path" translatable="false">wakeup_file_path</string>
     <string name="text_vosp">VOSP</string>
     <string name="text_vosp_summary">加入开源工程</string>
     <string name="text_lua_editor">Lua编辑器</string>
     <string name="text_js_editor">Js编辑器</string>
     <string name="text_select_nothing">未选择任何内容</string>
     <string name="text_copied">已复制</string>
-    <string name="key_auto_update_data" translatable="false">auto_update_data</string>
-    <string name="key_open_response_word" translatable="false">open_response_word</string>
-    <string name="key_response_word" translatable="false">response_word</string>
-    <string name="key_speak_response_word_on_voice_wakeup" translatable="false">speak_response_word_on_voice_wakeup</string>
-    <string name="key_stream_of_syn_output" translatable="false">stream_of_syn_output</string>
     <string name="desc_accessibility">
         开启后将获得的技能\n
         1.使用音量快捷唤醒\n
@@ -369,41 +272,10 @@
         用于屏幕点击，执行手势\n
         由于系统原因，可能卡顿（掉帧）
     </string>
-    <string name="key_auto_open_as_with_root" translatable="false">auto_open_as_with_root</string>
-    <string name="key_volume_wakeup_when_screen_off" translatable="false">volume_wakeup_when_screen_off</string>
-    <string name="key_auto_sleep_wakeup_duration" translatable="false">auto_sleep_wakeup_duration</string>
     <string name="text_update_log">Update log</string>
-    <string name="key_open_chat_system" translatable="false">open_chat_system</string>
-    <string name="key_open_voice_wakeup_if_auto_sleep" translatable="false">open_voice_wakeup_if_auto_sleep</string>
-    <string name="key_continuous_dialogue" translatable="false">continuous_dialogue</string>
-    <string name="key_chat_system_type" translatable="false">chat_system_type</string>
-    <string name="key_home_fun" translatable="false">home_fun</string>
-    <string name="key_fp_animation" translatable="false">fp_animation</string>
-    <string name="key_notify_wp_on_screen_off" translatable="false">notify_wp_on_screen_off</string>
-    <string name="key_dev_mode" translatable="false">dev_mode</string>
     <string name="text_set_priority">设置优先级</string>
     <string name="desc_new_account">新用户将获得7天高级用户免费体验资格</string>
-    <string name="key_resume_bkg_music" translatable="false">resume_bkg_music</string>
-    <string name="key_reco_when_wakeup_assist" translatable="false">reco_when_wakeup_assist</string>
-    <string name="key_use_assist_service" translatable="false">use_assist_service</string>
-    <string name="key_finish_word" translatable="false">finish_word</string>
-    <string name="key_exec_failed_voice_feedback" translatable="false">exec_failed_voice_feedback</string>
-    <string name="key_voice_recog_feedback" translatable="false">voice_recog_feedback</string>
-    <string name="key_exec_succ_feedback" translatable="false">exec_succ_feedback</string>
-    <string name="key_user_wakeup_word" translatable="false">user_wakeup_word</string>
-    <string name="key_fix_voice_micro" translatable="false">fix_voice_micro</string>
-    <string name="key_close_wakeup_notification" translatable="false">close_wakeup_notification</string>
-    <string name="key_remove_ad_power_saving_mode" translatable="false">remove_ad_power_saving_mode</string>
-    <string name="key_accessibility_service_power_saving_mode" translatable="false">accessibility_service_power_saving_mode</string>
-    <string name="key_translate_languages" translatable="false">translate_languages</string>
-    <string name="key_lasting_voice_command" translatable="false">lasting_voice_command</string>
-    <string name="key_auto_check_plugin_update" translatable="false">auto_check_plugin_update</string>
-    <string name="key_smart_find_and_kill_ad" translatable="false">smart_find_and_kill_ad</string>
-    <string name="key_float_voice_align" translatable="false">float_voice_align</string>
-    <string name="key_voice_recog_compatible_mode" translatable="false">voice_recog_compatible_mode</string>
-    <string name="key_text_ocr_key" translatable="false">text_ocr_key</string>
     <string name="text_plugins_manager" translatable="false">插件管理</string>
-    <string name="key_chat_str" translatable="false">chat_str</string>
     <string name="text_close">Close</string>
     <string name="label_screen_assistant">Screen Assistant</string>
     <string name="alias_regex">别名（正则式）</string>

@@ -15,7 +15,7 @@ import cn.vove7.jarvis.activities.screenassistant.ScreenAssistActivity
 import cn.vove7.jarvis.activities.screenassistant.ScreenShareActivity
 import cn.vove7.jarvis.activities.screenassistant.SpotScreenActivity
 import cn.vove7.jarvis.services.MainService
-import cn.vove7.jarvis.tools.AppConfig
+import cn.vove7.common.app.AppConfig
 import cn.vove7.vtp.log.Vog
 import java.lang.Thread.sleep
 import java.util.*

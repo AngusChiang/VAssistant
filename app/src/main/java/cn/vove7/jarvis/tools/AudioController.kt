@@ -2,6 +2,7 @@ package cn.vove7.jarvis.tools
 
 import android.media.AudioAttributes
 import android.media.MediaPlayer
+import cn.vove7.common.app.AppConfig
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.utils.ThreadPool
 import cn.vove7.vtp.log.Vog

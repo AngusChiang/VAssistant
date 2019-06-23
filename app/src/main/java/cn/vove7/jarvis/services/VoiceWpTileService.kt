@@ -4,7 +4,7 @@ import android.annotation.TargetApi
 import android.os.Build
 import cn.vove7.common.appbus.AppBus
 import cn.vove7.jarvis.R
-import cn.vove7.jarvis.tools.AppConfig
+import cn.vove7.common.app.AppConfig
 
 /**
  * 语音唤醒 状态栏快捷设置

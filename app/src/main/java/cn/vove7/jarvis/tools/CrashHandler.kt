@@ -5,6 +5,7 @@ import android.content.Intent
 import android.os.Build
 import android.os.Environment
 import android.os.Process
+import cn.vove7.common.app.AppConfig
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.model.UserInfo

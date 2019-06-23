@@ -27,7 +27,7 @@
 //import cn.vove7.jarvis.adapters.ExecuteQueueAdapter
 //import cn.vove7.jarvis.adapters.InstSettingListAdapter
 //import cn.vove7.jarvis.fragments.base.BaseBottomDialogWithToolbar
-//import cn.vove7.jarvis.tools.AppConfig
+//import cn.vove7.common.app.AppConfig
 //import cn.vove7.jarvis.view.dialog.ProgressDialog
 //import cn.vove7.vtp.dialog.DialogWithList
 //import cn.vove7.vtp.log.Vog

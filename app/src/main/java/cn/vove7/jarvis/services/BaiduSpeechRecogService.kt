@@ -13,7 +13,7 @@ import cn.vove7.jarvis.speech.baiduspeech.recognition.recognizer.MyRecognizer
 import cn.vove7.jarvis.speech.baiduspeech.wakeup.BaiduVoiceWakeup
 import cn.vove7.jarvis.speech.baiduspeech.wakeup.RecogWakeupListener
 import cn.vove7.jarvis.speech.baiduspeech.wakeup.WakeupEventAdapter
-import cn.vove7.jarvis.tools.AppConfig
+import cn.vove7.common.app.AppConfig
 import cn.vove7.vtp.log.Vog
 import com.baidu.speech.asr.SpeechConstant
 import com.google.gson.Gson

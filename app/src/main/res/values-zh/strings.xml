@@ -1,16 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string-array name="list_auto_sleep_duration">
-        <item>10分钟</item>
-        <item>20分钟</item>
-        <item>30分钟</item>
-        <item>1小时</item>
-        <item>2小时</item>
-        <item>5小时</item>
-        <item>不自动休眠</item>
-    </string-array>
-
     <string name="text_permission_manager">权限管理</string>
     <string name="simple_test_script">简单顺序脚本测试</string>
     <string name="text_androlua_test">AndroLua 测试</string>
@@ -158,8 +148,6 @@
     <string name="hint_depths_array">深度数组</string>
     <string name="hint_depths_array_helper">(以英文逗号分隔) 如 1,2,3</string>
     <string name="text_ad_texts">文本</string>
-    <string name="text_need_vip">此操作需要高级用户</string>
-    <string name="text_please_login_first">请先登录</string>
     <string name="text_unlock">解锁</string>
     <string name="text_need_unlock">部分功能需要解锁高级用户</string>
     <string name="text_add_regex">添加正则</string>

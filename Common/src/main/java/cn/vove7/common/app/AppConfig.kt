@@ -1,6 +1,5 @@
-package cn.vove7.jarvis.tools
+package cn.vove7.common.app
 
-import android.app.Activity
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothProfile
 import android.content.Context
@@ -10,9 +9,8 @@ import android.content.pm.ApplicationInfo
 import android.media.AudioManager
 import android.net.Uri
 import android.os.Build
-import cn.vove7.common.app.GlobalApp
-import cn.vove7.common.app.GlobalLog
-import cn.vove7.common.app.log
+import cn.vove7.common.BuildConfig
+import cn.vove7.common.R
 import cn.vove7.common.bridges.SystemBridge
 import cn.vove7.common.model.UserInfo
 import cn.vove7.common.netacc.ApiUrls
@@ -22,12 +20,8 @@ import cn.vove7.common.utils.ThreadPool.runOnCachePool
 import cn.vove7.common.utils.ThreadPool.runOnPool
 import cn.vove7.common.utils.runOnUi
 import cn.vove7.common.utils.secure.SecuritySharedPreference
-import cn.vove7.jarvis.BuildConfig
-import cn.vove7.jarvis.R
 import cn.vove7.vtp.log.Vog
 import cn.vove7.vtp.sharedpreference.SpHelper
-import com.afollestad.materialdialogs.MaterialDialog
-import com.afollestad.materialdialogs.checkbox.checkBoxPrompt
 import com.google.gson.Gson
 import com.umeng.analytics.MobclickAgent
 import org.jsoup.Jsoup
@@ -140,7 +134,7 @@ object AppConfig {
 
     val currentStreamType: Int
         get() {
-            val i = AppConfig.synStreamIndex.let { if (it in 0..2) it else 0 }
+            val i = synStreamIndex.let { if (it in 0..2) it else 0 }
             Vog.d("currentStreamIndex ---> $i")
             return streamTypeArray[i]
         }
@@ -148,7 +142,7 @@ object AppConfig {
     /**
      * 当前合成通道音量
      */
-    val currentStreamVolume get() = SystemBridge.getVolumeByType(AppConfig.currentStreamType)
+    val currentStreamVolume get() = SystemBridge.getVolumeByType(currentStreamType)
 
     /**
      * 改变sp存储路径
@@ -182,7 +176,7 @@ object AppConfig {
     private fun checkFirstLaunch() {
         if (BuildConfig.DEBUG) return
         val lastCode = sp.getLong("v_code")
-        val nowCode = AppConfig.versionCode
+        val nowCode = versionCode
         if (lastCode < nowCode) {
             FIRST_LAUNCH_NEW_VERSION = true
             sp.set("v_code", nowCode)
@@ -419,7 +413,7 @@ object AppConfig {
             }
         }
 
-    fun checkAppUpdate(context: Activity, byUser: Boolean, onUpdate: ((Boolean) -> Unit)? = null) {
+    fun checkAppUpdate(context: Context, byUser: Boolean, onUpdate: ((Pair<String, String>?) -> Unit)? = null) {
         if (BuildConfig.DEBUG && !byUser) {
             return
         }
@@ -438,28 +432,13 @@ object AppConfig {
                         return@runOnUi
                     }
                     if (checkHasUpdate(verName)) {
-                        onUpdate?.invoke(true)
-                        if (!context.isFinishing) {
-                            MaterialDialog(context).title(text = "发现新版本 v$verName")
-                                    .message(text = log)
-                                    .positiveButton(text = "用酷安下载") {
-                                        openCoolapk(context)
-                                    }
-                                    .checkBoxPrompt(text = "不再提醒此版本") {
-                                        if (it) {
-                                            sp.set("no_update_ver_name", verName)
-                                        } else sp.removeKey("no_update_ver_name")
-                                    }
-                                    .negativeButton()
-                                    .cancelable(false)
-                                    .show()
-                        }
+                        onUpdate?.invoke(verName to log)
                     } else
-                        onUpdate?.invoke(false)
+                        onUpdate?.invoke(null)
                 }
             } catch (e: Exception) {
                 GlobalLog.err("检查更新失败" + e.message)
-                onUpdate?.invoke(false)
+                onUpdate?.invoke(null)
             }
 
         }
@@ -469,7 +448,7 @@ object AppConfig {
         return try {
             version2Int(coolVersion) > version2Int(versionName)
         } catch (e: Exception) {
-            coolVersion != AppConfig.versionName
+            coolVersion != versionName
         }
     }
 
@@ -484,7 +463,7 @@ object AppConfig {
     }
 
 
-    private fun openCoolapk(context: Context) {
+    fun openCoolapk(context: Context) {
         val coolMarketPkg = "com.coolapk.market"
 
         val intent = Intent(Intent.ACTION_VIEW)

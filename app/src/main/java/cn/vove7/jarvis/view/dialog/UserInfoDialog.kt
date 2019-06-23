@@ -18,7 +18,7 @@ import cn.vove7.common.model.VipPrice
 import cn.vove7.common.netacc.ApiUrls
 import cn.vove7.common.netacc.WrapperNetHelper
 import cn.vove7.jarvis.R
-import cn.vove7.jarvis.tools.AppConfig
+import cn.vove7.common.app.AppConfig
 import cn.vove7.jarvis.tools.openQQChat
 import cn.vove7.jarvis.tools.pay.PurchaseHelper
 import com.afollestad.materialdialogs.MaterialDialog

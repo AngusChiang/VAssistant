@@ -62,7 +62,7 @@ import cn.vove7.jarvis.chat.TulingChatSystem
 import cn.vove7.jarvis.speech.SpeechEvent
 import cn.vove7.jarvis.speech.SpeechRecogService
 import cn.vove7.jarvis.speech.VoiceData
-import cn.vove7.jarvis.tools.AppConfig
+import cn.vove7.common.app.AppConfig
 import cn.vove7.jarvis.tools.DataCollector
 import cn.vove7.jarvis.tools.debugserver.RemoteDebugServer
 import cn.vove7.jarvis.tools.setFloat

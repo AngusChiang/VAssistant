@@ -13,7 +13,7 @@ import cn.vove7.jarvis.receivers.PowerEventReceiver
 import cn.vove7.jarvis.receivers.ScreenStatusListener
 import cn.vove7.jarvis.receivers.UtilEventReceiver
 import cn.vove7.jarvis.services.MainService
-import cn.vove7.jarvis.tools.AppConfig
+import cn.vove7.common.app.AppConfig
 import cn.vove7.jarvis.tools.AppNotification
 import cn.vove7.jarvis.tools.CrashHandler
 import cn.vove7.jarvis.tools.ShortcutUtil

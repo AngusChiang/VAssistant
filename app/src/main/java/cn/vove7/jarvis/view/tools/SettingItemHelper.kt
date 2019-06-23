@@ -8,7 +8,7 @@ import android.widget.CompoundButton
 import android.widget.TextView
 import cn.vove7.common.utils.ThreadPool
 import cn.vove7.jarvis.R
-import cn.vove7.jarvis.tools.AppConfig
+import cn.vove7.common.app.AppConfig
 import cn.vove7.jarvis.view.*
 import cn.vove7.vtp.easyadapter.BaseListAdapter
 import cn.vove7.vtp.log.Vog

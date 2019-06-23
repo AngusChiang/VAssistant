@@ -12,7 +12,7 @@ import cn.vove7.jarvis.activities.InstDetailActivity
 import cn.vove7.jarvis.activities.NewInstActivity
 import cn.vove7.jarvis.adapters.SimpleListAdapter
 import cn.vove7.jarvis.adapters.ListViewModel
-import cn.vove7.jarvis.tools.AppConfig
+import cn.vove7.common.app.AppConfig
 import cn.vove7.vtp.builder.BundleBuilder
 import cn.vove7.vtp.log.Vog
 

@@ -1,14 +1,12 @@
 package cn.vove7.jarvis.view
 
-import android.content.Context
 import android.support.design.widget.TextInputLayout
 import cn.vove7.common.accessibility.AccessibilityApi
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.bridges.RootHelper
 import cn.vove7.jarvis.R
-import cn.vove7.jarvis.tools.AppConfig
+import cn.vove7.common.app.AppConfig
 import cn.vove7.vtp.log.Vog
-import cn.vove7.vtp.runtimepermission.PermissionUtils
 import java.io.DataOutputStream
 import java.io.IOException
 import java.io.InputStreamReader

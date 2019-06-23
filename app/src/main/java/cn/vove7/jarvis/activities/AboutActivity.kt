@@ -13,9 +13,10 @@ import cn.vove7.jarvis.R
 import cn.vove7.jarvis.activities.base.BaseActivity
 import cn.vove7.jarvis.adapters.IconTitleEntity
 import cn.vove7.jarvis.adapters.IconTitleListAdapter
-import cn.vove7.jarvis.tools.AppConfig
+import cn.vove7.common.app.AppConfig
 import cn.vove7.jarvis.tools.openQQChat
 import cn.vove7.jarvis.view.custom.IconView
+import cn.vove7.jarvis.view.dialog.AppUpdateDialog
 import cn.vove7.jarvis.view.dialog.ProgressDialog
 import cn.vove7.jarvis.view.dialog.UpdateLogDialog
 import cn.vove7.vtp.easyadapter.BaseListAdapter
@@ -90,8 +91,12 @@ class AboutActivity : BaseActivity(), AdapterView.OnItemClickListener {
                 }
                 AppConfig.checkAppUpdate(this, true) {
                     p.dismiss()
-                    if (!it) {
+                    if (it == null) {
                         GlobalApp.toastSuccess("未发现新版本")
+                    } else {
+                        if (!isFinishing) {
+                            AppUpdateDialog(this, it.first, it.second)
+                        }
                     }
                 }
             }

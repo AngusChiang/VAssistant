@@ -13,10 +13,11 @@ import cn.vove7.jarvis.R
 import cn.vove7.jarvis.activities.base.BaseActivity
 import cn.vove7.jarvis.fragments.HomeFragment
 import cn.vove7.jarvis.fragments.MineFragment
-import cn.vove7.jarvis.tools.AppConfig
-import cn.vove7.jarvis.tools.AppConfig.checkAppUpdate
+import cn.vove7.common.app.AppConfig
+import cn.vove7.common.app.AppConfig.checkAppUpdate
 import cn.vove7.jarvis.tools.DataUpdator
 import cn.vove7.jarvis.tools.Tutorials
+import cn.vove7.jarvis.view.dialog.AppUpdateDialog
 import cn.vove7.jarvis.view.dialog.UpdateLogDialog
 import cn.vove7.jarvis.view.tools.FragmentSwitcher
 import cn.vove7.vtp.log.Vog
@@ -70,7 +71,7 @@ class RealMainActivity : BaseActivity() {
             val now = System.currentTimeMillis()
             if (now - lastCheck > 120000) {
                 checkDataUpdate()
-                checkAppUpdate(this, false)
+                checkAppUpdate(this, false, onUpdate)
                 if (AppConfig.autoCheckPluginUpdate)// 插件更新
                     DataUpdator.checkPluginUpdate()
                 lastCheck = now
@@ -134,9 +135,16 @@ class RealMainActivity : BaseActivity() {
         } else {
             runOnNewHandlerThread(delay = 2000) {
                 checkDataUpdate()
-                checkAppUpdate(this, false)
+                checkAppUpdate(this, false, onUpdate)
             }
         }
     }
 
+    private val onUpdate: (Pair<String, String>?) -> Unit
+        get() = a@{ it ->
+            it ?: return@a
+            if (!isFinishing) {
+                AppUpdateDialog(this, it.first, it.second)
+            }
+        }
 }

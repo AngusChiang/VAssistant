@@ -8,7 +8,7 @@ import android.support.annotation.RequiresApi
 
 import cn.vove7.jarvis.assist.AssistSession
 import cn.vove7.jarvis.assist.OnlyRecogAssistSession
-import cn.vove7.jarvis.tools.AppConfig
+import cn.vove7.common.app.AppConfig
 import cn.vove7.vtp.log.Vog
 
 @RequiresApi(api = Build.VERSION_CODES.M)

@@ -5,7 +5,7 @@ import cn.vove7.common.bridges.HttpBridge
 import cn.vove7.common.model.UserInfo
 import cn.vove7.vtp.net.GsonHelper
 import cn.vove7.jarvis.BuildConfig
-import cn.vove7.jarvis.tools.AppConfig
+import cn.vove7.common.app.AppConfig
 import com.google.gson.Gson
 
 /**

@@ -17,7 +17,7 @@ import cn.vove7.jarvis.receivers.PowerEventReceiver
 import cn.vove7.jarvis.receivers.ScreenStatusListener
 import cn.vove7.jarvis.services.MainService
 import cn.vove7.jarvis.speech.baiduspeech.recognition.model.SpeechConst
-import cn.vove7.jarvis.tools.AppConfig
+import cn.vove7.common.app.AppConfig
 import cn.vove7.jarvis.view.statusbar.StatusAnimation
 import cn.vove7.jarvis.view.statusbar.WakeupStatusAnimation
 import cn.vove7.vtp.log.Vog

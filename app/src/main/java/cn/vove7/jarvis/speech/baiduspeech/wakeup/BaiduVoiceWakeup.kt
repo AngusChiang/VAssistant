@@ -4,7 +4,7 @@ import android.content.Context
 import cn.vove7.androlua.luabridge.LuaUtil
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.jarvis.speech.WakeupI
-import cn.vove7.jarvis.tools.AppConfig
+import cn.vove7.common.app.AppConfig
 import cn.vove7.jarvis.tools.BaiduKey
 import cn.vove7.vtp.log.Vog
 import com.baidu.speech.EventListener
