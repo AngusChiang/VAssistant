@@ -13,6 +13,9 @@ import cn.vove7.common.helper.ToastyHelper.TYPE_ERROR
 import cn.vove7.common.helper.ToastyHelper.TYPE_INFO
 import cn.vove7.common.helper.ToastyHelper.TYPE_SUCCESS
 import cn.vove7.common.helper.ToastyHelper.TYPE_WARNING
+import cn.vove7.common.utils.runInCatch
+import cn.vove7.smartkey.SmartKey
+import cn.vove7.smartkey.android.AndroidSettings
 
 import cn.vove7.vtp.app.AppInfo
 import cn.vove7.vtp.log.Vog
@@ -33,11 +36,11 @@ open class GlobalApp : RePluginApplication() {
         super.onCreate()
         AppInfo.attachApplication(this)
         if (!BuildConfig.DEBUG) {
-            try {
+            runInCatch {
                 Vog.init(this, Log.ERROR)
-            } catch (e: Exception) {
             }
         }
+        AndroidSettings.init(this)
         Toasty.Config.getInstance()
                 .tintIcon(true) // optional (apply textColor also to the icon)
                 .allowQueue(false) // optional (prevents several Toastys from queuing)

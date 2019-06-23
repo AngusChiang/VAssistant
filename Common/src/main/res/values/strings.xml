@@ -158,4 +158,7 @@
     <string name="key_voice_syn_volume" translatable="false">voice_syn_volume</string>
 
 
+    <string name="key_speech_engine_type" translatable="false">speech_engine_type</string>
+
+
 </resources>

@@ -6,6 +6,7 @@ import android.content.DialogInterface
 import android.content.Intent
 import cn.vove7.common.MessageException
 import cn.vove7.common.accessibility.AccessibilityApi
+import cn.vove7.common.app.AppConfig
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.appbus.AppBus
@@ -62,7 +63,6 @@ import cn.vove7.jarvis.chat.TulingChatSystem
 import cn.vove7.jarvis.speech.SpeechEvent
 import cn.vove7.jarvis.speech.SpeechRecogService
 import cn.vove7.jarvis.speech.VoiceData
-import cn.vove7.common.app.AppConfig
 import cn.vove7.jarvis.speech.baiduspeech.BaiduSpeechRecogService
 import cn.vove7.jarvis.speech.baiduspeech.BaiduSpeechSynService
 import cn.vove7.jarvis.speech.baiduspeech.SyncEvent
@@ -148,6 +148,29 @@ class MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
             speechRecogService = BaiduSpeechRecogService(RecogEventListener())
             speechSynService = BaiduSpeechSynService(SynthesisEventListener())
         }
+    }
+
+    fun loadSpeechService(type: Int) {
+        unloadSpeechService()
+        when (AppConfig.speechEngineType) {
+            0 -> {//百度
+                speechRecogService = BaiduSpeechRecogService(RecogEventListener())
+                speechSynService = BaiduSpeechSynService(SynthesisEventListener())
+            }
+            1 -> {//讯飞
+
+            }
+            else -> {
+                speechRecogService = BaiduSpeechRecogService(RecogEventListener())
+                speechSynService = BaiduSpeechSynService(SynthesisEventListener())
+            }
+        }
+
+    }
+
+    private fun unloadSpeechService() {
+        speechRecogService?.release()
+        speechSynService?.release()
     }
 
     /**
@@ -776,7 +799,7 @@ class MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
                 return
             }
             //震动
-            if (AppConfig.vibrateWhenStartReco || voiceMode != MODE_VOICE) {//询问参数时，震动
+            if (AppConfig.vibrateWhenStartRecog || voiceMode != MODE_VOICE) {//询问参数时，震动
                 SystemBridge.vibrate(80L)
             }
             floatyPanel.show("开始聆听")

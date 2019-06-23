@@ -12,7 +12,7 @@ android {
         minSdkVersion 21
         targetSdkVersion 27
         versionCode 120
-        versionName "1.9.0"
+        versionName "1.9.1"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
         multiDexEnabled true
@@ -110,7 +110,6 @@ dependencies {
     implementation "com.android.support:palette-v7:$support_version"
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     //    implementation 'org.raphets:roundimageview:1.2.0'
-    implementation files('libs/bdasr_V3_20180320_9066860.jar')
     implementation project(':executorengine')
     implementation project(path: ':Common')
     implementation project(path: ':androlua')

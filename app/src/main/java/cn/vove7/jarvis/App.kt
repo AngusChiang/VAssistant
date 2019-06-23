@@ -14,6 +14,7 @@ import cn.vove7.jarvis.receivers.ScreenStatusListener
 import cn.vove7.jarvis.receivers.UtilEventReceiver
 import cn.vove7.jarvis.services.MainService
 import cn.vove7.common.app.AppConfig
+import cn.vove7.common.helper.AdvanAppHelper
 import cn.vove7.jarvis.tools.AppNotification
 import cn.vove7.jarvis.tools.CrashHandler
 import cn.vove7.jarvis.tools.ShortcutUtil
@@ -49,6 +50,7 @@ class App : GlobalApp() {
             startServices()
             CodeProcessor.init(this@App)
             ShortcutUtil.initShortcut()
+            AdvanAppHelper.getPkgList()
             startBroadcastReceivers()
             runOnPool {
                 openAccessibilityServiceAuto()

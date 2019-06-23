@@ -98,6 +98,7 @@ class TextOcrActivity : Activity() {
 
     override fun onStop() {
         super.onStop()
+        finish()
         System.gc()
     }
 

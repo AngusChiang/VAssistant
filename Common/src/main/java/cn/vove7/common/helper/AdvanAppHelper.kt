@@ -114,6 +114,7 @@ object AdvanAppHelper {
         }
     }
 
+    @Synchronized
     private fun checkAppList() {
         if (ALL_APP_LIST.isEmpty()) updateAppList()
     }

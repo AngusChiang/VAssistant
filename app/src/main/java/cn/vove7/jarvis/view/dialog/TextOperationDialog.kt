@@ -2,11 +2,11 @@ package cn.vove7.jarvis.view.dialog
 
 import android.content.Context
 import android.widget.PopupMenu
+import cn.vove7.common.app.AppConfig
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.bridges.SystemBridge
 import cn.vove7.common.utils.ThreadPool
 import cn.vove7.jarvis.R
-import cn.vove7.common.app.AppConfig
 import cn.vove7.jarvis.tools.baiduaip.BaiduAipHelper
 import cn.vove7.jarvis.view.dialog.base.BottomDialogWithText
 
@@ -66,6 +66,7 @@ class TextOperationDialog(val context: Context, val textModel: TextModel) {
         PopupMenu(context, d.buttonNegative).apply {
             menu.add("分享")
             menu.add("编辑")
+            menu.add("搜索")
             if (textModel.subText != null) {
                 menu.add("复制翻译")
             } else {
@@ -82,6 +83,9 @@ class TextOperationDialog(val context: Context, val textModel: TextModel) {
                     "复制翻译" -> {
                         SystemBridge.setClipText(textModel.subText)
                         GlobalApp.toastInfo(R.string.text_copied)
+                    }
+                    "搜索" -> {
+                        SystemBridge.quickSearch(textModel.text)
                     }
                 }
                 true

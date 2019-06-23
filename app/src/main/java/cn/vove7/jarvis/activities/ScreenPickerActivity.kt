@@ -216,10 +216,6 @@ class ScreenPickerActivity : Activity() {
         setContentView(rootContent)
     }
 
-    private fun showSplitWordDialog(s: String) {
-        sd = WordSplitDialog(this, s)
-        sd?.show()
-    }
 
     override fun onStop() {
         super.onStop()

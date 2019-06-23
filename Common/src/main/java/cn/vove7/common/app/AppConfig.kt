@@ -20,6 +20,8 @@ import cn.vove7.common.utils.ThreadPool.runOnCachePool
 import cn.vove7.common.utils.ThreadPool.runOnPool
 import cn.vove7.common.utils.runOnUi
 import cn.vove7.common.utils.secure.SecuritySharedPreference
+import cn.vove7.smartkey.android.smartKey
+import cn.vove7.smartkey.annotation.Config
 import cn.vove7.vtp.log.Vog
 import cn.vove7.vtp.sharedpreference.SpHelper
 import com.google.gson.Gson
@@ -36,9 +38,13 @@ import java.util.*
  * @author Administrator
  * 2018/9/16
  */
+@Config("cn.vove7.vassistant_preferences")
 object AppConfig {
     //key... value
-    var vibrateWhenStartReco = true
+
+    var speechEngineType: Int by smartKey(0, keyId = R.string.key_speech_engine_type)
+
+    var vibrateWhenStartRecog = true
     var isToastWhenRemoveAd = true
     var isAdBlockService = false
     var isLongPressVolUpWakeUp = true
@@ -271,7 +277,7 @@ object AppConfig {
 
     //load
     fun reload() {
-        vibrateWhenStartReco = getBooleanAndInit(R.string.key_vibrate_reco_begin, true)
+        vibrateWhenStartRecog = getBooleanAndInit(R.string.key_vibrate_reco_begin, true)
         isToastWhenRemoveAd = getBooleanAndInit(R.string.key_show_toast_when_remove_ad, true)
         isAdBlockService = getBooleanAndInit(R.string.key_open_ad_block, false)
         isLongPressVolUpWakeUp = getBooleanAndInit(R.string.key_long_press_volume_up_wake_up, true)
