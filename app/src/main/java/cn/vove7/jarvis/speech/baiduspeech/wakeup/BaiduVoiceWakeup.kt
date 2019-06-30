@@ -47,9 +47,8 @@ class BaiduVoiceWakeup(private val eventListener: EventListener) : WakeupI() {
                 context.filesDir.absolutePath + "/bd/WakeUp_xvtx.bin")
     }
 
-    override fun start() {
+    override fun doStart() {
         initIfNeed()
-        super.start()
         val params = HashMap<String, Any?>()
         params[SpeechConstant.IN_FILE] = "#cn.vove7.jarvis.speech.baiduspeech.MicInputStream.instance()"
         params[SpeechConstant.WP_WORDS_FILE] = AppConfig.wakeUpFilePath
@@ -71,15 +70,13 @@ class BaiduVoiceWakeup(private val eventListener: EventListener) : WakeupI() {
     /**
      * 停止即释放
      */
-    override fun stop() {
-        super.stop()
+    override fun doStop() {
         if (wp == null) return
         wp?.send(SpeechConstant.WAKEUP_STOP, null, null, 0, 0)
         release()
     }
 
     override fun release() {
-//        stop()
         wp?.unregisterListener(eventListener)
         wp = null
     }

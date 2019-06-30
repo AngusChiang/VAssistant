@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<cn.vove7.jarvis.view.custom.WrappedTextView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/text_view"
+    style="@style/TextAppearance.MaterialComponents.Subtitle1"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingLeft="16dp"
+    android:paddingRight="16dp"
+    android:text="@string/desc_accessibility"
+    android:textIsSelectable="true"
+    android:textSize="15sp">
+
+</cn.vove7.jarvis.view.custom.WrappedTextView>

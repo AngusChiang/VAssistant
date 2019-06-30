@@ -80,17 +80,6 @@ class SettingsActivity : ReturnableActivity() {
                             keyId = R.string.key_voice_control_dialog, defaultValue = true)
 
             )),
-            SettingGroupItem(R.color.google_green, "反馈", childItems = listOf(
-                    SwitchItem(title = "提示音", summary = "语音识别提示音", keyId = R.string.key_voice_recog_feedback, defaultValue = { AppConfig.voiceRecogFeedback }),
-                    CheckBoxItem(R.string.text_vibrate_reco_begin,
-                            keyId = R.string.key_vibrate_reco_begin, defaultValue = true),
-                    CheckBoxItem(title = "执行失败", keyId = R.string.key_exec_failed_voice_feedback,
-                            summary = "失败时的语音反馈",
-                            defaultValue = AppConfig.execFailedVoiceFeedback),
-                    CheckBoxItem(title = "执行结束", keyId = R.string.key_exec_succ_feedback,
-                            summary = "结束时状态栏效果反馈",
-                            defaultValue = AppConfig.execSuccessFeedback)
-            )),
             SettingGroupItem(R.color.cyan_500, titleS = "语音唤醒", childItems = listOf(
                     SwitchItem(R.string.text_open_voice_wakeup, summary = "以 \"你好小V\" 唤醒\n提示: 目前语音唤醒十分耗电,请三思" +
                             (if (AppConfig.voiceWakeup && !MainService.wakeupOpen) "\n已自动关闭" else ""),
@@ -168,6 +157,7 @@ class SettingsActivity : ReturnableActivity() {
             )),
 
             SettingGroupItem(R.color.google_green, titleS = "按键唤醒", childItems = listOf(
+
                     SwitchItem(title = "音量键唤醒",
                             keyId = R.string.key_long_press_volume_up_wake_up, summary = "可通过长按音量上键唤醒\n需要无障碍模式开启",
                             defaultValue =
@@ -183,6 +173,19 @@ class SettingsActivity : ReturnableActivity() {
                         ShortcutUtil.addWakeUpPinShortcut()
                     }
             )),
+
+            SettingGroupItem(R.color.google_green, "反馈", childItems = listOf(
+                    SwitchItem(title = "提示音", summary = "语音识别提示音", keyId = R.string.key_voice_recog_feedback, defaultValue = { AppConfig.voiceRecogEffect }),
+                    CheckBoxItem(R.string.text_vibrate_reco_begin,
+                            keyId = R.string.key_vibrate_reco_begin, defaultValue = true),
+                    CheckBoxItem(title = "执行失败", keyId = R.string.key_exec_failed_voice_feedback,
+                            summary = "失败时的语音反馈",
+                            defaultValue = AppConfig.execFailedVoiceFeedback),
+                    CheckBoxItem(title = "执行结束", keyId = R.string.key_exec_succ_feedback,
+                            summary = "结束时状态栏效果反馈",
+                            defaultValue = AppConfig.execSuccessFeedback)
+            )),
+
             SettingGroupItem(R.color.indigo_700, "响应词", childItems = listOf(
                     SwitchItem(title = "开启", summary = "开始识别前，响应词反馈", keyId = R.string.key_open_response_word,
                             defaultValue =

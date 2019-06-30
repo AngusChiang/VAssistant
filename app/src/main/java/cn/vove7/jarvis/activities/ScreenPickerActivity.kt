@@ -10,8 +10,10 @@ import android.view.View
 import android.widget.CheckedTextView
 import android.widget.RelativeLayout
 import android.widget.TextView
+import cn.vove7.bottomdialog.BottomDialog
 import cn.vove7.common.accessibility.AccessibilityApi
 import cn.vove7.common.accessibility.viewnode.ViewNode
+import cn.vove7.common.app.AppConfig
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.datamanager.parse.model.ActionScope
 import cn.vove7.common.utils.ThreadPool.runOnCachePool
@@ -21,13 +23,11 @@ import cn.vove7.common.view.finder.ScreenTextFinder
 import cn.vove7.jarvis.BuildConfig
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.services.MainService
-import cn.vove7.common.app.AppConfig
 import cn.vove7.jarvis.tools.DataCollector
 import cn.vove7.jarvis.tools.Tutorials
 import cn.vove7.jarvis.tools.baiduaip.BaiduAipHelper
 import cn.vove7.jarvis.view.dialog.TextOperationDialog
 import cn.vove7.jarvis.view.dialog.WordSplitDialog
-import cn.vove7.jarvis.view.dialog.base.BottomDialogWithText
 import cn.vove7.vtp.log.Vog
 import cn.vove7.vtp.sharedpreference.SpHelper
 import java.util.concurrent.CountDownLatch
@@ -170,6 +170,7 @@ class ScreenPickerActivity : Activity() {
             runOnCachePool {
                 //监听
                 count.await()
+                if (isFinishing) return@runOnCachePool
                 runOnUi {
                     GlobalApp.toastSuccess("翻译完成")
                 }
@@ -227,9 +228,9 @@ class ScreenPickerActivity : Activity() {
 
     var sd: WordSplitDialog? = null
 
-    var d: BottomDialogWithText? = null
+    var d: BottomDialog? = null
     private val onItemClick: (Model) -> Unit = { model ->
-        TextOperationDialog(this, TextOperationDialog.TextModel(model.text))
+        d = TextOperationDialog(this, TextOperationDialog.TextModel(model.text)).bottomDialog
     }
 
 

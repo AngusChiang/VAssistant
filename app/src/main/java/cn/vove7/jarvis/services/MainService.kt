@@ -47,7 +47,6 @@ import cn.vove7.common.utils.ThreadPool.runOnCachePool
 import cn.vove7.common.utils.ThreadPool.runOnPool
 import cn.vove7.common.utils.runOnNewHandlerThread
 import cn.vove7.common.utils.runOnUi
-import cn.vove7.common.utils.runWithClock
 import cn.vove7.common.utils.startActivityOnNewTask
 import cn.vove7.common.view.finder.ViewFindBuilder
 import cn.vove7.executorengine.exector.ExecutorEngine
@@ -60,12 +59,11 @@ import cn.vove7.jarvis.activities.ResultPickerActivity
 import cn.vove7.jarvis.activities.ScreenPickerActivity
 import cn.vove7.jarvis.chat.ChatSystem
 import cn.vove7.jarvis.chat.TulingChatSystem
-import cn.vove7.jarvis.speech.SpeechEvent
-import cn.vove7.jarvis.speech.SpeechRecogService
-import cn.vove7.jarvis.speech.VoiceData
+import cn.vove7.jarvis.speech.*
 import cn.vove7.jarvis.speech.baiduspeech.BaiduSpeechRecogService
 import cn.vove7.jarvis.speech.baiduspeech.BaiduSpeechSynService
-import cn.vove7.jarvis.speech.baiduspeech.SyncEvent
+import cn.vove7.jarvis.speech.xunfei.XunfeiSpeechRecogService
+import cn.vove7.jarvis.speech.xunfei.XunfeiSpeechSynService
 import cn.vove7.jarvis.tools.DataCollector
 import cn.vove7.jarvis.tools.debugserver.RemoteDebugServer
 import cn.vove7.jarvis.tools.setFloat
@@ -109,7 +107,7 @@ class MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
 
     //启动过慢  lateinit 导致未初始化异常
     var speechRecogService: SpeechRecogService? = null
-    var speechSynService: BaiduSpeechSynService? = null
+    var speechSynService: SpeechSynService? = null
 
     /**
      * 当前语音使用方式
@@ -143,22 +141,16 @@ class MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
     /**
      * 加载语音识别/合成服务
      */
-    private fun loadSpeechService() {
-        runWithClock("加载语音识别/合成服务") {
-            speechRecogService = BaiduSpeechRecogService(RecogEventListener())
-            speechSynService = BaiduSpeechSynService(SynthesisEventListener())
-        }
-    }
-
-    fun loadSpeechService(type: Int) {
+    fun loadSpeechService(type: Int? = null) {
         unloadSpeechService()
-        when (AppConfig.speechEngineType) {
+        when (type ?: AppConfig.speechEngineType) {
             0 -> {//百度
                 speechRecogService = BaiduSpeechRecogService(RecogEventListener())
                 speechSynService = BaiduSpeechSynService(SynthesisEventListener())
             }
             1 -> {//讯飞
-
+                speechRecogService = XunfeiSpeechRecogService(RecogEventListener())
+                speechSynService = XunfeiSpeechSynService(SynthesisEventListener())
             }
             else -> {
                 speechRecogService = BaiduSpeechRecogService(RecogEventListener())
@@ -518,7 +510,7 @@ class MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
                     speechRecogService?.stopWakeUp()
                 }
                 ACTION_RELOAD_SYN_CONF -> {
-                    speechSynService?.reLoad()
+                    speechSynService?.reload()
                 }
                 ACTION_START_WAKEUP_TIMER -> {
                     speechRecogService?.startAutoSleepWakeup()
@@ -731,7 +723,7 @@ class MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
     /**
      * 语音识别事件监听
      */
-    inner class RecogEventListener : SpeechEvent {
+    inner class RecogEventListener : RecogEvent {
         override fun onWakeup(word: String?) {
             Vog.d("onWakeup ---> 唤醒 -> $word")
             //解析成功  不再唤醒
@@ -907,7 +899,7 @@ class MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
         }
 
         override fun onRecogFailed(errCode: Int) {
-            floatyPanel.showAndHideDelay(SpeechEvent.codeString(errCode))
+            floatyPanel.showAndHideDelay(RecogEvent.codeString(errCode))
             when (voiceMode) {
                 MODE_VOICE -> {
                     listeningAni.hideDelay()
@@ -919,7 +911,7 @@ class MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
                     executeAnimation.begin()//continue
                 }
                 MODE_ALERT -> {
-                    if (errCode != SpeechEvent.CODE_NET_ERROR)
+                    if (errCode != RecogEvent.CODE_NET_ERROR)
                         onCommand(ACTION_START_RECOG)  //继续????
                 }
 
@@ -1105,7 +1097,7 @@ class MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
     /**
      * 语音合成事件监听
      */
-    inner class SynthesisEventListener : SyncEvent {
+    inner class SynthesisEventListener : SyntheEvent {
 
         /**
          * 出错时，根据text长度指定展示时间

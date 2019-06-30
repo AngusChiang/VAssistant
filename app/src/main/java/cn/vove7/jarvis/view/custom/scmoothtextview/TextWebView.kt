@@ -10,7 +10,7 @@ import android.view.View
 import android.webkit.*
 
 
-class TextWebView : NestedWebView ,TextLoader{
+class TextWebView : NestedWebView, TextLoader {
 
     private val baseUrl = "file:///android_asset/web/"
 
@@ -108,6 +108,6 @@ class TextWebView : NestedWebView ,TextLoader{
 }
 
 interface TextLoader {
-    fun setSource(source: String, wrap: Boolean)
+    fun setSource(source: String, wrap: Boolean = false)
     fun setHtml(html: String)
 }

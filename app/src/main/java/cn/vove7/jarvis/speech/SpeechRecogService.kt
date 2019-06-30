@@ -29,7 +29,7 @@ import cn.vove7.vtp.runtimepermission.PermissionUtils
  * 负责识别|唤醒 逻辑
  * Created by Administrator on 2018/11/4
  */
-abstract class SpeechRecogService(val event: SpeechEvent) : SpeechRecogI {
+abstract class SpeechRecogService(val event: RecogEvent) : SpeechRecogI {
     val context: Context
         get() = GlobalApp.APP
 
@@ -51,6 +51,17 @@ abstract class SpeechRecogService(val event: SpeechEvent) : SpeechRecogI {
 
     //长语音
     var lastingStopped = true
+
+
+    private val handlerThread by lazy { HandlerThread("recog") }
+
+    /**
+     * 分发事件
+     */
+    val handler: RecogHandler by lazy {
+        handlerThread.start()
+        RecogHandler(handlerThread.looper)
+    }
 
     override fun startRecog(byVoice: Boolean, notify: Boolean) {
         //检查权限
@@ -267,7 +278,7 @@ abstract class SpeechRecogService(val event: SpeechEvent) : SpeechRecogI {
                 SpeechConst.CODE_VOICE_ERR -> {//出错
                     val code = msg.data.getInt("data")
                     if (BuildConfig.DEBUG) {
-                        GlobalLog.log("识别出错：" + SpeechEvent.codeString(code))
+                        GlobalLog.log("识别出错：" + RecogEvent.codeString(code))
                     }
 
                     isListening = false
@@ -315,6 +326,10 @@ abstract class SpeechRecogService(val event: SpeechEvent) : SpeechRecogI {
         }
     }
 
+    override fun release() {
+        handlerThread.quitSafely()
+        doRelease()
+    }
 }
 
 interface SpeechRecogI {
@@ -358,6 +373,7 @@ interface SpeechRecogI {
     fun doStopWakeUp()
 
     fun release()
+    fun doRelease()
 
     /**
      * 开始录音后，手动停止录音。SDK会识别在此过程中的录音。点击“停止”按钮后调用。

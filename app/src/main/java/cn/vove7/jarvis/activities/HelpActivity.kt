@@ -7,6 +7,10 @@ import android.support.design.widget.TextInputLayout
 import android.view.View
 import android.widget.AdapterView
 import android.widget.TextView
+import cn.vove7.bottomdialog.BottomDialog
+import cn.vove7.bottomdialog.builder.buttons
+import cn.vove7.bottomdialog.builder.title
+import cn.vove7.bottomdialog.builder.withCloseIcon
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.bridges.SystemBridge
@@ -21,8 +25,8 @@ import cn.vove7.jarvis.adapters.IconTitleEntity
 import cn.vove7.jarvis.adapters.IconTitleListAdapter
 import cn.vove7.jarvis.tools.ItemWrap
 import cn.vove7.jarvis.tools.Tutorials
-import cn.vove7.jarvis.view.dialog.base.BottomDialogWithMarkdown
-import cn.vove7.jarvis.view.dialog.base.BottomDialogWithSmoothText
+import cn.vove7.jarvis.view.dialog.contentbuilder.MarkdownContentBuilder
+import cn.vove7.jarvis.view.dialog.contentbuilder.SmoothTextBuilder
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.customview.customView
 import kotlinx.android.synthetic.main.activity_abc_header.*
@@ -89,9 +93,12 @@ class HelpActivity : ReturnableActivity(), AdapterView.OnItemClickListener {
                 }
             }
             2 -> {
-                BottomDialogWithMarkdown(this, "常见问题").apply {
-                    loadFromAsset("files/faqs.md")
-                    show()
+                BottomDialog.builder(this){
+                    title("常见问题")
+                    withCloseIcon()
+                    content(MarkdownContentBuilder()){
+                        loadMarkdownFromAsset("files/faqs.md")
+                    }
                 }
             }
             3 -> SystemBridge.openUrl(ApiUrls.QQ_GROUP_1)
@@ -105,23 +112,29 @@ class HelpActivity : ReturnableActivity(), AdapterView.OnItemClickListener {
                     }
                 }
 
-                BottomDialogWithSmoothText(this, "日志").apply {
-                    setHtml(text)
-                    positiveButton(text = "复制") {
-                        SystemBridge.setClipText(GlobalLog.toString())
-                        GlobalApp.toastInfo(R.string.text_copied)
-                    }
-                    negativeButton(text = "清空") {
-                        GlobalLog.clear()
-                    }
-                    neutralButton(text = "导出至文件") {
-                        GlobalLog.export2Sd()
-                    }
-                    setCancelable(false)
-                    enableCloseIcon(true)
-                    show()
-                }
+                BottomDialog.builder(this) {
+                    title("日志")
+                    withCloseIcon()
+                    cancelable(false)
 
+                    content(SmoothTextBuilder().apply {
+                        html = text
+                    })
+
+                    buttons {
+                        positiveButton(text = "复制") {
+                            SystemBridge.setClipText(GlobalLog.toString())
+                            GlobalApp.toastInfo(R.string.text_copied)
+                        }
+                        negativeButton(text = "清空") {
+                            GlobalLog.clear()
+                            it.dismiss()
+                        }
+                        neutralButton(text = "导出至文件") {
+                            GlobalLog.export2Sd()
+                        }
+                    }
+                }
             }
         }
     }

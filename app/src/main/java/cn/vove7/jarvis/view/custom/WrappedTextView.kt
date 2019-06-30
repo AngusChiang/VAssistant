@@ -32,33 +32,40 @@ class WrappedTextView : TextView {
     }
 
     val handler by lazy { UiHandler(this, Looper.getMainLooper()) }
+
     @Synchronized
     fun appendln(s: Any? = null) {
         if (s != null) mappend(s)
         mappend("\n")
     }
 
+    @Synchronized
     fun appendlnRed(s: String) {
         appendlnColor(s, R.color.red_900)
     }
 
+    @Synchronized
     fun appendlnGreen(s: String) {
         appendlnColor(s, R.color.green_700)
     }
 
+    @Synchronized
     private fun appendlnColor(s: String, color: Int) {
         val ss = MultiSpan(context, s, color).spanStr
         appendln(ss)
     }
 
+    @Synchronized
     fun set(s: Any) {
         handler.sendMessage(handler.obtainMessage(SET, s))
     }
 
+    @Synchronized
     fun clear() {
-        set("")
+        handler.sendMessage(handler.obtainMessage(CLEAR))
     }
 
+    @Synchronized
     fun mappend(s: Any) {
         handler.sendMessage(handler.obtainMessage(APPEND, s))
     }
@@ -79,6 +86,7 @@ class WrappedTextView : TextView {
                         is SpannableStringBuilder -> textView.text = data
                     }
                 }
+                CLEAR -> textView.text = ""
             }
 
         }
@@ -87,6 +95,7 @@ class WrappedTextView : TextView {
     companion object {
         private const val APPEND = 0
         private const val SET = 1
+        private const val CLEAR = -1
     }
 
 }

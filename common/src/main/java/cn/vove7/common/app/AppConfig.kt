@@ -20,7 +20,8 @@ import cn.vove7.common.utils.ThreadPool.runOnCachePool
 import cn.vove7.common.utils.ThreadPool.runOnPool
 import cn.vove7.common.utils.runOnUi
 import cn.vove7.common.utils.secure.SecuritySharedPreference
-import cn.vove7.smartkey.android.smartKey
+import cn.vove7.smartkey.BaseConfig
+import cn.vove7.smartkey.android.noCacheKey
 import cn.vove7.smartkey.annotation.Config
 import cn.vove7.vtp.log.Vog
 import cn.vove7.vtp.sharedpreference.SpHelper
@@ -38,46 +39,63 @@ import java.util.*
  * @author Administrator
  * 2018/9/16
  */
-@Config("cn.vove7.vassistant_preferences")
-object AppConfig {
+@Config(BuildConfig.CONFIG_NAME)
+object AppConfig : BaseConfig {
     //key... value
 
-    var speechEngineType: Int by smartKey(0, keyId = R.string.key_speech_engine_type)
+    var speechEngineType: Int by noCacheKey(0, keyId = R.string.key_speech_engine_type)
 
-    var vibrateWhenStartRecog = true
-    var isToastWhenRemoveAd = true
-    var isAdBlockService = false
-    var isLongPressVolUpWakeUp = true
-    var voiceControlDialog = true
-    var adWaitSecs = 17
-    var voiceWakeup = false
-        //语音唤醒
-        set(v) {
-            field = v
-            sp.set(R.string.key_open_voice_wakeup, v)
-        }
-    var autoOpenASWithRoot = false
-    var userExpPlan = true
-    var isAutoVoiceWakeupCharging = false
-    var useSmartOpenIfParseFailed = true
-    var cloudServiceParseIfLocalFailed = false //云服务解析
-    var WAKEUP_FILE_NHXV = "assets:///bd/WakeUp_nhxv.bin"
-    var WAKEUP_FILE_XVTX = "assets:///bd/WakeUp_xvtx.bin"
+    var vibrateWhenStartRecog by noCacheKey(true, keyId = R.string.key_vibrate_reco_begin)
+    var isToastWhenRemoveAd by noCacheKey(true, keyId = R.string.key_show_toast_when_remove_ad)
+    var isAdBlockService by noCacheKey(false, keyId = R.string.key_open_ad_block)
+
+    var isLongPressVolUpWakeUp by noCacheKey(true, keyId = R.string.key_long_press_volume_up_wake_up)
+    var voiceControlDialog by noCacheKey(true, keyId = R.string.key_voice_control_dialog)
+    var adWaitSecs by noCacheKey(17, keyId = R.string.key_ad_wait_secs)
+
+    //语音唤醒
+    var voiceWakeup by noCacheKey(false, keyId = R.string.key_open_voice_wakeup)
+
+    var autoOpenASWithRoot by noCacheKey(false, keyId = R.string.key_auto_open_as_with_root)
+    var userExpPlan by noCacheKey(true, keyId = R.string.key_user_exp_plan)
+    var isAutoVoiceWakeupCharging by noCacheKey(false, keyId = R.string.key_auto_open_voice_wakeup_charging)
+
+    var useSmartOpenIfParseFailed by noCacheKey(true, keyId = R.string.key_use_smartopen_if_parse_failed)
+
+    // 云服务解析 无用
+    var cloudServiceParseIfLocalFailed by noCacheKey(false, keyId = R.string.key_only_cloud_service_parse)
+
+    const val WAKEUP_FILE_NHXV = "assets:///bd/WakeUp_nhxv.bin"
+    const val WAKEUP_FILE_XVTX = "assets:///bd/WakeUp_xvtx.bin"
+
     var DEFAULT_WAKEUP_FILE = WAKEUP_FILE_NHXV
-    var openResponseWord = false
-    var responseWord = "我在"
-    var speakResponseWordOnVoiceWakeup = true
-    var volumeWakeUpWhenScreenOff = true
+
+    var openResponseWord by noCacheKey(false, keyId = R.string.key_open_response_word)
+
+    var responseWord by noCacheKey("我在", keyId = R.string.key_response_word)
+
+    var speakResponseWordOnVoiceWakeup by noCacheKey(true, keyId = R.string.key_speak_response_word_on_voice_wakeup)
+
+//    var volumeWakeUpWhenScreenOff by noCacheKey(true, keyId = R.string.key_volume_wakeup_when_screen_off)
+
     //    var onlyCloudServiceParse = false //云服务解析
     var synStreamIndex: Int = 0//合成输出通道 对应 R.array.list_stream_syn_output
 
-    var volumeKeyDelayUp = 600//音量长按延迟
-    var wakeUpFilePath = DEFAULT_WAKEUP_FILE
-    var wakeUpWithHeadsetHook = false//耳机中键唤醒
+    //音量长按延迟
+    var volumeKeyDelayUp by noCacheKey(600, keyId = R.string.key_long_key_press_delay)
 
-    var openVoiceWakeUpIfAutoSleep = true// 自动休眠后，亮屏自动开启语音唤醒
-    var openChatSystem = true
+    var wakeUpFilePath by noCacheKey(DEFAULT_WAKEUP_FILE, keyId = R.string.key_wakeup_file_path)
+
+    //耳机中键唤醒
+    var wakeUpWithHeadsetHook by noCacheKey(false, keyId = R.string.key_wakeup_with_headsethook)
+
+    // 自动休眠后，亮屏自动开启语音唤醒
+    var openVoiceWakeUpIfAutoSleep by noCacheKey(true, keyId = R.string.key_open_voice_wakeup_if_auto_sleep)
+
+    var openChatSystem by noCacheKey(true, keyId = R.string.key_open_chat_system)
+
     var autoSleepWakeupMillis: Long = 10 * 60 * 1000
+
     var chatSystem: String = ""
     var fpAnimation: String = ""
 
@@ -85,23 +103,35 @@ object AppConfig {
 
     var userWakeupWord: String = ""//用户唤醒词
     //    var continuousDialogue = false//连续对话
-    var finishWord: String? = null
+    var finishWord: String? by noCacheKey(null, keyId = R.string.key_finish_word)
+
     //    var resumeMusic = true//继续播放
-    var useAssistService = true//助手服务
-    var execFailedVoiceFeedback = true//执行失败语音反馈
-    var execSuccessFeedback = true//执行成功反馈
-    var fixVoiceMicro = true//麦克风冲突
-    var notifyCloseMicro = true//通知唤醒状态/麦克风
-    //    var disableAdKillerOnLowBattery = true//低电量关闭去广告
-    @Deprecated("无障碍省电模式 弃用")
-    var disableAccessibilityOnLowBattery = true//低电量关闭无障碍
+
+    //助手服务
+    var useAssistService by noCacheKey(true, keyId = R.string.key_use_assist_service)
+
+    //执行失败语音反馈
+    var execFailedVoiceFeedback by noCacheKey(true, keyId = R.string.key_exec_failed_voice_feedback)
+
+    //执行成功反馈
+    var execSuccessFeedback by noCacheKey(true, keyId = R.string.key_exec_failed_voice_feedback)
+
+    var fixVoiceMicro by noCacheKey(true, keyId = R.string.key_fix_voice_micro)//麦克风冲突
+
+    //通知唤醒状态/麦克风
+    var notifyCloseMicro by noCacheKey(true, keyId = R.string.key_close_wakeup_notification)
+
     var translateLang = "auto"//翻译主语言
-    var voiceRecogFeedback = false //语音识别提示音
-        get() = field || isBlueToothConnect
 
-    var notifyWpOnScreenOff = true
+    val voiceRecogEffect by noCacheKey(false, keyId = R.string.key_voice_recog_feedback)
 
-    var devMode = BuildConfig.DEBUG
+    //语音识别提示音
+    val voiceRecogFeedback
+        get() = voiceRecogEffect || isBlueToothConnect
+
+    var notifyWpOnScreenOff by noCacheKey(true, keyId = R.string.key_notify_wp_on_screen_off)
+
+    var devMode by noCacheKey(BuildConfig.DEBUG, keyId = R.string.key_dev_mode)
 
     //fixme 连接手表也为true
     val isBlueToothConnect: Boolean
@@ -117,20 +147,22 @@ object AppConfig {
 
         }
 
-    var lastingVoiceCommand = false //长语音 连续命令
+    //长语音 连续命令
+    var lastingVoiceCommand by noCacheKey(false, keyId = R.string.key_lasting_voice_command)
 
     var listeningToastAlignDirection = 0//对齐方向
 
-    var autoCheckPluginUpdate = true
+    var autoCheckPluginUpdate by noCacheKey(true, keyId = R.string.key_auto_check_plugin_update)
 
     var FIRST_LAUNCH_NEW_VERSION = false or BuildConfig.DEBUG //新版本第一次启动
 
     var IS_SYS_APP = false
-    var smartKillAd = false // 跳过自动识别未标记的广告
+    var smartKillAd by noCacheKey(false, keyId = R.string.key_smart_find_and_kill_ad) // 跳过自动识别未标记的广告
 
-    var chatStr: String? = null//对话系统 字符串
+    //对话系统 字符串
+    var chatStr: String? by noCacheKey(null, keyId = R.string.key_chat_str)
 
-    var textOcrStr: String? = null
+    var textOcrStr: String? by noCacheKey(null, keyId = R.string.key_text_ocr_key)
 
     val streamTypeArray = arrayOf(
             AudioManager.STREAM_MUSIC
@@ -272,49 +304,12 @@ object AppConfig {
         }
         return true
     }
-    //todo map keyId -> value object 直接修改对应值 无需reload全部
 
 
-    //load
+    /**
+     * 不规则配置：单选框
+     */
     fun reload() {
-        vibrateWhenStartRecog = getBooleanAndInit(R.string.key_vibrate_reco_begin, true)
-        isToastWhenRemoveAd = getBooleanAndInit(R.string.key_show_toast_when_remove_ad, true)
-        isAdBlockService = getBooleanAndInit(R.string.key_open_ad_block, false)
-        isLongPressVolUpWakeUp = getBooleanAndInit(R.string.key_long_press_volume_up_wake_up, true)
-        voiceControlDialog = getBooleanAndInit(R.string.key_voice_control_dialog, true)
-        voiceWakeup = getBooleanAndInit(R.string.key_open_voice_wakeup, false)
-        userExpPlan = getBooleanAndInit(R.string.key_user_exp_plan, true)
-        isAutoVoiceWakeupCharging = getBooleanAndInit(R.string.key_auto_open_voice_wakeup_charging, false)
-        useSmartOpenIfParseFailed = getBooleanAndInit(R.string.key_use_smartopen_if_parse_failed, true)
-        openResponseWord = getBooleanAndInit(R.string.key_open_response_word, false)
-        speakResponseWordOnVoiceWakeup = getBooleanAndInit(R.string.key_speak_response_word_on_voice_wakeup, true)
-        autoOpenASWithRoot = getBooleanAndInit(R.string.key_auto_open_as_with_root, false)
-        openChatSystem = getBooleanAndInit(R.string.key_open_chat_system, true)
-        openVoiceWakeUpIfAutoSleep = getBooleanAndInit(R.string.key_open_voice_wakeup_if_auto_sleep, true)
-//        continuousDialogue = getBooleanAndInit(R.string.key_continuous_dialogue, false)
-//  todo      cloudServiceParseIfLocalFailed = getBooleanAndInit(R.string.key_cloud_service_parse, true)
-        sp.set(R.string.key_cloud_service_parse, false)
-//        resumeMusic = getBooleanAndInit(R.string.key_resume_bkg_music, true)
-        volumeWakeUpWhenScreenOff = getBooleanAndInit(R.string.key_volume_wakeup_when_screen_off, true)
-        useAssistService = getBooleanAndInit(R.string.key_use_assist_service, useAssistService)
-        execFailedVoiceFeedback = getBooleanAndInit(R.string.key_exec_failed_voice_feedback, true)
-        execSuccessFeedback = getBooleanAndInit(R.string.key_exec_failed_voice_feedback, true)
-        fixVoiceMicro = getBooleanAndInit(R.string.key_fix_voice_micro, true) //TODO && !AppConfig.IS_SYS_APP
-        notifyCloseMicro = getBooleanAndInit(R.string.key_close_wakeup_notification, true)
-//        disableAdKillerOnLowBattery = getBooleanAndInit(R.string.key_remove_ad_power_saving_mode, true)
-        disableAccessibilityOnLowBattery = getBooleanAndInit(R.string.key_accessibility_service_power_saving_mode, true)
-        wakeUpWithHeadsetHook = getBooleanAndInit(R.string.key_wakeup_with_headsethook, wakeUpWithHeadsetHook)
-        voiceRecogFeedback = getBooleanAndInit(R.string.key_voice_recog_feedback, false)
-        lastingVoiceCommand = getBooleanAndInit(R.string.key_lasting_voice_command, lastingVoiceCommand)
-        autoCheckPluginUpdate = getBooleanAndInit(R.string.key_auto_check_plugin_update, autoCheckPluginUpdate)
-        smartKillAd = getBooleanAndInit(R.string.key_smart_find_and_kill_ad, smartKillAd)
-        notifyWpOnScreenOff = getBooleanAndInit(R.string.key_notify_wp_on_screen_off, notifyWpOnScreenOff)
-        devMode = getBooleanAndInit(R.string.key_dev_mode, devMode)
-        chatStr = sp.getString(R.string.key_chat_str)
-        textOcrStr = sp.getString(R.string.key_text_ocr_key)
-
-        finishWord = sp.getString(R.string.key_finish_word)
-//        onlyCloudServiceParse = getBooleanAndInit(R.string.key_only_cloud_service_parse, false)
         userWakeupWord = sp.getString(R.string.key_user_wakeup_word) ?: ""
         synStreamIndex = sp.getString(R.string.key_stream_of_syn_output).let {
             Vog.d("reload ---> $it")
@@ -370,7 +365,6 @@ object AppConfig {
             Vog.d("悬浮依靠方向 $it")
         }
 
-        responseWord = sp.getString(R.string.key_response_word) ?: responseWord
         translateLang = sp.getString(R.string.key_translate_languages)?.let {
             val i = GlobalApp.APP.resources.getStringArray(R.array.list_translate_languages).indexOf(it)
             if (i == -1) translateLang
@@ -378,15 +372,10 @@ object AppConfig {
                     "pt", "de", "it", "el", "nl", "pl", "bul", "est", "dan", "fin", "cs", "rom", "slo",
                     "swe", "hu", "cht", "vie")[i]
         } ?: translateLang
-        wakeUpFilePath = sp.getString(R.string.key_wakeup_file_path) ?: wakeUpFilePath
         sp.getInt(R.string.key_ad_wait_secs).also {
             adWaitSecs = if (it == -1) 17 else it
         }
-        sp.getInt(R.string.key_long_key_press_delay).also {
-            volumeKeyDelayUp = if (it == -1) volumeKeyDelayUp else it
-        }
 
-        Vog.d("reload ---> AppConfig")
     }
 
     val sp: SpHelper by lazy { SpHelper(GlobalApp.APP) }
@@ -419,6 +408,12 @@ object AppConfig {
             }
         }
 
+    /**
+     *
+     * @param context Context
+     * @param byUser Boolean
+     * @param onUpdate Function1<Pair<String, String>?, Unit>?
+     */
     fun checkAppUpdate(context: Context, byUser: Boolean, onUpdate: ((Pair<String, String>?) -> Unit)? = null) {
         if (BuildConfig.DEBUG && !byUser) {
             return

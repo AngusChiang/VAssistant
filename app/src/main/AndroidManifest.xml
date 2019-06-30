@@ -69,24 +69,6 @@
         android:supportsRtl="true"
         android:theme="@style/NoActionBar"
         tools:ignore="GoogleAppIndexingWarning">
-        <!--<receiver android:name=".widget.QuickWakeupWidget">-->
-        <!--<intent-filter>-->
-        <!--<action android:name="android.appwidget.action.APPWIDGET_UPDATE" />-->
-        <!--</intent-filter>-->
-
-        <!--<meta-data-->
-        <!--android:name="android.appwidget.provider"-->
-        <!--android:resource="@xml/quick_wakeup_widget_info" />-->
-        <!--</receiver>-->
-        <!--<receiver android:name=".widget.SwitchVoiceWakeupWidget">-->
-        <!--<intent-filter>-->
-        <!--<action android:name="android.appwidget.action.APPWIDGET_UPDATE" />-->
-        <!--</intent-filter>-->
-
-        <!--<meta-data-->
-        <!--android:name="android.appwidget.provider"-->
-        <!--android:resource="@xml/quick_wakeup_widget_info" />-->
-        <!--</receiver>-->
 
         <meta-data
             android:name="com.baidu.speech.APP_ID"
@@ -130,8 +112,8 @@
         </activity> <!-- <activity android:name=".activities.MainActivity" /> -->
         <activity
             android:name=".activities.base.CreateShortcutActivity"
-            android:label="V Assistant快捷功能"
             android:exported="true"
+            android:label="V Assistant快捷功能"
             android:launchMode="singleInstance"
             android:theme="@style/TransparentBackground">
             <intent-filter>
@@ -226,8 +208,8 @@
         <!--助手应用/语音输入 ？ What feature-->
         <service
             android:name=".services.VoiceInputService"
-            android:label="@string/app_name"
             android:exported="true"
+            android:label="@string/app_name"
             android:permission="android.permission.BIND_VOICE_INTERACTION">
             <intent-filter>
                 <action android:name="android.speech.RecognitionService" />
@@ -236,7 +218,7 @@
             </intent-filter>
             <meta-data
                 android:name="android.speech"
-                android:resource="@xml/recognizer"/>
+                android:resource="@xml/recognizer" />
         </service>
 
         <activity
@@ -292,7 +274,6 @@
             android:name=".activities.JsEditorActivity"
             android:label="@string/text_js_editor"
             android:theme="@style/Theme.Darcula" />
-        <activity android:name=".activities.CrashInfoActivity" />
         <activity
             android:name=".activities.PluginManagerActivity"
             android:label="@string/text_plugins_manager" />
@@ -382,6 +363,10 @@
                 <action android:name="SCREEN_SPOT" />
             </intent-filter>
         </activity>
+        <activity
+            android:name=".activities.CodeViewActivity"
+            android:theme="@style/AppTheme"
+            android:label="查看代码" />
     </application>
 
 </manifest>

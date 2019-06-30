@@ -16,6 +16,10 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            buildConfigField "String", "CONFIG_NAME", '"cn.vove7.vassistant_preferences"'
+        }
+        debug {
+            buildConfigField "String", "CONFIG_NAME", '"cn.vove7.vassistant.debug_preferences"'
         }
     }
     productFlavors {
@@ -75,10 +79,12 @@ dependencies {
     api 'com.github.GrenderG:Toasty:1.4.1'
     api 'top.zibin:Luban:1.1.8'//鲁班 压缩图片
 
+    api 'org.jsoup:jsoup:1.11.3'
+
     api project(path: ':ParamRegexEngine')
     api project(path: ':umlib')
 
-    api 'com.github.Vove7.SmartKey:smartkey-android:6.0.2'
+    api 'com.github.Vove7.SmartKey:smartkey-android:6.0.4'
 }
 
 

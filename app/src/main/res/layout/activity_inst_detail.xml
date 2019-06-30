@@ -77,8 +77,7 @@
                 android:layout_marginTop="10dp"
                 android:labelFor="@id/example_text"
                 android:text="@string/text_examples"
-                android:textColor="?attr/colorAccent"
-                />
+                android:textColor="?attr/colorAccent" />
 
             <TextView
                 android:id="@+id/examples_text"
@@ -93,8 +92,7 @@
                 android:layout_marginTop="10dp"
                 android:labelFor="@id/regs_text"
                 android:text="@string/text_regex"
-                android:textColor="?attr/colorAccent"
-                />
+                android:textColor="?attr/colorAccent" />
 
             <TextView
                 android:id="@+id/regs_text"
@@ -108,24 +106,20 @@
                 android:layout_marginTop="10dp"
                 android:labelFor="@id/example_text"
                 android:text="@string/text_script"
-                android:textColor="?attr/colorAccent"
-                />
+                android:textColor="?attr/colorAccent" />
 
-            <io.github.kbiakov.codeview.CodeView
-                android:id="@+id/script_text"
-                android:layout_width="match_parent"
-                android:layout_height="150dp"
-                android:typeface="monospace" />
-
-            <TextView
-                android:id="@+id/copy_script"
+            <Button
+                android:id="@+id/view_code"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:padding="8dp"
-                android:background="?attr/selectableItemBackground"
-                android:text="点击复制"
-                android:textColor="@color/p_green"
-                android:textSize="12sp" />
+                android:text="查看脚本代码(长按复制代码)"
+                android:theme="@style/MaterialButton" />
+
+            <!--<thereisnospon.codeview.CodeView-->
+            <!--android:id="@+id/script_text"-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="150dp"-->
+            <!--android:typeface="monospace" />-->
 
             <TextView
                 android:layout_width="wrap_content"
@@ -160,7 +154,7 @@
                 android:layout_marginTop="10dp"
                 android:labelFor="@id/example_text"
                 android:text="跟随操作"
-                android:textColor="?attr/colorAccent"/>
+                android:textColor="?attr/colorAccent" />
 
             <cn.vove7.vtp.view.listview.WrapContentListView
                 android:id="@+id/follow_list"

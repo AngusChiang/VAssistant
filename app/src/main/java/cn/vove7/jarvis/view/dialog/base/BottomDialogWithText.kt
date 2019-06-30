@@ -4,7 +4,6 @@ import android.content.Context
 import android.text.method.ScrollingMovementMethod
 import android.view.View
 import cn.vove7.jarvis.R
-import cn.vove7.jarvis.fragments.base.BaseBottomDialogWithToolbar
 import cn.vove7.jarvis.view.custom.WrappedTextView
 
 /**

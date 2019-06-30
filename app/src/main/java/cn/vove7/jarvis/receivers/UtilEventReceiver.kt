@@ -3,8 +3,9 @@ package cn.vove7.jarvis.receivers
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import cn.vove7.bottomdialog.BottomDialogActivity
 import cn.vove7.jarvis.activities.PluginManagerActivity
-
+import cn.vove7.jarvis.view.dialog.AppUpdateDialog.Companion.getBuildAction
 import cn.vove7.vtp.log.Vog
 
 /**
@@ -15,23 +16,18 @@ import cn.vove7.vtp.log.Vog
  */
 object UtilEventReceiver : DyBCReceiver() {
     override val intentFilter: IntentFilter = IntentFilter().apply {
-        addAction(PLUGIN_DL_DONE)
+        addAction(APP_HAS_UPDATE)
     }
 
     override fun onReceive(context: Context?, intent: Intent?) {
         when (intent?.action) {
-            PLUGIN_DL_DONE -> {
-                Vog.d("PLUGIN_DL_DONE")
-                intent.getStringExtra("path")?.apply {
-                    PluginManagerActivity.installPlugin(this)
-                }
+            APP_HAS_UPDATE -> {
+                val ver = intent.getStringExtra("version")
+                val log = intent.getStringExtra("log")
+                BottomDialogActivity.builder(context!!, getBuildAction(ver, log))
             }
         }
     }
 
-    /**
-     * 插件下载完成，安装
-     */
-    const val PLUGIN_DL_DONE = "plugin_dl_done"
-
+    const val APP_HAS_UPDATE = "app_has_update"
 }

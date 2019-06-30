@@ -1,8 +1,10 @@
 package cn.vove7.jarvis.view.dialog
 
-import android.content.Context
-import cn.vove7.jarvis.fragments.base.SheetStatusListener
-import cn.vove7.jarvis.view.dialog.base.BottomDialogWithMarkdown
+import android.app.Activity
+import cn.vove7.bottomdialog.BottomDialog
+import cn.vove7.bottomdialog.builder.title
+import cn.vove7.bottomdialog.builder.withCloseIcon
+import cn.vove7.jarvis.view.dialog.contentbuilder.MarkdownContentBuilder
 
 /**
  * # UpdateLogDialog
@@ -10,17 +12,18 @@ import cn.vove7.jarvis.view.dialog.base.BottomDialogWithMarkdown
  * @author Administrator
  * 2018/10/28
  */
-class UpdateLogDialog(context: Context, onDismiss: (() -> Unit)? = null) {
+class UpdateLogDialog(context: Activity, onDismiss: (() -> Unit)? = null) {
+
     init {
-        val d = BottomDialogWithMarkdown(context, "更新日志")
-
-        d.show()
-        d.loadFromAsset("files/update_log.md")
-
-        d.listener = object : SheetStatusListener {
-            override fun onDismiss() {
-                onDismiss?.invoke()
+        val d = BottomDialog.builder(context) {
+            title("更新日志")
+            withCloseIcon()
+            content(MarkdownContentBuilder()) {
+                loadMarkdownFromAsset("files/update_log.md")
             }
+        }
+        d.setOnDismissListener {
+            onDismiss?.invoke()
         }
     }
 

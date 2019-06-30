@@ -185,13 +185,13 @@
                 android:layout_height="wrap_content"
                 android:text="@string/test_set_script"
                 android:theme="@style/MaterialButton" />
-            <io.github.kbiakov.codeview.CodeView
+            <thereisnospon.codeview.CodeView
                 android:id="@+id/code_view"
                 android:layout_width="match_parent"
                 android:minHeight="100dp"
                 android:layout_height="200dp">
 
-            </io.github.kbiakov.codeview.CodeView>
+            </thereisnospon.codeview.CodeView>
 
         </LinearLayout>
     </ScrollView>

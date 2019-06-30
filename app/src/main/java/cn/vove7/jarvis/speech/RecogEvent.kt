@@ -5,7 +5,7 @@ import java.io.Serializable
 /**
  * 语音识别事件interface
  */
-interface SpeechEvent {
+interface RecogEvent {
     companion object {
         const val CODE_UNKNOWN = -1
         const val CODE_NO_RESULT = 1

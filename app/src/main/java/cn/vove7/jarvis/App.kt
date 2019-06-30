@@ -14,6 +14,7 @@ import cn.vove7.jarvis.receivers.ScreenStatusListener
 import cn.vove7.jarvis.receivers.UtilEventReceiver
 import cn.vove7.jarvis.services.MainService
 import cn.vove7.common.app.AppConfig
+import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.helper.AdvanAppHelper
 import cn.vove7.jarvis.tools.AppNotification
 import cn.vove7.jarvis.tools.CrashHandler
@@ -21,7 +22,7 @@ import cn.vove7.jarvis.tools.ShortcutUtil
 import cn.vove7.jarvis.view.openAccessibilityServiceAuto
 import cn.vove7.vtp.log.Vog
 import com.umeng.commonsdk.UMConfigure
-import io.github.kbiakov.codeview.classifier.CodeProcessor
+import com.wanjian.cockroach.Cockroach
 
 
 @Suppress("MemberVisibilityCanBePrivate")
@@ -34,7 +35,6 @@ class App : GlobalApp() {
         Vog.d("onCreate ---> begin ${System.currentTimeMillis() / 1000}")
         ins = this
 
-        CrashHandler.init()
         runWithClock("加载配置") {
             AppConfig.init()
         }
@@ -44,11 +44,17 @@ class App : GlobalApp() {
             return
         }
 
+        Cockroach.install { thread, e ->
+            toastError("发生异常，可将[帮助/日志]发送进行反馈")
+            GlobalLog.log("发生异常 at $thread")
+            GlobalLog.err(e)
+            CrashHandler.postException(e)
+        }
+
         runOnNewHandlerThread("app_load") {
             if (AppConfig.FIRST_LAUNCH_NEW_VERSION || BuildConfig.DEBUG)
                 LuaApp.init(this, AppConfig.FIRST_LAUNCH_NEW_VERSION)
             startServices()
-            CodeProcessor.init(this@App)
             ShortcutUtil.initShortcut()
             AdvanAppHelper.getPkgList()
             startBroadcastReceivers()

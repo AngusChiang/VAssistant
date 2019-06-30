@@ -3,12 +3,14 @@ package cn.vove7.jarvis.tools
 import android.app.Notification
 import android.app.NotificationManager
 import android.content.Context
+import android.content.Intent
 import android.os.Build
 import android.provider.Settings
 import android.support.v4.app.NotificationManagerCompat
 import cn.vove7.common.app.AppConfig
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.app.GlobalLog
+import cn.vove7.jarvis.R
 import cn.vove7.vtp.notification.ChannelBuilder
 import cn.vove7.vtp.notification.NotificationHelper
 import cn.vove7.vtp.notification.NotificationIcons
@@ -33,9 +35,8 @@ object AppNotification {
                         }
             } else null
 
-    private val notificationHelper by lazy {
-        NotificationHelper(GlobalApp.APP, c, true)
-    }
+    private val notificationHelper get() = NotificationHelper(GlobalApp.APP, c, true)
+
 
     fun updateNotificationChannel(context: Context) {
         val aa = arrayOf("app_notification", "StatusBarIcon", "StatusBarIcon_alert")
@@ -64,6 +65,29 @@ object AppNotification {
     fun newNotification(title: String, content: String? = null, iconId: Int) {
         notificationHelper.sendNewNotification(title, content
             ?: "", NotificationIcons(iconId))
+    }
+
+    /**
+     * 广播通知
+     * @param id Int
+     * @param title String
+     * @param content String
+     * @param broadcastIntent Intent
+     * @param iconId Int
+     */
+    fun broadcastNotification(
+            id: Int,
+            title: String,
+            content: String,
+            broadcastIntent: Intent,
+            iconId: Int = R.mipmap.ic_launcher_vassist
+    ) {
+        notificationHelper.showNotification(
+                nId = id,
+                title = title,
+                content = content,
+                broadcastIntent = broadcastIntent,
+                icons = NotificationIcons(iconId))
     }
 
 }

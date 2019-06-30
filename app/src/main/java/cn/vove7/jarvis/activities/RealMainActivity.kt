@@ -1,10 +1,13 @@
 package cn.vove7.jarvis.activities
 
+import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import android.support.design.widget.BottomNavigationView
 import android.view.View
 import android.view.Window
+import cn.vove7.common.app.AppConfig
+import cn.vove7.common.app.AppConfig.checkAppUpdate
 import cn.vove7.common.model.UserInfo
 import cn.vove7.common.utils.StubbornFlag
 import cn.vove7.common.utils.runOnNewHandlerThread
@@ -13,11 +16,10 @@ import cn.vove7.jarvis.R
 import cn.vove7.jarvis.activities.base.BaseActivity
 import cn.vove7.jarvis.fragments.HomeFragment
 import cn.vove7.jarvis.fragments.MineFragment
-import cn.vove7.common.app.AppConfig
-import cn.vove7.common.app.AppConfig.checkAppUpdate
+import cn.vove7.jarvis.receivers.UtilEventReceiver
+import cn.vove7.jarvis.tools.AppNotification
 import cn.vove7.jarvis.tools.DataUpdator
 import cn.vove7.jarvis.tools.Tutorials
-import cn.vove7.jarvis.view.dialog.AppUpdateDialog
 import cn.vove7.jarvis.view.dialog.UpdateLogDialog
 import cn.vove7.jarvis.view.tools.FragmentSwitcher
 import cn.vove7.vtp.log.Vog
@@ -143,8 +145,15 @@ class RealMainActivity : BaseActivity() {
     private val onUpdate: (Pair<String, String>?) -> Unit
         get() = a@{ it ->
             it ?: return@a
-            if (!isFinishing) {
-                AppUpdateDialog(this, it.first, it.second)
-            }
+            AppNotification.broadcastNotification(
+                    123, "发现新版本 ${it.first}",
+                    "查看更新日志",
+                    (Intent(UtilEventReceiver.APP_HAS_UPDATE).apply {
+                        putExtra("version", it.first)
+                        putExtra("log", it.second)
+                    })
+            )
+
+
         }
 }

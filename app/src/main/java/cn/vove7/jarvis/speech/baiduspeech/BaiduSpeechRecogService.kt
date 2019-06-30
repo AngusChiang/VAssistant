@@ -1,11 +1,11 @@
 package cn.vove7.jarvis.speech.baiduspeech
 
-import android.os.HandlerThread
+import cn.vove7.common.app.AppConfig
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.utils.runInCatch
 import cn.vove7.common.utils.runOnNewHandlerThread
 import cn.vove7.jarvis.R
-import cn.vove7.jarvis.speech.SpeechEvent
+import cn.vove7.jarvis.speech.RecogEvent
 import cn.vove7.jarvis.speech.SpeechRecogService
 import cn.vove7.jarvis.speech.WakeupI
 import cn.vove7.jarvis.speech.baiduspeech.recognition.listener.SpeechStatusListener
@@ -13,7 +13,6 @@ import cn.vove7.jarvis.speech.baiduspeech.recognition.recognizer.MyRecognizer
 import cn.vove7.jarvis.speech.baiduspeech.wakeup.BaiduVoiceWakeup
 import cn.vove7.jarvis.speech.baiduspeech.wakeup.RecogWakeupListener
 import cn.vove7.jarvis.speech.baiduspeech.wakeup.WakeupEventAdapter
-import cn.vove7.common.app.AppConfig
 import cn.vove7.vtp.log.Vog
 import com.baidu.speech.asr.SpeechConstant
 import com.google.gson.Gson
@@ -22,7 +21,7 @@ import com.google.gson.annotations.SerializedName
 /**
  * 百度语音识别服务
  */
-class BaiduSpeechRecogService(event: SpeechEvent) : SpeechRecogService(event) {
+class BaiduSpeechRecogService(event: RecogEvent) : SpeechRecogService(event) {
 
     /**
      * 识别控制器，使用MyRecognizer控制识别的流程
@@ -39,15 +38,6 @@ class BaiduSpeechRecogService(event: SpeechEvent) : SpeechRecogService(event) {
      * 本Activity中是否需要调用离线命令词功能。根据此参数，判断是否需要调用SDK的ASR_KWS_LOAD_ENGINE事件
      */
     override var enableOffline = true
-
-    /**
-     * 分发事件
-     */
-    private val handler: RecogHandler by lazy {
-        val t = HandlerThread("recog")
-        t.start()
-        RecogHandler(t.looper)
-    }
 
     init {
         if (enableOffline) {
@@ -118,8 +108,7 @@ class BaiduSpeechRecogService(event: SpeechEvent) : SpeechRecogService(event) {
         myRecognizer.cancel()
     }
 
-
-    override fun release() {
+    override fun doRelease() {
         myRecognizer.release()
         wakeupI.stop()
     }

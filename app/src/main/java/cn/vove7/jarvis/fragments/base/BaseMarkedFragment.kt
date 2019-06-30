@@ -6,6 +6,11 @@ import android.view.View
 import android.widget.AdapterView
 import android.widget.Button
 import android.widget.Spinner
+import cn.vove7.bottomdialog.BottomDialog
+import cn.vove7.bottomdialog.builder.buttons
+import cn.vove7.bottomdialog.builder.message
+import cn.vove7.bottomdialog.builder.title
+import cn.vove7.common.app.AppConfig
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.datamanager.DAO
@@ -18,10 +23,8 @@ import cn.vove7.jarvis.R
 import cn.vove7.jarvis.adapters.ListViewModel
 import cn.vove7.jarvis.adapters.SimpleListAdapter
 import cn.vove7.jarvis.fragments.SimpleListFragment
-import cn.vove7.common.app.AppConfig
 import cn.vove7.jarvis.tools.DataUpdator
 import cn.vove7.jarvis.tools.DialogUtil
-import cn.vove7.jarvis.view.dialog.base.BottomDialogWithText
 import cn.vove7.vtp.log.Vog
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.customview.customView
@@ -177,26 +180,29 @@ abstract class BaseMarkedFragment : SimpleListFragment<MarkedData>(), OnSyncMark
                 //dialog edit
                 val data = item.extra
                 //todo colorful
-                BottomDialogWithText(context!!, item.title ?: "", data.toString()).apply {
+                BottomDialog.builder(activity!!) {
+                    title(item.title ?: "")
+                    message(data.toString())
                     if (data.belongUser()) {
-                        negativeButton(getString(R.string.text_share)) {
-                            share(data)
-                        }
-                        positiveButton(getString(R.string.text_edit)) {
-                            onEdit(item.extra)
-                        }
-                        neutralButton(getString(R.string.text_delete)) {
-                            DialogUtil.dataDelAlert(context) {
-                                if (data.tagId != null) {
-                                    deleteShare(data.tagId)
+                        buttons {
+                            negativeButton(getString(R.string.text_share)) {
+                                share(data)
+                            }
+                            positiveButton(getString(R.string.text_edit)) {
+                                onEdit(item.extra)
+                            }
+                            neutralButton(getString(R.string.text_delete)) {
+                                DialogUtil.dataDelAlert(context) {
+                                    if (data.tagId != null) {
+                                        deleteShare(data.tagId)
+                                    }
+                                    DAO.daoSession.markedDataDao.delete(data)
+                                    GlobalApp.toastSuccess(R.string.text_delete_complete)
+                                    refresh()
                                 }
-                                DAO.daoSession.markedDataDao.delete(data)
-                                GlobalApp.toastSuccess(R.string.text_delete_complete)
-                                refresh()
                             }
                         }
                     }
-                    show()
                 }
             }
         }

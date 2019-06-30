@@ -25,7 +25,7 @@ object DialogUtil {
         MaterialDialog(context)
                 .title(R.string.text_confirm_2_del)
                 .message(text = "若已分享，将同时删除云端记录")
-                .positiveButton(R.string.text_confirm) { _ ->
+                .positiveButton(R.string.text_confirm) {
                     onPosClick.invoke()
                 }.negativeButton()
                 .show()
@@ -40,9 +40,9 @@ fun Dialog.setFloat() {
         }
     }
     if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-        window.setType(android.view.WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY)
+        window?.setType(android.view.WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY)
     } else {
-        window.setType(android.view.WindowManager.LayoutParams.TYPE_SYSTEM_ALERT)
+        window?.setType(android.view.WindowManager.LayoutParams.TYPE_SYSTEM_ALERT)
     }
 }
 

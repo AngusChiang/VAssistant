@@ -42,10 +42,11 @@ class OSLActivity : OneFragmentActivity() {
                     , OslItem("AndroLua_pro", "https://github.com/nirenr/AndroLua_pro", "")
                     , OslItem("rhino-android", "https://github.com/F43nd1r/rhino-android", "")
                     , OslItem("VTP", "https://github.com/Vove7/VTP", "个人开发工具包")
+                    , OslItem("SmartKey", "https://github.com/Vove7/SmartKey", "利用Kotlin委托实现优雅地持久化存储App配置。")
                     , OslItem("Material Dialogs", "https://github.com/afollestad/material-dialogs", "")
                     , OslItem("DiscreteSeekBar", "https://github.com/AnderWeb/discreteSeekBar", "")
                     , OslItem("AndroidDonate", "https://github.com/didikee/AndroidDonate", "")
-                    , OslItem("CodeView (Android)", "https://github.com/kbiakov/CodeView-android", "CodeView helps to show code content with syntax highlighting in native way.")
+                    , OslItem("CodeView", "https://github.com/Thereisnospon/CodeView")
                     , OslItem("Jsoup", "https://jsoup.org/", "jsoup is a Java library for working with real-world HTML. It provides a very convenient API for extracting and manipulating data, using the best of DOM, CSS, and jquery-like methods.")
                     , OslItem("TapTargetView", "https://github.com/KeepSafe/TapTargetView", "")
                     , OslItem("BGAQRCode-Android", "https://github.com/bingoogolapple/BGAQRCode-Android", "")
@@ -55,8 +56,8 @@ class OSLActivity : OneFragmentActivity() {
                     , OslItem("Recycler Fast Scroll", "https://github.com/plusCubed/recycler-fast-scroll", "")
                     , OslItem("MarkdownView", "https://github.com/tiagohm/MarkdownView", "Android library to display markdown text.")
                     , OslItem("Toasty", "https://github.com/GrenderG/Toasty", "The usual Toast, but with steroids.")
-                    , OslItem("Konfetti", "https://github.com/DanielMartinus/Konfetti", "Celebrate more with this lightweight confetti particle system \uD83C\uDF8A Create realistic confetti by implementing this easy to use library.")
-                     , OslItem("Luban", "https://github.com/Curzibn/Luban", "Luban（鲁班） —— Android图片压缩工具，仿微信朋友圈压缩策略。")
+//                    , OslItem("Konfetti", "https://github.com/DanielMartinus/Konfetti", "Celebrate more with this lightweight confetti particle system \uD83C\uDF8A Create realistic confetti by implementing this easy to use library.")
+                    , OslItem("Luban", "https://github.com/Curzibn/Luban", "Luban（鲁班） —— Android图片压缩工具，仿微信朋友圈压缩策略。")
                     // , OslItem("", "", "")
             )
             notifyLoadSuccess(l, true)
@@ -70,6 +71,6 @@ class OslItem(
 //        val author: String? = null,
 //        val lisType: String?,
 //        val lisString: String? = null,
-        val desc: String?
+        val desc: String? = null
 
 )

@@ -3,6 +3,8 @@ package cn.vove7.common.model;
 import com.google.gson.annotations.Expose;
 
 import java.io.Serializable;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import cn.vove7.common.appbus.AppBus;
@@ -30,6 +32,7 @@ public class UserInfo implements Serializable {
     private boolean isVip = false;
 
     public void success() {
+        if(isLogin()) return;
         INSTANCE = this;
         isLogin = true;
     }
@@ -102,6 +105,17 @@ public class UserInfo implements Serializable {
     public static boolean isVip() {
         return INSTANCE != null && (INSTANCE.vipEndDate != null &&
                 INSTANCE.vipEndDate.getTime() > System.currentTimeMillis());
+    }
+
+    public static boolean isPermanentVip() {
+        try {
+            return INSTANCE != null && (INSTANCE.vipEndDate != null &&
+                    INSTANCE.vipEndDate.getTime() > new SimpleDateFormat("yyyy-MM-dd")
+                            .parse("2100-01-01").getTime());
+        } catch (ParseException e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 
     public static UserInfo getINSTANCE() {

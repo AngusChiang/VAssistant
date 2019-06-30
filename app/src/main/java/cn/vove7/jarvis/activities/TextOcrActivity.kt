@@ -5,6 +5,8 @@ import android.os.Bundle
 import android.view.Gravity
 import android.widget.CheckedTextView
 import android.widget.RelativeLayout
+import cn.vove7.bottomdialog.BottomDialog
+import cn.vove7.bottomdialog.builder.title
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.bridges.SystemBridge
 import cn.vove7.common.utils.gone
@@ -14,8 +16,7 @@ import cn.vove7.jarvis.R
 import cn.vove7.jarvis.tools.baiduaip.BaiduAipHelper
 import cn.vove7.jarvis.tools.baiduaip.model.TextOcrItem
 import cn.vove7.jarvis.view.dialog.TextOperationDialog
-import cn.vove7.jarvis.view.dialog.base.BottomDialogWithMarkdown
-import cn.vove7.jarvis.view.dialog.base.BottomDialogWithText
+import cn.vove7.jarvis.view.dialog.contentbuilder.MarkdownContentBuilder
 import cn.vove7.vtp.log.Vog
 import kotlinx.android.synthetic.main.activity_text_ocr.*
 
@@ -43,22 +44,9 @@ class TextOcrActivity : Activity() {
     }
 
 
-    var d: BottomDialogWithText? = null
     private val onItemClick: (Model) -> Unit = { model ->
         val text = model.item.text
         editDialog(text)
-    }
-
-    /**
-     * 若翻译过 ，显示 复制原文
-     */
-    private fun setCopyTranslationText(bd: BottomDialogWithText, trans: String) {
-        runOnUi {
-            bd.negativeButton(text = "复制翻译") {
-                SystemBridge.setClipText(trans)
-                GlobalApp.toastInfo(R.string.text_copied)
-            }
-        }
     }
 
     @Synchronized
@@ -174,9 +162,11 @@ class TextOcrActivity : Activity() {
         }
 
     private fun showHelp() {
-        BottomDialogWithMarkdown(this, "文字识别界面帮助").apply {
-            loadFromAsset("files/ocr_help.md")
-            show()
+        BottomDialog.builder(this) {
+            title("文字识别界面帮助")
+            content(MarkdownContentBuilder()) {
+                loadMarkdownFromAsset("files/ocr_help.md")
+            }
         }
     }
 
@@ -197,8 +187,16 @@ class TextOcrActivity : Activity() {
         statusBarHeight1
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        d?.dismiss()
+    }
+
+    var d: BottomDialog? = null
+
+
     private fun editDialog(text: String) {
-        TextOperationDialog(this, TextOperationDialog.TextModel(text))
+        d = TextOperationDialog(this, TextOperationDialog.TextModel(text)).bottomDialog
     }
 
     class Model(

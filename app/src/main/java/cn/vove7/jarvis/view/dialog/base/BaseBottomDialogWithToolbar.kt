@@ -1,4 +1,4 @@
-package cn.vove7.jarvis.fragments.base
+package cn.vove7.jarvis.view.dialog.base
 
 import android.content.Context
 import android.os.Bundle

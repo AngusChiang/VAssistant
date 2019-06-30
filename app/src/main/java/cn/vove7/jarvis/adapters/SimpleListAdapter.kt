@@ -14,12 +14,14 @@ import cn.vove7.vtp.log.Vog
 import java.io.Serializable
 import java.text.Collator
 
-open class SimpleListAdapter<T>(private val dataset: MutableList<ListViewModel<T>>
-                                , val itemClickListener: OnItemClickListener<T>? = null,
-                                val checkable: Boolean = false)
+open class SimpleListAdapter<T>(
+        private val dataset: MutableList<ListViewModel<T>> ,
+        val itemClickListener: OnItemClickListener<T>? = null,
+        val checkable: Boolean = false
+)
     : RecAdapterWithFooter<SimpleListAdapter.VHolder, ListViewModel<T>>() {
 
-    private val holders = SparseArray<SimpleListAdapter.VHolder>()
+    private val holders = SparseArray<VHolder>()
     override fun itemCount(): Int = dataset.size
     override fun getItem(pos: Int): ListViewModel<T>? {
         return dataset[pos]

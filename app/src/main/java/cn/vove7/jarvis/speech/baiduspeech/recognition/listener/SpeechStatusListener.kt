@@ -2,12 +2,12 @@ package cn.vove7.jarvis.speech.baiduspeech.recognition.listener
 
 import android.os.Handler
 import cn.vove7.common.app.GlobalLog
-import cn.vove7.jarvis.speech.SpeechEvent.Companion.CODE_ENGINE_BUSY
-import cn.vove7.jarvis.speech.SpeechEvent.Companion.CODE_NET_ERROR
-import cn.vove7.jarvis.speech.SpeechEvent.Companion.CODE_NO_RECORDER_PERMISSION
-import cn.vove7.jarvis.speech.SpeechEvent.Companion.CODE_NO_RESULT
-import cn.vove7.jarvis.speech.SpeechEvent.Companion.CODE_RECORDER_OPEN_FAIL
-import cn.vove7.jarvis.speech.SpeechEvent.Companion.CODE_UNKNOWN
+import cn.vove7.jarvis.speech.RecogEvent.Companion.CODE_ENGINE_BUSY
+import cn.vove7.jarvis.speech.RecogEvent.Companion.CODE_NET_ERROR
+import cn.vove7.jarvis.speech.RecogEvent.Companion.CODE_NO_RECORDER_PERMISSION
+import cn.vove7.jarvis.speech.RecogEvent.Companion.CODE_NO_RESULT
+import cn.vove7.jarvis.speech.RecogEvent.Companion.CODE_RECORDER_OPEN_FAIL
+import cn.vove7.jarvis.speech.RecogEvent.Companion.CODE_UNKNOWN
 import cn.vove7.jarvis.speech.VoiceData
 import cn.vove7.jarvis.speech.baiduspeech.recognition.message.SpeechMessage
 import cn.vove7.jarvis.speech.SpeechConst.Companion.CODE_VOICE_ERR

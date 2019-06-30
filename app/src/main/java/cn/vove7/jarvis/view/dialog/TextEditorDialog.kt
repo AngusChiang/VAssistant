@@ -1,5 +1,6 @@
 package cn.vove7.jarvis.view.dialog
 
+import android.app.Activity
 import android.content.Context
 import cn.vove7.common.bridges.SystemBridge
 import cn.vove7.common.utils.content
@@ -14,7 +15,7 @@ import kotlinx.android.synthetic.main.edit_view.view.*
  * @author 11324
  * 2019/3/12
  */
-class TextEditorDialog(context: Context, val text: String) {
+class TextEditorDialog(context: Activity, val text: String) {
     init {
         MaterialDialog(context).show {
             title(text = "编辑")

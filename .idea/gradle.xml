@@ -9,10 +9,10 @@
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$" />
-            <option value="$PROJECT_DIR$/Common" />
             <option value="$PROJECT_DIR$/ParamRegexEngine" />
             <option value="$PROJECT_DIR$/androlua" />
             <option value="$PROJECT_DIR$/app" />
+            <option value="$PROJECT_DIR$/common" />
             <option value="$PROJECT_DIR$/executorengine" />
             <option value="$PROJECT_DIR$/rhino-android" />
             <option value="$PROJECT_DIR$/speechLib" />

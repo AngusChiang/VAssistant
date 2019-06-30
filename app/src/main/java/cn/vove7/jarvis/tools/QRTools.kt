@@ -14,6 +14,8 @@ import java.lang.Thread.sleep
 import java.lang.ref.WeakReference
 
 
+
+
 /**
  * # QRTools
  *
@@ -33,6 +35,10 @@ object QRTools {
         val av = LayoutInflater.from(GlobalApp.APP).inflate(R.layout.zbar, null)
         val a = av.findViewById<MyBarView>(R.id.zbar)
         ScanTask(BitmapFactory.decodeFile(path), a, onResult).perform()
+    }
+
+    fun toFile(content:String) {
+//        val bitmap = QRCodeEncoder.syncEncodeQRCode("我爱你,我的祖国!", 400)
     }
 }
 

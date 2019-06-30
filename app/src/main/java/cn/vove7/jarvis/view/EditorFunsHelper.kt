@@ -1,5 +1,6 @@
 package cn.vove7.jarvis.view
 
+import android.app.Activity
 import android.content.Context
 import android.os.Bundle
 import android.support.design.widget.TabLayout
@@ -13,6 +14,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import cn.vove7.bottomdialog.BottomDialog
+import cn.vove7.bottomdialog.builder.message
+import cn.vove7.bottomdialog.builder.title
 import cn.vove7.common.interfaces.VApi
 import cn.vove7.common.interfaces.VApi.Companion.executorFunctions
 import cn.vove7.common.interfaces.VApi.Companion.executorMap
@@ -21,8 +25,6 @@ import cn.vove7.common.interfaces.VApi.Companion.runtimeMap
 import cn.vove7.common.interfaces.VApi.Companion.systemFunMap
 import cn.vove7.common.interfaces.VApi.Companion.systemFuncs
 import cn.vove7.jarvis.R
-import cn.vove7.jarvis.view.dialog.base.BottomDialogWithText
-import com.afollestad.materialdialogs.MaterialDialog
 
 /**
  * # EditorFunsHelper
@@ -172,7 +174,7 @@ class FunsFragmentAdapter(fm: FragmentManager, val c: Context, val apis: List<Ap
     : FragmentPagerAdapter(fm) {
 
     override fun getItem(p0: Int): Fragment {
-        return CateFrag.newI(apis[p0].functions, onClick)
+        return CateFrag.newInstance(apis[p0].functions, onClick)
     }
 
     override fun getPageTitle(position: Int): CharSequence? = apis[position].typeName
@@ -185,7 +187,7 @@ class CateFrag : Fragment() {
     lateinit var onClick: OnClick
 
     companion object {
-        fun newI(functions: List<ApiFunction>, onClick: OnClick): CateFrag {
+        fun newInstance(functions: List<ApiFunction>, onClick: OnClick): CateFrag {
             return CateFrag().also {
                 it.functions = functions
                 it.onClick = onClick
@@ -198,13 +200,13 @@ class CateFrag : Fragment() {
         val v = inflater.inflate(R.layout.item_api_category_rev, null)
         v.findViewById<RecyclerView>(R.id.rev).apply {
             layoutManager = GridLayoutManager(context, 3)
-            adapter = GridAdapter(context!!, functions, onClick)
+            adapter = GridAdapter(activity!!, functions, onClick)
         }
         return v
     }
 }
 
-class GridAdapter(val c: Context, val functions: List<ApiFunction>, val onClick: OnClick) : RecyclerView.Adapter<GridAdapter.VV>() {
+class GridAdapter(val c: Activity, val functions: List<ApiFunction>, val onClick: OnClick) : RecyclerView.Adapter<GridAdapter.VV>() {
     override fun onCreateViewHolder(p0: ViewGroup, p1: Int): VV {
         val v = LayoutInflater.from(c).inflate(R.layout.item_of_funcs, null)
         return VV(v)
@@ -213,7 +215,10 @@ class GridAdapter(val c: Context, val functions: List<ApiFunction>, val onClick:
     override fun getItemCount(): Int = functions.size
 
     private fun showDetail(f: ApiFunction) {
-        BottomDialogWithText(c,f.name,f.doc).show()
+        BottomDialog.builder(c) {
+            title(f.name)
+            message(f.doc)
+        }
     }
 
     private fun getItem(p: Int): ApiFunction = functions[p]

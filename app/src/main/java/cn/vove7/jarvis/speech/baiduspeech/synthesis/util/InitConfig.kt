@@ -1,4 +1,4 @@
-package cn.vove7.jarvis.speech.baiduspeech.synthesis.control
+package cn.vove7.jarvis.speech.baiduspeech.synthesis.util
 
 import com.baidu.tts.client.SpeechSynthesizerListener
 import com.baidu.tts.client.TtsMode

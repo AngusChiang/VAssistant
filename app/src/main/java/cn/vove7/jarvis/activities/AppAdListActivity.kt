@@ -3,6 +3,11 @@ package cn.vove7.jarvis.activities
 import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.View
+import cn.vove7.bottomdialog.BottomDialog
+import cn.vove7.bottomdialog.builder.buttons
+import cn.vove7.bottomdialog.builder.message
+import cn.vove7.bottomdialog.builder.title
+import cn.vove7.common.app.AppConfig
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.datamanager.AppAdInfo
@@ -16,7 +21,6 @@ import cn.vove7.jarvis.activities.base.OneFragmentActivity
 import cn.vove7.jarvis.adapters.ListViewModel
 import cn.vove7.jarvis.adapters.SimpleListAdapter
 import cn.vove7.jarvis.fragments.SimpleListFragment
-import cn.vove7.common.app.AppConfig
 import cn.vove7.jarvis.tools.DialogUtil
 import cn.vove7.jarvis.view.dialog.AdEditorDialog
 import cn.vove7.jarvis.view.dialog.base.BottomDialogWithText
@@ -59,31 +63,35 @@ class AppAdListActivity : OneFragmentActivity() {
                 @SuppressLint("CheckResult")
                 override fun onClick(holder: SimpleListAdapter.VHolder?, pos: Int, item: ListViewModel<AppAdInfo>) {
                     val data = item.extra
-                    BottomDialogWithText(context!!, item.title ?: "", data.toString()).apply {
 
+                    BottomDialog.builder(activity!!) {
+                        title(item.title ?: "")
+                        message(data.toString())
                         if (data.belongUser()) {
-                            neutralButton(getString(R.string.text_edit)) {
-                                editDialog.show(item.extra)
-                            }
-                            positiveButton(getString(R.string.text_share)) {
-                                if (!AppConfig.checkLogin()) {
-                                    return@positiveButton
+                            buttons {
+                                neutralButton(getString(R.string.text_edit)) {
+
+                                    editDialog.show(item.extra)
                                 }
-                                share(data)
-                            }
-                            negativeButton(getString(R.string.text_delete)) {
-                                val tag = data.tagId
-                                DialogUtil.dataDelAlert(context) {
-                                    if (tag != null) {
-                                        delRemoteShare(tag)
+                                positiveButton(getString(R.string.text_share)) {
+                                    if (!AppConfig.checkLogin()) {
+                                        return@positiveButton
                                     }
-                                    DAO.daoSession.appAdInfoDao.delete(data)
-                                    GlobalApp.toastSuccess(R.string.text_delete_complete)
-                                    refresh()
+                                    share(data)
+                                }
+                                negativeButton(getString(R.string.text_delete)) {
+                                    val tag = data.tagId
+                                    DialogUtil.dataDelAlert(context) {
+                                        if (tag != null) {
+                                            delRemoteShare(tag)
+                                        }
+                                        DAO.daoSession.appAdInfoDao.delete(data)
+                                        GlobalApp.toastSuccess(R.string.text_delete_complete)
+                                        refresh()
+                                    }
                                 }
                             }
                         }
-                        show()
                     }
                 }
             }

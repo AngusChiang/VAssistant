@@ -1,57 +1,62 @@
-package cn.vove7.jarvis.view.dialog.base
+package cn.vove7.jarvis.view.dialog.contentbuilder
 
-import android.content.Context
 import android.view.View
 import br.tiagohm.markdownview.MarkdownView
 import br.tiagohm.markdownview.css.styles.Bootstrap
+import cn.vove7.bottomdialog.interfaces.ContentBuilder
 import cn.vove7.jarvis.R
-import cn.vove7.jarvis.fragments.base.BaseBottomDialogWithToolbar
+import kotlinx.android.synthetic.main.dialog_markdown_view.view.*
 import java.io.File
 
+
 /**
- * # BottomDialogWithMarkdown
+ * # MarkdownContentBuilder
  *
- * @author Administrator
- * 2018/12/19
+ * @author Vove
+ * 2019/6/30
  */
-class BottomDialogWithMarkdown(context: Context, title: String?=null) : BaseBottomDialogWithToolbar(context, title) {
+class MarkdownContentBuilder : ContentBuilder() {
 
-    private val markDownView: MarkdownView by lazy {
-        contentView.findViewById<MarkdownView>(R.id.markdown_view).also {
-            it.addStyleSheet(MyStyle())
+    override val layoutRes: Int
+        get() = R.layout.dialog_markdown_view
+
+    lateinit var mdView: MarkdownView
+    override fun init(view: View) {
+        mdView = view.markdown_view
+        mdView.addStyleSheet(MyStyle())
+    }
+
+    var source: Any? = null
+    var sourceType = 0
+
+    fun loadMarkdownFromAsset(path: String) {
+        sourceType = 1
+        source = path
+    }
+
+    fun loadMarkdownFromFile(file: File) {
+        sourceType = 2
+        source = file
+    }
+
+    fun loadMarkdownFromUrl(url: String) {
+        sourceType = 3
+        source = url
+    }
+
+    fun loadMarkdown(text: String) {
+        source = text
+        sourceType = 4
+    }
+
+    override fun updateContent(type: Int, data: Any?) {
+        when (sourceType) {
+            1 -> mdView.loadMarkdownFromAsset(source as String)
+            2 -> mdView.loadMarkdownFromFile(source as File)
+            3 -> mdView.loadMarkdownFromUrl(source as String)
+            4 -> mdView.loadMarkdown(source as String)
         }
     }
-
-
-    val contentView: View by lazy {
-        layoutInflater.inflate(R.layout.dialog_markdown_view, null)
-    }
-
-    override fun onCreateContentView(parent: View): View = contentView
-    fun loadFromAsset(path: String): BottomDialogWithMarkdown {
-        markDownView.loadMarkdownFromAsset(path)
-        return this
-    }
-
-    fun loadText(md: String) {
-        markDownView.loadMarkdown(md)
-    }
-
-    fun loadFromFile(path: String): BottomDialogWithMarkdown {
-        val f = File(path)
-        if (f.exists()) {
-            markDownView.loadMarkdownFromFile(f)
-        } else {
-            loadText("文件不存在!")
-        }
-        return this
-    }
-
-    fun loadFromUrl(url: String): BottomDialogWithMarkdown {
-        markDownView.loadMarkdownFromUrl(url)
-        return this
-    }
-
 }
 
 /**

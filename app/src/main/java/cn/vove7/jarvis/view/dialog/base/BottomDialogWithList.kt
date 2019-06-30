@@ -10,8 +10,6 @@ import cn.vove7.jarvis.R
 import cn.vove7.jarvis.adapters.ListViewModelLoader
 import cn.vove7.jarvis.adapters.ListViewModel
 import cn.vove7.jarvis.adapters.SimpleListAdapter
-import cn.vove7.jarvis.fragments.base.BaseBottomDialogWithToolbar
-import com.pluscubed.recyclerfastscroll.RecyclerFastScroller
 import kotlinx.android.synthetic.main.dialog_list_view.view.*
 
 /**

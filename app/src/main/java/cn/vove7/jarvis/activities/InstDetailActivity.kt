@@ -11,6 +11,7 @@ import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.TextView
+import cn.vove7.common.app.AppConfig
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.app.log
@@ -36,7 +37,6 @@ import cn.vove7.jarvis.activities.base.BaseActivity
 import cn.vove7.jarvis.adapters.ExecuteQueueAdapter
 import cn.vove7.jarvis.adapters.InstSettingListAdapter
 import cn.vove7.jarvis.services.MainService
-import cn.vove7.common.app.AppConfig
 import cn.vove7.jarvis.tools.ItemWrap
 import cn.vove7.jarvis.tools.ShortcutUtil
 import cn.vove7.jarvis.tools.Tutorials
@@ -48,7 +48,6 @@ import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.customview.customView
 import com.afollestad.materialdialogs.input.input
 import com.afollestad.materialdialogs.list.listItems
-import io.github.kbiakov.codeview.adapters.Options
 import kotlinx.android.synthetic.main.activity_inst_detail.*
 import java.util.*
 
@@ -150,6 +149,7 @@ class InstDetailActivity : BaseActivity() {
             }
         }
         toolbar.menu.findItem(R.id.menu_as_global).isVisible = node.belongInApp()
+
         Handler().post {
             //标题
             title = node.actionTitle
@@ -160,18 +160,21 @@ class InstDetailActivity : BaseActivity() {
             regs_text.text = TextHelper.arr2String(node.regs?.toTypedArray()
                 ?: arrayOf<Any>(), "\n")
             version_text.text = node.versionCode.toString()
-//            script_text.setCode(node.action?.actionScript ?: "", )
-            script_text.setOptions(Options.get(this)
-                    .withLanguage(node.action?.scriptType ?: "lua")
-                    .withCode(node.action?.actionScript ?: "").withoutShadows())
+
+            view_code.setOnClickListener {
+                CodeViewActivity.viewCode(this@InstDetailActivity,
+                        title ?: "", node.action?.actionScript ?: "",
+                        node.action?.scriptType ?: "")
+            }
+            view_code.setOnLongClickListener {
+                SystemBridge.setClipText(node.action?.actionScript ?: "")
+                GlobalApp.toastInfo(R.string.text_copied)
+                true
+            }
             script_type_text.text = node.action?.scriptType
         }
         Handler().post {
             if (node.action != null) {
-                copy_script.setOnClickListener {
-                    SystemBridge.setClipText(node.action?.actionScript ?: "")
-                    GlobalApp.toastInfo(R.string.text_copied)
-                }
                 val settingsHeader = RegUtils.getRegisterSettingsTextAndName(node.action.actionScript)
                 if (settingsHeader != null) {
                     val script = settingsHeader.script

@@ -10,6 +10,8 @@ import android.support.v7.widget.Toolbar
 import android.view.KeyEvent
 import android.view.View
 import android.widget.*
+import cn.vove7.bottomdialog.BottomDialog
+import cn.vove7.bottomdialog.builder.title
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.bridges.SystemBridge
@@ -32,7 +34,6 @@ import cn.vove7.jarvis.BuildConfig
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.activities.base.ReturnableActivity
 import cn.vove7.jarvis.tools.UriUtils.getPathFromUri
-import cn.vove7.jarvis.view.dialog.InstRegexEditorDialog
 import cn.vove7.jarvis.view.dialog.SelectAppDialog
 import cn.vove7.vtp.easyadapter.BaseListAdapter
 import cn.vove7.vtp.log.Vog
@@ -40,7 +41,6 @@ import cn.vove7.vtp.view.span.ColourTextClickableSpan
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.customview.customView
 import com.afollestad.materialdialogs.input.input
-import io.github.kbiakov.codeview.adapters.Options
 import kotlinx.android.synthetic.main.activity_new_inst.*
 import java.io.File
 import java.util.*
@@ -67,13 +67,7 @@ class NewInstActivity : ReturnableActivity(), View.OnClickListener {
     private var scriptText: String? = null
         set(value) {
             field = value
-            if (code_view.getOptions() == null)
-                code_view.setOptions(Options.get(this)
-                        .withLanguage(scriptType ?: "lua")
-                        .withCode(value ?: ""))
-            else {
-                code_view.setCode(value ?: "")
-            }
+            code_view.showCode(value ?: "")
         }
 
     private var scriptType: String? = null

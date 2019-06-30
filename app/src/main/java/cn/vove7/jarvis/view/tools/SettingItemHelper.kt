@@ -10,6 +10,7 @@ import cn.vove7.common.utils.ThreadPool
 import cn.vove7.jarvis.R
 import cn.vove7.common.app.AppConfig
 import cn.vove7.jarvis.view.*
+import cn.vove7.smartkey.android.set
 import cn.vove7.vtp.easyadapter.BaseListAdapter
 import cn.vove7.vtp.log.Vog
 import cn.vove7.vtp.sharedpreference.SpHelper
@@ -116,8 +117,7 @@ class SettingItemHelper(val context: Context) {
                 item.summary = s
                 if ((item.callback as CallbackOnSet<String>?)?.invoke(ItemOperation(holder), s) != false) {
                     if (item.keyId != null) {
-                        sp.set(item.keyId, s)
-                        loadConfigInCacheThread()
+                        AppConfig.set(item.keyId, s)
                     }
                 }
                 setBasic(holder, item)
@@ -125,8 +125,7 @@ class SettingItemHelper(val context: Context) {
                 positiveButton()
                 neutralButton(text = "清空") {
                     if (item.keyId != null) {
-                        sp.setStringNull(context.getString(item.keyId))
-                        loadConfigInCacheThread()
+                        AppConfig.set(item.keyId, null)
                     }
                     item.summary = backSummary
                     setBasic(holder, item)
@@ -136,6 +135,9 @@ class SettingItemHelper(val context: Context) {
         }
     }
 
+    /**
+     * 通知AppConfig 加载不规则类型
+     */
     private fun loadConfigInCacheThread() {
         ThreadPool.runOnCachePool {
             AppConfig.reload()
@@ -178,8 +180,7 @@ class SettingItemHelper(val context: Context) {
             holder.compoundWight.isChecked = b
             holder.compoundWight.setOnCheckedChangeListener { _, isChecked ->
                 if ((item.callback as CallbackOnSet<Boolean>?)?.invoke(ItemOperation(holder), isChecked) != false) {
-                    sp.set(item.keyId, isChecked)
-                    loadConfigInCacheThread()
+                    AppConfig.set(item.keyId, isChecked)
                 }
             }
         } else {//withoutSp
@@ -242,9 +243,9 @@ class SettingItemHelper(val context: Context) {
     @Deprecated("unused")
     private fun initMultiDialog(holder: ChildItemHolder, item: SettingChildItem) {
         val sp = SpHelper(context)
-        val entity = context.resources.getStringArray(item.entityArrId!!)
-
-        val v = if (item.keyId != null) sp.getString(item.keyId) else item.defaultValue.invoke()
+//        val entity = context.resources.getStringArray(item.entityArrId!!)
+//
+//        val v = if (item.keyId != null) sp.getString(item.keyId) else item.defaultValue.invoke()
 
         setBasic(holder, item)
 
@@ -285,8 +286,7 @@ class SettingItemHelper(val context: Context) {
                         if ((item.callback as CallbackOnSet<Int>?)?.invoke(ItemOperation(holder), old) != false) {
                             item.summary = old.toString()
                             if (item.keyId != null) {
-                                sp.set(item.keyId, old)
-                                loadConfigInCacheThread()
+                                AppConfig.set(item.keyId, old)
                             }
                             setBasic(holder, item)
                         }

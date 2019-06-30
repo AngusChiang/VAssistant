@@ -14,7 +14,6 @@ import cn.vove7.common.helper.ToastyHelper.TYPE_INFO
 import cn.vove7.common.helper.ToastyHelper.TYPE_SUCCESS
 import cn.vove7.common.helper.ToastyHelper.TYPE_WARNING
 import cn.vove7.common.utils.runInCatch
-import cn.vove7.smartkey.SmartKey
 import cn.vove7.smartkey.android.AndroidSettings
 
 import cn.vove7.vtp.app.AppInfo
