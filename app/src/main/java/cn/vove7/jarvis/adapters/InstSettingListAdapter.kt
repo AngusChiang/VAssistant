@@ -23,7 +23,7 @@ class InstSettingListAdapter(val context: Context, settingsName: String, onFaile
         var view = convertView
         val c = getItem(position)
         if (view == null) {
-            val holder = SettingItemHelper(context).fill(c)!!
+            val holder = SettingItemHelper(context, c).fill()
             view = holder.itemView
         }
         return view

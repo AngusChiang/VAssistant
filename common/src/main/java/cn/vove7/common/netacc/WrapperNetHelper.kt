@@ -3,6 +3,7 @@ package cn.vove7.common.netacc
 import android.os.Looper
 import cn.vove7.common.BuildConfig
 import cn.vove7.common.accessibility.AccessibilityApi
+import cn.vove7.common.app.AppConfig
 import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.datamanager.history.CommandHistory
 import cn.vove7.common.datamanager.parse.model.Action
@@ -148,7 +149,7 @@ object WrapperNetHelper {
      * @param his CommandHistory
      */
     fun uploadUserCommandHistory(his: CommandHistory) {
-        if (BuildConfig.DEBUG /*|| !AppConfig.userExpPlan*/) return
+        if (BuildConfig.DEBUG || !AppConfig.userExpPlan) return
         ThreadPool.runOnPool {
             LooperHelper.prepareIfNeeded()
             postJson<Any>(ApiUrls.UPLOAD_CMD_HIS, his) {

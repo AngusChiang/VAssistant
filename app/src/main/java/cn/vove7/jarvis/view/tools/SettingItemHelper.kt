@@ -6,11 +6,11 @@ import android.view.LayoutInflater
 import android.view.View
 import android.widget.CompoundButton
 import android.widget.TextView
+import cn.vove7.common.app.AppConfig
+import cn.vove7.common.app.set
 import cn.vove7.common.utils.ThreadPool
 import cn.vove7.jarvis.R
-import cn.vove7.common.app.AppConfig
 import cn.vove7.jarvis.view.*
-import cn.vove7.smartkey.android.set
 import cn.vove7.vtp.easyadapter.BaseListAdapter
 import cn.vove7.vtp.log.Vog
 import cn.vove7.vtp.sharedpreference.SpHelper
@@ -19,6 +19,7 @@ import com.afollestad.materialdialogs.customview.customView
 import com.afollestad.materialdialogs.input.input
 import com.afollestad.materialdialogs.list.listItemsMultiChoice
 import com.afollestad.materialdialogs.list.listItemsSingleChoice
+import com.russhwolf.settings.contains
 import org.adw.library.widgets.discreteseekbar.DiscreteSeekBar
 
 /**
@@ -30,79 +31,86 @@ import org.adw.library.widgets.discreteseekbar.DiscreteSeekBar
 typealias OnClick = () -> Unit
 
 @Suppress("unchecked_cast")
-class SettingItemHelper(val context: Context) {
+class SettingItemHelper(
+        val context: Context,
+        val settingItem: SettingChildItem
+) {
+
+    lateinit var holder: ChildItemHolder
 
     @SuppressLint("InflateParams")
-    fun fill(childItem: SettingChildItem): ChildItemHolder? {
-        when (childItem.itemType) {
+    fun fill(): ChildItemHolder {
+        when (settingItem.itemType) {
             TYPE_INPUT -> {
                 val view = LayoutInflater.from(context).inflate(R.layout.item_of_settings_child, null)
-                val holder = ChildItemHolder(view!!)
-                initAndSetInputListener(holder, childItem)
+                holder = ChildItemHolder(view)
+                initAndSetInputListener()
                 return holder
             }
             TYPE_SWITCH -> {
                 val view = LayoutInflater.from(context).inflate(R.layout.item_of_settings_switch, null)
-                val holder = SwitchItemHolder(view!!)
-                initAndSetCompoundButtonListener(holder, childItem)
+                holder = SwitchItemHolder(view)
+                initAndSetCompoundButtonListener()
                 return holder
             }
             TYPE_SWITCH_CALLBACK -> {
                 val view = LayoutInflater.from(context).inflate(R.layout.item_of_settings_switch, null)
-                val holder = SwitchItemHolder(view!!)
-                initAndSetCompoundButtonListener(holder, childItem)
+                holder = SwitchItemHolder(view)
+                initAndSetCompoundButtonListener()
+
                 return holder
             }
             TYPE_CHECK_BOX -> {
                 val view = LayoutInflater.from(context).inflate(R.layout.item_of_settings_checkbox, null)
-                val holder = CheckBoxItemHolder(view!!)
-                initAndSetCompoundButtonListener(holder, childItem)
+                holder = CheckBoxItemHolder(view)
+                initAndSetCompoundButtonListener()
                 return holder
             }
             TYPE_SINGLE -> {
                 val view = LayoutInflater.from(context).inflate(R.layout.item_of_settings_child, null)
-                val holder = ChildItemHolder(view!!)
-                initSingleDialog(holder, childItem)
+                holder = ChildItemHolder(view)
+                initSingleDialog()
                 return holder
             }
             TYPE_MULTI -> {
                 val view = LayoutInflater.from(context).inflate(R.layout.item_of_settings_child, null)
-                val holder = ChildItemHolder(view!!)
-                initMultiDialog(holder, childItem)
+                holder = ChildItemHolder(view)
+                initMultiDialog()
                 return holder
             }
             TYPE_NUMBER -> {
                 val view = LayoutInflater.from(context).inflate(R.layout.item_of_settings_child, null)
-                val holder = ChildItemHolder(view!!)
-                initNumberPickerDialog(holder, childItem)
+                holder = ChildItemHolder(view)
+                initNumberPickerDialog()
                 return holder
             }
             TYPE_INTENT -> {
                 val view = LayoutInflater.from(context).inflate(R.layout.item_of_settings_child, null)
-                val holder = ChildItemHolder(view!!)
-                initIntentItem(holder, childItem)
+                holder = ChildItemHolder(view)
+                initIntentItem()
+
                 return holder
             }
         }
-        return null
+        throw Exception("unknown type: ${settingItem.itemType}")
     }
 
-    private fun initIntentItem(holder: ChildItemHolder, item: SettingChildItem) {
-        setBasic(holder, item) {
-            (item.callback as CallbackOnSet<Any>?)?.invoke(ItemOperation(holder), Any())
+    private fun initIntentItem() {
+        setBasic {
+            (settingItem.callback as CallbackOnSet<Any>?)?.invoke(ItemOperation(this), Any())
         }
     }
 
-    private fun initAndSetInputListener(holder: ChildItemHolder, item: SettingChildItem) {
+    private fun initAndSetInputListener() {
         val sp = SpHelper(context)
-        val backSummary: String? = item.summary
-        val d = item.defaultValue.invoke() as String?
+        val backSummary: String? = settingItem.summary
+        val d = settingItem.defaultValue.invoke() as String?
         var prefill: String? = null
-        if (item.keyId == null) {
+        if (settingItem.keyId == null) {
             prefill = d
         } else {
-            sp.getString(item.keyId).also {
-                if (it != null && it != "") item.summary = it
+            sp.getString(settingItem.keyId).also {
+                if (it != null && it != "") settingItem.summary = it
                 prefill = it
             }
         }
@@ -110,25 +118,25 @@ class SettingItemHelper(val context: Context) {
 //            ?: d.let { if (it == null || it == "") item.summary else it }
 //        else d.let { if (it == null || it == "") item.summary else it }
 //        val prefill = if (item.keyId != null) sp.getString(item.keyId)
-        setBasic(holder, item) {
-            MaterialDialog(context).title(text = item.title()).input(prefill = prefill) { d, c ->
+        setBasic {
+            MaterialDialog(context).title(text = settingItem.title()).input(prefill = prefill) { d, c ->
                 Vog.d("initAndSetInputListener ---> $c")
                 val s = c.toString()
-                item.summary = s
-                if ((item.callback as CallbackOnSet<String>?)?.invoke(ItemOperation(holder), s) != false) {
-                    if (item.keyId != null) {
-                        AppConfig.set(item.keyId, s)
+                settingItem.summary = s
+                if ((settingItem.callback as CallbackOnSet<String>?)?.invoke(ItemOperation(this), s) != false) {
+                    settingItem.keyId?.also {
+                        AppConfig.set(settingItem.keyId, s)
                     }
                 }
-                setBasic(holder, item)
+                setBasic()
             }.show {
                 positiveButton()
                 neutralButton(text = "清空") {
-                    if (item.keyId != null) {
-                        AppConfig.set(item.keyId, null)
+                    if (settingItem.keyId != null) {
+                        AppConfig.set(settingItem.keyId, null)
                     }
-                    item.summary = backSummary
-                    setBasic(holder, item)
+                    settingItem.summary = backSummary
+                    setBasic()
                 }
                 negativeButton()
             }
@@ -145,18 +153,15 @@ class SettingItemHelper(val context: Context) {
     }
 
     /**
-     *
-     * @param holder ChildItemHolder
-     * @param item SettingChildItem
      * @param lis View.OnClickListener
      */
-    private fun setBasic(holder: ChildItemHolder, item: SettingChildItem, lis: OnClick? = null) {
-        holder.titleView.text = item.title()
-        if (item.summary == null) {
+    fun setBasic(lis: OnClick? = null) {
+        holder.titleView.text = settingItem.title()
+        if (settingItem.summary == null) {
             holder.summaryView.visibility = View.GONE
         } else {
             holder.summaryView.visibility = View.VISIBLE
-            holder.summaryView.text = item.summary
+            holder.summaryView.text = settingItem.summary
         }
 
         if (lis != null)
@@ -167,69 +172,82 @@ class SettingItemHelper(val context: Context) {
 
     /**
      *
-     * @param holder SwitchItemHolder
-     * @param item SettingsActivity.SettingChildItem
-     * @param withoutSp Boolean
      */
-    private fun initAndSetCompoundButtonListener(holder: CompoundItemHolder, item: SettingChildItem) {
-        setBasic(holder, item) { holder.compoundWight.toggle() }
+    private fun initAndSetCompoundButtonListener() {
+        val item = settingItem
+        val holder = holder as CompoundItemHolder
+        setBasic { holder.compoundWight.toggle() }
 
         if (item.keyId != null) {
             val sp = SpHelper(context)
             val b = sp.getBoolean(item.keyId, item.defaultValue.invoke() as Boolean)
             holder.compoundWight.isChecked = b
             holder.compoundWight.setOnCheckedChangeListener { _, isChecked ->
-                if ((item.callback as CallbackOnSet<Boolean>?)?.invoke(ItemOperation(holder), isChecked) != false) {
+                if ((item.callback as CallbackOnSet<Boolean>?)?.invoke(ItemOperation(this), isChecked) != false) {
                     AppConfig.set(item.keyId, isChecked)
                 }
             }
         } else {//withoutSp
             holder.compoundWight.isChecked = item.defaultValue.invoke() as Boolean? ?: false
             holder.compoundWight.setOnCheckedChangeListener { _, isChecked ->
-                (item.callback as CallbackOnSet<Boolean>?)?.invoke(ItemOperation(holder), isChecked)
+                (item.callback as CallbackOnSet<Boolean>?)?.invoke(ItemOperation(this), isChecked)
             }
         }
     }
 
     /**
-     *
-     * @param holder ChildItemHolder
-     * @param item SettingChildItem
+     * 单选框初始化index
+     * 支持key 保存String 和 index
+     * @return Int
      */
-    private fun initSingleDialog(holder: ChildItemHolder, item: SettingChildItem) {
-        val sp = SpHelper(context)
-
-        var initPos = if (item.keyId != null) {
-            val v = sp.getString(item.keyId)
+    private fun getInitPos(): Int {
+        val item = settingItem
+        val default = item.defaultValue.invoke() as Int? ?: 0
+        item.summary = item.items?.get(default)
+        val key = item.key
+        key ?: return default
+        if (AppConfig.contains(key)) {
             val entity = context.resources.getStringArray(item.entityArrId!!)
-            if (v != null) {
+            return try {
+                val v = AppConfig.getString(key)
                 item.summary = v
                 entity.indexOf(v)
-            } else 0
-        } else {
-            val i = item.defaultValue.invoke() as Int? ?: 0
-            item.summary = item.items?.get(i)
-            i
+            } catch (e: Exception) {//保存值为int
+                val index = AppConfig.getInt(key, 0)
+                item.summary = entity[index]
+                index
+            }
         }
+        return default
+    }
+
+    /**
+     * 初始化单选对话框
+     */
+    private fun initSingleDialog() {
+        val item = settingItem
+
         val items =
             if (item.keyId != null) {
                 if (item.entityArrId != null)
                     context.resources.getStringArray(item.entityArrId).asList()
-                else item.items
-            } else item.items
+                else item.items!!
+            } else item.items!!
 
-        setBasic(holder, item) {
+        items[getInitPos()]?.also {
+            item.summary = it
+        }
+        setBasic {
             MaterialDialog(context)
                     .title(text = item.title())
-                    .listItemsSingleChoice(items = items, initialSelection = initPos) { _, i, t ->
-                        if ((item.callback as CallbackOnSet<Pair<Int, String>>?)?.invoke(ItemOperation(holder), Pair(i, t)) != false) {
+                    .listItemsSingleChoice(items = items, initialSelection = getInitPos()) { _, i, t ->
+                        if ((item.callback as CallbackOnSet<Pair<Int, String>>?)?.invoke(ItemOperation(this), Pair(i, t)) != false) {
                             if (item.keyId != null) {
-                                sp.set(item.keyId, t)
+                                AppConfig.set(item.keyId, t)
                                 loadConfigInCacheThread()
                             }
                             item.summary = t
-                            setBasic(holder, item)
-                            initPos = i
+                            setBasic()
                         }
                     }.show()
         }
@@ -241,34 +259,34 @@ class SettingItemHelper(val context: Context) {
      * @param item SettingChildItem
      */
     @Deprecated("unused")
-    private fun initMultiDialog(holder: ChildItemHolder, item: SettingChildItem) {
+    private fun initMultiDialog() {
+        val item = settingItem
         val sp = SpHelper(context)
 //        val entity = context.resources.getStringArray(item.entityArrId!!)
 //
 //        val v = if (item.keyId != null) sp.getString(item.keyId) else item.defaultValue.invoke()
 
-        setBasic(holder, item)
+        setBasic()
 
         MaterialDialog(context).title(text = item.title())
                 .listItemsMultiChoice(item.entityArrId) { _, _, ts ->
-                    if ((item.callback as CallbackOnSet<List<String>>?)?.invoke(ItemOperation(holder), ts) != false) {
+                    if ((item.callback as CallbackOnSet<List<String>>?)?.invoke(ItemOperation(this), ts) != false) {
                         if (item.keyId != null) {
                             sp.set(item.keyId, ts)
                             loadConfigInCacheThread()
                         }
                         item.summary = ts.toString()
-                        setBasic(holder, item)
+                        setBasic()
                     }
                     // callback
                 }.show()
     }
 
     /**
-     *
-     * @param holder ChildItemHolder
-     * @param item SettingChildItem
+     * 初始化 数字选择器
      */
-    private fun initNumberPickerDialog(holder: ChildItemHolder, item: SettingChildItem) {
+    private fun initNumberPickerDialog() {
+        val item = settingItem
         val sp = SpHelper(context)
         var old = if (item.keyId == null) item.defaultValue.invoke() as Int
         else sp.getInt(item.keyId)
@@ -278,17 +296,17 @@ class SettingItemHelper(val context: Context) {
         } else
             item.summary = old.toString()
 
-        setBasic(holder, item) {
+        setBasic {
             val vv = buildNumberPickerView(item.range!!, old)
             MaterialDialog(context).title(text = item.title())
                     .customView(null, vv.first)
                     .positiveButton {
-                        if ((item.callback as CallbackOnSet<Int>?)?.invoke(ItemOperation(holder), old) != false) {
+                        if ((item.callback as CallbackOnSet<Int>?)?.invoke(ItemOperation(this), old) != false) {
                             item.summary = old.toString()
                             if (item.keyId != null) {
                                 AppConfig.set(item.keyId, old)
                             }
-                            setBasic(holder, item)
+                            setBasic()
                         }
                     }
                     .negativeButton()

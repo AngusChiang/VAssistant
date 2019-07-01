@@ -36,7 +36,8 @@ class SettingsExpandableAdapter(val context: Context,
             childHolders.put(i, arrayOfNulls(getChildrenCount(i)))
         }
 
-        expView.setOnGroupCollapseListener { gPos ->//child item 立即消失
+        expView.setOnGroupCollapseListener { gPos ->
+            //child item 立即消失
             //收缩
             animationHelper.init()
             getDy(gPos).let {
@@ -61,7 +62,7 @@ class SettingsExpandableAdapter(val context: Context,
                         }
                 }
                 groupHolders[gPos]!!.downIcon.animate().rotation(0f).setDuration(200).start()
-            }catch (e: Exception) {
+            } catch (e: Exception) {
                 GlobalLog.err(e)
             }
         }
@@ -166,7 +167,7 @@ class SettingsExpandableAdapter(val context: Context,
         var firLoad = true
         if (view == null) {
             val c = getChild(groupPosition, childPosition)
-            val holder = SettingItemHelper(context).fill(c)!!
+            val holder = SettingItemHelper(context, c).fill()
             childHolders[groupPosition][childPosition] = holder
             view = holder.itemView
             animationHelper.fromT2B(view, childPosition)

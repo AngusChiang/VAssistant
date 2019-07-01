@@ -8,18 +8,19 @@ import android.os.Handler
 import android.view.View
 import android.widget.TextView
 import cn.vove7.common.accessibility.AccessibilityApi
+import cn.vove7.common.app.AppConfig
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.appbus.AppBus
 import cn.vove7.common.bridges.RootHelper
 import cn.vove7.common.bridges.SystemBridge
+import cn.vove7.common.model.UserInfo
 import cn.vove7.common.utils.ThreadPool
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.activities.base.ReturnableActivity
 import cn.vove7.jarvis.adapters.SettingsExpandableAdapter
 import cn.vove7.jarvis.receivers.PowerEventReceiver
 import cn.vove7.jarvis.services.MainService
-import cn.vove7.common.app.AppConfig
 import cn.vove7.jarvis.tools.ShortcutUtil
 import cn.vove7.jarvis.tools.Tutorials
 import cn.vove7.jarvis.tools.UriUtils
@@ -46,9 +47,8 @@ class SettingsActivity : ReturnableActivity() {
         try {
             expandableListView?.post {
                 expandableListView.apply {
+                    expandGroup(0)
                     expandGroup(1)
-                    expandGroup(2)
-                    expandGroup(3)
                 }
             }
         } catch (e: Exception) {
@@ -72,6 +72,19 @@ class SettingsActivity : ReturnableActivity() {
 //
 //            )),
             SettingGroupItem(R.color.indigo_700, titleS = "语音识别", childItems = listOf(
+
+                    SingleChoiceItem(title = "语音引擎", summary = "语音识别/唤醒/合成引擎",
+                            keyId = cn.vove7.common.R.string.key_speech_engine_type,
+                            entityArrId = R.array.list_speech_engine, defaultValue = { AppConfig.speechEngineType }) { o, it ->
+                        if (it.first == 1 && !UserInfo.isPermanentVip()) {
+                            GlobalApp.toastInfo("永久会员才可用讯飞引擎")
+                            return@SingleChoiceItem false
+                        } else {
+                            storeIndexOnSingleChoiceItem(o, it)
+                        }
+                        false
+                    },
+
                     SwitchItem(title = "长语音模式", summary = "开启后，唤醒后可连续说出命令\n可以通过按音量下键终止\n" +
                             "会占用麦克风",
                             keyId = R.string.key_lasting_voice_command, defaultValue = { AppConfig.lastingVoiceCommand }),

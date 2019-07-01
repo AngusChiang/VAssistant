@@ -2,7 +2,9 @@ package cn.vove7.jarvis.view
 
 import android.support.annotation.ArrayRes
 import android.widget.CompoundButton
+import cn.vove7.common.app.AppConfig
 import cn.vove7.common.app.GlobalApp
+import cn.vove7.common.app.set
 import cn.vove7.jarvis.view.tools.SettingItemHelper
 
 /**
@@ -24,30 +26,32 @@ const val TYPE_INTENT = 9
 
 /**
  * 返回结果用于是否设置
+ * 返回false 不进行自动处理
  */
 typealias CallbackOnSet<T> = (ItemOperation, T) -> Boolean
 
 /**
  * SettingChildItem 操作
- * @property holder ChildItemHolder
  * @property summary String?
  * @property title String?
  * @property isChecked Boolean?
  * @property compoundWight CompoundButton?
  * @constructor
  */
-class ItemOperation(val holder: SettingItemHelper.ChildItemHolder) {
+class ItemOperation(val itemHelper: SettingItemHelper) {
     var summary: String? = null
-        get() = holder.summaryView.text.toString()
+        get() = itemHelper.holder.summaryView.text.toString()
         set(value) {
-            holder.summaryView.text = value
+            itemHelper.holder.summaryView.text = value
             field = value
         }
 
+    val keyId get() = itemHelper.settingItem.keyId
+
     var title: String? = null
-        get() = holder.titleView.text.toString()
+        get() = itemHelper.holder.titleView.text.toString()
         set(value) {
-            holder.titleView.text = value
+            itemHelper.holder.titleView.text = value
             field = value
         }
 
@@ -58,8 +62,10 @@ class ItemOperation(val holder: SettingItemHelper.ChildItemHolder) {
             field = value
         }
 
+
     private val compoundWight: CompoundButton?
         get() {
+            val holder = itemHelper.holder
             return if (holder is SettingItemHelper.CompoundItemHolder)
                 holder.compoundWight
             else null
@@ -104,6 +110,8 @@ open class SettingChildItem(
 
         return ".."
     }
+
+    val key: String? get() = keyId?.let { GlobalApp.getString(it) }
 }
 
 //val reloadConfig: CallbackOnSet = { _, _ ->
@@ -152,6 +160,14 @@ class SingleChoiceItem(
         callback: CallbackOnSet<Pair<Int, String>>? = null
 ) : SettingChildItem(titleId, title, summary, TYPE_SINGLE, keyId, defaultValue,
         entityArrId = entityArrId, callback = callback, items = items)
+
+val storeIndexOnSingleChoiceItem: CallbackOnSet<Pair<Int, String>> = { io, it ->
+    io.keyId?.also { ki ->
+        AppConfig.set(ki, it.first)
+        io.summary = it.second
+    }
+    false
+}
 
 class IntentItem(titleId: Int? = null,
                  title: String? = null,

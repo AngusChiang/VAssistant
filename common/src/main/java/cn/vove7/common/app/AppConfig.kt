@@ -20,12 +20,16 @@ import cn.vove7.common.utils.ThreadPool.runOnCachePool
 import cn.vove7.common.utils.ThreadPool.runOnPool
 import cn.vove7.common.utils.runOnUi
 import cn.vove7.common.utils.secure.SecuritySharedPreference
-import cn.vove7.smartkey.BaseConfig
+import cn.vove7.smartkey.android.AndroidSettings
 import cn.vove7.smartkey.android.noCacheKey
 import cn.vove7.smartkey.annotation.Config
+import cn.vove7.smartkey.key.SmartKey
+import cn.vove7.smartkey.key.get
+import cn.vove7.smartkey.key.set
 import cn.vove7.vtp.log.Vog
 import cn.vove7.vtp.sharedpreference.SpHelper
 import com.google.gson.Gson
+import com.russhwolf.settings.Settings
 import com.umeng.analytics.MobclickAgent
 import org.jsoup.Jsoup
 import java.io.File
@@ -40,7 +44,7 @@ import java.util.*
  * 2018/9/16
  */
 @Config(BuildConfig.CONFIG_NAME)
-object AppConfig : BaseConfig {
+object AppConfig : Settings by SmartKey.getSettings(BuildConfig.CONFIG_NAME) {
     //key... value
 
     var speechEngineType: Int by noCacheKey(0, keyId = R.string.key_speech_engine_type)
@@ -379,14 +383,6 @@ object AppConfig : BaseConfig {
     }
 
     val sp: SpHelper by lazy { SpHelper(GlobalApp.APP) }
-    private fun getBooleanAndInit(keyId: Int, default: Boolean = false): Boolean {
-        return if (sp.containsKey(keyId)) {
-            sp.getBoolean(keyId)
-        } else {
-            sp.set(keyId, default)
-            default
-        }
-    }
 
     val versionName: String
         get() {
@@ -566,7 +562,13 @@ object AppConfig : BaseConfig {
         ssp.edit().putString(key, "$today|$v").apply()
     }
 
-    fun a() {
+}
 
-    }
+@Suppress("UNCHECKED_CAST")
+fun <T> Settings.get(keyId: Int, defaultValue: T?, cls: Class<*>, encrypt: Boolean = false): T? {
+    return get(AndroidSettings.s(keyId), defaultValue, cls, encrypt)
+}
+
+fun <T> Settings.set(keyId: Int, value: T?, encrypt: Boolean = false) {
+    set(AndroidSettings.s(keyId), value, encrypt)
 }
