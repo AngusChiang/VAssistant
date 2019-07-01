@@ -26,7 +26,6 @@ import cn.vove7.common.appbus.AppBus.ACTION_STOP_VOICE_WAKEUP_WITHOUT_NOTIFY
 import cn.vove7.common.appbus.AppBus.ACTION_STOP_WAKEUP
 import cn.vove7.common.appbus.AppBus.ACTION_STOP_WAKEUP_TIMER
 import cn.vove7.common.appbus.AppBus.ACTION_STOP_WAKEUP_WITHOUT_SWITCH
-import cn.vove7.common.appbus.AppBus.EVENT_FORCE_OFFLINE
 import cn.vove7.common.appbus.AppBus.EVENT_START_DEBUG_SERVER
 import cn.vove7.common.appbus.AppBus.EVENT_STOP_DEBUG_SERVER
 import cn.vove7.common.bridges.ChoiceData
@@ -65,6 +64,7 @@ import cn.vove7.jarvis.speech.baiduspeech.BaiduSpeechSynService
 import cn.vove7.jarvis.speech.xunfei.XunfeiSpeechRecogService
 import cn.vove7.jarvis.speech.xunfei.XunfeiSpeechSynService
 import cn.vove7.jarvis.tools.DataCollector
+import cn.vove7.jarvis.tools.AppLogic
 import cn.vove7.jarvis.tools.debugserver.RemoteDebugServer
 import cn.vove7.jarvis.tools.setFloat
 import cn.vove7.jarvis.view.dialog.MultiChoiceDialog
@@ -141,9 +141,13 @@ class MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
     /**
      * 加载语音识别/合成服务
      */
-    fun loadSpeechService(type: Int? = null) {
-        unloadSpeechService()
-        when (type ?: AppConfig.speechEngineType) {
+    fun loadSpeechService(type: Int? = null, notify: Boolean = false) {
+        val st = if (type == 1 && !AppLogic.canXunfei()) 0
+        else type ?: AppConfig.speechEngineType
+
+        val loaded = releaseSpeechService()
+
+        when (st) {
             0 -> {//百度
                 speechRecogService = BaiduSpeechRecogService(RecogEventListener())
                 speechSynService = BaiduSpeechSynService(SynthesisEventListener())
@@ -157,12 +161,17 @@ class MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
                 speechSynService = BaiduSpeechSynService(SynthesisEventListener())
             }
         }
-
+        if (loaded && notify) {
+            GlobalApp.toastInfo("重载语音引擎完成")
+        }
     }
 
-    private fun unloadSpeechService() {
+    private fun releaseSpeechService(): Boolean {
+        val load = speechRecogService != null
         speechRecogService?.release()
         speechSynService?.release()
+        if (load) sleep(1500)
+        return load
     }
 
     /**
@@ -443,10 +452,6 @@ class MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
     @Subscribe(threadMode = ThreadMode.BACKGROUND)
     fun onCommand(order: String) {//外部命令
         Vog.d("onCommand ---> $order")
-        if (order == EVENT_FORCE_OFFLINE) {
-            AppConfig.logout()
-            return
-        }
         if (!speechEngineLoaded) {
             GlobalApp.toastWarning("引擎未就绪")
             return

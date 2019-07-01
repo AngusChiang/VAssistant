@@ -14,13 +14,13 @@ import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.appbus.AppBus
 import cn.vove7.common.bridges.RootHelper
 import cn.vove7.common.bridges.SystemBridge
-import cn.vove7.common.model.UserInfo
 import cn.vove7.common.utils.ThreadPool
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.activities.base.ReturnableActivity
 import cn.vove7.jarvis.adapters.SettingsExpandableAdapter
 import cn.vove7.jarvis.receivers.PowerEventReceiver
 import cn.vove7.jarvis.services.MainService
+import cn.vove7.jarvis.tools.AppLogic
 import cn.vove7.jarvis.tools.ShortcutUtil
 import cn.vove7.jarvis.tools.Tutorials
 import cn.vove7.jarvis.tools.UriUtils
@@ -68,19 +68,19 @@ class SettingsActivity : ReturnableActivity() {
     }
 
     private fun initData(): List<SettingGroupItem> = listOf(
-//            SettingGroupItem(R.color.google_blue, "辅助应用", childItems = listOf(
-//
-//            )),
             SettingGroupItem(R.color.indigo_700, titleS = "语音识别", childItems = listOf(
-
-                    SingleChoiceItem(title = "语音引擎", summary = "语音识别/唤醒/合成引擎",
+                    SingleChoiceItem(title = "语音引擎", summary = "语音识别/唤醒/合成引擎\n切换后，若需设置语音合成，请重新进入此页面",
                             keyId = cn.vove7.common.R.string.key_speech_engine_type,
                             entityArrId = R.array.list_speech_engine, defaultValue = { AppConfig.speechEngineType }) { o, it ->
-                        if (it.first == 1 && !UserInfo.isPermanentVip()) {
-                            GlobalApp.toastInfo("永久会员才可用讯飞引擎")
+                        if (it.first == 1 && !AppLogic.canXunfei()) {
+                            GlobalApp.toastInfo("永久会员才可使用讯飞引擎", 1)
                             return@SingleChoiceItem false
                         } else {
                             storeIndexOnSingleChoiceItem(o, it)
+                            GlobalApp.toastInfo("切换语音引擎...")
+                            ThreadPool.runOnCachePool {
+                                MainService.instance?.loadSpeechService(it.first, true)
+                            }
                         }
                         false
                     },

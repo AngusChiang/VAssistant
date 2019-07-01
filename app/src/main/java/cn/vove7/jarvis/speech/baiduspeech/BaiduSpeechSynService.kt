@@ -188,12 +188,6 @@ class BaiduSpeechSynService(event: SyntheEvent) : SpeechSynService(event) {
         return true
     }
 
-    override fun reloadStreamType() {
-        val currentStreamType = AppConfig.currentStreamType
-        Vog.d("reloadStreamType ---> $currentStreamType")
-        setAudioStream(currentStreamType)
-    }
-
     /**
      * [AudioManager]
      * @param type Int

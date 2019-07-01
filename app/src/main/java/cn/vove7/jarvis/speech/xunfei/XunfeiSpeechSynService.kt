@@ -22,6 +22,7 @@ class XunfeiSpeechSynService(event: SyntheEvent) : SpeechSynService(event) {
     override val enableOffline: Boolean = false
 
     override fun setAudioStream(type: Int) {
+        mTts.setParameter(SpeechConstant.STREAM_TYPE, type.toString())
     }
 
     override fun release() {
@@ -39,7 +40,7 @@ class XunfeiSpeechSynService(event: SyntheEvent) : SpeechSynService(event) {
     override fun init() {
         SpeechUtility.createUtility(context, SpeechConstant.APPID +"=5d0f2ed4")
         mTts = SpeechSynthesizer.createSynthesizer(context) {
-            GlobalLog.err("讯飞初语音合成始化失败：$it")
+            GlobalLog.log("讯飞初语音合成始化：$it")
         }
     }
 
@@ -49,10 +50,6 @@ class XunfeiSpeechSynService(event: SyntheEvent) : SpeechSynService(event) {
 
     override fun doResume() {
         mTts.resumeSpeaking()
-    }
-
-    override fun reloadStreamType() {
-        mTts.setParameter(SpeechConstant.STREAM_TYPE, AppConfig.currentStreamType.toString())
     }
 }
 

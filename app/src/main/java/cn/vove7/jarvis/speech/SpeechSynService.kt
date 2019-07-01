@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.pm.PackageManager
 import android.support.v4.app.ActivityCompat
 import android.util.Pair
+import cn.vove7.common.app.AppConfig
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.utils.runOnNewHandlerThread
 
@@ -61,7 +62,9 @@ abstract class SpeechSynService(val event: SyntheEvent) {
         doResume()
     }
 
-    abstract fun reloadStreamType()
+    fun reloadStreamType() {
+        setAudioStream(AppConfig.currentStreamType)
+    }
 
 
     fun speak(text: String?) {

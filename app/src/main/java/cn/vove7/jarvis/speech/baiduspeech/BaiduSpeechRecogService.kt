@@ -27,7 +27,7 @@ class BaiduSpeechRecogService(event: RecogEvent) : SpeechRecogService(event) {
      * 识别控制器，使用MyRecognizer控制识别的流程
      */
     private val myRecognizer: MyRecognizer by lazy {
-        MyRecognizer(GlobalApp.APP, listener)
+        MyRecognizer(GlobalApp.APP, SpeechStatusListener(handler))
     }
 
     override val wakeupI: WakeupI by lazy {
@@ -52,9 +52,6 @@ class BaiduSpeechRecogService(event: RecogEvent) : SpeechRecogService(event) {
             startWakeUp()
         }
     }
-
-    val listener: SpeechStatusListener by lazy { SpeechStatusListener(handler) }
-
 
     private fun recogParams(silent: Boolean) = mutableMapOf<String, Any>(
             SpeechConstant.ACCEPT_AUDIO_DATA to false,

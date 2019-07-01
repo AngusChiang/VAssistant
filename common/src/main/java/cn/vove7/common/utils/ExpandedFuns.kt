@@ -57,10 +57,8 @@ fun runInCatch(log: Boolean = false, block: () -> Unit) {
     try {
         block.invoke()
     } catch (e: Throwable) {
-        e.log()
-        if (log) {
-            GlobalLog.err(e)
-        }
+        if (log) e.log()
+        else e.printStackTrace()
     }
 }
 

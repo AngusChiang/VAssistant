@@ -101,24 +101,31 @@ class SettingItemHelper(
         }
     }
 
-    private fun initAndSetInputListener() {
-        val sp = SpHelper(context)
-        val backSummary: String? = settingItem.summary
+    private fun getPrefill() :String?{
         val d = settingItem.defaultValue.invoke() as String?
-        var prefill: String? = null
+        var prefill: String? = d
         if (settingItem.keyId == null) {
             prefill = d
         } else {
-            sp.getString(settingItem.keyId).also {
-                if (it != null && it != "") settingItem.summary = it
-                prefill = it
+            val key = settingItem.key?:return d
+
+            if(key in AppConfig) {
+                AppConfig.getString(key).also {
+                    if (it != "") settingItem.summary = it
+                    prefill = it
+                }
             }
         }
-//        item.summary = if (item.keyId != null) sp.getString(item.keyId)
-//            ?: d.let { if (it == null || it == "") item.summary else it }
-//        else d.let { if (it == null || it == "") item.summary else it }
-//        val prefill = if (item.keyId != null) sp.getString(item.keyId)
+        return prefill
+    }
+    private fun initAndSetInputListener() {
+        val backSummary: String? = settingItem.summary
+
+        //初始化summary
+        getPrefill()
+
         setBasic {
+            val prefill = getPrefill()
             MaterialDialog(context).title(text = settingItem.title()).input(prefill = prefill) { d, c ->
                 Vog.d("initAndSetInputListener ---> $c")
                 val s = c.toString()
@@ -238,9 +245,13 @@ class SettingItemHelper(
             item.summary = it
         }
         setBasic {
+            val init = getInitPos()
             MaterialDialog(context)
                     .title(text = item.title())
-                    .listItemsSingleChoice(items = items, initialSelection = getInitPos()) { _, i, t ->
+                    .listItemsSingleChoice(items = items, initialSelection = init) { _, i, t ->
+                        //选择
+                        if(i == init) return@listItemsSingleChoice
+
                         if ((item.callback as CallbackOnSet<Pair<Int, String>>?)?.invoke(ItemOperation(this), Pair(i, t)) != false) {
                             if (item.keyId != null) {
                                 AppConfig.set(item.keyId, t)
