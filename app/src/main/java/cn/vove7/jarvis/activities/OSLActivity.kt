@@ -19,8 +19,11 @@ class OSLActivity : OneFragmentActivity() {
 
     class ListFragment : SimpleListFragment<OslItem>() {
 
-        override fun unification(it: OslItem): ListViewModel<OslItem> {
-            return ListViewModel(it.name, it.desc.let { s -> if (s == "") it.url else s }, extra = it)
+        override fun unification(data: OslItem): ListViewModel<OslItem> {
+            return ListViewModel(data.name, data.desc.let { s ->
+                if (s.isNullOrEmpty()) data.url
+                else s
+            }, extra = data)
         }
 
         override val itemClickListener: SimpleListAdapter.OnItemClickListener<OslItem> =
@@ -39,13 +42,13 @@ class OSLActivity : OneFragmentActivity() {
                     , OslItem("OkHttp", "https://github.com/square/okhttp", "HTTP is the way modern applications network. It’s how we exchange data & media. Doing HTTP efficiently makes your stuff load faster and saves bandwidth.")
                     , OslItem("Gson", "https://github.com/google/gson", "Gson is a Java library that can be used to convert Java Objects into their JSON representation. It can also be used to convert a JSON string to an equivalent Java object. Gson can work with arbitrary Java objects including pre-existing objects that you do not have source-code of.")
                     , OslItem("AndroLua", "https://github.com/L-JINBIN/AndroidLua", "AndroLua is the Lua interpreter ported to the Android platform.")
-                    , OslItem("AndroLua_pro", "https://github.com/nirenr/AndroLua_pro", "")
-                    , OslItem("rhino-android", "https://github.com/F43nd1r/rhino-android", "")
+                    , OslItem("AndroLua_pro", "https://github.com/nirenr/AndroLua_pro")
+                    , OslItem("rhino-android", "https://github.com/F43nd1r/rhino-android")
                     , OslItem("VTP", "https://github.com/Vove7/VTP", "个人开发工具包")
                     , OslItem("SmartKey", "https://github.com/Vove7/SmartKey", "利用Kotlin委托实现优雅地持久化存储App配置。")
-                    , OslItem("Material Dialogs", "https://github.com/afollestad/material-dialogs", "")
-                    , OslItem("DiscreteSeekBar", "https://github.com/AnderWeb/discreteSeekBar", "")
-                    , OslItem("AndroidDonate", "https://github.com/didikee/AndroidDonate", "")
+                    , OslItem("Material Dialogs", "https://github.com/afollestad/material-dialogs")
+                    , OslItem("DiscreteSeekBar", "https://github.com/AnderWeb/discreteSeekBar")
+                    , OslItem("AndroidDonate", "https://github.com/didikee/AndroidDonate")
                     , OslItem("CodeView", "https://github.com/Thereisnospon/CodeView")
                     , OslItem("Jsoup", "https://jsoup.org/", "jsoup is a Java library for working with real-world HTML. It provides a very convenient API for extracting and manipulating data, using the best of DOM, CSS, and jquery-like methods.")
                     , OslItem("TapTargetView", "https://github.com/KeepSafe/TapTargetView", "")
