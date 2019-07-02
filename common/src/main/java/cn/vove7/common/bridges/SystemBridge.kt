@@ -1140,7 +1140,7 @@ object SystemBridge : SystemOperation {
      * @param pkg String
      */
     override fun killApp(pkg: String): Boolean {
-        return if (RootHelper.isRoot()) {
+        return if (RootHelper.hasRoot()) {
             killAppByRoot(pkg)
         } else killAppByAS(pkg)
     }

@@ -12,12 +12,14 @@ import cn.vove7.common.accessibility.viewnode.ViewNode
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.appbus.AppBus
+import cn.vove7.common.bridges.RootHelper
 import cn.vove7.common.datamanager.parse.model.ActionScope
 import cn.vove7.common.model.RequestPermission
 import cn.vove7.common.utils.ThreadPool
 import cn.vove7.common.utils.whileWaitTime
 import cn.vove7.vtp.app.AppInfo
 import cn.vove7.vtp.log.Vog
+import cn.vove7.vtp.runtimepermission.PermissionUtils
 import java.util.concurrent.ConcurrentSkipListSet
 
 /**
@@ -115,9 +117,36 @@ abstract class AccessibilityApi : AccessibilityService() {
 
 
         /**
-         * 执行开启无障碍,需要系统App权限
+         * @return 是否成功
          */
-        fun openServiceSelf() {
+        fun openServiceSelf(): Boolean {
+            val s: String
+            val b = if (RootHelper.hasRoot()) {
+                s = ("使用Root权限")
+                RootHelper.openSelfAccessService()
+            } else if (canWriteSecureSettings()) {
+                s = ("使用WRITE_SECURE_SETTINGS权限")
+                openServiceBySettings()
+            } else {
+                s = "无任何权限"
+                false
+            }
+            val msg = "$s 无障碍开启${if (b) "成功" else "失败"}"
+            if (b) GlobalLog.log(msg)
+            else GlobalLog.err(msg)
+            return b
+        }
+
+        private fun canWriteSecureSettings(): Boolean {
+            return PermissionUtils.isAllGranted(GlobalApp.APP,
+                    arrayOf("android.permission.WRITE_SECURE_SETTINGS"))
+        }
+
+        /**
+         * 执行开启无障碍,需要系统App权限
+         * @return Boolean
+         */
+        private fun openServiceBySettings(): Boolean {
             val context = GlobalApp.APP
             var enabledServicesSetting = Settings.Secure.getString(
                     context.contentResolver, Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES)
@@ -128,10 +157,15 @@ abstract class AccessibilityApi : AccessibilityService() {
                     !enabledServicesSetting.contains(flattenToString)) {
                 enabledServicesSetting += flattenToString
             }
-            Settings.Secure.putString(context.contentResolver,
-                    Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES, enabledServicesSetting)
-            Settings.Secure.putInt(context.contentResolver,
-                    Settings.Secure.ACCESSIBILITY_ENABLED, 1)
+            try {
+                Settings.Secure.putString(context.contentResolver,
+                        Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES, enabledServicesSetting)
+                Settings.Secure.putInt(context.contentResolver,
+                        Settings.Secure.ACCESSIBILITY_ENABLED, 1)
+                return true
+            } catch (e: Throwable) {
+                return false
+            }
         }
 
 

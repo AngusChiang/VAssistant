@@ -150,8 +150,7 @@ class EditorFunsHelper(
                 )),
                 ApiCategory("安卓Runtime", listOf(//指令设置
                         ApiFunction("exec(cmd)", "执行终端命令，返回String", "androRuntime.exec()"),
-                        ApiFunction("isRoot()", "获取设备是否Root，返回Boolean", "androRuntime.isRoot()"),
-                        ApiFunction("requestRoot()", "请求Root权限，返回Boolean", "androRuntime.requestRoot()"),
+                        ApiFunction("hasRoot()", "获取设备是否Root，返回Boolean", "androRuntime.hasRoot()"),
                         ApiFunction("execWithSu(cmd)", "执行root命令，返回String", "androRuntime.execWithSu()")
 
                 )),

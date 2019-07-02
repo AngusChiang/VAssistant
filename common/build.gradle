@@ -85,6 +85,8 @@ dependencies {
     api project(path: ':umlib')
 
     api 'com.github.Vove7.SmartKey:smartkey-android:6.0.4'
+
+    api files('libs/RootShell.aar')
 }
 
 

@@ -245,13 +245,13 @@ class SettingsActivity : ReturnableActivity() {
             SettingGroupItem(R.color.lime_600, titleId = R.string.text_other, childItems = listOf(
                     SingleChoiceItem(title = "翻译主语言", entityArrId = R.array.list_translate_languages,
                             keyId = R.string.key_translate_languages),
-                    CheckBoxItem(title = "自动开启无障碍服务", summary = "App启动时自动开启无障碍服务，需要root支持，或者转为系统应用",
+                    CheckBoxItem(title = "自动开启无障碍服务", summary = "App启动时自动开启无障碍服务，需要root支持，或者使用ADB授予WRITE_SECURE_SETTINGS权限（方法见常见问题）",
                             keyId = R.string.key_auto_open_as_with_root, defaultValue = false)
                     { _, b ->
                         if (b) ThreadPool.runOnPool {
                             if (AccessibilityApi.isBaseServiceOn)
                                 return@runOnPool
-                            RootHelper.openSelfAccessService()
+                            AccessibilityApi.openServiceSelf()
                         }
                         return@CheckBoxItem true
                     },

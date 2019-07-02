@@ -60,7 +60,7 @@ object AppConfig : Settings by SmartKey.getSettings(BuildConfig.CONFIG_NAME) {
     //语音唤醒
     var voiceWakeup by noCacheKey(false, keyId = R.string.key_open_voice_wakeup)
 
-    var autoOpenASWithRoot by noCacheKey(false, keyId = R.string.key_auto_open_as_with_root)
+    var autoOpenAS by noCacheKey(false, keyId = R.string.key_auto_open_as_with_root)
     var userExpPlan by noCacheKey(true, keyId = R.string.key_user_exp_plan)
     var isAutoVoiceWakeupCharging by noCacheKey(false, keyId = R.string.key_auto_open_voice_wakeup_charging)
 

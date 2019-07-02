@@ -6,6 +6,7 @@ import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.bridges.RootHelper
 import cn.vove7.jarvis.R
 import cn.vove7.common.app.AppConfig
+import cn.vove7.common.app.GlobalLog
 import cn.vove7.vtp.log.Vog
 import java.io.DataOutputStream
 import java.io.IOException
@@ -28,9 +29,9 @@ fun openAccessibilityServiceAuto() {
         Vog.d("", "openAccessibilityService ---> 打开无障碍 as SYS_APP")
         AccessibilityApi.openServiceSelf()
     } else */
-    if (AppConfig.autoOpenASWithRoot) {
-        Vog.d("打开无障碍 as su")
-        RootHelper.openSelfAccessService()
+    if (AppConfig.autoOpenAS) {
+        GlobalLog.log("自启打开无障碍服务")
+        AccessibilityApi.openServiceSelf()
     }
 }
 

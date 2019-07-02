@@ -1,4 +1,4 @@
-
+WRITE_SETTINGS 开启无障碍
 
 适配讯飞语音识别
 

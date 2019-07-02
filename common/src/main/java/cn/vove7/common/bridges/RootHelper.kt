@@ -6,6 +6,7 @@ import android.view.accessibility.AccessibilityManager
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.app.GlobalLog
 import cn.vove7.vtp.log.Vog
+import com.stericson.RootShell.RootShell
 import java.io.DataInputStream
 import java.io.DataOutputStream
 
@@ -13,28 +14,12 @@ import java.io.DataOutputStream
  *
  */
 object RootHelper {
-    private var mHaveRoot = false
 
     /**
-     * 判断机器Android是否已经root，即是否获取root权限
+     * 判断即是否授予root权限
      */
-    fun isRoot(): Boolean {
-        if (!mHaveRoot) {
-            mHaveRoot = (execSuSilent("echo su") != -1).also {
-                Vog.d("isRoot ---> ${if (it) "have" else "didn't"} root")
-            } // 通过执行测试命令来检测
-        } else {
-            Vog.d("isRoot ---> have root")
-        }
-        return mHaveRoot
-    }
+    fun hasRoot(): Boolean = RootShell.isAccessGiven()
 
-    /**
-     * 申请root权限
-     */
-    fun requestRoot(): Boolean {
-        return isRoot()
-    }
 
     /**
      * 执行无root命令
@@ -119,22 +104,26 @@ object RootHelper {
     }
 
     @Synchronized
-    fun openSelfAccessService() {
+    fun openSelfAccessService(): Boolean {
 //        AccessibilityApi.openServiceSelf()
-        openAppAccessService(GlobalApp.APP.packageName,
+        return openAppAccessService(GlobalApp.APP.packageName,
                 "cn.vove7.jarvis.services.MyAccessibilityService")
     }
 
-    fun openAppAccessService(pkg: String, serviceName: String) {
+    fun openAppAccessService(pkg: String, serviceName: String): Boolean {
+        if (!RootHelper.hasRoot()) return false
         Vog.d("openAppAccessService ---> $serviceName")
         //同时不关闭其他
         try {
             execWithSu(buildList("$pkg/$serviceName"))
+            return true
         } catch (e: Exception) {
             GlobalLog.err(e.message)
             GlobalApp.toastError("无障碍自动开启失败")
+            return false
+        } finally {
+            Vog.d("openAppAccessService ---> 申请结束")
         }
-        Vog.d("openAppAccessService ---> 申请结束")
     }
 
     private fun buildList(s: String): String {
