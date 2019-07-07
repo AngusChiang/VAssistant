@@ -95,6 +95,7 @@ abstract class SpeechSynService(val event: SyntheEvent) {
             event.onUserInterrupt(text)
         if (speaking)
             event.onFinish(text)
+        doStop()
         speaking = false
         speakingText = null
     }
