@@ -4,63 +4,6 @@
     package="cn.vove7.jarvis">
 
     <!-- 语音识别 -->
-    <uses-permission android:name="android.permission.VIBRATE" />
-    <uses-permission android:name="android.permission.RECORD_AUDIO" />
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
-    <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.BROADCAST_STICKY" />
-    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
-    <uses-permission android:name="android.permission.USE_FINGERPRINT" /> <!-- 闪光灯，相机 -->
-    <uses-permission android:name="android.permission.FLASHLIGHT" />
-    <uses-permission android:name="android.permission.CAMERA" />
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" /> <!-- 设置勿扰 -->
-    <uses-permission android:name="android.permission.ACCESS_NOTIFICATION_POLICY" />
-
-    <uses-feature android:name="android.hardware.camera" />
-    <uses-feature android:name="android.hardware.autofocus" /> <!-- 悬浮窗 -->
-    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" /> <!-- 拨打电话 -->
-    <uses-permission android:name="android.permission.CALL_PHONE" /> <!-- 联系人 -->
-    <uses-permission android:name="android.permission.READ_CONTACTS" />
-    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
-    <uses-permission android:name="android.permission.BLUETOOTH" />
-    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
-    <uses-permission android:name="android.permission.WAKE_LOCK" />
-    <uses-permission android:name="android.permission.INSTALL_SHORTCUT" />
-    <uses-permission android:name="android.permission.UNINSTALL_SHORTCUT" />
-    <uses-permission android:name="com.android.alarm.permission.SET_ALARM" />
-    <uses-permission android:name="android.permission.WRITE_CALENDAR" />
-    <uses-permission android:name="android.permission.READ_CALENDAR" />
-    <!-- ??? -->
-    <permission
-        android:name="android.permission.INTERACT_ACROSS_USERS_FULL"
-        android:protectionLevel="signature" />
-
-    <uses-permission android:name="android.permission.DISABLE_KEYGUARD" />
-    <uses-permission android:name="android.permission.WAKE_LOCK" />
-    <!--解锁监听-->
-    <uses-permission android:name="android.permission.RECEIVE_USER_PRESENT" />
-    <uses-feature
-        android:name="android.hardware.bluetooth_le"
-        android:required="true" />
-
-    <!--ArgusAPM-->
-    <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
-    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
-    <uses-permission android:name="android.permission.BATTERY_STATS" />
-    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-
-    <!--adb授权，开启无障碍-->
-    <uses-permission android:name="android.permission.WRITE_SECURE_SETTINGS"
-        tools:ignore="ProtectedPermissions" />
     <application
         android:name=".App"
         android:allowBackup="true"
@@ -72,31 +15,6 @@
         android:supportsRtl="true"
         android:theme="@style/NoActionBar"
         tools:ignore="GoogleAppIndexingWarning">
-
-        <meta-data
-            android:name="com.baidu.speech.APP_ID"
-            android:value="10922901" />
-        <meta-data
-            android:name="com.baidu.speech.API_KEY"
-            android:value="xwzlOfIIysRN7IDdcjA823ZS" />
-        <meta-data
-            android:name="com.baidu.speech.SECRET_KEY"
-            android:value="d9ef661698c5d8cd45978aa55e600e03" />
-
-        <provider
-            android:name="android.support.v4.content.FileProvider"
-            android:authorities="${applicationId}.fileprovider"
-            android:exported="false"
-            android:grantUriPermissions="true">
-            <meta-data
-                android:name="android.support.FILE_PROVIDER_PATHS"
-                android:resource="@xml/file_paths" />
-        </provider>
-
-        <!--<provider-->
-        <!--android:name="com.argusapm.android.core.storage.ApmProvider"-->
-        <!--android:authorities="${applicationId}.apm.storage"-->
-        <!--android:exported="false" />-->
 
         <activity android:name=".activities.VoiceTestActivity" />
         <activity
@@ -112,7 +30,7 @@
             </intent-filter>
             <!-- <meta-data android:name="android.app.shortcuts" -->
             <!-- android:resource="@xml/shortcuts" /> -->
-        </activity> <!-- <activity android:name=".activities.MainActivity" /> -->
+        </activity>
         <activity
             android:name=".activities.base.CreateShortcutActivity"
             android:exported="true"
@@ -154,96 +72,35 @@
                 android:resource="@mipmap/ic_launcher_vassist" />
         </activity>
 
-        <service
-            android:name=".services.MyAccessibilityService"
-            android:label="@string/base_acc_service_label"
-            android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE">
-            <intent-filter>
-                <action android:name="android.accessibilityservice.AccessibilityService" />
-            </intent-filter>
-
-            <meta-data
-                android:name="android.accessibilityservice"
-                android:resource="@xml/base_accessibility_config" />
-        </service>
-
-        <service
-            android:name=".services.GestureService"
-            android:description="@string/desc_gesc_accessibility"
-            android:label="@string/gesture_acc_service_label"
-            android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE">
-            <intent-filter>
-                <action android:name="android.accessibilityservice.AccessibilityService" />
-            </intent-filter>
-
-            <meta-data
-                android:name="android.accessibilityservice"
-                android:resource="@xml/gesture_accessibility_config" />
-        </service>
-
-        <service
-            android:name="com.baidu.speech.VoiceRecognitionService"
-            android:exported="false" />
-        <service
-            android:name=".services.AssistSessionService"
-            android:permission="android.permission.BIND_VOICE_INTERACTION">
-            <meta-data
-                android:name="android.voice_interaction"
-                android:resource="@xml/assist_service" />
-            <meta-data
-                android:name="com.android.systemui.action_assist_icon"
-                android:resource="@mipmap/ic_launcher_vassist" />
-
-            <intent-filter>
-                <action android:name="android.service.voice.VoiceInteractionService" />
-            </intent-filter>
-        </service>
-        <service
-            android:name=".services.VoiceWpTileService"
-            android:icon="@drawable/ic_hearing"
-            android:label="@string/text_voice_wp"
-            android:permission="android.permission.BIND_QUICK_SETTINGS_TILE">
-            <intent-filter>
-                <action android:name="android.service.quicksettings.action.QS_TILE" />
-            </intent-filter>
-        </service>
-
-        <!--助手应用/语音输入 ？ What feature-->
-        <service
-            android:name=".services.VoiceInputService"
-            android:exported="true"
-            android:label="@string/app_name"
-            android:permission="android.permission.BIND_VOICE_INTERACTION">
-            <intent-filter>
-                <action android:name="android.speech.RecognitionService" />
-
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
-            <meta-data
-                android:name="android.speech"
-                android:resource="@xml/recognizer" />
-        </service>
+        <!--<provider-->
+        <!--android:name="com.argusapm.android.core.storage.ApmProvider"-->
+        <!--android:authorities="${applicationId}.apm.storage"-->
+        <!--android:exported="false" />-->
 
         <activity
             android:name=".activities.PermissionManagerActivity"
             android:label="@string/text_permission_manager" />
         <activity
             android:name=".activities.InstManagerActivity"
-            android:windowSoftInputMode="adjustPan" />
+            android:windowSoftInputMode="adjustPan" /> <!-- <activity android:name=".activities.MainActivity" /> -->
         <activity
             android:name=".activities.SettingsActivity"
             android:label="@string/title_activity_settings"
             android:theme="@style/AppTheme" />
+
         <activity
             android:name=".activities.InAppInstActivity"
             android:label="@string/text_cmd_in_app" />
+
         <activity
             android:name=".activities.NewInstActivity"
             android:launchMode="singleTop"
             android:windowSoftInputMode="adjustPan" />
+
         <activity
             android:name=".activities.WelcomeActivity"
             android:launchMode="singleTop" />
+
         <activity android:name=".activities.MarkedManagerActivity" />
         <activity android:name=".activities.AppAdListActivity" />
         <activity
@@ -251,14 +108,19 @@
             android:excludeFromRecents="false"
             android:label="@string/text_advanced_features"
             android:theme="@style/AppTheme" />
+
         <activity
             android:name=".activities.AboutActivity"
             android:label="@string/text_about"
             android:theme="@style/AppTheme" />
+
+
+        <!--助手应用/语音输入 ？ What feature-->
         <activity
             android:name=".activities.HelpActivity"
             android:label="@string/text_help"
             android:theme="@style/AppTheme" />
+
         <activity
             android:name=".activities.base.LaboratoryActivity"
             android:label="@string/text_laboratory"
@@ -301,8 +163,6 @@
             android:excludeFromRecents="true"
             android:launchMode="singleInstance"
             android:theme="@style/ScreenShotTheme" />
-
-        <!--屏幕助手-->
         <activity
             android:name=".activities.screenassistant.ScreenAssistActivity"
             android:excludeFromRecents="true"
@@ -315,9 +175,6 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
-
-
-        <!--屏幕助手api-->
         <activity
             android:name=".activities.TextOcrActivity"
             android:excludeFromRecents="true"
@@ -330,20 +187,17 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
-
         <activity
             android:name=".activities.screenassistant.ScreenShareActivity"
             android:exported="true"
             android:label="屏幕助手-截屏分享"
             android:theme="@style/ScreenPicker" />
-
         <activity
             android:name=".activities.ScreenPickerActivity"
             android:exported="true"
             android:label="屏幕助手-文字提取"
             android:launchMode="singleInstance"
             android:theme="@style/ScreenPicker" />
-
         <activity
             android:name=".activities.screenassistant.QrCodeActivity"
             android:exported="true"
@@ -351,8 +205,8 @@
             android:launchMode="singleInstance"
             android:theme="@style/ScreenPicker">
             <intent-filter>
-                <category android:name="android.intent.category.DEFAULT" />
                 <action android:name="SCAN_QR_CODE" />
+                <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
         <activity
@@ -362,14 +216,199 @@
             android:launchMode="singleInstance"
             android:theme="@style/ScreenPicker">
             <intent-filter>
-                <category android:name="android.intent.category.DEFAULT" />
                 <action android:name="SCREEN_SPOT" />
+                <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
         <activity
             android:name=".activities.CodeViewActivity"
-            android:theme="@style/AppTheme"
-            android:label="查看代码" />
+            android:label="查看代码"
+            android:theme="@style/AppTheme" />
+
+        <activity
+            android:name=".activities.screenassistant.ScreenOcrActivity"
+            android:exported="true"
+            android:label="屏幕助手-文字识别"
+            android:launchMode="singleInstance"
+            android:theme="@style/ScreenPicker" />
+
+        <meta-data
+            android:name="com.baidu.speech.APP_ID"
+            android:value="10922901" />
+        <meta-data
+            android:name="com.baidu.speech.API_KEY"
+            android:value="xwzlOfIIysRN7IDdcjA823ZS" />
+        <meta-data
+            android:name="com.baidu.speech.SECRET_KEY"
+            android:value="d9ef661698c5d8cd45978aa55e600e03" />
+
+        <!--屏幕助手-->
+        <provider
+            android:name="android.support.v4.content.FileProvider"
+            android:authorities="${applicationId}.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths" />
+        </provider>
+
+
+        <!--屏幕助手api-->
+        <service
+            android:name=".services.MyAccessibilityService"
+            android:label="@string/base_acc_service_label"
+            android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE">
+            <intent-filter>
+                <action android:name="android.accessibilityservice.AccessibilityService" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.accessibilityservice"
+                android:resource="@xml/base_accessibility_config" />
+        </service>
+
+        <service
+            android:name=".services.GestureService"
+            android:description="@string/desc_gesc_accessibility"
+            android:label="@string/gesture_acc_service_label"
+            android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE">
+            <intent-filter>
+                <action android:name="android.accessibilityservice.AccessibilityService" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.accessibilityservice"
+                android:resource="@xml/gesture_accessibility_config" />
+        </service>
+
+        <service
+            android:name="com.baidu.speech.VoiceRecognitionService"
+            android:exported="false" />
+
+        <service
+            android:name=".services.AssistSessionService"
+            android:permission="android.permission.BIND_VOICE_INTERACTION">
+            <intent-filter>
+                <action android:name="android.service.voice.VoiceInteractionService" />
+            </intent-filter>
+            <meta-data
+                android:name="com.android.systemui.action_assist_icon"
+                android:resource="@mipmap/ic_launcher_vassist" />
+
+            <meta-data
+                android:name="android.voice_interaction"
+                android:resource="@xml/assist_service" />
+        </service>
+        <service
+            android:name=".services.VoiceWpTileService"
+            android:icon="@drawable/ic_hearing"
+            android:label="@string/text_voice_wp"
+            android:permission="android.permission.BIND_QUICK_SETTINGS_TILE">
+            <intent-filter>
+                <action android:name="android.service.quicksettings.action.QS_TILE" />
+            </intent-filter>
+        </service>
+        <service
+            android:name=".services.ScreenAssistantTileService"
+            android:icon="@drawable/ic_tile_screen_assistant"
+            android:label="@string/label_screen_assistant"
+            android:permission="android.permission.BIND_QUICK_SETTINGS_TILE">
+            <intent-filter>
+                <action android:name="android.service.quicksettings.action.QS_TILE" />
+            </intent-filter>
+        </service>
+        <service
+            android:name=".services.ScreenTextPickTileService"
+            android:icon="@drawable/ic_twotone_text_box"
+            android:label="文字提取"
+            android:permission="android.permission.BIND_QUICK_SETTINGS_TILE">
+            <intent-filter>
+                <action android:name="android.service.quicksettings.action.QS_TILE" />
+            </intent-filter>
+        </service>
+        <service
+            android:name=".services.QrCodeTileService"
+            android:icon="@drawable/ic_twotone_qr_code"
+            android:label="二维码识别"
+            android:permission="android.permission.BIND_QUICK_SETTINGS_TILE">
+            <intent-filter>
+                <action android:name="android.service.quicksettings.action.QS_TILE" />
+            </intent-filter>
+        </service>
+
+        <service
+            android:name=".services.VoiceInputService"
+            android:exported="true"
+            android:label="@string/app_name"
+            android:permission="android.permission.BIND_VOICE_INTERACTION">
+            <intent-filter>
+                <action android:name="android.speech.RecognitionService" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+            <meta-data
+                android:name="android.speech"
+                android:resource="@xml/recognizer" />
+        </service>
     </application>
+    <permission
+        android:name="android.permission.INTERACT_ACROSS_USERS_FULL"
+        android:protectionLevel="signature" />
+    <uses-feature android:name="android.hardware.camera" />
+    <uses-feature android:name="android.hardware.autofocus" />
+    <uses-feature
+        android:name="android.hardware.bluetooth_le"
+        android:required="true" />
+    <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.INTERNET" /> <!-- 闪光灯，相机 -->
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.BROADCAST_STICKY" /> <!-- 设置勿扰 -->
+    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
+
+    <uses-permission android:name="android.permission.USE_FINGERPRINT" />
+    <uses-permission android:name="android.permission.FLASHLIGHT" /> <!-- 悬浮窗 -->
+    <uses-permission android:name="android.permission.CAMERA" /> <!-- 拨打电话 -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" /> <!-- 联系人 -->
+    <uses-permission android:name="android.permission.ACCESS_NOTIFICATION_POLICY" />
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+    <uses-permission android:name="android.permission.CALL_PHONE" />
+    <uses-permission android:name="android.permission.READ_CONTACTS" />
+    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
+    <uses-permission android:name="android.permission.BLUETOOTH" />
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.INSTALL_SHORTCUT" />
+    <uses-permission android:name="android.permission.UNINSTALL_SHORTCUT" />
+    <!-- ??? -->
+    <uses-permission android:name="com.android.alarm.permission.SET_ALARM" />
+
+    <uses-permission android:name="android.permission.WRITE_CALENDAR" />
+    <uses-permission android:name="android.permission.READ_CALENDAR" />
+    <!--解锁监听-->
+    <uses-permission android:name="android.permission.DISABLE_KEYGUARD" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+
+    <!--ArgusAPM-->
+    <uses-permission android:name="android.permission.RECEIVE_USER_PRESENT" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.BATTERY_STATS" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+
+    <!--adb授权，开启无障碍-->
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission
+        android:name="android.permission.WRITE_SECURE_SETTINGS"
+        tools:ignore="ProtectedPermissions" />
 
 </manifest>

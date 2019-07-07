@@ -41,12 +41,13 @@ class ScreenAssistActivity : BaseActivity() {
     private lateinit var bottomController: AssistSessionGridController
 
     companion object {
-        fun createIntent(path: String? = null): Intent {
+        fun createIntent(path: String? = null, delayCapture: Boolean = false): Intent {
             return Intent(GlobalApp.APP.packageName + ".SCREEN_ASSIST").apply {
                 newTask()
                 path?.also {
                     putExtra("path", it)
                 }
+                putExtra("delay", delayCapture)
             }
         }
     }
@@ -152,7 +153,8 @@ class ScreenAssistActivity : BaseActivity() {
                 showProgressBar = false
                 afterHandleScreen()
             } else {
-                runOnNewHandlerThread {
+                val delay = getBooleanExtra("delay", false)
+                runOnNewHandlerThread(delay = if (delay) 1000 else 0) {
                     val path = SystemBridge.screenShot()?.let {
                         runOnUi {
                             //截完图显示面板

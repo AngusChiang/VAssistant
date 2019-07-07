@@ -11,8 +11,8 @@ android {
         applicationId "cn.vove7.vassistant"
         minSdkVersion 21
         targetSdkVersion 27
-        versionCode 151
-        versionName "1.9.1"
+        versionCode 152
+        versionName "1.9.2"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
         multiDexEnabled true
@@ -118,7 +118,7 @@ dependencies {
     implementation 'com.github.didikee:AndroidDonate:0.1.0'
 
     implementation 'com.github.Vove7:CodeView:1.0.2'
-    implementation 'com.github.Vove7:BottomDialog:1.5'
+    implementation 'com.github.Vove7:BottomDialog:1.7'
 
     implementation 'com.github.android-notes:Cockroach:0.0.5'
 

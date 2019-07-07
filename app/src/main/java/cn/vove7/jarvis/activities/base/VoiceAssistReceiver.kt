@@ -10,12 +10,9 @@ import cn.vove7.common.datamanager.DAO
 import cn.vove7.common.datamanager.parse.model.Action
 import cn.vove7.executorengine.parse.OpenAppAction
 import cn.vove7.jarvis.R
-import cn.vove7.jarvis.activities.screenassistant.QrCodeActivity
-import cn.vove7.jarvis.activities.screenassistant.ScreenAssistActivity
-import cn.vove7.jarvis.activities.screenassistant.ScreenShareActivity
-import cn.vove7.jarvis.activities.screenassistant.SpotScreenActivity
 import cn.vove7.jarvis.services.MainService
 import cn.vove7.common.app.AppConfig
+import cn.vove7.jarvis.activities.screenassistant.*
 import cn.vove7.vtp.log.Vog
 import java.lang.Thread.sleep
 import java.util.*
@@ -75,6 +72,9 @@ class VoiceAssistActivity : Activity() {
             SCREEN_ASSIST_SCREEN_SHARE -> {
                 startActivity(Intent(this, ScreenShareActivity::class.java))
             }
+            SCREEN_ASSIST_SCREEN_OCR -> {
+                startActivity(Intent(this, ScreenOcrActivity::class.java))
+            }
             else -> {
                 try {
                     val id = action!!.toLong()
@@ -108,6 +108,8 @@ class VoiceAssistActivity : Activity() {
         const val SCREEN_ASSIST_TEXT_PICKER = "screen_assist_text_picker"
         const val SCREEN_ASSIST_QR = "screen_assist_qr"
         const val SCREEN_ASSIST_SPOT_SCREEN = "screen_assist_spot_screen"
+        const val SCREEN_ASSIST_SCREEN_OCR = "screen_assist_screen_ocr"
+
         const val SCREEN_ASSIST_SCREEN_SHARE = "screen_assist_screen_share"
 
         const val WAKE_UP = "wakeup"

@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.speech.RecognizerIntent
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.activities.base.VoiceAssistActivity.Companion.SCREEN_ASSIST_QR
+import cn.vove7.jarvis.activities.base.VoiceAssistActivity.Companion.SCREEN_ASSIST_SCREEN_OCR
 import cn.vove7.jarvis.activities.base.VoiceAssistActivity.Companion.SCREEN_ASSIST_SCREEN_SHARE
 import cn.vove7.jarvis.activities.base.VoiceAssistActivity.Companion.SCREEN_ASSIST_SPOT_SCREEN
 import cn.vove7.jarvis.activities.base.VoiceAssistActivity.Companion.SCREEN_ASSIST_TEXT_PICKER
@@ -35,7 +36,8 @@ class CreateShortcutActivity : Activity() {
                         "文字提取",
                         "二维码识别",
                         "屏幕识别",
-                        "屏幕分享"
+                        "屏幕分享",
+                        "文字识别"
 //                        "语音搜索"
                 ), waitForPositiveButton = false) { d, i, text ->
                     when (i) {
@@ -47,6 +49,7 @@ class CreateShortcutActivity : Activity() {
                         5 -> create(SCREEN_ASSIST_QR, text)
                         6 -> create(SCREEN_ASSIST_SPOT_SCREEN, text)
                         7 -> create(SCREEN_ASSIST_SCREEN_SHARE, text)
+                        8 -> create(SCREEN_ASSIST_SCREEN_OCR, text)
 //                        3 -> createWebSearch()
                     }
                     d.dismiss()

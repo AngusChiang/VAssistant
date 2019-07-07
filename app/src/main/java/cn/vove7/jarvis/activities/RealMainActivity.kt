@@ -71,15 +71,17 @@ class RealMainActivity : BaseActivity() {
     }
 
 
-    private var firstIn = true
-    private var lastCheck = 0L
-
     override fun onResume() {
         super.onResume()
-        checkAppUpdate(this, false, onUpdate)
+        val now = System.currentTimeMillis()
+
+        if (now - lastCheckApp > 10 * 60000) {
+            checkAppUpdate(this, false, onUpdate)
+            lastCheckApp = now
+        }
+
         if (!firstIn) {
             //检查数据更新
-            val now = System.currentTimeMillis()
             if (now - lastCheck > 120000) {
                 checkDataUpdate()
                 if (AppConfig.autoCheckPluginUpdate)// 插件更新
@@ -99,6 +101,12 @@ class RealMainActivity : BaseActivity() {
         )
 
         var showUpdate = true//显示更新日志
+
+        private var firstIn = true
+
+        private var lastCheck = 0L
+
+        var lastCheckApp = 0L
 
         var inFlag by StubbornFlag(initValue = true, afterValue = false)
     }

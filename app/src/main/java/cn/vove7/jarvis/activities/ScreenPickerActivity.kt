@@ -60,7 +60,8 @@ class ScreenPickerActivity : Activity() {
             return
         }
 
-        runOnNewHandlerThread {
+        val delay = intent.getBooleanExtra("delay", false)
+        runOnNewHandlerThread(delay = if (delay) 1000 else 0) {
             ScreenTextFinder().findAll()
                     .forEach { viewNodeList.add(Model(it)) }
             Vog.d("onCreate ---> 提取数量 ${viewNodeList.size}")

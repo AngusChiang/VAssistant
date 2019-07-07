@@ -20,6 +20,7 @@ import cn.vove7.jarvis.BuildConfig
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.activities.base.ReturnableActivity
 import cn.vove7.jarvis.activities.screenassistant.QrCodeActivity
+import cn.vove7.jarvis.activities.screenassistant.ScreenOcrActivity
 import cn.vove7.jarvis.activities.screenassistant.ScreenShareActivity
 import cn.vove7.jarvis.activities.screenassistant.SpotScreenActivity
 import cn.vove7.jarvis.adapters.SettingsExpandableAdapter
@@ -248,6 +249,9 @@ class AdvancedSettingActivity : ReturnableActivity() {
                         },
                         IntentItem(title = "屏幕识别") {
                             startActivity(Intent(this, SpotScreenActivity::class.java))
+                        },
+                        IntentItem(title = "文字识别") {
+                            startActivity(Intent(this, ScreenOcrActivity::class.java))
                         }
                 )
                 ))

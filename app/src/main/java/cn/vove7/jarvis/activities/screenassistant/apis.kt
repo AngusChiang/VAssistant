@@ -14,6 +14,10 @@ import android.os.Bundle
 class SpotScreenActivity : BaseFunActivity() {
     override val id: Int = 0
 }
+//文字识别
+class ScreenOcrActivity : BaseFunActivity() {
+    override val id: Int = 1
+}
 
 class ScreenShareActivity : BaseFunActivity() {
     override val id: Int = 3
@@ -30,6 +34,7 @@ abstract class BaseFunActivity : Activity() {
         super.onCreate(savedInstanceState)
         startActivity(Intent(this, ScreenAssistActivity::class.java).also {
             it.putExtra("fun_id", id)
+            it.putExtras(intent)
         })
         finish()
     }
