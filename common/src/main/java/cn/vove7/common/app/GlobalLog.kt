@@ -1,6 +1,7 @@
 package cn.vove7.common.app
 
 import android.util.Log
+import cn.vove7.common.BuildConfig
 import cn.vove7.common.utils.StorageHelper
 import java.io.BufferedWriter
 import java.io.File
@@ -63,13 +64,18 @@ object GlobalLog {
     private fun write(level: Int, msg: String?) {
         synchronized<Unit>(logList) {
             clearIfNeed()
-            val pre = findCaller(3)?.let {
-                (it.methodName + "(" + it.fileName +
-                        ":" + it.lineNumber + ")")
+            val pre by lazy {
+                findCaller(3)?.let {
+                    (it.methodName + "(" + it.fileName +
+                            ":" + it.lineNumber + ")")
 
-            } ?: "find caller unsuccessfully"
-            val text = "$pre  >>  $msg"
+                } ?: "find caller unsuccessfully"
+            }
+            val text = if (BuildConfig.DEBUG) "$pre  >>  $msg"
+            else "$msg"
             logList.add(LogInfo(level, text))
+
+            if (!BuildConfig.DEBUG) return
             try {
                 when (level) {
                     LEVEL_INFO -> {

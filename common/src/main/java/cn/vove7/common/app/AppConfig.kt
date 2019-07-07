@@ -64,6 +64,8 @@ object AppConfig : Settings by SmartKey.getSettings(BuildConfig.CONFIG_NAME) {
     var userExpPlan by noCacheKey(true, keyId = R.string.key_user_exp_plan)
     var isAutoVoiceWakeupCharging by noCacheKey(false, keyId = R.string.key_auto_open_voice_wakeup_charging)
 
+    var xunfeiSpeechKey by noCacheKey("5d184fe9"/*"5c5437d6"*//*"5d0f2ed4"*/,R.string.key_xunfei_speech_key)
+
     var useSmartOpenIfParseFailed by noCacheKey(true, keyId = R.string.key_use_smartopen_if_parse_failed)
 
     // 云服务解析 无用
@@ -105,7 +107,9 @@ object AppConfig : Settings by SmartKey.getSettings(BuildConfig.CONFIG_NAME) {
 
     var homeFun: String = "" //长按HOME键功能
 
-    var userWakeupWord: String = ""//用户唤醒词
+    //用户唤醒词
+    var userWakeupWord by noCacheKey("",R.string.key_user_wakeup_word)
+
     //    var continuousDialogue = false//连续对话
     var finishWord: String? by noCacheKey(null, keyId = R.string.key_finish_word)
 
@@ -237,6 +241,7 @@ object AppConfig : Settings by SmartKey.getSettings(BuildConfig.CONFIG_NAME) {
 
     val context get() = GlobalApp.APP
     private val ssp: SecuritySharedPreference by lazy { SecuritySharedPreference(context, "xka", Context.MODE_PRIVATE) }
+
     /**
      * checkUserInfo完reload
      */
@@ -314,7 +319,7 @@ object AppConfig : Settings by SmartKey.getSettings(BuildConfig.CONFIG_NAME) {
      * 不规则配置：单选框
      */
     fun reload() {
-        userWakeupWord = sp.getString(R.string.key_user_wakeup_word) ?: ""
+
         synStreamIndex = sp.getString(R.string.key_stream_of_syn_output).let {
             Vog.d("reload ---> $it")
             if (it == null) 0

@@ -61,8 +61,6 @@ import cn.vove7.jarvis.chat.TulingChatSystem
 import cn.vove7.jarvis.speech.*
 import cn.vove7.jarvis.speech.baiduspeech.BaiduSpeechRecogService
 import cn.vove7.jarvis.speech.baiduspeech.BaiduSpeechSynService
-import cn.vove7.jarvis.speech.xunfei.XunfeiSpeechRecogService
-import cn.vove7.jarvis.speech.xunfei.XunfeiSpeechSynService
 import cn.vove7.jarvis.tools.DataCollector
 import cn.vove7.jarvis.tools.AppLogic
 import cn.vove7.jarvis.tools.debugserver.RemoteDebugServer
@@ -152,10 +150,10 @@ class MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
                 speechRecogService = BaiduSpeechRecogService(RecogEventListener())
                 speechSynService = BaiduSpeechSynService(SynthesisEventListener())
             }
-            1 -> {//讯飞
-                speechRecogService = XunfeiSpeechRecogService(RecogEventListener())
-                speechSynService = XunfeiSpeechSynService(SynthesisEventListener())
-            }
+//            1 -> {//讯飞
+//                speechRecogService = XunfeiSpeechRecogService(RecogEventListener())
+//                speechSynService = XunfeiSpeechSynService(SynthesisEventListener())
+//            }
             else -> {
                 speechRecogService = BaiduSpeechRecogService(RecogEventListener())
                 speechSynService = BaiduSpeechSynService(SynthesisEventListener())

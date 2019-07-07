@@ -55,6 +55,15 @@ abstract class SpeechRecogService(val event: RecogEvent) : SpeechRecogI {
 
     private val handlerThread by lazy { HandlerThread("recog") }
 
+    init {
+        runOnNewHandlerThread(delay = 500) {
+            //初始化语音唤醒器
+            if (AppConfig.voiceWakeup) {
+                startWakeUp()
+            }
+        }
+    }
+
     /**
      * 分发事件
      */

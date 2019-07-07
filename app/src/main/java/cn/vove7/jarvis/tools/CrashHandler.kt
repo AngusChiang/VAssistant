@@ -15,6 +15,7 @@ import cn.vove7.common.utils.formatNow
 import cn.vove7.jarvis.BuildConfig
 import cn.vove7.vtp.system.DeviceInfo
 import cn.vove7.vtp.system.SystemHelper
+import com.wanjian.cockroach.Cockroach
 import java.io.File
 
 /**
@@ -23,14 +24,21 @@ import java.io.File
  * @author Administrator
  * 9/25/2018
  */
-object CrashHandler {
+object CrashHandler : Cockroach.ExceptionHandler {
 
     val context: Context by lazy {
         GlobalApp.APP
     }
 
-    fun postException(e: Throwable?) {
-        e ?: return
+    override fun handlerException(thread: Thread?, throwable: Throwable?) {
+        throwable ?: return
+        GlobalApp.toastError("发生异常，可将[帮助/日志]发送进行反馈")
+        GlobalLog.log("发生异常 at $thread")
+        GlobalLog.err(throwable)
+        handler(throwable)
+    }
+
+    private fun handler(e: Throwable) {
         val headerInfo = SystemHelper.getDeviceInfo(context).string()
         val log = GlobalLog.toString()
         val errFile = Environment.getExternalStorageDirectory().absolutePath + "/crash.log"

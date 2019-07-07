@@ -69,21 +69,21 @@ class SettingsActivity : ReturnableActivity() {
 
     private fun initData(): List<SettingGroupItem> = listOf(
             SettingGroupItem(R.color.indigo_700, titleS = "语音识别", childItems = listOf(
-                    SingleChoiceItem(title = "语音引擎", summary = "语音识别/唤醒/合成引擎\n切换后，若需设置语音合成，请重新进入此页面",
-                            keyId = cn.vove7.common.R.string.key_speech_engine_type,
-                            entityArrId = R.array.list_speech_engine, defaultValue = { AppConfig.speechEngineType }) { o, it ->
-                        if (it.first == 1 && !AppLogic.canXunfei()) {
-                            GlobalApp.toastInfo("永久会员才可使用讯飞引擎", 1)
-                            return@SingleChoiceItem false
-                        } else {
-                            storeIndexOnSingleChoiceItem(o, it)
-                            GlobalApp.toastInfo("切换语音引擎...")
-                            ThreadPool.runOnCachePool {
-                                MainService.instance?.loadSpeechService(it.first, true)
-                            }
-                        }
-                        false
-                    },
+//                    SingleChoiceItem(title = "语音引擎", summary = "语音识别/唤醒/合成引擎\n切换后，若需设置语音合成，请重新进入此页面",
+//                            keyId = cn.vove7.common.R.string.key_speech_engine_type,
+//                            entityArrId = R.array.list_speech_engine, defaultValue = { AppConfig.speechEngineType }) { o, it ->
+//                        if (it.first == 1 && !AppLogic.canXunfei()) {
+//                            GlobalApp.toastInfo("永久会员才可使用讯飞引擎", 1)
+//                            return@SingleChoiceItem false
+//                        } else {
+//                            storeIndexOnSingleChoiceItem(o, it)
+//                            GlobalApp.toastInfo("切换语音引擎...")
+//                            ThreadPool.runOnCachePool {
+//                                MainService.instance?.loadSpeechService(it.first, true)
+//                            }
+//                        }
+//                        false
+//                    },
 
                     SwitchItem(title = "长语音模式", summary = "开启后，唤醒后可连续说出命令\n可以通过按音量下键终止\n" +
                             "会占用麦克风",
@@ -293,8 +293,7 @@ class SettingsActivity : ReturnableActivity() {
     }
 
     private fun setPathAndReload(path: String) {
-        SpHelper(this).set(R.string.key_wakeup_file_path, path)
-        AppConfig.reload()
+        AppConfig.wakeUpFilePath = path
         if (AppConfig.voiceWakeup) {
             GlobalApp.toastInfo("正在重载配置")
             Handler().postDelayed({

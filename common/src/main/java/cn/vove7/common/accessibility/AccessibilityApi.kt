@@ -157,14 +157,14 @@ abstract class AccessibilityApi : AccessibilityService() {
                     !enabledServicesSetting.contains(flattenToString)) {
                 enabledServicesSetting += flattenToString
             }
-            try {
+            return try {
                 Settings.Secure.putString(context.contentResolver,
                         Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES, enabledServicesSetting)
                 Settings.Secure.putInt(context.contentResolver,
                         Settings.Secure.ACCESSIBILITY_ENABLED, 1)
-                return true
+                true
             } catch (e: Throwable) {
-                return false
+                false
             }
         }
 

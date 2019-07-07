@@ -47,10 +47,6 @@ class BaiduSpeechRecogService(event: RecogEvent) : SpeechRecogService(event) {
                 }
             }
         }
-        //初始化语音唤醒器
-        if (AppConfig.voiceWakeup) {
-            startWakeUp()
-        }
     }
 
     private fun recogParams(silent: Boolean) = mutableMapOf<String, Any>(

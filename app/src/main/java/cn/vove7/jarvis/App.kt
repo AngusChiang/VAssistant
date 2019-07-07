@@ -44,12 +44,7 @@ class App : GlobalApp() {
             return
         }
 
-        Cockroach.install { thread, e ->
-            toastError("发生异常，可将[帮助/日志]发送进行反馈")
-            GlobalLog.log("发生异常 at $thread")
-            GlobalLog.err(e)
-            CrashHandler.postException(e)
-        }
+        Cockroach.install(CrashHandler)
 
         runOnNewHandlerThread("app_load") {
             if (AppConfig.FIRST_LAUNCH_NEW_VERSION || BuildConfig.DEBUG)

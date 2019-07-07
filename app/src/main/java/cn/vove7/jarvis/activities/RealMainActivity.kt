@@ -29,6 +29,11 @@ import kotlinx.android.synthetic.main.activity_real_main.*
 import kotlinx.android.synthetic.main.fragment_mine.*
 
 
+/**
+ *
+ * 初始化流程
+ *
+ */
 class RealMainActivity : BaseActivity() {
 
     private val fSwitcher = FragmentSwitcher(this, R.id.fragment)
@@ -49,6 +54,11 @@ class RealMainActivity : BaseActivity() {
         requestWindowFeature(Window.FEATURE_NO_TITLE)
         setContentView(R.layout.activity_real_main)
 
+        initView()
+        requestPermission()
+    }
+
+    private fun initView() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             window.decorView.systemUiVisibility =
                 View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN or
@@ -58,8 +68,6 @@ class RealMainActivity : BaseActivity() {
 
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener)
         navigation.selectedItemId = if (AppConfig.FIRST_LAUNCH_NEW_VERSION && inFlag) R.id.nav_home else R.id.nav_me
-
-        requestPermission()
     }
 
 
@@ -68,12 +76,12 @@ class RealMainActivity : BaseActivity() {
 
     override fun onResume() {
         super.onResume()
+        checkAppUpdate(this, false, onUpdate)
         if (!firstIn) {
             //检查数据更新
             val now = System.currentTimeMillis()
             if (now - lastCheck > 120000) {
                 checkDataUpdate()
-                checkAppUpdate(this, false, onUpdate)
                 if (AppConfig.autoCheckPluginUpdate)// 插件更新
                     DataUpdator.checkPluginUpdate()
                 lastCheck = now
@@ -137,23 +145,20 @@ class RealMainActivity : BaseActivity() {
         } else {
             runOnNewHandlerThread(delay = 2000) {
                 checkDataUpdate()
-                checkAppUpdate(this, false, onUpdate)
             }
         }
     }
 
     private val onUpdate: (Pair<String, String>?) -> Unit
-        get() = a@{ it ->
-            it ?: return@a
+        get() = a@{ hasUpdate ->
+            hasUpdate ?: return@a
             AppNotification.broadcastNotification(
-                    123, "发现新版本 ${it.first}",
+                    123, "发现新版本 ${hasUpdate.first}",
                     "查看更新日志",
                     (Intent(UtilEventReceiver.APP_HAS_UPDATE).apply {
-                        putExtra("version", it.first)
-                        putExtra("log", it.second)
+                        putExtra("version", hasUpdate.first)
+                        putExtra("log", hasUpdate.second)
                     })
             )
-
-
         }
 }

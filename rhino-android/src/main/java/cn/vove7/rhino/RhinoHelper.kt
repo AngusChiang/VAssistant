@@ -70,7 +70,7 @@ class RhinoHelper : ScriptableObject, ScriptEngine {
 
         RhinoApi().bind(global)
 
-        loadAsset("apis.js")
+        loadAsset("/rhino_require/apis.js")
         isInit = true
     }
 

@@ -1,6 +1,5 @@
 package cn.vove7.jarvis.tools
 
-import cn.vove7.common.BuildConfig
 import cn.vove7.common.model.UserInfo
 
 /**
@@ -16,7 +15,7 @@ object AppLogic {
      * @return Boolean
      */
     fun canXunfei(): Boolean {
-        return UserInfo.isPermanentVip() && !BuildConfig.DEBUG
+        return UserInfo.isPermanentVip()
     }
 
 }
