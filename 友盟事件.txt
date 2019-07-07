@@ -7,5 +7,8 @@ sa_6,保存截图,0
 voice_wakeup,语音唤醒,0
 wakeup,唤醒,0
 chat,对话次数,0
-
+to_gen_qr,文本操作-二维码生成,0
+to_split_words,文本操作-分词,0
+to_trans,文本操作-翻译,0
+to_search,文本操作-搜索,0
 

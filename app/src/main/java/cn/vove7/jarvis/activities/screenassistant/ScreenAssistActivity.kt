@@ -5,7 +5,6 @@ import android.app.Dialog
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.os.Environment
 import android.support.design.widget.BottomSheetBehavior
 import android.view.View
 import android.view.View.FIND_VIEWS_WITH_CONTENT_DESCRIPTION
@@ -248,15 +247,12 @@ class ScreenAssistActivity : BaseActivity() {
         showProgressBar = true
         runOnNewHandlerThread {
             try {
-                val path = Environment.getExternalStorageDirectory().absolutePath +
-                        "/Pictures/Screenshots/Screenshot_${formatNow("yyyyMMdd-HHmmss")}.jpg"
+                val f = File(StorageHelper.screenshotsPath,
+                        "Screenshot_${formatNow("yyyyMMdd-HHmmss")}.jpg")
 
-                val f = File(path)
                 File(screenPath).copyTo(f, true)
-
-                GlobalApp.APP.sendBroadcast(Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE,
-                        Uri.fromFile(f)))
-                GlobalApp.toastInfo("保存到 $path")
+                f.broadcastImageFiel()
+                GlobalApp.toastInfo("已保存")
             } catch (e: SecurityException) {
                 GlobalApp.toastError("保存失败：无存储权限")
             } catch (e: Exception) {
@@ -289,7 +285,8 @@ class ScreenAssistActivity : BaseActivity() {
                         finishIfNotShowing()
                     }
                     when {
-                        result.startsWith("http", ignoreCase = true) -> {
+                        result.startsWith("http", ignoreCase = true)
+                                || result.matches(".*?://.*".toRegex()) -> {
                             setNeutralButton("访问") { _, _ ->
                                 finish()
                                 SystemBridge.openUrl(result.substring(0, 5).toLowerCase() // 某些HTTP://

@@ -1,15 +1,12 @@
 package cn.vove7.jarvis.activities
 
 import android.app.Activity
-import android.graphics.Color
 import android.os.Bundle
-import android.os.Handler
 import android.view.Gravity
 import android.view.KeyEvent
-import android.view.View
 import android.widget.CheckedTextView
 import android.widget.RelativeLayout
-import android.widget.TextView
+import android.widget.Toast
 import cn.vove7.bottomdialog.BottomDialog
 import cn.vove7.common.accessibility.AccessibilityApi
 import cn.vove7.common.accessibility.viewnode.ViewNode
@@ -97,25 +94,7 @@ class ScreenPickerActivity : Activity() {
         }
         sp.set(Tutorials.screen_translate_tips, true)
 
-        val textView = TextView(this).apply {
-            text = "点按[音量下键]可以开启屏幕翻译"
-            textSize = 16f
-            gravity = Gravity.CENTER
-            setTextColor(Color.RED)
-            setBackgroundColor(Color.WHITE)
-            setPadding(10, 10, 10, 10)
-        }
-        val p = RelativeLayout.LayoutParams(
-                RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.WRAP_CONTENT)
-        p.topMargin = 20
-        textView.setOnClickListener {
-            textView.visibility = View.GONE
-        }
-        rootContent.addView(textView, p)
-
-        Handler().postDelayed({
-            textView.visibility = View.GONE
-        }, 5000)
+        GlobalApp.toastInfo("点按[音量下键]可以开启屏幕翻译", Toast.LENGTH_LONG)
     }
 
     private val statusbarHeight: Int by lazy {

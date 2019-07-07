@@ -7,13 +7,21 @@ import cn.vove7.bottomdialog.BottomDialog
 import cn.vove7.bottomdialog.builder.ButtonsBuilder
 import cn.vove7.bottomdialog.builder.buttons
 import cn.vove7.bottomdialog.builder.title
+import cn.vove7.bottomdialog.builder.withCloseIcon
 import cn.vove7.common.app.AppConfig
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.bridges.SystemBridge
+import cn.vove7.common.utils.StorageHelper
 import cn.vove7.common.utils.ThreadPool
+import cn.vove7.common.utils.broadcastImageFiel
+import cn.vove7.common.utils.runOnUi
 import cn.vove7.jarvis.R
+import cn.vove7.jarvis.tools.DataCollector
+import cn.vove7.jarvis.tools.QRTools
 import cn.vove7.jarvis.tools.baiduaip.BaiduAipHelper
+import cn.vove7.jarvis.view.dialog.contentbuilder.ImageContentBuilder
 import cn.vove7.jarvis.view.dialog.contentbuilder.WrappedTextContentBuilder
+import java.io.File
 
 /**
  * # TextOperationDialog
@@ -25,8 +33,7 @@ import cn.vove7.jarvis.view.dialog.contentbuilder.WrappedTextContentBuilder
  */
 class TextOperationDialog(val context: Activity, val textModel: TextModel) {
 
-    val bottomDialog
-            = BottomDialog.builder(context) {
+    val bottomDialog = BottomDialog.builder(context) {
 
         title("文字操作")
         buttons {
@@ -37,6 +44,7 @@ class TextOperationDialog(val context: Activity, val textModel: TextModel) {
             }
 
             neutralButton(text = "分词") {
+                DataCollector.buriedPoint("to_split_words")
                 WordSplitDialog(this@TextOperationDialog.context, textModel.text)
                 it.dismiss()
             }
@@ -62,6 +70,7 @@ class TextOperationDialog(val context: Activity, val textModel: TextModel) {
 
 
     private fun translate() {
+        DataCollector.buriedPoint("to_trans")
         AppConfig.haveTranslatePermission() ?: return
         ThreadPool.runOnCachePool {
             bottomDialog.updateContent<WrappedTextContentBuilder> {
@@ -105,16 +114,56 @@ class TextOperationDialog(val context: Activity, val textModel: TextModel) {
                         GlobalApp.toastInfo(R.string.text_copied)
                     }
                     "搜索" -> {
+                        DataCollector.buriedPoint("to_search")
                         SystemBridge.quickSearch(textModel.text)
                     }
                     "生成二维码" -> {
-                        //TODO
-                        GlobalApp.toastInfo(R.string.text_coming_soon)
+                        DataCollector.buriedPoint("to_gen_qr")
+                        QRTools.encode(textModel.text) { path, e ->
+                            if (path != null) {
+                                bottomDialog.dismiss()
+                                runOnUi {
+                                    showQrDialog(textModel.text, path)
+                                }
+                            } else {
+                                GlobalApp.toastError("生成失败\n${e?.message}")
+                            }
+                        }
                     }
                 }
                 true
             }
             show()
+        }
+    }
+
+    private fun showQrDialog(content: String, path: String) {
+        BottomDialog.builder(context) {
+            title("二维码")
+            withCloseIcon()
+            content(ImageContentBuilder()) {
+                init {
+                    loadFile(File(path))
+                }
+            }
+            buttons {
+                positiveButton("分享") {
+                    it.dismiss()
+                    SystemBridge.shareImage(path)
+                }
+                negativeButton("保存") {
+                    val targetFile = File(StorageHelper.picturesPath, System.currentTimeMillis().toString() + ".jpg")
+                    try {
+                        File(path).copyTo(targetFile, true)
+                        it.dismiss()
+                        GlobalApp.toastInfo("已保存到：${targetFile.absolutePath}")
+                        targetFile.broadcastImageFiel()
+                    } catch (e: Exception) {
+                        GlobalApp.toastError("保存失败：${e.message}")
+                    }
+                }
+                neutralButton("") {}
+            }
         }
     }
 

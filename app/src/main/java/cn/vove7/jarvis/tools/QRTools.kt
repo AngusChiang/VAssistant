@@ -7,13 +7,16 @@ import android.os.AsyncTask
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import cn.bingoogolapple.qrcode.core.BGAQRCodeUtil
-import cn.bingoogolapple.qrcode.zbar.ZBarView
+import cn.bingoogolapple.qrcode.zxing.QRCodeEncoder
+import cn.bingoogolapple.qrcode.zxing.ZXingView
 import cn.vove7.common.app.GlobalApp
+import cn.vove7.common.app.log
+import cn.vove7.common.bridges.UtilBridge
+import cn.vove7.common.utils.StorageHelper
+import cn.vove7.common.utils.ThreadPool
 import cn.vove7.jarvis.R
 import java.lang.Thread.sleep
 import java.lang.ref.WeakReference
-
-
 
 
 /**
@@ -37,8 +40,21 @@ object QRTools {
         ScanTask(BitmapFactory.decodeFile(path), a, onResult).perform()
     }
 
-    fun toFile(content:String) {
-//        val bitmap = QRCodeEncoder.syncEncodeQRCode("我爱你,我的祖国!", 400)
+    fun encode(content: String, onFinish: (String?, e: Throwable?) -> Unit) {
+        ThreadPool.runOnPool {
+            val bitmap = try {
+                QRCodeEncoder.syncEncodeQRCode(content, 400)
+            } catch (e: Exception) {
+                e.log()
+                onFinish.invoke(null, e)
+                null
+            }
+            if (bitmap != null) {
+                val tmpFile = StorageHelper.cacheDir + "/qrtmp.png"
+                UtilBridge.bitmap2File(bitmap, tmpFile)
+                onFinish.invoke(tmpFile, null)
+            } else onFinish.invoke(null, null)
+        }
     }
 }
 
@@ -103,7 +119,7 @@ class ScanTask : AsyncTask<Void, Void, String?> {
 }
 
 class MyBarView(context: Context?, attributeSet: AttributeSet?)
-    : ZBarView(context, attributeSet) {
+    : ZXingView(context, attributeSet) {
 
     fun process(bitmap: Bitmap): String? {
         val r = processBitmapData(bitmap)

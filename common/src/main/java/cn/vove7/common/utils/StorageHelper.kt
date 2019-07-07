@@ -1,6 +1,7 @@
 package cn.vove7.common.utils
 
 import android.os.Environment
+import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.app.GlobalLog
 import java.io.File
 
@@ -13,54 +14,36 @@ import java.io.File
 object StorageHelper {
     val sdPath get() = Environment.getExternalStorageDirectory().absolutePath
 
-    val storePath by lazy {
-        val p = sdPath + "/V Assist"
-        createDir(p)
-        p
-    }
+    val storePath: String
+        get() = "$sdPath/V Assist".also { createDir(it) }
+
+    val cacheDir: String get() = GlobalApp.APP.cacheDir.absolutePath
 
     /**
      * 数据备份目录
      */
-    val backupPath: String by lazy {
-        val p = "$storePath/backup"
-        createDir(p)
-        p
-    }
+    val backupPath: String get() = "$storePath/backup".also { createDir(it) }
 
     /**
      * 插件下载目录
      */
-    val pluginsPath: String by lazy {
-        val p = "$storePath/plugins"
-        createDir(p)
-        p
-    }
+    val pluginsPath: String get() = "$storePath/plugins".also { createDir(it) }
 
-    val logPath: String by lazy {
-        val p = "$storePath/log"
-        createDir(p)
-        p
-    }
+    val logPath: String get() = "$storePath/log".also { createDir(it) }
+
+    val picturesPath: String get() = "$sdPath/Pictures".also { createDir(it) }
+
+    val screenshotsPath: String get() = "$picturesPath/Screenshots".also { createDir(it) }
 
     /**
      * sp配置重定向目录
      */
-    val spPath: String by lazy {
-        val p = "$storePath/sp_config"
-        createDir(p)
-        p
-    }
+    val spPath: String get() = "$storePath/sp_config".also { createDir(it) }
 
     /**
      * 离线资源路径
      */
-    val offlineResPath: String by lazy {
-        val p = "$storePath/off_res"
-        createDir(p)
-        p
-    }
-
+    val offlineResPath: String get() = "$storePath/off_res".also { createDir(it) }
 
     private fun createDir(p: String) {
         File(p).apply {

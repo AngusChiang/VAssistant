@@ -8,6 +8,7 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.Rect
+import android.net.Uri
 import android.os.Build
 import android.os.Handler
 import android.os.HandlerThread
@@ -25,6 +26,7 @@ import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.app.log
 import cn.vove7.vtp.app.AppInfo
 import cn.vove7.vtp.log.Vog
+import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -458,3 +460,9 @@ open class AnimationListener {
 }
 
 fun EditText.content(): String = this.text.toString()
+
+
+fun File.broadcastImageFiel() {
+    GlobalApp.APP.sendBroadcast(Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE,
+            Uri.fromFile(this)))
+}

@@ -149,13 +149,13 @@ abstract class AccessibilityApi : AccessibilityService() {
         private fun openServiceBySettings(): Boolean {
             val context = GlobalApp.APP
             var enabledServicesSetting = Settings.Secure.getString(
-                    context.contentResolver, Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES)
+                    context.contentResolver, Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES) ?: ""
             val selfComponentName = ComponentName(context.packageName,
                     "cn.vove7.jarvis.services.MyAccessibilityService")
             val flattenToString = selfComponentName.flattenToString()
-            if (enabledServicesSetting == null ||
-                    !enabledServicesSetting.contains(flattenToString)) {
-                enabledServicesSetting += flattenToString
+
+            if (!enabledServicesSetting.contains(flattenToString)) {
+                enabledServicesSetting += ":$flattenToString"
             }
             return try {
                 Settings.Secure.putString(context.contentResolver,
