@@ -125,17 +125,16 @@ class BaiduSpeechSynService(event: SyntheEvent) : SpeechSynService(event) {
                             GlobalApp.toastError("语音合成引擎初始化失败")
                         }
                     }
-                    RELEASE -> releaseA()
-                    else -> {
-                    }
                 }
             }
         }
     }
 
     override fun release() {
-        runInHandlerThread(RELEASE)
+        mSpeechSynthesizer.stop()
+        mSpeechSynthesizer.release()
         hThread.quitSafely()
+        isInited = false
     }
 
     private fun runInHandlerThread(action: Int, obj: Any? = null) {
@@ -276,17 +275,10 @@ class BaiduSpeechSynService(event: SyntheEvent) : SpeechSynService(event) {
 //        mSpeechSynthesizer.setStereoVolume(leftVolume, rightVolume)
 //    }
 
-    private fun releaseA() {
-        mSpeechSynthesizer.stop()
-        mSpeechSynthesizer.release()
-        isInited = false
-    }
-
 
     companion object {
         private var isInited = false
         private const val INIT = 1
-        private const val RELEASE = 11
 
         const val VOICE_FEMALE = "0"
         const val VOICE_MALE = "1"
