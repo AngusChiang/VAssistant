@@ -46,6 +46,7 @@ class OSLActivity : OneFragmentActivity() {
                     , OslItem("rhino-android", "https://github.com/F43nd1r/rhino-android")
                     , OslItem("VTP", "https://github.com/Vove7/VTP", "个人开发工具包")
                     , OslItem("SmartKey", "https://github.com/Vove7/SmartKey", "利用Kotlin委托实现优雅地持久化存储App配置。")
+                    , OslItem("BottomDialog", "https://github.com/Vove7/BottomDialog", "高度自定义的底部对话框。")
                     , OslItem("Material Dialogs", "https://github.com/afollestad/material-dialogs")
                     , OslItem("DiscreteSeekBar", "https://github.com/AnderWeb/discreteSeekBar")
                     , OslItem("AndroidDonate", "https://github.com/didikee/AndroidDonate")
