@@ -33,7 +33,7 @@ class OfflineResource(private val voiceType: String) {
                 VOICE_DUXY -> "bd_etts_common_speech_yyjw_mand_eng_high_am-mix_v3.0.0_20170512.dat"
                 VOICE_DUYY -> "bd_etts_common_speech_as_mand_eng_high_am_v3.0.0_20170516.dat"
                 //other
-                else -> throw RuntimeException("离线合成发音人类型不支持：voiceType")
+                else -> throw RuntimeException("离线合成发音人类型不支持：$voiceType")
             }
             if (File(modelFile).exists()) {
                 return modelFile

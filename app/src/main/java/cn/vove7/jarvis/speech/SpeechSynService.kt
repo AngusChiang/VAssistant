@@ -68,6 +68,9 @@ abstract class SpeechSynService(val event: SyntheEvent) {
 
 
     fun speak(text: String?) {
+        if (speaking) {
+            stop(false)
+        }
         speaking = true//标志放此
         if (text == null) {
             event.onError(text)

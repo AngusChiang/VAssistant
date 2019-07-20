@@ -30,8 +30,8 @@ class BaiduSpeechSynService(event: SyntheEvent) : SpeechSynService(event) {
 
     private lateinit var mSpeechSynthesizer: SpeechSynthesizer
 
-    override val enableOffline: Boolean
-        get() = File("${StorageHelper.sdPath}/baiduTTS", "bd_etts_text.dat")
+    override var enableOffline: Boolean =
+        File("${StorageHelper.sdPath}/baiduTTS", "bd_etts_text.dat")
                 .exists()
 
     private var appId: String = BaiduKey.appId.toString()
@@ -105,6 +105,7 @@ class BaiduSpeechSynService(event: SyntheEvent) : SpeechSynService(event) {
             } catch (e: Exception) {
                 GlobalLog.log("语音合成离线资源加载失败：${e.message}")
                 e.log()
+                enableOffline = false
             }
         }
         Vog.d("合成参数：$params")

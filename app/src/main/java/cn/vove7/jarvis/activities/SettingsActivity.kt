@@ -211,7 +211,7 @@ class SettingsActivity : ReturnableActivity() {
                             defaultValue =
                             { 0 }, entityArrId = R.array.voice_model_entities, callback =
                     { h, i ->
-                        AppBus.post(AppBus.ACTION_RELOAD_SYN_CONF)
+                        AppBus.postDelay(AppBus.ACTION_RELOAD_SYN_CONF, 500)
                         return@SingleChoiceItem true
                     }),
                     NumberPickerItem(R.string.text_speak_speed, keyId = R.string.key_voice_syn_speed,
@@ -224,7 +224,8 @@ class SettingsActivity : ReturnableActivity() {
                     SingleChoiceItem(title = "音量输出", summary = "选择音量跟随\n可能重启App生效", keyId = R.string.key_stream_of_syn_output,
                             entityArrId = R.array.list_stream_syn_output, defaultValue = { 0 }
                     ) { _, b ->
-                        MainService.instance?.speechSynService?.reloadStreamType()
+                        AppBus.postDelay(AppBus.ACTION_RELOAD_SYN_CONF, 500)
+//                        MainService.instance?.speechSynService?.reloadStreamType()
                         return@SingleChoiceItem true
                     },
                     IntentItem(title = "试听") {

@@ -471,12 +471,12 @@ object SystemBridge : SystemOperation {
 
     }
 
-    override var musicMaxVolume: Int = -1
+    override val musicMaxVolume: Int
         get() {
             val mAudioManager = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
             return mAudioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC)
         }
-    override var musicCurrentVolume: Int = -1
+    override val musicCurrentVolume: Int
         get() {
             val mAudioManager = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
             return mAudioManager.getStreamVolume(AudioManager.STREAM_MUSIC)

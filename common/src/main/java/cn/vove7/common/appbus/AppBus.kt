@@ -58,7 +58,7 @@ object AppBus {
         }
     }
 
-    fun postDelay(tag: String, data: Any, delay: Long) {
+    fun postDelay(data: Any, delay: Long, tag: String? = null) {
         synchronized(threadList) {
             threadList.add(thread(name = tag) {
                 try {
@@ -67,7 +67,7 @@ object AppBus {
                     return@thread
                 }
                 post(data)
-                removeByName(tag)
+                removeByName(tag ?: Thread.currentThread().name)
             })
         }
     }

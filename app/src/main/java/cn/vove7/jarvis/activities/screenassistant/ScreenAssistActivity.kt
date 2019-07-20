@@ -205,7 +205,7 @@ class ScreenAssistActivity : BaseActivity() {
                 screenOcr()
             }),
             Pair(2, {
-                AppBus.postDelay("0_0", AppBus.ACTION_BEGIN_SCREEN_PICKER, 800)
+                AppBus.postDelay(AppBus.ACTION_BEGIN_SCREEN_PICKER, 800)
                 finish()
             }),
             Pair(3, {

@@ -135,9 +135,9 @@ interface SystemOperation {
     fun isMediaPlaying(): Boolean
 
     //最大音量
-    var musicMaxVolume: Int
+    val musicMaxVolume: Int
     //当前音量
-    var musicCurrentVolume: Int
+    val musicCurrentVolume: Int
 
     fun vibrate(millis: Long): Boolean
     fun vibrate(arr: Array<Long>): Boolean
