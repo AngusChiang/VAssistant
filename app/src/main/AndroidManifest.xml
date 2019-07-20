@@ -320,7 +320,7 @@
         </service>
         <service
             android:name=".services.ScreenTextPickTileService"
-            android:icon="@drawable/ic_twotone_text_box"
+            android:icon="@drawable/ic_twotone_text_fields_24px"
             android:label="文字提取"
             android:permission="android.permission.BIND_QUICK_SETTINGS_TILE">
             <intent-filter>

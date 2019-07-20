@@ -120,6 +120,8 @@ abstract class AccessibilityApi : AccessibilityService() {
          * @return 是否成功
          */
         fun openServiceSelf(): Boolean {
+            if (isBaseServiceOn) return true
+
             val s: String
             val b = if (RootHelper.hasRoot()) {
                 s = ("使用Root权限")
