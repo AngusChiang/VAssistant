@@ -5,11 +5,11 @@ import android.os.Handler
 import android.os.HandlerThread
 import android.os.Message
 import android.util.Pair
-import cn.vove7.common.app.AppConfig
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.app.log
 import cn.vove7.common.utils.StorageHelper
+import cn.vove7.common.utils.runOnNewHandlerThread
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.speech.SpeechSynService
 import cn.vove7.jarvis.speech.SyntheEvent
@@ -38,9 +38,6 @@ class BaiduSpeechSynService(event: SyntheEvent) : SpeechSynService(event) {
     private var appKey: String = BaiduKey.appKey
     private var secretKey: String = BaiduKey.sKey
 
-    private lateinit var hThread: HandlerThread
-    private lateinit var tHandler: Handler
-
 
     // TtsMode.MIX; 离在线融合，在线优先； TtsMode.ONLINE 纯在线； 没有纯离线
     private val ttsMode
@@ -62,8 +59,12 @@ class BaiduSpeechSynService(event: SyntheEvent) : SpeechSynService(event) {
         val params = buildParams()
         val config = InitConfig(appId, appKey, secretKey, if (hasStoragePermission())
             ttsMode else TtsMode.ONLINE, params, BaiduSyncLis(this, event))
-        initThread()
-        runInHandlerThread(INIT, config)
+        runOnNewHandlerThread {
+            val isSuccess = load(config)
+            if (!isSuccess) {
+                GlobalApp.toastError("语音合成引擎初始化失败")
+            }
+        }
     }
 
     private fun getTypeCode(): String? {
@@ -73,7 +74,7 @@ class BaiduSpeechSynService(event: SyntheEvent) : SpeechSynService(event) {
         val entity = context.resources.getStringArray(R.array.voice_model_entities)
         val i = entity.indexOf(type)
         val types = context.resources.getStringArray(R.array.voice_model_values)
-        return types[i]
+        return types[i] ?: "0"
     }
 
     /**
@@ -110,39 +111,12 @@ class BaiduSpeechSynService(event: SyntheEvent) : SpeechSynService(event) {
         return params
     }
 
-
-    private fun initThread() {
-        hThread = HandlerThread("NonBlockSyntherizer-thread")
-        hThread.start()
-        tHandler = object : Handler(hThread.looper) {
-            override fun handleMessage(msg: Message) {
-                super.handleMessage(msg)
-                when (msg.what) {
-                    INIT -> {
-                        val config = msg.obj as InitConfig
-                        val isSuccess = load(config)
-                        if (!isSuccess) {
-                            GlobalApp.toastError("语音合成引擎初始化失败")
-                        }
-                    }
-                }
-            }
-        }
-    }
-
     override fun release() {
         mSpeechSynthesizer.stop()
         mSpeechSynthesizer.release()
-        hThread.quitSafely()
         isInited = false
     }
 
-    private fun runInHandlerThread(action: Int, obj: Any? = null) {
-        val msg = Message.obtain()
-        msg.what = action
-        msg.obj = obj
-        tHandler.sendMessage(msg)
-    }
 
     /**
      * 注意该方法需要在新线程中调用。且该线程不能结束。详细请参见NonBlockSyntherizer的实现
@@ -284,6 +258,11 @@ class BaiduSpeechSynService(event: SyntheEvent) : SpeechSynService(event) {
         const val VOICE_MALE = "1"
         const val VOICE_DUXY = "3"
         const val VOICE_DUYY = "4"
+        const val VOICE_BOWEN = "106"
+        const val VOICE_XIAOTONG = "110"
+        const val VOICE_XIAOMENG = "111"
+        const val VOICE_MIDUO = "103"
+        const val VOICE_XIAOJIAO = "5"
     }
 
 

@@ -12,7 +12,6 @@ import cn.vove7.common.app.AppConfig
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.appbus.AppBus
-import cn.vove7.common.bridges.RootHelper
 import cn.vove7.common.bridges.SystemBridge
 import cn.vove7.common.utils.ThreadPool
 import cn.vove7.jarvis.R
@@ -20,13 +19,11 @@ import cn.vove7.jarvis.activities.base.ReturnableActivity
 import cn.vove7.jarvis.adapters.SettingsExpandableAdapter
 import cn.vove7.jarvis.receivers.PowerEventReceiver
 import cn.vove7.jarvis.services.MainService
-import cn.vove7.jarvis.tools.AppLogic
 import cn.vove7.jarvis.tools.ShortcutUtil
 import cn.vove7.jarvis.tools.Tutorials
 import cn.vove7.jarvis.tools.UriUtils
 import cn.vove7.jarvis.view.*
 import cn.vove7.jarvis.view.custom.SettingGroupItem
-import cn.vove7.vtp.sharedpreference.SpHelper
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.customview.customView
 import kotlinx.android.synthetic.main.activity_expandable_settings.*
@@ -224,12 +221,14 @@ class SettingsActivity : ReturnableActivity() {
                         AppBus.post(AppBus.ACTION_RELOAD_SYN_CONF)
                         return@NumberPickerItem true
                     }),
-                    SingleChoiceItem(title = "输出方式", summary = "选择音量跟随\n可能重启App生效", keyId = R.string.key_stream_of_syn_output,
-                            entityArrId = R.array.list_stream_syn_output, defaultValue =
-                    { 0 })
-                    { _, b ->
+                    SingleChoiceItem(title = "音量输出", summary = "选择音量跟随\n可能重启App生效", keyId = R.string.key_stream_of_syn_output,
+                            entityArrId = R.array.list_stream_syn_output, defaultValue = { 0 }
+                    ) { _, b ->
                         MainService.instance?.speechSynService?.reloadStreamType()
                         return@SingleChoiceItem true
+                    },
+                    IntentItem(title = "试听") {
+                        MainService.instance?.speak("百度语音：基于业界领先的深度神经网络技术，提供高度拟人、流畅自然的语音合成服务，让您的应用、设备开口说话，更具个性")
                     }
             )),
             SettingGroupItem(R.color.google_red, titleS = "悬浮面板", childItems = listOf(
@@ -249,8 +248,9 @@ class SettingsActivity : ReturnableActivity() {
                             keyId = R.string.key_auto_open_as_with_root, defaultValue = false)
                     { _, b ->
                         if (b) ThreadPool.runOnPool {
-                            if (AccessibilityApi.isBaseServiceOn)
-                                return@runOnPool
+                            if (AccessibilityApi.isBaseServiceOn) {
+                            }
+                            return@runOnPool
                             AccessibilityApi.openServiceSelf()
                         }
                         return@CheckBoxItem true

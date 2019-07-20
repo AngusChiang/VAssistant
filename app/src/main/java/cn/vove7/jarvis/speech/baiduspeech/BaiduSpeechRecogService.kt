@@ -9,7 +9,7 @@ import cn.vove7.jarvis.speech.RecogEvent
 import cn.vove7.jarvis.speech.SpeechRecogService
 import cn.vove7.jarvis.speech.WakeupI
 import cn.vove7.jarvis.speech.baiduspeech.recognition.listener.SpeechStatusListener
-import cn.vove7.jarvis.speech.baiduspeech.recognition.recognizer.MyRecognizer
+import cn.vove7.jarvis.speech.baiduspeech.recognition.recognizer.BaiduRecognizer
 import cn.vove7.jarvis.speech.baiduspeech.wakeup.BaiduVoiceWakeup
 import cn.vove7.jarvis.speech.baiduspeech.wakeup.RecogWakeupListener
 import cn.vove7.jarvis.speech.baiduspeech.wakeup.WakeupEventAdapter
@@ -26,8 +26,8 @@ class BaiduSpeechRecogService(event: RecogEvent) : SpeechRecogService(event) {
     /**
      * 识别控制器，使用MyRecognizer控制识别的流程
      */
-    private val myRecognizer: MyRecognizer by lazy {
-        MyRecognizer(GlobalApp.APP, SpeechStatusListener(handler))
+    private val myRecognizer: BaiduRecognizer by lazy {
+        BaiduRecognizer(GlobalApp.APP, SpeechStatusListener(handler))
     }
 
     override val wakeupI: WakeupI by lazy {

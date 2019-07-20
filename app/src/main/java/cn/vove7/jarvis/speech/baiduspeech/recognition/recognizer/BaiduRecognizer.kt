@@ -20,7 +20,7 @@ import java.lang.Thread.sleep
  * @param context
  * @param eventListener
  */
-class MyRecognizer(
+class BaiduRecognizer(
         val context: Context,
         /**
          * SDK 内部核心 事件回调类
