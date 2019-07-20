@@ -161,10 +161,9 @@ class ScreenAssistActivity : BaseActivity() {
                             //截完图显示面板
                             showView()
                         }
-                        SystemBridge.release()
                         UtilBridge.bitmap2File(it, cachePath)?.absolutePath
                     }
-
+                    SystemBridge.release()
                     if (path == null) {
                         GlobalApp.toastError("截图失败")
                         finish()

@@ -34,10 +34,6 @@ class BaiduSpeechSynService(event: SyntheEvent) : SpeechSynService(event) {
         File("${StorageHelper.sdPath}/baiduTTS", "bd_etts_text.dat")
                 .exists()
 
-    private var appId: String = BaiduKey.appId.toString()
-    private var appKey: String = BaiduKey.appKey
-    private var secretKey: String = BaiduKey.sKey
-
 
     // TtsMode.MIX; 离在线融合，在线优先； TtsMode.ONLINE 纯在线； 没有纯离线
     private val ttsMode
@@ -47,6 +43,10 @@ class BaiduSpeechSynService(event: SyntheEvent) : SpeechSynService(event) {
     private var voiceSpeed = "5"
 
     override fun init() {
+
+        val appId: String = BaiduKey.appId.toString()
+        val appKey: String = BaiduKey.appKey
+        val secretKey: String = BaiduKey.sKey
 
         val sp = SpHelper(context)
         voiceModel = getTypeCode() ?: VOICE_FEMALE
