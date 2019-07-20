@@ -229,7 +229,7 @@ class SettingsActivity : ReturnableActivity() {
                         return@SingleChoiceItem true
                     },
                     IntentItem(title = "试听") {
-                        MainService.instance?.speak("百度语音：基于业界领先的深度神经网络技术，提供高度拟人、流畅自然的语音合成服务，让您的应用、设备开口说话，更具个性")
+                        MainService.instance?.speak("百度语音：基于业界领先的深度神经网络技术。")
                     }
             )),
             SettingGroupItem(R.color.google_red, titleS = "悬浮面板", childItems = listOf(
