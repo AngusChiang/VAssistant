@@ -87,7 +87,7 @@ interface VApi {
             arrayOf("interrupt()", "setScreenSize()",
                     "checkService()", "alert()",
                     "singleChoiceDialog()", "waitForVoiceParam()", "waitForText()", "sleep()", "smartOpen()",
-                    "smartClose()", "speak()", "speakSync()", "cancelRecog()"
+                    "smartClose()", "speak()", "speakSync()", "cancelRecog()","removeFloat()"
             )
 
         val spFuncs = arrayOf(
@@ -285,7 +285,8 @@ interface VApi {
                 Pair("waitForApp()", "等待应用出现,参数：(pkg[,activity[,millis]]) 返回Boolean 出现：true 等待超时：false"),
                 Pair("speak()", "speak(text)\n语音合成（异步）无返回值"),
                 Pair("speakSync()", "语音合成（同步）\nspeakSync(text)参数:待合成text文本 返回是否成功"),
-                Pair("cancelRecog()", "取消语音识别，可终止长语音")
+                Pair("cancelRecog()", "取消语音识别，可终止长语音"),
+                Pair("removeFloat()", "关闭语音悬浮窗")
 
         )
     }

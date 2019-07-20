@@ -91,6 +91,11 @@ interface CExecutorI : ActivityShowListener, RuntimeArgs, SpeakCallback {
     //同步
     fun speakSync(text: String): Boolean
 
+    /**
+     * 移除语音悬浮窗
+     */
+    fun removeFloat()
+
 }
 
 interface RuntimeArgs {

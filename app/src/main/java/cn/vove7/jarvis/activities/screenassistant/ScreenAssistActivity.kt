@@ -69,6 +69,7 @@ class ScreenAssistActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.dialog_assist)
+        DataCollector.buriedPoint("sa_0")
 
         window.setWindowAnimations(R.style.ScreenAssist)
         showProgressBar = true

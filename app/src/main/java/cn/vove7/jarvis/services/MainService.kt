@@ -378,6 +378,10 @@ class MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
         speechSynService?.speak(text) ?: notifySpeakFinish(text, false)
     }
 
+    override fun removeFloat() {
+        floatyPanel.hide()
+    }
+
     override fun onExecuteStart(tag: String) {//
         Vog.d("开始执行 -> $tag")
         executeAnimation.begin()

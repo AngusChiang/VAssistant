@@ -110,7 +110,9 @@ smartOpen = function(s){
 smartClose = function(s){
     return executor.smartClose(s)
 }
-
+removeFloat = function() {
+    executor.removeFloat()
+}
 sleep = function(m){
     executor.sleep(m)
 }

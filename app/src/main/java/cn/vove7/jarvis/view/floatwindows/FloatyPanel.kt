@@ -75,7 +75,7 @@ class FloatyPanel : AbFloatWindow(GlobalApp.APP) {
         contentView?.voice_text?.text = voiceText
     }
 
-    var hideInterrupt = false
+    private var hideInterrupt = false
 
     var isHiding = false
 

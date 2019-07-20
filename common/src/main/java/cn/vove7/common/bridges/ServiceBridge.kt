@@ -30,6 +30,7 @@ interface ServiceBridge : OnExecutorResult {
 
     fun speak(text: String?)
     fun speakWithCallback(text: String?, call: SpeakCallback)
+    fun removeFloat()
 }
 
 class ShowDialogEvent(

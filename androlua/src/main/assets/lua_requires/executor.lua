@@ -143,4 +143,6 @@ function sleep(m)
     executor.sleep(m)
 end
 
-
+function removeFloat()
+    executor.removeFloat()
+end

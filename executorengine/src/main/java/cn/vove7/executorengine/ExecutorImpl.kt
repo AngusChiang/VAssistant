@@ -652,6 +652,10 @@ open class ExecutorImpl(
         return resultBox.blockedGet() != null
     }
 
+    override fun removeFloat() {
+        serviceBridge?.removeFloat()
+    }
+
     /**
      * 实现SpeakCallback
      * @param p1 String?
