@@ -1,19 +1,16 @@
 package cn.vove7.jarvis.activities
 
-import android.accessibilityservice.AccessibilityService
-import android.accessibilityservice.AccessibilityServiceInfo
 import android.app.Activity
 import android.content.ActivityNotFoundException
-import android.content.Context
 import android.os.Build
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v7.app.AppCompatActivity
 import android.view.View
 import android.view.ViewGroup
-import android.view.accessibility.AccessibilityManager
 import android.widget.Switch
 import android.widget.TextView
+import cn.vove7.admin_manager.AdminReceiver
 import cn.vove7.common.accessibility.AccessibilityApi
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.bridges.SystemBridge
@@ -22,8 +19,12 @@ import cn.vove7.jarvis.activities.PermissionManagerActivity.PermissionStatus.Com
 import cn.vove7.jarvis.activities.base.OneFragmentActivity
 import cn.vove7.jarvis.adapters.RecAdapterWithFooter
 import cn.vove7.jarvis.fragments.SimpleListFragment
-import cn.vove7.vtp.log.Vog
 import cn.vove7.vtp.runtimepermission.PermissionUtils
+import android.app.admin.DevicePolicyManager
+import android.content.Intent
+import android.content.ComponentName
+import cn.vove7.common.app.log
+
 
 /**
  * 权限管理
@@ -42,14 +43,11 @@ class PermissionManagerActivity : OneFragmentActivity() {
 
     class ManageFragment : SimpleListFragment<PermissionStatus>() {
         lateinit var pActivity: Activity
-        //        lateinit var permissionList: List<PermissionStatus>
-        //        lateinit var adapter: BaseAdapter
-
 
         companion object {
-            fun newIns(acti: AppCompatActivity): ManageFragment {
+            fun newIns(act: AppCompatActivity): ManageFragment {
                 val m = ManageFragment()
-                m.pActivity = acti
+                m.pActivity = act
                 return m
             }
         }
@@ -114,33 +112,9 @@ class PermissionManagerActivity : OneFragmentActivity() {
                         }
                     }
                     holder.itemView.setOnClickListener {
+                        item.clickAction(item, pActivity)
                         if (!item.isOpen) {
-                            when {
-                                item.permissionName == "悬浮窗" ->
-                                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                                        try {
-                                            PermissionUtils.requestDrawOverlays(activity!!, 0)
-                                        } catch (e: Exception) {
-//                                            toast.showShort("跳转失败，请手动开启")
-                                            try {
-                                                SystemBridge.openAppDetail(context?.packageName
-                                                    ?: "")
-                                            } catch (e: Exception) {
-                                                GlobalApp.toastError("跳转失败，请到应用详情手动开启")
-                                            }
-                                        }
-                                    }
-                                item.permissionString[0].startsWith("ACCESSIBILITY_SERVICE") -> {
-                                    try {
-                                        PermissionUtils.gotoAccessibilitySetting(activity!!)
-                                    } catch (e: ActivityNotFoundException) {
-                                        GlobalApp.toastError("跳转失败，请自行开启")
-                                    }
-                                }
-                                else ->
-                                    PermissionUtils.autoRequestPermission(activity!!,
-                                            item.permissionString, position)
-                            }
+
                         }
                     }
                 }
@@ -161,10 +135,43 @@ class PermissionManagerActivity : OneFragmentActivity() {
         }
 
         val permissions by lazy {
+            val openASAction: (PermissionStatus, Activity) -> Unit = { it, act ->
+                try {
+                    PermissionUtils.gotoAccessibilitySetting(act)
+                } catch (e: ActivityNotFoundException) {
+                    GlobalApp.toastError("跳转失败，请自行开启")
+                }
+            }
             listOf(
-                    PermissionStatus(arrayOf("ACCESSIBILITY_SERVICE"), "基础无障碍服务", getString(R.string.desc_accessibility)),
-                    PermissionStatus(arrayOf("ACCESSIBILITY_SERVICE2"), "高级无障碍服务（执行手势 Android7.0+）", getString(R.string.desc_gesc_accessibility)),
-                    PermissionStatus(arrayOf("android.permission.SYSTEM_ALERT_WINDOW"), "悬浮窗", "显示全局对话框、语音面板"),
+                    PermissionStatus(arrayOf("android.permission.BIND_DEVICE_ADMIN"), "设备管理器", getString(cn.vove7.jarvis.R.string.admin_desc)) r@{ it, act->
+                        if(it.isOpen) return@r
+                        val mComponentName = ComponentName(act, AdminReceiver::class.java)
+                        val intent = Intent(DevicePolicyManager.ACTION_ADD_DEVICE_ADMIN)
+                        intent.putExtra(DevicePolicyManager.EXTRA_DEVICE_ADMIN, mComponentName)
+                        try {
+                            startActivityForResult(intent, 99)
+                        } catch (e: Exception) {
+                            e.log()
+                            GlobalApp.toastError("跳转失败，请手动进入[设置/安全/设备管理器]开启", 1 )
+                        }
+                    },
+                    PermissionStatus(arrayOf("ACCESSIBILITY_SERVICE"), "基础无障碍服务", getString(R.string.desc_accessibility), clickAction = openASAction),
+                    PermissionStatus(arrayOf("ACCESSIBILITY_SERVICE2"), "高级无障碍服务（执行手势 Android7.0+）", getString(R.string.desc_gesc_accessibility), clickAction = openASAction),
+                    PermissionStatus(arrayOf("android.permission.SYSTEM_ALERT_WINDOW"), "悬浮窗", "显示全局对话框、语音面板") { _, _ ->
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                            try {
+                                PermissionUtils.requestDrawOverlays(activity!!, 0)
+                            } catch (e: Exception) {
+//                                            toast.showShort("跳转失败，请手动开启")
+                                try {
+                                    SystemBridge.openAppDetail(context?.packageName
+                                        ?: "")
+                                } catch (e: Exception) {
+                                    GlobalApp.toastError("跳转失败，请到应用详情手动开启")
+                                }
+                            }
+                        }
+                    },
                     PermissionStatus(arrayOf("android.permission.READ_CONTACTS"), "联系人", "用于检索联系人"),
                     PermissionStatus(arrayOf("android.permission.CALL_PHONE"), "电话", "用于拨打电话"),
                     PermissionStatus(arrayOf("android.permission.RECORD_AUDIO"), "录音", "用于语音识别"),
@@ -187,13 +194,12 @@ class PermissionManagerActivity : OneFragmentActivity() {
             val context = GlobalApp.APP
             permissions.forEach {
                 it.isOpen = when {
+                    it.permissionName == "设备管理器" -> AdminReceiver.isActive()
                     it.permissionName == "悬浮窗" -> Build.VERSION.SDK_INT < Build.VERSION_CODES.M || PermissionUtils.canDrawOverlays(context)
                     it.permissionString[0] == "ACCESSIBILITY_SERVICE" ->
                         AccessibilityApi.isBaseServiceOn
-//                        PermissionUtils.accessibilityServiceEnabled(context,MyAccessibilityService::class.java as Class<AccessibilityService>)
                     it.permissionString[0] == "ACCESSIBILITY_SERVICE2" ->
                         AccessibilityApi.isAdvanServiceOn
-//                    PermissionUtils.accessibilityServiceEnabled(context,GestureService::class.java as Class<AccessibilityService>)
                     else -> PermissionUtils.isAllGranted(context, it.permissionString)
                 }
             }
@@ -212,7 +218,11 @@ class PermissionManagerActivity : OneFragmentActivity() {
             val permissionString: Array<String>,
             val permissionName: String,
             val desc: String,
-            var isOpen: Boolean = false
+            var isOpen: Boolean = false,
+            val clickAction: (PermissionStatus, Activity) -> Unit = { it, act ->
+                PermissionUtils.autoRequestPermission(act,
+                        it.permissionString, 100)
+            }
     ) {
         companion object {
             val allPerStr = arrayOf(
@@ -234,16 +244,4 @@ class PermissionManagerActivity : OneFragmentActivity() {
         }
 
     }
-}
-
-fun PermissionUtils.accessibilityServiceEnabled(context: Context, service: Class<AccessibilityService>): Boolean {
-    val pkg = context.packageName
-    val am = context.getSystemService(Context.ACCESSIBILITY_SERVICE) as AccessibilityManager
-    val enabledAccessibilityServiceList = am.getEnabledAccessibilityServiceList(AccessibilityServiceInfo.FEEDBACK_GENERIC)
-    for (info in enabledAccessibilityServiceList) {
-        Vog.v(info.id)
-        if (info.id == "$pkg/${service.name}")
-            return true
-    }
-    return false
 }

@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">admin-manager</string>
+    <string name="admin_desc">开启设备管理器，可以加强后台能力</string>
+</resources>

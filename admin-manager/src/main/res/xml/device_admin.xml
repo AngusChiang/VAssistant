@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<device-admin xmlns:android="http://schemas.android.com/apk/res/android">
+    <uses-policies>
+        <!--<limit-password />   //限制密码-->
+        <!--<watch-login />      //查看登录-->
+        <!--<reset-password />   //重置密码-->
+        <force-lock />       //锁屏
+        <!--<wipe-data />        //清除数据-->
+        <!--<expire-password />  //密码到期时间-->
+        <!--<encrypted-storage /> //加密存储-->
+        <!--<disable-camera />    //关闭相机-->
+    </uses-policies>
+</device-admin>
