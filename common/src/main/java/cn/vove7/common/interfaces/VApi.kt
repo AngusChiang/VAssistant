@@ -16,7 +16,7 @@ interface VApi {
 
         val runtimeFunctions = arrayOf("currentApp",
                 "currentActivity", "actionCount", "currentActionIndex", "isGlobal()",
-                "commandType", "command", "DEBUG", "focusView", "userInterrupt","notSupport()")
+                "commandType", "command", "DEBUG", "focusView", "userInterrupt", "notSupport()")
 
         val httpFunctions = arrayOf("get()", "post()", "postJson()", "getAsPc()")
 
@@ -67,7 +67,8 @@ interface VApi {
                 "getLocalIpAddress()", "getNetAddress()", "createAlarm()", "createCalendarEvent()",
                 "startActivity(pkg,fullActivityName)", "screenOn()", "screenOff()", "sendKey()",
                 "sendSMS()", "getLaunchIntent()", "getPhoneByName()", "getContactByName()", "isCharging()", "batteryLevel",
-                "simCount", "contacts", "saveMarkedContact()", "saveMarkedApp()", "enableNfc()", "disableNfc()"
+                "simCount", "contacts", "saveMarkedContact()", "saveMarkedApp()",
+                "enableNfc()", "disableNfc()", "screenBrightness", "screenBrightnessMode"
         )
         val appFunctions = arrayOf(
                 "startActivity()", "getSystemService()"
@@ -87,7 +88,7 @@ interface VApi {
             arrayOf("interrupt()", "setScreenSize()",
                     "checkService()", "alert()",
                     "singleChoiceDialog()", "waitForVoiceParam()", "waitForText()", "sleep()", "smartOpen()",
-                    "smartClose()", "speak()", "speakSync()", "cancelRecog()","removeFloat()"
+                    "smartClose()", "speak()", "speakSync()", "cancelRecog()", "removeFloat()"
             )
 
         val spFuncs = arrayOf(
@@ -271,7 +272,10 @@ interface VApi {
                 Pair("batteryLevel", "返回当前电量，范围0-100(Int)"),
                 Pair("isCharging()", "返回是否在充电"),
                 Pair("enableNfc()", "开启nfc，由于系统限制，只会跳转至nfc设置界面"),
-                Pair("disableNfc()", "关闭nfc，由于系统限制，只会跳转至nfc设置界面")
+                Pair("disableNfc()", "关闭nfc，由于系统限制，只会跳转至nfc设置界面"),
+                "screenBrightness" to "屏幕亮度值\n范围：0～255\nsystem.screenBrightness = 125",
+                "screenBrightnessMode" to "亮度调节模式\n1：自动调节\n0：手动调节"
+
         )
         val executorMap = hashMapOf(
                 Pair("interrupt()", "终止执行"),
