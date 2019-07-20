@@ -105,11 +105,4 @@ object UtilBridge {
         return list
     }
 
-    /**
-     * 当指令无法完成请求时，抛出该异常
-     */
-    fun notSupport() {
-        throw NotSupportException()
-    }
-
 }

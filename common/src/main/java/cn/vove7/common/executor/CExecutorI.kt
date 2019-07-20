@@ -1,5 +1,6 @@
 package cn.vove7.common.executor
 
+import cn.vove7.common.NotSupportException
 import cn.vove7.common.accessibility.viewnode.ViewNode
 import cn.vove7.common.bridges.ChoiceData
 import cn.vove7.common.datamanager.parse.model.Action
@@ -95,6 +96,13 @@ interface CExecutorI : ActivityShowListener, RuntimeArgs, SpeakCallback {
      * 移除语音悬浮窗
      */
     fun removeFloat()
+
+    /**
+     * 当指令无法完成请求时，抛出该异常
+     */
+    fun notSupport() {
+        throw NotSupportException()
+    }
 
 }
 

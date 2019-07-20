@@ -275,4 +275,15 @@ interface SystemOperation {
      */
     fun killApp(pkg: String): Boolean
 
+    /**
+     * 屏幕亮度
+     * 范围：0～255
+     */
+    var screenBrightness: Int
+
+    /**
+     * Settings.System.SCREEN_BRIGHTNESS_MODE_AUTOMATIC：值为1，自动调节亮度。
+     * Settings.System.SCREEN_BRIGHTNESS_MODE_MANUAL：值为0，手动模式。
+     */
+    var screenBrightnessMode: Int
 }

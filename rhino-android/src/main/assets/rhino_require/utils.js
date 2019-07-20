@@ -23,3 +23,7 @@ function arr2String(arr){
 function parseDateText(s){
     return TextDateParser.INSTANCE.parseDateText(s)
 }
+
+function notSupport() {
+    executor.notSupport()
+}

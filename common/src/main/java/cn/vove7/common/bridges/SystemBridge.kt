@@ -1177,4 +1177,31 @@ object SystemBridge : SystemOperation {
         GlobalActionExecutor.home()
         return b
     }
+
+    override var screenBrightness: Int
+        get() {
+            val contentResolver = GlobalApp.APP.contentResolver
+            val defVal = 125
+            return Settings.System.getInt(contentResolver,
+                    Settings.System.SCREEN_BRIGHTNESS, defVal)
+        }
+        set(value) {
+            val v = if (value < 0) 0 else if (value > 255) 255 else value
+            val contentResolver = GlobalApp.APP.contentResolver
+            Settings.System.putInt(contentResolver,
+                    Settings.System.SCREEN_BRIGHTNESS, value)
+        }
+
+    override var screenBrightnessMode: Int
+        get() {
+            val contentResolver = GlobalApp.APP.contentResolver
+            return Settings.System.getInt(contentResolver,
+                    Settings.System.SCREEN_BRIGHTNESS_MODE, 0)
+        }
+        set(value) {
+            val v = if (value == 0 || value == 1) value else 0
+            val contentResolver = GlobalApp.APP.contentResolver
+            Settings.System.putInt(contentResolver,
+                    Settings.System.SCREEN_BRIGHTNESS_MODE, v)
+        }
 }

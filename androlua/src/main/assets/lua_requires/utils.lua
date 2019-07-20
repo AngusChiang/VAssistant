@@ -5,6 +5,7 @@
 --
 
 require 'import'
+import 'cn.vove7.common.app.AppConfig'
 import 'cn.vove7.vtp.text.TextTransHelper'
 import 'cn.vove7.common.utils.TextHelper'
 import 'cn.vove7.vtp.builder.*'
@@ -37,4 +38,8 @@ end
 
 function arr2String(arr)
     return TextHelper.INSTANCE.arr2String(arr, ', ')
+end
+
+function notSupport()
+    executor.notSupport()
 end
