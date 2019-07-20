@@ -37,8 +37,8 @@ class LaboratoryActivity : ReturnableActivity() {
 
         expandableListView?.post {
             expandableListView.apply {
-                expandGroup(0)
-                expandGroup(1)
+                expandGroup(0, true)
+                expandGroup(1, true)
             }
         }
     }
