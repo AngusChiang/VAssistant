@@ -38,24 +38,6 @@ object AppNotification {
     private val notificationHelper get() = NotificationHelper(GlobalApp.APP, c, true)
 
 
-    fun updateNotificationChannel(context: Context) {
-        val aa = arrayOf("app_notification", "StatusBarIcon", "StatusBarIcon_alert")
-        if (AppConfig.FIRST_LAUNCH_NEW_VERSION && Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            (context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager).apply {
-                notificationChannels?.forEach {
-                    if (it.id !in aa) {
-                        try {
-                            deleteNotificationChannel(it.id)
-                        } catch (e: Exception) {
-                            GlobalLog.err(e)
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-
     /**
      * 随机id 新通知
      * @param title String

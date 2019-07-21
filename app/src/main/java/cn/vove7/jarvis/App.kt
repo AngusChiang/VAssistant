@@ -61,7 +61,6 @@ class App : GlobalApp() {
             startBroadcastReceivers()
             runOnPool {
                 openAccessibilityServiceAuto()
-                AppNotification.updateNotificationChannel(this)
             }
             RePluginManager().launchWithApp()
             Vog.d("onCreate ---> 结束 ${System.currentTimeMillis() / 1000}")
