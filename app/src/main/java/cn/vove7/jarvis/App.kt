@@ -6,6 +6,7 @@ import cn.jpush.android.api.JPushInterface
 import cn.vove7.androlua.LuaApp
 import cn.vove7.common.app.AppConfig
 import cn.vove7.common.app.GlobalApp
+import cn.vove7.common.appbus.AppBus
 import cn.vove7.common.helper.AdvanAppHelper
 import cn.vove7.common.model.UserInfo
 import cn.vove7.common.utils.ThreadPool.runOnPool
@@ -45,6 +46,7 @@ class App : GlobalApp() {
             Vog.d("非主进程")
             return
         }
+        AppBus.reg(this)
 
         Cockroach.install(CrashHandler)
 
@@ -131,8 +133,9 @@ class App : GlobalApp() {
         }
 
     @Subscribe
-    override fun onSetJpushAlias(id: String) {
-        JPushInterface.setAlias(this, UserInfo.getUserId().toString(),null)
-
+    fun onUserInit(event: String) {
+        if(event == AppBus.EVENT_USER_INIT) {
+            JPushInterface.setAlias(this, UserInfo.getUserId().toString(), null)
+        }
     }
 }

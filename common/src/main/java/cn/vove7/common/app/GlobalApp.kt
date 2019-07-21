@@ -47,9 +47,6 @@ open class GlobalApp : RePluginApplication() {
                 .apply() // required
     }
 
-    open fun onSetJpushAlias(id: String) {
-
-    }
 
     companion object {
         var launchTime: Long = 0
