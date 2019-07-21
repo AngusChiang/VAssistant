@@ -2,10 +2,12 @@ package cn.vove7.jarvis
 
 import android.app.ActivityManager
 import android.content.Context
+import cn.jpush.android.api.JPushInterface
 import cn.vove7.androlua.LuaApp
 import cn.vove7.common.app.AppConfig
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.helper.AdvanAppHelper
+import cn.vove7.common.model.UserInfo
 import cn.vove7.common.utils.ThreadPool.runOnPool
 import cn.vove7.common.utils.runOnNewHandlerThread
 import cn.vove7.common.utils.runWithClock
@@ -22,6 +24,7 @@ import cn.vove7.jarvis.view.openAccessibilityServiceAuto
 import cn.vove7.vtp.log.Vog
 import com.umeng.commonsdk.UMConfigure
 import com.wanjian.cockroach.Cockroach
+import org.greenrobot.eventbus.Subscribe
 
 
 @Suppress("MemberVisibilityCanBePrivate")
@@ -45,6 +48,8 @@ class App : GlobalApp() {
 
         Cockroach.install(CrashHandler)
 
+        JPushInterface.setDebugMode(BuildConfig.DEBUG);
+        JPushInterface.init(this)
         runOnNewHandlerThread("app_load") {
             if (AppConfig.FIRST_LAUNCH_NEW_VERSION || BuildConfig.DEBUG)
                 LuaApp.init(this, AppConfig.FIRST_LAUNCH_NEW_VERSION)
@@ -124,4 +129,10 @@ class App : GlobalApp() {
             }
             return null
         }
+
+    @Subscribe
+    override fun onSetJpushAlias(id: String) {
+        JPushInterface.setAlias(this, UserInfo.getUserId().toString(),null)
+
+    }
 }

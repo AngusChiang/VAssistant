@@ -32,6 +32,13 @@ android {
             resValue "string", "base_acc_service_label", "V Assist基础服务"
             resValue "string", "gesture_acc_service_label", "V Assist高级服务（7.0+可用）"
             buildConfigField "String", "UM_KEY", '"5d00ae230cafb2990c0000e4"'
+
+            manifestPlaceholders = [
+                    JPUSH_PKGNAME : "cn.vove7.vassistant",
+                    JPUSH_APPKEY : "f4b11a8374fbc79c3746a068", //JPush 上注册的包名对应的 Appkey.
+                    JPUSH_CHANNEL : "default", //暂时填写默认值即可.
+            ]
+
         }
         debug {
             minifyEnabled false
@@ -43,6 +50,12 @@ android {
             resValue "string", "base_acc_service_label", "V Assist基础DEBUG"
             resValue "string", "gesture_acc_service_label", "V Assist高级DEBUG"
             buildConfigField  "String", "UM_KEY", '"5d336b23570df3779c000b49"'
+
+            manifestPlaceholders = [
+                    JPUSH_PKGNAME : "cn.vove7.vassistant.debug",
+                    JPUSH_APPKEY : "2a428d87054dcc8b9fd45a30", //JPush 上注册的包名对应的 Appkey.
+                    JPUSH_CHANNEL : "default", //暂时填写默认值即可.
+            ]
         }
 //        beta {
 //            versionNameSuffix = '_beta'
@@ -136,12 +149,14 @@ dependencies {
     testImplementation 'org.reflections:reflections:0.9.10'
     implementation project(path: ':speechLib')
     implementation project(':admin-manager')
+    implementation project(':push')
 
     // Material
 //    implementation "com.google.android.material:material:$material_version"
 
 }
 repositories {
+    maven { url 'https://maven.aliyun.com/repository/jcenter' }
     maven { url 'https://jitpack.io' }
     mavenCentral()
     maven { url 'https://dl.bintray.com/umsdk/release' }

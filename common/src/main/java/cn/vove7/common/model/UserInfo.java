@@ -7,6 +7,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import cn.vove7.common.app.GlobalApp;
 import cn.vove7.common.appbus.AppBus;
 
 /**
@@ -35,6 +36,7 @@ public class UserInfo implements Serializable {
         if(isLogin()) return;
         INSTANCE = this;
         isLogin = true;
+        AppBus.INSTANCE.post(AppBus.EVENT_USER_INIT);
     }
 
     public static void logout() {

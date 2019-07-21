@@ -9,6 +9,7 @@ import kotlin.concurrent.thread
 
 object AppBus {
     const val EVENT_LOGOUT = "e_logout"
+    const val EVENT_USER_INIT = "event_user_init"
     const val EVENT_FORCE_OFFLINE = "e_force_offline"
     const val EVENT_START_DEBUG_SERVER = "start_debug_server"
     const val EVENT_STOP_DEBUG_SERVER = "stop_debug_server"
