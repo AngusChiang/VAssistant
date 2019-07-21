@@ -43,8 +43,6 @@ class App : GlobalApp() {
             AppConfig.init()
         }
 
-        checkSelfPermission("")
-
         if (!isMainProcess) {
             Vog.d("非主进程")
             return
