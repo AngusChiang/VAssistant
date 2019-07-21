@@ -3,7 +3,9 @@ package cn.vove7.jarvis
 import android.app.ActivityManager
 import android.content.Context
 import cn.vove7.androlua.LuaApp
+import cn.vove7.common.app.AppConfig
 import cn.vove7.common.app.GlobalApp
+import cn.vove7.common.helper.AdvanAppHelper
 import cn.vove7.common.utils.ThreadPool.runOnPool
 import cn.vove7.common.utils.runOnNewHandlerThread
 import cn.vove7.common.utils.runWithClock
@@ -13,9 +15,6 @@ import cn.vove7.jarvis.receivers.PowerEventReceiver
 import cn.vove7.jarvis.receivers.ScreenStatusListener
 import cn.vove7.jarvis.receivers.UtilEventReceiver
 import cn.vove7.jarvis.services.MainService
-import cn.vove7.common.app.AppConfig
-import cn.vove7.common.app.GlobalLog
-import cn.vove7.common.helper.AdvanAppHelper
 import cn.vove7.jarvis.tools.AppNotification
 import cn.vove7.jarvis.tools.CrashHandler
 import cn.vove7.jarvis.tools.ShortcutUtil
@@ -39,7 +38,7 @@ class App : GlobalApp() {
             AppConfig.init()
         }
 
-        if(!isMainProcess){
+        if (!isMainProcess) {
             Vog.d("非主进程")
             return
         }
@@ -61,7 +60,7 @@ class App : GlobalApp() {
             Vog.d("onCreate ---> 结束 ${System.currentTimeMillis() / 1000}")
             System.gc()
 
-            UMConfigure.init(this, "5d00ae230cafb2990c0000e4", "default", UMConfigure.DEVICE_TYPE_PHONE, "")
+            initUm()
         }
 
     }
@@ -87,12 +86,17 @@ class App : GlobalApp() {
         UtilEventReceiver.stop()
     }
 
+
     companion object {
         var ins: App? = null
 
         fun startServices() {
             ins?.startServices()
         }
+    }
+
+    private fun initUm() {
+        UMConfigure.init(this, BuildConfig.UM_KEY, "default", UMConfigure.DEVICE_TYPE_PHONE, "")
     }
 
     override fun onTerminate() {

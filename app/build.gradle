@@ -12,7 +12,7 @@ android {
         minSdkVersion 21
         targetSdkVersion 27
         versionCode 160
-        versionName "1.9.9"
+        versionName "1.9.3"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
         multiDexEnabled true
@@ -31,6 +31,7 @@ android {
             resValue "string", "app_name", "V Assistant"
             resValue "string", "base_acc_service_label", "V Assist基础服务"
             resValue "string", "gesture_acc_service_label", "V Assist高级服务（7.0+可用）"
+            buildConfigField "String", "UM_KEY", '"5d00ae230cafb2990c0000e4"'
         }
         debug {
             minifyEnabled false
@@ -41,6 +42,7 @@ android {
             resValue "string", "app_name", "V Assistant-debug"
             resValue "string", "base_acc_service_label", "V Assist基础DEBUG"
             resValue "string", "gesture_acc_service_label", "V Assist高级DEBUG"
+            buildConfigField  "String", "UM_KEY", '"5d336b23570df3779c000b49"'
         }
 //        beta {
 //            versionNameSuffix = '_beta'
