@@ -1,7 +1,10 @@
 package cn.vove7.jarvis.activities
 
 import android.app.Activity
+import android.app.admin.DevicePolicyManager
 import android.content.ActivityNotFoundException
+import android.content.ComponentName
+import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import android.support.v4.app.Fragment
@@ -13,6 +16,7 @@ import android.widget.TextView
 import cn.vove7.admin_manager.AdminReceiver
 import cn.vove7.common.accessibility.AccessibilityApi
 import cn.vove7.common.app.GlobalApp
+import cn.vove7.common.app.log
 import cn.vove7.common.bridges.SystemBridge
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.activities.PermissionManagerActivity.PermissionStatus.Companion.allPerStr
@@ -20,10 +24,6 @@ import cn.vove7.jarvis.activities.base.OneFragmentActivity
 import cn.vove7.jarvis.adapters.RecAdapterWithFooter
 import cn.vove7.jarvis.fragments.SimpleListFragment
 import cn.vove7.vtp.runtimepermission.PermissionUtils
-import android.app.admin.DevicePolicyManager
-import android.content.Intent
-import android.content.ComponentName
-import cn.vove7.common.app.log
 
 
 /**
@@ -143,8 +143,8 @@ class PermissionManagerActivity : OneFragmentActivity() {
                 }
             }
             listOf(
-                    PermissionStatus(arrayOf("android.permission.BIND_DEVICE_ADMIN"), "设备管理器", getString(cn.vove7.jarvis.R.string.admin_desc)) r@{ it, act->
-                        if(it.isOpen) return@r
+                    PermissionStatus(arrayOf("android.permission.BIND_DEVICE_ADMIN"), "设备管理器", getString(cn.vove7.jarvis.R.string.admin_desc)) r@{ it, act ->
+                        if (it.isOpen) return@r
                         val mComponentName = ComponentName(act, AdminReceiver::class.java)
                         val intent = Intent(DevicePolicyManager.ACTION_ADD_DEVICE_ADMIN)
                         intent.putExtra(DevicePolicyManager.EXTRA_DEVICE_ADMIN, mComponentName)
@@ -152,7 +152,7 @@ class PermissionManagerActivity : OneFragmentActivity() {
                             startActivityForResult(intent, 99)
                         } catch (e: Exception) {
                             e.log()
-                            GlobalApp.toastError("跳转失败，请手动进入[设置/安全/设备管理器]开启", 1 )
+                            GlobalApp.toastError("跳转失败，请手动进入[设置/安全/设备管理器]开启", 1)
                         }
                     },
                     PermissionStatus(arrayOf("ACCESSIBILITY_SERVICE"), "基础无障碍服务", getString(R.string.desc_accessibility), clickAction = openASAction),
@@ -171,6 +171,9 @@ class PermissionManagerActivity : OneFragmentActivity() {
                                 }
                             }
                         }
+                    },
+                    PermissionStatus(arrayOf("android.permission.WRITE_SETTINGS"), "修改系统设置", "用于调节屏幕亮度") { _, _ ->
+                        SystemBridge.openAppDetail(GlobalApp.APP.packageName)
                     },
                     PermissionStatus(arrayOf("android.permission.READ_CONTACTS"), "联系人", "用于检索联系人"),
                     PermissionStatus(arrayOf("android.permission.CALL_PHONE"), "电话", "用于拨打电话"),

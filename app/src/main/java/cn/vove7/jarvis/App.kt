@@ -2,6 +2,7 @@ package cn.vove7.jarvis
 
 import android.app.ActivityManager
 import android.content.Context
+import android.support.v4.app.CoreComponentFactory
 import cn.jpush.android.api.JPushInterface
 import cn.vove7.androlua.LuaApp
 import cn.vove7.common.app.AppConfig
@@ -41,6 +42,8 @@ class App : GlobalApp() {
         runWithClock("加载配置") {
             AppConfig.init()
         }
+
+        checkSelfPermission("")
 
         if (!isMainProcess) {
             Vog.d("非主进程")
