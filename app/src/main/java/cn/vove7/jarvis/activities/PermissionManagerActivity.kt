@@ -5,8 +5,10 @@ import android.app.admin.DevicePolicyManager
 import android.content.ActivityNotFoundException
 import android.content.ComponentName
 import android.content.Intent
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.provider.Settings
 import android.support.v4.app.Fragment
 import android.support.v7.app.AppCompatActivity
 import android.view.View
@@ -172,8 +174,16 @@ class PermissionManagerActivity : OneFragmentActivity() {
                             }
                         }
                     },
-                    PermissionStatus(arrayOf("android.permission.WRITE_SETTINGS"), "修改系统设置", "用于调节屏幕亮度") { _, _ ->
-                        SystemBridge.openAppDetail(GlobalApp.APP.packageName)
+                    PermissionStatus(arrayOf("android.permission.WRITE_SETTINGS"), "修改系统设置", "用于调节屏幕亮度") r@{ it, app ->
+                        if (it.isOpen || Build.VERSION.SDK_INT < Build.VERSION_CODES.M) return@r
+                        val intent = Intent(Settings.ACTION_MANAGE_WRITE_SETTINGS)
+                        intent.setData(Uri.parse("package:" + app.packageName))
+                        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                        try {
+                            app.startActivity(intent)
+                        } catch (e: Exception) {
+                            SystemBridge.openAppDetail(app.packageName)
+                        }
                     },
                     PermissionStatus(arrayOf("android.permission.READ_CONTACTS"), "联系人", "用于检索联系人"),
                     PermissionStatus(arrayOf("android.permission.CALL_PHONE"), "电话", "用于拨打电话"),
@@ -197,6 +207,9 @@ class PermissionManagerActivity : OneFragmentActivity() {
             val context = GlobalApp.APP
             permissions.forEach {
                 it.isOpen = when {
+                    it.permissionName == "修改系统设置" -> if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                        Settings.System.canWrite(context)
+                    } else true
                     it.permissionName == "设备管理器" -> AdminReceiver.isActive()
                     it.permissionName == "悬浮窗" -> Build.VERSION.SDK_INT < Build.VERSION_CODES.M || PermissionUtils.canDrawOverlays(context)
                     it.permissionString[0] == "ACCESSIBILITY_SERVICE" ->
@@ -222,7 +235,8 @@ class PermissionManagerActivity : OneFragmentActivity() {
             val permissionName: String,
             val desc: String,
             var isOpen: Boolean = false,
-            val clickAction: (PermissionStatus, Activity) -> Unit = { it, act ->
+            val clickAction: (PermissionStatus, Activity) -> Unit = a@{ it, act ->
+                if (it.isOpen) return@a
                 PermissionUtils.autoRequestPermission(act,
                         it.permissionString, 100)
             }
