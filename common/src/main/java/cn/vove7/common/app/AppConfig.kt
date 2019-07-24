@@ -454,12 +454,20 @@ object AppConfig : Settings by SmartKey.getSettings(BuildConfig.CONFIG_NAME) {
         }
     }
 
+    /**
+     * 版本号 -> 整数
+     * 规则: 1.1.0
+     * 小版本: 1.1.1.1
+     *
+     * @param s String
+     * @return Int
+     */
     private fun version2Int(s: String): Int {
         var sum = 0
-        var t = 1
-        s.split('.').reversed().forEach {
+        var t = 1000000
+        s.split('.').forEach {
             sum += it.toInt() * t
-            t *= 100
+            t /= 100
         }
         return sum
     }
