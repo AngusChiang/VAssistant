@@ -462,16 +462,15 @@ object AppConfig : Settings by SmartKey.getSettings(BuildConfig.CONFIG_NAME) {
      * @param s String
      * @return Int
      */
-    private fun version2Int(s: String): Int {
-        var sum = 0
-        var t = 1000000
+    private fun version2Int(s: String): Float {
+        var sum = 0f
+        var t = 1000000f
         s.split('.').forEach {
             sum += it.toInt() * t
             t /= 100
         }
         return sum
     }
-
 
     fun openCoolapk(context: Context) {
         val coolMarketPkg = "com.coolapk.market"
