@@ -1,8 +1,5 @@
 package cn.vove7.jarvis
 
-import android.app.ActivityManager
-import android.content.Context
-import android.support.v4.app.CoreComponentFactory
 import cn.jpush.android.api.JPushInterface
 import cn.vove7.androlua.LuaApp
 import cn.vove7.common.app.AppConfig
@@ -19,7 +16,6 @@ import cn.vove7.jarvis.receivers.PowerEventReceiver
 import cn.vove7.jarvis.receivers.ScreenStatusListener
 import cn.vove7.jarvis.receivers.UtilEventReceiver
 import cn.vove7.jarvis.services.MainService
-import cn.vove7.jarvis.tools.AppNotification
 import cn.vove7.jarvis.tools.CrashHandler
 import cn.vove7.jarvis.tools.ShortcutUtil
 import cn.vove7.jarvis.view.openAccessibilityServiceAuto
@@ -112,29 +108,9 @@ class App : GlobalApp() {
         super.onTerminate()
     }
 
-    /**
-     * 是否为主进程
-     * 未配置主进程名 默认为包名
-     */
-    val isMainProcess
-        get() = this.packageName == currentProcessName
-
-    val currentProcessName
-        get(): String? {
-            val pid = android.os.Process.myPid()
-            val manager = this.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
-            manager.runningAppProcesses.forEach { process ->
-                if (process.pid == pid)
-                    return process.processName.also {
-                        Vog.d("进程：${process.processName}")
-                    }
-            }
-            return null
-        }
-
     @Subscribe
     fun onUserInit(event: String) {
-        if(event == AppBus.EVENT_USER_INIT) {
+        if (event == AppBus.EVENT_USER_INIT) {
             JPushInterface.setAlias(this, UserInfo.getUserId().toString(), null)
         }
     }

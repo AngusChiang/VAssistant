@@ -1,5 +1,6 @@
 package cn.vove7.common.app
 
+import android.app.ActivityManager
 import android.app.Application
 import android.content.Context
 import android.content.Intent
@@ -93,6 +94,26 @@ open class GlobalApp : RePluginApplication() {
         var serviceBridge: ServiceBridge? = null
 
     }
+
+    /**
+     * 是否为主进程
+     * 未配置主进程名 默认为包名
+     */
+    val isMainProcess
+        get() = this.packageName == currentProcessName
+
+    val currentProcessName
+        get(): String? {
+            val pid = android.os.Process.myPid()
+            val manager = this.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
+            manager.runningAppProcesses.forEach { process ->
+                if (process.pid == pid)
+                    return process.processName.also {
+                        Vog.d("进程：${process.processName}")
+                    }
+            }
+            return null
+        }
 
     override fun attachBaseContext(base: Context?) {
         super.attachBaseContext(base)

@@ -5,6 +5,7 @@ import android.content.Intent
 import android.content.IntentFilter
 import cn.vove7.bottomdialog.BottomDialogActivity
 import cn.vove7.common.app.AppConfig
+import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.appbus.AppBus
 import cn.vove7.jarvis.services.MainService
 import cn.vove7.jarvis.view.dialog.AppUpdateDialog.Companion.getBuildAction
@@ -31,7 +32,7 @@ object UtilEventReceiver : DyBCReceiver() {
             APP_HAS_UPDATE -> {
                 val ver = intent.getStringExtra("version")
                 val log = intent.getStringExtra("log")
-                BottomDialogActivity.builder(context!!, getBuildAction(ver, log))
+                BottomDialogActivity.builder(GlobalApp.APP, getBuildAction(ver, log))
             }
         }
     }
