@@ -11,12 +11,29 @@ interface VApi {
                 "runtime",
                 "ViewFinder()",
                 "system",
-                "http"
+                "http",
+                "input"
         )
 
         val runtimeFunctions = arrayOf("currentApp",
                 "currentActivity", "actionCount", "currentActionIndex", "isGlobal()",
                 "commandType", "command", "DEBUG", "focusView", "userInterrupt", "notSupport()")
+
+        val inputFuns = arrayOf(
+                "init()",
+                "restore()",
+                "sendKey(keyCode)",
+                "sendKeys(keys)",
+                "selectedText",
+                "input(text)",
+                "actionSearch()",
+                "actionGo()",
+                "actionDone()",
+                "sendEnter()",
+                "delete()",
+                "select(start, end)",
+                "close()"
+        )
 
         val httpFunctions = arrayOf("get()", "post()", "postJson()", "getAsPc()")
 
@@ -35,7 +52,7 @@ interface VApi {
                 "parseDateText()"
         )
         val globalFuns = arrayOf(
-                "toast()", "back()", "home()", "powerDialog()", "quickSettings()",
+                "toast()", "toastLong()", "back()", "home()", "powerDialog()", "quickSettings()",
                 "recents()", "notificationBar()",
                 "setScreenSize()", "swipe()", "click()", "longClick()",
                 "gesture()", "scrollDown()", "scrollUp()", "screenShot()"
@@ -293,5 +310,21 @@ interface VApi {
                 Pair("removeFloat()", "关闭语音悬浮窗")
 
         )
+
+        val inputMap = hashMapOf(
+                "init()" to "设置VAssist内置输入法",
+                "restore()" to "恢复原输入法，指令结束后会自动恢复，也可显式调用，在合适时机恢复。",
+                "sendKey(keyCode)" to "发送按键，keyCode 见系统函数sendKey说明",
+                "sendKeys(keys)" to "发送一组按键",
+                "selectedText" to "编辑框选择的文本",
+                "input(text)" to "输入（光标后追加）",
+                "actionSearch()" to "发送IME_ACTION_SEARCH",
+                "actionGo()" to "发送IME_ACTION_GO",
+                "actionDone()" to "发送IME_ACTION_DONE",
+                "sendEnter()" to "发送回车键",
+                "delete()" to "删除键",
+                "select(start, end)" to "选择文本"
+        )
+
     }
 }

@@ -88,15 +88,13 @@ fun runOnNewHandlerThread(
  */
 fun <T> whileWaitTime(waitMillis: Long, run: () -> T?): T? {
     val begin = System.currentTimeMillis()
-    var now: Long
     val ct = Thread.currentThread()
     do {
         run.invoke()?.also {
             //if 耗时操作
             return it
         }
-        now = System.currentTimeMillis()
-    } while (now - begin < waitMillis && !ct.isInterrupted)
+    } while (System.currentTimeMillis() - begin < waitMillis && !ct.isInterrupted)
     return null
 }
 

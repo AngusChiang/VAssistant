@@ -8,7 +8,7 @@ import org.mozilla.javascript.ScriptableObject;
 public abstract class AbsApi {
 
     protected abstract String[] funs();
-    public void bind(ScriptableObject global) {
+    public void define(ScriptableObject global) {
         global.defineFunctionProperties(funs(), this.getClass(),
                 ScriptableObject.DONTENUM);
     }

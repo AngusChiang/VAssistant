@@ -91,5 +91,6 @@ interface GlobalActionExecutorI {
      * 通知
      */
     fun toast(msg: String?)
+    fun toastLong(msg: String?)
 }
 

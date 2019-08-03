@@ -27,6 +27,7 @@ import cn.vove7.common.interfaces.VApi.Companion.executorFunctions
 import cn.vove7.common.interfaces.VApi.Companion.finderFuns
 import cn.vove7.common.interfaces.VApi.Companion.globalFuns
 import cn.vove7.common.interfaces.VApi.Companion.httpFunctions
+import cn.vove7.common.interfaces.VApi.Companion.inputFuns
 import cn.vove7.common.interfaces.VApi.Companion.keywordss
 import cn.vove7.common.interfaces.VApi.Companion.myApiName
 import cn.vove7.common.interfaces.VApi.Companion.runtimeFunctions
@@ -191,7 +192,7 @@ class MyJsLanguageWithApi : Language(), VApi {
          * получения слов в редакторе.
          */
         private val ALL_KEYWORDS = ArrayUtil.merge(arrayOf(keywordss, myApiName,
-                appFunctions, runtimeFunctions, executorFunctions, viewNodeFunctions,
+                appFunctions, runtimeFunctions, executorFunctions, inputFuns, viewNodeFunctions,
                 finderFuns, globalFuns, systemFuncs, utilFuns, spFuncs, JS_KEYWORDS, httpFunctions,
                 androRuntimeFuncs))
     }

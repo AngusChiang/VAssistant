@@ -15,6 +15,7 @@ androRuntime = bridges.getRootHelper()
 serviceBridge = bridges.getServiceBridge()
 system = bridges.getSystemBridge()
 automator = bridges.getAutomator()
+input = bridges.getInputBridge()
 
 function notifyFailed(s)
     executor.executeFailed(s)

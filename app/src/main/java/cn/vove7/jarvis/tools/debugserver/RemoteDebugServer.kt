@@ -5,6 +5,7 @@ import android.os.Handler
 import android.os.Looper
 import android.widget.Toast
 import cn.vove7.androlua.LuaHelper
+import cn.vove7.common.app.AppConfig
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.appbus.AppBus
@@ -12,6 +13,7 @@ import cn.vove7.common.bridges.SystemBridge
 import cn.vove7.common.datamanager.parse.model.Action
 import cn.vove7.common.datamanager.parse.statusmap.ActionNode
 import cn.vove7.common.executor.OnPrint
+import cn.vove7.common.model.UserInfo
 import cn.vove7.common.utils.ThreadPool.runOnPool
 import cn.vove7.common.utils.runInCatch
 import cn.vove7.common.utils.startActivityOnNewTask
@@ -221,13 +223,18 @@ object RemoteDebugServer : Runnable {
                 }
                 else -> {
                     if (action.action.startsWith("new_inst")) {
+                        if (!UserInfo.isLogin()) {
+                            GlobalApp.toastError("请登录后操作")
+                            return@runOnPool
+                        }
+
                         GlobalApp.APP.apply {
                             val intent = Intent(this, NewInstActivity::class.java)
                             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK)
                             intent.putExtra("remote_script", action.text)
                             intent.putExtra("remote_script_type", if ("lua" == action.type) "lua" else "js")
-                            intent.putExtra("type", if (action.action == "new_inst_as_inapp")
-                                ActionNode.NODE_SCOPE_IN_APP else ActionNode.NODE_SCOPE_GLOBAL)
+                            intent.putExtra("type", if (action.action == "new_inst_as_inapp"){
+                                ActionNode.NODE_SCOPE_IN_APP} else ActionNode.NODE_SCOPE_GLOBAL)
                             //类型
                             startActivityOnNewTask(intent)
                         }

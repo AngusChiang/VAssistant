@@ -7,6 +7,7 @@ import android.os.Build
 import android.support.annotation.RequiresApi
 import android.util.Pair
 import android.view.ViewConfiguration
+import android.widget.Toast
 import cn.vove7.common.MessageException
 import cn.vove7.common.accessibility.AccessibilityApi
 import cn.vove7.common.annotation.ScriptApi
@@ -236,6 +237,10 @@ object GlobalActionExecutor : GlobalActionExecutorI {
 
     override fun toast(msg: String?) {
         GlobalApp.toastInfo(msg ?: "null")
+    }
+
+    override fun toastLong(msg: String?) {
+        GlobalApp.toastInfo(msg ?: "null", Toast.LENGTH_LONG)
     }
 
     override fun click(x: Int, y: Int): Boolean {

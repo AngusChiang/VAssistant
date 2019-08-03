@@ -6,6 +6,7 @@ import cn.vove7.common.interfaces.VApi.Companion.appFunctions
 import cn.vove7.common.interfaces.VApi.Companion.executorFunctions
 import cn.vove7.common.interfaces.VApi.Companion.finderFuns
 import cn.vove7.common.interfaces.VApi.Companion.globalFuns
+import cn.vove7.common.interfaces.VApi.Companion.inputFuns
 import cn.vove7.common.interfaces.VApi.Companion.keywordss
 import cn.vove7.common.interfaces.VApi.Companion.myApiName
 import cn.vove7.common.interfaces.VApi.Companion.runtimeFunctions
@@ -34,6 +35,7 @@ class LanguageJs private constructor() : Language(), VApi {
 
         super.addBasePackage("app", appFunctions)
         super.addBasePackage("runtime", runtimeFunctions)
+        super.addBasePackage("input", inputFuns)
         super.addBasePackage("ViewFinder()", finderFuns)
         super.addBasePackage("system", systemFuncs)
     }

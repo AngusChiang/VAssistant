@@ -1,3 +1,5 @@
+@file:Suppress("unused")
+
 package cn.vove7.common.view.finder
 
 import android.util.Range
@@ -19,8 +21,16 @@ import java.util.*
  */
 class ViewFindBuilder : FindBuilderWithOperation {
 
-    private val viewFinderX: ViewFinderWithMultiCondition
+    internal val viewFinderX: ViewFinderWithMultiCondition
         get() = finder as ViewFinderWithMultiCondition
+
+    /**
+     * DSL
+     * @param builder [@kotlin.ExtensionFunctionType] Function1<ViewFindBuilder, Unit>
+     */
+    operator fun invoke(builder: ViewFindBuilder.() -> Unit) {
+        apply(builder)
+    }
 
     constructor() {
         finder = ViewFinderWithMultiCondition()
@@ -72,14 +82,12 @@ class ViewFindBuilder : FindBuilderWithOperation {
      * @param regs 表达式 %消息%
      * @return this
      */
-    @Suppress(names = ["unused"])
     fun matchesText(vararg regs: String): ViewFindBuilder {
         viewFinderX.addViewTextCondition(*regs)
         viewFinderX.textMatchMode = TEXT_MATCH_MODE_MATCHES
         return this
     }
 
-    @Suppress(names = ["unused"])
     fun matchesText(regs: String): ViewFindBuilder {
         viewFinderX.addViewTextCondition(regs)
         viewFinderX.textMatchMode = TEXT_MATCH_MODE_MATCHES
@@ -111,7 +119,6 @@ class ViewFindBuilder : FindBuilderWithOperation {
      * @param text 文本内容
      * @return this
      */
-    @Suppress(names = ["unused"])
     fun similaryText(vararg text: String): ViewFindBuilder {
         viewFinderX.addViewTextCondition(*text)
         viewFinderX.textMatchMode = TEXT_MATCH_MODE_FUZZY_WITH_PINYIN
@@ -129,7 +136,6 @@ class ViewFindBuilder : FindBuilderWithOperation {
         return this
     }
 
-    @Suppress(names = ["unused"])
     fun textLengthLimit(lower: Int, upper: Int): ViewFindBuilder {
         viewFinderX.textLengthLimit = Range.create(lower, upper)
         return this
@@ -154,7 +160,7 @@ class ViewFindBuilder : FindBuilderWithOperation {
      * @return
      */
     fun desc(vararg desc: String): ViewFindBuilder {
-        viewFinderX.descTexts.addAll(Arrays.asList(*desc))
+        viewFinderX.descTexts.addAll(listOf(*desc))
         viewFinderX.descMatchMode = TEXT_MATCH_MODE_EQUAL
         return this
     }
@@ -172,7 +178,7 @@ class ViewFindBuilder : FindBuilderWithOperation {
     }
 
     fun containsDesc(vararg desc: String): ViewFindBuilder {
-        viewFinderX.descTexts.addAll(Arrays.asList(*desc))
+        viewFinderX.descTexts.addAll(listOf(*desc))
         viewFinderX.descMatchMode = TEXT_MATCH_MODE_CONTAIN
         return this
     }
@@ -195,7 +201,7 @@ class ViewFindBuilder : FindBuilderWithOperation {
     }
 
     fun type(vararg types: String): ViewFindBuilder {
-        viewFinderX.typeNames.addAll(Arrays.asList(*types))
+        viewFinderX.typeNames.addAll(listOf(*types))
         return this
     }
 
@@ -208,6 +214,7 @@ class ViewFindBuilder : FindBuilderWithOperation {
     }
 
     companion object {
+
         fun id(id: String): ViewFindBuilder {
             return ViewFindBuilder().apply {
                 id(id)
@@ -217,6 +224,12 @@ class ViewFindBuilder : FindBuilderWithOperation {
         fun text(text: String): ViewFindBuilder {
             return ViewFindBuilder().apply {
                 equalsText(text)
+            }
+        }
+
+        fun type(type: String): ViewFindBuilder {
+            return ViewFindBuilder().apply {
+                type(type)
             }
         }
 
@@ -237,5 +250,34 @@ class ViewFindBuilder : FindBuilderWithOperation {
                 this.type(*types)
             }
         }
+
+        fun containsText(vararg text: String): ViewFindBuilder {
+            return ViewFindBuilder().apply {
+                viewFinderX.addViewTextCondition(*text)
+                viewFinderX.textMatchMode = TEXT_MATCH_MODE_CONTAIN
+            }
+        }
+
+        fun containsText(text: String): ViewFindBuilder {
+            return ViewFindBuilder().apply {
+                viewFinderX.addViewTextCondition(text)
+                viewFinderX.textMatchMode = TEXT_MATCH_MODE_CONTAIN
+            }
+        }
+
+        fun matchesText(vararg regs: String): ViewFindBuilder {
+            return ViewFindBuilder().apply {
+                viewFinderX.addViewTextCondition(*regs)
+                viewFinderX.textMatchMode = TEXT_MATCH_MODE_MATCHES
+            }
+        }
+
+        fun matchesText(regs: String): ViewFindBuilder {
+            return ViewFindBuilder().apply {
+                viewFinderX.addViewTextCondition(regs)
+                viewFinderX.textMatchMode = TEXT_MATCH_MODE_MATCHES
+            }
+        }
+
     }
 }

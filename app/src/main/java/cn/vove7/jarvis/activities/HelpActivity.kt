@@ -11,6 +11,7 @@ import cn.vove7.bottomdialog.BottomDialog
 import cn.vove7.bottomdialog.builder.buttons
 import cn.vove7.bottomdialog.builder.title
 import cn.vove7.bottomdialog.builder.withCloseIcon
+import cn.vove7.bottomdoalog.extension.awesomeHeader
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.bridges.SystemBridge
@@ -94,8 +95,7 @@ class HelpActivity : ReturnableActivity(), AdapterView.OnItemClickListener {
             }
             2 -> {
                 BottomDialog.builder(this){
-                    title("常见问题")
-                    withCloseIcon()
+                    awesomeHeader("常见问题")
                     content(MarkdownContentBuilder()){
                         loadMarkdownFromAsset("files/faqs.md")
                     }
@@ -113,8 +113,7 @@ class HelpActivity : ReturnableActivity(), AdapterView.OnItemClickListener {
                 }
 
                 BottomDialog.builder(this) {
-                    title("日志")
-                    withCloseIcon()
+                    awesomeHeader("日志")
                     cancelable(false)
 
                     content(SmoothTextBuilder().apply {

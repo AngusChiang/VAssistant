@@ -8,11 +8,8 @@ import cn.vove7.common.accessibility.viewnode.ViewNode
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.appbus.AppBus
-import cn.vove7.common.bridges.ChoiceData
-import cn.vove7.common.bridges.ServiceBridge
-import cn.vove7.common.bridges.ShowDialogEvent
+import cn.vove7.common.bridges.*
 import cn.vove7.common.bridges.ShowDialogEvent.Companion.WHICH_SINGLE
-import cn.vove7.common.bridges.SystemBridge
 import cn.vove7.common.datamanager.DAO
 import cn.vove7.common.datamanager.executor.entity.MarkedData
 import cn.vove7.common.datamanager.executor.entity.MarkedData.MARKED_TYPE_SCRIPT_JS
@@ -40,6 +37,8 @@ import cn.vove7.executorengine.parse.ParseEngine
 import cn.vove7.vtp.log.Vog
 import java.io.Closeable
 import java.util.*
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.TimeUnit
 import kotlin.concurrent.thread
 
 /**
@@ -65,7 +64,6 @@ open class ExecutorImpl(
         get() = AccessibilityApi.accessibilityService
     private var lock = Object()
     var currentAction: Action? = null
-    //    val globalActionExecutor = GlobalActionExecutor()
     override var command: String? = null
     override var DEBUG: Boolean = false
     override val focusView: ViewNode?
@@ -250,6 +248,7 @@ open class ExecutorImpl(
         thread = null
         ScreenAdapter.reSet()
         SystemBridge.release()
+        InputMethodBridge.restore()
         System.gc()
         if (result != null)
             serviceBridge?.onExecuteFinished(result)

@@ -1,5 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="cn.vove7.common" >
+    package="cn.vove7.common">
 
     <uses-permission
         android:name="android.permission.ACCESS_COARSE_LOCATION"
@@ -13,9 +13,29 @@
     <uses-permission android:name="android.permission.VIBRATE" />
 
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+
     <application>
-        <activity android:name=".view.ScreenshotActivity"
+        <activity
+            android:name=".view.ScreenshotActivity"
             android:launchMode="singleInstance"
             android:theme="@style/ScreenShotTheme" />
+
+        <activity
+            android:name=".activities.RunnableActivity"
+            android:excludeFromRecents="true"
+            android:theme="@style/ScreenShotTheme"
+            android:launchMode="singleInstance" />
+
+        <service
+            android:name=".service.AssistInputService"
+            android:label="@string/app_name"
+            android:permission="android.permission.BIND_INPUT_METHOD">
+            <intent-filter>
+                <action android:name="android.view.InputMethod" />
+            </intent-filter>
+            <meta-data
+                android:name="android.view.im"
+                android:resource="@xml/method" />
+        </service>
     </application>
 </manifest>

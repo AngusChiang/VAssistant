@@ -18,7 +18,7 @@ object RootHelper {
     /**
      * 判断即是否授予root权限
      */
-    fun hasRoot(): Boolean = RootShell.isAccessGiven()
+    fun hasRoot(timeOut: Int = 5000): Boolean = RootShell.isAccessGiven(timeOut, 0)
 
 
     /**

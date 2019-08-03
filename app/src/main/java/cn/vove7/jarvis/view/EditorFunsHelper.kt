@@ -20,6 +20,8 @@ import cn.vove7.bottomdialog.builder.title
 import cn.vove7.common.interfaces.VApi
 import cn.vove7.common.interfaces.VApi.Companion.executorFunctions
 import cn.vove7.common.interfaces.VApi.Companion.executorMap
+import cn.vove7.common.interfaces.VApi.Companion.inputFuns
+import cn.vove7.common.interfaces.VApi.Companion.inputMap
 import cn.vove7.common.interfaces.VApi.Companion.runtimeFunctions
 import cn.vove7.common.interfaces.VApi.Companion.runtimeMap
 import cn.vove7.common.interfaces.VApi.Companion.systemFunMap
@@ -53,9 +55,9 @@ class EditorFunsHelper(
 //                )),
                 ApiCategory("运行时", mutableListOf<ApiFunction>().also {
                     runtimeFunctions.forEach { f ->
-                        it.add(ApiFunction(f, runtimeMap[f] ?: f, "runtime.$f"))
+                        it.add(ApiFunction(f, runtimeMap[f] ?: f))
                     }
-                }),
+                }, insertPre = "runtime."),
                 ApiCategory("执行器", mutableListOf<ApiFunction>().also {
                     executorFunctions.forEach { f ->
                         it.add(ApiFunction(f, executorMap[f] ?: f))
@@ -97,6 +99,12 @@ class EditorFunsHelper(
                         , ApiFunction("await()", "同waitFor()")
                         , ApiFunction("waitHide()", "等待消失 常用于加载View的消失,参数:([waitMs: Int])\n(可选)waitMs:等待时间,最长30s,\n返回Boolean: false:超时; true:该ViewNode消失")
                 )),
+                ApiCategory("编辑框操作", mutableListOf<ApiFunction>().apply {
+                    inputFuns.forEach {
+                        add(ApiFunction(it, inputMap[it] ?: it))
+                    }
+                }, insertPre = "input."),
+
                 ApiCategory("网络", listOf(
                         ApiFunction("get(url)", "发起get请求，参数:(url [, params:Map])", insertText = "http.get()")
                         , ApiFunction("post(url)", "发起post请求，参数:(url [, params:Map])", insertText = "http.post()")
@@ -112,6 +120,7 @@ class EditorFunsHelper(
                         , ApiFunction("smartClose(s)", "关闭应用、标记的记录")
                         , ApiFunction("sleep(m)", "睡眠m毫秒")
                         , ApiFunction("toast(msg)", "消息弹框")
+                        , ApiFunction("toastLong(msg)", "长时间消息弹框")
                         , ApiFunction("back()", "返回操作")
                         , ApiFunction("home()", "返回主页")
                         , ApiFunction("powerDialog()", "打开电源菜单")
@@ -132,9 +141,9 @@ class EditorFunsHelper(
                 )),
                 ApiCategory("系统", mutableListOf<ApiFunction>().also {
                     systemFuncs.forEach { f ->
-                        it.add(ApiFunction(f, systemFunMap[f] ?: f, "system.$f"))
+                        it.add(ApiFunction(f, systemFunMap[f] ?: f))
                     }
-                }),
+                }, insertPre = "system."),
                 ApiCategory("存储", listOf(//指令设置
                         ApiFunction("settings", "插入指令存储代码",
                                 insertText = "\nsettings = {\n" +
@@ -245,13 +254,22 @@ class GridAdapter(val c: Activity, val functions: List<ApiFunction>, val onClick
 
 class ApiCategory(
         val typeName: String,
-        val functions: List<ApiFunction>
-)
+        val functions: List<ApiFunction>,
+        val insertPre: String? = null
+) {
+    init {
+        if (insertPre != null) {
+            functions.forEach {
+                it.insertText = "$insertPre${it.name}"
+            }
+        }
+    }
+}
 
 class ApiFunction(
         val name: String,
         val summary: String = name,
-        val insertText: String = name,
+        var insertText: String = name,
         val doc: String = summary
 ) {
     val sortSummary: String

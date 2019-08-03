@@ -19,6 +19,8 @@ import cn.vove7.admin_manager.AdminReceiver
 import cn.vove7.common.accessibility.AccessibilityApi
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.app.log
+import cn.vove7.common.bridges.InputMethodBridge
+import cn.vove7.common.bridges.RootHelper
 import cn.vove7.common.bridges.SystemBridge
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.activities.PermissionManagerActivity.PermissionStatus.Companion.allPerStr
@@ -185,7 +187,20 @@ class PermissionManagerActivity : OneFragmentActivity() {
                             SystemBridge.openAppDetail(app.packageName)
                         }
                     },
-                    PermissionStatus(arrayOf("android.permission.READ_CONTACTS"), "联系人", "用于检索联系人"),
+                    PermissionStatus(arrayOf(), "输入法", """用于更强大的编辑操作
+提示；在执行编辑框操作时，会自动切换内置输入法进行操作，结束后会恢复原输入法。
+自动切换输入法支持三种方式：
+1. 无障碍服务（可见的切换步骤）
+2. Root权限（推荐）
+3. WRITE_SECURE_SETTINGS权限（推荐，开启方法，见[常见问题]）
+由于每次询问Root权限申请过慢，请预先授权。
+""") { it, app ->
+                        if(!it.isOpen) {
+                            startActivity(Intent(Settings.ACTION_INPUT_METHOD_SETTINGS))
+                        }
+                    },
+                    PermissionStatus(arrayOf(), "Root", "切换输入法，自动开启无障碍服务"),
+                    PermissionStatus(arrayOf("android.permission.READ_CONTACTS"), "联系人", "用于检索联系人，拨号指令"),
                     PermissionStatus(arrayOf("android.permission.CALL_PHONE"), "电话", "用于拨打电话"),
                     PermissionStatus(arrayOf("android.permission.RECORD_AUDIO"), "录音", "用于语音识别"),
                     PermissionStatus(arrayOf("android.permission.ACCESS_NETWORK_STATE"), "获取网络状态", "用于获取网络状态"),
@@ -207,6 +222,8 @@ class PermissionManagerActivity : OneFragmentActivity() {
             val context = GlobalApp.APP
             permissions.forEach {
                 it.isOpen = when {
+                    it.permissionName == "Root" -> RootHelper.hasRoot()
+                    it.permissionName == "输入法" -> InputMethodBridge.isEnable
                     it.permissionName == "修改系统设置" -> if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                         Settings.System.canWrite(context)
                     } else true
@@ -255,7 +272,9 @@ class PermissionManagerActivity : OneFragmentActivity() {
                     "android.permission.FLASHLIGHT",
                     "android.permission.ACCESS_COARSE_LOCATION",
                     "android.permission.ACCESS_FINE_LOCATION",
-                    "android.permission.CAMERA"
+                    "android.permission.CAMERA",
+                    "android.permission.WRITE_CALENDAR",
+                    "android.permission.READ_CALENDAR"
             )
 
         }

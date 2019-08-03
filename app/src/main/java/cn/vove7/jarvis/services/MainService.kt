@@ -133,7 +133,6 @@ class MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
         loadChatSystem()
         loadSpeechService()
         speechEngineLoaded = true
-        GlobalApp.toastInfo("启动完成")
     }
 
     /**

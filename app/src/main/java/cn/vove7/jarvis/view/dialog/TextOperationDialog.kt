@@ -8,6 +8,7 @@ import cn.vove7.bottomdialog.builder.ButtonsBuilder
 import cn.vove7.bottomdialog.builder.buttons
 import cn.vove7.bottomdialog.builder.title
 import cn.vove7.bottomdialog.builder.withCloseIcon
+import cn.vove7.bottomdoalog.extension.awesomeHeader
 import cn.vove7.common.app.AppConfig
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.bridges.SystemBridge
@@ -35,7 +36,7 @@ class TextOperationDialog(val context: Activity, val textModel: TextModel) {
 
     val bottomDialog = BottomDialog.builder(context) {
 
-        title("文字操作")
+        awesomeHeader("文字操作")
         buttons {
 
             positiveButton(text = "复制") {

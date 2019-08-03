@@ -54,6 +54,7 @@ class RhinoHelper : ScriptableObject, ScriptEngine {
         putProperty("androRuntime", bridgeManager.rootHelper)
         putProperty("serviceBridge", bridgeManager.serviceBridge)
         putProperty("app", appContext)
+        putProperty("input", bridgeManager.inputBridge)
         init()
     }
 
@@ -68,7 +69,7 @@ class RhinoHelper : ScriptableObject, ScriptEngine {
             global.init(androidHelper.contextFactory)
         }
 
-        RhinoApi().bind(global)
+        RhinoApi().define(global)
 
         loadAsset("rhino_require/apis.js")
         isInit = true

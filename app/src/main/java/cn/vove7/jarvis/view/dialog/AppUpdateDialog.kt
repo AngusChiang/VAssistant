@@ -5,6 +5,7 @@ import cn.vove7.bottomdialog.BottomDialog
 import cn.vove7.bottomdialog.builder.BottomDialogBuilder
 import cn.vove7.bottomdialog.builder.buttons
 import cn.vove7.bottomdialog.builder.title
+import cn.vove7.bottomdoalog.extension.awesomeHeader
 import cn.vove7.common.app.AppConfig
 import cn.vove7.jarvis.view.dialog.contentbuilder.MarkdownContentBuilder
 import cn.vove7.vtp.sharedpreference.SpHelper
@@ -25,7 +26,7 @@ class AppUpdateDialog(val context: Activity, val verName: String, val updateLog:
         fun getBuildAction(ver: String, log: String): BottomDialogBuilder.() -> Unit {
             return {
                 cancelable(false)
-                title("发现新版本: v$ver")
+                awesomeHeader("发现新版本: v$ver")
                 content(MarkdownContentBuilder()) {
                     loadMarkdown(log)
                 }
