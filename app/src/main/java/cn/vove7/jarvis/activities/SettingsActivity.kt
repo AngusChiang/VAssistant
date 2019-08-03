@@ -339,6 +339,7 @@ class SettingsActivity : ReturnableActivity() {
             }
             neutralButton(text = "清除设置") {
                 AppConfig.wakeupKeys = intArrayOf()
+                GlobalApp.toastSuccess("设置成功")
                 dismiss()
             }
 
