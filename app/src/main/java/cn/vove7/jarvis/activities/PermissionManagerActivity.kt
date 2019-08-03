@@ -22,12 +22,15 @@ import cn.vove7.common.app.log
 import cn.vove7.common.bridges.InputMethodBridge
 import cn.vove7.common.bridges.RootHelper
 import cn.vove7.common.bridges.SystemBridge
+import cn.vove7.common.utils.ThreadPool
+import cn.vove7.common.utils.runOnUi
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.activities.PermissionManagerActivity.PermissionStatus.Companion.allPerStr
 import cn.vove7.jarvis.activities.base.OneFragmentActivity
 import cn.vove7.jarvis.adapters.RecAdapterWithFooter
 import cn.vove7.jarvis.fragments.SimpleListFragment
 import cn.vove7.vtp.runtimepermission.PermissionUtils
+import kotlin.concurrent.thread
 
 
 /**
@@ -193,13 +196,18 @@ class PermissionManagerActivity : OneFragmentActivity() {
 1. 无障碍服务（可见的切换步骤）
 2. Root权限（推荐）
 3. WRITE_SECURE_SETTINGS权限（推荐，开启方法，见[常见问题]）
-由于每次询问Root权限申请过慢，请预先授权。
-""") { it, app ->
-                        if(!it.isOpen) {
+由于每次询问Root权限申请过慢，请预先授权。""") { it, app ->
+                        if (!it.isOpen) {
                             startActivity(Intent(Settings.ACTION_INPUT_METHOD_SETTINGS))
                         }
                     },
-                    PermissionStatus(arrayOf(), "Root", "切换输入法，自动开启无障碍服务"),
+                    PermissionStatus(arrayOf(), "Root", "切换输入法，自动开启无障碍服务\n授予Root权限时，请将打开Magisk Manager后台运行（若使用Msgisk管理授权）") { it, _ ->
+                        if (!it.isOpen) {
+                            ThreadPool.runOnPool {//防止阻塞主线程
+                                RootHelper.hasRoot()
+                            }
+                        }
+                    },
                     PermissionStatus(arrayOf("android.permission.READ_CONTACTS"), "联系人", "用于检索联系人，拨号指令"),
                     PermissionStatus(arrayOf("android.permission.CALL_PHONE"), "电话", "用于拨打电话"),
                     PermissionStatus(arrayOf("android.permission.RECORD_AUDIO"), "录音", "用于语音识别"),
@@ -222,7 +230,15 @@ class PermissionManagerActivity : OneFragmentActivity() {
             val context = GlobalApp.APP
             permissions.forEach {
                 it.isOpen = when {
-                    it.permissionName == "Root" -> RootHelper.hasRoot()
+                    it.permissionName == "Root" -> false.also { _ ->
+                        //异步获取root权限
+                        thread {
+                            it.isOpen = RootHelper.hasRoot()
+                            runOnUi {
+                                adapter.notifyDataSetChanged()
+                            }
+                        }
+                    }
                     it.permissionName == "输入法" -> InputMethodBridge.isEnable
                     it.permissionName == "修改系统设置" -> if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                         Settings.System.canWrite(context)
