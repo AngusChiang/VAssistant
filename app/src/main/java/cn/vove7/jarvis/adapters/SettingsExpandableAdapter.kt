@@ -32,21 +32,11 @@ class SettingsExpandableAdapter(val context: Context,
 
     var childHolders: SparseArray<Array<SettingItemHelper.ChildItemHolder?>> = SparseArray(groupCount)
 
-    private val transition by lazy {
-        AutoTransition().apply {
-            duration = 270
-            interpolator = AccelerateDecelerateInterpolator()
-        }
-    }
     var groupHolders: Array<GroupItemHolder?> = arrayOfNulls(groupItems.size)
 
     init {
         for (i in 0 until groupCount) {
             childHolders.put(i, arrayOfNulls(getChildrenCount(i)))
-        }
-        expView.setOnGroupClickListener { parent, v, groupPosition, id ->
-            TransitionManager.beginDelayedTransition(parent, transition)
-            false
         }
     }
 

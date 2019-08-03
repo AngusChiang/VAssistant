@@ -8,9 +8,9 @@ import cn.vove7.jarvis.chat.TulingChatSystem
 import cn.vove7.jarvis.tools.baiduaip.BaiduAipHelper
 import cn.vove7.paramregexengine.toParamRegex
 import cn.vove7.vtp.net.NetHelper
-import cn.vove7.vtp.text.TextHelper.compareSimilarityWithPinyin
 import org.jsoup.Jsoup
 import org.junit.Test
+import java.io.File
 import java.lang.Thread.sleep
 import java.text.SimpleDateFormat
 import java.util.*
@@ -161,8 +161,9 @@ class ExampleUnitTest {
                 }
             }
             TextHelper.matchValues(it, "%提前半小时%").also { re ->
-                if (re != null){}
-                    println(30)
+                if (re != null) {
+                }
+                println(30)
             }
         }
     }
@@ -218,10 +219,11 @@ class ExampleUnitTest {
     @Test
     fun testKotlin() {
         val click = {
-            if (1 == 2){
-                println("1==2")}
-            else{}
-                println("1!=2")
+            if (1 == 2) {
+                println("1==2")
+            } else {
+            }
+            println("1!=2")
         }
 
         fff(click)
@@ -301,9 +303,9 @@ class ExampleUnitTest {
             thread {
                 //子线程
                 sleep(1000)
-                if (!Thread.currentThread().isInterrupted){
-                    println("未中断")}
-                else println("被中断")
+                if (!Thread.currentThread().isInterrupted) {
+                    println("未中断")
+                } else println("被中断")
                 println("子线程结束")
             }
             println("父线程结束")
@@ -416,4 +418,31 @@ class ExampleUnitTest {
         l.await()
     }
 
+    @Test
+    fun genToc() {
+        val s = buildString {
+            val f = File("F:\\Project\\AndroidProjects\\VAssistant\\app\\src\\main\\assets\\files\\faqs.md")
+            f.forEachLine {
+                if (it.startsWith("#")) {
+                    val endIndex = it.let {
+                        var end = 0
+                        run {
+                            it.forEachIndexed { index, v ->
+                                if (v != '#' && v != ' ') {
+                                    end = index
+                                    return@run
+                                }
+                            }
+                        }
+                        end
+                    }
+                    val title = it.substring(endIndex, it.length)
+
+                    appendln("${" " * (2 * (endIndex - 2))}- [$title](#${title})}")
+                }
+            }
+        }
+
+        print(s)
+    }
 }

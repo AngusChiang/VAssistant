@@ -22,6 +22,7 @@ import cn.vove7.common.utils.runOnUi
 import cn.vove7.common.utils.secure.SecuritySharedPreference
 import cn.vove7.smartkey.android.AndroidSettings
 import cn.vove7.smartkey.android.noCacheKey
+import cn.vove7.smartkey.android.smartKey
 import cn.vove7.smartkey.annotation.Config
 import cn.vove7.smartkey.key.SmartKey
 import cn.vove7.smartkey.key.get
@@ -53,7 +54,10 @@ object AppConfig : Settings by SmartKey.getSettings(BuildConfig.CONFIG_NAME) {
     var isToastWhenRemoveAd by noCacheKey(true, keyId = R.string.key_show_toast_when_remove_ad)
     var isAdBlockService by noCacheKey(false, keyId = R.string.key_open_ad_block)
 
-    var isLongPressVolUpWakeUp by noCacheKey(true, keyId = R.string.key_long_press_volume_up_wake_up)
+    var isLongPressKeyWakeUp by noCacheKey(true, keyId = R.string.key_long_press_volume_up_wake_up)
+
+    var wakeupKeys by smartKey(intArrayOf())
+
     var voiceControlDialog by noCacheKey(true, keyId = R.string.key_voice_control_dialog)
     var adWaitSecs by noCacheKey(17, keyId = R.string.key_ad_wait_secs)
 
@@ -88,7 +92,7 @@ object AppConfig : Settings by SmartKey.getSettings(BuildConfig.CONFIG_NAME) {
     var synStreamIndex: Int = 0//合成输出通道 对应 R.array.list_stream_syn_output
 
     //音量长按延迟
-    var volumeKeyDelayUp by noCacheKey(600, keyId = R.string.key_long_key_press_delay)
+    var volumeKeyDelayUp by noCacheKey(400, keyId = R.string.key_long_key_press_delay)
 
     var wakeUpFilePath by noCacheKey(DEFAULT_WAKEUP_FILE, keyId = R.string.key_wakeup_file_path)
 

@@ -52,7 +52,7 @@ object BackupHelper {
         MaterialDialog(activity).title(text = "选择备份数据")
                 .noAutoDismiss()
                 .checkBoxText(text = "tips: 备份本地数据，不包括已分享的数据。云端未审核通过和信息过旧的记录，请自行处理\n" +
-                        "保存路径：$backupPath") {}
+                        "保存路径：$backupPath")
                 .listItemsMultiChoice(items = listOf(
                         "全局指令", "应用内指令", "标记联系人", "标记应用", "标记(打开)功能", "标记广告信息"
                 ), waitForPositiveButton = false, initialSelection = indices) { _, indexes, _ ->

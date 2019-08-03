@@ -1,10 +1,12 @@
 package cn.vove7.jarvis.activities
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
+import android.view.KeyEvent
 import android.view.View
 import android.widget.TextView
 import cn.vove7.common.accessibility.AccessibilityApi
@@ -19,14 +21,19 @@ import cn.vove7.jarvis.activities.base.ReturnableActivity
 import cn.vove7.jarvis.adapters.SettingsExpandableAdapter
 import cn.vove7.jarvis.receivers.PowerEventReceiver
 import cn.vove7.jarvis.services.MainService
+import cn.vove7.jarvis.services.MyAccessibilityService
 import cn.vove7.jarvis.tools.ShortcutUtil
 import cn.vove7.jarvis.tools.Tutorials
 import cn.vove7.jarvis.tools.UriUtils
+import cn.vove7.jarvis.tools.checkBoxText
 import cn.vove7.jarvis.view.*
 import cn.vove7.jarvis.view.custom.SettingGroupItem
 import com.afollestad.materialdialogs.MaterialDialog
+import com.afollestad.materialdialogs.callbacks.onCancel
+import com.afollestad.materialdialogs.callbacks.onDismiss
 import com.afollestad.materialdialogs.customview.customView
 import kotlinx.android.synthetic.main.activity_expandable_settings.*
+import java.util.*
 
 /**
  *
@@ -167,16 +174,25 @@ class SettingsActivity : ReturnableActivity() {
             )),
 
             SettingGroupItem(R.color.google_green, titleS = "按键唤醒", childItems = listOf(
-
-                    SwitchItem(title = "音量键唤醒",
+                    SwitchItem(title = "长按唤醒",
                             keyId = R.string.key_long_press_volume_up_wake_up, summary = "可通过长按音量上键唤醒\n需要无障碍模式开启",
                             defaultValue =
-                            { AppConfig.isLongPressVolUpWakeUp }),
+                            { AppConfig.isLongPressKeyWakeUp }),
                     NumberPickerItem(title = "长按延时", summary = "单位: ms", defaultValue =
                     { AppConfig.volumeKeyDelayUp },
                             keyId = R.string.key_long_key_press_delay, range = Pair(200, 1000)),
                     CheckBoxItem(title = "耳机中键唤醒", summary = "长按耳机中键进行唤醒", keyId = R.string.key_wakeup_with_headsethook,
                             defaultValue = AppConfig.wakeUpWithHeadsetHook),
+                    IntentItem(title = "自定义按键", summary = AppConfig.wakeupKeys.let {
+                        if (it.isEmpty()) "未设置"
+                        else Arrays.toString(it)
+                    }) {
+                        if (AccessibilityApi.isBaseServiceOn) {
+                            listenKeyDialog()
+                        } else {
+                            GlobalApp.toastInfo("请先开启无障碍服务")
+                        }
+                    },
                     IntentItem(R.string.text_add_wakeup_shortcut_to_launcher, summary = "添加需要8.0+\n" +
                             "7.1+可直接在桌面长按图标使用Shortcut快捷唤醒\ntips:桌面可直接添加小部件")
                     {
@@ -290,6 +306,68 @@ class SettingsActivity : ReturnableActivity() {
                 else -> {
                 }
             }
+        }
+    }
+
+    var lisKeyDialog: MaterialDialog? = null
+
+    @SuppressLint("CheckResult")
+    private fun listenKeyDialog() {
+        val service = (AccessibilityApi.accessibilityService as MyAccessibilityService)
+
+        var keyCode: Int? = null
+
+        lisKeyDialog = MaterialDialog(this).show {
+            title(text = "自定义按键")
+            message(text = "按下某键，此处显示结果")
+            checkBoxText(text = "不支持某些按键：电源键，音量键，耳机中键\n注意：某些按键会导致原有功能失效")
+            cancelable(false)
+            noAutoDismiss()
+            positiveButton {
+                val k = keyCode
+                if (k == null) {
+                    GlobalApp.toastInfo("未监听到任何按键")
+                } else {
+                    //此版仅自定义一个key
+                    AppConfig.wakeupKeys = intArrayOf(k)
+                    GlobalApp.toastSuccess("设置成功")
+                    dismiss()
+                }
+            }
+            negativeButton {
+                dismiss()
+            }
+            neutralButton(text = "清除设置") {
+                AppConfig.wakeupKeys = intArrayOf()
+                dismiss()
+            }
+
+            onDismiss {
+                service.keyListener = null
+                lisKeyDialog = null
+            }
+            onCancel {
+                service.keyListener = null
+                lisKeyDialog = null
+            }
+        }
+        val notSupportKey = arrayOf(KeyEvent.KEYCODE_VOLUME_UP, KeyEvent.KEYCODE_VOLUME_DOWN, KeyEvent.KEYCODE_HEADSETHOOK)
+        service.keyListener = {
+            if (it.keyCode in notSupportKey) {
+                lisKeyDialog?.message(text = "不支持音量键和耳机中键，请在设置中开启")
+                keyCode = null
+            } else {
+                keyCode = it.keyCode
+                lisKeyDialog?.message(text = it.keyCode.toString())
+            }
+        }
+    }
+
+    override fun onStop() {
+        super.onStop()
+        lisKeyDialog?.also {
+            it.dismiss()
+            (AccessibilityApi.accessibilityService as MyAccessibilityService?)?.keyListener = null
         }
     }
 

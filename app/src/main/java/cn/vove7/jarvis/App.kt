@@ -47,7 +47,7 @@ class App : GlobalApp() {
 
         Cockroach.install(CrashHandler)
 
-        JPushInterface.setDebugMode(BuildConfig.DEBUG);
+        JPushInterface.setDebugMode(BuildConfig.DEBUG)
         JPushInterface.init(this)
         runOnNewHandlerThread("app_load") {
             if (AppConfig.FIRST_LAUNCH_NEW_VERSION || BuildConfig.DEBUG)

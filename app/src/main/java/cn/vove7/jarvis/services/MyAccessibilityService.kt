@@ -13,18 +13,19 @@ import android.view.ViewGroup
 import android.view.accessibility.AccessibilityEvent
 import android.view.accessibility.AccessibilityNodeInfo
 import cn.vove7.common.accessibility.AccessibilityApi
+import cn.vove7.common.app.AppConfig
 import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.appbus.AppBus
+import cn.vove7.common.bridges.GlobalActionExecutor
+import cn.vove7.common.bridges.SystemBridge
+import cn.vove7.common.helper.AdvanAppHelper
+import cn.vove7.common.utils.StubbornFlag
 import cn.vove7.common.utils.ThreadPool.runOnCachePool
 import cn.vove7.common.utils.ThreadPool.runOnPool
 import cn.vove7.common.utils.activities
 import cn.vove7.common.utils.isInputMethod
-import cn.vove7.common.bridges.SystemBridge
-import cn.vove7.common.helper.AdvanAppHelper
-import cn.vove7.common.utils.StubbornFlag
 import cn.vove7.jarvis.plugins.AdKillerService
 import cn.vove7.jarvis.plugins.VoiceWakeupStrategy
-import cn.vove7.common.app.AppConfig
 import cn.vove7.jarvis.view.statusbar.AccessibilityStatusAnimation
 import cn.vove7.jarvis.view.statusbar.StatusAnimation
 import cn.vove7.vtp.log.Vog
@@ -90,18 +91,6 @@ class MyAccessibilityService : AccessibilityApi() {
             Vog.d(currentScope.toString())
             dispatchPluginsEvent(ON_APP_CHANGED, currentScope)//发送事件
         }
-    }
-
-
-    /**
-     * 通知UI更新（UI驱动事件）
-     */
-    private fun callAllNotifier() {
-//        viewNotifierThread?.interrupt()
-//        viewNotifierThread = thread {
-//            viewNotifier.notifyIfShow()
-//        }
-//        dispatchPluginsEvent(ON_UI_UPDATE, rootInWindow)
     }
 
     /**
@@ -284,9 +273,10 @@ class MyAccessibilityService : AccessibilityApi() {
     /**
      * 点按音量加，再长按触发音量增大
      */
-    private var v4  by StubbornFlag<Long?>(null)
+    private var v4 by StubbornFlag<Long?>(null)
 
 
+    var keyListener: ((event: KeyEvent) -> Unit)? = null
     /**
      * 按键监听
      * 熄屏时无法监听
@@ -294,9 +284,14 @@ class MyAccessibilityService : AccessibilityApi() {
      * @return Boolean
      */
     override fun onKeyEvent(event: KeyEvent): Boolean {
+        val lis = keyListener
+        if (lis != null) {
+            lis.invoke(event)
+            return true
+        }
 //        Vog.v("onKeyEvent  ----> $event")
         when (event.action) {
-            KeyEvent.ACTION_DOWN -> when (event.keyCode) {
+            ACTION_DOWN -> when (event.keyCode) {
                 KEYCODE_VOLUME_DOWN -> {
                     return when {
                         MainService.recogIsListening -> {//下键取消聆听
@@ -316,6 +311,7 @@ class MyAccessibilityService : AccessibilityApi() {
                         else -> super.onKeyEvent(event)
                     }
                 }
+                //耳机
                 KEYCODE_HEADSETHOOK -> {
                     when {
                         MainService.recogIsListening -> {//按下停止聆听
@@ -330,11 +326,25 @@ class MyAccessibilityService : AccessibilityApi() {
                         else -> super.onKeyEvent(event)
                     }
                 }
+                in AppConfig.wakeupKeys -> {
+                    return when {
+                        MainService.recogIsListening -> {//按下停止聆听
+                            v2 = true
+                            MainService.instance?.onCommand(AppBus.ACTION_STOP_RECOG)
+                            true
+                        }
+                        else -> {
+                            postLongDelay(startupRunner)
+                            true
+                        }
+                    }
+                }
                 KEYCODE_VOLUME_UP -> {
                     v4?.apply {
                         //点按后 长按
-                        if ((this + 1000) > System.currentTimeMillis())
+                        if ((this + 1000) > System.currentTimeMillis()) {
                             return super.onKeyEvent(event)
+                        }
 
                     }
                     when {
@@ -343,7 +353,7 @@ class MyAccessibilityService : AccessibilityApi() {
                             MainService.instance?.onCommand(AppBus.ACTION_STOP_RECOG)
                             return true
                         }
-                        AppConfig.isLongPressVolUpWakeUp -> {//长按唤醒
+                        AppConfig.isLongPressKeyWakeUp -> {//长按唤醒
                             postLongDelay(startupRunner)
                             return true
                         }
@@ -355,9 +365,9 @@ class MyAccessibilityService : AccessibilityApi() {
 //                    return true
 //                }
             }
-            KeyEvent.ACTION_UP -> {
+            ACTION_UP -> {
                 when (event.keyCode) {
-                    KEYCODE_HEADSETHOOK, KEYCODE_VOLUME_UP ->
+                    KEYCODE_HEADSETHOOK, KEYCODE_VOLUME_UP, in AppConfig.wakeupKeys ->
                         if (v3) {
                             return removeDelayIfInterrupt(event, startupRunner) || super.onKeyEvent(event)
                         }
@@ -402,11 +412,14 @@ class MyAccessibilityService : AccessibilityApi() {
                     v4 = System.currentTimeMillis()
                     SystemBridge.volumeUp()
                 }
-                KEYCODE_HEADSETHOOK -> {
-                    SystemBridge.switchMusicStatus()//
-                }
+                KEYCODE_HEADSETHOOK -> SystemBridge.switchMusicStatus()
                 KEYCODE_VOLUME_DOWN -> SystemBridge.volumeDown()
-                else -> return false
+                KEYCODE_BACK -> GlobalActionExecutor.back()
+                KEYCODE_HOME -> GlobalActionExecutor.home()
+                KEYCODE_APP_SWITCH -> GlobalActionExecutor.recents()
+                else -> {
+                    return false
+                }
             } //其他按键
         }
         return true
