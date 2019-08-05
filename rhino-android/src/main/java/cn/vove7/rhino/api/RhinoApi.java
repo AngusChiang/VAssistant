@@ -4,9 +4,11 @@ import android.util.Log;
 
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.Function;
+import org.mozilla.javascript.NativeJavaArray;
 import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.annotations.JSFunction;
 
+import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
@@ -63,7 +65,7 @@ public class RhinoApi extends AbsApi {
 
     public static void onException(Throwable e) {
         GlobalLog.INSTANCE.err(e);
-        notifyOutput(OnPrint.ERROR,e.getMessage());
+        notifyOutput(OnPrint.ERROR, e.getMessage());
     }
 
     private static final Set<OnPrint> printList = new HashSet<>();
@@ -100,10 +102,24 @@ public class RhinoApi extends AbsApi {
                                           Object[] args, Function funObj) {
         StringBuilder builder = new StringBuilder();
         for (int i = 0; i < args.length; i++) {
+
             if (i > 0)
                 builder.append(' ');
             // Convert the arbitrary JavaScript value into a string form.
-            String s = Context.toString(args[i]);
+            Object obj = args[i];
+            String s;
+            if (obj instanceof NativeJavaArray) {
+                try {
+                    Field ar = obj.getClass().getDeclaredField("array");
+                    ar.setAccessible(true);
+                    s = Arrays.toString((Object[]) ar.get(obj));
+                } catch (Exception e) {
+                    s = Context.toString(obj);
+                    e.printStackTrace();
+                }
+            } else {
+                s = Context.toString(obj);
+            }
             builder.append(s);
         }
         builder.append("\n");

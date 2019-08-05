@@ -1,6 +1,5 @@
 package cn.vove7.common.netacc
 
-import android.os.Looper
 import cn.vove7.common.BuildConfig
 import cn.vove7.common.accessibility.AccessibilityApi
 import cn.vove7.common.app.AppConfig
@@ -51,7 +50,7 @@ object WrapperNetHelper {
             url: String, model: Any? = null, requestCode: Int = -1, arg1: String? = null,
             crossinline callback: WrappedRequestCallback<ResponseMessage<T>>.() -> Unit) {
 
-        NetHelper.postJson(url, BaseRequestModel(model, arg1), requestCode, callback)
+        NetHelper.postJson(url, BaseRequestModel(model, arg1), requestCode, callback = callback)
 
     }
 

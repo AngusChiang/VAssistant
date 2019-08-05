@@ -7,6 +7,7 @@ import cn.vove7.vtp.log.Vog
 import com.luajava.JavaFunction
 import com.luajava.LuaException
 import com.luajava.LuaState
+import java.util.*
 
 /**
  * LuaPrinter
@@ -34,20 +35,25 @@ class LuaPrinter @JvmOverloads constructor(Ls: LuaState, private val print: OnPr
         }
         for (i in 2..L.top) {
             val type = L.type(i)
-            var `val`: String? = null
+            var value: String?
             val stype = L.typeName(type)
-            when (stype) {
+            value = when (stype) {
                 "userdata" -> {
                     val obj = L.toJavaObject(i)
-                    if (obj != null)
-                        `val` = obj.toString()
+                    if (obj != null) {
+                        if (obj::class.java.isArray) {
+                            Arrays.toString(obj as Array<*>)
+                        } else obj.toString()
+                    } else {
+                        "nil"
+                    }
                 }
-                "boolean" -> `val` = if (L.toBoolean(i)) "true" else "false"
-                else -> `val` = L.toString(i)
+                "boolean" -> if (L.toBoolean(i)) "true" else "false"
+                else -> L.toString(i)
             }
-            if (`val` == null)
-                `val` = stype
-            output.append(`val`)
+            if (value == null)
+                value = stype
+            output.append(value)
             output.append("  ")
 //            output.append("\t")
         }

@@ -5,16 +5,15 @@ apply plugin: 'org.greenrobot.greendao'
 //apply from: 'argusapm.gradle'
 android {
     compileSdkVersion 28
-    buildToolsVersion '28.0.2'
 
     defaultConfig {
         applicationId "cn.vove7.vassistant"
-        minSdkVersion 21
-        targetSdkVersion 27
+        minSdkVersion 16
+        targetSdkVersion 28
         versionCode 190
         versionName "1.9.4.1"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
-
+        vectorDrawables.useSupportLibrary = true
         multiDexEnabled true
 
         ndk {//排除其他 abi
@@ -133,7 +132,7 @@ dependencies {
     implementation 'com.github.didikee:AndroidDonate:0.1.0'
 
     implementation 'com.github.Vove7:CodeView:1.0.2'
-    implementation 'com.github.Vove7:BottomDialog:2.1.1'
+    implementation 'com.github.Vove7:BottomDialog:2.1.2'
 
     implementation 'com.github.android-notes:Cockroach:0.0.5'
 

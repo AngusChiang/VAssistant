@@ -9,9 +9,7 @@ import android.widget.AdapterView
 import android.widget.TextView
 import cn.vove7.bottomdialog.BottomDialog
 import cn.vove7.bottomdialog.builder.buttons
-import cn.vove7.bottomdialog.builder.title
-import cn.vove7.bottomdialog.builder.withCloseIcon
-import cn.vove7.bottomdoalog.extension.awesomeHeader
+import cn.vove7.bottomdialog.extension.awesomeHeader
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.bridges.SystemBridge

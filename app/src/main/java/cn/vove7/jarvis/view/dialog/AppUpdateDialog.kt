@@ -5,7 +5,7 @@ import cn.vove7.bottomdialog.BottomDialog
 import cn.vove7.bottomdialog.builder.BottomDialogBuilder
 import cn.vove7.bottomdialog.builder.buttons
 import cn.vove7.bottomdialog.builder.title
-import cn.vove7.bottomdoalog.extension.awesomeHeader
+import cn.vove7.bottomdialog.extension.awesomeHeader
 import cn.vove7.common.app.AppConfig
 import cn.vove7.jarvis.view.dialog.contentbuilder.MarkdownContentBuilder
 import cn.vove7.vtp.sharedpreference.SpHelper

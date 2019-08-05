@@ -4,7 +4,7 @@ import android.app.Activity
 import cn.vove7.bottomdialog.BottomDialog
 import cn.vove7.bottomdialog.builder.title
 import cn.vove7.bottomdialog.builder.withCloseIcon
-import cn.vove7.bottomdoalog.extension.awesomeHeader
+import cn.vove7.bottomdialog.extension.awesomeHeader
 import cn.vove7.jarvis.view.dialog.contentbuilder.MarkdownContentBuilder
 
 /**
