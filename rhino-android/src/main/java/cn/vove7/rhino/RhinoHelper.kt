@@ -55,6 +55,7 @@ class RhinoHelper : ScriptableObject, ScriptEngine {
         putProperty("serviceBridge", bridgeManager.serviceBridge)
         putProperty("app", appContext)
         putProperty("input", bridgeManager.inputBridge)
+        putProperty("dialog", bridgeManager.dialogBridge)
         init()
     }
 

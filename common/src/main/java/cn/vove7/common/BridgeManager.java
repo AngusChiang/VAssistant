@@ -1,5 +1,6 @@
 package cn.vove7.common;
 
+import cn.vove7.common.bridges.DialogBridge;
 import cn.vove7.common.bridges.GlobalActionExecutor;
 import cn.vove7.common.bridges.HttpBridge;
 import cn.vove7.common.bridges.InputMethodBridge;
@@ -22,6 +23,8 @@ public class BridgeManager {
     private ServiceBridge serviceBridge;
     private RootHelper rootHelper = RootHelper.INSTANCE;
     private HttpBridge httpBridge = HttpBridge.INSTANCE;
+    private DialogBridge dialogBridge = DialogBridge.INSTANCE;
+
 
     private InputOperation inputBridge = InputMethodBridge.INSTANCE;
 
@@ -30,6 +33,10 @@ public class BridgeManager {
         this.automator = automator;
         this.systemBridge = systemBridge;
         this.serviceBridge = serviceBridge;
+    }
+
+    public DialogBridge getDialogBridge() {
+        return dialogBridge;
     }
 
     public ServiceBridge getServiceBridge() {
