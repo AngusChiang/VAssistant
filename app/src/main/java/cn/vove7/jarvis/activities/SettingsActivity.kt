@@ -89,8 +89,7 @@ class SettingsActivity : ReturnableActivity() {
 //                        false
 //                    },
 
-                    SwitchItem(title = "长语音模式", summary = "开启后，唤醒后可连续说出命令\n可以通过按音量下键终止\n" +
-                            "会占用麦克风",
+                    SwitchItem(title = "连续对话", summary = "开启后，唤醒后可连续说出命令\n可以通过按音量下键终止",
                             keyId = R.string.key_lasting_voice_command, defaultValue = { AppConfig.lastingVoiceCommand }),
 
                     CheckBoxItem(R.string.text_voice_control_dialog, summary = "使用语言命令控制对话框",

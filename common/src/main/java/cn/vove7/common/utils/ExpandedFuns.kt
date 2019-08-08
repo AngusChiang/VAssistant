@@ -464,3 +464,11 @@ fun File.broadcastImageFiel() {
     GlobalApp.APP.sendBroadcast(Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE,
             Uri.fromFile(this)))
 }
+
+fun Activity.finishAndRemoveTaskCompat() {
+    if (Build.VERSION.SDK_INT < 21) {
+        finish()
+    } else {
+        finishAndRemoveTask()
+    }
+}

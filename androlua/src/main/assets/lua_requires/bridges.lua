@@ -16,6 +16,7 @@ serviceBridge = bridges.getServiceBridge()
 system = bridges.getSystemBridge()
 automator = bridges.getAutomator()
 input = bridges.getInputBridge()
+dialog = bridges.getDialogBridge()
 
 function notifyFailed(s)
     executor.executeFailed(s)
