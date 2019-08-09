@@ -1,10 +1,10 @@
 package cn.vove7.common.netacc.tool;
 
-import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 
 import cn.vove7.common.app.GlobalLog;
 import cn.vove7.vtp.log.Vog;
+import kotlin.text.Charsets;
 
 /**
  * Created by IntelliJ IDEA.
@@ -17,8 +17,7 @@ public class SecureHelper {
 
     public static String signData(Object body, Long uId, Long time) {
 
-        String content = String.valueOf(uId == null ? "" : uId) + (body == null ? "" : body)
-                + String.valueOf(time);
+        String content = String.valueOf(uId == null ? "" : uId) + (body == null ? "" : body) + time;
         String md5 = MD5(content + SECRET_KEY);
         Vog.INSTANCE.d("加密：" + content + "\n" + md5);
         return md5;
@@ -27,7 +26,7 @@ public class SecureHelper {
     public static String MD5(String s) {
         try {
             MessageDigest md = MessageDigest.getInstance("MD5");
-            byte[] bytes = md.digest(s.getBytes(StandardCharsets.UTF_8));
+            byte[] bytes = md.digest(s.getBytes(Charsets.UTF_8));
             return toHex(bytes);
         } catch (Exception e) {
             GlobalLog.INSTANCE.err(e);

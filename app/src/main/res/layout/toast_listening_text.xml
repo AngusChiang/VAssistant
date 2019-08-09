@@ -32,7 +32,8 @@
                 android:layout_height="25dp"
                 android:layout_marginEnd="10dp"
                 android:src="@drawable/parsing_animation"
-                android:visibility="gone" />
+                android:visibility="gone"
+                android:layout_marginRight="10dp" />
 
             <TextView
                 android:id="@+id/voice_text"

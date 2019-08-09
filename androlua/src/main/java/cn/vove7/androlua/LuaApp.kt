@@ -23,9 +23,16 @@ class LuaApp {
          * @param context Context
          */
         fun init(context: Context, update: Boolean) {
-            if(!update) return
-            runOnPool {
-                initAsset(context)
+            val fe = File(context.filesDir, "bridges.lua").exists()
+            GlobalLog.log("初始化Lua bridge文件: $fe")
+
+            if (!fe || update || BuildConfig.DEBUG) {//空优先级更大
+                GlobalLog.log("初始化Lua 文件")
+                runOnPool {
+                    initAsset(context)
+                }
+            } else {
+                GlobalLog.log("跳过初始化Lua文件")
             }
         }
 

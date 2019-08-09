@@ -1,5 +1,7 @@
 package cn.vove7.jarvis
 
+import android.content.Context
+import android.os.Build
 import cn.jpush.android.api.JPushInterface
 import cn.vove7.androlua.LuaApp
 import cn.vove7.common.app.AppConfig
@@ -20,6 +22,7 @@ import cn.vove7.jarvis.tools.CrashHandler
 import cn.vove7.jarvis.tools.ShortcutUtil
 import cn.vove7.jarvis.view.openAccessibilityServiceAuto
 import cn.vove7.vtp.log.Vog
+import com.qihoo360.replugin.gen.RePluginHostConfig
 import com.umeng.commonsdk.UMConfigure
 import com.wanjian.cockroach.Cockroach
 import org.greenrobot.eventbus.Subscribe
@@ -88,6 +91,13 @@ class App : GlobalApp() {
         UtilEventReceiver.stop()
     }
 
+    override fun attachBaseContext(base: Context?) {
+        //fix 4.x
+        if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.LOLLIPOP) {
+            val y = RePluginHostConfig.ACTIVITY_PIT_COUNT_TASK
+        }
+        super.attachBaseContext(base)
+    }
 
     companion object {
         var ins: App? = null
@@ -110,7 +120,9 @@ class App : GlobalApp() {
     @Subscribe
     fun onUserInit(event: String) {
         if (event == AppBus.EVENT_USER_INIT) {
-            JPushInterface.setAlias(this, UserInfo.getUserId().toString(), null)
+            JPushInterface.setAlias(this, 0, UserInfo.getUserId().toString())
+        } else if (event == AppBus.EVENT_LOGOUT) {
+            JPushInterface.deleteAlias(this, 0)
         }
     }
 }

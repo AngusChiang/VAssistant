@@ -5,8 +5,8 @@ import android.content.Intent
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.view.KeyEvent
-import cn.vove7.common.R
 import cn.vove7.common.app.GlobalApp
+import cn.vove7.common.app.log
 import cn.vove7.common.utils.newTask
 import cn.vove7.common.utils.runOnNewHandlerThread
 import cn.vove7.vtp.log.Vog
@@ -36,18 +36,16 @@ class RunnableActivity : AppCompatActivity() {
         overridePendingTransition(0, 0)
         super.onCreate(savedInstanceState)
 //        setContentView(R.layout.activity_shell)
-    }
-
-    override fun onResume() {
-        super.onResume()
-        Vog.d("runOnShell ${shellAction != null}")
         val action = shellAction
-        try {
-            runOnNewHandlerThread {
+        Vog.d("runOnShell ${shellAction != null}")
+        runOnNewHandlerThread {
+            try {
                 action?.invoke(this)
+            } catch (e: Exception) {
+                e.log()
+            } finally {
+                shellAction = null
             }
-        } finally {
-            shellAction = null
         }
     }
 

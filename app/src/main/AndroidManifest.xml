@@ -16,6 +16,10 @@
         android:theme="@style/NoActionBar"
         tools:ignore="GoogleAppIndexingWarning">
 
+        <uses-library
+            android:name="org.apache.http.legacy"
+            android:required="false" />
+
         <activity android:name=".activities.VoiceTestActivity" />
         <activity
             android:name=".activities.RealMainActivity"
@@ -33,6 +37,7 @@
         </activity>
         <activity
             android:name=".activities.base.CreateShortcutActivity"
+            android:excludeFromRecents="true"
             android:exported="true"
             android:label="V Assistant快捷功能"
             android:launchMode="singleInstance"
@@ -45,6 +50,7 @@
 
         <activity
             android:name=".activities.base.VoiceAssistActivity"
+            android:excludeFromRecents="true"
             android:exported="true"
             android:launchMode="singleInstance"
             android:theme="@style/TransparentBackground">
@@ -367,7 +373,8 @@
             </intent-filter>
         </service>
 
-        <receiver android:name=".receivers.JPushReceiver"
+        <receiver
+            android:name=".receivers.JPushReceiver"
             android:process=":pushcore">
 
             <intent-filter>
