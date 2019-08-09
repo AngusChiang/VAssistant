@@ -50,8 +50,7 @@ class App : GlobalApp() {
         JPushInterface.setDebugMode(BuildConfig.DEBUG)
         JPushInterface.init(this)
         runOnNewHandlerThread("app_load") {
-            if (AppConfig.FIRST_LAUNCH_NEW_VERSION || BuildConfig.DEBUG)
-                LuaApp.init(this, AppConfig.FIRST_LAUNCH_NEW_VERSION)
+            LuaApp.init(this, AppConfig.FIRST_LAUNCH_NEW_VERSION)
             startServices()
             ShortcutUtil.initShortcut()
             AdvanAppHelper.getPkgList()

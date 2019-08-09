@@ -421,7 +421,7 @@ class ExampleUnitTest {
     @Test
     fun genToc() {
         val s = buildString {
-            val f = File("F:\\Project\\AndroidProjects\\VAssistant\\app\\src\\main\\assets\\files\\faqs.md")
+            val f = File("F:\\Project\\IntellijProject\\gitee-page\\_posts\\2019-08-08-Rokid-Config.md")
             f.forEachLine {
                 if (it.startsWith("#")) {
                     val endIndex = it.let {

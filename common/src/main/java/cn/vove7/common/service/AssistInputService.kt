@@ -24,6 +24,7 @@ class AssistInputService : InputMethodService() {
     override fun onCreate() {
         super.onCreate()
         Vog.d("onCreate")
+        InputMethodBridge.bind(this)
     }
 
     lateinit var keyboardView: KeyboardView

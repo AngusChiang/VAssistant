@@ -4,6 +4,7 @@ import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.model.ResultBox
 import cn.vove7.vtp.log.Vog
+import com.google.gson.Gson
 import okhttp3.*
 import java.io.IOException
 import java.util.concurrent.TimeUnit
@@ -57,6 +58,10 @@ object HttpBridge {
         return call(call)
     }
 
+    fun postJson(url: String, jsonP: Map<String, Any>?): String? {
+        return postJson(url, Gson().toJson(jsonP))
+    }
+
     fun postJson(url: String, json: String?): String? {
 //        Vog.d("get ---> $url \n$json")
         println("get ---> $url \n$json")
@@ -77,6 +82,7 @@ object HttpBridge {
     }
 
 
+    //postForm
     fun post(url: String, params: Map<String, Any>?): String? {
 //        Vog.d("post ---> $url $params")
         val client = OkHttpClient.Builder()

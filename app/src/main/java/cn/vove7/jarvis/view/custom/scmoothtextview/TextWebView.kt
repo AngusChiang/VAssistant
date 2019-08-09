@@ -47,7 +47,9 @@ class TextWebView : NestedWebView, TextLoader {
         settings.setAppCacheEnabled(true)
         settings.setSupportZoom(false)
         settings.cacheMode = WebSettings.LOAD_NO_CACHE
-        settings.layoutAlgorithm = WebSettings.LayoutAlgorithm.TEXT_AUTOSIZING
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            settings.layoutAlgorithm = WebSettings.LayoutAlgorithm.TEXT_AUTOSIZING
+        }
 
         settings.defaultTextEncodingName = "utf-8"
         scrollBarStyle = View.SCROLLBARS_INSIDE_OVERLAY
@@ -92,7 +94,9 @@ class TextWebView : NestedWebView, TextLoader {
 
     private inner class WebClient : WebViewClient() {
         override fun shouldOverrideUrlLoading(view: WebView, request: WebResourceRequest): Boolean {
-            startActivity(request.url)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                startActivity(request.url)
+            }
             return true
         }
     }

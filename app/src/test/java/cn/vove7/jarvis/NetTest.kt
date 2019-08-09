@@ -82,7 +82,7 @@ object WrapperNetHelper {
             url: String, model: Any? = null, requestCode: Int = -1, arg1: String? = null,
             crossinline callback: WrappedRequestCallback<ResponseMessage<T>>.() -> Unit) {
 
-        NetHelper.postJson(url, RequestModel(model, arg1), requestCode, callback)
+        NetHelper.postJson(url, RequestModel(model, arg1), requestCode,callback = callback)
 
     }
 

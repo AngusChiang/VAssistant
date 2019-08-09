@@ -8,10 +8,10 @@ android {
 
     defaultConfig {
         applicationId "cn.vove7.vassistant"
-        minSdkVersion 16
+        minSdkVersion 21
         targetSdkVersion 28
-        versionCode 190
-        versionName "1.9.4.1"
+        versionCode 201
+        versionName "1.9.4.3"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
         multiDexEnabled true

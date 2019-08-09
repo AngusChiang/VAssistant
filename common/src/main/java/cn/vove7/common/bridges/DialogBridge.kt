@@ -48,15 +48,20 @@ object DialogBridge {
     }
 
     fun input(title: String?, hint: String?): String? {
+        return input(title, hint, null)
+    }
+
+    fun input(title: String?, hint: String?, preText: String?): String? {
         val resultBox = ResultBox<String?>()
         runOnUi {
             val app = GlobalApp.APP
             BaseDialog(app).apply {
                 val editText = EditText(app)
                 editText.hint = hint
+                editText.setText(preText)
                 setContentView(editText)
                 setTitle(title ?: "")
-
+                setCancelable(false)
                 setButton(DialogInterface.BUTTON_NEGATIVE, "取消", View.OnClickListener {
                     resultBox.setAndNotify(null)
                 })
