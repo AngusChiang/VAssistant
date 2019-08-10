@@ -66,20 +66,4 @@ class JsonTest {
             println(a.groupValues[2])
         } else print("err")
     }
-
-    @Test
-    fun replaceSrcHeader() {
-        arrayOf(
-                "require 'accessibility'",
-                "require \"accessibility\"\nprint(1)",
-                "print(2)\n\n require \"accessibility\"\nprint(1)"
-        ).forEach {
-            println("lua:\n${RegUtils.replaceLuaHeader(it)}")
-            println()
-            println()
-            println("rhino:\n${RegUtils.replaceRhinoHeader(it)}")
-            println()
-            println()
-        }
-    }
 }

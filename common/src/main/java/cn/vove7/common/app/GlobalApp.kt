@@ -95,6 +95,12 @@ open class GlobalApp : RePluginApplication() {
 
     }
 
+    override fun startActivity(intent: Intent?) {
+        //防止
+        intent?.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        super.startActivity(intent)
+    }
+
     /**
      * 是否为主进程
      * 未配置主进程名 默认为包名

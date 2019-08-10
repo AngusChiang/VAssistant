@@ -49,9 +49,6 @@ public class LuaFunHelper {
                 loadeds = loaded.asArray();
             } else return;
             if (loadeds != null) {
-                LuaObject require = L.getLuaObject("require");
-                //require "bridges"
-                require.call("bridges");
                 LuaObject _import = L.getLuaObject("import");
                 for (Object s : loadeds) {
                     Vog.INSTANCE.v("load -- " + s.toString());

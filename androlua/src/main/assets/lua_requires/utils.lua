@@ -4,7 +4,7 @@
 -- utils.lua
 --
 
-require 'import'
+--require 'import'
 import 'cn.vove7.common.app.AppConfig'
 import 'cn.vove7.vtp.text.TextTransHelper'
 import 'cn.vove7.common.utils.TextHelper'

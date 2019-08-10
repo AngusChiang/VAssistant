@@ -4,7 +4,7 @@
 -- executor.lua
 --
 
-require 'import'
+-- require 'import'
 --
 local bridges = luaman.getBridgeManager()
 local executor = bridges.getExecutor()

@@ -47,9 +47,12 @@ class LuaHelper : LuaManagerI, ScriptEngine {
     override var bridgeManager: BridgeManager?
 
 
-    constructor(context: Context, b: BridgeManager) : this(context) {
-        bridgeManager = b
+    constructor(context: Context, b: BridgeManager) {
+        this.context = context
         sBridgeManager = b
+        bridgeManager = b
+        initPath()
+        init()
     }
 
     lateinit var L: LuaState
@@ -103,10 +106,8 @@ class LuaHelper : LuaManagerI, ScriptEngine {
         libDir = context.getDir("lib", Context.MODE_PRIVATE).absolutePath
         jniLibsPath = context.applicationInfo.nativeLibraryDir + "/lib?.so" + ";" + libDir + "/lib?.so;"
 
-//        val assetPath = "file://android_assset"
-//        val assetInclude = "$assetPath/?.lua;$assetPath/?/init.lua;"
         luaRequireSearchPath = "$luaDir/?.lua;$luaDir/lua/?.lua;$luaDir/?/init.lua;"
-        luaRequireSearchPath += jniLibsPath ?: "" /*+ assetInclude*/
+        luaRequireSearchPath += (jniLibsPath ?: ";")
     }
 
     override fun log(log: Any?) {
@@ -141,43 +142,29 @@ class LuaHelper : LuaManagerI, ScriptEngine {
         L.setField(-2, "cpath")
         L.pop(1)
 
-
         LuaPrinter(L, object : OnPrint {
             override fun onPrint(l: Int, output: String?) {
                 notifyOutput(l, output)
             }
         })
 
-        val set = object : JavaFunction(L) {
-            override fun execute(): Int {
-                val thread = L.toJavaObject(2) as LuaThread
-                thread[L.toString(3)] = L.toJavaObject(4)
-                return 0
-            }
-        }
+        //从assert加载api
+        requireFromAsset(
+                "lua_requires/import.lua",
+                "lua_requires/bridges.lua",
+                "lua_requires/utils.lua",
+                "lua_requires/executor.lua",
+                "lua_requires/view_op.lua",
+                "lua_requires/global_op.lua",
+                "lua_requires/storages.lua",
+                "lua_requires/json.lua",
+                "lua_requires/settings.lua"
+        )
+    }
 
-        val call = object : JavaFunction(L) {
-            override fun execute(): Int {
-                val thread = L.toJavaObject(2) as LuaThread
-
-                val top = L.top
-                if (top > 3) {
-                    val args = arrayOf<Any>(top - 3)
-                    for (i in 4..top) {
-                        args[i - 4] = L.toJavaObject(i)
-                    }
-                    thread.call(L.toString(3), args)
-                } else if (top == 3) {
-                    thread.call(L.toString(3))
-                }
-                return 0
-            }
-        }
-        try {
-            set.register("set")
-            call.register("call")
-        } catch (e: LuaException) {
-            e.printStackTrace()
+    private fun requireFromAsset(vararg files: String) {
+        files.forEach {
+            execFromAsset(it, emptyArray())
         }
     }
 

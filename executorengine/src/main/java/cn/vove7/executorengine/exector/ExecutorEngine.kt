@@ -32,9 +32,8 @@ class ExecutorEngine : ExecutorImpl() {
         val rhinoHelper = RhinoHelper(bridgeManager)
         engines.add(rhinoHelper)
 
-        val sc = RegUtils.replaceRhinoHeader(script)
         return try {
-            rhinoHelper.evalString(sc, argMap)
+            rhinoHelper.evalString(script, argMap)
             RhinoApi.doLog("主线程执行完毕\n")
             PartialResult.success()
         } catch (we: MessageException) {

@@ -5,7 +5,7 @@
 -- bridges/api.lua
 --
 
-require 'import'
+-- require 'import'
 import "cn.vove7.common.appbus.AppBus"
 --
 bridges = luaman.getBridgeManager()
@@ -27,10 +27,10 @@ function log(msg)
     luaman.log(msg)
 end
 
-require 'utils'
-require 'executor'
-require 'view_op'
-require 'global_op'
-require 'storages'
-require 'settings'
+-- require 'utils'
+-- require 'executor'
+-- require 'view_op'
+-- require 'global_op'
+-- require 'storages'
+-- require 'settings'
 

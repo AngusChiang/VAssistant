@@ -3,7 +3,6 @@ package cn.vove7.common.utils
 import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.datamanager.model.InstSettingInfo
 import cn.vove7.paramregexengine.toParamRegex
-import cn.vove7.vtp.log.Vog
 
 /**
  *
@@ -98,26 +97,13 @@ object RegUtils {
         return null
     }
 
-    private const val rHeader = "require 'bridges'; " +
-            "local args = {...}; argMap = args[1]\n"
+    private const val rHeader = "local args = {...}; argMap = args[1]; "
 
     /**
      * 替换Lua 无障碍声明头部
      */
     fun replaceLuaHeader(s: String): String {
-        return (rHeader + s.replace(headerReg, "requireAccessibility()")).also {
-            //            print(it)
-            Vog.d(it)
-        }
-    }
-
-    private val headerReg get() = "require[ ]+[\"']accessibility[\"']".toRegex()
-
-    /**
-     * Rhino 无障碍声明头部
-     */
-    fun replaceRhinoHeader(s: String): String {
-        return s.replace(headerReg, "requireAccessibility()")
+        return (rHeader + s)
     }
 
     val PACKAGE_REGEX get() = "[a-zA-Z]+[0-9a-zA-Z_]*(\\.[a-zA-Z]+[0-9a-zA-Z_]*)+".toRegex()

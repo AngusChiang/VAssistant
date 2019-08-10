@@ -3,7 +3,6 @@ package cn.vove7.jarvis
 import android.content.Context
 import android.os.Build
 import cn.jpush.android.api.JPushInterface
-import cn.vove7.androlua.LuaApp
 import cn.vove7.common.app.AppConfig
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.appbus.AppBus
@@ -53,7 +52,6 @@ class App : GlobalApp() {
         JPushInterface.setDebugMode(BuildConfig.DEBUG)
         JPushInterface.init(this)
         runOnNewHandlerThread("app_load") {
-            LuaApp.init(this, AppConfig.FIRST_LAUNCH_NEW_VERSION)
             startServices()
             ShortcutUtil.initShortcut()
             AdvanAppHelper.getPkgList()
