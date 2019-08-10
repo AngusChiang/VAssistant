@@ -207,7 +207,7 @@ object SystemBridge : SystemOperation {
             context.startActivity(callIntent)
             true
         } catch (e: SecurityException) {
-            GlobalApp.toastInfo("无电话权限")
+            AppBus.post(RequestPermission("电话权限"))
             false
         } catch (e: Exception) {
             GlobalLog.err(e)

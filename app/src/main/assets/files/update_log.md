@@ -2,6 +2,7 @@
 
 - 语音合成适配9.0
 - 修复低概率所有指令执行失败
+- 弃用`require 'accessibility'`标志，请使用`requireAccessibility()`
 
 ### 1.9.4.1
 

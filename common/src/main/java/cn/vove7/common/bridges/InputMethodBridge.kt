@@ -177,7 +177,8 @@ object InputMethodBridge : InputOperation {
 
     val isEnable: Boolean
         get() = {
-            enabledInputMethodList.find { it.id.endsWith(".AssistInputService") } != null
+            val vassistImId = "${app.packageName}/${AssistInputService::class.java.name}"
+            enabledInputMethodList.find { it.id == vassistImId } != null
         }()
 
     /**
