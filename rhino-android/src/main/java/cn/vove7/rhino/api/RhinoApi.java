@@ -8,6 +8,8 @@ import org.mozilla.javascript.NativeJavaArray;
 import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.annotations.JSFunction;
 
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -49,16 +51,11 @@ public class RhinoApi extends AbsApi {
         for (Object arg : args) {
             String file = Context.toString(arg);
             try {
-                String sc = AssetHelper.INSTANCE.getStrFromAsset(GlobalApp.APP, file);
                 Log.d("RhinoApi :", "loadAsset  ----> " + file);
-                cx.evaluateString(thisObj, sc, "load_" + file, 1, null);
+                Reader reader = new InputStreamReader(GlobalApp.APP.getAssets().open(file));
+                cx.evaluateReader(thisObj, reader, "load_" + file, 1, null);
             } catch (Exception ex) {
-                // Treat StackOverflow and OutOfMemory as runtime errors
-                //ex.printStackTrace();
                 onException(ex);
-                //String msg = ToolErrorReporter.getMessage(
-                //        "msg.uncaughtJSException", ex.toString());
-                //throw Context.reportRuntimeError(msg);
             }
         }
     }

@@ -31,9 +31,9 @@ class RhinoHelper : ScriptableObject, ScriptEngine {
 
     private val appContext = GlobalApp.APP
 
-    private var rhinoContext: Context? = null
-    var isInit = false
-        private set
+    private val androidHelper = RhinoAndroidHelper(appContext)
+
+    private val rhinoContext: Context = androidHelper.enterContext()
 
     private val global = Global()
 
@@ -44,6 +44,14 @@ class RhinoHelper : ScriptableObject, ScriptEngine {
     constructor() {
         init()
     }
+
+    private val builtinVariables = "var com = Packages.com;\n" +
+            "var javax = Packages.javax;\n" +
+            "var net = Packages.net;\n" +
+            "var cn = Packages.cn;\n" +
+            "var kotlin = Packages.kotlin;\n" +
+            "var android = Packages.android;\n" +
+            "var org = Packages.org;\n"
 
     constructor(bridgeManager: BridgeManager) {
         putProperty("executor", bridgeManager.executor)
@@ -61,9 +69,6 @@ class RhinoHelper : ScriptableObject, ScriptEngine {
 
     //fixme  loadAsset 效率问题
     fun init() {
-        val androidHelper = RhinoAndroidHelper(appContext)
-        rhinoContext = androidHelper.enterContext()
-
         val originalThread = Thread.currentThread()
         GcCollector.regMainThread(global, originalThread)//注册线程
         if (!global.isInitialized) {
@@ -72,8 +77,16 @@ class RhinoHelper : ScriptableObject, ScriptEngine {
 
         RhinoApi().define(global)
 
-        loadAsset("rhino_require/apis.js")
-        isInit = true
+        //包名
+        rhinoContext.evaluateString(global, builtinVariables, "<builtin>", 1, null)
+
+        loadAsset("rhino_require/threads.js")
+        loadAsset("rhino_require/view_op.js")
+        loadAsset("rhino_require/executor.js")
+        loadAsset("rhino_require/global.js")
+        loadAsset("rhino_require/storages.js")
+        loadAsset("rhino_require/settings.js")
+        loadAsset("rhino_require/utils.js")
     }
 
     private fun putProperty(key: String, value: Any) {
@@ -97,14 +110,12 @@ class RhinoHelper : ScriptableObject, ScriptEngine {
         Vog.d("args" + Arrays.toString(args))
         val array = arrayOfNulls<Any>(args!!.size)
         System.arraycopy(args, 0, array, 0, args!!.size)
-        val argsObj = rhinoContext!!.newArray(global, array)
+        val argsObj = rhinoContext.newArray(global, array)
         global.defineProperty("args", argsObj, DONTENUM)
 
     }
 
-
-    fun setMap(map: Map<String, *>?) {
-        Vog.d("argMap" + map!!.toString())
+    private fun setMap(map: Map<String, *>?) {
         global.defineProperty("argMap", MapScriptable(map), DONTENUM)
     }
 
@@ -124,7 +135,7 @@ class RhinoHelper : ScriptableObject, ScriptEngine {
     @Throws(Exception::class)
     private fun evalS(scriptText: String) {
         try {
-            val script = rhinoContext?.compileString(scriptText, "<script>", 1, null)
+            val script = rhinoContext.compileString(scriptText, "<script>", 1, null)
             script?.exec(rhinoContext, global)
         } catch (we: WrappedException) {
             val e = we.wrappedException
@@ -163,7 +174,7 @@ class RhinoHelper : ScriptableObject, ScriptEngine {
         val source = readFileOrUrl(path, !isClass)
 
         val digest = getDigest(source)
-        val key = path + "_" + rhinoContext!!.optimizationLevel
+        val key = path + "_" + rhinoContext.optimizationLevel
         val ref = scriptCache.get(key, digest)
         var script: Script? = ref?.get()
 
@@ -184,7 +195,7 @@ class RhinoHelper : ScriptableObject, ScriptEngine {
                         }
                     }
                 }
-                script = rhinoContext!!.compileString(strSrc, path, 1, securityDomain)
+                script = rhinoContext.compileString(strSrc, path, 1, securityDomain)
             }
             scriptCache.put(key, digest, script)
         }
