@@ -193,9 +193,8 @@ abstract class SpeechRecogService(val event: RecogEvent) : SpeechRecogI {
     private fun restartStopTimer() {
         stopRecogHandler.removeCallbacks(stopRecogAction)
         if (isListening) {
-            stopRecogHandler.postDelayed(stopRecogAction, 1000)
+            stopRecogHandler.postDelayed(stopRecogAction, AppConfig.recogWaitDurationMillis.toLong())
         }
-
     }
 
 

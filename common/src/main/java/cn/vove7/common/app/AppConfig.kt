@@ -104,6 +104,9 @@ object AppConfig : Settings by SmartKey.getSettings(BuildConfig.CONFIG_NAME) {
 
     var openChatSystem by noCacheKey(true, keyId = R.string.key_open_chat_system)
 
+    //语音识别等待时长 s
+    var recogWaitDurationMillis by noCacheKey(1000, keyId = R.string.key_recog_wait_duration)
+
     var autoSleepWakeupMillis: Long = 10 * 60 * 1000
 
     var chatSystem: String = ""

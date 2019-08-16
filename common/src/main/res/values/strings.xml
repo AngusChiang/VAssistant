@@ -165,6 +165,7 @@
 
     <string name="key_speech_engine_type" translatable="false">speech_engine_type</string>
     <string name="key_xunfei_speech_key" translatable="false">xunfei_speech_key</string>
+    <string name="key_recog_wait_duration" translatable="false">recog_wait_duration</string>
 
 
 </resources>
