@@ -4,6 +4,7 @@ import android.app.AlertDialog
 import android.app.Dialog
 import android.content.DialogInterface
 import android.content.Intent
+import android.view.KeyEvent.*
 import cn.vove7.common.MessageException
 import cn.vove7.common.accessibility.AccessibilityApi
 import cn.vove7.common.app.AppConfig
@@ -28,10 +29,7 @@ import cn.vove7.common.appbus.AppBus.ACTION_STOP_WAKEUP_TIMER
 import cn.vove7.common.appbus.AppBus.ACTION_STOP_WAKEUP_WITHOUT_SWITCH
 import cn.vove7.common.appbus.AppBus.EVENT_START_DEBUG_SERVER
 import cn.vove7.common.appbus.AppBus.EVENT_STOP_DEBUG_SERVER
-import cn.vove7.common.bridges.ChoiceData
-import cn.vove7.common.bridges.ServiceBridge
-import cn.vove7.common.bridges.ShowDialogEvent
-import cn.vove7.common.bridges.SystemBridge
+import cn.vove7.common.bridges.*
 import cn.vove7.common.datamanager.history.CommandHistory
 import cn.vove7.common.datamanager.parse.model.Action
 import cn.vove7.common.executor.CExecutorI
@@ -61,8 +59,8 @@ import cn.vove7.jarvis.chat.TulingChatSystem
 import cn.vove7.jarvis.speech.*
 import cn.vove7.jarvis.speech.baiduspeech.BaiduSpeechRecogService
 import cn.vove7.jarvis.speech.baiduspeech.BaiduSpeechSynService
-import cn.vove7.jarvis.tools.DataCollector
 import cn.vove7.jarvis.tools.AppLogic
+import cn.vove7.jarvis.tools.DataCollector
 import cn.vove7.jarvis.tools.debugserver.RemoteDebugServer
 import cn.vove7.jarvis.tools.setFloat
 import cn.vove7.jarvis.view.dialog.MultiChoiceDialog
@@ -92,6 +90,9 @@ class MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
     val context = GlobalApp.APP
 
     private lateinit var floatyPanel: FloatyPanel
+
+    //正在解析指令
+    private var parsingCommand = false
 
 //    override val serviceId: Int
 //        get() = 126
@@ -704,19 +705,17 @@ class MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
             "减小音量" -> {
                 SystemBridge.volumeDown()
             }
-            "播放" -> SystemBridge.mediaResume()
-            "停止" -> SystemBridge.mediaStop()
-            "暂停" -> SystemBridge.mediaPause()
-            "上一首" -> SystemBridge.mediaPre()
-            "下一首" -> SystemBridge.mediaNext()
+            "播放" -> InputMethodBridge.sendKey(KEYCODE_MEDIA_PLAY)
+            "停止" -> InputMethodBridge.sendKey(KEYCODE_MEDIA_STOP)
+            "暂停" -> InputMethodBridge.sendKey(KEYCODE_MEDIA_PAUSE)
+            "上一首" -> InputMethodBridge.sendKey(KEYCODE_MEDIA_PREVIOUS)
+            "下一首" -> InputMethodBridge.sendKey(KEYCODE_MEDIA_NEXT)
             //打开电灯、关闭电灯、增大亮度、减小亮度
             //打开手电筒、关闭手电筒
             "打开手电筒", "打开电灯" -> SystemBridge.openFlashlight()
             "关闭手电筒", "关闭电灯" -> SystemBridge.closeFlashlight()
             else -> {//"截屏分享", "文字提取" 等命令
-                runOnPool {
-                    onParseCommand(w)
-                }
+                onParseCommand(w)
             }
         }
         return null
@@ -957,6 +956,7 @@ class MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
         resumeMusicIf()
 
         runOnCachePool {
+            parsingCommand = true
             val parseResult = ParseEngine
                     .parseAction(result, AccessibilityApi.accessibilityService?.currentScope, smartOpen, onClick)
             if (parseResult.isSuccess) {
@@ -983,6 +983,8 @@ class MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
                     onCommandParseFailed(result)
                 }
             }
+            parsingCommand = false
+
         }
         return true
     }
@@ -1063,7 +1065,6 @@ class MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
                     data.word.replace("=", "\n=") else word)
                 executeAnimation.begin()
                 executeAnimation.show(word)
-
             }
         }
     }
