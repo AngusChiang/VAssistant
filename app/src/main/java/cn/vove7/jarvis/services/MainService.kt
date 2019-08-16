@@ -45,6 +45,7 @@ import cn.vove7.common.utils.ThreadPool.runOnPool
 import cn.vove7.common.utils.runOnNewHandlerThread
 import cn.vove7.common.utils.runOnUi
 import cn.vove7.common.utils.startActivityOnNewTask
+import cn.vove7.common.utils.whileWaitTime
 import cn.vove7.common.view.finder.ViewFindBuilder
 import cn.vove7.executorengine.exector.ExecutorEngine
 import cn.vove7.executorengine.model.ActionParseResult
@@ -576,14 +577,7 @@ class MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
         var instance: MainService? = null
             get() {
                 return when {
-                    field == null -> {
-                        runOnPool {
-                            GlobalApp.toastInfo("正在启动服务")
-                            App.startServices()
-                            Vog.i("instance ---> null")
-                        }
-                        null
-                    }
+                    field == null -> null
                     field?.speechEngineLoaded == true -> field
                     else -> null
                 }
@@ -630,21 +624,36 @@ class MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
          * 切换识别
          */
         fun switchRecog() {
-            if (instance?.speechEngineLoaded != true) {//未加载
-                GlobalApp.toastWarning("引擎未就绪")
-                return
-            }
-            if (instance?.isSpeakingResWord == true && speaking) {
-                Vog.d("正在响应词")
-                return
-            } else {
-                instance?.isSpeakingResWord = false
-            }
-            if (recogIsListening) {
-                instance?.onCommand(ACTION_CANCEL_RECOG)
-            } else {
-                DataCollector.buriedPoint("wakeup")
-                instance?.onCommand(ACTION_START_RECOG)
+            //等待时防止阻塞主线程
+            runOnPool {
+                if (instance?.speechEngineLoaded != true) {//未加载成
+                    GlobalApp.toastWarning("正在启动")
+
+                    //在未启动时，等待5s加载完
+                    val b = whileWaitTime(5000) {
+                        if (instance?.speechEngineLoaded == true) Unit
+                        else {
+                            sleep(200)
+                            null
+                        }
+                    }
+                    if (b == null) {
+                        GlobalApp.toastWarning("引擎未就绪")
+                        return@runOnPool
+                    }
+                }
+                if (instance?.isSpeakingResWord == true && speaking) {
+                    Vog.d("正在响应词")
+                    return@runOnPool
+                } else {
+                    instance?.isSpeakingResWord = false
+                }
+                if (recogIsListening) {
+                    instance?.onCommand(ACTION_CANCEL_RECOG)
+                } else {
+                    DataCollector.buriedPoint("wakeup")
+                    instance?.onCommand(ACTION_START_RECOG)
+                }
             }
         }
 

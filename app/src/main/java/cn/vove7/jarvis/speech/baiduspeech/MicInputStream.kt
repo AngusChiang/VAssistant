@@ -3,17 +3,15 @@ package cn.vove7.jarvis.speech.baiduspeech
 import android.media.AudioFormat
 import android.media.AudioRecord
 import android.media.AudioRecord.RECORDSTATE_RECORDING
-import android.media.MediaRecorder.AudioSource.VOICE_COMMUNICATION
+import android.media.MediaRecorder
 import android.media.audiofx.AcousticEchoCanceler
 import cn.vove7.vtp.log.Vog
-import com.baidu.speech.utils.LogUtil
 import java.io.IOException
 import java.io.InputStream
 
 /**
  * Baidu语音识别输入
  * @property mAudioRecord AudioRecord
- * @property canceler AcousticEchoCanceler?
  */
 @Suppress("unused")
 class MicInputStream : InputStream() {
@@ -23,7 +21,7 @@ class MicInputStream : InputStream() {
     init {
         Vog.d("打开麦克风")
         try {
-            this.mAudioRecord = AudioRecord(VOICE_COMMUNICATION,
+            this.mAudioRecord = AudioRecord(MediaRecorder.AudioSource.DEFAULT,
                     16000, AudioFormat.CHANNEL_IN_MONO,
                     AudioFormat.ENCODING_PCM_16BIT, DEFAULT_BUFFER_SIZE)
             initAEC(mAudioRecord.audioSessionId)

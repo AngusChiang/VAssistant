@@ -51,8 +51,8 @@ class SettingsActivity : ReturnableActivity() {
         try {
             expandableListView?.post {
                 expandableListView.apply {
-                    expandGroup(0, true)
                     expandGroup(1, true)
+                    expandGroup(0, true)
                 }
             }
         } catch (e: Exception) {
@@ -98,7 +98,7 @@ class SettingsActivity : ReturnableActivity() {
                     NumberPickerItem(
                             title = "结束等待时长",
                             keyId = R.string.key_recog_wait_duration,
-                            summary = "在未识别到声音后自动结束识别",
+                            summary = "在未识别到声音后自动结束识别（单位ms）",
                             defaultValue = { AppConfig.recogWaitDurationMillis },
                             range = 1000 to 5000),
                     CheckBoxItem(

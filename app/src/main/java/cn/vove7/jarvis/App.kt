@@ -68,8 +68,11 @@ class App : GlobalApp() {
 
     }
 
+    @Synchronized
     private fun startServices() {
-        mainService = MainService()
+        if (!::mainService.isInitialized) {
+            mainService = MainService()
+        }
     }
 
     private fun startBroadcastReceivers() {
