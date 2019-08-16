@@ -175,7 +175,10 @@ object ParseEngine {
                           isFollow: Boolean): Boolean {
         it.regs.forEach { reg ->
             val result = try {//maybe 正则格式错误
-                (if (isFollow) reg.followRegex else reg.regex).match(cmd)
+                (if (isFollow) reg.followRegex else reg.regex).let {
+                    Vog.d("regSearch ${reg.regStr}")
+                    it.match(cmd)
+                }
             } catch (e: Exception) {
                 GlobalLog.err(e)
                 GlobalApp.toastError("正则解析错误，请查看日志")

@@ -14,7 +14,7 @@ import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.bridges.SystemBridge
 import cn.vove7.common.utils.StorageHelper
 import cn.vove7.common.utils.ThreadPool
-import cn.vove7.common.utils.broadcastImageFiel
+import cn.vove7.common.utils.broadcastImageFile
 import cn.vove7.common.utils.runOnUi
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.tools.DataCollector
@@ -158,7 +158,7 @@ class TextOperationDialog(val context: Activity, val textModel: TextModel) {
                         File(path).copyTo(targetFile, true)
                         it.dismiss()
                         GlobalApp.toastInfo("已保存到：${targetFile.absolutePath}")
-                        targetFile.broadcastImageFiel()
+                        targetFile.broadcastImageFile()
                     } catch (e: Exception) {
                         GlobalApp.toastError("保存失败：${e.message}")
                     }

@@ -1,7 +1,7 @@
 package cn.vove7.common.utils
 
 import cn.vove7.common.app.GlobalLog
-import cn.vove7.paramregexengine.toParamRegex
+import cn.vove7.paramregex.toParamRegex
 import java.io.File
 
 /**

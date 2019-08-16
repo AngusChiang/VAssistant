@@ -19,6 +19,7 @@ import cn.vove7.smartkey.android.AndroidSettings
 
 import cn.vove7.vtp.app.AppInfo
 import cn.vove7.vtp.log.Vog
+import cn.vove7.vtp.net.NetHelper
 import com.qihoo360.replugin.*
 import es.dmoral.toasty.Toasty
 
@@ -40,6 +41,7 @@ open class GlobalApp : RePluginApplication() {
                 Vog.init(this, Log.ERROR)
             }
         }
+        NetHelper.timeout = 5
         AndroidSettings.init(this)
         Toasty.Config.getInstance()
                 .tintIcon(true) // optional (apply textColor also to the icon)

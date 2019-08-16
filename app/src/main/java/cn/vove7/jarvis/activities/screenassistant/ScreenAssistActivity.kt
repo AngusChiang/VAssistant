@@ -253,7 +253,7 @@ class ScreenAssistActivity : BaseActivity() {
                         "Screenshot_${formatNow("yyyyMMdd-HHmmss")}.jpg")
 
                 File(screenPath).copyTo(f, true)
-                f.broadcastImageFiel()
+                f.broadcastImageFile()
                 GlobalApp.toastInfo("已保存")
             } catch (e: SecurityException) {
                 GlobalApp.toastError("保存失败：无存储权限")

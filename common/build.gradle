@@ -78,13 +78,12 @@ dependencies {
     api 'com.liulishuo.okdownload:okhttp:1.0.5'
     api 'com.github.GrenderG:Toasty:1.4.1'
     api 'top.zibin:Luban:1.1.8'//鲁班 压缩图片
-
     api 'org.jsoup:jsoup:1.11.3'
 
-    api project(path: ':ParamRegexEngine')
     api project(path: ':umlib')
 
     api 'com.github.Vove7.SmartKey:smartkey-android:6.0.4'
+    api 'com.github.Vove7:ParamRegexNdk:1.0.1'
 
     api files('libs/RootShell.aar')
 }

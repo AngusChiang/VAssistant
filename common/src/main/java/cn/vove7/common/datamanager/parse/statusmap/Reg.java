@@ -13,7 +13,7 @@ import org.greenrobot.greendao.annotation.Transient;
 
 import java.io.Serializable;
 
-import cn.vove7.paramregexengine.ParamRegex;
+import cn.vove7.paramregex.ParamRegex;
 
 /**
  * 次节点以%开始
@@ -58,7 +58,7 @@ public class Reg implements Serializable {
     @Keep
     private void buildRegex() {
         //结尾加上% ， 防止有[后续节点操作]匹配失败
-        String s = (!regStr.endsWith("%") && !regStr.endsWith("}")) ? (regStr + "%") : regStr;
+        String s = (!regStr.endsWith("%") && !regStr.endsWith("}")) ? (regStr + "%*") : regStr;
         regex = new ParamRegex(s);
     }
 

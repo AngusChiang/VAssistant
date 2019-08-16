@@ -460,7 +460,7 @@ open class AnimationListener {
 fun EditText.content(): String = this.text.toString()
 
 
-fun File.broadcastImageFiel() {
+fun File.broadcastImageFile() {
     GlobalApp.APP.sendBroadcast(Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE,
             Uri.fromFile(this)))
 }
