@@ -71,7 +71,7 @@ class App : GlobalApp() {
     }
 
     private fun startBroadcastReceivers() {
-        runOnNewHandlerThread("startBroadcastReceivers", delay = 5000) {
+        runOnNewHandlerThread("startBroadcastReceivers", delay = 2000) {
             PowerEventReceiver.start()
             ScreenStatusListener.start()
             AppInstallReceiver.start()
