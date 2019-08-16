@@ -39,9 +39,13 @@ object RemoteDebugServer : Runnable {
     var stopped: Boolean = true
     private const val LISTEN_PORT = 1527
     var thread: Thread? = null
-
+    var commandServer :CommandServer?=null
     var handler: Handler? = null
     fun start() {
+        commandServer?.stop()
+        commandServer = CommandServer().also {
+            it.start()
+        }
         if (!stopped && thread?.isAlive == true) {
             Vog.d("start ---> thread is Alive")
             return
@@ -49,7 +53,7 @@ object RemoteDebugServer : Runnable {
         thread = thread {
             handler = Handler(Looper.getMainLooper())
             startAutoSleep()
-            RemoteDebugServer.run()
+            run()
         }
 
     }
@@ -131,6 +135,8 @@ object RemoteDebugServer : Runnable {
     private val sleepRun = Runnable {
         Vog.d("休眠")
         stop()
+        commandServer?.stop()
+        commandServer = null
     }
 
     private fun startAutoSleep() {
