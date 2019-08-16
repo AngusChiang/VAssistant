@@ -23,7 +23,6 @@ import cn.vove7.jarvis.view.openAccessibilityServiceAuto
 import cn.vove7.vtp.log.Vog
 import com.qihoo360.replugin.gen.RePluginHostConfig
 import com.umeng.commonsdk.UMConfigure
-import com.wanjian.cockroach.Cockroach
 import org.greenrobot.eventbus.Subscribe
 
 
@@ -34,9 +33,6 @@ class App : GlobalApp() {
 
     override fun onCreate() {
         super.onCreate()
-        Vog.d("onCreate ---> begin ${System.currentTimeMillis() / 1000}")
-        ins = this
-
         runWithClock("加载配置") {
             AppConfig.init()
         }
@@ -46,30 +42,29 @@ class App : GlobalApp() {
             return
         }
         AppBus.reg(this)
+        CrashHandler.install()
 
-        Cockroach.install(CrashHandler)
-
-        JPushInterface.setDebugMode(BuildConfig.DEBUG)
-        JPushInterface.init(this)
         runOnNewHandlerThread("app_load") {
-            startServices()
-            ShortcutUtil.initShortcut()
-            AdvanAppHelper.getPkgList()
-            startBroadcastReceivers()
+            startMainServices()
             runOnPool {
                 openAccessibilityServiceAuto()
             }
+        }
+        //延时初始化
+        runOnNewHandlerThread(name = "延时启动", delay = 2000) {
+            JPushInterface.setDebugMode(BuildConfig.DEBUG)
+            JPushInterface.init(this)
+            ShortcutUtil.initShortcut()
+            AdvanAppHelper.getPkgList()
+            startBroadcastReceivers()
             RePluginManager().launchWithApp()
-            Vog.d("onCreate ---> 结束 ${System.currentTimeMillis() / 1000}")
-            System.gc()
-
             initUm()
         }
 
     }
 
     @Synchronized
-    private fun startServices() {
+    private fun startMainServices() {
         if (!::mainService.isInitialized) {
             mainService = MainService()
         }
@@ -100,16 +95,9 @@ class App : GlobalApp() {
         super.attachBaseContext(base)
     }
 
-    companion object {
-        var ins: App? = null
-
-        fun startServices() {
-            ins?.startServices()
-        }
-    }
-
     private fun initUm() {
         UMConfigure.init(this, BuildConfig.UM_KEY, "default", UMConfigure.DEVICE_TYPE_PHONE, "")
+        UMConfigure.setLogEnabled(BuildConfig.DEBUG)
     }
 
     override fun onTerminate() {
@@ -119,7 +107,7 @@ class App : GlobalApp() {
     }
 
     @Subscribe
-    fun onUserInit(event: String) {
+    fun onUserEvent(event: String) {
         if (event == AppBus.EVENT_USER_INIT) {
             JPushInterface.setAlias(this, 0, UserInfo.getUserId().toString())
         } else if (event == AppBus.EVENT_LOGOUT) {

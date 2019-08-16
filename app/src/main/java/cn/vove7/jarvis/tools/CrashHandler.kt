@@ -26,6 +26,10 @@ import java.io.File
  */
 object CrashHandler : Cockroach.ExceptionHandler {
 
+    fun install() {
+        Cockroach.install(this)
+    }
+
     val context: Context by lazy {
         GlobalApp.APP
     }
