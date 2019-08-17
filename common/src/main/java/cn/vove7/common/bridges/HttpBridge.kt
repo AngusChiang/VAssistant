@@ -16,7 +16,7 @@ import java.util.concurrent.TimeUnit
  * 2018/10/12
  */
 object HttpBridge {
-    var timeout = 10L
+    var timeout = 5L
 
     fun get(url: String): String? {
         return get(url, null)
