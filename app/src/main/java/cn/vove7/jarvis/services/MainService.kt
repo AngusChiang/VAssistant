@@ -50,7 +50,6 @@ import cn.vove7.common.view.finder.ViewFindBuilder
 import cn.vove7.executorengine.exector.ExecutorEngine
 import cn.vove7.executorengine.model.ActionParseResult
 import cn.vove7.executorengine.parse.ParseEngine
-import cn.vove7.jarvis.App
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.activities.PermissionManagerActivity
 import cn.vove7.jarvis.activities.ResultPickerActivity
@@ -644,6 +643,9 @@ class MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
                 }
                 if (instance?.isSpeakingResWord == true && speaking) {
                     Vog.d("正在响应词")
+                    return@runOnPool
+                } else if (instance?.parsingCommand == true) {
+                    Vog.d("正在解析指令")
                     return@runOnPool
                 } else {
                     instance?.isSpeakingResWord = false

@@ -59,8 +59,11 @@ object RemoteDebugServer : Runnable {
     }
 
     fun stop() {
+
         runOnPool {
             stopped = true
+            commandServer?.stop()
+            commandServer = null
             server?.close()
             clients?.forEach {
                 try {
@@ -135,8 +138,6 @@ object RemoteDebugServer : Runnable {
     private val sleepRun = Runnable {
         Vog.d("休眠")
         stop()
-        commandServer?.stop()
-        commandServer = null
     }
 
     private fun startAutoSleep() {
