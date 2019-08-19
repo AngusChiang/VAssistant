@@ -472,3 +472,12 @@ fun Activity.finishAndRemoveTaskCompat() {
         finishAndRemoveTask()
     }
 }
+
+
+infix fun Array<String>.orIn(s: String): Boolean {
+    forEach {
+        if (it in s) return true
+    }
+    return false
+
+}

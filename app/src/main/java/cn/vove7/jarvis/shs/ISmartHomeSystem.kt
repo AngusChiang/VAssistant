@@ -18,6 +18,10 @@ abstract class ISmartHomeSystem {
 
     abstract fun test()
 
+    //用于显示
+    abstract fun summary(): String
+
+
     //保存配置到指令存储
     abstract fun saveInstConfig()
 
@@ -54,11 +58,11 @@ abstract class ISmartHomeSystem {
                     #设备序列号
                     deviceId=${rokidSettings?.getString("rokid_device_id") ?: ""}
                     #后台管理地址，用于获取房间列表和设备列表
-                    adminUrl=${if(BuildConfig.DEBUG) "http://baduxiyang.oicp.net:9001" else ""}
+                    adminUrl=${if (BuildConfig.DEBUG) "http://baduxiyang.oicp.net:9001" else ""}
                     #后台管理登录名
-                    username=${if(BuildConfig.DEBUG) "admin" else ""}
+                    username=${if (BuildConfig.DEBUG) "admin" else ""}
                     #后台管理登录密码
-                    pass=${if(BuildConfig.DEBUG) "admin" else ""}
+                    pass=${if (BuildConfig.DEBUG) "admin" else ""}
                     #发送完成提示词
                     finishWord=若琪指令发送成功
                     """.trimIndent()

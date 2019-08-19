@@ -4,6 +4,8 @@ import android.content.Intent
 import android.os.Bundle
 import android.util.TypedValue
 import android.widget.PopupMenu
+import cn.vove7.bottomdialog.BottomDialog
+import cn.vove7.bottomdialog.extension.awesomeHeader
 import cn.vove7.common.app.AppConfig
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.bridges.SystemBridge
@@ -22,6 +24,7 @@ import cn.vove7.jarvis.shs.ISmartHomeSystem
 import cn.vove7.jarvis.view.*
 import cn.vove7.jarvis.view.custom.SettingGroupItem
 import cn.vove7.jarvis.view.dialog.TextEditorDialog
+import cn.vove7.jarvis.view.dialog.contentbuilder.MarkdownContentBuilder
 import cn.vove7.jarvis.view.dialog.editorView
 import com.afollestad.materialdialogs.WhichButton
 import com.afollestad.materialdialogs.actions.getActionButton
@@ -121,6 +124,19 @@ class LaboratoryActivity : ReturnableActivity() {
                                 }
                                 negativeButton { it.dismiss() }
                             }
+                        },
+                        IntentItem(title = "查看信息") {
+                            if (AppConfig.homeSystem == null) {
+                                GlobalApp.toastInfo("请先选择您的家居系统")
+                                return@IntentItem
+                            }
+                            BottomDialog.builder(this) {
+                                awesomeHeader("信息")
+                                content(MarkdownContentBuilder()) {
+                                    loadMarkdown(MainService.instance?.homeControlSystem?.summary()
+                                        ?: "")
+                                }
+                            }
                         }
                 )),
                 SettingGroupItem(R.color.google_green, titleS = "聊天", childItems = listOf(
@@ -158,10 +174,11 @@ class LaboratoryActivity : ReturnableActivity() {
                 SettingGroupItem(R.color.yellow_700, titleS = "语音唤醒", childItems = listOf(
                         SwitchItem(title = "自动释放麦克风", summary = "在已授予麦克风权限的其他App内自动关闭语音唤醒\n需要无障碍",/*设为系统应用后无效*/
                                 keyId = R.string.key_fix_voice_micro, defaultValue = { AppConfig.fixVoiceMicro }) { _, b ->
-                            if (b /* TODO && !AppConfig.IS_SYS_APP*/)
+                            if (b /* TODO && !AppConfig.IS_SYS_APP*/) {
                                 VoiceWakeupStrategy.register()
-                            else
-                                VoiceWakeupStrategy.unregister()
+                            } else {
+                            }
+                            VoiceWakeupStrategy.unregister()
                             return@SwitchItem true
                         },
                         CheckBoxItem(title = "显示通知", summary = "关闭和打开时在状态栏显示通知",

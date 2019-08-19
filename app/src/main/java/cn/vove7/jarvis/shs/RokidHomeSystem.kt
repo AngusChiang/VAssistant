@@ -6,6 +6,7 @@ import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.bridges.HttpBridge
 import cn.vove7.common.bridges.SettingsBridge
 import cn.vove7.common.netacc.tool.base64
+import cn.vove7.common.utils.orIn
 import cn.vove7.common.utils.runInCatch
 import cn.vove7.jarvis.services.MainService
 import cn.vove7.paramregex.toParamRegex
@@ -83,14 +84,13 @@ class RokidHomeSystem : ISmartHomeSystem() {
                 GlobalApp.toastError("若琪用户认证失败，请检查用户名及密码")
             }
             success { _, s ->
-                val numReg = "[0-9.]+".toRegex()
+                val numReg = "[0-9.()（）]+".toRegex()
                 val l = s.filter { !numReg.matches(it.name) }
                 GlobalLog.log("loadDevices ${l.size}")
                 l.forEach {
+                    deviceList.add(it.name)
                     if (it.type == "com.fibaro.setPoint") {
                         pointDeviceList.add(it.name)
-                    } else {
-                        deviceList.add(it.name)
                     }
                 }
             }
@@ -106,7 +106,7 @@ class RokidHomeSystem : ISmartHomeSystem() {
                 GlobalLog.err("加载房间列表失败：${exception.message}")
             }
             success { _, s ->
-                val numReg = "[0-9.]+".toRegex()
+                val numReg = "[0-9.()（）]+".toRegex()
                 val l = s.filter { !numReg.matches(it.name) }
 
                 GlobalLog.log("loadRooms ${l.size}")
@@ -119,6 +119,8 @@ class RokidHomeSystem : ISmartHomeSystem() {
 
     private val roomSensorsProperty = "(温度|湿度|亮度)"
 
+    private lateinit var finishWord: String
+
     //设备操作
     //智能情景
     //房间温度、湿度、亮度
@@ -128,8 +130,17 @@ class RokidHomeSystem : ISmartHomeSystem() {
         val devReg = deviceList.joinToString("|", "(", ")")
         val pointsReg by lazy { pointDeviceList.joinToString("|", "(", ")") }
 
+        val mm = "(帮我)?(打开|开启|关闭|关掉)$roomReg?的?$devReg%".toParamRegex().match(command)
 
-        return ("(帮我)?(打开|关闭|关掉)?$roomReg?的?$devReg%".toParamRegex().match(command) != null
+        finishWord = configs["finishWord"] ?: "若琪指令发送成功"
+        if (mm != null) {
+            mm["g8"]?.also {
+                finishWord = it + if (arrayOf("打开", "开启") orIn command) "已开启" else "已关闭"
+            }
+            return true
+        }
+
+        return ("$roomReg?的?$devReg%".toParamRegex().match(command) != null
                 || "${roomReg}的?$roomSensorsProperty".toParamRegex().match(command) != null
                 || (pointDeviceList.isNotEmpty() && "$roomReg?$pointsReg%".toParamRegex().match(command) != null)).also {
             Vog.d("若琪 $command isSupport: $it")
@@ -169,11 +180,20 @@ class RokidHomeSystem : ISmartHomeSystem() {
         ))
 
         if (resp?.startsWith("Congratulations") == true) {
-            MainService.instance?.speak(configs["finishWord"] ?: "若琪指令发送成功")
+            MainService.instance?.speak(finishWord)
         } else {
             GlobalApp.toastError("若琪指令发送失败：$resp")
             GlobalLog.err("若琪指令发送失败：$resp")
         }
+    }
+
+    override fun summary(): String = buildString {
+        appendln("支持的指令说法：(打开/关闭/关掉){房间名}{设备名}、打开{设备名}")
+        appendln("### 房间列表")
+        appendln(roomList.joinToString(", "))
+        appendln("### 设备列表")
+
+        appendln(deviceList.joinToString(", "))
     }
 
 
