@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.Build
 import android.service.quicksettings.TileService
 import android.support.annotation.RequiresApi
+import cn.vove7.common.utils.newTask
 import cn.vove7.jarvis.activities.ScreenPickerActivity
 import cn.vove7.jarvis.activities.screenassistant.QrCodeActivity
 import cn.vove7.jarvis.activities.screenassistant.ScreenAssistActivity
@@ -25,6 +26,7 @@ class ScreenAssistantTileService : TileService() {
 class ScreenTextPickTileService : TileService() {
     override fun onClick() {
         startActivityAndCollapse(Intent(this, ScreenPickerActivity::class.java).apply {
+            newTask()
             putExtra("delay", true)
         })
     }
@@ -34,6 +36,7 @@ class ScreenTextPickTileService : TileService() {
 class QrCodeTileService : TileService() {
     override fun onClick() {
         startActivityAndCollapse(Intent(this, QrCodeActivity::class.java).apply {
+            newTask()
             putExtra("delay", true)
         })
     }

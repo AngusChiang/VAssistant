@@ -135,7 +135,7 @@ class RokidHomeSystem : ISmartHomeSystem() {
         finishWord = configs["finishWord"] ?: "若琪指令发送成功"
         if (mm != null) {
             mm["g8"]?.also {
-                finishWord = it + if (arrayOf("打开", "开启") orIn command) "已开启" else "已关闭"
+                finishWord = "好的，" + it + if (arrayOf("打开", "开启") orIn command) "已开启" else "已关闭"
             }
             return true
         }
