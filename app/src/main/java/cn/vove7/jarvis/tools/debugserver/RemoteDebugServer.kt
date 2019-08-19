@@ -5,7 +5,6 @@ import android.os.Handler
 import android.os.Looper
 import android.widget.Toast
 import cn.vove7.androlua.LuaHelper
-import cn.vove7.common.app.AppConfig
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.appbus.AppBus
@@ -39,7 +38,7 @@ object RemoteDebugServer : Runnable {
     var stopped: Boolean = true
     private const val LISTEN_PORT = 1527
     var thread: Thread? = null
-    var commandServer :CommandServer?=null
+    var commandServer: CommandServer? = null
     var handler: Handler? = null
     fun start() {
         commandServer?.stop()
@@ -240,8 +239,9 @@ object RemoteDebugServer : Runnable {
                             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK)
                             intent.putExtra("remote_script", action.text)
                             intent.putExtra("remote_script_type", if ("lua" == action.type) "lua" else "js")
-                            intent.putExtra("type", if (action.action == "new_inst_as_inapp"){
-                                ActionNode.NODE_SCOPE_IN_APP} else ActionNode.NODE_SCOPE_GLOBAL)
+                            intent.putExtra("type", if (action.action == "new_inst_as_inapp") {
+                                ActionNode.NODE_SCOPE_IN_APP
+                            } else ActionNode.NODE_SCOPE_GLOBAL)
                             //类型
                             startActivityOnNewTask(intent)
                         }

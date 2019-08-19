@@ -12,10 +12,7 @@ import cn.vove7.bottomdialog.extension.awesomeHeader
 import cn.vove7.common.app.AppConfig
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.bridges.SystemBridge
-import cn.vove7.common.utils.StorageHelper
-import cn.vove7.common.utils.ThreadPool
-import cn.vove7.common.utils.broadcastImageFile
-import cn.vove7.common.utils.runOnUi
+import cn.vove7.common.utils.*
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.tools.DataCollector
 import cn.vove7.jarvis.tools.QRTools
@@ -32,9 +29,9 @@ import java.io.File
  * @author Vove
  * 2019/6/7
  */
-class TextOperationDialog(val context: Activity, val textModel: TextModel) {
+class TextOperationDialog(val activity: Activity, val textModel: TextModel) {
 
-    val bottomDialog = BottomDialog.builder(context) {
+    val bottomDialog = BottomDialog.builder(activity) {
 
         awesomeHeader("文字操作")
         buttons {
@@ -46,7 +43,7 @@ class TextOperationDialog(val context: Activity, val textModel: TextModel) {
 
             neutralButton(text = "分词") {
                 DataCollector.buriedPoint("to_split_words")
-                WordSplitDialog(this@TextOperationDialog.context, textModel.text)
+                WordSplitDialog(this@TextOperationDialog.activity, textModel.text)
                 it.dismiss()
             }
             negativeButton(text = "更多") {
@@ -92,7 +89,7 @@ class TextOperationDialog(val context: Activity, val textModel: TextModel) {
     private fun showMoreMenu() {
         var b: TextView? = null
         bottomDialog.updateFooter<ButtonsBuilder> { b = buttonNegative }
-        PopupMenu(context, b).apply {
+        PopupMenu(activity, b).apply {
             menu.add("分享")
             menu.add("编辑")
             menu.add("搜索")
@@ -106,7 +103,20 @@ class TextOperationDialog(val context: Activity, val textModel: TextModel) {
                 when (it.title) {
                     "分享" -> SystemBridge.shareText(textModel.text)
                     "编辑" -> {
-                        TextEditorDialog(context, textModel.text)
+                        TextEditorDialog(activity, textModel.text) {
+                            title(text = "编辑")
+                            positiveButton(text = "复制") {
+                                SystemBridge.setClipText(editorView.content())
+                            }
+                            negativeButton(text = "分享") {
+                                SystemBridge.shareText(editorView.content())
+                            }
+                            neutralButton(text = "完成") {
+                                TextOperationDialog(activity,
+                                        TextModel(editorView.content()))
+                                dismiss()
+                            }
+                        }
                         bottomDialog.dismiss()
                     }
                     "翻译" -> translate()
@@ -139,7 +149,7 @@ class TextOperationDialog(val context: Activity, val textModel: TextModel) {
     }
 
     private fun showQrDialog(content: String, path: String) {
-        BottomDialog.builder(context) {
+        BottomDialog.builder(activity) {
             title("二维码")
             withCloseIcon()
             content(ImageContentBuilder()) {

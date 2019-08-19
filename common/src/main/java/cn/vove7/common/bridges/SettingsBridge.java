@@ -168,7 +168,7 @@ public class SettingsBridge {
     /**
      * 检查一个存在name实例
      */
-    public SettingsBridge getConfig(String name) {
+    public static SettingsBridge getConfig(String name) {
         InstSettings inst = DaoHelper.INSTANCE.getInsetSettingsByName(name);
         if (inst != null) {
             return new SettingsBridge(name);
@@ -261,12 +261,9 @@ public class SettingsBridge {
     }
 
     public static Gson getG() {
-        return new GsonBuilder().registerTypeAdapter(Double.class, new JsonSerializer<Double>() {
-            @Override
-            public JsonElement serialize(Double src, Type typeOfSrc, JsonSerializationContext context) {
-                if (src == src.longValue()) return new JsonPrimitive(src.longValue());
-                return new JsonPrimitive(src);
-            }
+        return new GsonBuilder().registerTypeAdapter(Double.class, (JsonSerializer<Double>) (src, typeOfSrc, context) -> {
+            if (src == src.longValue()) return new JsonPrimitive(src.longValue());
+            return new JsonPrimitive(src);
         }).create();
     }
 }

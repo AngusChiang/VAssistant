@@ -2,10 +2,14 @@ package cn.vove7.jarvis.activities.base
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.TypedValue
+import android.widget.PopupMenu
+import cn.vove7.common.app.AppConfig
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.bridges.SystemBridge
 import cn.vove7.common.model.UserInfo
 import cn.vove7.common.utils.ThreadPool.runOnPool
+import cn.vove7.common.utils.content
 import cn.vove7.common.utils.newDoc
 import cn.vove7.common.utils.startActivityOnNewTask
 import cn.vove7.jarvis.R
@@ -14,9 +18,13 @@ import cn.vove7.jarvis.adapters.SettingsExpandableAdapter
 import cn.vove7.jarvis.plugins.AdKillerService
 import cn.vove7.jarvis.plugins.VoiceWakeupStrategy
 import cn.vove7.jarvis.services.MainService
-import cn.vove7.common.app.AppConfig
+import cn.vove7.jarvis.shs.ISmartHomeSystem
 import cn.vove7.jarvis.view.*
 import cn.vove7.jarvis.view.custom.SettingGroupItem
+import cn.vove7.jarvis.view.dialog.TextEditorDialog
+import cn.vove7.jarvis.view.dialog.editorView
+import com.afollestad.materialdialogs.WhichButton
+import com.afollestad.materialdialogs.actions.getActionButton
 import kotlinx.android.synthetic.main.activity_expandable_settings.*
 import java.lang.Thread.sleep
 
@@ -73,6 +81,48 @@ class LaboratoryActivity : ReturnableActivity() {
                         CheckBoxItem(R.string.text_show_toast_when_remove_ad, summary = getString(R.string.text_show_toast_when_remove_ad_summary)
                                 , keyId = R.string.key_show_toast_when_remove_ad, defaultValue = true)
                 )),
+                SettingGroupItem(R.color.indigo_700, titleS = "智能家居", childItems = listOf(
+                        SingleChoiceItem(title = "智能家居系统", summary = "选择您的家居系统", defaultValue = { AppConfig.homeSystem }, items = listOf("Rokid(若琪)")) { item, data ->
+                            AppConfig.homeSystem = data.first
+                            MainService.instance?.loadHomeSystem()
+                            true
+                        },
+                        IntentItem(title = "参数配置") {
+                            val s = AppConfig.homeSystem
+                            if (s == null) {
+                                GlobalApp.toastInfo("请先选择您的家居系统")
+                                return@IntentItem
+                            }
+                            TextEditorDialog(this, AppConfig.homeSystemConfig
+                                ?: ISmartHomeSystem.templateConfig(s)) {
+                                noAutoDismiss()
+                                title(text = "参数配置")
+                                editorView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13f)
+                                positiveButton(text = "保存") {
+                                    val text = editorView.content()
+                                    AppConfig.homeSystemConfig = text
+                                    //重新解析配置，并保存到对应的指令存储中
+                                    MainService.instance?.homeControlSystem?.apply {
+                                        init()
+                                        saveInstConfig()
+                                    }
+                                    GlobalApp.toastSuccess("保存完成")
+                                    it.dismiss()
+                                }
+                                neutralButton(text = "选择模板") {
+                                    PopupMenu(this@LaboratoryActivity, it.getActionButton(WhichButton.NEUTRAL)).apply {
+                                        menu.add(0, 0, 0, "Rokid(若琪)")
+                                        setOnMenuItemClickListener { i ->
+                                            editorView.setText(ISmartHomeSystem.templateConfig(i.itemId))
+                                            true
+                                        }
+                                        show()
+                                    }
+                                }
+                                negativeButton { it.dismiss() }
+                            }
+                        }
+                )),
                 SettingGroupItem(R.color.google_green, titleS = "聊天", childItems = listOf(
                         SwitchItem(title = "开启", summary = "指令匹配失败，调用聊天系统",
                                 keyId = R.string.key_open_chat_system, defaultValue = { true }) { _, b ->
@@ -101,22 +151,10 @@ class LaboratoryActivity : ReturnableActivity() {
                         SwitchItem(title = "助手模式", summary = "设为默认语音辅助应用后\n通过唤醒用系统语音助手触发\n可捕捉屏幕内容进行快捷操作\n关闭后只能使快速唤醒", keyId = R.string.key_use_assist_service,
                                 defaultValue = { AppConfig.useAssistService }),
                         InputItem(title = "文字识别参数设置", summary = "自定义文字识别key", keyId = R.string.key_text_ocr_key),
-                        SingleChoiceItem(title = "长按HOME键操作",summary = "适用于一加",
+                        SingleChoiceItem(title = "长按HOME键操作", summary = "适用于一加",
                                 keyId = R.string.key_home_fun, entityArrId = R.array.list_home_funs)
 
                 )),
-                SettingGroupItem(R.color.amber_A700, titleS = "结束词", childItems = listOf(
-                        InputItem(title = "设置结束词", summary = "在指令结尾可以快速结束聆听\n注意根据效果来设置结束词\n不使用，置空即可",
-                                keyId = R.string.key_finish_word)
-                )),
-                /*SettingGroupItem(R.color.teal_A700, titleS = "省电模式", childItems = listOf(
-//                        CheckBoxItem(title = "去广告服务", defaultValue = { true },
-//                                keyId = R.string.key_remove_ad_power_saving_mode,
-//                                summary = "在系统发出低电量提醒后，自动关闭去广告服务\n充电后自动开启"),
-                        CheckBoxItem(title = "无障碍服务", summary = "在系统发出低电量提醒后，自动关闭无障碍服务\n依赖无障碍服务的部分功将无法使用，基础功能仍能使用\n充电后自动恢复服务",
-                                keyId = R.string.key_accessibility_service_power_saving_mode)
-
-                )),*/
                 SettingGroupItem(R.color.yellow_700, titleS = "语音唤醒", childItems = listOf(
                         SwitchItem(title = "自动释放麦克风", summary = "在已授予麦克风权限的其他App内自动关闭语音唤醒\n需要无障碍",/*设为系统应用后无效*/
                                 keyId = R.string.key_fix_voice_micro, defaultValue = { AppConfig.fixVoiceMicro }) { _, b ->

@@ -3,6 +3,7 @@ package cn.vove7.common.bridges
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.model.ResultBox
+import cn.vove7.common.utils.runInCatch
 import cn.vove7.vtp.log.Vog
 import com.google.gson.Gson
 import okhttp3.*
@@ -63,8 +64,9 @@ object HttpBridge {
     }
 
     fun postJson(url: String, json: String?): String? {
-//        Vog.d("get ---> $url \n$json")
-        println("get ---> $url \n$json")
+        runInCatch {
+            Vog.d("get ---> $url \n$json")
+        }
         val client = OkHttpClient.Builder()
                 .readTimeout(timeout, TimeUnit.SECONDS).build()
         val requestBody = FormBody.create(MediaType
@@ -84,7 +86,9 @@ object HttpBridge {
 
     //postForm
     fun post(url: String, params: Map<String, Any>?): String? {
-//        Vog.d("post ---> $url $params")
+        runInCatch {
+            Vog.d("post ---> $url $params")
+        }
         val client = OkHttpClient.Builder()
                 .readTimeout(timeout, TimeUnit.SECONDS).build()
         val requestBody = FormBody.Builder().apply {

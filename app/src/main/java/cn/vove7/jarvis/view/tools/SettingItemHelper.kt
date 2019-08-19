@@ -11,6 +11,7 @@ import cn.vove7.common.app.set
 import cn.vove7.common.utils.ThreadPool
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.view.*
+import cn.vove7.smartkey.android.set
 import cn.vove7.vtp.easyadapter.BaseListAdapter
 import cn.vove7.vtp.log.Vog
 import cn.vove7.vtp.sharedpreference.SpHelper
@@ -109,8 +110,8 @@ class SettingItemHelper(
         } else {
             val key = settingItem.key?:return d
 
-            if(key in AppConfig) {
-                AppConfig.getString(key).also {
+            if(key in AppConfig.settings) {
+                AppConfig.settings.getString(key).also {
                     if (it != "") settingItem.summary = it
                     prefill = it
                 }
@@ -209,18 +210,20 @@ class SettingItemHelper(
      */
     private fun getInitPos(): Int {
         val item = settingItem
-        val default = item.defaultValue.invoke() as Int? ?: 0
-        item.summary = item.items?.get(default)
+        val default = item.defaultValue.invoke() as Int? ?: -1
+        if(default>=0) {
+            item.summary = item.items?.get(default)
+        }
         val key = item.key
         key ?: return default
-        if (AppConfig.contains(key)) {
+        if (AppConfig.settings.contains(key)) {
             val entity = context.resources.getStringArray(item.entityArrId!!)
             return try {
-                val v = AppConfig.getString(key)
+                val v = AppConfig.settings.getString(key)
                 item.summary = v
                 entity.indexOf(v)
             } catch (e: Exception) {//保存值为int
-                val index = AppConfig.getInt(key, 0)
+                val index = AppConfig.settings.getInt(key, 0)
                 item.summary = entity[index]
                 index
             }
@@ -241,7 +244,7 @@ class SettingItemHelper(
                 else item.items!!
             } else item.items!!
 
-        items[getInitPos()]?.also {
+        items.getOrNull(getInitPos())?.also {
             item.summary = it
         }
         setBasic {

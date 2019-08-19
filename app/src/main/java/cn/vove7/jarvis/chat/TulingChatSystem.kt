@@ -64,8 +64,8 @@ class RequestData {
 class UserI {
     val apiKey = {
         AppConfig.chatStr ?: UserInfo.getUserId().let {
-            if (BuildConfig.DEBUG || it in 1..999 || UserInfo.isVip()) "2a4a7374cf1147759d70432237593c15"
-            else "5f9469a7021e463eb098a14026d380ba"
+            if (BuildConfig.DEBUG || it in 1..999 || UserInfo.isVip()) "0c830192e98e4b29977c281304c6ba3d"
+            else "89658c8238384de39cee1ecb529cb81f"
         }
     }.invoke()
     val userId = UserInfo.getEmail()?.let {

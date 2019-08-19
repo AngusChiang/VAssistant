@@ -25,7 +25,12 @@ import cn.vove7.jarvis.activities.screenassistant.ScreenShareActivity
 import cn.vove7.jarvis.activities.screenassistant.SpotScreenActivity
 import cn.vove7.jarvis.adapters.SettingsExpandableAdapter
 import cn.vove7.jarvis.receivers.PowerEventReceiver
-import cn.vove7.jarvis.tools.*
+import cn.vove7.jarvis.services.MainService
+import cn.vove7.jarvis.shs.RokidHomeSystem
+import cn.vove7.jarvis.tools.DataUpdator
+import cn.vove7.jarvis.tools.ItemWrap
+import cn.vove7.jarvis.tools.Tutorials
+import cn.vove7.jarvis.tools.UriUtils
 import cn.vove7.jarvis.tools.backup.BackupHelper
 import cn.vove7.jarvis.tools.debugserver.RemoteDebugServer
 import cn.vove7.jarvis.view.*
@@ -252,6 +257,9 @@ class AdvancedSettingActivity : ReturnableActivity() {
                         },
                         IntentItem(title = "文字识别") {
                             startActivity(Intent(this, ScreenOcrActivity::class.java))
+                        },
+                        IntentItem(title = "若琪测试") {
+                            MainService.instance?.homeControlSystem?.test()
                         }
                 )
                 ))

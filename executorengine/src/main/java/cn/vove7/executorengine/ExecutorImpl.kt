@@ -425,8 +425,8 @@ open class ExecutorImpl(
            return openByIdentifier(marked)
         } else {*/
         markedOpenDao.queryBuilder().where(MarkedDataDao.Properties.Type.`in`(
-                MarkedData.MARKED_TYPE_SCRIPT_LUA,
-                MarkedData.MARKED_TYPE_SCRIPT_JS
+                MARKED_TYPE_SCRIPT_LUA,
+                MARKED_TYPE_SCRIPT_JS
         )).list().forEach {
             val result = it.rawRegex().matchEntire(p)//标记功能 严格匹配
             if (result != null) {

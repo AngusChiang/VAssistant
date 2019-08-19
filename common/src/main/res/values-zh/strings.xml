@@ -16,12 +16,10 @@
 
 
     <string-array name="list_auto_sleep_duration">
+        <item>1分钟</item>
+        <item>5分钟</item>
         <item>10分钟</item>
-        <item>20分钟</item>
         <item>30分钟</item>
-        <item>1小时</item>
-        <item>2小时</item>
-        <item>5小时</item>
         <item>不自动休眠</item>
     </string-array>
 

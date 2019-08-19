@@ -101,12 +101,19 @@ class MineFragment : Fragment() {
             login_lay.visibility = View.GONE
             user_info_lay.visibility = View.VISIBLE
             user_name_text.text = UserInfo.getUserName()
-            user_vip_text.text = if (UserInfo.isVip()) {
-                red_heard.show()
-                "高级用户"
-            } else {
-                red_heard.gone()
-                ""
+            user_vip_text.text = when {
+                UserInfo.isPermanentVip() ->{
+                    red_heard.show()
+                    "永久会员"
+                }
+                UserInfo.isVip() -> {
+                    red_heard.show()
+                    "会员用户"
+                }
+                else -> {
+                    red_heard.gone()
+                    ""
+                }
             }
         } else {
             login_lay.visibility = View.VISIBLE

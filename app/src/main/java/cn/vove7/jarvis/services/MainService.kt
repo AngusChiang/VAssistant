@@ -56,6 +56,8 @@ import cn.vove7.jarvis.activities.ResultPickerActivity
 import cn.vove7.jarvis.activities.ScreenPickerActivity
 import cn.vove7.jarvis.chat.ChatSystem
 import cn.vove7.jarvis.chat.TulingChatSystem
+import cn.vove7.jarvis.receivers.ScreenStatusListener
+import cn.vove7.jarvis.shs.ISmartHomeSystem
 import cn.vove7.jarvis.speech.*
 import cn.vove7.jarvis.speech.baiduspeech.BaiduSpeechRecogService
 import cn.vove7.jarvis.speech.baiduspeech.BaiduSpeechSynService
@@ -107,6 +109,7 @@ class MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
     //启动过慢  lateinit 导致未初始化异常
     var speechRecogService: SpeechRecogService? = null
     var speechSynService: SpeechSynService? = null
+    var homeControlSystem: ISmartHomeSystem? = null
 
     /**
      * 当前语音使用方式
@@ -134,6 +137,14 @@ class MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
         loadChatSystem()
         loadSpeechService()
         speechEngineLoaded = true
+        loadHomeSystem()
+    }
+
+    fun loadHomeSystem() {
+        homeControlSystem = ISmartHomeSystem.load()
+        runOnNewHandlerThread {
+            homeControlSystem?.init()
+        }
     }
 
     /**
@@ -742,6 +753,9 @@ class MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
     inner class RecogEventListener : RecogEvent {
         override fun onWakeup(word: String?) {
             Vog.d("onWakeup ---> 唤醒 -> $word")
+            if (!ScreenStatusListener.screenOn) {
+                SystemBridge.screenOn()
+            }
             //解析成功  不再唤醒
             parseWakeUpCommand(word ?: "") ?: return
             Vog.d("onWakeup ---> 开始聆听 -> $word")
@@ -818,14 +832,8 @@ class MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
             Vog.d("结果 --------> $voiceResult")
 
             when (voiceMode) {
-                MODE_VOICE -> {//剪去结束词
-                    AppConfig.finishWord.also {
-                        when {
-                            it?.isEmpty() != false -> onParseCommand(voiceResult)
-                            voiceResult.endsWith(it) -> onParseCommand(voiceResult.substring(0, voiceResult.length - it.length))
-                            else -> onParseCommand(voiceResult)
-                        }
-                    }
+                MODE_VOICE -> {
+                    onParseCommand(voiceResult)
                 }
                 MODE_GET_PARAM -> {//中途参数
                     resumeMusicIf()
@@ -869,13 +877,6 @@ class MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
             Vog.d("onTempResult ---> 临时结果 $temp")
             floatyPanel.show(temp)
             listeningAni.show(temp)
-            AppConfig.finishWord.also {
-                if (it != null && it != "") {
-                    if (temp.endsWith(it)) {
-                        onCommand(ACTION_STOP_RECOG)
-                    }
-                }
-            }
         }
 
         override fun onStopRecog() {
@@ -968,6 +969,14 @@ class MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
 
         runOnCachePool {
             parsingCommand = true
+            //优先智能家居控制系统
+            if (homeControlSystem?.isSupport(result) == true) {
+                homeControlSystem?.doAction(result)
+                hideAll()
+                parsingCommand = false
+                return@runOnCachePool
+            }
+
             val parseResult = ParseEngine
                     .parseAction(result, AccessibilityApi.accessibilityService?.currentScope, smartOpen, onClick)
             if (parseResult.isSuccess) {

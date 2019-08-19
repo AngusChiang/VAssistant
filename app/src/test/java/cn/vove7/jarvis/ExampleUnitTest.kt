@@ -6,7 +6,7 @@ import cn.vove7.common.datamanager.parse.model.Action
 import cn.vove7.common.utils.*
 import cn.vove7.jarvis.chat.TulingChatSystem
 import cn.vove7.jarvis.tools.baiduaip.BaiduAipHelper
-import cn.vove7.paramregexengine.toParamRegex
+import cn.vove7.paramregex.toParamRegex
 import cn.vove7.vtp.net.NetHelper
 import org.jsoup.Jsoup
 import org.junit.Test
@@ -346,6 +346,14 @@ class ExampleUnitTest {
 
     @Test
     fun singleTest() {
+
+        val s = "123#456#789"
+
+        val si = s.indexOf('#')
+        if (si > 0) {
+            println(s.substring(0,si))
+            println(s.substring(si+1))
+        }
 
         println("%呼叫@{name}".toParamRegex().match("呼叫123"))// true
 

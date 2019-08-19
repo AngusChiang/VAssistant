@@ -88,7 +88,7 @@ public class MarkedData implements DataFrom, Signable, Searchable, Serializable,
 
     @Override
     public void sign() {
-        setTagId(SecureHelper.MD5(key, type, from, regStr, value));
+        setTagId(SecureHelper.INSTANCE.MD5(key, type, from, regStr, value));
     }
 
     public String getType() {

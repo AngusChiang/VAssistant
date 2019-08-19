@@ -12,6 +12,12 @@ import es.dmoral.toasty.Toasty
  * 2019/3/16
  */
 object ToastyHelper {
+    init {
+        Toasty.Config.getInstance()
+                .allowQueue(true)
+                .apply()
+    }
+
     val app: Context get() = GlobalApp.APP
     fun toast(type: Int, msg: String, duration: Int) {
         runOnUi {

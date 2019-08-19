@@ -20,11 +20,11 @@ import cn.vove7.common.utils.ThreadPool.runOnCachePool
 import cn.vove7.common.utils.ThreadPool.runOnPool
 import cn.vove7.common.utils.runOnUi
 import cn.vove7.common.utils.secure.SecuritySharedPreference
+import cn.vove7.smartkey.BaseConfig
 import cn.vove7.smartkey.android.AndroidSettings
 import cn.vove7.smartkey.android.noCacheKey
 import cn.vove7.smartkey.android.smartKey
 import cn.vove7.smartkey.annotation.Config
-import cn.vove7.smartkey.key.SmartKey
 import cn.vove7.smartkey.key.get
 import cn.vove7.smartkey.key.set
 import cn.vove7.vtp.log.Vog
@@ -45,7 +45,7 @@ import java.util.*
  * 2018/9/16
  */
 @Config(BuildConfig.CONFIG_NAME)
-object AppConfig : Settings by SmartKey.getSettings(BuildConfig.CONFIG_NAME) {
+object AppConfig : BaseConfig {
     //key... value
 
     var speechEngineType: Int by noCacheKey(0, keyId = R.string.key_speech_engine_type)
@@ -68,7 +68,7 @@ object AppConfig : Settings by SmartKey.getSettings(BuildConfig.CONFIG_NAME) {
     var userExpPlan by noCacheKey(true, keyId = R.string.key_user_exp_plan)
     var isAutoVoiceWakeupCharging by noCacheKey(false, keyId = R.string.key_auto_open_voice_wakeup_charging)
 
-    var xunfeiSpeechKey by noCacheKey("5d184fe9"/*"5c5437d6"*//*"5d0f2ed4"*/,R.string.key_xunfei_speech_key)
+    var xunfeiSpeechKey by noCacheKey("5d184fe9"/*"5c5437d6"*//*"5d0f2ed4"*/, R.string.key_xunfei_speech_key)
 
     var useSmartOpenIfParseFailed by noCacheKey(true, keyId = R.string.key_use_smartopen_if_parse_failed)
 
@@ -110,17 +110,19 @@ object AppConfig : Settings by SmartKey.getSettings(BuildConfig.CONFIG_NAME) {
     var autoSleepWakeupMillis: Long = 10 * 60 * 1000
 
     var chatSystem: String = ""
+
+    var homeSystem: Int? by smartKey(null, R.string.key_home_system)
+    var homeSystemConfig: String? by smartKey(null, keyId = R.string.key_home_system_config, encrypt = true)
+
+
     var fpAnimation: String = ""
 
     var homeFun: String = "" //长按HOME键功能
 
     //用户唤醒词
-    var userWakeupWord by noCacheKey("",R.string.key_user_wakeup_word)
+    var userWakeupWord by noCacheKey("", R.string.key_user_wakeup_word)
 
     //    var continuousDialogue = false//连续对话
-    var finishWord: String? by noCacheKey(null, keyId = R.string.key_finish_word)
-
-    //    var resumeMusic = true//继续播放
 
     //助手服务
     var useAssistService by noCacheKey(true, keyId = R.string.key_use_assist_service)
@@ -352,15 +354,13 @@ object AppConfig : Settings by SmartKey.getSettings(BuildConfig.CONFIG_NAME) {
         autoSleepWakeupMillis = sp.getString(R.string.key_auto_sleep_wakeup_duration).let {
             if (it == null) autoSleepWakeupMillis
             else {
-                val oneHour: Long = 60 * 60 * 1000
+                val oneMinute: Long = 60 * 1000
                 val i = GlobalApp.APP.resources.getStringArray(R.array.list_auto_sleep_duration).indexOf(it)
                 when (i) {
-                    0 -> oneHour / 6
-                    1 -> oneHour / 3
-                    2 -> oneHour / 2
-                    3 -> oneHour
-                    4 -> 2 * oneHour
-                    5 -> 5 * oneHour
+                    0 -> oneMinute
+                    1 -> oneMinute * 5
+                    2 -> oneMinute * 10
+                    3 -> oneMinute / 30
                     6 -> -1 //不休眠
                     else -> autoSleepWakeupMillis
                 }

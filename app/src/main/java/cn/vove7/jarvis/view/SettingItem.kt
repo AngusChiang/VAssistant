@@ -94,7 +94,7 @@ open class SettingChildItem(
         var summary: String? = null,
         val itemType: Int,
         val keyId: Int? = null,
-        val defaultValue: (() -> Any),
+        val defaultValue: (() -> Any?),
 //        val autoSetValue: Boolean = keyId!=null,
         val range: Pair<Int, Int>? = null,
         val callback: CallbackOnSet<*>? = null,
@@ -154,7 +154,7 @@ class SingleChoiceItem(
         title: String? = null,
         summary: String? = null,
         keyId: Int? = null,
-        defaultValue: (() -> Int) = { 0 },//pos
+        defaultValue: (() -> Int?) = { 0 },//pos
         @ArrayRes entityArrId: Int? = null,
         items: List<String>? = null,
         callback: CallbackOnSet<Pair<Int, String>>? = null
@@ -163,7 +163,7 @@ class SingleChoiceItem(
 
 val storeIndexOnSingleChoiceItem: CallbackOnSet<Pair<Int, String>> = { io, it ->
     io.keyId?.also { ki ->
-        AppConfig.set(ki, it.first)
+        AppConfig.settings.set(ki, it.first)
         io.summary = it.second
     }
     false

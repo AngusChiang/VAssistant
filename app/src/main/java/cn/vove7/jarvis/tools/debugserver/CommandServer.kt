@@ -16,9 +16,11 @@ class CommandServer : NanoHTTPD(8000) {
     override fun serve(session: IHTTPSession?): Response {
         session ?: return super.serve(session)
         session.uri.substring(1).also {
+            if (it == ("favicon.ico")) return super.serve(session)
+
             Vog.d("serve $it")
-                MainService.parseCommand(it, true)
-                return newFixedLengthResponse("已执行")
+            MainService.parseCommand(it, true)
+            return newFixedLengthResponse("已执行")
         }
         return newFixedLengthResponse("请输入指令\nip:8000/你好")
     }

@@ -68,7 +68,7 @@ public class AppAdInfo implements Serializable, Searchable, Signable, DataFrom {
 
     @Override
     public void sign() {
-        setTagId(SecureHelper.MD5(descTitle, pkg, activity, viewId, type, String.valueOf(versionCode), texts, descs, depths));
+        setTagId(SecureHelper.INSTANCE.MD5(descTitle, pkg, activity, viewId, type, String.valueOf(versionCode), texts, descs, depths));
     }
 
     private Integer versionCode;//? 不需要 找不到就是找不到 . 消耗资源?

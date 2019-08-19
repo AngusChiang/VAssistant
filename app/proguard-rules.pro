@@ -19,3 +19,13 @@
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
+-assumenosideeffects class cn.vove7.vtp.log.Vog {
+
+public ... v(...);
+public ... i(...);
+public ... w(...);
+public ... d(...);
+public ... e(...);
+public ... a(...);
+
+}
