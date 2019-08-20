@@ -38,14 +38,11 @@ import cn.vove7.common.model.RequestPermission
 import cn.vove7.common.model.UserInfo
 import cn.vove7.common.model.VoiceRecogResult
 import cn.vove7.common.netacc.WrapperNetHelper
+import cn.vove7.common.utils.*
 import cn.vove7.common.utils.RegUtils.checkCancel
 import cn.vove7.common.utils.RegUtils.checkConfirm
 import cn.vove7.common.utils.ThreadPool.runOnCachePool
 import cn.vove7.common.utils.ThreadPool.runOnPool
-import cn.vove7.common.utils.runOnNewHandlerThread
-import cn.vove7.common.utils.runOnUi
-import cn.vove7.common.utils.startActivityOnNewTask
-import cn.vove7.common.utils.whileWaitTime
 import cn.vove7.common.view.finder.ViewFindBuilder
 import cn.vove7.executorengine.exector.ExecutorEngine
 import cn.vove7.executorengine.model.ActionParseResult
@@ -727,11 +724,11 @@ class MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
             "减小音量" -> {
                 SystemBridge.volumeDown()
             }
-            "播放" -> InputMethodBridge.sendKey(KEYCODE_MEDIA_PLAY)
-            "停止" -> InputMethodBridge.sendKey(KEYCODE_MEDIA_STOP)
-            "暂停" -> InputMethodBridge.sendKey(KEYCODE_MEDIA_PAUSE)
-            "上一首" -> InputMethodBridge.sendKey(KEYCODE_MEDIA_PREVIOUS)
-            "下一首" -> InputMethodBridge.sendKey(KEYCODE_MEDIA_NEXT)
+            "播放" -> runInCatch { InputMethodBridge.sendKey(KEYCODE_MEDIA_PLAY) }
+            "停止" -> runInCatch { InputMethodBridge.sendKey(KEYCODE_MEDIA_STOP) }
+            "暂停" -> runInCatch { InputMethodBridge.sendKey(KEYCODE_MEDIA_PAUSE) }
+            "上一首" -> runInCatch { InputMethodBridge.sendKey(KEYCODE_MEDIA_PREVIOUS) }
+            "下一首" -> runInCatch { InputMethodBridge.sendKey(KEYCODE_MEDIA_NEXT) }
             //打开电灯、关闭电灯、增大亮度、减小亮度
             //打开手电筒、关闭手电筒
             "打开手电筒", "打开电灯" -> SystemBridge.openFlashlight()
