@@ -1,5 +1,6 @@
 package cn.vove7.jarvis.shs
 
+import android.support.annotation.CallSuper
 import cn.vove7.common.app.AppConfig
 import cn.vove7.common.bridges.SettingsBridge
 import cn.vove7.jarvis.BuildConfig
@@ -11,16 +12,36 @@ import cn.vove7.jarvis.BuildConfig
  * 2019/8/18
  */
 abstract class ISmartHomeSystem {
-    abstract fun init()
+    @CallSuper
+    open fun init() {
+        loadUserCommand()
+    }
+
     abstract fun isSupport(command: String): Boolean
     abstract fun doAction(command: String)
+
+    private val userCommands = mutableSetOf<String>()
+
     val configs: MutableMap<String, String> = mutableMapOf()
+
+    fun loadUserCommand() {
+        userCommands.clear()
+        AppConfig.homeSystemUserCommand?.lines()?.forEach {
+            it.trim().takeIf { i -> i.isNotEmpty() }?.also { s ->
+                userCommands.add(s)
+            }
+        }
+    }
 
     abstract fun test()
 
     //用于显示
     abstract fun summary(): String
 
+
+    protected fun inUserCommand(command: String): Boolean {
+        return command in userCommands
+    }
 
     //保存配置到指令存储
     abstract fun saveInstConfig()

@@ -40,12 +40,13 @@ class RokidHomeSystem : ISmartHomeSystem() {
 
     private val pointDeviceList = mutableSetOf<String>()
 
-
     /**
      * 初始化支持设备列表
      * 初始化用户信息
      */
     override fun init() {
+        super.init()
+
         Vog.d("初始化Rokid")
         val config = AppConfig.homeSystemConfig
 
@@ -142,7 +143,8 @@ class RokidHomeSystem : ISmartHomeSystem() {
 
         return ("$roomReg?的?$devReg%".toParamRegex().match(command) != null
                 || "${roomReg}的?$roomSensorsProperty".toParamRegex().match(command) != null
-                || (pointDeviceList.isNotEmpty() && "$roomReg?$pointsReg%".toParamRegex().match(command) != null)).also {
+                || (pointDeviceList.isNotEmpty() && "$roomReg?$pointsReg%".toParamRegex().match(command) != null)
+                || inUserCommand(command)).also {
             Vog.d("若琪 $command isSupport: $it")
         }
 

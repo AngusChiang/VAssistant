@@ -125,6 +125,20 @@ class LaboratoryActivity : ReturnableActivity() {
                                 negativeButton { it.dismiss() }
                             }
                         },
+                        IntentItem(title = "自定义短语", summary = "自定义发送到家居控制系统的短语") {
+                            TextEditorDialog(this, AppConfig.homeSystemUserCommand){
+                                title(text = "自定义短语")
+                                editorView.hint = "每行一个"
+                                editorView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13f)
+                                positiveButton(text = "保存") {
+                                    val text = editorView.content()
+                                    AppConfig.homeSystemUserCommand = text
+                                    MainService.instance?.homeControlSystem?.loadUserCommand()
+                                    GlobalApp.toastSuccess("保存完成")
+                                }
+                                negativeButton()
+                            }
+                        },
                         IntentItem(title = "查看信息") {
                             if (AppConfig.homeSystem == null) {
                                 GlobalApp.toastInfo("请先选择您的家居系统")

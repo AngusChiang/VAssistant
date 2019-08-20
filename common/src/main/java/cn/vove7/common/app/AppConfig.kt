@@ -113,6 +113,8 @@ object AppConfig : BaseConfig {
 
     var homeSystem: Int? by smartKey(null, R.string.key_home_system)
     var homeSystemConfig: String? by smartKey(null, keyId = R.string.key_home_system_config, encrypt = true)
+    //用户自定义短语
+    var homeSystemUserCommand: String? by smartKey(null, keyId = R.string.key_home_system_user_command, encrypt = true)
 
 
     var fpAnimation: String = ""

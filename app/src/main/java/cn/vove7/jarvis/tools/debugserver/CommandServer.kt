@@ -1,5 +1,6 @@
 package cn.vove7.jarvis.tools.debugserver
 
+import cn.vove7.common.bridges.SystemBridge
 import cn.vove7.jarvis.services.MainService
 import cn.vove7.vtp.log.Vog
 import fi.iki.elonen.NanoHTTPD
@@ -20,9 +21,9 @@ class CommandServer : NanoHTTPD(8000) {
 
             Vog.d("serve $it")
             MainService.parseCommand(it, true)
-            return newFixedLengthResponse("已执行")
+            return newFixedLengthResponse("已执行\n")
         }
-        return newFixedLengthResponse("请输入指令\nip:8000/你好")
+        return newFixedLengthResponse("请输入指令\n${SystemBridge.getLocalIpAddress()}:8000/你好\n")
     }
 
 }
