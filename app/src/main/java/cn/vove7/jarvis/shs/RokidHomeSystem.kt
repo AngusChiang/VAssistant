@@ -34,9 +34,10 @@ class RokidHomeSystem : ISmartHomeSystem() {
             "地下室", "((#楼)?楼梯间)", "((#楼)?过道)"
     )
 
-    private lateinit var deviceList: MutableSet<String>
+    //防止解析语音指令执行时，未初始化
+    private var deviceList: MutableSet<String> = defaultRoomList.toMutableSet()
 
-    private lateinit var roomList: MutableSet<String>
+    private var roomList: MutableSet<String> = defaultDeviceList.toMutableSet()
 
     private val pointDeviceList = mutableSetOf<String>()
 
@@ -55,9 +56,9 @@ class RokidHomeSystem : ISmartHomeSystem() {
             return
         }
         runInCatch(true) {
-            parseConfig(config!!)
             roomList = defaultRoomList.toMutableSet()
             deviceList = defaultDeviceList.toMutableSet()
+            parseConfig(config!!)
             pointDeviceList.clear()
             loadDataFromRemote()
         }
