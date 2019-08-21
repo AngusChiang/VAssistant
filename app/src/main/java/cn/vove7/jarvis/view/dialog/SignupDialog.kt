@@ -14,6 +14,7 @@ import cn.vove7.common.netacc.WrapperNetHelper
 import cn.vove7.common.netacc.tool.SecureHelper
 import cn.vove7.common.utils.TextHelper
 import cn.vove7.common.utils.gone
+import cn.vove7.common.utils.onClick
 import cn.vove7.jarvis.R
 import cn.vove7.vtp.log.Vog
 import com.afollestad.materialdialogs.MaterialDialog
@@ -45,7 +46,7 @@ class SignupDialog(context: Context, val r: OnLoginSuccess) {
     val view: View by lazy { LayoutInflater.from(context).inflate(R.layout.dialog_sign_up, null) }
 
     init {
-        signUpBtn.setOnClickListener {
+        signUpBtn.onClick {
             userEmailView.error = ""
             userPassView.error = ""
             confirmPassView.error = ""
@@ -57,7 +58,7 @@ class SignupDialog(context: Context, val r: OnLoginSuccess) {
 
             if (TextUtils.isEmpty(userEmail)) {
                 userEmailView.error = GlobalApp.getString(R.string.text_not_empty)
-                return@setOnClickListener
+                return@onClick
             }
             if (TextHelper.isEmail(userEmail)) {//邮箱
                 userInfo.setEmail(userEmail)
@@ -65,24 +66,25 @@ class SignupDialog(context: Context, val r: OnLoginSuccess) {
 
             } else {
                 userEmailView.error = GlobalApp.getString(R.string.text_email_format_err)
-                return@setOnClickListener
+                return@onClick
             }
             if (TextUtils.isEmpty(userPass)) {//密码
                 userPassView.error = GlobalApp.getString(R.string.text_not_empty)
-                return@setOnClickListener
+                return@onClick
             }
             if (userPass.length < lastBit) {//密码
                 userPassView.error = "密码长度至少${lastBit}位"
-                return@setOnClickListener
+                return@onClick
             }
             if (confirmPass != userPass) {//密码
                 confirmPassView.error = GlobalApp.getString(R.string.text_pass_not_same)
-                return@setOnClickListener
+                return@onClick
             }
             userInfo.userPass = SecureHelper.MD5(userPass)
 
             loadBar.visibility = View.VISIBLE
             //post
+            signUpBtn.isClickable = false
             WrapperNetHelper.postJson<String>(ApiUrls.REGISTER_BY_EMAIL, model = userInfo) {
                 success { _, bean ->
                     //泛型
@@ -100,6 +102,9 @@ class SignupDialog(context: Context, val r: OnLoginSuccess) {
                     loadBar.visibility = View.INVISIBLE
                     e.log()
                     GlobalApp.toastError("出错")
+                }
+                end {
+                    signUpBtn.isClickable = true
                 }
             }
         }

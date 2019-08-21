@@ -479,5 +479,34 @@ infix fun Array<String>.orIn(s: String): Boolean {
         if (it in s) return true
     }
     return false
+}
 
+//上次点击时间
+private var lastClickTime = 0L
+
+/**
+ * 是否快速点击
+ * @param interval 间隔 Int 默认500ms
+ * @return Any?
+ */
+@Suppress("RedundantUnitExpression")
+fun isQuickClick(interval: Int = 300): Unit? {
+    val now = System.currentTimeMillis()
+    return (if (now - lastClickTime > interval) {
+        Unit
+    } else null).also {
+        lastClickTime = now
+    }
+}
+
+/**
+ * 设置防抖动点击事件
+ * @receiver View
+ * @param clickAction Function1<View, Unit>
+ */
+fun View.onClick(clickAction: (View) -> Unit) {
+    setOnClickListener {
+        isQuickClick() ?: return@setOnClickListener
+        clickAction(it)
+    }
 }
