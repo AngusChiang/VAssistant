@@ -364,7 +364,7 @@ class SettingsActivity : ReturnableActivity() {
                             summary = if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N_MR1) "您的设备不支持" else null
                     ) {
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1) {
-                            ShortcutUtil.addWakeUpPinShortcut()
+                            ShortcutUtil.addDebugShortcut()
                         }
                     }
             ))
