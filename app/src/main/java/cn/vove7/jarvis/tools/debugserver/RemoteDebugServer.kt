@@ -34,7 +34,10 @@ object RemoteDebugServer : Runnable {
 
     private var server: ServerSocket? = null
 
-    var clients: HashMap<Socket, PrintWriter>? = null
+    private var clients: HashMap<Socket, PrintWriter>? = null
+
+    val hasClient :Boolean get() = clients?.isNotEmpty() == true
+
     var stopped: Boolean = true
     private const val LISTEN_PORT = 1527
     private var thread: Thread? = null
@@ -138,6 +141,11 @@ object RemoteDebugServer : Runnable {
     private val sleepRun = Runnable {
         Vog.d("休眠")
         stop()
+    }
+
+    fun restartSleepTimer() {
+        stopAutoSleep()
+        startAutoSleep()
     }
 
     private fun startAutoSleep() {

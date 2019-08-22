@@ -13,17 +13,24 @@ import fi.iki.elonen.NanoHTTPD
  */
 class CommandServer : NanoHTTPD(8000) {
 
-
     override fun serve(session: IHTTPSession?): Response {
         session ?: return super.serve(session)
-        session.uri.substring(1).also {
-            if (it == ("favicon.ico")) return super.serve(session)
 
-            Vog.d("serve $it")
-            MainService.parseCommand(it, true)
-            return newFixedLengthResponse("已执行\n")
+        if (!RemoteDebugServer.hasClient) {
+            RemoteDebugServer.restartSleepTimer()
         }
-        return newFixedLengthResponse("请输入指令\n${SystemBridge.getLocalIpAddress()}:8000/你好\n")
+        //自动decode
+        return session.uri.substring(1).trim().let {
+            when {
+                it == ("favicon.ico") -> super.serve(session)
+                it.isNotEmpty() -> {
+                    Vog.d("serve $it")
+                    MainService.parseCommand(it, true)
+                    newFixedLengthResponse("已执行\n")
+                }
+                else -> newFixedLengthResponse("请输入指令, 示例：\n${SystemBridge.getLocalIpAddress()}:8000/你好\n")
+            }
+        }
     }
 
 }
