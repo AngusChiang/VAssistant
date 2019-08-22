@@ -342,10 +342,9 @@ class SettingsActivity : ReturnableActivity() {
                             keyId = R.string.key_auto_open_as_with_root, defaultValue = false)
                     { _, b ->
                         if (b) ThreadPool.runOnPool {
-                            if (AccessibilityApi.isBaseServiceOn) {
+                            if (!AccessibilityApi.isBaseServiceOn) {
+                                AccessibilityApi.openServiceSelf()
                             }
-                            return@runOnPool
-                            AccessibilityApi.openServiceSelf()
                         }
                         return@CheckBoxItem true
                     },
