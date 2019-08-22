@@ -37,9 +37,11 @@ object RemoteDebugServer : Runnable {
     var clients: HashMap<Socket, PrintWriter>? = null
     var stopped: Boolean = true
     private const val LISTEN_PORT = 1527
-    var thread: Thread? = null
-    var commandServer: CommandServer? = null
+    private var thread: Thread? = null
+    private var commandServer: CommandServer? = null
     var handler: Handler? = null
+
+    @Synchronized
     fun start() {
         commandServer?.stop()
         commandServer = CommandServer().also {
@@ -57,10 +59,10 @@ object RemoteDebugServer : Runnable {
 
     }
 
+    @Synchronized
     fun stop() {
-
+        stopped = true
         runOnPool {
-            stopped = true
             commandServer?.stop()
             commandServer = null
             server?.close()
@@ -80,7 +82,6 @@ object RemoteDebugServer : Runnable {
             thread = null
         }
     }
-//    }
 
     override fun run() {
         stopped = false

@@ -4,15 +4,16 @@ import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.speech.RecognizerIntent
+import cn.vove7.common.app.AppConfig
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.appbus.AppBus
 import cn.vove7.common.datamanager.DAO
 import cn.vove7.common.datamanager.parse.model.Action
 import cn.vove7.executorengine.parse.OpenAppAction
 import cn.vove7.jarvis.R
-import cn.vove7.jarvis.services.MainService
-import cn.vove7.common.app.AppConfig
 import cn.vove7.jarvis.activities.screenassistant.*
+import cn.vove7.jarvis.services.MainService
+import cn.vove7.jarvis.tools.debugserver.RemoteDebugServer
 import cn.vove7.vtp.log.Vog
 import java.lang.Thread.sleep
 import java.util.*
@@ -75,6 +76,13 @@ class VoiceAssistActivity : Activity() {
             SCREEN_ASSIST_SCREEN_OCR -> {
                 startActivity(Intent(this, ScreenOcrActivity::class.java))
             }
+            SWITCH_DEBUG_MODE -> {
+                if (RemoteDebugServer.stopped) {
+                    RemoteDebugServer.start()
+                } else {
+                    RemoteDebugServer.stop()
+                }
+            }
             else -> {
                 try {
                     val id = action!!.toLong()
@@ -103,6 +111,7 @@ class VoiceAssistActivity : Activity() {
 
     companion object {
         const val SWITCH_VOICE_WAKEUP = "switch_voice_wakeup"
+        const val SWITCH_DEBUG_MODE = "switch_debug_mode"
         const val SET_ASSIST_APP = "set_assist_app"
         const val WAKEUP_SCREEN_ASSIST = "wakeup_screen_assist"
         const val SCREEN_ASSIST_TEXT_PICKER = "screen_assist_text_picker"

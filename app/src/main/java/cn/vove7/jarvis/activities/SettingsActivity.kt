@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.ActivityNotFoundException
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.view.KeyEvent
@@ -338,9 +339,12 @@ class SettingsActivity : ReturnableActivity() {
             SettingGroupItem(R.color.lime_600, titleId = R.string.text_other, childItems = listOf(
                     SingleChoiceItem(title = "翻译主语言", entityArrId = R.array.list_translate_languages,
                             keyId = R.string.key_translate_languages),
-                    CheckBoxItem(title = "自动开启无障碍服务", summary = "App启动时自动开启无障碍服务，需要root支持，或者使用ADB授予WRITE_SECURE_SETTINGS权限（方法见常见问题）",
-                            keyId = R.string.key_auto_open_as_with_root, defaultValue = false)
-                    { _, b ->
+                    CheckBoxItem(
+                            title = "自动开启无障碍服务",
+                            summary = "App启动时自动开启无障碍服务，需要root支持，或者使用ADB授予WRITE_SECURE_SETTINGS权限（方法见常见问题）",
+                            keyId = R.string.key_auto_open_as_with_root,
+                            defaultValue = false
+                    ) { _, b ->
                         if (b) ThreadPool.runOnPool {
                             if (!AccessibilityApi.isBaseServiceOn) {
                                 AccessibilityApi.openServiceSelf()
@@ -354,7 +358,15 @@ class SettingsActivity : ReturnableActivity() {
                     },
                     CheckBoxItem(title = "用户体验计划", summary = "改善体验与完善功能",
                             keyId = R.string.key_user_exp_plan, defaultValue = true
-                    )
+                    ),
+                    IntentItem(
+                            title = "添加调试Shortcut",
+                            summary = if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N_MR1) "您的设备不支持" else null
+                    ) {
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1) {
+                            ShortcutUtil.addWakeUpPinShortcut()
+                        }
+                    }
             ))
     )
 
