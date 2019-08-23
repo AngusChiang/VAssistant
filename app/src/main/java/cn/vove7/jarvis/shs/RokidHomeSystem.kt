@@ -88,13 +88,13 @@ class RokidHomeSystem : ISmartHomeSystem() {
             success { _, s ->
                 val numReg = "[0-9.()（）]+".toRegex()
                 val l = s.filter { !numReg.matches(it.name) }
-                GlobalLog.log("loadDevices ${l.size}")
-                l.forEach {
+                l.filter { it.name.length > 1 && "^[\u4e00-\u9fa5]+$".toRegex().matches(it.name) }.forEach {
                     deviceList.add(it.name)
                     if (it.type == "com.fibaro.setPoint") {
                         pointDeviceList.add(it.name)
                     }
                 }
+                GlobalLog.log("loadDevices ${deviceList.size}")
             }
         }
     }

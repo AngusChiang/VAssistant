@@ -2,8 +2,10 @@ package cn.vove7.jarvis.shs
 
 import android.support.annotation.CallSuper
 import cn.vove7.common.app.AppConfig
+import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.bridges.SettingsBridge
 import cn.vove7.jarvis.BuildConfig
+import cn.vove7.vtp.net.GsonHelper
 
 /**
  * # ISmartHomeSystem
@@ -47,6 +49,7 @@ abstract class ISmartHomeSystem {
     abstract fun saveInstConfig()
 
     internal fun parseConfig(s: String) {
+        configs.clear()
         s.lines().forEach {
             if (it.trimStart().startsWith('#'))
                 return@forEach
@@ -58,6 +61,9 @@ abstract class ISmartHomeSystem {
                     configs[it.substring(0, si).trim()] = v
                 }
             }
+        }
+        if (BuildConfig.DEBUG) {
+            GlobalLog.log(GsonHelper.toJson(configs, true))
         }
     }
 
