@@ -10,8 +10,6 @@ import android.support.v7.widget.Toolbar
 import android.view.KeyEvent
 import android.view.View
 import android.widget.*
-import cn.vove7.bottomdialog.BottomDialog
-import cn.vove7.bottomdialog.builder.title
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.bridges.SystemBridge
@@ -28,6 +26,7 @@ import cn.vove7.common.datamanager.parse.statusmap.Reg
 import cn.vove7.common.helper.AdvanAppHelper
 import cn.vove7.common.model.UserInfo
 import cn.vove7.common.netacc.ApiUrls
+import cn.vove7.common.utils.get
 import cn.vove7.executorengine.model.ActionParseResult
 import cn.vove7.executorengine.parse.ParseEngine
 import cn.vove7.jarvis.BuildConfig
@@ -57,9 +56,12 @@ class NewInstActivity : ReturnableActivity(), View.OnClickListener {
     var parentId: Long? = null//上级命令MapNodeId
     private var instType: Int = NODE_SCOPE_GLOBAL
 
-    private var editNode: ActionNode? = null//修改
+    private val editNode: ActionNode by lazy {
+        val id = intent.getLongExtra("nodeId", 0L)
+        DAO.daoSession.actionNodeDao.queryBuilder().where(ActionNodeDao.Properties.Id.eq(id)).unique()
+    }//修改
     private var parentNode: ActionNode? = null
-    private var isReedit = false
+    private val isReedit by lazy { intent["reedit", false] }
 
     private var enterTime = 0L
 
@@ -98,25 +100,28 @@ class NewInstActivity : ReturnableActivity(), View.OnClickListener {
 
 
     private fun initData() {
-        isReedit = intent.getBooleanExtra("reedit", false)
-
         val arr = resources.getStringArray(R.array.list_pos_of_regex_param)
         posData = arrayListOf()
         posData.addAll(arr)
         if (isReedit) {//重新编辑
-            val id = intent.getLongExtra("nodeId", 0L)
-            editNode = DAO.daoSession.actionNodeDao.queryBuilder().where(ActionNodeDao.Properties.Id.eq(id)).unique()
-//            editNode?.assembly()
-            scriptType = editNode!!.action.scriptType
-            scriptText = editNode?.action?.actionScript
-            if (editNode == null) {
+            try {//测试 初始化结果
+                editNode
+            } catch (e: Throwable) {
                 GlobalApp.toastError(getString(R.string.text_error_occurred) + " code :n117")
-            } else {//展示信息
-                activity_name.setText(editNode?.actionScope?.activity)
-                desc_text.setText(editNode?.actionTitle)
-                editNode?.regsWithoutCache?.forEach {
-                    regs.add(it.regStr)
+                finish()
+                return
+            }
+            editNode.apply {
+
+                scriptType = action.scriptType
+                scriptText = action.actionScript
+                activity_name.setText(actionScope?.activity)
+                desc_text.setText(actionTitle)
+                regsWithoutCache?.forEach {
+                    this@NewInstActivity.regs.add(it.regStr)
                 }
+                check_box_auto_launch_app.isChecked = autoLaunchApp
+
             }
         } else {// 来自RemoteDebugServer
             if (intent.hasExtra("remote_script")) {
@@ -168,7 +173,7 @@ class NewInstActivity : ReturnableActivity(), View.OnClickListener {
         MaterialDialog(this)
                 .title(R.string.text_confirm_to_exit)
                 .message(R.string.text_content_wont_be_save)
-                .positiveButton { _ ->
+                .positiveButton {
                     super.onBackPressed()
                 }.negativeButton()
                 .show()
@@ -206,24 +211,18 @@ class NewInstActivity : ReturnableActivity(), View.OnClickListener {
             } else it
         }
         if (isReedit) {//保存编辑
-            if (editNode == null) {
-                GlobalApp.toastError(getString(R.string.text_error_occurred))
-                GlobalLog.err(getString(R.string.text_error_occurred))
-                return
-            }
-
             if (inApp) {//更新scope
-                editNode?.setScopeId(DaoHelper.getActionScopeId(ActionScope(pkg, activityName)))
+                editNode.setScopeId(DaoHelper.getActionScopeId(ActionScope(pkg, activityName)))
+                editNode.autoLaunchApp = check_box_auto_launch_app.isChecked
             }
-            val ac = editNode?.action!!
+            val ac = editNode.action!!
             ac.scriptType = scriptType
             ac.actionScript = scriptText
             DAO.daoSession.actionDao.update(ac)
-            editNode?.actionTitle = desc
-
-            editNode!!.regs.forEach { DAO.daoSession.regDao.delete(it) }
+            editNode.actionTitle = desc
+            editNode.regs.forEach { DAO.daoSession.regDao.delete(it) }
             wrapRegs().forEach {
-                it.nodeId = editNode!!.id
+                it.nodeId = editNode.id
                 DAO.daoSession.regDao.insert(it)
             }
             DAO.daoSession.actionNodeDao.update(editNode)
@@ -329,8 +328,8 @@ class NewInstActivity : ReturnableActivity(), View.OnClickListener {
                 }
             })
             if (isReedit) {
-                scriptText = editNode?.action?.actionScript
-                scriptType = editNode!!.action.scriptType
+                scriptText = editNode.action?.actionScript
+                scriptType = editNode.action.scriptType
             }
             selScriptDialog = MaterialDialog(this).noAutoDismiss()
                     .customView(view = dView, scrollable = true)

@@ -11,10 +11,7 @@ import cn.vove7.vtp.log.Vog
  * @author Administrator
  * 2018/10/23
  */
-class DBUpdator(context: Context,name:String): DaoMaster.OpenHelper(context, name) {
-    override fun onCreate(db: SQLiteDatabase?) {
-        super.onCreate(db)
-    }
+class DBUpdator(context: Context, name: String) : DaoMaster.OpenHelper(context, name) {
 
     override fun onUpgrade(db: SQLiteDatabase?, oldVersion: Int, newVersion: Int) {
         super.onUpgrade(db, oldVersion, newVersion)

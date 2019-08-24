@@ -101,6 +101,15 @@
 
 
             <TextView
+                android:id="@+id/auto_launch_app_flag"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:labelFor="@id/example_text"
+                android:text="自启App"
+                android:textColor="?attr/colorAccent" />
+
+            <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"

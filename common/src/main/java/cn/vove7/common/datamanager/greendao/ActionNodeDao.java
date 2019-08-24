@@ -36,16 +36,17 @@ public class ActionNodeDao extends AbstractDao<ActionNode, Long> {
     public static class Properties {
         public final static Property Id = new Property(0, Long.class, "id", true, "_id");
         public final static Property ActionScopeType = new Property(1, int.class, "actionScopeType", false, "ACTION_SCOPE_TYPE");
-        public final static Property ActionId = new Property(2, Long.class, "actionId", false, "ACTION_ID");
-        public final static Property ParentId = new Property(3, Long.class, "parentId", false, "PARENT_ID");
-        public final static Property ScopeId = new Property(4, Long.class, "scopeId", false, "SCOPE_ID");
-        public final static Property DescId = new Property(5, Long.class, "descId", false, "DESC_ID");
-        public final static Property ActionTitle = new Property(6, String.class, "actionTitle", false, "ACTION_TITLE");
-        public final static Property TagId = new Property(7, String.class, "tagId", false, "TAG_ID");
-        public final static Property VersionCode = new Property(8, int.class, "versionCode", false, "VERSION_CODE");
-        public final static Property PublishUserId = new Property(9, Long.class, "publishUserId", false, "PUBLISH_USER_ID");
-        public final static Property Priority = new Property(10, int.class, "priority", false, "PRIORITY");
-        public final static Property From = new Property(11, String.class, "from", false, "FROM");
+        public final static Property AutoLaunchApp = new Property(2, boolean.class, "autoLaunchApp", false, "AUTO_LAUNCH_APP");
+        public final static Property ActionId = new Property(3, Long.class, "actionId", false, "ACTION_ID");
+        public final static Property ParentId = new Property(4, Long.class, "parentId", false, "PARENT_ID");
+        public final static Property ScopeId = new Property(5, Long.class, "scopeId", false, "SCOPE_ID");
+        public final static Property DescId = new Property(6, Long.class, "descId", false, "DESC_ID");
+        public final static Property ActionTitle = new Property(7, String.class, "actionTitle", false, "ACTION_TITLE");
+        public final static Property TagId = new Property(8, String.class, "tagId", false, "TAG_ID");
+        public final static Property VersionCode = new Property(9, int.class, "versionCode", false, "VERSION_CODE");
+        public final static Property PublishUserId = new Property(10, Long.class, "publishUserId", false, "PUBLISH_USER_ID");
+        public final static Property Priority = new Property(11, int.class, "priority", false, "PRIORITY");
+        public final static Property From = new Property(12, String.class, "from", false, "FROM");
     }
 
     private DaoSession daoSession;
@@ -67,16 +68,17 @@ public class ActionNodeDao extends AbstractDao<ActionNode, Long> {
         db.execSQL("CREATE TABLE " + constraint + "\"ACTION_NODE\" (" + //
                 "\"_id\" INTEGER PRIMARY KEY ," + // 0: id
                 "\"ACTION_SCOPE_TYPE\" INTEGER NOT NULL ," + // 1: actionScopeType
-                "\"ACTION_ID\" INTEGER," + // 2: actionId
-                "\"PARENT_ID\" INTEGER," + // 3: parentId
-                "\"SCOPE_ID\" INTEGER," + // 4: scopeId
-                "\"DESC_ID\" INTEGER," + // 5: descId
-                "\"ACTION_TITLE\" TEXT," + // 6: actionTitle
-                "\"TAG_ID\" TEXT," + // 7: tagId
-                "\"VERSION_CODE\" INTEGER NOT NULL ," + // 8: versionCode
-                "\"PUBLISH_USER_ID\" INTEGER," + // 9: publishUserId
-                "\"PRIORITY\" INTEGER NOT NULL ," + // 10: priority
-                "\"FROM\" TEXT);"); // 11: from
+                "\"AUTO_LAUNCH_APP\" INTEGER NOT NULL ," + // 2: autoLaunchApp
+                "\"ACTION_ID\" INTEGER," + // 3: actionId
+                "\"PARENT_ID\" INTEGER," + // 4: parentId
+                "\"SCOPE_ID\" INTEGER," + // 5: scopeId
+                "\"DESC_ID\" INTEGER," + // 6: descId
+                "\"ACTION_TITLE\" TEXT," + // 7: actionTitle
+                "\"TAG_ID\" TEXT," + // 8: tagId
+                "\"VERSION_CODE\" INTEGER NOT NULL ," + // 9: versionCode
+                "\"PUBLISH_USER_ID\" INTEGER," + // 10: publishUserId
+                "\"PRIORITY\" INTEGER NOT NULL ," + // 11: priority
+                "\"FROM\" TEXT);"); // 12: from
     }
 
     /** Drops the underlying database table. */
@@ -94,47 +96,48 @@ public class ActionNodeDao extends AbstractDao<ActionNode, Long> {
             stmt.bindLong(1, id);
         }
         stmt.bindLong(2, entity.getActionScopeType());
+        stmt.bindLong(3, entity.getAutoLaunchApp() ? 1L: 0L);
  
         Long actionId = entity.getActionId();
         if (actionId != null) {
-            stmt.bindLong(3, actionId);
+            stmt.bindLong(4, actionId);
         }
  
         Long parentId = entity.getParentId();
         if (parentId != null) {
-            stmt.bindLong(4, parentId);
+            stmt.bindLong(5, parentId);
         }
  
         Long scopeId = entity.getScopeId();
         if (scopeId != null) {
-            stmt.bindLong(5, scopeId);
+            stmt.bindLong(6, scopeId);
         }
  
         Long descId = entity.getDescId();
         if (descId != null) {
-            stmt.bindLong(6, descId);
+            stmt.bindLong(7, descId);
         }
  
         String actionTitle = entity.getActionTitle();
         if (actionTitle != null) {
-            stmt.bindString(7, actionTitle);
+            stmt.bindString(8, actionTitle);
         }
  
         String tagId = entity.getTagId();
         if (tagId != null) {
-            stmt.bindString(8, tagId);
+            stmt.bindString(9, tagId);
         }
-        stmt.bindLong(9, entity.getVersionCode());
+        stmt.bindLong(10, entity.getVersionCode());
  
         Long publishUserId = entity.getPublishUserId();
         if (publishUserId != null) {
-            stmt.bindLong(10, publishUserId);
+            stmt.bindLong(11, publishUserId);
         }
-        stmt.bindLong(11, entity.getPriority());
+        stmt.bindLong(12, entity.getPriority());
  
         String from = entity.getFrom();
         if (from != null) {
-            stmt.bindString(12, from);
+            stmt.bindString(13, from);
         }
     }
 
@@ -147,47 +150,48 @@ public class ActionNodeDao extends AbstractDao<ActionNode, Long> {
             stmt.bindLong(1, id);
         }
         stmt.bindLong(2, entity.getActionScopeType());
+        stmt.bindLong(3, entity.getAutoLaunchApp() ? 1L: 0L);
  
         Long actionId = entity.getActionId();
         if (actionId != null) {
-            stmt.bindLong(3, actionId);
+            stmt.bindLong(4, actionId);
         }
  
         Long parentId = entity.getParentId();
         if (parentId != null) {
-            stmt.bindLong(4, parentId);
+            stmt.bindLong(5, parentId);
         }
  
         Long scopeId = entity.getScopeId();
         if (scopeId != null) {
-            stmt.bindLong(5, scopeId);
+            stmt.bindLong(6, scopeId);
         }
  
         Long descId = entity.getDescId();
         if (descId != null) {
-            stmt.bindLong(6, descId);
+            stmt.bindLong(7, descId);
         }
  
         String actionTitle = entity.getActionTitle();
         if (actionTitle != null) {
-            stmt.bindString(7, actionTitle);
+            stmt.bindString(8, actionTitle);
         }
  
         String tagId = entity.getTagId();
         if (tagId != null) {
-            stmt.bindString(8, tagId);
+            stmt.bindString(9, tagId);
         }
-        stmt.bindLong(9, entity.getVersionCode());
+        stmt.bindLong(10, entity.getVersionCode());
  
         Long publishUserId = entity.getPublishUserId();
         if (publishUserId != null) {
-            stmt.bindLong(10, publishUserId);
+            stmt.bindLong(11, publishUserId);
         }
-        stmt.bindLong(11, entity.getPriority());
+        stmt.bindLong(12, entity.getPriority());
  
         String from = entity.getFrom();
         if (from != null) {
-            stmt.bindString(12, from);
+            stmt.bindString(13, from);
         }
     }
 
@@ -207,16 +211,17 @@ public class ActionNodeDao extends AbstractDao<ActionNode, Long> {
         ActionNode entity = new ActionNode( //
             cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0), // id
             cursor.getInt(offset + 1), // actionScopeType
-            cursor.isNull(offset + 2) ? null : cursor.getLong(offset + 2), // actionId
-            cursor.isNull(offset + 3) ? null : cursor.getLong(offset + 3), // parentId
-            cursor.isNull(offset + 4) ? null : cursor.getLong(offset + 4), // scopeId
-            cursor.isNull(offset + 5) ? null : cursor.getLong(offset + 5), // descId
-            cursor.isNull(offset + 6) ? null : cursor.getString(offset + 6), // actionTitle
-            cursor.isNull(offset + 7) ? null : cursor.getString(offset + 7), // tagId
-            cursor.getInt(offset + 8), // versionCode
-            cursor.isNull(offset + 9) ? null : cursor.getLong(offset + 9), // publishUserId
-            cursor.getInt(offset + 10), // priority
-            cursor.isNull(offset + 11) ? null : cursor.getString(offset + 11) // from
+            cursor.getShort(offset + 2) != 0, // autoLaunchApp
+            cursor.isNull(offset + 3) ? null : cursor.getLong(offset + 3), // actionId
+            cursor.isNull(offset + 4) ? null : cursor.getLong(offset + 4), // parentId
+            cursor.isNull(offset + 5) ? null : cursor.getLong(offset + 5), // scopeId
+            cursor.isNull(offset + 6) ? null : cursor.getLong(offset + 6), // descId
+            cursor.isNull(offset + 7) ? null : cursor.getString(offset + 7), // actionTitle
+            cursor.isNull(offset + 8) ? null : cursor.getString(offset + 8), // tagId
+            cursor.getInt(offset + 9), // versionCode
+            cursor.isNull(offset + 10) ? null : cursor.getLong(offset + 10), // publishUserId
+            cursor.getInt(offset + 11), // priority
+            cursor.isNull(offset + 12) ? null : cursor.getString(offset + 12) // from
         );
         return entity;
     }
@@ -225,16 +230,17 @@ public class ActionNodeDao extends AbstractDao<ActionNode, Long> {
     public void readEntity(Cursor cursor, ActionNode entity, int offset) {
         entity.setId(cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0));
         entity.setActionScopeType(cursor.getInt(offset + 1));
-        entity.setActionId(cursor.isNull(offset + 2) ? null : cursor.getLong(offset + 2));
-        entity.setParentId(cursor.isNull(offset + 3) ? null : cursor.getLong(offset + 3));
-        entity.setScopeId(cursor.isNull(offset + 4) ? null : cursor.getLong(offset + 4));
-        entity.setDescId(cursor.isNull(offset + 5) ? null : cursor.getLong(offset + 5));
-        entity.setActionTitle(cursor.isNull(offset + 6) ? null : cursor.getString(offset + 6));
-        entity.setTagId(cursor.isNull(offset + 7) ? null : cursor.getString(offset + 7));
-        entity.setVersionCode(cursor.getInt(offset + 8));
-        entity.setPublishUserId(cursor.isNull(offset + 9) ? null : cursor.getLong(offset + 9));
-        entity.setPriority(cursor.getInt(offset + 10));
-        entity.setFrom(cursor.isNull(offset + 11) ? null : cursor.getString(offset + 11));
+        entity.setAutoLaunchApp(cursor.getShort(offset + 2) != 0);
+        entity.setActionId(cursor.isNull(offset + 3) ? null : cursor.getLong(offset + 3));
+        entity.setParentId(cursor.isNull(offset + 4) ? null : cursor.getLong(offset + 4));
+        entity.setScopeId(cursor.isNull(offset + 5) ? null : cursor.getLong(offset + 5));
+        entity.setDescId(cursor.isNull(offset + 6) ? null : cursor.getLong(offset + 6));
+        entity.setActionTitle(cursor.isNull(offset + 7) ? null : cursor.getString(offset + 7));
+        entity.setTagId(cursor.isNull(offset + 8) ? null : cursor.getString(offset + 8));
+        entity.setVersionCode(cursor.getInt(offset + 9));
+        entity.setPublishUserId(cursor.isNull(offset + 10) ? null : cursor.getLong(offset + 10));
+        entity.setPriority(cursor.getInt(offset + 11));
+        entity.setFrom(cursor.isNull(offset + 12) ? null : cursor.getString(offset + 12));
      }
     
     @Override

@@ -53,9 +53,11 @@ public class ActionNode implements Serializable, Searchable, DataFrom {
     private int actionScopeType = -1;
 
     public static final int NODE_SCOPE_GLOBAL = 0x1;
+    public static final int NODE_SCOPE_IN_APP = 0x2;
+
+    private boolean autoLaunchApp = true;
     @Deprecated
     public static final int NODE_SCOPE_GLOBAL_2 = 0x4;//follows
-    public static final int NODE_SCOPE_IN_APP = 0x2;
     @Deprecated
     public static final int NODE_SCOPE_IN_APP_2 = 0x3;//2后操作
 
@@ -335,11 +337,12 @@ public class ActionNode implements Serializable, Searchable, DataFrom {
         this.priority = priority;
     }
 
-    @Generated(hash = 1407012622)
-    public ActionNode(Long id, int actionScopeType, Long actionId, Long parentId, Long scopeId, Long descId,
-                      String actionTitle, String tagId, int versionCode, Long publishUserId, int priority, String from) {
+    @Generated(hash = 656437417)
+    public ActionNode(Long id, int actionScopeType, boolean autoLaunchApp, Long actionId, Long parentId, Long scopeId,
+            Long descId, String actionTitle, String tagId, int versionCode, Long publishUserId, int priority, String from) {
         this.id = id;
         this.actionScopeType = actionScopeType;
+        this.autoLaunchApp = autoLaunchApp;
         this.actionId = actionId;
         this.parentId = parentId;
         this.scopeId = scopeId;
@@ -792,5 +795,13 @@ public class ActionNode implements Serializable, Searchable, DataFrom {
     @Override
     public int hashCode() {
         return Objects.hash(tagId);
+    }
+
+    public boolean getAutoLaunchApp() {
+        return this.autoLaunchApp;
+    }
+
+    public void setAutoLaunchApp(boolean autoLaunchApp) {
+        this.autoLaunchApp = autoLaunchApp;
     }
 }

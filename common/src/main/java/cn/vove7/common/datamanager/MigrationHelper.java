@@ -93,9 +93,16 @@ public final class MigrationHelper {
             ArrayList<String> properties = new ArrayList<>(columns.size());
             for (int j = 0; j < daoConfig.properties.length; j++) {
                 String columnName = daoConfig.properties[j].columnName;
-                if (columns.contains(columnName)) {
-                    properties.add(columnName);
+                if (!columns.contains(columnName)) {
+                    StringBuilder insertTableStringBuilder = new StringBuilder();
+                    insertTableStringBuilder.append("ALTER TABLE ")
+                            .append(tempTableName)
+                            .append(" ADD COLUMN     ")
+                            .append(columnName)
+                            .append(getTableType(daoConfig.properties[j].type));
+                    db.execSQL(insertTableStringBuilder.toString());
                 }
+                properties.add(columnName);
             }
             if (properties.size() > 0) {
                 final String columnSQL = TextUtils.join(",", properties);
@@ -111,7 +118,21 @@ public final class MigrationHelper {
             db.execSQL("DROP TABLE " + tempTableName);
         }
     }
-
+    private static Object getTableType(Class<?> type){
+        if(type.equals(int.class)){
+            return " INTEGER DEFAULT 0";
+        }
+        if(type.equals(long.class)){
+            return " Long DEFAULT 0";
+        }
+        if(type.equals(String.class)){
+            return " TEXT ";
+        }
+        if(type.equals(boolean.class)){
+            return " NUMERIC DEFAULT 1";
+        }
+        return " TEXT";
+    }
     private static List<String> getColumns(StandardDatabase db, String tableName) {
         List<String> columns = null;
         try (Cursor cursor = db.rawQuery("SELECT * FROM " + tableName + " limit 0", null)) {

@@ -43,6 +43,8 @@ import cn.vove7.jarvis.tools.Tutorials
 import cn.vove7.jarvis.view.dialog.ProgressDialog
 import cn.vove7.vtp.dialog.DialogWithList
 import cn.vove7.vtp.easyadapter.BaseListAdapter
+import cn.vove7.vtp.extend.gone
+import cn.vove7.vtp.extend.show
 import cn.vove7.vtp.log.Vog
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.customview.customView
@@ -172,6 +174,11 @@ class InstDetailActivity : BaseActivity() {
                 true
             }
             script_type_text.text = node.action?.scriptType
+        }
+        if (node.autoLaunchApp) {
+            auto_launch_app_flag.show()
+        } else {
+            auto_launch_app_flag.gone()
         }
         Handler().post {
             if (node.action != null) {

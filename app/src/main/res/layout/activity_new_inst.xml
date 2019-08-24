@@ -41,6 +41,7 @@
                 android:layout_height="wrap_content"
                 android:padding="10dp"
                 android:visibility="gone"
+                tools:visibility="visible"
                 android:background="@color/red_500">
 
                 <TextView
@@ -109,15 +110,16 @@
 
                     <Button
                         android:id="@+id/btn_sel_app"
-                        android:layout_width="0dp"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
                         android:singleLine="true"
                         android:text="@string/text_select_application"
                         android:theme="@style/MaterialButton" />
 
                     <android.support.design.widget.TextInputLayout
                         android:layout_width="match_parent"
+                        android:layout_weight="1"
+
                         android:layout_height="wrap_content">
 
                         <EditText
@@ -128,6 +130,12 @@
                             android:textColor="?attr/colorAccent" />
                     </android.support.design.widget.TextInputLayout>
                 </LinearLayout>
+
+                <CheckBox
+                    android:id="@+id/check_box_auto_launch_app"
+                    android:layout_width="wrap_content"
+                    android:text="自启动App(在脚本动作执行前启动应用)"
+                    android:layout_height="wrap_content" />
 
                 <include layout="@layout/group_line" />
             </LinearLayout>
@@ -148,6 +156,7 @@
                 android:minHeight="50dp"
                 android:layout_height="wrap_content"
                 android:divider="#00000000" />
+
             <TextView
                 android:layout_width="match_parent"
                 android:text="长按删除"
@@ -185,6 +194,7 @@
                 android:layout_height="wrap_content"
                 android:text="@string/test_set_script"
                 android:theme="@style/MaterialButton" />
+
             <thereisnospon.codeview.CodeView
                 android:id="@+id/code_view"
                 android:layout_width="match_parent"

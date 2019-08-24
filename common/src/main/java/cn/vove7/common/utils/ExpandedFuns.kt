@@ -510,3 +510,8 @@ fun View.onClick(clickAction: (View) -> Unit) {
         clickAction(it)
     }
 }
+
+@Suppress("UNCHECKED_CAST")
+operator fun <T> Intent.get(key: String, def: T): T {
+    return extras?.get(key) as T? ?: def
+}
