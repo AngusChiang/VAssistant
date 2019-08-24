@@ -85,7 +85,10 @@ class LaboratoryActivity : ReturnableActivity() {
                                 , keyId = R.string.key_show_toast_when_remove_ad, defaultValue = true)
                 )),
                 SettingGroupItem(R.color.indigo_700, titleS = "智能家居", childItems = listOf(
-                        SingleChoiceItem(title = "智能家居系统", summary = "选择您的家居系统", defaultValue = { AppConfig.homeSystem }, items = listOf("Rokid(若琪)")) { item, data ->
+                        SingleChoiceItem(title = "智能家居系统", summary = "选择您的家居系统",
+                                defaultValue = { AppConfig.homeSystem },
+                                items = listOf("Rokid(若琪)")
+                        ) { item, data ->
                             AppConfig.homeSystem = data.first
                             MainService.instance?.loadHomeSystem()
                             true

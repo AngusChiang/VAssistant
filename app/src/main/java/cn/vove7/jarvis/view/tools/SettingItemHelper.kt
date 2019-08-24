@@ -7,7 +7,6 @@ import android.view.View
 import android.widget.CompoundButton
 import android.widget.TextView
 import cn.vove7.common.app.AppConfig
-import cn.vove7.common.app.set
 import cn.vove7.common.utils.ThreadPool
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.view.*
@@ -102,15 +101,15 @@ class SettingItemHelper(
         }
     }
 
-    private fun getPrefill() :String?{
+    private fun getPrefill(): String? {
         val d = settingItem.defaultValue.invoke() as String?
         var prefill: String? = d
         if (settingItem.keyId == null) {
             prefill = d
         } else {
-            val key = settingItem.key?:return d
+            val key = settingItem.key ?: return d
 
-            if(key in AppConfig.settings) {
+            if (key in AppConfig.settings) {
                 AppConfig.settings.getString(key).also {
                     if (it != "") settingItem.summary = it
                     prefill = it
@@ -119,6 +118,7 @@ class SettingItemHelper(
         }
         return prefill
     }
+
     private fun initAndSetInputListener() {
         val backSummary: String? = settingItem.summary
 
@@ -211,7 +211,7 @@ class SettingItemHelper(
     private fun getInitPos(): Int {
         val item = settingItem
         val default = item.defaultValue.invoke() as Int? ?: -1
-        if(default>=0) {
+        if (default >= 0) {
             item.summary = item.items?.get(default)
         }
         val key = item.key
@@ -237,6 +237,7 @@ class SettingItemHelper(
     private fun initSingleDialog() {
         val item = settingItem
 
+        val ds = item.summary
         val items =
             if (item.keyId != null) {
                 if (item.entityArrId != null)
@@ -247,23 +248,31 @@ class SettingItemHelper(
         items.getOrNull(getInitPos())?.also {
             item.summary = it
         }
+
+        fun notifyData(index: Int?, text: String?) {
+            if ((item.callback as CallbackOnSet<Pair<Int?, String?>>?)?.invoke(ItemOperation(this), Pair(index, text)) != false) {
+                if (item.keyId != null) {
+                    AppConfig.set(item.keyId, text)
+                    loadConfigInCacheThread()
+                }
+                item.summary = text ?: ds
+                setBasic()
+            }
+        }
         setBasic {
             val init = getInitPos()
             MaterialDialog(context)
                     .title(text = item.title())
                     .listItemsSingleChoice(items = items, initialSelection = init) { _, i, t ->
                         //选择
-                        if(i == init) return@listItemsSingleChoice
+                        if (i == init) return@listItemsSingleChoice
 
-                        if ((item.callback as CallbackOnSet<Pair<Int, String>>?)?.invoke(ItemOperation(this), Pair(i, t)) != false) {
-                            if (item.keyId != null) {
-                                AppConfig.set(item.keyId, t)
-                                loadConfigInCacheThread()
-                            }
-                            item.summary = t
-                            setBasic()
+                        notifyData(i, t)
+                    }.show {
+                        neutralButton(text = "清空选择") {
+                            notifyData(null, null)
                         }
-                    }.show()
+                    }
         }
     }
 
