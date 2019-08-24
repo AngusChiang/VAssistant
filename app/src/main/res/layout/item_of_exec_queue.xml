@@ -10,16 +10,16 @@
 
     <TextView
         android:id="@+id/desc_text"
-        android:layout_width="0dp"
+        android:text="1234"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:textSize="16sp"
+        android:textSize="15sp"
         android:textStyle="bold" />
 
     <EditText
         android:id="@+id/param_text"
-        android:layout_width="100dp"
-        android:layout_height="wrap_content"
-        android:hint="例如：n : 1234, k : sss"
-        android:maxLines="1" />
+        android:layout_marginStart="20dp"
+        android:layout_width="match_parent"
+        android:hint="当前动作无参数"
+        android:layout_height="wrap_content" />
 </LinearLayout>

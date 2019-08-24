@@ -602,6 +602,7 @@ class InstDetailActivity : BaseActivity() {
                         it.value.action.priority = it.index
                         que.add(it.value.action)
                     }
+                    //TODO 输入指令
                     MainService.instance
                             ?.runActionQue("RUN: ${node.actionTitle}", que)
                     //防止以DEBUG方式运行

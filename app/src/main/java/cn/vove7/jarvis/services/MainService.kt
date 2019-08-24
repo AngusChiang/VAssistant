@@ -444,7 +444,7 @@ class MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
     }
 
     fun runActionQue(cmd: String, que: PriorityQueue<Action>) {
-        cExecutor.execQueue(cmd, que)
+        cExecutor.execQueue(cmd, que, false)
     }
 
     /**

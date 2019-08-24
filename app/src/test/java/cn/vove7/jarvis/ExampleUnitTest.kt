@@ -351,8 +351,8 @@ class ExampleUnitTest {
 
         val si = s.indexOf('#')
         if (si > 0) {
-            println(s.substring(0,si))
-            println(s.substring(si+1))
+            println(s.substring(0, si))
+            println(s.substring(si + 1))
         }
 
         println("%呼叫@{name}".toParamRegex().match("呼叫123"))// true
@@ -452,5 +452,14 @@ class ExampleUnitTest {
         }
 
         print(s)
+    }
+
+    @Test
+    fun findParamName() {
+        val s = "@{abc}你好@{a2}讷讷@{#num}123"
+
+        val reg = "@\\{#?([^}.]+)}".toRegex()
+
+        reg.findAll(s).map { it.groupValues[1] }.forEach(::println)
     }
 }
