@@ -187,7 +187,7 @@
             android:exported="true"
             android:label="屏幕助手-文字识别"
             android:launchMode="singleInstance"
-            android:theme="@style/ScreenPicker">
+            android:theme="@style/TextOcr">
             <intent-filter>
                 <action android:name="${applicationId}.SCREEN_OCR" />
                 <category android:name="android.intent.category.DEFAULT" />
