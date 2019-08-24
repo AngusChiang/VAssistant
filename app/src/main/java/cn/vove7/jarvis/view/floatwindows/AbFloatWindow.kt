@@ -101,8 +101,7 @@ abstract class AbFloatWindow(
     open fun hide() {
         Vog.d("隐藏悬浮窗")
         synchronized(this) {
-            if (isShowing)
-                removeView()
+            removeView()
         }
     }
 

@@ -422,6 +422,7 @@ class MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
             EXEC_CODE_INTERRUPT -> onExecuteInterrupt()
             else -> executeAnimation.hideDelay()
         }
+        hideAll(false)
     }
 
     //from executor 线程
@@ -982,8 +983,8 @@ class MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
             do {
                 val parseResult: ActionParseResult = ParseEngine
                         .parseAction(result, AccessibilityApi.accessibilityService?.currentScope, smartOpen, onClick, lastPosition)
-                lastPosition = parseResult.lastPosition
-                Vog.d("onParseCommand lastPosition: ${parseResult.msg} $lastPosition")
+                lastPosition = parseResult.lastGlobalPosition
+                Vog.d("onParseCommand lastGlobalPosition: ${parseResult.msg} $lastPosition")
                 val actionQueue = parseResult.actionQueue
                 if (parseResult.isSuccess) {//actionQueue == null 指smartOpen, onClick 操作成功
                     if (actionQueue != null) {

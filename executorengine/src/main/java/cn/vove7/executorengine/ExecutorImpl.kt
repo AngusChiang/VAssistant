@@ -174,7 +174,7 @@ open class ExecutorImpl(
             commandType = 0
             currentActionIndex = 0
             actionCount = actionQueue.size
-            val er = pollActionQueue()
+            val er = pollActionQueue(actionQueue)
             onFinish(er)
             currentAction = null
             if (sync) waiter.setAndNotify(er)
@@ -186,33 +186,24 @@ open class ExecutorImpl(
      * 执行队列
      *
      */
-    private fun pollActionQueue(): Int {
+    private fun pollActionQueue(q: PriorityQueue<Action>): Int {
         var r: Pair<Int, String?>
-        while (actionQueue.isNotEmpty()) {
+        while (q.isNotEmpty()) {
             currentActionIndex++
             if (!userInterrupt) {
-                actionQueue.poll().apply {
+                q.poll().apply {
                     currentAction = this
 
                     actionScope = this.actionScopeType
                     Vog.d("pollActionQueue ---> $actionScope")
                     r = runScript(this.actionScript, this.param)// 清除参数缓存
                     if (r.first != EXEC_CODE_SUCCESS) {
-                        when (r.first) {
-                            EXEC_CODE_INTERRUPT -> {//出错
-                                currentAction = null
-                                actionQueue.clear()
-//                            serviceBridge?.onExecuteFailed(r.msg)
-                                return EXEC_CODE_FAILED
-                            }
-                        }
                         return r.first
                     }
                 }
             } else {
                 Vog.i("pollActionQueue 终止")
-                actionQueue.clear()
-//                serviceBridge?.onExecuteInterrupt("强行终止")
+                q.clear()
                 return EXEC_CODE_INTERRUPT
             }
         }
@@ -220,7 +211,7 @@ open class ExecutorImpl(
     }
 
     override fun runScript(script: String, argMap: Map<String, Any?>?): Pair<Int, String?> {
-        Vog.d("runScript arg : $argMap")
+        Vog.d("runScript arg : $argMap\n$script")
         return when (currentAction?.scriptType) {
             SCRIPT_TYPE_LUA -> {
                 onLuaExec(script, argMap)
@@ -298,7 +289,7 @@ open class ExecutorImpl(
         val o = parseAppInCommand(data)
         return if (o != null) {
             //执行
-            execQueue(data, o.actionQueue ?: PriorityQueue())
+            pollActionQueue(o.actionQueue ?: PriorityQueue())
             true
         } else {
             //检查标记功能

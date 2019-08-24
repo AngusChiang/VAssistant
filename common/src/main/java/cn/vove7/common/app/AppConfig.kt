@@ -362,7 +362,7 @@ object AppConfig : BaseConfig {
                     1 -> oneMinute * 5
                     2 -> oneMinute * 10
                     3 -> oneMinute / 30
-                    6 -> -1 //不休眠
+                    4 -> -1 //不休眠
                     else -> autoSleepWakeupMillis
                 }
             }

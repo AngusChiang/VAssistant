@@ -73,9 +73,9 @@ object ParseEngine {
      * 0>1>..>9
      *
      * 命令    ↓
+     * App内   ↓ -> 扫一扫/ 不在指定Activity -> （有跟随指令）跳至首页
      * 全局命令 ↓
      * 使用打开 ->
-     * App内   ↓ -> 扫一扫/ 不在指定Activity -> （有跟随指令）跳至首页
      * 点击操作
      *
      * todo 顺序 小 -> 大
@@ -86,21 +86,20 @@ object ParseEngine {
                     click: (String) -> ActionParseResult,
                     lastLocation: Int = 0
     ): ActionParseResult {
+        //APP内
+        val appResult = parseAppActionWithScope(cmdWord, scope)
+        if (appResult.isSuccess) return appResult
+
         val globalResult = globalActionMatch(cmdWord, lastLocation)
         if (globalResult.isSuccess) {
             return globalResult
         }
-        //smartOpen
         Vog.d("globalAction --无匹配")
-
+        //smartOpen
         val sor = smartOpen.invoke(cmdWord)
         if (sor.isSuccess) {
             return sor
         }
-
-        //APP内
-        val appResult = parseAppActionWithScope(cmdWord, scope)
-        if (appResult.isSuccess) return appResult
 
         //点击
         val cr = click.invoke(cmdWord)
@@ -131,7 +130,7 @@ object ParseEngine {
             actionQueue.add(matchedNode.action)//匹配应用内时
             // 根据第一个action.scope 决定是否进入首页
             return ActionParseResult(true, actionQueue, matchedNode.actionTitle,
-                    SystemBridge.getAppInfo(scope.packageName)).also {
+                    SystemBridge.getAppInfo(scope.packageName), 0).also {
                 //自动执行打开
                 if (matchedNode.autoLaunchApp) it.insertOpenAppAction(scope)
             }
@@ -253,7 +252,7 @@ object ParseEngine {
             if (r) {
                 val actionQueue = PriorityQueue<Action>()
                 actionQueue.add(it.action)
-                return ActionParseResult(true, actionQueue, it.actionTitle, lastPosition = index + 1)
+                return ActionParseResult(true, actionQueue, it.actionTitle, lastGlobalPosition = index + 1)
             }
         }
         return ActionParseResult(false)

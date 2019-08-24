@@ -115,7 +115,6 @@ class FloatyPanel : AbFloatWindow(GlobalApp.APP) {
 
     fun hideDelay(delay: Long = 800) {
         hideInterrupt = false
-        if (!isShowing) return
         delayHandler.postDelayed(delayHide, delay)
         Vog.d("hide delay $delay")
     }
