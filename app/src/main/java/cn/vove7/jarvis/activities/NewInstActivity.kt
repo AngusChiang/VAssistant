@@ -240,6 +240,7 @@ class NewInstActivity : ReturnableActivity(), View.OnClickListener {
             if (inApp) {
                 val scope = ActionScope(pkg, activityName)
                 newNode.actionScope = scope
+                newNode.autoLaunchApp = check_box_auto_launch_app.isChecked
             }
 
             val action = Action(scriptText, scriptType)
