@@ -175,7 +175,7 @@ class InstDetailActivity : BaseActivity() {
             }
             script_type_text.text = node.action?.scriptType
         }
-        if (node.autoLaunchApp) {
+        if (ActionNode.belongInApp(node.actionScopeType) && node.autoLaunchApp) {
             auto_launch_app_flag.show()
         } else {
             auto_launch_app_flag.gone()
@@ -302,18 +302,18 @@ class InstDetailActivity : BaseActivity() {
                             .negativeButton(R.string.text_cancel)
                             .show()
                 }
-                R.id.menu_add_follow -> {// 选择: 从已有(inApp Global)关联parentId，或者新建
-
-                    MaterialDialog(this).listItems(items = listOf(
-                            getString(R.string.text_new),
-                            getString(R.string.text_sel_from_existing)
-                    ), waitForPositiveButton = false) { _, i, s ->
-                        when (i) {
-                            0 -> addFollowFromNew()
-                            1 -> GlobalApp.toastInfo(R.string.text_coming_soon)//todo
-                        }
-                    }.show()
-                }
+//                R.id.menu_add_follow -> {// 选择: 从已有(inApp Global)关联parentId，或者新建
+//
+//                    MaterialDialog(this).listItems(items = listOf(
+//                            getString(R.string.text_new),
+//                            getString(R.string.text_sel_from_existing)
+//                    ), waitForPositiveButton = false) { _, i, s ->
+//                        when (i) {
+//                            0 -> addFollowFromNew()
+//                            1 -> GlobalApp.toastInfo(R.string.text_coming_soon)//todo
+//                        }
+//                    }.show()
+//                }
                 R.id.menu_run -> {
                     showRunDialog()
                 }

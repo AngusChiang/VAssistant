@@ -21,11 +21,11 @@
         android:icon="@drawable/ic_delete_white_24dp"
         android:title="@string/text_delete"
         app:showAsAction="ifRoom" />
-    <item
-        android:id="@+id/menu_add_follow"
-        android:icon="@drawable/ic_add_white_24dp"
-        android:title="@string/text_add_follow_action"
-        app:showAsAction="ifRoom" />
+<!--    <item-->
+<!--        android:id="@+id/menu_add_follow"-->
+<!--        android:icon="@drawable/ic_add_white_24dp"-->
+<!--        android:title="@string/text_add_follow_action"-->
+<!--        app:showAsAction="ifRoom" />-->
     <item
         android:id="@+id/menu_as_global"
         android:title="@string/text_as_global_inst"

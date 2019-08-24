@@ -231,7 +231,7 @@ class NewInstActivity : ReturnableActivity(), View.OnClickListener {
             DAO.clear()
             finish()
 
-        } else {//新发布 构造newNode
+        } else {//新发布 构造newNodeIns
             val newNode = ActionNode()
             if (parentNode != null) {
                 newNode.parentId = parentId
