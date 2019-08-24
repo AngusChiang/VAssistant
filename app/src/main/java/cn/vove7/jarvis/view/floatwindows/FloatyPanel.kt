@@ -7,7 +7,6 @@ import android.view.View
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.appbus.AppBus
 import cn.vove7.common.model.RequestPermission
-import cn.vove7.common.utils.LooperHelper
 import cn.vove7.common.utils.gone
 import cn.vove7.common.utils.runOnUi
 import cn.vove7.common.utils.show
@@ -116,6 +115,7 @@ class FloatyPanel : AbFloatWindow(GlobalApp.APP) {
 
     fun hideDelay(delay: Long = 800) {
         hideInterrupt = false
+        if (!isShowing) return
         delayHandler.postDelayed(delayHide, delay)
         Vog.d("hide delay $delay")
     }

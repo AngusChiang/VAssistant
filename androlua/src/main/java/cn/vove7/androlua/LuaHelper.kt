@@ -198,7 +198,7 @@ class LuaHelper : LuaManagerI, ScriptEngine {
             setArgs(args)
             exec(args?.size ?: 0)
         } else
-            throw MessageException(checkErr(r))
+            throw checkErr(r)
     }
 
 
@@ -228,20 +228,20 @@ class LuaHelper : LuaManagerI, ScriptEngine {
         if (ok == 0) {
             return
         } else {//载入参数错误
-            throw MessageException(checkErr(ok))
+            throw checkErr(ok)
         }
     }
 
-    fun checkErr(r: Int): String {
+    fun checkErr(r: Int): Throwable {
         val e = errorReason(r) + ": " + L.toString(-1)
 
         if (e.contains("java.lang.UnsupportedOperationException") ||
                 e.contains("java.lang.InterruptedException")) {
-            return "强制终止"
+            return InterruptedException(e)
         } else if (e.contains("cn.vove7.common.NotSupportException")) {
-            return NotSupportException().message!!
+            return NotSupportException()
         }
-        return e
+        return MessageException(e)
     }
 
     override fun handleError(err: String) {

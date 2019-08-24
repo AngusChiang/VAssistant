@@ -18,14 +18,6 @@ class ResultBox<T> {
         this.mValue = initValue
     }
 
-    fun get(): T? {
-        return mValue
-    }
-
-    fun set(value: T) {
-        this.mValue = value
-    }
-
     fun setAndNotify(value: T) {
         Vog.d("setAndNotify ---> $value")
         mValue = value
@@ -35,6 +27,7 @@ class ResultBox<T> {
     //等待结果
     @Throws(InterruptedException::class)
     fun blockedGet(safely: Boolean = true): T? {
+        if (lock.count <= 0) return mValue
         if (safely) {
             runInCatch {
                 lock.await()

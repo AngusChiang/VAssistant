@@ -127,11 +127,6 @@ class RealMainActivity : BaseActivity() {
         showDataUpdateLog()
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        System.gc()
-    }
-
     private fun checkDataUpdate() {
         DataUpdator.checkUpdate(this) {
             if (!UserInfo.isLogin())

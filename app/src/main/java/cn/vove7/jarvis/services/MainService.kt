@@ -33,6 +33,11 @@ import cn.vove7.common.bridges.*
 import cn.vove7.common.datamanager.history.CommandHistory
 import cn.vove7.common.datamanager.parse.model.Action
 import cn.vove7.common.executor.CExecutorI
+import cn.vove7.common.executor.CExecutorI.Companion.EXEC_CODE_EMPTY_QUEUE
+import cn.vove7.common.executor.CExecutorI.Companion.EXEC_CODE_FAILED
+import cn.vove7.common.executor.CExecutorI.Companion.EXEC_CODE_INTERRUPT
+import cn.vove7.common.executor.CExecutorI.Companion.EXEC_CODE_NOT_SUPPORT
+import cn.vove7.common.executor.CExecutorI.Companion.EXEC_CODE_SUCCESS
 import cn.vove7.common.interfaces.SpeakCallback
 import cn.vove7.common.model.RequestPermission
 import cn.vove7.common.model.UserInfo
@@ -390,7 +395,7 @@ class MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
         floatyPanel.hide()
     }
 
-    override fun onExecuteStart(tag: String) {//
+    private fun onExecuteStart(tag: String) {//
         Vog.d("开始执行 -> $tag")
         executeAnimation.begin()
         executeAnimation.show(tag)
@@ -400,8 +405,8 @@ class MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
      * 执行结果回调
      * from executor 线程
      */
-    override fun onExecuteFinished(result: Boolean) {//
-        Vog.d("执行器执行结束 --> $result")
+    private fun onExecuteFinished(resultCode: Int) {//
+        Vog.d("执行器执行结束 --> $resultCode")
         if (!speaking) {//执行完毕后，在未speak时启动长语音
             Vog.d("执行器执行结束 移除悬浮窗")
             floatyPanel.hideImmediately()
@@ -409,26 +414,23 @@ class MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
         } else {
             Vog.d("执行器执行结束 speaking")
         }
-        if (AppConfig.execSuccessFeedback) {
-            if (result) executeAnimation.success()
-            else executeAnimation.failedAndHideDelay()
-        } else executeAnimation.hideDelay()
+        when (resultCode) {
+            EXEC_CODE_SUCCESS -> {
+                executeAnimation.success()
+            }
+            EXEC_CODE_FAILED -> onExecuteFailed()
+            EXEC_CODE_INTERRUPT -> onExecuteInterrupt()
+            else -> executeAnimation.hideDelay()
+        }
     }
 
     //from executor 线程
-    override fun onExecuteFailed(errMsg: String?) {//错误信息
-        GlobalLog.err("执行出错：$errMsg")
-        executeAnimation.failedAndHideDelay(errMsg)
-        if (AppConfig.execFailedVoiceFeedback)
-            speakWithCallback("执行失败") {
-
-            }
-        else GlobalApp.toastError("执行失败")
+    private fun onExecuteFailed() {//错误信息
+        GlobalApp.toastError("执行失败")
         floatyPanel.hideImmediately()
     }
 
-    override fun onExecuteInterrupt(errMsg: String) {
-        Vog.e(errMsg)
+    private fun onExecuteInterrupt() {
         executeAnimation.failedAndHideDelay()
     }
 
@@ -973,37 +975,53 @@ class MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
                 parsingCommand = false
                 return@runOnCachePool
             }
+            //执行状态码码
+            var execCode = EXEC_CODE_NOT_SUPPORT
+            var lastPosition = 0
 
-            val parseResult = ParseEngine
-                    .parseAction(result, AccessibilityApi.accessibilityService?.currentScope, smartOpen, onClick)
-            if (parseResult.isSuccess) {
-                if (parseResult.actionQueue?.isNotEmpty() == true) {
-                    floatyPanel.hideDelay()//执行时 消失
-                    cExecutor.execQueue(result, parseResult.actionQueue)
-
-                    val his = CommandHistory(UserInfo.getUserId(), result,
-                            parseResult.msg)
-                    WrapperNetHelper.uploadUserCommandHistory(his)
-                } else {
-                    hideAll()
-                }
-            } else {// statistics
-                //云解析
-                if (needCloud && AppConfig.cloudServiceParseIfLocalFailed) {
-                    Vog.d("onParseCommand ---> 失败云解析")
-                    WrapperNetHelper.cloudParse(result) {
-                        runFromCloud(result, it)
+            do {
+                val parseResult: ActionParseResult = ParseEngine
+                        .parseAction(result, AccessibilityApi.accessibilityService?.currentScope, smartOpen, onClick, lastPosition)
+                lastPosition = parseResult.lastPosition
+                Vog.d("onParseCommand lastPosition: ${parseResult.msg} $lastPosition")
+                val actionQueue = parseResult.actionQueue
+                if (parseResult.isSuccess) {//actionQueue == null 指smartOpen, onClick 操作成功
+                    if (actionQueue != null) {
+                        floatyPanel.hideDelay()//执行时 消失
+                        execCode = cExecutor.execQueue(result, actionQueue)
+                        Vog.d("onParseCommand execCode: ${parseResult.msg} $execCode")
+                    } else {//smartOpen, onClick 操作成功
+                        execCode = EXEC_CODE_SUCCESS
                     }
-                } else if (chat) {//聊天
-                    doChat(result)
-                } else {
-                    onCommandParseFailed(result)
-                }
+                } else break
+            } while (execCode == EXEC_CODE_NOT_SUPPORT)
+
+            when (execCode) {
+                EXEC_CODE_NOT_SUPPORT, EXEC_CODE_EMPTY_QUEUE ->//不支持的指令
+                    afterInstParse(result, needCloud, chat)
+                else -> onExecuteFinished(execCode)
             }
             parsingCommand = false
-
         }
         return true
+    }
+
+    /**
+     * 指令解析不支持后
+     * 云解析、对话
+     */
+    private fun afterInstParse(result: String, needCloud: Boolean, chat: Boolean) {
+        //云解析
+        if (needCloud && AppConfig.cloudServiceParseIfLocalFailed) {
+            Vog.d("onParseCommand ---> 失败云解析")
+            WrapperNetHelper.cloudParse(result) {
+                runFromCloud(result, it)
+            }
+        } else if (chat) {//聊天
+            doChat(result)
+        } else {
+            onCommandParseFailed(result)
+        }
     }
 
     /**
@@ -1027,7 +1045,7 @@ class MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
         var r: ActionParseResult? = null
         if (AppConfig.useSmartOpenIfParseFailed) {//智能识别打开操作
             Vog.d("开启 -- smartOpen")
-            if (cmdWord != "") {//使用smartOpen
+            if (cmdWord.isNotBlank()) {//使用smartOpen
                 //设置command
                 val engine = ExecutorEngine()
                 val result = engine.use {

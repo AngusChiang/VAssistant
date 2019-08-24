@@ -3,6 +3,7 @@ package cn.vove7.executorengine
 import android.content.Context
 import android.support.annotation.CallSuper
 import cn.vove7.common.NeedAccessibilityException
+import cn.vove7.common.NotSupportException
 import cn.vove7.common.accessibility.AccessibilityApi
 import cn.vove7.common.accessibility.viewnode.ViewNode
 import cn.vove7.common.app.GlobalApp
@@ -22,7 +23,12 @@ import cn.vove7.common.datamanager.parse.model.ActionScope
 import cn.vove7.common.datamanager.parse.statusmap.ActionNode
 import cn.vove7.common.executor.CExecutorI
 import cn.vove7.common.executor.CExecutorI.Companion.DEBUG_SCRIPT
-import cn.vove7.common.executor.PartialResult
+import cn.vove7.common.executor.CExecutorI.Companion.EXEC_CODE_EMPTY_QUEUE
+import cn.vove7.common.executor.CExecutorI.Companion.EXEC_CODE_FAILED
+import cn.vove7.common.executor.CExecutorI.Companion.EXEC_CODE_INTERRUPT
+import cn.vove7.common.executor.CExecutorI.Companion.EXEC_CODE_NOT_FINISH
+import cn.vove7.common.executor.CExecutorI.Companion.EXEC_CODE_NOT_SUPPORT
+import cn.vove7.common.executor.CExecutorI.Companion.EXEC_CODE_SUCCESS
 import cn.vove7.common.helper.AdvanAppHelper
 import cn.vove7.common.helper.startable
 import cn.vove7.common.model.MatchedData
@@ -37,8 +43,6 @@ import cn.vove7.executorengine.parse.ParseEngine
 import cn.vove7.vtp.log.Vog
 import java.io.Closeable
 import java.util.*
-import java.util.concurrent.CountDownLatch
-import java.util.concurrent.TimeUnit
 import kotlin.concurrent.thread
 
 /**
@@ -149,9 +153,10 @@ open class ExecutorImpl(
      */
     private var thread: Thread? = null
 
-    override fun execQueue(cmdWords: String, actionQueue: PriorityQueue<Action>?) {
-        Vog.d("执行队列 ${actionQueue?.size}")
-        if (actionQueue?.isEmpty() != false) return
+    override fun execQueue(cmdWords: String, actionQueue: PriorityQueue<Action>, sync: Boolean): Int {
+        Vog.d("执行队列 ${actionQueue.size}")
+        if (actionQueue.isEmpty()) return EXEC_CODE_EMPTY_QUEUE
+
         thread?.apply {
             if (isAlive) this.interrupt()
         }
@@ -160,6 +165,8 @@ open class ExecutorImpl(
 
         this.actionQueue = actionQueue
         lock = Object()
+        val waiter = ResultBox<Int>()
+        if (!sync) waiter.setAndNotify(EXEC_CODE_NOT_FINISH)
         thread = thread(start = true, name = "脚本线程：$cmdWords", isDaemon = true, priority = Thread.MAX_PRIORITY) {
             LooperHelper.prepareIfNeeded()
             running = true
@@ -167,18 +174,20 @@ open class ExecutorImpl(
             commandType = 0
             currentActionIndex = 0
             actionCount = actionQueue.size
-            serviceBridge?.onExecuteStart(cmdWords)
-            onFinish(pollActionQueue())
+            val er = pollActionQueue()
+            onFinish(er)
             currentAction = null
+            if (sync) waiter.setAndNotify(er)
         }
+        return waiter.blockedGet(true) ?: EXEC_CODE_FAILED
     }
 
     /**
      * 执行队列
      *
      */
-    private fun pollActionQueue(): Boolean? {
-        var r: PartialResult
+    private fun pollActionQueue(): Int {
+        var r: Pair<Int, String?>
         while (actionQueue.isNotEmpty()) {
             currentActionIndex++
             if (!userInterrupt) {
@@ -188,26 +197,29 @@ open class ExecutorImpl(
                     actionScope = this.actionScopeType
                     Vog.d("pollActionQueue ---> $actionScope")
                     r = runScript(this.actionScript, this.param)// 清除参数缓存
-                    when {
-                        r.needTerminal -> {//出错
-                            currentAction = null
-                            actionQueue.clear()
-                            serviceBridge?.onExecuteFailed(r.msg)
-                            return null
+                    if (r.first != EXEC_CODE_SUCCESS) {
+                        when (r.first) {
+                            EXEC_CODE_INTERRUPT -> {//出错
+                                currentAction = null
+                                actionQueue.clear()
+//                            serviceBridge?.onExecuteFailed(r.msg)
+                                return EXEC_CODE_FAILED
+                            }
                         }
+                        return r.first
                     }
                 }
             } else {
                 Vog.i("pollActionQueue 终止")
                 actionQueue.clear()
-                serviceBridge?.onExecuteInterrupt("强行终止")
-                return false
+//                serviceBridge?.onExecuteInterrupt("强行终止")
+                return EXEC_CODE_INTERRUPT
             }
         }
-        return !userInterrupt
+        return if (userInterrupt) EXEC_CODE_INTERRUPT else EXEC_CODE_SUCCESS
     }
 
-    override fun runScript(script: String, argMap: Map<String, Any?>?): PartialResult {
+    override fun runScript(script: String, argMap: Map<String, Any?>?): Pair<Int, String?> {
         Vog.d("runScript arg : $argMap")
         return when (currentAction?.scriptType) {
             SCRIPT_TYPE_LUA -> {
@@ -216,18 +228,15 @@ open class ExecutorImpl(
             SCRIPT_TYPE_JS -> {
                 onRhinoExec(script, argMap)
             }
-            else ->
-                PartialResult.fatal("未知脚本类型: " + currentAction?.scriptType)
+            else -> EXEC_CODE_NOT_SUPPORT to "未知脚本类型: "
         }
     }
 
-    open fun onLuaExec(script: String, argMap: Map<String, Any?>?): PartialResult {
-        return PartialResult.fatal("not implement onLuaExec")
-    }
+    open fun onLuaExec(script: String, argMap: Map<String, Any?>?): Pair<Int, String?> = throw NotSupportException()
 
-    open fun onRhinoExec(script: String, argMap: Map<String, Any?>?): PartialResult {
-        return PartialResult.fatal("not implement onRhinoExec")
-    }
+
+    open fun onRhinoExec(script: String, argMap: Map<String, Any?>?): Pair<Int, String?> = throw NotSupportException()
+
 
     fun executeFailed() {
         executeFailed(null)
@@ -241,17 +250,13 @@ open class ExecutorImpl(
 
     /**
      * 资源释放
-     * @param result Boolean?
      */
-    override fun onFinish(result: Boolean?) {
+    override fun onFinish(resultCode: Int) {
         running = false
         thread = null
         ScreenAdapter.reSet()
         SystemBridge.release()
         InputMethodBridge.restore()
-        System.gc()
-        if (result != null)
-            serviceBridge?.onExecuteFinished(result)
     }
 
     /**
@@ -293,7 +298,7 @@ open class ExecutorImpl(
         val o = parseAppInCommand(data)
         return if (o != null) {
             //执行
-            execQueue(data, o.actionQueue)
+            execQueue(data, o.actionQueue ?: PriorityQueue())
             true
         } else {
             //检查标记功能
@@ -514,7 +519,6 @@ open class ExecutorImpl(
                 e.printStackTrace()
                 //必须强行stop
                 Vog.d("被迫强行停止")
-                serviceBridge?.onExecuteInterrupt("终止执行")
                 Thread.currentThread().interrupt()
                 Thread.currentThread().stop()//???
                 return false

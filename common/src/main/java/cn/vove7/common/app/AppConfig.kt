@@ -129,11 +129,11 @@ object AppConfig : BaseConfig {
     //助手服务
     var useAssistService by noCacheKey(true, keyId = R.string.key_use_assist_service)
 
-    //执行失败语音反馈
-    var execFailedVoiceFeedback by noCacheKey(true, keyId = R.string.key_exec_failed_voice_feedback)
-
-    //执行成功反馈
-    var execSuccessFeedback by noCacheKey(true, keyId = R.string.key_exec_failed_voice_feedback)
+//    //执行失败语音反馈
+//    var execFailedVoiceFeedback by noCacheKey(true, keyId = R.string.key_exec_failed_voice_feedback)
+//
+//    //执行成功反馈
+//    var execSuccessFeedback by noCacheKey(true, keyId = R.string.key_exec_failed_voice_feedback)
 
     var fixVoiceMicro by noCacheKey(true, keyId = R.string.key_fix_voice_micro)//麦克风冲突
 
@@ -357,8 +357,7 @@ object AppConfig : BaseConfig {
             if (it == null) autoSleepWakeupMillis
             else {
                 val oneMinute: Long = 60 * 1000
-                val i = GlobalApp.APP.resources.getStringArray(R.array.list_auto_sleep_duration).indexOf(it)
-                when (i) {
+                when (GlobalApp.APP.resources.getStringArray(R.array.list_auto_sleep_duration).indexOf(it)) {
                     0 -> oneMinute
                     1 -> oneMinute * 5
                     2 -> oneMinute * 10

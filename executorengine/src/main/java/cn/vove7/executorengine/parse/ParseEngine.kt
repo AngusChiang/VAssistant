@@ -39,8 +39,6 @@ object ParseEngine {
         updateNode()
     }
 
-    var i = 0
-
     fun updateInApp() {
         AppActionNodes = DAO.daoSession.actionNodeDao.queryBuilder()
                 .where(ActionNodeDao.Properties.ActionScopeType
@@ -75,9 +73,9 @@ object ParseEngine {
      * 0>1>..>9
      *
      * 命令    ↓
-     * 全局命令 ↓ 一级命令 -> ...
+     * 全局命令 ↓
      * 使用打开 ->
-     * App内   ↓ 二级命令 -> 扫一扫/ 不在指定Activity -> （有跟随指令）跳至首页
+     * App内   ↓ -> 扫一扫/ 不在指定Activity -> （有跟随指令）跳至首页
      * 点击操作
      *
      * todo 顺序 小 -> 大
@@ -85,10 +83,10 @@ object ParseEngine {
      */
     fun parseAction(cmdWord: String, scope: ActionScope?,
                     smartOpen: (String) -> ActionParseResult,
-                    click: (String) -> ActionParseResult
+                    click: (String) -> ActionParseResult,
+                    lastLocation: Int = 0
     ): ActionParseResult {
-        i = 0
-        val globalResult = globalActionMatch(cmdWord)
+        val globalResult = globalActionMatch(cmdWord, lastLocation)
         if (globalResult.isSuccess) {
             return globalResult
         }
@@ -248,13 +246,14 @@ object ParseEngine {
      * 一级匹配
      * 全局不存在follows
      */
-    private fun globalActionMatch(cmd: String): ActionParseResult {
-        GlobalActionNodes.forEach {
+    private fun globalActionMatch(cmd: String, lastLocation: Int): ActionParseResult {
+        if (lastLocation < 0) return ActionParseResult(false)
+        GlobalActionNodes.subList(lastLocation, GlobalActionNodes.size).forEachIndexed { index, it ->
             val r = regSearch(cmd, it, false)
             if (r) {
                 val actionQueue = PriorityQueue<Action>()
                 actionQueue.add(it.action)
-                return ActionParseResult(true, actionQueue, it.actionTitle)
+                return ActionParseResult(true, actionQueue, it.actionTitle, lastPosition = index + 1)
             }
         }
         return ActionParseResult(false)

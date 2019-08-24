@@ -15,7 +15,14 @@ import java.util.*
  */
 interface CExecutorI : ActivityShowListener, RuntimeArgs, SpeakCallback {
     companion object {
-        val DEBUG_SCRIPT = "DEBUG"
+        const val DEBUG_SCRIPT = "DEBUG"
+        const val EXEC_CODE_SUCCESS = 0
+        const val EXEC_CODE_FAILED = -1
+        const val EXEC_CODE_NOT_SUPPORT = -2
+        const val EXEC_CODE_INTERRUPT = -3
+        const val EXEC_CODE_NOT_FINISH = -4
+        const val EXEC_CODE_EMPTY_QUEUE = -5
+        const val EXEC_CODE_REQUIRE = -6
     }
 
     /**
@@ -31,11 +38,11 @@ interface CExecutorI : ActivityShowListener, RuntimeArgs, SpeakCallback {
      */
     fun waitAccessibility(waitMillis: Long): Boolean
 
-    fun execQueue(cmdWords: String, actionQueue: PriorityQueue<Action>?)
+    fun execQueue(cmdWords: String, actionQueue: PriorityQueue<Action>, sync: Boolean = true): Int
     fun interrupt()
     fun runScript(script: String, args: Array<String>? = null): PartialResult = PartialResult(false)
 
-    fun runScript(script: String, argMap: Map<String, Any?>? = null): PartialResult
+    fun runScript(script: String, argMap: Map<String, Any?>? = null): Pair<Int, String?>
     fun setScreenSize(width: Int, height: Int)
 
     fun executeFailed(msg: String?)
@@ -79,7 +86,7 @@ interface CExecutorI : ActivityShowListener, RuntimeArgs, SpeakCallback {
 
     fun notifySync()
     fun sleep(millis: Long)
-    fun onFinish(result: Boolean?)
+    fun onFinish(resultCode: Int)
 
     fun smartOpen(data: String): Boolean
     fun smartClose(data: String): Boolean

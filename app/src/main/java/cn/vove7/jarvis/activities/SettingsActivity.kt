@@ -258,14 +258,17 @@ class SettingsActivity : ReturnableActivity() {
                             keyId = R.string.key_voice_recog_feedback,
                             defaultValue = { AppConfig.voiceRecogEffect }
                     ),
-                    CheckBoxItem(R.string.text_vibrate_reco_begin,
-                            keyId = R.string.key_vibrate_reco_begin, defaultValue = true),
-                    CheckBoxItem(title = "执行失败", keyId = R.string.key_exec_failed_voice_feedback,
-                            summary = "失败时的语音反馈",
-                            defaultValue = AppConfig.execFailedVoiceFeedback),
-                    CheckBoxItem(title = "执行结束", keyId = R.string.key_exec_succ_feedback,
-                            summary = "结束时状态栏效果反馈",
-                            defaultValue = AppConfig.execSuccessFeedback)
+                    CheckBoxItem(
+                            R.string.text_vibrate_reco_begin,
+                            keyId = R.string.key_vibrate_reco_begin,
+                            defaultValue = true
+                    )
+//                    CheckBoxItem(title = "执行失败", keyId = R.string.key_exec_failed_voice_feedback,
+//                            summary = "失败时的语音反馈",
+//                            defaultValue = AppConfig.execFailedVoiceFeedback),
+//                    CheckBoxItem(title = "执行结束", keyId = R.string.key_exec_succ_feedback,
+//                            summary = "结束时状态栏效果反馈",
+//                            defaultValue = AppConfig.execSuccessFeedback)
             )),
 
             SettingGroupItem(R.color.indigo_700, "响应词", childItems = listOf(

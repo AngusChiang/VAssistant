@@ -71,11 +71,6 @@ abstract class BaseActivityWithViewPager : BaseActivity() {
         return super.onOptionsItemSelected(item)
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        System.gc()
-    }
-
     inner class FragmentAdapter(fm: FragmentManager) : FragmentPagerAdapter(fm) {
 
         override fun getItem(position: Int): Fragment = fragments[position]

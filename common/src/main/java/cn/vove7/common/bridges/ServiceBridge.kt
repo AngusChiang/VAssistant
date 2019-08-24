@@ -11,7 +11,7 @@ import java.text.Collator
  * 保留Java调用
  * Created by Vove on 2018/6/18
  */
-interface ServiceBridge : OnExecutorResult {
+interface ServiceBridge {
 
     /**
      * 中途获取未知参数

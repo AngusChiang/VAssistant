@@ -2,7 +2,6 @@ package cn.vove7.rhino
 
 import android.os.Looper
 import cn.vove7.common.BridgeManager
-import cn.vove7.common.MessageException
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.interfaces.ScriptEngine
 import cn.vove7.rhino.api.RhinoApi
@@ -141,14 +140,14 @@ class RhinoHelper : ScriptableObject, ScriptEngine {
             val e = we.wrappedException
             if (e is InterruptedException) {
                 RhinoApi.doLog("强行终止")
-                throw MessageException("强行终止")
+                throw e
             } else {
                 RhinoApi.doLog(e.message)
-                throw MessageException(e.message)
+                throw e
             }
         } catch (t: Throwable) {
             RhinoApi.doLog(t.message)
-            throw MessageException(t.message)
+            throw t
         }
 
     }

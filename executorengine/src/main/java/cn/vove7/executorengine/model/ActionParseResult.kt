@@ -15,7 +15,9 @@ class ActionParseResult(
         val isSuccess: Boolean = false,
         var actionQueue: PriorityQueue<Action>? = null,
         var msg: String? = null,
-        val appinfo: AppInfo? = null
+        val appinfo: AppInfo? = null,
+        //上次匹配位置
+        val lastPosition: Int = -1
 ) {
     fun insertOpenAppAction(currentScope: ActionScope): ActionParseResult {
         if (!isSuccess) return this
