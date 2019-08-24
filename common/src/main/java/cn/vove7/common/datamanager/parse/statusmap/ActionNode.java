@@ -339,7 +339,7 @@ public class ActionNode implements Serializable, Searchable, DataFrom {
 
     @Generated(hash = 656437417)
     public ActionNode(Long id, int actionScopeType, boolean autoLaunchApp, Long actionId, Long parentId, Long scopeId,
-            Long descId, String actionTitle, String tagId, int versionCode, Long publishUserId, int priority, String from) {
+                      Long descId, String actionTitle, String tagId, int versionCode, Long publishUserId, int priority, String from) {
         this.id = id;
         this.actionScopeType = actionScopeType;
         this.autoLaunchApp = autoLaunchApp;
@@ -751,13 +751,18 @@ public class ActionNode implements Serializable, Searchable, DataFrom {
         newNode.actionTitle = this.actionTitle;
         newNode.publishUserId = UserInfo.getUserId();
         //newNode.actionScopeType = this.actionScopeType;
-        String p = this.actionScope.getPackageName();
-        if (Action.SCRIPT_TYPE_JS.equals(newNode.action.getScriptType()))
-            p = String.format(PreOpen_JS, p);
-        else
-            p = String.format(PreOpen_LUA, p);
 
-        String newS = p + newNode.action.getActionScript();
+        String newS;
+        if (autoLaunchApp) {
+            String p = this.actionScope.getPackageName();
+            if (Action.SCRIPT_TYPE_JS.equals(newNode.action.getScriptType()))
+                p = String.format(PreOpen_JS, p);
+            else
+                p = String.format(PreOpen_LUA, p);
+
+            newS = p + newNode.action.getActionScript();
+        } else newS = action.getActionScript();
+
         Vog.INSTANCE.d("cloneGlobal ---> \n" + newS);
         newNode.action.setActionScript(newS);
         if (this.desc != null) {

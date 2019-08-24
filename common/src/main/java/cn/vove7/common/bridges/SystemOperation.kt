@@ -152,7 +152,7 @@ interface SystemOperation {
     fun isScreenOn(): Boolean
 
     fun getClipText(): String?
-    fun setClipText(text: String?)
+    fun setClipText(text: String?) :Boolean
 
     fun sendEmail(to: String, subject: String? = null, content: String? = null)
 

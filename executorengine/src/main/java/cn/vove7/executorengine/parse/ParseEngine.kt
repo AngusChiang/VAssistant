@@ -127,13 +127,16 @@ object ParseEngine {
             return ActionParseResult(false, null, "无匹配(未匹配应用内操作)")
         }
 
-        val inAppQue = matchAppAction(cmd, scope, isFollow)
-        val actionQueue = inAppQue.second //匹配应用内时
-        // 根据第一个action.scope 决定是否进入首页
-        if (actionQueue.isNotEmpty()) {//自动执行打开
-            return ActionParseResult(true, actionQueue, inAppQue.first,
-                    SystemBridge.getAppInfo(scope.packageName))
-                    .insertOpenAppAction(scope)
+        val matchedNode = matchAppAction(cmd, scope, isFollow)
+        if (matchedNode != null) {
+            val actionQueue = PriorityQueue<Action>()
+            actionQueue.add(matchedNode.action)//匹配应用内时
+            // 根据第一个action.scope 决定是否进入首页
+            return ActionParseResult(true, actionQueue, matchedNode.actionTitle,
+                    SystemBridge.getAppInfo(scope.packageName)).also {
+                //自动执行打开
+                if (matchedNode.autoLaunchApp) it.insertOpenAppAction(scope)
+            }
         }
         return ActionParseResult(false)
     }
@@ -145,23 +148,21 @@ object ParseEngine {
      * 网易云 音乐 播放
      * QQ扫一扫
      * App内指令
-     * 深度搜索
      * @param isFollow 此时匹配应用内指令，指明是前面是否有指令，true: 有父级操作 false: 首个操作
      * 用于判断是否加前缀%
      * @return  Pair<String?, PriorityQueue<Action> 匹配的actionTitle 运行队列
      */
-    fun matchAppAction(cmd: String, matchScope: ActionScope, isFollow: Boolean = false): Pair<String?, PriorityQueue<Action>> {
+    fun matchAppAction(cmd: String, matchScope: ActionScope, isFollow: Boolean = false): ActionNode? {
 
-        val actionQueue = PriorityQueue<Action>()
         AppActionNodes.filter {
             //筛选当前App  根据pkg
             val sc = it.actionScope
             sc?.eqPkg(matchScope) == true
         }.forEach {
-            val r = regSearch(cmd, it, actionQueue, isFollow)
-            if (r) return Pair(it.actionTitle, actionQueue)
+            val r = regSearch(cmd, it, isFollow)
+            if (r) return it
         }
-        return Pair(null, actionQueue)
+        return null
     }
 
     /**
@@ -171,8 +172,7 @@ object ParseEngine {
      * @param actionQueue PriorityQueue<Action>
      * @return Boolean
      */
-    private fun regSearch(cmd: String, it: ActionNode, actionQueue: PriorityQueue<Action>,
-                          isFollow: Boolean): Boolean {
+    private fun regSearch(cmd: String, it: ActionNode, isFollow: Boolean): Boolean {
         it.regs.forEach { reg ->
             val result = try {//maybe 正则格式错误
                 (if (isFollow) reg.followRegex else reg.regex).let {
@@ -190,7 +190,6 @@ object ParseEngine {
                 ac.param = result
                 it.param = result
                 ac.matchWord = cmd
-                actionQueue.add(ac)
                 //深搜命令
 //                actionDsMatch(actionQueue, it, result.groupValues[result.groups.size - 1], ac)
                 return true
@@ -250,10 +249,13 @@ object ParseEngine {
      * 全局不存在follows
      */
     private fun globalActionMatch(cmd: String): ActionParseResult {
-        val actionQueue = PriorityQueue<Action>()
         GlobalActionNodes.forEach {
-            val r = regSearch(cmd, it, actionQueue, false)
-            if (r) return ActionParseResult(true, actionQueue, it.actionTitle)
+            val r = regSearch(cmd, it, false)
+            if (r) {
+                val actionQueue = PriorityQueue<Action>()
+                actionQueue.add(it.action)
+                return ActionParseResult(true, actionQueue, it.actionTitle)
+            }
         }
         return ActionParseResult(false)
     }
@@ -265,9 +267,8 @@ object ParseEngine {
      * @return ActionParseResult
      */
     fun testParse(testWord: String, node: ActionNode): ActionParseResult {
-        val actionQueue = PriorityQueue<Action>()
-        regSearch(testWord, node, actionQueue, false)
-        return ActionParseResult(actionQueue.isNotEmpty(), actionQueue)
+        val r = regSearch(testWord, node, false)
+        return ActionParseResult(r, PriorityQueue<Action>().also { it.add(node.action) })
     }
 
 }

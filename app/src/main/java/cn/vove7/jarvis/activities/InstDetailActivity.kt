@@ -46,6 +46,7 @@ import cn.vove7.vtp.easyadapter.BaseListAdapter
 import cn.vove7.vtp.extend.gone
 import cn.vove7.vtp.extend.show
 import cn.vove7.vtp.log.Vog
+import cn.vove7.vtp.net.toJson
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.customview.customView
 import com.afollestad.materialdialogs.input.input
@@ -348,15 +349,15 @@ class InstDetailActivity : BaseActivity() {
                     } else
                         showShareDialog()
                 }
+                R.id.menu_inst_share -> {
+                    if(SystemBridge.setClipText(node.toJson())){
+                        GlobalApp.toastInfo(R.string.text_copied)
+                    }
+                }
                 R.id.menu_as_global -> {//copy as global
-                    //todo one month need vip
-//                    val sp = SpHelper(this)
-//                    val prompt = sp.getBoolean(R.string.key_show_prompt_inapp_as_global_dialog)
-//                    if (prompt) {
                     //重要信息
                     MaterialDialog(this).title(text = "设为全局指令")
-                            .message(text = "此操作会复制此指令(包括跟随操作)至全局，若不选择复制跟随操作，" +
-                                    "选择下方[不包含]即可。\n注意：跟随操作不允许此操作\n跟随操作最多之复制一层")
+                            .message(text = "此操作会复制此指令(包括跟随操作)至全局。")
                             /*.checkBoxPrompt(text = "不再提醒") {
                                 sp.set(R.string.key_show_prompt_inapp_as_global_dialog, it)
                             }*/.positiveButton(R.string.text_continue) {
@@ -587,7 +588,7 @@ class InstDetailActivity : BaseActivity() {
             execQueue.add(0, p)
             p = p.parent
         }
-        if (ActionNode.belongInApp(execQueue[0].actionScopeType)) {
+        if (execQueue[0].autoLaunchApp && ActionNode.belongInApp(execQueue[0].actionScopeType)) {
             val pkg = execQueue[0].actionScope.packageName
             val appName = AdvanAppHelper.getAppInfo(pkg)?.name
             execQueue.add(0, ActionNode("打开App: $appName",

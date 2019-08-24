@@ -9,10 +9,7 @@ import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.Rect
 import android.net.Uri
-import android.os.Build
-import android.os.Handler
-import android.os.HandlerThread
-import android.os.Looper
+import android.os.*
 import android.support.annotation.ColorRes
 import android.support.v4.app.ActivityCompat
 import android.util.DisplayMetrics
@@ -27,6 +24,7 @@ import cn.vove7.common.app.log
 import cn.vove7.vtp.app.AppInfo
 import cn.vove7.vtp.log.Vog
 import java.io.File
+import java.io.Serializable
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -514,4 +512,45 @@ fun View.onClick(clickAction: (View) -> Unit) {
 @Suppress("UNCHECKED_CAST")
 operator fun <T> Intent.get(key: String, def: T): T {
     return extras?.get(key) as T? ?: def
+}
+
+inline fun <reified ACT> Context.startActivity(intentBuilder: Intent.() -> Unit) {
+    startActivity(Intent(this, ACT::class.java).apply(intentBuilder))
+}
+
+fun Intent.putArgs(vararg args:Pair<String,Any>){
+    putExtras(bundle(*args))
+}
+
+/**
+ * 构建 Bundle
+ * 示例：
+ * bundle(1 to "a", 2 to 2)
+ * @param extras Array<out Pair<String, Any>>
+ * @return Bundle
+ */
+fun bundle(vararg extras: Pair<String, Any>): Bundle {
+    return Bundle().apply {
+        extras.forEach {
+            when (val value = it.second) {
+                is Int -> putInt(it.first, value)
+                is IntArray -> putIntArray(it.first, value)
+                is Long -> putLong(it.first, value)
+                is LongArray -> putLongArray(it.first, value)
+                is Float -> putFloat(it.first, value)
+                is FloatArray -> putFloatArray(it.first, value)
+                is Byte -> putByte(it.first, value)
+                is ByteArray -> putByteArray(it.first, value)
+                is Char -> putChar(it.first, value)
+                is CharArray -> putCharArray(it.first, value)
+                is String -> putString(it.first, value)
+                is ArrayList<*> -> putStringArrayList(it.first, value as java.util.ArrayList<String>?)
+                is CharSequence -> putCharSequence(it.first, value)
+                is Serializable -> putSerializable(it.first, value)
+//                is IBinder -> putBinder(it.first, value)
+//                is Size -> putSize(it.first, value)
+            }
+        }
+
+    }
 }

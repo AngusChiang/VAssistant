@@ -45,4 +45,8 @@
         android:id="@+id/menu_add_shortcut"
         android:title="@string/text_add_shortcut_to_launcher"
         app:showAsAction="never"/>
+    <item
+        android:id="@+id/menu_inst_share"
+        android:title="复制指令（用于分享导出）"
+        app:showAsAction="never"/>
 </menu>

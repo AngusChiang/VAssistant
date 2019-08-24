@@ -677,14 +677,16 @@ object SystemBridge : SystemOperation {
         }
     }
 
-    override fun setClipText(text: String?) {
+    override fun setClipText(text: String?): Boolean {
         prepareIfNeeded()
-        try {
+        return try {
             val cm = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
             val mClipData = ClipData.newPlainText("", text)
             cm.primaryClip = mClipData
+            true
         } catch (e: Throwable) {
             GlobalApp.toastError("复制失败：" + e.message)
+            false
         }
     }
 
