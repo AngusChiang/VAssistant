@@ -44,13 +44,13 @@ object CrashHandler : Cockroach.ExceptionHandler {
 
     private fun handler(e: Throwable) {
         val headerInfo = SystemHelper.getDeviceInfo(context).string()
-        val log = GlobalLog.toString()
+//        val log = GlobalLog.toString()
         val errFile = Environment.getExternalStorageDirectory().absolutePath + "/crash.log"
         try {
             val info = TextPrinter().apply {
                 println(headerInfo)
                 e.printStackTrace(this)
-                println(log)
+//                println(log)
             }.toString()
 
             try {//输出和sd卡
@@ -63,7 +63,7 @@ object CrashHandler : Cockroach.ExceptionHandler {
         } catch (e1: Exception) {//文件读写
             if (!BuildConfig.DEBUG)
                 WrapperNetHelper.postJson<Any>(ApiUrls.CRASH_HANDLER,
-                        headerInfo + e.message + log + "crash上传失败${e1.message}") {}
+                        headerInfo + e.message + "crash上传失败${e1.message}") {}
         }
     }
 }
