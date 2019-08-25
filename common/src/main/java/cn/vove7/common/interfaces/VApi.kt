@@ -15,7 +15,7 @@ interface VApi {
                 "input"
         )
 
-        val runtimeFunctions = arrayOf("currentApp",
+        val runtimeFunctions = arrayOf("argMap", "currentApp",
                 "currentActivity", "actionCount", "currentActionIndex", "isGlobal()",
                 "commandType", "command", "DEBUG", "focusView", "userInterrupt", "notSupport()")
 
@@ -119,6 +119,7 @@ interface VApi {
 
         //map
         val runtimeMap = hashMapOf(
+                Pair("argMap", "包含当前指令文本中包含的参数"),
                 Pair("currentApp", "当前App信息"),
                 Pair("currentActivity", "当前Activity"),
                 Pair("actionCount", "执行队列长度"),

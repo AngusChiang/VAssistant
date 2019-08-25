@@ -168,16 +168,20 @@ open class ExecutorImpl(
         val waiter = ResultBox<Int>()
         if (!sync) waiter.setAndNotify(EXEC_CODE_NOT_FINISH)
         thread = thread(start = true, name = "脚本线程：$cmdWords", isDaemon = true, priority = Thread.MAX_PRIORITY) {
-            LooperHelper.prepareIfNeeded()
-            running = true
-            userInterrupt = false
-            commandType = 0
-            currentActionIndex = 0
-            actionCount = actionQueue.size
-            val er = pollActionQueue(actionQueue)
-            onFinish(er)
-            currentAction = null
-            if (sync) waiter.setAndNotify(er)
+            var er = EXEC_CODE_FAILED
+            try {
+                LooperHelper.prepareIfNeeded()
+                running = true
+                userInterrupt = false
+                commandType = 0
+                currentActionIndex = 0
+                actionCount = actionQueue.size
+                er = pollActionQueue(actionQueue)
+                onFinish(er)
+                currentAction = null
+            } finally {
+                if (sync) waiter.setAndNotify(er)
+            }
         }
         return waiter.blockedGet(true) ?: EXEC_CODE_FAILED
     }
