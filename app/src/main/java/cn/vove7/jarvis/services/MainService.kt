@@ -422,7 +422,6 @@ class MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
             EXEC_CODE_INTERRUPT -> onExecuteInterrupt()
             else -> executeAnimation.hideDelay()
         }
-        hideAll(false)
     }
 
     //from executor 线程
