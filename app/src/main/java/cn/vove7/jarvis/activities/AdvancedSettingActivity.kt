@@ -73,18 +73,6 @@ class AdvancedSettingActivity : ReturnableActivity() {
             }
         }
 
-        btn_unlock.setOnClickListener {
-            if (UserInfo.isLogin()) {
-                UserInfoDialog(this) {}
-            } else {
-                GlobalApp.toastInfo(R.string.text_please_login_first)
-                LoginDialog(this) {
-                    if (UserInfo.isVip()) {
-                        unlock_advan_fun.visibility = View.GONE
-                    } else UserInfoDialog(this) {}
-                }
-            }
-        }
     }
 
     var first = true
@@ -103,14 +91,6 @@ class AdvancedSettingActivity : ReturnableActivity() {
                     , ItemWrap(Tutorials.t_mark_man, adapter.childHolders[0][1]?.titleView, "标记管理", "这里查看标记的数据和管理")
             ))
         }, 1000)
-    }
-
-    override fun onResume() {
-        super.onResume()
-//        AppConfig.checkDate()
-//        unlock_advan_fun.visibility = if (UserInfo.isVip()) {
-//            View.GONE
-//        } else View.VISIBLE
     }
 
     private fun startOnNewWin(cls: Class<*>) {
