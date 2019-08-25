@@ -263,14 +263,21 @@ class SettingItemHelper(
             val init = getInitPos()
             MaterialDialog(context)
                     .title(text = item.title())
-                    .listItemsSingleChoice(items = items, initialSelection = init) { _, i, t ->
+                    .listItemsSingleChoice(
+                            items = items,
+                            initialSelection = init,
+                            waitForPositiveButton = false
+                    ) { d, i, t ->
                         //选择
+                        d.dismiss()
                         if (i == init) return@listItemsSingleChoice
 
                         notifyData(i, t)
                     }.show {
-                        neutralButton(text = "清空选择") {
-                            notifyData(null, null)
+                        if(item.allowClear) {
+                            neutralButton(text = "清空选择") {
+                                notifyData(null, null)
+                            }
                         }
                     }
         }

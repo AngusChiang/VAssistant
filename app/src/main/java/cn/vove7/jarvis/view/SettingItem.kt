@@ -100,7 +100,8 @@ open class SettingChildItem(
         val callback: CallbackOnSet<*>? = null,
         val entityArrId: Int? = null,
 //        val valueArrId: Int? = null,
-        val items: List<String>? = null
+        val items: List<String>? = null,
+        val allowClear: Boolean = false
 ) {
     fun title(): String {
         if (titleId != null)
@@ -157,9 +158,10 @@ class SingleChoiceItem(
         defaultValue: (() -> Int?) = { 0 },//pos
         @ArrayRes entityArrId: Int? = null,
         items: List<String>? = null,
+        allowClear: Boolean = false,
         callback: CallbackOnSet<Pair<Int?, String?>>? = null
 ) : SettingChildItem(titleId, title, summary, TYPE_SINGLE, keyId, defaultValue,
-        entityArrId = entityArrId, callback = callback, items = items)
+        entityArrId = entityArrId, callback = callback, items = items, allowClear = allowClear)
 
 val storeIndexOnSingleChoiceItem: CallbackOnSet<Pair<Int, String>> = { io, it ->
     io.keyId?.also { ki ->

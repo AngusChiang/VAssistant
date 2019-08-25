@@ -87,7 +87,7 @@ class LaboratoryActivity : ReturnableActivity() {
                 SettingGroupItem(R.color.indigo_700, titleS = "智能家居", childItems = listOf(
                         SingleChoiceItem(title = "智能家居系统", summary = "选择您的家居系统",
                                 defaultValue = { AppConfig.homeSystem },
-                                items = listOf("Rokid(若琪)")
+                                items = listOf("Rokid(若琪)"), allowClear = true
                         ) { item, data ->
                             AppConfig.homeSystem = data.first
                             MainService.instance?.loadHomeSystem()
@@ -129,7 +129,7 @@ class LaboratoryActivity : ReturnableActivity() {
                             }
                         },
                         IntentItem(title = "自定义短语", summary = "自定义发送到家居控制系统的短语") {
-                            TextEditorDialog(this, AppConfig.homeSystemUserCommand){
+                            TextEditorDialog(this, AppConfig.homeSystemUserCommand) {
                                 title(text = "自定义短语")
                                 editorView.hint = "每行一个"
                                 editorView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13f)
