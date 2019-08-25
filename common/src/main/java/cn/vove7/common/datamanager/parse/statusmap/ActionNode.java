@@ -516,9 +516,6 @@ public class ActionNode implements Serializable, Searchable, DataFrom {
             return regs;
         if (regs == null) {
             final DaoSession daoSession = this.daoSession;
-            if (daoSession == null) {
-                throw new DaoException("Entity is detached from DAO context");
-            }
             RegDao targetDao = daoSession.getRegDao();
             List<Reg> regsNew = targetDao._queryActionNode_Regs(id);
             synchronized (this) {

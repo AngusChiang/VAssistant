@@ -20,6 +20,6 @@
         android:id="@+id/param_text"
         android:layout_marginStart="20dp"
         android:layout_width="match_parent"
-        android:hint="当前动作无参数"
+        android:hint="当前动作无需指定参数"
         android:layout_height="wrap_content" />
 </LinearLayout>
