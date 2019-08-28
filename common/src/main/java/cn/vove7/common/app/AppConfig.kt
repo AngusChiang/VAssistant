@@ -135,7 +135,7 @@ object AppConfig : BaseConfig {
 //    //执行成功反馈
 //    var execSuccessFeedback by noCacheKey(true, keyId = R.string.key_exec_failed_voice_feedback)
 
-    var fixVoiceMicro by noCacheKey(true, keyId = R.string.key_fix_voice_micro)//麦克风冲突
+    var fixVoiceMicro by noCacheKey(false, keyId = R.string.key_fix_voice_micro)//麦克风冲突
 
     //通知唤醒状态/麦克风
     var notifyCloseMicro by noCacheKey(true, keyId = R.string.key_close_wakeup_notification)
