@@ -4,7 +4,6 @@ import android.media.AudioManager
 import android.util.Pair
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.app.GlobalLog
-import cn.vove7.common.app.log
 import cn.vove7.common.utils.StorageHelper
 import cn.vove7.common.utils.runOnNewHandlerThread
 import cn.vove7.jarvis.R
