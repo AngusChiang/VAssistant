@@ -1,9 +1,6 @@
 package cn.vove7.jarvis.speech.baiduspeech
 
 import android.media.AudioManager
-import android.os.Handler
-import android.os.HandlerThread
-import android.os.Message
 import android.util.Pair
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.app.GlobalLog
@@ -39,7 +36,11 @@ class BaiduSpeechSynService(event: SyntheEvent) : SpeechSynService(event) {
     private val ttsMode
         get() = if (enableOffline) TtsMode.MIX else TtsMode.ONLINE
 
-    private var voiceModel = VOICE_FEMALE
+    private var voiceModel: String? = null
+        set(value) {
+            Vog.d("切换发音人：$value")
+            field = value
+        }
     private var voiceSpeed = "5"
 
     override fun init() {
@@ -49,7 +50,7 @@ class BaiduSpeechSynService(event: SyntheEvent) : SpeechSynService(event) {
         val secretKey: String = BaiduKey.sKey
 
         val sp = SpHelper(context)
-        voiceModel = getTypeCode() ?: VOICE_FEMALE
+        voiceModel = getTypeCode()
         var eed = sp.getInt(R.string.key_voice_syn_speed)
         if (eed == -1) eed = 5
         voiceSpeed = eed.toString()
@@ -74,7 +75,9 @@ class BaiduSpeechSynService(event: SyntheEvent) : SpeechSynService(event) {
         val entity = context.resources.getStringArray(R.array.voice_model_entities)
         val i = entity.indexOf(type)
         val types = context.resources.getStringArray(R.array.voice_model_values)
-        return types[i] ?: "0"
+        return (types[i] ?: "0").also {
+            Vog.d("发音人：$type $it")
+        }
     }
 
     /**
@@ -87,7 +90,7 @@ class BaiduSpeechSynService(event: SyntheEvent) : SpeechSynService(event) {
         // 以下参数均为选填
 
         // 设置在线发声音人： 0 普通女声（默认） 1 普通男声 2 特别男声 3 情感男声<度逍遥> 4 情感儿童声<度丫丫>
-        params[SpeechSynthesizer.PARAM_SPEAKER] = voiceModel
+        params[SpeechSynthesizer.PARAM_SPEAKER] = voiceModel ?: VOICE_FEMALE
         // 设置合成的音量，0-9 ，默认 5
         params[SpeechSynthesizer.PARAM_VOLUME] = "9"
         // 设置合成的语速，0-9 ，默认 5
@@ -98,13 +101,12 @@ class BaiduSpeechSynService(event: SyntheEvent) : SpeechSynService(event) {
 //         离线资源文件， 从assets目录中复制到临时目录，需要在initTTs方法前完成
         if (enableOffline) {
             GlobalLog.log("加载百度语音合成离线资源...")
-            val offlineResource = OfflineResource(voiceModel)
+            val offlineResource = OfflineResource(voiceModel ?: VOICE_FEMALE)
             try {// 声学模型文件路径 (离线引擎使用), 请确认下面两个文件存在
                 params[SpeechSynthesizer.PARAM_TTS_TEXT_MODEL_FILE] = offlineResource.offlineFile
                 params[SpeechSynthesizer.PARAM_TTS_SPEECH_MODEL_FILE] = offlineResource.modelFilename
             } catch (e: Exception) {
                 GlobalLog.log("语音合成离线资源加载失败：${e.message}")
-                e.log()
                 enableOffline = false
             }
         }
@@ -180,6 +182,8 @@ class BaiduSpeechSynService(event: SyntheEvent) : SpeechSynService(event) {
      * @return
      */
     override fun doSpeak(text: String) {
+        Vog.d("发音人：$voiceModel")
+        mSpeechSynthesizer.setParam(SpeechSynthesizer.PARAM_SPEAKER, voiceModel)
         mSpeechSynthesizer.speak(text)
     }
 
