@@ -1,8 +1,11 @@
 package cn.vove7.jarvis
 
 import android.content.Context
+import android.content.Intent
 import android.os.Build
+import android.os.Handler
 import cn.jpush.android.api.JPushInterface
+import cn.vove7.common.activities.RunnableActivity.Companion.runInShellActivity
 import cn.vove7.common.app.AppConfig
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.appbus.AppBus
@@ -114,4 +117,29 @@ class App : GlobalApp() {
             JPushInterface.deleteAlias(this, 0)
         }
     }
+
+    //供脚本api
+    override fun startActivity(intent: Intent?) {
+        //防止在外部无法打开其他应用
+        val component = intent?.component
+        val isVApp = component?.className?.let {
+            try {
+                Class.forName(it)
+                true
+            } catch (e: Throwable) {
+                false
+            }
+        } ?: false
+        Vog.d("isVApp $isVApp")
+        if (!isVApp && AppConfig.openAppCompat) {
+            runInShellActivity {
+                it.startActivity(intent)
+                it.finish()
+            }
+        } else {
+            intent?.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            super.startActivity(intent)
+        }
+    }
+
 }

@@ -48,6 +48,7 @@ import java.util.*
 object AppConfig : BaseConfig {
     //key... value
 
+    var openAppCompat by noCacheKey(false, keyId = R.string.key_open_app_compat)
     var speechEngineType: Int by noCacheKey(0, keyId = R.string.key_speech_engine_type)
 
     var vibrateWhenStartRecog by noCacheKey(true, keyId = R.string.key_vibrate_reco_begin)

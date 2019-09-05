@@ -51,11 +51,11 @@ class RunnableActivity : AppCompatActivity() {
 
     //屏蔽按键
     override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
-        return true
+        return shellAction != null
     }
 
     override fun onKeyUp(keyCode: Int, event: KeyEvent?): Boolean {
-        return true
+        return shellAction != null
     }
 
     override fun finish() {

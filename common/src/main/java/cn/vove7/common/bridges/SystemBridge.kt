@@ -4,6 +4,7 @@ package cn.vove7.common.bridges
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.app.Application
 import android.app.NotificationManager
 import android.app.SearchManager
 import android.bluetooth.BluetoothAdapter
@@ -63,7 +64,7 @@ import kotlin.concurrent.thread
 
 @Suppress("unused", "MemberVisibilityCanBePrivate")
 object SystemBridge : SystemOperation {
-    private val context: Context
+    private val context: Application
         get() = GlobalApp.APP
 
     override fun openAppDetail(pkg: String): Boolean {
@@ -74,7 +75,7 @@ object SystemBridge : SystemOperation {
             val uri = Uri.fromParts("package", pkg, null)
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             intent.data = uri
-            context.startActivity(intent)
+            context.baseContext.startActivity(intent)
             true
         } catch (e: Exception) {
             GlobalLog.err(e)

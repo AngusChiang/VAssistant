@@ -369,7 +369,10 @@ class SettingsActivity : ReturnableActivity() {
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1) {
                             ShortcutUtil.addDebugShortcut()
                         }
-                    }
+                    },
+                    CheckBoxItem(title = "以兼容模式启动应用", summary = "某些机型在外部无法打开其他软件，请尝试开启",
+                            keyId = R.string.key_open_app_compat, defaultValue = false
+                    )
             ))
     )
 
