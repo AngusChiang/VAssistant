@@ -7,6 +7,7 @@ import android.os.Build
 import android.service.voice.VoiceInteractionSession
 import android.support.annotation.RequiresApi
 import cn.vove7.common.bridges.UtilBridge
+import cn.vove7.common.utils.newTask
 import cn.vove7.common.utils.runOnNewHandlerThread
 import cn.vove7.jarvis.activities.screenassistant.ScreenAssistActivity
 import cn.vove7.vtp.log.Vog
@@ -20,20 +21,19 @@ import java.util.*
 @RequiresApi(api = Build.VERSION_CODES.M)
 class AssistSession(context: Context) : VoiceInteractionSession(context) {
     override fun onHandleScreenshot(screenshot: Bitmap?) {
-        Vog.d("onHandleScreenshot ---> $screenshot")
+        Vog.d("onHandleScreenshot ---> screenshot: ${screenshot != null}")
         if (screenshot == null) {
-            context.startActivity(Intent(context, ScreenAssistActivity::class.java))
+            context.startActivity(Intent(context, ScreenAssistActivity::class.java).newTask())
             finish()
             return
         }
-        val p=context.cacheDir.absolutePath +
+        val p = context.cacheDir.absolutePath +
                 "/screen-${Random().nextInt()}.png"
         context.startActivity(ScreenAssistActivity.createIntent(p))
 
         runOnNewHandlerThread {
             UtilBridge.bitmap2File(screenshot, p)
         }
-
         finish()
     }
 
