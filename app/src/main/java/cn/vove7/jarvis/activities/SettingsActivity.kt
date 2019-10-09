@@ -12,6 +12,7 @@ import android.view.View
 import android.widget.TextView
 import cn.vove7.common.accessibility.AccessibilityApi
 import cn.vove7.common.app.AppConfig
+import cn.vove7.common.app.AppPermission
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.appbus.AppBus
@@ -339,14 +340,12 @@ class SettingsActivity : ReturnableActivity() {
 //                        return@SingleChoiceItem true
 //                    }
 //            )),
-            SettingGroupItem(R.color.lime_600, titleId = R.string.text_other, childItems = listOf(
-                    SingleChoiceItem(title = "翻译主语言", entityArrId = R.array.list_translate_languages,
-                            keyId = R.string.key_translate_languages),
+            SettingGroupItem(R.color.lime_600, titleS = "启动选项", childItems = listOf(
                     CheckBoxItem(
                             title = "自动开启无障碍服务",
                             summary = "App启动时自动开启无障碍服务，需要root支持，或者使用ADB授予WRITE_SECURE_SETTINGS权限（方法见常见问题）",
                             keyId = R.string.key_auto_open_as_with_root,
-                            defaultValue = false
+                            defaultValue = AppConfig.autoOpenAS
                     ) { _, b ->
                         if (b) ThreadPool.runOnPool {
                             if (!AccessibilityApi.isBaseServiceOn) {
@@ -355,6 +354,16 @@ class SettingsActivity : ReturnableActivity() {
                         }
                         return@CheckBoxItem true
                     },
+                    CheckBoxItem(
+                            title = "自动设为助手应用",
+                            summary = "App启动时自动设为助手应用\n需要root或WRITE_SECURE_SETTINGS权限",
+                            keyId = R.string.key_auto_set_assistant_app,
+                            defaultValue = AppConfig.autoSetAssistantApp
+                    )
+            )),
+                    SettingGroupItem(R.color.lime_600, titleId = R.string.text_other, childItems = listOf(
+                    SingleChoiceItem(title = "翻译主语言", entityArrId = R.array.list_translate_languages,
+                            keyId = R.string.key_translate_languages),
                     CheckBoxItem(title = "以兼容模式启动应用", summary = "某些机型在外部无法打开其他软件，请尝试开启",
                             keyId = R.string.key_open_app_compat, defaultValue = false
                     ),

@@ -22,7 +22,8 @@ import cn.vove7.jarvis.receivers.UtilEventReceiver
 import cn.vove7.jarvis.services.MainService
 import cn.vove7.jarvis.tools.CrashHandler
 import cn.vove7.jarvis.tools.ShortcutUtil
-import cn.vove7.jarvis.view.openAccessibilityServiceAuto
+import cn.vove7.jarvis.tools.openAccessibilityServiceAuto
+import cn.vove7.jarvis.tools.setAssistantAppAuto
 import cn.vove7.vtp.log.Vog
 import com.qihoo360.replugin.gen.RePluginHostConfig
 import com.umeng.commonsdk.UMConfigure
@@ -51,6 +52,7 @@ class App : GlobalApp() {
             startMainServices()
             runOnPool {
                 openAccessibilityServiceAuto()
+                setAssistantAppAuto()
             }
         }
         //延时初始化

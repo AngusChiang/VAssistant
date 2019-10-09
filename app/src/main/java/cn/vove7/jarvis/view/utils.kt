@@ -20,53 +20,6 @@ import java.io.InputStreamReader
  */
 
 /**
- * root自动开启 or 系统应用
- */
-fun openAccessibilityServiceAuto() {
-    Vog.d("打开无障碍")
-    if (AccessibilityApi.isBaseServiceOn) return
-    /*if (AppConfig.IS_SYS_APP) {
-        Vog.d("", "openAccessibilityService ---> 打开无障碍 as SYS_APP")
-        AccessibilityApi.openServiceSelf()
-    } else */
-    if (AppConfig.autoOpenAS) {
-        GlobalLog.log("自启打开无障碍服务")
-        AccessibilityApi.openServiceSelf()
-    }
-}
-
-fun wirelessDebug(en: Boolean) {
-    try {
-        RootHelper.execWithSu("setprop service.adb.tcp.port ${if (en) "5555" else "-1"}\n" +
-                "stop adbd\n" +
-                "start adbd")
-    } catch (e: Exception) {
-        e.printStackTrace()
-        GlobalApp.toastError(e.message ?: "")
-    }
-}
-
-fun isWirelessDebugEnable(): Boolean {
-    try {
-        val proc = Runtime.getRuntime().exec("su")
-        val os = DataOutputStream(proc.outputStream)
-        os.writeBytes("getprop service.adb.tcp.port\n")
-        os.flush()
-        os.close()
-        val reader = InputStreamReader(proc.inputStream)
-        val chars = CharArray(5)
-        reader.read(chars)
-        reader.close()
-        proc.destroy()
-        val result = String(chars)
-        return result.matches("[0-9]+\\n".toRegex()) && !result.contains("-1")
-    } catch (e: IOException) {
-        e.printStackTrace()
-        return false
-    }
-}
-
-/**
  * 检查TextInputLayout编辑框内容是否空
  * @receiver TextInputLayout
  * @param errMsgWhenEmpty String

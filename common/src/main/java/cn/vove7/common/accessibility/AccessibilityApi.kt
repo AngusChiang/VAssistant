@@ -122,16 +122,16 @@ abstract class AccessibilityApi : AccessibilityService() {
         fun openServiceSelf(): Boolean {
             if (isBaseServiceOn) return true
 
-            val s: String
-            val b = if (RootHelper.hasRoot()) {
-                s = ("使用Root权限")
-                RootHelper.openSelfAccessService()
-            } else if (canWriteSecureSettings()) {
-                s = ("使用WRITE_SECURE_SETTINGS权限")
-                openServiceBySettings()
-            } else {
-                s = "无任何权限"
-                false
+            val (s, b) = when {
+                RootHelper.hasRoot() -> {
+                    "使用Root权限" to RootHelper.openSelfAccessService()
+                }
+                canWriteSecureSettings() -> {
+                    "使用WRITE_SECURE_SETTINGS权限" to openServiceBySettings()
+                }
+                else -> {
+                    "无任何权限" to false
+                }
             }
             val msg = "$s 无障碍开启${if (b) "成功" else "失败"}"
             if (b) GlobalLog.log(msg)

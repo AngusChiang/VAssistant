@@ -5,15 +5,20 @@ import android.content.Intent
 import android.os.Bundle
 import android.speech.RecognizerIntent
 import cn.vove7.common.app.AppConfig
+import cn.vove7.common.app.AppPermission
 import cn.vove7.common.app.GlobalApp
+import cn.vove7.common.app.log
 import cn.vove7.common.appbus.AppBus
+import cn.vove7.common.bridges.RootHelper
 import cn.vove7.common.datamanager.DAO
 import cn.vove7.common.datamanager.parse.model.Action
+import cn.vove7.common.utils.startActivity
 import cn.vove7.executorengine.parse.OpenAppAction
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.activities.screenassistant.*
 import cn.vove7.jarvis.services.MainService
 import cn.vove7.jarvis.tools.debugserver.RemoteDebugServer
+import cn.vove7.jarvis.tools.setAssistantApp
 import cn.vove7.vtp.log.Vog
 import java.lang.Thread.sleep
 import java.util.*
@@ -55,7 +60,17 @@ class VoiceAssistActivity : Activity() {
             }
             SET_ASSIST_APP ->
                 thread(isDaemon = true) {
-                    MainService.parseCommand("设为默认助手", false)
+                    if (AppPermission.canWriteSecureSettings || RootHelper.hasRoot(100)) {
+                        try {
+                            setAssistantApp()
+                            GlobalApp.toastSuccess("设置完成")
+                        } catch (e: Throwable) {
+                            e.log()
+                            GlobalApp.toastSuccess("设置失败\n${e.message}")
+                        }
+                    } else {
+                        MainService.parseCommand("设为默认助手", false)
+                    }
                     sleep(5000)
                 }
             WAKEUP_SCREEN_ASSIST -> {
@@ -65,16 +80,16 @@ class VoiceAssistActivity : Activity() {
                 AppBus.post(AppBus.ACTION_BEGIN_SCREEN_PICKER)
             }
             SCREEN_ASSIST_QR -> {
-                startActivity(Intent(this, QrCodeActivity::class.java))
+                startActivity<QrCodeActivity>()
             }
             SCREEN_ASSIST_SPOT_SCREEN -> {
-                startActivity(Intent(this, SpotScreenActivity::class.java))
+                startActivity<SpotScreenActivity>()
             }
             SCREEN_ASSIST_SCREEN_SHARE -> {
-                startActivity(Intent(this, ScreenShareActivity::class.java))
+                startActivity<ScreenShareActivity>()
             }
             SCREEN_ASSIST_SCREEN_OCR -> {
-                startActivity(Intent(this, ScreenOcrActivity::class.java))
+                startActivity<ScreenOcrActivity>()
             }
             SWITCH_DEBUG_MODE -> {
                 if (RemoteDebugServer.stopped) {

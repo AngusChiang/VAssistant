@@ -514,11 +514,13 @@ operator fun <T> Intent.get(key: String, def: T): T {
     return extras?.get(key) as T? ?: def
 }
 
-inline fun <reified ACT> Context.startActivity(intentBuilder: Intent.() -> Unit) {
-    startActivity(Intent(this, ACT::class.java).apply(intentBuilder))
+inline fun <reified ACT> Context.startActivity(noinline intentBuilder: (Intent.() -> Unit)? = null) {
+    startActivity(Intent(this, ACT::class.java).also {
+        if (intentBuilder != null) it.apply(intentBuilder)
+    })
 }
 
-fun Intent.putArgs(vararg args:Pair<String,Any>){
+fun Intent.putArgs(vararg args: Pair<String, Any>) {
     putExtras(bundle(*args))
 }
 

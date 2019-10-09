@@ -66,6 +66,7 @@ object AppConfig : BaseConfig {
     var voiceWakeup by noCacheKey(false, keyId = R.string.key_open_voice_wakeup)
 
     var autoOpenAS by noCacheKey(false, keyId = R.string.key_auto_open_as_with_root)
+    var autoSetAssistantApp by noCacheKey(false, keyId = R.string.key_auto_set_assistant_app)
     var userExpPlan by noCacheKey(true, keyId = R.string.key_user_exp_plan)
     var isAutoVoiceWakeupCharging by noCacheKey(false, keyId = R.string.key_auto_open_voice_wakeup_charging)
 
