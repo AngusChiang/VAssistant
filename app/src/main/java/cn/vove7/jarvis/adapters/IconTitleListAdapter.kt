@@ -3,6 +3,7 @@ package cn.vove7.jarvis.adapters
 import android.content.Context
 import android.util.SparseArray
 import android.view.View
+import cn.vove7.common.utils.onClick
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.activities.AboutActivity
 import cn.vove7.vtp.easyadapter.BaseListAdapter
@@ -16,7 +17,9 @@ import cn.vove7.vtp.easyadapter.BaseListAdapter
 class IconTitleListAdapter(context: Context, dataset: List<IconTitleEntity>)
     : BaseListAdapter<AboutActivity.VH, IconTitleEntity>(context, dataset) {
     override fun layoutId(position: Int): Int = R.layout.item_whit_icon_title
+
     val holders = SparseArray<AboutActivity.VH>()
+
     override fun onBindView(holder: AboutActivity.VH, pos: Int, item: IconTitleEntity) {
         holders.put(pos, holder)
         item.iconId.let {
@@ -24,6 +27,9 @@ class IconTitleListAdapter(context: Context, dataset: List<IconTitleEntity>)
                 holder.iconView.setImageResource(it)
         }
         holder.titleView.setText(item.titleId)
+        holder.itemView.onClick {
+            item.onclick()
+        }
         val subtitle = item.summaryId
         if (subtitle == null) {
             holder.subTitleView.visibility = View.GONE
@@ -41,5 +47,6 @@ class IconTitleListAdapter(context: Context, dataset: List<IconTitleEntity>)
 class IconTitleEntity(
         val iconId: Int? = null,
         val titleId: Int,
-        val summaryId: Int? = null
+        val summaryId: Int? = null,
+        val onclick: Function0<Unit>
 )

@@ -5,7 +5,6 @@ import android.os.Bundle
 import android.os.Environment
 import android.support.design.widget.TextInputLayout
 import android.view.View
-import android.widget.AdapterView
 import android.widget.TextView
 import cn.vove7.bottomdialog.BottomDialog
 import cn.vove7.bottomdialog.builder.buttons
@@ -37,7 +36,7 @@ import java.io.File
  * @author Administrator
  * 9/23/2018
  */
-class HelpActivity : ReturnableActivity(), AdapterView.OnItemClickListener {
+class HelpActivity : ReturnableActivity() {
     lateinit var adapter: IconTitleListAdapter
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -45,7 +44,6 @@ class HelpActivity : ReturnableActivity(), AdapterView.OnItemClickListener {
         header_content.addView(layoutInflater.inflate(R.layout.header_help, null))
 
         list_view.adapter = IconTitleListAdapter(this, getData()).also { adapter = it }
-        list_view.onItemClickListener = this
         list_view.setOnItemLongClickListener { parent, view, position, id ->
             if (position == 5) {
                 GlobalLog.export2Sd()
@@ -68,73 +66,6 @@ class HelpActivity : ReturnableActivity(), AdapterView.OnItemClickListener {
         }
     }
 
-    override fun onItemClick(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-        when (position) {
-            0 -> {
-                SystemBridge.openUrl(ApiUrls.USER_GUIDE)
-            }
-            1 -> {
-                MaterialDialog(this).show {
-                    title(text = "快捷键")
-                    val text = TextView(this@HelpActivity).apply {
-                        setPadding(50, 0, 50, 30)
-                        append("1. 长按音量上键进行唤醒。\n" +
-                                "2. 按下松开音量上键，再快速长按可持续加大音量。\n" +
-                                "3. 在聆听时，可通过点按音量上键停止聆听，点按下音量下键取消聆听。\n" +
-                                "4. 在执行时，可长按下键，终止执行\n" +
-                                "5. 在长语音聆听时，可长按下键，结束长语音\n" +
-                                "6. 有线耳机适用,并且支持长按中键唤醒\n" +
-                                "7. 锁屏下可进行唤醒。\n\n")
-                        append(MultiSpan(this@HelpActivity,
-                                "以上音量快捷键需要无障碍支持", typeface = Typeface.BOLD).spanStr)
-                    }
-                    customView(view = text, scrollable = true)
-                }
-            }
-            2 -> {
-                BottomDialog.builder(this){
-                    awesomeHeader("常见问题")
-                    content(MarkdownContentBuilder()){
-                        loadMarkdownFromAsset("files/faqs.md")
-                    }
-                }
-            }
-            3 -> SystemBridge.openUrl(ApiUrls.QQ_GROUP_1)
-            4 -> showFeedbackDialog()
-            5 -> {
-                var text = GlobalLog.colorHtml()
-                if (BuildConfig.DEBUG && text.isEmpty()) {
-                    try {
-                        text = File(Environment.getExternalStorageDirectory().absolutePath + "/crash.log").readText()
-                    } catch (e: Exception) {
-                    }
-                }
-
-                BottomDialog.builder(this) {
-                    awesomeHeader("日志")
-                    cancelable(false)
-
-                    content(SmoothTextBuilder().apply {
-                        html = text
-                    })
-
-                    buttons {
-                        positiveButton(text = "复制") {
-                            SystemBridge.setClipText(GlobalLog.toString())
-                            GlobalApp.toastInfo(R.string.text_copied)
-                        }
-                        negativeButton(text = "清空") {
-                            GlobalLog.clear()
-                            it.dismiss()
-                        }
-                        neutralButton(text = "导出至文件") {
-                            GlobalLog.export2Sd()
-                        }
-                    }
-                }
-            }
-        }
-    }
 
     //TODO
     private fun showFeedbackDialog() {
@@ -183,15 +114,76 @@ class HelpActivity : ReturnableActivity(), AdapterView.OnItemClickListener {
         return s
     }
 
-    private fun getData(): List<IconTitleEntity> {
-        return listOf(
-                IconTitleEntity(R.drawable.ic_book_24dp, R.string.text_user_manual),
-                IconTitleEntity(R.drawable.ic_accessibility, R.string.text_hot_key_desc)
-                , IconTitleEntity(R.drawable.ic_question_answer, R.string.text_faq)
-                , IconTitleEntity(R.drawable.ic_qq, R.string.text_add_qq_group)
-                , IconTitleEntity(R.drawable.ic_feedback_black_24dp, R.string.text_feedback)
-                , IconTitleEntity(R.drawable.ic_bug_report_24dp, titleId = R.string.text_browse_log,
-                summaryId = R.string.text_long_press_to_export_log)
-        )
-    }
+    private fun getData(): List<IconTitleEntity> = listOf(
+            IconTitleEntity(R.drawable.ic_book_24dp, R.string.text_user_manual) {
+                SystemBridge.openUrl(ApiUrls.USER_GUIDE)
+            },
+            IconTitleEntity(R.drawable.ic_accessibility, R.string.text_hot_key_desc) {
+
+                MaterialDialog(this).show {
+                    title(text = "快捷键")
+                    val text = TextView(this@HelpActivity).apply {
+                        setPadding(50, 0, 50, 30)
+                        append("1. 长按音量上键进行唤醒。\n" +
+                                "2. 按下松开音量上键，再快速长按可持续加大音量。\n" +
+                                "3. 在聆听时，可通过点按音量上键停止聆听，点按下音量下键取消聆听。\n" +
+                                "4. 在执行时，可长按下键，终止执行\n" +
+                                "5. 在长语音聆听时，可长按下键，结束长语音\n" +
+                                "6. 有线耳机适用,并且支持长按中键唤醒\n" +
+                                "7. 锁屏下可进行唤醒。\n\n")
+                        append(MultiSpan(this@HelpActivity,
+                                "以上音量快捷键需要无障碍支持", typeface = Typeface.BOLD).spanStr)
+                    }
+                    customView(view = text, scrollable = true)
+                }
+            },
+            IconTitleEntity(R.drawable.ic_question_answer, R.string.text_faq) {
+                BottomDialog.builder(this) {
+                    awesomeHeader("常见问题")
+                    content(MarkdownContentBuilder()) {
+                        loadMarkdownFromAsset("files/faqs.md")
+                    }
+                }
+            },
+            IconTitleEntity(R.drawable.ic_qq, R.string.text_add_qq_group) {
+                SystemBridge.openUrl(ApiUrls.QQ_GROUP_1)
+            },
+            IconTitleEntity(R.drawable.ic_feedback_black_24dp, R.string.text_feedback) {
+                showFeedbackDialog()
+            },
+            IconTitleEntity(R.drawable.ic_bug_report_24dp, titleId = R.string.text_browse_log,
+                    summaryId = R.string.text_long_press_to_export_log) {
+                var text = GlobalLog.colorHtml()
+                if (BuildConfig.DEBUG && text.isEmpty()) {
+                    try {
+                        text = File(Environment.getExternalStorageDirectory().absolutePath + "/crash.log").readText()
+                    } catch (e: Exception) {
+                    }
+                }
+
+                BottomDialog.builder(this) {
+                    awesomeHeader("日志")
+                    cancelable(false)
+
+                    content(SmoothTextBuilder().apply {
+                        html = text
+                    })
+
+                    buttons {
+                        positiveButton(text = "复制") {
+                            SystemBridge.setClipText(GlobalLog.toString())
+                            GlobalApp.toastInfo(R.string.text_copied)
+                        }
+                        negativeButton(text = "清空") {
+                            GlobalLog.clear()
+                            it.dismiss()
+                        }
+                        neutralButton(text = "导出至文件") {
+                            GlobalLog.export2Sd()
+                        }
+                    }
+                }
+            }
+    )
+
 }
