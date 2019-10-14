@@ -76,7 +76,7 @@ class RetrievePasswordDialog(context: Context) {
                             startDown(countDownSecs)
                         } else {
                             this@apply.isEnabled = true
-                            (bean.message)
+                            GlobalApp.toastError(bean.message)
                         }
                     }
                     fail { _, e ->
@@ -130,7 +130,7 @@ class RetrievePasswordDialog(context: Context) {
 
             loadBar.visibility = View.VISIBLE
             //post
-            WrapperNetHelper.postJson<String>(ApiUrls.RET_PASS__BY_EMAIL, model = userInfo, arg1 = verCode) {
+            WrapperNetHelper.postJson<String>(ApiUrls.RET_PASS_BY_EMAIL, model = userInfo, arg1 = verCode) {
                 success { _, bean ->
                     //泛型
                     Vog.d("onResponse ---> $bean")

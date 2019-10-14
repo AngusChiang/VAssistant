@@ -1,5 +1,6 @@
 package cn.vove7.common.netacc.model
 
+import cn.vove7.common.app.AppConfig
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.appbus.AppBus
 import cn.vove7.common.appbus.AppBus.EVENT_FORCE_OFFLINE
@@ -20,6 +21,7 @@ open class ResponseMessage<T> {
     fun isOk(): Boolean {
         if (tokenIsOutdate()||isInvalid()) {
             GlobalApp.toastError(message)
+            AppConfig.logout()
             AppBus.post(EVENT_FORCE_OFFLINE)
         }
         return code == CODE_OK

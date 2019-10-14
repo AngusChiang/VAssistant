@@ -37,7 +37,7 @@ object ApiUrls {
     val CHECK_USER_DATE: String get() = ACCOUNT + "cud"
 
     val REGISTER_BY_EMAIL: String get() = ACCOUNT + "rbe"
-    val RET_PASS__BY_EMAIL: String get() = ACCOUNT + "rpbe"
+    val RET_PASS_BY_EMAIL: String get() = ACCOUNT + "rpbe"
     val SEND_SIGN_UP_EMAIL_VER_CODE: String get() = ACCOUNT + "sec"
     val SEND_RET_PASS_EMAIL_VER_CODE: String get() = ACCOUNT + "srec"
 
