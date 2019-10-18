@@ -1,4 +1,4 @@
-package cn.vove7.common.netacc.tool
+package cn.vove7.jarvis.net.tool
 
 import android.util.Base64
 import cn.vove7.common.app.GlobalLog
@@ -16,9 +16,8 @@ object SecureHelper {
 
     private val HEX_DIGITS = "0123456789ABCDEF".toCharArray()
 
-    fun signData(body: Any?, uId: Long?, time: Long?): String {
-
-        val content = (uId ?: "").toString() + (body ?: "") + time
+    fun signData(body: String?, time: Long?): String {
+        val content = (body ?: "") + time
         val md5 = MD5(content + SECRET_KEY)
         Vog.d("加密：$content\n$md5")
         return md5

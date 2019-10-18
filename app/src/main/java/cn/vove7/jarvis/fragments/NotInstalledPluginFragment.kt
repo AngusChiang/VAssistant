@@ -8,8 +8,8 @@ import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.app.log
 import cn.vove7.common.interfaces.DownloadInfo
 import cn.vove7.common.interfaces.DownloadProgressListener
-import cn.vove7.common.netacc.ApiUrls
-import cn.vove7.common.netacc.WrapperNetHelper
+import cn.vove7.jarvis.net.ApiUrls
+import cn.vove7.jarvis.net.WrapperNetHelper
 import cn.vove7.common.utils.StorageHelper
 import cn.vove7.common.view.editor.MultiSpan
 import cn.vove7.jarvis.R

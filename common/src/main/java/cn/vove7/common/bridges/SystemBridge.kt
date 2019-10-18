@@ -37,7 +37,6 @@ import cn.vove7.common.R
 import cn.vove7.common.accessibility.AccessibilityApi
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.app.GlobalLog
-import cn.vove7.common.app.log
 import cn.vove7.common.appbus.AppBus
 import cn.vove7.common.bridges.UtilBridge.bitmap2File
 import cn.vove7.common.datamanager.DAO
@@ -46,8 +45,8 @@ import cn.vove7.common.helper.AdvanAppHelper
 import cn.vove7.common.helper.AdvanContactHelper
 import cn.vove7.common.model.RequestPermission
 import cn.vove7.common.model.ResultBox
-import cn.vove7.common.netacc.ApiUrls
-import cn.vove7.common.netacc.WrapperNetHelper
+import cn.vove7.jarvis.netacc.ApiUrls
+import cn.vove7.jarvis.netacc.WrapperNetHelper
 import cn.vove7.common.utils.*
 import cn.vove7.common.view.ScreenshotActivity
 import cn.vove7.common.view.finder.ViewFindBuilder

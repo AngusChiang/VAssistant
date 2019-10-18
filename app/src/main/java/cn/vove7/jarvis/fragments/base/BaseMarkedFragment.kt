@@ -17,8 +17,8 @@ import cn.vove7.common.datamanager.DAO
 import cn.vove7.common.datamanager.executor.entity.MarkedData
 import cn.vove7.common.datamanager.parse.DataFrom
 import cn.vove7.common.model.UserInfo
-import cn.vove7.common.netacc.ApiUrls
-import cn.vove7.common.netacc.WrapperNetHelper
+import cn.vove7.jarvis.net.ApiUrls
+import cn.vove7.jarvis.net.WrapperNetHelper
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.adapters.ListViewModel
 import cn.vove7.jarvis.adapters.SimpleListAdapter

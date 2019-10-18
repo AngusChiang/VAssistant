@@ -42,7 +42,7 @@ import cn.vove7.common.interfaces.SpeakCallback
 import cn.vove7.common.model.RequestPermission
 import cn.vove7.common.model.UserInfo
 import cn.vove7.common.model.VoiceRecogResult
-import cn.vove7.common.netacc.WrapperNetHelper
+import cn.vove7.jarvis.net.WrapperNetHelper
 import cn.vove7.common.utils.*
 import cn.vove7.common.utils.RegUtils.checkCancel
 import cn.vove7.common.utils.RegUtils.checkConfirm

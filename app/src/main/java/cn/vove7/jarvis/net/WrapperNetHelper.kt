@@ -1,4 +1,4 @@
-package cn.vove7.common.netacc
+package cn.vove7.jarvis.net
 
 import cn.vove7.common.BuildConfig
 import cn.vove7.common.accessibility.AccessibilityApi
@@ -9,13 +9,16 @@ import cn.vove7.common.datamanager.parse.model.Action
 import cn.vove7.common.datamanager.parse.model.ActionScope
 import cn.vove7.common.interfaces.DownloadInfo
 import cn.vove7.common.interfaces.DownloadProgressListener
-import cn.vove7.common.netacc.model.BaseRequestModel
-import cn.vove7.common.netacc.model.LastDateInfo
-import cn.vove7.common.netacc.model.RequestParseModel
-import cn.vove7.common.netacc.model.ResponseMessage
+import cn.vove7.common.model.UserInfo
 import cn.vove7.common.utils.LooperHelper
 import cn.vove7.common.utils.ThreadPool
+import cn.vove7.jarvis.net.model.BaseRequestModel
+import cn.vove7.jarvis.net.model.LastDateInfo
+import cn.vove7.jarvis.net.model.RequestParseModel
+import cn.vove7.jarvis.net.model.ResponseMessage
+import cn.vove7.jarvis.net.tool.SecureHelper
 import cn.vove7.vtp.log.Vog
+import cn.vove7.vtp.net.GsonHelper
 import cn.vove7.vtp.net.NetHelper
 import cn.vove7.vtp.net.WrappedRequestCallback
 import com.google.gson.reflect.TypeToken
@@ -24,13 +27,15 @@ import com.liulishuo.okdownload.DownloadTask
 import com.liulishuo.okdownload.core.breakpoint.BreakpointInfo
 import com.liulishuo.okdownload.core.cause.EndCause
 import com.liulishuo.okdownload.core.cause.ResumeFailedCause
+import okhttp3.*
 import java.io.File
 import java.lang.reflect.Type
+import java.util.concurrent.TimeUnit
 
 /**
  * # NetHelper
  *
- * @author 17719247306
+ * @author Vove7
  * 2018/9/12
  */
 
@@ -46,12 +51,32 @@ import java.lang.reflect.Type
  */
 object WrapperNetHelper {
 
+    inline fun <reified T> post(
+            url: String, model: Any? = null, requestCode: Int = -1, arg1: String? = null,
+            crossinline onsuccess: (ResponseMessage<T>) -> Unit
+    ) {
+        postJson<T>(url, model, requestCode, arg1) {
+            success { _, responseMessage ->
+                onsuccess(responseMessage)
+            }
+        }
+    }
+
     inline fun <reified T> postJson(
             url: String, model: Any? = null, requestCode: Int = -1, arg1: String? = null,
-            crossinline callback: WrappedRequestCallback<ResponseMessage<T>>.() -> Unit) {
-
-        NetHelper.postJson(url, BaseRequestModel(model, arg1), requestCode, callback = callback)
-
+            crossinline callback: WrappedRequestCallback<ResponseMessage<T>>.() -> Unit
+    ) {
+        val reqModel = BaseRequestModel(model, arg1)
+        val ts = (System.currentTimeMillis() / 1000)
+        val reqJson = GsonHelper.toJson(reqModel)
+        val sign = SecureHelper.signData(reqJson, ts)
+        val headers = mapOf(
+                "versionCode" to "${BuildConfig.VERSION_CODE}",
+                "timestamp" to ts.toString(),
+                "token" to UserInfo.getUserToken(),
+                "sign" to sign
+        )
+        NetHelper.postJsonString(url, reqJson, requestCode, headers = headers, callback = callback)
     }
 
 
@@ -151,11 +176,9 @@ object WrapperNetHelper {
         if (BuildConfig.DEBUG || !AppConfig.userExpPlan) return
         ThreadPool.runOnPool {
             LooperHelper.prepareIfNeeded()
-            postJson<Any>(ApiUrls.UPLOAD_CMD_HIS, his) {
-                success { _, b ->
-                    if (!b.isOk()) {
-                        Vog.d(b.message)
-                    }
+            post<Any>(ApiUrls.UPLOAD_CMD_HIS, his) { b ->
+                if (!b.isOk()) {
+                    Vog.d(b.message)
                 }
             }
         }
@@ -191,7 +214,7 @@ object WrapperNetHelper {
     }
 
     fun getLastInfo(back: (LastDateInfo?) -> Unit) {
-        WrapperNetHelper.postJson<LastDateInfo>(ApiUrls.GET_LAST_DATA_DATE) {
+        postJson<LastDateInfo>(ApiUrls.GET_LAST_DATA_DATE) {
             success { _, b ->
                 if (b.isOk()) {
                     back.invoke(b.data)
@@ -208,3 +231,34 @@ object WrapperNetHelper {
 
 }
 
+/**
+ * 网络post请求 内容格式为json
+ * @param url String
+ * @param model Any? 请求体
+ * @param requestCode Int
+ * @param callback WrappedRequestCallback<T>.()
+ */
+inline fun <reified T> NetHelper.postJsonString(
+        url: String, json: String? = null, requestCode: Int = 0,
+        headers: Map<String, String>? = null,
+        callback: WrappedRequestCallback<T>.() -> Unit
+): Call {
+    val client = OkHttpClient.Builder()
+            .readTimeout(timeout, TimeUnit.SECONDS).build()
+
+    val requestBody = FormBody.create(MediaType
+            .parse("application/json; charset=utf-8"), json)
+
+    Vog.d("post ($url)\n$json")
+    val request = Request.Builder().url(url)
+            .post(requestBody)
+            .apply {
+                headers?.forEach {
+                    addHeader(it.key, it.value)
+                }
+            }
+            .build()
+    val call = client.newCall(request)
+    call(url, call, requestCode, callback)
+    return call
+}

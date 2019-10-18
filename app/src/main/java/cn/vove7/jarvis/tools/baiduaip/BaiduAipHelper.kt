@@ -2,7 +2,7 @@ package cn.vove7.jarvis.tools.baiduaip
 
 import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.bridges.HttpBridge
-import cn.vove7.common.netacc.tool.SecureHelper
+import cn.vove7.jarvis.net.tool.SecureHelper
 import cn.vove7.vtp.net.GsonHelper
 import cn.vove7.common.app.AppConfig
 import cn.vove7.jarvis.tools.BaiduKey

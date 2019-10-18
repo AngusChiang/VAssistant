@@ -20,7 +20,7 @@ import cn.vove7.common.datamanager.parse.DataFrom;
 import cn.vove7.common.interfaces.Searchable;
 import cn.vove7.common.interfaces.Signable;
 import cn.vove7.common.model.UserInfo;
-import cn.vove7.common.netacc.tool.SecureHelper;
+import cn.vove7.jarvis.net.tool.SecureHelper;
 import cn.vove7.common.utils.RegUtils;
 import kotlin.text.Regex;
 

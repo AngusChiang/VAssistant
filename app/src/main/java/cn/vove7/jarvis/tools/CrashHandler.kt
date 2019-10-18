@@ -7,8 +7,8 @@ import cn.vove7.common.app.AppConfig
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.model.UserInfo
-import cn.vove7.common.netacc.ApiUrls
-import cn.vove7.common.netacc.WrapperNetHelper
+import cn.vove7.jarvis.net.ApiUrls
+import cn.vove7.jarvis.net.WrapperNetHelper
 import cn.vove7.common.utils.TextHelper
 import cn.vove7.common.utils.TextPrinter
 import cn.vove7.common.utils.formatNow

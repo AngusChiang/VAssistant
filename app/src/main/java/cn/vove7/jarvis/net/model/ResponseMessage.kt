@@ -1,4 +1,4 @@
-package cn.vove7.common.netacc.model
+package cn.vove7.jarvis.net.model
 
 import cn.vove7.common.app.AppConfig
 import cn.vove7.common.app.GlobalApp

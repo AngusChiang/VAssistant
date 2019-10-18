@@ -9,15 +9,14 @@ import android.view.LayoutInflater
 import android.view.View
 import android.widget.TextView
 import android.widget.Toast
-import cn.jpush.android.api.JPushInterface
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.app.log
 import cn.vove7.common.bridges.SystemBridge
 import cn.vove7.common.model.UserInfo
 import cn.vove7.common.model.VipPrice
-import cn.vove7.common.netacc.ApiUrls
-import cn.vove7.common.netacc.WrapperNetHelper
+import cn.vove7.jarvis.net.ApiUrls
+import cn.vove7.jarvis.net.WrapperNetHelper
 import cn.vove7.jarvis.R
 import cn.vove7.common.app.AppConfig
 import cn.vove7.jarvis.tools.openQQChat

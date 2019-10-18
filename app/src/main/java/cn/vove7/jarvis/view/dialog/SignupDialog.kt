@@ -9,9 +9,9 @@ import android.widget.ProgressBar
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.app.log
 import cn.vove7.common.model.UserInfo
-import cn.vove7.common.netacc.ApiUrls
-import cn.vove7.common.netacc.WrapperNetHelper
-import cn.vove7.common.netacc.tool.SecureHelper
+import cn.vove7.jarvis.net.ApiUrls
+import cn.vove7.jarvis.net.WrapperNetHelper
+import cn.vove7.jarvis.net.tool.SecureHelper
 import cn.vove7.common.utils.TextHelper
 import cn.vove7.common.utils.gone
 import cn.vove7.common.utils.onClick

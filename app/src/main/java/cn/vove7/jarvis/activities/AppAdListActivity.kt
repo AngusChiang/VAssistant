@@ -14,8 +14,8 @@ import cn.vove7.common.datamanager.AppAdInfo
 import cn.vove7.common.datamanager.DAO
 import cn.vove7.common.datamanager.greendao.AppAdInfoDao
 import cn.vove7.common.datamanager.parse.DataFrom
-import cn.vove7.common.netacc.ApiUrls
-import cn.vove7.common.netacc.WrapperNetHelper
+import cn.vove7.jarvis.net.ApiUrls
+import cn.vove7.jarvis.net.WrapperNetHelper
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.activities.base.OneFragmentActivity
 import cn.vove7.jarvis.adapters.ListViewModel
@@ -23,7 +23,6 @@ import cn.vove7.jarvis.adapters.SimpleListAdapter
 import cn.vove7.jarvis.fragments.SimpleListFragment
 import cn.vove7.jarvis.tools.DialogUtil
 import cn.vove7.jarvis.view.dialog.AdEditorDialog
-import cn.vove7.jarvis.view.dialog.base.BottomDialogWithText
 import cn.vove7.vtp.log.Vog
 
 /**

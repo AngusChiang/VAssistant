@@ -2,7 +2,7 @@ package cn.vove7.jarvis
 
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.app.log
-import cn.vove7.common.netacc.tool.base64
+import cn.vove7.jarvis.net.tool.base64
 import cn.vove7.vtp.net.NetHelper
 import org.junit.Test
 

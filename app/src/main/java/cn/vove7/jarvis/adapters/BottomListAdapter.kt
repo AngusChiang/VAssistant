@@ -22,7 +22,7 @@ class BottomListAdapter<Type>(val context: Context, items: List<ListViewModel<Ty
     }
 
     override fun onBindView(holder: VHolder, pos: Int, item: ListViewModel<Type>) {
-        holder.itemView.setOnClickListener { _ -> listener.onClick(null, pos, getItem(pos)) }
+        holder.itemView.setOnClickListener { listener.onClick(null, pos, getItem(pos)) }
         holder.title.text = item.title
         if (item.icon != null) {
             holder.icon.visibility = View.VISIBLE

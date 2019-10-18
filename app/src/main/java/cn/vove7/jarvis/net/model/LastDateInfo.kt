@@ -1,4 +1,4 @@
-package cn.vove7.common.netacc.model
+package cn.vove7.jarvis.net.model
 
 /**
  * Created by Administrator on 2018/10/6

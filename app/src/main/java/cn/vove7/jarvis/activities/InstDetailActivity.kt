@@ -26,8 +26,8 @@ import cn.vove7.common.datamanager.parse.model.ActionDesc
 import cn.vove7.common.datamanager.parse.statusmap.ActionNode
 import cn.vove7.common.helper.AdvanAppHelper
 import cn.vove7.common.model.UserInfo
-import cn.vove7.common.netacc.ApiUrls
-import cn.vove7.common.netacc.WrapperNetHelper
+import cn.vove7.jarvis.net.ApiUrls
+import cn.vove7.jarvis.net.WrapperNetHelper
 import cn.vove7.common.utils.RegUtils
 import cn.vove7.common.utils.TextHelper
 import cn.vove7.common.utils.ThreadPool.runOnPool
@@ -50,7 +50,6 @@ import cn.vove7.vtp.net.toJson
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.customview.customView
 import com.afollestad.materialdialogs.input.input
-import com.afollestad.materialdialogs.list.listItems
 import kotlinx.android.synthetic.main.activity_inst_detail.*
 import java.util.*
 

@@ -25,7 +25,7 @@ import cn.vove7.common.datamanager.parse.statusmap.ActionNode.NODE_SCOPE_IN_APP
 import cn.vove7.common.datamanager.parse.statusmap.Reg
 import cn.vove7.common.helper.AdvanAppHelper
 import cn.vove7.common.model.UserInfo
-import cn.vove7.common.netacc.ApiUrls
+import cn.vove7.jarvis.net.ApiUrls
 import cn.vove7.common.utils.get
 import cn.vove7.executorengine.model.ActionParseResult
 import cn.vove7.executorengine.parse.ParseEngine

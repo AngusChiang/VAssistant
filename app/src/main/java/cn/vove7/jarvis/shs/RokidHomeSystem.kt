@@ -5,7 +5,7 @@ import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.bridges.HttpBridge
 import cn.vove7.common.bridges.SettingsBridge
-import cn.vove7.common.netacc.tool.base64
+import cn.vove7.jarvis.net.tool.base64
 import cn.vove7.common.utils.orIn
 import cn.vove7.common.utils.runInCatch
 import cn.vove7.jarvis.services.MainService
