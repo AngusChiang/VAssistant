@@ -1,8 +1,8 @@
 package cn.vove7.jarvis
 
-import cn.vove7.jarvis.net.ApiUrls
-import cn.vove7.jarvis.net.WrapperNetHelper
-import cn.vove7.jarvis.net.model.LastDateInfo
+import cn.vove7.common.net.ApiUrls
+import cn.vove7.common.net.WrapperNetHelper
+import cn.vove7.common.net.model.LastDateInfo
 import cn.vove7.vtp.net.NetHelper
 import cn.vove7.vtp.net.WrappedRequestCallback
 import org.junit.Test

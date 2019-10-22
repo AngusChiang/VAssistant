@@ -12,9 +12,9 @@ import cn.vove7.common.datamanager.executor.entity.MarkedData
 import cn.vove7.common.datamanager.parse.statusmap.ActionNode
 import cn.vove7.common.helper.AdvanAppHelper
 import cn.vove7.common.model.ResultBox
-import cn.vove7.jarvis.net.ApiUrls
-import cn.vove7.jarvis.net.WrapperNetHelper
-import cn.vove7.jarvis.net.model.LastDateInfo
+import cn.vove7.common.net.ApiUrls
+import cn.vove7.common.net.WrapperNetHelper
+import cn.vove7.common.net.model.LastDateInfo
 import cn.vove7.common.utils.TextHelper
 import cn.vove7.common.utils.ThreadPool.runOnCachePool
 import cn.vove7.common.utils.ThreadPool.runOnPool

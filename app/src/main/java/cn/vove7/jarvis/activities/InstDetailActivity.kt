@@ -26,8 +26,8 @@ import cn.vove7.common.datamanager.parse.model.ActionDesc
 import cn.vove7.common.datamanager.parse.statusmap.ActionNode
 import cn.vove7.common.helper.AdvanAppHelper
 import cn.vove7.common.model.UserInfo
-import cn.vove7.jarvis.net.ApiUrls
-import cn.vove7.jarvis.net.WrapperNetHelper
+import cn.vove7.common.net.ApiUrls
+import cn.vove7.common.net.WrapperNetHelper
 import cn.vove7.common.utils.RegUtils
 import cn.vove7.common.utils.TextHelper
 import cn.vove7.common.utils.ThreadPool.runOnPool

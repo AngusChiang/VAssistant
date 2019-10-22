@@ -1,4 +1,4 @@
-package cn.vove7.jarvis.net.model
+package cn.vove7.common.net.model
 
 import cn.vove7.common.model.UserInfo
 import java.io.Serializable

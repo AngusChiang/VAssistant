@@ -11,9 +11,9 @@ import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.bridges.SystemBridge
 import cn.vove7.common.model.UserInfo
-import cn.vove7.jarvis.net.ApiUrls
-import cn.vove7.jarvis.net.WrapperNetHelper
-import cn.vove7.jarvis.net.model.LastDateInfo
+import cn.vove7.common.net.ApiUrls
+import cn.vove7.common.net.WrapperNetHelper
+import cn.vove7.common.net.model.LastDateInfo
 import cn.vove7.common.utils.newDoc
 import cn.vove7.jarvis.BuildConfig
 import cn.vove7.jarvis.R

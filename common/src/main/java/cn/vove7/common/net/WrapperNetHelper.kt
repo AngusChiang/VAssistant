@@ -1,4 +1,4 @@
-package cn.vove7.jarvis.net
+package cn.vove7.common.net
 
 import cn.vove7.common.BuildConfig
 import cn.vove7.common.accessibility.AccessibilityApi
@@ -10,13 +10,13 @@ import cn.vove7.common.datamanager.parse.model.ActionScope
 import cn.vove7.common.interfaces.DownloadInfo
 import cn.vove7.common.interfaces.DownloadProgressListener
 import cn.vove7.common.model.UserInfo
+import cn.vove7.common.net.model.BaseRequestModel
+import cn.vove7.common.net.model.LastDateInfo
+import cn.vove7.common.net.model.RequestParseModel
+import cn.vove7.common.net.model.ResponseMessage
+import cn.vove7.common.net.tool.SecureHelper
 import cn.vove7.common.utils.LooperHelper
 import cn.vove7.common.utils.ThreadPool
-import cn.vove7.jarvis.net.model.BaseRequestModel
-import cn.vove7.jarvis.net.model.LastDateInfo
-import cn.vove7.jarvis.net.model.RequestParseModel
-import cn.vove7.jarvis.net.model.ResponseMessage
-import cn.vove7.jarvis.net.tool.SecureHelper
 import cn.vove7.vtp.log.Vog
 import cn.vove7.vtp.net.GsonHelper
 import cn.vove7.vtp.net.NetHelper
@@ -73,7 +73,7 @@ object WrapperNetHelper {
         val headers = mapOf(
                 "versionCode" to "${BuildConfig.VERSION_CODE}",
                 "timestamp" to ts.toString(),
-                "token" to UserInfo.getUserToken(),
+                "token" to (UserInfo.getUserToken() ?: ""),
                 "sign" to sign
         )
         NetHelper.postJsonString(url, reqJson, requestCode, headers = headers, callback = callback)

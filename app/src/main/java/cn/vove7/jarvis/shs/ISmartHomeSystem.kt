@@ -5,6 +5,7 @@ import cn.vove7.common.app.AppConfig
 import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.bridges.SettingsBridge
 import cn.vove7.jarvis.BuildConfig
+import cn.vove7.paramregex.toParamRegex
 import cn.vove7.vtp.net.GsonHelper
 
 /**
@@ -22,7 +23,7 @@ abstract class ISmartHomeSystem {
     abstract fun isSupport(command: String): Boolean
     abstract fun doAction(command: String)
 
-    private val userCommands = mutableSetOf<String>()
+    internal val userCommands = mutableSetOf<String>()
 
     val configs: MutableMap<String, String> = mutableMapOf()
 
@@ -41,8 +42,10 @@ abstract class ISmartHomeSystem {
     abstract fun summary(): String
 
 
-    protected fun inUserCommand(command: String): Boolean {
-        return command in userCommands
+    protected open fun inUserCommand(command: String, vararg extras: Any): Boolean {
+        return userCommands.any {
+            it.toParamRegex().match(command) != null
+        }
     }
 
     //保存配置到指令存储

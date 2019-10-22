@@ -12,9 +12,9 @@ import cn.vove7.bottomdialog.extension.awesomeHeader
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.bridges.SystemBridge
-import cn.vove7.jarvis.net.ApiUrls
-import cn.vove7.jarvis.net.WrapperNetHelper
-import cn.vove7.jarvis.net.model.UserFeedback
+import cn.vove7.common.net.ApiUrls
+import cn.vove7.common.net.WrapperNetHelper
+import cn.vove7.common.net.model.UserFeedback
 import cn.vove7.common.view.editor.MultiSpan
 import cn.vove7.jarvis.BuildConfig
 import cn.vove7.jarvis.R

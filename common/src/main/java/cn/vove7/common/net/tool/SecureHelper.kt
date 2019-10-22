@@ -1,4 +1,4 @@
-package cn.vove7.jarvis.net.tool
+package cn.vove7.common.net.tool
 
 import android.util.Base64
 import cn.vove7.common.app.GlobalLog

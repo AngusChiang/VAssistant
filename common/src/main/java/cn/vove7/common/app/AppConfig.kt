@@ -13,8 +13,8 @@ import cn.vove7.common.BuildConfig
 import cn.vove7.common.R
 import cn.vove7.common.bridges.SystemBridge
 import cn.vove7.common.model.UserInfo
-import cn.vove7.jarvis.netacc.ApiUrls
-import cn.vove7.jarvis.netacc.WrapperNetHelper
+import cn.vove7.common.net.ApiUrls
+import cn.vove7.common.net.WrapperNetHelper
 import cn.vove7.common.utils.StorageHelper
 import cn.vove7.common.utils.ThreadPool.runOnCachePool
 import cn.vove7.common.utils.ThreadPool.runOnPool

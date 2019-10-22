@@ -472,7 +472,7 @@ fun Activity.finishAndRemoveTaskCompat() {
 }
 
 
-infix fun Array<String>.orIn(s: String): Boolean {
+infix fun Array<String>.anyIn(s: String): Boolean {
     forEach {
         if (it in s) return true
     }

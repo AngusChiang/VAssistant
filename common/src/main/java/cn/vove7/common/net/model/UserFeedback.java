@@ -1,4 +1,4 @@
-package cn.vove7.jarvis.net.model;
+package cn.vove7.common.net.model;
 
 /**
  * Created by Administrator on 9/28/2018

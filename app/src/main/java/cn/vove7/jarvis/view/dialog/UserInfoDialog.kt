@@ -1,9 +1,6 @@
 package cn.vove7.jarvis.view.dialog
 
 import android.app.Activity
-import android.content.ClipData
-import android.content.ClipboardManager
-import android.content.Context
 import android.os.Handler
 import android.view.LayoutInflater
 import android.view.View
@@ -15,8 +12,8 @@ import cn.vove7.common.app.log
 import cn.vove7.common.bridges.SystemBridge
 import cn.vove7.common.model.UserInfo
 import cn.vove7.common.model.VipPrice
-import cn.vove7.jarvis.net.ApiUrls
-import cn.vove7.jarvis.net.WrapperNetHelper
+import cn.vove7.common.net.ApiUrls
+import cn.vove7.common.net.WrapperNetHelper
 import cn.vove7.jarvis.R
 import cn.vove7.common.app.AppConfig
 import cn.vove7.jarvis.tools.openQQChat

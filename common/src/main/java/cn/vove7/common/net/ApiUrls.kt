@@ -1,4 +1,4 @@
-package cn.vove7.jarvis.net
+package cn.vove7.common.net
 
 /**
  * # ApiUrls
