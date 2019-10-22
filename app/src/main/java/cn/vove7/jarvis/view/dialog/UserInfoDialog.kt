@@ -177,10 +177,6 @@ class UserInfoDialog(val context: Activity, val onUpdate: () -> Unit) {
         MaterialDialog(context).title(R.string.text_purchase_recharge_code)
                 .customView(view = cView, scrollable = true)
                 .positiveButton(text = "支付宝") {
-                    val cs = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-                    cs.primaryClip = ClipData.newPlainText("", UserInfo.getEmail())
-                    GlobalApp.toastInfo(R.string.text_email_copy_to_clip, Toast.LENGTH_LONG)
-
                     PurchaseHelper.openAliPay(context) { b, m ->
                         if (!b) GlobalApp.toastInfo(m)
                     }

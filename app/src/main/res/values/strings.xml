@@ -172,7 +172,7 @@
     <string name="text_purchase_recharge_code">Purchase Recharge code</string>
     <string name="text_purchase_recharge_code_msg" translatable="false">
         1.联系qq获取（推荐）\n
-        2.通过支付宝转账下方指定金额，在备注填写你的邮箱，不久你会收到含有充值码的邮件(很久未收到邮件，请联系QQ)\n
+        2.通过支付宝转账下方指定金额，成功后选择[联系商家]，我会及时回复。(若很久未回复，请联系QQ)\n
         3.点击下方[使用充值码]继续操作即可。\n
         另外，如果你可以为VOSP做出贡献，可成为永久高级会员。
     </string>
