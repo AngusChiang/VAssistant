@@ -262,9 +262,9 @@ class RokidHomeSystem : ISmartHomeSystem() {
                 , "播放音乐" to true
                 , "暂停播放" to true
                 , "继续播放" to true
-                , "换一首" to false
-                , "上一首" to false
-                , "下一首" to false
+                , "换一首" to true
+                , "上一首" to true
+                , "下一首" to true
                 , "我想听小相思" to true
                 , "餐厅空调制冷模式" to true
                 , "打开浪漫模式" to true
