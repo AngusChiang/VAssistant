@@ -6,7 +6,7 @@ import cn.vove7.jarvis.speech.baiduspeech.recognition.util.PidBuilder
 import com.baidu.speech.asr.SpeechConstant
 import java.util.*
 
-class OnlineRecogParams(context: Context) : CommonRecogParams(context) {
+class OnlineRecogParams(context: Context) : CommonRecogParams() {
 
     init {
         stringParams.addAll(Arrays.asList(

@@ -37,7 +37,6 @@ class RecogWakeupListener(private val handler: Handler) : SimpleWakeupListener()
         else
             GlobalApp.toastError("语音唤醒错误")
         SpHelper(GlobalApp.APP).set(R.string.key_open_voice_wakeup, false)
-        AppConfig.reload()
     }
 
     override fun onStop() {
