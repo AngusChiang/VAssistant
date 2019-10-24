@@ -31,8 +31,8 @@ import es.dmoral.toasty.Toasty
  */
 
 open class GlobalApp : RePluginApplication() {
+
     override fun onCreate() {
-        APP = this
         launchTime = System.currentTimeMillis()
         super.onCreate()
         AppInfo.attachApplication(this)
@@ -49,6 +49,7 @@ open class GlobalApp : RePluginApplication() {
                 .setTextSize(14)
                 .apply() // required
     }
+
 
 
     companion object {
@@ -118,6 +119,7 @@ open class GlobalApp : RePluginApplication() {
         }
 
     override fun attachBaseContext(base: Context?) {
+        APP = this
         super.attachBaseContext(base)
         try {
             MultiDex.install(base)

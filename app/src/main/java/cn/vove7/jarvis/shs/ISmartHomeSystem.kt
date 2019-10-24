@@ -71,8 +71,8 @@ abstract class ISmartHomeSystem {
     }
 
     companion object {
-        fun load(): ISmartHomeSystem? {
-            return when (AppConfig.homeSystem) {
+        fun load(type: Int?): ISmartHomeSystem? {
+            return when (type) {
                 0 -> RokidHomeSystem()
                 else -> null
             }

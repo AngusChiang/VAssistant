@@ -1,9 +1,12 @@
 package cn.vove7.jarvis
 
+import android.content.ContentProvider
+import android.content.ContentValues
 import android.content.Context
 import android.content.Intent
+import android.database.Cursor
+import android.net.Uri
 import android.os.Build
-import android.os.Handler
 import cn.jpush.android.api.JPushInterface
 import cn.vove7.common.activities.RunnableActivity.Companion.runInShellActivity
 import cn.vove7.common.app.AppConfig
@@ -55,17 +58,6 @@ class App : GlobalApp() {
                 setAssistantAppAuto()
             }
         }
-        //延时初始化
-        runOnNewHandlerThread(name = "延时启动", delay = 2000) {
-            JPushInterface.setDebugMode(BuildConfig.DEBUG)
-            JPushInterface.init(this)
-            ShortcutUtil.initShortcut()
-            AdvanAppHelper.getPkgList()
-            startBroadcastReceivers()
-            RePluginManager().launchWithApp()
-            initUm()
-        }
-
     }
 
     @Synchronized
@@ -75,34 +67,11 @@ class App : GlobalApp() {
         }
     }
 
-    private fun startBroadcastReceivers() {
-        runOnNewHandlerThread("startBroadcastReceivers", delay = 2000) {
-            PowerEventReceiver.start()
-            ScreenStatusListener.start()
-            AppInstallReceiver.start()
-            UtilEventReceiver.start()
-//            BTConnectListener.start()
-        }
-    }
-
     private fun stopBroadcastReceivers() {
         PowerEventReceiver.stop()
         ScreenStatusListener.stop()
         AppInstallReceiver.stop()
         UtilEventReceiver.stop()
-    }
-
-    override fun attachBaseContext(base: Context?) {
-        //fix 4.x
-        if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.LOLLIPOP) {
-            val y = RePluginHostConfig.ACTIVITY_PIT_COUNT_TASK
-        }
-        super.attachBaseContext(base)
-    }
-
-    private fun initUm() {
-        UMConfigure.init(this, BuildConfig.UM_KEY, "default", UMConfigure.DEVICE_TYPE_PHONE, "")
-        UMConfigure.setLogEnabled(BuildConfig.DEBUG)
     }
 
     override fun onTerminate() {
@@ -144,4 +113,41 @@ class App : GlobalApp() {
         }
     }
 
+}
+
+class InitCp : ContentProvider() {
+
+    override fun onCreate(): Boolean {
+        runOnNewHandlerThread(name = "延时启动", delay = 2000) {
+            JPushInterface.setDebugMode(BuildConfig.DEBUG)
+            JPushInterface.init(context)
+            ShortcutUtil.initShortcut()
+            AdvanAppHelper.getPkgList()
+            startBroadcastReceivers()
+            RePluginManager().launchWithApp()
+            initUm()
+        }
+        return true
+    }
+
+    private fun startBroadcastReceivers() {
+        runOnNewHandlerThread("startBroadcastReceivers", delay = 2000) {
+            PowerEventReceiver.start()
+            ScreenStatusListener.start()
+            AppInstallReceiver.start()
+            UtilEventReceiver.start()
+//            BTConnectListener.start()
+        }
+    }
+
+    private fun initUm() {
+        UMConfigure.init(GlobalApp.APP, BuildConfig.UM_KEY, "default", UMConfigure.DEVICE_TYPE_PHONE, "")
+        UMConfigure.setLogEnabled(BuildConfig.DEBUG)
+    }
+
+    override fun insert(uri: Uri, values: ContentValues?): Uri? = null
+    override fun query(uri: Uri, projection: Array<String>?, selection: String?, selectionArgs: Array<String>?, sortOrder: String?): Cursor? = null
+    override fun update(uri: Uri, values: ContentValues?, selection: String?, selectionArgs: Array<String>?): Int = 0
+    override fun delete(uri: Uri, selection: String?, selectionArgs: Array<String>?): Int = 0
+    override fun getType(uri: Uri): String? = null
 }

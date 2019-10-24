@@ -71,7 +71,9 @@ import cn.vove7.jarvis.view.dialog.MultiChoiceDialog
 import cn.vove7.jarvis.view.dialog.OnMultiSelectListener
 import cn.vove7.jarvis.view.dialog.OnSelectListener
 import cn.vove7.jarvis.view.dialog.SingleChoiceDialog
-import cn.vove7.jarvis.view.floatwindows.FloatyPanel
+import cn.vove7.jarvis.view.floatwindows.DefaultPanel
+import cn.vove7.jarvis.view.floatwindows.IFloatyPanel
+import cn.vove7.jarvis.view.floatwindows.OldFloatPanel
 import cn.vove7.jarvis.view.statusbar.ExecuteAnimation
 import cn.vove7.jarvis.view.statusbar.ListeningAnimation
 import cn.vove7.jarvis.view.statusbar.ParseAnimation
@@ -93,7 +95,7 @@ class MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
 
     val context = GlobalApp.APP
 
-    private lateinit var floatyPanel: FloatyPanel
+    private lateinit var floatyPanel: IFloatyPanel
 
     //正在解析指令
     private var parsingCommand = false
@@ -135,15 +137,23 @@ class MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
 
     fun init() {
         AppBus.reg(this)
-        floatyPanel = FloatyPanel()
+        loadFloatPanel()
         loadChatSystem()
         loadSpeechService()
         speechEngineLoaded = true
         loadHomeSystem()
     }
 
-    fun loadHomeSystem() {
-        homeControlSystem = ISmartHomeSystem.load()
+    fun loadFloatPanel(type: Int = AppConfig.panelStyle) {
+        floatyPanel = when (type) {
+            0 -> DefaultPanel()
+            1 -> OldFloatPanel()
+            else -> DefaultPanel()
+        }
+    }
+
+    fun loadHomeSystem(type: Int? = AppConfig.homeSystem) {
+        homeControlSystem = ISmartHomeSystem.load(type)
         runOnNewHandlerThread {
             homeControlSystem?.init()
         }
@@ -189,7 +199,6 @@ class MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
      * 加载对话系统
      */
     fun loadChatSystem(open: Boolean = AppConfig.openChatSystem) {
-//        val type = GlobalApp.APP.resources.getStringArray(R.array.list_chat_system)
 
         if (!open) return
 //        chatSystem = when (AppConfig.chatSystem) {
@@ -392,7 +401,7 @@ class MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
     }
 
     override fun removeFloat() {
-        floatyPanel.hide()
+        floatyPanel.hideImmediately()
     }
 
     private fun onExecuteStart(tag: String) {//
@@ -1220,6 +1229,10 @@ class MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
                 isMusicFocus = false
             }
         }
+    }
+
+    fun showPanelSettings() {
+        floatyPanel.showSettings()
     }
 
 }

@@ -92,8 +92,7 @@ class InstSettingListAdapter(val context: Context, settingsName: String, onFaile
                     SingleChoiceItem(title = s.title, summary = s.summary, callback = { _, d ->
                         settingsBridge.set(key, (d as Pair<*, *>).second)
                         return@SingleChoiceItem true
-                    }, defaultValue = {
-                        val p = settingsBridge.getString(key)
+                    }, defaultValue = settingsBridge.getString(key).let { p ->
                         when {
                             p != null -> s.items.indexOf(p)
                             s.defaultValue == null -> 0

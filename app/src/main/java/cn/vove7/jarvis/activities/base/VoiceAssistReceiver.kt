@@ -44,8 +44,7 @@ class VoiceAssistActivity : Activity() {
                 MainService.switchRecog()
             }
             "android.intent.action.VOICE_ASSIST" -> {//一加长按HOME键
-                val arr = resources.getStringArray(R.array.list_home_funs)
-                when (arr.indexOf(AppConfig.homeFun)) {
+                when (AppConfig.homeFun) {
                     0 -> startActivity(ScreenAssistActivity.createIntent())
                     1 -> MainService.switchRecog()
                     else -> startActivity(ScreenAssistActivity.createIntent())

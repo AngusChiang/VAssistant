@@ -12,7 +12,6 @@ import com.baidu.speech.asr.SpeechConstant
 import com.qihoo360.replugin.utils.AssetsUtils
 import org.json.JSONObject
 import java.io.File
-import java.lang.Thread.sleep
 
 /**
  * 初始化 提供 EventManagerFactory需要的Context和EventListener

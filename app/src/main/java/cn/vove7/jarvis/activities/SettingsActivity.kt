@@ -12,7 +12,6 @@ import android.view.View
 import android.widget.TextView
 import cn.vove7.common.accessibility.AccessibilityApi
 import cn.vove7.common.app.AppConfig
-import cn.vove7.common.app.AppPermission
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.appbus.AppBus
@@ -35,7 +34,6 @@ import com.afollestad.materialdialogs.callbacks.onCancel
 import com.afollestad.materialdialogs.callbacks.onDismiss
 import com.afollestad.materialdialogs.customview.customView
 import kotlinx.android.synthetic.main.activity_expandable_settings.*
-import java.util.*
 
 /**
  *
@@ -133,7 +131,7 @@ class SettingsActivity : ReturnableActivity() {
                             summary = "在非充电状态下，为了节省电量，在无操作一段时间后将自动关闭唤醒\n默认10分钟",
                             keyId = R.string.key_auto_sleep_wakeup_duration,
                             entityArrId = R.array.list_auto_sleep_duration,
-                            defaultValue = { 0 }
+                            defaultValue = 0
                     ) { _, _ ->
                         if (AppConfig.voiceWakeup) {
                             AppBus.post(AppBus.ACTION_STOP_VOICE_WAKEUP_WITHOUT_NOTIFY)
@@ -236,7 +234,7 @@ class SettingsActivity : ReturnableActivity() {
                             title = "自定义按键",
                             summary = AppConfig.wakeupKeys.let {
                                 if (it.isEmpty()) "未设置"
-                                else Arrays.toString(it)
+                                else it.contentToString()
                             }
                     ) {
                         if (AccessibilityApi.isBaseServiceOn) {
@@ -298,8 +296,7 @@ class SettingsActivity : ReturnableActivity() {
                             R.string.text_sound_model,
                             summary = "在线声音模型",
                             keyId = R.string.key_voice_syn_model,
-                            defaultValue =
-                            { 0 },
+                            defaultValue = 0,
                             entityArrId = R.array.voice_model_entities
                     ) { h, i ->
                         AppBus.postDelay(AppBus.ACTION_RELOAD_SYN_CONF, 500)
@@ -320,7 +317,7 @@ class SettingsActivity : ReturnableActivity() {
                             summary = "选择音量跟随\n可能重启App生效",
                             keyId = R.string.key_stream_of_syn_output,
                             entityArrId = R.array.list_stream_syn_output,
-                            defaultValue = { 0 }
+                            defaultValue = 0
                     ) { _, b ->
                         AppBus.postDelay(AppBus.ACTION_RELOAD_SYN_CONF, 500)
 //                        MainService.instance?.speechSynService?.reloadStreamType()
@@ -331,15 +328,22 @@ class SettingsActivity : ReturnableActivity() {
                     }
             )),
             SettingGroupItem(R.color.google_red, titleS = "悬浮面板", childItems = listOf(
-                    SingleChoiceItem(title = "动画", entityArrId = R.array.list_fp_animation, keyId = R.string.key_fp_animation)
+                    SingleChoiceItem(
+                            title = "样式",
+                            keyId = R.string.key_panel_style,
+                            entityArrId = R.array.list_panel_style
+                    ) { _, p ->
+                        p ?: return@SingleChoiceItem false
+                        if (p.first != AppConfig.panelStyle) {
+                            MainService.instance?.loadFloatPanel(p.first)
+                        }
+                        true
+                    },
+                    IntentItem(title = "面板设置") {
+                        MainService.instance?.showPanelSettings()
+                    }
+//                    SingleChoiceItem(title = "动画", entityArrId = R.array.list_fp_animation, keyId = R.string.key_fp_animation)
             )),
-//            SettingGroupItem(R.color.lime_600, titleS = "语音面板", childItems = listOf(
-//                    SingleChoiceItem(title = "依靠方向", keyId = R.string.key_float_voice_align,
-//                            entityArrId = R.array.list_float_voice_align) { _, b ->
-//                        MainService.instance?.toastAlign = (b as Pair<*, *>).first as Int
-//                        return@SingleChoiceItem true
-//                    }
-//            )),
             SettingGroupItem(R.color.lime_600, titleS = "启动选项", childItems = listOf(
                     CheckBoxItem(
                             title = "自动开启无障碍服务",
@@ -361,9 +365,9 @@ class SettingsActivity : ReturnableActivity() {
                             defaultValue = AppConfig.autoSetAssistantApp
                     )
             )),
-                    SettingGroupItem(R.color.lime_600, titleId = R.string.text_other, childItems = listOf(
+            SettingGroupItem(R.color.lime_600, titleId = R.string.text_other, childItems = listOf(
                     SingleChoiceItem(title = "翻译主语言", entityArrId = R.array.list_translate_languages,
-                            keyId = R.string.key_translate_languages),
+                            keyId = R.string.key_translate_languages, defaultValue = 0),
                     CheckBoxItem(title = "以兼容模式启动应用", summary = "某些机型在外部无法打开其他软件，请尝试开启",
                             keyId = R.string.key_open_app_compat, defaultValue = false
                     ),

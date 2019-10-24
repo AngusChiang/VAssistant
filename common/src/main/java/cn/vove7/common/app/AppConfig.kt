@@ -48,6 +48,7 @@ import java.util.*
 object AppConfig : BaseConfig {
     //key... value
 
+    val panelStyle: Int by noCacheKey(0, R.string.key_panel_style)
     var openAppCompat by noCacheKey(false, keyId = R.string.key_open_app_compat)
     var speechEngineType: Int by noCacheKey(0, keyId = R.string.key_speech_engine_type)
 
@@ -59,8 +60,8 @@ object AppConfig : BaseConfig {
 
     var wakeupKeys by smartKey(intArrayOf())
 
-    var voiceControlDialog by noCacheKey(true, keyId = R.string.key_voice_control_dialog)
-    var adWaitSecs by noCacheKey(17, keyId = R.string.key_ad_wait_secs)
+    val voiceControlDialog by noCacheKey(true, keyId = R.string.key_voice_control_dialog)
+    val adWaitSecs by noCacheKey(17, keyId = R.string.key_ad_wait_secs)
 
     //语音唤醒
     var voiceWakeup by noCacheKey(false, keyId = R.string.key_open_voice_wakeup)
@@ -91,7 +92,12 @@ object AppConfig : BaseConfig {
 //    var volumeWakeUpWhenScreenOff by noCacheKey(true, keyId = R.string.key_volume_wakeup_when_screen_off)
 
     //    var onlyCloudServiceParse = false //云服务解析
-    var synStreamIndex: Int = 0//合成输出通道 对应 R.array.list_stream_syn_output
+    val synStreamIndex: Int
+        //合成输出通道 对应 R.array.list_stream_syn_output
+        get() = getSingleChoicePosition(
+                R.string.key_stream_of_syn_output,
+                R.array.list_stream_syn_output, 0
+        )
 
     //音量长按延迟
     var volumeKeyDelayUp by noCacheKey(400, keyId = R.string.key_long_key_press_delay)
@@ -109,9 +115,26 @@ object AppConfig : BaseConfig {
     //语音识别等待时长 s
     var recogWaitDurationMillis by noCacheKey(1000, keyId = R.string.key_recog_wait_duration)
 
-    var autoSleepWakeupMillis: Long = 10 * 60 * 1000
+    val autoSleepWakeupMillis: Long
+        get() {
+            val oneMinute: Long = 60 * 1000
+            return when (getSingleChoicePosition(R.string.key_auto_sleep_wakeup_duration, R.array.list_auto_sleep_duration)) {
+                0 -> oneMinute
+                1 -> oneMinute * 5
+                2 -> oneMinute * 10
+                3 -> oneMinute / 30
+                4 -> -1 //不休眠
+                else -> 10 * oneMinute
+            }.also {
+                Vog.d("reload ---> autoSleepWakeupMillis = $it")
+            }
+        }
 
-    var chatSystem: String = ""
+    val chatSystem: Int
+        get() {
+            val i = getSingleChoicePosition(R.string.key_chat_system_type, R.array.list_chat_system)
+            return (if (!UserInfo.isVip()) 0 else i).also { Vog.d("reload ---> chatSystem $it") }
+        }
 
     var homeSystem: Int? by smartKey(null, R.string.key_home_system)
     var homeSystemConfig: String? by smartKey(null, keyId = R.string.key_home_system_config, encrypt = true)
@@ -119,9 +142,11 @@ object AppConfig : BaseConfig {
     var homeSystemUserCommand: String? by smartKey(null, keyId = R.string.key_home_system_user_command, encrypt = true)
 
 
-    var fpAnimation: String = ""
+    val fpAnimation: Int
+        get() = getSingleChoicePosition(R.string.key_fp_animation, R.array.list_fp_animation, 0)
 
-    var homeFun: String = "" //长按HOME键功能
+    val homeFun: Int //长按HOME键功能
+        get() = getSingleChoicePosition(R.string.key_home_fun, R.array.list_home_funs)
 
     //用户唤醒词
     var userWakeupWord by noCacheKey("", R.string.key_user_wakeup_word)
@@ -142,7 +167,14 @@ object AppConfig : BaseConfig {
     //通知唤醒状态/麦克风
     var notifyCloseMicro by noCacheKey(true, keyId = R.string.key_close_wakeup_notification)
 
-    var translateLang = "auto"//翻译主语言
+    val translateLang: String
+        //翻译主语言
+        get() {
+            val i = getSingleChoicePosition(R.string.key_translate_languages, R.array.list_translate_languages, 0)
+            return arrayOf("auto", "zh", "en", "yue", "wyw", "jp", "kor", "fra", "spa", "th", "ara", "ru",
+                    "pt", "de", "it", "el", "nl", "pl", "bul", "est", "dan", "fin", "cs", "rom", "slo",
+                    "swe", "hu", "cht", "vie")[i]
+        }
 
     val voiceRecogEffect by noCacheKey(false, keyId = R.string.key_voice_recog_feedback)
 
@@ -171,7 +203,11 @@ object AppConfig : BaseConfig {
     //长语音 连续命令
     var lastingVoiceCommand by noCacheKey(false, keyId = R.string.key_lasting_voice_command)
 
-    var listeningToastAlignDirection = 0//对齐方向
+    val listeningToastAlignDirection
+        //对齐方向
+        get() = getSingleChoicePosition(R.string.key_float_voice_align, R.array.list_float_voice_align, 0).also {
+            Vog.d("悬浮依靠方向 $it")
+        }
 
     var autoCheckPluginUpdate by noCacheKey(true, keyId = R.string.key_auto_check_plugin_update)
 
@@ -276,7 +312,6 @@ object AppConfig : BaseConfig {
         } else {
             Vog.d("init ---> not login")
         }
-        reload()
     }
 
     fun login(userInfo: UserInfo) {
@@ -327,74 +362,13 @@ object AppConfig : BaseConfig {
         return true
     }
 
-
-    /**
-     * 不规则配置：单选框
-     */
-    fun reload() {
-
-        synStreamIndex = sp.getString(R.string.key_stream_of_syn_output).let {
-            Vog.d("reload ---> $it")
-            if (it == null) 0
-            else {
-                var i = GlobalApp.APP.resources.getStringArray(R.array.list_stream_syn_output).indexOf(it)
-                if (i < 0) i = 0
-                i
-            }
+    //适配单选 存储String/Int
+    private fun getSingleChoicePosition(keyId: Int, entityId: Int, def: Int = -1): Int {
+        return try {
+            return GlobalApp.APP.resources.getStringArray(entityId).indexOf(sp.getString(keyId))
+        } catch (e: ClassCastException) {
+            settings.getInt(context.getString(keyId), def)
         }
-
-        chatSystem = sp.getString(R.string.key_chat_system_type).let {
-            val i = GlobalApp.APP.resources.getStringArray(R.array.list_chat_system)
-            if (!UserInfo.isVip()) i[0] else it ?: i[0]
-        }.also { Vog.d("reload ---> chatSystem $it") }
-
-        fpAnimation = sp.getString(R.string.key_fp_animation)
-            ?: GlobalApp.APP.resources.getStringArray(R.array.list_fp_animation)[0]
-
-
-        homeFun = sp.getString(R.string.key_home_fun)
-            ?: GlobalApp.APP.resources.getStringArray(R.array.list_home_funs)[0]
-
-        autoSleepWakeupMillis = sp.getString(R.string.key_auto_sleep_wakeup_duration).let {
-            if (it == null) autoSleepWakeupMillis
-            else {
-                val oneMinute: Long = 60 * 1000
-                when (GlobalApp.APP.resources.getStringArray(R.array.list_auto_sleep_duration).indexOf(it)) {
-                    0 -> oneMinute
-                    1 -> oneMinute * 5
-                    2 -> oneMinute * 10
-                    3 -> oneMinute / 30
-                    4 -> -1 //不休眠
-                    else -> autoSleepWakeupMillis
-                }
-            }
-        }.also {
-            Vog.d("reload ---> autoSleepWakeupMillis = $it")
-        }
-
-        listeningToastAlignDirection = sp.getString(R.string.key_float_voice_align).let {
-            if (it == null)
-                0
-            else {
-                val i = GlobalApp.APP.resources.getStringArray(R.array.list_float_voice_align).indexOf(it)
-                if (i < 0) 0
-                else i
-            }
-        }.also {
-            Vog.d("悬浮依靠方向 $it")
-        }
-
-        translateLang = sp.getString(R.string.key_translate_languages)?.let {
-            val i = GlobalApp.APP.resources.getStringArray(R.array.list_translate_languages).indexOf(it)
-            if (i == -1) translateLang
-            arrayOf("auto", "zh", "en", "yue", "wyw", "jp", "kor", "fra", "spa", "th", "ara", "ru",
-                    "pt", "de", "it", "el", "nl", "pl", "bul", "est", "dan", "fin", "cs", "rom", "slo",
-                    "swe", "hu", "cht", "vie")[i]
-        } ?: translateLang
-        sp.getInt(R.string.key_ad_wait_secs).also {
-            adWaitSecs = if (it == -1) 17 else it
-        }
-
     }
 
     val sp: SpHelper by lazy { SpHelper(GlobalApp.APP) }

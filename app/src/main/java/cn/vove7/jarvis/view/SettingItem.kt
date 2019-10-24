@@ -113,6 +113,9 @@ open class SettingChildItem(
     }
 
     val key: String? get() = keyId?.let { GlobalApp.getString(it) }
+
+    val choiceItems
+        get() = entityArrId?.let { GlobalApp.APP.resources.getStringArray(it).toList() } ?: items!!
 }
 
 //val reloadConfig: CallbackOnSet = { _, _ ->
@@ -155,12 +158,12 @@ class SingleChoiceItem(
         title: String? = null,
         summary: String? = null,
         keyId: Int? = null,
-        defaultValue: (() -> Int?) = { 0 },//pos
+        defaultValue: Int = -1,//pos
         @ArrayRes entityArrId: Int? = null,
         items: List<String>? = null,
         allowClear: Boolean = false,
-        callback: CallbackOnSet<Pair<Int?, String?>>? = null
-) : SettingChildItem(titleId, title, summary, TYPE_SINGLE, keyId, defaultValue,
+        callback: CallbackOnSet<Pair<Int, String>?>? = null
+) : SettingChildItem(titleId, title, summary, TYPE_SINGLE, keyId, { defaultValue },
         entityArrId = entityArrId, callback = callback, items = items, allowClear = allowClear)
 
 val storeIndexOnSingleChoiceItem: CallbackOnSet<Pair<Int, String>> = { io, it ->

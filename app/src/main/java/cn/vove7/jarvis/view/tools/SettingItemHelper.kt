@@ -152,15 +152,6 @@ class SettingItemHelper(
     }
 
     /**
-     * 通知AppConfig 加载不规则类型
-     */
-    private fun loadConfigInCacheThread() {
-        ThreadPool.runOnCachePool {
-            AppConfig.reload()
-        }
-    }
-
-    /**
      * @param lis View.OnClickListener
      */
     fun setBasic(lis: OnClick? = null) {
@@ -208,23 +199,25 @@ class SettingItemHelper(
      * 支持key 保存String 和 index
      * @return Int
      */
-    private fun getInitPos(): Int {
+    private fun getInitPosAndInitSummary(): Int {
         val item = settingItem
         val default = item.defaultValue.invoke() as Int? ?: -1
         if (default >= 0) {
-            item.summary = item.items?.get(default)
+            item.summary = item.choiceItems[default]
         }
         val key = item.key
         key ?: return default
         if (AppConfig.settings.contains(key)) {
-            val entity = context.resources.getStringArray(item.entityArrId!!)
+            val entity = item.choiceItems
             return try {
                 val v = AppConfig.settings.getString(key)
                 item.summary = v
                 entity.indexOf(v)
             } catch (e: Exception) {//保存值为int
-                val index = AppConfig.settings.getInt(key, 0)
-                item.summary = entity[index]
+                val index = AppConfig.settings.getInt(key, -1)
+                if (index >= 0) {
+                    item.summary = entity[index]
+                }
                 index
             }
         }
@@ -239,44 +232,45 @@ class SettingItemHelper(
 
         val ds = item.summary
         val items =
-            if (item.keyId != null) {
-                if (item.entityArrId != null)
-                    context.resources.getStringArray(item.entityArrId).asList()
-                else item.items!!
-            } else item.items!!
+            if (item.keyId != null && item.entityArrId != null)
+                context.resources.getStringArray(item.entityArrId).asList()
+            else item.items!!
 
-        items.getOrNull(getInitPos())?.also {
-            item.summary = it
-        }
+        var initp = getInitPosAndInitSummary()
 
-        fun notifyData(index: Int?, text: String?) {
-            if ((item.callback as CallbackOnSet<Pair<Int?, String?>>?)?.invoke(ItemOperation(this), Pair(index, text)) != false) {
+        fun notifyData(pair: Pair<Int, String>?) {
+            if ((item.callback as CallbackOnSet<Pair<Int, String>?>?)?.invoke(ItemOperation(this), pair) != false) {
                 if (item.keyId != null) {
-                    AppConfig.set(item.keyId, text)
-                    loadConfigInCacheThread()
+                    try {
+                        AppConfig.set(item.keyId, pair?.first)
+                    } catch (e: Exception) {
+                        val key = item.key!!
+                        AppConfig.settings.remove(key)
+                        AppConfig.set(key, pair?.first)
+                    }
                 }
-                item.summary = text ?: ds
+                item.summary = pair?.second ?: ds
                 setBasic()
             }
         }
         setBasic {
-            val init = getInitPos()
             MaterialDialog(context)
                     .title(text = item.title())
                     .listItemsSingleChoice(
                             items = items,
-                            initialSelection = init,
+                            initialSelection = initp,
                             waitForPositiveButton = false
                     ) { d, i, t ->
                         //选择
                         d.dismiss()
-                        if (i == init) return@listItemsSingleChoice
-
-                        notifyData(i, t)
+                        if (i == initp) return@listItemsSingleChoice
+                        initp = i
+                        notifyData(i to t)
                     }.show {
-                        if(item.allowClear) {
+                        if (item.allowClear) {
                             neutralButton(text = "清空选择") {
-                                notifyData(null, null)
+                                initp = -1
+                                notifyData(null)
                             }
                         }
                     }
@@ -303,7 +297,6 @@ class SettingItemHelper(
                     if ((item.callback as CallbackOnSet<List<String>>?)?.invoke(ItemOperation(this), ts) != false) {
                         if (item.keyId != null) {
                             sp.set(item.keyId, ts)
-                            loadConfigInCacheThread()
                         }
                         item.summary = ts.toString()
                         setBasic()

@@ -1,6 +1,7 @@
 package cn.vove7.jarvis.view.animation;
 
 import android.content.Context;
+import android.support.annotation.NonNull;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.view.ViewCompat;
@@ -23,7 +24,13 @@ public class FabBehavior extends CoordinatorLayout.Behavior {
 
 
     @Override
-    public boolean onStartNestedScroll(CoordinatorLayout coordinatorLayout, View child, View directTargetChild, View target, int nestedScrollAxes, int type) {
+    public boolean onStartNestedScroll(
+            @NonNull CoordinatorLayout coordinatorLayout,
+            @NonNull View child,
+            @NonNull View directTargetChild,
+            @NonNull View target,
+            int nestedScrollAxes, int type
+    ) {
         //被观察者（RecyclerView）发生滑动的开始的时候回调的
         //nestedScrollAxes:滑动关联轴，现在只关心垂直的滑动。
         return nestedScrollAxes == ViewCompat.SCROLL_AXIS_VERTICAL || super.onStartNestedScroll(coordinatorLayout, child, directTargetChild,
@@ -32,7 +39,13 @@ public class FabBehavior extends CoordinatorLayout.Behavior {
 
 
     @Override
-    public void onNestedScroll(CoordinatorLayout coordinatorLayout, View child, View target, int dxConsumed, int dyConsumed, int dxUnconsumed, int dyUnconsumed, int type) {
+    public void onNestedScroll(
+            @NonNull CoordinatorLayout coordinatorLayout,
+            @NonNull View child,
+            @NonNull View target,
+            int dxConsumed, int dyConsumed,
+            int dxUnconsumed, int dyUnconsumed, int type
+    ) {
         super.onNestedScroll(coordinatorLayout, child, target, dxConsumed, dyConsumed, dxUnconsumed, dyUnconsumed, type);
         //被观察者滑动的时候回调的
         if (dyConsumed > 0 && visible) {

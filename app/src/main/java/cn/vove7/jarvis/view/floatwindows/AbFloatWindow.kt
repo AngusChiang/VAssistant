@@ -4,10 +4,9 @@ import android.content.Context
 import android.graphics.PixelFormat
 import android.graphics.Point
 import android.os.Build
-import android.view.Gravity
-import android.view.LayoutInflater
-import android.view.View
-import android.view.WindowManager
+import android.view.*
+import cn.vove7.common.utils.runOnUi
+import cn.vove7.jarvis.R
 import cn.vove7.vtp.log.Vog
 import cn.vove7.vtp.runtimepermission.PermissionUtils
 
@@ -19,8 +18,9 @@ import cn.vove7.vtp.runtimepermission.PermissionUtils
  */
 abstract class AbFloatWindow(
         val context: Context,
-        var mParams: WindowManager.LayoutParams? = null
-) {
+        val width: Int,
+        val height: Int
+) : IFloatyPanel {
     open var posX: Int = 0
     open var posY: Int = 0
 
@@ -28,20 +28,24 @@ abstract class AbFloatWindow(
 
     var contentView: View? = null
 
-    val winParams get() = mParams ?: buildLayoutParams().also { mParams = it }
+    private val winParams get() = buildLayoutParams()
+    lateinit var animationBody: View
+
+    private val rootView: ViewGroup get() = LayoutInflater.from(context).inflate(R.layout.float_panel_root, null) as ViewGroup
 
     private val newView: View
         get() {
+            val contentView = rootView
             return LayoutInflater.from(context)
-                    .inflate(this.layoutResId(), null).also {
-                        contentView = it
+                    .inflate(this.layoutResId(), contentView).also {
+                        animationBody = contentView.getChildAt(0)
                         onCreateView(it)
                     }
         }
 
     open fun onCreateView(view: View) {}
 
-    var windowManager: WindowManager = context.applicationContext.getSystemService(Context.WINDOW_SERVICE)
+    private var windowManager: WindowManager = context.applicationContext.getSystemService(Context.WINDOW_SERVICE)
             as WindowManager
 
     protected val isShowing get() = contentView != null
@@ -58,12 +62,6 @@ abstract class AbFloatWindow(
         Vog.d("状态栏高度 ---> $statusBarHeight1")
         statusBarHeight1
     }
-
-    init {
-        val size = Point()
-        windowManager.defaultDisplay.getSize(size)
-    }
-
 
     /**
      * 布局Id
@@ -117,7 +115,7 @@ abstract class AbFloatWindow(
     @Synchronized
     open fun onRemove() {
         try {
-            windowManager.removeView(contentView)
+            contentView?.also { windowManager.removeView(it) }
             contentView = null
         } catch (e: Exception) {
             e.printStackTrace()
@@ -139,8 +137,8 @@ abstract class AbFloatWindow(
     private fun buildLayoutParams(x: Int = posX, y: Int = posY): WindowManager.LayoutParams {
         val params = WindowManager.LayoutParams()
         params.packageName = context.packageName
-        params.width = WindowManager.LayoutParams.MATCH_PARENT
-        params.height = WindowManager.LayoutParams.WRAP_CONTENT
+        params.width = width
+        params.height = height
         params.flags = WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL or
                 WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE or
                 WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN or
@@ -159,4 +157,7 @@ abstract class AbFloatWindow(
         return params
     }
 
+    override fun hideImmediately() {
+        runOnUi { hide() }
+    }
 }

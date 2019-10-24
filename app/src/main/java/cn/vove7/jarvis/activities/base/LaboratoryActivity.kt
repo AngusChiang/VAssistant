@@ -86,11 +86,11 @@ class LaboratoryActivity : ReturnableActivity() {
                 )),
                 SettingGroupItem(R.color.indigo_700, titleS = "智能家居", childItems = listOf(
                         SingleChoiceItem(title = "智能家居系统", summary = "选择您的家居系统",
-                                defaultValue = { AppConfig.homeSystem },
+                                defaultValue = AppConfig.homeSystem ?: -1,
+                                keyId = R.string.key_home_system,
                                 items = listOf("Rokid(若琪)"), allowClear = true
-                        ) { item, data ->
-                            AppConfig.homeSystem = data.first
-                            MainService.instance?.loadHomeSystem()
+                        ) { _, data ->
+                            MainService.instance?.loadHomeSystem(data?.first)
                             true
                         },
                         IntentItem(title = "参数配置") {
@@ -166,7 +166,7 @@ class LaboratoryActivity : ReturnableActivity() {
                         },
                         SingleChoiceItem(title = "对话系统",
                                 keyId = R.string.key_chat_system_type, entityArrId = R.array.list_chat_system,
-                                defaultValue = { 0 }) { _, d ->
+                                defaultValue = 0 ) { _, d ->
                             runOnPool {
                                 sleep(800)//等待设置完成
                                 MainService.instance?.loadChatSystem()
@@ -186,7 +186,6 @@ class LaboratoryActivity : ReturnableActivity() {
                         InputItem(title = "文字识别参数设置", summary = "自定义文字识别key", keyId = R.string.key_text_ocr_key),
                         SingleChoiceItem(title = "长按HOME键操作", summary = "适用于一加",
                                 keyId = R.string.key_home_fun, entityArrId = R.array.list_home_funs)
-
                 )),
                 SettingGroupItem(R.color.yellow_700, titleS = "语音唤醒", childItems = listOf(
                         SwitchItem(title = "自动释放麦克风", summary = "在已授予麦克风权限的其他App内自动关闭语音唤醒\n需要无障碍",/*设为系统应用后无效*/
@@ -194,8 +193,8 @@ class LaboratoryActivity : ReturnableActivity() {
                             if (b /* TODO && !AppConfig.IS_SYS_APP*/) {
                                 VoiceWakeupStrategy.register()
                             } else {
+                                VoiceWakeupStrategy.unregister()
                             }
-                            VoiceWakeupStrategy.unregister()
                             return@SwitchItem true
                         },
                         CheckBoxItem(title = "显示通知", summary = "关闭和打开时在状态栏显示通知",

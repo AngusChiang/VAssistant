@@ -70,12 +70,14 @@ class BaiduSpeechSynService(event: SyntheEvent) : SpeechSynService(event) {
     private fun getTypeCode(): String? {
         val sp = SpHelper(context)
 
-        val type = sp.getString(R.string.key_voice_syn_model) ?: return null
-        val entity = context.resources.getStringArray(R.array.voice_model_entities)
-        val i = entity.indexOf(type)
+        val i = try {
+            context.resources.getStringArray(R.array.voice_model_entities).indexOf(sp.getString(R.string.key_voice_syn_model) ?: return null)
+        } catch (e: ClassCastException) {
+            sp.getInt(R.string.key_voice_syn_model)
+        }
         val types = context.resources.getStringArray(R.array.voice_model_values)
         return (types[i] ?: "0").also {
-            Vog.d("发音人：$type $it")
+            Vog.d("发音人：$i $it")
         }
     }
 

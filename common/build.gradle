@@ -62,7 +62,7 @@ dependencies {
     api "com.android.support:support-annotations:${support_version}"
     api 'com.google.code.gson:gson:2.8.5'
     api 'com.android.support:multidex:1.0.3'
-    api 'com.squareup.okhttp3:okhttp:3.11.0'
+    api 'com.squareup.okhttp3:okhttp:4.2.2'
     api files('libs/aip-java-sdk-4.4.1.jar')
     api files('libs/json-20160810.jar')
     api files('libs/log4j-1.2.17.jar')
@@ -82,7 +82,7 @@ dependencies {
 
     api project(path: ':umlib')
 
-    api 'com.github.Vove7.SmartKey:smartkey-android:6.0.6'
+    api 'com.github.Vove7.SmartKey:smartkey-android:6.0.9'
     api 'com.github.Vove7:ParamRegexNdk:1.0.6'
 
     api files('libs/RootShell.aar')

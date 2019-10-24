@@ -32,6 +32,11 @@
         <item>揭露</item>
     </string-array>
 
+    <string-array name="list_panel_style" translatable="false">
+        <item>默认</item>
+        <item>样式A</item>
+    </string-array>
+
     <string-array name="list_home_funs" translatable="false">
         <item>屏幕助手</item>
         <item>语音识别</item>
@@ -118,6 +123,7 @@
     <string name="key_home_system_config" translatable="false">home_system_config</string>
     <string name="key_home_system_user_command" translatable="false">home_system_user_command</string>
     <string name="key_home_system" translatable="false">home_system</string>
+    <string name="key_panel_style" translatable="false">panel_style</string>
     <string name="key_fp_animation" translatable="false">fp_animation</string>
     <string name="key_notify_wp_on_screen_off" translatable="false">notify_wp_on_screen_off</string>
     <string name="key_dev_mode" translatable="false">dev_mode</string>

@@ -28,6 +28,8 @@ import com.liulishuo.okdownload.core.breakpoint.BreakpointInfo
 import com.liulishuo.okdownload.core.cause.EndCause
 import com.liulishuo.okdownload.core.cause.ResumeFailedCause
 import okhttp3.*
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.RequestBody.Companion.toRequestBody
 import java.io.File
 import java.lang.reflect.Type
 import java.util.concurrent.TimeUnit
@@ -245,9 +247,7 @@ inline fun <reified T> NetHelper.postJsonString(
 ): Call {
     val client = OkHttpClient.Builder()
             .readTimeout(timeout, TimeUnit.SECONDS).build()
-
-    val requestBody = FormBody.create(MediaType
-            .parse("application/json; charset=utf-8"), json)
+    val requestBody = (json ?: "").toRequestBody("application/json; charset=utf-8".toMediaTypeOrNull())
 
     Vog.d("post ($url)\n$json")
     val request = Request.Builder().url(url)

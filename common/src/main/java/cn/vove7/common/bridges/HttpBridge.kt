@@ -7,6 +7,8 @@ import cn.vove7.common.utils.runInCatch
 import cn.vove7.vtp.log.Vog
 import com.google.gson.Gson
 import okhttp3.*
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.RequestBody.Companion.toRequestBody
 import java.io.IOException
 import java.util.concurrent.TimeUnit
 
@@ -69,8 +71,7 @@ object HttpBridge {
         }
         val client = OkHttpClient.Builder()
                 .readTimeout(timeout, TimeUnit.SECONDS).build()
-        val requestBody = FormBody.create(MediaType
-                .parse("application/json; charset=utf-8"), json ?: "")
+        val requestBody = (json ?: "").toRequestBody("application/json; charset=utf-8".toMediaTypeOrNull())
 
         val request = Request.Builder().url(url)
                 .post(requestBody)
@@ -123,12 +124,12 @@ object HttpBridge {
             @Throws(IOException::class)
             override fun onResponse(call: Call, response: Response) {//响应成功更新UI
                 if (response.isSuccessful) {
-                    val s = response.body()?.string()
+                    val s = response.body?.string()
                     println("onResponse ---> http bridge $s")
                     result.setAndNotify(s)
                 } else {
                     GlobalApp.toastInfo("网络请求失败")
-                    GlobalLog.err("网络错误：" + response.message())
+                    GlobalLog.err("网络错误：" + response.message)
                     result.setAndNotify(null)
                 }
             }

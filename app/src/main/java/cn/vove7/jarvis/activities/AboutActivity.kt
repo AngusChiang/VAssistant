@@ -75,7 +75,6 @@ class AboutActivity : BaseActivity() {
             SpHelper(this).set(R.string.key_dev_mode, true)
             GlobalApp.toastSuccess("进入开发模式", Toast.LENGTH_LONG)
         }
-        AppConfig.reload()
     }
 
     class VH(v: View) : BaseListAdapter.ViewHolder(v) {
