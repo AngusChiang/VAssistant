@@ -329,9 +329,10 @@ class SettingsActivity : ReturnableActivity() {
             )),
             SettingGroupItem(R.color.google_red, titleS = "悬浮面板", childItems = listOf(
                     SingleChoiceItem(
-                            title = "样式",
+                            title = "面板样式",
                             keyId = R.string.key_panel_style,
-                            entityArrId = R.array.list_panel_style
+                            entityArrId = R.array.list_panel_style,
+                            defaultValue = 0
                     ) { _, p ->
                         p ?: return@SingleChoiceItem false
                         if (p.first != AppConfig.panelStyle) {
