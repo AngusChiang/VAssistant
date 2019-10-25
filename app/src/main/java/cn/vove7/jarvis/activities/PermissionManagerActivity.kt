@@ -189,12 +189,13 @@ class PermissionManagerActivity : OneFragmentActivity() {
                         }
                     },
                     PermissionStatus(arrayOf(), "输入法", """用于更强大的编辑操作
-提示；在执行编辑框操作时，会自动切换内置输入法进行操作，结束后会恢复原输入法。
-自动切换输入法支持三种方式：
-1. 无障碍服务（可见的切换步骤）
-2. Root权限（推荐）
-3. WRITE_SECURE_SETTINGS权限（推荐，开启方法，见[常见问题]）
-由于每次询问Root权限申请过慢，请预先授权。""") { it, app ->
+                            |提示；在执行编辑框操作时，会自动切换内置输入法进行操作，结束后会恢复原输入法。
+                            |自动切换输入法支持三种方式：
+                            |1. 无障碍服务（可见的切换步骤）
+                            |2. Root权限（推荐）
+                            |3. WRITE_SECURE_SETTINGS权限（推荐，开启方法，见[常见问题]）
+                            |由于每次询问Root权限申请过慢，请预先授权。""".trimMargin()
+                    ) { it, app ->
                         if (!it.isOpen) {
                             startActivity(Intent(Settings.ACTION_INPUT_METHOD_SETTINGS))
                         }
@@ -207,7 +208,7 @@ class PermissionManagerActivity : OneFragmentActivity() {
                             }
                         }
                     },
-                    PermissionStatus(arrayOf(), "WRITE_SECURE_SETTINGS", "自动切换输入法、开启无障碍服务") { it, _ ->
+                    PermissionStatus(arrayOf(), "WRITE_SECURE_SETTINGS", "自动切换输入法、开启无障碍服务\nroot和此权限有一即可") { it, _ ->
                         if (!it.isOpen) {
                             SystemBridge.openUrl("https://vove.gitee.io/2019/07/02/OOO/")
                         }
