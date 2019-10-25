@@ -303,7 +303,11 @@ object AppConfig : BaseConfig {
                         UserInfo::class.java)
                 Vog.d("init user info ---> $info")
                 info.success()//设置登陆后，读取配置  null 抛出空指针
-                WrapperNetHelper.postJson<Any>(ApiUrls.VERIFY_TOKEN) { }
+                WrapperNetHelper.postJson<Any>(ApiUrls.VERIFY_TOKEN) {
+                    success { _, responseMessage ->
+                        responseMessage.isOk()
+                    }
+                }
             } catch (e: Exception) {
                 GlobalLog.err(e)
                 GlobalApp.toastError("用户信息提取失败，请重新登陆")
