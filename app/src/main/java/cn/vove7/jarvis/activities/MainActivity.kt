@@ -1,89 +1,167 @@
 package cn.vove7.jarvis.activities
 
-import android.app.Activity
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
-import android.view.KeyEvent
+import android.support.design.widget.BottomNavigationView
 import android.view.View
-import cn.vove7.jarvis.R
+import android.view.Window
 import cn.vove7.common.app.AppConfig
+import cn.vove7.common.app.AppConfig.checkAppUpdate
+import cn.vove7.common.model.UserInfo
+import cn.vove7.common.utils.StubbornFlag
+import cn.vove7.common.utils.runOnNewHandlerThread
+import cn.vove7.jarvis.BuildConfig
+import cn.vove7.jarvis.R
+import cn.vove7.jarvis.activities.base.BaseActivity
+import cn.vove7.jarvis.fragments.HomeFragment
+import cn.vove7.jarvis.fragments.MineFragment
+import cn.vove7.jarvis.receivers.UtilEventReceiver
+import cn.vove7.jarvis.tools.AppNotification
+import cn.vove7.jarvis.tools.DataUpdator
+import cn.vove7.jarvis.tools.Tutorials
+import cn.vove7.jarvis.view.dialog.UpdateLogDialog
+import cn.vove7.jarvis.view.tools.FragmentSwitcher
+import cn.vove7.vtp.log.Vog
 import cn.vove7.vtp.runtimepermission.PermissionUtils
+import com.afollestad.materialdialogs.MaterialDialog
+import kotlinx.android.synthetic.main.activity_real_main.*
+import kotlinx.android.synthetic.main.fragment_mine.*
 
-class MainActMivity : Activity() {
+
+/**
+ *
+ * 初始化流程
+ *
+ */
+class MainActivity : BaseActivity() {
+
+    private val fSwitcher = FragmentSwitcher(this, R.id.fragment)
+    private val homeF by lazy { HomeFragment.newInstance() }
+    //    val storeF = StoreFragment.newInstance()
+    private val mineF by lazy { MineFragment.newInstance() }
+    private val mOnNavigationItemSelectedListener = BottomNavigationView.OnNavigationItemSelectedListener { item ->
+        return@OnNavigationItemSelectedListener when (item.itemId) {
+            R.id.nav_home -> fSwitcher.switchFragment(homeF)
+//            R.id.nav_store -> fSwitcher.switchFragment(storeF)
+            R.id.nav_me -> fSwitcher.switchFragment(mineF)
+            else -> false
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        requestWindowFeature(Window.FEATURE_NO_TITLE)
+        setContentView(R.layout.activity_real_main)
 
-        if (!AppConfig.checkUser()) {
-            finish()
-            return
+        initView()
+        requestPermission()
+    }
+
+    private fun initView() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            window.decorView.systemUiVisibility =
+                View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN or
+                        View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
+            window.statusBarColor = resources.getColor(R.color.app_background)
         }
 
-        PermissionUtils.autoRequestPermission(this, arrayOf(
-                "android.permission.RECORD_AUDIO",
-                "android.permission.INTERNET",
-                "android.permission.READ_PHONE_STATE",
-                "android.permission.WRITE_EXTERNAL_STORAGE",
-                "android.permission.FLASHLIGHT",
-                "android.permission.CAMERA",
-                "android.permission.CALL_PHONE",
-                "android.permission.READ_CONTACTS"
-        ))
-
-        setContentView(R.layout.activity_main)
+        navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener)
+        navigation.selectedItemId = if (AppConfig.FIRST_LAUNCH_NEW_VERSION && inFlag) R.id.nav_home else R.id.nav_me
     }
 
-    override fun onKeyDown(keyCode: Int, event: KeyEvent): Boolean {
-        if (keyCode == KeyEvent.KEYCODE_BACK) {
-            val home = Intent(Intent.ACTION_MAIN)
-            home.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
-            home.addCategory(Intent.CATEGORY_HOME)
-            startActivity(home)
-            return true
+
+    override fun onResume() {
+        super.onResume()
+        val now = System.currentTimeMillis()
+
+        if (now - lastCheckApp > 10 * 60000) {
+            checkAppUpdate(this, false, onUpdate)
+            lastCheckApp = now
         }
-        return super.onKeyDown(keyCode, event)
-    }
 
-    fun go2Lua(view: View) {
-        startActivity(Intent(this, LuaEditorActivity::class.java))
-    }
-
-    fun go2Voice(view: View) {
-        startActivity(Intent(this, VoiceTestActivity::class.java))
-    }
-
-    fun go2InstList(v: View) {
-        startActivity(Intent(this, InstManagerActivity::class.java))
-
-    }
-
-    fun permissionMan(v: View) {
-        startActivity(Intent(this, PermissionManagerActivity::class.java))
-    }
-
-    fun go2Setting(v: View) {
-        startActivity(Intent(this, SettingsActivity::class.java))
-    }
-
-    fun go2Js(v: View) {
-        startActivity(Intent(this, JsEditorActivity::class.java))
-    }
-
-    fun go2Welcome(v: View) {
-        startActivity(Intent(this, WelcomeActivity::class.java))
-    }
-
-    fun onClick(v: View) {
-
-        when (v.id) {
-            R.id.button_mark -> {
-                startActivity(Intent(this, MarkedManagerActivity::class.java))
+        if (!firstIn) {
+            //检查数据更新
+            if (now - lastCheck > 120000) {
+                checkDataUpdate()
+                if (AppConfig.autoCheckPluginUpdate)// 插件更新
+                    DataUpdator.checkPluginUpdate()
+                lastCheck = now
             }
-            R.id.button_main -> {
-                startActivity(Intent(this, RealMainActivity::class.java))
-            }
-
-        }
-
+        } else
+            firstIn = false
     }
+
+    companion object {
+        val ps = arrayOf(
+                android.Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                android.Manifest.permission.RECORD_AUDIO,
+                android.Manifest.permission.MODIFY_AUDIO_SETTINGS,
+                android.Manifest.permission.READ_PHONE_STATE
+        )
+
+        var showUpdate = true//显示更新日志
+
+        private var firstIn = true
+
+        private var lastCheck = 0L
+
+        var lastCheckApp = 0L
+
+        var inFlag by StubbornFlag(initValue = true, afterValue = false)
+    }
+
+    private fun requestPermission() {
+        if (!PermissionUtils.isAllGranted(this, ps)) {
+            MaterialDialog(this).title(text = "请先授予必要的权限")
+                    .message(text = "1. 麦克风\n2. 存储权限\n需要其他权限可到权限管理中开启").positiveButton {
+                        PermissionUtils.autoRequestPermission(this, ps)
+                    }.show()
+        } else {
+            showDataUpdateLog()
+        }
+    }
+
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        showDataUpdateLog()
+    }
+
+    private fun checkDataUpdate() {
+        DataUpdator.checkUpdate(this) {
+            if (!UserInfo.isLogin())
+                text_login?.post {
+                    Tutorials.showForView(this, Tutorials.T_LOGIN, text_login,
+                            "新用户注册", getString(R.string.desc_new_account))
+                }
+        }
+    }
+
+    private fun showDataUpdateLog() {
+        lastCheck = System.currentTimeMillis()
+        if (AppConfig.FIRST_LAUNCH_NEW_VERSION && showUpdate && !BuildConfig.DEBUG) {
+            UpdateLogDialog(this) {
+                Vog.d("检查数据更新")
+                checkDataUpdate()
+            }
+            showUpdate = false
+        } else {
+            runOnNewHandlerThread(delay = 2000) {
+                checkDataUpdate()
+            }
+        }
+    }
+
+    private val onUpdate: (Pair<String, String>?) -> Unit
+        get() = a@{ hasUpdate ->
+            hasUpdate ?: return@a
+            AppNotification.broadcastNotification(
+                    123, "发现新版本 ${hasUpdate.first}",
+                    "查看更新日志",
+                    (Intent(UtilEventReceiver.APP_HAS_UPDATE).apply {
+                        putExtra("version", hasUpdate.first)
+                        putExtra("log", hasUpdate.second)
+                    })
+            )
+        }
 }

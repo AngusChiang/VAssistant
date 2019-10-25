@@ -26,7 +26,7 @@
 
         <activity android:name=".activities.VoiceTestActivity" />
         <activity
-            android:name=".activities.RealMainActivity"
+            android:name=".activities.MainActivity"
             android:autoRemoveFromRecents="true"
             android:excludeFromRecents="true"
             android:launchMode="singleTask"
@@ -92,7 +92,7 @@
             android:label="@string/text_permission_manager" />
         <activity
             android:name=".activities.InstManagerActivity"
-            android:windowSoftInputMode="adjustPan" /> <!-- <activity android:name=".activities.MainActivity" /> -->
+            android:windowSoftInputMode="adjustPan" />
         <activity
             android:name=".activities.SettingsActivity"
             android:label="@string/title_activity_settings"

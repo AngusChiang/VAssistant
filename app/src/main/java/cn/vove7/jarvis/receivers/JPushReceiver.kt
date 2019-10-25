@@ -5,7 +5,7 @@ import android.content.Intent
 import android.util.Log
 import cn.jpush.android.api.NotificationMessage
 import cn.jpush.android.service.JPushMessageReceiver
-import cn.vove7.jarvis.activities.RealMainActivity
+import cn.vove7.jarvis.activities.MainActivity
 
 /**
  * # MyReceiver
@@ -21,6 +21,6 @@ class JPushReceiver : JPushMessageReceiver() {
 
     override fun onNotifyMessageOpened(p0: Context?, p1: NotificationMessage?) {
         super.onNotifyMessageOpened(p0, p1)
-        p0?.startActivity(Intent(p0, RealMainActivity::class.java))
+        p0?.startActivity(Intent(p0, MainActivity::class.java))
     }
 }
