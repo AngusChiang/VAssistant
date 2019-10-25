@@ -38,6 +38,7 @@ object AppBus {
 
 //    const val ORDER_STOP_DEBUG = "stop_debug"
 
+    @JvmStatic
     fun post(data: Any) {
         if (BuildConfig.DEBUG) {//打印函数栈
             val st = Thread.currentThread().stackTrace[3]
@@ -59,6 +60,7 @@ object AppBus {
         }
     }
 
+    @JvmStatic
     fun postDelay(data: Any, delay: Long, tag: String? = null) {
         synchronized(threadList) {
             threadList.add(thread(name = tag) {
