@@ -40,13 +40,13 @@ class App : GlobalApp() {
 
     override fun onCreate() {
         super.onCreate()
-        runWithClock("加载配置") {
-            AppConfig.init()
-        }
 
         if (!isMainProcess) {
             Vog.d("非主进程")
             return
+        }
+        runWithClock("加载配置") {
+            AppConfig.init()
         }
         AppBus.reg(this)
         CrashHandler.install()
