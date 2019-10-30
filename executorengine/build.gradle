@@ -35,6 +35,3 @@ dependencies {
     implementation project(':androlua')
     implementation project(path: ':rhino-android')
 }
-repositories {
-    mavenCentral()
-}

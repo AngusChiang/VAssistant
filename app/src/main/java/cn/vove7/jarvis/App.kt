@@ -2,11 +2,9 @@ package cn.vove7.jarvis
 
 import android.content.ContentProvider
 import android.content.ContentValues
-import android.content.Context
 import android.content.Intent
 import android.database.Cursor
 import android.net.Uri
-import android.os.Build
 import cn.jpush.android.api.JPushInterface
 import cn.vove7.common.activities.RunnableActivity.Companion.runInShellActivity
 import cn.vove7.common.app.AppConfig
@@ -28,7 +26,6 @@ import cn.vove7.jarvis.tools.ShortcutUtil
 import cn.vove7.jarvis.tools.openAccessibilityServiceAuto
 import cn.vove7.jarvis.tools.setAssistantAppAuto
 import cn.vove7.vtp.log.Vog
-import com.qihoo360.replugin.gen.RePluginHostConfig
 import com.umeng.commonsdk.UMConfigure
 import org.greenrobot.eventbus.Subscribe
 

@@ -34,6 +34,3 @@ dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     // 此处以JCore 2.1.0 版本为例。
 }
-repositories {
-    mavenCentral()
-}

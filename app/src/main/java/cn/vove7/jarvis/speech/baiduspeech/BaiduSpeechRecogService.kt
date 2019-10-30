@@ -14,7 +14,7 @@ import cn.vove7.jarvis.speech.baiduspeech.wakeup.BaiduVoiceWakeup
 import cn.vove7.jarvis.speech.baiduspeech.wakeup.RecogWakeupListener
 import cn.vove7.jarvis.speech.baiduspeech.wakeup.WakeupEventAdapter
 import cn.vove7.vtp.log.Vog
-import com.baidu.speech.asr.SpeechConstant
+import com.baidu.speech.asr.SpeechConstant.*
 import com.google.gson.Gson
 import com.google.gson.annotations.SerializedName
 
@@ -50,27 +50,27 @@ class BaiduSpeechRecogService(event: RecogEvent) : SpeechRecogService(event) {
     }
 
     private fun recogParams(silent: Boolean) = mutableMapOf<String, Any>(
-            SpeechConstant.ACCEPT_AUDIO_DATA to false,
-//          SpeechConstant.VAD_MODEL to "dnn",
-            SpeechConstant.DISABLE_PUNCTUATION to false,//标点符号
-            SpeechConstant.ACCEPT_AUDIO_VOLUME to true,
-            SpeechConstant.PID to 1536,
-            SpeechConstant.NLU to "enable"
+            ACCEPT_AUDIO_DATA to false,
+            VAD_MODEL to VAD_TOUCH,
+            DISABLE_PUNCTUATION to false,//标点符号
+            ACCEPT_AUDIO_VOLUME to true,
+            PID to 1536,
+            NLU to "enable"
     ).also {
-        it[SpeechConstant.IN_FILE] = "#cn.vove7.jarvis.speech.baiduspeech.MicInputStream.instance()"
+        it[IN_FILE] = "#cn.vove7.jarvis.speech.baiduspeech.MicInputStream.instance()"
         //从指定时间开始识别，可以 - 指定ms 识别之前的内容
         if (!AppConfig.openResponseWord && !AppConfig.voiceRecogFeedback)//唤醒即识别 音效和响应词关闭时开启
-            it[SpeechConstant.AUDIO_MILLS] = System.currentTimeMillis() - 100
+            it[AUDIO_MILLS] = System.currentTimeMillis() - 100
         //长语音，不再依赖百度语音内置
 //        if (AppConfig.lastingVoiceCommand)
         //静音时长
         if (AppConfig.voiceRecogFeedback && !silent)
-            it[SpeechConstant.SOUND_START] = R.raw.recog_start
+            it[SOUND_START] = R.raw.recog_start
         if (AppConfig.voiceRecogFeedback) {
-            it[SpeechConstant.SOUND_END] = R.raw.recog_finish
-            it[SpeechConstant.SOUND_SUCCESS] = R.raw.recog_finish
-            it[SpeechConstant.SOUND_ERROR] = R.raw.recog_failed
-            it[SpeechConstant.SOUND_CANCEL] = R.raw.recog_cancel
+            it[SOUND_END] = R.raw.recog_finish
+            it[SOUND_SUCCESS] = R.raw.recog_finish
+            it[SOUND_ERROR] = R.raw.recog_failed
+            it[SOUND_CANCEL] = R.raw.recog_cancel
         }
 
     }

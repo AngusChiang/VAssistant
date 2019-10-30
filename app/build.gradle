@@ -161,13 +161,6 @@ dependencies {
 
 }
 repositories {
-    maven { url 'https://maven.aliyun.com/repository/jcenter' }
-    maven { url 'https://jitpack.io' }
-    mavenCentral()
-    maven { url 'https://dl.bintray.com/umsdk/release' }
-    maven { url "https://dl.bintray.com/drummer-aidan/maven/" }
-
-    maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
     flatDir {
         dirs 'libs'
     }

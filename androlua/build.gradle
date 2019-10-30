@@ -46,6 +46,3 @@ dependencies {
     implementation "com.qihoo360.replugin:replugin-host-lib:${RP_VERSION}"
 
 }
-repositories {
-    mavenCentral()
-}
