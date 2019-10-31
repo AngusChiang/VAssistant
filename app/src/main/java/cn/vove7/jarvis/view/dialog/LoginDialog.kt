@@ -17,7 +17,7 @@ import cn.vove7.common.net.tool.SecureHelper
 import cn.vove7.common.utils.TextHelper
 import cn.vove7.common.utils.inVisibility
 import cn.vove7.jarvis.R
-import cn.vove7.common.app.AppConfig
+import cn.vove7.jarvis.tools.AppLogic
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.customview.customView
 import kotlinx.android.synthetic.main.dialog_login.view.*
@@ -85,7 +85,7 @@ class LoginDialog(val context: Context, initEmail: String? = null,
                     if (bean.isOk()) {
                         try {
                             val userInfo = bean.data!!
-                            AppConfig.login(userInfo)
+                            AppLogic.onLogin(userInfo)
                         } catch (e: Exception) {
                             GlobalApp.toastInfo(R.string.text_error_occurred)
                             GlobalLog.err(e.message)

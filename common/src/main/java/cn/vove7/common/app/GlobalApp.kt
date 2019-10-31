@@ -42,7 +42,6 @@ open class GlobalApp : RePluginApplication() {
             }
         }
         NetHelper.timeout = 5
-        AndroidSettings.init(this)
         Toasty.Config.getInstance()
                 .tintIcon(true) // optional (apply textColor also to the icon)
                 .allowQueue(false) // optional (prevents several Toastys from queuing)

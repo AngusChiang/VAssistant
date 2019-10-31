@@ -2,9 +2,14 @@ package cn.vove7.jarvis.chat
 
 import android.widget.ImageView
 import cn.vove7.common.app.GlobalApp
+import cn.vove7.common.appbus.AppBus
+import cn.vove7.common.datamanager.history.CommandHistory
+import cn.vove7.common.model.UserInfo
 import cn.vove7.common.utils.inVisibility
 import cn.vove7.common.utils.show
 import cn.vove7.jarvis.fragments.AwesomeItem
+import cn.vove7.jarvis.services.MainService
+import cn.vove7.jarvis.view.floatwindows.IFloatyPanel
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import java.io.Serializable
@@ -16,6 +21,26 @@ import java.io.Serializable
  * 2018/10/28
  */
 interface ChatSystem {
+    fun onChat(s: String, fp: IFloatyPanel): Boolean {
+        val ser = MainService.instance!!
+        val data = chatWithText(s) ?: return false
+
+        if (data.resultUrls.isNotEmpty()) {
+            fp.showListResult(data.word, data.resultUrls)
+        } else {
+            data.word.let { word ->
+                AppBus.post(CommandHistory(UserInfo.getUserId(), s, word))
+                ser.speak(word)
+                fp.showTextResult(if (word.contains("="))
+                    word.replace("=", "\n=") else word)
+                ser.executeAnimation.begin()
+                ser.executeAnimation.show(word)
+            }
+        }
+        return true
+    }
+
+    //耗时操作
     fun chatWithText(s: String): ChatResult?
 }
 

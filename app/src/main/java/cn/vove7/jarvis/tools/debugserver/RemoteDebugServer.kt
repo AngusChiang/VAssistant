@@ -14,6 +14,7 @@ import cn.vove7.common.datamanager.parse.statusmap.ActionNode
 import cn.vove7.common.executor.OnPrint
 import cn.vove7.common.model.UserInfo
 import cn.vove7.common.utils.ThreadPool.runOnPool
+import cn.vove7.common.utils.div
 import cn.vove7.common.utils.runInCatch
 import cn.vove7.common.utils.startActivityOnNewTask
 import cn.vove7.jarvis.BuildConfig
@@ -98,7 +99,7 @@ object RemoteDebugServer : Runnable {
         }
         RhinoApi.regPrint(print)
         LuaHelper.regPrint(print)
-        GlobalApp.toastInfo(R.string.text_debug_service_starting, Toast.LENGTH_LONG)
+        GlobalApp.toastInfo(GlobalApp.getString(R.string.text_debug_service_starting) / SystemBridge.getLocalIpAddress() , Toast.LENGTH_LONG)
         server?.use {
             while (!stopped) {
                 try {
@@ -107,8 +108,7 @@ object RemoteDebugServer : Runnable {
                     val inputStream = BufferedReader(InputStreamReader(client.getInputStream(), "UTF-8"))
                     val o = PrintWriter(BufferedWriter(OutputStreamWriter(client.getOutputStream())), true)
                     clients?.put(client, o)
-                    GlobalApp.toastInfo(String.format(GlobalApp.getString(R.string.text_establish_connection), client.inetAddress
-                        ?: "null"))
+                    GlobalApp.toastInfo(GlobalApp.getString(R.string.text_establish_connection).format(client.inetAddress ?: "null"))
                     print.onPrint(0, "与PC[${client.inetAddress}]建立连接   --来自App")
                     //type -> script -> arg
                     runOnPool {
@@ -130,7 +130,6 @@ object RemoteDebugServer : Runnable {
                 }
             }
         }
-        show("RemoteDebug finished!")
 // finally {
         stopped = true
         onFinish()
@@ -261,11 +260,6 @@ object RemoteDebugServer : Runnable {
             }
         }
     }
-
-    private fun show(s: String) {
-        Vog.d("show  ----> $s")
-    }
-
 }
 
 class RemoteAction(

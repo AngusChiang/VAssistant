@@ -54,7 +54,6 @@ import cn.vove7.executorengine.model.ActionParseResult
 import cn.vove7.executorengine.parse.ParseEngine
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.activities.PermissionManagerActivity
-import cn.vove7.jarvis.activities.ResultPickerActivity
 import cn.vove7.jarvis.activities.ScreenPickerActivity
 import cn.vove7.jarvis.chat.ChatSystem
 import cn.vove7.jarvis.chat.TulingChatSystem
@@ -77,7 +76,6 @@ import cn.vove7.jarvis.view.floatwindows.OldFloatPanel
 import cn.vove7.jarvis.view.statusbar.ExecuteAnimation
 import cn.vove7.jarvis.view.statusbar.ListeningAnimation
 import cn.vove7.jarvis.view.statusbar.ParseAnimation
-import cn.vove7.vtp.builder.BundleBuilder
 import cn.vove7.vtp.log.Vog
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.SubscriberExceptionEvent
@@ -123,12 +121,12 @@ class MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
     //识别过程动画
     private val listeningAni: ListeningAnimation by lazy { ListeningAnimation() }
     private val parseAnimation: ParseAnimation by lazy { ParseAnimation() }
-    private val executeAnimation: ExecuteAnimation by lazy { ExecuteAnimation() }
+    val executeAnimation: ExecuteAnimation by lazy { ExecuteAnimation() }
 
     init {
         instance = this
         GlobalApp.serviceBridge = this
-        runOnNewHandlerThread("load_speech_engine", delay = 1000) {
+        runOnNewHandlerThread("load_speech_engine") {
             init()
         }
     }
@@ -153,9 +151,8 @@ class MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
     }
 
     fun loadHomeSystem(type: Int? = AppConfig.homeSystem) {
-        homeControlSystem = ISmartHomeSystem.load(type)
-        runOnNewHandlerThread {
-            homeControlSystem?.init()
+        homeControlSystem = ISmartHomeSystem.load(type)?.also {
+            runOnNewHandlerThread { it.init() }
         }
     }
 
@@ -311,7 +308,7 @@ class MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
             Vog.d("speak临时 ${speechRecogService?.lastingStopped}")
             //没有手动停止 即认为处于长语音状态
             afterSpeakResumeListen = !(speechRecogService?.lastingStopped
-                ?: true)
+                    ?: true)
             if (cancelRecog && recogIsListening) {
                 speechRecogService?.cancelRecog(false)
             }
@@ -832,7 +829,7 @@ class MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
             if (AppConfig.vibrateWhenStartRecog || voiceMode != MODE_VOICE) {//询问参数时，震动
                 SystemBridge.vibrate(80L)
             }
-            floatyPanel.show("开始聆听")
+            floatyPanel.showUserWord("开始聆听")
             Vog.d("onPreStartRecog ---> 开始识别")
         }
 
@@ -862,7 +859,7 @@ class MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
                             performAlertClick(false)
                         }
                         else -> {
-                            floatyPanel.show("重新识别")
+                            floatyPanel.showUserWord("重新识别")
                             onCommand(ACTION_START_RECOG)  //继续????
                         }
                     }
@@ -883,7 +880,7 @@ class MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
         override fun onTempResult(temp: String) {
             temResult = temp
             Vog.d("onTempResult ---> 临时结果 $temp")
-            floatyPanel.show(temp)
+            floatyPanel.showUserWord(temp)
             listeningAni.show(temp)
         }
 
@@ -969,7 +966,7 @@ class MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
             chat: Boolean = AppConfig.openChatSystem, from: Int = 0): Boolean {
         Vog.d("解析命令：$result")
         isContinousDialogue = false
-        floatyPanel.show(result)
+        floatyPanel.showTextResult(result)
         parseAnimation.begin()
         floatyPanel.showParseAni()
 
@@ -1083,34 +1080,16 @@ class MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
         parseAnimation.begin()
         floatyPanel.showParseAni()
         resumeMusicLock = true
-        val data = chatSystem.chatWithText(result)
-        if (data == null) {
+        if (chatSystem.onChat(result, floatyPanel)) {
+
+        } else {
             floatyPanel.showAndHideDelay("获取失败,详情查看日志")
             parseAnimation.failedAndHideDelay()
             resumeMusicIf()
             //检查长语音
             speechRecogService?.startIfLastingVoice()
-        } else {
-            data.resultUrls.also {
-                when {
-                    it.isEmpty() -> return@also
-                    it.size == 1 -> SystemBridge.openUrl(it[0].url)
-                    else -> startActivity(Intent(context, ResultPickerActivity::class.java)
-                            .also { intent ->
-                                intent.putExtra("title", data.word)
-                                intent.putExtra("data", BundleBuilder().put("items", it).data)
-                            })
-                }
-            }
-            data.word.let { word ->
-                AppBus.post(CommandHistory(UserInfo.getUserId(), result, word))
-                speak(word)
-                floatyPanel.show(if (word.contains("="))
-                    data.word.replace("=", "\n=") else word)
-                executeAnimation.begin()
-                executeAnimation.show(word)
-            }
         }
+
     }
 
     fun startActivity(intent: Intent) {
@@ -1177,7 +1156,7 @@ class MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
 
         override fun onStart(text: String?) {
             Vog.d("onSynData 开始")
-            floatyPanel.show(text)
+            floatyPanel.showTextResult(text ?: "")
             stopLastingRecogTemp()
             checkMusic()
         }

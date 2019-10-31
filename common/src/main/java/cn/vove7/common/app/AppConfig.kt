@@ -29,9 +29,7 @@ import cn.vove7.smartkey.key.get
 import cn.vove7.smartkey.key.set
 import cn.vove7.vtp.log.Vog
 import cn.vove7.vtp.sharedpreference.SpHelper
-import com.google.gson.Gson
 import com.russhwolf.settings.Settings
-import com.umeng.analytics.MobclickAgent
 import org.jsoup.Jsoup
 import java.io.File
 import java.text.SimpleDateFormat
@@ -113,7 +111,7 @@ object AppConfig : BaseConfig {
     var openChatSystem by noCacheKey(true, keyId = R.string.key_open_chat_system)
 
     //语音识别等待时长 s
-    var recogWaitDurationMillis by noCacheKey(1000, keyId = R.string.key_recog_wait_duration)
+    var recogWaitDurationMillis by noCacheKey(800, keyId = R.string.key_recog_wait_duration)
 
     val autoSleepWakeupMillis: Long
         get() {
@@ -211,9 +209,6 @@ object AppConfig : BaseConfig {
 
     var autoCheckPluginUpdate by noCacheKey(true, keyId = R.string.key_auto_check_plugin_update)
 
-    var FIRST_LAUNCH_NEW_VERSION = false or BuildConfig.DEBUG //新版本第一次启动
-
-    var IS_SYS_APP = false
     var smartKillAd by noCacheKey(false, keyId = R.string.key_smart_find_and_kill_ad) // 跳过自动识别未标记的广告
 
     //对话系统 字符串
@@ -259,78 +254,7 @@ object AppConfig : BaseConfig {
         }
     }
 
-    fun init() {
-        checkFirstLaunch()
-        checkIsSystemApp()
-        checkUserInfo()
-    }
-
-    /**
-     * 启动时执行一次
-     */
-    private fun checkFirstLaunch() {
-        if (BuildConfig.DEBUG) return
-        val lastCode = sp.getLong("v_code")
-        val nowCode = versionCode
-        if (lastCode < nowCode) {
-            FIRST_LAUNCH_NEW_VERSION = true
-            sp.set("v_code", nowCode)
-        } else {
-            FIRST_LAUNCH_NEW_VERSION = false
-        }
-    }
-
-    private fun checkIsSystemApp() {
-        val f = context.packageManager.getPackageInfo(context.packageName, 0)
-                ?.applicationInfo?.flags ?: 0
-
-        IS_SYS_APP = (f and ApplicationInfo.FLAG_SYSTEM) == 1
-        GlobalLog.log("是否系统应用：$IS_SYS_APP")
-    }
-
-    val context get() = GlobalApp.APP
-    private val ssp: SecuritySharedPreference by lazy { SecuritySharedPreference(context, "xka", Context.MODE_PRIVATE) }
-
-    /**
-     * checkUserInfo完reload
-     */
-    private fun checkUserInfo() {
-        //用户信息
-        val key = context.getString(R.string.key_login_info)
-        if (ssp.contains(key)) {
-            try {
-                val info = Gson().fromJson(ssp.getString(key, null),
-                        UserInfo::class.java)
-                Vog.d("init user info ---> $info")
-                info.success()//设置登陆后，读取配置  null 抛出空指针
-                WrapperNetHelper.postJson<Any>(ApiUrls.VERIFY_TOKEN) {
-                    success { _, responseMessage ->
-                        responseMessage.isOk()
-                    }
-                }
-            } catch (e: Exception) {
-                GlobalLog.err(e)
-                GlobalApp.toastError("用户信息提取失败，请重新登陆")
-                ssp.remove(context.getString(R.string.key_login_info))
-            }
-        } else {
-            Vog.d("init ---> not login")
-        }
-    }
-
-    fun login(userInfo: UserInfo) {
-        MobclickAgent.onProfileSignIn("${UserInfo.getUserId()}")
-        userInfo.success()
-        //保存->sp
-        val infoJson = Gson().toJson(userInfo)
-        ssp.edit().putString(context.getString(R.string.key_login_info), infoJson).apply()
-    }
-
-    fun logout() {
-        MobclickAgent.onProfileSignOff()
-        ssp.remove(context.getString(R.string.key_login_info))
-        UserInfo.logout()
-    }
+    private val context get() = GlobalApp.APP
 
     var lastCheckTime = 0L
     /**
@@ -368,6 +292,7 @@ object AppConfig : BaseConfig {
 
     //适配单选 存储String/Int
     private fun getSingleChoicePosition(keyId: Int, entityId: Int, def: Int = -1): Int {
+        val sp = SpHelper(GlobalApp.APP)
         return try {
             return GlobalApp.APP.resources.getStringArray(entityId).indexOf(sp.getString(keyId))
         } catch (e: ClassCastException) {
@@ -375,7 +300,6 @@ object AppConfig : BaseConfig {
         }
     }
 
-    val sp: SpHelper by lazy { SpHelper(GlobalApp.APP) }
 
     val versionName: String
         get() {
@@ -542,6 +466,7 @@ object AppConfig : BaseConfig {
      * @param key String
      */
     private fun getTodayCount(key: String): Int {
+        val ssp = SecuritySharedPreference(context, "xka", Context.MODE_PRIVATE)
         val today = SimpleDateFormat("yyyyMMdd", Locale.getDefault()).format(Date())
         try {
             ssp.getString(key, null)?.split("|")?.apply {
@@ -557,11 +482,35 @@ object AppConfig : BaseConfig {
     }
 
     private fun plusTodayCount(key: String, d: Int? = null) {
+        val ssp = SecuritySharedPreference(context, "xka", Context.MODE_PRIVATE)
         val today = SimpleDateFormat("yyyyMMdd", Locale.getDefault()).format(Date())
         val v = (d ?: getTodayCount(key)) + 1
         ssp.edit().putString(key, "$today|$v").apply()
     }
 
+    ///////////////////////////////////
+    val IS_SYS_APP: Boolean
+        get() {
+            val f = context.packageManager.getPackageInfo(context.packageName, 0)
+                    ?.applicationInfo?.flags ?: 0
+            val i = (f and ApplicationInfo.FLAG_SYSTEM) == 1
+            GlobalLog.log("是否系统应用：$i")
+            return i
+        }
+
+    //新版本第一次启动
+    val FIRST_LAUNCH_NEW_VERSION by lazy {
+        val sp = SpHelper(GlobalApp.APP)
+        val lastCode = sp.getLong("v_code")
+        val nowCode = versionCode
+        if (lastCode < nowCode) {
+            sp.set("v_code", nowCode)
+            true
+        } else {
+            false
+        }
+    }
+    ///////////////////////////////////
 }
 
 @Suppress("UNCHECKED_CAST")

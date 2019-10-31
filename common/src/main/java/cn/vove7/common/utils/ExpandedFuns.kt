@@ -556,3 +556,5 @@ fun bundle(vararg extras: Pair<String, Any>): Bundle {
 
     }
 }
+
+operator fun String.div(any: Any?): String = format(any)

@@ -82,7 +82,7 @@ class MicInputStream : InputStream() {
     @Throws(IOException::class)
     override fun read(var1: ByteArray, var2: Int, var3: Int): Int {
         val var4 = mAudioRecord.read(var1, var2, var3)
-        Vog.v("AudioRecord read: len:$var4 byteOffset:$var2 byteCount:$var3")
+//        Vog.v("AudioRecord read: len:$var4 byteOffset:$var2 byteCount:$var3")
         return if (var4 in 0..var3) {
             var4
         } else {
@@ -92,10 +92,7 @@ class MicInputStream : InputStream() {
 
     @Throws(IOException::class)
     override fun close() {
-        if (this.mAudioRecord != null) {
-            this.mAudioRecord!!.release()
-        }
-
+        mAudioRecord?.release()
     }
 
     @Throws(IOException::class)

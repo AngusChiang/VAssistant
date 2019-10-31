@@ -8,6 +8,7 @@ import cn.vove7.common.app.AppConfig
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.appbus.AppBus
 import cn.vove7.jarvis.services.MainService
+import cn.vove7.jarvis.tools.AppLogic
 import cn.vove7.jarvis.view.dialog.AppUpdateDialog.Companion.getBuildAction
 import org.greenrobot.eventbus.Subscribe
 
@@ -41,6 +42,7 @@ object UtilEventReceiver : DyBCReceiver() {
     fun onBusEvent(event: String) {
         when (event) {
             AppBus.EVENT_LOGOUT, AppBus.EVENT_FORCE_OFFLINE -> {
+                AppLogic.onLogout()
                 if (AppConfig.speechEngineType == 1) {
                     AppConfig.speechEngineType = 0
                     MainService.instance?.loadSpeechService(0)

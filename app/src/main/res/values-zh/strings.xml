@@ -128,7 +128,7 @@
     <string name="text_email_copy_to_clip">你的邮箱已复制到剪切板，请填写至备注</string>
     <string name="text_understand">知道了</string>
     <string name="text_continue">继续</string>
-    <string name="text_debug_service_starting">调试服务在空闲2分钟后自动关闭</string>
+    <string name="text_debug_service_starting">调试服务在空闲2分钟后自动关闭\nIP：%s</string>
     <string name="text_version_code">版本号</string>
     <string name="text_script">脚本</string>
     <string name="text_script_type">脚本语言</string>

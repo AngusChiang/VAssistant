@@ -21,7 +21,6 @@ open class ResponseMessage<T> {
     fun isOk(): Boolean {
         if (tokenIsOutdate()||isInvalid()) {
             GlobalApp.toastError(message)
-            AppConfig.logout()
             AppBus.post(EVENT_FORCE_OFFLINE)
         }
         return code == CODE_OK

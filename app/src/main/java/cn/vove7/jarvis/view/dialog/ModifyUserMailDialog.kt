@@ -10,7 +10,7 @@ import cn.vove7.common.net.WrapperNetHelper
 import cn.vove7.common.net.tool.SecureHelper
 import cn.vove7.common.utils.TextHelper
 import cn.vove7.jarvis.R
-import cn.vove7.common.app.AppConfig
+import cn.vove7.jarvis.tools.AppLogic
 import cn.vove7.jarvis.view.checkEmpty
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.customview.customView
@@ -65,7 +65,7 @@ class ModifyUserMailDialog(val context: Context, val onUpdate: () -> Unit) {
                     val newInfo = UserInfo.INSTANCE.apply {
                         setEmail(newMailAddress)
                     }
-                    AppConfig.login(newInfo)
+                    AppLogic.onLogin(newInfo)
                     onUpdate.invoke()
                     dialog.dismiss()
                 } else {

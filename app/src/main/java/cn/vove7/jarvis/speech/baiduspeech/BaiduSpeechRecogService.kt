@@ -49,7 +49,7 @@ class BaiduSpeechRecogService(event: RecogEvent) : SpeechRecogService(event) {
         }
     }
 
-    private fun recogParams(silent: Boolean) = mutableMapOf<String, Any>(
+    private fun recogParams(silent: Boolean) = mutableMapOf(
             ACCEPT_AUDIO_DATA to false,
             VAD_MODEL to VAD_TOUCH,
             DISABLE_PUNCTUATION to false,//标点符号
@@ -59,14 +59,15 @@ class BaiduSpeechRecogService(event: RecogEvent) : SpeechRecogService(event) {
     ).also {
         it[IN_FILE] = "#cn.vove7.jarvis.speech.baiduspeech.MicInputStream.instance()"
         //从指定时间开始识别，可以 - 指定ms 识别之前的内容
-        if (!AppConfig.openResponseWord && !AppConfig.voiceRecogFeedback)//唤醒即识别 音效和响应词关闭时开启
+        val voiceRecogFeedback = AppConfig.voiceRecogFeedback
+        if (!AppConfig.openResponseWord && !voiceRecogFeedback)//唤醒即识别 音效和响应词关闭时开启
             it[AUDIO_MILLS] = System.currentTimeMillis() - 100
         //长语音，不再依赖百度语音内置
 //        if (AppConfig.lastingVoiceCommand)
         //静音时长
-        if (AppConfig.voiceRecogFeedback && !silent)
+        if (voiceRecogFeedback && !silent)
             it[SOUND_START] = R.raw.recog_start
-        if (AppConfig.voiceRecogFeedback) {
+        if (voiceRecogFeedback) {
             it[SOUND_END] = R.raw.recog_finish
             it[SOUND_SUCCESS] = R.raw.recog_finish
             it[SOUND_ERROR] = R.raw.recog_failed

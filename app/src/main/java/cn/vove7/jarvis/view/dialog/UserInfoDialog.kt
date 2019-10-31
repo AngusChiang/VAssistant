@@ -15,7 +15,7 @@ import cn.vove7.common.model.VipPrice
 import cn.vove7.common.net.ApiUrls
 import cn.vove7.common.net.WrapperNetHelper
 import cn.vove7.jarvis.R
-import cn.vove7.common.app.AppConfig
+import cn.vove7.jarvis.tools.AppLogic
 import cn.vove7.jarvis.tools.openQQChat
 import cn.vove7.jarvis.tools.pay.PurchaseHelper
 import com.afollestad.materialdialogs.MaterialDialog
@@ -47,7 +47,7 @@ class UserInfoDialog(val context: Activity, val onUpdate: () -> Unit) {
             .neutralButton(R.string.text_recharge) { recharge() }
             .negativeButton(R.string.text_logout) {
                 exit = true
-                AppConfig.logout()
+                AppLogic.onLogout()
                 onUpdate.invoke()
             }.customView(view = view)
 
@@ -125,7 +125,7 @@ class UserInfoDialog(val context: Activity, val onUpdate: () -> Unit) {
                 if (bean.isOk()) {
                     try {
                         val userInfo = bean.data!!
-                        AppConfig.login(userInfo)
+                        AppLogic.onLogin(userInfo)
                         onUpdate.invoke()
                         setData()
                     } catch (e: Exception) {

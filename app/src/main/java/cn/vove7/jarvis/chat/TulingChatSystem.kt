@@ -1,11 +1,12 @@
 package cn.vove7.jarvis.chat
 
+import cn.vove7.common.app.AppConfig
 import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.bridges.HttpBridge
 import cn.vove7.common.model.UserInfo
-import cn.vove7.vtp.net.GsonHelper
 import cn.vove7.jarvis.BuildConfig
-import cn.vove7.common.app.AppConfig
+import cn.vove7.jarvis.view.floatwindows.IFloatyPanel
+import cn.vove7.vtp.net.GsonHelper
 import com.google.gson.Gson
 
 /**

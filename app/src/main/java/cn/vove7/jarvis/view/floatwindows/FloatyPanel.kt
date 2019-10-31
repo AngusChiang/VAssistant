@@ -6,9 +6,14 @@ import android.view.View
 import android.widget.TextView
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.appbus.AppBus
+import cn.vove7.common.bridges.SystemBridge
 import cn.vove7.common.model.RequestPermission
 import cn.vove7.common.utils.runOnUi
+import cn.vove7.common.utils.startActivity
 import cn.vove7.jarvis.R
+import cn.vove7.jarvis.activities.ResultPickerActivity
+import cn.vove7.jarvis.chat.UrlItem
+import cn.vove7.vtp.builder.BundleBuilder
 import cn.vove7.vtp.log.Vog
 
 /**
@@ -42,6 +47,27 @@ abstract class FloatyPanel(width: Int, height: Int) : AbFloatWindow(
             voiceText = text
             showText(text)
         }
+    }
+
+    override fun showUserWord(text: String?) {
+        show(text)
+    }
+
+    override fun showTextResult(result: String) {
+        show(result)
+    }
+
+    override fun showListResult(tite: String, items: List<UrlItem>) {
+        when {
+            items.size == 1 -> SystemBridge.openUrl(items[0].url)
+            else -> {
+                GlobalApp.APP.startActivity<ResultPickerActivity> {
+                    putExtra("title", tite)
+                    putExtra("data", BundleBuilder().put("items", items).data)
+                }
+            }
+        }
+
     }
 
     private fun showText(text: String?) {

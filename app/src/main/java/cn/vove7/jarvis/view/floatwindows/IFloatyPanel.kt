@@ -1,6 +1,7 @@
 package cn.vove7.jarvis.view.floatwindows
 
 import cn.vove7.common.app.GlobalApp
+import cn.vove7.jarvis.chat.UrlItem
 
 /**
  * # IFloatyPanel
@@ -14,10 +15,14 @@ interface IFloatyPanel {
     fun hideDelay(delay: Long = 800)
     fun show(text: String?)
 
+    fun showUserWord(text: String?)
+    fun showTextResult(result: String)
+    fun showListResult(tite:String, items: List<UrlItem>)
+
     fun showListeningAni()
 
     fun showAndHideDelay(text: String, delay: Long = 1000) {
-        show(text)
+        showTextResult(text)
         hideDelay(delay)
     }
 

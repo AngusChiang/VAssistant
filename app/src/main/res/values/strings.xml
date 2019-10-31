@@ -186,7 +186,7 @@
     <string name="text_email_copy_to_clip">你的邮箱已复制到剪切板，请填写至备注</string>
     <string name="text_understand">Understand</string>
     <string name="text_continue">Continue</string>
-    <string name="text_debug_service_starting">Debug service will close automatically after 2 minutes of free time.</string>
+    <string name="text_debug_service_starting">Debug service will close automatically after 2 minutes of free time.\nIP: %</string>
     <string name="text_version_code">Version code</string>
     <string name="text_script">Script</string>
     <string name="text_script_type">Script language</string>

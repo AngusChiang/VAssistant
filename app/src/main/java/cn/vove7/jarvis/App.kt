@@ -21,10 +21,8 @@ import cn.vove7.jarvis.receivers.PowerEventReceiver
 import cn.vove7.jarvis.receivers.ScreenStatusListener
 import cn.vove7.jarvis.receivers.UtilEventReceiver
 import cn.vove7.jarvis.services.MainService
-import cn.vove7.jarvis.tools.CrashHandler
-import cn.vove7.jarvis.tools.ShortcutUtil
-import cn.vove7.jarvis.tools.openAccessibilityServiceAuto
-import cn.vove7.jarvis.tools.setAssistantAppAuto
+import cn.vove7.jarvis.tools.*
+import cn.vove7.smartkey.android.AndroidSettings
 import cn.vove7.vtp.log.Vog
 import com.umeng.commonsdk.UMConfigure
 import org.greenrobot.eventbus.Subscribe
@@ -42,19 +40,14 @@ class App : GlobalApp() {
             Vog.d("非主进程")
             return
         }
+        AndroidSettings.init(this)
+        CrashHandler.install()
         runWithClock("加载配置") {
-            AppConfig.init()
+            AppLogic.onLaunch()
         }
         AppBus.reg(this)
-        CrashHandler.install()
 
-        runOnNewHandlerThread("app_load") {
-            startMainServices()
-            runOnPool {
-                openAccessibilityServiceAuto()
-                setAssistantAppAuto()
-            }
-        }
+        startMainServices()
     }
 
     @Synchronized
@@ -116,6 +109,11 @@ class InitCp : ContentProvider() {
 
     override fun onCreate(): Boolean {
         runOnNewHandlerThread(name = "延时启动", delay = 2000) {
+            runOnPool {
+                openAccessibilityServiceAuto()
+                setAssistantAppAuto()
+            }
+
             JPushInterface.setDebugMode(BuildConfig.DEBUG)
             JPushInterface.init(context)
             ShortcutUtil.initShortcut()
