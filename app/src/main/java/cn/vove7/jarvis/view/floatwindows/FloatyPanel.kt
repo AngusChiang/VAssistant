@@ -74,6 +74,7 @@ abstract class FloatyPanel(width: Int, height: Int) : AbFloatWindow(
         contentView?.findViewById<TextView>(R.id.voice_text)?.text = text
     }
 
+    fun <T : View> f(vid: Int): T? = contentView?.findViewById(vid)
 
     private var voiceText: String? = ""
 
@@ -92,14 +93,20 @@ abstract class FloatyPanel(width: Int, height: Int) : AbFloatWindow(
     /**
      * 执行superRemove移除视图
      */
-    abstract fun showExitAnimation()
-    abstract fun showEnterAnimation()
+    open fun showExitAnimation() {
+        superRemove()
+    }
+
+    open fun showEnterAnimation() {}
 
     internal fun superRemove() {
         isHiding = false
         super.onRemove()
     }
 
+    override fun showListeningAni() {}
+
+    override fun showParseAni() {}
 
     private fun removeDelayHide() {
         hideInterrupt = true

@@ -14,23 +14,10 @@ class OldFloatPanel : FloatyPanel(-1, -2) {
 
     override fun layoutResId(): Int = R.layout.float_panel_old
 
-
     override fun onCreateView(view: View) {
         animationBody.layoutParams = (animationBody.layoutParams as LinearLayout.LayoutParams).also {
             it.topMargin = statusbarHeight
         }
     }
 
-    override fun showListeningAni() {
-    }
-
-    override fun showParseAni() {
-    }
-
-    override fun showExitAnimation() {
-        superRemove()
-    }
-
-    override fun showEnterAnimation() {
-    }
 }
