@@ -15,8 +15,6 @@ import cn.vove7.common.helper.ToastyHelper.TYPE_INFO
 import cn.vove7.common.helper.ToastyHelper.TYPE_SUCCESS
 import cn.vove7.common.helper.ToastyHelper.TYPE_WARNING
 import cn.vove7.common.utils.runInCatch
-import cn.vove7.smartkey.android.AndroidSettings
-
 import cn.vove7.vtp.app.AppInfo
 import cn.vove7.vtp.log.Vog
 import cn.vove7.vtp.net.NetHelper
@@ -50,7 +48,6 @@ open class GlobalApp : RePluginApplication() {
     }
 
 
-
     companion object {
         var launchTime: Long = 0
 
@@ -61,34 +58,54 @@ open class GlobalApp : RePluginApplication() {
 
         fun getString(id: Int): String = APP.getString(id)
 
+        @JvmStatic
+        @JvmOverloads
         fun toastInfo(rId: Int, duration: Int = Toast.LENGTH_SHORT) {
             toastInfo(getString(rId), duration)
         }
 
+        @JvmStatic
+        @JvmOverloads
+        fun toastShort(msg: String?, duration: Int = Toast.LENGTH_SHORT) = toastInfo(msg, duration)
+
+        @JvmStatic
+        @JvmOverloads
         fun toastInfo(msg: String?, duration: Int = Toast.LENGTH_SHORT) {
             ToastyHelper.toast(TYPE_INFO, "$msg", duration)
         }
 
+        @JvmOverloads
+        @JvmStatic
         fun toastSuccess(sId: Int, duration: Int = Toast.LENGTH_SHORT) {
             toastSuccess(getString(sId), duration)
         }
 
+        @JvmStatic
+        @JvmOverloads
         fun toastSuccess(msg: String, duration: Int = Toast.LENGTH_SHORT) {
             ToastyHelper.toast(TYPE_SUCCESS, msg, duration)
         }
 
+        @JvmStatic
+        @JvmOverloads
         fun toastError(sId: Int, duration: Int = Toast.LENGTH_SHORT) {
             toastError(getString(sId), duration)
         }
 
+        @JvmStatic
+        @JvmOverloads
         fun toastError(msg: String?, duration: Int = Toast.LENGTH_SHORT) {
             ToastyHelper.toast(TYPE_ERROR, "$msg", duration)
         }
 
+        @JvmStatic
+        @JvmOverloads
         fun toastWarning(sId: Int, duration: Int = Toast.LENGTH_SHORT) {
             toastWarning(getString(sId), duration)
         }
 
+        @JvmStatic
+        @JvmOverloads
         fun toastWarning(msg: String, duration: Int = Toast.LENGTH_SHORT) {
             ToastyHelper.toast(TYPE_WARNING, msg, duration)
         }
