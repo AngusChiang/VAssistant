@@ -15,6 +15,7 @@ import cn.vove7.common.net.ApiUrls
 import cn.vove7.common.net.WrapperNetHelper
 import cn.vove7.common.net.model.LastDateInfo
 import cn.vove7.common.utils.newDoc
+import cn.vove7.common.utils.startActivity
 import cn.vove7.jarvis.BuildConfig
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.activities.base.ReturnableActivity
@@ -86,20 +87,14 @@ class AdvancedSettingActivity : ReturnableActivity() {
         }, 1000)
     }
 
-    private fun startOnNewWin(cls: Class<*>) {
-        startActivity(Intent(this, cls).also {
-            it.newDoc()
-        })
-    }
-
     private val groupItems: List<SettingGroupItem> by lazy {
         mutableListOf(
                 SettingGroupItem(R.color.google_blue, "管理", childItems = listOf(
                         IntentItem(R.string.instru_management) {
-                            startOnNewWin(InstManagerActivity::class.java)
+                            startActivity<InstManagerActivity>()
                         },
                         IntentItem(R.string.text_mark_management) {
-                            startOnNewWin(MarkedManagerActivity::class.java)
+                            startActivity<MarkedManagerActivity>()
                         },
                         IntentItem(R.string.text_check_last_data) {
                             showLastDataDate()
@@ -127,12 +122,12 @@ class AdvancedSettingActivity : ReturnableActivity() {
                         },
                         IntentItem(R.string.text_test_code_lua, onClick = {
                             if (AppConfig.checkLogin()) {
-                                startOnNewWin(LuaEditorActivity::class.java)
+                                startActivity<LuaEditorActivity>()
                             }
                         }),
                         IntentItem(R.string.text_code_test_js, null, onClick = {
                             if (AppConfig.checkLogin())
-                                startOnNewWin(JsEditorActivity::class.java)
+                                startActivity<JsEditorActivity>()
                         })
                 )),
                 SettingGroupItem(R.color.google_red, "备份", childItems = listOf(

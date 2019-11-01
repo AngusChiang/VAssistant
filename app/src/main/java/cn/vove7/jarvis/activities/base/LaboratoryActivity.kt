@@ -1,6 +1,5 @@
 package cn.vove7.jarvis.activities.base
 
-import android.content.Intent
 import android.os.Bundle
 import android.util.TypedValue
 import android.widget.PopupMenu
@@ -12,8 +11,7 @@ import cn.vove7.common.bridges.SystemBridge
 import cn.vove7.common.model.UserInfo
 import cn.vove7.common.utils.ThreadPool.runOnPool
 import cn.vove7.common.utils.content
-import cn.vove7.common.utils.newDoc
-import cn.vove7.common.utils.startActivityOnNewTask
+import cn.vove7.common.utils.startActivity
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.activities.PluginManagerActivity
 import cn.vove7.jarvis.adapters.SettingsExpandableAdapter
@@ -58,9 +56,7 @@ class LaboratoryActivity : ReturnableActivity() {
         listOf(
                 SettingGroupItem(R.color.indigo_700, "插件管理", childItems = listOf(
                         IntentItem(title = "插件管理", summary = "扩展功能") {
-                            startActivityOnNewTask(Intent(this, PluginManagerActivity::class.java).also {
-                                it.newDoc()
-                            })
+                            startActivity<PluginManagerActivity>()
                         },
                         CheckBoxItem(title = "自动检查更新", keyId = R.string.key_auto_check_plugin_update,
                                 defaultValue = AppConfig.autoCheckPluginUpdate)
@@ -100,7 +96,7 @@ class LaboratoryActivity : ReturnableActivity() {
                                 return@IntentItem
                             }
                             TextEditorDialog(this, AppConfig.homeSystemConfig
-                                ?: ISmartHomeSystem.templateConfig(s)) {
+                                    ?: ISmartHomeSystem.templateConfig(s)) {
                                 noAutoDismiss()
                                 title(text = "参数配置")
                                 editorView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13f)
@@ -151,7 +147,7 @@ class LaboratoryActivity : ReturnableActivity() {
                                 awesomeHeader("信息")
                                 content(MarkdownContentBuilder()) {
                                     loadMarkdown(MainService.homeControlSystem?.summary()
-                                        ?: "")
+                                            ?: "")
                                 }
                             }
                         }
@@ -166,7 +162,7 @@ class LaboratoryActivity : ReturnableActivity() {
                         },
                         SingleChoiceItem(title = "对话系统",
                                 keyId = R.string.key_chat_system_type, entityArrId = R.array.list_chat_system,
-                                defaultValue = 0 ) { _, d ->
+                                defaultValue = 0) { _, d ->
                             runOnPool {
                                 sleep(800)//等待设置完成
                                 MainService.loadChatSystem()
