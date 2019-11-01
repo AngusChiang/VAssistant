@@ -100,7 +100,7 @@ class SettingsActivity : ReturnableActivity() {
                             keyId = R.string.key_recog_wait_duration,
                             summary = "在未识别到声音后自动结束识别（单位ms）",
                             defaultValue = { AppConfig.recogWaitDurationMillis },
-                            range = 500 to 5000),
+                            range = 300 to 3000),
                     CheckBoxItem(
                             R.string.text_voice_control_dialog,
                             summary = "使用语言命令控制对话框",

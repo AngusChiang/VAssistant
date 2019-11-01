@@ -111,7 +111,7 @@ object AppConfig : BaseConfig {
     var openChatSystem by noCacheKey(true, keyId = R.string.key_open_chat_system)
 
     //语音识别等待时长 s
-    var recogWaitDurationMillis by noCacheKey(800, keyId = R.string.key_recog_wait_duration)
+    var recogWaitDurationMillis by noCacheKey(600, keyId = R.string.key_recog_wait_duration)
 
     val autoSleepWakeupMillis: Long
         get() {
