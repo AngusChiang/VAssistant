@@ -79,7 +79,7 @@ object PowerEventReceiver : DyBCReceiver(), OnPowerEvent {
     override fun onLowBattery() {
         powerSavingMode = true
 
-        if (MainService.instance?.speechRecogService?.wakeupI?.opened == true) {
+        if (MainService.speechRecogService?.wakeupI?.opened == true) {
             AppBus.post(AppBus.ACTION_STOP_WAKEUP_WITHOUT_SWITCH)
         }
     }

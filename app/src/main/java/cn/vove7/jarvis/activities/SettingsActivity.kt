@@ -83,7 +83,7 @@ class SettingsActivity : ReturnableActivity() {
 //                            storeIndexOnSingleChoiceItem(o, it)
 //                            GlobalApp.toastInfo("切换语音引擎...")
 //                            ThreadPool.runOnCachePool {
-//                                MainService.instance?.loadSpeechService(it.first, true)
+//                                MainService.loadSpeechService(it.first, true)
 //                            }
 //                        }
 //                        false
@@ -320,11 +320,11 @@ class SettingsActivity : ReturnableActivity() {
                             defaultValue = 0
                     ) { _, b ->
                         AppBus.postDelay(AppBus.ACTION_RELOAD_SYN_CONF, 500)
-//                        MainService.instance?.speechSynService?.reloadStreamType()
+//                        MainService.speechSynService?.reloadStreamType()
                         return@SingleChoiceItem true
                     },
                     IntentItem(title = "试听") {
-                        MainService.instance?.speak("百度语音：基于业界领先的深度神经网络技术。")
+                        MainService.speak("百度语音：基于业界领先的深度神经网络技术。")
                     }
             )),
             SettingGroupItem(R.color.google_red, titleS = "悬浮面板", childItems = listOf(
@@ -336,12 +336,12 @@ class SettingsActivity : ReturnableActivity() {
                     ) { _, p ->
                         p ?: return@SingleChoiceItem false
                         if (p.first != AppConfig.panelStyle) {
-                            MainService.instance?.loadFloatPanel(p.first)
+                            MainService.loadFloatPanel(p.first)
                         }
                         true
                     },
                     IntentItem(title = "面板设置") {
-                        MainService.instance?.showPanelSettings()
+                        MainService.showPanelSettings()
                     }
 //                    SingleChoiceItem(title = "动画", entityArrId = R.array.list_fp_animation, keyId = R.string.key_fp_animation)
             )),

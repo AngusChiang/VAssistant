@@ -90,7 +90,7 @@ class LaboratoryActivity : ReturnableActivity() {
                                 keyId = R.string.key_home_system,
                                 items = listOf("Rokid(若琪)"), allowClear = true
                         ) { _, data ->
-                            MainService.instance?.loadHomeSystem(data?.first)
+                            MainService.loadHomeSystem(data?.first)
                             true
                         },
                         IntentItem(title = "参数配置") {
@@ -108,7 +108,7 @@ class LaboratoryActivity : ReturnableActivity() {
                                     val text = editorView.content()
                                     AppConfig.homeSystemConfig = text
                                     //重新解析配置，并保存到对应的指令存储中
-                                    MainService.instance?.homeControlSystem?.apply {
+                                    MainService.homeControlSystem?.apply {
                                         init()
                                         saveInstConfig()
                                     }
@@ -136,7 +136,7 @@ class LaboratoryActivity : ReturnableActivity() {
                                 positiveButton(text = "保存") {
                                     val text = editorView.content()
                                     AppConfig.homeSystemUserCommand = text
-                                    MainService.instance?.homeControlSystem?.loadUserCommand()
+                                    MainService.homeControlSystem?.loadUserCommand()
                                     GlobalApp.toastSuccess("保存完成")
                                 }
                                 negativeButton()
@@ -150,7 +150,7 @@ class LaboratoryActivity : ReturnableActivity() {
                             BottomDialog.builder(this) {
                                 awesomeHeader("信息")
                                 content(MarkdownContentBuilder()) {
-                                    loadMarkdown(MainService.instance?.homeControlSystem?.summary()
+                                    loadMarkdown(MainService.homeControlSystem?.summary()
                                         ?: "")
                                 }
                             }
@@ -160,7 +160,7 @@ class LaboratoryActivity : ReturnableActivity() {
                         SwitchItem(title = "开启", summary = "指令匹配失败，调用聊天系统",
                                 keyId = R.string.key_open_chat_system, defaultValue = { true }) { _, b ->
                             if (b) {
-                                MainService.instance?.loadChatSystem()
+                                MainService.loadChatSystem()
                             }
                             return@SwitchItem true
                         },
@@ -169,7 +169,7 @@ class LaboratoryActivity : ReturnableActivity() {
                                 defaultValue = 0 ) { _, d ->
                             runOnPool {
                                 sleep(800)//等待设置完成
-                                MainService.instance?.loadChatSystem()
+                                MainService.loadChatSystem()
                                 GlobalApp.toastInfo("对话系统切换完成")
                             }
                             return@SingleChoiceItem true

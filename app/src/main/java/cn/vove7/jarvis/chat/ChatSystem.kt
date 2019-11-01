@@ -22,7 +22,6 @@ import java.io.Serializable
  */
 interface ChatSystem {
     fun onChat(s: String, fp: IFloatyPanel): Boolean {
-        val ser = MainService.instance!!
         val data = chatWithText(s) ?: return false
 
         if (data.resultUrls.isNotEmpty()) {
@@ -30,11 +29,11 @@ interface ChatSystem {
         } else {
             data.word.let { word ->
                 AppBus.post(CommandHistory(UserInfo.getUserId(), s, word))
-                ser.speak(word)
+                MainService.speak(word)
                 fp.showTextResult(if (word.contains("="))
                     word.replace("=", "\n=") else word)
-                ser.executeAnimation.begin()
-                ser.executeAnimation.show(word)
+                MainService.executeAnimation.begin()
+                MainService.executeAnimation.show(word)
             }
         }
         return true

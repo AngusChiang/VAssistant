@@ -66,8 +66,8 @@ object BTConnectListener : DyBCReceiver() {
                     //config
 //                    useBTRecorderIf()//连接
 //                    updateBluetoothParameters(true)
-                    if (MainService.instance?.speechRecogService?.wakeupI?.opened == true) {
-//                        MainService.instance?.onCommand(AppBus.)
+                    if (MainService.speechRecogService?.wakeupI?.opened == true) {
+//                        MainService.onCommand(AppBus.)
                     }
 
                 } else if (state == BluetoothProfile.STATE_DISCONNECTED) {

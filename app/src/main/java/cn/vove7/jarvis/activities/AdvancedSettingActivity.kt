@@ -232,7 +232,7 @@ class AdvancedSettingActivity : ReturnableActivity() {
                             startActivity(Intent(this, ScreenOcrActivity::class.java))
                         },
                         IntentItem(title = "若琪测试") {
-                            MainService.instance?.homeControlSystem?.test()
+                            MainService.homeControlSystem?.test()
                         }
                 )
                 ))

@@ -70,6 +70,7 @@ import cn.vove7.jarvis.view.dialog.MultiChoiceDialog
 import cn.vove7.jarvis.view.dialog.OnMultiSelectListener
 import cn.vove7.jarvis.view.dialog.OnSelectListener
 import cn.vove7.jarvis.view.dialog.SingleChoiceDialog
+import cn.vove7.jarvis.view.floatwindows.CustomPanel
 import cn.vove7.jarvis.view.floatwindows.DefaultPanel
 import cn.vove7.jarvis.view.floatwindows.IFloatyPanel
 import cn.vove7.jarvis.view.floatwindows.OldFloatPanel
@@ -89,8 +90,33 @@ import kotlin.concurrent.thread
 /**
  * 主服务
  */
-class MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
+object MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
 
+    fun start() {
+        GlobalLog.log("主服务上线")
+    }
+
+    /**
+     * 正常语音模式
+     */
+    const val MODE_VOICE = 858
+    /**
+     * 执行期间获取"语音参数"
+     */
+    const val MODE_GET_PARAM = 72
+    /**
+     * 确认对话框语音模式
+     */
+    const val MODE_ALERT = 27
+
+    /**
+     * 语音输入
+     */
+    const val MODE_INPUT = 127
+
+    /**
+     * 语音事件数据类型
+     */
     val context = GlobalApp.APP
 
     private lateinit var floatyPanel: IFloatyPanel
@@ -124,7 +150,6 @@ class MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
     val executeAnimation: ExecuteAnimation by lazy { ExecuteAnimation() }
 
     init {
-        instance = this
         GlobalApp.serviceBridge = this
         runOnNewHandlerThread("load_speech_engine") {
             init()
@@ -146,6 +171,7 @@ class MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
         floatyPanel = when (type) {
             0 -> DefaultPanel()
             1 -> OldFloatPanel()
+            2 -> CustomPanel()
             else -> DefaultPanel()
         }
     }
@@ -566,126 +592,92 @@ class MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
         GlobalApp.serviceBridge = null
     }
 
-    companion object {
-        /**
-         * 正常语音模式
-         */
-        const val MODE_VOICE = 858
-        /**
-         * 执行期间获取"语音参数"
-         */
-        const val MODE_GET_PARAM = 72
-        /**
-         * 确认对话框语音模式
-         */
-        const val MODE_ALERT = 27
-
-        /**
-         * 语音输入
-         */
-        const val MODE_INPUT = 127
-
-        /**
-         * 语音事件数据类型
-         */
-
-        var instance: MainService? = null
-            get() {
-                return when {
-                    field == null -> null
-                    field?.speechEngineLoaded == true -> field
-                    else -> null
-                }
-            }
-
-        val wpTimerEnd
-            get() = (instance?.speechRecogService?.wakeupTimerEnd == true).also {
-                Vog.d("语音唤醒定时器状态：${instance?.speechRecogService?.wakeupTimerEnd}")
-            }
-        val wakeupOpen
-            get() =
-                (instance?.speechRecogService?.wakeupI?.opened == true).also {
-                    Vog.d("语音唤醒状态：$it")
-                }
-
-
-        val recogIsListening: Boolean
-            get() {
-                return if (instance?.speechEngineLoaded != true) {//未加载
-                    GlobalApp.toastWarning("引擎未就绪")
-                    false
-                } else instance?.speechRecogService?.isListening == true
-            }
-        val exEngineRunning: Boolean
-            get() {
-                return if (instance?.speechEngineLoaded != true) {//未加载
-                    GlobalApp.toastWarning("引擎未就绪")
-                    false
-                } else instance?.cExecutor?.running == true
-            }
-
-        /**
-         * 语音合成speaking
-         */
-        val speaking: Boolean
-            get() {
-                return if (instance?.speechEngineLoaded != true) {//未加载
-                    GlobalApp.toastWarning("引擎未就绪")
-                    false
-                } else instance?.speechSynService?.speaking == true
-            }
-
-        /**
-         * 切换识别
-         */
-        fun switchRecog() {
-            //等待时防止阻塞主线程
-            runOnPool {
-                if (instance?.speechEngineLoaded != true) {//未加载成
-                    GlobalApp.toastWarning("正在启动")
-
-                    //在未启动时，等待5s加载完
-                    val b = whileWaitTime(5000) {
-                        if (instance?.speechEngineLoaded == true) Unit
-                        else {
-                            sleep(200)
-                            null
-                        }
-                    }
-                    if (b == null) {
-                        GlobalApp.toastWarning("引擎未就绪")
-                        return@runOnPool
-                    }
-                }
-                if (instance?.isSpeakingResWord == true && speaking) {
-                    Vog.d("正在响应词")
-                    return@runOnPool
-                } else if (instance?.parsingCommand == true) {
-                    Vog.d("正在解析指令")
-                    return@runOnPool
-                } else {
-                    instance?.isSpeakingResWord = false
-                }
-                if (recogIsListening) {
-                    instance?.onCommand(ACTION_CANCEL_RECOG)
-                } else {
-                    DataCollector.buriedPoint("wakeup")
-                    instance?.onCommand(ACTION_START_RECOG)
-                }
-            }
+    val wpTimerEnd
+        get() = (speechRecogService?.wakeupTimerEnd == true).also {
+            Vog.d("语音唤醒定时器状态：${speechRecogService?.wakeupTimerEnd}")
+        }
+    val wakeupOpen
+        get() = (speechRecogService?.wakeupI?.opened == true).also {
+            Vog.d("语音唤醒状态：$it")
         }
 
-        /**
-         * 供插件调用
-         * @param cmd String
-         */
-        fun parseCommand(cmd: String, chat: Boolean) {
-            if (instance?.speechEngineLoaded != true) {//未加载
+
+    val recogIsListening: Boolean
+        get() {
+            return if (!speechEngineLoaded) {//未加载
                 GlobalApp.toastWarning("引擎未就绪")
-                return
-            }
-            instance?.onParseCommand(cmd, false, chat)
+                false
+            } else speechRecogService?.isListening == true
         }
+    val exEngineRunning: Boolean
+        get() {
+            return if (!speechEngineLoaded) {//未加载
+                GlobalApp.toastWarning("引擎未就绪")
+                false
+            } else cExecutor?.running
+        }
+
+    /**
+     * 语音合成speaking
+     */
+    val speaking: Boolean
+        get() {
+            return if (!speechEngineLoaded) {//未加载
+                GlobalApp.toastWarning("引擎未就绪")
+                false
+            } else speechSynService?.speaking == true
+        }
+
+    /**
+     * 切换识别
+     */
+    fun switchRecog() {
+        //等待时防止阻塞主线程
+        runOnPool {
+            if (!speechEngineLoaded) {//未加载成
+                GlobalApp.toastWarning("正在启动")
+
+                //在未启动时，等待5s加载完
+                val b = whileWaitTime(5000) {
+                    if (speechEngineLoaded) Unit
+                    else {
+                        sleep(200)
+                        null
+                    }
+                }
+                if (b == null) {
+                    GlobalApp.toastWarning("引擎未就绪")
+                    return@runOnPool
+                }
+            }
+            if (isSpeakingResWord && speaking) {
+                Vog.d("正在响应词")
+                return@runOnPool
+            } else if (parsingCommand) {
+                Vog.d("正在解析指令")
+                return@runOnPool
+            } else {
+                isSpeakingResWord = false
+            }
+            if (recogIsListening) {
+                onCommand(ACTION_CANCEL_RECOG)
+            } else {
+                DataCollector.buriedPoint("wakeup")
+                onCommand(ACTION_START_RECOG)
+            }
+        }
+    }
+
+    /**
+     * 供插件调用
+     * @param cmd String
+     */
+    fun parseCommand(cmd: String, chat: Boolean) {
+        if (!speechEngineLoaded) {//未加载
+            GlobalApp.toastWarning("引擎未就绪")
+            return
+        }
+        onParseCommand(cmd, false, chat)
     }
 
     /**
@@ -755,7 +747,7 @@ class MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
     /**
      * 语音识别事件监听
      */
-    inner class RecogEventListener : RecogEvent {
+    class RecogEventListener : RecogEvent {
         override fun onWakeup(word: String?) {
             Vog.d("onWakeup ---> 唤醒 -> $word")
             if (!ScreenStatusListener.screenOn) {
@@ -958,10 +950,8 @@ class MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
 
     /**
      * 解析指令
-     * @param result String
-     * @param from Boolean
      */
-    fun onParseCommand(
+    private fun onParseCommand(
             result: String, needCloud: Boolean = true,
             chat: Boolean = AppConfig.openChatSystem, from: Int = 0): Boolean {
         Vog.d("解析命令：$result")
@@ -1127,7 +1117,7 @@ class MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
     /**
      * 语音合成事件监听
      */
-    inner class SynthesisEventListener : SyntheEvent {
+    class SynthesisEventListener : SyntheEvent {
 
         /**
          * 出错时，根据text长度指定展示时间

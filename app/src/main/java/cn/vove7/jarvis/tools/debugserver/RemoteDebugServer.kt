@@ -227,7 +227,7 @@ object RemoteDebugServer : Runnable {
                         print.onPrint(0, "无动作")
                     } else {
                         print.onPrint(0, "执行：$cmd")
-                        MainService.instance?.onParseCommand(cmd)
+                        MainService.parseCommand(cmd, true)
                     }
                 }
                 "copyText" -> {

@@ -55,7 +55,7 @@ class ScreenPickerActivity : Activity() {
             return
         }
         if (unSupportPage.contains(AccessibilityApi.accessibilityService?.currentScope)) {
-            MainService.instance?.speak("不支持当前页")
+            MainService.speak("不支持当前页")
             finish()
             return
         }

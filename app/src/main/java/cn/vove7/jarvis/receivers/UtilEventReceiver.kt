@@ -45,7 +45,7 @@ object UtilEventReceiver : DyBCReceiver() {
                 AppLogic.onLogout()
                 if (AppConfig.speechEngineType == 1) {
                     AppConfig.speechEngineType = 0
-                    MainService.instance?.loadSpeechService(0)
+                    MainService.loadSpeechService(0)
                 }
             }
         }

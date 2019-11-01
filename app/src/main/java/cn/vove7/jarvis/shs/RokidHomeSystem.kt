@@ -205,7 +205,7 @@ class RokidHomeSystem : ISmartHomeSystem() {
         ))
 
         if (resp?.startsWith("Congratulations") == true) {
-            MainService.instance?.speak(finishWord)
+            MainService.speak(finishWord)
         } else {
             GlobalApp.toastError("若琪指令发送失败：$resp")
             GlobalLog.err("若琪指令发送失败：$resp")

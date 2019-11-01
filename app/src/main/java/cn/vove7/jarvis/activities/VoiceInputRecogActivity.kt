@@ -26,7 +26,7 @@ class VoiceInputRecogActivity : Activity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         AppBus.reg(this)
-        MainService.instance?.startVoiceInput() ?: let {
+        MainService.startVoiceInput() ?: let {
             GlobalApp.toastWarning("App未就绪")
             finishAndRemoveTask()
         }
@@ -63,7 +63,7 @@ class VoiceInputRecogActivity : Activity() {
     }
 
     override fun onBackPressed() {
-        MainService.instance?.onCommand(AppBus.ACTION_CANCEL_RECOG)
+        MainService.onCommand(AppBus.ACTION_CANCEL_RECOG)
         return
     }
 

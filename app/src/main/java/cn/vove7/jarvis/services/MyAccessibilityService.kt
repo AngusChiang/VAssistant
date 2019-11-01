@@ -255,15 +255,15 @@ class MyAccessibilityService : AccessibilityApi() {
 
     //按键监听
     private var startupRunner: Runnable = Runnable {
-        MainService.instance?.onCommand(AppBus.ACTION_START_RECOG)
+        MainService.onCommand(AppBus.ACTION_START_RECOG)
     }
 
     private var stopExecRunner: Runnable = Runnable {
-        MainService.instance?.onCommand(AppBus.ACTION_STOP_EXEC)
+        MainService.onCommand(AppBus.ACTION_STOP_EXEC)
     }
 
     private var stopSpeakRunner: Runnable = Runnable {
-        MainService.instance?.speechSynService?.stop(true)
+        MainService.speechSynService?.stop(true)
     }
 //    private var delayUp = 600L
 
@@ -296,7 +296,7 @@ class MyAccessibilityService : AccessibilityApi() {
                     return when {
                         MainService.recogIsListening -> {//下键取消聆听
                             v2 = true
-                            MainService.instance?.onCommand(AppBus.ACTION_CANCEL_RECOG)//up speed
+                            MainService.onCommand(AppBus.ACTION_CANCEL_RECOG)//up speed
                             true
                         }
                         MainService.speaking -> {
@@ -316,7 +316,7 @@ class MyAccessibilityService : AccessibilityApi() {
                     when {
                         MainService.recogIsListening -> {//按下停止聆听
                             v2 = true
-                            MainService.instance?.onCommand(AppBus.ACTION_STOP_RECOG)
+                            MainService.onCommand(AppBus.ACTION_STOP_RECOG)
                             return true
                         }
                         AppConfig.wakeUpWithHeadsetHook -> {//长按耳机中键唤醒
@@ -330,7 +330,7 @@ class MyAccessibilityService : AccessibilityApi() {
                     return when {
                         MainService.recogIsListening -> {//按下停止聆听
                             v2 = true
-                            MainService.instance?.onCommand(AppBus.ACTION_STOP_RECOG)
+                            MainService.onCommand(AppBus.ACTION_STOP_RECOG)
                             true
                         }
                         else -> {
@@ -350,7 +350,7 @@ class MyAccessibilityService : AccessibilityApi() {
                     when {
                         MainService.recogIsListening -> {//按下停止聆听
                             v2 = true
-                            MainService.instance?.onCommand(AppBus.ACTION_STOP_RECOG)
+                            MainService.onCommand(AppBus.ACTION_STOP_RECOG)
                             return true
                         }
                         AppConfig.isLongPressKeyWakeUp -> {//长按唤醒
@@ -374,7 +374,7 @@ class MyAccessibilityService : AccessibilityApi() {
                     KEYCODE_VOLUME_DOWN -> {
                         if (v3) {
                             when {
-                                MainService.instance?.speechSynService?.speaking == true -> {
+                                MainService.speechSynService?.speaking == true -> {
                                     return removeDelayIfInterrupt(event, stopSpeakRunner) || super.onKeyEvent(event)
                                 }
                                 MainService.exEngineRunning -> {//长按下键

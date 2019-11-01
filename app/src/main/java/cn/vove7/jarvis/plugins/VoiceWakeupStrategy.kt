@@ -41,7 +41,7 @@ object VoiceWakeupStrategy : AbsAccPluginService() {
         if (appInfo.hasMicroPermission()) {//有麦克风权限的App
             //case 1 进入App 自动休眠 ->  ACTION_STOP_VOICE_WAKEUP_WITHOUT_NOTIFY
             //wakeupI?.opened开启时，在内关闭唤醒
-            if (MainService.instance?.speechRecogService?.wakeupI?.opened == true) {
+            if (MainService.speechRecogService?.wakeupI?.opened == true) {
                 closeWakeup()
             }
         } else if (closed && AppConfig.voiceWakeup) {//已自动关闭 并且定时器有效
@@ -51,7 +51,7 @@ object VoiceWakeupStrategy : AbsAccPluginService() {
 
     fun closeWakeup() {
         if(!AppConfig.voiceWakeup) return
-        MainService.instance?.onCommand(AppBus.ACTION_STOP_VOICE_WAKEUP_WITHOUT_NOTIFY)
+        MainService.onCommand(AppBus.ACTION_STOP_VOICE_WAKEUP_WITHOUT_NOTIFY)
         Vog.d("VoiceWakeupStrategy ---> 关闭语音唤醒")
         closed = true
         if (AppConfig.notifyCloseMicro) {
@@ -72,7 +72,7 @@ object VoiceWakeupStrategy : AbsAccPluginService() {
             statusAni.begin()
             statusAni.hideDelay(2000)
         }
-        MainService.instance?.onCommand(AppBus.ACTION_START_VOICE_WAKEUP_WITHOUT_NOTIFY)
+        MainService.onCommand(AppBus.ACTION_START_VOICE_WAKEUP_WITHOUT_NOTIFY)
     }
 
 

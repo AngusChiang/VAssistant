@@ -197,7 +197,7 @@ class InstDetailActivity : BaseActivity() {
                             Action.SCRIPT_TYPE_JS -> Action.SCRIPT_TYPE_JS
                             else -> null
                         }
-                        MainService.instance?.runActionQue("初始化指令设置",
+                        MainService.runActionQue("初始化指令设置",
                                 PriorityQueue<Action>().also { it.add(createSettingAction) })
 //                        AppBus.post(createSettingAction)
                     }
@@ -602,8 +602,7 @@ class InstDetailActivity : BaseActivity() {
                         que.add(it.value.action)
                     }
                     //TODO 输入指令
-                    MainService.instance
-                            ?.runActionQue("RUN: ${node.actionTitle}", que)
+                    MainService.runActionQue("RUN: ${node.actionTitle}", que)
                     //防止以DEBUG方式运行
 //                    AppBus.post(que)
                 })

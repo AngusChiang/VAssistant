@@ -31,8 +31,6 @@ import org.greenrobot.eventbus.Subscribe
 @Suppress("MemberVisibilityCanBePrivate")
 class App : GlobalApp() {
 
-    private lateinit var mainService: MainService
-
     override fun onCreate() {
         super.onCreate()
 
@@ -50,11 +48,8 @@ class App : GlobalApp() {
         startMainServices()
     }
 
-    @Synchronized
     private fun startMainServices() {
-        if (!::mainService.isInitialized) {
-            mainService = MainService()
-        }
+        MainService.start()
     }
 
     private fun stopBroadcastReceivers() {
@@ -65,7 +60,7 @@ class App : GlobalApp() {
     }
 
     override fun onTerminate() {
-        MainService.instance?.destroy()
+        MainService.destroy()
         stopBroadcastReceivers()
         super.onTerminate()
     }

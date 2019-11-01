@@ -10,6 +10,7 @@ import cn.vove7.common.app.AppConfig
 import cn.vove7.common.app.AppConfig.checkAppUpdate
 import cn.vove7.common.model.UserInfo
 import cn.vove7.common.utils.StubbornFlag
+import cn.vove7.common.utils.finishAndRemoveTaskCompat
 import cn.vove7.common.utils.runOnNewHandlerThread
 import cn.vove7.jarvis.BuildConfig
 import cn.vove7.jarvis.R
@@ -47,6 +48,10 @@ class MainActivity : BaseActivity() {
             R.id.nav_me -> fSwitcher.switchFragment(mineF)
             else -> false
         }
+    }
+
+    override fun onBackPressed() {
+        finishAndRemoveTask()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {

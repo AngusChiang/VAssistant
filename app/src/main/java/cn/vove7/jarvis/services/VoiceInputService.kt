@@ -25,14 +25,14 @@ class VoiceInputService : RecognitionService() {
         this.listener = listener
         Vog.d("onStartListening ---> 开始")
         AppBus.reg(this)
-        MainService.instance?.startVoiceInput() ?: let {
+        MainService.startVoiceInput() ?: let {
             GlobalApp.toastWarning("App未就绪")
             stopSelf()
         }
     }
 
     override fun onCancel(listener: Callback?) {
-        MainService.instance?.onCommand(AppBus.ACTION_CANCEL_RECOG)
+        MainService.onCommand(AppBus.ACTION_CANCEL_RECOG)
         Vog.d("onCancel ---> 取消")
     }
 
@@ -44,7 +44,7 @@ class VoiceInputService : RecognitionService() {
 
 
     override fun onStopListening(listener: Callback?) {
-        MainService.instance?.onCommand(AppBus.ACTION_STOP_RECOG)
+        MainService.onCommand(AppBus.ACTION_STOP_RECOG)
         Vog.d("onStopListening ---> 停止")
     }
 
