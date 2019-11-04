@@ -18,6 +18,10 @@ object RootHelper {
     /**
      * 判断即是否授予root权限
      */
+    @JvmStatic
+    fun isRoot(): Boolean = hasRoot(100)
+
+    @JvmStatic
     fun hasRoot(timeOut: Int = 5000): Boolean = RootShell.isAccessGiven(timeOut, 0)
 
 
@@ -68,11 +72,7 @@ object RootHelper {
                 dos.flush()
                 dos.writeBytes("exit\n")
                 dos.flush()
-
-                var line: String? = null
-                while ((dis.readLine().also { line = it }) != null) {
-                    result.append(line).append("\n")
-                }
+                while ((dis.readLine().also { result.appendln(it) }) != null);
                 p.waitFor()
             }
         }
