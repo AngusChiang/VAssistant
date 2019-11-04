@@ -4,12 +4,12 @@ import android.content.Context
 import cn.vove7.common.app.GlobalLog
 import cn.vove7.jarvis.speech.baiduspeech.recognition.OfflineRecogParams
 import cn.vove7.jarvis.speech.baiduspeech.recognition.listener.IRecogListener
+import cn.vove7.vtp.asset.AssetHelper
 import cn.vove7.vtp.log.Vog
 import com.baidu.speech.EventListener
 import com.baidu.speech.EventManager
 import com.baidu.speech.EventManagerFactory
 import com.baidu.speech.asr.SpeechConstant
-import com.qihoo360.replugin.utils.AssetsUtils
 import org.json.JSONObject
 import java.io.File
 
@@ -65,11 +65,10 @@ class BaiduRecognizer(
     }
 
     private fun copyFile() {
-        val filesDir = context.filesDir.absolutePath + "/bd/"
-        val fName = "baidu_speech_grammar.bsg"
-        if (!File(filesDir, fName).exists()) {
-            AssetsUtils.extractTo(context, "bd/baidu_speech_grammar.bsg",
-                    filesDir, fName)
+        val fName = "bd/baidu_speech_grammar.bsg"
+        val outFile = context.filesDir.absolutePath + "/$fName"
+        if (!File(outFile).exists()) {
+            AssetHelper.copy2File(context, fName, outFile)
         }
     }
 

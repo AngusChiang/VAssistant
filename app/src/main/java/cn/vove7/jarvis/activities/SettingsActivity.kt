@@ -45,7 +45,7 @@ class SettingsActivity : ReturnableActivity() {
         setContentView(R.layout.activity_expandable_settings)
 
         val expandableListView = expand_list
-        adapter = SettingsExpandableAdapter(this, initData(), expandableListView)
+        adapter = SettingsExpandableAdapter(this, initData())
         expandableListView.setAdapter(adapter)
 
         try {

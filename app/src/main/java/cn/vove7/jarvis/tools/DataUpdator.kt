@@ -20,7 +20,6 @@ import cn.vove7.common.utils.ThreadPool.runOnCachePool
 import cn.vove7.common.utils.ThreadPool.runOnPool
 import cn.vove7.executorengine.parse.ParseEngine
 import cn.vove7.jarvis.R
-import cn.vove7.jarvis.droidplugin.RePluginInfo
 import cn.vove7.jarvis.plugins.AdKillerService
 import cn.vove7.jarvis.view.dialog.ProgressTextDialog
 import cn.vove7.vtp.log.Vog
@@ -335,30 +334,4 @@ object DataUpdator {
         }
     }
 
-    /**
-     * 检查插件更新
-     */
-    fun checkPluginUpdate() {
-        WrapperNetHelper.postJson<List<RePluginInfo>>(ApiUrls.PLUGIN_LIST) {
-            success { _, b ->
-                if (b.isOk()) {
-                    runOnCachePool {
-                        b.data?.forEach {
-                            if (it.hasUpdate()) {
-                                Vog.i("checkPluginUpdate ---> 检测到有插件更新")
-                                GlobalApp.toastInfo("检测到有插件更新")
-                                return@runOnCachePool
-                            }
-                        }
-                    }
-                } else {
-                    GlobalLog.err(b.message)
-                }
-            }
-            fail { _, e ->
-                GlobalLog.err(e)
-            }
-        }
-        Vog.i("checkPluginUpdate ---> 无插件更新")
-    }
 }

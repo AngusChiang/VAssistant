@@ -134,16 +134,18 @@ abstract class CodeEditorActivity : BaseActivity() {
 
     override fun onBackPressed() {
         if (haveFileUnsaved) {
-            MaterialDialog(this).title(text = "提示")
-                    .message(text = "有未保存的文件，是否放弃保存")
-                    .positiveButton {
-                        finish()
-                    }.negativeButton()
-                    .neutralButton(text = "保存退出") {
-                        codeEditor.saveFile(openFile!!)
-                        finish()
-                    }
-                    .show()
+            MaterialDialog(this).show {
+                title(text = "提示")
+                message(text = "有未保存的文件，是否放弃保存")
+                positiveButton {
+                    finish()
+                }
+                negativeButton()
+                neutralButton(text = "保存退出") {
+                    codeEditor.saveFile(openFile!!)
+                    finish()
+                }
+            }
             return
         } else super.onBackPressed()
     }

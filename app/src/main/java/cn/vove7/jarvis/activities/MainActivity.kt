@@ -10,7 +10,6 @@ import cn.vove7.common.app.AppConfig
 import cn.vove7.common.app.AppConfig.checkAppUpdate
 import cn.vove7.common.model.UserInfo
 import cn.vove7.common.utils.StubbornFlag
-import cn.vove7.common.utils.finishAndRemoveTaskCompat
 import cn.vove7.common.utils.runOnNewHandlerThread
 import cn.vove7.jarvis.BuildConfig
 import cn.vove7.jarvis.R
@@ -66,8 +65,8 @@ class MainActivity : BaseActivity() {
     private fun initView() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             window.decorView.systemUiVisibility =
-                View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN or
-                        View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
+                    View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN or
+                            View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
             window.statusBarColor = resources.getColor(R.color.app_background)
         }
 
@@ -89,8 +88,6 @@ class MainActivity : BaseActivity() {
             //检查数据更新
             if (now - lastCheck > 120000) {
                 checkDataUpdate()
-                if (AppConfig.autoCheckPluginUpdate)// 插件更新
-                    DataUpdator.checkPluginUpdate()
                 lastCheck = now
             }
         } else
@@ -118,7 +115,8 @@ class MainActivity : BaseActivity() {
 
     private fun requestPermission() {
         if (!PermissionUtils.isAllGranted(this, ps)) {
-            MaterialDialog(this).title(text = "请先授予必要的权限")
+            MaterialDialog(this)
+                    .title(text = "请先授予必要的权限")
                     .message(text = "1. 麦克风\n2. 存储权限\n需要其他权限可到权限管理中开启").positiveButton {
                         PermissionUtils.autoRequestPermission(this, ps)
                     }.show()

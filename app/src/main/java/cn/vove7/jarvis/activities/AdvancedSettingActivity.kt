@@ -14,7 +14,6 @@ import cn.vove7.common.model.UserInfo
 import cn.vove7.common.net.ApiUrls
 import cn.vove7.common.net.WrapperNetHelper
 import cn.vove7.common.net.model.LastDateInfo
-import cn.vove7.common.utils.newDoc
 import cn.vove7.common.utils.startActivity
 import cn.vove7.jarvis.BuildConfig
 import cn.vove7.jarvis.R
@@ -56,7 +55,7 @@ class AdvancedSettingActivity : ReturnableActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_expandable_settings)
         val expandableListView = expand_list
-        adapter = SettingsExpandableAdapter(this, groupItems, expandableListView)
+        adapter = SettingsExpandableAdapter(this, groupItems)
 
         expandableListView?.setAdapter(adapter)
 

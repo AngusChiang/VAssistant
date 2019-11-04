@@ -11,9 +11,7 @@ import cn.vove7.common.bridges.SystemBridge
 import cn.vove7.common.model.UserInfo
 import cn.vove7.common.utils.ThreadPool.runOnPool
 import cn.vove7.common.utils.content
-import cn.vove7.common.utils.startActivity
 import cn.vove7.jarvis.R
-import cn.vove7.jarvis.activities.PluginManagerActivity
 import cn.vove7.jarvis.adapters.SettingsExpandableAdapter
 import cn.vove7.jarvis.plugins.AdKillerService
 import cn.vove7.jarvis.plugins.VoiceWakeupStrategy
@@ -41,7 +39,7 @@ class LaboratoryActivity : ReturnableActivity() {
 
         setContentView(R.layout.activity_expandable_settings)
         val expandableListView = expand_list
-        val adapter = SettingsExpandableAdapter(this, groupItems, expandableListView)
+        val adapter = SettingsExpandableAdapter(this, groupItems)
         expandableListView.setAdapter(adapter)
 
         expandableListView?.post {
@@ -54,13 +52,13 @@ class LaboratoryActivity : ReturnableActivity() {
 
     private val groupItems: List<SettingGroupItem> by lazy {
         listOf(
-                SettingGroupItem(R.color.indigo_700, "插件管理", childItems = listOf(
-                        IntentItem(title = "插件管理", summary = "扩展功能") {
-                            startActivity<PluginManagerActivity>()
-                        },
-                        CheckBoxItem(title = "自动检查更新", keyId = R.string.key_auto_check_plugin_update,
-                                defaultValue = AppConfig.autoCheckPluginUpdate)
-                )),
+//                SettingGroupItem(R.color.indigo_700, "扩展管理", childItems = listOf(
+//                        IntentItem(title = "插件管理", summary = "扩展功能") {
+//                            startActivity<PluginManagerActivity>()
+//                        },
+//                        CheckBoxItem(title = "自动检查更新", keyId = R.string.key_auto_check_plugin_update,
+//                                defaultValue = AppConfig.autoCheckPluginUpdate)
+//                )),
                 SettingGroupItem(R.color.google_blue, getString(R.string.text_open_ad_killer_service), childItems = listOf(
                         SwitchItem(R.string.text_open, summary = if (UserInfo.isVip()) null
                         else getString(R.string.summary_not_vip_remove_ad), keyId = R.string.key_open_ad_block,

@@ -15,7 +15,6 @@ import cn.vove7.common.model.UserInfo
 import cn.vove7.common.utils.ThreadPool.runOnPool
 import cn.vove7.common.utils.runOnNewHandlerThread
 import cn.vove7.common.utils.runWithClock
-import cn.vove7.jarvis.droidplugin.RePluginManager
 import cn.vove7.jarvis.receivers.AppInstallReceiver
 import cn.vove7.jarvis.receivers.PowerEventReceiver
 import cn.vove7.jarvis.receivers.ScreenStatusListener
@@ -114,7 +113,6 @@ class InitCp : ContentProvider() {
             ShortcutUtil.initShortcut()
             AdvanAppHelper.getPkgList()
             startBroadcastReceivers()
-            RePluginManager().launchWithApp()
             initUm()
         }
         return true

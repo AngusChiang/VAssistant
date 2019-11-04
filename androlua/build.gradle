@@ -34,7 +34,6 @@ android {
     productFlavors {
     }
 }
-apply plugin: 'replugin-host-gradle'
 
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
@@ -43,6 +42,5 @@ dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     implementation "com.github.Vove7:VTP:$vtp_version"
     implementation project(':common')
-    implementation "com.qihoo360.replugin:replugin-host-lib:${RP_VERSION}"
 
 }

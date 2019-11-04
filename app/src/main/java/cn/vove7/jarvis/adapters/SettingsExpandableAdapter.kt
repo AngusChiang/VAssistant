@@ -1,17 +1,11 @@
 package cn.vove7.jarvis.adapters
 
 import android.content.Context
-import android.support.transition.AutoTransition
-import android.support.transition.TransitionManager
-import android.support.v4.view.animation.LinearOutSlowInInterpolator
 import android.util.SparseArray
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.animation.AccelerateDecelerateInterpolator
-import android.view.animation.DecelerateInterpolator
 import android.widget.BaseExpandableListAdapter
-import android.widget.ExpandableListView
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.view.SettingChildItem
 import cn.vove7.jarvis.view.custom.GroupItemHolder
@@ -24,9 +18,10 @@ import cn.vove7.jarvis.view.tools.SettingItemHelper
  * @author 17719247306
  * 2018/9/10
  */
-class SettingsExpandableAdapter(val context: Context,
-                                var groupItems: List<SettingGroupItem>, val expView: ExpandableListView)
-    : BaseExpandableListAdapter() {
+class SettingsExpandableAdapter(
+        val context: Context,
+        var groupItems: List<SettingGroupItem>
+) : BaseExpandableListAdapter() {
 
 //    private val animationHelper = ListItemAnimationHelper(false, 100f)
 
@@ -38,34 +33,6 @@ class SettingsExpandableAdapter(val context: Context,
         for (i in 0 until groupCount) {
             childHolders.put(i, arrayOfNulls(getChildrenCount(i)))
         }
-    }
-
-
-    /**
-     * 获取group位置
-     * @param g Int
-     * @return Int
-     */
-    private fun getGroupAbsPos(g: Int): Int {
-        var cc = 0
-        for (i in 0 until g) {
-            cc++
-            if (expView.isGroupExpanded(i))
-                cc += getChildrenCount(i)
-        }
-        return cc
-    }
-
-    /**
-     * 获取child 在list中的位置
-     * @param g Int
-     * @param c Int
-     * @return Int
-     */
-    private fun getChildAboPos(g: Int, c: Int): Int {
-        var count = getGroupAbsPos(g)
-        count += c + 1
-        return count
     }
 
     override fun getGroup(groupPosition: Int): SettingGroupItem = groupItems[groupPosition]
