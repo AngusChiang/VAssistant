@@ -10,7 +10,6 @@ import cn.vove7.common.net.WrapperNetHelper
 import cn.vove7.common.utils.secure.SecuritySharedPreference
 import cn.vove7.vtp.log.Vog
 import com.google.gson.Gson
-import com.umeng.analytics.MobclickAgent
 
 /**
  * # Logic
@@ -57,7 +56,7 @@ object AppLogic {
 
     fun onLogin(userInfo: UserInfo) {
         val ssp = SecuritySharedPreference(context, "xka", Context.MODE_PRIVATE)
-        MobclickAgent.onProfileSignIn("${UserInfo.getUserId()}")
+        DataCollector.onProfileSignIn("${UserInfo.getUserId()}")
         userInfo.success()
         //保存->sp
         val infoJson = Gson().toJson(userInfo)
@@ -66,7 +65,7 @@ object AppLogic {
 
     fun onLogout() {
         val ssp = SecuritySharedPreference(context, "xka", Context.MODE_PRIVATE)
-        MobclickAgent.onProfileSignOff()
+        DataCollector.onProfileSignOff()
         ssp.remove(context.getString(R.string.key_login_info))
         UserInfo.logout()
     }

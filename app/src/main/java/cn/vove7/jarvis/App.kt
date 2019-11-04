@@ -23,7 +23,6 @@ import cn.vove7.jarvis.services.MainService
 import cn.vove7.jarvis.tools.*
 import cn.vove7.smartkey.android.AndroidSettings
 import cn.vove7.vtp.log.Vog
-import com.umeng.commonsdk.UMConfigure
 import org.greenrobot.eventbus.Subscribe
 
 
@@ -113,7 +112,6 @@ class InitCp : ContentProvider() {
             ShortcutUtil.initShortcut()
             AdvanAppHelper.getPkgList()
             startBroadcastReceivers()
-            initUm()
         }
         return true
     }
@@ -126,11 +124,6 @@ class InitCp : ContentProvider() {
             UtilEventReceiver.start()
 //            BTConnectListener.start()
         }
-    }
-
-    private fun initUm() {
-        UMConfigure.init(GlobalApp.APP, BuildConfig.UM_KEY, "default", UMConfigure.DEVICE_TYPE_PHONE, "")
-        UMConfigure.setLogEnabled(BuildConfig.DEBUG)
     }
 
     override fun insert(uri: Uri, values: ContentValues?): Uri? = null

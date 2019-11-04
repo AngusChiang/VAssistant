@@ -20,7 +20,6 @@
             <option value="$PROJECT_DIR$/push" />
             <option value="$PROJECT_DIR$/rhino-android" />
             <option value="$PROJECT_DIR$/speechLib" />
-            <option value="$PROJECT_DIR$/umlib" />
           </set>
         </option>
         <option name="resolveModulePerSourceSet" value="false" />
