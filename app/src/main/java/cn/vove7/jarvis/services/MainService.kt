@@ -680,7 +680,7 @@ object MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
         onCommand(ACTION_START_RECOG)
     }
 
-    private fun hideAll(immediately: Boolean = false) {
+    internal fun hideAll(immediately: Boolean = false) {
         if (immediately) {
             floatyPanel.hideImmediately()
             listeningAni.hideDelay(0)
@@ -947,7 +947,7 @@ object MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
             chat: Boolean = AppConfig.openChatSystem, from: Int = 0): Boolean {
         Vog.d("解析命令：$result")
         isContinousDialogue = false
-        floatyPanel.showTextResult(result)
+        floatyPanel.showUserWord(result)
         parseAnimation.begin()
         floatyPanel.showParseAni()
 

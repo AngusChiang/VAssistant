@@ -26,6 +26,8 @@ interface ChatSystem {
 
         if (data.resultUrls.isNotEmpty()) {
             fp.showListResult(data.word, data.resultUrls)
+            fp.hideDelay()
+            MainService.hideAll()
         } else {
             data.word.let { word ->
                 AppBus.post(CommandHistory(UserInfo.getUserId(), s, word))
