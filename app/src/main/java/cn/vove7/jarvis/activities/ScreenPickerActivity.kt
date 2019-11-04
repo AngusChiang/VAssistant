@@ -130,7 +130,7 @@ class ScreenPickerActivity : Activity() {
         viewNodeList.forEach {
             val text = it.text
             runOnCachePool {
-                val r = BaiduAipHelper.translate(text, to = AppConfig.translateLang)
+                val r = BaiduAipHelper.translate(text.toString(), to = AppConfig.translateLang)
                 if (r != null) {
                     val res = r.transResult
                     if (text == res) {//文本相同
@@ -210,7 +210,7 @@ class ScreenPickerActivity : Activity() {
 
     var d: BottomDialog? = null
     private val onItemClick: (Model) -> Unit = { model ->
-        d = TextOperationDialog(this, TextOperationDialog.TextModel(model.text)).bottomDialog
+        d = TextOperationDialog(this, TextOperationDialog.TextModel(model.text.toString())).bottomDialog
     }
 
 
@@ -219,7 +219,7 @@ class ScreenPickerActivity : Activity() {
             var textView: CheckedTextView? = null,
             var subText: String? = null
     ) {
-        val text: String get() = viewNode.text ?: viewNode.desc() ?: ""
+        val text: CharSequence get() = viewNode.text ?: viewNode.desc() ?: ""
     }
 
 }

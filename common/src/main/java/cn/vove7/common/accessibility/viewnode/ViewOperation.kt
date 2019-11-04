@@ -102,22 +102,22 @@ interface ViewOperation {
      * @param text String
      * @return Boolean 是否成功
      */
-    fun trySetText(text: String): Boolean
+    fun trySetText(text: CharSequence): Boolean
 
     /**
      * 获取Node包含文本
      * @return String?
      */
-    var text: String?
+    var text: CharSequence?
 
     /**
      * 追加文本
      * @param s String
      * @return Boolean
      */
-    fun appendText(s: String)
+    fun appendText(s: CharSequence)
 
-    fun desc(): String?
+    fun desc(): CharSequence?
     //选择
     fun select(): Boolean
 
@@ -133,11 +133,11 @@ interface ViewOperation {
 
     fun scrollDown(): Boolean
 
-    fun setText(text: String, ep: String?): Boolean
+    fun setText(text: CharSequence, ep: String?): Boolean
     /**
      * 拼音首字母
      */
-    fun setTextWithInitial(text: String): Boolean
+    fun setTextWithInitial(text: CharSequence): Boolean
 
     fun scrollForward(): Boolean
     fun scrollBackward(): Boolean

@@ -120,11 +120,11 @@ abstract class FindBuilderWithOperation
         return node.scrollDown()
     }
 
-    override fun setText(text: String, ep: String?): Boolean {
+    override fun setText(text: CharSequence, ep: String?): Boolean {
         return node.setText(text, ep)
     }
 
-    override fun appendText(s: String) {
+    override fun appendText(s: CharSequence) {
         node.appendText(s)
     }
 
@@ -132,15 +132,15 @@ abstract class FindBuilderWithOperation
         return node.desc()
     }
 
-    override fun setTextWithInitial(text: String): Boolean {
+    override fun setTextWithInitial(text: CharSequence): Boolean {
         return node.setTextWithInitial(text)
     }
 
-    override fun trySetText(text: String): Boolean {
+    override fun trySetText(text: CharSequence): Boolean {
         return node.trySetText(text)
     }
 
-    override var text: String?
+    override var text: CharSequence?
         get() = node.text
         set(v) {
             node.text = v

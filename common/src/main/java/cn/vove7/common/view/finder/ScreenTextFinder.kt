@@ -11,7 +11,7 @@ import android.view.accessibility.AccessibilityNodeInfo
 class ScreenTextFinder(startNode: AccessibilityNodeInfo? = null) : ViewFinder(startNode) {
     var isWeb = false
     override fun findCondition(node: AccessibilityNodeInfo): Boolean {
-        if (node.className.endsWith("WebView", ignoreCase = true)) {
+        if (node.className?.endsWith("WebView", ignoreCase = true) == true) {
             isWeb = true
             return false
         }

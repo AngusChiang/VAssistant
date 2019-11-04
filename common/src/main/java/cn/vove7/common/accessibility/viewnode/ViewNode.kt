@@ -208,7 +208,7 @@ class ViewNode(val node: AccessibilityNodeInfo) : ViewOperation, Comparable<View
         }
     }
 
-    override var text: String?
+    override var text: CharSequence?
         get() {
             val text = node.text
             Vog.d("$text")
@@ -224,7 +224,7 @@ class ViewNode(val node: AccessibilityNodeInfo) : ViewOperation, Comparable<View
         return node.contentDescription?.toString()
     }
 
-    override fun appendText(s: String) {
+    override fun appendText(s: CharSequence) {
         text = buildString {
             append(text)
             append(s)
@@ -234,24 +234,24 @@ class ViewNode(val node: AccessibilityNodeInfo) : ViewOperation, Comparable<View
     /**
      * @param ep 额外参数
      */
-    override fun setText(text: String, ep: String?): Boolean {
+    override fun setText(text: CharSequence, ep: String?): Boolean {
         val arg = Bundle()
         arg.putCharSequence(AccessibilityNodeInfo.ACTION_ARGUMENT_SET_TEXT_CHARSEQUENCE, transText(text, ep))
         return node.performAction(AccessibilityNodeInfo.ACTION_SET_TEXT, arg)
     }
 
-    override fun setTextWithInitial(text: String): Boolean {
+    override fun setTextWithInitial(text: CharSequence): Boolean {
         return setText(text, "1")
     }
 
     /**
      * text转变
      */
-    private fun transText(text: String, ep: String?): String {
+    private fun transText(text: CharSequence, ep: String?): CharSequence {
         if (ep == null) return text
         return when (ep) {
             "1" -> {//转中文拼音首字母
-                TextTransHelper(GlobalApp.APP).chineseStr2Pinyin(text, true)
+                TextTransHelper(GlobalApp.APP).chineseStr2Pinyin(text.toString(), true)
             }
             else -> {
                 text
@@ -261,7 +261,7 @@ class ViewNode(val node: AccessibilityNodeInfo) : ViewOperation, Comparable<View
         }
     }
 
-    override fun trySetText(text: String): Boolean {
+    override fun trySetText(text: CharSequence): Boolean {
         val arg = Bundle()
         arg.putCharSequence(AccessibilityNodeInfo.ACTION_ARGUMENT_SET_TEXT_CHARSEQUENCE, text)
         var p = node
