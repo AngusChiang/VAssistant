@@ -31,7 +31,6 @@ class App : GlobalApp() {
 
     override fun onCreate() {
         super.onCreate()
-
         if (!isMainProcess) {
             Vog.d("非主进程")
             return
@@ -48,19 +47,6 @@ class App : GlobalApp() {
 
     private fun startMainServices() {
         MainService.start()
-    }
-
-    private fun stopBroadcastReceivers() {
-        PowerEventReceiver.stop()
-        ScreenStatusListener.stop()
-        AppInstallReceiver.stop()
-        UtilEventReceiver.stop()
-    }
-
-    override fun onTerminate() {
-        MainService.destroy()
-        stopBroadcastReceivers()
-        super.onTerminate()
     }
 
     @Subscribe

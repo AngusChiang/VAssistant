@@ -13,6 +13,10 @@ import java.text.Collator
  */
 interface ServiceBridge {
 
+    companion object {
+        lateinit var instance: ServiceBridge
+    }
+
     /**
      * 中途获取未知参数
      */

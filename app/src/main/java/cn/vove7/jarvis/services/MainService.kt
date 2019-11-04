@@ -150,7 +150,7 @@ object MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
     val executeAnimation: ExecuteAnimation by lazy { ExecuteAnimation() }
 
     init {
-        GlobalApp.serviceBridge = this
+        ServiceBridge.instance = this
         runOnNewHandlerThread("load_speech_engine") {
             init()
         }
@@ -581,15 +581,6 @@ object MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         intent.putExtra("pName", r.permissionName)
         startActivity(intent)
-    }
-
-    fun destroy() {
-        if (speechEngineLoaded) {
-            speechRecogService?.release()
-            speechSynService?.release()
-        }
-        AppBus.unreg(this)
-        GlobalApp.serviceBridge = null
     }
 
     val wpTimerEnd

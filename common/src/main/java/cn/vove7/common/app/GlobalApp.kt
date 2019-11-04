@@ -108,9 +108,6 @@ open class GlobalApp : Application() {
         fun toastWarning(msg: String, duration: Int = Toast.LENGTH_SHORT) {
             ToastyHelper.toast(TYPE_WARNING, msg, duration)
         }
-
-        var serviceBridge: ServiceBridge? = null
-
     }
 
     /**

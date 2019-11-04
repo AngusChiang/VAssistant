@@ -60,7 +60,7 @@ import kotlin.concurrent.thread
  */
 open class ExecutorImpl(
         val context: Context = GlobalApp.APP,
-        val serviceBridge: ServiceBridge? = GlobalApp.serviceBridge
+        val serviceBridge: ServiceBridge = ServiceBridge.instance
 ) : CExecutorI, Closeable {
 
     private val systemBridge = SystemBridge
@@ -472,7 +472,7 @@ open class ExecutorImpl(
      * 等待语音参数
      */
     override fun waitForVoiceParam(askWord: String?): String? {
-        serviceBridge?.getVoiceParam()
+        serviceBridge.getVoiceParam()
         waitForUnlock()
         //得到结果 -> action.param
         return tmpMap[VOICE_RESULT] as String?
@@ -577,7 +577,7 @@ open class ExecutorImpl(
      */
     override fun waitForSingleChoice(askTitle: String, choiceData: List<ChoiceData>): ChoiceData? {
         //通知显示单选框
-        serviceBridge?.showChoiceDialog(ShowDialogEvent(WHICH_SINGLE, askTitle, choiceData))
+        serviceBridge.showChoiceDialog(ShowDialogEvent(WHICH_SINGLE, askTitle, choiceData))
         waitForUnlock()
 
         return (tmpMap.getAndRemove(SINGLE_CHOICE_RESULT) as ChoiceData?).also {
@@ -625,7 +625,7 @@ open class ExecutorImpl(
      * @param msg 提示信息
      */
     override fun alert(title: String, msg: String): Boolean {
-        serviceBridge?.showAlert(title, msg)
+        serviceBridge.showAlert(title, msg)
         waitForUnlock()
 
         return (tmpMap[ALERT_RESULT] as Boolean?).also {
@@ -639,19 +639,19 @@ open class ExecutorImpl(
     }
 
     override fun speak(text: String) {
-        serviceBridge?.speak(text)
+        serviceBridge.speak(text)
     }
 
     override fun speakSync(text: String): Boolean {
         val resultBox = ResultBox<String?>()
-        serviceBridge?.speakWithCallback(text) {
+        serviceBridge.speakWithCallback(text) {
             resultBox.setAndNotify(it)
         }
         return resultBox.blockedGet() != null
     }
 
     override fun removeFloat() {
-        serviceBridge?.removeFloat()
+        serviceBridge.removeFloat()
     }
 
     /**
