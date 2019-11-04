@@ -27,4 +27,12 @@ object DataCollector {
 
     }
 
+    fun onPageStart(pageName: String) {
+
+    }
+
+    fun onPageEnd(pageName: String) {
+
+    }
+
 }
