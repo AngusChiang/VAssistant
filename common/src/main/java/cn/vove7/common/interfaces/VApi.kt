@@ -313,12 +313,13 @@ interface VApi {
         )
 
         val inputMap = hashMapOf(
-                "init()" to "设置VAssist内置输入法",
+                "init()" to "设置VAssist内置输入法(无需显式调用)",
                 "restore()" to "恢复原输入法，指令结束后会自动恢复，也可显式调用，在合适时机恢复。",
                 "sendKey(keyCode)" to "发送按键，keyCode 见系统函数sendKey说明",
                 "sendKeys(keys)" to "发送一组按键",
                 "selectedText" to "编辑框选择的文本",
                 "input(text)" to "输入（光标后追加）",
+                "sendDefaultEditorAction()" to "发送默认输入框能响应的EditorAction事件",
                 "actionSearch()" to "发送IME_ACTION_SEARCH",
                 "actionGo()" to "发送IME_ACTION_GO",
                 "actionDone()" to "发送IME_ACTION_DONE",
