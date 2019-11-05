@@ -24,6 +24,8 @@ import cn.vove7.common.utils.ThreadPool.runOnCachePool
 import cn.vove7.common.utils.ThreadPool.runOnPool
 import cn.vove7.common.utils.activities
 import cn.vove7.common.utils.isInputMethod
+import cn.vove7.common.utils.runInCatch
+import cn.vove7.jarvis.BuildConfig
 import cn.vove7.jarvis.plugins.AdKillerService
 import cn.vove7.jarvis.plugins.VoiceWakeupStrategy
 import cn.vove7.jarvis.view.statusbar.AccessibilityStatusAnimation
@@ -98,13 +100,11 @@ class MyAccessibilityService : AccessibilityApi() {
      */
     override fun onAccessibilityEvent(event: AccessibilityEvent?) {
         event ?: return
-        //熄屏|低电量
-
         val eventType = event.eventType
-        try {
+
+        if (BuildConfig.DEBUG) runInCatch {
             Vog.v("class :$currentAppInfo - $currentActivity ${event.className} \n" +
                     AccessibilityEvent.eventTypeToString(eventType))
-        } catch (e: Exception) {
         }
 
         when (eventType) {

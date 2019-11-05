@@ -63,7 +63,7 @@ class EditorFunsHelper(
                         it.add(ApiFunction(f, executorMap[f] ?: f))
                     }
                 }),
-                ApiCategory("ViewNode", listOf(
+                ApiCategory("视图操作", listOf(
                         ApiFunction("tryClick()", "尝试点击"),
                         ApiFunction("globalClick()", "使用全局函数click进行点击操作，如点击网页控件\n需要高级无障碍服务"),
                         ApiFunction("swipe(dx, dy, delay)", "以此Node中心滑动到相对(dx,dy)的地方"),
@@ -82,20 +82,22 @@ class EditorFunsHelper(
                         , ApiFunction("focus()", "获得焦点")
                         , ApiFunction("appendText()()", "追加文本，适用于纯文本输入框")
                 )),
-                ApiCategory("ViewFinder", listOf(
-                        ApiFunction("find()", "搜索所有符合条件,返回Array<ViewNode>")
-                        , ApiFunction("waitFor()", "无限等待，直到搜索到，返回ViewNode")
-                        , ApiFunction("waitFor(m)", "等待最长m毫秒，超时失败返回空")
-                        , ApiFunction("findFirst()", "立即搜索，返回找到第一个，可能失败")
+                ApiCategory("视图搜索", listOf(
+                        ApiFunction("id(id)", "指定视图id")
+                        , ApiFunction("text(texts)", "文本匹配模式：相同文本,不区分大小写\n同equalsText")
                         , ApiFunction("equalsText(texts)", "文本匹配模式：相同文本,不区分大小写")
-                        , ApiFunction("containsText(texts)", "文本匹配模式：包含文本,不区分大小写")
                         , ApiFunction("similaryText(texts)", "根据文本相似度 > 0.75(中文转为拼音后的比较)")
-                        , ApiFunction("id(id)", "匹配id")
+                        , ApiFunction("containsText(texts)", "文本匹配模式：包含文本,不区分大小写")
+                        , ApiFunction("matchesText(regex)", "文本匹配模式：正则模式")
                         , ApiFunction("desc(descs)", "匹配desc")
                         , ApiFunction("containsDesc(descs)", "包含desc")
+                        , ApiFunction("type(types)", "匹配控件的className")
                         , ApiFunction("editable()", "匹配可编辑控件")
                         , ApiFunction("scrollable()", "匹配可滑动")
-                        , ApiFunction("type(types)", "匹配控件的className")
+                        , ApiFunction("findFirst()", "立即搜索，返回找到第一个，可能失败")
+                        , ApiFunction("find()", "搜索所有符合条件,返回Array<ViewNode>")
+                        , ApiFunction("waitFor()", "无限等待，直到搜索到，返回ViewNode")
+                        , ApiFunction("waitFor(m)", "等待最长m毫秒，超时失败返回空")
                         , ApiFunction("await()", "同waitFor()")
                         , ApiFunction("waitHide()", "等待消失 常用于加载View的消失,参数:([waitMs: Int])\n(可选)waitMs:等待时间,最长30s,\n返回Boolean: false:超时; true:该ViewNode消失")
                 )),

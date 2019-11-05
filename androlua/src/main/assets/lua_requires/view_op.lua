@@ -78,3 +78,46 @@ function traversing(node, ...)
     local printer = ps[1]
     traversingNode(0, 0, node, printer)
 end
+
+-- 快捷api
+
+function id(id)
+    return ViewFinder().id(id)
+end
+
+function text(...)
+    return ViewFinder().equalsText({...})
+end
+
+function containsText(...)
+    return ViewFinder().containsText({...})
+end
+
+function matchesText(...)
+    return ViewFinder().matchesText({...})
+end
+
+function similaryText(...)
+    return ViewFinder().similaryText({...})
+end
+
+function desc(...)
+    return ViewFinder().desc({...})
+end
+
+function containsDesc(...)
+    return ViewFinder().containsDesc({...})
+end
+
+function editable(b)
+    return ViewFinder().editable(b)
+end
+
+function scrollable(b)
+    return ViewFinder().scrollable(b)
+end
+
+function type(...)
+    return ViewFinder().type({ ... })
+end
+

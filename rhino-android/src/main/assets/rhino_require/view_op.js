@@ -49,3 +49,44 @@ traversingNode = function(index,d, node){
 traversing = function(node){
     traversingNode(0,0, node)
 }
+
+// 快捷api
+function id(id) {
+    return ViewFinder().id(id)
+}
+
+function text(text) {
+    return ViewFinder().equalsText(text)
+}
+
+function containsText(text) {
+    return ViewFinder().containsText(text)
+}
+
+function matchesText(text) {
+    return ViewFinder().matchesText(text)
+}
+
+function similaryText(text) {
+    return ViewFinder().similaryText(text)
+}
+
+function desc(text) {
+    return ViewFinder().desc(text)
+}
+
+function containsDesc(text) {
+    return ViewFinder().containsDesc(text)
+}
+
+function editable(b) {
+    return ViewFinder().editable(b)
+}
+
+function scrollable(b) {
+    return ViewFinder().scrollable(b)
+}
+
+function type(cls) {
+    return ViewFinder().type(cls)
+}
