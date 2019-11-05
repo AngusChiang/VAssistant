@@ -101,11 +101,15 @@ class ViewFindBuilder : FindBuilderWithOperation {
      * @param text text
      * @return this
      */
+    fun text(vararg text: String): ViewFindBuilder = equalsText(*text)
+
     fun equalsText(vararg text: String): ViewFindBuilder {
         viewFinderX.addViewTextCondition(*text)
         viewFinderX.textMatchMode = TEXT_MATCH_MODE_EQUAL
         return this
     }
+
+    fun text(text: String): ViewFindBuilder = equalsText(text)
 
     fun equalsText(text: String): ViewFindBuilder {
         viewFinderX.addViewTextCondition(text)
