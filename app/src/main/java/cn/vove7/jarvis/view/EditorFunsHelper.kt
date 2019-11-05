@@ -75,12 +75,12 @@ class EditorFunsHelper(
                         , ApiFunction("getChilds()", "获取下级所有Node,返回Array<ViewNode>")
                         , ApiFunction("getParent()", "获取父级Node，返回ViewNode?")
                         , ApiFunction("getBounds()", "获取边界范围")
-                        , ApiFunction("getCenterPoint()", "获取中心点坐标Point(x,y)(相对于本机屏幕),")
+                        , ApiFunction("getCenterPoint()", "获取中心点坐标Point(x,y)(相对于本机屏幕)")
                         , ApiFunction("getText()", "获取Node包含的文本")
                         , ApiFunction("select()", "选择")
                         , ApiFunction("trySelect()", "选择")
                         , ApiFunction("focus()", "获得焦点")
-                        , ApiFunction("appendText()()", "追加文本，适用于纯文本输入框")
+                        , ApiFunction("appendText()", "追加文本，适用于纯文本输入框")
                 )),
                 ApiCategory("视图搜索", listOf(
                         ApiFunction("id(id)", "指定视图id")
