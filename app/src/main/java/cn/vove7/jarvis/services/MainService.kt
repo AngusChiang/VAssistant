@@ -481,11 +481,11 @@ object MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
     /**
      * 测试脚本
      */
-    @Subscribe(threadMode = ThreadMode.POSTING)
+    @Subscribe(threadMode = ThreadMode.ASYNC)
     fun runAction(ac: Action) {
         val q = PriorityQueue<Action>()
         q.add(ac)
-        cExecutor.execQueue(CExecutorI.DEBUG_SCRIPT, q)
+        cExecutor.execQueue(CExecutorI.DEBUG_SCRIPT, q, false)
     }
 
     /**
