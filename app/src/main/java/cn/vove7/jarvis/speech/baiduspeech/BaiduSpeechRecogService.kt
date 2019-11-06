@@ -14,6 +14,7 @@ import cn.vove7.jarvis.speech.baiduspeech.wakeup.BaiduVoiceWakeup
 import cn.vove7.jarvis.speech.baiduspeech.wakeup.RecogWakeupListener
 import cn.vove7.jarvis.speech.baiduspeech.wakeup.WakeupEventAdapter
 import cn.vove7.vtp.log.Vog
+import com.baidu.speech.asr.SpeechConstant
 import com.baidu.speech.asr.SpeechConstant.*
 import com.google.gson.Gson
 import com.google.gson.annotations.SerializedName
@@ -57,6 +58,9 @@ class BaiduSpeechRecogService(event: RecogEvent) : SpeechRecogService(event) {
             PID to 1536,
             NLU to "enable"
     ).also {
+        if(enableOffline) {
+            it[DECODER] = 2
+        }
         it[IN_FILE] = "#cn.vove7.jarvis.speech.baiduspeech.MicInputStream.instance()"
         //从指定时间开始识别，可以 - 指定ms 识别之前的内容
         val voiceRecogFeedback = AppConfig.voiceRecogFeedback
