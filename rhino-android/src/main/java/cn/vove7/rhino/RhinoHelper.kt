@@ -1,7 +1,7 @@
 package cn.vove7.rhino
 
 import android.os.Looper
-import cn.vove7.common.ScriptEnginesBridges
+import cn.vove7.common.ScriptEngineBridges
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.interfaces.ScriptEngine
 import cn.vove7.rhino.api.RhinoApi
@@ -52,8 +52,8 @@ class RhinoHelper : ScriptableObject, ScriptEngine {
             "var android = Packages.android;\n" +
             "var org = Packages.org;\n"
 
-    constructor(scriptEnginesBridges: ScriptEnginesBridges) {
-        scriptEnginesBridges.apis.forEach { (t, u) ->
+    constructor(scriptEngineBridges: ScriptEngineBridges) {
+        scriptEngineBridges.apis.forEach { (t, u) ->
             putProperty(t, u)
         }
         init()

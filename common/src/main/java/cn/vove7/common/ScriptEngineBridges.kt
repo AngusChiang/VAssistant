@@ -6,7 +6,7 @@ package cn.vove7.common
  *
  * 2018/8/6
  */
-class ScriptEnginesBridges(vararg apis: Pair<String, Any>) {
+class ScriptEngineBridges(vararg apis: Pair<String, Any>) {
 
     val apis = mutableMapOf(*apis)
 

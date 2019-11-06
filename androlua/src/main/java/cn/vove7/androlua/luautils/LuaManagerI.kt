@@ -1,7 +1,7 @@
 package cn.vove7.androlua.luautils
 
 import android.content.Context
-import cn.vove7.common.ScriptEnginesBridges
+import cn.vove7.common.ScriptEngineBridges
 import com.luajava.LuaException
 import com.luajava.LuaState
 import dalvik.system.DexClassLoader
@@ -19,7 +19,7 @@ interface LuaManagerI {
     val luaState: LuaState
     val classLoaders: ArrayList<ClassLoader>
 
-    var bridgeManager: ScriptEnginesBridges?
+    var bridgeManager: ScriptEngineBridges?
     val app: Context
 
     @Throws(LuaException::class)

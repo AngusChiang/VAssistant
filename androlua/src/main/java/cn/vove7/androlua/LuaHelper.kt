@@ -7,7 +7,7 @@ import cn.vove7.androlua.luautils.LuaDexLoader
 import cn.vove7.androlua.luautils.LuaGcable
 import cn.vove7.androlua.luautils.LuaManagerI
 import cn.vove7.androlua.luautils.LuaPrinter
-import cn.vove7.common.ScriptEnginesBridges
+import cn.vove7.common.ScriptEngineBridges
 import cn.vove7.common.MessageException
 import cn.vove7.common.NotSupportException
 import cn.vove7.common.app.GlobalApp
@@ -37,17 +37,17 @@ class LuaHelper : LuaManagerI, ScriptEngine {
 
     constructor(context: Context) {
         this.context = context
-        bridgeManager = sScriptEnginesBridges
+        bridgeManager = scriptEngineBridges
         initPath()
         init()
     }
 
-    override var bridgeManager: ScriptEnginesBridges?
+    override var bridgeManager: ScriptEngineBridges?
 
 
-    constructor(context: Context, b: ScriptEnginesBridges) {
+    constructor(context: Context, b: ScriptEngineBridges) {
         this.context = context
-        sScriptEnginesBridges = b
+        scriptEngineBridges = b
         bridgeManager = b
         initPath()
         init()
@@ -70,7 +70,7 @@ class LuaHelper : LuaManagerI, ScriptEngine {
         private var jniLibsPath: String? = null
         private var luaDir: String? = null
         private val printList = HashSet<OnPrint>()
-        private var sScriptEnginesBridges: ScriptEnginesBridges? = null
+        private var scriptEngineBridges: ScriptEngineBridges? = null
 
         fun regPrint(print: OnPrint) {
             synchronized(printList) {

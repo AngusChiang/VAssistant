@@ -3,7 +3,7 @@ package cn.vove7.executorengine.exector
 import cn.vove7.androlua.LuaHelper
 import cn.vove7.common.NeedAccessibilityException
 import cn.vove7.common.NotSupportException
-import cn.vove7.common.ScriptEnginesBridges
+import cn.vove7.common.ScriptEngineBridges
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.bridges.*
@@ -27,7 +27,7 @@ import java.util.concurrent.ConcurrentSkipListSet
  * 2018/8/28
  */
 class ExecutorEngine : ExecutorImpl() {
-    private val bridgeManager = ScriptEnginesBridges(
+    private val bridgeManager = ScriptEngineBridges(
             "executor" to this,
             "http" to HttpBridge,
             "runtime" to this,
