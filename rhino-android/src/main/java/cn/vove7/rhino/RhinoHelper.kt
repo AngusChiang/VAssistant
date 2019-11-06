@@ -1,7 +1,7 @@
 package cn.vove7.rhino
 
 import android.os.Looper
-import cn.vove7.common.BridgeManager
+import cn.vove7.common.ScriptEnginesBridges
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.interfaces.ScriptEngine
 import cn.vove7.rhino.api.RhinoApi
@@ -52,17 +52,10 @@ class RhinoHelper : ScriptableObject, ScriptEngine {
             "var android = Packages.android;\n" +
             "var org = Packages.org;\n"
 
-    constructor(bridgeManager: BridgeManager) {
-        putProperty("executor", bridgeManager.executor)
-        putProperty("http", bridgeManager.httpBridge)
-        putProperty("runtime", bridgeManager.executor)
-        putProperty("system", bridgeManager.systemBridge)
-        putProperty("automator", bridgeManager.automator)
-        putProperty("androRuntime", bridgeManager.rootHelper)
-        putProperty("serviceBridge", bridgeManager.serviceBridge)
-        putProperty("app", appContext)
-        putProperty("input", bridgeManager.inputBridge)
-        putProperty("dialog", bridgeManager.dialogBridge)
+    constructor(scriptEnginesBridges: ScriptEnginesBridges) {
+        scriptEnginesBridges.apis.forEach { (t, u) ->
+            putProperty(t, u)
+        }
         init()
     }
 
@@ -79,13 +72,15 @@ class RhinoHelper : ScriptableObject, ScriptEngine {
         //包名
         rhinoContext.evaluateString(global, builtinVariables, "<builtin>", 1, null)
 
-        loadAsset("rhino_require/threads.js")
-        loadAsset("rhino_require/view_op.js")
-        loadAsset("rhino_require/executor.js")
-        loadAsset("rhino_require/global.js")
-        loadAsset("rhino_require/storages.js")
-        loadAsset("rhino_require/settings.js")
-        loadAsset("rhino_require/utils.js")
+        loadAsset(
+                "rhino_require/threads.js",
+                "rhino_require/view_op.js",
+                "rhino_require/executor.js",
+                "rhino_require/global.js",
+                "rhino_require/storages.js",
+                "rhino_require/settings.js",
+                "rhino_require/utils.js"
+        )
     }
 
     private fun putProperty(key: String, value: Any) {

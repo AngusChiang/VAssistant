@@ -1,14 +1,13 @@
 package cn.vove7.androlua
 
 import android.content.Context
-import cn.vove7.androlua.luabridge.LuaThread
 import cn.vove7.androlua.luabridge.LuaUtil
 import cn.vove7.androlua.luabridge.LuaUtil.errorReason
 import cn.vove7.androlua.luautils.LuaDexLoader
 import cn.vove7.androlua.luautils.LuaGcable
 import cn.vove7.androlua.luautils.LuaManagerI
 import cn.vove7.androlua.luautils.LuaPrinter
-import cn.vove7.common.BridgeManager
+import cn.vove7.common.ScriptEnginesBridges
 import cn.vove7.common.MessageException
 import cn.vove7.common.NotSupportException
 import cn.vove7.common.app.GlobalApp
@@ -16,7 +15,6 @@ import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.executor.OnPrint
 import cn.vove7.common.interfaces.ScriptEngine
 import cn.vove7.vtp.log.Vog
-import com.luajava.JavaFunction
 import com.luajava.LuaException
 import com.luajava.LuaState
 import com.luajava.LuaState.LUA_GCSTOP
@@ -39,17 +37,17 @@ class LuaHelper : LuaManagerI, ScriptEngine {
 
     constructor(context: Context) {
         this.context = context
-        bridgeManager = sBridgeManager
+        bridgeManager = sScriptEnginesBridges
         initPath()
         init()
     }
 
-    override var bridgeManager: BridgeManager?
+    override var bridgeManager: ScriptEnginesBridges?
 
 
-    constructor(context: Context, b: BridgeManager) {
+    constructor(context: Context, b: ScriptEnginesBridges) {
         this.context = context
-        sBridgeManager = b
+        sScriptEnginesBridges = b
         bridgeManager = b
         initPath()
         init()
@@ -72,7 +70,7 @@ class LuaHelper : LuaManagerI, ScriptEngine {
         private var jniLibsPath: String? = null
         private var luaDir: String? = null
         private val printList = HashSet<OnPrint>()
-        private var sBridgeManager: BridgeManager? = null
+        private var sScriptEnginesBridges: ScriptEnginesBridges? = null
 
         fun regPrint(print: OnPrint) {
             synchronized(printList) {

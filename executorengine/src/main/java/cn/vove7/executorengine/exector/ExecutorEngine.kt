@@ -1,26 +1,23 @@
 package cn.vove7.executorengine.exector
 
 import cn.vove7.androlua.LuaHelper
-import cn.vove7.common.BridgeManager
 import cn.vove7.common.NeedAccessibilityException
 import cn.vove7.common.NotSupportException
+import cn.vove7.common.ScriptEnginesBridges
+import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.app.GlobalLog
-import cn.vove7.common.bridges.GlobalActionExecutor
-import cn.vove7.common.bridges.SystemBridge
+import cn.vove7.common.bridges.*
 import cn.vove7.common.datamanager.parse.model.Action
 import cn.vove7.common.executor.CExecutorI.Companion.EXEC_CODE_FAILED
-import cn.vove7.common.executor.CExecutorI.Companion.EXEC_CODE_INTERRUPT
 import cn.vove7.common.executor.CExecutorI.Companion.EXEC_CODE_NOT_SUPPORT
 import cn.vove7.common.executor.CExecutorI.Companion.EXEC_CODE_REQUIRE
 import cn.vove7.common.executor.CExecutorI.Companion.EXEC_CODE_SUCCESS
 import cn.vove7.common.executor.OnPrint
-import cn.vove7.common.executor.PartialResult
 import cn.vove7.common.interfaces.ScriptEngine
 import cn.vove7.common.utils.RegUtils
 import cn.vove7.executorengine.ExecutorImpl
 import cn.vove7.rhino.RhinoHelper
 import cn.vove7.rhino.api.RhinoApi
-import cn.vove7.smartkey.tool.Vog
 import java.util.concurrent.ConcurrentSkipListSet
 
 /**
@@ -30,9 +27,18 @@ import java.util.concurrent.ConcurrentSkipListSet
  * 2018/8/28
  */
 class ExecutorEngine : ExecutorImpl() {
-    private val bridgeManager = BridgeManager(this, GlobalActionExecutor,
-            SystemBridge, serviceBridge)
-
+    private val bridgeManager = ScriptEnginesBridges(
+            "executor" to this,
+            "http" to HttpBridge,
+            "runtime" to this,
+            "system" to SystemBridge,
+            "automator" to GlobalActionExecutor,
+            "androRuntime" to RootHelper,
+            "serviceBridge" to ServiceBridge.instance,
+            "app" to GlobalApp.APP,
+            "input" to InputMethodBridge,
+            "dialog" to DialogBridge
+    )
 
     override fun onRhinoExec(script: String, argMap: Map<String, Any?>?): Pair<Int, String?> {
 
@@ -41,7 +47,7 @@ class ExecutorEngine : ExecutorImpl() {
         return runScriptWithCatch({
             rhinoHelper.evalString(script, argMap)
             RhinoApi.doLog("主线程执行完毕\n")
-        },{
+        }, {
             RhinoApi.doLog(it)
         })
     }

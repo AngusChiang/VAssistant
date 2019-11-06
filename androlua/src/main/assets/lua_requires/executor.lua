@@ -6,8 +6,6 @@
 
 -- require 'import'
 --
-local bridges = luaman.getBridgeManager()
-local executor = bridges.getExecutor()
 runtime = executor
 
 actionCount = executor.actionCount

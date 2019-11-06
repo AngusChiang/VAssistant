@@ -9,14 +9,14 @@
 import "cn.vove7.common.appbus.AppBus"
 --
 bridges = luaman.getBridgeManager()
-executor = bridges.getExecutor()
-http = bridges.getHttpBridge()
-androRuntime = bridges.getRootHelper()
-serviceBridge = bridges.getServiceBridge()
-system = bridges.getSystemBridge()
-automator = bridges.getAutomator()
-input = bridges.getInputBridge()
-dialog = bridges.getDialogBridge()
+executor = bridges.get('executor')
+http = bridges.get('http')
+androRuntime = bridges.get('androRuntime')
+serviceBridge = bridges.get('serviceBridge')
+system = bridges.get('system')
+automator = bridges.get('automator')
+input = bridges.get('input')
+dialog = bridges.get('dialog')
 
 function notifyFailed(s)
     executor.executeFailed(s)
