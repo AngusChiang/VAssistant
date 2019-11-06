@@ -46,7 +46,6 @@ import cn.vove7.common.net.WrapperNetHelper
 import cn.vove7.common.utils.*
 import cn.vove7.common.utils.RegUtils.checkCancel
 import cn.vove7.common.utils.RegUtils.checkConfirm
-import cn.vove7.common.utils.ThreadPool.runOnCachePool
 import cn.vove7.common.utils.ThreadPool.runOnPool
 import cn.vove7.common.view.finder.ViewFindBuilder
 import cn.vove7.executorengine.exector.ExecutorEngine
@@ -78,6 +77,10 @@ import cn.vove7.jarvis.view.statusbar.ExecuteAnimation
 import cn.vove7.jarvis.view.statusbar.ListeningAnimation
 import cn.vove7.jarvis.view.statusbar.ParseAnimation
 import cn.vove7.vtp.log.Vog
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.SubscriberExceptionEvent
 import org.greenrobot.eventbus.ThreadMode
@@ -122,7 +125,7 @@ object MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
     private lateinit var floatyPanel: IFloatyPanel
 
     //正在解析指令
-    private var parsingCommand = false
+    private val parsingCommand get() = parseJob != null
 
 //    override val serviceId: Int
 //        get() = 126
@@ -646,6 +649,7 @@ object MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
                 return@runOnPool
             } else if (parsingCommand) {
                 Vog.d("正在解析指令")
+                stopParse()
                 return@runOnPool
             } else {
                 isSpeakingResWord = false
@@ -939,6 +943,7 @@ object MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
 
     private var isContinousDialogue = false
 
+    private var parseJob: Job? = null
     /**
      * 解析指令
      */
@@ -946,6 +951,11 @@ object MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
             result: String, needCloud: Boolean = true,
             chat: Boolean = AppConfig.openChatSystem, from: Int = 0): Boolean {
         Vog.d("解析命令：$result")
+        if (parsingCommand) {
+            Vog.d("正在解析命令:::::::")
+            return false
+        }
+
         isContinousDialogue = false
         floatyPanel.showUserWord(result)
         parseAnimation.begin()
@@ -953,51 +963,59 @@ object MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
 
         resumeMusicIf()
 
-        runOnCachePool {
-            parsingCommand = true
-            //优先智能家居控制系统
-            if (homeControlSystem?.isSupport(result) == true) {
-                homeControlSystem?.doAction(result)
-                hideAll()
-                parsingCommand = false
-                return@runOnCachePool
-            }
-            //执行状态码码
-            var execCode = EXEC_CODE_NOT_SUPPORT
-            var lastPosition = 0
+        parseJob = GlobalScope.launch {
+            try {
+                //优先智能家居控制系统
+                if (homeControlSystem?.isSupport(result) == true) {
+                    homeControlSystem?.doAction(result)
+                    hideAll()
+                    return@launch
+                }
+                //执行状态码码
+                var execCode = EXEC_CODE_NOT_SUPPORT
+                var lastPosition = 0
 
-            do {
-                val parseResult: ActionParseResult = ParseEngine
-                        .parseAction(result, AccessibilityApi.accessibilityService?.currentScope, smartOpen, onClick, lastPosition)
-                lastPosition = parseResult.lastGlobalPosition
-                Vog.d("onParseCommand lastGlobalPosition: ${parseResult.msg} $lastPosition")
-                val actionQueue = parseResult.actionQueue
-                if (parseResult.isSuccess) {//actionQueue == null 指smartOpen, onClick 操作成功
-                    if (actionQueue != null) {
-                        floatyPanel.hideDelay()//执行时 消失
-                        execCode = cExecutor.execQueue(result, actionQueue)
-                        Vog.d("onParseCommand execCode: ${parseResult.msg} $execCode")
-                    } else {//smartOpen, onClick 操作成功
-                        execCode = EXEC_CODE_SUCCESS
-                    }
-                } else break
-            } while (execCode == EXEC_CODE_NOT_SUPPORT)
+                do {
+                    delay(1)
+                    val parseResult: ActionParseResult = ParseEngine
+                            .parseAction(result, AccessibilityApi.accessibilityService?.currentScope, smartOpen, onClick, lastPosition)
+                    lastPosition = parseResult.lastGlobalPosition
+                    Vog.d("onParseCommand lastGlobalPosition: ${parseResult.msg} $lastPosition")
+                    delay(1)
+                    if (parseResult.isSuccess) {//actionQueue == null 指smartOpen, onClick 操作成功
+                        val actionQueue = parseResult.actionQueue
+                        if (actionQueue != null) {
+                            floatyPanel.hideDelay()//执行时 消失
+                            execCode = cExecutor.execQueue(result, actionQueue)
+                            Vog.d("onParseCommand execCode: ${parseResult.msg} $execCode")
+                        } else {//smartOpen, onClick 操作成功
+                            execCode = EXEC_CODE_SUCCESS
+                        }
+                    } else break
+                } while (execCode == EXEC_CODE_NOT_SUPPORT)
 
-            when (execCode) {
-                EXEC_CODE_NOT_SUPPORT, EXEC_CODE_EMPTY_QUEUE ->//不支持的指令
-                    afterInstParse(result, needCloud, chat)
-                else -> onExecuteFinished(execCode)
+                when (execCode) {
+                    EXEC_CODE_NOT_SUPPORT, EXEC_CODE_EMPTY_QUEUE ->//不支持的指令
+                        afterInstParse(result, needCloud, chat)
+                    else -> onExecuteFinished(execCode)
+                }
+            } finally {
+                parseJob = null
             }
-            parsingCommand = false
         }
         return true
+    }
+
+    private fun stopParse() {
+        parseJob?.cancel()
+        hideAll(true)
     }
 
     /**
      * 指令解析不支持后
      * 云解析、对话
      */
-    private fun afterInstParse(result: String, needCloud: Boolean, chat: Boolean) {
+    private suspend fun afterInstParse(result: String, needCloud: Boolean, chat: Boolean) {
         //云解析
         if (needCloud && AppConfig.cloudServiceParseIfLocalFailed) {
             Vog.d("onParseCommand ---> 失败云解析")
@@ -1056,10 +1074,8 @@ object MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
      * 聊天
      * @param result String
      */
-    private fun doChat(result: String) {
+    private suspend fun doChat(result: String) {
         DataCollector.buriedPoint("chat")
-        parseAnimation.begin()
-        floatyPanel.showParseAni()
         resumeMusicLock = true
         if (chatSystem.onChat(result, floatyPanel)) {
 

@@ -12,6 +12,7 @@ import cn.vove7.jarvis.services.MainService
 import cn.vove7.jarvis.view.floatwindows.IFloatyPanel
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
+import kotlinx.coroutines.delay
 import java.io.Serializable
 
 /**
@@ -21,9 +22,9 @@ import java.io.Serializable
  * 2018/10/28
  */
 interface ChatSystem {
-    fun onChat(s: String, fp: IFloatyPanel): Boolean {
+    suspend fun onChat(s: String, fp: IFloatyPanel): Boolean {
         val data = chatWithText(s) ?: return false
-
+        delay(1)
         if (data.resultUrls.isNotEmpty()) {
             fp.showListResult(data.word, data.resultUrls)
             fp.hideDelay()
