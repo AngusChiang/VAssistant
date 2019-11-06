@@ -7,7 +7,6 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import cn.vove7.common.app.GlobalApp;
 import cn.vove7.common.appbus.AppBus;
 
 /**
@@ -33,16 +32,20 @@ public class UserInfo implements Serializable {
     private boolean isVip = false;
 
     public void success() {
-        if(isLogin()) return;
         INSTANCE = this;
-        isLogin = true;
-        AppBus.INSTANCE.post(AppBus.EVENT_USER_INIT);
+        if (!isLogin()) {
+            isLogin = true;
+            AppBus.INSTANCE.post(AppBus.EVENT_USER_INIT);
+        }
     }
 
-    public static void logout() {
+    public synchronized static void logout() {
         INSTANCE = null;
+        boolean l = isLogin;
         isLogin = false;
-        AppBus.INSTANCE.post(AppBus.EVENT_LOGOUT);
+        if (l) {
+            AppBus.post(AppBus.EVENT_LOGOUT);
+        }
     }
 
     public void setUserId(Long userId) {
@@ -132,7 +135,8 @@ public class UserInfo implements Serializable {
         return INSTANCE == null ? null : INSTANCE.vipEndDate;
     }
 
-    public void setVipEndDate(Date vipEndDate) { }
+    public void setVipEndDate(Date vipEndDate) {
+    }
 }
 
 
