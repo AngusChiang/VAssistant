@@ -24,6 +24,8 @@
 
 package com.luajava;
 
+import android.util.Log;
+
 import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
@@ -35,9 +37,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import cn.vove7.androlua.BuildConfig;
+
 /**
  * Class that contains functions accessed by lua.
  * TODO 适配kotlin object类 companion函数
+ *
  * @author Thiago Ponte
  */
 public final class LuaJavaAPI {
@@ -73,6 +78,24 @@ public final class LuaJavaAPI {
     }
 
 
+    private static final boolean m = true;
+
+    /**
+     * 检查是否使用反射
+     */
+    private static void checkReflect(Object obj) throws LuaException {
+        if (!m) return;
+        if (BuildConfig.DEBUG) {
+            Log.d("checkReflect", String.valueOf(obj));
+        }
+        if (obj != null) {
+            String clsNAme = obj.getClass().getName();
+            if (clsNAme.startsWith("java.lang.reflect")) {
+                throw new LuaException(new ReflectiveOperationException(clsNAme));
+            }
+        }
+    }
+
     /**
      * Java implementation of the metamethod __index
      *
@@ -84,6 +107,7 @@ public final class LuaJavaAPI {
 
     public static int objectIndex(long luaState, Object obj, String searchName, int type)
             throws LuaException {
+        checkReflect(obj);
         LuaState L = LuaStateFactory.getExistingState(luaState);
         synchronized (L) {
 
@@ -117,6 +141,7 @@ public final class LuaJavaAPI {
 
     public static int callMethod(long luaState, Object obj, String cacheName)
             throws LuaException {
+        checkReflect(obj);
         LuaState L = LuaStateFactory.getExistingState(luaState);
         synchronized (L) {
             Method[] methods = methodCache.get(cacheName);
@@ -195,6 +220,7 @@ public final class LuaJavaAPI {
 
     public static int objectNewIndex(long luaState, Object obj, String searchName)
             throws LuaException {
+        checkReflect(obj);
         LuaState L = LuaStateFactory.getExistingState(luaState);
         synchronized (L) {
             int res;
