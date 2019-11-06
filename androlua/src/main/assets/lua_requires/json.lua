@@ -72,7 +72,7 @@ function encode(v)
     return "null"
   end
 
-  local vtype = base.type(v)
+  local vtype = base._type(v)
 
   -- Handle strings
   if vtype == 'string' then
@@ -356,7 +356,7 @@ function isArray(t)
   -- (with the possible exception of 'n')
   local maxIndex = 0
   for k, v in base.pairs(t) do
-    if (base.type(k) == 'number' and math.floor(k) == k and 1 <= k) then -- k,v is an indexed pair
+    if (base._type(k) == 'number' and math.floor(k) == k and 1 <= k) then -- k,v is an indexed pair
       if (not isEncodable(v)) then return false end -- All array elements must be encodable
       maxIndex = math.max(maxIndex, k)
     else
@@ -376,7 +376,7 @@ end
 -- @param o The object to examine.
 -- @return boolean True if the object should be JSON encoded, false if it should be ignored.
 function isEncodable(o)
-  local t = base.type(o)
+  local t = base._type(o)
   return (t == 'string' or t == 'boolean' or t == 'number' or t == 'nil' or t == 'table') or (t == 'function' and o == null)
 end
 

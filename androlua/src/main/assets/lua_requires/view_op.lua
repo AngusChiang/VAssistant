@@ -117,6 +117,8 @@ function scrollable(b)
     return ViewFinder().scrollable(b)
 end
 
+-- 与lua type函数冲突 将原type 名为 _type
+_type = type
 function type(...)
     return ViewFinder().type({ ... })
 end
