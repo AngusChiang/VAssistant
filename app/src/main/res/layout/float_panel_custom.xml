@@ -4,11 +4,12 @@
     android:id="@+id/body"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:layout_marginTop="20dp"
     android:background="@drawable/round_white_full_10dp"
     android:elevation="2dp"
+    android:minWidth="150dp"
     android:orientation="vertical"
-    android:minWidth="200dp">
+    android:paddingTop="10dp"
+    android:paddingBottom="10dp">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -18,23 +19,22 @@
 
         <cn.vove7.jarvis.view.animation.WaveView
             android:id="@+id/listening_ani"
-            android:layout_width="37dp"
-            android:layout_height="37dp"
-            app:waveColor="@color/fff" />
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            app:waveColor="@color/green_700" />
 
         <ImageView
             android:id="@+id/parse_ani"
-            android:layout_width="25dp"
-            android:layout_height="25dp"
-            android:layout_marginEnd="10dp"
-            android:layout_marginRight="10dp"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:padding="2dp"
             android:src="@drawable/parsing_animation"
             android:visibility="gone" />
 
         <TextView
             android:id="@id/voice_text"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="37dp"
             android:fontFamily="sans-serif-black"
             android:gravity="center|start"
             android:minWidth="60dp"
@@ -44,6 +44,7 @@
             android:textStyle="bold"
             android:typeface="monospace" />
     </LinearLayout>
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -68,13 +69,14 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:fontFamily="sans-serif-black"
-            android:gravity="center|start"
-            android:minWidth="60dp"
-            android:minHeight="37dp"
-            android:text="正在聆听"
+            android:gravity="center"
+            android:paddingStart="10dp"
+            android:paddingEnd="10dp"
+            android:textColor="#000"
             android:textSize="14sp"
             android:textStyle="bold"
-            android:typeface="monospace" />
+            android:typeface="monospace"
+            android:visibility="gone" />
     </LinearLayout>
 
 </LinearLayout>

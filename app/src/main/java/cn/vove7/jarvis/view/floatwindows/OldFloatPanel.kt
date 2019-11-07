@@ -2,6 +2,8 @@ package cn.vove7.jarvis.view.floatwindows
 
 import android.view.View
 import android.widget.LinearLayout
+import cn.vove7.bottomdialog.util.fadeIn
+import cn.vove7.common.utils.fadeOut
 import cn.vove7.jarvis.R
 
 /**

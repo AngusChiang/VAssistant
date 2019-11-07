@@ -14,6 +14,7 @@ import android.support.annotation.ColorRes
 import android.support.v4.app.ActivityCompat
 import android.util.DisplayMetrics
 import android.view.View
+import android.view.animation.AlphaAnimation
 import android.view.animation.Animation
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
@@ -507,6 +508,27 @@ fun View.onClick(clickAction: (View) -> Unit) {
         isQuickClick() ?: return@setOnClickListener
         clickAction(it)
     }
+}
+
+
+fun View.fadeOut(
+        duration: Long = 800,
+        endStatus: Int = View.GONE,
+        end: Function0<Unit>? = null
+) {
+    startAnimation(AlphaAnimation(1f, 0f).apply {
+        this.duration = duration
+        setAnimationListener(object :Animation.AnimationListener{
+            override fun onAnimationRepeat(animation: Animation?) {}
+
+            override fun onAnimationEnd(animation: Animation?) {
+                visibility = endStatus
+                end?.invoke()
+            }
+
+            override fun onAnimationStart(animation: Animation?) {}
+        })
+    })
 }
 
 @Suppress("UNCHECKED_CAST")

@@ -34,7 +34,7 @@
 
     <string-array name="list_panel_style" translatable="false">
         <item>默认</item>
-        <item>样式A</item>
+        <item>简洁</item>
         <item>样式B</item>
     </string-array>
 

@@ -4,10 +4,12 @@ import android.os.Handler
 import android.os.Looper
 import android.view.View
 import android.widget.TextView
+import cn.vove7.bottomdialog.util.fadeIn
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.appbus.AppBus
 import cn.vove7.common.bridges.SystemBridge
 import cn.vove7.common.model.RequestPermission
+import cn.vove7.common.utils.fadeOut
 import cn.vove7.common.utils.runOnUi
 import cn.vove7.common.utils.startActivity
 import cn.vove7.jarvis.R
@@ -93,11 +95,16 @@ abstract class FloatyPanel(width: Int, height: Int) : AbFloatWindow(
     /**
      * 执行superRemove移除视图
      */
-    open fun showExitAnimation() {
-        superRemove()
+    open fun showEnterAnimation() {
+        animationBody.fadeIn(100)
     }
 
-    open fun showEnterAnimation() {}
+    open fun showExitAnimation() {
+        animationBody.fadeOut(100) {
+            superRemove()
+        }
+    }
+
 
     internal fun superRemove() {
         isHiding = false
