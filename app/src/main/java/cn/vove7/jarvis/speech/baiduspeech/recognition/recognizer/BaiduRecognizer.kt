@@ -4,14 +4,12 @@ import android.content.Context
 import cn.vove7.common.app.GlobalLog
 import cn.vove7.jarvis.speech.baiduspeech.recognition.OfflineRecogParams
 import cn.vove7.jarvis.speech.baiduspeech.recognition.listener.IRecogListener
-import cn.vove7.vtp.asset.AssetHelper
 import cn.vove7.vtp.log.Vog
 import com.baidu.speech.EventListener
 import com.baidu.speech.EventManager
 import com.baidu.speech.EventManagerFactory
 import com.baidu.speech.asr.SpeechConstant
 import org.json.JSONObject
-import java.io.File
 
 /**
  * 初始化 提供 EventManagerFactory需要的Context和EventListener
@@ -56,20 +54,11 @@ class BaiduRecognizer(
      * 加载离线词
      */
     fun loadOfflineEngine() {
-        copyFile()
         val json = JSONObject(OfflineRecogParams.fetchOfflineParams()).toString()
         Vog.v("loadOfflineEngine params:$json")
         asr.send(SpeechConstant.ASR_KWS_LOAD_ENGINE, json, null, 0, 0)
         isOfflineEngineLoaded = true
         // 没有ASR_KWS_LOAD_ENGINE这个回调表试失败，如缺少第一次联网时下载的正式授权文件。
-    }
-
-    private fun copyFile() {
-        val fName = "bd/baidu_speech_grammar.bsg"
-        val outFile = context.filesDir.absolutePath + "/$fName"
-        if (!File(outFile).exists()) {
-            AssetHelper.copy2File(context, fName, outFile)
-        }
     }
 
     fun start(params: Map<String, Any>) {
