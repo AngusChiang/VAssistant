@@ -5,10 +5,9 @@ import android.content.Intent
 import android.os.Bundle
 import android.speech.RecognizerIntent
 import android.speech.RecognizerIntent.ACTION_WEB_SEARCH
-import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.appbus.AppBus
-import cn.vove7.common.model.VoiceRecogResult
 import cn.vove7.common.bridges.SystemBridge
+import cn.vove7.common.model.VoiceRecogResult
 import cn.vove7.jarvis.services.MainService
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
@@ -26,17 +25,14 @@ class VoiceInputRecogActivity : Activity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         AppBus.reg(this)
-        MainService.startVoiceInput() ?: let {
-            GlobalApp.toastWarning("App未就绪")
-            finishAndRemoveTask()
-        }
+        MainService.startVoiceInput()
 
 //        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
 //            vi = voiceInteractor
 //        }
     }
 
-//
+    //
 //    override fun isVoiceInteraction(): Boolean = true
     @Subscribe(threadMode = ThreadMode.MAIN)
     fun onResult(voiceResult: VoiceRecogResult) {
@@ -53,7 +49,8 @@ class VoiceInputRecogActivity : Activity() {
 //            i.putExtra(RecognizerIntent.EXTRA_RESULTS, arr)
             i.putStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS, arr1)
 //            i.putExtra(RecognizerIntent.EXTRA_CONFIDENCE_SCORES, arrayListOf(1.0))
-            i.putExtra("android.speech.extra.LANGUAGE_RESULTS", "cmn-hans-cn")
+//            i.putExtra("android.speech.extra.LANGUAGE_RESULTS", "cmn-hans-cn")
+            i.putExtra(RecognizerIntent.EXTRA_CONFIDENCE_SCORES, floatArrayOf(1f))
             i.putExtra("query", voiceResult.result)
             setResult(RESULT_OK, i)
         }
@@ -63,12 +60,18 @@ class VoiceInputRecogActivity : Activity() {
     }
 
     override fun onBackPressed() {
-        MainService.onCommand(AppBus.ACTION_CANCEL_RECOG)
-        return
+        if (MainService.recogIsListening) {
+            MainService.onCommand(AppBus.ACTION_CANCEL_RECOG)
+        } else {
+            super.onBackPressed()
+        }
     }
 
     override fun onStop() {
         super.onStop()
+        if (!isFinishing) {
+            finishAndRemoveTask()
+        }
         AppBus.unreg(this)
     }
 
