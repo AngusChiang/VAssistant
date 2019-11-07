@@ -1,6 +1,5 @@
 package cn.vove7.jarvis.activities
 
-import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.speech.RecognizerIntent
@@ -8,6 +7,7 @@ import android.speech.RecognizerIntent.ACTION_WEB_SEARCH
 import cn.vove7.common.appbus.AppBus
 import cn.vove7.common.bridges.SystemBridge
 import cn.vove7.common.model.VoiceRecogResult
+import cn.vove7.jarvis.activities.base.BaseActivity
 import cn.vove7.jarvis.services.MainService
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
@@ -19,7 +19,7 @@ import java.util.*
  * @author 11324
  * 2019/1/20
  */
-class VoiceInputRecogActivity : Activity() {
+class VoiceInputRecogActivity : BaseActivity() {
 //    lateinit var vi: VoiceInteractor
 
     override fun onCreate(savedInstanceState: Bundle?) {

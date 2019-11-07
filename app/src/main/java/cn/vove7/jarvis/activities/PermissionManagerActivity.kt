@@ -49,6 +49,14 @@ class PermissionManagerActivity : OneFragmentActivity() {
         }
     }
 
+    override fun onBackPressed() {
+        if (intent.hasExtra("removeFromTask")) {
+            finishAndRemoveTask()
+        } else {
+            super.onBackPressed()
+        }
+    }
+
     class ManageFragment : SimpleListFragment<PermissionStatus>() {
         lateinit var pActivity: Activity
 
