@@ -12,16 +12,17 @@ import android.widget.TextView
 import cn.vove7.common.appbus.AppBus
 import cn.vove7.common.model.UserInfo
 import cn.vove7.common.utils.gone
+import cn.vove7.common.utils.onClick
 import cn.vove7.common.utils.show
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.activities.*
 import cn.vove7.jarvis.activities.base.LaboratoryActivity
-import cn.vove7.jarvis.tools.AppLogic
 import cn.vove7.jarvis.view.dialog.LoginDialog
 import cn.vove7.jarvis.view.dialog.UserInfoDialog
 import cn.vove7.vtp.easyadapter.BaseListAdapter
 import cn.vove7.vtp.log.Vog
 import kotlinx.android.synthetic.main.fragment_mine.*
+import kotlinx.android.synthetic.main.fragment_mine.view.*
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
 
@@ -46,20 +47,20 @@ class MineFragment : Fragment() {
     }
 
     lateinit var listView: ListView
-    lateinit var loginView: View
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.fragment_mine, container, false)
         AppBus.reg(this)
-        loginView = view.findViewById(R.id.text_login)
-        view.findViewById<View>(R.id.user_name_text).setOnClickListener {
-            UserInfoDialog(activity!!) {
-                loadUserInfo()
-            }
-        }
-        loginView.setOnClickListener {
-            LoginDialog(context!!) {
-                loadUserInfo()
+
+        view.top_panel.onClick {
+            if (UserInfo.isLogin()) {
+                UserInfoDialog(activity!!) {
+                    loadUserInfo()
+                }
+            }else{
+                LoginDialog(context!!) {
+                    loadUserInfo()
+                }
             }
         }
         listView = view.findViewById(R.id.list_view)
@@ -93,8 +94,8 @@ class MineFragment : Fragment() {
     }
 
     override fun onDestroy() {
-        super.onDestroy()
         AppBus.unreg(this)
+        super.onDestroy()
     }
 
     private fun loadUserInfo() {
@@ -103,7 +104,7 @@ class MineFragment : Fragment() {
             user_info_lay.visibility = View.VISIBLE
             user_name_text.text = UserInfo.getUserName()
             user_vip_text.text = when {
-                UserInfo.isPermanentVip() ->{
+                UserInfo.isPermanentVip() -> {
                     red_heard.show()
                     "永久会员"
                 }
