@@ -583,6 +583,7 @@ object MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
         val intent = Intent(context, PermissionManagerActivity::class.java)
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         intent.putExtra("pName", r.permissionName)
+        intent.putExtra("removeFromTask", true)
         startActivity(intent)
     }
 

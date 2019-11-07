@@ -36,6 +36,7 @@ class InstManagerActivity : BaseActivityWithViewPager() {
         toolbar.apply {
             inflateMenu(R.menu.menu_sync)
             menu.add("从剪切板导入")
+            menu.add("新建指令教程")
             SearchActionHelper(menu!!.findItem(R.id.menu_item_search)) { text ->
                 (currentFragment as SimpleListFragment<*>).search(text)
             }
@@ -50,6 +51,9 @@ class InstManagerActivity : BaseActivityWithViewPager() {
                 val f = fragments[p] as OnSyncInst
                 f.onSync()
                 return true
+            }
+            item?.title == "新建指令教程" -> {
+                SystemBridge.openUrl("https://vove.gitee.io/2019/01/29/Customize_Instruction_Regex/")
             }
             item?.title == "从剪切板导入" -> {
                 if (!UserInfo.isLogin()) {

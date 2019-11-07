@@ -61,8 +61,21 @@
         android:id="@+id/menu_sel_code"
         android:title="选择示例脚本"
         app:showAsAction="never" />
+
     <item
-        android:id="@+id/menu_api_doc"
-        android:title="API文档"
-        app:showAsAction="never" />
+        android:title="文档"
+        app:showAsAction="never">
+        <menu>
+            <item
+                android:id="@+id/menu_api_doc"
+                android:title="API文档" />
+            <item
+                android:id="@+id/menu_view_api"
+                android:title="视图操作教程" />
+            <item
+                android:id="@+id/menu_vosp"
+                android:title="脚本开源项目" />
+        </menu>
+
+    </item>
 </menu>

@@ -164,6 +164,12 @@ abstract class CodeEditorActivity : BaseActivity() {
                     GlobalApp.toastError("参数设置错误")
                 }
             }
+            R.id.menu_vosp -> {
+                SystemBridge.openUrl("https://github.com/Vove7/VOSP")
+            }
+            R.id.menu_view_api -> {
+                SystemBridge.openUrl("https://vove.gitee.io/2019/11/02/View-Api/")
+            }
             R.id.menu_api_doc -> {
                 SystemBridge.openUrl("https://vove.gitee.io/2018/09/25/Script-Api/")
             }
