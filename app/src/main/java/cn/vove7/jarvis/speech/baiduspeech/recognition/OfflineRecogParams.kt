@@ -12,9 +12,9 @@ import com.baidu.speech.asr.SpeechConstant
 
 object OfflineRecogParams : CommonRecogParams() {
 
-    fun fetchOfflineParams(): Map<String, Any> = mapOf(
-            Pair(SpeechConstant.DECODER, 2),
-            Pair(SpeechConstant.ASR_OFFLINE_ENGINE_GRAMMER_FILE_PATH, "asset:///bd/baidu_speech_grammar.bsg"),
+    fun fetchOfflineParams(grammarFile:String): Map<String, Any> = mapOf(
+            SpeechConstant.DECODER to 2,
+            SpeechConstant.ASR_OFFLINE_ENGINE_GRAMMER_FILE_PATH to grammarFile,
             Pair(SpeechConstant.SLOT_DATA,
                     BaiduSpeechRecogService.OffWord(
                             if (ActivityCompat.checkSelfPermission(GlobalApp.APP,
