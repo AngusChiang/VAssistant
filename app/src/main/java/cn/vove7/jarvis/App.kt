@@ -99,6 +99,7 @@ class InitCp : ContentProvider() {
             ShortcutUtil.initShortcut()
             AdvanAppHelper.getPkgList()
             startBroadcastReceivers()
+            launchExtension()
         }
         return true
     }
