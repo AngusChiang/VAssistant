@@ -102,8 +102,8 @@ class RhinoHelper : ScriptableObject, ScriptEngine {
     fun setArgs(args: Array<*>?) {
         args ?: return
         Vog.d("args" + Arrays.toString(args))
-        val array = arrayOfNulls<Any>(args!!.size)
-        System.arraycopy(args, 0, array, 0, args!!.size)
+        val array = arrayOfNulls<Any>(args.size)
+        System.arraycopy(args, 0, array, 0, args.size)
         val argsObj = rhinoContext.newArray(global, array)
         global.defineProperty("args", argsObj, DONTENUM)
 
@@ -247,7 +247,7 @@ class RhinoHelper : ScriptableObject, ScriptEngine {
         }
         val name = path.substring(nameStart, nameEnd)
         try {
-            val loader = SecurityController.createLoader(rhinoContext!!.getApplicationClassLoader(), securityDomain)
+            val loader = SecurityController.createLoader(rhinoContext.getApplicationClassLoader(), securityDomain)
             val clazz = loader.defineClass(name, data)
             loader.linkClass(clazz)
             if (!Script::class.java.isAssignableFrom(clazz)) {
@@ -289,7 +289,7 @@ class RhinoHelper : ScriptableObject, ScriptEngine {
 
 
         fun get(path: String, digest: ByteArray?): ScriptReference? {
-            var ref: ScriptReference? = null
+            var ref: ScriptReference?
             while (queue.poll().also { ref = it as ScriptReference? } != null) {
                 remove(ref!!.path)
             }
@@ -303,23 +303,6 @@ class RhinoHelper : ScriptableObject, ScriptEngine {
 
         fun put(path: String, digest: ByteArray?, script: Script?) {
             put(path, ScriptReference(path, digest, script, queue))
-        }
-
-    }
-
-    private class InterruptibleAndroidContextFactory(cacheDirectory: File) : AndroidContextFactory(cacheDirectory) {
-
-
-        protected override fun observeInstructionCount(cx: Context?, instructionCount: Int) {
-            if (Thread.currentThread().isInterrupted() && Looper.myLooper() != Looper.getMainLooper()) {
-                throw RuntimeException("Thread isInterrupted")
-            }
-        }
-
-        protected override fun makeContext(): Context {
-            val cx = super.makeContext()
-            cx.setInstructionObserverThreshold(10000)
-            return cx
         }
 
     }

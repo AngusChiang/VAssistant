@@ -1192,7 +1192,7 @@ object SystemBridge : SystemOperation {
             val v = if (value < 0) 0 else if (value > 255) 255 else value
             val contentResolver = GlobalApp.APP.contentResolver
             Settings.System.putInt(contentResolver,
-                    Settings.System.SCREEN_BRIGHTNESS, value)
+                    Settings.System.SCREEN_BRIGHTNESS, v)
         }
 
     override var screenBrightnessMode: Int
