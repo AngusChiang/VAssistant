@@ -125,7 +125,12 @@ class SettingItemHelper(
 
     private fun initColorPickerItem() {
         val item = settingItem as ColorPickerItem
-        var color = item.key?.let { config.settings.getInt(it, 0) } ?: item.defaultValue() as Int?
+        val def = item.defaultValue() as Int?
+        var color = item.key?.let {
+            if (it in config)
+                config.settings.getInt(it, def ?: 0)
+            else def
+        } ?: def
         val sum = {
             color?.let { "▇▇▇▇▇▇▇▇▇".spanColor(it) } ?: ""
         }
@@ -133,6 +138,7 @@ class SettingItemHelper(
 
         setBasic {
             val cpv = ColorPickerView(context)
+            cpv.setPadding(10.dp.px, 0, 10.dp.px, 0)
             MaterialDialog(context).title(text = settingItem.title()).show {
                 customView(view = cpv)
                 positiveButton {
