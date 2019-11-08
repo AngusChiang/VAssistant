@@ -1,6 +1,7 @@
 package cn.vove7.jarvis.view.floatwindows
 
 import android.graphics.drawable.AnimationDrawable
+import android.view.View
 import android.view.ViewAnimationUtils
 import android.view.WindowManager
 import android.view.animation.AccelerateInterpolator
@@ -10,8 +11,13 @@ import cn.vove7.common.utils.listener
 import cn.vove7.common.utils.runInCatch
 import cn.vove7.common.utils.show
 import cn.vove7.jarvis.R
+import cn.vove7.jarvis.view.NumberPickerItem
 import cn.vove7.jarvis.view.SettingChildItem
 import cn.vove7.jarvis.view.SingleChoiceItem
+import cn.vove7.jarvis.view.dp
+import group.infotech.drawable.dsl.corners
+import group.infotech.drawable.dsl.shapeDrawable
+import group.infotech.drawable.dsl.solidColor
 import kotlinx.android.synthetic.main.float_panel_default.view.*
 
 /**
@@ -25,6 +31,20 @@ class DefaultPanel : FloatyPanel(
         WindowManager.LayoutParams.WRAP_CONTENT
 ) {
     override fun layoutResId(): Int = R.layout.float_panel_default
+    override fun onCreateView(view: View) {
+        super.onCreateView(view)
+        animationBody.background = buildBackground()
+    }
+
+    private fun buildBackground(
+            radius: Int = FloatPanelConfig.defaultPanelRadius,
+            color: Int = FloatPanelConfig.defaultPanelColor) = shapeDrawable {
+        solidColor = color
+        corners {
+            bottomLeft = radius.dp.pxf
+            bottomRight = radius.dp.pxf
+        }
+    }
 
     override fun showListeningAni() {
         if (contentView?.listening_ani?.isShown == true) return
@@ -59,29 +79,25 @@ class DefaultPanel : FloatyPanel(
         }
     }
 
-
     override fun showExitAnimation() = buildExitAnimation()
-
 
     private fun buildExitAnimation() {
         when (FloatPanelConfig.defaultPanelAnimation) {
             1 -> {//揭露动画
-                startCircularAnimation()
+                startExitCircularAnimation()
             }
-            else -> {
-                AnimationUtils.loadAnimation(context, R.anim.pop_fade_out).apply {
-                    listener {
-                        onEnd { superRemove() }
-                    }
-                    runInCatch {
-                        animationBody.startAnimation(this)
-                    }
+            else -> AnimationUtils.loadAnimation(context, R.anim.pop_fade_out).apply {
+                listener {
+                    onEnd { superRemove() }
+                }
+                runInCatch {
+                    animationBody.startAnimation(this)
                 }
             }
         }
     }
 
-    private fun startCircularAnimation() {
+    private fun startExitCircularAnimation() {
         try {
             ViewAnimationUtils.createCircularReveal(animationBody, screenWidth / 2, 0,
                     screenWidth.toFloat(), 0f)
@@ -98,12 +114,29 @@ class DefaultPanel : FloatyPanel(
             superRemove()
         }
     }
+
     override val settingItems: Array<SettingChildItem>
         get() = arrayOf(
                 SingleChoiceItem(
                         title = "动画", defaultValue = 0,
                         entityArrId = R.array.list_fp_animation,
                         keyId = R.string.key_default_fp_animation
+                ),
+                NumberPickerItem(
+                        title = "圆角",
+                        keyId = R.string.key_default_fp_radius,
+                        defaultValue = { FloatPanelConfig.defaultPanelRadius },
+                        range = 0..50,
+                        onDialogDismiss = {
+                            hide()
+                        },
+                        onChange = {
+                            if (!isShowing) {
+                                show("设置圆角")
+                            } else runInCatch {
+                                animationBody.background = buildBackground(radius = it)
+                            }
+                        }
                 )
         )
 

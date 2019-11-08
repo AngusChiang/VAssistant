@@ -125,7 +125,6 @@
     <string name="key_home_system_user_command" translatable="false">home_system_user_command</string>
     <string name="key_home_system" translatable="false">home_system</string>
     <string name="key_panel_style" translatable="false">panel_style</string>
-    <string name="key_default_fp_animation" translatable="false">fp_animation</string>
     <string name="key_notify_wp_on_screen_off" translatable="false">notify_wp_on_screen_off</string>
     <string name="key_dev_mode" translatable="false">dev_mode</string>
 
@@ -182,6 +181,11 @@
     <string name="key_full_power_hint_text" translatable="false">full_power_hint_text</string>
     <string name="key_low_power_hint_text" translatable="false">low_power_hint_text</string>
     <string name="key_charging_hint_text" translatable="false">charging_hint_text</string>
+
+
+    <string name="key_default_fp_animation" translatable="false">default_fp_animation</string>
+    <string name="key_default_fp_radius" translatable="false">default_fp_radius</string>
+    <string name="key_default_fp_color" translatable="false">default_fp_color</string>
 
 
 

@@ -16,6 +16,7 @@ import cn.vove7.vtp.easyadapter.BaseListAdapter
 import cn.vove7.vtp.log.Vog
 import cn.vove7.vtp.sharedpreference.SpHelper
 import com.afollestad.materialdialogs.MaterialDialog
+import com.afollestad.materialdialogs.callbacks.onDismiss
 import com.afollestad.materialdialogs.customview.customView
 import com.afollestad.materialdialogs.input.input
 import com.afollestad.materialdialogs.list.listItemsMultiChoice
@@ -335,6 +336,7 @@ class SettingItemHelper(
                             setBasic()
                         }
                     }
+                    .onDismiss { (item as ItemDialogAction).onDialogDismiss?.invoke() }
                     .negativeButton()
                     .show()
 
@@ -342,6 +344,7 @@ class SettingItemHelper(
                 override fun onProgressChanged(seekBar: DiscreteSeekBar?, value: Int, fromUser: Boolean) {
                     if (fromUser) {
                         old = value
+                        (settingItem as NumberPickerItem).onChange?.invoke(value)
                     }
                 }
 

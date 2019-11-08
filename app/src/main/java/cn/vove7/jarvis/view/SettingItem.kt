@@ -154,17 +154,47 @@ class SwitchItem(
         callback: CallbackOnSet<Boolean>? = null
 ) : CompoundItem(titleId, title, summary, keyId, defaultValue, onTileAreaClick, callback, TYPE_SWITCH)
 
+interface ItemDialogAction {
+    val onDialogDismiss: Function0<Unit>?
+}
 
-class NumberPickerItem(
-        titleId: Int? = null,
-        title: String? = null,
-        summary: String? = null,
-        keyId: Int? = null,
-        defaultValue: () -> Int,
-        range: Pair<Int, Int>,
-        callback: CallbackOnSet<Int>? = null
-) : SettingChildItem(titleId, title, summary, TYPE_NUMBER, keyId, defaultValue, range = range,
-        callback = callback)
+
+class NumberPickerItem : SettingChildItem, ItemDialogAction {
+    val onChange: Function1<Int, Unit>?
+    override val onDialogDismiss: Function0<Unit>?
+
+    constructor(
+            titleId: Int? = null,
+            title: String? = null,
+            summary: String? = null,
+            keyId: Int? = null,
+            defaultValue: () -> Int,
+            range: Pair<Int, Int>,
+            onChange: Function1<Int, Unit>? = null,
+            onDialogDismiss: Function0<Unit>? = null,
+            callback: CallbackOnSet<Int>? = null
+    ) : super(titleId, title, summary, TYPE_NUMBER, keyId, defaultValue, range = range,
+            callback = callback) {
+        this.onChange = onChange
+        this.onDialogDismiss = onDialogDismiss
+    }
+
+    constructor(
+            titleId: Int? = null,
+            title: String? = null,
+            summary: String? = null,
+            keyId: Int? = null,
+            defaultValue: () -> Int,
+            range: IntRange,
+            onChange: Function1<Int, Unit>? = null,
+            onDialogDismiss: Function0<Unit>? = null,
+            callback: CallbackOnSet<Int>? = null
+    ) : super(titleId, title, summary, TYPE_NUMBER, keyId, defaultValue, range = range.first to range.last,
+            callback = callback) {
+        this.onChange = onChange
+        this.onDialogDismiss = onDialogDismiss
+    }
+}
 
 class SingleChoiceItem(
         titleId: Int? = null,

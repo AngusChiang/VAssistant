@@ -7,6 +7,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
+import android.graphics.Color
 import android.graphics.Rect
 import android.net.Uri
 import android.os.*
@@ -335,6 +336,8 @@ fun Context.color(@ColorRes id: Int): Int {
         resources.getColor(id)
     }
 }
+
+val String.asColor: Int get() = Color.parseColor(this)
 
 /**
  * 截取Activity
