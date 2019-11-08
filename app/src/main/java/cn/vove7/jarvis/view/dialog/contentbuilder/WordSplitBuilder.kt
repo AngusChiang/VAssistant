@@ -11,8 +11,8 @@ import android.widget.ProgressBar
 import cn.vove7.bottomdialog.interfaces.ContentBuilder
 import cn.vove7.bottomdialog.util.ObservableList
 import cn.vove7.bottomdialog.util.fadeIn
-import cn.vove7.bottomdialog.util.fadeOut
 import cn.vove7.bottomdialog.util.listenListToUpdate
+import cn.vove7.common.utils.fadeOut
 import cn.vove7.common.utils.runInCatch
 import cn.vove7.common.utils.runOnUi
 import cn.vove7.jarvis.R
@@ -21,7 +21,9 @@ import cn.vove7.jarvis.view.custom.WarpLinearLayout
 import cn.vove7.vtp.extend.buildList
 import cn.vove7.vtp.log.Vog
 import kotlinx.android.synthetic.main.dialog_pick_text.view.*
-import kotlin.concurrent.thread
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
 import kotlin.math.max
 import kotlin.math.min
 
@@ -49,28 +51,28 @@ class WordSplitBuilder(private val rawWords: String) : ContentBuilder() {
 
     private var loading: Boolean = false
         set(value) {
-            runInCatch {
-                runOnUi {
+            runOnUi {
+                runInCatch {
                     if (value) loadingBar.fadeIn()
-                    else loadingBar.fadeOut()
+                    else loadingBar.fadeOut(endStatus = View.INVISIBLE)
                 }
             }
             field = value
         }
-    private var lexerThread: Thread? = null
+
+    private var lexerJob: Job?
 
     init {
         loading = true
-        thread {
+        lexerJob = GlobalScope.launch {
             BaiduAipHelper.lexer(rawWords).also {
-                if (Thread.currentThread().isInterrupted) return@thread
-                lexerThread = null
+                loading = false
                 if (it == null) {
                     wordList.add("分词失败")
                 } else {
                     wordList.addAll(it)
                 }
-                loading = false
+                lexerJob = null
             }
         }
     }
@@ -82,16 +84,16 @@ class WordSplitBuilder(private val rawWords: String) : ContentBuilder() {
         if (loading) loadingBar.fadeIn()
         else loadingBar.fadeOut()
         dialog.setOnDismissListener {
-            lexerThread?.interrupt()
+            lexerJob?.cancel()
         }
     }
 
     override fun updateContent(type: Int, data: Any?) {
         content.removeAllViews()
         wordList.forEachIndexed { i, v ->
-            val v = buildView(i, v)
-            content.addView(v)
-            checkedTextList.add(v)
+            val vv = buildView(i, v)
+            content.addView(vv)
+            checkedTextList.add(vv)
         }
         splitAndOnTouch(checkedTextList, content)
     }
