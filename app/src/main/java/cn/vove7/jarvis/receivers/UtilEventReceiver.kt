@@ -19,8 +19,8 @@ import org.greenrobot.eventbus.Subscribe
  * 2018/11/24
  */
 object UtilEventReceiver : DyBCReceiver() {
-    override fun start() {
-        super.start()
+
+    override fun onStart() {
         AppBus.reg(this)
     }
 

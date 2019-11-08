@@ -13,6 +13,7 @@ import android.net.Uri
 import android.os.*
 import android.support.annotation.ColorRes
 import android.support.v4.app.ActivityCompat
+import android.text.SpannableStringBuilder
 import android.util.DisplayMetrics
 import android.view.View
 import android.view.animation.AlphaAnimation
@@ -23,6 +24,7 @@ import cn.vove7.common.BuildConfig
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.app.log
+import cn.vove7.common.view.editor.MultiSpan
 import cn.vove7.vtp.app.AppInfo
 import cn.vove7.vtp.log.Vog
 import java.io.File
@@ -582,3 +584,30 @@ fun bundle(vararg extras: Pair<String, Any>): Bundle {
 }
 
 operator fun String.div(any: Any?): String = format(any)
+
+
+
+/**
+ *
+ * @receiver String
+ * @param selectedString String
+ * @param fontSize Int dip
+ * @param color Int? @ColorInt
+ * @param underLine Boolean
+ * @param typeface Int?
+ * @return SpannableStringBuilder
+ */
+fun String.span(selectedString: String = this, fontSize: Int?=null, color: Int? = null,
+                underLine: Boolean = false, typeface: Int? = null): SpannableStringBuilder {
+    return MultiSpan(this, selectedString, color = color, fontSize = fontSize,
+            underLine = underLine, typeface = typeface).build()
+}
+
+fun String.spanColor(colorString: String): SpannableStringBuilder {
+    return spanColor(colorString.asColor)
+}
+
+fun String.spanColor(color: Int): SpannableStringBuilder {
+    return MultiSpan(this, color = color).build()
+}
+

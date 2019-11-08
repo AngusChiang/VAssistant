@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import android.widget.CompoundButton
 import android.widget.TextView
 import cn.vove7.common.utils.onClick
+import cn.vove7.common.utils.spanColor
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.view.*
 import cn.vove7.smartkey.BaseConfig
@@ -19,8 +20,8 @@ import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.callbacks.onDismiss
 import com.afollestad.materialdialogs.customview.customView
 import com.afollestad.materialdialogs.input.input
-import com.afollestad.materialdialogs.list.listItemsMultiChoice
 import com.afollestad.materialdialogs.list.listItemsSingleChoice
+import com.flask.colorpicker.ColorPickerView
 import com.russhwolf.settings.contains
 import org.adw.library.widgets.discreteseekbar.DiscreteSeekBar
 
@@ -68,12 +69,12 @@ class SettingItemHelper(
                 initSingleDialog()
                 return holder
             }
-            TYPE_MULTI -> {
-                val view = LayoutInflater.from(context).inflate(R.layout.item_of_settings_child, p, false)
-                holder = ChildItemHolder(view)
-                initMultiDialog()
-                return holder
-            }
+//            TYPE_MULTI -> {
+//                val view = LayoutInflater.from(context).inflate(R.layout.item_of_settings_child, p, false)
+//                holder = ChildItemHolder(view)
+//                initMultiDialog()
+//                return holder
+//            }
             TYPE_NUMBER -> {
                 val view = LayoutInflater.from(context).inflate(R.layout.item_of_settings_child, p, false)
                 holder = ChildItemHolder(view)
@@ -84,6 +85,13 @@ class SettingItemHelper(
                 val view = LayoutInflater.from(context).inflate(R.layout.item_of_settings_child, p, false)
                 holder = ChildItemHolder(view)
                 initIntentItem()
+
+                return holder
+            }
+            TYPE_COLOR -> {
+                val view = LayoutInflater.from(context).inflate(R.layout.item_of_settings_child, p, false)
+                holder = ChildItemHolder(view)
+                initColorPickerItem()
 
                 return holder
             }
@@ -115,20 +123,53 @@ class SettingItemHelper(
         return prefill
     }
 
+    private fun initColorPickerItem() {
+        val item = settingItem as ColorPickerItem
+        var color = item.key?.let { config.settings.getInt(it, 0) } ?: item.defaultValue() as Int?
+        val sum = {
+            color?.let { "▇▇▇▇▇▇▇▇▇".spanColor(it) } ?: ""
+        }
+        item.summary = sum()
+
+        setBasic {
+            val cpv = ColorPickerView(context)
+            MaterialDialog(context).title(text = settingItem.title()).show {
+                customView(view = cpv)
+                positiveButton {
+                    color = cpv.selectedColor
+                    if ((item.callback as CallbackOnSet<Int>?)?.invoke(ItemOperation(this@SettingItemHelper), color
+                                ?: 0) != false) {
+                        item.summary = sum()
+                        if (item.keyId != null) {
+                            this@SettingItemHelper.config.set(item.keyId, color)
+                        }
+                        setBasic()
+                    }
+                }
+                positiveButton()
+                onDismiss {
+                    item.onDialogDismiss?.invoke()
+                }
+            }
+        }
+    }
+
     private fun initAndSetInputListener() {
-        val backSummary: String? = settingItem.summary
+        val backSummary: CharSequence? = settingItem.summary
             ?: settingItem.defaultValue.invoke() as String?
 
         //初始化summary
         getPrefill()
-
+        if (settingItem.summary == null) {
+            settingItem.summary = backSummary
+        }
         setBasic {
             val prefill = getPrefill()
             MaterialDialog(context).title(text = settingItem.title()).input(prefill = prefill) { d, c ->
                 Vog.d("initAndSetInputListener ---> $c")
                 val s = c.toString()
-                settingItem.summary = s
                 if ((settingItem.callback as CallbackOnSet<String>?)?.invoke(ItemOperation(this), s) != false) {
+                    settingItem.summary = s
                     settingItem.keyId?.also {
                         config.set(settingItem.keyId, s)
                     }
@@ -151,7 +192,7 @@ class SettingItemHelper(
     /**
      * @param lis View.OnClickListener
      */
-    fun setBasic(lis: OnClick? = null) {
+    private fun setBasic(lis: OnClick? = null) {
         holder.titleView.text = settingItem.title()
         if (settingItem.summary == null) {
             holder.summaryView.visibility = View.GONE
@@ -203,7 +244,7 @@ class SettingItemHelper(
      * @return Int
      */
     private fun getInitPosAndInitSummary(): Int {
-        val item = settingItem
+        val item = settingItem as SingleChoiceItem
         val default = item.defaultValue.invoke() as Int? ?: -1
         if (default >= 0) {
             item.summary = item.choiceItems[default]
@@ -232,7 +273,7 @@ class SettingItemHelper(
      * 初始化单选对话框
      */
     private fun initSingleDialog() {
-        val item = settingItem
+        val item = settingItem as SingleChoiceItem
 
         val ds = item.summary
         val items =
@@ -258,8 +299,7 @@ class SettingItemHelper(
             }
         }
         setBasic {
-            MaterialDialog(context)
-                    .title(text = item.title())
+            MaterialDialog(context).title(text = item.title())
                     .listItemsSingleChoice(
                             items = items,
                             initialSelection = initp,
@@ -281,33 +321,30 @@ class SettingItemHelper(
         }
     }
 
-    /**
-     *
-     * @param holder ChildItemHolder
-     * @param item SettingChildItem
-     */
-    @Deprecated("unused")
-    private fun initMultiDialog() {
-        val item = settingItem
-        val sp = SpHelper(context)
-//        val entity = context.resources.getStringArray(item.entityArrId!!)
+//    /**
+//     *
+//     * @param holder ChildItemHolder
+//     * @param item SettingChildItem
+//     */
+//    @Deprecated("unused")
+//    private fun initMultiDialog() {
+//        val item = settingItem
+//        val sp = SpHelper(context)
 //
-//        val v = if (item.keyId != null) sp.getString(item.keyId) else item.defaultValue.invoke()
-
-        setBasic()
-
-        MaterialDialog(context).title(text = item.title())
-                .listItemsMultiChoice(item.entityArrId) { _, _, ts ->
-                    if ((item.callback as CallbackOnSet<List<String>>?)?.invoke(ItemOperation(this), ts) != false) {
-                        if (item.keyId != null) {
-                            sp.set(item.keyId, ts)
-                        }
-                        item.summary = ts.toString()
-                        setBasic()
-                    }
-                    // callback
-                }.show()
-    }
+//        setBasic()
+//
+//        MaterialDialog(context).title(text = item.title())
+//                .listItemsMultiChoice(item.entityArrId) { _, _, ts ->
+//                    if ((item.callback as CallbackOnSet<List<String>>?)?.invoke(ItemOperation(this), ts) != false) {
+//                        if (item.keyId != null) {
+//                            sp.set(item.keyId, ts)
+//                        }
+//                        item.summary = ts.toString()
+//                        setBasic()
+//                    }
+//                    // callback
+//                }.show()
+//    }
 
     /**
      * 初始化 数字选择器
@@ -317,14 +354,15 @@ class SettingItemHelper(
         val sp = SpHelper(context)
         var old = if (item.keyId == null) item.defaultValue.invoke() as Int
         else sp.getInt(item.keyId)
-        if (old == -1) {
+        item.summary = if (old == -1) {
             old = item.defaultValue.invoke() as Int
-            item.summary = item.summary ?: old.toString()
-        } else
-            item.summary = old.toString()
+            item.summary ?: old.toString()
+        } else {
+            old.toString()
+        }
 
         setBasic {
-            val vv = buildNumberPickerView(item.range!!, old)
+            val vv = buildNumberPickerView((item as NumberPickerItem).range, old)
             MaterialDialog(context).title(text = item.title())
                     .customView(null, vv.first)
                     .positiveButton {

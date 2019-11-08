@@ -186,6 +186,7 @@
     <string name="key_default_fp_animation" translatable="false">default_fp_animation</string>
     <string name="key_default_fp_radius" translatable="false">default_fp_radius</string>
     <string name="key_default_fp_color" translatable="false">default_fp_color</string>
+    <string name="key_default_fp_text_color" translatable="false">default_fp_text_color</string>
 
 
 

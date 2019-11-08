@@ -19,7 +19,7 @@
 
         <provider
             android:name=".InitCp"
-            android:authorities="${applicationId}"
+            android:authorities="${applicationId}.init"
             android:exported="false" />
         <uses-library
             android:name="org.apache.http.legacy"

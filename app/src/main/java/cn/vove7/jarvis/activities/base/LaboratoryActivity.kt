@@ -224,7 +224,6 @@ class LaboratoryActivity : ReturnableActivity() {
             title: String,
             items: MutableList<SettingChildItem>
     ) = BottomDialog.builder(this) {
-        peekHeight = 500
         this.title(title)
         content(SettingItemBuilder(items, PluginConfig))
     }

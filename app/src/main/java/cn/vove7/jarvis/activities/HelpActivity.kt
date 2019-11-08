@@ -15,7 +15,7 @@ import cn.vove7.common.bridges.SystemBridge
 import cn.vove7.common.net.ApiUrls
 import cn.vove7.common.net.WrapperNetHelper
 import cn.vove7.common.net.model.UserFeedback
-import cn.vove7.common.view.editor.MultiSpan
+import cn.vove7.common.utils.span
 import cn.vove7.jarvis.BuildConfig
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.activities.base.ReturnableActivity
@@ -131,8 +131,7 @@ class HelpActivity : ReturnableActivity() {
                                 "5. 在长语音聆听时，可长按下键，结束长语音\n" +
                                 "6. 有线耳机适用,并且支持长按中键唤醒\n" +
                                 "7. 锁屏下可进行唤醒。\n\n")
-                        append(MultiSpan(this@HelpActivity,
-                                "以上音量快捷键需要无障碍支持", typeface = Typeface.BOLD).spanStr)
+                        append("以上音量快捷键需要无障碍支持".span(typeface = Typeface.BOLD))
                     }
                     customView(view = text, scrollable = true)
                 }

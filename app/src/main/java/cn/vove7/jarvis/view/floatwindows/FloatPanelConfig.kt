@@ -16,8 +16,9 @@ import cn.vove7.smartkey.annotation.Config
 object FloatPanelConfig : AConfig() {
 
     val defaultPanelAnimation: Int by noCacheKey(0, R.string.key_default_fp_animation)
-    val defaultPanelRadius: Int by noCacheKey(10, R.string.key_default_fp_radius)
+    val defaultPanelRadius: Int by noCacheKey(20, R.string.key_default_fp_radius)
     val defaultPanelColor: Int by noCacheKey("#0085f4".asColor, R.string.key_default_fp_color)
+    val defaultTextColor: Int by noCacheKey("#ffffff".asColor, R.string.key_default_fp_text_color)
 
 
 }

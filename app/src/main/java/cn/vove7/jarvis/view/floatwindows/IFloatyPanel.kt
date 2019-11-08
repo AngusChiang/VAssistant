@@ -40,7 +40,6 @@ interface IFloatyPanel {
             GlobalApp.toastInfo("此样式无设置选项")
         } else {
             BottomDialog.builder(activity) {
-                peekHeight = 600
                 title("面板设置")
                 content(SettingItemBuilder(settingItems.toMutableList(), FloatPanelConfig))
             }

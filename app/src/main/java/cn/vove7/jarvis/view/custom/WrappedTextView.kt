@@ -5,10 +5,13 @@ import android.graphics.Typeface
 import android.os.Handler
 import android.os.Looper
 import android.os.Message
+import android.support.annotation.ColorRes
+import android.support.v4.content.ContextCompat
 import android.text.SpannableStringBuilder
 import android.util.AttributeSet
 import android.widget.TextView
-import cn.vove7.common.view.editor.MultiSpan
+import cn.vove7.common.utils.span
+import cn.vove7.common.utils.spanColor
 import cn.vove7.jarvis.R
 
 /**
@@ -17,7 +20,7 @@ import cn.vove7.jarvis.R
  * @author Administrator
  * 2018/12/19
  */
-class WrappedTextView : TextView {
+class WrappedTextView : android.support.v7.widget.AppCompatTextView {
     constructor(context: Context?) : super(context)
     constructor(context: Context?, attrs: AttributeSet?) : super(context, attrs)
     constructor(context: Context?, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr)
@@ -28,7 +31,7 @@ class WrappedTextView : TextView {
     }
 
     fun appendlnBold(text: String, fontSize: Int = 15) {
-        appendln(MultiSpan(context, text, fontSize = fontSize, typeface = Typeface.BOLD).spanStr)
+        appendln(text.span(fontSize = fontSize, typeface = Typeface.BOLD))
     }
 
     val handler by lazy { UiHandler(this, Looper.getMainLooper()) }
@@ -50,8 +53,8 @@ class WrappedTextView : TextView {
     }
 
     @Synchronized
-    private fun appendlnColor(s: String, color: Int) {
-        val ss = MultiSpan(context, s, color).spanStr
+    private fun appendlnColor(s: String, @ColorRes color: Int) {
+        val ss = s.spanColor(ContextCompat.getColor(context, color))
         appendln(ss)
     }
 

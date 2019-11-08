@@ -5,7 +5,7 @@
         <!-- Customize your theme here. -->
         <item name="colorPrimary">@color/p_green</item>
         <item name="colorPrimaryDark">@color/p_green_dark</item>
-        <item name="colorAccent">@color/google_blue</item>
+        <item name="colorAccent">@color/google_green</item>
         <item name="android:navigationBarColor">@color/p_green</item>
 
         <!--<item name="md_color_title">@color/google_blue</item>-->

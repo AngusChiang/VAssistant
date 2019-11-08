@@ -2,9 +2,7 @@ package cn.vove7.jarvis.view
 
 import android.support.annotation.ArrayRes
 import android.widget.CompoundButton
-import cn.vove7.common.app.AppConfig
 import cn.vove7.common.app.GlobalApp
-import cn.vove7.common.app.set
 import cn.vove7.jarvis.view.tools.SettingItemHelper
 
 /**
@@ -21,6 +19,7 @@ const val TYPE_SINGLE = 4
 @Deprecated("unused")
 const val TYPE_MULTI = 5
 const val TYPE_NUMBER = 6
+const val TYPE_COLOR = 7
 const val TYPE_INTENT = 9
 
 /**
@@ -84,22 +83,16 @@ class ItemOperation(val itemHelper: SettingItemHelper) {
  * @property defaultValue Function0<Any>
  * @property range Pair<Int, Int>?
  * @property callback Function1<Any, Unit>?
- * @property entityArrId Int?
  * @constructor
  */
 open class SettingChildItem(
-        val titleId: Int?,
+        private val titleId: Int?,
         val title: String?,
-        var summary: String? = null,
+        var summary: CharSequence? = null,
         val itemType: Int,
         val keyId: Int? = null,
         val defaultValue: (() -> Any?),
-//        val autoSetValue: Boolean = keyId!=null,
-        val range: Pair<Int, Int>? = null,
         val callback: CallbackOnSet<*>? = null,
-        val entityArrId: Int? = null,
-//        val valueArrId: Int? = null,
-        val items: List<String>? = null,
         val allowClear: Boolean = false
 ) {
     fun title(): String {
@@ -113,8 +106,6 @@ open class SettingChildItem(
 
     val key: String? get() = keyId?.let { GlobalApp.getString(it) }
 
-    val choiceItems
-        get() = entityArrId?.let { GlobalApp.APP.resources.getStringArray(it).toList() } ?: items!!
 }
 
 //val reloadConfig: CallbackOnSet = { _, _ ->
@@ -158,9 +149,13 @@ interface ItemDialogAction {
     val onDialogDismiss: Function0<Unit>?
 }
 
+interface ItemChangeListener<T> {
+    val onChange: Function1<T, Unit>?
+}
 
-class NumberPickerItem : SettingChildItem, ItemDialogAction {
-    val onChange: Function1<Int, Unit>?
+class NumberPickerItem : SettingChildItem, ItemDialogAction, ItemChangeListener<Int> {
+    val range: Pair<Int, Int>
+    override val onChange: Function1<Int, Unit>?
     override val onDialogDismiss: Function0<Unit>?
 
     constructor(
@@ -173,9 +168,10 @@ class NumberPickerItem : SettingChildItem, ItemDialogAction {
             onChange: Function1<Int, Unit>? = null,
             onDialogDismiss: Function0<Unit>? = null,
             callback: CallbackOnSet<Int>? = null
-    ) : super(titleId, title, summary, TYPE_NUMBER, keyId, defaultValue, range = range,
+    ) : super(titleId, title, summary, TYPE_NUMBER, keyId, defaultValue,
             callback = callback) {
         this.onChange = onChange
+        this.range = range
         this.onDialogDismiss = onDialogDismiss
     }
 
@@ -189,12 +185,23 @@ class NumberPickerItem : SettingChildItem, ItemDialogAction {
             onChange: Function1<Int, Unit>? = null,
             onDialogDismiss: Function0<Unit>? = null,
             callback: CallbackOnSet<Int>? = null
-    ) : super(titleId, title, summary, TYPE_NUMBER, keyId, defaultValue, range = range.first to range.last,
-            callback = callback) {
+    ) : super(titleId, title, summary, TYPE_NUMBER, keyId, defaultValue, callback = callback) {
         this.onChange = onChange
+        this.range = range.first to range.last
         this.onDialogDismiss = onDialogDismiss
     }
 }
+
+class ColorPickerItem(
+        titleId: Int? = null,
+        title: String? = null,
+        keyId: Int? = null,
+        defaultValue: Int,
+        override val onChange: Function1<Int, Unit>? = null,
+        override val onDialogDismiss: Function0<Unit>? = null,
+        callback: CallbackOnSet<Int>? = null
+) : SettingChildItem(titleId, title, null, TYPE_COLOR, keyId, { defaultValue }, callback = callback),
+        ItemDialogAction, ItemChangeListener<Int>
 
 class SingleChoiceItem(
         titleId: Int? = null,
@@ -202,19 +209,16 @@ class SingleChoiceItem(
         summary: String? = null,
         keyId: Int? = null,
         defaultValue: Int = -1,//pos
-        @ArrayRes entityArrId: Int? = null,
-        items: List<String>? = null,
+        @ArrayRes val entityArrId: Int? = null,
+        val items: List<String>? = null,
         allowClear: Boolean = false,
         callback: CallbackOnSet<Pair<Int, String>?>? = null
 ) : SettingChildItem(titleId, title, summary, TYPE_SINGLE, keyId, { defaultValue },
-        entityArrId = entityArrId, callback = callback, items = items, allowClear = allowClear)
-
-val storeIndexOnSingleChoiceItem: CallbackOnSet<Pair<Int, String>> = { io, it ->
-    io.keyId?.also { ki ->
-        AppConfig.settings.set(ki, it.first)
-        io.summary = it.second
-    }
-    false
+        callback = callback, allowClear = allowClear) {
+    val choiceItems
+        get() = entityArrId?.let {
+            GlobalApp.APP.resources.getStringArray(it).toList()
+        } ?: items!!
 }
 
 class IntentItem(titleId: Int? = null,

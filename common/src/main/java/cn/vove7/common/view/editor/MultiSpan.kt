@@ -1,16 +1,9 @@
 package cn.vove7.common.view.editor
 
-import android.content.Context
-import android.graphics.Typeface
-import android.support.annotation.ColorRes
 import android.text.SpannableStringBuilder
 import android.text.Spanned
-import android.text.TextPaint
-import android.text.style.ClickableSpan
-import android.text.style.StyleSpan
-import android.text.style.UnderlineSpan
+import android.text.style.*
 import android.view.View
-import cn.vove7.common.R
 
 
 /**
@@ -20,53 +13,55 @@ import cn.vove7.common.R
  *
  * Create By Vove
  */
-typealias OnClick = (String) -> Unit
 
 /**
- * @param fontSize 单位sp
+ * @param fontSize 单位dp
  */
 class MultiSpan(
-        var context: Context, val text: String,
-        @ColorRes private val colorId: Int = defaultColor, private var fontSize: Int = -1,
-        val underLine: Boolean = false, typeface: Int? = null,
-        private val onClick: OnClick? = null
-) : ClickableSpan() {
-    var spanStr: SpannableStringBuilder
+        val text: String, selectionText: String = text,
+        color: Int? = null, fontSize: Int? = null,
+        underLine: Boolean = false,
+        /**
+         * @[android.graphics.Typeface]
+         */
+        typeface: Int? = null,
+        onClick: ((String) -> Unit)? = null
+) {
+    var spanStr = SpannableStringBuilder(text)
+    val start = text.indexOf(selectionText)
+    val end = start + selectionText.length
 
     init {
-        if (fontSize > 0)
-            this.fontSize = DisplayUtils.sp2px(context, fontSize.toFloat())
-//        spanStr = SpannableString(text)
 
-        spanStr = SpannableStringBuilder(text)
-        spanStr.setSpan(this, 0, text.length, Spanned.SPAN_INCLUSIVE_EXCLUSIVE)
-
-        if (underLine) {
-            spanStr.setSpan(UnderlineSpan(), 0, text.length, Spanned.SPAN_INCLUSIVE_EXCLUSIVE)
+        onClick?.also {
+            val cs = object : ClickableSpan() {
+                override fun onClick(widget: View) {
+                    it.invoke(text)
+                }
+            }
+            spanStr.setSpan(cs, start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
         }
 
-        if (typeface != null) {
-            spanStr.setSpan(StyleSpan(typeface),
-                    0, text.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+
+        fontSize?.also {
+            val sizeSpan = AbsoluteSizeSpan(it, true)
+            spanStr.setSpan(sizeSpan, start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+        }
+
+        color?.also {
+            val cs = ForegroundColorSpan(it)
+            spanStr.setSpan(cs, start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+        }
+        if (underLine) {
+            spanStr.setSpan(UnderlineSpan(), start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+        }
+
+        typeface?.also {
+            spanStr.setSpan(StyleSpan(it), start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
         }
     }
 
     fun build(): SpannableStringBuilder {
         return spanStr
-    }
-
-    override fun onClick(widget: View) {
-        onClick?.invoke(text)
-    }
-
-    override fun updateDrawState(ds: TextPaint) {
-        ds.color = context.resources.getColor(colorId)
-        if (fontSize > 0)
-            ds.textSize = fontSize.toFloat()
-    }
-
-    companion object {
-
-        private val defaultColor = R.color.primary_text
     }
 }

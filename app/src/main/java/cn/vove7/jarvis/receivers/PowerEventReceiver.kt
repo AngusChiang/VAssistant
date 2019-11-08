@@ -5,6 +5,7 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.os.BatteryManager
 import cn.vove7.common.app.AppConfig
+import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.appbus.AppBus
 import cn.vove7.common.bridges.SystemBridge
 import cn.vove7.jarvis.plugins.VoiceWakeupStrategy
@@ -30,6 +31,14 @@ object PowerEventReceiver : DyBCReceiver(), OnPowerEvent {
             if (needBatteryLevelChanged)
                 addAction(Intent.ACTION_BATTERY_CHANGED)
         }
+
+    override fun onStart() {
+        GlobalLog.log("电源提醒服务上线")
+    }
+
+    override fun onStop() {
+        GlobalLog.log("电源提醒服务关闭")
+    }
 
     var isCharging: Boolean = SystemBridge.isCharging //初始状态?
 

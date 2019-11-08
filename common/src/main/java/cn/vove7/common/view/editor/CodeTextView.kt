@@ -11,6 +11,8 @@ import cn.vove7.common.view.editor.codeparse.AbsLexicalAnalyzer
 import cn.vove7.common.view.editor.codeparse.JsLexicalAnalyzer
 import cn.vove7.common.view.editor.codeparse.Word
 import cn.vove7.common.R
+import cn.vove7.common.utils.span
+import cn.vove7.common.utils.spanColor
 
 
 /**
@@ -111,9 +113,9 @@ open class CodeTextView : EditText {
             }
             //渲染字体
             if (it.error) {
-                append(MultiSpan(context, it.word, colors[0], underLine = true).spanStr)
+                append(it.word.span(color = colors[0], underLine = true))
             } else {//
-                append(MultiSpan(context, it.word, colors[it.wordType]).spanStr)
+                append(it.word.spanColor(colors[it.wordType]))
             }
             cCol = it.end
         }

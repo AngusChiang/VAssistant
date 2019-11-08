@@ -5,11 +5,14 @@ import android.graphics.Typeface
 import android.os.Handler
 import android.os.Looper
 import android.os.Message
+import android.support.annotation.ColorRes
 import android.text.SpannableStringBuilder
 import android.text.method.LinkMovementMethod
 import android.text.util.Linkify
 import android.view.View
 import android.widget.TextView
+import cn.vove7.common.utils.color
+import cn.vove7.common.utils.spanColor
 import cn.vove7.common.view.editor.MultiSpan
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.tools.noAutoScroll
@@ -86,8 +89,8 @@ open class ProgressTextDialog(context: Context, title: String? = null,
         return this
     }
 
-    private fun appendlnColor(s: String, color: Int): ProgressTextDialog {
-        val ss = MultiSpan(context, s, color).spanStr
+    private fun appendlnColor(s: String,@ColorRes color: Int): ProgressTextDialog {
+        val ss = s.spanColor(context.color(color))
         appendln(ss)
         return this
     }

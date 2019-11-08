@@ -20,7 +20,8 @@ import cn.vove7.common.bridges.SystemBridge
 import cn.vove7.common.datamanager.parse.model.Action
 import cn.vove7.common.executor.OnPrint
 import cn.vove7.common.interfaces.CodeEditorOperation
-import cn.vove7.common.view.editor.MultiSpan
+import cn.vove7.common.utils.color
+import cn.vove7.common.utils.spanColor
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.tools.UriUtils
 import cn.vove7.jarvis.view.EditorFunsHelper
@@ -52,19 +53,19 @@ abstract class CodeEditorActivity : BaseActivity() {
     inner class MyPrinter : OnPrint {
         override fun onPrint(l: Int, output: String?) {
             val pair = when (l) {
-                OnPrint.ERROR -> Pair(cn.vove7.vtp.R.color.red_500, "ERROR: ")
-                OnPrint.WARN -> Pair(cn.vove7.vtp.R.color.orange_700, "WARN: ")
-                OnPrint.INFO -> Pair(cn.vove7.vtp.R.color.orange_700, "INFO: ")
-                else -> Pair(cn.vove7.vtp.R.color.default_text_color, "")
+                OnPrint.ERROR -> Pair(R.color.red_500, "ERROR: ")
+                OnPrint.WARN -> Pair(R.color.orange_700, "WARN: ")
+                OnPrint.INFO -> Pair(R.color.orange_700, "INFO: ")
+                else -> Pair(R.color.default_text_color, "")
             }
 
-            val i = MultiSpan(this@CodeEditorActivity, pair.second, colorId = pair.first)
-            val v = MultiSpan(this@CodeEditorActivity, output ?: "", colorId = pair.first)
+            val i = pair.second.spanColor(color(pair.first))
+            val v = (output ?: "").spanColor(pair.first)
             synchronized(logList) {
-                logList.add(i.spanStr)
-                logList.add(v.spanStr)
-                logDialog?.append(i.spanStr)
-                logDialog?.append(v.spanStr)
+                logList.add(i)
+                logList.add(v)
+                logDialog?.append(i)
+                logDialog?.append(v)
             }
         }
     }

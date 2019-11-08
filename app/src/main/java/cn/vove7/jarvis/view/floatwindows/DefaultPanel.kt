@@ -11,10 +11,7 @@ import cn.vove7.common.utils.listener
 import cn.vove7.common.utils.runInCatch
 import cn.vove7.common.utils.show
 import cn.vove7.jarvis.R
-import cn.vove7.jarvis.view.NumberPickerItem
-import cn.vove7.jarvis.view.SettingChildItem
-import cn.vove7.jarvis.view.SingleChoiceItem
-import cn.vove7.jarvis.view.dp
+import cn.vove7.jarvis.view.*
 import group.infotech.drawable.dsl.corners
 import group.infotech.drawable.dsl.shapeDrawable
 import group.infotech.drawable.dsl.solidColor
@@ -36,14 +33,21 @@ class DefaultPanel : FloatyPanel(
         animationBody.background = buildBackground()
     }
 
+    /**
+     * 加载配置
+     */
     private fun buildBackground(
             radius: Int = FloatPanelConfig.defaultPanelRadius,
-            color: Int = FloatPanelConfig.defaultPanelColor) = shapeDrawable {
-        solidColor = color
+            bgColor: Int = FloatPanelConfig.defaultPanelColor,
+            textColor: Int = FloatPanelConfig.defaultTextColor
+    ) = shapeDrawable {
+        solidColor = bgColor
         corners {
             bottomLeft = radius.dp.pxf
             bottomRight = radius.dp.pxf
         }
+        animationBody.voice_text.setTextColor(textColor)
+        animationBody.listening_ani.setColor(textColor)
     }
 
     override fun showListeningAni() {
@@ -127,14 +131,38 @@ class DefaultPanel : FloatyPanel(
                         keyId = R.string.key_default_fp_radius,
                         defaultValue = { FloatPanelConfig.defaultPanelRadius },
                         range = 0..50,
-                        onDialogDismiss = {
-                            hide()
-                        },
+                        onDialogDismiss = { hide() },
                         onChange = {
                             if (!isShowing) {
                                 show("设置圆角")
                             } else runInCatch {
                                 animationBody.background = buildBackground(radius = it)
+                            }
+                        }
+                ),
+                ColorPickerItem(
+                        title = "背景颜色",
+                        keyId = R.string.key_default_fp_color,
+                        defaultValue = FloatPanelConfig.defaultPanelColor,
+                        onDialogDismiss = { hide() },
+                        onChange = {
+                            if (!isShowing) {
+                                show("设置圆角")
+                            } else runInCatch {
+                                animationBody.background = buildBackground(bgColor = it)
+                            }
+                        }
+                ),
+                ColorPickerItem(
+                        title = "文字颜色",
+                        keyId = R.string.key_default_fp_text_color,
+                        defaultValue = FloatPanelConfig.defaultTextColor,
+                        onDialogDismiss = { hide() },
+                        onChange = {
+                            if (!isShowing) {
+                                show("设置圆角")
+                            } else runInCatch {
+                                animationBody.background = buildBackground(textColor = it)
                             }
                         }
                 )

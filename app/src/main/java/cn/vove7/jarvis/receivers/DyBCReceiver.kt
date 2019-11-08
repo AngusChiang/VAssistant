@@ -19,7 +19,10 @@ abstract class DyBCReceiver : BroadcastReceiver() {
     /**
      * 注册广播接收器
      */
-    open fun start() {
+    fun start() {
+        if (!open) {
+            onStart()
+        }
         open = true
         GlobalApp.APP.apply {
             val intent = registerReceiver(this@DyBCReceiver, intentFilter)
@@ -27,15 +30,22 @@ abstract class DyBCReceiver : BroadcastReceiver() {
         }
     }
 
+    open fun onStart() {}
+
     /**
      * 取消关闭注册
      */
     fun stop() {
+        if (open) {
+            onStop()
+        }
         open = false
         try {
             GlobalApp.APP.unregisterReceiver(this)
         } catch (e: Exception) {
         }
     }
+
+    open fun onStop() {}
 
 }
