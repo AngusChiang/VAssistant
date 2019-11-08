@@ -2,7 +2,7 @@ package cn.vove7.jarvis.view.dialog.base
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.support.annotation.StringRes
+import androidx.annotation.StringRes
 import android.view.LayoutInflater
 import android.view.View
 import cn.vove7.common.app.GlobalLog

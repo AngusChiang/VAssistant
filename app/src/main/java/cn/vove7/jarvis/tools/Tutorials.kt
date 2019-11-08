@@ -3,7 +3,7 @@ package cn.vove7.jarvis.tools
 import android.app.Activity
 import android.content.Context
 import android.graphics.Typeface
-import android.support.annotation.DrawableRes
+import androidx.annotation.DrawableRes
 import android.view.View
 import android.widget.TextView
 import cn.vove7.common.app.GlobalApp

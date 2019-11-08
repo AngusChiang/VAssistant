@@ -9,7 +9,7 @@ import android.content.pm.ShortcutManager
 import android.graphics.drawable.Icon
 import android.os.Build
 import android.speech.RecognizerIntent
-import android.support.annotation.RequiresApi
+import androidx.annotation.RequiresApi
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.app.GlobalApp.Companion.getString
 import cn.vove7.common.app.GlobalLog

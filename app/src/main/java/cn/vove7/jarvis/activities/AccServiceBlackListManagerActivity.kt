@@ -1,6 +1,6 @@
 package cn.vove7.jarvis.activities
 
-import android.support.v4.app.Fragment
+import androidx.fragment.app.Fragment
 import android.view.Menu
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.utils.ThreadPool
@@ -25,7 +25,7 @@ import cn.vove7.vtp.sharedpreference.SpHelper
 @Deprecated("无用")
 class AccServiceBlackListManagerActivity : OneFragmentActivity() {
 
-    override var fragments: Array<Fragment> = arrayOf(
+    override var fragments: Array<androidx.fragment.app.Fragment> = arrayOf(
             SFragment()
     )
 

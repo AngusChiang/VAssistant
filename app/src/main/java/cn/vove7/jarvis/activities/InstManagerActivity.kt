@@ -1,6 +1,6 @@
 package cn.vove7.jarvis.activities
 
-import android.support.v4.app.Fragment
+import androidx.fragment.app.Fragment
 import android.view.Menu
 import android.view.MenuItem
 import cn.vove7.common.app.GlobalApp
@@ -27,7 +27,7 @@ class InstManagerActivity : BaseActivityWithViewPager() {
 
     override var titleInit: String? = "指令管理"
 
-    override var fragments: Array<Fragment> = arrayOf(
+    override var fragments: Array<androidx.fragment.app.Fragment> = arrayOf(
             GlobalInstListFragment(),
             InstAppListFragment()
     )

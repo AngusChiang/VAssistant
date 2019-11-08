@@ -4,8 +4,8 @@ import android.content.Context
 import android.content.pm.PackageManager
 import android.media.AudioManager
 import android.os.*
-import android.support.annotation.CallSuper
-import android.support.v4.app.ActivityCompat
+import androidx.annotation.CallSuper
+import androidx.core.app.ActivityCompat
 import cn.vove7.common.app.AppConfig
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.app.GlobalLog

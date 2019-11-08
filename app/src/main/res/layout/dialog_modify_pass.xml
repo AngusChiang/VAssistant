@@ -8,7 +8,7 @@
     android:paddingStart="?attr/dialogPreferredPadding"
     android:paddingEnd="?attr/dialogPreferredPadding">
 
-    <android.support.design.widget.TextInputLayout
+    <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/old_pass"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
@@ -19,9 +19,9 @@
             android:hint="原密码"
             android:inputType="textPassword" />
 
-    </android.support.design.widget.TextInputLayout>
+    </com.google.android.material.textfield.TextInputLayout>
 
-    <android.support.design.widget.TextInputLayout
+    <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/new_pass1"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
@@ -32,9 +32,9 @@
             android:hint="新密码"
             android:inputType="textPassword" />
 
-    </android.support.design.widget.TextInputLayout>
+    </com.google.android.material.textfield.TextInputLayout>
 
-    <android.support.design.widget.TextInputLayout
+    <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/new_pass2"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
@@ -45,6 +45,6 @@
             android:hint="重复新密码"
             android:inputType="textPassword" />
 
-    </android.support.design.widget.TextInputLayout>
+    </com.google.android.material.textfield.TextInputLayout>
 
 </LinearLayout>

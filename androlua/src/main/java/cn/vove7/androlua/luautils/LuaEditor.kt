@@ -189,7 +189,7 @@ class LuaEditor(private val mContext: Context, attrs: AttributeSet)
             override fun onCreateActionMode(mode: ActionMode, menu: Menu): Boolean {
                 mode.title = "跳转行"
                 mode.subtitle = null
-                edit = object : android.support.v7.widget.AppCompatEditText(mContext) {
+                edit = object : androidx.appcompat.widget.AppCompatEditText(mContext) {
                     public override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
                         if (s.length > 0) {
                             idx = 0
@@ -248,7 +248,7 @@ class LuaEditor(private val mContext: Context, attrs: AttributeSet)
             override fun onCreateActionMode(mode: ActionMode, menu: Menu): Boolean {
                 mode.title = "查找"
                 mode.subtitle = null
-                edit = object : android.support.v7.widget.AppCompatEditText(mContext) {
+                edit = object : androidx.appcompat.widget.AppCompatEditText(mContext) {
                     public override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
                         if (s.length > 0) {
                             idx = 0

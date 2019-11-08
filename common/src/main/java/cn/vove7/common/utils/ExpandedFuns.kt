@@ -11,8 +11,8 @@ import android.graphics.Color
 import android.graphics.Rect
 import android.net.Uri
 import android.os.*
-import android.support.annotation.ColorRes
-import android.support.v4.app.ActivityCompat
+import androidx.annotation.ColorRes
+import androidx.core.app.ActivityCompat
 import android.text.SpannableStringBuilder
 import android.util.DisplayMetrics
 import android.view.View

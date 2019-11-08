@@ -24,6 +24,7 @@ import android.content.SharedPreferences;
 import android.os.Environment;
 import android.preference.PreferenceManager;
 
+
 /**
  * "Оболочка" приложения. Класс для работы с настройками и другими данными.
  */
@@ -39,7 +40,6 @@ public class Wrapper {
 
     /**
      * Устанавливаем значение Read Only, необходим
-     * для использования Switch-кнопок в {@link android.support.design.widget.NavigationView}.
      * @param readOnly - устанавливаемое значение для Read Only.
      */
     public void setReadOnly(boolean readOnly) {

@@ -1,6 +1,6 @@
 package cn.vove7.jarvis.shs
 
-import android.support.annotation.CallSuper
+import androidx.annotation.CallSuper
 import cn.vove7.common.app.AppConfig
 import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.bridges.SettingsBridge

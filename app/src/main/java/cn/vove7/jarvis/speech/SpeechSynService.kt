@@ -3,7 +3,7 @@ package cn.vove7.jarvis.speech
 import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager
-import android.support.v4.app.ActivityCompat
+import androidx.core.app.ActivityCompat
 import android.util.Pair
 import cn.vove7.common.app.AppConfig
 import cn.vove7.common.app.GlobalApp

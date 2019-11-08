@@ -37,7 +37,7 @@
 
     </RadioGroup>
 
-    <android.support.design.widget.TextInputLayout
+    <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/name_text"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
@@ -46,9 +46,9 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="@string/text_show_name" />
-    </android.support.design.widget.TextInputLayout>
+    </com.google.android.material.textfield.TextInputLayout>
 
-    <android.support.design.widget.TextInputLayout
+    <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/activity_text"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
@@ -57,9 +57,9 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="@string/text_activity_name" />
-    </android.support.design.widget.TextInputLayout>
+    </com.google.android.material.textfield.TextInputLayout>
 
-    <android.support.design.widget.TextInputLayout
+    <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/ad_texts_text"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
@@ -68,9 +68,9 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="@string/text_ad_texts" />
-    </android.support.design.widget.TextInputLayout>
+    </com.google.android.material.textfield.TextInputLayout>
 
-    <android.support.design.widget.TextInputLayout
+    <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/ad_descs_text"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
@@ -79,9 +79,9 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Descs" />
-    </android.support.design.widget.TextInputLayout>
+    </com.google.android.material.textfield.TextInputLayout>
 
-    <android.support.design.widget.TextInputLayout
+    <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/ad_view_id_text"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
@@ -90,9 +90,9 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="View id" />
-    </android.support.design.widget.TextInputLayout>
+    </com.google.android.material.textfield.TextInputLayout>
 
-    <android.support.design.widget.TextInputLayout
+    <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/depths_text"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -104,14 +104,14 @@
             android:layout_height="wrap_content"
             android:digits=",1234567890"
             android:hint="@string/hint_depths_array" />
-    </android.support.design.widget.TextInputLayout>
+    </com.google.android.material.textfield.TextInputLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center_vertical">
 
-        <android.support.design.widget.TextInputLayout
+        <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/pkg_text"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -121,7 +121,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="@string/text_package_name" />
-        </android.support.design.widget.TextInputLayout>
+        </com.google.android.material.textfield.TextInputLayout>
 
         <Button
             android:id="@+id/sel_app_btn"
@@ -131,7 +131,7 @@
             android:theme="@style/MaterialButton.White" />
     </LinearLayout>
 
-    <android.support.design.widget.TextInputLayout
+    <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/class_text"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
@@ -140,6 +140,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Class name" />
-    </android.support.design.widget.TextInputLayout>
+    </com.google.android.material.textfield.TextInputLayout>
 
 </LinearLayout>

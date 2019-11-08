@@ -1,19 +1,19 @@
 package cn.vove7.jarvis.view.tools
 
-import android.support.annotation.IdRes
-import android.support.v4.app.Fragment
-import android.support.v7.app.AppCompatActivity
+import androidx.annotation.IdRes
+import androidx.fragment.app.Fragment
+import androidx.appcompat.app.AppCompatActivity
 
 class FragmentSwitcher(val activity: AppCompatActivity, @IdRes val containId: Int) {
 
-    var currentFragment: Fragment? = null
-    private val fragments = hashMapOf<String, Fragment>()
+    var currentFragment: androidx.fragment.app.Fragment? = null
+    private val fragments = hashMapOf<String, androidx.fragment.app.Fragment>()
 
-    fun switchFragment(f: Fragment): Boolean {
+    fun switchFragment(f: androidx.fragment.app.Fragment): Boolean {
         return switchFragment(f::class.simpleName!!, f)
     }
 
-    private fun switchFragment(tag: String, f: Fragment): Boolean {
+    private fun switchFragment(tag: String, f: androidx.fragment.app.Fragment): Boolean {
         if (currentFragment == f) return true
         fragments[tag] = f
         if (currentFragment != null) {
@@ -32,11 +32,11 @@ class FragmentSwitcher(val activity: AppCompatActivity, @IdRes val containId: In
         return true
     }
 
-    fun getFragmentInstance(cls: Class<Fragment>): Fragment? {
+    fun getFragmentInstance(cls: Class<androidx.fragment.app.Fragment>): androidx.fragment.app.Fragment? {
         return getFragmentInstance(cls::class.simpleName)
     }
 
-    fun getFragmentInstance(tag: String?): Fragment? {
+    fun getFragmentInstance(tag: String?): androidx.fragment.app.Fragment? {
         return fragments[tag]
     }
 }

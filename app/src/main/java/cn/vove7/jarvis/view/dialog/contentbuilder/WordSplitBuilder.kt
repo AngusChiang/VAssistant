@@ -3,7 +3,7 @@ package cn.vove7.jarvis.view.dialog.contentbuilder
 import android.annotation.SuppressLint
 import android.graphics.Color
 import android.graphics.Rect
-import android.support.v7.widget.AppCompatCheckedTextView
+import androidx.appcompat.widget.AppCompatCheckedTextView
 import android.view.MotionEvent
 import android.view.View
 import android.widget.CheckedTextView

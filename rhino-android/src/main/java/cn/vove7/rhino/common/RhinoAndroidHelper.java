@@ -1,13 +1,12 @@
 package cn.vove7.rhino.common;
 
-import android.support.annotation.VisibleForTesting;
+import androidx.annotation.VisibleForTesting;
 
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.ContextFactory;
 import org.mozilla.javascript.SecurityController;
 
 import java.io.File;
-import java.io.IOException;
 
 /**
  * Created by Stardust on 2017/4/5.

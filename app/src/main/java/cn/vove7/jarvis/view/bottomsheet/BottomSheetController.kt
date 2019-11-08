@@ -1,8 +1,8 @@
 package cn.vove7.jarvis.view.bottomsheet
 
 import android.content.Context
-import android.support.annotation.CallSuper
-import android.support.design.widget.BottomSheetBehavior
+import androidx.annotation.CallSuper
+import com.google.android.material.bottomsheet.BottomSheetBehavior
 import android.view.View
 
 /**

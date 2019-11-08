@@ -20,8 +20,8 @@
 package cn.vove7.rhino.processor.widget;
 
 import android.content.Context;
-import android.support.annotation.WorkerThread;
-import android.support.v7.widget.AppCompatTextView;
+import androidx.annotation.WorkerThread;
+import androidx.appcompat.widget.AppCompatTextView;
 import android.text.Editable;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;

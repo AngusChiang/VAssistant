@@ -1,8 +1,8 @@
 package cn.vove7.jarvis.tools
 
 import android.os.Handler
-import android.support.v4.view.MenuItemCompat
-import android.support.v7.widget.SearchView
+import androidx.core.view.MenuItemCompat
+import androidx.appcompat.widget.SearchView
 import android.view.MenuItem
 import cn.vove7.vtp.log.Vog
 

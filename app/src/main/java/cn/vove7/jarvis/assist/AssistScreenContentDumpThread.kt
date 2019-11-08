@@ -7,7 +7,7 @@ import android.content.Intent
 import android.media.MediaScannerConnection
 import android.os.Build
 import android.os.Bundle
-import android.support.annotation.RequiresApi
+import androidx.annotation.RequiresApi
 import android.util.Log
 
 import org.json.JSONArray

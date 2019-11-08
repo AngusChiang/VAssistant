@@ -1,6 +1,6 @@
 package cn.vove7.jarvis.activities.base
 
-import android.support.v7.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatActivity
 import cn.vove7.jarvis.tools.DataCollector
 
 

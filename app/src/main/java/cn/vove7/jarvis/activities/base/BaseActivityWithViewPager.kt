@@ -1,10 +1,10 @@
 package cn.vove7.jarvis.activities.base
 
 import android.os.Bundle
-import android.support.v4.app.Fragment
-import android.support.v4.app.FragmentManager
-import android.support.v4.app.FragmentPagerAdapter
-import android.support.v7.widget.Toolbar
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentManager
+import androidx.fragment.app.FragmentPagerAdapter
+import androidx.appcompat.widget.Toolbar
 import android.view.MenuItem
 import android.view.View
 import cn.vove7.jarvis.R
@@ -22,7 +22,7 @@ abstract class BaseActivityWithViewPager : BaseActivity() {
     lateinit var toolbar: Toolbar
     lateinit var fragmentAdapter: FragmentAdapter
 
-    val currentFragment: Fragment
+    val currentFragment: androidx.fragment.app.Fragment
         get() = fragments[view_pager.currentItem]
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -58,7 +58,7 @@ abstract class BaseActivityWithViewPager : BaseActivity() {
      */
     open fun beforeSetViewPager() {}
 
-    abstract var fragments: Array<Fragment>
+    abstract var fragments: Array<androidx.fragment.app.Fragment>
 
     abstract var titles: Array<String>
 
@@ -71,9 +71,9 @@ abstract class BaseActivityWithViewPager : BaseActivity() {
         return super.onOptionsItemSelected(item)
     }
 
-    inner class FragmentAdapter(fm: FragmentManager) : FragmentPagerAdapter(fm) {
+    inner class FragmentAdapter(fm: androidx.fragment.app.FragmentManager) : androidx.fragment.app.FragmentPagerAdapter(fm) {
 
-        override fun getItem(position: Int): Fragment = fragments[position]
+        override fun getItem(position: Int): androidx.fragment.app.Fragment = fragments[position]
 
         override fun getCount(): Int = fragments.size
 

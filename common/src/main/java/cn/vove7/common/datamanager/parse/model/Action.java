@@ -1,8 +1,8 @@
 package cn.vove7.common.datamanager.parse.model;
 
 import android.os.Bundle;
-import android.support.annotation.Keep;
-import android.support.annotation.NonNull;
+import androidx.annotation.Keep;
+import androidx.annotation.NonNull;
 import android.text.TextUtils;
 
 import com.google.gson.annotations.Expose;

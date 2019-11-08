@@ -19,7 +19,7 @@
 
 package cn.vove7.rhino.processor.commons;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 
 import java.io.File;

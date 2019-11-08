@@ -6,8 +6,8 @@ import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
 import android.os.Handler
-import android.support.v7.widget.LinearLayoutManager
-import android.support.v7.widget.RecyclerView
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import android.text.SpannableStringBuilder
 import android.view.*
 import android.view.inputmethod.InputMethodManager
@@ -124,7 +124,7 @@ abstract class CodeEditorActivity : BaseActivity() {
     private val activityRootView: View by lazy { findViewById<View>(R.id.root) }
 
     private fun initEditorToolbar() {
-        symbol_line.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
+        symbol_line.layoutManager = androidx.recyclerview.widget.LinearLayoutManager(this, androidx.recyclerview.widget.LinearLayoutManager.HORIZONTAL, false)
         symbol_line.adapter = SymbolsAdapter(this, codeEditor, symbols)
     }
 
@@ -320,7 +320,7 @@ abstract class CodeEditorActivity : BaseActivity() {
         get() = codeEditor.getEditorContent() ?: ""
 
     class SymbolsAdapter(val c: Context, val editor: CodeEditorOperation, val symbols: List<Symbol>)
-        : RecyclerView.Adapter<V>() {
+        : androidx.recyclerview.widget.RecyclerView.Adapter<V>() {
         override fun onCreateViewHolder(p0: ViewGroup, p1: Int): V {
             val v = LayoutInflater.from(c).inflate(R.layout.item_of_symbols, null)
             return V(v)
@@ -339,7 +339,7 @@ abstract class CodeEditorActivity : BaseActivity() {
         }
     }
 
-    class V(v: View) : RecyclerView.ViewHolder(v) {
+    class V(v: View) : androidx.recyclerview.widget.RecyclerView.ViewHolder(v) {
         val textView = v
     }
 

@@ -2,7 +2,7 @@ package cn.vove7.jarvis.speech.baiduspeech.recognition
 
 import android.Manifest
 import android.content.pm.PackageManager
-import android.support.v4.app.ActivityCompat
+import androidx.core.app.ActivityCompat
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.helper.AdvanAppHelper
 import cn.vove7.common.helper.AdvanContactHelper

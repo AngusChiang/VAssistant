@@ -5,8 +5,8 @@ import android.graphics.Typeface
 import android.os.Handler
 import android.os.Looper
 import android.os.Message
-import android.support.annotation.ColorRes
-import android.support.v4.content.ContextCompat
+import androidx.annotation.ColorRes
+import androidx.core.content.ContextCompat
 import android.text.SpannableStringBuilder
 import android.util.AttributeSet
 import android.widget.TextView
@@ -20,7 +20,7 @@ import cn.vove7.jarvis.R
  * @author Administrator
  * 2018/12/19
  */
-class WrappedTextView : android.support.v7.widget.AppCompatTextView {
+class WrappedTextView : androidx.appcompat.widget.AppCompatTextView {
     constructor(context: Context?) : super(context)
     constructor(context: Context?, attrs: AttributeSet?) : super(context, attrs)
     constructor(context: Context?, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr)

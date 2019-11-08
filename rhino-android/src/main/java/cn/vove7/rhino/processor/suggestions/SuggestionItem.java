@@ -19,7 +19,7 @@
 
 package cn.vove7.rhino.processor.suggestions;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 /**
  * @author Trần Lê Duy

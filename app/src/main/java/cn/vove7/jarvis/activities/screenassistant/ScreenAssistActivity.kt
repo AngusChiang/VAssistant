@@ -5,7 +5,7 @@ import android.app.Dialog
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.support.design.widget.BottomSheetBehavior
+import com.google.android.material.bottomsheet.BottomSheetBehavior
 import android.view.View
 import android.view.View.FIND_VIEWS_WITH_CONTENT_DESCRIPTION
 import android.view.animation.AlphaAnimation

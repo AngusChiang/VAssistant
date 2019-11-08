@@ -309,7 +309,7 @@ class SettingItemHelper(
                         d.dismiss()
                         if (i == initp) return@listItemsSingleChoice
                         initp = i
-                        notifyData(i to t)
+                        notifyData(i to t.toString())
                     }.show {
                         if (item.allowClear) {
                             neutralButton(text = "清空选择") {

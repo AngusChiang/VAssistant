@@ -5,7 +5,7 @@ import android.graphics.Typeface
 import android.os.Handler
 import android.os.Looper
 import android.os.Message
-import android.support.annotation.ColorRes
+import androidx.annotation.ColorRes
 import android.text.SpannableStringBuilder
 import android.text.method.LinkMovementMethod
 import android.text.util.Linkify

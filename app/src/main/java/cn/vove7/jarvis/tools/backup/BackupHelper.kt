@@ -172,7 +172,7 @@ object BackupHelper {
         Vog.d("showBackupFileList ---> $fileList")
         MaterialDialog(activity).title(text = "备份文件")
                 .listItemsSingleChoice(items = fileList) { dialog, index, text ->
-                    restoreFromFile(activity, File(backupPath, text))
+                    restoreFromFile(activity, File(backupPath, text.toString()))
                 }.show {
                     neutralButton(text = "选择文件") {
                         val selIntent = Intent(Intent.ACTION_GET_CONTENT)

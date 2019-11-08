@@ -2,7 +2,7 @@ package cn.vove7.common.interfaces.api
 
 import android.accessibilityservice.GestureDescription
 import android.os.Build
-import android.support.annotation.RequiresApi
+import androidx.annotation.RequiresApi
 import cn.vove7.common.annotation.ScriptApi
 import cn.vove7.common.annotation.ScriptApiClass
 import cn.vove7.common.annotation.ScriptApiParamDesc

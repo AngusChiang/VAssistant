@@ -16,7 +16,7 @@
         android:indeterminate="true"
         android:visibility="invisible" />
 
-    <android.support.design.widget.TextInputLayout
+    <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/title_text"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
@@ -26,10 +26,10 @@
             android:layout_height="wrap_content"
             android:hint="@string/text_feedback_title_hint" />
 
-    </android.support.design.widget.TextInputLayout>
+    </com.google.android.material.textfield.TextInputLayout>
 
 
-    <android.support.design.widget.TextInputLayout
+    <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/desc_text"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
@@ -39,5 +39,5 @@
             android:layout_height="wrap_content"
             android:hint="@string/text_description" />
 
-    </android.support.design.widget.TextInputLayout>
+    </com.google.android.material.textfield.TextInputLayout>
 </LinearLayout>

@@ -4,7 +4,7 @@ import android.app.ActivityManager
 import android.app.Application
 import android.content.Context
 import android.content.Intent
-import android.support.multidex.MultiDex
+import androidx.multidex.MultiDex
 import android.util.Log
 import android.widget.Toast
 import cn.vove7.common.BuildConfig

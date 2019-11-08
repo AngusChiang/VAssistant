@@ -7,7 +7,7 @@
     android:orientation="vertical"
     tools:context="cn.vove7.jarvis.fragments.MineFragment">
 
-    <android.support.v7.widget.CardView
+    <androidx.cardview.widget.CardView
         android:id="@+id/top_panel"
         android:layout_width="match_parent"
         android:layout_height="180dp"
@@ -112,7 +112,7 @@
             </RelativeLayout>
         </LinearLayout>
 
-    </android.support.v7.widget.CardView>
+    </androidx.cardview.widget.CardView>
 
 
     <ListView

@@ -2,7 +2,7 @@ package cn.vove7.jarvis.activities
 
 import android.os.Bundle
 import android.os.PersistableBundle
-import android.support.v4.app.Fragment
+import androidx.fragment.app.Fragment
 import android.view.View
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.activities.base.BaseActivityWithViewPager
@@ -17,7 +17,7 @@ import kotlinx.android.synthetic.main.activity_base_view_pager.*
  */
 class WelcomeActivity : BaseActivityWithViewPager() {
     override var titles: Array<String> = arrayOf()
-    override var fragments: Array<Fragment> = arrayOf()
+    override var fragments: Array<androidx.fragment.app.Fragment> = arrayOf()
 
     override fun beforeSetViewPager() {
         fragments = arrayOf(

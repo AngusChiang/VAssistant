@@ -3,7 +3,7 @@ package cn.vove7.jarvis.services
 import android.content.Intent
 import android.os.Build
 import android.service.quicksettings.TileService
-import android.support.annotation.RequiresApi
+import androidx.annotation.RequiresApi
 import cn.vove7.common.utils.newTask
 import cn.vove7.jarvis.activities.ScreenPickerActivity
 import cn.vove7.jarvis.activities.screenassistant.QrCodeActivity

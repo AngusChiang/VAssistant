@@ -3,7 +3,7 @@ package cn.vove7.jarvis.view.dialog
 import android.app.Dialog
 import android.content.Context
 import android.os.Build
-import android.support.annotation.CallSuper
+import androidx.annotation.CallSuper
 import android.view.WindowManager
 import cn.vove7.common.appbus.AppBus
 import cn.vove7.common.bridges.ChoiceData

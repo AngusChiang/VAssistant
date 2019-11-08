@@ -39,7 +39,8 @@ class CreateShortcutActivity : Activity() {
                         "屏幕分享",
                         "文字识别"
 //                        "语音搜索"
-                ), waitForPositiveButton = false) { d, i, text ->
+                ), waitForPositiveButton = false) { d, i, t ->
+                    val text = t.toString()
                     when (i) {
                         0 -> create(VoiceAssistActivity.WAKE_UP, text)
                         1 -> create(SWITCH_VOICE_WAKEUP, text)

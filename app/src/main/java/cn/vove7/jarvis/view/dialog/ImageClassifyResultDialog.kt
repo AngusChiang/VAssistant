@@ -6,7 +6,7 @@ import android.content.Context
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
 import android.os.Bundle
-import android.support.v7.graphics.Palette
+import androidx.palette.graphics.Palette
 import android.view.View
 import android.view.Window
 import android.widget.ImageView
@@ -89,7 +89,7 @@ class ImageClassifyResultDialog(
 
         override fun onResourceReady(resource: Drawable?, model: Any?, target: Target<Drawable>?, dataSource: DataSource?, isFirstResource: Boolean): Boolean {
             if (resource == null) return false
-            Palette.from((resource as BitmapDrawable).bitmap)
+            androidx.palette.graphics.Palette.from((resource as BitmapDrawable).bitmap)
                     .generate().darkMutedSwatch?.rgb?.also {
                 viewHolder.titleBgLay.setBackgroundColor((0x88000000 + it).toInt())//半透明
             }

@@ -29,12 +29,12 @@ import android.graphics.drawable.Drawable;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Parcelable;
-import android.support.annotation.ColorInt;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.annotation.WorkerThread;
-import android.support.v4.content.ContextCompat;
-import android.support.v7.widget.AppCompatMultiAutoCompleteTextView;
+import androidx.annotation.ColorInt;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.annotation.WorkerThread;
+import androidx.core.content.ContextCompat;
+import androidx.appcompat.widget.AppCompatMultiAutoCompleteTextView;
 import android.text.Editable;
 import android.text.InputType;
 import android.text.Layout;
@@ -565,7 +565,7 @@ public class TextProcessor extends AppCompatMultiAutoCompleteTextView
             public boolean onCreateActionMode(ActionMode mode, Menu menu) {
                 mode.setTitle("跳转行");
                 mode.setSubtitle(null);
-                edit = new android.support.v7.widget.AppCompatEditText(mContext) {
+                edit = new androidx.appcompat.widget.AppCompatEditText(mContext) {
                     @Override
                     public void onTextChanged(CharSequence s, int start, int before, int count) {
                         if (s.length() > 0) {
@@ -634,7 +634,7 @@ public class TextProcessor extends AppCompatMultiAutoCompleteTextView
             public boolean onCreateActionMode(ActionMode mode, Menu menu) {
                 mode.setTitle("查找");
                 mode.setSubtitle(null);
-                edit = new android.support.v7.widget.AppCompatEditText(mContext) {
+                edit = new androidx.appcompat.widget.AppCompatEditText(mContext) {
                     @Override
                     public void onTextChanged(CharSequence s, int start, int before, int count) {
                         if (s.length() > 0) {

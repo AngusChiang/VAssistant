@@ -1,9 +1,9 @@
 package cn.vove7.jarvis.view.bottomsheet
 
 import android.content.Context
-import android.support.annotation.MenuRes
-import android.support.design.widget.BottomSheetBehavior
-import android.support.v7.widget.Toolbar
+import androidx.annotation.MenuRes
+import com.google.android.material.bottomsheet.BottomSheetBehavior
+import androidx.appcompat.widget.Toolbar
 import android.view.View
 import android.widget.TextView
 import cn.vove7.jarvis.R

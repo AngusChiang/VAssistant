@@ -3,7 +3,7 @@ package cn.vove7.jarvis.activities
 import android.graphics.Typeface
 import android.os.Bundle
 import android.os.Environment
-import android.support.design.widget.TextInputLayout
+import com.google.android.material.textfield.TextInputLayout
 import android.view.View
 import android.widget.TextView
 import cn.vove7.bottomdialog.BottomDialog

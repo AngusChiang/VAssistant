@@ -1,6 +1,6 @@
 package cn.vove7.jarvis.view.statusbar
 
-import android.support.v4.app.NotificationManagerCompat
+import androidx.core.app.NotificationManagerCompat
 import cn.vove7.jarvis.R
 
 /**

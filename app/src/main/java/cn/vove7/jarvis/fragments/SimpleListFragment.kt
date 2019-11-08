@@ -3,13 +3,13 @@ package cn.vove7.jarvis.fragments
 import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.os.Handler
-import android.support.annotation.LayoutRes
-import android.support.design.widget.FloatingActionButton
-import android.support.v4.app.Fragment
-import android.support.v4.widget.SwipeRefreshLayout
-import android.support.v7.widget.CardView
-import android.support.v7.widget.LinearLayoutManager
-import android.support.v7.widget.RecyclerView
+import androidx.annotation.LayoutRes
+import com.google.android.material.floatingactionbutton.FloatingActionButton
+import androidx.fragment.app.Fragment
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+import androidx.cardview.widget.CardView
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import android.view.*
 import android.widget.*
 import cn.vove7.common.interfaces.Searchable
@@ -30,7 +30,7 @@ import com.pluscubed.recyclerfastscroll.RecyclerFastScroller
  * @author 17719247306
  * 2018/8/18
  */
-abstract class SimpleListFragment<DataType> : Fragment(), ListViewModelLoader<DataType> {
+abstract class SimpleListFragment<DataType> : androidx.fragment.app.Fragment(), ListViewModelLoader<DataType> {
     override var sortData: Boolean = false
     open val itemClickListener: SimpleListAdapter.OnItemClickListener<DataType>? = null
     override val pageSizeLimit: Int = 50
@@ -63,7 +63,7 @@ abstract class SimpleListFragment<DataType> : Fragment(), ListViewModelLoader<Da
         adapter = SimpleListAdapter(dataSet, itemClickListener, itemCheckable)
     }
 
-    override fun onContextItemSelected(item: MenuItem?): Boolean {
+    override fun onContextItemSelected(item: MenuItem): Boolean {
         val p = (item?.menuInfo as RecyclerViewWithContextMenu
         .RecyclerViewContextInfo?)?.position ?: -1
         return if (p in 0 until dataSet.size)
@@ -71,10 +71,10 @@ abstract class SimpleListFragment<DataType> : Fragment(), ListViewModelLoader<Da
         else false
     }
 
-    override fun onCreateContextMenu(menu: ContextMenu?, v: View?, menuInfo: ContextMenu.ContextMenuInfo?) {
+    override fun onCreateContextMenu(menu: ContextMenu, v: View, menuInfo: ContextMenu.ContextMenuInfo?) {
         val p = (menuInfo as RecyclerViewWithContextMenu
         .RecyclerViewContextInfo?)?.position ?: -1
-        if (p in 0 until dataSet.size && menu != null)
+        if (p in 0 until dataSet.size)
             onCreatePopupMenu(menu, p, dataSet[p])
     }
 
@@ -100,7 +100,7 @@ abstract class SimpleListFragment<DataType> : Fragment(), ListViewModelLoader<Da
     lateinit var progressBar: ProgressBar
     protected lateinit var netErrViewContainer: ViewGroup
     private var netErrView: View? = null
-    private lateinit var swipeRefreshLayout: SwipeRefreshLayout
+    private lateinit var swipeRefreshLayout: androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 
     open val itemCheckable: Boolean = false
 
@@ -115,9 +115,9 @@ abstract class SimpleListFragment<DataType> : Fragment(), ListViewModelLoader<Da
      * 页码
      */
     override var pageIndex = 0
-    lateinit var recyclerView: RecyclerView
+    lateinit var recyclerView: androidx.recyclerview.widget.RecyclerView
     lateinit var fastScroller: RecyclerFastScroller
-    var layManager: RecyclerView.LayoutManager? = null
+    var layManager: androidx.recyclerview.widget.RecyclerView.LayoutManager? = null
     lateinit var adapter: RecAdapterWithFooter<*, *>
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         contentView = inflater.inflate(R.layout.fragment_base_list, container, false)
@@ -160,7 +160,7 @@ abstract class SimpleListFragment<DataType> : Fragment(), ListViewModelLoader<Da
         addHeader(v)
     }
 
-    val float_header by lazy { contentView.findViewById<CardView>(R.id.float_header) }
+    val float_header by lazy { contentView.findViewById<androidx.cardview.widget.CardView>(R.id.float_header) }
     fun setHeader(v: View) {
         float_header.removeAllViews()
         float_header.addView(v)
@@ -179,7 +179,7 @@ abstract class SimpleListFragment<DataType> : Fragment(), ListViewModelLoader<Da
     private fun afterSet() {
         if (layManager != null && !layManager!!.isAttachedToWindow) {
             recyclerView.layoutManager = layManager
-        } else recyclerView.layoutManager = LinearLayoutManager(context)
+        } else recyclerView.layoutManager = androidx.recyclerview.widget.LinearLayoutManager(context)
 
         recyclerView.adapter = adapter
         netErrViewContainer.addView(
@@ -207,9 +207,9 @@ abstract class SimpleListFragment<DataType> : Fragment(), ListViewModelLoader<Da
             //下拉刷新
             refresh()
         }
-        recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+        recyclerView.addOnScrollListener(object : androidx.recyclerview.widget.RecyclerView.OnScrollListener() {
             //上拉加载
-            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+            override fun onScrolled(recyclerView: androidx.recyclerview.widget.RecyclerView, dx: Int, dy: Int) {
                 super.onScrolled(recyclerView, dx, dy)
                 if (!allLoadFlag && isSlideToBottom() && !swipeRefreshLayout.isRefreshing) {//上拉加载,
                     if (pageIndex != 0)

@@ -1,6 +1,6 @@
 package cn.vove7.jarvis.activities
 
-import android.support.v4.app.Fragment
+import androidx.fragment.app.Fragment
 import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
@@ -55,7 +55,7 @@ class MarkedManagerActivity : BaseActivityWithViewPager() {
         )
     }
 
-    override var fragments: Array<Fragment> = arrayOf(
+    override var fragments: Array<androidx.fragment.app.Fragment> = arrayOf(
             MarkedContractFragment(),
             MarkedAppFragment(),
             MarkedOpenFragment(),

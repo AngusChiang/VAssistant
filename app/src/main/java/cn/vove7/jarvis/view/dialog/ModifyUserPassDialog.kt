@@ -1,7 +1,7 @@
 package cn.vove7.jarvis.view.dialog
 
 import android.content.Context
-import android.support.design.widget.TextInputLayout
+import com.google.android.material.textfield.TextInputLayout
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.app.log
 import cn.vove7.common.net.ApiUrls

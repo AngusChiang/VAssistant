@@ -1,7 +1,7 @@
 package cn.vove7.executorengine
 
 import android.content.Context
-import android.support.annotation.CallSuper
+import androidx.annotation.CallSuper
 import cn.vove7.common.NeedAccessibilityException
 import cn.vove7.common.NotSupportException
 import cn.vove7.common.accessibility.AccessibilityApi

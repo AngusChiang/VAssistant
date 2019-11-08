@@ -5,7 +5,7 @@ import android.content.Intent
 import android.graphics.Bitmap
 import android.os.Build
 import android.service.voice.VoiceInteractionSession
-import android.support.annotation.RequiresApi
+import androidx.annotation.RequiresApi
 import cn.vove7.common.bridges.UtilBridge
 import cn.vove7.common.utils.newTask
 import cn.vove7.common.utils.runOnNewHandlerThread

@@ -1,6 +1,6 @@
 package cn.vove7.androlua.luabridge;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 import cn.vove7.androlua.luautils.LuaGcable;
 import cn.vove7.androlua.luautils.LuaRunnableI;

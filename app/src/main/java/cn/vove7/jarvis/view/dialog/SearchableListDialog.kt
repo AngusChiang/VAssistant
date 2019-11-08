@@ -17,8 +17,8 @@ import com.afollestad.materialdialogs.list.listItems
 class SearchableListDialog(val context: Context, val items: List<String>, val onSel: (Pair<Int, String>, showItems: List<String>) -> Unit) {
     var tmp: MutableList<String> = items.toMutableList()
     val dialog: MaterialDialog by lazy {
-        MaterialDialog(context).listItems(items = items, waitForPositiveButton = false) { dialog, index, text ->
-            onSel.invoke(Pair(index, text), tmp)
+        MaterialDialog(context).listItems(items = items, waitForPositiveButton = false) { _, index, text ->
+            onSel.invoke(Pair(index, text.toString()), tmp)
         }.apply {
             searchable()
         }

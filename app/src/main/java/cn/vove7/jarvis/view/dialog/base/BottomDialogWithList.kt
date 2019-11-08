@@ -2,8 +2,8 @@ package cn.vove7.jarvis.view.dialog.base
 
 import android.content.Context
 import android.os.Bundle
-import android.support.v7.widget.LinearLayoutManager
-import android.support.v7.widget.RecyclerView
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import android.view.View
 import cn.vove7.common.utils.runOnUi
 import cn.vove7.jarvis.R
@@ -24,10 +24,10 @@ abstract class BottomDialogWithList<T>(context: Context, title: String)
     private val listAdapter by lazy { SimpleListAdapter(dataSet, this) }
     override var pageIndex: Int = 0
 
-    private val recyclerView: RecyclerView by lazy {
+    private val recyclerView: androidx.recyclerview.widget.RecyclerView by lazy {
         myView.recycler_view.apply {
             myView.fast_scroller.attachRecyclerView(this)
-            layoutManager = LinearLayoutManager(context)
+            layoutManager = androidx.recyclerview.widget.LinearLayoutManager(context)
             this.adapter = listAdapter
         }
     }

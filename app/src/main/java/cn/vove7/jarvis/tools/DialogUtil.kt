@@ -3,7 +3,7 @@ package cn.vove7.jarvis.tools
 import android.annotation.SuppressLint
 import android.app.Dialog
 import android.content.Context
-import android.support.v7.widget.AppCompatCheckBox
+import androidx.appcompat.widget.AppCompatCheckBox
 import android.widget.ScrollView
 import cn.vove7.jarvis.R
 import cn.vove7.vtp.log.Vog

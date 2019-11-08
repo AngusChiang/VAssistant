@@ -6,8 +6,8 @@ import android.content.DialogInterface
 import android.graphics.drawable.Drawable
 import android.os.Build
 import android.os.Bundle
-import android.support.annotation.DrawableRes
-import android.support.annotation.StringRes
+import androidx.annotation.DrawableRes
+import androidx.annotation.StringRes
 import android.util.DisplayMetrics
 import android.view.Gravity
 import android.view.View

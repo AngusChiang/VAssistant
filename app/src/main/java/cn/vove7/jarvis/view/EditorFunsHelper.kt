@@ -3,13 +3,13 @@ package cn.vove7.jarvis.view
 import android.app.Activity
 import android.content.Context
 import android.os.Bundle
-import android.support.design.widget.TabLayout
-import android.support.v4.app.Fragment
-import android.support.v4.app.FragmentManager
-import android.support.v4.app.FragmentPagerAdapter
-import android.support.v4.view.ViewPager
-import android.support.v7.widget.GridLayoutManager
-import android.support.v7.widget.RecyclerView
+import com.google.android.material.tabs.TabLayout
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentManager
+import androidx.fragment.app.FragmentPagerAdapter
+import androidx.viewpager.widget.ViewPager
+import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -38,8 +38,8 @@ typealias OnClick = (String) -> Unit
 
 class EditorFunsHelper(
         val c: Context,
-        fm: FragmentManager,
-        val pager: ViewPager,
+        fm: androidx.fragment.app.FragmentManager,
+        val pager: androidx.viewpager.widget.ViewPager,
         val tabLay: TabLayout,
         val onClick: OnClick
 ) : VApi {
@@ -180,10 +180,10 @@ class EditorFunsHelper(
     }
 }
 
-class FunsFragmentAdapter(fm: FragmentManager, val c: Context, val apis: List<ApiCategory>, val onClick: OnClick)
-    : FragmentPagerAdapter(fm) {
+class FunsFragmentAdapter(fm: androidx.fragment.app.FragmentManager, val c: Context, val apis: List<ApiCategory>, val onClick: OnClick)
+    : androidx.fragment.app.FragmentPagerAdapter(fm) {
 
-    override fun getItem(p0: Int): Fragment {
+    override fun getItem(p0: Int): androidx.fragment.app.Fragment {
         return CateFrag.newInstance(apis[p0].functions, onClick)
     }
 
@@ -192,7 +192,7 @@ class FunsFragmentAdapter(fm: FragmentManager, val c: Context, val apis: List<Ap
     override fun getCount(): Int = apis.size
 }
 
-class CateFrag : Fragment() {
+class CateFrag : androidx.fragment.app.Fragment() {
     lateinit var functions: List<ApiFunction>
     lateinit var onClick: OnClick
 
@@ -208,15 +208,15 @@ class CateFrag : Fragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val v = inflater.inflate(R.layout.item_api_category_rev, null)
-        v.findViewById<RecyclerView>(R.id.rev).apply {
-            layoutManager = GridLayoutManager(context, 3)
+        v.findViewById<androidx.recyclerview.widget.RecyclerView>(R.id.rev).apply {
+            layoutManager = androidx.recyclerview.widget.GridLayoutManager(context, 3)
             adapter = GridAdapter(activity!!, functions, onClick)
         }
         return v
     }
 }
 
-class GridAdapter(val c: Activity, val functions: List<ApiFunction>, val onClick: OnClick) : RecyclerView.Adapter<GridAdapter.VV>() {
+class GridAdapter(val c: Activity, val functions: List<ApiFunction>, val onClick: OnClick) : androidx.recyclerview.widget.RecyclerView.Adapter<GridAdapter.VV>() {
     override fun onCreateViewHolder(p0: ViewGroup, p1: Int): VV {
         val v = LayoutInflater.from(c).inflate(R.layout.item_of_funcs, null)
         return VV(v)
@@ -248,7 +248,7 @@ class GridAdapter(val c: Activity, val functions: List<ApiFunction>, val onClick
 
     }
 
-    class VV(v: View) : RecyclerView.ViewHolder(v) {
+    class VV(v: View) : androidx.recyclerview.widget.RecyclerView.ViewHolder(v) {
         val title = v.findViewById<TextView>(R.id.title)
         val summary = v.findViewById<TextView>(R.id.summary)
     }

@@ -1,7 +1,7 @@
 package cn.vove7.jarvis.view.custom
 
 import android.content.Context
-import android.support.v7.widget.RecyclerView
+import androidx.recyclerview.widget.RecyclerView
 import android.util.AttributeSet
 import android.view.View
 
@@ -11,7 +11,7 @@ import android.view.View
  * @author 17719
  * 2018/8/14
  */
-class WrappedRecyView : RecyclerView {
+class WrappedRecyView : androidx.recyclerview.widget.RecyclerView {
     constructor(context: Context) : super(context)
     constructor(context: Context, attrs: AttributeSet?) : super(context, attrs)
 

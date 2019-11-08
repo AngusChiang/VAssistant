@@ -37,15 +37,10 @@ object RootHelper {
             val p = Runtime.getRuntime().exec(cmd)
             DataOutputStream(p.outputStream).use { dos ->
                 DataInputStream(p.inputStream).use { dis ->
-                    //                    dos.writeBytes(cmd + "\n")
                     dos.flush()
                     dos.writeBytes("exit\n")
                     dos.flush()
-
-                    var line: String? = null
-                    while ((dis.readLine().also { line = it }) != null) {
-                        result.append(line).append("\n")
-                    }
+                    while ((dis.readLine().also { result.appendln(it) }) != null);
                     p.waitFor()
                 }
             }

@@ -1,14 +1,14 @@
 package cn.vove7.jarvis.view
 
 import android.content.Context
-import android.support.v7.widget.RecyclerView
+import androidx.recyclerview.widget.RecyclerView
 import android.util.AttributeSet
 import android.view.ContextMenu
 import android.view.View
 
 import cn.vove7.vtp.log.Vog
 
-class RecyclerViewWithContextMenu : RecyclerView {
+class RecyclerViewWithContextMenu : androidx.recyclerview.widget.RecyclerView {
     private val mContextInfo = RecyclerViewContextInfo()
 
     constructor(context: Context) : super(context)

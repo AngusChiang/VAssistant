@@ -8,7 +8,7 @@
     android:paddingStart="?attr/dialogPreferredPadding"
     android:paddingEnd="?attr/dialogPreferredPadding">
 
-    <android.support.design.widget.TextInputLayout
+    <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/user_pass"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
@@ -19,9 +19,9 @@
             android:hint="账户密码"
             android:inputType="textPassword" />
 
-    </android.support.design.widget.TextInputLayout>
+    </com.google.android.material.textfield.TextInputLayout>
 
-    <android.support.design.widget.TextInputLayout
+    <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/new_mail"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
@@ -31,6 +31,6 @@
             android:layout_height="wrap_content"
             android:hint="新邮箱" />
 
-    </android.support.design.widget.TextInputLayout>
+    </com.google.android.material.textfield.TextInputLayout>
 
 </LinearLayout>

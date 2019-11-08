@@ -4,7 +4,7 @@ import android.accessibilityservice.AccessibilityService
 import android.content.ComponentName
 import android.os.Build
 import android.provider.Settings
-import android.support.v4.view.accessibility.AccessibilityNodeInfoCompat.FOCUS_INPUT
+import androidx.core.view.accessibility.AccessibilityNodeInfoCompat.FOCUS_INPUT
 import android.view.accessibility.AccessibilityNodeInfo
 import cn.vove7.common.NeedAccessibilityException
 import cn.vove7.common.accessibility.component.AccPluginService

@@ -1,6 +1,6 @@
 package cn.vove7.jarvis.activities
 
-import android.support.v4.app.Fragment
+import androidx.fragment.app.Fragment
 import cn.vove7.common.bridges.SystemBridge
 import cn.vove7.jarvis.activities.base.OneFragmentActivity
 import cn.vove7.jarvis.adapters.ListViewModel
@@ -15,7 +15,7 @@ import cn.vove7.jarvis.fragments.SimpleListFragment
  */
 class OSLActivity : OneFragmentActivity() {
 
-    override var fragments: Array<Fragment> = arrayOf(ListFragment())
+    override var fragments: Array<androidx.fragment.app.Fragment> = arrayOf(ListFragment())
 
     class ListFragment : SimpleListFragment<OslItem>() {
 

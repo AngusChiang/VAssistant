@@ -3,7 +3,7 @@ package cn.vove7.rhino.common;
 
 
 import android.os.Build;
-import android.support.annotation.VisibleForTesting;
+import androidx.annotation.VisibleForTesting;
 
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.tools.shell.ShellContextFactory;
