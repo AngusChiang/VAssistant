@@ -126,7 +126,6 @@
     <string name="text_sound_model">Voice model</string>
     <string name="text_volume">Volume</string>
     <string name="text_speak_speed">Speed of Speak</string>
-    <string name="text_open_ad_killer_service">AdKiller service</string>
     <string name="text_remote_debug">Remote debug</string>
     <string name="text_open_voice_wakeup">Voice wakeup</string>
     <string name="text_play_voice_message">Play voice message</string>

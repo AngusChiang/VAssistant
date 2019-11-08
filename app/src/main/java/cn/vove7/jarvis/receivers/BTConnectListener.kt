@@ -1,12 +1,12 @@
 package cn.vove7.jarvis.receivers
 
+import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothHeadset
 import android.bluetooth.BluetoothProfile
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import cn.vove7.common.app.GlobalApp
-import android.bluetooth.BluetoothDevice
 import cn.vove7.jarvis.services.MainService
 import cn.vove7.vtp.log.Vog
 
@@ -19,15 +19,13 @@ import cn.vove7.vtp.log.Vog
  */
 object BTConnectListener : DyBCReceiver() {
 
-    override val intentFilter: IntentFilter by lazy {
-        val i = IntentFilter()
-        i.addAction(BluetoothHeadset.ACTION_CONNECTION_STATE_CHANGED)
-        i.addAction(BluetoothHeadset.ACTION_AUDIO_STATE_CHANGED)
-        i
-    }
+    override val intentFilter: IntentFilter
+        get() = IntentFilter().apply {
+            addAction(BluetoothHeadset.ACTION_CONNECTION_STATE_CHANGED)
+            addAction(BluetoothHeadset.ACTION_AUDIO_STATE_CHANGED)
+        }
+
     val context: Context get() = GlobalApp.APP
-
-
     var bluetoothHeadset: BluetoothHeadset? = null
     var bluetoothDevice: BluetoothDevice? = null
 
@@ -40,6 +38,7 @@ object BTConnectListener : DyBCReceiver() {
             bh.startVoiceRecognition(bd)
         }
     }
+
     fun stopBTRecorderIf() {
         val bh = bluetoothHeadset
         val bd = bluetoothDevice
@@ -80,8 +79,8 @@ object BTConnectListener : DyBCReceiver() {
                 val prevState = intent.getIntExtra(BluetoothProfile.EXTRA_PREVIOUS_STATE, -1)
                 if (state == BluetoothHeadset.STATE_AUDIO_CONNECTED) {
                     // SCO channel has just become available.
-                        // still waiting for the TTS to be set up.
-                        // we now have SCO connection and TTS, so we can start.
+                    // still waiting for the TTS to be set up.
+                    // we now have SCO connection and TTS, so we can start.
                 } else if (prevState == BluetoothHeadset.STATE_AUDIO_CONNECTED) {
                     // apparently our connection to the headset has dropped.
                     // we won't be able to continue voice dialing.

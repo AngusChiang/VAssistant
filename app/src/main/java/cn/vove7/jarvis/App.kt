@@ -15,6 +15,7 @@ import cn.vove7.common.model.UserInfo
 import cn.vove7.common.utils.ThreadPool.runOnPool
 import cn.vove7.common.utils.runOnNewHandlerThread
 import cn.vove7.common.utils.runWithClock
+import cn.vove7.jarvis.plugins.PowerListener
 import cn.vove7.jarvis.receivers.AppInstallReceiver
 import cn.vove7.jarvis.receivers.PowerEventReceiver
 import cn.vove7.jarvis.receivers.ScreenStatusListener
@@ -109,6 +110,12 @@ class InitCp : ContentProvider() {
             AppInstallReceiver.start()
             UtilEventReceiver.start()
 //            BTConnectListener.start()
+        }
+    }
+
+    private fun launchExtension() {
+        if (AppConfig.extPowerIndicator) {
+            PowerListener.start()
         }
     }
 

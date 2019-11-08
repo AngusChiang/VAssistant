@@ -3,11 +3,11 @@ package cn.vove7.jarvis.receivers
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import cn.vove7.common.app.AppConfig
 import cn.vove7.common.appbus.AppBus
 import cn.vove7.common.utils.StubbornFlag
 import cn.vove7.jarvis.plugins.VoiceWakeupStrategy
 import cn.vove7.jarvis.services.MainService
-import cn.vove7.common.app.AppConfig
 import cn.vove7.vtp.log.Vog
 
 /**
@@ -21,13 +21,12 @@ object ScreenStatusListener : DyBCReceiver(), ScreenEvent {
     var screenOn: Boolean = true
 
     val event: ScreenEvent = this
-    override val intentFilter: IntentFilter by lazy {
-        val i = IntentFilter()
-        i.addAction(Intent.ACTION_SCREEN_OFF)
-        i.addAction(Intent.ACTION_SCREEN_ON)
-        i.addAction(Intent.ACTION_USER_PRESENT)
-        i
-    }
+    override val intentFilter: IntentFilter
+        get() = IntentFilter().apply {
+            addAction(Intent.ACTION_SCREEN_OFF)
+            addAction(Intent.ACTION_SCREEN_ON)
+            addAction(Intent.ACTION_USER_PRESENT)
+        }
 
     override fun onReceive(context: Context?, intent: Intent?) {
 

@@ -59,12 +59,12 @@ abstract class FloatyPanel(width: Int, height: Int) : AbFloatWindow(
         show(result)
     }
 
-    override fun showListResult(tite: String, items: List<UrlItem>) {
+    override fun showListResult(title: String, items: List<UrlItem>) {
         when {
             items.size == 1 -> SystemBridge.openUrl(items[0].url)
             else -> {
                 GlobalApp.APP.startActivity<ResultPickerActivity> {
-                    putExtra("title", tite)
+                    putExtra("title", title)
                     putExtra("data", BundleBuilder().put("items", items).data)
                 }
             }

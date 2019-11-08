@@ -79,7 +79,6 @@
     <string name="text_sound_model">声音模型</string>
     <string name="text_volume">音量</string>
     <string name="text_speak_speed">语速</string>
-    <string name="text_open_ad_killer_service">去广告服务</string>
     <string name="text_remote_debug">远程调试</string>
     <string name="text_open_voice_wakeup">语音唤醒</string>
     <string name="text_play_voice_message">播放语音消息</string>

@@ -24,9 +24,10 @@ object UtilEventReceiver : DyBCReceiver() {
         AppBus.reg(this)
     }
 
-    override val intentFilter: IntentFilter = IntentFilter().apply {
-        addAction(APP_HAS_UPDATE)
-    }
+    override val intentFilter: IntentFilter
+        get() = IntentFilter().apply {
+            addAction(APP_HAS_UPDATE)
+        }
 
     override fun onReceive(context: Context?, intent: Intent?) {
         when (intent?.action) {

@@ -4,11 +4,11 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.os.BatteryManager
+import cn.vove7.common.app.AppConfig
 import cn.vove7.common.appbus.AppBus
 import cn.vove7.common.bridges.SystemBridge
 import cn.vove7.jarvis.plugins.VoiceWakeupStrategy
 import cn.vove7.jarvis.services.MainService
-import cn.vove7.common.app.AppConfig
 import cn.vove7.vtp.log.Vog
 
 /**
@@ -21,16 +21,16 @@ import cn.vove7.vtp.log.Vog
 object PowerEventReceiver : DyBCReceiver(), OnPowerEvent {
     val event: OnPowerEvent = this //can be list 方便二次开发
     var needBatteryLevelChanged = false
-    override val intentFilter: IntentFilter by lazy {
-        val i = IntentFilter()
-        i.addAction(Intent.ACTION_POWER_CONNECTED)
-        i.addAction(Intent.ACTION_POWER_DISCONNECTED)
-        i.addAction(Intent.ACTION_BATTERY_LOW)
-        i.addAction(Intent.ACTION_BATTERY_OKAY)
-        if (needBatteryLevelChanged)
-            i.addAction(Intent.ACTION_BATTERY_CHANGED)
-        i
-    }
+    override val intentFilter: IntentFilter
+        get() = IntentFilter().apply {
+            addAction(Intent.ACTION_POWER_CONNECTED)
+            addAction(Intent.ACTION_POWER_DISCONNECTED)
+            addAction(Intent.ACTION_BATTERY_LOW)
+            addAction(Intent.ACTION_BATTERY_OKAY)
+            if (needBatteryLevelChanged)
+                addAction(Intent.ACTION_BATTERY_CHANGED)
+        }
+
     var isCharging: Boolean = SystemBridge.isCharging //初始状态?
 
     /**

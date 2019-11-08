@@ -10,14 +10,14 @@ import cn.vove7.vtp.log.Vog
  * App安装卸载广播监听
  */
 object AppInstallReceiver : DyBCReceiver() {
-    override val intentFilter: IntentFilter by lazy {
-        IntentFilter().apply {
+    override val intentFilter: IntentFilter
+        get() = IntentFilter().apply {
             addAction(Intent.ACTION_PACKAGE_ADDED)
             addAction(Intent.ACTION_PACKAGE_REMOVED)
             addAction(Intent.ACTION_PACKAGE_REPLACED)
             addDataScheme("package")
         }
-    }
+
 
     override fun onReceive(context: Context, intent: Intent) {
 //        runOnPool {

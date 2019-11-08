@@ -93,7 +93,7 @@ class SettingsActivity : ReturnableActivity() {
                             title = "连续对话",
                             summary = "开启后，唤醒后可连续说出命令\n可以通过按音量下键终止",
                             keyId = R.string.key_lasting_voice_command,
-                            defaultValue = { AppConfig.lastingVoiceCommand }
+                            defaultValue = AppConfig.lastingVoiceCommand
                     ),
                     NumberPickerItem(
                             title = "结束等待时长",
@@ -124,7 +124,7 @@ class SettingsActivity : ReturnableActivity() {
                                 }
                                 return@SwitchItem true
                             },
-                            defaultValue = { false }
+                            defaultValue = false
                     ),
                     SingleChoiceItem(
                             title = "自动休眠时长",
@@ -213,8 +213,7 @@ class SettingsActivity : ReturnableActivity() {
                             title = "长按唤醒",
                             keyId = R.string.key_long_press_volume_up_wake_up,
                             summary = "可通过长按音量上键唤醒\n需要无障碍模式开启",
-                            defaultValue =
-                            { AppConfig.isLongPressKeyWakeUp }
+                            defaultValue = AppConfig.isLongPressKeyWakeUp
                     ),
                     NumberPickerItem(
                             title = "长按延时",
@@ -255,7 +254,7 @@ class SettingsActivity : ReturnableActivity() {
                             title = "提示音",
                             summary = "语音识别提示音",
                             keyId = R.string.key_voice_recog_feedback,
-                            defaultValue = { AppConfig.voiceRecogEffect }
+                            defaultValue = AppConfig.voiceRecogEffect
                     ),
                     CheckBoxItem(
                             R.string.text_vibrate_reco_begin,
@@ -275,8 +274,7 @@ class SettingsActivity : ReturnableActivity() {
                             title = "开启",
                             summary = "开始识别前，响应词反馈",
                             keyId = R.string.key_open_response_word,
-                            defaultValue =
-                            { AppConfig.openResponseWord }
+                            defaultValue = AppConfig.openResponseWord
                     ),
                     InputItem(
                             title = "设置响应词",

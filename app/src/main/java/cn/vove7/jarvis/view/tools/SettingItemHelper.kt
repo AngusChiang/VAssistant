@@ -4,12 +4,13 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import android.widget.CompoundButton
 import android.widget.TextView
-import cn.vove7.common.app.AppConfig
-import cn.vove7.common.utils.ThreadPool
+import cn.vove7.common.utils.onClick
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.view.*
+import cn.vove7.smartkey.BaseConfig
 import cn.vove7.smartkey.android.set
 import cn.vove7.vtp.easyadapter.BaseListAdapter
 import cn.vove7.vtp.log.Vog
@@ -33,59 +34,53 @@ typealias OnClick = () -> Unit
 @Suppress("unchecked_cast")
 class SettingItemHelper(
         val context: Context,
-        val settingItem: SettingChildItem
+        val settingItem: SettingChildItem,
+        val config: BaseConfig
 ) {
 
     lateinit var holder: ChildItemHolder
 
     @SuppressLint("InflateParams")
-    fun fill(): ChildItemHolder {
+    fun fill(p: ViewGroup? = null): ChildItemHolder {
         when (settingItem.itemType) {
             TYPE_INPUT -> {
-                val view = LayoutInflater.from(context).inflate(R.layout.item_of_settings_child, null)
+                val view = LayoutInflater.from(context).inflate(R.layout.item_of_settings_child, p, false)
                 holder = ChildItemHolder(view)
                 initAndSetInputListener()
                 return holder
             }
             TYPE_SWITCH -> {
-                val view = LayoutInflater.from(context).inflate(R.layout.item_of_settings_switch, null)
+                val view = LayoutInflater.from(context).inflate(R.layout.item_of_settings_switch, p, false)
                 holder = SwitchItemHolder(view)
                 initAndSetCompoundButtonListener()
-                return holder
-            }
-            TYPE_SWITCH_CALLBACK -> {
-                val view = LayoutInflater.from(context).inflate(R.layout.item_of_settings_switch, null)
-                holder = SwitchItemHolder(view)
-                initAndSetCompoundButtonListener()
-
                 return holder
             }
             TYPE_CHECK_BOX -> {
-                val view = LayoutInflater.from(context).inflate(R.layout.item_of_settings_checkbox, null)
+                val view = LayoutInflater.from(context).inflate(R.layout.item_of_settings_checkbox, p, false)
                 holder = CheckBoxItemHolder(view)
                 initAndSetCompoundButtonListener()
                 return holder
             }
             TYPE_SINGLE -> {
-                val view = LayoutInflater.from(context).inflate(R.layout.item_of_settings_child, null)
+                val view = LayoutInflater.from(context).inflate(R.layout.item_of_settings_child, p, false)
                 holder = ChildItemHolder(view)
                 initSingleDialog()
                 return holder
             }
             TYPE_MULTI -> {
-                val view = LayoutInflater.from(context).inflate(R.layout.item_of_settings_child, null)
+                val view = LayoutInflater.from(context).inflate(R.layout.item_of_settings_child, p, false)
                 holder = ChildItemHolder(view)
                 initMultiDialog()
                 return holder
             }
             TYPE_NUMBER -> {
-                val view = LayoutInflater.from(context).inflate(R.layout.item_of_settings_child, null)
+                val view = LayoutInflater.from(context).inflate(R.layout.item_of_settings_child, p, false)
                 holder = ChildItemHolder(view)
                 initNumberPickerDialog()
                 return holder
             }
             TYPE_INTENT -> {
-                val view = LayoutInflater.from(context).inflate(R.layout.item_of_settings_child, null)
+                val view = LayoutInflater.from(context).inflate(R.layout.item_of_settings_child, p, false)
                 holder = ChildItemHolder(view)
                 initIntentItem()
 
@@ -109,8 +104,8 @@ class SettingItemHelper(
         } else {
             val key = settingItem.key ?: return d
 
-            if (key in AppConfig.settings) {
-                AppConfig.settings.getString(key).also {
+            if (key in config.settings) {
+                config.settings.getString(key).also {
                     if (it != "") settingItem.summary = it
                     prefill = it
                 }
@@ -121,6 +116,7 @@ class SettingItemHelper(
 
     private fun initAndSetInputListener() {
         val backSummary: String? = settingItem.summary
+            ?: settingItem.defaultValue.invoke() as String?
 
         //初始化summary
         getPrefill()
@@ -133,7 +129,7 @@ class SettingItemHelper(
                 settingItem.summary = s
                 if ((settingItem.callback as CallbackOnSet<String>?)?.invoke(ItemOperation(this), s) != false) {
                     settingItem.keyId?.also {
-                        AppConfig.set(settingItem.keyId, s)
+                        config.set(settingItem.keyId, s)
                     }
                 }
                 setBasic()
@@ -141,7 +137,7 @@ class SettingItemHelper(
                 positiveButton()
                 neutralButton(text = "清空") {
                     if (settingItem.keyId != null) {
-                        AppConfig.set(settingItem.keyId, null)
+                        this@SettingItemHelper.config.set(settingItem.keyId, null)
                     }
                     settingItem.summary = backSummary
                     setBasic()
@@ -176,14 +172,20 @@ class SettingItemHelper(
         val item = settingItem
         val holder = holder as CompoundItemHolder
         setBasic { holder.compoundWight.toggle() }
-
+        (item as CompoundItem).apply {
+            if (onTileAreaClick != null) {
+                holder.tileArea.onClick(onTileAreaClick)
+            } else {
+                holder.tileArea.background = null
+            }
+        }
         if (item.keyId != null) {
             val sp = SpHelper(context)
             val b = sp.getBoolean(item.keyId, item.defaultValue.invoke() as Boolean)
             holder.compoundWight.isChecked = b
             holder.compoundWight.setOnCheckedChangeListener { _, isChecked ->
                 if ((item.callback as CallbackOnSet<Boolean>?)?.invoke(ItemOperation(this), isChecked) != false) {
-                    AppConfig.set(item.keyId, isChecked)
+                    config.set(item.keyId, isChecked)
                 }
             }
         } else {//withoutSp
@@ -207,14 +209,15 @@ class SettingItemHelper(
         }
         val key = item.key
         key ?: return default
-        if (AppConfig.settings.contains(key)) {
+        val cs = config.settings
+        if (key in cs) {
             val entity = item.choiceItems
             return try {
-                val v = AppConfig.settings.getString(key)
+                val v = cs.getString(key)
                 item.summary = v
                 entity.indexOf(v)
             } catch (e: Exception) {//保存值为int
-                val index = AppConfig.settings.getInt(key, -1)
+                val index = cs.getInt(key, -1)
                 if (index >= 0) {
                     item.summary = entity[index]
                 }
@@ -242,11 +245,11 @@ class SettingItemHelper(
             if ((item.callback as CallbackOnSet<Pair<Int, String>?>?)?.invoke(ItemOperation(this), pair) != false) {
                 if (item.keyId != null) {
                     try {
-                        AppConfig.set(item.keyId, pair?.first)
+                        config.set(item.keyId, pair?.first)
                     } catch (e: Exception) {
                         val key = item.key!!
-                        AppConfig.settings.remove(key)
-                        AppConfig.set(key, pair?.first)
+                        config.settings.remove(key)
+                        config.set(key, pair?.first)
                     }
                 }
                 item.summary = pair?.second ?: ds
@@ -327,7 +330,7 @@ class SettingItemHelper(
                         if ((item.callback as CallbackOnSet<Int>?)?.invoke(ItemOperation(this), old) != false) {
                             item.summary = old.toString()
                             if (item.keyId != null) {
-                                AppConfig.set(item.keyId, old)
+                                config.set(item.keyId, old)
                             }
                             setBasic()
                         }
@@ -379,5 +382,9 @@ class SettingItemHelper(
 
     class CheckBoxItemHolder(v: View) : CompoundItemHolder(v, v.findViewById(R.id.wight_checkbox))
 
-    open class CompoundItemHolder(v: View, val compoundWight: CompoundButton) : ChildItemHolder(v)
+    open class CompoundItemHolder(
+            v: View,
+            val compoundWight: CompoundButton,
+            val tileArea: View = v.findViewById(R.id.tile_area)
+    ) : ChildItemHolder(v)
 }

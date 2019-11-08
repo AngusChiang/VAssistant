@@ -503,13 +503,12 @@ fun isQuickClick(interval: Int = 300): Unit? {
  * @receiver View
  * @param clickAction Function1<View, Unit>
  */
-fun View.onClick(clickAction: (View) -> Unit) {
+fun View.onClick(clickAction: () -> Unit) {
     setOnClickListener {
         isQuickClick() ?: return@setOnClickListener
-        clickAction(it)
+        clickAction()
     }
 }
-
 
 fun View.fadeOut(
         duration: Long = 800,
@@ -518,7 +517,7 @@ fun View.fadeOut(
 ) {
     startAnimation(AlphaAnimation(1f, 0f).apply {
         this.duration = duration
-        setAnimationListener(object :Animation.AnimationListener{
+        setAnimationListener(object : Animation.AnimationListener {
             override fun onAnimationRepeat(animation: Animation?) {}
 
             override fun onAnimationEnd(animation: Animation?) {

@@ -139,10 +139,6 @@ object AppConfig : BaseConfig {
     //用户自定义短语
     var homeSystemUserCommand: String? by smartKey(null, keyId = R.string.key_home_system_user_command, encrypt = true)
 
-
-    val fpAnimation: Int
-        get() = getSingleChoicePosition(R.string.key_fp_animation, R.array.list_fp_animation, 0)
-
     val homeFun: Int //长按HOME键功能
         get() = getSingleChoicePosition(R.string.key_home_fun, R.array.list_home_funs)
 
@@ -215,6 +211,12 @@ object AppConfig : BaseConfig {
     var chatStr: String? by noCacheKey(null, keyId = R.string.key_chat_str)
 
     var textOcrStr: String? by noCacheKey(null, keyId = R.string.key_text_ocr_key)
+
+    //////////////////扩展//////////////////////
+
+    val extPowerIndicator by noCacheKey(false, R.string.key_extension_power_indicator)
+    ////////////////////////////////////////
+
 
     val streamTypeArray = arrayOf(
             AudioManager.STREAM_MUSIC

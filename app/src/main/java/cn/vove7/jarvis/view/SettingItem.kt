@@ -21,7 +21,6 @@ const val TYPE_SINGLE = 4
 @Deprecated("unused")
 const val TYPE_MULTI = 5
 const val TYPE_NUMBER = 6
-const val TYPE_SWITCH_CALLBACK = 8
 const val TYPE_INTENT = 9
 
 /**
@@ -122,24 +121,38 @@ open class SettingChildItem(
 //    AppConfig.reload()
 //}
 
+open class CompoundItem(
+        titleId: Int? = null,
+        title: String? = null,
+        summary: String? = null,
+        keyId: Int? = null,
+        defaultValue: Boolean = false,
+        val onTileAreaClick: Function0<Unit>? = null,
+        callback: CallbackOnSet<Boolean>? = null,
+        val type: Int
+) : SettingChildItem(titleId, title, summary, type, keyId, { defaultValue },
+        callback = callback)
+
+
 class CheckBoxItem(
         titleId: Int? = null,
         title: String? = null,
         summary: String? = null,
         keyId: Int? = null,
         defaultValue: Boolean = false,
+        onTileAreaClick: Function0<Unit>? = null,
         callback: CallbackOnSet<Boolean>? = null
-) : SettingChildItem(titleId, title, summary, TYPE_CHECK_BOX, keyId, { defaultValue },
-        callback = callback)
+) : CompoundItem(titleId, title, summary, keyId, defaultValue, onTileAreaClick, callback = callback, type = TYPE_CHECK_BOX)
 
 class SwitchItem(
         titleId: Int? = null,
         title: String? = null,
         summary: String? = null,
         keyId: Int? = null,
-        defaultValue: () -> Boolean,
+        defaultValue: Boolean,
+        onTileAreaClick: Function0<Unit>? = null,
         callback: CallbackOnSet<Boolean>? = null
-) : SettingChildItem(titleId, title, summary, TYPE_SWITCH, keyId, defaultValue, callback = callback)
+) : CompoundItem(titleId, title, summary, keyId, defaultValue, onTileAreaClick, callback, TYPE_SWITCH)
 
 
 class NumberPickerItem(

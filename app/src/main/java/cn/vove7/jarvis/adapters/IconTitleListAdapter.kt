@@ -27,9 +27,7 @@ class IconTitleListAdapter(context: Context, dataset: List<IconTitleEntity>)
                 holder.iconView.setImageResource(it)
         }
         holder.titleView.setText(item.titleId)
-        holder.itemView.onClick {
-            item.onclick()
-        }
+        holder.itemView.onClick(item.onclick)
         val subtitle = item.summaryId
         if (subtitle == null) {
             holder.subTitleView.visibility = View.GONE

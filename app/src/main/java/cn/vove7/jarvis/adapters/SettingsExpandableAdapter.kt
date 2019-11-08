@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.BaseExpandableListAdapter
+import cn.vove7.common.app.AppConfig
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.view.SettingChildItem
 import cn.vove7.jarvis.view.custom.GroupItemHolder
@@ -65,7 +66,7 @@ class SettingsExpandableAdapter(
 
         if (view == null) {
             val c = getChild(groupPosition, childPosition)
-            val holder = SettingItemHelper(context, c).fill()
+            val holder = SettingItemHelper(context, c, AppConfig).fill()
             childHolders[groupPosition][childPosition] = holder
             view = holder.itemView
         }

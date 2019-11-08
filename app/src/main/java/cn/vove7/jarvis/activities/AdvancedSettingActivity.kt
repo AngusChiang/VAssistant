@@ -28,7 +28,10 @@ import cn.vove7.jarvis.services.MainService
 import cn.vove7.jarvis.tools.*
 import cn.vove7.jarvis.tools.backup.BackupHelper
 import cn.vove7.jarvis.tools.debugserver.RemoteDebugServer
-import cn.vove7.jarvis.view.*
+import cn.vove7.jarvis.view.CheckBoxItem
+import cn.vove7.jarvis.view.InputItem
+import cn.vove7.jarvis.view.IntentItem
+import cn.vove7.jarvis.view.SwitchItem
 import cn.vove7.jarvis.view.custom.SettingGroupItem
 import cn.vove7.jarvis.view.dialog.ProgressDialog
 import cn.vove7.vtp.app.AppHelper
@@ -102,10 +105,7 @@ class AdvancedSettingActivity : ReturnableActivity() {
                                 keyId = R.string.key_auto_update_data, defaultValue = true)
                 )),
                 SettingGroupItem(R.color.google_green, "脚本", childItems = listOf(
-                        SwitchItem(R.string.text_remote_debug, summary = if (RemoteDebugServer.stopped) "使用Pc调试，请查阅使用手册"
-                        else ipText, defaultValue = {
-                            !RemoteDebugServer.stopped
-                        }, callback = { item, it ->
+                        SwitchItem(R.string.text_remote_debug, summary = if (RemoteDebugServer.stopped) "使用Pc调试，请查阅使用手册" else ipText, defaultValue = !RemoteDebugServer.stopped, callback = { item, it ->
                             if (!BuildConfig.DEBUG && !AppConfig.checkLogin()) {
                                 item.isChecked = false
                                 return@SwitchItem true
@@ -200,7 +200,7 @@ class AdvancedSettingActivity : ReturnableActivity() {
                         IntentItem(title = "触发低电量") {
                             PowerEventReceiver.onLowBattery()
                         },
-                        SwitchItem(title = "无线调试", defaultValue = { isWirelessDebugEnable() }) { _, i ->
+                        SwitchItem(title = "无线调试", defaultValue = isWirelessDebugEnable()) { _, i ->
                             wirelessDebug(i)
                             return@SwitchItem false
                         },

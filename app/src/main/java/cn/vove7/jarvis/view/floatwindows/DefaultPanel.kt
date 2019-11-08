@@ -5,8 +5,6 @@ import android.view.ViewAnimationUtils
 import android.view.WindowManager
 import android.view.animation.AccelerateInterpolator
 import android.view.animation.AnimationUtils
-import cn.vove7.common.app.AppConfig
-import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.utils.gone
 import cn.vove7.common.utils.listener
 import cn.vove7.common.utils.runInCatch
@@ -45,7 +43,7 @@ class DefaultPanel : FloatyPanel(
 
     override fun showEnterAnimation() = runInCatch {
         val width = contentView?.width ?: screenWidth
-        when (AppConfig.fpAnimation) {
+        when (FloatPanelConfig.defaultPanelAnimation) {
             1 -> {//揭露动画
                 ViewAnimationUtils
                         .createCircularReveal(animationBody, width / 2, 0, 0f, width.toFloat())
@@ -66,7 +64,7 @@ class DefaultPanel : FloatyPanel(
 
 
     private fun buildExitAnimation() {
-        when (AppConfig.fpAnimation) {
+        when (FloatPanelConfig.defaultPanelAnimation) {
             1 -> {//揭露动画
                 startCircularAnimation()
             }
@@ -105,7 +103,7 @@ class DefaultPanel : FloatyPanel(
                 SingleChoiceItem(
                         title = "动画", defaultValue = 0,
                         entityArrId = R.array.list_fp_animation,
-                        keyId = R.string.key_fp_animation
+                        keyId = R.string.key_default_fp_animation
                 )
         )
 
