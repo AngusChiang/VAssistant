@@ -1,5 +1,6 @@
 package cn.vove7.jarvis.services
 
+import android.app.Activity
 import android.app.AlertDialog
 import android.app.Dialog
 import android.content.DialogInterface
@@ -1208,8 +1209,8 @@ object MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
         }
     }
 
-    fun showPanelSettings() {
-        floatyPanel.showSettings()
+    fun showPanelSettings(act: Activity) {
+        floatyPanel.showSettings(act)
     }
 
 }

@@ -5,18 +5,17 @@
     android:minWidth="100dp"
     android:gravity="center"
     android:orientation="vertical"
-    android:paddingLeft="10dp"
-    android:paddingTop="5dp"
-    android:paddingRight="10dp"
-    android:paddingBottom="5dp"
-    app:cardBackgroundColor="@color/green_700">
+    android:background="@drawable/round_bg_green">
 
     <TextView
         android:id="@id/voice_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:text="正在聆听"
         android:fontFamily="sans-serif-black"
+        android:paddingLeft="7dp"
+        android:paddingTop="4dp"
+        android:paddingRight="7dp"
+        android:paddingBottom="4dp"
+        android:text="正在聆听"
         android:textColor="#fff" />
 </LinearLayout>

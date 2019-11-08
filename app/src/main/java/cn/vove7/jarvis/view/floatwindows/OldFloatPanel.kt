@@ -5,6 +5,7 @@ import android.widget.LinearLayout
 import cn.vove7.bottomdialog.util.fadeIn
 import cn.vove7.common.utils.fadeOut
 import cn.vove7.jarvis.R
+import cn.vove7.jarvis.view.SettingChildItem
 
 /**
  * # OldFloatPanel
@@ -22,4 +23,6 @@ class OldFloatPanel : FloatyPanel(-1, -2) {
         }
     }
 
+    override val settingItems: Array<SettingChildItem>
+        get() = emptyArray()
 }

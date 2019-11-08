@@ -1,10 +1,18 @@
 package cn.vove7.jarvis.view.floatwindows
 
+import android.graphics.drawable.AnimationDrawable
+import android.view.View
+import android.widget.LinearLayout
 import android.widget.TextView
+import cn.vove7.common.utils.gone
+import cn.vove7.common.utils.runOnUi
+import cn.vove7.common.utils.show
 import cn.vove7.jarvis.R
+import cn.vove7.jarvis.view.SettingChildItem
+import kotlinx.android.synthetic.main.float_panel_default.view.*
 
 
-class CustomPanel : FloatyPanel(-1, -1) {
+class CustomPanel : FloatyPanel(-1, -2) {
 
     override fun layoutResId(): Int = R.layout.float_panel_custom
 
@@ -30,8 +38,15 @@ class CustomPanel : FloatyPanel(-1, -1) {
     }
 
     override fun showTextResult(result: String) {
-        super.showTextResult(result)
-        f<TextView>(R.id.result_text)?.text = result
+        runOnUi {
+            showListeningAni()
+            f<TextView>(R.id.result_text)?.apply {
+                show()
+                text = result
+            }
+        }
     }
 
+    override val settingItems: Array<SettingChildItem>
+        get() = emptyArray()
 }

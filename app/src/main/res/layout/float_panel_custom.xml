@@ -36,10 +36,9 @@
             android:layout_width="wrap_content"
             android:layout_height="37dp"
             android:fontFamily="sans-serif-black"
-            android:gravity="center|start"
-            android:minWidth="60dp"
-            android:minHeight="37dp"
-            android:text="正在聆听"
+            android:gravity="center"
+            android:minWidth="30dp"
+            android:textColor="#000"
             android:textSize="14sp"
             android:textStyle="bold"
             android:typeface="monospace" />
@@ -50,19 +49,6 @@
         android:layout_height="wrap_content"
         android:gravity="center"
         android:padding="0dp">
-
-        <cn.vove7.jarvis.view.animation.WaveView
-            android:layout_width="37dp"
-            android:layout_height="37dp"
-            app:waveColor="@color/fff" />
-
-        <ImageView
-            android:layout_width="25dp"
-            android:layout_height="25dp"
-            android:layout_marginEnd="10dp"
-            android:layout_marginRight="10dp"
-            android:src="@drawable/parsing_animation"
-            android:visibility="gone" />
 
         <TextView
             android:id="@+id/result_text"

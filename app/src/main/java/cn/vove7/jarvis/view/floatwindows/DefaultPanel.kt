@@ -12,6 +12,8 @@ import cn.vove7.common.utils.listener
 import cn.vove7.common.utils.runInCatch
 import cn.vove7.common.utils.show
 import cn.vove7.jarvis.R
+import cn.vove7.jarvis.view.SettingChildItem
+import cn.vove7.jarvis.view.SingleChoiceItem
 import kotlinx.android.synthetic.main.float_panel_default.view.*
 
 /**
@@ -98,4 +100,13 @@ class DefaultPanel : FloatyPanel(
             superRemove()
         }
     }
+    override val settingItems: Array<SettingChildItem>
+        get() = arrayOf(
+                SingleChoiceItem(
+                        title = "动画", defaultValue = 0,
+                        entityArrId = R.array.list_fp_animation,
+                        keyId = R.string.key_fp_animation
+                )
+        )
+
 }

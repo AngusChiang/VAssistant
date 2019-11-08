@@ -341,9 +341,8 @@ class SettingsActivity : ReturnableActivity() {
                         true
                     },
                     IntentItem(title = "面板设置") {
-                        MainService.showPanelSettings()
+                        MainService.showPanelSettings(this)
                     }
-//                    SingleChoiceItem(title = "动画", entityArrId = R.array.list_fp_animation, keyId = R.string.key_fp_animation)
             )),
             SettingGroupItem(R.color.lime_600, titleS = "启动选项", childItems = listOf(
                     CheckBoxItem(

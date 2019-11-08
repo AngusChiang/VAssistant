@@ -134,7 +134,7 @@ abstract class AbFloatWindow(
         windowManager.updateViewLayout(contentView, buildLayoutParams(x, y))
     }
 
-    private fun buildLayoutParams(x: Int = posX, y: Int = posY): WindowManager.LayoutParams {
+    open fun buildLayoutParams(x: Int = posX, y: Int = posY): WindowManager.LayoutParams {
         val params = WindowManager.LayoutParams()
         params.packageName = context.packageName
         params.width = width
@@ -149,7 +149,6 @@ abstract class AbFloatWindow(
         params.gravity = Gravity.TOP or Gravity.START
         params.x = x
         params.y = y
-
 
         params.type = if (Build.VERSION.SDK_INT >= 26)
             WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY
