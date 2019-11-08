@@ -296,7 +296,11 @@ object AppConfig : BaseConfig {
     private fun getSingleChoicePosition(keyId: Int, entityId: Int, def: Int = -1): Int {
         val sp = SpHelper(GlobalApp.APP)
         return try {
-            return GlobalApp.APP.resources.getStringArray(entityId).indexOf(sp.getString(keyId))
+            if (sp.containsKey(keyId)) {
+                GlobalApp.APP.resources.getStringArray(entityId).indexOf(sp.getString(keyId))
+            } else {
+                settings.getInt(context.getString(keyId), def)
+            }
         } catch (e: ClassCastException) {
             settings.getInt(context.getString(keyId), def)
         }
