@@ -17,12 +17,12 @@ abstract class BaseActivity : AppCompatActivity() {
 
     public override fun onResume() {
         super.onResume()
-        DataCollector.onPageStart(pageName)
+        DataCollector.onPageStart(this, pageName)
     }
 
     public override fun onPause() {
         super.onPause()
-        DataCollector.onPageEnd(pageName)
+        DataCollector.onPageEnd(this, pageName)
     }
 
 }

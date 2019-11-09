@@ -16,6 +16,7 @@ import cn.vove7.common.utils.TextHelper
 import cn.vove7.common.utils.gone
 import cn.vove7.common.utils.onClick
 import cn.vove7.jarvis.R
+import cn.vove7.jarvis.tools.DataCollector
 import cn.vove7.vtp.log.Vog
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.customview.customView
@@ -92,6 +93,7 @@ class SignupDialog(context: Context, val r: OnLoginSuccess) {
                     loadBar.visibility = View.INVISIBLE
                     if (bean.isOk()) {
                         GlobalApp.toastInfo(bean.data ?: "null")
+                        DataCollector.onUserRegister()
                         LoginDialog(context, userEmail, userPass, r)
                         dialog.dismiss()
                     } else {

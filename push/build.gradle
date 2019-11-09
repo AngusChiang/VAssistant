@@ -29,7 +29,9 @@ android {
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
 
-    api 'cn.jiguang.sdk:jpush:3.3.4'  // 此处以JPush 3.3.4 版本为例。
-    api 'cn.jiguang.sdk:jcore:2.1.0'
+    api 'cn.jiguang.sdk:jpush:3.3.6'  // 此处以JPush 3.3.4 版本为例。
+    api 'cn.jiguang.sdk:jcore:2.1.6'
+    api 'cn.jiguang.sdk:janalytics:2.1.0'
+
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
 }
