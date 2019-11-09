@@ -1,6 +1,7 @@
 package cn.vove7.executorengine
 
 import android.content.Context
+import android.os.Looper
 import androidx.annotation.CallSuper
 import cn.vove7.common.NeedAccessibilityException
 import cn.vove7.common.NotSupportException
@@ -182,6 +183,7 @@ open class ExecutorImpl(
             } finally {
                 if (sync) waiter.setAndNotify(er)
             }
+            Looper.myLooper()?.quitSafely()
         }
         return waiter.blockedGet(true) ?: EXEC_CODE_FAILED
     }
