@@ -98,7 +98,7 @@ class TextOcrActivity : Activity() {
         wordItems.forEach { model ->
             val item = model.item
             val view = CheckedTextView(this).apply {
-                setBackgroundResource(R.drawable.bg_screen_text_high_light)
+                setBackgroundResource(R.drawable.bg_screen_text_high_light_no_radius)
                 Vog.d("buildContent ---> $item")
                 gravity = Gravity.TOP
                 setTextColor(0xFFFFFF)
@@ -113,13 +113,13 @@ class TextOcrActivity : Activity() {
                     true
                 }
                 text = item.text
-                val h = item.height + 10
-                val w = item.width + 10
+                val h = item.height
+                val w = item.width
                 val top = item.top - statusbarHeight
                 val left = item.left
                 val rotationAngle = item.rotationAngle
                 Vog.d("buildContent ---> ${item.text} top:$top ,left:$left ,w:$w h:$h rotationAngle:$rotationAngle")
-                setPadding(10, 0, 10, 0)
+//                setPadding(10, 0, 10, 0)
 
                 layoutParams = RelativeLayout.LayoutParams(w, h).also {
                     it.setMargins(left, top, 0, 0)

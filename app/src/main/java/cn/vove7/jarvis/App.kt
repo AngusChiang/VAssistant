@@ -20,6 +20,7 @@ import cn.vove7.jarvis.receivers.AppInstallReceiver
 import cn.vove7.jarvis.receivers.PowerEventReceiver
 import cn.vove7.jarvis.receivers.ScreenStatusListener
 import cn.vove7.jarvis.receivers.UtilEventReceiver
+import cn.vove7.jarvis.services.ForegroundService
 import cn.vove7.jarvis.services.MainService
 import cn.vove7.jarvis.tools.*
 import cn.vove7.smartkey.android.AndroidSettings
@@ -100,6 +101,7 @@ class InitCp : ContentProvider() {
             AdvanAppHelper.getPkgList()
             startBroadcastReceivers()
             launchExtension()
+            context?.startService(Intent(context, ForegroundService::class.java))
         }
         return true
     }

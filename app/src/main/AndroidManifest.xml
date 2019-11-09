@@ -14,8 +14,8 @@
         android:roundIcon="@mipmap/ic_launcher_vassist"
         android:supportsRtl="true"
         android:theme="@style/NoActionBar"
-        tools:replace="android:allowBackup"
-        tools:ignore="GoogleAppIndexingWarning">
+        tools:ignore="GoogleAppIndexingWarning"
+        tools:replace="android:allowBackup">
 
         <provider
             android:name=".InitCp"
@@ -371,6 +371,10 @@
                 <action android:name="cn.jiguang.user.service.action" />
             </intent-filter>
         </service>
+        <service
+            android:name=".services.ForegroundService"
+            android:label="前台服务"
+            android:priority="1000" />
 
         <receiver
             android:name=".receivers.JPushReceiver"

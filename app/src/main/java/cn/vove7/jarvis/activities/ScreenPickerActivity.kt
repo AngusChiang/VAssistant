@@ -185,10 +185,10 @@ class ScreenPickerActivity : Activity() {
                 setOnClickListener {
                     onItemClick.invoke(model)
                 }
-                setPadding(10, 0, 10, 0)
+//                setPadding(10, 0, 10, 0)
                 layoutParams = RelativeLayout.LayoutParams(
-                        (rect.right - rect.left) + 10, (rect.bottom - rect.top) + 10).also {
-                    it.setMargins(rect.left - 5, rect.top - statusbarHeight - 5, 0, 0)
+                        (rect.right - rect.left), (rect.bottom - rect.top)).also {
+                    it.setMargins(rect.left, rect.top - statusbarHeight, 0, 0)
                 }
             }
             model.textView = view

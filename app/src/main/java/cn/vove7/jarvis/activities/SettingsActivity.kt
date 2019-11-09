@@ -345,7 +345,7 @@ class SettingsActivity : ReturnableActivity() {
             SettingGroupItem(R.color.lime_600, titleS = "启动选项", childItems = listOf(
                     CheckBoxItem(
                             title = "自动开启无障碍服务",
-                            summary = "App启动时自动开启无障碍服务，需要root支持，或者使用ADB授予WRITE_SECURE_SETTINGS权限（方法见常见问题）",
+                            summary = "App启动时自动开启无障碍服务，需要ROOT支持，或者使用ADB授予WRITE_SECURE_SETTINGS权限（方法见常见问题）",
                             keyId = R.string.key_auto_open_as_with_root,
                             defaultValue = AppConfig.autoOpenAS
                     ) { _, b ->
@@ -358,7 +358,7 @@ class SettingsActivity : ReturnableActivity() {
                     },
                     CheckBoxItem(
                             title = "自动设为助手应用",
-                            summary = "App启动时自动设为助手应用\n需要root或WRITE_SECURE_SETTINGS权限",
+                            summary = "App启动时自动设为助手应用\n需要ROOT或WRITE_SECURE_SETTINGS权限",
                             keyId = R.string.key_auto_set_assistant_app,
                             defaultValue = AppConfig.autoSetAssistantApp
                     )

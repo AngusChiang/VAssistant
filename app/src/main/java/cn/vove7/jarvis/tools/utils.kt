@@ -92,11 +92,13 @@ fun setAssistantApp() {
     val name = "${app.packageName}/${AssistSessionService::class.qualifiedName}"
 
     if (AppPermission.canWriteSecureSettings) {
-            val cr = app.contentResolver
-            Settings.Secure.putString(cr, "assistant", name)
-            Settings.Secure.putString(cr, "voice_interaction_service", name)
+        GlobalLog.log("设为助手应用[WriteSecureSettings]")
+        val cr = app.contentResolver
+        Settings.Secure.putString(cr, "assistant", name)
+        Settings.Secure.putString(cr, "voice_interaction_service", name)
 
     } else if (RootHelper.hasRoot(100)) {
+        GlobalLog.log("设为助手应用[ROOT]")
         RootHelper.execWithSu("settings put secure assistant $name")
         RootHelper.execWithSu("settings put secure voice_interaction_service $name")
     }

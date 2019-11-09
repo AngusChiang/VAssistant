@@ -10,8 +10,8 @@ android {
         applicationId "cn.vove7.vassistant"
         minSdkVersion 21
         targetSdkVersion 28
-        versionCode 310
-        versionName "1.9.8.7"
+        versionCode 1988
+        versionName "1.9.8.8"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
         multiDexEnabled true
@@ -94,6 +94,16 @@ android {
     packagingOptions {
         exclude 'META-INF/proguard/coroutines.pro'
     }
+
+    //配置打包apk路径及文件名
+    android.applicationVariants.all { variant ->
+        variant.outputs.all { output ->
+//            def type = "-" + buildType.name
+            def filename = "../../apks/vassist-v${versionCode}.apk"
+            outputFileName = filename
+        }
+    }
+
 }
 
 task makeJar(type: Jar) {
