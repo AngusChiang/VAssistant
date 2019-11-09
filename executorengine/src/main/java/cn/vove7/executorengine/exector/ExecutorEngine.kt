@@ -34,6 +34,7 @@ class ExecutorEngine : ExecutorImpl() {
             "system" to SystemBridge,
             "automator" to GlobalActionExecutor,
             "androRuntime" to RootHelper,
+            "shell" to RootHelper,
             "serviceBridge" to ServiceBridge.instance,
             "app" to GlobalApp.APP,
             "input" to InputMethodBridge,

@@ -3,13 +3,6 @@ package cn.vove7.jarvis.view
 import android.app.Activity
 import android.content.Context
 import android.os.Bundle
-import com.google.android.material.tabs.TabLayout
-import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentManager
-import androidx.fragment.app.FragmentPagerAdapter
-import androidx.viewpager.widget.ViewPager
-import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -27,6 +20,7 @@ import cn.vove7.common.interfaces.VApi.Companion.runtimeMap
 import cn.vove7.common.interfaces.VApi.Companion.systemFunMap
 import cn.vove7.common.interfaces.VApi.Companion.systemFuncs
 import cn.vove7.jarvis.R
+import com.google.android.material.tabs.TabLayout
 
 /**
  * # EditorFunsHelper
@@ -160,11 +154,10 @@ class EditorFunsHelper(
                         , ApiFunction("getBoolean()", "参数k")
                 )),
                 ApiCategory("安卓Runtime", listOf(//指令设置
-                        ApiFunction("exec(cmd)", "执行终端命令，返回String", "androRuntime.exec()"),
-                        ApiFunction("hasRoot()", "获取设备是否Root，返回Boolean", "androRuntime.hasRoot()"),
-                        ApiFunction("execWithSu(cmd)", "执行root命令，返回String", "androRuntime.execWithSu()")
-
-                )),
+                        ApiFunction("exec(cmd)", "执行终端命令，返回String"),
+                        ApiFunction("hasRoot()", "获取设备是否Root，返回Boolean"),
+                        ApiFunction("execWithSu(cmd)", "执行root命令，返回String")
+                ), insertPre = "shell."),
                 ApiCategory("其他", listOf(//指令设置
                         ApiFunction("toPinyin()", "将text文本中的中文转换为拼音，\n参数：(text [,onlyFirstLetter])\nonlyFirstLetter是否只需要首字母")
                         , ApiFunction("matches()", "匹配字符串,参数(text,regexStr)\ntext: 待匹配字符串 regex:正则式字符串 %为匹配任意字符 返回boolean 是否匹配成功")

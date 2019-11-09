@@ -120,12 +120,12 @@ class AdvancedSettingActivity : ReturnableActivity() {
                             SystemBridge.openUrl("https://vove.gitee.io/2018/09/29/App_Debugger/")
                         },
                         IntentItem(R.string.text_test_code_lua, onClick = {
-                            if (AppConfig.checkLogin()) {
+                            if (BuildConfig.DEBUG || AppConfig.checkLogin()) {
                                 startActivity<LuaEditorActivity>()
                             }
                         }),
                         IntentItem(R.string.text_code_test_js, null, onClick = {
-                            if (AppConfig.checkLogin())
+                            if (BuildConfig.DEBUG || AppConfig.checkLogin())
                                 startActivity<JsEditorActivity>()
                         })
                 )),
@@ -262,6 +262,7 @@ class AdvancedSettingActivity : ReturnableActivity() {
                 }
             }
         }
+        super.onActivityResult(requestCode, resultCode, data)
     }
 
     private fun getLastInfo(back: (LastDateInfo?) -> Unit) {

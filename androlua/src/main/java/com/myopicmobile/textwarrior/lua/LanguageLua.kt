@@ -47,6 +47,7 @@ class LanguageLua private constructor() : Language(), VApi {
         super.addBasePackage("ViewFinder()", finderFuns)
         super.addBasePackage("system", systemFuncs)
         super.addBasePackage("androRuntime", androRuntimeFuncs)
+        super.addBasePackage("shell", androRuntimeFuncs)
 
         super.addBasePackage("io", package_io.split("\\|".toRegex()).dropLastWhile
         { it.isEmpty() }.toTypedArray())
