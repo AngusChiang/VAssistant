@@ -15,9 +15,9 @@
         android:layout_marginTop="15dp"
         android:layout_marginEnd="15dp"
         android:layout_marginBottom="10dp"
-        android:foreground="?attr/selectableItemBackground"
         android:baselineAligned="false"
         android:elevation="2dp"
+        android:foreground="?attr/selectableItemBackground"
         android:gravity="center_vertical"
         android:orientation="horizontal"
         app:cardBackgroundColor="@color/google_blue"
@@ -119,11 +119,11 @@
         android:id="@+id/list_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginStart="5dp"
+        android:layout_marginStart="15dp"
         android:layout_marginTop="25dp"
-        android:layout_marginEnd="5dp"
+        android:layout_marginEnd="15dp"
         android:divider="@color/app_background"
-        android:dividerHeight="5dp"
+        android:dividerHeight="7dp"
         tools:listitem="@layout/item_mine_features" />
 
 </LinearLayout>
