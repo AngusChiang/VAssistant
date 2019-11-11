@@ -152,7 +152,7 @@ interface SystemOperation {
     fun isScreenOn(): Boolean
 
     fun getClipText(): String?
-    fun setClipText(text: String?) :Boolean
+    fun setClipText(text: String?): Boolean
 
     fun sendEmail(to: String, subject: String? = null, content: String? = null)
 
@@ -286,4 +286,7 @@ interface SystemOperation {
      * Settings.System.SCREEN_BRIGHTNESS_MODE_MANUAL：值为0，手动模式。
      */
     var screenBrightnessMode: Int
+
+    val screenHeight: Int
+    val screenWidth: Int
 }

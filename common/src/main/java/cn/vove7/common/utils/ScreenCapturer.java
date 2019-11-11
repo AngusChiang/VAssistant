@@ -14,12 +14,13 @@ import android.media.projection.MediaProjectionManager;
 import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
-import androidx.annotation.Nullable;
-import androidx.annotation.RequiresApi;
 import android.view.OrientationEventListener;
 
-import cn.vove7.vtp.system.DeviceInfo;
-import cn.vove7.vtp.system.ScreenInfo;
+import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
+
+import cn.vove7.common.bridges.SystemBridge;
+import kotlin.Pair;
 
 /**
  * Created by Stardust on 2017/5/17.
@@ -93,28 +94,20 @@ public class ScreenCapturer {
             mVirtualDisplay.release();
         }
         mImageAvailable = false;
-        int screenHeight = getOrientationAwareScreenHeight(orientation);
-        int screenWidth = getOrientationAwareScreenWidth(orientation);
+        Pair<Integer, Integer> hw = SystemBridge.INSTANCE.getScreenHW();
+
+        int screenHeight;
+        int screenWidth;
+        if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            screenHeight = hw.getSecond();
+            screenWidth = hw.getFirst();
+        } else {
+            screenHeight = hw.getFirst();
+            screenWidth = hw.getSecond();
+        }
+
         initVirtualDisplay(screenWidth, screenHeight, mScreenDensity);
         startAcquireImageLoop();
-    }
-
-    public int getOrientationAwareScreenWidth(int orientation) {
-        ScreenInfo info = DeviceInfo.getInfo(mContext).screenInfo;
-        if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            return info.height;
-        } else {
-            return info.width;
-        }
-    }
-
-    public int getOrientationAwareScreenHeight(int orientation) {
-        ScreenInfo info = DeviceInfo.getInfo(mContext).screenInfo;
-        if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            return info.width;
-        } else {
-            return info.height;
-        }
     }
 
     private void initVirtualDisplay(int width, int height, int screenDensity) {
@@ -187,10 +180,6 @@ public class ScreenCapturer {
             }
             mCachedImageLock.wait();
         }
-    }
-
-    public int getScreenDensity() {
-        return mScreenDensity;
     }
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)

@@ -1,6 +1,8 @@
 package cn.vove7.jarvis.tools.baiduaip.model
 
 import java.io.Serializable
+import kotlin.math.atan
+import kotlin.math.sqrt
 
 /**
  * # TextOcrItem
@@ -41,7 +43,7 @@ data class TextOcrItem(
         var dy = points[i].y - points[j].y
         dx *= dx
         dy *= dy
-        return Math.sqrt((dx + dy).toDouble()).toInt()
+        return sqrt((dx + dy).toDouble()).toInt()
     }
 
     /**
@@ -51,7 +53,7 @@ data class TextOcrItem(
     val rotationAngle: Float
         get() {
             val k = (points[1].y - points[0].y).toDouble() / (points[1].x - points[0].x) //tan(x)
-            return (Math.atan(k) / Math.PI * 180).toFloat()
+            return (atan(k) / Math.PI * 180).toFloat()
         }
 
 }

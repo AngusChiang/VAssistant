@@ -1,16 +1,16 @@
 package cn.vove7.jarvis.tools.baiduaip
 
+import cn.vove7.common.app.AppConfig
 import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.bridges.HttpBridge
 import cn.vove7.common.net.tool.SecureHelper
-import cn.vove7.vtp.net.GsonHelper
-import cn.vove7.common.app.AppConfig
 import cn.vove7.jarvis.tools.BaiduKey
 import cn.vove7.jarvis.tools.baiduaip.model.ImageClassifyResult
 import cn.vove7.jarvis.tools.baiduaip.model.Point
 import cn.vove7.jarvis.tools.baiduaip.model.TextOcrItem
 import cn.vove7.jarvis.tools.baiduaip.model.TranslateResult
 import cn.vove7.vtp.log.Vog
+import cn.vove7.vtp.net.GsonHelper
 import com.baidu.aip.imageclassify.AipImageClassify
 import com.baidu.aip.nlp.AipNlp
 import com.baidu.aip.ocr.AipOcr
@@ -128,12 +128,11 @@ object BaiduAipHelper {
             }
         }
 
-        val options = HashMap<String, String>()
-        options["vertexes_location"] = "true"
-        options["probability"] = "true"
-        options["recognize_granularity"] = "big"
-
-        val obj = baiduOcr.general(imgPath, options)
+        val obj = baiduOcr.general(imgPath, hashMapOf(
+                "vertexes_location" to "true",
+                "probability" to "true",
+                "recognize_granularity" to "big"
+        ))
 
         if (obj.has("error_code")) {//出错
             val errMsg = "文字OCR错误：" + obj.getString("error_code") + obj.getString("error_msg")
