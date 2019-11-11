@@ -10,8 +10,8 @@ android {
         applicationId "cn.vove7.vassistant"
         minSdkVersion 21
         targetSdkVersion 28
-        versionCode 1990
-        versionName "1.9.9"
+        versionCode 1992
+        versionName "1.9.9.1"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
         multiDexEnabled true
@@ -26,7 +26,6 @@ android {
             resValue "string", "app_name", "V Assistant"
             resValue "string", "base_acc_service_label", "V Assist基础服务"
             resValue "string", "gesture_acc_service_label", "V Assist高级服务（7.0+可用）"
-            buildConfigField "String", "UM_KEY", '"5d00ae230cafb2990c0000e4"'
 
             manifestPlaceholders = [
                     JPUSH_PKGNAME : "cn.vove7.vassistant",
@@ -47,7 +46,6 @@ android {
             resValue "string", "app_name", "V Assistant-debug"
             resValue "string", "base_acc_service_label", "V Assist基础DEBUG"
             resValue "string", "gesture_acc_service_label", "V Assist高级DEBUG"
-            buildConfigField  "String", "UM_KEY", '"5d336b23570df3779c000b49"'
 
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
 
