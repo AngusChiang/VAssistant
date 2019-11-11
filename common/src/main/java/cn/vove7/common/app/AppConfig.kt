@@ -183,12 +183,13 @@ object AppConfig : BaseConfig {
     //fixme 连接手表也为true
     val isBlueToothConnect: Boolean
         get() {
-            val adapter = BluetoothAdapter.getDefaultAdapter()
-            adapter.bondedDevices?.forEach {
-                it.type
-            }
-            return (BluetoothProfile.STATE_CONNECTED ==
-                    adapter.getProfileConnectionState(BluetoothProfile.HEADSET)).also {
+            val adapter: BluetoothAdapter? = BluetoothAdapter.getDefaultAdapter()
+//            adapter?.bondedDevices?.forEach {
+//                it.type
+//            }
+            return (
+                    BluetoothProfile.STATE_CONNECTED == adapter?.getProfileConnectionState(BluetoothProfile.HEADSET)
+                    ).also {
                 Vog.d("蓝牙连接：$it")
             }
 
