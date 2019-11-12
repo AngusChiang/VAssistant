@@ -21,8 +21,8 @@ abstract class AbFloatWindow(
         val width: Int,
         val height: Int
 ) : IFloatyPanel {
-    open var posX: Int = 0
-    open var posY: Int = 0
+    open val posX: Int = 0
+    open val posY: Int = 0
 
     abstract val onNoPermission: () -> Unit
 

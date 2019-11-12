@@ -181,7 +181,7 @@ abstract class BaseMarkedFragment : SimpleListFragment<MarkedData>(), OnSyncMark
                 val data = item.extra
                 //todo colorful
                 BottomDialog.builder(activity!!) {
-                    title(item.title ?: "")
+                    title(item.title ?: "", true)
                     message(data.toString())
                     if (data.belongUser()) {
                         buttons {

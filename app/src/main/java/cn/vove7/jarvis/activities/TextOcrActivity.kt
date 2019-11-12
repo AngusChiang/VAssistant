@@ -169,7 +169,7 @@ class TextOcrActivity : Activity() {
 
     private fun showHelp() {
         BottomDialog.builder(this) {
-            title("文字识别界面帮助")
+            title("文字识别界面帮助", true)
             content(MarkdownContentBuilder()) {
                 loadMarkdownFromAsset("files/ocr_help.md")
             }

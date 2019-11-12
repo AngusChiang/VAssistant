@@ -70,10 +70,7 @@ import cn.vove7.jarvis.view.dialog.MultiChoiceDialog
 import cn.vove7.jarvis.view.dialog.OnMultiSelectListener
 import cn.vove7.jarvis.view.dialog.OnSelectListener
 import cn.vove7.jarvis.view.dialog.SingleChoiceDialog
-import cn.vove7.jarvis.view.floatwindows.CustomPanel
-import cn.vove7.jarvis.view.floatwindows.DefaultPanel
-import cn.vove7.jarvis.view.floatwindows.IFloatyPanel
-import cn.vove7.jarvis.view.floatwindows.OldFloatPanel
+import cn.vove7.jarvis.view.floatwindows.*
 import cn.vove7.jarvis.view.statusbar.ExecuteAnimation
 import cn.vove7.jarvis.view.statusbar.ListeningAnimation
 import cn.vove7.jarvis.view.statusbar.ParseAnimation
@@ -176,6 +173,7 @@ object MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
             0 -> DefaultPanel()
             1 -> OldFloatPanel()
             2 -> CustomPanel()
+            3 -> GooglePanel()
             else -> DefaultPanel()
         }
     }
