@@ -11,6 +11,7 @@ import android.bluetooth.BluetoothAdapter
 import android.content.*
 import android.content.Context.WIFI_SERVICE
 import android.content.pm.PackageManager
+import android.content.pm.PackageManager.MATCH_DEFAULT_ONLY
 import android.graphics.Bitmap
 import android.hardware.Camera
 import android.hardware.camera2.CameraCharacteristics
@@ -1016,7 +1017,11 @@ object SystemBridge : SystemOperation {
         val intent = Intent(Intent.ACTION_WEB_SEARCH)
         intent.putExtra(SearchManager.QUERY, s)
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-        context.startActivity(intent)
+        if (context.packageManager.resolveActivity(intent, MATCH_DEFAULT_ONLY) != null) {
+            context.startActivity(intent)
+        } else {
+            GlobalApp.toastError("无可用应用")
+        }
     }
 
     override fun disableSoftKeyboard(): Boolean {
