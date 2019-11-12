@@ -10,8 +10,8 @@ android {
         applicationId "cn.vove7.vassistant"
         minSdkVersion 21
         targetSdkVersion 28
-        versionCode 1992
-        versionName "1.9.9.1"
+        versionCode 1993
+        versionName "1.9.9.2"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
         multiDexEnabled true
@@ -151,7 +151,6 @@ dependencies {
     implementation 'com.github.tiagohm.MarkdownView:library:0.19.0'
     implementation 'org.nanohttpd:nanohttpd:2.3.1'
 
-    testImplementation 'org.reflections:reflections:0.9.10'
     implementation project(path: ':speechLib')
     implementation project(':admin-manager')
     implementation project(':push')
