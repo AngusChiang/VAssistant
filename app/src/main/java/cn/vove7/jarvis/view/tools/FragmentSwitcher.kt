@@ -11,6 +11,7 @@ class FragmentSwitcher(val activity: AppCompatActivity, @IdRes val containId: In
 
     fun switchFragment(f: Fragment): Boolean {
         if (currentFragment == f) return true
+        fragments.add(f)
         currentFragment?.also {
             activity.supportFragmentManager.beginTransaction().apply {
                 hide(it)
