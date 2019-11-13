@@ -11,8 +11,6 @@ import android.graphics.Color
 import android.graphics.Rect
 import android.net.Uri
 import android.os.*
-import androidx.annotation.ColorRes
-import androidx.core.app.ActivityCompat
 import android.text.SpannableStringBuilder
 import android.util.DisplayMetrics
 import android.view.View
@@ -20,6 +18,8 @@ import android.view.animation.AlphaAnimation
 import android.view.animation.Animation
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
+import androidx.annotation.ColorRes
+import androidx.core.app.ActivityCompat
 import cn.vove7.common.BuildConfig
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.app.GlobalLog
@@ -535,6 +535,8 @@ fun View.fadeOut(
     })
 }
 
+operator fun Intent.contains(key: String): Boolean = hasExtra(key)
+
 @Suppress("UNCHECKED_CAST")
 operator fun <T> Intent.get(key: String, def: T): T {
     return extras?.get(key) as T? ?: def
@@ -586,7 +588,6 @@ fun bundle(vararg extras: Pair<String, Any>): Bundle {
 operator fun String.div(any: Any?): String = format(any)
 
 
-
 /**
  *
  * @receiver String
@@ -597,7 +598,7 @@ operator fun String.div(any: Any?): String = format(any)
  * @param typeface Int?
  * @return SpannableStringBuilder
  */
-fun String.span(selectedString: String = this, fontSize: Int?=null, color: Int? = null,
+fun String.span(selectedString: String = this, fontSize: Int? = null, color: Int? = null,
                 underLine: Boolean = false, typeface: Int? = null): SpannableStringBuilder {
     return MultiSpan(this, selectedString, color = color, fontSize = fontSize,
             underLine = underLine, typeface = typeface).build()

@@ -101,14 +101,13 @@ class VoiceAssistActivity : Activity() {
                 }
             }
             TileService.ACTION_QS_TILE_PREFERENCES -> {
-                val cn = (intent.extras.get(Intent.EXTRA_COMPONENT_NAME) as ComponentName?)
+                val cn = (intent.extras?.get(Intent.EXTRA_COMPONENT_NAME) as ComponentName?)
                         ?: return
                 runInCatch {
                     val tileService = Class.forName(cn.className)
                     val ins = tileService.newInstance()
                     if (ins is TileLongClickable) {
-                        val clm = tileService.getDeclaredMethod("onLongClick")
-                        clm.invoke(ins)
+                        ins.onLongClick()
                     }
                 }
             }

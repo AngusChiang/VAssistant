@@ -10,6 +10,7 @@ import cn.vove7.common.bridges.UtilBridge
 import cn.vove7.common.utils.newTask
 import cn.vove7.common.utils.runOnNewHandlerThread
 import cn.vove7.jarvis.activities.screenassistant.ScreenAssistActivity
+import cn.vove7.jarvis.activities.screenassistant.statusBarIsLight
 import cn.vove7.vtp.log.Vog
 import java.util.*
 
@@ -29,7 +30,7 @@ class AssistSession(context: Context) : VoiceInteractionSession(context) {
         }
         val p = context.cacheDir.absolutePath +
                 "/screen-${Random().nextInt()}.png"
-        context.startActivity(ScreenAssistActivity.createIntent(p))
+        context.startActivity(ScreenAssistActivity.createIntent(p, light = screenshot.statusBarIsLight))
 
         runOnNewHandlerThread {
             UtilBridge.bitmap2File(screenshot, p)

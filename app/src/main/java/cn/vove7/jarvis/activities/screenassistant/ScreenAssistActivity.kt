@@ -3,7 +3,10 @@ package cn.vove7.jarvis.activities.screenassistant
 import android.app.AlertDialog
 import android.app.Dialog
 import android.content.Intent
+import android.graphics.Bitmap
+import android.graphics.Color
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.view.Gravity
 import android.view.View
@@ -35,26 +38,35 @@ import java.util.*
  * @author 11324
  * 2019/3/21
  */
+
+val Bitmap.statusBarIsLight: Boolean
+    get() {
+        val spColor = getPixel(width / 2, 0)
+        val r = Color.red(spColor)
+        val g = Color.green(spColor)
+        val b = Color.blue(spColor)
+        return r + b + g > 450
+    }
+
 class ScreenAssistActivity : BaseActivity() {
 
     private lateinit var screenPath: String
     private lateinit var bottomController: AssistSessionGridController
 
     companion object {
-        fun createIntent(path: String? = null, delayCapture: Boolean = false): Intent {
+
+        fun createIntent(path: String? = null, delayCapture: Boolean = false, light: Boolean? = null): Intent {
             return Intent(GlobalApp.APP.packageName + ".SCREEN_ASSIST").apply {
                 newTask()
-                path?.also {
-                    putExtra("path", it)
-                }
+                path?.also { putExtra("path", it) }
+                light?.also { putExtra("light", it) }
                 putExtra("delay", delayCapture)
             }
         }
     }
 
     private val isReady: Boolean?
-        get() =
-            if (showProgressBar) null else true
+        get() = if (showProgressBar) null else true
 
     private var showProgressBar: Boolean = false
         set(value) {
@@ -65,13 +77,25 @@ class ScreenAssistActivity : BaseActivity() {
             }
         }
 
+    private fun setStatusBarLight(l: Boolean) {
+        if (l && Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            window.decorView.systemUiVisibility = window.decorView.systemUiVisibility or View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
+        }
+    }
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.dialog_assist)
         DataCollector.buriedPoint("sa_0")
 
+        bottom_sheet.setBackgroundResource(R.drawable.toolbar_round_bg)
         window.setWindowAnimations(R.style.ScreenAssist)
+
+        if ("light" in intent) {
+            setStatusBarLight(intent["light", false])
+        }
+
         showProgressBar = true
         bottomController = AssistSessionGridController(this, bottom_sheet, itemClick, ::onLongClick) {
             if (isReady == true) screenPath else null
@@ -114,6 +138,10 @@ class ScreenAssistActivity : BaseActivity() {
             if (!bottomController.isBottomSheetShowing) {
                 bottomController.bottomView.visibility = View.VISIBLE
                 bottomController.showBottom()
+
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    window.decorView.systemUiVisibility = window.decorView.systemUiVisibility or View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR
+                }
 
                 val animation = AlphaAnimation(0f, 1f)
                 animation.duration = 300
@@ -163,6 +191,7 @@ class ScreenAssistActivity : BaseActivity() {
                 runOnNewHandlerThread(delay = if (delay) 1000 else 0) {
                     val path = SystemBridge.screenShot()?.let {
                         runOnUi {
+                            setStatusBarLight(it.statusBarIsLight)
                             //截完图显示面板
                             showView()
                         }
