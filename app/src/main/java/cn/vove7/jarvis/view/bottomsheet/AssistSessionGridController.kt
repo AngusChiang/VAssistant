@@ -2,16 +2,12 @@ package cn.vove7.jarvis.view.bottomsheet
 
 import android.app.Activity
 import android.content.Context
-import android.view.Gravity
 import android.view.View
 import android.widget.GridView
 import android.widget.ImageView
-import android.widget.PopupMenu
 import cn.vove7.common.app.GlobalApp
-import cn.vove7.common.utils.runInCatch
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.adapters.ListViewModel
-import cn.vove7.jarvis.tools.ActionHelper
 import cn.vove7.vtp.easyadapter.BaseListAdapter
 import kotlinx.android.synthetic.main.dialog_assist.view.*
 
@@ -23,7 +19,7 @@ import kotlinx.android.synthetic.main.dialog_assist.view.*
  */
 class AssistSessionGridController(
         context: Activity, bottomView: View,
-        val click: (Int) -> Unit, val screenPath: () -> String?)
+        val click: (Int) -> Unit, val onLongClick: (item: SessionFunItem, v: View) -> Boolean, val screenPath: () -> String?)
     : BottomSheetController(context, bottomView) {
 
     private val gridView: GridView by lazy { bottomView.fun_grid }
@@ -39,9 +35,7 @@ class AssistSessionGridController(
                     setImageDrawable(context.getDrawable(item.iconId))
                     setOnClickListener { click.invoke(pos) }
                     setOnLongClickListener {
-                        if (item.name == "二维码/条码识别") {
-                            popMenu(it)
-                        } else {
+                        if (!onLongClick(item, it)) {
                             GlobalApp.toastInfo(item.desc ?: item.name)
                         }
                         true
@@ -51,32 +45,6 @@ class AssistSessionGridController(
 
             override fun onCreateViewHolder(view: View): VH = VH(view)
         }
-    }
-
-    private fun popMenu(v: View) {
-        PopupMenu(context, v,
-                Gravity.END or Gravity.TOP).apply {
-            setOnMenuItemClickListener {
-                when (it.itemId) {
-                    R.id.item_wechat_qr -> {
-                        (context as Activity).finish()
-                        runInCatch {
-                            ActionHelper.qrWithWechat(screenPath()!!)
-                        }
-                    }
-                    R.id.item_alipay_qr -> {
-                        (context as Activity).finish()
-                        runInCatch {
-                            ActionHelper.qrWithAlipay(screenPath()!!)
-                        }
-                    }
-                }
-                true
-            }
-            inflate(R.menu.menu_qrcode_action)
-            show()
-        }
-
     }
 
     inner class VH(itemView: View) : BaseListAdapter.ViewHolder(itemView) {

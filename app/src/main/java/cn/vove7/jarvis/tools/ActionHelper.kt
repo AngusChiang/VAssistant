@@ -87,8 +87,6 @@ object ActionHelper {
                     GlobalApp.toastError("未安装支付宝")
                     return@runOnPool
                 }
-//                tmpFile = createTmpFile
-//                File(path).copyTo(tmpFile, true)//复制文件
                 val tmpFile = File(path)
 
                 val imgUri = if (Build.VERSION.SDK_INT >= 24) {
@@ -105,5 +103,24 @@ object ActionHelper {
                 GlobalApp.toastError("执行失败: " + e.message)
             }
         }
+    }
+
+    fun spotWithTaobao(path: String) {
+        if (!SystemBridge.hasInstall("com.taobao.taobao")) {
+            GlobalApp.toastError("未安装手机淘宝")
+            return
+        }
+        val tmpFile = File(path)
+
+        val imgUri = if (Build.VERSION.SDK_INT >= 24) {
+            FileProvider.getUriForFile(app, "${app.packageName}.fileprovider", tmpFile)
+        } else Uri.fromFile(tmpFile)
+        val intent = Intent(Intent.ACTION_SEND).apply {
+            type = "image/jpg"
+            putExtra(Intent.EXTRA_STREAM, imgUri)
+            //ResolveInfo{bf02772 com.taobao.taobao/com.etao.feimagesearch.IrpActivity m=0x608000}
+            component = ComponentName("com.taobao.taobao", "com.etao.feimagesearch.IrpActivity")
+        }
+        app.startActivity(intent.newTask())
     }
 }

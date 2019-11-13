@@ -10,6 +10,6 @@
         android:layout_width="match_parent"
         android:src="@drawable/ic_twotone_graphic_eq"
         android:background="?android:selectableItemBackgroundBorderless"
-        android:layout_height="50dp"
+        android:layout_height="45dp"
         android:padding="5dp" />
 </LinearLayout>

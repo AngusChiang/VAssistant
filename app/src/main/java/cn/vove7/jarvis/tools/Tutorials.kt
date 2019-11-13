@@ -45,6 +45,7 @@ object Tutorials {
     const val t_inst_detail_run = "t_inst_detail_run"
     const val screen_translate_tips = "screen_translate_tips"
     const val screen_assistant_qrcode = "screen_assistant_qrcode"
+    const val screen_assistant_spot = "screen_assistant_spot"
 
     val context: Context
         get() = GlobalApp.APP
@@ -167,6 +168,7 @@ object Tutorials {
                 , t_inst_detail_run
                 , screen_translate_tips
                 , screen_assistant_qrcode
+                , screen_assistant_spot
         ).forEach {
             sp.removeKey(it)
         }

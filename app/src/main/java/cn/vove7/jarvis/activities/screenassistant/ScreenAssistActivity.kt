@@ -5,10 +5,11 @@ import android.app.Dialog
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import com.google.android.material.bottomsheet.BottomSheetBehavior
+import android.view.Gravity
 import android.view.View
 import android.view.View.FIND_VIEWS_WITH_CONTENT_DESCRIPTION
 import android.view.animation.AlphaAnimation
+import android.widget.PopupMenu
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.appbus.AppBus
 import cn.vove7.common.bridges.SystemBridge
@@ -18,13 +19,12 @@ import cn.vove7.jarvis.R
 import cn.vove7.jarvis.activities.TextOcrActivity
 import cn.vove7.jarvis.activities.base.BaseActivity
 import cn.vove7.jarvis.services.MainService
-import cn.vove7.jarvis.tools.DataCollector
-import cn.vove7.jarvis.tools.QRTools
-import cn.vove7.jarvis.tools.Tutorials
+import cn.vove7.jarvis.tools.*
 import cn.vove7.jarvis.tools.baiduaip.BaiduAipHelper
 import cn.vove7.jarvis.view.bottomsheet.AssistSessionGridController
 import cn.vove7.jarvis.view.dialog.ImageClassifyResultDialog
 import cn.vove7.vtp.log.Vog
+import com.google.android.material.bottomsheet.BottomSheetBehavior
 import kotlinx.android.synthetic.main.dialog_assist.*
 import java.io.File
 import java.util.*
@@ -73,7 +73,7 @@ class ScreenAssistActivity : BaseActivity() {
 
         window.setWindowAnimations(R.style.ScreenAssist)
         showProgressBar = true
-        bottomController = AssistSessionGridController(this, bottom_sheet, itemClick) {
+        bottomController = AssistSessionGridController(this, bottom_sheet, itemClick, ::onLongClick) {
             if (isReady == true) screenPath else null
         }
         bottomController.initView()
@@ -120,9 +120,14 @@ class ScreenAssistActivity : BaseActivity() {
                 bottomController.bottomView.startAnimation(animation)
                 bottomController.bottomView.post {
                     val list = arrayListOf<View>()
+                    val list2 = arrayListOf<View>()
                     bottomController.bottomView.findViewsWithText(list, "二维码/条码识别", FIND_VIEWS_WITH_CONTENT_DESCRIPTION)
-                    Tutorials.showForView(this, Tutorials.screen_assistant_qrcode,
-                            list[0], "长按查看更多功能", "使用微信扫一扫\n支付宝扫一扫")
+                    bottomController.bottomView.findViewsWithText(list2, "屏幕识别", FIND_VIEWS_WITH_CONTENT_DESCRIPTION)
+
+                    Tutorials.oneStep(this, arrayOf(
+                            ItemWrap(Tutorials.screen_assistant_spot, list2[0], "长按更多功能", "淘宝商品识别"),
+                            ItemWrap(Tutorials.screen_assistant_qrcode, list[0], "长按查看更多功能", "使用微信扫一扫\n支付宝扫一扫")
+                    ))
 
                 }
             }
@@ -221,6 +226,62 @@ class ScreenAssistActivity : BaseActivity() {
                 save2Local()
             })
     )
+
+    private fun onLongClick(item: AssistSessionGridController.SessionFunItem, v: View): Boolean {
+        return when {
+            item.name == "二维码/条码识别" -> {
+                popQrMenu(v)
+                true
+            }
+            item.name == "屏幕识别" -> {
+                popSpotMenu(v)
+                true
+            }
+            else -> false
+        }
+    }
+
+    private fun popSpotMenu(v: View) {
+        PopupMenu(this, v, Gravity.END or Gravity.TOP).apply {
+            inflate(R.menu.menu_spot_action)
+            setOnMenuItemClickListener {
+                when (it.itemId) {
+                    R.id.item_spot_with_taobao -> {
+                        finish()
+                        ActionHelper.spotWithTaobao(screenPath)
+                    }
+                }
+                true
+            }
+            show()
+        }
+    }
+
+    private fun popQrMenu(v: View) {
+        PopupMenu(this, v, Gravity.END or Gravity.TOP).apply {
+            setOnMenuItemClickListener {
+                when (it.itemId) {
+                    R.id.item_wechat_qr -> {
+                        finish()
+                        runInCatch {
+                            ActionHelper.qrWithWechat(screenPath)
+                        }
+                    }
+                    R.id.item_alipay_qr -> {
+                        finish()
+                        runInCatch {
+                            ActionHelper.qrWithAlipay(screenPath)
+                        }
+                    }
+                }
+                true
+            }
+            inflate(R.menu.menu_qrcode_action)
+            show()
+        }
+
+    }
+
 
     private val itemClick: (Int) -> Unit = { pos ->
         funMap[pos]?.invoke()
