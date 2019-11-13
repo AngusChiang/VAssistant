@@ -150,7 +150,7 @@ class TextOperationDialog(val activity: Activity, val textModel: TextModel) {
 
     private fun showQrDialog(content: String, path: String) {
         BottomDialog.builder(activity) {
-            title("二维码")
+            title("二维码", true)
             withCloseIcon()
             content(ImageContentBuilder()) {
                 init {

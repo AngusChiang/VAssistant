@@ -219,7 +219,7 @@ class GridAdapter(val c: Activity, val functions: List<ApiFunction>, val onClick
 
     private fun showDetail(f: ApiFunction) {
         BottomDialog.builder(c) {
-            title(f.name)
+            title(f.name, true)
             message(f.doc)
         }
     }

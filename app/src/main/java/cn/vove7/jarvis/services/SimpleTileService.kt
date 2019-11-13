@@ -5,6 +5,7 @@ import android.os.Build
 import android.service.quicksettings.Tile
 import android.service.quicksettings.TileService
 import androidx.annotation.RequiresApi
+import cn.vove7.common.app.GlobalApp
 
 /**
  * # SimpleTileService
@@ -15,7 +16,7 @@ import androidx.annotation.RequiresApi
 @RequiresApi(Build.VERSION_CODES.N)
 abstract class SimpleTileService : TileService() {
 
-    private var toggleState = STATE_OFF
+    open var toggleState: Boolean = false
     abstract var activeIcon: Int
     abstract var inactiveIcon: Int
 
@@ -46,7 +47,7 @@ abstract class SimpleTileService : TileService() {
 
     //点击事件
     override fun onClick() {
-        if (toggleState == STATE_ON) {
+        if (toggleState) {
             if (onInactive())
                 setInactiveStatus()
         } else {
@@ -55,28 +56,28 @@ abstract class SimpleTileService : TileService() {
         }
     }
 
+    private val appContext get() = GlobalApp.APP
+
     //设置未激活状态
     private fun setInactiveStatus() {
-        val icon = Icon.createWithResource(applicationContext, inactiveIcon)
-        qsTile.state = Tile.STATE_INACTIVE// 更改成非活跃状态
+        toggleState = false
 
-        toggleState = STATE_OFF
-        qsTile.icon = icon//设置图标
-        qsTile.updateTile()//更新Tile
+        qsTile?.apply {
+            state = Tile.STATE_INACTIVE// 更改成非活跃状态
+            icon = Icon.createWithResource(appContext, inactiveIcon)//设置图标
+            updateTile()//更新Tile
+        }
     }
 
     //设置激活状态
     private fun setActiveStatus() {
-        val icon = Icon.createWithResource(applicationContext, activeIcon)
-        qsTile.state = Tile.STATE_ACTIVE// 更改成非活跃状态
+        toggleState = true
+        qsTile?.apply {
+            state = Tile.STATE_ACTIVE// 更改成非活跃状态
+            icon = Icon.createWithResource(appContext, activeIcon)//设置图标
+            updateTile()//更新Tile
+        }
 
-        toggleState = STATE_ON
-        qsTile.icon = icon//设置图标
-        qsTile.updateTile()//更新Tile
     }
 
-    companion object {
-        private const val STATE_OFF = 0
-        private const val STATE_ON = 1
-    }
 }

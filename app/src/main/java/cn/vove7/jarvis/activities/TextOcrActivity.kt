@@ -97,7 +97,15 @@ class TextOcrActivity : Activity() {
 //                RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT)
         wordItems.forEach { model ->
             val item = model.item
-            val view = CheckedTextView(this).apply {
+
+            val h = item.height
+            val t = item.top
+            if (t + h <= statusbarHeight) {
+                return@forEach
+            }
+            val top = t - statusbarHeight
+
+            CheckedTextView(this).apply {
                 setBackgroundResource(R.drawable.bg_screen_text_high_light_no_radius)
                 Vog.d("buildContent ---> $item")
                 gravity = Gravity.TOP
@@ -113,9 +121,7 @@ class TextOcrActivity : Activity() {
                     true
                 }
                 text = item.text
-                val h = item.height
                 val w = item.width
-                val top = item.top - statusbarHeight
                 val left = item.left
                 val rotationAngle = item.rotationAngle
                 Vog.d("buildContent ---> ${item.text} top:$top ,left:$left ,w:$w h:$h rotationAngle:$rotationAngle")
@@ -128,9 +134,9 @@ class TextOcrActivity : Activity() {
                 rotationY = 0.5f
                 rotation = rotationAngle
                 model.textView = this
+                rootContent.addView(this)
             }
 
-            rootContent.addView(view)
         }
 
         helpIcon.setOnClickListener {
@@ -163,7 +169,7 @@ class TextOcrActivity : Activity() {
 
     private fun showHelp() {
         BottomDialog.builder(this) {
-            title("文字识别界面帮助")
+            title("文字识别界面帮助", true)
             content(MarkdownContentBuilder()) {
                 loadMarkdownFromAsset("files/ocr_help.md")
             }

@@ -11,6 +11,7 @@ import android.bluetooth.BluetoothAdapter
 import android.content.*
 import android.content.Context.WIFI_SERVICE
 import android.content.pm.PackageManager
+import android.content.pm.PackageManager.MATCH_DEFAULT_ONLY
 import android.graphics.Bitmap
 import android.hardware.Camera
 import android.hardware.camera2.CameraCharacteristics
@@ -27,12 +28,14 @@ import android.nfc.NfcManager
 import android.os.*
 import android.provider.AlarmClock
 import android.provider.Settings
+import android.telecom.TelecomManager
+import android.telephony.SubscriptionManager
+import android.util.DisplayMetrics
+import android.view.KeyEvent
+import android.view.WindowManager
 import androidx.annotation.RequiresApi
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
-import android.telecom.TelecomManager
-import android.telephony.SubscriptionManager
-import android.view.KeyEvent
 import cn.vove7.common.R
 import cn.vove7.common.accessibility.AccessibilityApi
 import cn.vove7.common.app.GlobalApp
@@ -154,7 +157,7 @@ object SystemBridge : SystemOperation {
     }
 
     override fun getPkgByWord(appWord: String): String? =
-        getPkgByName(appWord)
+            getPkgByName(appWord)
 
 
     // Open App 启动对应首页Activity
@@ -1014,7 +1017,11 @@ object SystemBridge : SystemOperation {
         val intent = Intent(Intent.ACTION_WEB_SEARCH)
         intent.putExtra(SearchManager.QUERY, s)
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-        context.startActivity(intent)
+        if (context.packageManager.resolveActivity(intent, MATCH_DEFAULT_ONLY) != null) {
+            context.startActivity(intent)
+        } else {
+            GlobalApp.toastError("无可用应用")
+        }
     }
 
     override fun disableSoftKeyboard(): Boolean {
@@ -1042,7 +1049,7 @@ object SystemBridge : SystemOperation {
         get() {
             val filter = IntentFilter(Intent.ACTION_BATTERY_CHANGED)
             val intent = context.registerReceiver(null, filter)
-                ?: return -1
+                    ?: return -1
 
             val level = intent.getIntExtra(BatteryManager.EXTRA_LEVEL, 100) //电量的刻度
             val maxLevel = intent.getIntExtra(BatteryManager.EXTRA_SCALE, 100) //最大
@@ -1207,4 +1214,16 @@ object SystemBridge : SystemOperation {
             Settings.System.putInt(contentResolver,
                     Settings.System.SCREEN_BRIGHTNESS_MODE, v)
         }
+
+
+    val screenHW: Pair<Int, Int>
+        get() {
+            val m = DisplayMetrics()
+            (context.getSystemService(Context.WINDOW_SERVICE) as WindowManager).defaultDisplay.getRealMetrics(m)
+            return m.heightPixels to m.widthPixels
+        }
+
+    override val screenHeight: Int get() = screenHW.first
+
+    override val screenWidth: Int get() = screenHW.second
 }

@@ -5,6 +5,7 @@ import cn.vove7.bottomdialog.BottomDialog
 import cn.vove7.bottomdialog.builder.buttons
 import cn.vove7.bottomdialog.builder.title
 import cn.vove7.bottomdialog.builder.withCloseIcon
+import cn.vove7.bottomdialog.extension.awesomeHeader
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.bridges.SystemBridge
 import cn.vove7.jarvis.R
@@ -14,7 +15,6 @@ import cn.vove7.jarvis.view.dialog.contentbuilder.WordSplitBuilder
  * # WordSplitDialog
  *  分词
  * @author Administrator
- * @param type 滑动时 反转方式
  * 2018/10/28
  */
 class WordSplitDialog(context: Activity, val rawWords: String) {
@@ -27,7 +27,7 @@ class WordSplitDialog(context: Activity, val rawWords: String) {
 
         cancelable(false)
         withCloseIcon()
-        title("分词")
+        awesomeHeader("分词")
         content(builder)
 
         buttons {

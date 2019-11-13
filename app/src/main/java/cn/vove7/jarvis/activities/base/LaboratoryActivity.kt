@@ -224,7 +224,7 @@ class LaboratoryActivity : ReturnableActivity() {
             title: String,
             items: MutableList<SettingChildItem>
     ) = BottomDialog.builder(this) {
-        this.title(title)
+        this.awesomeHeader(title)
         content(SettingItemBuilder(items, PluginConfig))
     }
 

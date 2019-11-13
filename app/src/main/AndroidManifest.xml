@@ -73,6 +73,24 @@
 
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.VOICE_LAUNCH" />
+
+            </intent-filter>
+            <!-- 接收长按TileService -->
+            <intent-filter>
+                <action android:name="android.service.quicksettings.action.QS_TILE_PREFERENCES" />
+            </intent-filter>
+            <!-- 自定义action`-->
+            <intent-filter>
+                <action android:name="switch_voice_wakeup" />
+                <action android:name="switch_debug_mode" />
+                <action android:name="set_assist_app" />
+                <action android:name="wakeup_screen_assist" />
+                <action android:name="screen_assist_text_picker" />
+                <action android:name="screen_assist_qr" />
+                <action android:name="screen_assist_spot_screen" />
+                <action android:name="screen_assist_screen_ocr" />
+                <action android:name="screen_assist_screen_share" />
+                <action android:name="wakeup" />
             </intent-filter>
 
             <meta-data

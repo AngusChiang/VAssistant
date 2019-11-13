@@ -10,15 +10,11 @@ android {
         applicationId "cn.vove7.vassistant"
         minSdkVersion 21
         targetSdkVersion 28
-        versionCode 1990
-        versionName "1.9.9"
+        versionCode 1993
+        versionName "1.9.9.2"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
         multiDexEnabled true
-
-        ndk {//排除其他 abi
-            abiFilters "armeabi-v7a"
-        }
 
         useLibrary 'org.apache.http.legacy'
     }
@@ -30,7 +26,6 @@ android {
             resValue "string", "app_name", "V Assistant"
             resValue "string", "base_acc_service_label", "V Assist基础服务"
             resValue "string", "gesture_acc_service_label", "V Assist高级服务（7.0+可用）"
-            buildConfigField "String", "UM_KEY", '"5d00ae230cafb2990c0000e4"'
 
             manifestPlaceholders = [
                     JPUSH_PKGNAME : "cn.vove7.vassistant",
@@ -38,6 +33,9 @@ android {
                     JPUSH_CHANNEL : "default", //暂时填写默认值即可.
             ]
 
+            ndk {//排除其他 abi
+                abiFilters "armeabi-v7a"
+            }
         }
         debug {
             minifyEnabled false
@@ -48,7 +46,6 @@ android {
             resValue "string", "app_name", "V Assistant-debug"
             resValue "string", "base_acc_service_label", "V Assist基础DEBUG"
             resValue "string", "gesture_acc_service_label", "V Assist高级DEBUG"
-            buildConfigField  "String", "UM_KEY", '"5d336b23570df3779c000b49"'
 
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
 
@@ -141,7 +138,7 @@ dependencies {
 
     implementation 'com.github.QuadFlask:colorpicker:0.0.15'
     implementation 'com.github.Vove7:CodeView:1.0.2'
-    implementation 'com.github.Vove7:BottomDialog:2.1.4'
+    implementation 'com.github.Vove7:BottomDialog:2.1.5-x'
 
     implementation 'com.github.android-notes:Cockroach:0.0.5'
 
@@ -154,7 +151,6 @@ dependencies {
     implementation 'com.github.tiagohm.MarkdownView:library:0.19.0'
     implementation 'org.nanohttpd:nanohttpd:2.3.1'
 
-    testImplementation 'org.reflections:reflections:0.9.10'
     implementation project(path: ':speechLib')
     implementation project(':admin-manager')
     implementation project(':push')

@@ -1,8 +1,10 @@
 package cn.vove7.jarvis.activities.base
 
 import android.app.Activity
+import android.content.ComponentName
 import android.content.Intent
 import android.os.Bundle
+import android.service.quicksettings.TileService
 import android.speech.RecognizerIntent
 import cn.vove7.common.app.AppConfig
 import cn.vove7.common.app.AppPermission
@@ -12,11 +14,12 @@ import cn.vove7.common.appbus.AppBus
 import cn.vove7.common.bridges.RootHelper
 import cn.vove7.common.datamanager.DAO
 import cn.vove7.common.datamanager.parse.model.Action
+import cn.vove7.common.utils.runInCatch
 import cn.vove7.common.utils.startActivity
 import cn.vove7.executorengine.parse.OpenAppAction
-import cn.vove7.jarvis.R
 import cn.vove7.jarvis.activities.screenassistant.*
 import cn.vove7.jarvis.services.MainService
+import cn.vove7.jarvis.services.TileLongClickable
 import cn.vove7.jarvis.tools.debugserver.RemoteDebugServer
 import cn.vove7.jarvis.tools.setAssistantApp
 import cn.vove7.vtp.log.Vog
@@ -95,6 +98,18 @@ class VoiceAssistActivity : Activity() {
                     RemoteDebugServer.start()
                 } else {
                     RemoteDebugServer.stop()
+                }
+            }
+            TileService.ACTION_QS_TILE_PREFERENCES -> {
+                val cn = (intent.extras.get(Intent.EXTRA_COMPONENT_NAME) as ComponentName?)
+                        ?: return
+                runInCatch {
+                    val tileService = Class.forName(cn.className)
+                    val ins = tileService.newInstance()
+                    if (ins is TileLongClickable) {
+                        val clm = tileService.getDeclaredMethod("onLongClick")
+                        clm.invoke(ins)
+                    }
                 }
             }
             else -> {

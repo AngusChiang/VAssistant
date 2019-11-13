@@ -40,7 +40,7 @@ interface IFloatyPanel {
             GlobalApp.toastInfo("此样式无设置选项")
         } else {
             BottomDialog.builder(activity) {
-                title("面板设置")
+                title("面板设置", true)
                 content(SettingItemBuilder(settingItems.toMutableList(), FloatPanelConfig))
             }
         }

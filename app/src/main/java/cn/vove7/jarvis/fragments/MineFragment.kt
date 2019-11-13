@@ -9,8 +9,10 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ListView
 import android.widget.TextView
+import androidx.cardview.widget.CardView
 import cn.vove7.common.appbus.AppBus
 import cn.vove7.common.model.UserInfo
+import cn.vove7.common.utils.color
 import cn.vove7.common.utils.gone
 import cn.vove7.common.utils.onClick
 import cn.vove7.common.utils.show
@@ -75,7 +77,7 @@ class MineFragment : androidx.fragment.app.Fragment() {
             override fun layoutId(position: Int): Int = R.layout.item_mine_features
 
             override fun onBindView(holder: ItemHolder, pos: Int, item: Pair<Int, Int>) {
-                holder.leftLine.setBackgroundResource(item.first)
+                holder.leftLine.setCardBackgroundColor(context!!.color(item.first))
                 holder.textView.setText(item.second)
                 holder.clickBody.setOnClickListener {
                     onItemClick(pos)
@@ -84,6 +86,7 @@ class MineFragment : androidx.fragment.app.Fragment() {
 
             override fun onCreateViewHolder(view: View): ItemHolder = ItemHolder(view)
         }
+        listView.onItemClickListener = null
         return view
     }
 
@@ -145,7 +148,7 @@ class MineFragment : androidx.fragment.app.Fragment() {
     }
 
     class ItemHolder(v: View) : BaseListAdapter.ViewHolder(v) {
-        val leftLine: View = v.findViewById(R.id.line)
+        val leftLine: CardView = v.findViewById(R.id.line)
         val clickBody: View = v.findViewById(R.id.click_body)
 
         val textView: TextView = v.findViewById(R.id.text)

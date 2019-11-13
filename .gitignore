@@ -11,3 +11,6 @@
 /caches
 /captures
 .externalNativeBuild
+/apks
+/app/release
+/app/debug
