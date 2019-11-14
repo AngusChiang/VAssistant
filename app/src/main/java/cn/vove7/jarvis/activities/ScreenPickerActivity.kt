@@ -210,7 +210,7 @@ class ScreenPickerActivity : Activity() {
 
     var d: BottomDialog? = null
     private val onItemClick: (Model) -> Unit = { model ->
-        d = TextOperationDialog(this, TextOperationDialog.TextModel(model.text.toString())).bottomDialog
+        d = TextOperationDialog(this, TextOperationDialog.TextModel(model.text.toString(), model.subText)).bottomDialog
     }
 
 
