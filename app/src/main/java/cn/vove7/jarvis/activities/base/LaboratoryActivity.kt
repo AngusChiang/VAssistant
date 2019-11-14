@@ -43,7 +43,7 @@ class LaboratoryActivity : ReturnableActivity() {
 
         setContentView(R.layout.activity_expandable_settings)
         val expandableListView = expand_list
-        val adapter = SettingsExpandableAdapter(this, groupItems)
+        val adapter = SettingsExpandableAdapter(this, groupItems, expandableListView)
         expandableListView.setAdapter(adapter)
 
         expandableListView?.post {

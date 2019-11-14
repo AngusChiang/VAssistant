@@ -58,7 +58,7 @@ class AdvancedSettingActivity : ReturnableActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_expandable_settings)
         val expandableListView = expand_list
-        adapter = SettingsExpandableAdapter(this, groupItems)
+        adapter = SettingsExpandableAdapter(this, groupItems, expandableListView)
 
         expandableListView?.setAdapter(adapter)
 
