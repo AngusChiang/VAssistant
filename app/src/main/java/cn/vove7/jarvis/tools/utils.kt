@@ -89,7 +89,7 @@ fun setAssistantAppAuto() {
 @Throws
 fun setAssistantApp() {
     val app = GlobalApp.APP
-    val name = "${app.packageName}/${AssistSessionService::class.qualifiedName}"
+    val name = "${app.packageName}/${AssistSessionService::class.java.name}"
 
     if (AppPermission.canWriteSecureSettings) {
         GlobalLog.log("设为助手应用[WriteSecureSettings]")
