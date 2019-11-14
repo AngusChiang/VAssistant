@@ -68,7 +68,6 @@ class LaboratoryActivity : ReturnableActivity() {
                                             title = "低电量",
                                             keyId = R.string.key_low_power_hint_text,
                                             defaultValue = { PluginConfig.onLowText }
-
                                     ),
                                     InputItem(
                                             title = "开始充电",
@@ -79,6 +78,29 @@ class LaboratoryActivity : ReturnableActivity() {
                         }, defaultValue = false) { _, d ->
                             if (d) PowerListener.start()
                             else PowerListener.stop()
+                            return@CheckBoxItem true
+                        },
+                        CheckBoxItem(
+                                title = "去广告服务",
+                                summary = (if (UserInfo.isVip()) "" else "非高级用户，一天最多去广告5次") + "\n需要无障碍权限",
+                                keyId = R.string.key_open_ad_block,
+                                defaultValue = AppConfig.isAdBlockService,
+                                onTileAreaClick = {
+                                    showExtensionSettings("电源提醒", mutableListOf(
+                                            NumberPickerItem(R.string.text_time_wait_ad, "界面等待广告出现最长时间，单位秒",
+                                                    keyId = R.string.key_ad_wait_secs, range = Pair(10, 100),
+                                                    defaultValue = { 17 }),
+                                            CheckBoxItem(title = "智能识别广告", summary = "[应用切换]时识别未标记的广告页并清除\n有效时间1.5s\n可能会增加耗电",
+                                                    keyId = R.string.key_smart_find_and_kill_ad, defaultValue = AppConfig.smartKillAd),
+                                            CheckBoxItem(R.string.text_show_toast_when_remove_ad, summary = getString(R.string.text_show_toast_when_remove_ad_summary)
+                                                    , keyId = R.string.key_show_toast_when_remove_ad, defaultValue = true)
+                                    ))
+                                }
+                        ) { _, it ->
+                            when (it) {
+                                true -> AdKillerService.register()
+                                false -> AdKillerService.unregister()
+                            }
                             return@CheckBoxItem true
                         }
                 )),
@@ -98,7 +120,7 @@ class LaboratoryActivity : ReturnableActivity() {
                                 return@IntentItem
                             }
                             TextEditorDialog(this, AppConfig.homeSystemConfig
-                                ?: ISmartHomeSystem.templateConfig(s)) {
+                                    ?: ISmartHomeSystem.templateConfig(s)) {
                                 noAutoDismiss()
                                 title(text = "参数配置")
                                 editorView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13f)
@@ -149,28 +171,10 @@ class LaboratoryActivity : ReturnableActivity() {
                                 awesomeHeader("信息")
                                 content(MarkdownContentBuilder()) {
                                     loadMarkdown(MainService.homeControlSystem?.summary()
-                                        ?: "")
+                                            ?: "")
                                 }
                             }
                         }
-                )),
-                SettingGroupItem(R.color.google_blue, titleS = "去广告服务", childItems = listOf(
-                        SwitchItem(R.string.text_open, summary = if (UserInfo.isVip()) null
-                        else getString(R.string.summary_not_vip_remove_ad), keyId = R.string.key_open_ad_block,
-                                defaultValue = true) { _, it ->
-                            when (it) {
-                                true -> AdKillerService.register()
-                                false -> AdKillerService.unregister()
-                            }
-                            return@SwitchItem true
-                        },
-                        NumberPickerItem(R.string.text_time_wait_ad, "界面等待广告出现最长时间，单位秒",
-                                keyId = R.string.key_ad_wait_secs, range = Pair(10, 100),
-                                defaultValue = { 17 }),
-                        CheckBoxItem(title = "智能识别广告", summary = "[应用切换]时识别未标记的广告页并清除\n有效时间1.5s\n可能会增加耗电",
-                                keyId = R.string.key_smart_find_and_kill_ad, defaultValue = AppConfig.smartKillAd),
-                        CheckBoxItem(R.string.text_show_toast_when_remove_ad, summary = getString(R.string.text_show_toast_when_remove_ad_summary)
-                                , keyId = R.string.key_show_toast_when_remove_ad, defaultValue = true)
                 )),
                 SettingGroupItem(R.color.google_green, titleS = "聊天", childItems = listOf(
                         SwitchItem(title = "开启", summary = "指令匹配失败，调用聊天系统",
@@ -224,7 +228,9 @@ class LaboratoryActivity : ReturnableActivity() {
             title: String,
             items: MutableList<SettingChildItem>
     ) = BottomDialog.builder(this) {
-        this.awesomeHeader(title)
+        peekHeightProportion = 0.6f
+        expandable = false
+        title(title, true)
         content(SettingItemBuilder(items, PluginConfig))
     }
 

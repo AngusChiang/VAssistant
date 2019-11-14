@@ -1,7 +1,6 @@
 package cn.vove7.jarvis.fragments.base
 
 import android.annotation.SuppressLint
-import com.google.android.material.textfield.TextInputLayout
 import android.view.View
 import android.widget.AdapterView
 import android.widget.Button
@@ -28,6 +27,7 @@ import cn.vove7.jarvis.tools.DialogUtil
 import cn.vove7.vtp.log.Vog
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.customview.customView
+import com.google.android.material.textfield.TextInputLayout
 
 /**
  * # BaseMarkedFragment
@@ -173,39 +173,40 @@ abstract class BaseMarkedFragment : SimpleListFragment<MarkedData>(), OnSyncMark
         editDialog.show()
     }
 
-    override val itemClickListener =
-        object : SimpleListAdapter.OnItemClickListener<MarkedData> {
+    override val itemClickListener = object : SimpleListAdapter.OnItemClickListener<MarkedData> {
 
-            override fun onClick(holder: SimpleListAdapter.VHolder?, pos: Int, item: ListViewModel<MarkedData>) {
-                //dialog edit
-                val data = item.extra
-                //todo colorful
-                BottomDialog.builder(activity!!) {
-                    title(item.title ?: "", true)
-                    message(data.toString())
-                    if (data.belongUser()) {
-                        buttons {
-                            negativeButton(getString(R.string.text_share)) {
-                                share(data)
-                            }
-                            positiveButton(getString(R.string.text_edit)) {
-                                onEdit(item.extra)
-                            }
-                            neutralButton(getString(R.string.text_delete)) {
-                                DialogUtil.dataDelAlert(context) {
-                                    if (data.tagId != null) {
-                                        deleteShare(data.tagId)
-                                    }
-                                    DAO.daoSession.markedDataDao.delete(data)
-                                    GlobalApp.toastSuccess(R.string.text_delete_complete)
-                                    refresh()
+        override fun onClick(holder: SimpleListAdapter.VHolder?, pos: Int, item: ListViewModel<MarkedData>) {
+            //dialog edit
+            val data = item.extra
+            //todo colorful
+            BottomDialog.builder(activity!!) {
+                peekHeightProportion = 0.6f
+                expandable = false
+                title(item.title ?: "", true)
+                message(data.toString())
+                if (data.belongUser()) {
+                    buttons {
+                        negativeButton(getString(R.string.text_share)) {
+                            share(data)
+                        }
+                        positiveButton(getString(R.string.text_edit)) {
+                            onEdit(item.extra)
+                        }
+                        neutralButton(getString(R.string.text_delete)) {
+                            DialogUtil.dataDelAlert(context) {
+                                if (data.tagId != null) {
+                                    deleteShare(data.tagId)
                                 }
+                                DAO.daoSession.markedDataDao.delete(data)
+                                GlobalApp.toastSuccess(R.string.text_delete_complete)
+                                refresh()
                             }
                         }
                     }
                 }
             }
         }
+    }
 
     private fun deleteShare(tagId: String) {
         WrapperNetHelper.postJson<Any>(ApiUrls.DELETE_SHARE_MARKED, tagId) {

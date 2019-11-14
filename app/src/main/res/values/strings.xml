@@ -208,7 +208,6 @@
     <string name="text_unlock">Unlock</string>
     <string name="text_need_unlock">Partial function need to unlock.</string>
     <string name="text_add_regex">Add regex</string>
-    <string name="summary_not_vip_remove_ad">非高级用户，一天最多去广告5次</string>
     <string name="text_open">Open</string>
     <string name="text_unlock_functions">Unlock functions</string>
     <string name="text_guide">Guide</string>
