@@ -82,7 +82,7 @@ class LaboratoryActivity : ReturnableActivity() {
                         },
                         CheckBoxItem(
                                 title = "去广告服务",
-                                summary = (if (UserInfo.isVip()) "" else "非高级用户，一天最多去广告5次") + "\n需要无障碍权限",
+                                summary = (if (UserInfo.isVip()) "" else "非高级用户，一天最多去广告5次\n") + "需要无障碍权限",
                                 keyId = R.string.key_open_ad_block,
                                 defaultValue = AppConfig.isAdBlockService,
                                 onTileAreaClick = {
