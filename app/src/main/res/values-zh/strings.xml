@@ -150,7 +150,6 @@
     <string name="text_unlock">解锁</string>
     <string name="text_need_unlock">部分功能需要解锁高级用户</string>
     <string name="text_add_regex">添加正则</string>
-    <string name="summary_not_vip_remove_ad">非高级用户，一天最多去广告5次</string>
     <string name="text_open">开启</string>
     <string name="text_unlock_functions">解锁将支持的功能</string>
     <string name="text_guide">教程</string>

@@ -39,14 +39,12 @@ import kotlinx.android.synthetic.main.activity_expandable_settings.*
  *
  */
 class SettingsActivity : ReturnableActivity() {
-    lateinit var adapter: SettingsExpandableAdapter
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_expandable_settings)
 
         val expandableListView = expand_list
-        adapter = SettingsExpandableAdapter(this, initData())
-        expandableListView.setAdapter(adapter)
+        expandableListView.setAdapter(SettingsExpandableAdapter(this, initData(), expandableListView))
 
         try {
             expandableListView?.post {

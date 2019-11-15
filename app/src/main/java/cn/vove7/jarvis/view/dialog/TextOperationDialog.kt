@@ -77,6 +77,7 @@ class TextOperationDialog(val activity: Activity, val textModel: TextModel) {
                     val r = BaiduAipHelper.translate(textModel.text, to = AppConfig.translateLang)
                     if (r != null) {
                         textModel.subText = r.transResult
+                        clear()
                         set(text)
                         appendlnRed("\n翻译结果：")
                         appendln(textModel.subText)

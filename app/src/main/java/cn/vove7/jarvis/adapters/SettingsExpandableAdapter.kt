@@ -6,11 +6,13 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.BaseExpandableListAdapter
+import android.widget.ExpandableListView
 import cn.vove7.common.app.AppConfig
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.view.SettingChildItem
 import cn.vove7.jarvis.view.custom.GroupItemHolder
 import cn.vove7.jarvis.view.custom.SettingGroupItem
+import cn.vove7.jarvis.view.dp
 import cn.vove7.jarvis.view.tools.SettingItemHelper
 
 /**
@@ -21,7 +23,8 @@ import cn.vove7.jarvis.view.tools.SettingItemHelper
  */
 class SettingsExpandableAdapter(
         val context: Context,
-        var groupItems: List<SettingGroupItem>
+        var groupItems: List<SettingGroupItem>,
+        expView: ExpandableListView
 ) : BaseExpandableListAdapter() {
 
 //    private val animationHelper = ListItemAnimationHelper(false, 100f)
@@ -34,6 +37,18 @@ class SettingsExpandableAdapter(
         for (i in 0 until groupCount) {
             childHolders.put(i, arrayOfNulls(getChildrenCount(i)))
         }
+        expView.setOnGroupCollapseListener { gPos ->
+            if (gPos % 2 == 1) return@setOnGroupCollapseListener
+            groupHolders[gPos / 2]?.downIcon?.apply {
+                animate().rotation(0f).setDuration(200).start()
+            }
+        }
+        expView.setOnGroupExpandListener { gPos ->
+            if (gPos % 2 == 1) return@setOnGroupExpandListener
+            groupHolders[gPos / 2]?.downIcon?.apply {
+                animate()?.rotation(180f)?.setDuration(200)?.start()
+            }
+        }
     }
 
     override fun getGroup(groupPosition: Int): SettingGroupItem = groupItems[groupPosition]
@@ -42,19 +57,30 @@ class SettingsExpandableAdapter(
 
     override fun hasStableIds(): Boolean = true
 
-    override fun getGroupView(groupPosition: Int, isExpanded: Boolean, convertView: View?, parent: ViewGroup?): View {
-        val g = getGroup(groupPosition)
-        var view = convertView
-        val holder: GroupItemHolder = if (view == null) {
-            view = LayoutInflater.from(context).inflate(R.layout.item_of_settings_group, null)
-            GroupItemHolder(view).also {
-                view!!.tag = it
-                groupHolders[groupPosition] = it
+    override fun getGroupView(g: Int, isExpanded: Boolean, convertView: View?, parent: ViewGroup?): View {
+        if (g % 2 == 0) {
+            val groupPosition = g / 2
+            val item = getGroup(groupPosition)
+            var view = convertView
+            return (if (view == null || view.tag !is GroupItemHolder) {
+                view = LayoutInflater.from(context).inflate(R.layout.item_of_settings_group, parent, false)
+                GroupItemHolder(view).also {
+                    view.tag = it
+                    groupHolders[groupPosition] = it
+                }
+            } else view.tag as GroupItemHolder).let {
+                it.lineView.setBackgroundResource(item.iconId)
+                it.titleView.text = item.title
+                it.itemView
             }
-        } else view.tag as GroupItemHolder
-        holder.lineView.setBackgroundResource(g.iconId)
-        holder.titleView.text = g.title
-        return view!!
+        } else {
+            //分隔符
+            return View(parent?.context).also {
+                it.background = null
+                it.isEnabled = false
+                it.layoutParams = ViewGroup.LayoutParams(-1, 5.dp.px)
+            }
+        }
     }
 
     override fun getChildView(groupPosition: Int, childPosition: Int, isLastChild: Boolean, convertView: View?, parent: ViewGroup?): View {
@@ -74,13 +100,13 @@ class SettingsExpandableAdapter(
         return view
     }
 
-    override fun getChildrenCount(groupPosition: Int): Int = groupItems[groupPosition].childItems.size
+    override fun getChildrenCount(groupPosition: Int): Int = if (groupPosition % 2 == 0) groupItems[groupPosition / 2].childItems.size else 0
 
-    override fun getChild(groupPosition: Int, childPosition: Int): SettingChildItem = groupItems[groupPosition].childItems[childPosition]
+    override fun getChild(groupPosition: Int, childPosition: Int): SettingChildItem = groupItems[groupPosition / 2].childItems[childPosition]
 
     override fun getGroupId(groupPosition: Int): Long = groupPosition.toLong()
 
     override fun getChildId(groupPosition: Int, childPosition: Int): Long = (groupPosition * 1000 + childPosition).toLong()
 
-    override fun getGroupCount(): Int = groupItems.size
+    override fun getGroupCount(): Int = groupItems.size * 2 - 1 // 空隙
 }
