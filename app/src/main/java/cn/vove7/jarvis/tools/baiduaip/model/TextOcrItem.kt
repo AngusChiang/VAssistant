@@ -11,7 +11,7 @@ import kotlin.math.sqrt
  * 2019/3/11
  */
 data class TextOcrItem(
-        val text: String,
+        val text: CharSequence,
         /**
          * 坐标：左上 右上，右下，左下
          */
@@ -19,7 +19,9 @@ data class TextOcrItem(
         /**
          * 平均
          */
-        val probability: Double
+        val probability: Double,
+        var subText: String? = null
+
 ) : Serializable {
     /**
      * 中心坐标 1,3 点中心

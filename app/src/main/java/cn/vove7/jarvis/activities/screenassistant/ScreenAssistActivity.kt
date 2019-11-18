@@ -439,12 +439,9 @@ class ScreenAssistActivity : BaseActivity() {
         showProgressBar = true
         runOnNewHandlerThread {
             try {
-                val intent = Intent(GlobalApp.APP,
-                        TextOcrActivity::class.java).also {
-                    val results = BaiduAipHelper.ocr(UtilBridge.compressImage(screenPath))
-                    it.putExtra("items", results)
-                }
+                val results = BaiduAipHelper.ocr(UtilBridge.compressImage(screenPath))
                 if (isFinishing) return@runOnNewHandlerThread
+                TextOcrActivity.start(this, results)
                 startActivity(intent)
                 finish()
             } catch (e: Exception) {

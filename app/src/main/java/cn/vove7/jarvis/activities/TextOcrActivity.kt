@@ -1,17 +1,19 @@
 package cn.vove7.jarvis.activities
 
 import android.app.Activity
+import android.content.Context
+import android.graphics.Point
 import android.os.Bundle
 import android.view.Gravity
+import android.view.KeyEvent
 import android.widget.CheckedTextView
 import android.widget.RelativeLayout
 import cn.vove7.bottomdialog.BottomDialog
 import cn.vove7.bottomdialog.builder.title
+import cn.vove7.common.app.AppConfig
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.bridges.SystemBridge
-import cn.vove7.common.utils.gone
-import cn.vove7.common.utils.runOnNewHandlerThread
-import cn.vove7.common.utils.runOnUi
+import cn.vove7.common.utils.*
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.tools.baiduaip.BaiduAipHelper
 import cn.vove7.jarvis.tools.baiduaip.model.TextOcrItem
@@ -19,6 +21,10 @@ import cn.vove7.jarvis.view.dialog.TextOperationDialog
 import cn.vove7.jarvis.view.dialog.contentbuilder.MarkdownContentBuilder
 import cn.vove7.vtp.log.Vog
 import kotlinx.android.synthetic.main.activity_text_ocr.*
+import java.util.*
+import java.util.concurrent.CountDownLatch
+import kotlin.math.abs
+import kotlin.math.sqrt
 
 /**
  * # TextOcrActivity
@@ -28,6 +34,17 @@ import kotlinx.android.synthetic.main.activity_text_ocr.*
  */
 class TextOcrActivity : Activity() {
     private val wordItems = mutableListOf<Model>()
+
+    companion object {
+        fun start(act: Context, items: ArrayList<TextOcrItem>, bundle: Bundle? = null) {
+            act.startActivity<TextOcrActivity> {
+                if (bundle != null) {
+                    putExtras(bundle)
+                }
+                putExtra("items", items)
+            }
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -43,10 +60,11 @@ class TextOcrActivity : Activity() {
 
     }
 
-
     private val onItemClick: (Model) -> Unit = { model ->
-        val text = model.item.text
-        editDialog(text)
+        if (model.textView?.isChecked == true && wordItems.none { it.textView?.isChecked == true && it != model }) {
+            val text = model.item.text
+            editDialog(text)
+        }
     }
 
     @Synchronized
@@ -112,20 +130,11 @@ class TextOcrActivity : Activity() {
                 setTextColor(0xFFFFFF)
                 textSize = 15f
                 isVerticalScrollBarEnabled = true
-                setOnClickListener {
-                    (it as CheckedTextView).apply {
-                    }.toggle()
-                }
-                setOnLongClickListener {
-                    onItemClick.invoke(model)
-                    true
-                }
                 text = item.text
                 val w = item.width
                 val left = item.left
                 val rotationAngle = item.rotationAngle
                 Vog.d("buildContent ---> ${item.text} top:$top ,left:$left ,w:$w h:$h rotationAngle:$rotationAngle")
-//                setPadding(10, 0, 10, 0)
 
                 layoutParams = RelativeLayout.LayoutParams(w, h).also {
                     it.setMargins(left, top, 0, 0)
@@ -146,8 +155,67 @@ class TextOcrActivity : Activity() {
         floatEditIcon.setOnClickListener {
             editCheckedText()
         }
+        rootContent.setData(wordItems, onItemClick)
+
+        if (intent.hasExtra("t")) {
+            translateAll()
+        }
+    }
+
+    override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
+        Vog.d("onKeyDown ---> $keyCode")
+        if (!hasT && keyCode == KeyEvent.KEYCODE_VOLUME_DOWN) {
+            translateAll()
+            return true
+        }
+        return super.onKeyDown(keyCode, event)
+    }
+
+    override fun onKeyUp(keyCode: Int, event: KeyEvent?): Boolean {
+        if (!hasT && keyCode == KeyEvent.KEYCODE_VOLUME_DOWN)
+            return true
+        return super.onKeyUp(keyCode, event)
+    }
+
+    var hasT = false
+    private fun translateAll() {
+        AppConfig.haveTranslatePermission() ?: return
+
+        hasT = true
+        GlobalApp.toastInfo("开始翻译")
+        val count = CountDownLatch(wordItems.size)
+        wordItems.forEach {
+            val text = it.item.text
+            ThreadPool.runOnCachePool {
+                val r = BaiduAipHelper.translate(text.toString(), to = AppConfig.translateLang)
+                if (r != null) {
+                    val res = r.transResult
+                    if (text == res) {//文本相同
+                        count.countDown()
+                        return@runOnCachePool
+                    }
+                    it.item.subText = res
+                    runOnUi {
+                        it.textView?.isChecked = true
+                        it.textView?.text = res
+                    }
+                } else {
+                    it.item.subText = "翻译失败"
+                }
+                count.countDown()
+            }
+            ThreadPool.runOnCachePool {
+                //监听
+                count.await()
+                if (isFinishing) return@runOnCachePool
+                runOnUi {
+                    GlobalApp.toastSuccess("翻译完成")
+                }
+            }
+        }
 
     }
+
 
     /**
      * 勾选的文字
@@ -200,14 +268,37 @@ class TextOcrActivity : Activity() {
 
     var d: BottomDialog? = null
 
-
-    private fun editDialog(text: String) {
+    private fun editDialog(text: CharSequence) {
         d = TextOperationDialog(this, TextOperationDialog.TextModel(text)).bottomDialog
     }
 
     class Model(
             val item: TextOcrItem,
             var textView: CheckedTextView? = null
-    )
+    ) {
+
+        operator fun contains(p: Point): Boolean {
+            return abs(point2LineDis(p, 0, 3) + point2LineDis(p, 1, 2) - item.width) < 5 &&
+                    abs(point2LineDis(p, 0, 1) + point2LineDis(p, 2, 3) - item.height) < 5
+        }
+
+        /**
+         * 点到直线距离
+         * A = y2 - y1
+         * B = x1 -x2
+         * C = y1(x2-x1) - x1(y2-y1)
+         */
+        @Suppress("LocalVariableName")
+        private fun point2LineDis(p: Point, i1: Int, i2: Int): Int {
+            val p1 = item.points[i1]
+            val p2 = item.points[i2]
+            val A = p2.y - p1.y
+            val B = p1.x - p2.x
+            val C = p1.y * (p2.x - p1.x) - p1.x * (p2.y - p1.y)
+            return abs(
+                    (A * p.x + B * p.y + C) / sqrt((A * A + B * B).toDouble())
+            ).toInt()
+        }
+    }
 
 }
