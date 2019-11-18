@@ -16,7 +16,6 @@ import cn.vove7.common.net.ApiUrls
 import cn.vove7.common.net.WrapperNetHelper
 import cn.vove7.common.net.model.LastDateInfo
 import cn.vove7.common.utils.TextHelper
-import cn.vove7.common.utils.ThreadPool.runOnCachePool
 import cn.vove7.common.utils.ThreadPool.runOnPool
 import cn.vove7.executorengine.parse.ParseEngine
 import cn.vove7.jarvis.R
@@ -265,7 +264,9 @@ object DataUpdator {
                         back.invoke(false)
                     }
                 } else {
-                    if(bean.code == 1) {
+                    if (bean.code == 1) {
+                        SpHelper(GlobalApp.APP).set(R.string.key_last_sync_in_app_date,
+                                System.currentTimeMillis())
                         back.invoke(true)
                     } else {
                         GlobalApp.toastError(bean.message)
