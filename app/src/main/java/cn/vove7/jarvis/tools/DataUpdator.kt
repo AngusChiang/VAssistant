@@ -265,8 +265,12 @@ object DataUpdator {
                         back.invoke(false)
                     }
                 } else {
-                    GlobalApp.toastError(R.string.text_net_err)
-                    back.invoke(false)
+                    if(bean.code == 1) {
+                        back.invoke(true)
+                    } else {
+                        GlobalApp.toastError(bean.message)
+                        back.invoke(false)
+                    }
                 }
             }
             fail { _, e ->
