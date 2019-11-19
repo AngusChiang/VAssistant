@@ -8,6 +8,7 @@ import android.os.IBinder
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import cn.vove7.common.app.GlobalLog
+import cn.vove7.jarvis.R
 import cn.vove7.vtp.notification.ChannelBuilder
 
 /**
@@ -36,13 +37,19 @@ class ForegroundService : Service() {
             NotificationCompat.Builder(this)
         }
 
+    private val foreNotification get() = builder.apply {
+        priority = NotificationCompat.PRIORITY_MAX
+        setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+        setSmallIcon(R.mipmap.ic_launcher_vassist)
+        setOngoing(true)
+        setContentTitle("VAssist前台服务")
+        setContentText("如果不想看到此通知，可长按进入通知管理关闭此通知")
+    }.build()
+
     override fun onCreate() {
         super.onCreate()
         GlobalLog.log("开启前台服务")
-        startForeground(1111, builder.apply {
-            setContentTitle("VAssist前台服务")
-            setContentText("如果不想看到此通知，可长按进入通知管理关闭此通知")
-        }.build())
+        startForeground(1111, foreNotification)
     }
 
     override fun onDestroy() {
