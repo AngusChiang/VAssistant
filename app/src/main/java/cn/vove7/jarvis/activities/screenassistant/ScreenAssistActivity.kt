@@ -48,6 +48,15 @@ val Bitmap.statusBarIsLight: Boolean
         return r + b + g > 450
     }
 
+val Bitmap.navBarIsLight: Boolean
+    get() {
+        val spColor = getPixel(width / 2, height)
+        val r = Color.red(spColor)
+        val g = Color.green(spColor)
+        val b = Color.blue(spColor)
+        return r + b + g > 450
+    }
+
 class ScreenAssistActivity : BaseActivity() {
 
     private lateinit var screenPath: String
@@ -92,8 +101,8 @@ class ScreenAssistActivity : BaseActivity() {
         bottom_sheet.setBackgroundResource(R.drawable.toolbar_round_bg)
         window.setWindowAnimations(R.style.ScreenAssist)
 
-        if ("light" in intent) {
-            setStatusBarLight(intent["light", false])
+        if ("sbarLight" in intent) {
+            setStatusBarLight(intent["sbarLight", false])
         }
 
         showProgressBar = true
@@ -441,7 +450,7 @@ class ScreenAssistActivity : BaseActivity() {
             try {
                 val results = BaiduAipHelper.ocr(UtilBridge.compressImage(screenPath))
                 if (isFinishing) return@runOnNewHandlerThread
-                TextOcrActivity.start(this, results)
+                TextOcrActivity.start(this, results, intent.extras)
                 startActivity(intent)
                 finish()
             } catch (e: Exception) {

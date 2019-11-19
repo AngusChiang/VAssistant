@@ -6,6 +6,7 @@ import android.graphics.Point
 import android.os.Bundle
 import android.view.Gravity
 import android.view.KeyEvent
+import android.view.View
 import android.widget.CheckedTextView
 import android.widget.RelativeLayout
 import cn.vove7.bottomdialog.BottomDialog
@@ -15,10 +16,12 @@ import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.bridges.SystemBridge
 import cn.vove7.common.utils.*
 import cn.vove7.jarvis.R
+import cn.vove7.jarvis.tools.Tutorials
 import cn.vove7.jarvis.tools.baiduaip.BaiduAipHelper
 import cn.vove7.jarvis.tools.baiduaip.model.TextOcrItem
 import cn.vove7.jarvis.view.dialog.TextOperationDialog
 import cn.vove7.jarvis.view.dialog.contentbuilder.MarkdownContentBuilder
+import cn.vove7.vtp.asset.AssetHelper
 import cn.vove7.vtp.log.Vog
 import kotlinx.android.synthetic.main.activity_text_ocr.*
 import java.util.*
@@ -48,6 +51,8 @@ class TextOcrActivity : Activity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        window.decorView.systemUiVisibility = window.decorView.systemUiVisibility or View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR
+
         intent?.let {
             if (it.hasExtra("items")) {
                 copy(it.getSerializableExtra("items") as List<TextOcrItem>)
@@ -60,10 +65,14 @@ class TextOcrActivity : Activity() {
 
     }
 
+    override fun onBackPressed() {
+        overridePendingTransition(0, 0)
+        super.onBackPressed()
+    }
+
     private val onItemClick: (Model) -> Unit = { model ->
         if (model.textView?.isChecked == true && wordItems.none { it.textView?.isChecked == true && it != model }) {
-            val text = model.item.text
-            editDialog(text)
+            editDialog(model.item.text, model.item.subText)
         }
     }
 
@@ -156,9 +165,19 @@ class TextOcrActivity : Activity() {
             editCheckedText()
         }
         rootContent.setData(wordItems, onItemClick)
-
+        rootContent.onStartMove = {
+            floatEditIcon.gone()
+            helpIcon.gone()
+        }
+        rootContent.onTouchUp = {
+            if (floatEditIcon.isOrWillBeHidden) {
+                floatEditIcon.fadeIn(200)
+            }
+        }
         if (intent.hasExtra("t")) {
             translateAll()
+        } else {
+            Tutorials.showForView(this, Tutorials.screen_assistant_ocr, floatEditIcon, "", AssetHelper.getStrFromAsset(this, "files/ocr_help.md"))
         }
     }
 
@@ -268,8 +287,8 @@ class TextOcrActivity : Activity() {
 
     var d: BottomDialog? = null
 
-    private fun editDialog(text: CharSequence) {
-        d = TextOperationDialog(this, TextOperationDialog.TextModel(text)).bottomDialog
+    private fun editDialog(text: CharSequence, sub: String? = null) {
+        d = TextOperationDialog(this, TextOperationDialog.TextModel(text, sub)).bottomDialog
     }
 
     class Model(

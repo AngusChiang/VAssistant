@@ -40,13 +40,13 @@ class VoiceAssistActivity : Activity() {
         val action = intent.action
         Vog.d("VoiceAssist ---> $action")
         when (action) {
-            Intent.ACTION_ASSIST, Intent.ACTION_VOICE_COMMAND,
+            Intent.ACTION_VOICE_COMMAND,
             RecognizerIntent.ACTION_VOICE_SEARCH_HANDS_FREE,
             RecognizerIntent.ACTION_WEB_SEARCH, WAKE_UP -> {
                 Vog.d("onCreate ---> ASSIST wakeup")
                 MainService.switchRecog()
             }
-            "android.intent.action.VOICE_ASSIST" -> {//一加长按HOME键
+            Intent.ACTION_ASSIST, "android.intent.action.VOICE_ASSIST" -> {//一加长按HOME键
                 when (AppConfig.homeFun) {
                     0 -> startActivity(ScreenAssistActivity.createIntent())
                     1 -> MainService.switchRecog()

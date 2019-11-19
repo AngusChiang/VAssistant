@@ -19,6 +19,10 @@ class ChildSelectableView @JvmOverloads constructor(
     private var wordItems = mutableListOf<TextOcrActivity.Model>()
     private var onChildViewClick: Function1<TextOcrActivity.Model, Unit>? = null
 
+    var onTouchDown: (() -> Unit)? = null
+    var onStartMove: (() -> Unit)? = null
+    var onTouchUp: (() -> Unit)? = null
+
     @Synchronized
     fun setData(data: List<TextOcrActivity.Model>, onViewClick: Function1<TextOcrActivity.Model, Unit>) {
         wordItems.clear()
@@ -42,8 +46,12 @@ class ChildSelectableView @JvmOverloads constructor(
                     lastSelModel = model
                     model.textView?.toggle()
                 }
+                onTouchDown?.invoke()
             }
             MotionEvent.ACTION_MOVE -> {
+                if(!move){
+                    onStartMove?.invoke()
+                }
                 move = true
                 val p = event.point
                 val model = wordItems.find { p in it }
@@ -62,6 +70,7 @@ class ChildSelectableView @JvmOverloads constructor(
                     onChildViewClick?.invoke(m)
                 }
                 lastSelModel = null
+                onTouchUp?.invoke()
             }
         }
         return true

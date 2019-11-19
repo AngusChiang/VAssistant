@@ -31,13 +31,18 @@ import java.io.File
  */
 class TextOperationDialog(val activity: Activity, val textModel: TextModel) {
 
+    //默认已换行
+    private var wraped = true
+
     val bottomDialog = BottomDialog.builder(activity) {
 
         awesomeHeader("文字操作")
         buttons {
 
+            val cv = WrappedTextContentBuilder("")
+            content(cv)
             positiveButton(text = "复制") {
-                SystemBridge.setClipText(textModel.textS)
+                SystemBridge.setClipText(cv.text.toString())
                 GlobalApp.toastInfo(R.string.text_copied)
             }
 
@@ -51,7 +56,6 @@ class TextOperationDialog(val activity: Activity, val textModel: TextModel) {
             }
         }
 
-        content(WrappedTextContentBuilder(""))
     }
 
     init {
@@ -77,8 +81,7 @@ class TextOperationDialog(val activity: Activity, val textModel: TextModel) {
                     val r = BaiduAipHelper.translate(textModel.textS, to = AppConfig.translateLang)
                     if (r != null) {
                         textModel.subText = r.transResult
-                        clear()
-                        set(text)
+                        set(textModel.text)
                         appendlnRed("\n翻译结果：")
                         appendln(textModel.subText)
                     } else appendlnRed("翻译失败")
@@ -91,6 +94,11 @@ class TextOperationDialog(val activity: Activity, val textModel: TextModel) {
         var b: TextView? = null
         bottomDialog.updateFooter<ButtonsBuilder> { b = buttonNegative }
         PopupMenu(activity, b).apply {
+            if (wraped) {
+                menu.add("取消换行")
+            } else {
+                menu.add("自动换行")
+            }
             menu.add("分享")
             menu.add("编辑")
             menu.add("搜索")
@@ -102,6 +110,18 @@ class TextOperationDialog(val activity: Activity, val textModel: TextModel) {
             menu.add("生成二维码")
             setOnMenuItemClickListener {
                 when (it.title) {
+                    "取消换行" -> {
+                        wraped = false
+                        bottomDialog.updateContent<WrappedTextContentBuilder> {
+                            text = textModel.text.lines().joinToString("")
+                        }
+                    }
+                    "自动换行" -> {
+                        wraped = true
+                        bottomDialog.updateContent<WrappedTextContentBuilder> {
+                            text = textModel.text
+                        }
+                    }
                     "分享" -> SystemBridge.shareText(textModel.textS)
                     "编辑" -> {
                         TextEditorDialog(activity, textModel.textS) {
