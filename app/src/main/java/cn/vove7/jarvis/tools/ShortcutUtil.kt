@@ -10,6 +10,7 @@ import android.graphics.drawable.Icon
 import android.os.Build
 import android.speech.RecognizerIntent
 import androidx.annotation.RequiresApi
+import cn.vove7.common.app.AppConfig
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.app.GlobalApp.Companion.getString
 import cn.vove7.common.app.GlobalLog
@@ -59,7 +60,7 @@ object ShortcutUtil {
         get() = buildShortcut(
                 "fast_wakeup",
                 getString(R.string.shortcut_wakeup),
-                Intent(Intent.ACTION_ASSIST, null, context, VoiceAssistActivity::class.java),
+                Intent(VoiceAssistActivity.WAKE_UP, null, context, VoiceAssistActivity::class.java),
                 3
         )
 
@@ -125,6 +126,9 @@ object ShortcutUtil {
      */
     fun initShortcut() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1) {
+            if (AppConfig.PRE_VERSION_CODE <= 19931) {
+                shortManager?.removeAllDynamicShortcuts()
+            }
             addShortcut(wakeUpShortcut!!)
             addShortcut(switchVoiceWpShortcut!!)
             addShortcut(oneKeySetAssistShortcut!!)
@@ -147,10 +151,7 @@ object ShortcutUtil {
 
     @RequiresApi(Build.VERSION_CODES.N_MR1)
     private fun existsCut(id: String): Boolean {
-        shortManager?.dynamicShortcuts?.forEach {
-            if (it.id == id) return true
-        }
-        return false
+        return shortManager?.dynamicShortcuts?.any { it.id == id } ?: false
     }
 
     @RequiresApi(Build.VERSION_CODES.N_MR1)
