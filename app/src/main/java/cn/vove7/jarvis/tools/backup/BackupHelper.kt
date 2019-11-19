@@ -454,7 +454,7 @@ object BackupHelper {
     //////////////////设置备份/////////////////
     fun backupAppConfig(): Boolean {
         return try {
-            val fList = arrayOf(GlobalApp.APP.packageName + "_preferences.xml", "tutorials.xml")
+            val fList = arrayOf(GlobalApp.APP.packageName + "_preferences.xml", "tutorials.xml", "plugin.xml", "float_panel_config.xml")
             val spDir = File(GlobalApp.APP.cacheDir.parent, "shared_prefs")
             fList.forEach {
                 FileHelper.easyCopy(File(spDir, it), File(StorageHelper.spPath, it))
