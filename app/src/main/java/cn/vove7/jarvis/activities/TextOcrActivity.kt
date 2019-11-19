@@ -157,17 +157,12 @@ class TextOcrActivity : Activity() {
 
         }
 
-        helpIcon.setOnClickListener {
-            showHelp()
-        }
-
         floatEditIcon.setOnClickListener {
             editCheckedText()
         }
         rootContent.setData(wordItems, onItemClick)
         rootContent.onStartMove = {
             floatEditIcon.gone()
-            helpIcon.gone()
         }
         rootContent.onTouchUp = {
             if (floatEditIcon.isOrWillBeHidden) {
@@ -253,15 +248,6 @@ class TextOcrActivity : Activity() {
                 }
             } else it
         }
-
-    private fun showHelp() {
-        BottomDialog.builder(this) {
-            title("文字识别界面帮助", true)
-            content(MarkdownContentBuilder()) {
-                loadMarkdownFromAsset("files/ocr_help.md")
-            }
-        }
-    }
 
     private fun editCheckedText() {
         editDialog(checkedText)
