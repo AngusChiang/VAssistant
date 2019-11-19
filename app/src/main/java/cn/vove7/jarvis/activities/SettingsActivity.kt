@@ -49,8 +49,8 @@ class SettingsActivity : ReturnableActivity() {
         try {
             expandableListView?.post {
                 expandableListView.apply {
-                    expandGroup(1, true)
-                    expandGroup(0, true)
+                    expandGroup(0)
+                    expandGroup(2)
                 }
             }
         } catch (e: Exception) {

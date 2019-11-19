@@ -1,4 +1,4 @@
-package cn.vove7.jarvis.activities.base
+package cn.vove7.jarvis.activities
 
 import android.os.Bundle
 import android.util.TypedValue
@@ -13,6 +13,7 @@ import cn.vove7.common.model.UserInfo
 import cn.vove7.common.utils.ThreadPool.runOnPool
 import cn.vove7.common.utils.content
 import cn.vove7.jarvis.R
+import cn.vove7.jarvis.activities.base.ReturnableActivity
 import cn.vove7.jarvis.adapters.SettingsExpandableAdapter
 import cn.vove7.jarvis.plugins.AdKillerService
 import cn.vove7.jarvis.plugins.PluginConfig
@@ -48,8 +49,8 @@ class LaboratoryActivity : ReturnableActivity() {
 
         expandableListView?.post {
             expandableListView.apply {
-                expandGroup(0, true)
-                expandGroup(1, true)
+                expandGroup(0)
+                expandGroup(2)
             }
         }
     }
@@ -82,7 +83,7 @@ class LaboratoryActivity : ReturnableActivity() {
                         },
                         CheckBoxItem(
                                 title = "去广告服务",
-                                summary = (if (UserInfo.isVip()) "" else "非高级用户，一天最多去广告5次") + "\n需要无障碍权限",
+                                summary = (if (UserInfo.isVip()) "" else "非高级用户，一天最多去广告5次\n") + "需要无障碍权限",
                                 keyId = R.string.key_open_ad_block,
                                 defaultValue = AppConfig.isAdBlockService,
                                 onTileAreaClick = {

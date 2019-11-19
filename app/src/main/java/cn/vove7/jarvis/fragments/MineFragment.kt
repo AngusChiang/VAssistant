@@ -3,7 +3,6 @@ package cn.vove7.jarvis.fragments
 
 import android.content.Intent
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -18,7 +17,7 @@ import cn.vove7.common.utils.onClick
 import cn.vove7.common.utils.show
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.activities.*
-import cn.vove7.jarvis.activities.base.LaboratoryActivity
+import cn.vove7.jarvis.activities.LaboratoryActivity
 import cn.vove7.jarvis.view.dialog.LoginDialog
 import cn.vove7.jarvis.view.dialog.UserInfoDialog
 import cn.vove7.vtp.easyadapter.BaseListAdapter
