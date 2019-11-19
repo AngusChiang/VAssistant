@@ -105,6 +105,13 @@ class LaboratoryActivity : ReturnableActivity() {
                             return@CheckBoxItem true
                         }
                 )),
+                SettingGroupItem(R.color.google_red, titleS = "屏幕助手", childItems = listOf(
+                        SwitchItem(title = "助手模式", summary = "设为默认语音辅助应用后\n通过唤醒用系统语音助手触发\n可捕捉屏幕内容进行快捷操作\n关闭后只能使快速唤醒", keyId = R.string.key_use_assist_service,
+                                defaultValue = AppConfig.useAssistService),
+                        InputItem(title = "文字识别参数设置", summary = "自定义文字识别key", keyId = R.string.key_text_ocr_key),
+                        SingleChoiceItem(title = "长按HOME键操作", summary = "适用于一加",
+                                keyId = R.string.key_home_fun, entityArrId = R.array.list_home_funs)
+                )),
                 SettingGroupItem(R.color.a8nv, titleS = "智能家居", childItems = listOf(
                         SingleChoiceItem(title = "智能家居系统", summary = "选择您的家居系统",
                                 defaultValue = AppConfig.homeSystem ?: -1,
@@ -200,13 +207,6 @@ class LaboratoryActivity : ReturnableActivity() {
                             SystemBridge.openUrl("https://vove.gitee.io/2019/01/24/custom_chat_system/")
                         }
 
-                )),
-                SettingGroupItem(R.color.google_red, titleS = "屏幕助手", childItems = listOf(
-                        SwitchItem(title = "助手模式", summary = "设为默认语音辅助应用后\n通过唤醒用系统语音助手触发\n可捕捉屏幕内容进行快捷操作\n关闭后只能使快速唤醒", keyId = R.string.key_use_assist_service,
-                                defaultValue = AppConfig.useAssistService),
-                        InputItem(title = "文字识别参数设置", summary = "自定义文字识别key", keyId = R.string.key_text_ocr_key),
-                        SingleChoiceItem(title = "长按HOME键操作", summary = "适用于一加",
-                                keyId = R.string.key_home_fun, entityArrId = R.array.list_home_funs)
                 )),
                 SettingGroupItem(R.color.yellow_700, titleS = "语音唤醒", childItems = listOf(
                         SwitchItem(title = "自动释放麦克风", summary = "在已授予麦克风权限的其他App内自动关闭语音唤醒\n需要无障碍",/*设为系统应用后无效*/
