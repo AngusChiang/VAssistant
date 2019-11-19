@@ -138,7 +138,7 @@ dependencies {
 
     implementation 'com.github.QuadFlask:colorpicker:0.0.15'
     implementation 'com.github.Vove7:CodeView:1.0.2'
-    implementation 'com.github.Vove7:BottomDialog:2.1.5-x'
+    implementation 'com.github.Vove7:BottomDialog:2.1.6-x'
 
     implementation 'com.github.android-notes:Cockroach:0.0.5'
 
