@@ -7,6 +7,7 @@ import android.view.MotionEvent
 import android.view.View
 import android.widget.RelativeLayout
 import cn.vove7.jarvis.activities.TextOcrActivity
+import kotlin.math.sqrt
 
 class ChildSelectableView @JvmOverloads constructor(
         context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
@@ -34,12 +35,17 @@ class ChildSelectableView @JvmOverloads constructor(
 
     private var lastSelModel: TextOcrActivity.Model? = null
 
+    private var moveToOther = false
     private var move = false
+    private var downPoint: Point? = null
+
     override fun onTouch(v: View?, event: MotionEvent?): Boolean {
         event ?: return true
         when (event.action) {
             MotionEvent.ACTION_DOWN -> {
                 val p = event.point
+                downPoint = p
+                moveToOther = false
                 move = false
                 val model = wordItems.find { p in it }
                 if (model != null) {
@@ -49,14 +55,15 @@ class ChildSelectableView @JvmOverloads constructor(
                 onTouchDown?.invoke()
             }
             MotionEvent.ACTION_MOVE -> {
-                if(!move){
+                if (!move && downPoint!!.distance(event.point) > 20) {
                     onStartMove?.invoke()
+                    move = true
                 }
-                move = true
                 val p = event.point
                 val model = wordItems.find { p in it }
                 if (model != null) {
                     if (lastSelModel != model) {
+                        moveToOther = true
                         model.textView?.toggle()
                         lastSelModel = model
                     }
@@ -66,14 +73,23 @@ class ChildSelectableView @JvmOverloads constructor(
             }
             MotionEvent.ACTION_UP -> {
                 val m = lastSelModel
-                if (!move && m != null) {
+                val p = event.point
+                val dis = p.distance(downPoint!!)
+                if (!moveToOther && dis < 20 && m != null) {
                     onChildViewClick?.invoke(m)
                 }
                 lastSelModel = null
                 onTouchUp?.invoke()
+                downPoint = null
             }
         }
         return true
+    }
+
+    private fun Point.distance(that: Point): Double {
+        val dx = x - that.x
+        val dy = y - that.y
+        return sqrt((dx * dx + dy * dy).toDouble())
     }
 
 }
