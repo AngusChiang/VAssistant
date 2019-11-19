@@ -36,7 +36,8 @@ class TextOperationDialog(val activity: Activity, val textModel: TextModel) {
 
     private val cv = WrappedTextContentBuilder("")
 
-    private val viewText get() = cv.text.toString()
+    //待操作文字
+    private var opText = textModel.text.toString()
 
     val bottomDialog = BottomDialog.builder(activity) {
 
@@ -45,13 +46,13 @@ class TextOperationDialog(val activity: Activity, val textModel: TextModel) {
 
             content(cv)
             positiveButton(text = "复制") {
-                SystemBridge.setClipText(viewText)
+                SystemBridge.setClipText(opText)
                 GlobalApp.toastInfo(R.string.text_copied)
             }
 
             neutralButton(text = "分词") {
                 DataCollector.buriedPoint("to_split_words")
-                WordSplitDialog(this@TextOperationDialog.activity, viewText)
+                WordSplitDialog(this@TextOperationDialog.activity, opText)
                 it.dismiss()
             }
             negativeButton(text = "更多") {
@@ -81,7 +82,7 @@ class TextOperationDialog(val activity: Activity, val textModel: TextModel) {
             bottomDialog.updateContent<WrappedTextContentBuilder> {
                 textView.apply {
                     appendlnGreen("\n翻译中...")
-                    val r = BaiduAipHelper.translate(viewText, to = AppConfig.translateLang)
+                    val r = BaiduAipHelper.translate(opText, to = AppConfig.translateLang)
                     if (r != null) {
                         textModel.subText = r.transResult
                         set(textModel.text)
@@ -116,18 +117,20 @@ class TextOperationDialog(val activity: Activity, val textModel: TextModel) {
                     "取消换行" -> {
                         wraped = false
                         bottomDialog.updateContent<WrappedTextContentBuilder> {
-                            text = textModel.text.lines().joinToString("")
+                            opText = textModel.text.lines().joinToString("")
+                            text = opText
                         }
                     }
                     "自动换行" -> {
                         wraped = true
                         bottomDialog.updateContent<WrappedTextContentBuilder> {
-                            text = textModel.text
+                            opText = textModel.text.toString()
+                            text = opText
                         }
                     }
-                    "分享" -> SystemBridge.shareText(viewText)
+                    "分享" -> SystemBridge.shareText(opText)
                     "编辑" -> {
-                        TextEditorDialog(activity, viewText) {
+                        TextEditorDialog(activity, opText) {
                             title(text = "编辑")
                             positiveButton(text = "复制") {
                                 SystemBridge.setClipText(editorView.content())
@@ -150,15 +153,15 @@ class TextOperationDialog(val activity: Activity, val textModel: TextModel) {
                     }
                     "搜索" -> {
                         DataCollector.buriedPoint("to_search")
-                        SystemBridge.quickSearch(viewText)
+                        SystemBridge.quickSearch(opText)
                     }
                     "生成二维码" -> {
                         DataCollector.buriedPoint("to_gen_qr")
-                        QRTools.encode(viewText) { path, e ->
+                        QRTools.encode(opText) { path, e ->
                             if (path != null) {
                                 bottomDialog.dismiss()
                                 runOnUi {
-                                    showQrDialog(viewText, path)
+                                    showQrDialog(opText, path)
                                 }
                             } else {
                                 GlobalApp.toastError("生成失败\n${e?.message}")
