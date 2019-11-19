@@ -47,7 +47,7 @@ class WordSplitDialog(context: Activity, val rawWords: String) {
                     return@negativeButton
                 }
                 SystemBridge.setClipText(builder.getCheckedText())
-                GlobalApp.toastInfo(R.string.text_copied)
+                GlobalApp.toastSuccess("已复制选择内容")
             }
             neutralButton(text = "分享") {
                 val st = builder.getCheckedText()
