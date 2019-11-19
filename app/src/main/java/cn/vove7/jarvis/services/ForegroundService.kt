@@ -1,7 +1,9 @@
 package cn.vove7.jarvis.services
 
 import android.app.NotificationManager
+import android.app.PendingIntent
 import android.app.Service
+import android.content.ComponentName
 import android.content.Intent
 import android.os.Build
 import android.os.IBinder
@@ -9,6 +11,8 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import cn.vove7.common.app.GlobalLog
 import cn.vove7.jarvis.R
+import cn.vove7.jarvis.activities.base.VoiceAssistActivity
+import cn.vove7.jarvis.activities.screenassistant.ScreenAssistActivity
 import cn.vove7.vtp.notification.ChannelBuilder
 
 /**
@@ -37,14 +41,23 @@ class ForegroundService : Service() {
             NotificationCompat.Builder(this)
         }
 
-    private val foreNotification get() = builder.apply {
-        priority = NotificationCompat.PRIORITY_MAX
-        setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
-        setSmallIcon(R.mipmap.ic_launcher_vassist)
-        setOngoing(true)
-        setContentTitle("VAssist前台服务")
-        setContentText("如果不想看到此通知，可长按进入通知管理关闭此通知")
-    }.build()
+    private fun getPendingIntent(action: String): PendingIntent {
+        val intent = Intent(action).apply {
+            component = ComponentName(this@ForegroundService, VoiceAssistActivity::class.java)
+        }
+        return PendingIntent.getActivity(this, 0, intent, 0)
+    }
+
+    private val foreNotification
+        get() = builder.apply {
+            addAction(0, "唤醒", getPendingIntent(VoiceAssistActivity.WAKE_UP))
+            addAction(0, "屏幕助手", PendingIntent.getActivity(this@ForegroundService, 0, ScreenAssistActivity.createIntent(delayCapture = true), 0))
+            priority = NotificationCompat.PRIORITY_MAX
+            setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+            setSmallIcon(R.mipmap.ic_launcher_vassist)
+            setOngoing(true)
+            setContentTitle("VAssist前台服务(可长按关闭)")
+        }.build()
 
     override fun onCreate() {
         super.onCreate()
