@@ -10,8 +10,9 @@ android {
         applicationId "cn.vove7.vassistant"
         minSdkVersion 21
         targetSdkVersion 28
-        versionCode 1994
+        def subVersion = 2
         versionName "1.9.9.3"
+        versionCode Integer.parseInt(versionName.replace(".", "")) * 10 + subVersion
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
         multiDexEnabled true
@@ -138,7 +139,7 @@ dependencies {
 
     implementation 'com.github.QuadFlask:colorpicker:0.0.15'
     implementation 'com.github.Vove7:CodeView:1.0.2'
-    implementation 'com.github.Vove7:BottomDialog:2.1.5-x'
+    implementation 'com.github.Vove7:BottomDialog:2.1.6-x'
 
     implementation 'com.github.android-notes:Cockroach:0.0.5'
 

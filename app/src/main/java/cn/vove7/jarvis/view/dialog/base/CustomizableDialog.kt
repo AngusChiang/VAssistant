@@ -100,7 +100,7 @@ abstract class CustomizableDialog(
     }
 
     open fun onFinish() {}
-    fun finish(posText: String? = null, onClick: (() -> Unit)? = null) {
+    fun finish(posText: String? = "完成", onClick: (() -> Unit)? = null) {
         onFinish()
         runInCatch {
             runOnUi {

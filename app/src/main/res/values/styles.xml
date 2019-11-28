@@ -57,6 +57,7 @@
 
     <style name="TextOcr" parent="ScreenPicker" >
         <item name="android:statusBarColor">@color/half_trans</item>
+        <item name="android:navigationBarColor">#22000000</item>
     </style>
 
     <style name="ScreenAssist" parent="ScreenPicker">

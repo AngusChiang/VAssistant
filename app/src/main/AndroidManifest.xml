@@ -148,7 +148,7 @@
             android:theme="@style/AppTheme" />
 
         <activity
-            android:name=".activities.base.LaboratoryActivity"
+            android:name=".activities.LaboratoryActivity"
             android:label="@string/text_laboratory"
             android:theme="@style/AppTheme" />
         <activity

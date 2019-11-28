@@ -505,12 +505,18 @@ object AppConfig : BaseConfig {
             return i
         }
 
+    //上次启动版本号
+    val PRE_VERSION_CODE by lazy {
+        val sp = SpHelper(GlobalApp.APP)
+        sp.getLong("v_code").let{
+            if (it < 0) versionCode else it
+        }
+    }
     //新版本第一次启动
     val FIRST_LAUNCH_NEW_VERSION by lazy {
         val sp = SpHelper(GlobalApp.APP)
-        val lastCode = sp.getLong("v_code")
         val nowCode = versionCode
-        if (lastCode < nowCode) {
+        if (PRE_VERSION_CODE < nowCode) {
             sp.set("v_code", nowCode)
             true
         } else {

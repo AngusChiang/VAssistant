@@ -515,6 +515,15 @@ fun View.onClick(clickAction: () -> Unit) {
     }
 }
 
+
+fun View.fadeIn(duration: Long = 500) {
+    animation?.cancel()
+    visibility = View.VISIBLE
+    startAnimation(AlphaAnimation(0f, 1f).apply {
+        setDuration(duration)
+    })
+}
+
 fun View.fadeOut(
         duration: Long = 800,
         endStatus: Int = View.GONE,

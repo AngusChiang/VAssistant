@@ -37,7 +37,7 @@ object Tutorials {
     const val t_mark_man = "t_mark_man"
     //设置页
     const val t_settings_set_assist = "t_settings_set_assist"
-    val sp: SpHelper  by lazy { SpHelper(GlobalApp.APP, "tutorials") }
+    private val _sp: SpHelper  get() = SpHelper(GlobalApp.APP, "tutorials")
     //指令详情页
     const val t_inst_detail_desc = "t_inst_detail_desc"
     const val t_inst_detail_exp = "t_inst_detail_exp"
@@ -46,6 +46,7 @@ object Tutorials {
     const val screen_translate_tips = "screen_translate_tips"
     const val screen_assistant_qrcode = "screen_assistant_qrcode"
     const val screen_assistant_spot = "screen_assistant_spot"
+    const val screen_assistant_ocr = "screen_assistant_ocr"
 
     val context: Context
         get() = GlobalApp.APP
@@ -68,6 +69,7 @@ object Tutorials {
 
     private fun buildAfterShow(list: Array<ItemWrap>): Array<TapTarget?> {
         val l = mutableListOf<TapTarget>()
+        val sp = _sp
         list.withIndex().forEach { kv ->
             val it = kv.value
             if (!debug && sp.getBoolean(it.key)) return@forEach
@@ -83,6 +85,7 @@ object Tutorials {
 
     fun showForText(context: Activity, key: String, view: TextView, description: String? = null,
                     @DrawableRes iconId: Int? = null, onClick: (() -> Unit)? = null) {
+        val sp = _sp
         if (!debug && sp.getBoolean(key)) return
         else sp.set(key, true)
         TapTargetView.showFor(context, // `this` is an Activity
@@ -99,6 +102,7 @@ object Tutorials {
 
     fun showForView(context: Activity, key: String, view: View, title: String, description: String? = null,
                     @DrawableRes iconId: Int? = null, onClick: (() -> Unit)? = null) {
+        val sp = _sp
         if (!debug && sp.getBoolean(key)) return
         else sp.set(key, true)
         TapTargetView.showFor(context, // `this` is an Activity
@@ -160,6 +164,7 @@ object Tutorials {
      * 重置引导
      */
     fun resetTutorials() {
+        val sp = _sp
         arrayOf(T_LOGIN, h_t_1, h_t_2, h_t_3, h_t_4,
                 t_inst_man, t_mark_man, t_settings_set_assist
                 , t_inst_detail_desc
@@ -169,6 +174,7 @@ object Tutorials {
                 , screen_translate_tips
                 , screen_assistant_qrcode
                 , screen_assistant_spot
+                , screen_assistant_ocr
         ).forEach {
             sp.removeKey(it)
         }
