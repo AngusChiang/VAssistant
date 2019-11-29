@@ -24,6 +24,8 @@ import cn.vove7.jarvis.view.dialog.contentbuilder.MarkdownContentBuilder
 import cn.vove7.vtp.asset.AssetHelper
 import cn.vove7.vtp.log.Vog
 import kotlinx.android.synthetic.main.activity_text_ocr.*
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import java.util.*
 import java.util.concurrent.CountDownLatch
 import kotlin.math.abs
@@ -85,14 +87,14 @@ class TextOcrActivity : Activity() {
     }
 
     private fun ocrWithScreenShot() {
-        runOnNewHandlerThread {
+        GlobalScope.launch {
             //异步
             try {
                 val path = SystemBridge.screen2File()?.absolutePath
                 if (path == null) {
                     GlobalApp.toastError("截图失败")
                     finish()
-                    return@runOnNewHandlerThread
+                    return@launch
                 }
                 runOnUi {
                     setContentView(R.layout.activity_text_ocr)

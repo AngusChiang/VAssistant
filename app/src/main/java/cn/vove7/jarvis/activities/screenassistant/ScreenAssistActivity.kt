@@ -29,6 +29,7 @@ import cn.vove7.jarvis.view.dialog.ImageClassifyResultDialog
 import cn.vove7.vtp.log.Vog
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import kotlinx.android.synthetic.main.dialog_assist.*
+import kotlinx.coroutines.*
 import java.io.File
 import java.util.*
 
@@ -196,10 +197,11 @@ class ScreenAssistActivity : BaseActivity() {
                 showProgressBar = false
                 afterHandleScreen()
             } else {
-                val delay = getBooleanExtra("delay", false)
-                runOnNewHandlerThread(delay = if (delay) 1000 else 0) {
+                val isDelay = getBooleanExtra("delay", false)
+                GlobalScope.launch {
+                    delay(if (isDelay) 1000 else 0)
                     val path = SystemBridge.screenShot()?.let {
-                        runOnUi {
+                        withContext(Dispatchers.Main) {
                             setStatusBarLight(it.statusBarIsLight)
                             //截完图显示面板
                             showView()
@@ -210,7 +212,7 @@ class ScreenAssistActivity : BaseActivity() {
                     if (path == null) {
                         GlobalApp.toastError("截图失败")
                         finish()
-                        return@runOnNewHandlerThread
+                        return@launch
                     } else screenPath = path
                     showProgressBar = false
                     afterHandleScreen()

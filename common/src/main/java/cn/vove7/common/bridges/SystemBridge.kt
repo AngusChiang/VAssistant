@@ -62,6 +62,7 @@ import cn.vove7.vtp.log.Vog
 import cn.vove7.vtp.system.DeviceInfo
 import cn.vove7.vtp.system.SystemHelper
 import java.io.File
+import java.lang.Thread.sleep
 import java.util.*
 import kotlin.concurrent.thread
 
@@ -157,7 +158,7 @@ object SystemBridge : SystemOperation {
     }
 
     override fun getPkgByWord(appWord: String): String? =
-            getPkgByName(appWord)
+        getPkgByName(appWord)
 
 
     // Open App 启动对应首页Activity
@@ -838,15 +839,23 @@ object SystemBridge : SystemOperation {
     override fun screenShot(): Bitmap? {
         Vog.d("screenShot ---> 请求截屏")
         if (screenData == null) {
+            //出现授权窗口，延迟截图
+            val beginCap = SystemClock.uptimeMillis()
+
             val resultBox = ResultBox<Intent?>()
             val capIntent = ScreenshotActivity.getScreenshotIntent(context, resultBox)
             context.startActivity(capIntent)
+
             screenData = resultBox.blockedGet(false) ?: return null
+            if (SystemClock.uptimeMillis() - beginCap > 1000) {
+                sleep(500)
+            }
         }
         Vog.d("screenShot ---> $screenData")
-        if (cap == null)
+        if (cap == null) {
             cap = ScreenCapturer(context, screenData, -1, DeviceInfo.getInfo(context).screenInfo.density
                     , null)
+        }
 
         return try {
             cap?.capture()?.let {
@@ -857,13 +866,9 @@ object SystemBridge : SystemOperation {
             }
             //
         } catch (e: Exception) {
-            e.printStackTrace()
+            e.log()
             null
         }
-//        val resultBox = ResultBox<Bitmap?>()
-//        val capIntent = ScreenshotActivity.getScreenshotIntent(context, resultBox)
-//        context.startActivity(capIntent)
-//        return resultBox.blockedGet()
     }
 
     private fun processImg(image: Image): Bitmap? {
@@ -1049,7 +1054,7 @@ object SystemBridge : SystemOperation {
         get() {
             val filter = IntentFilter(Intent.ACTION_BATTERY_CHANGED)
             val intent = context.registerReceiver(null, filter)
-                    ?: return -1
+                ?: return -1
 
             val level = intent.getIntExtra(BatteryManager.EXTRA_LEVEL, 100) //电量的刻度
             val maxLevel = intent.getIntExtra(BatteryManager.EXTRA_SCALE, 100) //最大
