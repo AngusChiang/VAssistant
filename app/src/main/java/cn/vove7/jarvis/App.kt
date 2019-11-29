@@ -5,6 +5,7 @@ import android.content.ContentValues
 import android.content.Intent
 import android.database.Cursor
 import android.net.Uri
+import android.os.Build
 import cn.jiguang.analytics.android.api.JAnalyticsInterface
 import cn.jpush.android.api.JPushInterface
 import cn.vove7.common.activities.RunnableActivity.Companion.runInShellActivity
@@ -104,7 +105,13 @@ class InitCp : ContentProvider() {
             AdvanAppHelper.getPkgList()
             startBroadcastReceivers()
             launchExtension()
-            context?.startService(Intent(context, ForegroundService::class.java))
+
+            val foreService = Intent(context, ForegroundService::class.java)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                context?.startForegroundService(foreService)
+            } else {
+                context?.startService(foreService)
+            }
         }
         return true
     }
