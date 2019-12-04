@@ -10,7 +10,6 @@ import android.view.View
 import android.widget.CheckedTextView
 import android.widget.RelativeLayout
 import cn.vove7.bottomdialog.BottomDialog
-import cn.vove7.bottomdialog.builder.title
 import cn.vove7.common.app.AppConfig
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.bridges.SystemBridge
@@ -20,7 +19,6 @@ import cn.vove7.jarvis.tools.Tutorials
 import cn.vove7.jarvis.tools.baiduaip.BaiduAipHelper
 import cn.vove7.jarvis.tools.baiduaip.model.TextOcrItem
 import cn.vove7.jarvis.view.dialog.TextOperationDialog
-import cn.vove7.jarvis.view.dialog.contentbuilder.MarkdownContentBuilder
 import cn.vove7.vtp.asset.AssetHelper
 import cn.vove7.vtp.log.Vog
 import kotlinx.android.synthetic.main.activity_text_ocr.*
@@ -53,6 +51,7 @@ class TextOcrActivity : Activity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        window.setWindowAnimations(R.style.fade)
         window.decorView.systemUiVisibility = window.decorView.systemUiVisibility or View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR
 
         intent?.let {
@@ -68,7 +67,6 @@ class TextOcrActivity : Activity() {
     }
 
     override fun onBackPressed() {
-        overridePendingTransition(0, 0)
         super.onBackPressed()
     }
 

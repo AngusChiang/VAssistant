@@ -4,11 +4,11 @@ import android.os.Handler
 import android.os.Looper
 import android.view.View
 import android.widget.TextView
-import cn.vove7.bottomdialog.util.fadeIn
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.appbus.AppBus
 import cn.vove7.common.bridges.SystemBridge
 import cn.vove7.common.model.RequestPermission
+import cn.vove7.common.utils.fadeIn
 import cn.vove7.common.utils.fadeOut
 import cn.vove7.common.utils.runOnUi
 import cn.vove7.common.utils.startActivity
