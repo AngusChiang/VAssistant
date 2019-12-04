@@ -1,22 +1,17 @@
 package cn.vove7.jarvis.tools
 
-import android.content.Context
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
-import android.os.AsyncTask
-import android.util.AttributeSet
-import android.view.LayoutInflater
-import cn.bingoogolapple.qrcode.core.BGAQRCodeUtil
-import cn.bingoogolapple.qrcode.zxing.QRCodeEncoder
-import cn.bingoogolapple.qrcode.zxing.ZXingView
-import cn.vove7.common.app.GlobalApp
-import cn.vove7.common.app.log
+import android.graphics.*
+import android.graphics.Color.BLACK
+import android.graphics.Color.WHITE
 import cn.vove7.common.bridges.UtilBridge
 import cn.vove7.common.utils.StorageHelper
-import cn.vove7.common.utils.ThreadPool
-import cn.vove7.jarvis.R
-import java.lang.Thread.sleep
-import java.lang.ref.WeakReference
+import cn.vove7.vtp.log.Vog
+import com.google.zxing.*
+import com.google.zxing.common.HybridBinarizer
+import com.google.zxing.qrcode.QRCodeWriter
+import kotlinx.coroutines.*
+import java.util.*
+import kotlin.math.pow
 
 
 /**
@@ -27,111 +22,115 @@ import java.lang.ref.WeakReference
  */
 object QRTools {
 
-    fun parseBitmap(bitmap: Bitmap, onResult: (String?) -> Unit) {
-        val av = LayoutInflater.from(GlobalApp.APP).inflate(R.layout.zbar, null)
-        val a = av.findViewById<MyBarView>(R.id.zbar)
+    fun parseBitmap(srcBitmap: Bitmap, onResult: (String?) -> Unit): Job = GlobalScope.launch {
+        var result: String? = null
+        val gray by lazy { srcBitmap.toGray() }
+        try {
 
-        ScanTask(bitmap, a, onResult).perform()
-    }
-
-    fun parseFile(path: String, onResult: (String?) -> Unit) {
-        val av = LayoutInflater.from(GlobalApp.APP).inflate(R.layout.zbar, null)
-        val a = av.findViewById<MyBarView>(R.id.zbar)
-        ScanTask(BitmapFactory.decodeFile(path), a, onResult).perform()
-    }
-
-    fun encode(content: String, onFinish: (String?, e: Throwable?) -> Unit) {
-        ThreadPool.runOnPool {
-            val bitmap = try {
-                QRCodeEncoder.syncEncodeQRCode(content, 400)
-            } catch (e: Exception) {
-                e.log()
-                onFinish.invoke(null, e)
-                null
+            result = decode(srcBitmap) ?: decode(gray)
+            if (result != null) {
+                return@launch
             }
+            val minSize = 170
+            var imgSize: Int = Math.min(gray.width, gray.getHeight())
+            var level = 1
+            while (imgSize > minSize) {
+                val newImage: Bitmap = gray.scale(0.9.pow(level).toFloat())
+                result = decode(newImage)
+                if (result != null && result.isNotEmpty()) {
+                    newImage.recycle()
+                    return@launch
+                }
+                imgSize = newImage.width.coerceAtMost(newImage.height)
+                newImage.recycle()
+                level++
+            }
+        } finally {
+            gray.recycle()
+            withContext(Dispatchers.Main) {
+                onResult(result)
+            }
+
+        }
+    }
+
+    private fun decode(bm: Bitmap): String? {
+        val width: Int = bm.width
+        val height: Int = bm.height
+        val pixels = IntArray(width * height)
+        bm.getPixels(pixels, 0, width, 0, 0, width, height)
+        // 新建一个RGBLuminanceSource对象
+        val source = RGBLuminanceSource(width, height, pixels)
+        // 将图片转换成二进制图片 坑
+        val binaryBitmap = BinaryBitmap(HybridBinarizer(source))
+        val reader = MultiFormatReader() // 初始化解析对象
+
+        val hints: MutableMap<DecodeHintType, Any> = HashMap()
+        hints[DecodeHintType.CHARACTER_SET] = "UTF-8"
+        return try {
+            reader.decode(binaryBitmap, hints)?.text
+        } catch (e: Throwable) {
+            Vog.e(e)
+            null
+        }
+    }
+
+    fun parseFile(path: String, onResult: (String?) -> Unit): Job {
+        val img = BitmapFactory.decodeFile(path)
+        return parseBitmap(img) {
+            img.recycle()
+            onResult(it)
+        }
+    }
+
+    /**
+     * 将图片转成灰阶。
+     *
+     * @return
+     */
+    private fun Bitmap.toGray(): Bitmap {
+        val bmpOriginal = this
+        val bmpGray = Bitmap.createBitmap(width, height, Bitmap.Config.RGB_565)
+        val c = Canvas(bmpGray)
+        val paint = Paint()
+        val cm = ColorMatrix()
+        cm.setSaturation(0f)
+        val f = ColorMatrixColorFilter(cm)
+        paint.colorFilter = f
+        c.drawBitmap(bmpOriginal, 0f, 0f, paint)
+        return bmpGray
+    }
+
+    private fun Bitmap.scale(scale: Float): Bitmap {
+        val matrix = Matrix()
+        matrix.postScale(scale, scale) // 使用后乘
+        return Bitmap.createBitmap(this, 0, 0, width, height, matrix, false)
+    }
+
+    fun encode(content: String, onFinish: (String?, e: Throwable?) -> Unit) = GlobalScope.launch {
+        try {
+            val hw = 400
+            val matrix = QRCodeWriter().encode(content, BarcodeFormat.QR_CODE, hw, hw)
+            val pixels = IntArray(hw * hw)
+            for (y in 0 until hw) {
+                for (x in 0 until hw) {
+                    if (matrix[x, y]) {
+                        pixels[y * hw + x] = BLACK
+                    } else {
+                        pixels[y * hw + x] = WHITE
+                    }
+                }
+            }
+            val bitmap = Bitmap.createBitmap(hw, hw, Bitmap.Config.RGB_565)
+            bitmap.setPixels(pixels, 0, hw, 0, 0, hw, hw)
+
             if (bitmap != null) {
                 val tmpFile = StorageHelper.cacheDir + "/qrtmp.png"
                 UtilBridge.bitmap2File(bitmap, tmpFile)
                 onFinish.invoke(tmpFile, null)
             } else onFinish.invoke(null, null)
+        } catch (e: Throwable) {
+            onFinish(null, e)
         }
-    }
-}
-
-/**
- * 改写Zbar
- * @property mPicturePath String?
- * @property mBitmap Bitmap?
- * @property mQRCodeViewRef WeakReference<MyBarView>?
- * @property onResult Function1<String?, Unit>
- */
-class ScanTask : AsyncTask<Void, Void, String?> {
-    private var mPicturePath: String? = null
-    private var mBitmap: Bitmap? = null
-    private var mQRCodeViewRef: WeakReference<MyBarView>? = null
-    private var onResult: (String?) -> Unit
-
-    constructor(picturePath: String, qrCodeView: MyBarView, onResult: (String?) -> Unit) {
-        mPicturePath = picturePath
-        mQRCodeViewRef = WeakReference(qrCodeView)
-        this.onResult = onResult
-    }
-
-    constructor(bitmap: Bitmap, qrCodeView: MyBarView, onResult: (String?) -> Unit) {
-        mBitmap = bitmap
-        mQRCodeViewRef = WeakReference(qrCodeView)
-        this.onResult = onResult
-    }
-
-    fun perform(): ScanTask {
-        executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
-        return this
-    }
-
-    fun cancelTask() {
-        if (status != AsyncTask.Status.FINISHED) {
-            cancel(true)
-        }
-    }
-
-    override fun onCancelled() {
-        super.onCancelled()
-        mQRCodeViewRef!!.clear()
-        mBitmap = null
-    }
-
-    override fun doInBackground(vararg params: Void): String? {
-        val qrCodeView = mQRCodeViewRef!!.get() ?: return null
-        sleep(300)
-        if (mPicturePath != null) {
-            return qrCodeView.process(BGAQRCodeUtil.getDecodeAbleBitmap(mPicturePath))
-        } else if (mBitmap != null) {
-            val result = qrCodeView.process(mBitmap!!)
-            mBitmap = null
-            return result
-        }
-        return null
-    }
-
-    override fun onPostExecute(result: String?) {
-        onResult.invoke(result)
-    }
-}
-
-class MyBarView(context: Context?, attributeSet: AttributeSet?)
-    : ZXingView(context, attributeSet) {
-
-    fun process(bitmap: Bitmap): String? {
-        val r = processBitmapData(bitmap)
-        return try {
-            r?.javaClass?.getDeclaredField("result")?.let {
-                it.isAccessible = true
-                it.get(r) as String?
-            }
-        } catch (e: Exception) {
-            e.printStackTrace()
-            null
-        }
-
     }
 }

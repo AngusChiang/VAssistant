@@ -93,6 +93,14 @@ class ScreenAssistActivity : BaseActivity() {
         }
     }
 
+    private var oneJob: Job? = null
+        set(value) {
+            field?.cancel()
+            field = value
+            value?.invokeOnCompletion {
+                oneJob = null
+            }
+        }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -141,6 +149,11 @@ class ScreenAssistActivity : BaseActivity() {
     override fun onStop() {
         super.onStop()
         finish()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        oneJob?.cancel()
     }
 
     private fun showView() {
@@ -330,10 +343,10 @@ class ScreenAssistActivity : BaseActivity() {
     private fun scanQrCode() {
         isReady ?: return
         showProgressBar = true
-        QRTools.parseFile(screenPath) {
+        oneJob = QRTools.parseFile(screenPath) {
             runOnUi {
                 showProgressBar = false
-                onScanQRCodeSuccess(it)
+                onScanQRCodeResult(it)
             }
         }
     }
@@ -371,8 +384,8 @@ class ScreenAssistActivity : BaseActivity() {
         }
     }
 
-    private fun onScanQRCodeSuccess(result: String?) {
-        Vog.d("onScanQRCodeSuccess ---> $result")
+    private fun onScanQRCodeResult(result: String?) {
+        Vog.d("onScanQRCodeResult ---> $result")
         if (result == null) {
             finishIfNotShowing()
             GlobalApp.toastError("无识别结果")
@@ -448,13 +461,13 @@ class ScreenAssistActivity : BaseActivity() {
     private fun screenOcr() {
         isReady ?: return
         showProgressBar = true
-        runOnNewHandlerThread {
+        oneJob = GlobalScope.launch {
             try {
                 val results = BaiduAipHelper.ocr(UtilBridge.compressImage(screenPath))
-                if (isFinishing) return@runOnNewHandlerThread
-                TextOcrActivity.start(this, results, intent.extras)
-                startActivity(intent)
-                finish()
+                if (oneJob?.isCancelled == false) {
+                    TextOcrActivity.start(this@ScreenAssistActivity, results, intent.extras)
+                    finish()
+                }
             } catch (e: Exception) {
                 e.printStackTrace()
                 GlobalApp.toastError(e.message ?: "")

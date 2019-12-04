@@ -53,7 +53,8 @@ class OSLActivity : OneFragmentActivity() {
                     , OslItem("CodeView", "https://github.com/Thereisnospon/CodeView")
                     , OslItem("Jsoup", "https://jsoup.org/", "jsoup is a Java library for working with real-world HTML. It provides a very convenient API for extracting and manipulating data, using the best of DOM, CSS, and jquery-like methods.")
                     , OslItem("TapTargetView", "https://github.com/KeepSafe/TapTargetView", "")
-                    , OslItem("BGAQRCode-Android", "https://github.com/bingoogolapple/BGAQRCode-Android", "")
+
+                    , OslItem("Zxing", "https://github.com/jenly1314/ZXingLite", "ZXing的精简版.")
                     , OslItem("Glide", "https://bumptech.github.io/glide/", "Glide is a fast and efficient image loading library for Android focused on smooth scrolling. Glide offers an easy to use API, a performant and extensible resource decoding pipeline and automatic resource pooling.")
                     , OslItem("RePlugin", "https://github.com/Qihoo360/RePlugin", "RePlugin is a complete Android plug-in solution which is suitable for general use.")
                     , OslItem("apk-parser", "https://github.com/hsiafan/apk-parser", "Apk parser lib, for decoding binary xml file, getting apk meta info.")
