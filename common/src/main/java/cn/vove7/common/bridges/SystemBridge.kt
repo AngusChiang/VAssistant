@@ -838,7 +838,8 @@ object SystemBridge : SystemOperation {
 
     override fun screenShot(): Bitmap? {
         Vog.d("screenShot ---> 请求截屏")
-        if (screenData == null) {
+        var data = screenData
+        data = if (data == null) {
             //出现授权窗口，延迟截图
             val beginCap = SystemClock.uptimeMillis()
 
@@ -846,15 +847,17 @@ object SystemBridge : SystemOperation {
             val capIntent = ScreenshotActivity.getScreenshotIntent(context, resultBox)
             context.startActivity(capIntent)
 
-            screenData = resultBox.blockedGet(false) ?: return null
+            val sd = resultBox.blockedGet(false) ?: return null
             if (SystemClock.uptimeMillis() - beginCap > 1000) {
                 sleep(500)
             }
+            sd
+        } else {
+            data
         }
         Vog.d("screenShot ---> $screenData")
         if (cap == null) {
-            cap = ScreenCapturer(context, screenData, -1, DeviceInfo.getInfo(context).screenInfo.density
-                    , null)
+            cap = ScreenCapturer(context, data)
         }
 
         return try {
