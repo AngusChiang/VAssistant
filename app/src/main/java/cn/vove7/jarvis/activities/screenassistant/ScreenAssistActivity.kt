@@ -111,8 +111,8 @@ class ScreenAssistActivity : BaseActivity() {
 
         window.setWindowAnimations(R.style.ScreenAssist)
 
-        if ("sbarLight" in intent) {
-            setStatusBarLight(intent["sbarLight", false])
+        if ("light" in intent) {
+            setStatusBarLight(intent["light", false])
         }
 
         showProgressBar = true
