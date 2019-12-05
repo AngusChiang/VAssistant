@@ -1,5 +1,6 @@
 package cn.vove7.jarvis.services
 
+import android.app.Notification
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.app.Service
@@ -25,8 +26,10 @@ class ForegroundService : Service() {
 
     private val channel
         get() = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            ChannelBuilder.with("foreground_service", "前台服务", NotificationManagerCompat.IMPORTANCE_MIN)
+            ChannelBuilder.with("foreground_service_2", "前台服务", NotificationManagerCompat.IMPORTANCE_MIN)
                     .build().apply {
+
+                        setShowBadge(false)
                         enableVibration(false)
                         enableLights(false)
                     }
