@@ -64,7 +64,6 @@
     </style>
 
     <style name="ScreenAssist" parent="ScreenPicker">
-        <item name="android:navigationBarColor">#fff</item>
         <item name="android:windowEnterAnimation">@anim/fade_in_bottom</item>
         <item name="android:windowExitAnimation">@anim/fade_out_bottom</item>
     </style>

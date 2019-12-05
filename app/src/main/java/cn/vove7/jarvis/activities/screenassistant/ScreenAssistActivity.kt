@@ -88,9 +88,11 @@ class ScreenAssistActivity : BaseActivity() {
         }
 
     private fun setStatusBarLight(l: Boolean) {
+        var flags = View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY or View.SYSTEM_UI_FLAG_HIDE_NAVIGATION or window.decorView.systemUiVisibility
         if (l && Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            window.decorView.systemUiVisibility = window.decorView.systemUiVisibility or View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
+            flags = flags or window.decorView.systemUiVisibility or View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
         }
+        window.decorView.systemUiVisibility = flags
     }
 
     private var oneJob: Job? = null
@@ -107,7 +109,6 @@ class ScreenAssistActivity : BaseActivity() {
         setContentView(R.layout.dialog_assist)
         DataCollector.buriedPoint("sa_0")
 
-        bottom_sheet.setBackgroundResource(R.drawable.toolbar_round_bg)
         window.setWindowAnimations(R.style.ScreenAssist)
 
         if ("sbarLight" in intent) {
@@ -160,7 +161,7 @@ class ScreenAssistActivity : BaseActivity() {
         runOnUi {
             if (!bottomController.isBottomSheetShowing) {
                 bottomController.bottomView.visibility = View.VISIBLE
-                bottomController.showBottom()
+                bottomController.expandSheet()
 
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                     window.decorView.systemUiVisibility = window.decorView.systemUiVisibility or View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR
