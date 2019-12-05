@@ -29,7 +29,10 @@ import cn.vove7.jarvis.view.dialog.ImageClassifyResultDialog
 import cn.vove7.vtp.log.Vog
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import kotlinx.android.synthetic.main.dialog_assist.*
-import kotlinx.coroutines.*
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import java.io.File
 import java.util.*
 
@@ -87,12 +90,15 @@ class ScreenAssistActivity : BaseActivity() {
             }
         }
 
-    private fun setStatusBarLight(l: Boolean) {
-        var flags = View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY or View.SYSTEM_UI_FLAG_HIDE_NAVIGATION or window.decorView.systemUiVisibility
-        if (l && Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            flags = flags or window.decorView.systemUiVisibility or View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
+    private fun hideNavBar() = runOnUi {
+        window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY or View.SYSTEM_UI_FLAG_HIDE_NAVIGATION or window.decorView.systemUiVisibility
+    }
+
+    private fun setStatusBarLight() = runOnUi {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            window.decorView.systemUiVisibility = window.decorView.systemUiVisibility or
+                    View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
         }
-        window.decorView.systemUiVisibility = flags
     }
 
     private var oneJob: Job? = null
@@ -106,14 +112,16 @@ class ScreenAssistActivity : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        window.setWindowAnimations(R.style.ScreenAssist)
+        //from 屏幕助手
+        if ("light" in intent) {
+            hideNavBar()
+            if (intent["light", false]) {
+                setStatusBarLight()
+            }
+        }
         setContentView(R.layout.dialog_assist)
         DataCollector.buriedPoint("sa_0")
-
-        window.setWindowAnimations(R.style.ScreenAssist)
-
-        if ("light" in intent) {
-            setStatusBarLight(intent["light", false])
-        }
 
         showProgressBar = true
         bottomController = AssistSessionGridController(this, bottom_sheet, itemClick, ::onLongClick) {
@@ -157,31 +165,25 @@ class ScreenAssistActivity : BaseActivity() {
         oneJob?.cancel()
     }
 
-    private fun showView() {
-        runOnUi {
-            if (!bottomController.isBottomSheetShowing) {
-                bottomController.bottomView.visibility = View.VISIBLE
-                bottomController.expandSheet()
+    private fun showView() = runOnUi {
+        if (!bottomController.isBottomSheetShowing) {
+            bottomController.bottomView.visibility = View.VISIBLE
+            bottomController.expandSheet()
 
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                    window.decorView.systemUiVisibility = window.decorView.systemUiVisibility or View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR
-                }
+            val animation = AlphaAnimation(0f, 1f)
+            animation.duration = 300
+            bottomController.bottomView.startAnimation(animation)
+            bottomController.bottomView.post {
+                val list = arrayListOf<View>()
+                val list2 = arrayListOf<View>()
+                bottomController.bottomView.findViewsWithText(list, "二维码/条码识别", FIND_VIEWS_WITH_CONTENT_DESCRIPTION)
+                bottomController.bottomView.findViewsWithText(list2, "屏幕识别", FIND_VIEWS_WITH_CONTENT_DESCRIPTION)
 
-                val animation = AlphaAnimation(0f, 1f)
-                animation.duration = 300
-                bottomController.bottomView.startAnimation(animation)
-                bottomController.bottomView.post {
-                    val list = arrayListOf<View>()
-                    val list2 = arrayListOf<View>()
-                    bottomController.bottomView.findViewsWithText(list, "二维码/条码识别", FIND_VIEWS_WITH_CONTENT_DESCRIPTION)
-                    bottomController.bottomView.findViewsWithText(list2, "屏幕识别", FIND_VIEWS_WITH_CONTENT_DESCRIPTION)
+                Tutorials.oneStep(this, arrayOf(
+                        ItemWrap(Tutorials.screen_assistant_spot, list2[0], "长按更多功能", "淘宝商品识别"),
+                        ItemWrap(Tutorials.screen_assistant_qrcode, list[0], "长按查看更多功能", "使用微信扫一扫\n支付宝扫一扫")
+                ))
 
-                    Tutorials.oneStep(this, arrayOf(
-                            ItemWrap(Tutorials.screen_assistant_spot, list2[0], "长按更多功能", "淘宝商品识别"),
-                            ItemWrap(Tutorials.screen_assistant_qrcode, list[0], "长按查看更多功能", "使用微信扫一扫\n支付宝扫一扫")
-                    ))
-
-                }
             }
         }
     }
@@ -215,12 +217,15 @@ class ScreenAssistActivity : BaseActivity() {
                 GlobalScope.launch {
                     delay(if (isDelay) 1000 else 0)
                     val path = SystemBridge.screenShot()?.let {
-                        withContext(Dispatchers.Main) {
-                            setStatusBarLight(it.statusBarIsLight)
-                            //截完图显示面板
-                            showView()
+                        //截完图显示面板
+                        if (it.statusBarIsLight) {
+                            setStatusBarLight()
                         }
-                        UtilBridge.bitmap2File(it, cachePath)?.absolutePath
+                        hideNavBar()
+                        showView()
+                        val p = UtilBridge.bitmap2File(it, cachePath)?.absolutePath
+                        it.recycle()
+                        p
                     }
                     SystemBridge.release()
                     if (path == null) {
