@@ -73,7 +73,7 @@ object WrapperNetHelper {
         val reqJson = GsonHelper.toJson(reqModel)
         val sign = SecureHelper.signData(reqJson, ts)
         val headers = mapOf(
-                "versionCode" to "${BuildConfig.VERSION_CODE}",
+                "versionCode" to "${AppConfig.versionCode}",
                 "timestamp" to ts.toString(),
                 "token" to (UserInfo.getUserToken() ?: ""),
                 "sign" to sign
