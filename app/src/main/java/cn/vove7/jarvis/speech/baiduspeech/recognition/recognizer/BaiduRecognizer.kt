@@ -56,20 +56,12 @@ class BaiduRecognizer(
      * 加载离线词
      */
     fun loadOfflineEngine() {
-        val grammarFile = context.filesDir.absolutePath + "/baidu_speech_grammar.bsg"
-        copyGrammar(grammarFile)
+        val grammarFile = "assets://bd/baidu_speech_grammar.bsg"
         val json = JSONObject(OfflineRecogParams.fetchOfflineParams(grammarFile)).toString()
         Vog.v("loadOfflineEngine params:$json")
         asr.send(SpeechConstant.ASR_KWS_LOAD_ENGINE, json, null, 0, 0)
         isOfflineEngineLoaded = true
         // 没有ASR_KWS_LOAD_ENGINE这个回调表试失败，如缺少第一次联网时下载的正式授权文件。
-    }
-
-    private fun copyGrammar(grammarFile: String) {
-        val f = File(grammarFile)
-        if (!f.exists()) {
-            context.assets.open("bd/baidu_speech_grammar.bsg").copyTo(FileOutputStream(f))
-        }
     }
 
     fun start(params: Map<String, Any>) {

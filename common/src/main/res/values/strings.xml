@@ -190,5 +190,8 @@
     <string name="key_default_fp_text_color" translatable="false">default_fp_text_color</string>
 
 
+    <string name="key_recog_compatible_mode" translatable="false">recog_compatible_mode</string>
+
+
 
 </resources>

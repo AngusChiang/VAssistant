@@ -14,7 +14,6 @@ import cn.vove7.jarvis.speech.baiduspeech.wakeup.BaiduVoiceWakeup
 import cn.vove7.jarvis.speech.baiduspeech.wakeup.RecogWakeupListener
 import cn.vove7.jarvis.speech.baiduspeech.wakeup.WakeupEventAdapter
 import cn.vove7.vtp.log.Vog
-import com.baidu.speech.asr.SpeechConstant
 import com.baidu.speech.asr.SpeechConstant.*
 import com.google.gson.Gson
 import com.google.gson.annotations.SerializedName
@@ -52,16 +51,19 @@ class BaiduSpeechRecogService(event: RecogEvent) : SpeechRecogService(event) {
 
     private fun recogParams(silent: Boolean) = mutableMapOf(
             ACCEPT_AUDIO_DATA to false,
-            VAD_MODEL to VAD_TOUCH,
+            VAD to VAD_TOUCH,
             DISABLE_PUNCTUATION to false,//标点符号
             ACCEPT_AUDIO_VOLUME to true,
             PID to 1536,
             NLU to "enable"
     ).also {
-        if(enableOffline) {
+        if (enableOffline) {
             it[DECODER] = 2
+            it[ASR_OFFLINE_ENGINE_GRAMMER_FILE_PATH] = "assets://bd/baidu_speech_grammar.bsg"
         }
-        it[IN_FILE] = "#cn.vove7.jarvis.speech.baiduspeech.MicInputStream.instance()"
+        if (!AppConfig.recogCompatibleMode) {
+            it[IN_FILE] = "#cn.vove7.jarvis.speech.baiduspeech.MicInputStream.instance()"
+        }
         //从指定时间开始识别，可以 - 指定ms 识别之前的内容
         val voiceRecogFeedback = AppConfig.voiceRecogFeedback
         if (!AppConfig.openResponseWord && !voiceRecogFeedback)//唤醒即识别 音效和响应词关闭时开启
