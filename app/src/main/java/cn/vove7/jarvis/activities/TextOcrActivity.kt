@@ -72,16 +72,6 @@ class TextOcrActivity : Activity() {
 
     }
 
-    override fun onBackPressed() {
-        super.onBackPressed()
-    }
-
-    private val onItemClick: (Model) -> Unit = { model ->
-        if (model.textView?.isChecked == true && wordItems.none { it.textView?.isChecked == true && it != model }) {
-            editDialog(model.item.text, model.item.subText)
-        }
-    }
-
     @Synchronized
     private fun copy(list: List<TextOcrItem>) {
         wordItems.clear()
@@ -124,6 +114,11 @@ class TextOcrActivity : Activity() {
     }
 
 
+    private val onItemClick: (Model) -> Unit = { model ->
+        if (model.textView?.isChecked == true && wordItems.none { it.textView?.isChecked == true && it != model }) {
+            editDialog(model.item.text, model.item.subText)
+        }
+    }
     private fun buildContent() {
         loading_layout.gone()
 //        rootContent.layoutParams = RelativeLayout.LayoutParams(
@@ -166,11 +161,15 @@ class TextOcrActivity : Activity() {
         floatEditIcon.setOnClickListener {
             editCheckedText()
         }
-        rootContent.setData(wordItems, onItemClick)
         rootContent.onStartMove = {
             floatEditIcon.gone()
         }
-        rootContent.onTouchUp = {
+        rootContent.onTouchUp = {hasResult->
+            if (hasResult) {//一个时 弹出编辑
+                wordItems.find { it.textView!!.isChecked }?.also {
+                    onItemClick(it)
+                }
+            }
             if (floatEditIcon.isOrWillBeHidden) {
                 floatEditIcon.fadeIn(200)
             }
@@ -197,7 +196,7 @@ class TextOcrActivity : Activity() {
         return super.onKeyUp(keyCode, event)
     }
 
-    var hasT = false
+    private var hasT = false
     private fun translateAll() {
         AppConfig.haveTranslatePermission() ?: return
 
@@ -281,30 +280,6 @@ class TextOcrActivity : Activity() {
     class Model(
             val item: TextOcrItem,
             var textView: CheckedTextView? = null
-    ) {
-
-        operator fun contains(p: Point): Boolean {
-            return abs(point2LineDis(p, 0, 3) + point2LineDis(p, 1, 2) - item.width) < 5 &&
-                    abs(point2LineDis(p, 0, 1) + point2LineDis(p, 2, 3) - item.height) < 5
-        }
-
-        /**
-         * 点到直线距离
-         * A = y2 - y1
-         * B = x1 -x2
-         * C = y1(x2-x1) - x1(y2-y1)
-         */
-        @Suppress("LocalVariableName")
-        private fun point2LineDis(p: Point, i1: Int, i2: Int): Int {
-            val p1 = item.points[i1]
-            val p2 = item.points[i2]
-            val A = p2.y - p1.y
-            val B = p1.x - p2.x
-            val C = p1.y * (p2.x - p1.x) - p1.x * (p2.y - p1.y)
-            return abs(
-                    (A * p.x + B * p.y + C) / sqrt((A * A + B * B).toDouble())
-            ).toInt()
-        }
-    }
+    )
 
 }
