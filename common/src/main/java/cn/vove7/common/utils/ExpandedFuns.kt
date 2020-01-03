@@ -57,7 +57,7 @@ fun runOnUi(action: () -> Unit) {
     }
 }
 
-fun runInCatch(log: Boolean = false, block: () -> Unit) {
+inline fun runInCatch(log: Boolean = false, block: () -> Unit) {
     try {
         block.invoke()
     } catch (e: Throwable) {
@@ -145,22 +145,9 @@ fun prettyMillisTime(millis: Long): String = buildString {
     append("${t}s")
 }
 
-fun prints(vararg msgs: Any?) {
-    msgs.forEach {
-        print(it)
-        print(" ")
-    }
-}
-
 fun formatNow(pat: String = "yyyy-MM-dd HH:mm:ss"): String = SimpleDateFormat(pat, Locale.getDefault()).format(Date())
 
 fun Context.startActivityOnNewTask(intent: Intent) {
-    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-    startActivity(intent)
-}
-
-fun Context.startActivityOnNewTask(actCls: Class<*>) {
-    val intent = Intent(this, actCls)
     intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
     startActivity(intent)
 }
@@ -194,11 +181,6 @@ fun AppInfo.isInputMethod(context: Context): Boolean {
         e.log()
         false
     }
-}
-
-
-fun AppInfo.isHomeApp(): Boolean {
-    return AppInfo.getHomes(GlobalApp.APP).contains(packageName)
 }
 
 val appActivityCache = hashMapOf<String, Array<String>>()
