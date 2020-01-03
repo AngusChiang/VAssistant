@@ -115,6 +115,14 @@ class HelpActivity : ReturnableActivity() {
     }
 
     private fun getData(): List<IconTitleEntity> = listOf(
+            IconTitleEntity(R.drawable.ic_help, R.string.using_help) {
+                BottomDialog.builder(this) {
+                    awesomeHeader(getString(R.string.using_help))
+                    content(MarkdownContentBuilder()) {
+                        loadMarkdownFromAsset("files/introduction.md")
+                    }
+                }
+            },
             IconTitleEntity(R.drawable.ic_book_24dp, R.string.text_user_manual) {
                 SystemBridge.openUrl(ApiUrls.USER_GUIDE)
             },

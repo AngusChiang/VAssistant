@@ -3,29 +3,24 @@ package cn.vove7.jarvis.activities
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
-import com.google.android.material.bottomnavigation.BottomNavigationView
 import android.view.View
 import android.view.Window
 import cn.vove7.common.app.AppConfig
 import cn.vove7.common.app.AppConfig.checkAppUpdate
+import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.model.UserInfo
-import cn.vove7.common.utils.StubbornFlag
 import cn.vove7.common.utils.runOnNewHandlerThread
 import cn.vove7.jarvis.BuildConfig
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.activities.base.BaseActivity
-import cn.vove7.jarvis.fragments.HomeFragment
-import cn.vove7.jarvis.fragments.MineFragment
 import cn.vove7.jarvis.receivers.UtilEventReceiver
 import cn.vove7.jarvis.tools.AppNotification
 import cn.vove7.jarvis.tools.DataUpdator
 import cn.vove7.jarvis.tools.Tutorials
 import cn.vove7.jarvis.view.dialog.UpdateLogDialog
-import cn.vove7.jarvis.view.tools.FragmentSwitcher
 import cn.vove7.vtp.log.Vog
 import cn.vove7.vtp.runtimepermission.PermissionUtils
 import com.afollestad.materialdialogs.MaterialDialog
-import kotlinx.android.synthetic.main.activity_real_main.*
 import kotlinx.android.synthetic.main.fragment_mine.*
 
 
@@ -35,19 +30,6 @@ import kotlinx.android.synthetic.main.fragment_mine.*
  *
  */
 class MainActivity : BaseActivity() {
-
-    private val fSwitcher = FragmentSwitcher(this, R.id.fragment)
-    private val homeF by lazy { HomeFragment.newInstance() }
-    //    val storeF = StoreFragment.newInstance()
-    private val mineF by lazy { MineFragment.newInstance() }
-    private val mOnNavigationItemSelectedListener = BottomNavigationView.OnNavigationItemSelectedListener { item ->
-        return@OnNavigationItemSelectedListener when (item.itemId) {
-            R.id.nav_home -> fSwitcher.switchFragment(homeF)
-//            R.id.nav_store -> fSwitcher.switchFragment(storeF)
-            R.id.nav_me -> fSwitcher.switchFragment(mineF)
-            else -> false
-        }
-    }
 
     override fun onBackPressed() {
         finishAndRemoveTask()
@@ -65,13 +47,10 @@ class MainActivity : BaseActivity() {
     private fun initView() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             window.decorView.systemUiVisibility =
-                    View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN or
-                            View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
+                View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN or
+                        View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
             window.statusBarColor = resources.getColor(R.color.app_background)
         }
-
-        navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener)
-        navigation.selectedItemId = if (AppConfig.FIRST_LAUNCH_NEW_VERSION && inFlag) R.id.nav_home else R.id.nav_me
     }
 
 
@@ -110,7 +89,6 @@ class MainActivity : BaseActivity() {
 
         var lastCheckApp = 0L
 
-        var inFlag by StubbornFlag(initValue = true, afterValue = false)
     }
 
     private fun requestPermission() {
@@ -158,6 +136,7 @@ class MainActivity : BaseActivity() {
     private val onUpdate: (Pair<String, String>?) -> Unit
         get() = a@{ hasUpdate ->
             hasUpdate ?: return@a
+            GlobalApp.toastSuccess("发现新版本 ${hasUpdate.first}", 1)
             AppNotification.broadcastNotification(
                     123, "发现新版本 ${hasUpdate.first}",
                     "查看更新日志",

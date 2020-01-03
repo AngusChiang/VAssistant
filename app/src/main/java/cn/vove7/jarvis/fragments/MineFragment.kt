@@ -18,6 +18,7 @@ import cn.vove7.common.utils.show
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.activities.*
 import cn.vove7.jarvis.activities.LaboratoryActivity
+import cn.vove7.jarvis.services.MainService
 import cn.vove7.jarvis.view.dialog.LoginDialog
 import cn.vove7.jarvis.view.dialog.UserInfoDialog
 import cn.vove7.vtp.easyadapter.BaseListAdapter
@@ -64,6 +65,8 @@ class MineFragment : androidx.fragment.app.Fragment() {
                 }
             }
         }
+        view.fab.onClick(MainService::switchRecog)
+
         listView = view.findViewById(R.id.list_view)
         listView.adapter = object : BaseListAdapter<ItemHolder, Pair<Int, Int>>(context!!, listOf(
                 Pair(R.color.google_blue, R.string.text_settings),

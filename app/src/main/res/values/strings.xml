@@ -286,4 +286,5 @@
     <string name="label_screen_assistant">Screen Assistant</string>
     <string name="alias_regex">别名（正则式）</string>
     <string name="text_mail_help">发送后请在收件箱中查看邮件，注意查看邮件是否被收进[垃圾箱]，若无法收到，可使用QQ与我联系，谢谢:)</string>
+    <string name="using_help">Using help</string>
 </resources>
