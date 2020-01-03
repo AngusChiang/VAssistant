@@ -78,8 +78,8 @@ class ScreenAssistActivity : BaseActivity() {
         }
     }
 
-    private val isReady: Boolean?
-        get() = if (showProgressBar) null else true
+    private val isReady: Boolean
+        get() = !showProgressBar
 
     private var showProgressBar: Boolean = false
         set(value) {
@@ -125,7 +125,7 @@ class ScreenAssistActivity : BaseActivity() {
 
         showProgressBar = true
         bottomController = AssistSessionGridController(this, bottom_sheet, itemClick, ::onLongClick) {
-            if (isReady == true) screenPath else null
+            if (isReady) screenPath else null
         }
         bottomController.initView()
         bottomController.hideBottom()
@@ -347,7 +347,10 @@ class ScreenAssistActivity : BaseActivity() {
     }
 
     private fun scanQrCode() {
-        isReady ?: return
+        if (!isReady) {
+            intent?.putExtra("fun_id", 4)
+            return
+        }
         showProgressBar = true
         oneJob = QRTools.parseFile(screenPath) {
             runOnUi {
@@ -358,14 +361,19 @@ class ScreenAssistActivity : BaseActivity() {
     }
 
     private fun shareScreen() {
-        isReady ?: return
+        if (!isReady) {
+            intent?.putExtra("fun_id", 3)
+            return
+        }
         SystemBridge.shareImage(screenPath)
         finish()
     }
 
     private fun save2Local() {
-        isReady ?: return
-
+        if (!isReady) {
+            intent?.putExtra("fun_id", 5)
+            return
+        }
         showProgressBar = true
         runOnNewHandlerThread {
             try {
@@ -465,7 +473,10 @@ class ScreenAssistActivity : BaseActivity() {
      * 文字识别
      */
     private fun screenOcr() {
-        isReady ?: return
+        if (!isReady) {
+            intent?.putExtra("fun_id", 1)
+            return
+        }
         showProgressBar = true
         oneJob = GlobalScope.launch {
             try {
@@ -489,7 +500,10 @@ class ScreenAssistActivity : BaseActivity() {
      * 图像识别
      */
     private fun imageClassify() {
-        isReady ?: return
+        if (!isReady) {
+            intent?.putExtra("fun_id", 0)
+            return
+        }
 
         showProgressBar = true
         CoroutineExt.launchIo {
