@@ -10,7 +10,7 @@ import cn.vove7.common.datamanager.parse.model.ActionScope
 import cn.vove7.common.datamanager.parse.statusmap.ActionNode
 import cn.vove7.common.datamanager.parse.statusmap.ActionNode.NODE_SCOPE_GLOBAL
 import cn.vove7.common.datamanager.parse.statusmap.ActionNode.NODE_SCOPE_IN_APP
-import cn.vove7.common.utils.ThreadPool.runOnPool
+import cn.vove7.common.utils.CoroutineExt.launch
 import cn.vove7.executorengine.model.ActionParseResult
 import cn.vove7.vtp.log.Vog
 import java.util.*
@@ -59,7 +59,7 @@ object ParseEngine {
      * 同步后，更新数据
      */
     fun updateNode() {
-        runOnPool {
+        launch {
             updateInApp()
             updateGlobal()
         }

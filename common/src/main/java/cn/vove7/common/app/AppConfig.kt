@@ -15,10 +15,9 @@ import cn.vove7.common.bridges.SystemBridge
 import cn.vove7.common.model.UserInfo
 import cn.vove7.common.net.ApiUrls
 import cn.vove7.common.net.WrapperNetHelper
+import cn.vove7.common.utils.CoroutineExt.launch
+import cn.vove7.common.utils.CoroutineExt.withMain
 import cn.vove7.common.utils.StorageHelper
-import cn.vove7.common.utils.ThreadPool.runOnCachePool
-import cn.vove7.common.utils.ThreadPool.runOnPool
-import cn.vove7.common.utils.runOnUi
 import cn.vove7.common.utils.secure.SecuritySharedPreference
 import cn.vove7.smartkey.BaseConfig
 import cn.vove7.smartkey.android.AndroidSettings
@@ -265,13 +264,11 @@ object AppConfig : BaseConfig {
     /**
      * 发送请求，验证时间
      */
-    fun checkDate() {
-        runOnCachePool {
-            if (System.currentTimeMillis() - lastCheckTime > 600000) {
-                if (UserInfo.isLogin()) {
-                    lastCheckTime = System.currentTimeMillis()
-                    WrapperNetHelper.postJson<Any>(ApiUrls.CHECK_USER_DATE) { }
-                }
+    fun checkDate() = launch {
+        if (System.currentTimeMillis() - lastCheckTime > 600000) {
+            if (UserInfo.isLogin()) {
+                lastCheckTime = System.currentTimeMillis()
+                WrapperNetHelper.postJson<Any>(ApiUrls.CHECK_USER_DATE) { }
             }
         }
     }
@@ -340,7 +337,7 @@ object AppConfig : BaseConfig {
         if (BuildConfig.DEBUG && !byUser) {
             return
         }
-        runOnPool {
+        launch {
             try {
                 val doc = Jsoup.connect("https://www.coolapk.com/apk/cn.vove7.vassistant")
                         .timeout(5000).get()
@@ -348,11 +345,11 @@ object AppConfig : BaseConfig {
                 val verName = doc.body().getElementsByClass("list_app_info").text()
                 val log = doc.body().getElementsByClass("apk_left_title_info")[0]
                         .html().replace("<br> ", "\n")
-                runOnUi {
+                withMain {
                     val noUpdateName = sp.getString("no_update_ver_name") ?: ""
                     if (!byUser && noUpdateName == verName) {
                         Vog.d("checkAppUpdate ---> 忽略此版")
-                        return@runOnUi
+                        return@withMain
                     }
                     if (checkHasUpdate(verName)) {
                         onUpdate?.invoke(verName to log)
@@ -448,7 +445,7 @@ object AppConfig : BaseConfig {
     }
 
     fun plusAdKillCount() {
-        runOnCachePool {
+        launch {
             plusTodayCount("akc")
         }
     }
@@ -458,12 +455,14 @@ object AppConfig : BaseConfig {
      * @return Boolean
      */
     fun haveTextPickPermission(): Boolean {
-        if (UserInfo.isVip())
-            return true
         val f = getTodayCount("tp")
+        if (UserInfo.isVip()) {
+            plusTodayCount("tp", f)
+            return true
+        }
         return (f < 10).also {
             //免费10次
-            if (it) runOnCachePool {
+            if (it) launch {
                 plusTodayCount("tp", f)
             }
         }
@@ -510,7 +509,7 @@ object AppConfig : BaseConfig {
     //上次启动版本号
     val PRE_VERSION_CODE by lazy {
         val sp = SpHelper(GlobalApp.APP)
-        sp.getLong("v_code").let{
+        sp.getLong("v_code").let {
             if (it < 0) versionCode else it
         }
     }

@@ -4,8 +4,8 @@ import android.accessibilityservice.AccessibilityService
 import android.content.ComponentName
 import android.os.Build
 import android.provider.Settings
-import androidx.core.view.accessibility.AccessibilityNodeInfoCompat.FOCUS_INPUT
 import android.view.accessibility.AccessibilityNodeInfo
+import androidx.core.view.accessibility.AccessibilityNodeInfoCompat.FOCUS_INPUT
 import cn.vove7.common.NeedAccessibilityException
 import cn.vove7.common.accessibility.component.AccPluginService
 import cn.vove7.common.accessibility.viewnode.ViewNode
@@ -15,7 +15,7 @@ import cn.vove7.common.appbus.AppBus
 import cn.vove7.common.bridges.RootHelper
 import cn.vove7.common.datamanager.parse.model.ActionScope
 import cn.vove7.common.model.RequestPermission
-import cn.vove7.common.utils.ThreadPool
+import cn.vove7.common.utils.CoroutineExt.launch
 import cn.vove7.common.utils.whileWaitTime
 import cn.vove7.vtp.app.AppInfo
 import cn.vove7.vtp.log.Vog
@@ -103,6 +103,8 @@ abstract class AccessibilityApi : AccessibilityService() {
          * @return Boolean
          * @throws NeedAccessibilityException
          */
+        @JvmOverloads
+        @JvmStatic
         @Throws(NeedAccessibilityException::class)
         fun waitAccessibility(waitMillis: Long = 30000): Boolean {
             if (AccessibilityApi.isBaseServiceOn) return true
@@ -203,7 +205,7 @@ abstract class AccessibilityApi : AccessibilityService() {
 
                 ON_APP_CHANGED -> {
                     Vog.d("dispatchPluginsEvent ---> ON_APP_CHANGED")
-                    ThreadPool.runOnCachePool {
+                    launch {
                         pluginsServices.forEach {
                             it.onAppChanged(data as ActionScope)
                         }

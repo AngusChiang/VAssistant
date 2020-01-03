@@ -9,7 +9,7 @@ import cn.vove7.common.datamanager.executor.entity.MarkedData.MARKED_TYPE_SCRIPT
 import cn.vove7.common.datamanager.greendao.MarkedDataDao
 import cn.vove7.common.datamanager.parse.DataFrom
 import cn.vove7.common.model.UserInfo
-import cn.vove7.common.utils.ThreadPool.runOnCachePool
+import cn.vove7.common.utils.CoroutineExt.launch
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.adapters.ListViewModel
 import cn.vove7.jarvis.fragments.base.BaseMarkedFragment
@@ -44,7 +44,7 @@ class MarkedOpenFragment : BaseMarkedFragment() {
     var onlySelf = false
 
     override fun onLoadData(pageIndex: Int) {
-        runOnCachePool {
+        launch {
             val builder = DAO.daoSession.markedDataDao
                     .queryBuilder()
                     .where(MarkedDataDao.Properties.Type.`in`(MarkedData.MARKED_TYPE_SCRIPT_JS, MARKED_TYPE_SCRIPT_LUA))

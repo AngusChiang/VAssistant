@@ -4,7 +4,7 @@ import android.media.AudioAttributes
 import android.media.MediaPlayer
 import cn.vove7.common.app.AppConfig
 import cn.vove7.common.app.GlobalApp
-import cn.vove7.common.utils.ThreadPool
+import cn.vove7.common.utils.CoroutineExt
 import cn.vove7.vtp.log.Vog
 
 /**
@@ -23,7 +23,7 @@ object AudioController {
      */
     fun playOnce(rawId: Int, streamType: Int = AppConfig.currentStreamType,
                  onFinish: (() -> Unit)? = null) {
-        ThreadPool.runOnCachePool {
+        CoroutineExt.launch {
             MediaPlayer.create(GlobalApp.APP, rawId)?.apply {
                 setOnCompletionListener {
                     release()

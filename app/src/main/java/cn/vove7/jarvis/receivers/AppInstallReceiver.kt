@@ -20,7 +20,7 @@ object AppInstallReceiver : DyBCReceiver() {
 
 
     override fun onReceive(context: Context, intent: Intent) {
-//        runOnPool {
+//        launch {
 //            AdvanAppHelper.updateAppList()
 //        }
         val pkg = intent.data?.schemeSpecificPart ?: return

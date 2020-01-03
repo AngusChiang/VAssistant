@@ -13,7 +13,7 @@ import cn.vove7.common.datamanager.parse.model.Action
 import cn.vove7.common.datamanager.parse.statusmap.ActionNode
 import cn.vove7.common.executor.OnPrint
 import cn.vove7.common.model.UserInfo
-import cn.vove7.common.utils.ThreadPool.runOnPool
+import cn.vove7.common.utils.CoroutineExt.launch
 import cn.vove7.common.utils.div
 import cn.vove7.common.utils.runInCatch
 import cn.vove7.common.utils.startActivityOnNewTask
@@ -66,7 +66,7 @@ object RemoteDebugServer : Runnable {
     @Synchronized
     fun stop() {
         stopped = true
-        runOnPool {
+        launch {
             commandServer?.stop()
             commandServer = null
             server?.close()
@@ -111,7 +111,7 @@ object RemoteDebugServer : Runnable {
                     GlobalApp.toastInfo(GlobalApp.getString(R.string.text_establish_connection).format(client.inetAddress ?: "null"))
                     print.onPrint(0, "与PC[${client.inetAddress}]建立连接   --来自App")
                     //type -> script -> arg
-                    runOnPool {
+                    launch {
                         try {
                             while (!stopped) {
                                 val data = inputStream.readLine()
@@ -198,14 +198,14 @@ object RemoteDebugServer : Runnable {
     private fun onPostAction(actionJson: String) {
         Vog.d("onPostAction ---> $actionJson")
 
-        runOnPool {
+        launch {
             val action: RemoteAction
             try {
                 action = Gson().fromJson<RemoteAction>(actionJson, RemoteAction::class.java)
             } catch (e: Exception) {
                 GlobalLog.err(e)
                 print.onPrint(0, "发生错误${e.message}")
-                return@runOnPool
+                return@launch
             }
             when (action.action) {
                 "run" -> {
@@ -239,7 +239,7 @@ object RemoteDebugServer : Runnable {
                     if (action.action.startsWith("new_inst")) {
                         if (!UserInfo.isLogin()) {
                             GlobalApp.toastError("请登录后操作")
-                            return@runOnPool
+                            return@launch
                         }
 
                         GlobalApp.APP.apply {

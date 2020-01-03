@@ -2,7 +2,7 @@ package cn.vove7.jarvis.view.dialog
 
 import android.content.Context
 import android.os.Bundle
-import cn.vove7.common.utils.ThreadPool
+import cn.vove7.common.utils.CoroutineExt
 import cn.vove7.common.helper.AdvanAppHelper
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.adapters.ListViewModel
@@ -23,7 +23,7 @@ class SelectAppDialog(
     override var sortData: Boolean = true
 
     override fun onLoadData(pageIndex: Int) {
-        ThreadPool.runOnCachePool {
+        CoroutineExt.launch {
             notifyLoadSuccess(AdvanAppHelper.ALL_APP_LIST.values, true)
         }
     }

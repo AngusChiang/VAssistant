@@ -16,7 +16,7 @@ import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.appbus.AppBus
 import cn.vove7.common.bridges.SystemBridge
-import cn.vove7.common.utils.ThreadPool
+import cn.vove7.common.utils.CoroutineExt
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.activities.base.ReturnableActivity
 import cn.vove7.jarvis.adapters.SettingsExpandableAdapter
@@ -352,7 +352,7 @@ class SettingsActivity : ReturnableActivity() {
                             keyId = R.string.key_auto_open_as_with_root,
                             defaultValue = AppConfig.autoOpenAS
                     ) { _, b ->
-                        if (b) ThreadPool.runOnPool {
+                        if (b) CoroutineExt.launch {
                             if (!AccessibilityApi.isBaseServiceOn) {
                                 AccessibilityApi.openServiceSelf()
                             }

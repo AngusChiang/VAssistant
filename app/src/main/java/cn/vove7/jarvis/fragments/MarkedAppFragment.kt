@@ -3,12 +3,11 @@ package cn.vove7.jarvis.fragments
 import android.os.Bundle
 import android.view.View
 import android.widget.CompoundButton
-import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.datamanager.DAO
 import cn.vove7.common.datamanager.executor.entity.MarkedData
 import cn.vove7.common.datamanager.executor.entity.MarkedData.MARKED_TYPE_APP
 import cn.vove7.common.datamanager.greendao.MarkedDataDao
-import cn.vove7.common.utils.ThreadPool.runOnCachePool
+import cn.vove7.common.utils.CoroutineExt.launch
 import cn.vove7.common.bridges.SystemBridge
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.adapters.ListViewModel
@@ -73,7 +72,7 @@ class MarkedAppFragment : BaseMarkedFragment() {
      * @param pageIndex Int
      */
     override fun onLoadData(pageIndex: Int) {
-        runOnCachePool {
+        launch {
             val builder = DAO.daoSession.markedDataDao
                     .queryBuilder()
                     .where(MarkedDataDao.Properties.Type.eq(MARKED_TYPE_APP))

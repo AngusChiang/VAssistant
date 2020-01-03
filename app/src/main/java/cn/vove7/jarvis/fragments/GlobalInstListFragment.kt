@@ -11,7 +11,7 @@ import cn.vove7.common.datamanager.parse.DataFrom
 import cn.vove7.common.datamanager.parse.statusmap.ActionNode
 import cn.vove7.common.datamanager.parse.statusmap.ActionNode.NODE_SCOPE_GLOBAL
 import cn.vove7.common.model.UserInfo
-import cn.vove7.common.utils.ThreadPool.runOnPool
+import cn.vove7.common.utils.CoroutineExt.launch
 import cn.vove7.jarvis.activities.InstDetailActivity
 import cn.vove7.jarvis.activities.NewInstActivity
 import cn.vove7.jarvis.activities.OnSyncInst
@@ -84,7 +84,7 @@ class GlobalInstListFragment : SimpleListFragment<ActionNode>(), OnSyncInst {
     }
 
     override fun onLoadData(pageIndex: Int) {
-        runOnPool {
+        launch {
             val builder = DAO.daoSession.actionNodeDao.queryBuilder()
                     .where(ActionNodeDao.Properties.ActionScopeType.eq(ActionNode.NODE_SCOPE_GLOBAL))
                     .orderDesc(ActionNodeDao.Properties.Priority)//按优先级

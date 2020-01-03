@@ -538,7 +538,7 @@ open class ExecutorImpl(
 
     private fun waitForActivity(scope: ActionScope) {
         locksWaitForActivity[this] = scope
-        ThreadPool.runOnCachePool {
+        CoroutineExt.launch {
             //开线程
             Thread.sleep(200)
             try {//主动调用一次

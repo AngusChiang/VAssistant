@@ -2,7 +2,7 @@ package cn.vove7.jarvis.adapters
 
 import android.view.MenuItem
 import cn.vove7.common.app.GlobalLog
-import cn.vove7.common.utils.ThreadPool
+import cn.vove7.common.utils.CoroutineExt
 import cn.vove7.common.utils.runOnUi
 import cn.vove7.jarvis.fragments.AwesomeItem
 import cn.vove7.jarvis.tools.SearchActionHelper
@@ -94,7 +94,7 @@ interface ListViewModelLoader<DataType> {
             }
 
             changeViewOnLoading()
-            ThreadPool.runOnCachePool {
+            CoroutineExt.launch {
                 val tmp = dataSet.filter {
                     it.title?.contains(text, ignoreCase = true) == true ||
                             it.subTitle?.contains(text, ignoreCase = true) == true

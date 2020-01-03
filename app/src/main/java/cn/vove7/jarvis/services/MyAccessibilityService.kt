@@ -20,8 +20,7 @@ import cn.vove7.common.bridges.GlobalActionExecutor
 import cn.vove7.common.bridges.SystemBridge
 import cn.vove7.common.helper.AdvanAppHelper
 import cn.vove7.common.utils.StubbornFlag
-import cn.vove7.common.utils.ThreadPool.runOnCachePool
-import cn.vove7.common.utils.ThreadPool.runOnPool
+import cn.vove7.common.utils.CoroutineExt.launch
 import cn.vove7.common.utils.activities
 import cn.vove7.common.utils.isInputMethod
 import cn.vove7.common.utils.runInCatch
@@ -53,7 +52,7 @@ class MyAccessibilityService : AccessibilityApi() {
     }
 
     private fun startPluginService() {
-        runOnPool {
+        launch {
             //注册无障碍组件
             if (AppConfig.isAdBlockService)
                 registerPlugin(AdKillerService)
@@ -114,7 +113,7 @@ class MyAccessibilityService : AccessibilityApi() {
                 val pkg = event.packageName as String?
 //                Vog.v("WINDOW_STATE_CHANGED ---> $classNameStr $pkg")
 
-                runOnCachePool {
+                launch {
                     if (classNameStr != null && pkg != null)
                         updateCurrentApp(pkg, classNameStr.toString())
                 }

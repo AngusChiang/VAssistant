@@ -16,7 +16,7 @@ import cn.vove7.common.net.model.RequestParseModel
 import cn.vove7.common.net.model.ResponseMessage
 import cn.vove7.common.net.tool.SecureHelper
 import cn.vove7.common.utils.LooperHelper
-import cn.vove7.common.utils.ThreadPool
+import cn.vove7.common.utils.CoroutineExt
 import cn.vove7.vtp.log.Vog
 import cn.vove7.vtp.net.GsonHelper
 import cn.vove7.vtp.net.NetHelper
@@ -176,7 +176,7 @@ object WrapperNetHelper {
      */
     fun uploadUserCommandHistory(his: CommandHistory) {
         if (BuildConfig.DEBUG || !AppConfig.userExpPlan) return
-        ThreadPool.runOnPool {
+        CoroutineExt.launch {
             LooperHelper.prepareIfNeeded()
             post<Any>(ApiUrls.UPLOAD_CMD_HIS, his) { b ->
                 if (!b.isOk()) {

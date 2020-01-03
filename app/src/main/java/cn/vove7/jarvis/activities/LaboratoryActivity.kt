@@ -10,7 +10,7 @@ import cn.vove7.common.app.AppConfig
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.bridges.SystemBridge
 import cn.vove7.common.model.UserInfo
-import cn.vove7.common.utils.ThreadPool.runOnPool
+import cn.vove7.common.utils.CoroutineExt.launch
 import cn.vove7.common.utils.content
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.activities.base.ReturnableActivity
@@ -195,7 +195,7 @@ class LaboratoryActivity : ReturnableActivity() {
                         SingleChoiceItem(title = "对话系统",
                                 keyId = R.string.key_chat_system_type, entityArrId = R.array.list_chat_system,
                                 defaultValue = 0) { _, d ->
-                            runOnPool {
+                            launch {
                                 sleep(800)//等待设置完成
                                 MainService.loadChatSystem()
                                 GlobalApp.toastInfo("对话系统切换完成")

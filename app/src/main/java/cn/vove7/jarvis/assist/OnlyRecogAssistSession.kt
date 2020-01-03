@@ -5,7 +5,7 @@ import android.app.assist.AssistStructure
 import android.content.Context
 import android.os.Bundle
 import android.service.voice.VoiceInteractionSession
-import cn.vove7.common.utils.ThreadPool.runOnPool
+import cn.vove7.common.utils.CoroutineExt.launch
 import cn.vove7.jarvis.services.MainService
 
 /**
@@ -16,7 +16,7 @@ import cn.vove7.jarvis.services.MainService
  */
 class OnlyRecogAssistSession(context: Context) : VoiceInteractionSession(context) {
     override fun onHandleAssist(data: Bundle?, structure: AssistStructure?, content: AssistContent?) {
-        runOnPool {
+        launch {
             MainService.switchRecog()
         }
         finish()

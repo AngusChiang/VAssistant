@@ -40,6 +40,7 @@ class TextOperationDialog(val activity: Activity, val textModel: TextModel) {
     private var opText = textModel.text.toString()
 
     val bottomDialog = BottomDialog.builder(activity) {
+        navBgColor
 
         awesomeHeader("文字操作")
         buttons {
@@ -78,7 +79,7 @@ class TextOperationDialog(val activity: Activity, val textModel: TextModel) {
     private fun translate() {
         DataCollector.buriedPoint("to_trans")
         AppConfig.haveTranslatePermission() ?: return
-        ThreadPool.runOnCachePool {
+        CoroutineExt.launch {
             bottomDialog.updateContent<WrappedTextContentBuilder> {
                 textView.apply {
                     appendlnGreen("\n翻译中...")

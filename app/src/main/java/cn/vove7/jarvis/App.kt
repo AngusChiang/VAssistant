@@ -14,7 +14,7 @@ import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.appbus.AppBus
 import cn.vove7.common.helper.AdvanAppHelper
 import cn.vove7.common.model.UserInfo
-import cn.vove7.common.utils.ThreadPool.runOnPool
+import cn.vove7.common.utils.CoroutineExt.launch
 import cn.vove7.common.utils.runOnNewHandlerThread
 import cn.vove7.common.utils.runWithClock
 import cn.vove7.jarvis.plugins.PowerListener
@@ -67,12 +67,7 @@ class App : GlobalApp() {
         //防止在外部无法打开其他应用
         val component = intent?.component
         val isVApp = component?.className?.let {
-            try {
-                Class.forName(it)
-                true
-            } catch (e: Throwable) {
-                false
-            }
+            kotlin.runCatching { Class.forName(it) }.isSuccess
         } ?: false
         Vog.d("isVApp $isVApp")
         if (!isVApp && AppConfig.openAppCompat) {
@@ -92,7 +87,7 @@ class InitCp : ContentProvider() {
 
     override fun onCreate(): Boolean {
         runOnNewHandlerThread(name = "延时启动", delay = 2000) {
-            runOnPool {
+            launch {
                 openAccessibilityServiceAuto()
                 setAssistantAppAuto()
             }

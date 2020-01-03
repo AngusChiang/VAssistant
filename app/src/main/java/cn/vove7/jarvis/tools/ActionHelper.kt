@@ -9,10 +9,7 @@ import androidx.core.content.FileProvider
 import cn.vove7.common.accessibility.AccessibilityApi
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.bridges.SystemBridge
-import cn.vove7.common.utils.ThreadPool
-import cn.vove7.common.utils.clearTask
-import cn.vove7.common.utils.newTask
-import cn.vove7.common.utils.runOnNewHandlerThread
+import cn.vove7.common.utils.*
 import cn.vove7.common.view.finder.ViewFindBuilder.Companion.text
 import cn.vove7.common.view.finder.ViewFindBuilder.Companion.types
 import java.io.File
@@ -33,12 +30,12 @@ object ActionHelper {
      * 使用微信扫描屏幕
      */
     fun qrWithWechat(path: String) {
-        ThreadPool.runOnPool {
+        CoroutineExt.launch {
             var tmpFile: File? = null
             try {
                 tmpFile = createTmpFile
                 File(path).copyTo(tmpFile, true)//复制文件
-                app.sendBroadcast(Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, Uri.fromFile(tmpFile)))
+                tmpFile.broadcastImageFile()
 
                 doQrWithWechat()
             } catch (e: Throwable) {
@@ -54,13 +51,12 @@ object ActionHelper {
     val app get() = GlobalApp.APP
 
     private fun doQrWithWechat() {
-        AccessibilityApi.waitAccessibility()
-
         val intent = app.packageManager.getLaunchIntentForPackage("com.tencent.mm")
         if (intent == null) {
             GlobalApp.toastError("未安装微信")
             return
         }
+        AccessibilityApi.waitAccessibility()
         intent.putExtra("LauncherUI.From.Scaner.Shortcut", true)
         app.startActivity(intent.clearTask())
 
@@ -81,11 +77,11 @@ object ActionHelper {
      * @param path String
      */
     fun qrWithAlipay(path: String) {
-        ThreadPool.runOnPool {
+        CoroutineExt.launch {
             try {
                 if (SystemBridge.getAppInfo("com.eg.android.AlipayGphone") == null) {
                     GlobalApp.toastError("未安装支付宝")
-                    return@runOnPool
+                    return@launch
                 }
                 val tmpFile = File(path)
 

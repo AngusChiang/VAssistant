@@ -30,7 +30,7 @@ import cn.vove7.common.net.ApiUrls
 import cn.vove7.common.net.WrapperNetHelper
 import cn.vove7.common.utils.RegUtils
 import cn.vove7.common.utils.TextHelper
-import cn.vove7.common.utils.ThreadPool.runOnPool
+import cn.vove7.common.utils.CoroutineExt.launch
 import cn.vove7.executorengine.parse.ParseEngine
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.activities.base.BaseActivity
@@ -403,7 +403,7 @@ class InstDetailActivity : BaseActivity() {
     }
 
     private fun delLocalNode() {
-        runOnPool {
+        launch {
             val b = DaoHelper.deleteActionNodeInTX(node.id)
             if (b) {
                 GlobalApp.toastSuccess("删除成功")
@@ -445,7 +445,7 @@ class InstDetailActivity : BaseActivity() {
             return
         }
         p = ProgressDialog(this)
-        runOnPool {
+        launch {
             val cloneNode: ActionNode?
             try {
                 cloneNode = node.cloneGlobal(containSub)
@@ -528,7 +528,7 @@ class InstDetailActivity : BaseActivity() {
                     if (s < 0) {
                         return@success
                     }
-                    runOnPool {
+                    launch {
                         //更新 tagId
                         node.versionCode = s
                         Vog.d("new ver---> $s")
@@ -555,7 +555,7 @@ class InstDetailActivity : BaseActivity() {
                     GlobalApp.toastSuccess(R.string.text_share_success)
                     //sign tag
                     val s = bean.data
-                    runOnPool {
+                    launch {
                         //更新 tagId
                         Vog.d("share new tag---> $s")
                         node.from = DataFrom.FROM_SHARED

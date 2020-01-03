@@ -9,7 +9,6 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
-import androidx.fragment.app.Fragment
 import androidx.appcompat.app.AppCompatActivity
 import android.view.View
 import android.view.ViewGroup
@@ -23,7 +22,7 @@ import cn.vove7.common.app.log
 import cn.vove7.common.bridges.InputMethodBridge
 import cn.vove7.common.bridges.RootHelper
 import cn.vove7.common.bridges.SystemBridge
-import cn.vove7.common.utils.ThreadPool
+import cn.vove7.common.utils.CoroutineExt
 import cn.vove7.common.utils.runOnUi
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.activities.PermissionManagerActivity.PermissionStatus.Companion.allPerStr
@@ -210,7 +209,7 @@ class PermissionManagerActivity : OneFragmentActivity() {
                     },
                     PermissionStatus(arrayOf(), "Root", "自动切换输入法、开启无障碍服务\n授予Root权限时，请将打开Magisk Manager后台运行（若使用Msgisk管理授权）") { it, _ ->
                         if (!it.isOpen) {
-                            ThreadPool.runOnPool {
+                            CoroutineExt.launch {
                                 //防止阻塞主线程
                                 RootHelper.hasRoot()
                             }
@@ -243,7 +242,7 @@ class PermissionManagerActivity : OneFragmentActivity() {
          * 刷新权限状态
          */
         private fun refreshStatus() {
-            ThreadPool.runOnPool {
+            CoroutineExt.launch {
                 val context = GlobalApp.APP
                 permissions.forEach {
                     it.isOpen = when {

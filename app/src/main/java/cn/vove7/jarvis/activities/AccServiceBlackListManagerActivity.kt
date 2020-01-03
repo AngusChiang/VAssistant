@@ -1,9 +1,8 @@
 package cn.vove7.jarvis.activities
 
-import androidx.fragment.app.Fragment
 import android.view.Menu
 import cn.vove7.common.app.GlobalApp
-import cn.vove7.common.utils.ThreadPool
+import cn.vove7.common.utils.CoroutineExt
 import cn.vove7.common.helper.AdvanAppHelper
 import cn.vove7.common.helper.startable
 import cn.vove7.jarvis.R
@@ -48,7 +47,7 @@ class AccServiceBlackListManagerActivity : OneFragmentActivity() {
                 refresh()
                 return
             }
-            ThreadPool.runOnCachePool {
+            CoroutineExt.launch {
                 val tmp = dataSet.filter {
                     it.title?.contains(text, ignoreCase = true) == true
                 }
@@ -92,7 +91,7 @@ class AccServiceBlackListManagerActivity : OneFragmentActivity() {
             }
 
         override fun onLoadData(pageIndex: Int) {
-            ThreadPool.runOnCachePool {
+            CoroutineExt.launch {
                 notifyLoadSuccess(AdvanAppHelper.ALL_APP_LIST.values.filter { it.startable }.toList(), true)
             }
         }

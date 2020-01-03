@@ -29,10 +29,7 @@ import cn.vove7.jarvis.view.dialog.ImageClassifyResultDialog
 import cn.vove7.vtp.log.Vog
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import kotlinx.android.synthetic.main.dialog_assist.*
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import java.io.File
 import java.util.*
 
@@ -198,7 +195,7 @@ class ScreenAssistActivity : BaseActivity() {
             checkFuns()
         }
         //进入时清空缓存
-        ThreadPool.runOnCachePool {
+        CoroutineExt.launch {
             cacheDir.listFiles()?.filter { it.isFile && it.absolutePath != screenPath }?.forEach {
                 it.delete()
             }
@@ -492,9 +489,9 @@ class ScreenAssistActivity : BaseActivity() {
         isReady ?: return
 
         showProgressBar = true
-        ThreadPool.runOnPool {
+        CoroutineExt.launchIo {
             val r = BaiduAipHelper.imageClassify(UtilBridge.compressImage(screenPath))
-            runOnUi {
+            withContext(Dispatchers.Main) {
                 showProgressBar = false
                 Vog.d("imageClassify ---> ${r?.bestResult}")
                 val result = r?.bestResult
@@ -505,7 +502,7 @@ class ScreenAssistActivity : BaseActivity() {
                             finish()
                         }
                     } else if (!isFinishing) {
-                        dialog = ImageClassifyResultDialog(result, this, screenPath) {
+                        dialog = ImageClassifyResultDialog(result, this@ScreenAssistActivity, screenPath) {
                             finish()
                         }.also { it.show() }
                     }

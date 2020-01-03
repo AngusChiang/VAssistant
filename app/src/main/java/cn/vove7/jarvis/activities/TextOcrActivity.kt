@@ -13,7 +13,12 @@ import cn.vove7.bottomdialog.BottomDialog
 import cn.vove7.common.app.AppConfig
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.bridges.SystemBridge
-import cn.vove7.common.utils.*
+import cn.vove7.common.utils.CoroutineExt.launch
+import cn.vove7.common.utils.CoroutineExt.withMain
+import cn.vove7.common.utils.fadeIn
+import cn.vove7.common.utils.gone
+import cn.vove7.common.utils.runOnUi
+import cn.vove7.common.utils.startActivity
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.tools.Tutorials
 import cn.vove7.jarvis.tools.baiduaip.BaiduAipHelper
@@ -23,9 +28,10 @@ import cn.vove7.vtp.asset.AssetHelper
 import cn.vove7.vtp.log.Vog
 import kotlinx.android.synthetic.main.activity_text_ocr.*
 import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.async
+import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
 import java.util.*
-import java.util.concurrent.CountDownLatch
 import kotlin.math.abs
 import kotlin.math.sqrt
 
@@ -197,34 +203,29 @@ class TextOcrActivity : Activity() {
 
         hasT = true
         GlobalApp.toastInfo("开始翻译")
-        val count = CountDownLatch(wordItems.size)
-        wordItems.forEach {
-            val text = it.item.text
-            ThreadPool.runOnCachePool {
-                val r = BaiduAipHelper.translate(text.toString(), to = AppConfig.translateLang)
-                if (r != null) {
-                    val res = r.transResult
-                    if (text == res) {//文本相同
-                        count.countDown()
-                        return@runOnCachePool
+
+        launch {
+            val defs = wordItems.map {
+                val text = it.item.text
+                async {
+                    val r = BaiduAipHelper.translate(text.toString(), to = AppConfig.translateLang)
+                    if (r != null) {
+                        val res = r.transResult
+                        it.item.subText = res
+                        withMain {
+                            it.textView?.isChecked = true
+                            it.textView?.text = res
+                        }
+                    } else {
+                        it.item.subText = "翻译失败"
                     }
-                    it.item.subText = res
-                    runOnUi {
-                        it.textView?.isChecked = true
-                        it.textView?.text = res
-                    }
-                } else {
-                    it.item.subText = "翻译失败"
                 }
-                count.countDown()
             }
-            ThreadPool.runOnCachePool {
-                //监听
-                count.await()
-                if (isFinishing) return@runOnCachePool
-                runOnUi {
-                    GlobalApp.toastSuccess("翻译完成")
-                }
+            defs.joinAll()
+            //监听
+            if (isFinishing) return@launch
+            withMain {
+                GlobalApp.toastSuccess("翻译完成")
             }
         }
 

@@ -6,7 +6,7 @@ import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.bridges.SystemBridge
 import cn.vove7.common.datamanager.DAO
 import cn.vove7.common.model.UserInfo
-import cn.vove7.common.utils.ThreadPool.runOnCachePool
+import cn.vove7.common.utils.CoroutineExt.launch
 import cn.vove7.jarvis.activities.AppAdListActivity
 import cn.vove7.jarvis.adapters.ListViewModel
 import cn.vove7.jarvis.adapters.SimpleListAdapter
@@ -107,7 +107,7 @@ class MarkedAdFragment : SimpleListFragment<String>(), OnSyncMarked {
     val maps = mutableMapOf<String, Int>()
 
     override fun onLoadData(pageIndex: Int) {
-        runOnCachePool {
+        launch {
             notifyLoadSuccess(adAddPkgs.sub(pageIndex * pageSizeLimit, pageSizeLimit))
         }
     }

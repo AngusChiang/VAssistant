@@ -47,7 +47,7 @@ import cn.vove7.common.net.WrapperNetHelper
 import cn.vove7.common.utils.*
 import cn.vove7.common.utils.RegUtils.checkCancel
 import cn.vove7.common.utils.RegUtils.checkConfirm
-import cn.vove7.common.utils.ThreadPool.runOnPool
+import cn.vove7.common.utils.CoroutineExt.launch
 import cn.vove7.common.view.finder.ViewFindBuilder
 import cn.vove7.executorengine.exector.ExecutorEngine
 import cn.vove7.executorengine.model.ActionParseResult
@@ -627,7 +627,7 @@ object MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
      */
     fun switchRecog() {
         //等待时防止阻塞主线程
-        runOnPool {
+        launch {
             if (!speechEngineLoaded) {//未加载成
                 GlobalApp.toastWarning("正在启动")
 
@@ -641,16 +641,16 @@ object MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
                 }
                 if (b == null) {
                     GlobalApp.toastWarning("引擎未就绪")
-                    return@runOnPool
+                    return@launch
                 }
             }
             if (isSpeakingResWord && speaking) {
                 Vog.d("正在响应词")
-                return@runOnPool
+                return@launch
             } else if (parsingCommand) {
                 Vog.d("正在解析指令")
                 stopParse()
-                return@runOnPool
+                return@launch
             } else {
                 isSpeakingResWord = false
             }

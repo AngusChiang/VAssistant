@@ -16,7 +16,7 @@ import cn.vove7.common.net.ApiUrls
 import cn.vove7.common.net.WrapperNetHelper
 import cn.vove7.common.net.model.LastDateInfo
 import cn.vove7.common.utils.TextHelper
-import cn.vove7.common.utils.ThreadPool.runOnPool
+import cn.vove7.common.utils.CoroutineExt.launch
 import cn.vove7.executorengine.parse.ParseEngine
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.plugins.AdKillerService
@@ -101,7 +101,7 @@ object DataUpdator {
     fun oneKeyUpdate(activity: Activity, types: List<Int>,
                      back: (() -> Unit)? = null, t: String) {
         val textDialog = ProgressTextDialog(activity, "正在更新", false, autoScroll = true)
-        runOnPool {
+        launch {
             textDialog.appendlnBold("更新：\n$t\n")
             types.forEach {
                 val result = ResultBox<Boolean>()

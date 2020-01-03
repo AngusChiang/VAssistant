@@ -3,16 +3,16 @@ package cn.vove7.jarvis.plugins
 import cn.vove7.common.accessibility.AccessibilityApi
 import cn.vove7.common.accessibility.component.AbsAccPluginService
 import cn.vove7.common.accessibility.viewnode.ViewNode
+import cn.vove7.common.app.AppConfig
 import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.datamanager.AppAdInfo
 import cn.vove7.common.datamanager.DAO
 import cn.vove7.common.datamanager.greendao.AppAdInfoDao
 import cn.vove7.common.datamanager.parse.model.ActionScope
 import cn.vove7.common.helper.AdvanAppHelper
-import cn.vove7.common.utils.ThreadPool.runOnPool
+import cn.vove7.common.utils.CoroutineExt.launch
 import cn.vove7.common.view.finder.ViewFindBuilder
 import cn.vove7.common.view.finder.ViewFinder
-import cn.vove7.common.app.AppConfig
 import cn.vove7.jarvis.view.statusbar.RemoveAdAnimation
 import cn.vove7.vtp.app.AppInfo
 import cn.vove7.vtp.log.Vog
@@ -44,18 +44,15 @@ object AdKillerService : AbsAccPluginService() {
 
     override fun onBind() {
         GlobalLog.log("去广告服务上线")
-        runOnPool {
-            if (!AccessibilityApi.isBaseServiceOn) return@runOnPool
+        launch {
+            if (!AccessibilityApi.isBaseServiceOn) return@launch
             finderCaches.clear()
             val appAdInfoDao = DAO.daoSession.appAdInfoDao
             val appAdInfos = appAdInfoDao.loadAll()
             appAdInfos.forEach {
                 val scope = ActionScope(it.pkg, it.activity)
-                if (finderCaches.containsKey(scope))
-                    finderCaches[scope]!!.add(buildFinder(it))
-                else {
-                    finderCaches[scope] = mutableSetOf(buildFinder(it))
-                }
+                val set = finderCaches.getOrPut(scope, { mutableSetOf() })
+                set.add(buildFinder(it))
             }
             Vog.d("AdOnBind ---> ${finderCaches.size}")
         }
@@ -99,7 +96,7 @@ object AdKillerService : AbsAccPluginService() {
                     GlobalLog.err(e)
                 }
             }.also { t ->
-                synchronized(sthreads){
+                synchronized(sthreads) {
                     sthreads.add(t)
                 }
             }
