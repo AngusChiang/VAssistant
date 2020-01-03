@@ -45,9 +45,9 @@ import cn.vove7.common.model.UserInfo
 import cn.vove7.common.model.VoiceRecogResult
 import cn.vove7.common.net.WrapperNetHelper
 import cn.vove7.common.utils.*
+import cn.vove7.common.utils.CoroutineExt.launch
 import cn.vove7.common.utils.RegUtils.checkCancel
 import cn.vove7.common.utils.RegUtils.checkConfirm
-import cn.vove7.common.utils.CoroutineExt.launch
 import cn.vove7.common.view.finder.ViewFindBuilder
 import cn.vove7.executorengine.exector.ExecutorEngine
 import cn.vove7.executorengine.model.ActionParseResult
@@ -336,7 +336,7 @@ object MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
             Vog.d("speak临时 ${speechRecogService?.lastingStopped}")
             //没有手动停止 即认为处于长语音状态
             afterSpeakResumeListen = !(speechRecogService?.lastingStopped
-                    ?: true)
+                ?: true)
             if (cancelRecog && recogIsListening) {
                 speechRecogService?.cancelRecog(false)
             }

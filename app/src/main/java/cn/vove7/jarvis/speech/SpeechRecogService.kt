@@ -257,6 +257,8 @@ abstract class SpeechRecogService(val event: RecogEvent) : SpeechRecogI {
     }
 
 
+    var tempResult: String? = null
+
     /**
      * 语音事件分发[中枢]
      * @constructor
@@ -275,13 +277,17 @@ abstract class SpeechRecogService(val event: RecogEvent) : SpeechRecogI {
                     }
                 }
                 SpeechConst.CODE_VOICE_READY -> {
+                    tempResult = null
                     event.onRecogReady(isSilent)
                     startSCO()
                 }
                 SpeechConst.CODE_VOICE_TEMP -> {//中间结果
-                    restartStopTimer()
                     val res = msg.data.getString("data") ?: return
-                    event.onTempResult(res)
+                    if (res != tempResult) {
+                        tempResult = res
+                        restartStopTimer()
+                        event.onTempResult(res)
+                    }
                 }
                 SpeechConst.CODE_VOICE_ERR -> {//出错
                     val code = msg.data.getInt("data")
