@@ -1,9 +1,11 @@
 package cn.vove7.jarvis.activities
 
+import android.content.ComponentName
+import android.content.Intent
 import android.graphics.Typeface
+import android.net.Uri
 import android.os.Bundle
 import android.os.Environment
-import com.google.android.material.textfield.TextInputLayout
 import android.view.View
 import android.widget.TextView
 import cn.vove7.bottomdialog.BottomDialog
@@ -27,6 +29,7 @@ import cn.vove7.jarvis.view.dialog.contentbuilder.MarkdownContentBuilder
 import cn.vove7.jarvis.view.dialog.contentbuilder.SmoothTextBuilder
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.customview.customView
+import com.google.android.material.textfield.TextInputLayout
 import kotlinx.android.synthetic.main.activity_abc_header.*
 import java.io.File
 
@@ -153,7 +156,15 @@ class HelpActivity : ReturnableActivity() {
                 }
             },
             IconTitleEntity(R.drawable.ic_qq, R.string.text_add_qq_group) {
-                SystemBridge.openUrl(ApiUrls.QQ_GROUP_1)
+                val qqPkg = "com.tencent.mobileqq"
+                if (SystemBridge.hasInstall(qqPkg)) {
+                    val intent = Intent(Intent.ACTION_VIEW)
+                    intent.data = Uri.parse(ApiUrls.QQ_GROUP_1)
+                    intent.component = ComponentName(qqPkg, "com.tencent.mobileqq.activity.JumpActivity")
+                    GlobalApp.APP.startActivity(intent)
+                } else {
+                    SystemBridge.openUrl(ApiUrls.QQ_GROUP_1)
+                }
             },
             IconTitleEntity(R.drawable.ic_feedback_black_24dp, R.string.text_feedback) {
                 showFeedbackDialog()

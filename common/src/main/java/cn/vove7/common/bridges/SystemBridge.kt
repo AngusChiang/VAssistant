@@ -330,7 +330,7 @@ object SystemBridge : SystemOperation {
     }
 
     override fun hasInstall(pkg: String): Boolean {
-        return AdvanAppHelper.ALL_APP_LIST[pkg] != null
+        return pkg in AdvanAppHelper.ALL_APP_LIST
     }
 
     @Throws()
