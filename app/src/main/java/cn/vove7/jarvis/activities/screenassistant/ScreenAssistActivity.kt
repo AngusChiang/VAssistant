@@ -60,6 +60,9 @@ val Bitmap.navBarIsLight: Boolean
 
 class ScreenAssistActivity : BaseActivity() {
 
+    /**
+     * 截图文件在下次进入删除
+     */
     private lateinit var screenPath: String
     private lateinit var bottomController: AssistSessionGridController
 
@@ -196,7 +199,7 @@ class ScreenAssistActivity : BaseActivity() {
         }
         //进入时清空缓存
         CoroutineExt.launch {
-            cacheDir.listFiles()?.filter { it.isFile && it.absolutePath != screenPath }?.forEach {
+            cacheDir.listFiles()?.filter { it.isFile && it.extension == "png" && it.absolutePath != screenPath }?.forEach {
                 it.delete()
             }
         }
