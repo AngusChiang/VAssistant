@@ -51,7 +51,7 @@ class BaiduSpeechRecogService(event: RecogEvent) : SpeechRecogService(event) {
 
     private fun recogParams(silent: Boolean) = mutableMapOf(
             ACCEPT_AUDIO_DATA to false,
-            VAD to VAD_TOUCH,
+            VAD to if(!AppConfig.recogCompatibleMode) VAD_TOUCH else VAD_DNN,
             DISABLE_PUNCTUATION to false,//标点符号
             ACCEPT_AUDIO_VOLUME to true,
             PID to 1536,

@@ -10,7 +10,7 @@ import cn.vove7.jarvis.speech.baiduspeech.BaiduSpeechRecogService
 import com.baidu.speech.asr.SpeechConstant
 
 
-object OfflineRecogParams : CommonRecogParams() {
+object OfflineRecogParams {
 
     fun fetchOfflineParams(grammarFile:String): Map<String, Any> = mapOf(
             SpeechConstant.DECODER to 2,
