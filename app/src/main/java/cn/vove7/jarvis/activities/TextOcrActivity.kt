@@ -2,7 +2,6 @@ package cn.vove7.jarvis.activities
 
 import android.app.Activity
 import android.content.Context
-import android.graphics.Point
 import android.os.Bundle
 import android.view.Gravity
 import android.view.KeyEvent
@@ -26,14 +25,13 @@ import cn.vove7.jarvis.tools.baiduaip.model.TextOcrItem
 import cn.vove7.jarvis.view.dialog.TextOperationDialog
 import cn.vove7.vtp.asset.AssetHelper
 import cn.vove7.vtp.log.Vog
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 import kotlinx.android.synthetic.main.activity_text_ocr.*
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
 import java.util.*
-import kotlin.math.abs
-import kotlin.math.sqrt
 
 /**
  * # TextOcrActivity
@@ -119,10 +117,9 @@ class TextOcrActivity : Activity() {
             editDialog(model.item.text, model.item.subText)
         }
     }
+
     private fun buildContent() {
         loading_layout.gone()
-//        rootContent.layoutParams = RelativeLayout.LayoutParams(
-//                RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT)
         wordItems.forEach { model ->
             val item = model.item
 
@@ -164,9 +161,9 @@ class TextOcrActivity : Activity() {
         rootContent.onStartMove = {
             floatEditIcon.gone()
         }
-        rootContent.onTouchUp = {hasResult->
+        rootContent.onTouchUp = { hasResult ->
             if (hasResult) {//一个时 弹出编辑
-                wordItems.find { it.textView!!.isChecked }?.also {
+                wordItems.find { it.textView?.isChecked ?: false }?.also {
                     onItemClick(it)
                 }
             }
