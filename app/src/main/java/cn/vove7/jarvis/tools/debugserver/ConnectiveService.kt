@@ -98,8 +98,8 @@ class ConnectiveService : NanoHTTPD(8001) {
             TYPE_SCRIPT -> {
                 val script = params["script"] ?: return
                 val type = params["type"] ?: Action.SCRIPT_TYPE_LUA
-                GlobalApp.toastInfo("执行来自：${params["from"]}的脚本[$type]\n$script")
-                GlobalLog.log("执行远程脚本：${session.remoteIpAddress}\n")
+                GlobalApp.toastInfo("执行来自：${params["from"]}的脚本")
+                GlobalLog.log("执行远程脚本[$type]：${session.remoteIpAddress}\n$script")
                 AppBus.post(Action(script, type))
             }
         }
