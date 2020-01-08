@@ -171,8 +171,8 @@ abstract class FindBuilderWithOperation
         return node.scrollRight()
     }
 
-    override val childs: Array<ViewNode>
-        get() = node.childs
+    override val children: Array<ViewNode>
+        get() = node.children
 
     override fun childAt(i: Int): ViewNode? {
         return node.childAt(i)

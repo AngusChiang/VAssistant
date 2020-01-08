@@ -284,7 +284,7 @@ object DaoHelper {
             DAO.daoSession.regDao.insert(it)
         }
 
-        //childs
+        //children
         if (newNode.follows?.isNotEmpty() == true)
             for (ci in newNode.follows) {//递归 深度
                 Vog.d("insertNewActionNode ---> 检查 child ${ci.actionTitle}")

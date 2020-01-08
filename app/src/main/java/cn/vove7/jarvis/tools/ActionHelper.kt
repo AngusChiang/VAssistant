@@ -9,9 +9,13 @@ import androidx.core.content.FileProvider
 import cn.vove7.common.accessibility.AccessibilityApi
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.bridges.SystemBridge
-import cn.vove7.common.utils.*
+import cn.vove7.common.utils.CoroutineExt
+import cn.vove7.common.utils.broadcastImageFile
+import cn.vove7.common.utils.clearTask
+import cn.vove7.common.utils.newTask
 import cn.vove7.common.view.finder.ViewFindBuilder.Companion.text
-import cn.vove7.common.view.finder.ViewFindBuilder.Companion.types
+import cn.vove7.common.view.finder.ViewFindBuilder.Companion.type
+import kotlinx.coroutines.delay
 import java.io.File
 import java.util.*
 
@@ -39,11 +43,13 @@ object ActionHelper {
 
                 doQrWithWechat()
             } catch (e: Throwable) {
+                tmpFile?.delete()
+                tmpFile = null
                 GlobalApp.toastError("执行失败: " + e.message)
             } finally {
-                runOnNewHandlerThread(delay = 3000) {
-                    tmpFile?.delete()
-                }
+                //立即删除会导致无法识别
+                delay(1000)
+                tmpFile?.delete()
             }
         }
     }
@@ -56,20 +62,13 @@ object ActionHelper {
             GlobalApp.toastError("未安装微信")
             return
         }
-        AccessibilityApi.waitAccessibility()
+        AccessibilityApi.requireAccessibility()
         intent.putExtra("LauncherUI.From.Scaner.Shortcut", true)
         app.startActivity(intent.clearTask())
 
-        val p = text("二维码/条码").waitFor()?.parent?.parent?.parent!!
+        text("扫二维码 / 条码 / 小程序码").parent!!.children[2].click()
 
-        p.finder().depths(arrayOf(1, 0, 0, 0)).tryClick()
-
-        text("从相册选取二维码").waitFor(5000)?.tryClick()
-
-        text("图片").waitFor(15000)//等待进入 选择图片
-
-        types("GridView").childs[1].tryClick()
-
+        type("RecyclerView").children[1].click()
     }
 
     /**

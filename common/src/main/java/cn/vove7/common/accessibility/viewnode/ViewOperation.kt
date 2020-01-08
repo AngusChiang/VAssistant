@@ -23,11 +23,14 @@ interface ViewOperation {
      */
     fun getCenterPoint(): Point?
 
+    @Deprecated("typo", ReplaceWith("children"))
+    val childs: Array<ViewNode> get() = children
+
     /**
      * 获取下级所有Node
      * @return Array<ViewNode>
      */
-    val childs: Array<ViewNode>
+    val children: Array<ViewNode>
 
     /**
      * 获取边界范围

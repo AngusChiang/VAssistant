@@ -120,6 +120,13 @@ abstract class AccessibilityApi : AccessibilityService() {
             } ?: throw NeedAccessibilityException()
         }
 
+        fun requireAccessibility() {
+            if (!isBaseServiceOn) {
+                AppBus.post(RequestPermission("无障碍服务"))
+                throw NeedAccessibilityException()
+            }
+        }
+
 
         /**
          * @return 是否成功

@@ -93,7 +93,7 @@ interface VApi {
         val viewNodeFunctions =
             arrayOf(
                     "tryClick()", "getCenterPoint()", "centerPoint()",
-                    "getChilds()", "childs", "bounds", "getBounds()",
+                    "children", "bounds", "getBounds()",
                     "getBoundsInParent()", "boundsInParent", "getParent()",
                     "parent", "click()", "globalClick()", "swipe()", "tryLongClick()",
                     "getChildCount()", "childCount", "longClick()",
