@@ -397,7 +397,7 @@ object AppConfig : BaseConfig {
     private fun onCheckProp(config: Map<String, String>) {
         Vog.d("onCheckProp $config")
         config["rokid"]?.toBoolean()?.also {
-            if (!it && homeSystem == 1) {
+            if (!it && homeSystem == 0) {
                 homeSystem = null
                 AppBus.post(AppBus.ACTION_RELOAD_HOME_SYSTEM)
             }
