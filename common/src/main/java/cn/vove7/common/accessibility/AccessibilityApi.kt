@@ -93,6 +93,9 @@ abstract class AccessibilityApi : AccessibilityService() {
         var accessibilityService: AccessibilityApi? = null
         //无障碍高级服务 执行手势等操作 fixme 开启后部分机型掉帧
         var gestureService: AccessibilityApi? = null
+
+        val currentScope get() = accessibilityService?.currentScope
+
         val isBaseServiceOn: Boolean
             get() = (accessibilityService != null)
         val isAdvanServiceOn: Boolean get() = gestureService != null

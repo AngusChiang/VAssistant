@@ -51,6 +51,7 @@ import cn.vove7.common.model.RequestPermission
 import cn.vove7.common.model.ResultBox
 import cn.vove7.common.net.ApiUrls
 import cn.vove7.common.net.WrapperNetHelper
+import cn.vove7.common.net.tool.SecureHelper
 import cn.vove7.common.utils.*
 import cn.vove7.common.view.ScreenshotActivity
 import cn.vove7.common.view.finder.ViewFindBuilder
@@ -58,12 +59,21 @@ import cn.vove7.vtp.app.AppHelper
 import cn.vove7.vtp.app.AppInfo
 import cn.vove7.vtp.calendar.CalendarAccount
 import cn.vove7.vtp.calendar.CalendarHelper
+import cn.vove7.vtp.extend.buildList
 import cn.vove7.vtp.log.Vog
 import cn.vove7.vtp.system.DeviceInfo
 import cn.vove7.vtp.system.SystemHelper
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.runBlocking
+import okhttp3.OkHttpClient
+import okhttp3.Request
 import java.io.File
 import java.lang.Thread.sleep
+import java.net.URLEncoder
 import java.util.*
+import java.util.concurrent.TimeUnit
 import kotlin.concurrent.thread
 
 @Suppress("unused", "MemberVisibilityCanBePrivate")
@@ -1234,4 +1244,133 @@ object SystemBridge : SystemOperation {
     override val screenHeight: Int get() = screenHW.first
 
     override val screenWidth: Int get() = screenHW.second
+
+    /**
+     * 返回设备名
+     * @param ip String
+     * @return String?
+     */
+    private fun scanIp(ip: String, client: OkHttpClient): String? {
+        Vog.d("scanIp $ip")
+        val call = client.newCall(Request.Builder().url("http://$ip:8001").get().build())
+        return try {
+            call.execute().body?.string()
+        } catch (e: Throwable) {
+            null
+        }
+    }
+
+    /**
+     * 扫描局域网中其他 VAssist 服务
+     * TODO 虚拟机 子网？ 10.0.0.2 -> 192.168.1.111
+     * @return List<String>
+     */
+    fun scanVassistHostsInLAN(): List<Pair<String, String>> = runBlocking {
+        val localIp = getLocalIpAddress() ?: return@runBlocking emptyList<Pair<String, String>>()
+
+        val sd = localIp.lastIndexOf('.')
+        val n = localIp.substring(sd + 1).toInt()
+        val pip = localIp.substring(0, sd + 1)
+
+        val client = OkHttpClient.Builder()
+                .connectTimeout(300L, TimeUnit.MILLISECONDS)
+                .build()
+
+        (2..254).filter { it != n }.map {
+            async(context = Dispatchers.IO) {
+                val ip = pip + it
+                val dn = scanIp(ip, client)
+                return@async if (dn != null && dn.startsWith("""/|\""")) ip to dn.substring(3) else null
+            }
+        }.awaitAll().filterNotNull()
+    }
+
+    /**
+     * 发送脚本到 [BusServer]
+     * @param ip2name List<Pair<String, String>>
+     * @param script String
+     * @param type String
+     */
+    @JvmOverloads
+    fun sendScript2RemoteDevice(ip2name: List<Pair<String, String>>, script: String, type: String, toast: Boolean = true) {
+        val ts = System.currentTimeMillis()
+
+        //todo url 长度限制
+        val ps = mapOf(
+                "action" to "script",
+                "script" to script,
+                "type" to type,
+                "from" to deviceName
+        ).toQueryString()
+
+        @Suppress("SpellCheckingInspection")
+        val headers = mapOf(
+                "ts" to ts.toString(),
+                "sign" to SecureHelper.signData(ps, ts, "cssccssc")
+        )
+        val result = _send2Bus(ip2name, ps, headers)
+        if (toast) {
+            GlobalApp.toastInfo(result.joinToString("\n"), 1)
+        }
+    }
+
+    private fun Map<String, String>.toQueryString(): String {
+        return URLEncoder.encode(entries.joinToString("&") { it.key + "=" + it.value }, "utf-8")
+    }
+
+    private fun _send2Bus(ip2name: List<Pair<String, String>>, ps: String, hs: Map<String, String>): List<String> = buildList {
+        ip2name.forEach { (ip, name) ->
+            val res = HttpBridge.get("http://$ip:8001/api?$ps", hs)
+            this += if (res != null) {
+                GlobalLog.log("远程指令[成功]：$ip $name")
+                "$name 发送成功"
+            } else {
+                GlobalLog.err("远程指令[失败]：$ip $name")
+                "$name 发送失败"
+            }
+        }
+    }
+
+    /**
+     * 发送指令 [BusServer]
+     * @param ip2name List<Pair<String, String>>
+     * @param cmd String
+     * @param toast Boolean
+     */
+    @JvmOverloads
+    fun sendCommand2RemoteDevice(ip2name: List<Pair<String, String>>, cmd: String, toast: Boolean = true) {
+        val ts = System.currentTimeMillis()
+        val ps = mapOf(
+                "action" to "command",
+                "command" to cmd,
+                "from" to deviceName
+        ).toQueryString()
+
+        @Suppress("SpellCheckingInspection")
+        val headers = mapOf(
+                "ts" to ts.toString(),
+                "sign" to SecureHelper.signData(ps, ts, "cssccssc")
+        )
+        val result = _send2Bus(ip2name, ps, headers)
+        if (toast) {
+            GlobalApp.toastInfo(result.joinToString("\n"), 1)
+        }
+    }
+
+    override fun sendCommand2OtherDevices(cmd: String?) {
+        val ip2name = scanVassistHostsInLAN()
+        when (ip2name.size) {
+            0 -> GlobalApp.toastWarning("未发现设备")
+            1 -> sendCommand2RemoteDevice(ip2name, cmd ?: "")
+            else -> {
+                DialogBridge.multiSelect("选择设备", ip2name.map { it.second + "\n" + it.first }.toTypedArray()) {
+                    if (it != null) {
+                        sendCommand2RemoteDevice(it.map { i -> ip2name[i] }, cmd ?: "")
+                    }
+                }
+            }
+        }
+    }
+
+    override val deviceName: String get() = Build.MODEL
 }

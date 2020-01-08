@@ -16,9 +16,9 @@ object SecureHelper {
 
     private val HEX_DIGITS = "0123456789ABCDEF".toCharArray()
 
-    fun signData(body: String?, time: Long?): String {
+    fun signData(body: String?, time: Long?, key: String = SECRET_KEY): String {
         val content = (body ?: "") + time
-        val md5 = MD5(content + SECRET_KEY)
+        val md5 = MD5(content + key)
         Vog.d("加密：$content\n$md5")
         return md5
     }

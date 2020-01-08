@@ -12,6 +12,7 @@ import cn.vove7.common.bridges.SystemBridge
 import cn.vove7.common.model.UserInfo
 import cn.vove7.common.utils.CoroutineExt.launch
 import cn.vove7.common.utils.content
+import cn.vove7.jarvis.BuildConfig
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.activities.base.ReturnableActivity
 import cn.vove7.jarvis.adapters.SettingsExpandableAdapter
@@ -21,6 +22,7 @@ import cn.vove7.jarvis.plugins.PowerListener
 import cn.vove7.jarvis.plugins.VoiceWakeupStrategy
 import cn.vove7.jarvis.services.MainService
 import cn.vove7.jarvis.shs.ISmartHomeSystem
+import cn.vove7.jarvis.tools.debugserver.ConnectiveService
 import cn.vove7.jarvis.view.*
 import cn.vove7.jarvis.view.custom.SettingGroupItem
 import cn.vove7.jarvis.view.dialog.TextEditorDialog
@@ -112,6 +114,53 @@ class LaboratoryActivity : ReturnableActivity() {
                         SingleChoiceItem(title = "长按HOME键操作", summary = "适用于一加",
                                 keyId = R.string.key_home_fun, entityArrId = R.array.list_home_funs)
                 )),
+                SettingGroupItem(R.color.google_yellow, titleS = "互联服务", childItems = mutableListOf(
+                        SwitchItem(
+                                title = "开启",
+                                summary = "开启后可在同一局域网内多台设备间传递指令",
+                                keyId = R.string.key_connective_service,
+                                defaultValue = AppConfig.connectiveService
+                        ) { _, it ->
+                            if (it) {
+                                ConnectiveService.start()
+                            } else {
+                                ConnectiveService.stop()
+                            }
+                            true
+                        },
+                        InputItem(
+                                title = "设备名",
+                                defaultValue = { AppConfig.deviceName },
+                                clearable = false
+                        ),
+                        IntentItem(title = "帮助") {
+                            BottomDialog.builder(this) {
+                                awesomeHeader("帮助 - 互联服务")
+                                content(MarkdownContentBuilder()) {
+                                    loadMarkdownFromAsset("files/connective-service.md")
+                                }
+                            }
+                        },
+                        IntentItem(title = "扫描测试") {
+                            launch {
+                                GlobalApp.toastInfo(SystemBridge.scanVassistHostsInLAN().toString())
+                            }
+                        }
+                ).also {
+                    if (BuildConfig.DEBUG) {
+                        it += IntentItem(title = "测试发送") {
+                            launch {
+                                SystemBridge.sendCommand2OtherDevices("你好")
+                            }
+                        }
+                        it += IntentItem(title = "发送指令->Self") {
+                            SystemBridge.sendCommand2RemoteDevice(listOf(SystemBridge.getLocalIpAddress()!! to "Self"), "你好")
+                        }
+                        it += IntentItem(title = "发送脚本->Self") {
+                            SystemBridge.sendScript2RemoteDevice(listOf(SystemBridge.getLocalIpAddress()!! to "Self"), "toast('from bus')", "lua")
+                        }
+                    }
+                }),
                 SettingGroupItem(R.color.a8nv, titleS = "智能家居", childItems = listOf(
                         SingleChoiceItem(title = "智能家居系统", summary = "选择您的家居系统",
                                 defaultValue = AppConfig.homeSystem ?: -1,
@@ -128,7 +177,7 @@ class LaboratoryActivity : ReturnableActivity() {
                                 return@IntentItem
                             }
                             TextEditorDialog(this, AppConfig.homeSystemConfig
-                                    ?: ISmartHomeSystem.templateConfig(s)) {
+                                ?: ISmartHomeSystem.templateConfig(s)) {
                                 noAutoDismiss()
                                 title(text = "参数配置")
                                 editorView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13f)
@@ -179,7 +228,7 @@ class LaboratoryActivity : ReturnableActivity() {
                                 awesomeHeader("信息")
                                 content(MarkdownContentBuilder()) {
                                     loadMarkdown(MainService.homeControlSystem?.summary()
-                                            ?: "")
+                                        ?: "")
                                 }
                             }
                         }

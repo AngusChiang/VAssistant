@@ -25,6 +25,7 @@ import cn.vove7.jarvis.receivers.UtilEventReceiver
 import cn.vove7.jarvis.services.ForegroundService
 import cn.vove7.jarvis.services.MainService
 import cn.vove7.jarvis.tools.*
+import cn.vove7.jarvis.tools.debugserver.ConnectiveService
 import cn.vove7.smartkey.android.AndroidSettings
 import cn.vove7.vtp.log.Vog
 import org.greenrobot.eventbus.Subscribe
@@ -90,6 +91,9 @@ class InitCp : ContentProvider() {
             launch {
                 openAccessibilityServiceAuto()
                 setAssistantAppAuto()
+                if (AppConfig.connectiveService) {
+                    ConnectiveService.start()
+                }
             }
 
             JPushInterface.setDebugMode(BuildConfig.DEBUG)

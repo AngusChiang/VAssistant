@@ -236,6 +236,7 @@ class InputItem(titleId: Int? = null,
                 summary: String? = null,
                 keyId: Int? = null,
                 defaultValue: () -> String = { "" },
+                val clearable:Boolean = true,
                 callback: CallbackOnSet<String>? = null)
     : SettingChildItem(titleId, title, summary, itemType = TYPE_INPUT, keyId = keyId,
         defaultValue = defaultValue, callback = callback)

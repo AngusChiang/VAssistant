@@ -667,7 +667,7 @@ object MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
      * 供插件调用
      * @param cmd String
      */
-    fun parseCommand(cmd: String, chat: Boolean) {
+    fun parseCommand(cmd: String, chat: Boolean = true) {
         if (!speechEngineLoaded) {//未加载
             GlobalApp.toastWarning("引擎未就绪")
             return
@@ -949,7 +949,7 @@ object MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
      */
     private fun onParseCommand(
             result: String, needCloud: Boolean = true,
-            chat: Boolean = AppConfig.openChatSystem, from: Int = 0): Boolean {
+            chat: Boolean = true, from: Int = 0): Boolean {
         Vog.d("解析命令：$result")
         if (parsingCommand) {
             Vog.d("正在解析命令:::::::")
@@ -964,42 +964,43 @@ object MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
         resumeMusicIf()
 
         parseJob = GlobalScope.launch {
-            try {
-                //优先智能家居控制系统
-                if (homeControlSystem?.isSupport(result) == true) {
-                    homeControlSystem?.doAction(result)
-                    hideAll()
-                    return@launch
-                }
-                //执行状态码码
-                var execCode = EXEC_CODE_NOT_SUPPORT
-                var lastPosition = 0
+            //优先智能家居控制系统
+            if (homeControlSystem?.isSupport(result) == true) {
+                homeControlSystem?.doAction(result)
+                hideAll()
+                return@launch
+            }
+            //执行状态码码
+            var execCode = EXEC_CODE_NOT_SUPPORT
+            var lastPosition = 0
 
-                do {
-                    delay(1)
-                    val parseResult: ActionParseResult = ParseEngine
-                            .parseAction(result, AccessibilityApi.accessibilityService?.currentScope, smartOpen, onClick, lastPosition)
-                    lastPosition = parseResult.lastGlobalPosition
-                    Vog.d("onParseCommand lastGlobalPosition: ${parseResult.msg} $lastPosition")
-                    delay(1)
-                    if (parseResult.isSuccess) {//actionQueue == null 指smartOpen, onClick 操作成功
-                        val actionQueue = parseResult.actionQueue
-                        if (actionQueue != null) {
-                            floatyPanel.hideDelay()//执行时 消失
-                            execCode = cExecutor.execQueue(result, actionQueue)
-                            Vog.d("onParseCommand execCode: ${parseResult.msg} $execCode")
-                        } else {//smartOpen, onClick 操作成功
-                            execCode = EXEC_CODE_SUCCESS
-                        }
-                    } else break
-                } while (execCode == EXEC_CODE_NOT_SUPPORT)
+            do {
+                delay(1)
+                val parseResult: ActionParseResult = ParseEngine
+                        .parseAction(result, AccessibilityApi.currentScope, smartOpen, onClick, lastPosition)
+                lastPosition = parseResult.lastGlobalPosition
+                Vog.d("onParseCommand lastGlobalPosition: ${parseResult.msg} $lastPosition")
+                delay(1)
+                if (parseResult.isSuccess) {//actionQueue == null 指smartOpen, onClick 操作成功
+                    val actionQueue = parseResult.actionQueue
+                    if (actionQueue != null) {
+                        floatyPanel.hideDelay()//执行时 消失
+                        execCode = cExecutor.execQueue(result, actionQueue)
+                        Vog.d("onParseCommand execCode: ${parseResult.msg} $execCode")
+                    } else {//smartOpen, onClick 操作成功
+                        execCode = EXEC_CODE_SUCCESS
+                    }
+                } else break
+            } while (execCode == EXEC_CODE_NOT_SUPPORT)
 
-                when (execCode) {
-                    EXEC_CODE_NOT_SUPPORT, EXEC_CODE_EMPTY_QUEUE ->//不支持的指令
-                        afterInstParse(result, needCloud, chat)
-                    else -> onExecuteFinished(execCode)
-                }
-            } finally {
+            when (execCode) {
+                EXEC_CODE_NOT_SUPPORT, EXEC_CODE_EMPTY_QUEUE ->//不支持的指令
+                    afterInstParse(result, needCloud, chat && AppConfig.openChatSystem)
+                else -> onExecuteFinished(execCode)
+            }
+
+        }.also {
+            it.invokeOnCompletion {
                 parseJob = null
             }
         }

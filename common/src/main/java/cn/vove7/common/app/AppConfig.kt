@@ -45,6 +45,11 @@ import java.util.*
 object AppConfig : BaseConfig {
     //key... value
 
+    //api 修改
+    @JvmStatic
+    var connectiveService by noCacheKey(false, R.string.key_connective_service)
+    val deviceName by noCacheKey(SystemBridge.deviceName, R.string.key_device_name)
+
     val panelStyle: Int by noCacheKey(0, R.string.key_panel_style)
     var openAppCompat by noCacheKey(false, keyId = R.string.key_open_app_compat)
     var speechEngineType: Int by noCacheKey(0, keyId = R.string.key_speech_engine_type)

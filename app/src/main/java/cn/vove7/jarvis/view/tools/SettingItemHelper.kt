@@ -183,12 +183,14 @@ class SettingItemHelper(
                 setBasic()
             }.show {
                 positiveButton()
-                neutralButton(text = "清空") {
-                    if (settingItem.keyId != null) {
-                        this@SettingItemHelper.config.set(settingItem.keyId, null)
+                if((settingItem as InputItem).clearable) {
+                    neutralButton(text = "清空") {
+                        if (settingItem.keyId != null) {
+                            this@SettingItemHelper.config.set(settingItem.keyId, null)
+                        }
+                        settingItem.summary = backSummary
+                        setBasic()
                     }
-                    settingItem.summary = backSummary
-                    setBasic()
                 }
                 negativeButton()
             }

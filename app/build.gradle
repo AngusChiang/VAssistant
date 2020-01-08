@@ -11,8 +11,12 @@ android {
         minSdkVersion 21
         targetSdkVersion 28
         def subVersion = 0
-        versionName "1.9.9.6"
-        versionCode Integer.parseInt(versionName.replace(".", "")) * 10 + subVersion
+        versionName "2.0.0"
+        def vc = Integer.parseInt(versionName.replace(".", "")) * 10
+        if (vc < 10000) {
+            vc *= 10
+        }
+        versionCode vc + subVersion
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
         multiDexEnabled true
@@ -24,9 +28,9 @@ android {
         resValue "string", "gesture_acc_service_label", "V Assist高级服务（7.0+可用）"
 
         manifestPlaceholders = [
-                JPUSH_PKGNAME : "cn.vove7.vassistant",
+                JPUSH_PKGNAME: "cn.vove7.vassistant",
                 JPUSH_APPKEY : "f4b11a8374fbc79c3746a068", //JPush 上注册的包名对应的 Appkey.
-                JPUSH_CHANNEL : "default", //暂时填写默认值即可.
+                JPUSH_CHANNEL: "default", //暂时填写默认值即可.
         ]
     }
 
@@ -60,12 +64,12 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
 
             manifestPlaceholders = [
-                    JPUSH_PKGNAME : "cn.vove7.vassistant.debug",
+                    JPUSH_PKGNAME: "cn.vove7.vassistant.debug",
                     JPUSH_APPKEY : "2a428d87054dcc8b9fd45a30", //JPush 上注册的包名对应的 Appkey.
-                    JPUSH_CHANNEL : "default", //暂时填写默认值即可.da
+                    JPUSH_CHANNEL: "default", //暂时填写默认值即可.da
             ]
             ndk {//排除其他 abi
-                abiFilters "armeabi-v7a" ,"x86"
+                abiFilters "armeabi-v7a", "x86"
             }
         }
 //        beta {

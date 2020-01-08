@@ -289,4 +289,7 @@ interface SystemOperation {
 
     val screenHeight: Int
     val screenWidth: Int
+    fun sendCommand2OtherDevices(cmd: String?)
+    val deviceName: String
+
 }

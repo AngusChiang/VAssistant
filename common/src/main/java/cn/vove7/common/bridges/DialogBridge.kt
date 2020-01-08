@@ -78,6 +78,38 @@ object DialogBridge {
         return resultBox.blockedGet(false)
     }
 
+    fun multiSelect(title: String, items: Array<String>): Array<Int>? {
+        val resultBox = ResultBox<Array<Int>?>()
+
+        multiSelect(title, items) {
+            resultBox.setAndNotify(it)
+        }
+
+        return resultBox.blockedGet(false)
+    }
+
+    fun multiSelect(title: String, items: Array<String>, onSelect: (Array<Int>?) -> Unit) = runOnUi {
+        val result = mutableSetOf<Int>()
+        AlertDialog.Builder(GlobalApp.APP)
+                .setTitle(title)
+                .setMultiChoiceItems(items, BooleanArray(items.size) { false }) { _, which, isChecked ->
+            if (which >= 0) {
+                if (isChecked) {
+                    result += which
+                } else {
+                    result -= which
+                }
+            }
+        }.setPositiveButton("确定") { _, _ ->
+            onSelect(result.toTypedArray())
+        }.setNegativeButton("取消") { _, _ ->
+            onSelect(null)
+        }.create().apply {
+            setFloat()
+            show()
+        }
+    }
+
 }
 
 internal fun Dialog.setFloat() {

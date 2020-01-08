@@ -102,8 +102,8 @@ class EditorFunsHelper(
                 }, insertPre = "input."),
 
                 ApiCategory("网络", listOf(
-                        ApiFunction("get(url)", "发起get请求，参数:(url [, params:Map])", insertText = "http.get()")
-                        , ApiFunction("post(url)", "发起post请求，参数:(url [, params:Map])", insertText = "http.post()")
+                        ApiFunction("get(url)", "发起get请求，参数:(url [, headers:Map])", insertText = "http.get()")
+                        , ApiFunction("post(url)", "发起post请求，参数:(url [, formData:Map])", insertText = "http.post()")
                         , ApiFunction("postJson(url, json)", "发起post请求, 参数:(url [, json:String)", insertText = "http.postJson()")
                         , ApiFunction("getAsPc(url, json)", "模拟Pc发起get请求, 参数:(url [params:Map])", insertText = "http.getAsPc()")
                 )),

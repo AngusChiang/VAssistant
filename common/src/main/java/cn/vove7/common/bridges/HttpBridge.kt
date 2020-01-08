@@ -25,13 +25,13 @@ object HttpBridge {
         return get(url, null)
     }
 
-    fun get(url: String, params: Map<String, Any>?): String? {
-        println("get ---> $url $params")
+    fun get(url: String, headers: Map<String, Any>?): String? {
+        println("get ---> $url $headers")
         val client = OkHttpClient.Builder()
                 .readTimeout(timeout, TimeUnit.SECONDS).build()
         val request = Request.Builder().url(url)
                 .get().also {
-                    params?.forEach { p ->
+                    headers?.forEach { p ->
                         it.addHeader(p.key, p.value.toString())
                     }
                 }
@@ -86,14 +86,14 @@ object HttpBridge {
 
 
     //postForm
-    fun post(url: String, params: Map<String, Any>?): String? {
+    fun post(url: String, formData: Map<String, Any>?): String? {
         runInCatch {
-            Vog.d("post ---> $url $params")
+            Vog.d("post ---> $url $formData")
         }
         val client = OkHttpClient.Builder()
                 .readTimeout(timeout, TimeUnit.SECONDS).build()
         val requestBody = FormBody.Builder().apply {
-            params?.forEach { p ->
+            formData?.forEach { p ->
                 add(p.key, p.value.toString())
             }
         }.build()
