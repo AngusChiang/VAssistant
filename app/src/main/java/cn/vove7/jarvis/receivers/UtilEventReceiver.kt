@@ -49,6 +49,9 @@ object UtilEventReceiver : DyBCReceiver() {
                     MainService.loadSpeechService(0)
                 }
             }
+            AppBus.ACTION_RELOAD_HOME_SYSTEM -> {
+                MainService.loadHomeSystem()
+            }
         }
     }
 

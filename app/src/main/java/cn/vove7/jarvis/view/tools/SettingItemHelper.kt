@@ -255,7 +255,9 @@ class SettingItemHelper(
         val item = settingItem as SingleChoiceItem
         val default = item.defaultValue.invoke() as Int? ?: -1
         if (default >= 0) {
-            item.summary = item.choiceItems[default]
+            kotlin.runCatching {
+                item.summary = item.choiceItems[default]
+            }
         }
         val key = item.key
         key ?: return default
@@ -269,7 +271,9 @@ class SettingItemHelper(
             } catch (e: Exception) {//保存值为int
                 val index = cs.getInt(key, -1)
                 if (index >= 0) {
-                    item.summary = entity[index]
+                    kotlin.runCatching {
+                        item.summary = entity[index]
+                    }
                 }
                 index
             }

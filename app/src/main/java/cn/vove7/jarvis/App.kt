@@ -96,6 +96,8 @@ class InitCp : ContentProvider() {
                 }
             }
 
+            AppConfig.fetchNetConfig()
+
             JPushInterface.setDebugMode(BuildConfig.DEBUG)
             JPushInterface.init(context)
             JAnalyticsInterface.init(context)

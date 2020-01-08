@@ -36,6 +36,9 @@ object AppBus {
     const val ACTION_START_WAKEUP_TIMER = "start_wakeup_timer"
     const val ACTION_STOP_WAKEUP_TIMER = "stop_wakeup_timer"
 
+
+    const val ACTION_RELOAD_HOME_SYSTEM = "reload_home_system"
+
 //    const val ORDER_STOP_DEBUG = "stop_debug"
 
     @JvmStatic

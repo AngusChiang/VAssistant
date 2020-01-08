@@ -29,6 +29,7 @@ import cn.vove7.jarvis.view.dialog.TextEditorDialog
 import cn.vove7.jarvis.view.dialog.contentbuilder.MarkdownContentBuilder
 import cn.vove7.jarvis.view.dialog.contentbuilder.SettingItemBuilder
 import cn.vove7.jarvis.view.dialog.editorView
+import cn.vove7.vtp.extend.buildList
 import com.afollestad.materialdialogs.WhichButton
 import com.afollestad.materialdialogs.actions.getActionButton
 import kotlinx.android.synthetic.main.activity_expandable_settings.*
@@ -143,7 +144,7 @@ class LaboratoryActivity : ReturnableActivity() {
                         },
                         IntentItem(title = "扫描测试") {
                             launch {
-                                GlobalApp.toastInfo(SystemBridge.scanVassistHostsInLAN().toString())
+                                GlobalApp.toastInfo(SystemBridge.scanVassistHostsInLAN().joinToString("\n"), 1)
                             }
                         }
                 ).also {
@@ -165,7 +166,11 @@ class LaboratoryActivity : ReturnableActivity() {
                         SingleChoiceItem(title = "智能家居系统", summary = "选择您的家居系统",
                                 defaultValue = AppConfig.homeSystem ?: -1,
                                 keyId = R.string.key_home_system,
-                                items = listOf("Rokid(若琪)"), allowClear = true
+                                items = buildList {
+                                    if (AppConfig.netConfig("rokid", true)) {
+                                        this += "Rokid(若琪)"
+                                    }
+                                }, allowClear = true
                         ) { _, data ->
                             MainService.loadHomeSystem(data?.first)
                             true

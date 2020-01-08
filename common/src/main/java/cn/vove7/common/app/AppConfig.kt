@@ -7,10 +7,15 @@ import android.content.ContextWrapper
 import android.content.Intent
 import android.content.pm.ApplicationInfo
 import android.media.AudioManager
+import android.net.ConnectivityManager
+import android.net.Network
+import android.net.NetworkRequest
 import android.net.Uri
 import android.os.Build
 import cn.vove7.common.BuildConfig
 import cn.vove7.common.R
+import cn.vove7.common.appbus.AppBus
+import cn.vove7.common.bridges.HttpBridge
 import cn.vove7.common.bridges.SystemBridge
 import cn.vove7.common.model.UserInfo
 import cn.vove7.common.net.ApiUrls
@@ -140,10 +145,10 @@ object AppConfig : BaseConfig {
             return (if (!UserInfo.isVip()) 0 else i).also { Vog.d("reload ---> chatSystem $it") }
         }
 
-    var homeSystem: Int? by smartKey(null, R.string.key_home_system)
-    var homeSystemConfig: String? by smartKey(null, keyId = R.string.key_home_system_config, encrypt = true)
+    var homeSystem: Int? by noCacheKey(null, R.string.key_home_system)
+    var homeSystemConfig: String? by noCacheKey(null, keyId = R.string.key_home_system_config, encrypt = true)
     //用户自定义短语
-    var homeSystemUserCommand: String? by smartKey(null, keyId = R.string.key_home_system_user_command, encrypt = true)
+    var homeSystemUserCommand: String? by noCacheKey(null, keyId = R.string.key_home_system_user_command, encrypt = true)
 
     val homeFun: Int //长按HOME键功能
         get() = getSingleChoicePosition(R.string.key_home_fun, R.array.list_home_funs)
@@ -331,6 +336,83 @@ object AppConfig : BaseConfig {
                 }
             }
         }
+
+    private var netConfig: Map<String, String>? = null
+
+    @Suppress("IMPLICIT_CAST_TO_ANY", "UNCHECKED_CAST")
+    fun <T> netConfig(key: String, def: T): T {
+        return netConfig?.let {
+            if (key in it) {
+                val value = it[key] ?: ""
+                when (def) {
+                    is Boolean -> value.toBoolean()
+                    is Int -> value.toInt()
+                    is Float -> value.toFloat()
+                    else -> value
+                } as T
+            } else return@let def
+        } ?: def
+    }
+
+    private var networkCallback: ConnectivityManager.NetworkCallback? = null
+
+    private val connectivityManager get() = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+
+    @Synchronized
+    private fun observeNet2Reload() {
+        if (networkCallback == null) {
+            networkCallback = object : ConnectivityManager.NetworkCallback() {
+                override fun onAvailable(network: Network?) {
+                    fetchNetConfig()
+                }
+            }
+        }
+
+        val cm = connectivityManager
+        if (Build.VERSION.SDK_INT >= 24) { //API 大于24时
+            cm.registerDefaultNetworkCallback(networkCallback)
+        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) { //API 大于21时
+            val builder = NetworkRequest.Builder()
+            val request = builder.build()
+            cm.registerNetworkCallback(request, networkCallback)
+        }
+    }
+
+    fun fetchNetConfig() = launch {
+        val configStr = HttpBridge.get("https://gitee.com/Vove/Config/raw/master/V-Assistant.properties")
+        if (configStr == null) {
+            observeNet2Reload()
+            return@launch
+        } else {
+            if (networkCallback != null) {
+                connectivityManager.unregisterNetworkCallback(networkCallback)
+            }
+        }
+
+        val map = configStr.prop2Map()
+        netConfig = map
+        onCheckProp(map)
+    }
+
+    private fun onCheckProp(config: Map<String, String>) {
+        Vog.d("onCheckProp $config")
+        config["rokid"]?.toBoolean()?.also {
+            if (!it && homeSystem == 1) {
+                homeSystem = null
+                AppBus.post(AppBus.ACTION_RELOAD_HOME_SYSTEM)
+            }
+        }
+
+    }
+
+    private fun String.prop2Map(): Map<String, String> {
+        return mutableMapOf<String, String>().apply {
+            lineSequence().forEach {
+                val (k, v) = it.split('=')
+                put(k, v)
+            }
+        }
+    }
 
     /**
      *
