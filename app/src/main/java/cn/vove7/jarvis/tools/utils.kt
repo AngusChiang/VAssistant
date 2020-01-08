@@ -130,7 +130,6 @@ fun isWirelessDebugEnable(): Boolean {
         val result = String(chars)
         return result.matches("[0-9]+\\n".toRegex()) && !result.contains("-1")
     } catch (e: IOException) {
-        e.printStackTrace()
         return false
     }
 }
