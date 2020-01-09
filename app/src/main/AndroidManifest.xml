@@ -98,10 +98,6 @@
                 android:resource="@mipmap/ic_launcher_vassist" />
         </activity>
 
-        <!--<provider-->
-        <!--android:name="com.argusapm.android.core.storage.ApmProvider"-->
-        <!--android:authorities="${applicationId}.apm.storage"-->
-        <!--android:exported="false" />-->
 
         <activity
             android:name=".activities.PermissionManagerActivity"
@@ -380,29 +376,21 @@
         <!-- Since JCore2.0.0 Required SDK核心功能-->
         <!-- 可配置android:process参数将Service放在其他进程中；android:enabled属性不能是false -->
         <!-- 这个是自定义Service，要继承极光JCommonService，可以在更多手机平台上使得推送通道保持的更稳定 -->
-        <service
-            android:name="cn.vove7.push.JPushService"
-            android:enabled="true"
-            android:exported="false"
-            android:process=":pushcore">
-            <intent-filter>
-                <action android:name="cn.jiguang.user.service.action" />
-            </intent-filter>
-        </service>
+
         <service
             android:name=".services.ForegroundService"
             android:label="前台服务"
             android:priority="1000" />
 
-        <receiver
-            android:name=".receivers.JPushReceiver"
-            android:process=":pushcore">
+<!--        <receiver-->
+<!--            android:name=".receivers.JPushReceiver"-->
+<!--            android:process=":pushcore">-->
 
-            <intent-filter>
-                <action android:name="cn.jpush.android.intent.RECEIVE_MESSAGE" />
-                <category android:name="${applicationId}" />
-            </intent-filter>
-        </receiver>
+<!--            <intent-filter>-->
+<!--                <action android:name="cn.jpush.android.intent.RECEIVE_MESSAGE" />-->
+<!--                <category android:name="${applicationId}" />-->
+<!--            </intent-filter>-->
+<!--        </receiver>-->
     </application>
     <permission
         android:name="android.permission.INTERACT_ACROSS_USERS_FULL"

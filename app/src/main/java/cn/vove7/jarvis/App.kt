@@ -7,13 +7,11 @@ import android.database.Cursor
 import android.net.Uri
 import android.os.Build
 import cn.jiguang.analytics.android.api.JAnalyticsInterface
-import cn.jpush.android.api.JPushInterface
 import cn.vove7.common.activities.RunnableActivity.Companion.runInShellActivity
 import cn.vove7.common.app.AppConfig
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.appbus.AppBus
 import cn.vove7.common.helper.AdvanAppHelper
-import cn.vove7.common.model.UserInfo
 import cn.vove7.common.utils.CoroutineExt.launch
 import cn.vove7.common.utils.runOnNewHandlerThread
 import cn.vove7.common.utils.runWithClock
@@ -56,11 +54,11 @@ class App : GlobalApp() {
 
     @Subscribe
     fun onUserEvent(event: String) {
-        if (event == AppBus.EVENT_USER_INIT) {
-            JPushInterface.setAlias(this, 0, UserInfo.getUserId().toString())
-        } else if (event == AppBus.EVENT_LOGOUT) {
-            JPushInterface.deleteAlias(this, 0)
-        }
+//        if (event == AppBus.EVENT_USER_INIT) {
+//            JPushInterface.setAlias(this, 0, UserInfo.getUserId().toString())
+//        } else if (event == AppBus.EVENT_LOGOUT) {
+//            JPushInterface.deleteAlias(this, 0)
+//        }
     }
 
     //供脚本api
@@ -98,10 +96,9 @@ class InitCp : ContentProvider() {
 
             AppConfig.fetchNetConfig()
 
-            JPushInterface.setDebugMode(BuildConfig.DEBUG)
-            JPushInterface.init(context)
+//            JPushInterface.setDebugMode(BuildConfig.DEBUG)
+//            JPushInterface.init(context)
             JAnalyticsInterface.init(context)
-            JAnalyticsInterface.setDebugMode(BuildConfig.DEBUG)
             ShortcutUtil.initShortcut()
             AdvanAppHelper.getPkgList()
             startBroadcastReceivers()

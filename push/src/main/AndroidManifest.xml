@@ -1,4 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="cn.vove7.push">
 
     <application>
@@ -10,5 +11,20 @@
         <meta-data
             android:name="JPUSH_APPKEY"
             android:value="${JPUSH_APPKEY}" />
+
+        <service
+            android:name="cn.jpush.android.service.DaemonService"
+            android:enabled="false"
+            android:exported="false"
+            tools:replace="android:exported,android:enabled" />
+<!--        <service-->
+<!--            android:name="cn.vove7.push.JPushService"-->
+<!--            android:enabled="true"-->
+<!--            android:exported="false"-->
+<!--            android:process=":pushcore">-->
+<!--            <intent-filter>-->
+<!--                <action android:name="cn.jiguang.user.service.action" />-->
+<!--            </intent-filter>-->
+<!--        </service>-->
     </application>
 </manifest>
