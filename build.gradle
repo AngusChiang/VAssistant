@@ -8,6 +8,9 @@ buildscript {
     ext.androidx_version = '1.1.0'
 
     repositories {
+        maven{ url'http://maven.aliyun.com/nexus/content/groups/public/' }
+        maven{ url'http://maven.aliyun.com/nexus/content/repositories/jcenter'}
+
         mavenCentral()
         google()
         jcenter()
@@ -25,8 +28,10 @@ buildscript {
 
 allprojects {
     repositories {
+        maven{ url'http://maven.aliyun.com/nexus/content/groups/public/' }
+        maven{ url'http://maven.aliyun.com/nexus/content/repositories/jcenter'}
+
         mavenCentral()
-        maven { url 'https://maven.aliyun.com/repository/jcenter' }
         maven { url "https://dl.bintray.com/drummer-aidan/maven/" }
         maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
         google()
