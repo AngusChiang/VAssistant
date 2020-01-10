@@ -179,6 +179,12 @@ object GlobalLog {
         }
     }
 
+    inline fun logStackTrace() = log(
+            Thread.currentThread().stackTrace.joinToString("\n") {
+                "${it.methodName}(${it.fileName}:${it.lineNumber})"
+            }
+    )
+
 }
 
 
