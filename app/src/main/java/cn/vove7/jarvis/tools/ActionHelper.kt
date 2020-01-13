@@ -101,20 +101,28 @@ object ActionHelper {
     }
 
     fun spotWithTaobao(path: String) {
-        if (!SystemBridge.hasInstall("com.taobao.taobao")) {
-            GlobalApp.toastError("未安装手机淘宝")
+        //ResolveInfo{bf02772 com.taobao.taobao/com.etao.feimagesearch.IrpActivity m=0x608000}
+        spotWith(path, ComponentName("com.taobao.taobao", "com.etao.feimagesearch.IrpActivity"), "手机淘宝")
+    }
+
+    fun spotWithJD(path: String) {
+        //ResolveInfo{cbd9e43 com.jingdong.app.mall/.open.InterfaceActivity m=0x608000}
+        spotWith(path, ComponentName("com.jingdong.app.mall", "com.jingdong.app.mall.open.InterfaceActivity"), "京东")
+    }
+
+    private fun spotWith(path: String, cn: ComponentName, appName: String) {
+        if (!SystemBridge.hasInstall(cn.packageName)) {
+            GlobalApp.toastError("未安装${appName}")
             return
         }
         val tmpFile = File(path)
-
         val imgUri = if (Build.VERSION.SDK_INT >= 24) {
             FileProvider.getUriForFile(app, "${app.packageName}.fileprovider", tmpFile)
         } else Uri.fromFile(tmpFile)
         val intent = Intent(Intent.ACTION_SEND).apply {
             type = "image/jpg"
             putExtra(Intent.EXTRA_STREAM, imgUri)
-            //ResolveInfo{bf02772 com.taobao.taobao/com.etao.feimagesearch.IrpActivity m=0x608000}
-            component = ComponentName("com.taobao.taobao", "com.etao.feimagesearch.IrpActivity")
+            component = cn
         }
         app.startActivity(intent.newTask())
     }

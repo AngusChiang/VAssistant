@@ -2,7 +2,7 @@
 
 - 优化音乐控制指令
 - 支持执行 [Tasker](https://www.coolapk.com/apk/net.dinglisch.android.taskerm) 任务
-
+- [屏幕识别] 支持京东识别
 ### 2.0.0.1
 
 - 修复唤醒后不会自动停止

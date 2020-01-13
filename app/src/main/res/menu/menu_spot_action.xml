@@ -3,5 +3,8 @@
     <item
         android:id="@+id/item_spot_with_taobao"
         android:title="淘宝商品识别" />
+  <item
+        android:id="@+id/item_spot_with_jd"
+        android:title="京东商品识别" />
 
 </menu>

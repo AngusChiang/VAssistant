@@ -309,6 +309,10 @@ class ScreenAssistActivity : BaseActivity() {
                         finish()
                         ActionHelper.spotWithTaobao(screenPath)
                     }
+                    R.id.item_spot_with_jd -> {
+                        finish()
+                        ActionHelper.spotWithJD(screenPath)
+                    }
                 }
                 true
             }
