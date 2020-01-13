@@ -10,7 +10,7 @@ import androidx.fragment.app.Fragment
  */
 
 abstract class OneFragmentActivity : BaseActivityWithViewPager() {
-    override var fragments: Array<androidx.fragment.app.Fragment> = arrayOf()
+    override var fragments: Array<Fragment> = arrayOf()
 
     override var titles: Array<String> = arrayOf()
 }

@@ -198,7 +198,7 @@ class ScreenAssistActivity : BaseActivity() {
             checkFuns()
         }
         //进入时清空缓存
-        CoroutineExt.launch {
+        launch {
             cacheDir.listFiles()?.filter { it.isFile && it.extension == "png" && it.absolutePath != screenPath }?.forEach {
                 it.delete()
             }
@@ -214,7 +214,7 @@ class ScreenAssistActivity : BaseActivity() {
                 afterHandleScreen()
             } else {
                 val isDelay = getBooleanExtra("delay", false)
-                GlobalScope.launch {
+                launch {
                     delay(if (isDelay) 1000 else 0)
                     val path = SystemBridge.screenShot()?.let {
                         //截完图显示面板
@@ -482,7 +482,7 @@ class ScreenAssistActivity : BaseActivity() {
             return
         }
         showProgressBar = true
-        oneJob = GlobalScope.launch {
+        oneJob = launch {
             try {
                 val results = BaiduAipHelper.ocr(UtilBridge.compressImage(screenPath))
                 if (oneJob?.isCancelled == false) {
@@ -510,7 +510,7 @@ class ScreenAssistActivity : BaseActivity() {
         }
 
         showProgressBar = true
-        CoroutineExt.launchIo {
+        launchIo {
             val r = BaiduAipHelper.imageClassify(UtilBridge.compressImage(screenPath))
             withContext(Dispatchers.Main) {
                 showProgressBar = false

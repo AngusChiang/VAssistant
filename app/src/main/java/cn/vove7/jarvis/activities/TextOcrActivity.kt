@@ -12,25 +12,22 @@ import cn.vove7.bottomdialog.BottomDialog
 import cn.vove7.common.app.AppConfig
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.bridges.SystemBridge
-import cn.vove7.common.utils.CoroutineExt.launch
 import cn.vove7.common.utils.CoroutineExt.withMain
 import cn.vove7.common.utils.fadeIn
 import cn.vove7.common.utils.gone
 import cn.vove7.common.utils.runOnUi
 import cn.vove7.common.utils.startActivity
 import cn.vove7.jarvis.R
+import cn.vove7.jarvis.activities.base.BaseActivity
 import cn.vove7.jarvis.tools.Tutorials
 import cn.vove7.jarvis.tools.baiduaip.BaiduAipHelper
 import cn.vove7.jarvis.tools.baiduaip.model.TextOcrItem
 import cn.vove7.jarvis.view.dialog.TextOperationDialog
 import cn.vove7.vtp.asset.AssetHelper
 import cn.vove7.vtp.log.Vog
-import com.google.android.material.floatingactionbutton.FloatingActionButton
 import kotlinx.android.synthetic.main.activity_text_ocr.*
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.joinAll
-import kotlinx.coroutines.launch
 import java.util.*
 
 /**
@@ -39,7 +36,7 @@ import java.util.*
  * @author 11324
  * 2019/3/11
  */
-class TextOcrActivity : Activity() {
+class TextOcrActivity : BaseActivity() {
     private val wordItems = mutableListOf<Model>()
 
     companion object {
@@ -79,7 +76,7 @@ class TextOcrActivity : Activity() {
     }
 
     private fun ocrWithScreenShot() {
-        GlobalScope.launch {
+        launch {
             //异步
             try {
                 val path = SystemBridge.screen2File()?.absolutePath

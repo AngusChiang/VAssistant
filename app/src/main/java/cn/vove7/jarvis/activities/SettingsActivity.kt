@@ -352,7 +352,7 @@ class SettingsActivity : ReturnableActivity() {
                             keyId = R.string.key_auto_open_as_with_root,
                             defaultValue = AppConfig.autoOpenAS
                     ) { _, b ->
-                        if (b) CoroutineExt.launch {
+                        if (b) launch {
                             if (!AccessibilityApi.isBaseServiceOn) {
                                 AccessibilityApi.openServiceSelf()
                             }

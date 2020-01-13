@@ -1,8 +1,8 @@
 package cn.vove7.jarvis.view.dialog
 
-import android.app.Activity
 import android.widget.PopupMenu
 import android.widget.TextView
+import androidx.appcompat.app.AppCompatActivity
 import cn.vove7.bottomdialog.BottomDialog
 import cn.vove7.bottomdialog.builder.ButtonsBuilder
 import cn.vove7.bottomdialog.builder.buttons
@@ -12,8 +12,12 @@ import cn.vove7.bottomdialog.extension.awesomeHeader
 import cn.vove7.common.app.AppConfig
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.bridges.SystemBridge
-import cn.vove7.common.utils.*
+import cn.vove7.common.utils.StorageHelper
+import cn.vove7.common.utils.broadcastImageFile
+import cn.vove7.common.utils.content
+import cn.vove7.common.utils.runOnUi
 import cn.vove7.jarvis.R
+import cn.vove7.jarvis.lifecycle.LifeCycleScope
 import cn.vove7.jarvis.tools.DataCollector
 import cn.vove7.jarvis.tools.QRTools
 import cn.vove7.jarvis.tools.baiduaip.BaiduAipHelper
@@ -29,8 +33,8 @@ import java.io.File
  * @author Vove
  * 2019/6/7
  */
-class TextOperationDialog(val activity: Activity, val textModel: TextModel) {
-
+class TextOperationDialog(val activity: AppCompatActivity, val textModel: TextModel) {
+    val lifeCycleScope by lazy { LifeCycleScope(activity.lifecycle) }
     //默认已换行
     private var wraped = true
 
@@ -40,8 +44,6 @@ class TextOperationDialog(val activity: Activity, val textModel: TextModel) {
     private var opText = textModel.text.toString()
 
     val bottomDialog = BottomDialog.builder(activity) {
-        navBgColor
-
         awesomeHeader("文字操作")
         buttons {
 
@@ -79,7 +81,7 @@ class TextOperationDialog(val activity: Activity, val textModel: TextModel) {
     private fun translate() {
         DataCollector.buriedPoint("to_trans")
         AppConfig.haveTranslatePermission() ?: return
-        CoroutineExt.launch {
+        lifeCycleScope.launch {
             bottomDialog.updateContent<WrappedTextContentBuilder> {
                 textView.apply {
                     appendlnGreen("\n翻译中...")
