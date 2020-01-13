@@ -168,7 +168,7 @@ object SystemBridge : SystemOperation {
     }
 
     override fun getPkgByWord(appWord: String): String? =
-        getPkgByName(appWord)
+            getPkgByName(appWord)
 
 
     // Open App 启动对应首页Activity
@@ -388,17 +388,28 @@ object SystemBridge : SystemOperation {
     }
 
 
+    /**
+     * 兼容
+     * @param keyCode Int
+     */
     private fun sendMediaKey(keyCode: Int) {
-        var ke = KeyEvent(KeyEvent.ACTION_DOWN, keyCode)
         val intent = Intent(Intent.ACTION_MEDIA_BUTTON)
         intent.addFlags(Intent.FLAG_RECEIVER_FOREGROUND)
+        val kdn = KeyEvent(KeyEvent.ACTION_DOWN, keyCode)
+        val kup = KeyEvent(KeyEvent.ACTION_UP, keyCode)
 
-        intent.putExtra(Intent.EXTRA_KEY_EVENT, ke)
-        GlobalApp.APP.sendBroadcast(intent)
+        //一个一个发送
 
-        ke = KeyEvent(KeyEvent.ACTION_UP, keyCode)
-        intent.putExtra(Intent.EXTRA_KEY_EVENT, ke)
-        GlobalApp.APP.sendBroadcast(intent)
+        GlobalApp.APP.packageManager.queryBroadcastReceivers(intent, 0).map {
+            ComponentName(it.activityInfo.packageName, it.activityInfo.name)
+        }.forEach { cn ->
+            Vog.d("sendMediaKey to $cn")
+            intent.putExtra(Intent.EXTRA_KEY_EVENT, kdn)
+            intent.component = cn
+            GlobalApp.APP.sendBroadcast(intent)
+            intent.putExtra(Intent.EXTRA_KEY_EVENT, kup)
+            GlobalApp.APP.sendBroadcast(intent)
+        }
     }
 
     override fun mediaResume() {
@@ -1067,7 +1078,7 @@ object SystemBridge : SystemOperation {
         get() {
             val filter = IntentFilter(Intent.ACTION_BATTERY_CHANGED)
             val intent = context.registerReceiver(null, filter)
-                ?: return -1
+                    ?: return -1
 
             val level = intent.getIntExtra(BatteryManager.EXTRA_LEVEL, 100) //电量的刻度
             val maxLevel = intent.getIntExtra(BatteryManager.EXTRA_SCALE, 100) //最大

@@ -32,6 +32,7 @@ android {
                 JPUSH_APPKEY : "f4b11a8374fbc79c3746a068", //JPush 上注册的包名对应的 Appkey.
                 JPUSH_CHANNEL: "default", //暂时填写默认值即可.
         ]
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
     buildTypes {
@@ -130,7 +131,7 @@ task makeJar(type: Jar) {
     //exclude{ it.name.startsWith('R$');}
 }
 dependencies {
-
+    androidTestImplementation 'androidx.test.ext:junit:1.1.1'
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     androidTestImplementation('androidx.test.espresso:espresso-core:3.2.0')
 

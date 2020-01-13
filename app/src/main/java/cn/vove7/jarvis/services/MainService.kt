@@ -5,7 +5,6 @@ import android.app.AlertDialog
 import android.app.Dialog
 import android.content.DialogInterface
 import android.content.Intent
-import android.view.KeyEvent.*
 import cn.vove7.common.MessageException
 import cn.vove7.common.accessibility.AccessibilityApi
 import cn.vove7.common.app.AppConfig
@@ -719,11 +718,11 @@ object MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
             "减小音量" -> {
                 SystemBridge.volumeDown()
             }
-            "播放" -> runInCatch { InputMethodBridge.sendKey(KEYCODE_MEDIA_PLAY) }
-            "停止" -> runInCatch { InputMethodBridge.sendKey(KEYCODE_MEDIA_STOP) }
-            "暂停" -> runInCatch { InputMethodBridge.sendKey(KEYCODE_MEDIA_PAUSE) }
-            "上一首" -> runInCatch { InputMethodBridge.sendKey(KEYCODE_MEDIA_PREVIOUS) }
-            "下一首" -> runInCatch { InputMethodBridge.sendKey(KEYCODE_MEDIA_NEXT) }
+            "播放" -> runInCatch { SystemBridge.mediaResume() }
+            "停止" -> runInCatch { SystemBridge.mediaStop() }
+            "暂停" -> runInCatch { SystemBridge.mediaPause() }
+            "上一首" -> runInCatch { SystemBridge.mediaPre() }
+            "下一首" -> runInCatch { SystemBridge.mediaNext() }
             //打开电灯、关闭电灯、增大亮度、减小亮度
             //打开手电筒、关闭手电筒
             "打开手电筒", "打开电灯" -> SystemBridge.openFlashlight()
