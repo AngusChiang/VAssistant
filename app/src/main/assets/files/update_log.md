@@ -1,3 +1,8 @@
+### 2.0.1
+
+- 优化音乐控制指令
+- 支持执行 [Tasker](https://www.coolapk.com/apk/net.dinglisch.android.taskerm) 任务
+
 ### 2.0.0.1
 
 - 修复唤醒后不会自动停止
