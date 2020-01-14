@@ -7,9 +7,9 @@ import cn.vove7.androlua.luautils.LuaDexLoader
 import cn.vove7.androlua.luautils.LuaGcable
 import cn.vove7.androlua.luautils.LuaManagerI
 import cn.vove7.androlua.luautils.LuaPrinter
-import cn.vove7.common.ScriptEngineBridges
 import cn.vove7.common.MessageException
 import cn.vove7.common.NotSupportException
+import cn.vove7.common.ScriptEngineBridges
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.executor.OnPrint
@@ -147,9 +147,9 @@ class LuaHelper : LuaManagerI, ScriptEngine {
         })
 
         //从assert加载api
+        requireFromAsset("lua_requires/import.lua")
+        evalString(buildInitBridgeScript(), emptyMap<String, String>())
         requireFromAsset(
-                "lua_requires/import.lua",
-                "lua_requires/bridges.lua",
                 "lua_requires/utils.lua",
                 "lua_requires/executor.lua",
                 "lua_requires/view_op.lua",
@@ -159,6 +159,10 @@ class LuaHelper : LuaManagerI, ScriptEngine {
                 "lua_requires/settings.lua"
         )
     }
+
+    private fun buildInitBridgeScript(): String = bridgeManager?.apis?.keys?.joinToString("\n") {
+        it + " = " + "luaman.getBridgeManager().get('${it}')"
+    } ?: ""
 
     private fun requireFromAsset(vararg files: String) {
         files.forEach {
