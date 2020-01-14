@@ -20,6 +20,7 @@ import cn.vove7.common.utils.whileWaitTime
 import cn.vove7.vtp.app.AppInfo
 import cn.vove7.vtp.log.Vog
 import cn.vove7.vtp.runtimepermission.PermissionUtils
+import java.lang.Thread.sleep
 import java.util.concurrent.ConcurrentSkipListSet
 
 /**
@@ -116,7 +117,10 @@ abstract class AccessibilityApi : AccessibilityService() {
             return whileWaitTime(if (waitMillis > 30000) 30000 else waitMillis) {
                 if (AccessibilityApi.isBaseServiceOn)
                     true
-                else null
+                else {
+                    sleep(500)
+                    null
+                }
             } ?: throw NeedAccessibilityException()
         }
 
