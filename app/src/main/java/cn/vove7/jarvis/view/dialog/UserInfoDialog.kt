@@ -216,6 +216,9 @@ class UserInfoDialog(val context: Activity, val onUpdate: () -> Unit) {
                 e.log()
                 GlobalApp.toastError(R.string.text_net_err)
             }
+            end {
+                dialog.show()
+            }
         }
     }
 
