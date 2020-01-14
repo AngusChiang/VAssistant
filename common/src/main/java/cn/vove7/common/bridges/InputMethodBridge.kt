@@ -294,11 +294,11 @@ object InputMethodBridge : InputOperation {
                 showInputMethodPicker()
                 sleep(300)//等待显示
 
-                getStoreImLabel(id)?.also { name ->
-                    text(name).waitFor(1000)?.tryClick()
+                val name = getStoreImLabel(id)
+                if (name != null) {
+                    text(name.trim()).waitFor(2000)?.tryClick()
                 }
-
-                Vog.d("输入法恢复成功")
+                Vog.d("输入法恢复 $name")
             } finally {
                 it.finishAndRemoveTask()
                 //等待消失
