@@ -1,6 +1,7 @@
 package cn.vove7.common.view.finder
 
 import android.view.accessibility.AccessibilityNodeInfo
+import cn.vove7.common.BuildConfig
 import cn.vove7.common.NeedAccessibilityException
 import cn.vove7.common.accessibility.AccessibilityApi
 import cn.vove7.common.accessibility.viewnode.ViewNode
@@ -98,9 +99,14 @@ abstract class ViewFinder(var node: AccessibilityNodeInfo?) {
             return null
         }
         (0 until node.childCount).forEach { index ->
-            Vog.v("traverseAllNode ${node.className} $index/${node.childCount}")
+            if(BuildConfig.DEBUG) {
+                Vog.v("traverseAllNode ${node.className} $index/${node.childCount}")
+            }
             val childNode = node.getChild(index)
             if (childNode != null) {
+                if(BuildConfig.DEBUG) {
+                    Vog.v("child[$index]: ${childNode.text}")
+                }
                 if (!includeInvisible && !childNode.isVisibleToUser) {
                     Vog.v("unVisibleToUser ---> ${childNode.text}")
                     return@forEach
