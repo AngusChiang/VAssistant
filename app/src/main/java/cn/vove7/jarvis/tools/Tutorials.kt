@@ -46,7 +46,7 @@ object Tutorials {
     const val screen_translate_tips = "screen_translate_tips"
     const val screen_assistant_qrcode = "screen_assistant_qrcode"
     const val screen_assistant_spot = "screen_assistant_spot"
-    const val screen_assistant_ocr = "screen_assistant_ocr"
+    const val screen_assistant_ocr = "screen_assistant_ocr2"
 
     val context: Context
         get() = GlobalApp.APP

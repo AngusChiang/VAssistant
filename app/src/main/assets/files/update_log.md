@@ -1,5 +1,6 @@
 ### 2.0.2
 
+- 优化文字识别页
 - 增强稳定性
 - 添加api `utils.runAppCommand` 负责全局指令调用App内指令
 - 添加api `utils.waitAccessibility`

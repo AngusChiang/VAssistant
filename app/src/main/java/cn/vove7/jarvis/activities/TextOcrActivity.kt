@@ -1,6 +1,5 @@
 package cn.vove7.jarvis.activities
 
-import android.app.Activity
 import android.content.Context
 import android.os.Bundle
 import android.view.Gravity
@@ -23,6 +22,7 @@ import cn.vove7.jarvis.tools.Tutorials
 import cn.vove7.jarvis.tools.baiduaip.BaiduAipHelper
 import cn.vove7.jarvis.tools.baiduaip.model.TextOcrItem
 import cn.vove7.jarvis.view.dialog.TextOperationDialog
+import cn.vove7.jarvis.view.dp
 import cn.vove7.vtp.asset.AssetHelper
 import cn.vove7.vtp.log.Vog
 import kotlinx.android.synthetic.main.activity_text_ocr.*
@@ -117,6 +117,7 @@ class TextOcrActivity : BaseActivity() {
 
     private fun buildContent() {
         loading_layout.gone()
+        val framePx = 1.5f.dp.px
         wordItems.forEach { model ->
             val item = model.item
 
@@ -130,18 +131,14 @@ class TextOcrActivity : BaseActivity() {
             CheckedTextView(this).apply {
                 setBackgroundResource(R.drawable.bg_screen_text_high_light_no_radius)
                 Vog.d("buildContent ---> $item")
-                gravity = Gravity.TOP
-                setTextColor(0xFFFFFF)
-                textSize = 15f
-                isVerticalScrollBarEnabled = true
-                text = item.text
+                gravity = Gravity.CENTER
                 val w = item.width
                 val left = item.left
                 val rotationAngle = item.rotationAngle
                 Vog.d("buildContent ---> ${item.text} top:$top ,left:$left ,w:$w h:$h rotationAngle:$rotationAngle")
 
-                layoutParams = RelativeLayout.LayoutParams(w, h).also {
-                    it.setMargins(left, top, 0, 0)
+                layoutParams = RelativeLayout.LayoutParams(w + 2 * framePx, h + 2 * framePx).also {
+                    it.setMargins(left - framePx / 2, top - framePx / 2, 0, 0)
                 }
                 rotationX = 0.5f
                 rotationY = 0.5f
@@ -154,6 +151,12 @@ class TextOcrActivity : BaseActivity() {
 
         floatEditIcon.setOnClickListener {
             editCheckedText()
+        }
+        floatEditIcon.setOnLongClickListener {
+            wordItems.forEach {
+                it.textView?.isChecked = false
+            }
+            true
         }
         rootContent.onStartMove = {
             floatEditIcon.gone()
@@ -197,7 +200,7 @@ class TextOcrActivity : BaseActivity() {
         hasT = true
         GlobalApp.toastInfo("开始翻译")
 
-        launch {
+        launchIo {
             val defs = wordItems.map {
                 val text = it.item.text
                 async {
@@ -207,7 +210,6 @@ class TextOcrActivity : BaseActivity() {
                         it.item.subText = res
                         withMain {
                             it.textView?.isChecked = true
-                            it.textView?.text = res
                         }
                     } else {
                         it.item.subText = "翻译失败"
@@ -216,7 +218,7 @@ class TextOcrActivity : BaseActivity() {
             }
             defs.joinAll()
             //监听
-            if (isFinishing) return@launch
+            if (isFinishing) return@launchIo
             withMain {
                 GlobalApp.toastSuccess("翻译完成")
             }
