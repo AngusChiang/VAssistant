@@ -202,7 +202,7 @@ open class ExecutorImpl(
 
                     actionScope = this.actionScopeType
                     Vog.d("pollActionQueue ---> $actionScope")
-                    r = runScript(this.actionScript, this.param)// 清除参数缓存
+                    r = runScript(this.actionScript, scriptType, this.param)// 清除参数缓存
                     if (r.first != EXEC_CODE_SUCCESS) {
                         return r.first
                     }
@@ -216,9 +216,9 @@ open class ExecutorImpl(
         return if (userInterrupt) EXEC_CODE_INTERRUPT else EXEC_CODE_SUCCESS
     }
 
-    override fun runScript(script: String, argMap: Map<String, Any?>?): Pair<Int, String?> {
+    override fun runScript(script: String, type:String, argMap: Map<String, Any?>?): Pair<Int, String?> {
         Vog.d("runScript arg : $argMap\n$script")
-        return when (currentAction?.scriptType) {
+        return when (type) {
             SCRIPT_TYPE_LUA -> {
                 onLuaExec(script, argMap)
             }

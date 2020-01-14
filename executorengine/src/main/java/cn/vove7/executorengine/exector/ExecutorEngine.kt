@@ -38,7 +38,8 @@ class ExecutorEngine : ExecutorImpl() {
             "serviceBridge" to ServiceBridge.instance,
             "app" to GlobalApp.APP,
             "input" to InputMethodBridge,
-            "dialog" to DialogBridge
+            "dialog" to DialogBridge,
+            "utils" to UtilBridge
     )
 
     override fun onRhinoExec(script: String, argMap: Map<String, Any?>?): Pair<Int, String?> {
@@ -56,7 +57,7 @@ class ExecutorEngine : ExecutorImpl() {
     //didn't work fixme
     fun runActionSilent(action: Action, argMap: Map<String, Any?>?) {//静默
         currentAction = action
-        runScript(action.actionScript, argMap)
+        runScript(action.actionScript, action.scriptType, argMap)
     }
 
     /**

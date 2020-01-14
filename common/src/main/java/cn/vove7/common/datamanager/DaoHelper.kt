@@ -159,7 +159,7 @@ object DaoHelper {
                         ActionNodeDao.Properties.ActionScopeType.eq(type),
                         actionNodeDao.queryBuilder().or(ActionNodeDao.Properties.PublishUserId.isNull,
                                 ActionNodeDao.Properties.PublishUserId.notEq(UserInfo.getUserId()
-                                    ?: -1L)
+                                        ?: -1L)
                         )
                 ).list().toHashSet()
 
@@ -244,6 +244,19 @@ object DaoHelper {
                 .unique()
     }
 
+    fun getInAppActionNodeByCmd(pkg: String, cmd: String): ActionNode? {
+        val scopeIds = DAO.daoSession.actionScopeDao.queryBuilder()
+                .where(ActionScopeDao.Properties.PackageName.eq(pkg))
+                .list().map { it.id }
+
+        return DAO.daoSession.actionNodeDao.queryBuilder()
+                .where(
+                        ActionNodeDao.Properties.ActionScopeType.eq(ActionNode.NODE_SCOPE_IN_APP),
+                        ActionNodeDao.Properties.ActionTitle.eq(cmd),
+                        ActionNodeDao.Properties.ScopeId.`in`(scopeIds)
+                ).unique()
+    }
+
     /**
      *
      * @param newNode ActionNode
@@ -317,7 +330,7 @@ object DaoHelper {
                 ,
                 markedDao.queryBuilder().or(MarkedDataDao.Properties.PublishUserId.isNull,
                         MarkedDataDao.Properties.PublishUserId.notEq(UserInfo.getUserId()
-                            ?: -1L)
+                                ?: -1L)
                 )
         ).list()
         //用户自己 可能未审核
@@ -367,7 +380,7 @@ object DaoHelper {
                     AppAdInfoDao.Properties.From.notEq(DataFrom.FROM_USER),
                     appAdInfoDao.queryBuilder().or(AppAdInfoDao.Properties.PublishUserId.isNull,
                             AppAdInfoDao.Properties.PublishUserId.notEq(UserInfo.getUserId()
-                                ?: -1L))
+                                    ?: -1L))
             ).list().toHashSet()
             val userList = appAdInfoDao.queryBuilder().whereOr(
                     AppAdInfoDao.Properties.From.eq(DataFrom.FROM_USER),

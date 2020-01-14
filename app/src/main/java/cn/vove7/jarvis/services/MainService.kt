@@ -486,7 +486,13 @@ object MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
     fun runAction(ac: Action) {
         val q = PriorityQueue<Action>()
         q.add(ac)
-        cExecutor.execQueue(CExecutorI.DEBUG_SCRIPT, q, false)
+        val title = ac.param["title"] as? String
+        if(ac.param["from"] == "script") {
+            val res = cExecutor.runScript(ac.actionScript,ac.scriptType, ac.param)
+            cExecutor.onFinish(res.first)
+        }else {
+            cExecutor.execQueue(title ?: CExecutorI.DEBUG_SCRIPT, q, false)
+        }
     }
 
     /**

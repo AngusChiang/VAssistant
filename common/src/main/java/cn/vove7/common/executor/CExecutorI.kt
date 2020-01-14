@@ -42,7 +42,7 @@ interface CExecutorI : ActivityShowListener, RuntimeArgs, SpeakCallback {
     fun interrupt()
     fun runScript(script: String, args: Array<String>? = null): PartialResult = PartialResult(false)
 
-    fun runScript(script: String, argMap: Map<String, Any?>? = null): Pair<Int, String?>
+    fun runScript(script: String, type: String, argMap: Map<String, Any?>? = null): Pair<Int, String?>
     fun setScreenSize(width: Int, height: Int)
 
     fun executeFailed(msg: String?)

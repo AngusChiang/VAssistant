@@ -1,8 +1,12 @@
 package cn.vove7.common.bridges
 
 import android.graphics.Bitmap
+import cn.vove7.common.MessageException
+import cn.vove7.common.annotation.ScriptApi
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.app.GlobalLog
+import cn.vove7.common.appbus.AppBus
+import cn.vove7.common.datamanager.DaoHelper
 import cn.vove7.common.utils.tasker.TaskerIntent
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
@@ -11,6 +15,7 @@ import top.zibin.luban.Luban
 import java.io.File
 import java.io.FileOutputStream
 import java.util.*
+import kotlin.collections.HashMap
 
 
 /**
@@ -127,4 +132,37 @@ object UtilBridge {
         }
     }
 
+    /**
+     * 执行App内指令
+     * 用于全局调用App内指令
+     * @param pkg String
+     * @param cmd String
+     */
+    @ScriptApi
+    @JvmStatic
+    @JvmOverloads
+    fun runAppCommand(pkg: String, cmd: String, argMap: Map<String, Any?>? = null): Boolean {
+        val node = DaoHelper.getInAppActionNodeByCmd(pkg, cmd)
+        return if (node == null) {
+            false
+        } else {
+            val action = node.action
+            action.param = (HashMap(argMap ?: emptyMap())).also {
+                it["title"] = cmd
+                it["from"] = "script"
+            }
+            AppBus.post(action)
+            true
+        }
+    }
+
+    /**
+     * 抛出异常
+     * @param msg String?
+     */
+    @ScriptApi
+    @JvmStatic
+    fun `throw`(msg: String?) {
+        throw MessageException(msg)
+    }
 }

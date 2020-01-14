@@ -1,3 +1,10 @@
+### 2.0.2
+
+- 增强稳定性
+- 添加api `utils.runAppCommand` 负责全局指令调用App内指令
+- 添加api `utils.waitAccessibility`
+- 添加api `utils.checkVersion`
+
 ### 2.0.1
 
 - 优化音乐控制指令
