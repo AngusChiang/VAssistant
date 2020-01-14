@@ -2,17 +2,15 @@ package cn.vove7.jarvis.tools
 
 import android.content.ComponentName
 import android.content.Intent
-import android.net.Uri
-import android.os.Build
 import android.os.Environment
-import androidx.core.content.FileProvider
+import cn.vove7.common.MessageException
 import cn.vove7.common.accessibility.AccessibilityApi
 import cn.vove7.common.app.GlobalApp
+import cn.vove7.common.app.log
 import cn.vove7.common.bridges.SystemBridge
 import cn.vove7.common.utils.CoroutineExt
 import cn.vove7.common.utils.broadcastImageFile
 import cn.vove7.common.utils.clearTask
-import cn.vove7.common.utils.newTask
 import cn.vove7.common.view.finder.ViewFindBuilder.Companion.text
 import cn.vove7.common.view.finder.ViewFindBuilder.Companion.type
 import kotlinx.coroutines.delay
@@ -43,6 +41,7 @@ object ActionHelper {
             doQrWithWechat()
         } catch (e: Throwable) {
             tmpFile?.delete()
+            e.log()
             tmpFile = null
             GlobalApp.toastError("执行失败: " + e.message)
         } finally {
@@ -58,7 +57,7 @@ object ActionHelper {
         val intent = app.packageManager.getLaunchIntentForPackage("com.tencent.mm")
         if (intent == null) {
             GlobalApp.toastError("未安装微信")
-            return
+            throw MessageException("未安装微信")
         }
         AccessibilityApi.requireAccessibility()
         intent.putExtra("LauncherUI.From.Scaner.Shortcut", true)
@@ -73,53 +72,37 @@ object ActionHelper {
      * 调用支付宝扫一扫
      * @param path String
      */
-    fun qrWithAlipay(path: String) = CoroutineExt.launch {
-        try {
-            if (SystemBridge.getAppInfo("com.eg.android.AlipayGphone") == null) {
-                GlobalApp.toastError("未安装支付宝")
-                return@launch
-            }
-            val tmpFile = File(path)
+    fun qrWithAlipay(path: String): Boolean = shareWith(path, ComponentName("com.eg.android.AlipayGphone",
+            "com.alipay.mobile.quinox.splash.ShareScanQRDispenseActivity"), "支付宝")
 
-            val imgUri = if (Build.VERSION.SDK_INT >= 24) {
-                FileProvider.getUriForFile(app, "${app.packageName}.fileprovider", tmpFile)
-            } else Uri.fromFile(tmpFile)
-            val intent = Intent(Intent.ACTION_SEND).apply {
-                type = "image/jpg"
-                putExtra(Intent.EXTRA_STREAM, imgUri)
-                component = ComponentName("com.eg.android.AlipayGphone", "com.alipay.mobile.quinox.splash.ShareScanQRDispenseActivity")
-            }
-            app.startActivity(intent.newTask())
-
-        } catch (e: Throwable) {
-            GlobalApp.toastError("执行失败: " + e.message)
-        }
-    }
-
-    fun spotWithTaobao(path: String) {
+    fun spotWithTaobao(path: String): Boolean {
         //ResolveInfo{bf02772 com.taobao.taobao/com.etao.feimagesearch.IrpActivity m=0x608000}
-        spotWith(path, ComponentName("com.taobao.taobao", "com.etao.feimagesearch.IrpActivity"), "手机淘宝")
+        return shareWith(path, ComponentName("com.taobao.taobao", "com.etao.feimagesearch.IrpActivity"), "手机淘宝")
     }
 
-    fun spotWithJD(path: String) {
+    fun spotWithJD(path: String): Boolean {
         //ResolveInfo{cbd9e43 com.jingdong.app.mall/.open.InterfaceActivity m=0x608000}
-        spotWith(path, ComponentName("com.jingdong.app.mall", "com.jingdong.app.mall.open.InterfaceActivity"), "京东")
+        return shareWith(path, ComponentName("com.jingdong.app.mall", "com.jingdong.app.mall.open.InterfaceActivity"), "京东")
     }
 
-    private fun spotWith(path: String, cn: ComponentName, appName: String) {
+    private fun shareWith(path: String, cn: ComponentName, appName: String): Boolean {
         if (!SystemBridge.hasInstall(cn.packageName)) {
             GlobalApp.toastError("未安装${appName}")
-            return
+            return false
         }
-        val tmpFile = File(path)
-        val imgUri = if (Build.VERSION.SDK_INT >= 24) {
-            FileProvider.getUriForFile(app, "${app.packageName}.fileprovider", tmpFile)
-        } else Uri.fromFile(tmpFile)
+        val imgUri = File(path).toShareUri()
         val intent = Intent(Intent.ACTION_SEND).apply {
             type = "image/jpg"
             putExtra(Intent.EXTRA_STREAM, imgUri)
             component = cn
         }
-        app.startActivity(intent.newTask())
+        //已经检查 component
+        app.startActivity(intent)
+        return true
+    }
+
+    fun ocrWithBaiMiao(screenPath: String): Boolean {
+        return shareWith(screenPath, ComponentName("com.uzero.baimiao",
+                "com.uzero.baimiao.ui.ImageCropperAndRecognizeActivity"), "白描")
     }
 }

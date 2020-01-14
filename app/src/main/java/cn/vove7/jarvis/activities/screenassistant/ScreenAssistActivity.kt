@@ -287,17 +287,39 @@ class ScreenAssistActivity : BaseActivity() {
     )
 
     private fun onLongClick(item: AssistSessionGridController.SessionFunItem, v: View): Boolean {
-        return when {
-            item.name == "二维码/条码识别" -> {
+        when (item.name) {
+            "二维码/条码识别" -> {
                 popQrMenu(v)
                 true
             }
-            item.name == "屏幕识别" -> {
-                popSpotMenu(v)
+            "文字识别" -> {
+                popOcrMenu(v)
                 true
             }
-            else -> false
+            "屏幕识别" -> {
+                popSpotMenu(v)
+            }
         }
+        return true
+    }
+
+    private fun popOcrMenu(v: View) {
+        PopupMenu(this, v, Gravity.END or Gravity.TOP).apply {
+            inflate(R.menu.menu_ocr_action)
+            setOnMenuItemClickListener {
+                when (it.itemId) {
+                    R.id.item_ocr_with_bm -> {
+                        if (ActionHelper.ocrWithBaiMiao(screenPath)) {
+                            finish()
+                        }
+                    }
+                }
+                true
+            }
+
+
+
+        }.show()
     }
 
     private fun popSpotMenu(v: View) {
@@ -306,12 +328,14 @@ class ScreenAssistActivity : BaseActivity() {
             setOnMenuItemClickListener {
                 when (it.itemId) {
                     R.id.item_spot_with_taobao -> {
-                        finish()
-                        ActionHelper.spotWithTaobao(screenPath)
+                        if (ActionHelper.spotWithTaobao(screenPath)) {
+                            finish()
+                        }
                     }
                     R.id.item_spot_with_jd -> {
-                        finish()
-                        ActionHelper.spotWithJD(screenPath)
+                        if (ActionHelper.spotWithJD(screenPath)) {
+                            finish()
+                        }
                     }
                 }
                 true
@@ -326,14 +350,11 @@ class ScreenAssistActivity : BaseActivity() {
                 when (it.itemId) {
                     R.id.item_wechat_qr -> {
                         finish()
-                        runInCatch {
-                            ActionHelper.qrWithWechat(screenPath)
-                        }
+                        ActionHelper.qrWithWechat(screenPath)
                     }
                     R.id.item_alipay_qr -> {
-                        finish()
-                        runInCatch {
-                            ActionHelper.qrWithAlipay(screenPath)
+                        if (ActionHelper.qrWithAlipay(screenPath)) {
+                            finish()
                         }
                     }
                 }
