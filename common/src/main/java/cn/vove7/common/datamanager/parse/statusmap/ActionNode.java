@@ -732,6 +732,32 @@ public class ActionNode implements Serializable, Searchable, DataFrom {
             "system.openAppByPkg('%s', true)\n" +
                     "sleep(1000)\n";
 
+    private String getInappToGlobal(String pkg, String cmd) {
+        return "local packageName = '" + pkg + "'\n" +
+                "local cmd = '" + cmd + "'\n" +
+                "\n" +
+                "function getAppName(packageName)\n" +
+                "    import 'com.google.gson.JsonParser'\n" +
+                "    local result = http.get('http://vassist.vove7.cn:8082/coolapk/'..packageName)\n" +
+                "    if result then\n" +
+                "        local arr = JsonParser().parse(result)\n" +
+                "        return arr.get(0).asString\n" +
+                "    else \n" +
+                "        return packageName\n" +
+                "    end\n" +
+                "end\n" +
+                "\n" +
+                "if not system.hasInstall(packageName) then\n" +
+                "    app.toastError('请先安装 ['.. getAppName(packageName)..']', 1)\n" +
+                "    return\n" +
+                "end\n" +
+                "\n" +
+                "result = utils.runAppCommand(packageName, cmd, argMap)\n" +
+                "if not result then\n" +
+                "    toast(\"指令 [\"..cmd..\"] 未找到\")\n" +
+                "end\n";
+    }
+
     /**
      * 从inApp复制一个全局Node
      * 改变脚本
@@ -742,26 +768,17 @@ public class ActionNode implements Serializable, Searchable, DataFrom {
     public ActionNode cloneGlobal(boolean containChild) {
         ActionNode newNode = new ActionNode();
         this.assembly();
-        newNode.regs = this.regs;
-        newNode.action = this.action.cloneNew();
+
+        newNode.regs = this.getRegs();
+
+        String script = getInappToGlobal(getActionScope().getPackageName(), getActionTitle());
+        newNode.action = new Action(script, Action.SCRIPT_TYPE_LUA);
         newNode.from = DataFrom.FROM_USER;
         newNode.actionTitle = this.actionTitle;
         newNode.publishUserId = UserInfo.getUserId();
-        //newNode.actionScopeType = this.actionScopeType;
+        newNode.actionScopeType = NODE_SCOPE_GLOBAL;
 
-        String newS;
-        if (autoLaunchApp) {
-            String p = this.actionScope.getPackageName();
-            if (Action.SCRIPT_TYPE_JS.equals(newNode.action.getScriptType()))
-                p = String.format(PreOpen_JS, p);
-            else
-                p = String.format(PreOpen_LUA, p);
-
-            newS = p + newNode.action.getActionScript();
-        } else newS = action.getActionScript();
-
-        Vog.INSTANCE.d("cloneGlobal ---> \n" + newS);
-        newNode.action.setActionScript(newS);
+        Vog.INSTANCE.d("cloneGlobal ---> \n" + script);
         if (this.desc != null) {
             try {
                 newNode.desc = this.desc.clone();

@@ -188,16 +188,30 @@ open class ExecutorImpl(
         return waiter.blockedGet(true) ?: EXEC_CODE_FAILED
     }
 
+    internal val currentQueue = PriorityQueue<Action>()
+
+    override fun addQueue(act: Action) {
+        Vog.d("addQueue $act")
+        currentQueue.add(act)
+    }
+
+    override fun addQueue(act: PriorityQueue<Action>) {
+        Vog.d("addQueue ${act.size}")
+        currentQueue.addAll(act)
+    }
+
     /**
      * 执行队列
      *
      */
     private fun pollActionQueue(q: PriorityQueue<Action>): Int {
+        currentQueue.clear()
+        currentQueue.addAll(q)
         var r: Pair<Int, String?>
-        while (q.isNotEmpty()) {
+        while (currentQueue.isNotEmpty()) {
             currentActionIndex++
             if (!userInterrupt) {
-                q.poll().apply {
+                currentQueue.poll().apply {
                     currentAction = this
 
                     actionScope = this.actionScopeType
@@ -209,7 +223,7 @@ open class ExecutorImpl(
                 }
             } else {
                 Vog.i("pollActionQueue 终止")
-                q.clear()
+                currentQueue.clear()
                 return EXEC_CODE_INTERRUPT
             }
         }

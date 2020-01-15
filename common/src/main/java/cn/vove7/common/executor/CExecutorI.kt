@@ -52,6 +52,8 @@ interface CExecutorI : ActivityShowListener, RuntimeArgs, SpeakCallback {
     fun alert(title: String, msg: String): Boolean
 
     fun notifyAlertResult(result: Boolean)
+    fun addQueue(act: Action)
+    fun addQueue(act: PriorityQueue<Action>)
 
     /**
      * 等待单选结果

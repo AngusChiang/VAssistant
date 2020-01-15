@@ -309,7 +309,6 @@ abstract class SimpleListFragment<DataType> : androidx.fragment.app.Fragment(), 
         runOnUi {
             recyclerView.visibility = View.VISIBLE
             netErrViewContainer.visibility = View.GONE
-            pageIndex++
             loading = false
             stopRefreshing()
             notifyDataSetChanged()

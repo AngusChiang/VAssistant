@@ -21,18 +21,25 @@ class ActionParseResult(
 ) {
     fun insertOpenAppAction(currentScope: ActionScope): ActionParseResult {
         if (!isSuccess) return this
-
-        appinfo?.packageName?.also {
-            val appScope = actionQueue?.peek()?.scope//action入口
-            val ina = appScope?.inActivity(currentScope.activity) ?: true
-
-            if (!ina) {//Activity 空 or Activity 不等 => 不同页面
-                Vog.d("parseAction ---> 应用内不同页")
-                //插入跳转代码
-                val openAction by OpenAppAction(appScope?.packageName ?: "")
-                actionQueue?.add(openAction)
-            }//else 位于当前界面 不用添加跳转代码
-        }
+        val q = actionQueue ?: return this
+        val pkg = appinfo?.packageName ?: return this
+        Companion.insertOpenAppAction(pkg, currentScope, q)
         return this
+    }
+
+    companion object {
+        fun insertOpenAppAction(pkg: String, currentScope: ActionScope, q: PriorityQueue<Action>) {
+            pkg.also {
+                val appScope = q?.peek()?.scope//action入口
+                val ina = appScope?.inActivity(currentScope.activity) ?: false
+
+                if (!ina) {//Activity 空 or Activity 不等 => 不同页面
+                    Vog.d("parseAction ---> 应用内不同页")
+                    //插入跳转代码
+                    val openAction by OpenAppAction(pkg)
+                    q.add(openAction)
+                }//else 位于当前界面 不用添加跳转代码
+            }
+        }
     }
 }

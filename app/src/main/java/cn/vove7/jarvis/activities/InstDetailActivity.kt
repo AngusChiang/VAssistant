@@ -1,5 +1,7 @@
 package cn.vove7.jarvis.activities
 
+import android.app.Activity
+import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
 import android.os.Build
@@ -30,7 +32,6 @@ import cn.vove7.common.net.ApiUrls
 import cn.vove7.common.net.WrapperNetHelper
 import cn.vove7.common.utils.RegUtils
 import cn.vove7.common.utils.TextHelper
-import cn.vove7.common.utils.CoroutineExt.launch
 import cn.vove7.executorengine.parse.ParseEngine
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.activities.base.BaseActivity
@@ -60,12 +61,22 @@ import java.util.*
  * 2018/10/3
  */
 class InstDetailActivity : BaseActivity() {
+
+    companion object {
+        fun start(context: Context, nodeId: Long) {
+            val intent = Intent(context, InstDetailActivity::class.java)
+            intent.putExtra("nodeId", nodeId)
+            context.startActivity(intent)
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_inst_detail)
         toolbar.inflateMenu(R.menu.menu_inst_detail)
         initView()
         nodeId = intent.getLongExtra("nodeId", -1)
+        Vog.d("nodeId: $nodeId")
         if (nodeId == -1L) {
             finish()
             return
@@ -160,7 +171,7 @@ class InstDetailActivity : BaseActivity() {
             instructions_text.text = node.desc?.instructions ?: "无"
             examples_text.text = node.desc?.example ?: "无"
             regs_text.text = TextHelper.arr2String(node.regs?.toTypedArray()
-                ?: arrayOf<Any>(), "\n")
+                    ?: arrayOf<Any>(), "\n")
             version_text.text = node.versionCode.toString()
 
             view_code.setOnClickListener {
@@ -274,6 +285,7 @@ class InstDetailActivity : BaseActivity() {
                             .message(R.string.text_msg_delete_action_node)
                             .positiveButton(R.string.text_confirm) {
                                 val p = ProgressDialog(this)
+                                val nodeId = node.id
                                 if (node.tagId != null) {
                                     WrapperNetHelper.postJson<Any>(ApiUrls.DELETE_SHARE_INST, node.tagId) {
                                         success { _, bean ->
@@ -297,6 +309,10 @@ class InstDetailActivity : BaseActivity() {
                                     p.dismiss()
                                 }
                                 AppBus.post("del_inst")
+                                setResult(Activity.RESULT_OK, Intent().apply {
+                                    putExtra("action", "del")
+                                    putExtra("id", nodeId)
+                                })
                                 finish()
                             }
                             .negativeButton(R.string.text_cancel)
@@ -349,25 +365,19 @@ class InstDetailActivity : BaseActivity() {
                         showShareDialog()
                 }
                 R.id.menu_inst_share -> {
-                    if(SystemBridge.setClipText(node.toJson())){
+                    if (SystemBridge.setClipText(node.toJson())) {
                         GlobalApp.toastInfo(R.string.text_copied)
                     }
                 }
                 R.id.menu_as_global -> {//copy as global
                     //重要信息
-                    MaterialDialog(this).title(text = "设为全局指令")
-                            .message(text = "此操作会复制此指令(包括跟随操作)至全局。")
-                            /*.checkBoxPrompt(text = "不再提醒") {
-                                sp.set(R.string.key_show_prompt_inapp_as_global_dialog, it)
-                            }*/.positiveButton(R.string.text_continue) {
-                        doCopy2Global(true)
-                    }.neutralButton(text = "不包含") {
-                                doCopy2Global(false)
-                            }
-                            .negativeButton().show()
-//                    } else {
-//                        doCopy2Global()
-//                    }
+                    MaterialDialog(this).show {
+                        title(text = "设为全局指令")
+                        message(text = "此操作会复制此指令(包括跟随操作)至全局。")
+                        positiveButton(R.string.text_continue) {
+                            doCopy2Global(false)
+                        }
+                    }
                 }
                 R.id.menu_settings -> {//显示设置
 //                    if (!AppConfig.checkLogin() && !BuildConfig.DEBUG) {
@@ -453,6 +463,7 @@ class InstDetailActivity : BaseActivity() {
                     GlobalApp.toastSuccess(R.string.text_have_done)
                     DAO.clear()
                     ParseEngine.updateGlobal()
+                    InstDetailActivity.start(this@InstDetailActivity, cloneNode.id)
                 } else {
                     GlobalApp.toastError(R.string.text_an_err_happened)
                 }

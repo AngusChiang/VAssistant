@@ -142,18 +142,7 @@ object UtilBridge {
     @JvmStatic
     @JvmOverloads
     fun runAppCommand(pkg: String, cmd: String, argMap: Map<String, Any?>? = null): Boolean {
-        val node = DaoHelper.getInAppActionNodeByCmd(pkg, cmd)
-        return if (node == null) {
-            false
-        } else {
-            val action = node.action
-            action.param = (HashMap(argMap ?: emptyMap())).also {
-                it["title"] = cmd
-                it["from"] = "script"
-            }
-            AppBus.post(action)
-            true
-        }
+        return ServiceBridge.instance.runAppCommand(pkg, cmd, argMap)
     }
 
     /**

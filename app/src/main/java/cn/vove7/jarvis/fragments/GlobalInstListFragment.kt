@@ -1,9 +1,11 @@
 package cn.vove7.jarvis.fragments
 
+import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import android.widget.CompoundButton
+import cn.vove7.common.app.AppConfig
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.datamanager.DAO
 import cn.vove7.common.datamanager.greendao.ActionNodeDao
@@ -11,13 +13,11 @@ import cn.vove7.common.datamanager.parse.DataFrom
 import cn.vove7.common.datamanager.parse.statusmap.ActionNode
 import cn.vove7.common.datamanager.parse.statusmap.ActionNode.NODE_SCOPE_GLOBAL
 import cn.vove7.common.model.UserInfo
-import cn.vove7.common.utils.CoroutineExt.launch
 import cn.vove7.jarvis.activities.InstDetailActivity
 import cn.vove7.jarvis.activities.NewInstActivity
 import cn.vove7.jarvis.activities.OnSyncInst
-import cn.vove7.jarvis.adapters.SimpleListAdapter
 import cn.vove7.jarvis.adapters.ListViewModel
-import cn.vove7.common.app.AppConfig
+import cn.vove7.jarvis.adapters.SimpleListAdapter
 import cn.vove7.jarvis.tools.DataUpdator
 
 /**
@@ -37,20 +37,20 @@ class GlobalInstListFragment : SimpleListFragment<ActionNode>(), OnSyncInst {
         startActivity(intent)
     }
     override val itemClickListener: SimpleListAdapter.OnItemClickListener<ActionNode> =
-        object : SimpleListAdapter.OnItemClickListener<ActionNode> {
-            override fun onClick(holder: SimpleListAdapter.VHolder?, pos: Int, item: ListViewModel<ActionNode>) {
-                //显示详情
-                val node = item.extra
+            object : SimpleListAdapter.OnItemClickListener<ActionNode> {
+                override fun onClick(holder: SimpleListAdapter.VHolder?, pos: Int, item: ListViewModel<ActionNode>) {
+                    //显示详情
+                    val node = item.extra
 
-                val intent = Intent(context, InstDetailActivity::class.java)
-                intent.putExtra("nodeId", node.id)
-                startActivity(intent)
+                    val intent = Intent(context, InstDetailActivity::class.java)
+                    intent.putExtra("nodeId", node.id)
+                    startActivityForResult(intent, 1)
 //                InstDetailFragment(node) {
 //                    ParseEngine.updateGlobal()
 //                    refresh()
 //                }.show(activity?.supportFragmentManager, "inst_detail")
+                }
             }
-        }
 
     var onlySelf = false
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -75,6 +75,21 @@ class GlobalInstListFragment : SimpleListFragment<ActionNode>(), OnSyncInst {
                 refresh()
             }
         }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        if (requestCode == 1 && resultCode == Activity.RESULT_OK && data != null) {
+            when (data.getStringExtra("action")) {
+                "del" -> {
+                    val id = data.getLongExtra("id", -1)
+                    dataSet.find { it.extra.id == id }?.also {
+                        dataSet.remove(it)
+                    }
+                    notifyDataSetChanged()
+                }
+            }
+        }
+        super.onActivityResult(requestCode, resultCode, data)
     }
 
     override fun unification(it: ActionNode): ListViewModel<ActionNode>? {

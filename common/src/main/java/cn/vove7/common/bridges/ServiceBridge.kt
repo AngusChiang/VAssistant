@@ -35,6 +35,8 @@ interface ServiceBridge {
     fun speak(text: String?)
     fun speakWithCallback(text: String?, call: SpeakCallback)
     fun removeFloat()
+
+    fun runAppCommand(pkg: String, cmd: String, argMap: Map<String, Any?>? = null): Boolean
 }
 
 class ShowDialogEvent(

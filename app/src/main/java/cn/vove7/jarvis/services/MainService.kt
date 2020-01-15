@@ -29,9 +29,14 @@ import cn.vove7.common.appbus.AppBus.ACTION_STOP_WAKEUP_TIMER
 import cn.vove7.common.appbus.AppBus.ACTION_STOP_WAKEUP_WITHOUT_SWITCH
 import cn.vove7.common.appbus.AppBus.EVENT_START_DEBUG_SERVER
 import cn.vove7.common.appbus.AppBus.EVENT_STOP_DEBUG_SERVER
-import cn.vove7.common.bridges.*
+import cn.vove7.common.bridges.ChoiceData
+import cn.vove7.common.bridges.ServiceBridge
+import cn.vove7.common.bridges.ShowDialogEvent
+import cn.vove7.common.bridges.SystemBridge
+import cn.vove7.common.datamanager.DaoHelper
 import cn.vove7.common.datamanager.history.CommandHistory
 import cn.vove7.common.datamanager.parse.model.Action
+import cn.vove7.common.datamanager.parse.model.ActionScope
 import cn.vove7.common.executor.CExecutorI
 import cn.vove7.common.executor.CExecutorI.Companion.EXEC_CODE_EMPTY_QUEUE
 import cn.vove7.common.executor.CExecutorI.Companion.EXEC_CODE_FAILED
@@ -335,7 +340,7 @@ object MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
             Vog.d("speak临时 ${speechRecogService?.lastingStopped}")
             //没有手动停止 即认为处于长语音状态
             afterSpeakResumeListen = !(speechRecogService?.lastingStopped
-                ?: true)
+                    ?: true)
             if (cancelRecog && recogIsListening) {
                 speechRecogService?.cancelRecog(false)
             }
@@ -468,6 +473,31 @@ object MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
     }
 
     /**
+     * 需检查 pkg 是否安装
+     * @param pkg String
+     * @param cmd String
+     * @param argMap Map<String, Any?>?
+     * @return Boolean
+     */
+    override fun runAppCommand(pkg: String, cmd: String, argMap: Map<String, Any?>?): Boolean {
+        val node = DaoHelper.getInAppActionNodeByCmd(pkg, cmd)
+        return if (node == null) {
+            false
+        } else {
+            val action = node.action
+            val q = PriorityQueue<Action>()
+            q += action
+            if (node.autoLaunchApp) {//自启
+                ActionParseResult.insertOpenAppAction(pkg,
+                        AccessibilityApi.currentScope ?: ActionScope("-", "-"),q)
+            }
+            action.param = argMap ?: emptyMap()
+            cExecutor.addQueue(q)
+            true
+        }
+    }
+
+    /**
      * 测试文本
      */
     @Subscribe(threadMode = ThreadMode.POSTING)
@@ -486,13 +516,7 @@ object MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
     fun runAction(ac: Action) {
         val q = PriorityQueue<Action>()
         q.add(ac)
-        val title = ac.param["title"] as? String
-        if(ac.param["from"] == "script") {
-            val res = cExecutor.runScript(ac.actionScript,ac.scriptType, ac.param)
-            cExecutor.onFinish(res.first)
-        }else {
-            cExecutor.execQueue(title ?: CExecutorI.DEBUG_SCRIPT, q, false)
-        }
+        cExecutor.execQueue(CExecutorI.DEBUG_SCRIPT, q, false)
     }
 
     /**

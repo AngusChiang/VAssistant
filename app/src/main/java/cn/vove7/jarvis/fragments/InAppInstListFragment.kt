@@ -1,5 +1,6 @@
 package cn.vove7.jarvis.fragments
 
+import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
@@ -42,7 +43,7 @@ class InAppInstListFragment : SimpleListFragment<ActionNode>() {
 
             val intent = Intent(context, InstDetailActivity::class.java)
             intent.putExtra("nodeId", node.id)
-            startActivity(intent)
+            startActivityForResult(intent, 1)
 //            InstDetailFragment(node) {
 //                ParseEngine.updateInApp()
 //                refresh()
@@ -92,6 +93,20 @@ class InAppInstListFragment : SimpleListFragment<ActionNode>() {
         Vog.d(pkg)
     }
 
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        if (requestCode == 1 && resultCode == Activity.RESULT_OK && data != null) {
+            when (data.getStringExtra("action")) {
+                "del" -> {
+                    val id = data.getLongExtra("id", -1)
+                    dataSet.find { it.extra.id == id }?.also {
+                        dataSet.remove(it)
+                    }
+                    notifyDataSetChanged()
+                }
+            }
+        }
+        super.onActivityResult(requestCode, resultCode, data)
+    }
 
     override fun unification(it: ActionNode): ListViewModel<ActionNode>? {
         val fs = it.follows?.size ?: 0
