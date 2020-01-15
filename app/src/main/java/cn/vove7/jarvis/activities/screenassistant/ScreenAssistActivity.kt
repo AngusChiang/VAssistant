@@ -287,20 +287,20 @@ class ScreenAssistActivity : BaseActivity() {
     )
 
     private fun onLongClick(item: AssistSessionGridController.SessionFunItem, v: View): Boolean {
+        var handle = true
         when (item.name) {
             "二维码/条码识别" -> {
                 popQrMenu(v)
-                true
             }
             "文字识别" -> {
                 popOcrMenu(v)
-                true
             }
             "屏幕识别" -> {
                 popSpotMenu(v)
             }
+            else -> handle = false
         }
-        return true
+        return handle
     }
 
     private fun popOcrMenu(v: View) {
