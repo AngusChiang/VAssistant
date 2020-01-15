@@ -2,6 +2,7 @@
 
 - 优化文字识别页
 - 增强稳定性
+- 修复指令导出问题
 - 添加api `utils.runAppCommand` 负责全局指令调用App内指令
 - 添加api `utils.waitAccessibility`
 - 添加api `utils.checkVersion`

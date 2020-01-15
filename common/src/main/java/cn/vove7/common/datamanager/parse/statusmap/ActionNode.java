@@ -77,7 +77,7 @@ public class ActionNode implements Serializable, Searchable, DataFrom {
      */
     public boolean belongSelf() {
         Long uId = UserInfo.getUserId();
-        return DataFrom.FROM_USER.equals(from) ||
+        return from == null || DataFrom.FROM_USER.equals(from) ||
                 (DataFrom.FROM_SHARED.equals(from) && (publishUserId == null || publishUserId.equals(uId)));
         //return DataFrom.FROM_SHARED.equals(from)
         //        && (publishUserId != null &&
@@ -781,7 +781,7 @@ public class ActionNode implements Serializable, Searchable, DataFrom {
         Vog.INSTANCE.d("cloneGlobal ---> \n" + script);
         if (this.desc != null) {
             try {
-                newNode.desc = this.desc.clone();
+                newNode.desc = this.getDesc().clone();
             } catch (CloneNotSupportedException e) {
                 GlobalLog.INSTANCE.err(e);
             }
@@ -795,6 +795,24 @@ public class ActionNode implements Serializable, Searchable, DataFrom {
 
     public void setActionId(Long actionId) {
         this.actionId = actionId;
+    }
+
+    public ActionNode shareData() {
+        ActionNode shareNode = new ActionNode();
+        shareNode.action = getAction();
+        if (this.getDesc() != null) {
+            try {
+                shareNode.desc = getDesc().clone();
+            } catch (CloneNotSupportedException e) {
+            }
+        }
+        shareNode.actionScope = getActionScope();
+        shareNode.actionScopeType = getActionScopeType();
+        shareNode.autoLaunchApp = getAutoLaunchApp();
+        shareNode.actionTitle = getActionTitle();
+        shareNode.priority = getPriority();
+        shareNode.regs = getRegs();
+        return shareNode;
     }
 
     /**

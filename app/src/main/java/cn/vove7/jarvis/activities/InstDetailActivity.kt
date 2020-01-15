@@ -365,7 +365,7 @@ class InstDetailActivity : BaseActivity() {
                         showShareDialog()
                 }
                 R.id.menu_inst_share -> {
-                    if (SystemBridge.setClipText(node.toJson())) {
+                    if (SystemBridge.setClipText(node.shareData().toJson())) {
                         GlobalApp.toastInfo(R.string.text_copied)
                     }
                 }

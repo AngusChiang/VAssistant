@@ -87,6 +87,16 @@ class GlobalInstListFragment : SimpleListFragment<ActionNode>(), OnSyncInst {
                     }
                     notifyDataSetChanged()
                 }
+                "update" -> {
+                    val id = data.getLongExtra("id", -1)
+                    dataSet.find { it.extra.id == id }?.also {
+                        it.extra.refresh()
+                    }
+                    notifyDataSetChanged()
+                }
+                "insert" -> {
+                    refresh()
+                }
             }
         }
         super.onActivityResult(requestCode, resultCode, data)
