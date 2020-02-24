@@ -27,8 +27,8 @@ import cn.vove7.common.appbus.AppBus.ACTION_STOP_VOICE_WAKEUP_WITHOUT_NOTIFY
 import cn.vove7.common.appbus.AppBus.ACTION_STOP_WAKEUP
 import cn.vove7.common.appbus.AppBus.ACTION_STOP_WAKEUP_TIMER
 import cn.vove7.common.appbus.AppBus.ACTION_STOP_WAKEUP_WITHOUT_SWITCH
-import cn.vove7.common.appbus.AppBus.EVENT_START_DEBUG_SERVER
-import cn.vove7.common.appbus.AppBus.EVENT_STOP_DEBUG_SERVER
+import cn.vove7.common.appbus.AppBus.ACTION_START_DEBUG_SERVER
+import cn.vove7.common.appbus.AppBus.ACTION_STOP_DEBUG_SERVER
 import cn.vove7.common.bridges.ChoiceData
 import cn.vove7.common.bridges.ServiceBridge
 import cn.vove7.common.bridges.ShowDialogEvent
@@ -558,10 +558,10 @@ object MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
                 ACTION_STOP_VOICE_WAKEUP_WITHOUT_NOTIFY -> {
                     speechRecogService?.stopWakeUp(notify = false, stopTimer = false)
                 }
-                EVENT_START_DEBUG_SERVER -> {
+                ACTION_START_DEBUG_SERVER -> {
                     RemoteDebugServer.start()
                 }
-                EVENT_STOP_DEBUG_SERVER -> {
+                ACTION_STOP_DEBUG_SERVER -> {
                     RemoteDebugServer.stop()
                 }
                 ACTION_BEGIN_SCREEN_PICKER -> {

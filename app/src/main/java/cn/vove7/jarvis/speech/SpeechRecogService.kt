@@ -1,6 +1,7 @@
 package cn.vove7.jarvis.speech
 
 import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.media.AudioManager
 import android.os.*
@@ -14,8 +15,10 @@ import cn.vove7.common.model.RequestPermission
 import cn.vove7.common.utils.runInCatch
 import cn.vove7.common.utils.runOnNewHandlerThread
 import cn.vove7.jarvis.BuildConfig
+import cn.vove7.jarvis.R
 import cn.vove7.jarvis.receivers.PowerEventReceiver
 import cn.vove7.jarvis.receivers.ScreenStatusListener
+import cn.vove7.jarvis.services.ForegroundService
 import cn.vove7.jarvis.services.MainService
 import cn.vove7.jarvis.view.statusbar.StatusAnimation
 import cn.vove7.jarvis.view.statusbar.WakeupStatusAnimation
@@ -109,18 +112,22 @@ abstract class SpeechRecogService(val event: RecogEvent) : SpeechRecogI {
         isListening = false
         closeSCO()
         doCancelRecog()
-        if (notify)
+        if (notify) {
             event.onCancelRecog()
+        }
     }
 
     final override fun startWakeUp(notify: Boolean, resetTimer: Boolean) {
         if (!wakeupI.opened) {
-            if (notify)
+            if (notify) {
                 wakeupStatusAni.showAndHideDelay("语音唤醒开启", 5000)
+            }
             doStartWakeup()
+            ForegroundService.refreshTitle()
 
-            if (resetTimer)//定时器结束
+            if (resetTimer) {//定时器结束
                 startAutoSleepWakeup()
+            }
         }
     }
 
@@ -134,13 +141,16 @@ abstract class SpeechRecogService(val event: RecogEvent) : SpeechRecogI {
     }
 
     final override fun stopWakeUp(notify: Boolean, stopTimer: Boolean) {
-        if (notify && (ScreenStatusListener.screenOn || AppConfig.notifyWpOnScreenOff)) //亮屏，或开启息屏通知
-            if (wakeupI.opened)
+        if (notify && (ScreenStatusListener.screenOn || AppConfig.notifyWpOnScreenOff)) { //亮屏，或开启息屏通知
+            if (wakeupI.opened) {
                 wakeupStatusAni.failedAndHideDelay("语音唤醒关闭", 5000)
-
+            }
+        }
+        ForegroundService.refreshTitle()
         if (wakeupI.opened) {
-            if (stopTimer)
+            if (stopTimer) {
                 stopAutoSleepWakeup()
+            }
             doStopWakeUp()
         }
     }
@@ -161,9 +171,13 @@ abstract class SpeechRecogService(val event: RecogEvent) : SpeechRecogI {
      */
     private val stopWakeUpAction = Runnable {
         wakeupTimerEnd = true
+        ForegroundService.refreshTitle()
         if (wakeupI.opened) {
             if (AppConfig.voiceWakeup) {
-                wakeupStatusAni.failed("语音唤醒已自动休眠")
+                wakeupStatusAni.show(
+                        R.drawable.ic_unhearing, "语音唤醒已自动休眠(点击再次开启)",
+                        Intent(AppBus.ACTION_START_WAKEUP)
+                )
             }
             doStopWakeUp()//不通知
         }

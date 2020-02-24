@@ -20,6 +20,7 @@ import cn.vove7.common.utils.startActivityOnNewTask
 import cn.vove7.jarvis.BuildConfig
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.activities.NewInstActivity
+import cn.vove7.jarvis.services.ForegroundService
 import cn.vove7.jarvis.services.MainService
 import cn.vove7.rhino.api.RhinoApi
 import cn.vove7.vtp.log.Vog
@@ -66,6 +67,7 @@ object RemoteDebugServer : Runnable {
     @Synchronized
     fun stop() {
         stopped = true
+        ForegroundService.refreshTitle()
         launch {
             commandServer?.stop()
             commandServer = null
@@ -90,6 +92,7 @@ object RemoteDebugServer : Runnable {
     override fun run() {
         stopped = false
         clients = hashMapOf()
+        ForegroundService.refreshTitle()
         try {
             server = ServerSocket(LISTEN_PORT)
         } catch (e: BindException) {//Address already in use

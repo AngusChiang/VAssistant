@@ -3,6 +3,7 @@ package cn.vove7.jarvis.view.statusbar
 import android.app.Notification
 import android.app.NotificationManager
 import android.content.Context
+import android.content.Intent
 import android.os.Build
 import android.provider.Settings
 import androidx.core.app.NotificationManagerCompat
@@ -26,18 +27,19 @@ abstract class StatusAnimation {
     open val importLevel: Int = NotificationManagerCompat.IMPORTANCE_LOW
     open val alert: Boolean = false
     open val nId = 127
-    private val channel get() =
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            ChannelBuilder.with("StatusBarIcon${if (alert) "_alert" else ""}",
-                    "状态栏动画${if (alert) "_alert" else ""}", importLevel).build().apply {
-                Vog.d("alert ---> $alert")
-                if (alert) {
-                    enableVibration(true)
-                    setSound(Settings.System.DEFAULT_NOTIFICATION_URI, Notification.AUDIO_ATTRIBUTES_DEFAULT)
-                    vibrationPattern = longArrayOf(0, 200)
+    private val channel
+        get() =
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                ChannelBuilder.with("StatusBarIcon${if (alert) "_alert" else ""}",
+                        "状态栏动画${if (alert) "_alert" else ""}", importLevel).build().apply {
+                    Vog.d("alert ---> $alert")
+                    if (alert) {
+                        enableVibration(true)
+                        setSound(Settings.System.DEFAULT_NOTIFICATION_URI, Notification.AUDIO_ATTRIBUTES_DEFAULT)
+                        vibrationPattern = longArrayOf(0, 200)
+                    }
                 }
-            }
-        } else null
+            } else null
 
 
     abstract var title: String
@@ -94,6 +96,10 @@ abstract class StatusAnimation {
             GlobalLog.err(e)
         }
         onFailed()
+    }
+
+    fun show(iconRes: Int, msg: String, intent: Intent? = null) {
+        notifier.showNotification(nId, title, msg, NotificationIcons(iconRes), intent)
     }
 
     open fun finish() {

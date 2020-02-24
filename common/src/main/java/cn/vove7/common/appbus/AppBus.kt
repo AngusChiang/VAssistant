@@ -11,11 +11,12 @@ object AppBus {
     const val EVENT_LOGOUT = "e_logout"
     const val EVENT_USER_INIT = "event_user_init"
     const val EVENT_FORCE_OFFLINE = "e_force_offline"
-    const val EVENT_START_DEBUG_SERVER = "start_debug_server"
-    const val EVENT_STOP_DEBUG_SERVER = "stop_debug_server"
     const val EVENT_INST_SAVE_COMPLETE = "inst_settings_save_complete"
     const val EVENT_PLUGIN_INSTALLED = "e_plugin_installed"
     const val EVENT_PLUGIN_UNINSTALLED = "e_plugin_uninstalled"
+
+    const val ACTION_START_DEBUG_SERVER = "start_debug_server"
+    const val ACTION_STOP_DEBUG_SERVER = "stop_debug_server"
 
     const val ACTION_BEGIN_SCREEN_PICKER = "begin_screen_picker"
     const val ACTION_BEGIN_SCREEN_PICKER_TRANSLATE = "begin_screen_picker_translate"

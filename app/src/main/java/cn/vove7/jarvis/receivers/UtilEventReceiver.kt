@@ -7,6 +7,9 @@ import cn.vove7.bottomdialog.BottomDialogActivity
 import cn.vove7.common.app.AppConfig
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.appbus.AppBus
+import cn.vove7.common.appbus.AppBus.ACTION_START_WAKEUP
+import cn.vove7.common.appbus.AppBus.ACTION_STOP_DEBUG_SERVER
+import cn.vove7.common.appbus.AppBus.ACTION_STOP_WAKEUP
 import cn.vove7.jarvis.services.MainService
 import cn.vove7.jarvis.tools.AppLogic
 import cn.vove7.jarvis.view.dialog.AppUpdateDialog.Companion.getBuildAction
@@ -27,14 +30,23 @@ object UtilEventReceiver : DyBCReceiver() {
     override val intentFilter: IntentFilter
         get() = IntentFilter().apply {
             addAction(APP_HAS_UPDATE)
+            addAction(ACTION_START_WAKEUP)
+            addAction(ACTION_STOP_WAKEUP)
+            addAction(ACTION_STOP_DEBUG_SERVER)
         }
 
     override fun onReceive(context: Context?, intent: Intent?) {
-        when (intent?.action) {
+        val action = intent?.action ?: return
+
+        when (action) {
             APP_HAS_UPDATE -> {
                 val ver = intent.getStringExtra("version")
                 val log = intent.getStringExtra("log")
                 BottomDialogActivity.builder(GlobalApp.APP, getBuildAction(ver, log))
+            }
+            else -> {
+                //广播转EventBus
+                AppBus.post(action)
             }
         }
     }
