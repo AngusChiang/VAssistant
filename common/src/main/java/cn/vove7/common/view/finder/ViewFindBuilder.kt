@@ -225,9 +225,9 @@ class ViewFindBuilder : FindBuilderWithOperation {
             }
         }
 
-        fun text(text: String): ViewFindBuilder {
+        fun text(vararg text: String): ViewFindBuilder {
             return ViewFindBuilder().apply {
-                equalsText(text)
+                equalsText(*text)
             }
         }
 

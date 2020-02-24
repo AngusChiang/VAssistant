@@ -4,10 +4,14 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.media.projection.MediaProjectionManager
+import android.os.Build
 import android.os.Bundle
+import cn.vove7.common.accessibility.AccessibilityApi
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.model.ResultBox
+import cn.vove7.common.utils.CoroutineExt.launch
+import cn.vove7.common.view.finder.ViewFindBuilder.Companion.text
 
 import cn.vove7.vtp.log.Vog
 
@@ -29,6 +33,13 @@ class ScreenshotActivity : Activity() {
                 as MediaProjectionManager
         try {
             startActivityForResult(mMediaProjectionManager.createScreenCaptureIntent(), REQUEST_MEDIA_PROJECTION)
+            //自动点击
+            if (Build.VERSION.SDK_INT >= 29 && AccessibilityApi.isBaseServiceOn) {
+                launch {
+                    text("立即开始", "start now")
+                            .waitFor(1000)?.tryClick()
+                }
+            }
         } catch (e: Exception) {
             GlobalApp.toastWarning("不支持截屏")
             GlobalLog.err(e)
