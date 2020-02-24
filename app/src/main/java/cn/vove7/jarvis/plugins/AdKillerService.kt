@@ -70,7 +70,7 @@ object AdKillerService : AbsAccPluginService() {
             Vog.d("onSkipAd ---> 发现广告，清除成功")
             AppConfig.plusAdKillCount()//+1
 
-            if (AppConfig.isToastWhenRemoveAd) {
+            if (PluginConfig.isToastWhenRemoveAd) {
                 removeAdAnimation.begin()
                 removeAdAnimation.hideDelay(3500)
             }
@@ -88,7 +88,7 @@ object AdKillerService : AbsAccPluginService() {
         finders?.forEach {
             thread {
                 try {
-                    it.waitFor((AppConfig.adWaitSecs * 1000).toLong())?.also { node ->
+                    it.waitFor((PluginConfig.adWaitSecs * 1000).toLong())?.also { node ->
                         Vog.i(" ${Thread.currentThread()} 发现广告 ---> ${appInfo?.name}  $it")
                         onSkipAd(node)
                     }
@@ -145,7 +145,7 @@ object AdKillerService : AbsAccPluginService() {
         else {//停止未结束的搜索
             stopSearchThreads()
             //smart skip ad
-            if (AppConfig.smartKillAd && lastPkg != appScope.packageName
+            if (PluginConfig.smartKillAd && lastPkg != appScope.packageName
                     && AdvanAppHelper.getAppInfo(appScope.packageName)?.isUserApp == true)//切换页面
                 smartSkipAppSwitchAd()
             else Vog.d("onAppChanged smartSkipApp ---> 系统应用")

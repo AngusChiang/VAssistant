@@ -93,9 +93,9 @@ class LaboratoryActivity : ReturnableActivity() {
                                     showExtensionSettings("电源提醒", mutableListOf(
                                             NumberPickerItem(R.string.text_time_wait_ad, "界面等待广告出现最长时间，单位秒",
                                                     keyId = R.string.key_ad_wait_secs, range = Pair(10, 100),
-                                                    defaultValue = { 17 }),
+                                                    defaultValue = { PluginConfig.adWaitSecs }),
                                             CheckBoxItem(title = "智能识别广告", summary = "[应用切换]时识别未标记的广告页并清除\n有效时间1.5s\n可能会增加耗电",
-                                                    keyId = R.string.key_smart_find_and_kill_ad, defaultValue = AppConfig.smartKillAd),
+                                                    keyId = R.string.key_smart_find_and_kill_ad, defaultValue = PluginConfig.smartKillAd),
                                             CheckBoxItem(R.string.text_show_toast_when_remove_ad, summary = getString(R.string.text_show_toast_when_remove_ad_summary)
                                                     , keyId = R.string.key_show_toast_when_remove_ad, defaultValue = true)
                                     ))

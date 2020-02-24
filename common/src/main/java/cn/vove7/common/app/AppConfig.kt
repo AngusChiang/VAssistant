@@ -60,7 +60,6 @@ object AppConfig : BaseConfig {
     var speechEngineType: Int by noCacheKey(0, keyId = R.string.key_speech_engine_type)
 
     var vibrateWhenStartRecog by noCacheKey(true, keyId = R.string.key_vibrate_reco_begin)
-    var isToastWhenRemoveAd by noCacheKey(true, keyId = R.string.key_show_toast_when_remove_ad)
     var isAdBlockService by noCacheKey(false, keyId = R.string.key_open_ad_block)
 
     var isLongPressKeyWakeUp by noCacheKey(true, keyId = R.string.key_long_press_volume_up_wake_up)
@@ -68,7 +67,6 @@ object AppConfig : BaseConfig {
     var wakeupKeys by smartKey(intArrayOf())
 
     val voiceControlDialog by noCacheKey(true, keyId = R.string.key_voice_control_dialog)
-    val adWaitSecs by noCacheKey(17, keyId = R.string.key_ad_wait_secs)
 
     val recogCompatibleMode by noCacheKey(false, R.string.key_recog_compatible_mode)
 
@@ -218,8 +216,6 @@ object AppConfig : BaseConfig {
         }
 
     var autoCheckPluginUpdate by noCacheKey(true, keyId = R.string.key_auto_check_plugin_update)
-
-    var smartKillAd by noCacheKey(false, keyId = R.string.key_smart_find_and_kill_ad) // 跳过自动识别未标记的广告
 
     //对话系统 字符串
     var chatStr: String? by noCacheKey(null, keyId = R.string.key_chat_str)

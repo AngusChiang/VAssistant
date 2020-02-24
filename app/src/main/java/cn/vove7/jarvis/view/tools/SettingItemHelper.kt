@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.CompoundButton
 import android.widget.TextView
+import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.utils.onClick
 import cn.vove7.common.utils.spanColor
 import cn.vove7.jarvis.R
@@ -15,7 +16,6 @@ import cn.vove7.smartkey.BaseConfig
 import cn.vove7.smartkey.android.set
 import cn.vove7.vtp.easyadapter.BaseListAdapter
 import cn.vove7.vtp.log.Vog
-import cn.vove7.vtp.sharedpreference.SpHelper
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.callbacks.onDismiss
 import com.afollestad.materialdialogs.customview.customView
@@ -230,8 +230,7 @@ class SettingItemHelper(
             }
         }
         if (item.keyId != null) {
-            val sp = SpHelper(context)
-            val b = sp.getBoolean(item.keyId, item.defaultValue.invoke() as Boolean)
+            val b = config.settings.getBoolean(GlobalApp.getString(item.keyId), item.defaultValue.invoke() as Boolean)
             holder.compoundWight.isChecked = b
             holder.compoundWight.setOnCheckedChangeListener { _, isChecked ->
                 if ((item.callback as CallbackOnSet<Boolean>?)?.invoke(ItemOperation(this), isChecked) != false) {
@@ -363,9 +362,8 @@ class SettingItemHelper(
      */
     private fun initNumberPickerDialog() {
         val item = settingItem
-        val sp = SpHelper(context)
         var old = if (item.keyId == null) item.defaultValue.invoke() as Int
-        else sp.getInt(item.keyId)
+        else config.settings.getInt(GlobalApp.getString(item.keyId), -1)
         item.summary = if (old == -1) {
             old = item.defaultValue.invoke() as Int
             item.summary ?: old.toString()
