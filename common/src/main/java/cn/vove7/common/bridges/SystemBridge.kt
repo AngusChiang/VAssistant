@@ -983,6 +983,7 @@ object SystemBridge : SystemOperation {
         val intent = Intent(AlarmClock.ACTION_SET_ALARM)
                 .putExtra(AlarmClock.EXTRA_HOUR, hour)
                 .putExtra(AlarmClock.EXTRA_MINUTES, minutes)
+                .putExtra(AlarmClock.EXTRA_VIBRATE, true)
                 .putExtra(AlarmClock.EXTRA_SKIP_UI, noUi)
         if (message != null) intent.putExtra(AlarmClock.EXTRA_MESSAGE, message)
         if (days != null) intent.putIntegerArrayListExtra(AlarmClock.EXTRA_DAYS, ArrayList(days.toList()))
