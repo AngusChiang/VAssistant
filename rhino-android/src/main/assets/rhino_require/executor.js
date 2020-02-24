@@ -16,6 +16,12 @@ accessibility = function(){
 requireAccessibility = function(){
     executor.requireAccessibility()
 }
+waitAccessibility = function(m) {
+    if(m)
+        return executor.waitAccessibility(m)
+    else
+        return executor.waitAccessibility()
+}
 
 //  语音合成同步 ，说完再向下执行
 // @param text

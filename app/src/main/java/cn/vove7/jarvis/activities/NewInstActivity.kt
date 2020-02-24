@@ -229,6 +229,10 @@ class NewInstActivity : ReturnableActivity(), View.OnClickListener {
             ParseEngine.updateNode()
             GlobalApp.toastSuccess(getString(R.string.text_save_success))
             DAO.clear()
+            setResult(Activity.RESULT_OK, Intent().apply {
+                putExtra("action","update")
+                putExtra("id", editNode.id)
+            })
             finish()
 
         } else {//新发布 构造newNodeIns
@@ -259,6 +263,11 @@ class NewInstActivity : ReturnableActivity(), View.OnClickListener {
                 GlobalApp.toastSuccess(getString(R.string.text_save_success))
                 ParseEngine.updateNode()
                 DAO.clear()
+
+                setResult(Activity.RESULT_OK, Intent().apply {
+                    putExtra("action","insert")
+                    putExtra("id", editNode.id)
+                })
                 finish()
             } else {
                 GlobalApp.toastError(getString(R.string.text_save_failed))
@@ -357,6 +366,7 @@ class NewInstActivity : ReturnableActivity(), View.OnClickListener {
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
         if (resultCode == Activity.RESULT_OK) {//选择文件回调
             when (requestCode) {
                 1 -> {

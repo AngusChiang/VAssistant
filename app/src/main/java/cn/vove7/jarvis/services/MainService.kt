@@ -5,7 +5,6 @@ import android.app.AlertDialog
 import android.app.Dialog
 import android.content.DialogInterface
 import android.content.Intent
-import android.view.KeyEvent.*
 import cn.vove7.common.MessageException
 import cn.vove7.common.accessibility.AccessibilityApi
 import cn.vove7.common.app.AppConfig
@@ -30,9 +29,14 @@ import cn.vove7.common.appbus.AppBus.ACTION_STOP_WAKEUP_TIMER
 import cn.vove7.common.appbus.AppBus.ACTION_STOP_WAKEUP_WITHOUT_SWITCH
 import cn.vove7.common.appbus.AppBus.EVENT_START_DEBUG_SERVER
 import cn.vove7.common.appbus.AppBus.EVENT_STOP_DEBUG_SERVER
-import cn.vove7.common.bridges.*
+import cn.vove7.common.bridges.ChoiceData
+import cn.vove7.common.bridges.ServiceBridge
+import cn.vove7.common.bridges.ShowDialogEvent
+import cn.vove7.common.bridges.SystemBridge
+import cn.vove7.common.datamanager.DaoHelper
 import cn.vove7.common.datamanager.history.CommandHistory
 import cn.vove7.common.datamanager.parse.model.Action
+import cn.vove7.common.datamanager.parse.model.ActionScope
 import cn.vove7.common.executor.CExecutorI
 import cn.vove7.common.executor.CExecutorI.Companion.EXEC_CODE_EMPTY_QUEUE
 import cn.vove7.common.executor.CExecutorI.Companion.EXEC_CODE_FAILED
@@ -336,7 +340,7 @@ object MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
             Vog.d("speak临时 ${speechRecogService?.lastingStopped}")
             //没有手动停止 即认为处于长语音状态
             afterSpeakResumeListen = !(speechRecogService?.lastingStopped
-                ?: true)
+                    ?: true)
             if (cancelRecog && recogIsListening) {
                 speechRecogService?.cancelRecog(false)
             }
@@ -466,6 +470,31 @@ object MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
 
     private fun onExecuteInterrupt() {
         executeAnimation.failedAndHideDelay()
+    }
+
+    /**
+     * 需检查 pkg 是否安装
+     * @param pkg String
+     * @param cmd String
+     * @param argMap Map<String, Any?>?
+     * @return Boolean
+     */
+    override fun runAppCommand(pkg: String, cmd: String, argMap: Map<String, Any?>?): Boolean {
+        val node = DaoHelper.getInAppActionNodeByCmd(pkg, cmd)
+        return if (node == null) {
+            false
+        } else {
+            val action = node.action
+            val q = PriorityQueue<Action>()
+            q += action
+            if (node.autoLaunchApp) {//自启
+                ActionParseResult.insertOpenAppAction(pkg,
+                        AccessibilityApi.currentScope ?: ActionScope("-", "-"),q)
+            }
+            action.param = argMap ?: emptyMap()
+            cExecutor.addQueue(q)
+            true
+        }
     }
 
     /**
@@ -719,11 +748,11 @@ object MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
             "减小音量" -> {
                 SystemBridge.volumeDown()
             }
-            "播放" -> runInCatch { InputMethodBridge.sendKey(KEYCODE_MEDIA_PLAY) }
-            "停止" -> runInCatch { InputMethodBridge.sendKey(KEYCODE_MEDIA_STOP) }
-            "暂停" -> runInCatch { InputMethodBridge.sendKey(KEYCODE_MEDIA_PAUSE) }
-            "上一首" -> runInCatch { InputMethodBridge.sendKey(KEYCODE_MEDIA_PREVIOUS) }
-            "下一首" -> runInCatch { InputMethodBridge.sendKey(KEYCODE_MEDIA_NEXT) }
+            "播放" -> runInCatch { SystemBridge.mediaResume() }
+            "停止" -> runInCatch { SystemBridge.mediaStop() }
+            "暂停" -> runInCatch { SystemBridge.mediaPause() }
+            "上一首" -> runInCatch { SystemBridge.mediaPre() }
+            "下一首" -> runInCatch { SystemBridge.mediaNext() }
             //打开电灯、关闭电灯、增大亮度、减小亮度
             //打开手电筒、关闭手电筒
             "打开手电筒", "打开电灯" -> SystemBridge.openFlashlight()

@@ -1,6 +1,7 @@
 importClass(Packages.cn.vove7.vtp.text.TextTransHelper)
 importClass(Packages.cn.vove7.common.utils.TextHelper)
 importClass(Packages.cn.vove7.common.utils.TextDateParser)
+importClass(Packages.cn.vove7.common.app.AppConfig)
 importPackage(Packages.cn.vove7.vtp.builder)
 
 function toPinyin(text,firstLetter){
@@ -26,4 +27,9 @@ function parseDateText(s){
 
 function notSupport() {
     executor.notSupport()
+}
+
+function checkVersion(vc, vn) {
+    if(AppConfig.INSTANCE.versionCode < vc)
+        utils.throw('此操作需要' + vn + ', 请更新至最新版本')
 }

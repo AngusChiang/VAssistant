@@ -188,37 +188,51 @@ open class ExecutorImpl(
         return waiter.blockedGet(true) ?: EXEC_CODE_FAILED
     }
 
+    internal val currentQueue = PriorityQueue<Action>()
+
+    override fun addQueue(act: Action) {
+        Vog.d("addQueue $act")
+        currentQueue.add(act)
+    }
+
+    override fun addQueue(act: PriorityQueue<Action>) {
+        Vog.d("addQueue ${act.size}")
+        currentQueue.addAll(act)
+    }
+
     /**
      * 执行队列
      *
      */
     private fun pollActionQueue(q: PriorityQueue<Action>): Int {
+        currentQueue.clear()
+        currentQueue.addAll(q)
         var r: Pair<Int, String?>
-        while (q.isNotEmpty()) {
+        while (currentQueue.isNotEmpty()) {
             currentActionIndex++
             if (!userInterrupt) {
-                q.poll().apply {
+                currentQueue.poll().apply {
                     currentAction = this
 
                     actionScope = this.actionScopeType
                     Vog.d("pollActionQueue ---> $actionScope")
-                    r = runScript(this.actionScript, this.param)// 清除参数缓存
+                    r = runScript(this.actionScript, scriptType, this.param)// 清除参数缓存
                     if (r.first != EXEC_CODE_SUCCESS) {
                         return r.first
                     }
                 }
             } else {
                 Vog.i("pollActionQueue 终止")
-                q.clear()
+                currentQueue.clear()
                 return EXEC_CODE_INTERRUPT
             }
         }
         return if (userInterrupt) EXEC_CODE_INTERRUPT else EXEC_CODE_SUCCESS
     }
 
-    override fun runScript(script: String, argMap: Map<String, Any?>?): Pair<Int, String?> {
+    override fun runScript(script: String, type:String, argMap: Map<String, Any?>?): Pair<Int, String?> {
         Vog.d("runScript arg : $argMap\n$script")
-        return when (currentAction?.scriptType) {
+        return when (type) {
             SCRIPT_TYPE_LUA -> {
                 onLuaExec(script, argMap)
             }

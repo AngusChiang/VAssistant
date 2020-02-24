@@ -1,7 +1,10 @@
 package cn.vove7.jarvis.activities.base
 
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.Lifecycle
+import cn.vove7.jarvis.lifecycle.LifeCycleScopeDelegate
 import cn.vove7.jarvis.tools.DataCollector
+import kotlinx.coroutines.CoroutineScope
 
 
 /**
@@ -10,7 +13,11 @@ import cn.vove7.jarvis.tools.DataCollector
  * @author Vove
  * 2019/6/12
  */
-abstract class BaseActivity : AppCompatActivity() {
+abstract class BaseActivity : AppCompatActivity(), LifeCycleScopeDelegate {
+
+    override val scopeLazyer: Lazy<out CoroutineScope> = genScopeLazyer()
+    override val scope: CoroutineScope by scopeLazyer
+    override val lc: Lifecycle get() = lifecycle
 
     open val pageName: String
         get() = this::class.java.simpleName

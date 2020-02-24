@@ -3,25 +3,23 @@ package cn.vove7.jarvis.fragments
 import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.os.Handler
-import androidx.annotation.LayoutRes
-import com.google.android.material.floatingactionbutton.FloatingActionButton
-import androidx.fragment.app.Fragment
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-import androidx.cardview.widget.CardView
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import android.view.*
 import android.widget.*
+import androidx.annotation.LayoutRes
+import androidx.lifecycle.Lifecycle
 import cn.vove7.common.interfaces.Searchable
 import cn.vove7.common.utils.runOnUi
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.adapters.ListViewModel
+import cn.vove7.jarvis.adapters.ListViewModelLoader
 import cn.vove7.jarvis.adapters.RecAdapterWithFooter
 import cn.vove7.jarvis.adapters.SimpleListAdapter
-import cn.vove7.jarvis.adapters.ListViewModelLoader
+import cn.vove7.jarvis.lifecycle.LifeCycleScopeDelegate
 import cn.vove7.jarvis.view.RecyclerViewWithContextMenu
 import cn.vove7.vtp.log.Vog
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.pluscubed.recyclerfastscroll.RecyclerFastScroller
+import kotlinx.coroutines.CoroutineScope
 
 /**
  * # SimpleListFragment
@@ -30,11 +28,15 @@ import com.pluscubed.recyclerfastscroll.RecyclerFastScroller
  * @author 17719247306
  * 2018/8/18
  */
-abstract class SimpleListFragment<DataType> : androidx.fragment.app.Fragment(), ListViewModelLoader<DataType> {
+abstract class SimpleListFragment<DataType> : androidx.fragment.app.Fragment(), LifeCycleScopeDelegate, ListViewModelLoader<DataType> {
     override var sortData: Boolean = false
     open val itemClickListener: SimpleListAdapter.OnItemClickListener<DataType>? = null
     override val pageSizeLimit: Int = 50
     override val dataSet: MutableList<ListViewModel<DataType>> = mutableListOf()
+
+    override val scopeLazyer: Lazy<out CoroutineScope> = genScopeLazyer()
+    override val scope: CoroutineScope by scopeLazyer
+    override val lc: Lifecycle get() = lifecycle
 
     open fun clearDataSet() {
         synchronized(dataSet) {
@@ -307,7 +309,6 @@ abstract class SimpleListFragment<DataType> : androidx.fragment.app.Fragment(), 
         runOnUi {
             recyclerView.visibility = View.VISIBLE
             netErrViewContainer.visibility = View.GONE
-            pageIndex++
             loading = false
             stopRefreshing()
             notifyDataSetChanged()

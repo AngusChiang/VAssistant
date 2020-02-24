@@ -17,6 +17,7 @@ import cn.vove7.jarvis.receivers.UtilEventReceiver
 import cn.vove7.jarvis.tools.AppNotification
 import cn.vove7.jarvis.tools.DataUpdator
 import cn.vove7.jarvis.tools.Tutorials
+import cn.vove7.jarvis.tools.debugserver.RemoteDebugServer
 import cn.vove7.jarvis.view.dialog.UpdateLogDialog
 import cn.vove7.vtp.log.Vog
 import cn.vove7.vtp.runtimepermission.PermissionUtils
@@ -42,13 +43,20 @@ class MainActivity : BaseActivity() {
 
         initView()
         requestPermission()
+        checkDebug()
+    }
+
+    private fun checkDebug() {
+        if (BuildConfig.DEBUG && intent.hasExtra("debug")) {
+            RemoteDebugServer.start()
+        }
     }
 
     private fun initView() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             window.decorView.systemUiVisibility =
-                View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN or
-                        View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
+                    View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN or
+                            View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
             window.statusBarColor = resources.getColor(R.color.app_background)
         }
     }

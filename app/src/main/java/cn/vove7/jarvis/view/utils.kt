@@ -61,9 +61,9 @@ private val context get() = GlobalApp.APP
 //object SP
 //object DP
 
-class Dp(val value: Int) {
-    val px: Int = dp2px(context, value.toFloat())
-    val pxf: Float = dp2px(context, value.toFloat()).toFloat()
+class Dp(val value: Float) {
+    val px: Int = dp2px(context, value)
+    val pxf: Float = dp2px(context, value).toFloat()
 
 //    infix fun to(ignore: PX): Int = px
 }
@@ -81,7 +81,8 @@ class Sp(val value: Float) {
 //    infix fun to(ignore: PX): Int = px
 }
 
-val Int.dp get() = Dp(this)
+val Int.dp get() = Dp(this.toFloat())
+val Float.dp get() = Dp(this)
 val Int.px get() = Px(this)
 val Number.sp get() = Sp(this.toFloat())
 

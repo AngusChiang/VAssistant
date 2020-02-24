@@ -198,7 +198,7 @@ class ScreenAssistActivity : BaseActivity() {
             checkFuns()
         }
         //进入时清空缓存
-        CoroutineExt.launch {
+        launch {
             cacheDir.listFiles()?.filter { it.isFile && it.extension == "png" && it.absolutePath != screenPath }?.forEach {
                 it.delete()
             }
@@ -214,7 +214,7 @@ class ScreenAssistActivity : BaseActivity() {
                 afterHandleScreen()
             } else {
                 val isDelay = getBooleanExtra("delay", false)
-                GlobalScope.launch {
+                launch {
                     delay(if (isDelay) 1000 else 0)
                     val path = SystemBridge.screenShot()?.let {
                         //截完图显示面板
@@ -287,17 +287,39 @@ class ScreenAssistActivity : BaseActivity() {
     )
 
     private fun onLongClick(item: AssistSessionGridController.SessionFunItem, v: View): Boolean {
-        return when {
-            item.name == "二维码/条码识别" -> {
+        var handle = true
+        when (item.name) {
+            "二维码/条码识别" -> {
                 popQrMenu(v)
-                true
             }
-            item.name == "屏幕识别" -> {
+            "文字识别" -> {
+                popOcrMenu(v)
+            }
+            "屏幕识别" -> {
                 popSpotMenu(v)
+            }
+            else -> handle = false
+        }
+        return handle
+    }
+
+    private fun popOcrMenu(v: View) {
+        PopupMenu(this, v, Gravity.END or Gravity.TOP).apply {
+            inflate(R.menu.menu_ocr_action)
+            setOnMenuItemClickListener {
+                when (it.itemId) {
+                    R.id.item_ocr_with_bm -> {
+                        if (ActionHelper.ocrWithBaiMiao(screenPath)) {
+                            finish()
+                        }
+                    }
+                }
                 true
             }
-            else -> false
-        }
+
+
+
+        }.show()
     }
 
     private fun popSpotMenu(v: View) {
@@ -306,8 +328,14 @@ class ScreenAssistActivity : BaseActivity() {
             setOnMenuItemClickListener {
                 when (it.itemId) {
                     R.id.item_spot_with_taobao -> {
-                        finish()
-                        ActionHelper.spotWithTaobao(screenPath)
+                        if (ActionHelper.spotWithTaobao(screenPath)) {
+                            finish()
+                        }
+                    }
+                    R.id.item_spot_with_jd -> {
+                        if (ActionHelper.spotWithJD(screenPath)) {
+                            finish()
+                        }
                     }
                 }
                 true
@@ -322,14 +350,11 @@ class ScreenAssistActivity : BaseActivity() {
                 when (it.itemId) {
                     R.id.item_wechat_qr -> {
                         finish()
-                        runInCatch {
-                            ActionHelper.qrWithWechat(screenPath)
-                        }
+                        ActionHelper.qrWithWechat(screenPath)
                     }
                     R.id.item_alipay_qr -> {
-                        finish()
-                        runInCatch {
-                            ActionHelper.qrWithAlipay(screenPath)
+                        if (ActionHelper.qrWithAlipay(screenPath)) {
+                            finish()
                         }
                     }
                 }
@@ -478,7 +503,7 @@ class ScreenAssistActivity : BaseActivity() {
             return
         }
         showProgressBar = true
-        oneJob = GlobalScope.launch {
+        oneJob = launch {
             try {
                 val results = BaiduAipHelper.ocr(UtilBridge.compressImage(screenPath))
                 if (oneJob?.isCancelled == false) {
@@ -506,7 +531,7 @@ class ScreenAssistActivity : BaseActivity() {
         }
 
         showProgressBar = true
-        CoroutineExt.launchIo {
+        launchIo {
             val r = BaiduAipHelper.imageClassify(UtilBridge.compressImage(screenPath))
             withContext(Dispatchers.Main) {
                 showProgressBar = false

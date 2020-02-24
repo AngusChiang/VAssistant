@@ -19,6 +19,15 @@ function requireAccessibility()
     executor.requireAccessibility()
 end
 
+function waitAccessibility( ... )
+    local ps = { ... }
+    if #ps == 0 then
+        return executor.waitAccessibility()
+    else
+        return executor.waitAccessibility(ps[1])
+    end
+end
+
 function checkService()
     return executor.checkAccessibilityService(false)
 end

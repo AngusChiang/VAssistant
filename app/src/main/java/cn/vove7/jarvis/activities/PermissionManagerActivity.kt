@@ -9,11 +9,11 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
-import androidx.appcompat.app.AppCompatActivity
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Switch
 import android.widget.TextView
+import androidx.appcompat.app.AppCompatActivity
 import cn.vove7.admin_manager.AdminReceiver
 import cn.vove7.common.accessibility.AccessibilityApi
 import cn.vove7.common.app.AppPermission
@@ -22,7 +22,6 @@ import cn.vove7.common.app.log
 import cn.vove7.common.bridges.InputMethodBridge
 import cn.vove7.common.bridges.RootHelper
 import cn.vove7.common.bridges.SystemBridge
-import cn.vove7.common.utils.CoroutineExt
 import cn.vove7.common.utils.runOnUi
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.activities.PermissionManagerActivity.PermissionStatus.Companion.allPerStr
@@ -177,7 +176,7 @@ class PermissionManagerActivity : OneFragmentActivity() {
 //                                            toast.showShort("跳转失败，请手动开启")
                                 try {
                                     SystemBridge.openAppDetail(context?.packageName
-                                        ?: "")
+                                            ?: "")
                                 } catch (e: Exception) {
                                     GlobalApp.toastError("跳转失败，请到应用详情手动开启")
                                 }
@@ -209,7 +208,7 @@ class PermissionManagerActivity : OneFragmentActivity() {
                     },
                     PermissionStatus(arrayOf(), "Root", "自动切换输入法、开启无障碍服务\n授予Root权限时，请将打开Magisk Manager后台运行（若使用Msgisk管理授权）") { it, _ ->
                         if (!it.isOpen) {
-                            CoroutineExt.launch {
+                            launch {
                                 //防止阻塞主线程
                                 RootHelper.hasRoot()
                             }
@@ -241,36 +240,33 @@ class PermissionManagerActivity : OneFragmentActivity() {
         /**
          * 刷新权限状态
          */
-        private fun refreshStatus() {
-            CoroutineExt.launch {
-                val context = GlobalApp.APP
-                permissions.forEach {
-                    it.isOpen = when {
-                        it.permissionName == "Root" -> false.also { _ ->
-                            //异步获取root权限
-                            thread {
-                                it.isOpen = RootHelper.hasRoot()
-                                runOnUi { adapter.notifyDataSetChanged() }
-                            }
+        private fun refreshStatus() = launch {
+            val context = GlobalApp.APP
+            permissions.forEach {
+                it.isOpen = when {
+                    it.permissionName == "Root" -> false.also { _ ->
+                        //异步获取root权限
+                        thread {
+                            it.isOpen = RootHelper.hasRoot()
+                            runOnUi { adapter.notifyDataSetChanged() }
                         }
-                        it.permissionName == "输入法" -> InputMethodBridge.isEnable
-                        it.permissionName == "WRITE_SECURE_SETTINGS" -> AppPermission.canWriteSecureSettings
-                        it.permissionName == "修改系统设置" -> if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                            Settings.System.canWrite(context)
-                        } else true
-                        it.permissionName == "设备管理器" -> AdminReceiver.isActive()
-                        it.permissionName == "悬浮窗" -> Build.VERSION.SDK_INT < Build.VERSION_CODES.M || PermissionUtils.canDrawOverlays(context)
-                        it.permissionString[0] == "ACCESSIBILITY_SERVICE" ->
-                            AccessibilityApi.isBaseServiceOn
-                        it.permissionString[0] == "ACCESSIBILITY_SERVICE2" ->
-                            AccessibilityApi.isAdvanServiceOn
-                        else -> PermissionUtils.isAllGranted(context, it.permissionString)
                     }
+                    it.permissionName == "输入法" -> InputMethodBridge.isEnable
+                    it.permissionName == "WRITE_SECURE_SETTINGS" -> AppPermission.canWriteSecureSettings
+                    it.permissionName == "修改系统设置" -> if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                        Settings.System.canWrite(context)
+                    } else true
+                    it.permissionName == "设备管理器" -> AdminReceiver.isActive()
+                    it.permissionName == "悬浮窗" -> Build.VERSION.SDK_INT < Build.VERSION_CODES.M || PermissionUtils.canDrawOverlays(context)
+                    it.permissionString[0] == "ACCESSIBILITY_SERVICE" ->
+                        AccessibilityApi.isBaseServiceOn
+                    it.permissionString[0] == "ACCESSIBILITY_SERVICE2" ->
+                        AccessibilityApi.isAdvanServiceOn
+                    else -> PermissionUtils.isAllGranted(context, it.permissionString)
                 }
-                runOnUi { adapter.notifyDataSetChanged() }
             }
+            runOnUi { adapter.notifyDataSetChanged() }
         }
-
     }
 
     class Holder(view: View) : RecAdapterWithFooter.RecViewHolder(view, null) {

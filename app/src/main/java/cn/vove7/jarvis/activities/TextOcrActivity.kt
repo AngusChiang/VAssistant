@@ -1,6 +1,5 @@
 package cn.vove7.jarvis.activities
 
-import android.app.Activity
 import android.content.Context
 import android.os.Bundle
 import android.view.Gravity
@@ -12,25 +11,23 @@ import cn.vove7.bottomdialog.BottomDialog
 import cn.vove7.common.app.AppConfig
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.bridges.SystemBridge
-import cn.vove7.common.utils.CoroutineExt.launch
 import cn.vove7.common.utils.CoroutineExt.withMain
 import cn.vove7.common.utils.fadeIn
 import cn.vove7.common.utils.gone
 import cn.vove7.common.utils.runOnUi
 import cn.vove7.common.utils.startActivity
 import cn.vove7.jarvis.R
+import cn.vove7.jarvis.activities.base.BaseActivity
 import cn.vove7.jarvis.tools.Tutorials
 import cn.vove7.jarvis.tools.baiduaip.BaiduAipHelper
 import cn.vove7.jarvis.tools.baiduaip.model.TextOcrItem
 import cn.vove7.jarvis.view.dialog.TextOperationDialog
+import cn.vove7.jarvis.view.dp
 import cn.vove7.vtp.asset.AssetHelper
 import cn.vove7.vtp.log.Vog
-import com.google.android.material.floatingactionbutton.FloatingActionButton
 import kotlinx.android.synthetic.main.activity_text_ocr.*
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.joinAll
-import kotlinx.coroutines.launch
 import java.util.*
 
 /**
@@ -39,7 +36,7 @@ import java.util.*
  * @author 11324
  * 2019/3/11
  */
-class TextOcrActivity : Activity() {
+class TextOcrActivity : BaseActivity() {
     private val wordItems = mutableListOf<Model>()
 
     companion object {
@@ -79,7 +76,7 @@ class TextOcrActivity : Activity() {
     }
 
     private fun ocrWithScreenShot() {
-        GlobalScope.launch {
+        launch {
             //异步
             try {
                 val path = SystemBridge.screen2File()?.absolutePath
@@ -120,6 +117,7 @@ class TextOcrActivity : Activity() {
 
     private fun buildContent() {
         loading_layout.gone()
+        val framePx = 1.5f.dp.px
         wordItems.forEach { model ->
             val item = model.item
 
@@ -133,18 +131,14 @@ class TextOcrActivity : Activity() {
             CheckedTextView(this).apply {
                 setBackgroundResource(R.drawable.bg_screen_text_high_light_no_radius)
                 Vog.d("buildContent ---> $item")
-                gravity = Gravity.TOP
-                setTextColor(0xFFFFFF)
-                textSize = 15f
-                isVerticalScrollBarEnabled = true
-                text = item.text
+                gravity = Gravity.CENTER
                 val w = item.width
                 val left = item.left
                 val rotationAngle = item.rotationAngle
                 Vog.d("buildContent ---> ${item.text} top:$top ,left:$left ,w:$w h:$h rotationAngle:$rotationAngle")
 
-                layoutParams = RelativeLayout.LayoutParams(w, h).also {
-                    it.setMargins(left, top, 0, 0)
+                layoutParams = RelativeLayout.LayoutParams(w + 2 * framePx, h + 2 * framePx).also {
+                    it.setMargins(left - framePx / 2, top - framePx / 2, 0, 0)
                 }
                 rotationX = 0.5f
                 rotationY = 0.5f
@@ -157,6 +151,12 @@ class TextOcrActivity : Activity() {
 
         floatEditIcon.setOnClickListener {
             editCheckedText()
+        }
+        floatEditIcon.setOnLongClickListener {
+            wordItems.forEach {
+                it.textView?.isChecked = false
+            }
+            true
         }
         rootContent.onStartMove = {
             floatEditIcon.gone()
@@ -200,7 +200,7 @@ class TextOcrActivity : Activity() {
         hasT = true
         GlobalApp.toastInfo("开始翻译")
 
-        launch {
+        launchIo {
             val defs = wordItems.map {
                 val text = it.item.text
                 async {
@@ -210,7 +210,6 @@ class TextOcrActivity : Activity() {
                         it.item.subText = res
                         withMain {
                             it.textView?.isChecked = true
-                            it.textView?.text = res
                         }
                     } else {
                         it.item.subText = "翻译失败"
@@ -219,7 +218,7 @@ class TextOcrActivity : Activity() {
             }
             defs.joinAll()
             //监听
-            if (isFinishing) return@launch
+            if (isFinishing) return@launchIo
             withMain {
                 GlobalApp.toastSuccess("翻译完成")
             }

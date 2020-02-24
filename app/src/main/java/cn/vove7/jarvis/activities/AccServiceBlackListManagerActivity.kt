@@ -47,7 +47,7 @@ class AccServiceBlackListManagerActivity : OneFragmentActivity() {
                 refresh()
                 return
             }
-            CoroutineExt.launch {
+            launch {
                 val tmp = dataSet.filter {
                     it.title?.contains(text, ignoreCase = true) == true
                 }
@@ -91,7 +91,7 @@ class AccServiceBlackListManagerActivity : OneFragmentActivity() {
             }
 
         override fun onLoadData(pageIndex: Int) {
-            CoroutineExt.launch {
+            launch {
                 notifyLoadSuccess(AdvanAppHelper.ALL_APP_LIST.values.filter { it.startable }.toList(), true)
             }
         }

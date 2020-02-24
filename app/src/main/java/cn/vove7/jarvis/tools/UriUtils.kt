@@ -3,10 +3,18 @@ package cn.vove7.jarvis.tools
 import android.content.ContentUris
 import android.content.Context
 import android.net.Uri
+import android.os.Build
 import android.os.Environment
 import android.provider.DocumentsContract
 import android.provider.MediaStore
+import androidx.core.content.FileProvider
+import cn.vove7.common.app.GlobalApp
+import java.io.File
 
+
+fun File.toShareUri(): Uri = if (Build.VERSION.SDK_INT >= 24) {
+    FileProvider.getUriForFile(ActionHelper.app, "${GlobalApp.APP.packageName}.fileprovider", this)
+} else Uri.fromFile(this)
 
 /**
  * # UriUtils
@@ -44,7 +52,7 @@ object UriUtils {
                 // TODO handle non-primary volumes
             } else if (isDownloadsDocument(uri)) {
                 val id = DocumentsContract.getDocumentId(uri)
-                if(id.startsWith("raw:")){
+                if (id.startsWith("raw:")) {
                     return id.substring(4)
                 }
                 val contentUri = ContentUris.withAppendedId(

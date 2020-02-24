@@ -1,9 +1,13 @@
 package cn.vove7.common.bridges
 
 import android.graphics.Bitmap
-import cn.vove7.common.NotSupportException
+import cn.vove7.common.MessageException
+import cn.vove7.common.annotation.ScriptApi
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.app.GlobalLog
+import cn.vove7.common.appbus.AppBus
+import cn.vove7.common.datamanager.DaoHelper
+import cn.vove7.common.utils.tasker.TaskerIntent
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser
@@ -11,6 +15,7 @@ import top.zibin.luban.Luban
 import java.io.File
 import java.io.FileOutputStream
 import java.util.*
+import kotlin.collections.HashMap
 
 
 /**
@@ -105,4 +110,48 @@ object UtilBridge {
         return list
     }
 
+    @JvmStatic
+    fun runTask(name: String) {
+        GlobalLog.log("exec task: $name")
+        val status = TaskerIntent.testStatus(GlobalApp.APP)
+        if (status == TaskerIntent.Status.OK) {
+            val i = TaskerIntent(name)
+            GlobalApp.APP.sendBroadcast(i)
+            GlobalLog.log("tasker[$name] success")
+        } else {
+            val s = TaskerIntent.statusToString(status)
+            when (status) {
+                TaskerIntent.Status.AccessBlocked -> {
+                    GlobalApp.toastError("请进入Tasker [首选项/杂项] 开启[允许外部访问]", 1)
+                }
+                else -> {
+                    GlobalApp.toastError(s)
+                }
+            }
+            GlobalLog.err("tasker[$name] $s")
+        }
+    }
+
+    /**
+     * 执行App内指令
+     * 用于全局调用App内指令
+     * @param pkg String
+     * @param cmd String
+     */
+    @ScriptApi
+    @JvmStatic
+    @JvmOverloads
+    fun runAppCommand(pkg: String, cmd: String, argMap: Map<String, Any?>? = null): Boolean {
+        return ServiceBridge.instance.runAppCommand(pkg, cmd, argMap)
+    }
+
+    /**
+     * 抛出异常
+     * @param msg String?
+     */
+    @ScriptApi
+    @JvmStatic
+    fun `throw`(msg: String?) {
+        throw MessageException(msg)
+    }
 }

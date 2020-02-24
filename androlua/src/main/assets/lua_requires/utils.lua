@@ -6,6 +6,7 @@
 
 --require 'import'
 import 'cn.vove7.common.app.AppConfig'
+import "cn.vove7.common.appbus.AppBus"
 import 'cn.vove7.vtp.text.TextTransHelper'
 import 'cn.vove7.common.utils.TextHelper'
 import 'cn.vove7.vtp.builder.*'
@@ -42,4 +43,18 @@ end
 
 function notSupport()
     executor.notSupport()
+end
+
+function notifyFailed(s)
+    executor.executeFailed(s)
+end
+
+function log(msg)
+    luaman.log(msg)
+end
+
+function checkVersion(vc, vn)
+    if(AppConfig.INSTANCE.versionCode < vc) then
+        utils.throw('此操作需要'..vn..', 请更新至最新版本')
+    end
 end

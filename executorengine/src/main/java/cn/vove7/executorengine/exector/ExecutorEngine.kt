@@ -15,6 +15,7 @@ import cn.vove7.common.executor.CExecutorI.Companion.EXEC_CODE_SUCCESS
 import cn.vove7.common.executor.OnPrint
 import cn.vove7.common.interfaces.ScriptEngine
 import cn.vove7.common.utils.RegUtils
+import cn.vove7.common.utils.runInCatch
 import cn.vove7.executorengine.ExecutorImpl
 import cn.vove7.rhino.RhinoHelper
 import cn.vove7.rhino.api.RhinoApi
@@ -38,16 +39,18 @@ class ExecutorEngine : ExecutorImpl() {
             "serviceBridge" to ServiceBridge.instance,
             "app" to GlobalApp.APP,
             "input" to InputMethodBridge,
-            "dialog" to DialogBridge
+            "dialog" to DialogBridge,
+            "utils" to UtilBridge
     )
-
     override fun onRhinoExec(script: String, argMap: Map<String, Any?>?): Pair<Int, String?> {
 
         val rhinoHelper = RhinoHelper(bridgeManager)
         engines.add(rhinoHelper)
         return runScriptWithCatch({
             rhinoHelper.evalString(script, argMap)
-            RhinoApi.doLog("主线程执行完毕\n")
+            if (currentQueue.isEmpty()) {
+                RhinoApi.doLog("主线程执行完毕\n")
+            }
         }, {
             RhinoApi.doLog(it)
         })
@@ -56,7 +59,7 @@ class ExecutorEngine : ExecutorImpl() {
     //didn't work fixme
     fun runActionSilent(action: Action, argMap: Map<String, Any?>?) {//静默
         currentAction = action
-        runScript(action.actionScript, argMap)
+        runScript(action.actionScript, action.scriptType, argMap)
     }
 
     /**
@@ -72,7 +75,9 @@ class ExecutorEngine : ExecutorImpl() {
 
         return runScriptWithCatch({
             luaHelper.evalString(newScript, argMap)
-            luaHelper.handleMessage(OnPrint.INFO, "主线程执行完毕\n")
+            if (currentQueue.isEmpty()) {
+                luaHelper.handleMessage(OnPrint.INFO, "主线程执行完毕\n")
+            }
         }, {
             luaHelper.handleMessage(OnPrint.ERROR, it)
         })
@@ -100,7 +105,7 @@ class ExecutorEngine : ExecutorImpl() {
     }
 
     @Synchronized
-    private fun release() {
+    private fun release() = runInCatch(true) {
         engines.forEach {
             it.release()
         }

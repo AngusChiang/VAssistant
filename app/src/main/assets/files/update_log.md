@@ -1,7 +1,23 @@
-### 2.0.1
+### 2.0.3
 
 - 查询天气不再询问城市
 - 
+
+### 2.0.2
+
+- 优化文字识别页
+- 增强稳定性
+- 修复指令导出问题
+- 添加api `utils.runAppCommand` 负责全局指令调用App内指令
+- 添加api `utils.waitAccessibility`
+- 添加api `utils.checkVersion`
+
+### 2.0.1
+
+- 优化音乐控制指令
+- 支持执行 [Tasker](https://www.coolapk.com/apk/net.dinglisch.android.taskerm) 任务
+- [屏幕识别] 支持京东识别
+- 修复唤醒词“播放”导致切换输入法
 
 ### 2.0.0.1
 

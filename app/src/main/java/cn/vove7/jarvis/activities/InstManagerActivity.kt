@@ -1,6 +1,5 @@
 package cn.vove7.jarvis.activities
 
-import androidx.fragment.app.Fragment
 import android.view.Menu
 import android.view.MenuItem
 import cn.vove7.common.app.GlobalApp
@@ -62,11 +61,10 @@ class InstManagerActivity : BaseActivityWithViewPager() {
                 }
                 try {
                     val node = GsonHelper.fromJson<ActionNode>(SystemBridge.getClipText())!!
-                    node.id = -1
-                    val id = DaoHelper.insertNewActionNode(node) ?: throw Exception("数据保存失败")
+                    node.id = 0
                     node.from = DataFrom.FROM_USER
                     node.publishUserId = UserInfo.getUserId()
-
+                    val id = DaoHelper.insertNewActionNode(node) ?: throw Exception("数据保存失败")
                     GlobalApp.toastSuccess("导入完成")
                     startActivity<InstDetailActivity> {
                         putArgs("nodeId" to id)
