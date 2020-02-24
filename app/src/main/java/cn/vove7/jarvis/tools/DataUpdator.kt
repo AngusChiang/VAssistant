@@ -149,6 +149,7 @@ object DataUpdator {
                     }
                 }
             }
+            GlobalApp.toastInfo("更新完成")
             textDialog.appendlnGreen("更新完成")
             textDialog.finish()
             back?.invoke()
