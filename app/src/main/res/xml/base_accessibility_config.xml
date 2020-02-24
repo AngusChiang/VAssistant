@@ -5,7 +5,7 @@
     android:accessibilityFlags="flagIncludeNotImportantViews|flagReportViewIds|flagRetrieveInteractiveWindows|flagRequestEnhancedWebAccessibility|flagRequestFilterKeyEvents"
     android:canRetrieveWindowContent="true"
     android:description="@string/desc_accessibility"
-    android:notificationTimeout="0"
+    android:notificationTimeout="10"
     android:canRequestFilterKeyEvents="true"
     android:canRequestEnhancedWebAccessibility="true"
     android:settingsActivity="cn.vove7.jarvis.activities.SettingsActivity" />

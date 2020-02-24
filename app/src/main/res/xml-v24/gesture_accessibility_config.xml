@@ -6,7 +6,7 @@
     android:canPerformGestures="true"
     android:canRetrieveWindowContent="false"
     android:description="@string/desc_gesc_accessibility"
-    android:notificationTimeout="0"
+    android:notificationTimeout="10"
     android:packageNames=""
     android:settingsActivity="cn.vove7.jarvis.activities.SettingsActivity"
     android:summary="@string/desc_gesc_accessibility" />
