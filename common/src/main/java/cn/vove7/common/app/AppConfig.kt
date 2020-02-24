@@ -50,6 +50,8 @@ import java.util.*
 object AppConfig : BaseConfig {
     //key... value
 
+    val wakeupScreenWhenVw by noCacheKey(true, R.string.key_wakeup_screen_when_vw)
+
     //api 修改
     @JvmStatic
     var connectiveService by noCacheKey(false, R.string.key_connective_service)

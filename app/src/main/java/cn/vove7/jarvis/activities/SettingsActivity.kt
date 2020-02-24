@@ -171,6 +171,12 @@ class SettingsActivity : ReturnableActivity() {
                         }
                         return@CheckBoxItem true
                     },
+                    CheckBoxItem(
+                            title = "自动亮屏",
+                            summary = "在息屏语音唤醒时点亮屏幕",
+                            keyId = R.string.key_wakeup_screen_when_vw,
+                            defaultValue = AppConfig.wakeupScreenWhenVw
+                    ),
                     IntentItem(R.string.text_customize_wakeup_words) {
                         MaterialDialog(this).title(R.string.text_customize_wakeup_words)
                                 .customView(R.layout.dialog_customize_wakeup_words, scrollable = true)

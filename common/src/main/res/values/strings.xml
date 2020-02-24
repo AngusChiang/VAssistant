@@ -194,6 +194,7 @@
     <string name="key_recog_compatible_mode" translatable="false">recog_compatible_mode</string>
 
     <string name="key_connective_service" translatable="false">connective_service</string>
+    <string name="key_wakeup_screen_when_vw" translatable="false">key_wakeup_screen_when_vw</string>
     <string name="key_device_name" translatable="false">device_name</string>
 
 

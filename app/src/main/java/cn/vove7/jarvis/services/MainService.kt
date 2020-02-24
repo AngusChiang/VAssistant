@@ -773,6 +773,9 @@ object MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
      */
     class RecogEventListener : RecogEvent {
         override fun onWakeup(word: String?) {
+            if (AppConfig.wakeupScreenWhenVw && !ScreenStatusListener.screenOn) {
+                SystemBridge.screenOn()
+            }
             Vog.d("onWakeup ---> 唤醒 -> $word")
             if (!ScreenStatusListener.screenOn) {
                 SystemBridge.screenOn()
