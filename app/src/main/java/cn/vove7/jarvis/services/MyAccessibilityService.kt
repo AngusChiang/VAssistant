@@ -3,6 +3,7 @@ package cn.vove7.jarvis.services
 import android.accessibilityservice.AccessibilityButtonController
 import android.accessibilityservice.AccessibilityService
 import android.accessibilityservice.AccessibilityServiceInfo.FLAG_REQUEST_ACCESSIBILITY_BUTTON
+import android.annotation.TargetApi
 import android.content.Context
 import android.graphics.Rect
 import android.os.Build
@@ -19,12 +20,13 @@ import cn.vove7.common.appbus.AppBus
 import cn.vove7.common.bridges.GlobalActionExecutor
 import cn.vove7.common.bridges.SystemBridge
 import cn.vove7.common.helper.AdvanAppHelper
-import cn.vove7.common.utils.StubbornFlag
 import cn.vove7.common.utils.CoroutineExt.launch
+import cn.vove7.common.utils.StubbornFlag
 import cn.vove7.common.utils.activities
 import cn.vove7.common.utils.isInputMethod
 import cn.vove7.common.utils.runInCatch
 import cn.vove7.jarvis.BuildConfig
+import cn.vove7.jarvis.activities.screenassistant.ScreenAssistActivity
 import cn.vove7.jarvis.plugins.AdKillerService
 import cn.vove7.jarvis.plugins.VoiceWakeupStrategy
 import cn.vove7.jarvis.view.statusbar.AccessibilityStatusAnimation
@@ -49,6 +51,41 @@ class MyAccessibilityService : AccessibilityApi() {
         accAni.showAndHideDelay("服务开启", 5000L)
 
         startPluginService()
+        if (AppConfig.showAccessNavButton) {
+            showNavButton()
+        }
+    }
+
+    private val onNavClick by lazy {
+        @TargetApi(Build.VERSION_CODES.O)
+        object : AccessibilityButtonController.AccessibilityButtonCallback() {
+            override fun onClicked(controller: AccessibilityButtonController?) {
+                when (AppConfig.homeFun) {
+                    0 -> startActivity(ScreenAssistActivity.createIntent())
+                    1 -> MainService.switchRecog()
+                    else -> startActivity(ScreenAssistActivity.createIntent())
+                }
+            }
+        }
+    }
+
+    fun showNavButton() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val ser = serviceInfo
+            ser.flags = ser.flags or FLAG_REQUEST_ACCESSIBILITY_BUTTON
+            serviceInfo = ser
+            accessibilityButtonController.registerAccessibilityButtonCallback(onNavClick)
+        }
+    }
+
+    fun hideNavButton() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            //0x00000100
+            val ser = serviceInfo
+            ser.flags = ser.flags and 0x0ffffeff
+            serviceInfo = ser
+            accessibilityButtonController.unregisterAccessibilityButtonCallback(onNavClick)
+        }
     }
 
     private fun startPluginService() {

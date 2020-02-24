@@ -16,7 +16,6 @@ import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.appbus.AppBus
 import cn.vove7.common.bridges.SystemBridge
-import cn.vove7.common.utils.CoroutineExt
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.activities.base.ReturnableActivity
 import cn.vove7.jarvis.adapters.SettingsExpandableAdapter
@@ -106,7 +105,7 @@ class SettingsActivity : ReturnableActivity() {
                             defaultValue = true
                     ),
                     CheckBoxItem(
-                            title="兼容模式",
+                            title = "兼容模式",
                             summary = "语音识别无法正常使用时请开启",
                             keyId = R.string.key_recog_compatible_mode,
                             defaultValue = AppConfig.recogCompatibleMode
@@ -372,6 +371,23 @@ class SettingsActivity : ReturnableActivity() {
                     CheckBoxItem(title = "以兼容模式启动应用", summary = "某些机型在外部无法打开其他软件，请尝试开启",
                             keyId = R.string.key_open_app_compat, defaultValue = false
                     ),
+                    CheckBoxItem(title = "无障碍按钮", summary = "显示导航栏无障碍按钮，要求系统版本Android O\n动作受[实验室/屏幕助手/长按HOME键操作]控制",
+                            keyId = R.string.key_show_access_nav_button, defaultValue = false
+                    ) { _, b ->
+                        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+                            GlobalApp.toastError("要求系统版本Android O")
+                            return@CheckBoxItem false
+                        }
+                        if (AccessibilityApi.isBaseServiceOn) {
+                            val service = (AccessibilityApi.accessibilityService as MyAccessibilityService)
+                            if (b) {
+                                service.showNavButton()
+                            } else {
+                                service.hideNavButton()
+                            }
+                        }
+                        return@CheckBoxItem true
+                    },
                     IntentItem(title = "重置引导") {
                         Tutorials.resetTutorials()
                         GlobalApp.toastInfo("重置完成")
@@ -412,6 +428,7 @@ class SettingsActivity : ReturnableActivity() {
                     }
                 }
                 else -> {
+                    super.onActivityResult(requestCode, resultCode, data)
                 }
             }
         }

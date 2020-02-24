@@ -118,6 +118,7 @@
     <string name="key_chat_str" translatable="false">chat_str</string>
 
     <string name="key_open_chat_system" translatable="false">open_chat_system</string>
+    <string name="key_show_access_nav_button" translatable="false">show_access_nav_button</string>
     <string name="key_open_voice_wakeup_if_auto_sleep" translatable="false">open_voice_wakeup_if_auto_sleep</string>
     <string name="key_continuous_dialogue" translatable="false">continuous_dialogue</string>
     <string name="key_chat_system_type" translatable="false">chat_system_type</string>

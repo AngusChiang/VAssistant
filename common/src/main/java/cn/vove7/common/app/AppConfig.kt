@@ -121,6 +121,8 @@ object AppConfig : BaseConfig {
 
     var openChatSystem by noCacheKey(true, keyId = R.string.key_open_chat_system)
 
+    var showAccessNavButton by noCacheKey(true, keyId = R.string.key_show_access_nav_button)
+
     //语音识别等待时长 s
     var recogWaitDurationMillis by noCacheKey(600, keyId = R.string.key_recog_wait_duration)
 
