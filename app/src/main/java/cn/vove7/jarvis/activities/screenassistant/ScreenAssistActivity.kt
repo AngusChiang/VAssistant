@@ -29,7 +29,10 @@ import cn.vove7.jarvis.view.dialog.ImageClassifyResultDialog
 import cn.vove7.vtp.log.Vog
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import kotlinx.android.synthetic.main.dialog_assist.*
-import kotlinx.coroutines.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.withContext
 import java.io.File
 import java.util.*
 
@@ -152,6 +155,12 @@ class ScreenAssistActivity : BaseActivity() {
 
         root.setOnClickListener {
             onBackPressed()
+        }
+        val p = root.parent
+        if (p is View) {
+            p.setOnClickListener {
+                onBackPressed()
+            }
         }
     }
 
@@ -316,7 +325,6 @@ class ScreenAssistActivity : BaseActivity() {
                 }
                 true
             }
-
 
 
         }.show()
