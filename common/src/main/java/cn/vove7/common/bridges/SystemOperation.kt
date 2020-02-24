@@ -4,6 +4,7 @@ import android.content.Intent
 import android.graphics.Bitmap
 import android.location.Location
 import cn.vove7.common.annotation.ScriptApiClass
+import cn.vove7.common.model.LocationInfo
 import cn.vove7.vtp.app.AppInfo
 import cn.vove7.vtp.system.DeviceInfo
 import java.io.File
@@ -178,6 +179,8 @@ interface SystemOperation {
      * @return String? 获取失败返回空
      */
     fun location(): Location?
+
+    fun locationInfo(): LocationInfo?
 
     /**
      * 获得内外ip

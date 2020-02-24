@@ -3,9 +3,9 @@ package cn.vove7.jarvis.chat
 import cn.vove7.common.app.AppConfig
 import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.bridges.HttpBridge
+import cn.vove7.common.bridges.SystemBridge
 import cn.vove7.common.model.UserInfo
 import cn.vove7.jarvis.BuildConfig
-import cn.vove7.jarvis.view.floatwindows.IFloatyPanel
 import cn.vove7.vtp.net.GsonHelper
 import com.google.gson.Gson
 
@@ -27,7 +27,7 @@ class TulingChatSystem : ChatSystem {
                 if (err != null)
                     return ChatResult(err, arrayListOf())
                 if (obj?.results?.isNotEmpty() == true) {
-                    return obj.getChatResult()
+                    return obj.getChatResult()?.let { autoProcess(it) }
                 }
                 return null
             } catch (e: Exception) {
@@ -37,6 +37,16 @@ class TulingChatSystem : ChatSystem {
             }
         }
         return null
+    }
+
+    private fun autoProcess(result: ChatResult): ChatResult? {
+        if (result.word == "请问你想查询哪个城市") {
+            val li = SystemBridge.locationInfo()
+            if (li != null) {
+                return chatWithText(li.city)
+            }
+        }
+        return result
     }
 
     companion object {

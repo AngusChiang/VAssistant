@@ -47,6 +47,7 @@ import cn.vove7.common.datamanager.DAO
 import cn.vove7.common.datamanager.executor.entity.MarkedData
 import cn.vove7.common.helper.AdvanAppHelper
 import cn.vove7.common.helper.AdvanContactHelper
+import cn.vove7.common.model.LocationInfo
 import cn.vove7.common.model.RequestPermission
 import cn.vove7.common.model.ResultBox
 import cn.vove7.common.net.ApiUrls
@@ -61,6 +62,7 @@ import cn.vove7.vtp.calendar.CalendarAccount
 import cn.vove7.vtp.calendar.CalendarHelper
 import cn.vove7.vtp.extend.buildList
 import cn.vove7.vtp.log.Vog
+import cn.vove7.vtp.net.GsonHelper
 import cn.vove7.vtp.system.DeviceInfo
 import cn.vove7.vtp.system.SystemHelper
 import kotlinx.coroutines.Dispatchers
@@ -736,6 +738,17 @@ object SystemBridge : SystemOperation {
     override fun lockScreen(): Boolean {
         screenOff()
         return false
+    }
+
+    override fun locationInfo(): LocationInfo? {
+        return try {
+            val res = HttpBridge.get("http://whois.pconline.com.cn/ipJson.jsp?json=true")
+            GsonHelper.fromJson<LocationInfo>(res)
+        } catch (e: Throwable) {
+            e.log()
+            null
+        }
+
     }
 
     //TODO 测试
