@@ -3,6 +3,7 @@ package cn.vove7.jarvis.activities.base
 import android.app.Activity
 import android.content.ComponentName
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.service.quicksettings.TileService
 import android.speech.RecognizerIntent
@@ -39,6 +40,14 @@ class VoiceAssistActivity : Activity() {
         super.onCreate(savedInstanceState)
         val action = intent.action
         Vog.d("VoiceAssist ---> $action")
+
+        val uri = intent.data
+        if (uri?.scheme == "vassistant") {
+            if (parseUri(uri)) {
+                finishAndRemoveTask()
+                return
+            }
+        }
         when (action) {
             Intent.ACTION_VOICE_COMMAND,
             RecognizerIntent.ACTION_VOICE_SEARCH_HANDS_FREE,
@@ -102,7 +111,7 @@ class VoiceAssistActivity : Activity() {
             }
             TileService.ACTION_QS_TILE_PREFERENCES -> {
                 val cn = (intent.extras?.get(Intent.EXTRA_COMPONENT_NAME) as ComponentName?)
-                        ?: return
+                    ?: return
                 runInCatch {
                     val tileService = Class.forName(cn.className)
                     val ins = tileService.newInstance()
@@ -135,6 +144,17 @@ class VoiceAssistActivity : Activity() {
             }
         }
         finishAndRemoveTask()
+    }
+
+    private fun parseUri(uri: Uri): Boolean {
+        when (uri.host) {
+            "run" -> {
+                val cmd = uri.getQueryParameter("cmd") ?: return false
+                MainService.parseCommand(cmd)
+                return true
+            }
+        }
+        return false
     }
 
     companion object {

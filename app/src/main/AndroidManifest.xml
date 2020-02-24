@@ -57,6 +57,13 @@
             android:launchMode="singleInstance"
             android:theme="@style/TransparentBackground">
             <intent-filter>
+                <data android:scheme="vassistant" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.BROWSABLE" />
+            </intent-filter>
+            <intent-filter>
 
                 <!-- 一加按键设置(搜索助手) 触发辅助应用 -->
                 <action android:name="android.intent.action.ASSIST" />
@@ -382,15 +389,15 @@
             android:label="前台服务"
             android:priority="1000" />
 
-<!--        <receiver-->
-<!--            android:name=".receivers.JPushReceiver"-->
-<!--            android:process=":pushcore">-->
+        <!--        <receiver-->
+        <!--            android:name=".receivers.JPushReceiver"-->
+        <!--            android:process=":pushcore">-->
 
-<!--            <intent-filter>-->
-<!--                <action android:name="cn.jpush.android.intent.RECEIVE_MESSAGE" />-->
-<!--                <category android:name="${applicationId}" />-->
-<!--            </intent-filter>-->
-<!--        </receiver>-->
+        <!--            <intent-filter>-->
+        <!--                <action android:name="cn.jpush.android.intent.RECEIVE_MESSAGE" />-->
+        <!--                <category android:name="${applicationId}" />-->
+        <!--            </intent-filter>-->
+        <!--        </receiver>-->
     </application>
     <permission
         android:name="android.permission.INTERACT_ACROSS_USERS_FULL"
