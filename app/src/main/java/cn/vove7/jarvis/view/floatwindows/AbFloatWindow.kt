@@ -31,6 +31,8 @@ abstract class AbFloatWindow(
     private val winParams get() = buildLayoutParams()
     lateinit var animationBody: View
 
+    val aniBodyInit get() = ::animationBody.isInitialized
+
     private val rootView: ViewGroup get() = LayoutInflater.from(context).inflate(R.layout.float_panel_root, null) as ViewGroup
 
     private val newView: View

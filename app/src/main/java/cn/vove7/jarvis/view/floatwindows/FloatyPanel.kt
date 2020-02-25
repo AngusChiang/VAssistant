@@ -89,7 +89,9 @@ abstract class FloatyPanel(width: Int, height: Int) : AbFloatWindow(
 
     override fun onRemove() {
         isHiding = true
-        showExitAnimation()
+        if(aniBodyInit) {
+            showExitAnimation()
+        }
     }
 
     /**
