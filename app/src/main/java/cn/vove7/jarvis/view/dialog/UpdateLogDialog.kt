@@ -1,11 +1,15 @@
 package cn.vove7.jarvis.view.dialog
 
 import android.app.Activity
+import androidx.core.content.ContextCompat
 import cn.vove7.bottomdialog.BottomDialog
-import cn.vove7.bottomdialog.builder.title
-import cn.vove7.bottomdialog.builder.withCloseIcon
+import cn.vove7.bottomdialog.builder.buttons
 import cn.vove7.bottomdialog.extension.awesomeHeader
+import cn.vove7.common.model.UserInfo
+import cn.vove7.common.utils.spanColor
+import cn.vove7.jarvis.R
 import cn.vove7.jarvis.view.dialog.contentbuilder.MarkdownContentBuilder
+import java.util.*
 
 /**
  * # UpdateLogDialog
@@ -20,6 +24,22 @@ class UpdateLogDialog(context: Activity, onDismiss: (() -> Unit)? = null) {
             awesomeHeader("更新日志")
             content(MarkdownContentBuilder()) {
                 loadMarkdownFromAsset("files/update_log.md")
+            }
+            buttons {
+                if (UserInfo.getVipEndDate() ?: Date(0) < Calendar.getInstance().also { it.add(Calendar.DAY_OF_YEAR, 7) }.time) {
+                    neutralButton("支持一下".spanColor(ContextCompat.getColor(context, R.color.google_green))) {
+                        UserInfoDialog.recharge(context)
+                    }
+                }
+                positiveButton("帮助手册") {
+                    it.dismiss()
+                    BottomDialog.builder(context) {
+                        awesomeHeader(context.getString(R.string.using_help))
+                        content(MarkdownContentBuilder()) {
+                            loadMarkdownFromAsset("files/introduction.md")
+                        }
+                    }
+                }
             }
         }
         d.setOnDismissListener {
