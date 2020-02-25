@@ -7,9 +7,6 @@ import android.content.ContextWrapper
 import android.content.Intent
 import android.content.pm.ApplicationInfo
 import android.media.AudioManager
-import android.net.ConnectivityManager
-import android.net.Network
-import android.net.NetworkRequest
 import android.net.Uri
 import android.os.Build
 import cn.vove7.common.BuildConfig
@@ -27,10 +24,10 @@ import cn.vove7.common.utils.secure.SecuritySharedPreference
 import cn.vove7.smartkey.BaseConfig
 import cn.vove7.smartkey.android.AndroidSettings
 import cn.vove7.smartkey.android.noCacheKey
-import cn.vove7.smartkey.android.smartKey
 import cn.vove7.smartkey.annotation.Config
 import cn.vove7.smartkey.key.get
 import cn.vove7.smartkey.key.set
+import cn.vove7.smartkey.key.smartKey
 import cn.vove7.vtp.log.Vog
 import cn.vove7.vtp.sharedpreference.SpHelper
 import com.russhwolf.settings.Settings
@@ -66,7 +63,7 @@ object AppConfig : BaseConfig {
 
     var isLongPressKeyWakeUp by noCacheKey(true, keyId = R.string.key_long_press_volume_up_wake_up)
 
-    var wakeupKeys by smartKey(intArrayOf())
+    var wakeupKeys by smartKey(intArrayOf(), "wakeupKeys")
 
     val voiceControlDialog by noCacheKey(true, keyId = R.string.key_voice_control_dialog)
 
@@ -354,44 +351,21 @@ object AppConfig : BaseConfig {
         } ?: def
     }
 
-    private var networkCallback: ConnectivityManager.NetworkCallback? = null
-
-    private val connectivityManager get() = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-
-    @Synchronized
-    private fun observeNet2Reload() {
-        if (networkCallback == null) {
-            networkCallback = object : ConnectivityManager.NetworkCallback() {
-                override fun onAvailable(network: Network?) {
-                    fetchNetConfig()
-                }
-            }
-        }
-
-        val cm = connectivityManager
-        if (Build.VERSION.SDK_INT >= 24) { //API 大于24时
-            cm.registerDefaultNetworkCallback(networkCallback)
-        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) { //API 大于21时
-            val builder = NetworkRequest.Builder()
-            val request = builder.build()
-            cm.registerNetworkCallback(request, networkCallback)
-        }
-    }
+    private var remoteConfig by smartKey<Map<String, String>?>(null, key = "remote_config")
 
     fun fetchNetConfig() = launch {
         val configStr = HttpBridge.get("https://gitee.com/Vove/Config/raw/master/V-Assistant.properties")
         if (configStr == null) {
-            observeNet2Reload()
-            return@launch
-        } else {
-            if (networkCallback != null) {
-                connectivityManager.unregisterNetworkCallback(networkCallback)
+            val rc = remoteConfig
+            if (rc != null) {
+                onCheckProp(rc)
             }
+        } else {
+            val map = configStr.prop2Map()
+            remoteConfig = map
+            netConfig = map
+            onCheckProp(map)
         }
-
-        val map = configStr.prop2Map()
-        netConfig = map
-        onCheckProp(map)
     }
 
     private fun onCheckProp(config: Map<String, String>) {

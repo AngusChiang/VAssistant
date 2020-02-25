@@ -1,6 +1,5 @@
 package cn.vove7.common.bridges
 
-import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.model.ResultBox
 import cn.vove7.common.utils.runInCatch
@@ -117,7 +116,6 @@ object HttpBridge {
             override fun onFailure(call: Call, e: IOException) {
                 e.printStackTrace()
                 GlobalLog.err("请求失败: " + e.message)
-                GlobalApp.toastError("网络请求失败")
                 result.setAndNotify(null)
             }
 
@@ -128,7 +126,6 @@ object HttpBridge {
                     println("onResponse ---> http bridge $s")
                     result.setAndNotify(s)
                 } else {
-                    GlobalApp.toastInfo("网络请求失败")
                     GlobalLog.err("网络错误：" + response.message)
                     result.setAndNotify(null)
                 }
