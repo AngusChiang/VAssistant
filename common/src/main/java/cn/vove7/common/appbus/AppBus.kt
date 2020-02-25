@@ -11,6 +11,7 @@ object AppBus {
     const val EVENT_LOGOUT = "e_logout"
     const val EVENT_USER_INIT = "event_user_init"
     const val EVENT_FORCE_OFFLINE = "e_force_offline"
+    const val EVENT_REFRESH_USER_INFO = "e_refresh_user_info"
     const val EVENT_INST_SAVE_COMPLETE = "inst_settings_save_complete"
     const val EVENT_PLUGIN_INSTALLED = "e_plugin_installed"
     const val EVENT_PLUGIN_UNINSTALLED = "e_plugin_uninstalled"

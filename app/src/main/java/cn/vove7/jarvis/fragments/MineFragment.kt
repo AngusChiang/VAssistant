@@ -11,14 +11,16 @@ import android.widget.TextView
 import androidx.cardview.widget.CardView
 import cn.vove7.common.appbus.AppBus
 import cn.vove7.common.model.UserInfo
+import cn.vove7.common.net.ApiUrls
+import cn.vove7.common.net.WrapperNetHelper
 import cn.vove7.common.utils.color
 import cn.vove7.common.utils.gone
 import cn.vove7.common.utils.onClick
 import cn.vove7.common.utils.show
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.activities.*
-import cn.vove7.jarvis.activities.LaboratoryActivity
 import cn.vove7.jarvis.services.MainService
+import cn.vove7.jarvis.tools.AppLogic
 import cn.vove7.jarvis.view.dialog.LoginDialog
 import cn.vove7.jarvis.view.dialog.UserInfoDialog
 import cn.vove7.vtp.easyadapter.BaseListAdapter
@@ -45,6 +47,25 @@ class MineFragment : androidx.fragment.app.Fragment() {
             AppBus.EVENT_FORCE_OFFLINE, AppBus.EVENT_LOGOUT -> {
                 loadUserInfo()
             }
+            AppBus.EVENT_REFRESH_USER_INFO -> {
+                refreshUserInfo()
+            }
+        }
+    }
+
+    private fun refreshUserInfo() {
+        WrapperNetHelper.postJson<UserInfo>(ApiUrls.GET_USER_INFO) {
+            success { _, bean ->
+                if (bean.isOk()) {
+                    try {
+                        val userInfo = bean.data!!
+                        AppLogic.onLogin(userInfo)
+                        loadUserInfo()
+                    } catch (e: Exception) {
+                        return@success
+                    }
+                }
+            }
         }
     }
 
@@ -59,7 +80,7 @@ class MineFragment : androidx.fragment.app.Fragment() {
                 UserInfoDialog(activity!!) {
                     loadUserInfo()
                 }
-            }else{
+            } else {
                 LoginDialog(context!!) {
                     loadUserInfo()
                 }
