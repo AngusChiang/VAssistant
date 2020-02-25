@@ -66,6 +66,8 @@ class AppAdListActivity : OneFragmentActivity() {
                     BottomDialog.builder(activity!!) {
                         title(item.title ?: "", true)
                         message(data.toString())
+                        expandable = false
+                        peekHeightProportion = 0.6f
                         if (data.belongUser()) {
                             buttons {
                                 neutralButton(getString(R.string.text_edit)) {

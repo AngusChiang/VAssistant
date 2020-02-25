@@ -45,6 +45,7 @@ class TextOperationDialog(val activity: AppCompatActivity, val textModel: TextMo
 
     val bottomDialog = BottomDialog.builder(activity) {
         awesomeHeader("文字操作")
+        peekHeightProportion = 0.6f
         buttons {
 
             content(cv)
