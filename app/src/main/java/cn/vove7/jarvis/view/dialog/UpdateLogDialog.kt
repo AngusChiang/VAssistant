@@ -31,7 +31,7 @@ class UpdateLogDialog(context: Activity, onDismiss: (() -> Unit)? = null) {
                         UserInfoDialog.recharge(context)
                     }
                 }
-                positiveButton("帮助手册") {
+                positiveButton("新用户必读") {
                     it.dismiss()
                     BottomDialog.builder(context) {
                         awesomeHeader(context.getString(R.string.using_help))
