@@ -19,7 +19,7 @@ import kotlinx.android.synthetic.main.dialog_assist.view.*
  */
 class AssistSessionGridController(
         context: Activity, bottomView: View,
-        val click: (Int) -> Unit, val onLongClick: (item: SessionFunItem, v: View) -> Boolean, val screenPath: () -> String?)
+        val click: (Int) -> Unit, val onLongClick: (item: SessionFunItem, v: View) -> Boolean)
     : BottomSheetController(context, bottomView) {
 
     private val gridView: GridView by lazy { bottomView.fun_grid }
@@ -31,6 +31,7 @@ class AssistSessionGridController(
 
             override fun onBindView(holder: VH, pos: Int, item: SessionFunItem) {
                 holder.imageView.apply {
+                    this.tag = item.name
                     contentDescription = item.name
                     setImageDrawable(context.getDrawable(item.iconId))
                     setOnClickListener { click.invoke(pos) }
