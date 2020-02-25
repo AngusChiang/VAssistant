@@ -10,7 +10,6 @@ import android.os.Build
 import android.os.Bundle
 import android.view.Gravity
 import android.view.View
-import android.view.View.FIND_VIEWS_WITH_CONTENT_DESCRIPTION
 import android.view.animation.AlphaAnimation
 import android.widget.PopupMenu
 import cn.vove7.common.app.GlobalApp
@@ -127,9 +126,7 @@ class ScreenAssistActivity : BaseActivity() {
         DataCollector.buriedPoint("sa_0")
 
         showProgressBar = true
-        bottomController = AssistSessionGridController(this, bottom_sheet, itemClick, ::onLongClick) {
-            if (isReady) screenPath else null
-        }
+        bottomController = AssistSessionGridController(this, bottom_sheet, itemClick, ::onLongClick)
         bottomController.initView()
         bottomController.hideBottom()
         bottomController.bottomView.visibility = View.GONE
@@ -183,16 +180,10 @@ class ScreenAssistActivity : BaseActivity() {
             animation.duration = 300
             bottomController.bottomView.startAnimation(animation)
             bottomController.bottomView.post {
-                val list = arrayListOf<View>()
-                val list2 = arrayListOf<View>()
-                bottomController.bottomView.findViewsWithText(list, "二维码/条码识别", FIND_VIEWS_WITH_CONTENT_DESCRIPTION)
-                bottomController.bottomView.findViewsWithText(list2, "屏幕识别", FIND_VIEWS_WITH_CONTENT_DESCRIPTION)
-
                 Tutorials.oneStep(this, arrayOf(
-                        ItemWrap(Tutorials.screen_assistant_spot, list2[0], "长按更多功能", "淘宝商品识别"),
-                        ItemWrap(Tutorials.screen_assistant_qrcode, list[0], "长按查看更多功能", "使用微信扫一扫\n支付宝扫一扫")
+                        ItemWrap(Tutorials.screen_assistant_spot, bottomController.bottomView.findViewWithTag("屏幕识别"), "长按更多功能", "淘宝商品识别"),
+                        ItemWrap(Tutorials.screen_assistant_qrcode, bottomController.bottomView.findViewWithTag("二维码/条码识别"), "长按查看更多功能", "使用微信扫一扫\n支付宝扫一扫")
                 ))
-
             }
         }
     }
@@ -271,7 +262,7 @@ class ScreenAssistActivity : BaseActivity() {
     private val funMap = mapOf(
             Pair(0, {
                 DataCollector.buriedPoint("sa_1")
-                imageClassify()
+                popSpotMenu(bottomController.bottomView.findViewWithTag<View>("屏幕识别"))
             }),
             Pair(1, {
                 DataCollector.buriedPoint("sa_2")
