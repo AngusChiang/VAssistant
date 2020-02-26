@@ -378,7 +378,7 @@ class SettingsActivity : ReturnableActivity() {
                             keyId = R.string.key_open_app_compat, defaultValue = false
                     ),
                     CheckBoxItem(title = "无障碍按钮", summary = "显示导航栏无障碍按钮，要求系统版本Android O\n动作受[实验室/屏幕助手/长按HOME键操作]控制",
-                            keyId = R.string.key_show_access_nav_button, defaultValue = false
+                            keyId = R.string.key_show_access_nav_button, defaultValue = AppConfig.showAccessNavButton
                     ) { _, b ->
                         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
                             GlobalApp.toastError("要求系统版本Android O")

@@ -33,8 +33,8 @@ data class TextOcrItem(
 
     val width: Int get() = calPointDistance(0, 1)
 
-    val left: Int = calCenterPoint(0, 3).x
-    val top: Int = calCenterPoint(0, 1).y
+    val left: Int get() = calCenterPoint(0, 3).x
+    val top: Int get() = calCenterPoint(0, 1).y
 
     private fun calCenterPoint(i: Int, j: Int): Point = Point((points[i].x + points[j].x) / 2,
             (points[i].y + points[j].y) / 2)
@@ -61,6 +61,11 @@ data class TextOcrItem(
 }
 
 data class Point(
-        val x: Int,
-        val y: Int
-) : Serializable
+        var x: Int,
+        var y: Int
+) : Serializable {
+    fun zoom(multiple: Float) {
+        x = (x * multiple).toInt()
+        y = (y * multiple).toInt()
+    }
+}

@@ -504,7 +504,20 @@ class ScreenAssistActivity : BaseActivity() {
         showProgressBar = true
         oneJob = launch {
             try {
-                val results = BaiduAipHelper.ocr(UtilBridge.compressImage(screenPath))
+                //压缩图片
+                val cf = UtilBridge.compressImage(screenPath)
+                val fsw = cf.calImageSize()
+                val zoomSize = SystemBridge.screenWidth.toFloat() / fsw.second
+                val z = SystemBridge.screenHeight.toFloat() / fsw.first
+
+                val results = BaiduAipHelper.ocr(cf)
+                if (zoomSize != 1f) {
+                    results.forEach {
+                        it.points.forEach { p ->
+                            p.zoom(zoomSize)
+                        }
+                    }
+                }
                 if (oneJob?.isCancelled == false) {
                     TextOcrActivity.start(this@ScreenAssistActivity, results, intent.extras)
                     finish()

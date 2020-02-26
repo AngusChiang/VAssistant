@@ -7,6 +7,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.graphics.Rect
 import android.net.Uri
@@ -603,3 +604,14 @@ fun String.spanColor(color: Int): SpannableStringBuilder {
     return MultiSpan(this, color = color).build()
 }
 
+/**
+ * 计算图片文件尺寸
+ * @receiver File
+ * @return Pair<Int, Int> h to w
+ */
+fun File.calImageSize(): Pair<Int, Int> {
+    val options = BitmapFactory.Options()
+    options.inJustDecodeBounds = true
+    BitmapFactory.decodeFile(path, options)//这里的bitmap是个空
+    return options.outHeight to options.outWidth
+}
