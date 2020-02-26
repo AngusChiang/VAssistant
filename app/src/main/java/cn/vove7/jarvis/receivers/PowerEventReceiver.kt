@@ -32,14 +32,6 @@ object PowerEventReceiver : DyBCReceiver(), OnPowerEvent {
                 addAction(Intent.ACTION_BATTERY_CHANGED)
         }
 
-    override fun onStart() {
-        GlobalLog.log("电源提醒服务上线")
-    }
-
-    override fun onStop() {
-        GlobalLog.log("电源提醒服务关闭")
-    }
-
     var isCharging: Boolean = SystemBridge.isCharging //初始状态?
 
     /**

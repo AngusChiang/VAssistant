@@ -5,6 +5,7 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.os.BatteryManager
 import android.os.BatteryManager.BATTERY_STATUS_FULL
+import cn.vove7.common.app.GlobalLog
 import cn.vove7.jarvis.receivers.DyBCReceiver
 import cn.vove7.jarvis.services.MainService
 
@@ -18,6 +19,13 @@ object PowerListener : DyBCReceiver() {
             addAction(Intent.ACTION_BATTERY_CHANGED)
         }
 
+    override fun onStart() {
+        GlobalLog.log("电源提醒服务上线")
+    }
+
+    override fun onStop() {
+        GlobalLog.log("电源提醒服务关闭")
+    }
 
     /**
      * 判断充满提醒
