@@ -91,6 +91,8 @@ abstract class FloatyPanel(width: Int, height: Int) : AbFloatWindow(
         isHiding = true
         if(aniBodyInit) {
             showExitAnimation()
+        } else {
+            superRemove()
         }
     }
 
