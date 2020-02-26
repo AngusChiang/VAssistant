@@ -102,7 +102,12 @@ object ActionHelper {
     }
 
     fun ocrWithBaiMiao(screenPath: String): Boolean {
-        return shareWith(screenPath, ComponentName("com.uzero.baimiao",
-                "com.uzero.baimiao.ui.ImageCropperAndRecognizeActivity"), "白描")
+        return if (SystemBridge.hasInstall("com.uzero.baimiao")) {
+            shareWith(screenPath, ComponentName("com.uzero.baimiao",
+                    "com.uzero.baimiao.ui.ImageCropperAndRecognizeActivity"), "白描")
+        } else {//play 版
+            shareWith(screenPath, ComponentName("com.uzero.baimiaog",
+                    "com.uzero.baimiao.ui.ImageCropperAndRecognizeActivity"), "白描")
+        }
     }
 }
