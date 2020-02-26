@@ -59,7 +59,7 @@ class BaiduSpeechRecogService(event: RecogEvent) : SpeechRecogService(event) {
     ).also {
         if (enableOffline) {
             it[DECODER] = 2
-            it[ASR_OFFLINE_ENGINE_GRAMMER_FILE_PATH] = "assets://bd/baidu_speech_grammar.bsg"
+            it[ASR_OFFLINE_ENGINE_GRAMMER_FILE_PATH] = "assets:///bd/baidu_speech_grammar.bsg"
         }
         if (!AppConfig.recogCompatibleMode) {
             it[IN_FILE] = "#cn.vove7.jarvis.speech.baiduspeech.MicInputStream.instance()"
