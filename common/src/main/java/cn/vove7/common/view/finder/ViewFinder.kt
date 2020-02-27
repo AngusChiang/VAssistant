@@ -71,10 +71,7 @@ abstract class ViewFinder(var node: AccessibilityNodeInfo?) {
         return findAll()
     }
 
-    fun findAll(): Array<ViewNode> {
-        return findAll(false)
-    }
-
+    @JvmOverloads
     fun findAll(includeInvisible: Boolean = false): Array<ViewNode> {
         list.clear()
         traverseAllNode(startNode, true, includeInvisible)

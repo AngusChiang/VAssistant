@@ -22,7 +22,6 @@ import cn.vove7.common.bridges.SystemBridge
 import cn.vove7.common.helper.AdvanAppHelper
 import cn.vove7.common.utils.CoroutineExt.launch
 import cn.vove7.common.utils.StubbornFlag
-import cn.vove7.common.utils.activities
 import cn.vove7.common.utils.isInputMethod
 import cn.vove7.common.utils.runInCatch
 import cn.vove7.jarvis.BuildConfig
@@ -106,15 +105,21 @@ class MyAccessibilityService : AccessibilityApi() {
     /**
      * 更新当前[currentScope]
      * @param pkg String
-     * @param activityName String
+     * @param pageName String Activity or Dialog
      */
-    private fun updateCurrentApp(pkg: String, activityName: String) {
+    private fun updateCurrentApp(pkg: String, pageName: String) {
         synchronized(MyAccessibilityService::class.java) {
-            if (currentScope.packageName == pkg && activityName == currentActivity) return
+            if (currentScope.packageName == pkg && pageName == currentActivity) return
             AdvanAppHelper.getAppInfo(pkg).also {
                 // 系统界面??
                 currentAppInfo = try {//todo 防止阻塞
-                    if (it == null || it.isInputMethod(this) || !it.activities().contains(activityName)) {//过滤输入法、非activity
+                    //过滤输入法、非activity
+                    if (
+                            it == null ||
+                            (pkg != packageName && it.isInputMethod(this)) ||
+                            pageName.startsWith("android.widget")
+//                            !it.activities().contains(activityName)
+                    ) {
                         return
                     } else it
                 } catch (e: Exception) {
@@ -123,8 +128,8 @@ class MyAccessibilityService : AccessibilityApi() {
                 }
             }
             Vog.v("updateCurrentApp ---> $pkg")
-            Vog.v("updateCurrentApp ---> $activityName")
-            currentScope.activity = activityName
+            Vog.v("updateCurrentPage ---> $pageName")
+            currentScope.activity = pageName
             currentScope.packageName = pkg
             Vog.d(currentScope.toString())
             dispatchPluginsEvent(ON_APP_CHANGED, currentScope)//发送事件
@@ -142,106 +147,20 @@ class MyAccessibilityService : AccessibilityApi() {
             Vog.v("class :$currentAppInfo - $currentActivity ${event.className} \n" +
                     AccessibilityEvent.eventTypeToString(eventType))
         }
-
         when (eventType) {
             AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED -> {
                 //界面切换
                 val classNameStr = event.className
                 val pkg = event.packageName as String?
-//                Vog.v("WINDOW_STATE_CHANGED ---> $classNameStr $pkg")
-
-                launch {
-                    if (classNameStr != null && pkg != null)
+                Vog.v("WINDOW_STATE_CHANGED ---> $classNameStr $pkg")
+                if (classNameStr != null && pkg != null) {
+                    launch {
                         updateCurrentApp(pkg, classNameStr.toString())
+                    }
                 }
             }
-//            AccessibilityEvent.TYPE_VIEW_CLICKED -> try {
-//                Vog.i("onAccessibilityEvent ---> 点击 :${ViewNode(event.source)}")
-//            } catch (e: Exception) {
-//            }
-//            AccessibilityEvent.TYPE_WINDOWS_CHANGED -> try {
-//                Vog.i("onAccessibilityEvent ---> TYPE_WINDOWS_CHANGED :${event.source}")
-//            } catch (e: Exception) {
-//            }
         }
-
-        //        runOnCachePool {
-        //            if (blackPackage.contains(currentScope.packageName)) {//black list
-//                Vog.v("onAccessibilityEvent ---> in black")
-//                return@runOnCachePool
-//            }
-//        根据事件回调类型进行处理
-//            when (eventType) {
-//                AccessibilityEvent.TYPE_WINDOWS_CHANGED -> {
-//                    callAllNotifier()
-//                }
-//                AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED -> {//"帧"刷新  限制频率
-//                    System.currentTimeMillis().also {
-//                        if (it - lastContentChangedTime < 300) {
-//                            Vog.v("onAccessibilityEvent ---> lock")
-//                            return@runOnCachePool
-//                        }
-//                        lastContentChangedTime = it
-//                    }
-//                    callAllNotifier()
-//                }
-//            TYPE_VIEW_SCROLLED -> {
-//                callAllNotifier()
-//            }
-//                AccessibilityEvent.TYPE_VIEW_CLICKED -> {
-//                lastScreenEvent = event
-//            callAllNotifier()
-//                try {
-//                    Vog.d("onAccessibilityEvent ---> 点击 :${ViewNode(event.source)}")
-//                } catch (e: Exception) {
-//                }
-//        }
-//            }
-//        }
-
-//        runOnCachePool {
-        //            if (blackPackage.contains(currentScope.packageName)) {//black list
-//                Vog.v("onAccessibilityEvent ---> in black")
-//                return@runOnCachePool
-//            }
-//        根据事件回调类型进行处理
-//            when (eventType) {
-//                AccessibilityEvent.TYPE_WINDOWS_CHANGED -> {
-//                    callAllNotifier()
-//                }
-//                AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED -> {//"帧"刷新  限制频率
-//                    System.currentTimeMillis().also {
-//                        if (it - lastContentChangedTime < 300) {
-//                            Vog.v("onAccessibilityEvent ---> lock")
-//                            return@runOnCachePool
-//                        }
-//                        lastContentChangedTime = it
-//                    }
-//                    callAllNotifier()
-//                }
-//            TYPE_VIEW_SCROLLED -> {
-//                callAllNotifier()
-//            }
-//                AccessibilityEvent.TYPE_VIEW_CLICKED -> {
-//                lastScreenEvent = event
-//            callAllNotifier()
-//                try {
-//                    Vog.d("onAccessibilityEvent ---> 点击 :${ViewNode(event.source)}")
-//                } catch (e: Exception) {
-//                }
-//        }
-//            }
-//        }
     }
-
-//    private fun startTraverse(rootNode: AccessibilityNodeInfo?) {
-//        return
-//        if (BuildConfig.DEBUG) {
-//            val builder = StringBuilder("\n" + rootNode?.packageName + "\n")
-//            traverseAllNode(builder, 0, rootNode)
-//            Vog.v("onAccessibilityEvent  ---->" + builder.toString() + " \n\n\n")
-//        }
-//    }
 
     /**
      * is output ViewGroup

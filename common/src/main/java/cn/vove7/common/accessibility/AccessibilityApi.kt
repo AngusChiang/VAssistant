@@ -216,12 +216,13 @@ abstract class AccessibilityApi : AccessibilityService() {
         fun dispatchPluginsEvent(what: Int, data: Any? = null) {
             if (data == null) return
             when (what) {
-
                 ON_APP_CHANGED -> {
                     Vog.d("dispatchPluginsEvent ---> ON_APP_CHANGED")
-                    launch {
-                        pluginsServices.forEach {
-                            it.onAppChanged(data as ActionScope)
+                    if(pluginsServices.isNotEmpty()) {
+                        launch {
+                            pluginsServices.forEach {
+                                it.onAppChanged(data as ActionScope)
+                            }
                         }
                     }
                 }

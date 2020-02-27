@@ -15,20 +15,20 @@ import cn.vove7.common.appbus.AppBus.ACTION_BEGIN_SCREEN_PICKER
 import cn.vove7.common.appbus.AppBus.ACTION_BEGIN_SCREEN_PICKER_TRANSLATE
 import cn.vove7.common.appbus.AppBus.ACTION_CANCEL_RECOG
 import cn.vove7.common.appbus.AppBus.ACTION_RELOAD_SYN_CONF
+import cn.vove7.common.appbus.AppBus.ACTION_START_DEBUG_SERVER
 import cn.vove7.common.appbus.AppBus.ACTION_START_RECOG
 import cn.vove7.common.appbus.AppBus.ACTION_START_RECOG_SILENT
 import cn.vove7.common.appbus.AppBus.ACTION_START_VOICE_WAKEUP_WITHOUT_NOTIFY
 import cn.vove7.common.appbus.AppBus.ACTION_START_WAKEUP
 import cn.vove7.common.appbus.AppBus.ACTION_START_WAKEUP_TIMER
 import cn.vove7.common.appbus.AppBus.ACTION_START_WAKEUP_WITHOUT_SWITCH
+import cn.vove7.common.appbus.AppBus.ACTION_STOP_DEBUG_SERVER
 import cn.vove7.common.appbus.AppBus.ACTION_STOP_EXEC
 import cn.vove7.common.appbus.AppBus.ACTION_STOP_RECOG
 import cn.vove7.common.appbus.AppBus.ACTION_STOP_VOICE_WAKEUP_WITHOUT_NOTIFY
 import cn.vove7.common.appbus.AppBus.ACTION_STOP_WAKEUP
 import cn.vove7.common.appbus.AppBus.ACTION_STOP_WAKEUP_TIMER
 import cn.vove7.common.appbus.AppBus.ACTION_STOP_WAKEUP_WITHOUT_SWITCH
-import cn.vove7.common.appbus.AppBus.ACTION_START_DEBUG_SERVER
-import cn.vove7.common.appbus.AppBus.ACTION_STOP_DEBUG_SERVER
 import cn.vove7.common.bridges.ChoiceData
 import cn.vove7.common.bridges.ServiceBridge
 import cn.vove7.common.bridges.ShowDialogEvent
@@ -52,13 +52,14 @@ import cn.vove7.common.utils.*
 import cn.vove7.common.utils.CoroutineExt.launch
 import cn.vove7.common.utils.RegUtils.checkCancel
 import cn.vove7.common.utils.RegUtils.checkConfirm
+import cn.vove7.common.view.finder.ScreenTextFinder
 import cn.vove7.common.view.finder.ViewFindBuilder
 import cn.vove7.executorengine.exector.ExecutorEngine
 import cn.vove7.executorengine.model.ActionParseResult
 import cn.vove7.executorengine.parse.ParseEngine
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.activities.PermissionManagerActivity
-import cn.vove7.jarvis.activities.ScreenPickerActivity
+import cn.vove7.jarvis.activities.TextOcrActivity
 import cn.vove7.jarvis.chat.ChatSystem
 import cn.vove7.jarvis.chat.TulingChatSystem
 import cn.vove7.jarvis.receivers.ScreenStatusListener
@@ -68,6 +69,8 @@ import cn.vove7.jarvis.speech.baiduspeech.BaiduSpeechRecogService
 import cn.vove7.jarvis.speech.baiduspeech.BaiduSpeechSynService
 import cn.vove7.jarvis.tools.AppLogic
 import cn.vove7.jarvis.tools.DataCollector
+import cn.vove7.jarvis.tools.baiduaip.model.Point
+import cn.vove7.jarvis.tools.baiduaip.model.TextOcrItem
 import cn.vove7.jarvis.tools.debugserver.RemoteDebugServer
 import cn.vove7.jarvis.tools.setFloat
 import cn.vove7.jarvis.view.dialog.MultiChoiceDialog
@@ -340,7 +343,7 @@ object MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
             Vog.d("speak临时 ${speechRecogService?.lastingStopped}")
             //没有手动停止 即认为处于长语音状态
             afterSpeakResumeListen = !(speechRecogService?.lastingStopped
-                    ?: true)
+                ?: true)
             if (cancelRecog && recogIsListening) {
                 speechRecogService?.cancelRecog(false)
             }
@@ -489,7 +492,7 @@ object MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
             q += action
             if (node.autoLaunchApp) {//自启
                 ActionParseResult.insertOpenAppAction(pkg,
-                        AccessibilityApi.currentScope ?: ActionScope("-", "-"),q)
+                        AccessibilityApi.currentScope ?: ActionScope("-", "-"), q)
             }
             action.param = argMap ?: emptyMap()
             cExecutor.addQueue(q)
@@ -517,6 +520,31 @@ object MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
         val q = PriorityQueue<Action>()
         q.add(ac)
         cExecutor.execQueue(CExecutorI.DEBUG_SCRIPT, q, false)
+    }
+
+    fun getScreenText(): List<TextOcrItem>? {
+        if (!AppConfig.haveTextPickPermission()) {//免费次数
+            GlobalApp.toastWarning("今日次数达到上限")
+            return null
+        }
+        if (!AccessibilityApi.isBaseServiceOn) {
+            AppBus.post(RequestPermission("无障碍服务"))
+            return null
+        }
+        DataCollector.buriedPoint("sa_3")
+
+        return ScreenTextFinder().findAll().map {
+            val rect = it.bounds
+            val points = listOf(
+                    Point(rect.left, rect.top),
+                    Point(rect.right, rect.top),
+                    Point(rect.right, rect.bottom),
+                    Point(rect.left, rect.bottom)
+            )
+            TextOcrItem(
+                    it.text ?: it.desc() ?: "", points, 1.0
+            )
+        }
     }
 
     /**
@@ -564,16 +592,24 @@ object MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
                 ACTION_STOP_DEBUG_SERVER -> {
                     RemoteDebugServer.stop()
                 }
+                //文字提取 需要无遮挡
                 ACTION_BEGIN_SCREEN_PICKER -> {
-                    context.startActivityOnNewTask(Intent(context, ScreenPickerActivity::class.java).also {
-                        it.addFlags(Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS)
-                    })
+                    val list = getScreenText() ?: return@thread
+
+                    if (list.isEmpty()) {
+                        GlobalApp.toastInfo("未提取到任何内容")
+                    } else {
+                        TextOcrActivity.start(context, list as ArrayList<TextOcrItem>)
+                    }
                 }
                 ACTION_BEGIN_SCREEN_PICKER_TRANSLATE -> {
-                    context.startActivityOnNewTask(Intent(context, ScreenPickerActivity::class.java).also {
-                        it.putExtra("t", "t")
-                        it.addFlags(Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS)
-                    })
+                    val list = getScreenText() ?: return@thread
+
+                    if (list.isEmpty()) {
+                        GlobalApp.toastInfo("未提取到任何内容")
+                    } else {
+                        TextOcrActivity.start(context, list as ArrayList<TextOcrItem>, bundle("t" to "t"))
+                    }
                 }
                 ACTION_START_WAKEUP -> {
                     AppConfig.voiceWakeup = true

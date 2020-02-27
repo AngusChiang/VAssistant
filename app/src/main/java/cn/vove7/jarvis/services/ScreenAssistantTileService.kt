@@ -5,6 +5,7 @@ import android.os.Build
 import android.service.quicksettings.TileService
 import androidx.annotation.RequiresApi
 import cn.vove7.common.app.GlobalApp
+import cn.vove7.common.appbus.AppBus
 import cn.vove7.common.utils.newTask
 import cn.vove7.jarvis.activities.ScreenPickerActivity
 import cn.vove7.jarvis.activities.screenassistant.QrCodeActivity
@@ -47,7 +48,7 @@ class ScreenTextPickTileService : TileService(), TileLongClickable {
     }
 
     override fun onLongClick() {
-        GlobalApp.APP.startActivity(intent)
+        AppBus.postDelay(AppBus.ACTION_BEGIN_SCREEN_PICKER, 800)
     }
 }
 

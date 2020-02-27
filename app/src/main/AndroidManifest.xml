@@ -221,6 +221,7 @@
         <activity
             android:name=".activities.ScreenPickerActivity"
             android:exported="true"
+            android:excludeFromRecents="true"
             android:label="屏幕助手-文字提取"
             android:launchMode="singleInstance"
             android:theme="@style/ScreenPicker" />
