@@ -8,6 +8,8 @@ import android.graphics.Color
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.view.Gravity
 import android.view.View
 import android.view.animation.AlphaAnimation
@@ -18,7 +20,6 @@ import cn.vove7.common.bridges.SystemBridge
 import cn.vove7.common.bridges.UtilBridge
 import cn.vove7.common.utils.*
 import cn.vove7.jarvis.R
-import cn.vove7.jarvis.activities.ScreenPickerActivity
 import cn.vove7.jarvis.activities.TextOcrActivity
 import cn.vove7.jarvis.activities.base.BaseActivity
 import cn.vove7.jarvis.services.MainService
@@ -521,7 +522,7 @@ class ScreenAssistActivity : BaseActivity() {
                 }
                 if (oneJob?.isCancelled == false) {
                     TextOcrActivity.start(this@ScreenAssistActivity, results, intent.extras)
-                    finish()
+                    bottomController.hideBottom()
                 }
             } catch (e: Exception) {
                 e.printStackTrace()
