@@ -266,7 +266,7 @@ class NewInstActivity : ReturnableActivity(), View.OnClickListener {
 
                 setResult(Activity.RESULT_OK, Intent().apply {
                     putExtra("action","insert")
-                    putExtra("id", editNode.id)
+                    putExtra("id", newNode.id)
                 })
                 finish()
             } else {
