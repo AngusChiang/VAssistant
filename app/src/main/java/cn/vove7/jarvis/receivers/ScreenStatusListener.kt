@@ -18,7 +18,10 @@ import cn.vove7.vtp.log.Vog
  */
 object ScreenStatusListener : DyBCReceiver(), ScreenEvent {
 
+    @JvmStatic
     var screenOn: Boolean = true
+    @JvmStatic
+    var screenlock: Boolean = false
 
     val event: ScreenEvent = this
     override val intentFilter: IntentFilter
@@ -39,10 +42,12 @@ object ScreenStatusListener : DyBCReceiver(), ScreenEvent {
             Intent.ACTION_SCREEN_OFF -> {
                 Vog.d("灭屏")
                 screenOn = false
+                screenlock = true
                 event.onScreenOff()
             }
             Intent.ACTION_USER_PRESENT -> {
                 Vog.d("解锁")
+                screenlock = false
                 event.onUnlock()
             }
         }
