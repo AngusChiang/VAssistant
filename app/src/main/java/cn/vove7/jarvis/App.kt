@@ -6,7 +6,6 @@ import android.content.Intent
 import android.database.Cursor
 import android.net.Uri
 import android.os.Build
-import cn.jiguang.analytics.android.api.JAnalyticsInterface
 import cn.vove7.common.activities.RunnableActivity.Companion.runInShellActivity
 import cn.vove7.common.app.AppConfig
 import cn.vove7.common.app.GlobalApp
@@ -96,9 +95,6 @@ class InitCp : ContentProvider() {
 
             AppConfig.fetchNetConfig()
 
-//            JPushInterface.setDebugMode(BuildConfig.DEBUG)
-//            JPushInterface.init(context)
-            JAnalyticsInterface.init(context)
             ShortcutUtil.initShortcut()
             AdvanAppHelper.getPkgList()
             startBroadcastReceivers()

@@ -171,7 +171,6 @@ dependencies {
 
     implementation project(path: ':speechLib')
     implementation project(':admin-manager')
-    implementation project(':push')
 
     implementation "com.github.infotech-group:android-drawable-dsl:0.3.0"
 
