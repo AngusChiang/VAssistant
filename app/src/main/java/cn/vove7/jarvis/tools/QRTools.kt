@@ -110,7 +110,9 @@ object QRTools {
     fun encode(content: String, onFinish: (String?, e: Throwable?) -> Unit) = GlobalScope.launch {
         try {
             val hw = 400
-            val matrix = QRCodeWriter().encode(content, BarcodeFormat.QR_CODE, hw, hw)
+            val hints = Hashtable<EncodeHintType, String>()
+            hints[EncodeHintType.CHARACTER_SET] = "utf-8"
+            val matrix = QRCodeWriter().encode(content, BarcodeFormat.QR_CODE, hw, hw, hints)
             val pixels = IntArray(hw * hw)
             for (y in 0 until hw) {
                 for (x in 0 until hw) {
