@@ -338,6 +338,9 @@ class ScreenAssistActivity : BaseActivity() {
                             finish()
                         }
                     }
+                    R.id.item_spot_with_default-> {
+                        imageClassify()
+                    }
                 }
                 true
             }
