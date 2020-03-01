@@ -278,6 +278,16 @@ interface SystemOperation {
      */
     fun killApp(pkg: String): Boolean
 
+    fun getGlobalSettings(key: String): Any?
+    fun getSystemSettings(key: String): Any?
+    fun getSecureSettings(key: String): Any?
+
+    fun putGlobalSettings(key: String, value: Any)
+    fun putSystemSettings(key: String, value: Any)
+    fun putSecureSettings(key: String, value: Any)
+
+    fun hasPermission(p: String): Boolean
+
     /**
      * 屏幕亮度
      * 范围：0～255

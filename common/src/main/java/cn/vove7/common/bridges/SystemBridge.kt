@@ -63,6 +63,7 @@ import cn.vove7.vtp.calendar.CalendarHelper
 import cn.vove7.vtp.extend.buildList
 import cn.vove7.vtp.log.Vog
 import cn.vove7.vtp.net.GsonHelper
+import cn.vove7.vtp.runtimepermission.PermissionUtils
 import cn.vove7.vtp.system.DeviceInfo
 import cn.vove7.vtp.system.SystemHelper
 import kotlinx.coroutines.Dispatchers
@@ -170,7 +171,7 @@ object SystemBridge : SystemOperation {
     }
 
     override fun getPkgByWord(appWord: String): String? =
-            getPkgByName(appWord)
+        getPkgByName(appWord)
 
 
     // Open App 启动对应首页Activity
@@ -1092,7 +1093,7 @@ object SystemBridge : SystemOperation {
         get() {
             val filter = IntentFilter(Intent.ACTION_BATTERY_CHANGED)
             val intent = context.registerReceiver(null, filter)
-                    ?: return -1
+                ?: return -1
 
             val level = intent.getIntExtra(BatteryManager.EXTRA_LEVEL, 100) //电量的刻度
             val maxLevel = intent.getIntExtra(BatteryManager.EXTRA_SCALE, 100) //最大
@@ -1229,6 +1230,94 @@ object SystemBridge : SystemOperation {
         }
         GlobalActionExecutor.home()
         return b
+    }
+
+    override fun getGlobalSettings(key: String): Any? {
+        val cr = context.contentResolver
+        return try {
+            Settings.Global.getInt(cr, key)
+        } catch (e: Settings.SettingNotFoundException) {
+            try {
+                Settings.Global.getFloat(cr, key)
+            } catch (e: Settings.SettingNotFoundException) {
+                Settings.Global.getString(cr, key)
+            }
+        }
+    }
+
+    override fun getSecureSettings(key: String): Any? {
+        val cr = context.contentResolver
+        return try {
+            Settings.Secure.getInt(cr, key)
+        } catch (e: Settings.SettingNotFoundException) {
+            try {
+                Settings.Secure.getFloat(cr, key)
+            } catch (e: Settings.SettingNotFoundException) {
+                Settings.Secure.getString(cr, key)
+            }
+        }
+    }
+
+    override fun putSecureSettings(key: String, value: Any) {
+        val cr = context.contentResolver
+        when (value) {
+            is String -> {
+                Settings.Secure.putString(cr, key, value)
+            }
+            is Int -> {
+                Settings.Secure.putInt(cr, key, value)
+            }
+            is Float -> {
+                Settings.Secure.putFloat(cr, key, value)
+            }
+        }
+    }
+
+    override fun putGlobalSettings(key: String, value: Any) {
+        val cr = context.contentResolver
+        when (value) {
+            is String -> {
+                Settings.Global.putString(cr, key, value)
+            }
+            is Int -> {
+                Settings.Global.putInt(cr, key, value)
+            }
+            is Float -> {
+                Settings.Global.putFloat(cr, key, value)
+            }
+        }
+    }
+
+    override fun getSystemSettings(key: String): Any? {
+        val cr = context.contentResolver
+        return try {
+            Settings.System.getInt(cr, key)
+        } catch (e: Settings.SettingNotFoundException) {
+            try {
+                Settings.System.getFloat(cr, key)
+            } catch (e: Settings.SettingNotFoundException) {
+                Settings.System.getString(cr, key)
+            }
+        }
+    }
+
+    override fun putSystemSettings(key: String, value: Any) {
+        val cr = context.contentResolver
+        when (value) {
+            is String -> {
+                Settings.System.putString(cr, key, value)
+            }
+            is Int -> {
+                Settings.System.putInt(cr, key, value)
+            }
+            is Float -> {
+                Settings.System.putFloat(cr, key, value)
+            }
+        }
+    }
+
+    override fun hasPermission(p: String): Boolean {
+        return PermissionUtils.isAllGranted(GlobalApp.APP, arrayOf(p))
     }
 
     override var screenBrightness: Int
