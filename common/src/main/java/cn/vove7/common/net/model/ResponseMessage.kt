@@ -16,7 +16,7 @@ open class ResponseMessage<T> {
     var message: String = "null"
 
     var err: String? = null
-    var data: T? = null
+    val data: T? = null
 
     fun isOk(): Boolean {
         if (tokenIsOutdate()||isInvalid()) {

@@ -5,11 +5,12 @@ import android.os.Build
 import android.os.Bundle
 import android.view.View
 import android.view.Window
+import androidx.work.WorkerParameters
 import cn.vove7.common.app.AppConfig
 import cn.vove7.common.app.AppConfig.checkAppUpdate
 import cn.vove7.common.app.GlobalApp
+import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.model.UserInfo
-import cn.vove7.common.utils.runOnNewHandlerThread
 import cn.vove7.jarvis.BuildConfig
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.activities.base.BaseActivity
@@ -19,10 +20,13 @@ import cn.vove7.jarvis.tools.DataUpdator
 import cn.vove7.jarvis.tools.Tutorials
 import cn.vove7.jarvis.tools.debugserver.RemoteDebugServer
 import cn.vove7.jarvis.view.dialog.UpdateLogDialog
+import cn.vove7.jarvis.work.DataSyncWork
 import cn.vove7.vtp.log.Vog
 import cn.vove7.vtp.runtimepermission.PermissionUtils
 import com.afollestad.materialdialogs.MaterialDialog
 import kotlinx.android.synthetic.main.fragment_mine.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 
 
 /**
@@ -44,6 +48,21 @@ class MainActivity : BaseActivity() {
         initView()
         requestPermission()
         checkDebug()
+        if (AppConfig.FIRST_IN) {
+            DataUpdator.checkUpdate { result ->
+                if (result != null) {
+                    GlobalLog.log("数据同步完成")
+                    AppNotification.broadcastNotification(1234, "指令数据已更新",
+                            "点击查看更新内容",
+                            Intent(UtilEventReceiver.INST_DATA_SYNC_FINISH).apply {
+                                putExtra("content", result)
+                            }
+                    )
+                } else {
+                    GlobalLog.log("暂未更新")
+                }
+            }
+        }
     }
 
     private fun checkDebug() {
@@ -55,8 +74,8 @@ class MainActivity : BaseActivity() {
     private fun initView() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             window.decorView.systemUiVisibility =
-                    View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN or
-                            View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
+                View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN or
+                        View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
             window.statusBarColor = resources.getColor(R.color.app_background)
         }
     }
@@ -66,15 +85,10 @@ class MainActivity : BaseActivity() {
         super.onResume()
         val now = System.currentTimeMillis()
 
-        if (now - lastCheckApp > 10 * 60000) {
-            checkAppUpdate(this, false, onUpdate)
-            lastCheckApp = now
-        }
-
         if (!firstIn) {
             //检查数据更新
             if (now - lastCheck > 120000) {
-                checkDataUpdate()
+                showTutorials()
                 lastCheck = now
             }
         } else
@@ -95,8 +109,6 @@ class MainActivity : BaseActivity() {
 
         private var lastCheck = 0L
 
-        var lastCheckApp = 0L
-
     }
 
     private fun requestPermission() {
@@ -116,13 +128,12 @@ class MainActivity : BaseActivity() {
         showDataUpdateLog()
     }
 
-    private fun checkDataUpdate() {
-        DataUpdator.checkUpdate(this) {
-            if (!UserInfo.isLogin())
-                text_login?.post {
-                    Tutorials.showForView(this, Tutorials.T_LOGIN, text_login,
-                            "新用户注册", getString(R.string.desc_new_account))
-                }
+    private fun showTutorials() {
+        if (!UserInfo.isLogin()) {
+            text_login?.post {
+                Tutorials.showForView(this, Tutorials.T_LOGIN, text_login,
+                        "新用户注册", getString(R.string.desc_new_account))
+            }
         }
     }
 
@@ -131,27 +142,15 @@ class MainActivity : BaseActivity() {
         if (AppConfig.FIRST_LAUNCH_NEW_VERSION && showUpdate && !BuildConfig.DEBUG) {
             UpdateLogDialog(this) {
                 Vog.d("检查数据更新")
-                checkDataUpdate()
+                showTutorials()
             }
             showUpdate = false
         } else {
-            runOnNewHandlerThread(delay = 2000) {
-                checkDataUpdate()
+            launch(Dispatchers.Main) {
+                delay(2000)
+                showTutorials()
             }
         }
     }
 
-    private val onUpdate: (Pair<String, String>?) -> Unit
-        get() = a@{ hasUpdate ->
-            hasUpdate ?: return@a
-            GlobalApp.toastSuccess("发现新版本 ${hasUpdate.first}", 1)
-            AppNotification.broadcastNotification(
-                    123, "发现新版本 ${hasUpdate.first}",
-                    "查看更新日志",
-                    (Intent(UtilEventReceiver.APP_HAS_UPDATE).apply {
-                        putExtra("version", hasUpdate.first)
-                        putExtra("log", hasUpdate.second)
-                    })
-            )
-        }
 }

@@ -6,6 +6,8 @@ import android.content.Intent
 import android.database.Cursor
 import android.net.Uri
 import android.os.Build
+import androidx.work.PeriodicWorkRequest
+import androidx.work.WorkManager
 import cn.vove7.common.activities.RunnableActivity.Companion.runInShellActivity
 import cn.vove7.common.app.AppConfig
 import cn.vove7.common.app.GlobalApp
@@ -23,9 +25,11 @@ import cn.vove7.jarvis.services.ForegroundService
 import cn.vove7.jarvis.services.MainService
 import cn.vove7.jarvis.tools.*
 import cn.vove7.jarvis.tools.debugserver.ConnectiveService
+import cn.vove7.jarvis.work.DataSyncWork
 import cn.vove7.smartkey.android.AndroidSettings
 import cn.vove7.vtp.log.Vog
 import org.greenrobot.eventbus.Subscribe
+import java.util.concurrent.TimeUnit
 
 
 @Suppress("MemberVisibilityCanBePrivate")
@@ -93,7 +97,8 @@ class InitCp : ContentProvider() {
                 }
             }
 
-            AppConfig.fetchNetConfig()
+            WorkManager.getInstance(GlobalApp.APP)
+                    .enqueue(DataSyncWork.getRequest())
 
             ShortcutUtil.initShortcut()
             AdvanAppHelper.getPkgList()

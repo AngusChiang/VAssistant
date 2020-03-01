@@ -24,6 +24,7 @@ import cn.vove7.jarvis.activities.screenassistant.ScreenShareActivity
 import cn.vove7.jarvis.activities.screenassistant.SpotScreenActivity
 import cn.vove7.jarvis.adapters.SettingsExpandableAdapter
 import cn.vove7.jarvis.receivers.PowerEventReceiver
+import cn.vove7.jarvis.receivers.UtilEventReceiver
 import cn.vove7.jarvis.services.MainService
 import cn.vove7.jarvis.tools.*
 import cn.vove7.jarvis.tools.backup.BackupHelper
@@ -100,9 +101,7 @@ class AdvancedSettingActivity : ReturnableActivity() {
                         },
                         IntentItem(R.string.text_check_last_data) {
                             showLastDataDate()
-                        },
-                        CheckBoxItem(title = "自动更新", summary = "在进入App后自动检查并更新最新数据",
-                                keyId = R.string.key_auto_update_data, defaultValue = true)
+                        }
                 )),
                 SettingGroupItem(R.color.google_green, "脚本", childItems = listOf(
                         SwitchItem(R.string.text_remote_debug, summary = if (RemoteDebugServer.stopped) "使用Pc调试，请查阅使用手册" else ipText, defaultValue = !RemoteDebugServer.stopped, callback = { item, it ->
@@ -312,7 +311,8 @@ class AdvancedSettingActivity : ReturnableActivity() {
                         }
                     }
                     positiveButton(text = "一键同步") {
-                        DataUpdator.oneKeyUpdate(this@AdvancedSettingActivity, list, null, "")
+                        GlobalApp.toastInfo("正在后台同步...")
+                        DataUpdator.oneKeyUpdate(list)
                     }
                 }
     }

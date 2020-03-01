@@ -574,6 +574,15 @@ object AppConfig : BaseConfig {
             if (it < 0) versionCode else it
         }
     }
+    //第一次进入App
+    val FIRST_IN: Boolean
+        get() {
+            val _is = AppConfig.contains("first_in")
+            if (!_is) {
+                AppConfig.set("first_in", true)
+            }
+            return !_is
+        }
     //新版本第一次启动
     val FIRST_LAUNCH_NEW_VERSION by lazy {
         val sp = SpHelper(GlobalApp.APP)

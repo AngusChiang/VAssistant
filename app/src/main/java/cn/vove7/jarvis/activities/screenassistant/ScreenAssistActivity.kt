@@ -134,7 +134,7 @@ class ScreenAssistActivity : BaseActivity() {
         bottomController.bottomView.visibility = View.GONE
 
         bottomController.bottomView.post {
-            bottomController.behavior.setBottomSheetCallback(object : BottomSheetBehavior.BottomSheetCallback() {
+            bottomController.behavior.addBottomSheetCallback(object : BottomSheetBehavior.BottomSheetCallback() {
                 override fun onStateChanged(p0: View, p1: Int) {
                     if (p1 == BottomSheetBehavior.STATE_HIDDEN) {
                         Vog.d("onStateChanged ---> 隐藏")

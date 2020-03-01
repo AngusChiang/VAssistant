@@ -134,7 +134,6 @@
     <string name="key_auto_set_assistant_app" translatable="false">auto_set_assistant_app</string>
     <string name="key_volume_wakeup_when_screen_off" translatable="false">volume_wakeup_when_screen_off</string>
     <string name="key_auto_sleep_wakeup_duration" translatable="false">auto_sleep_wakeup_duration</string>
-    <string name="key_auto_update_data" translatable="false">auto_update_data</string>
 
     <string name="key_open_response_word" translatable="false">open_response_word</string>
     <string name="key_response_word" translatable="false">response_word</string>

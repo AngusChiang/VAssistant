@@ -1,7 +1,9 @@
 package cn.vove7.jarvis.tools
 
-import android.app.Activity
+import android.content.Intent
 import android.graphics.Color
+import android.text.SpannableStringBuilder
+import androidx.core.content.ContextCompat
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.datamanager.AppAdInfo
@@ -15,13 +17,13 @@ import cn.vove7.common.model.ResultBox
 import cn.vove7.common.net.ApiUrls
 import cn.vove7.common.net.WrapperNetHelper
 import cn.vove7.common.net.model.LastDateInfo
-import cn.vove7.common.utils.TextHelper
 import cn.vove7.common.utils.CoroutineExt.launch
+import cn.vove7.common.utils.TextHelper
+import cn.vove7.common.utils.spanColor
 import cn.vove7.executorengine.parse.ParseEngine
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.plugins.AdKillerService
-import cn.vove7.jarvis.view.dialog.ProgressTextDialog
-import cn.vove7.vtp.log.Vog
+import cn.vove7.jarvis.receivers.UtilEventReceiver
 import cn.vove7.vtp.sharedpreference.SpHelper
 
 /**
@@ -33,34 +35,24 @@ import cn.vove7.vtp.sharedpreference.SpHelper
 object DataUpdator {
 
     /**
-     * 启动时检查更新
-     * @param activity Activity
+     * 指令检查更新
      */
-    private var lastCheck = 0L
-
-    fun checkUpdate(activity: Activity, back: () -> Unit) {
-        val now = System.currentTimeMillis()
-        if (now - lastCheck < 30 * 60 * 1000) {//防止频繁请求
-            back.invoke()
-            return
-        }
-        lastCheck = now
-
+    fun checkUpdate(back: (result: CharSequence?) -> Unit) {
         WrapperNetHelper.postJson<LastDateInfo>(ApiUrls.GET_LAST_DATA_DATE) {
             success { _, b ->
                 val it = b.data
                 if (b.isOk() && it != null) {
                     val v = check(it)
                     if (v.first.isNotEmpty()) {
-                        notifyUpdate(activity, v.first, v.second, back)
+                        notifyUpdate(v.first, back)
                     } else {
-                        back.invoke()
+                        back.invoke(null)
                     }
                 }
                 fail { _, e ->
+                    GlobalLog.log("检查数据更新失败")
                     GlobalLog.err(e)
-                    Vog.d("checkDataUpdate ---> 检查数据失败")
-                    back.invoke()
+                    back.invoke(null)
                 }
             }
         }
@@ -68,92 +60,101 @@ object DataUpdator {
 
     /**
      * 弹出更新对话框，更新内容
-     * @param activity Activity
      * @param needUpdateTypes List<Int>
      * @param s String
      */
-    private fun notifyUpdate(activity: Activity, needUpdateTypes: List<Int>, s: String, back: () -> Unit) {
-        if (activity.isFinishing) return
-        oneKeyUpdate(activity, needUpdateTypes, back, s)
+    private fun notifyUpdate(needUpdateTypes: List<Int>, back: (CharSequence) -> Unit) {
+        oneKeyUpdate(needUpdateTypes, back)
     }
 
-    class Updater(val textDialog: ProgressTextDialog) : OnUpdate {
+    class Updater(val builder: SpannableStringBuilder) : OnUpdate {
         override fun invoke(p1: Int, p2: String) {
             when (p1) {
                 Color.GREEN ->
-                    textDialog.appendlnGreen(p2)
+                    builder.appendlnGreen(p2)
                 Color.RED -> {
-                    textDialog.appendlnRed(p2)
+                    builder.appendlnRed(p2)
                 }
                 Color.YELLOW ->
-                    textDialog.appendlnAmber(p2)
-
+                    builder.appendln(p2.spanColor(Color.YELLOW))
                 else ->
-                    textDialog.appendln(p2)
+                    builder.appendln(p2)
             }
         }
+    }
+
+    fun SpannableStringBuilder.appendlnGreen(s: String) {
+        appendln(s.spanColor(ContextCompat.getColor(GlobalApp.APP, R.color.green_700)))
+    }
+
+    fun SpannableStringBuilder.appendlnRed(s: String) {
+        appendln(s.spanColor(ContextCompat.getColor(GlobalApp.APP, R.color.red_500)))
     }
 
     /**
      * 根据type更新数据
      * @param types List<Int>
      */
-    fun oneKeyUpdate(activity: Activity, types: List<Int>,
-                     back: (() -> Unit)? = null, t: String) {
-        val textDialog = ProgressTextDialog(activity, "正在更新", false, autoScroll = true)
-        launch {
-            textDialog.appendlnBold("更新：\n$t\n")
-            types.forEach {
-                val result = ResultBox<Boolean>()
-                val updater = Updater(textDialog)
-                when (it) {
-                    0 -> {
-                        textDialog.appendlnGreen("正在获取：全局指令")
-                        syncGlobalInst(updater) { b ->
-                            result.setAndNotify(b)
+    fun oneKeyUpdate(
+            types: List<Int>,
+            back: ((CharSequence) -> Unit)? = { result ->
+                AppNotification.broadcastNotification(1234, "指令数据已更新",
+                        "点击查看更新内容",
+                        Intent(UtilEventReceiver.INST_DATA_SYNC_FINISH).apply {
+                            putExtra("content", result)
                         }
-                        if (result.blockedGet() == true) {
-                            textDialog.appendlnGreen("成功")
-                        } else {
-                            textDialog.appendlnRed("失败,可至帮助进行反馈")
-                        }
+                )
+            }
+    ) = launch {
+        val builder = SpannableStringBuilder()
+        types.forEach {
+            val result = ResultBox<Boolean>()
+            val updater = Updater(builder)
+            when (it) {
+                0 -> {
+                    builder.appendlnGreen("正在获取：全局指令")
+                    syncGlobalInst(updater) { b ->
+                        result.setAndNotify(b)
                     }
-                    1 -> {
-                        textDialog.appendlnGreen("正在获取：应用内指令")
-                        syncInAppInst(updater) { b -> result.setAndNotify(b) }
-                        if (result.blockedGet() == true) {
-                            textDialog.appendlnGreen("成功")
-                        } else {
-                            textDialog.appendlnRed("失败,可至帮助进行反馈")
-                        }
+                    if (result.blockedGet() == true) {
+                        builder.appendlnGreen("成功")
+                    } else {
+                        builder.appendln("失败,可至帮助进行反馈".spanColor(Color.RED))
                     }
-                    2, 3, 4 -> {//marked data
-                        textDialog.appendlnGreen("正在获取：" + arrayOf("标记联系人", "标记应用", "标记功能")[it - 2])
-                        syncMarkedData(updater, getTypes(it), markedLastKeyId[it - 2]) { b ->
-                            result.setAndNotify(b)
-                        }
-                        if (result.blockedGet() == true) {
-                            textDialog.appendlnGreen("成功")
-                        } else {
-                            textDialog.appendlnRed("失败,可至帮助进行反馈")
-                        }
+                }
+                1 -> {
+                    builder.appendlnGreen("正在获取：应用内指令")
+                    syncInAppInst(updater) { b -> result.setAndNotify(b) }
+                    if (result.blockedGet() == true) {
+                        builder.appendlnGreen("成功")
+                    } else {
+                        builder.appendlnRed("失败,可至帮助进行反馈")
                     }
-                    5 -> {//ad
-                        textDialog.appendlnGreen("正在获取：标记广告")
-                        syncMarkedAd(updater) { b -> result.setAndNotify(b) }
-                        if (result.blockedGet() == true) {
-                            textDialog.appendlnGreen("成功")
-                        } else {
-                            textDialog.appendlnRed("失败,可至帮助进行反馈")
-                        }
+                }
+                2, 3, 4 -> {//marked data
+                    builder.appendlnGreen("正在获取：" + arrayOf("标记联系人", "标记应用", "标记功能")[it - 2])
+                    syncMarkedData(updater, getTypes(it), markedLastKeyId[it - 2]) { b ->
+                        result.setAndNotify(b)
+                    }
+                    if (result.blockedGet() == true) {
+                        builder.appendlnGreen("成功")
+                    } else {
+                        builder.appendlnRed("失败,可至帮助进行反馈")
+                    }
+                }
+                5 -> {//ad
+                    builder.appendlnGreen("正在获取：标记广告")
+                    syncMarkedAd(updater) { b -> result.setAndNotify(b) }
+                    if (result.blockedGet() == true) {
+                        builder.appendlnGreen("成功")
+                    } else {
+                        builder.appendlnRed("失败,可至帮助进行反馈")
                     }
                 }
             }
-            GlobalApp.toastInfo("更新完成")
-            textDialog.appendlnGreen("更新完成")
-            textDialog.finish()
-            back?.invoke()
         }
+        builder.appendlnGreen("更新完成")
+        back?.invoke(builder)
     }
 
 
@@ -214,7 +215,6 @@ object DataUpdator {
                                 ParseEngine.updateGlobal()
                                 back.invoke(true)
                             } else {
-                                GlobalApp.toastError("同步失败")
                                 back.invoke(false)
                             }
                         }

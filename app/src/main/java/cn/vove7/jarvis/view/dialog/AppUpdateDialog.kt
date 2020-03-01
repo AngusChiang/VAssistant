@@ -16,7 +16,7 @@ import cn.vove7.vtp.sharedpreference.SpHelper
  * @author Vove
  * 2019/6/23
  */
-class AppUpdateDialog(val context: Activity, val verName: String, val updateLog: String) {
+class AppUpdateDialog(val context: Activity, verName: String, val updateLog: String) {
 
     init {
         BottomDialog.builder(context, action = getBuildAction(verName, updateLog))
