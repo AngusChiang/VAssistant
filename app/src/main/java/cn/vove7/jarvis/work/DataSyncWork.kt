@@ -9,6 +9,7 @@ import cn.vove7.common.app.GlobalLog
 import cn.vove7.jarvis.receivers.UtilEventReceiver
 import cn.vove7.jarvis.tools.AppNotification
 import cn.vove7.jarvis.tools.DataUpdator
+import java.util.*
 import java.util.concurrent.TimeUnit
 
 /**
@@ -23,7 +24,8 @@ class DataSyncWork(context: Context, workerParams: WorkerParameters) : Worker(co
     companion object {
 
         fun getRequest(): WorkRequest = PeriodicWorkRequest
-                .Builder(DataSyncWork::class.java, 30, TimeUnit.MINUTES)
+                .Builder(DataSyncWork::class.java,
+                        AppConfig.netConfig("dataSyncInterval", 30L), TimeUnit.MINUTES)
                 .setConstraints(
                         Constraints.Builder()
                                 .setRequiredNetworkType(NetworkType.CONNECTED)
@@ -33,11 +35,18 @@ class DataSyncWork(context: Context, workerParams: WorkerParameters) : Worker(co
     }
 
     override fun doWork(): Result {
+        val time = Calendar.getInstance(TimeZone.getDefault())
+        val h = time.get(Calendar.HOUR_OF_DAY)
+        //夜间休息
+        if (h in 1..6) {
+            return Result.success()
+        }
+
         GlobalLog.log("数据同步")
         AppConfig.fetchNetConfig()
         AppConfig.checkAppUpdate(GlobalApp.APP, false, onUpdate)
 
-        if(!AppConfig.FIRST_IN) {
+        if (!AppConfig.FIRST_IN) {
             DataUpdator.checkUpdate { result ->
                 if (result != null) {
                     //更新成功
