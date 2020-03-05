@@ -28,6 +28,7 @@ class ScreenshotActivity : Activity() {
 
     }
 
+    var clickAuto = false
     private fun requestCap() {//请求
         val mMediaProjectionManager = application.getSystemService(Context.MEDIA_PROJECTION_SERVICE)
                 as MediaProjectionManager
@@ -36,8 +37,8 @@ class ScreenshotActivity : Activity() {
             //自动点击
             if (Build.VERSION.SDK_INT >= 29 && AccessibilityApi.isBaseServiceOn) {
                 launch {
-                    text("立即开始", "start now")
-                            .waitFor(1000)?.tryClick()
+                    clickAuto = text("立即开始", "start now")
+                            .waitFor(1000)?.tryClick() ?: false
                 }
             }
         } catch (e: Exception) {
@@ -58,7 +59,7 @@ class ScreenshotActivity : Activity() {
         when (requestCode) {
             REQUEST_MEDIA_PROJECTION -> {
                 if (resultCode == RESULT_OK && data != null) {
-                    notifyResult(data)
+                    notifyResult(data, clickAuto)
                 } else {
                     notifyResult()
                     GlobalApp.toastError("无权限截屏")
@@ -71,15 +72,15 @@ class ScreenshotActivity : Activity() {
     companion object {
 
         private const val REQUEST_MEDIA_PROJECTION = 100
-        var resultBox: ResultBox<Intent?>? = null
+        var resultBox: ResultBox<Pair<Intent?, Boolean>>? = null
 
-        fun notifyResult(b: Intent? = null) {
+        fun notifyResult(b: Intent? = null, autoClick: Boolean = false) {
             Vog.d("notifyResult ---> $b")
-            resultBox?.setAndNotify(b)
+            resultBox?.setAndNotify(b to autoClick)
             resultBox = null
         }
 
-        fun getScreenshotIntent(context: Context, r: ResultBox<Intent?>): Intent {
+        fun getScreenshotIntent(context: Context, r: ResultBox<Pair<Intent?, Boolean>>): Intent {
             resultBox = r
             val intent = Intent(context, ScreenshotActivity::class.java)
             intent.flags = (
