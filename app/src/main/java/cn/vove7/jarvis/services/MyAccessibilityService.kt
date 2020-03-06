@@ -268,15 +268,15 @@ class MyAccessibilityService : AccessibilityApi() {
                 }
                 //耳机
                 KEYCODE_HEADSETHOOK -> {
-                    when {
+                    return when {
                         MainService.recogIsListening -> {//按下停止聆听
                             v2 = true
                             MainService.onCommand(AppBus.ACTION_STOP_RECOG)
-                            return true
+                            true
                         }
                         AppConfig.wakeUpWithHeadsetHook -> {//长按耳机中键唤醒
                             postLongDelay(startupRunner)
-                            return true
+                            true
                         }
                         else -> super.onKeyEvent(event)
                     }
@@ -288,10 +288,11 @@ class MyAccessibilityService : AccessibilityApi() {
                             MainService.onCommand(AppBus.ACTION_STOP_RECOG)
                             true
                         }
-                        else -> {
+                        AppConfig.isLongPressKeyWakeUp -> {//长按自定义键唤醒
                             postLongDelay(startupRunner)
                             true
                         }
+                        else -> super.onKeyEvent(event)
                     }
                 }
                 KEYCODE_VOLUME_UP -> {
@@ -300,17 +301,16 @@ class MyAccessibilityService : AccessibilityApi() {
                         if ((this + 1000) > System.currentTimeMillis()) {
                             return super.onKeyEvent(event)
                         }
-
                     }
-                    when {
+                    return when {
                         MainService.recogIsListening -> {//按下停止聆听
                             v2 = true
                             MainService.onCommand(AppBus.ACTION_STOP_RECOG)
-                            return true
+                            true
                         }
                         AppConfig.isLongPressKeyWakeUp -> {//长按唤醒
                             postLongDelay(startupRunner)
-                            return true
+                            true
                         }
                         else -> super.onKeyEvent(event)
                     }

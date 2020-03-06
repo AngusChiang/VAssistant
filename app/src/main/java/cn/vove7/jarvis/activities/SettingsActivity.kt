@@ -220,7 +220,7 @@ class SettingsActivity : ReturnableActivity() {
                     SwitchItem(
                             title = "长按唤醒",
                             keyId = R.string.key_long_press_volume_up_wake_up,
-                            summary = "可通过长按音量上键唤醒\n需要无障碍模式开启",
+                            summary = "可通过长按[音量上键和自定义键]唤醒\n需要无障碍模式开启",
                             defaultValue = AppConfig.isLongPressKeyWakeUp
                     ),
                     NumberPickerItem(
