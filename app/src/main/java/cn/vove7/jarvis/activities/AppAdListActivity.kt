@@ -17,6 +17,7 @@ import cn.vove7.common.datamanager.parse.DataFrom
 import cn.vove7.common.net.ApiUrls
 import cn.vove7.common.net.WrapperNetHelper
 import cn.vove7.jarvis.R
+import cn.vove7.jarvis.activities.base.BaseActivity
 import cn.vove7.jarvis.activities.base.OneFragmentActivity
 import cn.vove7.jarvis.adapters.ListViewModel
 import cn.vove7.jarvis.adapters.SimpleListAdapter
@@ -52,7 +53,7 @@ class AppAdListActivity : OneFragmentActivity() {
         lateinit var pkg: String
 
         val editDialog: AdEditorDialog by lazy {
-            AdEditorDialog(context!!) {
+            AdEditorDialog(activity as BaseActivity) {
                 refresh()
             }
         }

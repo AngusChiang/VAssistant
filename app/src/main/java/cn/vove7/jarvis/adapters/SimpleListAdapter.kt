@@ -115,7 +115,7 @@ open class SimpleListAdapter<T>(
 class ListViewModel<T>(
         val title: String?,
         val subTitle: String? = null,
-        val icon: Drawable? = null,
+        var icon: Drawable? = null,
         val extra: T,
         var checked: Boolean = false
 ) : Serializable, Comparable<ListViewModel<T>> {

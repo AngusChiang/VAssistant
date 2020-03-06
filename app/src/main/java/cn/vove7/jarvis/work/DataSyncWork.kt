@@ -49,13 +49,13 @@ class DataSyncWork(context: Context, workerParams: WorkerParameters) : Worker(co
 
         if (!AppConfig.FIRST_IN) {
             DataUpdator.checkUpdate { result ->
-                if (result != null) {
+                if (result.hasUpdate) {
                     //更新成功
                     GlobalLog.log("数据同步完成")
                     AppNotification.broadcastNotification(1234, "指令数据已更新",
                             "点击查看更新内容",
                             Intent(UtilEventReceiver.INST_DATA_SYNC_FINISH).apply {
-                                putExtra("content", result)
+                                putExtra("content", result.result)
                             }
                     )
                 } else {

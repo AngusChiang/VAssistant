@@ -6,6 +6,7 @@ import com.google.android.material.textfield.TextInputLayout
 import android.view.View
 import android.widget.Button
 import android.widget.RadioGroup
+import androidx.appcompat.app.AppCompatActivity
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.datamanager.AppAdInfo
 import cn.vove7.common.datamanager.DAO
@@ -16,6 +17,8 @@ import cn.vove7.common.helper.AdvanAppHelper
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.plugins.AdKillerService
 import cn.vove7.common.app.AppConfig
+import cn.vove7.jarvis.activities.base.BaseActivity
+import cn.vove7.jarvis.lifecycle.LifecycleScope
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.customview.customView
 
@@ -25,7 +28,7 @@ import com.afollestad.materialdialogs.customview.customView
  * @author Administrator
  * 9/22/2018
  */
-class AdEditorDialog(val context: Context, val onUpdate: () -> Unit) {
+class AdEditorDialog(val context: BaseActivity, val onUpdate: () -> Unit) {
 
     private fun clearErr() {
         showNameText.error = ""
@@ -164,7 +167,7 @@ class AdEditorDialog(val context: Context, val onUpdate: () -> Unit) {
             }
         }
         val d by lazy {
-            SelectAppDialog(context) {
+            SelectAppDialog.get(context) {
                 pkgText.editText?.setText(it.packageName)
             }
         }

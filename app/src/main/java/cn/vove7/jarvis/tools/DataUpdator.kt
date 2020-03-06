@@ -34,10 +34,19 @@ import cn.vove7.vtp.sharedpreference.SpHelper
  */
 object DataUpdator {
 
+    class UpdateResult(
+            val hasUpdate: Boolean,
+            val result: CharSequence? = null
+    ) {
+        companion object {
+            fun noUpdate(): UpdateResult = UpdateResult(false)
+        }
+    }
+
     /**
      * 指令检查更新
      */
-    fun checkUpdate(back: (result: CharSequence?) -> Unit) {
+    fun checkUpdate(back: (result: UpdateResult) -> Unit) {
         WrapperNetHelper.postJson<LastDateInfo>(ApiUrls.GET_LAST_DATA_DATE) {
             success { _, b ->
                 val it = b.data
@@ -46,13 +55,13 @@ object DataUpdator {
                     if (v.first.isNotEmpty()) {
                         notifyUpdate(v.first, back)
                     } else {
-                        back.invoke(null)
+                        back.invoke(UpdateResult.noUpdate())
                     }
                 }
                 fail { _, e ->
                     GlobalLog.log("检查数据更新失败")
                     GlobalLog.err(e)
-                    back.invoke(null)
+                    back.invoke(UpdateResult.noUpdate())
                 }
             }
         }
@@ -63,7 +72,7 @@ object DataUpdator {
      * @param needUpdateTypes List<Int>
      * @param s String
      */
-    private fun notifyUpdate(needUpdateTypes: List<Int>, back: (CharSequence) -> Unit) {
+    private fun notifyUpdate(needUpdateTypes: List<Int>, back: (UpdateResult) -> Unit) {
         oneKeyUpdate(needUpdateTypes, back)
     }
 
@@ -97,15 +106,18 @@ object DataUpdator {
      */
     fun oneKeyUpdate(
             types: List<Int>,
-            back: ((CharSequence) -> Unit)? = { result ->
-                AppNotification.broadcastNotification(1234, "指令数据已更新",
-                        "点击查看更新内容",
-                        Intent(UtilEventReceiver.INST_DATA_SYNC_FINISH).apply {
-                            putExtra("content", result)
-                        }
-                )
+            back: ((UpdateResult) -> Unit)? = { result ->
+                if(result.hasUpdate) {
+                    AppNotification.broadcastNotification(1234, "指令数据已更新",
+                            "点击查看更新内容",
+                            Intent(UtilEventReceiver.INST_DATA_SYNC_FINISH).apply {
+                                putExtra("content", result.result)
+                            }
+                    )
+                }
             }
     ) = launch {
+        val hasUpdate = true
         val builder = SpannableStringBuilder()
         types.forEach {
             val result = ResultBox<Boolean>()
@@ -154,7 +166,7 @@ object DataUpdator {
             }
         }
         builder.appendlnGreen("更新完成")
-        back?.invoke(builder)
+        back?.invoke(UpdateResult(hasUpdate, builder))
     }
 
 

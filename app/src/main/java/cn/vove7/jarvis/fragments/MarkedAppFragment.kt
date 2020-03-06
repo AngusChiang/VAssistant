@@ -10,6 +10,7 @@ import cn.vove7.common.datamanager.greendao.MarkedDataDao
 import cn.vove7.common.utils.CoroutineExt.launch
 import cn.vove7.common.bridges.SystemBridge
 import cn.vove7.jarvis.R
+import cn.vove7.jarvis.activities.base.BaseActivity
 import cn.vove7.jarvis.adapters.ListViewModel
 import cn.vove7.jarvis.fragments.base.BaseMarkedFragment
 import cn.vove7.jarvis.view.dialog.SelectAppDialog
@@ -40,7 +41,7 @@ class MarkedAppFragment : BaseMarkedFragment() {
     override val lastKeyId: Int = R.string.key_last_sync_marked_app_date
 
     val d by lazy {
-        SelectAppDialog(context!!) {
+        SelectAppDialog.get(activity as BaseActivity) {
             setValue(it.packageName)
             if (getKey() != "") {
                 setKey(it.name ?: "")

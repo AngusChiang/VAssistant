@@ -88,6 +88,9 @@
         <item name="windowNoTitle">true</item>
         <item name="windowActionBar">false</item>
     </style>
+    <style name="Main" parent="NoActionBar">
+        <item name="android:windowBackground">@drawable/bg_splash</item>
+    </style>
 
 
     <style name="MaterialButton.White" parent="MaterialButton">

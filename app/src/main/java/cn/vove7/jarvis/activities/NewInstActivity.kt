@@ -6,10 +6,11 @@ import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import androidx.appcompat.widget.Toolbar
 import android.view.KeyEvent
 import android.view.View
 import android.widget.*
+import androidx.appcompat.widget.Toolbar
+import cn.vove7.bottomdialog.BottomDialog
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.bridges.SystemBridge
@@ -230,7 +231,7 @@ class NewInstActivity : ReturnableActivity(), View.OnClickListener {
             GlobalApp.toastSuccess(getString(R.string.text_save_success))
             DAO.clear()
             setResult(Activity.RESULT_OK, Intent().apply {
-                putExtra("action","update")
+                putExtra("action", "update")
                 putExtra("id", editNode.id)
             })
             finish()
@@ -265,7 +266,7 @@ class NewInstActivity : ReturnableActivity(), View.OnClickListener {
                 DAO.clear()
 
                 setResult(Activity.RESULT_OK, Intent().apply {
-                    putExtra("action","insert")
+                    putExtra("action", "insert")
                     putExtra("id", newNode.id)
                 })
                 finish()
@@ -275,8 +276,8 @@ class NewInstActivity : ReturnableActivity(), View.OnClickListener {
         }
     }
 
-    val selAppDialog: SelectAppDialog by lazy {
-        SelectAppDialog(this) {
+    private val selAppDialog: BottomDialog by lazy {
+        SelectAppDialog.get(this) {
             btn_sel_app.text = it.name
             pkg = it.packageName
         }

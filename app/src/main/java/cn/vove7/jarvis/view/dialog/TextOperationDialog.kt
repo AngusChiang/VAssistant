@@ -17,12 +17,14 @@ import cn.vove7.common.utils.broadcastImageFile
 import cn.vove7.common.utils.content
 import cn.vove7.common.utils.runOnUi
 import cn.vove7.jarvis.R
-import cn.vove7.jarvis.lifecycle.LifeCycleScope
+import cn.vove7.jarvis.activities.base.BaseActivity
+import cn.vove7.jarvis.lifecycle.LifecycleScope
 import cn.vove7.jarvis.tools.DataCollector
 import cn.vove7.jarvis.tools.QRTools
 import cn.vove7.jarvis.tools.baiduaip.BaiduAipHelper
 import cn.vove7.jarvis.view.dialog.contentbuilder.ImageContentBuilder
 import cn.vove7.jarvis.view.dialog.contentbuilder.WrappedTextContentBuilder
+import kotlinx.coroutines.launch
 import java.io.File
 
 /**
@@ -33,8 +35,10 @@ import java.io.File
  * @author Vove
  * 2019/6/7
  */
-class TextOperationDialog(val activity: AppCompatActivity, val textModel: TextModel) {
-    val lifeCycleScope by lazy { LifeCycleScope(activity.lifecycle) }
+class TextOperationDialog(val activity: BaseActivity, val textModel: TextModel) {
+
+    val lifeCycleScope = activity.lifecycleScope
+
     //默认已换行
     private var wraped = true
 

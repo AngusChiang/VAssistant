@@ -13,6 +13,7 @@ import cn.vove7.jarvis.adapters.SimpleListAdapter
 import cn.vove7.jarvis.fragments.base.OnSyncMarked
 import cn.vove7.jarvis.plugins.AdKillerService
 import cn.vove7.common.app.AppConfig
+import cn.vove7.jarvis.activities.base.BaseActivity
 import cn.vove7.jarvis.tools.DataUpdator
 import cn.vove7.jarvis.view.dialog.AdEditorDialog
 import cn.vove7.vtp.log.Vog
@@ -63,7 +64,7 @@ class MarkedAdFragment : SimpleListFragment<String>(), OnSyncMarked {
         if (!AppConfig.checkLogin()) {
             return@OnClickListener
         }
-        AdEditorDialog(context!!) {
+        AdEditorDialog(activity as BaseActivity) {
             refresh()
             AdKillerService.update()
         }.show()

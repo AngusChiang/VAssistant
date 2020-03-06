@@ -35,7 +35,7 @@ class SearchActionHelper(searchMenuItem: MenuItem, val lis: (String) -> Unit) {
                 sR = Runnable {
                     lis.invoke(nt)
                 }
-                handler.postDelayed(sR, 500)
+                handler.postDelayed(sR, 200)
                 return true
             }
         })

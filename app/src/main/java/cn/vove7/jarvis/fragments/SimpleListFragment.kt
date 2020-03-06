@@ -15,6 +15,7 @@ import cn.vove7.jarvis.adapters.ListViewModelLoader
 import cn.vove7.jarvis.adapters.RecAdapterWithFooter
 import cn.vove7.jarvis.adapters.SimpleListAdapter
 import cn.vove7.jarvis.lifecycle.LifeCycleScopeDelegate
+import cn.vove7.jarvis.lifecycle.LifecycleScope
 import cn.vove7.jarvis.view.RecyclerViewWithContextMenu
 import cn.vove7.vtp.log.Vog
 import com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -34,9 +35,9 @@ abstract class SimpleListFragment<DataType> : androidx.fragment.app.Fragment(), 
     override val pageSizeLimit: Int = 50
     override val dataSet: MutableList<ListViewModel<DataType>> = mutableListOf()
 
-    override val scopeLazyer: Lazy<out CoroutineScope> = genScopeLazyer()
-    override val scope: CoroutineScope by scopeLazyer
-    override val lc: Lifecycle get() = lifecycle
+    override val lifecycleScope by lazy {
+        LifecycleScope(lifecycle)
+    }
 
     open fun clearDataSet() {
         synchronized(dataSet) {
