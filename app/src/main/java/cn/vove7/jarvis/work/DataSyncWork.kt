@@ -28,6 +28,7 @@ class DataSyncWork(context: Context, workerParams: WorkerParameters) : Worker(co
                         AppConfig.netConfig("dataSyncInterval", 30L), TimeUnit.MINUTES)
                 .setConstraints(
                         Constraints.Builder()
+                                .setRequiresBatteryNotLow(true)
                                 .setRequiredNetworkType(NetworkType.CONNECTED)
                                 .build()
                 )
