@@ -122,24 +122,10 @@ class VoiceAssistActivity : Activity() {
             }
             else -> {
                 try {
-                    val id = action!!.toLong()
-                    val node = DAO.daoSession.actionNodeDao.load(id)
-                    if (node != null) {
-                        val que = PriorityQueue<Action>()
-                        if (node.belongInApp()) {
-                            val scope = node.actionScope
-                            if (scope != null) {//App内 启动
-                                val openAction by OpenAppAction(scope.packageName)
-                                que.add(openAction)
-                            }
-                        }
-                        que.add(node.action)
-                        node.action.param = null
-                        AppBus.post(que)
-                    } else {
-                        GlobalApp.toastError("指令不存在")
-                    }
+                    val id = action?.toLongOrNull() ?: return
+                    runActionById(id)
                 } catch (e: Exception) {
+                    e.log()
                 }
             }
         }
@@ -153,8 +139,32 @@ class VoiceAssistActivity : Activity() {
                 MainService.parseCommand(cmd)
                 return true
             }
+            "inst" -> {//vassistant://run_inst/id
+                val id = uri.getQueryParameter("id")?.toLongOrNull() ?: return false
+                runActionById(id)
+                return true
+            }
         }
         return false
+    }
+
+    private fun runActionById(actionId: Long) {
+        val node = DAO.daoSession.actionNodeDao.load(actionId)
+        if (node != null) {
+            val que = PriorityQueue<Action>()
+            if (node.belongInApp() && node.autoLaunchApp) {
+                val scope = node.actionScope
+                if (scope != null) {//App内 启动
+                    val openAction by OpenAppAction(scope.packageName)
+                    que.add(openAction)
+                }
+            }
+            que.add(node.action)
+            node.action.param = null
+            AppBus.post(que)
+        } else {
+            GlobalApp.toastError("指令不存在")
+        }
     }
 
     companion object {

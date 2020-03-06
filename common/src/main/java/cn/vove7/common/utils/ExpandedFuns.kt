@@ -6,10 +6,8 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
-import android.graphics.Color
-import android.graphics.Rect
+import android.graphics.*
+import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.*
 import android.text.SpannableStringBuilder
@@ -614,4 +612,18 @@ fun File.calImageSize(): Pair<Int, Int> {
     options.inJustDecodeBounds = true
     BitmapFactory.decodeFile(path, options)//这里的bitmap是个空
     return options.outHeight to options.outWidth
+}
+
+
+fun Drawable.toBitmap(): Bitmap {
+    val w = intrinsicWidth
+    val h = intrinsicHeight
+    val config = if (opacity != PixelFormat.OPAQUE) Bitmap.Config.ARGB_8888
+    else Bitmap.Config.RGB_565
+
+    val bitmap = Bitmap.createBitmap(w, h, config)
+    val canvas = Canvas(bitmap)
+    setBounds(0, 0, w, h)
+    draw(canvas);
+    return bitmap
 }

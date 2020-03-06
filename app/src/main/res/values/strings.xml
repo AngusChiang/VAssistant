@@ -235,7 +235,6 @@
     <string name="text_set_as_default_assist">设为默认辅助应用</string>
 
     <string name="desc_device_admin">Lock screen</string>
-    <string name="text_long_press_to_export_log">Long press to export log</string>
     <string name="text_send">Send</string>
     <string name="text_feedback_title_hint">Question or suggestion</string>
     <string name="text_browse_log">Browse logs</string>

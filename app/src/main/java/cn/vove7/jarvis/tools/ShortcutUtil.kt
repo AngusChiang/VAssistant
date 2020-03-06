@@ -6,7 +6,10 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.ShortcutInfo
 import android.content.pm.ShortcutManager
+import android.graphics.Bitmap
+import android.graphics.drawable.Drawable
 import android.graphics.drawable.Icon
+import android.net.Uri
 import android.os.Build
 import android.speech.RecognizerIntent
 import androidx.annotation.RequiresApi
@@ -16,6 +19,7 @@ import cn.vove7.common.app.GlobalApp.Companion.getString
 import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.datamanager.parse.statusmap.ActionNode
 import cn.vove7.common.utils.newTask
+import cn.vove7.common.utils.toBitmap
 import cn.vove7.jarvis.BuildConfig
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.activities.base.VoiceAssistActivity
@@ -194,13 +198,18 @@ object ShortcutUtil {
      * @param actionNode ActionNode
      * @param add2Icon Boolean
      */
-    fun addActionShortcut(actionNode: ActionNode, add2Icon: Boolean = false) {
+    fun addActionShortcut(actionNode: ActionNode, add2Icon: Boolean = false, dr: Drawable? = null) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1) {
             val info = ShortcutInfo.Builder(context, "${actionNode.id}")
-                    .setIcon(Icon.createWithResource(context, R.drawable.ic_play_arrow))
+                    .setIcon(
+                            dr?.let {
+                                Icon.createWithBitmap(Bitmap.createBitmap(it.toBitmap()))
+                            } ?: Icon.createWithResource(context, R.drawable.ic_play_arrow)
+                    )
                     .setShortLabel(actionNode.actionTitle ?: "无标题") // 短标签名
                     .setLongLabel(actionNode.actionTitle ?: "无标题")  //长标签名
-                    .setIntent(Intent("${actionNode.id}", null, context, VoiceAssistActivity::class.java))  //action
+                    .setIntent(Intent("", Uri.parse("vassistant://inst?id=${actionNode.id}")
+                            , context, VoiceAssistActivity::class.java))  //action
                     .setDisabledMessage(getString(R.string.text_not_enable)) //disable后提示
                     .setRank(0) //位置
                     .build()

@@ -42,6 +42,7 @@ import cn.vove7.jarvis.tools.ItemWrap
 import cn.vove7.jarvis.tools.ShortcutUtil
 import cn.vove7.jarvis.tools.Tutorials
 import cn.vove7.jarvis.view.dialog.ProgressDialog
+import cn.vove7.vtp.app.AppInfo
 import cn.vove7.vtp.dialog.DialogWithList
 import cn.vove7.vtp.easyadapter.BaseListAdapter
 import cn.vove7.vtp.extend.gone
@@ -171,7 +172,7 @@ class InstDetailActivity : BaseActivity() {
             instructions_text.text = node.desc?.instructions ?: "无"
             examples_text.text = node.desc?.example ?: "无"
             regs_text.text = TextHelper.arr2String(node.regs?.toTypedArray()
-                    ?: arrayOf<Any>(), "\n")
+                ?: arrayOf<Any>(), "\n")
             version_text.text = node.versionCode.toString()
 
             view_code.setOnClickListener {
@@ -394,15 +395,20 @@ class InstDetailActivity : BaseActivity() {
                     d.show()
                 }
                 R.id.menu_add_shortcut -> {
+                    val ic by lazy {
+                        if (node.belongInApp()) {
+                            AppInfo(node.actionScope.packageName).icon
+                        } else null
+                    }
                     MaterialDialog(this).title(R.string.text_add_shortcut_to_launcher)
                             .message(text = "注意：只能添加没有参数的指令，或者在运行时可以询问参数值指令，否则无法正常执行\n" +
                                     "此操作需要7.1+\n8.0+系统可添加至桌面快捷图标")
                             .positiveButton {
-                                ShortcutUtil.addActionShortcut(node)
+                                ShortcutUtil.addActionShortcut(node, dr = ic)
                             }.show {
                                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                                     neutralButton(text = "同时添加进图标shortcut") {
-                                        ShortcutUtil.addActionShortcut(node, true)
+                                        ShortcutUtil.addActionShortcut(node, true, ic)
                                     }
                                 }
                             }

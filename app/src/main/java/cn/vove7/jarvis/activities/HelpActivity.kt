@@ -169,8 +169,7 @@ class HelpActivity : ReturnableActivity() {
             IconTitleEntity(R.drawable.ic_feedback_black_24dp, R.string.text_feedback) {
                 showFeedbackDialog()
             },
-            IconTitleEntity(R.drawable.ic_bug_report_24dp, titleId = R.string.text_browse_log,
-                    summaryId = R.string.text_long_press_to_export_log) {
+            IconTitleEntity(R.drawable.ic_bug_report_24dp, titleId = R.string.text_browse_log) {
                 var text = GlobalLog.colorHtml()
                 if (BuildConfig.DEBUG && text.isEmpty()) {
                     try {
