@@ -457,7 +457,11 @@ object BackupHelper {
             val fList = arrayOf(GlobalApp.APP.packageName + "_preferences.xml", "tutorials.xml", "plugin.xml", "float_panel_config.xml")
             val spDir = File(GlobalApp.APP.cacheDir.parent, "shared_prefs")
             fList.forEach {
-                FileHelper.easyCopy(File(spDir, it), File(StorageHelper.spPath, it))
+                try {//有些文件未初始化
+                    FileHelper.easyCopy(File(spDir, it), File(StorageHelper.spPath, it))
+                } catch (e: Exception) {
+
+                }
             }
             true
         } catch (e: Throwable) {
@@ -472,14 +476,16 @@ object BackupHelper {
      */
     fun restoreAppConfig(): Pair<Boolean, String> {
         return try {
-            val fList = arrayOf(GlobalApp.APP.packageName + "_preferences.xml", "tutorials.xml")
+            val fList = arrayOf(GlobalApp.APP.packageName + "_preferences.xml", "tutorials.xml", "plugin.xml", "float_panel_config.xml")
             val spDir = File(GlobalApp.APP.cacheDir.parent, "shared_prefs")
+            if (File(StorageHelper.spPath).list().isEmpty()) {
+                return Pair(false, "未发现备份文件")
+            }
             fList.forEach {
                 val baF = File(StorageHelper.spPath, it)
-                if (baF.exists().not()) {
-                    return Pair(true, "未发现备份文件")
+                if (baF.exists()) {
+                    FileHelper.easyCopy(baF, File(spDir, it))
                 }
-                FileHelper.easyCopy(baF, File(spDir, it))
             }
             Pair(true, "恢复完成，请重启App")
         } catch (e: Throwable) {

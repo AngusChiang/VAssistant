@@ -24,7 +24,6 @@ import cn.vove7.jarvis.activities.screenassistant.ScreenShareActivity
 import cn.vove7.jarvis.activities.screenassistant.SpotScreenActivity
 import cn.vove7.jarvis.adapters.SettingsExpandableAdapter
 import cn.vove7.jarvis.receivers.PowerEventReceiver
-import cn.vove7.jarvis.receivers.UtilEventReceiver
 import cn.vove7.jarvis.services.MainService
 import cn.vove7.jarvis.tools.*
 import cn.vove7.jarvis.tools.backup.BackupHelper
@@ -53,11 +52,13 @@ import java.util.*
  * 2018/9/10
  */
 class AdvancedSettingActivity : ReturnableActivity() {
-
+    override val layoutRes: Int
+        get() = R.layout.activity_expandable_settings
+    override val darkTheme: Int
+        get() = R.style.DarkTheme
     lateinit var adapter: SettingsExpandableAdapter
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_expandable_settings)
         val expandableListView = expand_list
         adapter = SettingsExpandableAdapter(this, groupItems, expandableListView)
 
@@ -156,7 +157,6 @@ class AdvancedSettingActivity : ReturnableActivity() {
                         },
                         IntentItem(title = "恢复设置", summary = "从sd卡恢复设置\n需重启App") {
                             BackupHelper.restoreAppConfig().also {
-                                GlobalApp.toastInfo(it.second)
                                 if (it.first) { //跳转重启
                                     GlobalApp.toastSuccess(it.second)
                                     AppHelper.showPackageDetail(this, packageName)
