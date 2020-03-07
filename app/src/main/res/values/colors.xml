@@ -42,4 +42,5 @@
 
     <color name="a81nv">#33654B</color>
 
+    <color name="bg_splash">@color/app_background</color>
 </resources>

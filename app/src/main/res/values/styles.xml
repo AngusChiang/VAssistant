@@ -134,6 +134,7 @@
 
     <style name="Main" parent="NoActionBar">
         <item name="android:windowBackground">@drawable/bg_splash</item>
+        <item name="android:statusBarColor">@color/bg_splash</item>
     </style>
 
 

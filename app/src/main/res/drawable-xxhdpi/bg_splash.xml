@@ -1,8 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
-
-    <item android:drawable="?attr/app_background" />
-
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android"
+    android:opacity="opaque">
+    <item>
+        <shape android:shape="rectangle">
+            <solid android:color="@color/bg_splash" />
+        </shape>
+    </item>
     <item>
         <bitmap
             android:gravity="center"
