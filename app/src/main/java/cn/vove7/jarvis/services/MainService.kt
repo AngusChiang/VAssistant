@@ -5,6 +5,7 @@ import android.app.AlertDialog
 import android.app.Dialog
 import android.content.DialogInterface
 import android.content.Intent
+import android.os.SystemClock
 import cn.vove7.common.MessageException
 import cn.vove7.common.accessibility.AccessibilityApi
 import cn.vove7.common.app.AppConfig
@@ -722,11 +723,21 @@ object MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
             if (recogIsListening) {
                 onCommand(ACTION_CANCEL_RECOG)
             } else {
+                //防抖动
+                val now = SystemClock.uptimeMillis()
+                if (now - lastStartRecog > 3000) {
+                    lastStartRecog = now
+                } else {
+                    Vog.d("switchRecog 防抖动")
+                    return@launch
+                }
                 DataCollector.buriedPoint("wakeup")
                 onCommand(ACTION_START_RECOG)
             }
         }
     }
+
+    private var lastStartRecog = 0L
 
     /**
      * 供插件调用

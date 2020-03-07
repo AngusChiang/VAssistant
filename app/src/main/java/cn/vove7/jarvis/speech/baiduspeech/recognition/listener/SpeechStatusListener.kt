@@ -2,20 +2,22 @@ package cn.vove7.jarvis.speech.baiduspeech.recognition.listener
 
 import android.os.Handler
 import cn.vove7.common.app.GlobalLog
+import cn.vove7.common.appbus.AppBus
+import cn.vove7.jarvis.speech.RecogEvent
 import cn.vove7.jarvis.speech.RecogEvent.Companion.CODE_ENGINE_BUSY
 import cn.vove7.jarvis.speech.RecogEvent.Companion.CODE_NET_ERROR
 import cn.vove7.jarvis.speech.RecogEvent.Companion.CODE_NO_RECORDER_PERMISSION
 import cn.vove7.jarvis.speech.RecogEvent.Companion.CODE_NO_RESULT
 import cn.vove7.jarvis.speech.RecogEvent.Companion.CODE_RECORDER_OPEN_FAIL
 import cn.vove7.jarvis.speech.RecogEvent.Companion.CODE_UNKNOWN
-import cn.vove7.jarvis.speech.VoiceData
-import cn.vove7.jarvis.speech.baiduspeech.recognition.message.SpeechMessage
 import cn.vove7.jarvis.speech.SpeechConst.Companion.CODE_VOICE_ERR
 import cn.vove7.jarvis.speech.SpeechConst.Companion.CODE_VOICE_READY
 import cn.vove7.jarvis.speech.SpeechConst.Companion.CODE_VOICE_RESULT
 import cn.vove7.jarvis.speech.SpeechConst.Companion.CODE_VOICE_TEMP
 import cn.vove7.jarvis.speech.SpeechConst.Companion.CODE_VOICE_VOL
 import cn.vove7.jarvis.speech.SpeechConst.Companion.STATUS_FINISHED
+import cn.vove7.jarvis.speech.VoiceData
+import cn.vove7.jarvis.speech.baiduspeech.recognition.message.SpeechMessage
 import cn.vove7.jarvis.speech.baiduspeech.recognition.model.RecogResult
 import cn.vove7.vtp.log.Vog
 import kotlin.math.absoluteValue
@@ -27,6 +29,7 @@ import kotlin.math.absoluteValue
  */
 class SpeechStatusListener(private val handler: Handler) : StatusRecogListener() {
 
+    var rtmp: String? = null
     var isSuccess = false
     override fun onAsrBegin() {
         super.onAsrBegin()
@@ -36,12 +39,14 @@ class SpeechStatusListener(private val handler: Handler) : StatusRecogListener()
     override fun onAsrReady() {
         super.onAsrReady()
         Vog.d("ready")
+        rtmp = null
         handler.sendMessage(SpeechMessage.buildMessage(CODE_VOICE_READY))
     }
 
     override fun onAsrPartialResult(results: Array<String>?, recogResult: RecogResult) {
         super.onAsrPartialResult(results, recogResult)
         val tmp = results?.get(0) ?: ""
+        rtmp = tmp
         handler.sendMessage(SpeechMessage.buildMessage(CODE_VOICE_TEMP, tmp))
     }
 
@@ -61,13 +66,22 @@ class SpeechStatusListener(private val handler: Handler) : StatusRecogListener()
             9 -> {
                 CODE_NO_RECORDER_PERMISSION
             }
+            10 -> {
+                if (rtmp == null) {
+                    RecogEvent.CODE_NO_VOICE
+                } else CODE_UNKNOWN
+            }
             3 -> {
                 if (subErrorCode == 3001) CODE_RECORDER_OPEN_FAIL
                 else CODE_NO_RESULT
             }
             7 -> CODE_NO_RESULT
             2 -> CODE_NET_ERROR
-            8 -> CODE_ENGINE_BUSY //"引擎忙"
+            8 -> {
+                //"引擎忙"
+                AppBus.postDelay(AppBus.ACTION_CANCEL_RECOG, 800)
+                CODE_ENGINE_BUSY
+            }
             1 -> CODE_NET_ERROR //"网络超时"
             else -> {
                 CODE_UNKNOWN//"未知错误"
