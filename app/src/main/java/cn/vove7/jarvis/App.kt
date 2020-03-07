@@ -3,11 +3,13 @@ package cn.vove7.jarvis
 import android.content.ContentProvider
 import android.content.ContentValues
 import android.content.Intent
+import android.content.res.Configuration
 import android.database.Cursor
 import android.net.Uri
 import android.os.Build
-import androidx.work.PeriodicWorkRequest
 import androidx.work.WorkManager
+import cn.daqinjia.android.scaffold.ui.base.ScaffoldActivity
+import cn.vove7.bottomdialog.builder.BottomDialogBuilder
 import cn.vove7.common.activities.RunnableActivity.Companion.runInShellActivity
 import cn.vove7.common.app.AppConfig
 import cn.vove7.common.app.GlobalApp
@@ -29,7 +31,6 @@ import cn.vove7.jarvis.work.DataSyncWork
 import cn.vove7.smartkey.android.AndroidSettings
 import cn.vove7.vtp.log.Vog
 import org.greenrobot.eventbus.Subscribe
-import java.util.concurrent.TimeUnit
 
 
 @Suppress("MemberVisibilityCanBePrivate")
@@ -49,6 +50,15 @@ class App : GlobalApp() {
         AppBus.reg(this)
 
         startMainServices()
+        ScaffoldActivity.apply {
+            enableThamable = true
+            globalDarkTheme = R.style.DarkTheme_NoActionBar
+        }
+
+        BottomDialogBuilder.apply {
+            enableAutoDarkTheme = true
+            darkTheme = R.style.BottomDialog_Dark
+        }
     }
 
     private fun startMainServices() {

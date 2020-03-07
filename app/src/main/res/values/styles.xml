@@ -1,5 +1,31 @@
 <resources>
 
+    <style name="DarkTheme" parent="Theme.AppCompat.DayNight.DarkActionBar">
+
+        <!-- Customize your theme here. -->
+        <item name="colorPrimary">#212121</item>
+        <item name="colorPrimaryDark">#212121</item>
+        <item name="colorAccent">@color/google_green</item>
+        <item name="android:navigationBarColor">#212121</item>
+        <item name="md_corner_radius">10dp</item>
+        <item name="app_background">@color/app_dark_background</item>
+        <item name="app_foreground">@color/app_dark_foreground</item>
+        <item name="android:windowBackground">@color/app_dark_background</item>
+
+        <item name="primary_text_color">#d5d5d5</item>
+
+        <item name="md_button_selector">@color/google_green</item>
+        <item name="md_color_button_text">#BDBDBD</item>
+        <item name="dialogTheme">@style/Dialog_Fullscreen</item>
+        <!--<item name="md_color_content">@color/your_color</item>-->
+        <item name="actionModeStyle">@style/MyActionMode</item>
+        <item name="secondary_text_color">@color/secondary_text</item>
+        <!--<item name="android:colorControlHighlight">@color/colorPrimary</item>-->
+
+        <item name="popupTheme">@style/ThemeOverlay.AppCompat.DayNight</item>
+        <item name="popupMenuStyle">@style/ThemeOverlay.AppCompat.DayNight</item>
+    </style>
+
     <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
         <!-- Customize your theme here. -->
         <item name="colorPrimary">@color/p_green</item>
@@ -11,11 +37,28 @@
         <item name="dialogTheme">@style/Dialog_Fullscreen</item>
         <!--<item name="md_color_content">@color/your_color</item>-->
         <item name="actionModeStyle">@style/MyActionMode</item>
+
+        <item name="primary_text_color">#282828</item>
+        <item name="app_background">#f4f4f4</item>
+        <item name="app_foreground">#fdfdfe</item>
         <!--<item name="android:colorControlHighlight">@color/colorPrimary</item>-->
+        <item name="popupMenuStyle">@style/ThemeOverlay.AppCompat.Light</item>
+        <item name="popupTheme">@style/ThemeOverlay.AppCompat.Light</item>
+        <item name="secondary_text_color">@color/secondary_text</item>
+
+    </style>
+
+    <style name="DarkTheme.NoActionBar" parent="DarkTheme">
+        <item name="windowNoTitle">true</item>
+        <item name="windowActionBar">false</item>
+    </style>
+
+    <style name="BottomDialog.Dark" parent="BottomDialog">
+        <item name="bd_bg_color">@color/app_dark_foreground</item>
+        <item name="android:textColorPrimary">#fff</item>
     </style>
 
     <style name="MyActionMode" parent="ThemeOverlay.AppCompat.Light">
-
         <item name="height">?attr/actionBarSize</item>
     </style>
 
@@ -55,7 +98,7 @@
         <!--<item name="android:windowAnimationStyle">@style/InOut</item>-->
     </style>
 
-    <style name="TextOcr" parent="ScreenPicker" >
+    <style name="TextOcr" parent="ScreenPicker">
         <item name="android:statusBarColor">@color/half_trans</item>
         <item name="android:navigationBarColor">#22000000</item>
         <item name="android:windowAnimationStyle">@style/fade</item>
@@ -88,6 +131,7 @@
         <item name="windowNoTitle">true</item>
         <item name="windowActionBar">false</item>
     </style>
+
     <style name="Main" parent="NoActionBar">
         <item name="android:windowBackground">@drawable/bg_splash</item>
     </style>

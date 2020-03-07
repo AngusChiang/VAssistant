@@ -24,19 +24,19 @@
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:gravity="center_vertical"
             android:layout_height="wrap_content"
-            android:minHeight="45dp"
-            android:baselineAligned="false">
+            android:baselineAligned="false"
+            android:gravity="center_vertical"
+            android:minHeight="45dp">
 
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="5dp"
+                android:layout_marginLeft="5dp"
                 android:layout_weight="1"
                 android:orientation="vertical"
-                android:padding="5dp"
-                android:layout_marginLeft="5dp">
+                android:padding="5dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -50,7 +50,7 @@
                         android:gravity="center_vertical"
                         android:minHeight="23dp"
                         android:text="1234"
-                        android:textColor="@color/primary_text"
+                        android:textColor="?attr/primary_text_color"
                         android:textSize="16sp"
                         android:textStyle="bold" />
 

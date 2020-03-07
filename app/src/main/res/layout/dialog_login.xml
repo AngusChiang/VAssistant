@@ -55,7 +55,7 @@
         android:layout_height="wrap_content"
         android:text="@string/desc_new_account"
         android:gravity="center_horizontal"
-        android:textColor="?attr/colorPrimary" />
+        android:textColor="?attr/colorAccent" />
 
 
 </LinearLayout>

@@ -12,6 +12,7 @@ import android.content.*
 import android.content.Context.WIFI_SERVICE
 import android.content.pm.PackageManager
 import android.content.pm.PackageManager.MATCH_DEFAULT_ONLY
+import android.content.res.Configuration
 import android.graphics.Bitmap
 import android.hardware.Camera
 import android.hardware.camera2.CameraCharacteristics
@@ -1487,4 +1488,10 @@ object SystemBridge : SystemOperation {
     }
 
     override val deviceName: String get() = Build.MODEL
+
+
+    val isDarkMode
+        get() = (GlobalApp.APP.resources!!.configuration.uiMode
+                and Configuration.UI_MODE_NIGHT_MASK) ==
+                Configuration.UI_MODE_NIGHT_YES
 }

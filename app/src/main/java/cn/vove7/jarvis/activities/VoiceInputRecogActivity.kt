@@ -20,10 +20,15 @@ import java.util.*
  * 2019/1/20
  */
 class VoiceInputRecogActivity : BaseActivity() {
-//    lateinit var vi: VoiceInteractor
+    //    lateinit var vi: VoiceInteractor
+    override val layoutRes: Int
+        get() = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
+        try {
+            super.onCreate(savedInstanceState)
+        } catch (e: Exception) {
+        }
         AppBus.reg(this)
         MainService.startVoiceInput()
 

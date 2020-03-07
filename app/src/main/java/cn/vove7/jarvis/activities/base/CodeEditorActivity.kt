@@ -41,6 +41,8 @@ import kotlinx.android.synthetic.main.editor_tool_bar.*
 abstract class CodeEditorActivity : BaseActivity() {
 
     abstract val codeEditor: CodeEditorOperation
+    override val darkTheme: Int
+        get() = R.style.DarkTheme
 
     var openFile: String? = null
 
@@ -92,7 +94,7 @@ abstract class CodeEditorActivity : BaseActivity() {
         mInputManager.hideSoftInputFromWindow(findViewById<View>(R.id.root).windowToken, 0)
     }
 
-    private fun initView() {
+    override fun initView() {
         toggle_functions.setOnClickListener {
             if (functions_grid.visibility == View.GONE) {
                 functions_grid.visibility = View.VISIBLE
@@ -272,6 +274,7 @@ abstract class CodeEditorActivity : BaseActivity() {
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
         if (resultCode == Activity.RESULT_OK) {//选择文件回调
             when (requestCode) {
                 1 -> {

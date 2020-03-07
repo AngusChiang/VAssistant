@@ -27,6 +27,7 @@ import cn.vove7.jarvis.tools.ItemWrap
 import cn.vove7.jarvis.tools.Tutorials
 import cn.vove7.jarvis.view.dialog.contentbuilder.MarkdownContentBuilder
 import cn.vove7.jarvis.view.dialog.contentbuilder.SmoothTextBuilder
+import cn.vove7.jarvis.view.dialog.contentbuilder.markdownContent
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.customview.customView
 import com.google.android.material.textfield.TextInputLayout
@@ -40,10 +41,14 @@ import java.io.File
  * 9/23/2018
  */
 class HelpActivity : ReturnableActivity() {
+    override val layoutRes: Int
+        get() = R.layout.activity_abc_header
+    override val darkTheme: Int
+        get() = R.style.DarkTheme
     lateinit var adapter: IconTitleListAdapter
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_abc_header)
         header_content.addView(layoutInflater.inflate(R.layout.header_help, null))
 
         list_view.adapter = IconTitleListAdapter(this, getData()).also { adapter = it }
@@ -121,7 +126,7 @@ class HelpActivity : ReturnableActivity() {
             IconTitleEntity(R.drawable.ic_help, R.string.using_help) {
                 BottomDialog.builder(this) {
                     awesomeHeader(getString(R.string.using_help))
-                    content(MarkdownContentBuilder()) {
+                    markdownContent {
                         loadMarkdownFromAsset("files/introduction.md")
                     }
                 }
@@ -150,7 +155,7 @@ class HelpActivity : ReturnableActivity() {
             IconTitleEntity(R.drawable.ic_question_answer, R.string.text_faq) {
                 BottomDialog.builder(this) {
                     awesomeHeader("常见问题")
-                    content(MarkdownContentBuilder()) {
+                    markdownContent {
                         loadMarkdownFromAsset("files/faqs.md")
                     }
                 }

@@ -1,10 +1,6 @@
 package cn.vove7.jarvis.activities.base
 
 import android.os.Bundle
-import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentManager
-import androidx.fragment.app.FragmentPagerAdapter
-import androidx.appcompat.widget.Toolbar
 import android.view.MenuItem
 import android.view.View
 import cn.vove7.jarvis.R
@@ -18,8 +14,8 @@ import kotlinx.android.synthetic.main.activity_base_view_pager.*
  * 2018/8/14
  */
 abstract class BaseActivityWithViewPager : BaseActivity() {
-
-    lateinit var toolbar: Toolbar
+    override val layoutRes: Int
+        get() = R.layout.activity_base_view_pager
     lateinit var fragmentAdapter: FragmentAdapter
 
     val currentFragment: androidx.fragment.app.Fragment
@@ -27,7 +23,6 @@ abstract class BaseActivityWithViewPager : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_base_view_pager)
         toolbar = findViewById(R.id.toolbar)
         //设置ToolBar
         setSupportActionBar(toolbar)

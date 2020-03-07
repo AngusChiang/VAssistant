@@ -3,6 +3,7 @@ package cn.vove7.jarvis.receivers
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.content.res.Configuration
 import cn.vove7.bottomdialog.BottomDialogActivity
 import cn.vove7.bottomdialog.builder.oneButton
 import cn.vove7.bottomdialog.extension.awesomeHeader
@@ -46,7 +47,9 @@ object UtilEventReceiver : DyBCReceiver() {
             APP_HAS_UPDATE -> {
                 val ver = intent.getStringExtra("version")
                 val log = intent.getStringExtra("log")
-                BottomDialogActivity.builder(GlobalApp.APP, AppUpdateDialog.getBuildAction(ver, log))
+
+                BottomDialogActivity.builder(GlobalApp.APP,
+                        AppUpdateDialog.getBuildAction(ver, log))
             }
             INST_DATA_SYNC_FINISH -> {
                 val content = intent.getCharSequenceExtra("content")

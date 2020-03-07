@@ -7,7 +7,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/app_background"
+        android:background="?attr/app_background"
         android:fitsSystemWindows="true"
         android:orientation="vertical"
         app:layout_constraintLeft_toLeftOf="parent"
@@ -112,15 +112,10 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content">
 
-                    <!--<cn.vove7.jarvis.view.custom.IconView-->
-                    <!--android:layout_width="wrap_content"-->
-                    <!--android:layout_height="wrap_content"-->
-                    <!--android:src="@drawable/ic_home_black_24dp" />-->
-                </RelativeLayout>
+                 </RelativeLayout>
             </LinearLayout>
 
         </androidx.cardview.widget.CardView>
-
 
         <ListView
             android:id="@+id/list_view"
@@ -129,7 +124,7 @@
             android:layout_marginStart="15dp"
             android:layout_marginTop="25dp"
             android:layout_marginEnd="15dp"
-            android:divider="@color/app_background"
+            android:divider="?attr/app_background"
             android:dividerHeight="7dp"
             tools:listitem="@layout/item_mine_features" />
 
@@ -141,7 +136,8 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="20dp"
         android:src="@drawable/ripple_voice_on_assist"
-        app:backgroundTint="#fff"
+        app:backgroundTint="?attr/app_background"
+        app:elevation="1dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent" />

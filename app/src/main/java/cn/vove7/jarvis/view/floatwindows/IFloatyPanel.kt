@@ -41,7 +41,7 @@ interface IFloatyPanel {
         } else {
             BottomDialog.builder(activity) {
                 title("面板设置", true)
-                content(SettingItemBuilder(settingItems.toMutableList(), FloatPanelConfig))
+                content(SettingItemBuilder(activity, settingItems.toMutableList(), FloatPanelConfig))
             }
         }
     }

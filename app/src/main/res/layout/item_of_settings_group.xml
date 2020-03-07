@@ -2,7 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@color/app_foreground"
+    android:background="?attr/app_foreground"
     android:clickable="false"
     android:orientation="vertical">
 
@@ -35,7 +35,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Sample"
-                android:textColor="@color/primary_text"
+                android:textColor="?attr/primary_text_color"
                 android:textSize="18sp"
                 android:textStyle="bold" />
 
@@ -47,6 +47,7 @@
 
                 <ImageView
                     android:id="@+id/down_icon"
+                    android:tint="?attr/primary_text_color"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:src="@drawable/ic_keyboard_arrow_down_black_24dp" />

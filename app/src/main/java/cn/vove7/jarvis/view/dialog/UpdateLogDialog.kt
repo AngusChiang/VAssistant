@@ -7,8 +7,10 @@ import cn.vove7.bottomdialog.builder.buttons
 import cn.vove7.bottomdialog.extension.awesomeHeader
 import cn.vove7.common.model.UserInfo
 import cn.vove7.common.utils.spanColor
+import cn.vove7.jarvis.App
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.view.dialog.contentbuilder.MarkdownContentBuilder
+import cn.vove7.jarvis.view.dialog.contentbuilder.markdownContent
 import java.util.*
 
 /**
@@ -22,7 +24,7 @@ class UpdateLogDialog(context: Activity, onDismiss: (() -> Unit)? = null) {
     init {
         val d = BottomDialog.builder(context) {
             awesomeHeader("更新日志")
-            content(MarkdownContentBuilder()) {
+            markdownContent {
                 loadMarkdownFromAsset("files/update_log.md")
             }
             buttons {
@@ -35,7 +37,7 @@ class UpdateLogDialog(context: Activity, onDismiss: (() -> Unit)? = null) {
                     it.dismiss()
                     BottomDialog.builder(context) {
                         awesomeHeader(context.getString(R.string.using_help))
-                        content(MarkdownContentBuilder()) {
+                        markdownContent {
                             loadMarkdownFromAsset("files/introduction.md")
                         }
                     }

@@ -74,9 +74,11 @@ class NewInstActivity : ReturnableActivity(), View.OnClickListener {
         }
 
     private var scriptType: String? = null
-    lateinit var toolbar: Toolbar
 
-    override fun onCreate(savedInstanceState: Bundle?) {
+    override val layoutRes: Int
+        get() =R.layout.activity_new_inst
+
+            override fun onCreate(savedInstanceState: Bundle?) {
         enterTime = System.currentTimeMillis()
         super.onCreate(savedInstanceState)
 
@@ -85,7 +87,6 @@ class NewInstActivity : ReturnableActivity(), View.OnClickListener {
             return
         }
 
-        setContentView(R.layout.activity_new_inst)
         toolbar = findViewById(R.id.toolbar)
         setSupportActionBar(toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
@@ -101,7 +102,7 @@ class NewInstActivity : ReturnableActivity(), View.OnClickListener {
 
 
     private fun initData() {
-        val arr = resources.getStringArray(R.array.list_pos_of_regex_param)
+        val arr = resources!!.getStringArray(R.array.list_pos_of_regex_param)
         posData = arrayListOf()
         posData.addAll(arr)
         if (isReedit) {//重新编辑
@@ -320,7 +321,7 @@ class NewInstActivity : ReturnableActivity(), View.OnClickListener {
         if (selScriptDialog == null) {
             val dView = layoutInflater.inflate(R.layout.dialog_sel_script, null)
             scriptTextView = dView.findViewById(R.id.script_text)
-            val typeArr = resources.getStringArray(R.array.list_script_type)
+            val typeArr = resources!!.getStringArray(R.array.list_script_type)
             dView.findViewById<Spinner>(R.id.script_type_spinner).also {
                 it.setSelection(
                         when (scriptType) {

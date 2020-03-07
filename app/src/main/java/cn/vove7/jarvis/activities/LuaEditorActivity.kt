@@ -19,10 +19,11 @@ class LuaEditorActivity : CodeEditorActivity() {
     override val scriptType: String = Action.SCRIPT_TYPE_LUA
     override val symbols: List<Symbol>
         get() = luaSymbols
+    override val layoutRes: Int
+        get() = R.layout.activity_lua_code_editor
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_lua_code_editor)
     }
 
     init {

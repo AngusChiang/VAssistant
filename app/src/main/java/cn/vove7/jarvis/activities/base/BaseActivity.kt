@@ -1,11 +1,10 @@
 package cn.vove7.jarvis.activities.base
 
-import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.Lifecycle
+import cn.daqinjia.android.scaffold.ui.base.NoBindingActivity
+import cn.daqinjia.android.scaffold.ui.base.ScaffoldActivity
 import cn.vove7.jarvis.lifecycle.LifeCycleScopeDelegate
 import cn.vove7.jarvis.lifecycle.LifecycleScope
 import cn.vove7.jarvis.tools.DataCollector
-import kotlinx.coroutines.CoroutineScope
 
 
 /**
@@ -14,8 +13,15 @@ import kotlinx.coroutines.CoroutineScope
  * @author Vove
  * 2019/6/12
  */
-abstract class BaseActivity : AppCompatActivity(), LifeCycleScopeDelegate {
+abstract class BaseActivity : NoBindingActivity(), LifeCycleScopeDelegate {
+    override val needToolbar: Boolean
+        get() = false
 
+    val isDarkTheme
+        get() = ScaffoldActivity::class.java.getDeclaredMethod("isDarkMode").run {
+            isAccessible = true
+            invoke(this@BaseActivity) as Boolean
+        }
     override val lifecycleScope by lazy {
         LifecycleScope(lifecycle)
     }

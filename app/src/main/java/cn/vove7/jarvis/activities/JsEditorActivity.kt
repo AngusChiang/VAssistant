@@ -29,9 +29,11 @@ class JsEditorActivity : CodeEditorActivity() {
         RhinoApi.regPrint(print)
     }
 
+    override val layoutRes: Int
+        get() = R.layout.activity_js_code_editor
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_js_code_editor)
 
         val mEditor = findViewById<TextProcessor>(R.id.editor)
         mEditor.language = MyJsLanguageWithApi()

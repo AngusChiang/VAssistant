@@ -11,7 +11,7 @@ android {
         minSdkVersion 21
         targetSdkVersion 28
         def subVersion = 0
-        versionName "2.0.5"
+        versionName "2.0.6"
         def vc = Integer.parseInt(versionName.replace(".", "")) * 10
         if (vc < 10000) {
             vc *= 10
@@ -154,7 +154,7 @@ dependencies {
 
     implementation 'com.github.QuadFlask:colorpicker:0.0.15'
     implementation 'com.github.Vove7:CodeView:1.0.2'
-    implementation 'com.github.Vove7:BottomDialog:2.1.8'
+    implementation 'com.github.Vove7:BottomDialog:2.2.0'
 
     implementation 'com.github.Vove7:SlidePickerView:1.0.0'
 
@@ -176,6 +176,7 @@ dependencies {
     def work_version = "2.3.2"
     implementation "androidx.work:work-runtime-ktx:$work_version"
 
+    implementation 'com.gitee.Vove:ScaffoldAndroid:a564fd346d'
 }
 repositories {
     flatDir {

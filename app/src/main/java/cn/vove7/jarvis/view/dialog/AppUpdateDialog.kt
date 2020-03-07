@@ -4,10 +4,12 @@ import android.app.Activity
 import cn.vove7.bottomdialog.BottomDialog
 import cn.vove7.bottomdialog.builder.BottomDialogBuilder
 import cn.vove7.bottomdialog.builder.buttons
-import cn.vove7.bottomdialog.builder.title
 import cn.vove7.bottomdialog.extension.awesomeHeader
 import cn.vove7.common.app.AppConfig
+import cn.vove7.jarvis.App
+import cn.vove7.jarvis.R
 import cn.vove7.jarvis.view.dialog.contentbuilder.MarkdownContentBuilder
+import cn.vove7.jarvis.view.dialog.contentbuilder.markdownContent
 import cn.vove7.vtp.sharedpreference.SpHelper
 
 /**
@@ -16,10 +18,16 @@ import cn.vove7.vtp.sharedpreference.SpHelper
  * @author Vove
  * 2019/6/23
  */
-class AppUpdateDialog(val context: Activity, verName: String, val updateLog: String) {
+class AppUpdateDialog(
+        val context: Activity,
+        verName: String,
+        updateLog: String
+) {
 
     init {
-        BottomDialog.builder(context, action = getBuildAction(verName, updateLog))
+        BottomDialog.builder(
+                context, action = getBuildAction(verName, updateLog)
+        )
     }
 
     companion object {
@@ -27,7 +35,7 @@ class AppUpdateDialog(val context: Activity, verName: String, val updateLog: Str
             return {
                 cancelable(false)
                 awesomeHeader("发现新版本: v$ver")
-                content(MarkdownContentBuilder()) {
+                markdownContent {
                     loadMarkdown(log)
                 }
                 buttons {

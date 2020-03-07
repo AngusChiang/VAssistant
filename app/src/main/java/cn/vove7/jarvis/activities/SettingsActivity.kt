@@ -38,9 +38,13 @@ import kotlinx.android.synthetic.main.activity_expandable_settings.*
  *
  */
 class SettingsActivity : ReturnableActivity() {
+    override val layoutRes: Int
+        get() = R.layout.activity_expandable_settings
+    override val darkTheme: Int
+        get() = R.style.DarkTheme
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_expandable_settings)
 
         val expandableListView = expand_list
         expandableListView.setAdapter(SettingsExpandableAdapter(this, initData(), expandableListView))

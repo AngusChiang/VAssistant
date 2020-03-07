@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.MenuItem
 import android.view.View
+import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import cn.vove7.common.app.AppConfig
@@ -14,7 +15,6 @@ import cn.vove7.jarvis.activities.base.BaseActivity
 import cn.vove7.jarvis.adapters.IconTitleEntity
 import cn.vove7.jarvis.adapters.IconTitleListAdapter
 import cn.vove7.jarvis.tools.openQQChat
-import cn.vove7.jarvis.view.custom.IconView
 import cn.vove7.jarvis.view.dialog.AppUpdateDialog
 import cn.vove7.jarvis.view.dialog.ProgressDialog
 import cn.vove7.jarvis.view.dialog.UpdateLogDialog
@@ -33,13 +33,16 @@ import kotlinx.android.synthetic.main.header_about.*
  * 9/23/2018
  */
 class AboutActivity : BaseActivity() {
+    override val layoutRes: Int
+        get() = R.layout.activity_abc_header
+    override val darkTheme: Int
+        get() = R.style.DarkTheme
 
     private var clickTime = 0L
     private var clickCount = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_abc_header)
 
         header_content.addView(layoutInflater.inflate(R.layout.header_about, null))
 
@@ -78,7 +81,7 @@ class AboutActivity : BaseActivity() {
     }
 
     class VH(v: View) : BaseListAdapter.ViewHolder(v) {
-        val iconView = v.findViewById<IconView>(R.id.icon)!!
+        val iconView = v.findViewById<ImageView>(R.id.icon)!!
         val titleView = v.findViewById<TextView>(R.id.title)!!
         val subTitleView = v.findViewById<TextView>(R.id.sub_title)!!
     }

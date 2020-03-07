@@ -5,6 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginTop="2dp"
+    app:cardBackgroundColor="?attr/app_foreground"
     android:layout_marginBottom="2dp"
     android:foreground="?attr/selectableItemBackground"
     app:cardCornerRadius="2dp"
@@ -31,7 +32,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
             android:text="@string/text_settings"
-            android:textColor="@color/primary_text"
+            android:textColor="?attr/primary_text_color"
             android:textSize="16sp" />
 
     </LinearLayout>

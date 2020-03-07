@@ -11,6 +11,7 @@ import android.os.Bundle
 import android.provider.Settings
 import android.view.View
 import android.view.ViewGroup
+import android.widget.CheckedTextView
 import android.widget.Switch
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
@@ -105,7 +106,6 @@ class PermissionManagerActivity : OneFragmentActivity() {
                 }
 
                 override fun onBindView(holder: Holder, position: Int, item: PermissionStatus) {
-
                     holder.title.text = item.permissionName
                     if (item.desc == "") {
                         holder.subtitle.visibility = View.GONE
@@ -113,17 +113,12 @@ class PermissionManagerActivity : OneFragmentActivity() {
                         holder.subtitle.visibility = View.VISIBLE
                         holder.subtitle.text = item.desc
                     }
-                    when (item.isOpen) {
-                        true -> {
-                            holder.open.text = getString(R.string.text_opened)
-                            holder.open.setTextColor(resources.getColor(R.color.status_green))
-                            holder.title.setTextColor(resources.getColor(R.color.primary_text))
-                        }
-                        else -> {
-                            holder.open.text = getString(R.string.text_to_open)
-                            holder.open.setTextColor(resources.getColor(R.color.red_500))
-                            holder.title.setTextColor(resources.getColor(R.color.red_500))
-                        }
+                    holder.open.isChecked = item.isOpen
+                    holder.title.isChecked = item.isOpen
+                    if (item.isOpen) {
+                        holder.open.text = getString(R.string.text_opened)
+                    } else {
+                        holder.open.text = getString(R.string.text_to_open)
                     }
                     holder.itemView.setOnClickListener {
                         item.clickAction(item, pActivity)
@@ -176,7 +171,7 @@ class PermissionManagerActivity : OneFragmentActivity() {
 //                                            toast.showShort("跳转失败，请手动开启")
                                 try {
                                     SystemBridge.openAppDetail(context?.packageName
-                                            ?: "")
+                                        ?: "")
                                 } catch (e: Exception) {
                                     GlobalApp.toastError("跳转失败，请到应用详情手动开启")
                                 }
@@ -270,9 +265,9 @@ class PermissionManagerActivity : OneFragmentActivity() {
     }
 
     class Holder(view: View) : RecAdapterWithFooter.RecViewHolder(view, null) {
-        val title = view.findViewById<TextView>(R.id.title)
-        val subtitle = view.findViewById<TextView>(R.id.subtitle)
-        val open = view.findViewById<TextView>(R.id.open)
+        val title = view.findViewById<CheckedTextView>(R.id.title)
+        val subtitle = view.findViewById<CheckedTextView>(R.id.subtitle)
+        val open = view.findViewById<CheckedTextView>(R.id.open)
     }
 
     class PermissionStatus(

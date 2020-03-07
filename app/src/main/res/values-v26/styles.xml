@@ -16,7 +16,13 @@
         <item name="editTextStyle">@style/EditTextStyle</item>
         <item name="android:windowBackground">@color/app_background</item>
 
+        <item name="primary_text_color">#282828</item>
+        <item name="app_background">#f4f4f4</item>
+        <item name="app_foreground">#fdfdfe</item>
         <!--<item name="android:colorControlHighlight">@color/colorPrimary</item>-->
+        <item name="popupMenuStyle">@style/ThemeOverlay.AppCompat.Light</item>
+        <item name="popupTheme">@style/ThemeOverlay.AppCompat.Light</item>
+        <item name="secondary_text_color">@color/secondary_text</item>
     </style>
 
     <style name="EditTextStyle" parent="@style/Widget.AppCompat.EditText">

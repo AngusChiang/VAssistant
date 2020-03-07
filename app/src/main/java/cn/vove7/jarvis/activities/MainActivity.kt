@@ -5,10 +5,8 @@ import android.os.Build
 import android.os.Bundle
 import android.view.View
 import android.view.Window
-import androidx.work.WorkerParameters
+import cn.daqinjia.android.scaffold.ui.base.ScaffoldActivity
 import cn.vove7.common.app.AppConfig
-import cn.vove7.common.app.AppConfig.checkAppUpdate
-import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.model.UserInfo
 import cn.vove7.jarvis.BuildConfig
@@ -20,7 +18,6 @@ import cn.vove7.jarvis.tools.DataUpdator
 import cn.vove7.jarvis.tools.Tutorials
 import cn.vove7.jarvis.tools.debugserver.RemoteDebugServer
 import cn.vove7.jarvis.view.dialog.UpdateLogDialog
-import cn.vove7.jarvis.work.DataSyncWork
 import cn.vove7.vtp.log.Vog
 import cn.vove7.vtp.runtimepermission.PermissionUtils
 import com.afollestad.materialdialogs.MaterialDialog
@@ -36,16 +33,16 @@ import kotlinx.coroutines.delay
  */
 class MainActivity : BaseActivity() {
 
+    override val layoutRes: Int
+        get() = R.layout.activity_real_main
+
     override fun onBackPressed() {
         finishAndRemoveTask()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
         requestWindowFeature(Window.FEATURE_NO_TITLE)
-        setContentView(R.layout.activity_real_main)
-
-        initView()
+        super.onCreate(savedInstanceState)
         requestPermission()
         checkDebug()
         if (AppConfig.FIRST_IN) {
@@ -71,12 +68,14 @@ class MainActivity : BaseActivity() {
         }
     }
 
-    private fun initView() {
+    override fun initView() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            window.decorView.systemUiVisibility =
-                View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN or
-                        View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
-            window.statusBarColor = resources.getColor(R.color.app_background)
+            if (!isDarkTheme) {
+                window.decorView.systemUiVisibility =
+                    View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN or
+                            View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
+                window.statusBarColor = resources!!.getColor(R.color.app_background, theme)
+            }
         }
     }
 

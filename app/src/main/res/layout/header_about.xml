@@ -13,7 +13,6 @@
         android:layout_width="127dp"
         android:layout_height="127dp"
         android:src="@mipmap/icon_large"
-        android:textColor="@color/primary_text"
         android:textSize="20sp" />
 
     <LinearLayout
@@ -25,7 +24,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/text_version"
-            android:textColor="@color/primary_text" />
+            android:textColor="?attr/primary_text_color" />
 
         <TextView
             android:id="@+id/ver_name_view"
@@ -33,7 +32,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="5dp"
             android:text="1.0.0"
-            android:textColor="@color/primary_text" />
+            android:textColor="?attr/primary_text_color" />
 
     </LinearLayout>
 

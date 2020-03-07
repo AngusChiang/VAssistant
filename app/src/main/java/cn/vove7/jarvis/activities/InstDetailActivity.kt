@@ -71,11 +71,12 @@ class InstDetailActivity : BaseActivity() {
         }
     }
 
+    override val layoutRes: Int
+        get() = R.layout.activity_inst_detail
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_inst_detail)
         toolbar.inflateMenu(R.menu.menu_inst_detail)
-        initView()
         nodeId = intent.getLongExtra("nodeId", -1)
         Vog.d("nodeId: $nodeId")
         if (nodeId == -1L) {
@@ -262,7 +263,8 @@ class InstDetailActivity : BaseActivity() {
     }
 
     var settingName: String? = null
-    private fun initView() {
+    override fun initView() {
+        toolbar = findViewById(R.id.toolbar)
         toolbar.setOnMenuItemClickListener { it ->
             when (it.itemId) {
                 R.id.menu_edit -> {//修改

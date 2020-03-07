@@ -31,9 +31,9 @@ class SelectAppDialog {
             }
             dialog.setOnShowListener {
                 dialog.updateHeader<ToolbarHeader> {
-                    toolBar.menu?.clear()
-                    toolBar.inflateMenu(R.menu.menu_search)
-                    val searchItem = toolBar.menu?.findItem(R.id.menu_search)!!
+                    toolbar.menu?.clear()
+                    toolbar.inflateMenu(R.menu.menu_search)
+                    val searchItem = toolbar.menu?.findItem(R.id.menu_search)!!
                     SearchActionHelper(searchItem) { text ->
                         contentBuilder.filter(text)
                     }

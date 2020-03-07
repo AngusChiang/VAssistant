@@ -10,7 +10,6 @@ import cn.vove7.common.app.AppConfig
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.bridges.SystemBridge
 import cn.vove7.common.model.UserInfo
-import cn.vove7.common.utils.CoroutineExt.launch
 import cn.vove7.common.utils.content
 import cn.vove7.jarvis.BuildConfig
 import cn.vove7.jarvis.R
@@ -26,14 +25,14 @@ import cn.vove7.jarvis.tools.debugserver.ConnectiveService
 import cn.vove7.jarvis.view.*
 import cn.vove7.jarvis.view.custom.SettingGroupItem
 import cn.vove7.jarvis.view.dialog.TextEditorDialog
-import cn.vove7.jarvis.view.dialog.contentbuilder.MarkdownContentBuilder
 import cn.vove7.jarvis.view.dialog.contentbuilder.SettingItemBuilder
+import cn.vove7.jarvis.view.dialog.contentbuilder.markdownContent
 import cn.vove7.jarvis.view.dialog.editorView
 import cn.vove7.vtp.extend.buildList
 import com.afollestad.materialdialogs.WhichButton
 import com.afollestad.materialdialogs.actions.getActionButton
 import kotlinx.android.synthetic.main.activity_expandable_settings.*
-import java.lang.Thread.sleep
+import kotlinx.coroutines.delay
 
 /**
  * # LaboratoryActivity
@@ -42,10 +41,13 @@ import java.lang.Thread.sleep
  * 9/24/2018
  */
 class LaboratoryActivity : ReturnableActivity() {
+    override val layoutRes: Int
+        get() = R.layout.activity_expandable_settings
+    override val darkTheme: Int
+        get() = R.style.DarkTheme
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        setContentView(R.layout.activity_expandable_settings)
         val expandableListView = expand_list
         val adapter = SettingsExpandableAdapter(this, groupItems, expandableListView)
         expandableListView.setAdapter(adapter)
@@ -90,7 +92,7 @@ class LaboratoryActivity : ReturnableActivity() {
                                 keyId = R.string.key_open_ad_block,
                                 defaultValue = AppConfig.isAdBlockService,
                                 onTileAreaClick = {
-                                    showExtensionSettings("电源提醒", mutableListOf(
+                                    showExtensionSettings("去广告服务", mutableListOf(
                                             NumberPickerItem(R.string.text_time_wait_ad, "界面等待广告出现最长时间，单位秒",
                                                     keyId = R.string.key_ad_wait_secs, range = Pair(10, 100),
                                                     defaultValue = { PluginConfig.adWaitSecs }),
@@ -137,14 +139,20 @@ class LaboratoryActivity : ReturnableActivity() {
                         IntentItem(title = "帮助") {
                             BottomDialog.builder(this) {
                                 awesomeHeader("帮助 - 互联服务")
-                                content(MarkdownContentBuilder()) {
+                                markdownContent {
                                     loadMarkdownFromAsset("files/connective-service.md")
                                 }
                             }
                         },
                         IntentItem(title = "扫描测试") {
                             launch {
-                                GlobalApp.toastInfo(SystemBridge.scanVassistHostsInLAN().joinToString("\n"), 1)
+                                val ds = SystemBridge.scanVassistHostsInLAN()
+                                if (ds.isEmpty()) {
+                                    GlobalApp.toastInfo("未发现设备")
+                                } else {
+                                    GlobalApp.toastInfo(ds.joinToString("\n"), 1)
+                                }
+
                             }
                         }
                 ).also {
@@ -231,7 +239,7 @@ class LaboratoryActivity : ReturnableActivity() {
                             }
                             BottomDialog.builder(this) {
                                 awesomeHeader("信息")
-                                content(MarkdownContentBuilder()) {
+                                markdownContent {
                                     loadMarkdown(MainService.homeControlSystem?.summary()
                                         ?: "")
                                 }
@@ -250,7 +258,7 @@ class LaboratoryActivity : ReturnableActivity() {
                                 keyId = R.string.key_chat_system_type, entityArrId = R.array.list_chat_system,
                                 defaultValue = 0) { _, d ->
                             launch {
-                                sleep(800)//等待设置完成
+                                delay(800)//等待设置完成
                                 MainService.loadChatSystem()
                                 GlobalApp.toastInfo("对话系统切换完成")
                             }
@@ -285,8 +293,8 @@ class LaboratoryActivity : ReturnableActivity() {
     ) = BottomDialog.builder(this) {
         peekHeightProportion = 0.6f
         expandable = false
-        title(title, true)
-        content(SettingItemBuilder(items, PluginConfig))
+        title(title, round = true, centerTitle = true)
+        content(SettingItemBuilder(this@LaboratoryActivity, items, PluginConfig))
     }
 
 }

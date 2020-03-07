@@ -3,9 +3,12 @@ package cn.vove7.common.appbus
 import cn.vove7.common.BuildConfig
 import cn.vove7.common.app.GlobalLog
 import cn.vove7.vtp.log.Vog
+import kotlinx.coroutines.CoroutineScope
 import org.greenrobot.eventbus.EventBus
 import java.lang.Thread.sleep
 import kotlin.concurrent.thread
+import kotlin.coroutines.CoroutineContext
+import kotlin.coroutines.EmptyCoroutineContext
 
 object AppBus {
     const val EVENT_LOGOUT = "e_logout"
@@ -43,6 +46,8 @@ object AppBus {
 
 //    const val ORDER_STOP_DEBUG = "stop_debug"
 
+    val scope by lazy { BusScope() }
+
     @JvmStatic
     fun post(data: Any) {
         if (BuildConfig.DEBUG) {//打印函数栈
@@ -55,6 +60,7 @@ object AppBus {
     }
 
     private val threadList = mutableListOf<Thread>()
+
     private fun removeByName(name: String) {
         try {
             threadList.removeAll {
@@ -95,6 +101,11 @@ object AppBus {
 
     fun unreg(a: Any) {
         EventBus.getDefault().unregister(a)
+    }
+
+    class BusScope : CoroutineScope {
+        override val coroutineContext: CoroutineContext
+            get() = EmptyCoroutineContext
     }
 }
 

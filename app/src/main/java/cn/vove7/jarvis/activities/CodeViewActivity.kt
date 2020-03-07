@@ -22,6 +22,10 @@ class CodeViewActivity : ReturnableActivity() {
 
     lateinit var code: String
 
+    override val layoutRes: Int
+        get() = R.layout.activity_ciew_code
+    override val darkTheme: Int
+        get() = R.style.DarkTheme
 
     companion object {
         fun viewCode(context: Context, title: String, code: String, type: String) {
@@ -50,8 +54,6 @@ class CodeViewActivity : ReturnableActivity() {
             finish()
             return
         }
-
-        setContentView(R.layout.activity_ciew_code)
 
         code_view.showCode(code)
     }

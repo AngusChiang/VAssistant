@@ -7,6 +7,7 @@ import android.view.KeyEvent
 import android.view.View
 import android.widget.CheckedTextView
 import android.widget.RelativeLayout
+import androidx.appcompat.app.AppCompatActivity
 import cn.vove7.bottomdialog.BottomDialog
 import cn.vove7.common.app.AppConfig
 import cn.vove7.common.app.GlobalApp
@@ -18,6 +19,7 @@ import cn.vove7.common.utils.runOnUi
 import cn.vove7.common.utils.startActivity
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.activities.base.BaseActivity
+import cn.vove7.jarvis.lifecycle.LifecycleScope
 import cn.vove7.jarvis.tools.Tutorials
 import cn.vove7.jarvis.tools.baiduaip.BaiduAipHelper
 import cn.vove7.jarvis.tools.baiduaip.model.TextOcrItem
@@ -26,8 +28,10 @@ import cn.vove7.jarvis.view.dp
 import cn.vove7.vtp.asset.AssetHelper
 import cn.vove7.vtp.log.Vog
 import kotlinx.android.synthetic.main.activity_text_ocr.*
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.joinAll
+import kotlinx.coroutines.launch
 import java.util.*
 
 /**
@@ -36,7 +40,12 @@ import java.util.*
  * @author 11324
  * 2019/3/11
  */
-class TextOcrActivity : BaseActivity() {
+class TextOcrActivity : AppCompatActivity() {
+
+    private val lifecycleScope by lazy {
+        LifecycleScope(lifecycle)
+    }
+
     private val wordItems = mutableListOf<Model>()
 
     companion object {
@@ -52,13 +61,13 @@ class TextOcrActivity : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_text_ocr)
         window.setWindowAnimations(R.style.fade)
         window.decorView.systemUiVisibility = window.decorView.systemUiVisibility or View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR
 
         intent?.let {
             if (it.hasExtra("items")) {
                 copy(it.getSerializableExtra("items") as List<TextOcrItem>)
-                setContentView(R.layout.activity_text_ocr)
                 buildContent()
             } else {//请求截屏
                 ocrWithScreenShot()
@@ -76,7 +85,7 @@ class TextOcrActivity : BaseActivity() {
     }
 
     private fun ocrWithScreenShot() {
-        launch {
+        lifecycleScope.launch {
             //异步
             try {
                 val path = SystemBridge.screen2File()?.absolutePath
@@ -200,7 +209,7 @@ class TextOcrActivity : BaseActivity() {
         hasT = true
         GlobalApp.toastInfo("开始翻译")
 
-        launchIo {
+        lifecycleScope.launch(Dispatchers.IO) {
             val defs = wordItems.map {
                 val text = it.item.text
                 async {
@@ -218,7 +227,7 @@ class TextOcrActivity : BaseActivity() {
             }
             defs.joinAll()
             //监听
-            if (isFinishing) return@launchIo
+            if (isFinishing) return@launch
             withMain {
                 GlobalApp.toastSuccess("翻译完成")
             }
@@ -252,11 +261,11 @@ class TextOcrActivity : BaseActivity() {
     private val statusbarHeight: Int by lazy {
         var statusBarHeight1 = -1
         //获取status_bar_height资源的ID
-        val resourceId = resources.getIdentifier("status_bar_height",
+        val resourceId = resources!!.getIdentifier("status_bar_height",
                 "dimen", "android")
         if (resourceId > 0) {
             //根据资源ID获取响应的尺寸值
-            statusBarHeight1 = resources.getDimensionPixelSize(resourceId)
+            statusBarHeight1 = resources!!.getDimensionPixelSize(resourceId)
         }
         Vog.d("状态栏高度 ---> $statusBarHeight1")
         statusBarHeight1
@@ -270,7 +279,7 @@ class TextOcrActivity : BaseActivity() {
     var d: BottomDialog? = null
 
     private fun editDialog(text: CharSequence, sub: String? = null) {
-        d = TextOperationDialog(this, TextOperationDialog.TextModel(text, sub)).bottomDialog
+        d = TextOperationDialog(this, lifecycleScope, TextOperationDialog.TextModel(text, sub)).bottomDialog
     }
 
     class Model(

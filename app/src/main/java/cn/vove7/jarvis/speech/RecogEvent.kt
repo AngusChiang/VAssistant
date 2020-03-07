@@ -13,6 +13,7 @@ interface RecogEvent {
         const val CODE_NO_RECORDER_PERMISSION = 3
         const val CODE_ENGINE_BUSY = 4
         const val CODE_RECORDER_OPEN_FAIL = 5
+        const val CODE_NO_VOICE = 6
 
         fun codeString(code: Int): String {
             return mapOf(
@@ -21,6 +22,7 @@ interface RecogEvent {
                     Pair(CODE_NET_ERROR, "网络错误"),
                     Pair(CODE_NO_RECORDER_PERMISSION, "无麦克风权限"),
                     Pair(CODE_ENGINE_BUSY, "引擎忙"),
+                    Pair(CODE_NO_VOICE, "无识别结果"),
                     Pair(CODE_RECORDER_OPEN_FAIL, "麦克风打开失败")
             )[code] ?: "未知错误"
         }

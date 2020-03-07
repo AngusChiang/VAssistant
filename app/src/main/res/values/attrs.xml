@@ -13,4 +13,10 @@
     <declare-styleable name="WaveView">
         <attr name="waveColor" format="color|reference" />
     </declare-styleable>
+
+    <!--自定义主题属性-->
+    <attr name="app_background" format="color|reference" />
+    <attr name="app_foreground" format="color|reference" />
+    <attr name="primary_text_color" format="color|reference" />
+    <attr name="secondary_text_color" format="color|reference" />
 </resources>

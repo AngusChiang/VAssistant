@@ -8,8 +8,6 @@ import android.graphics.Color
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import android.view.Gravity
 import android.view.View
 import android.view.animation.AlphaAnimation
@@ -82,6 +80,9 @@ class ScreenAssistActivity : BaseActivity() {
         }
     }
 
+    override val layoutRes: Int
+        get() = R.layout.dialog_assist
+
     private val isReady: Boolean
         get() = !showProgressBar
 
@@ -124,7 +125,6 @@ class ScreenAssistActivity : BaseActivity() {
                 setStatusBarLight()
             }
         }
-        setContentView(R.layout.dialog_assist)
         DataCollector.buriedPoint("sa_0")
 
         showProgressBar = true
@@ -338,7 +338,7 @@ class ScreenAssistActivity : BaseActivity() {
                             finish()
                         }
                     }
-                    R.id.item_spot_with_default-> {
+                    R.id.item_spot_with_default -> {
                         imageClassify()
                     }
                 }
