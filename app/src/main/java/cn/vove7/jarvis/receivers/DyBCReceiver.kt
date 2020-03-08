@@ -54,7 +54,11 @@ abstract class DyBCReceiver : BroadcastReceiver() {
         }
         open = false
         try {
-            GlobalApp.APP.unregisterReceiver(this)
+            if (receiverType == TYPE_LOCAL) {
+                LocalBroadcastManager.getInstance(GlobalApp.APP).unregisterReceiver(this)
+            } else {
+                GlobalApp.APP.unregisterReceiver(this)
+            }
         } catch (e: Exception) {
         }
     }
