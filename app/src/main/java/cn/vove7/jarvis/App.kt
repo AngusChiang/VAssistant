@@ -3,7 +3,6 @@ package cn.vove7.jarvis
 import android.content.ContentProvider
 import android.content.ContentValues
 import android.content.Intent
-import android.content.res.Configuration
 import android.database.Cursor
 import android.net.Uri
 import android.os.Build
@@ -107,8 +106,9 @@ class InitCp : ContentProvider() {
                 }
             }
 
-            WorkManager.getInstance(GlobalApp.APP)
-                    .enqueue(DataSyncWork.getRequest())
+            val wm = WorkManager.getInstance(GlobalApp.APP)
+            wm.cancelAllWork()
+            wm.enqueue(DataSyncWork.getRequest())
 
             ShortcutUtil.initShortcut()
             AdvanAppHelper.getPkgList()

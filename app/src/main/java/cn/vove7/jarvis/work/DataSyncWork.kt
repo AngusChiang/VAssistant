@@ -22,7 +22,6 @@ import java.util.concurrent.TimeUnit
 class DataSyncWork(context: Context, workerParams: WorkerParameters) : Worker(context, workerParams) {
 
     companion object {
-
         fun getRequest(): WorkRequest = PeriodicWorkRequest
                 .Builder(DataSyncWork::class.java,
                         AppConfig.netConfig("dataSyncInterval", 30L), TimeUnit.MINUTES)
@@ -32,6 +31,7 @@ class DataSyncWork(context: Context, workerParams: WorkerParameters) : Worker(co
                                 .setRequiredNetworkType(NetworkType.CONNECTED)
                                 .build()
                 )
+                .addTag("DataSyncWork")
                 .build()
     }
 
