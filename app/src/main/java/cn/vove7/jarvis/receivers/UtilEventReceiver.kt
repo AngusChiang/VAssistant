@@ -3,7 +3,6 @@ package cn.vove7.jarvis.receivers
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
-import android.content.res.Configuration
 import cn.vove7.bottomdialog.BottomDialogActivity
 import cn.vove7.bottomdialog.builder.oneButton
 import cn.vove7.bottomdialog.extension.awesomeHeader
@@ -26,6 +25,9 @@ import org.greenrobot.eventbus.Subscribe
  * 2018/11/24
  */
 object UtilEventReceiver : DyBCReceiver() {
+
+    override val receiverType: Int
+        get() = TYPE_LOCAL
 
     override fun onStart() {
         AppBus.reg(this)

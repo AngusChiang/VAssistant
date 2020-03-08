@@ -2,6 +2,7 @@ package cn.vove7.jarvis.receivers
 
 import android.content.BroadcastReceiver
 import android.content.IntentFilter
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import cn.vove7.common.app.GlobalApp
 
 /**
@@ -14,7 +15,14 @@ import cn.vove7.common.app.GlobalApp
 abstract class DyBCReceiver : BroadcastReceiver() {
     abstract val intentFilter: IntentFilter
 
+    companion object {
+        const val TYPE_GLOBAL = 0
+        const val TYPE_LOCAL = 1
+    }
+
     var open = false
+
+    open val receiverType = TYPE_GLOBAL
 
     /**
      * 注册广播接收器
@@ -25,8 +33,13 @@ abstract class DyBCReceiver : BroadcastReceiver() {
         }
         open = true
         GlobalApp.APP.apply {
-            val intent = registerReceiver(this@DyBCReceiver, intentFilter)
-            if (intent != null) onReceive(this, intent)//注册时即通知
+            if (receiverType == TYPE_LOCAL) {
+                val intent = registerReceiver(this@DyBCReceiver, intentFilter)
+                if (intent != null) onReceive(this, intent)//注册时即通知
+            } else {
+                LocalBroadcastManager.getInstance(this)
+                        .registerReceiver(this@DyBCReceiver, intentFilter)
+            }
         }
     }
 
