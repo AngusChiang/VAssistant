@@ -15,6 +15,7 @@
         <item name="primary_text_color">#d5d5d5</item>
 
         <item name="md_button_selector">@color/google_green</item>
+        <item name="md_color_content">@color/primary_text</item>
         <item name="md_color_button_text">#BDBDBD</item>
         <item name="dialogTheme">@style/Dialog_Fullscreen</item>
         <!--<item name="md_color_content">@color/your_color</item>-->
@@ -22,8 +23,9 @@
         <item name="secondary_text_color">@color/secondary_text</item>
         <!--<item name="android:colorControlHighlight">@color/colorPrimary</item>-->
 
-        <item name="popupTheme">@style/ThemeOverlay.AppCompat.DayNight</item>
-        <item name="popupMenuStyle">@style/ThemeOverlay.AppCompat.DayNight</item>
+        <item name="android:popupTheme">@style/PopMenu.Dark</item>
+        <item name="popupTheme">@style/PopMenu.Dark</item>
+        <item name="popupMenuStyle">@style/PopMenu.Dark</item>
     </style>
 
     <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
@@ -42,6 +44,7 @@
         <item name="app_background">#f4f4f4</item>
         <item name="app_foreground">#fdfdfe</item>
         <!--<item name="android:colorControlHighlight">@color/colorPrimary</item>-->
+        <item name="android:popupMenuStyle">@style/ThemeOverlay.AppCompat.Light</item>
         <item name="popupMenuStyle">@style/ThemeOverlay.AppCompat.Light</item>
         <item name="popupTheme">@style/ThemeOverlay.AppCompat.Light</item>
         <item name="secondary_text_color">@color/secondary_text</item>
@@ -109,6 +112,54 @@
     <style name="ScreenAssist" parent="ScreenPicker">
         <item name="android:windowEnterAnimation">@anim/fade_in_bottom</item>
         <item name="android:windowExitAnimation">@anim/fade_out_bottom</item>
+        <item name="bd_bg_color">@color/app_foreground</item>
+    </style>
+
+    <style name="TextOcr.Dark" parent="TextOcr">
+
+        <item name="primary_text_color">#d5d5d5</item>
+
+        <item name="md_button_selector">@color/google_green</item>
+        <item name="md_color_button_text">#BDBDBD</item>
+        <item name="app_background">@color/app_dark_background</item>
+        <item name="app_foreground">@color/app_dark_foreground</item>
+        <item name="secondary_text_color">@color/secondary_text</item>
+
+        <item name="md_background_color">@color/app_dark_background</item>
+        <item name="md_color_content">@color/primary_text</item>
+
+        <item name="popupTheme">@style/PopMenu.Dark</item>
+        <item name="android:popupMenuStyle">@style/PopMenu.Dark</item>
+        <item name="popupMenuStyle">@style/PopMenu.Dark</item>
+
+        <item name="bd_bg_color">@color/app_dark_foreground</item>
+        <item name="android:textColorPrimary">#fff</item>
+    </style>
+
+    <style name="ScreenAssist.Dark" parent="ScreenAssist">
+
+        <item name="primary_text_color">#d5d5d5</item>
+
+        <item name="md_button_selector">@color/google_green</item>
+        <item name="md_color_button_text">#BDBDBD</item>
+        <item name="app_background">@color/app_dark_background</item>
+        <item name="app_foreground">@color/app_dark_foreground</item>
+        <item name="secondary_text_color">@color/secondary_text</item>
+
+        <item name="md_background_color">@color/app_dark_background</item>
+        <item name="md_color_content">@color/primary_text</item>
+        <item name="popupTheme">@style/PopMenu.Dark</item>
+        <item name="android:popupMenuStyle">@style/PopMenu.Dark</item>
+        <item name="popupMenuStyle">@style/PopMenu.Dark</item>
+        <item name="bd_bg_color">@color/app_dark_foreground</item>
+        <item name="android:textColorPrimary">#fff</item>
+        <item name="popupMenuBackground">@color/app_dark_foreground</item>
+        <item name="android:popupBackground">@color/app_dark_foreground</item>
+    </style>
+
+    <style name="PopMenu.Dark" parent="ThemeOverlay.AppCompat.Dark">
+        <item name="background">@color/app_dark_background</item>
+        <item name="android:windowBackground">@color/app_dark_background</item>
     </style>
 
     <style name="fade" parent="@android:style/Animation.Activity">

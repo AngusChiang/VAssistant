@@ -1,6 +1,7 @@
 package cn.vove7.jarvis.view.dialog
 
 import android.app.Activity
+import android.view.Gravity
 import android.widget.PopupMenu
 import android.widget.TextView
 import cn.vove7.bottomdialog.BottomDialog

@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#fcfdfe"
+    android:background="?attr/app_background"
     tools:context=".activities.NewInstActivity">
 
     <com.google.android.material.appbar.AppBarLayout
@@ -26,8 +26,8 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
-        android:scrollbars="none"
         android:padding="10dp"
+        android:scrollbars="none"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
         <LinearLayout
@@ -39,10 +39,10 @@
                 android:id="@+id/parent_lay"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:background="@color/red_500"
                 android:padding="10dp"
                 android:visibility="gone"
-                tools:visibility="visible"
-                android:background="@color/red_500">
+                tools:visibility="visible">
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -78,8 +78,9 @@
                     <EditText
                         android:id="@+id/desc_text"
                         android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
                         android:hint="@string/text_inst_name"
-                        android:layout_height="wrap_content" />
+                        android:textColor="?attr/primary_text_color" />
                 </com.google.android.material.textfield.TextInputLayout>
 
 
@@ -118,9 +119,9 @@
 
                     <com.google.android.material.textfield.TextInputLayout
                         android:layout_width="match_parent"
-                        android:layout_weight="1"
+                        android:layout_height="wrap_content"
 
-                        android:layout_height="wrap_content">
+                        android:layout_weight="1">
 
                         <EditText
                             android:id="@+id/activity_name"
@@ -134,8 +135,9 @@
                 <CheckBox
                     android:id="@+id/check_box_auto_launch_app"
                     android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
                     android:text="自启动App(在脚本动作执行前启动应用)"
-                    android:layout_height="wrap_content" />
+                    android:textColor="?attr/primary_text_color" />
 
                 <include layout="@layout/group_line" />
             </LinearLayout>
@@ -153,14 +155,15 @@
             <cn.vove7.vtp.view.listview.WrapContentListView
                 android:id="@+id/regex_str_list"
                 android:layout_width="match_parent"
-                android:minHeight="50dp"
                 android:layout_height="wrap_content"
-                android:divider="#00000000" />
+                android:divider="#00000000"
+                android:minHeight="50dp" />
 
             <TextView
                 android:layout_width="match_parent"
-                android:text="长按删除"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                android:textColor="?attr/primary_text_color"
+                android:text="长按删除" />
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -198,8 +201,8 @@
             <thereisnospon.codeview.CodeView
                 android:id="@+id/code_view"
                 android:layout_width="match_parent"
-                android:minHeight="100dp"
-                android:layout_height="200dp">
+                android:layout_height="200dp"
+                android:minHeight="100dp">
 
             </thereisnospon.codeview.CodeView>
 

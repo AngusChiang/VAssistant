@@ -14,8 +14,8 @@
     <color name="icons">#FFFFFF</color>
     <color name="divider">#BDBDBD</color>
     <color name="app_background">#f4f4f4</color>
-    <color name="app_dark_background">#0D293E</color>
-    <color name="app_foreground">#606060</color>
+    <color name="app_dark_background">#1A1A1A</color>
+    <color name="app_foreground">#fdfdfe</color>
     <color name="app_dark_foreground">#303030</color>
 
     <color name="status_green">#13bd10</color>

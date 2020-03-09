@@ -2,7 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="horizontal"
+    android:orientation="vertical"
     android:paddingStart="?attr/dialogPreferredPadding"
     android:paddingTop="5dp"
     android:paddingBottom="5dp"
@@ -10,16 +10,17 @@
 
     <TextView
         android:id="@+id/desc_text"
-        android:text="1234"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:text="1234"
+        android:textColor="?attr/colorAccent"
         android:textSize="15sp"
         android:textStyle="bold" />
 
     <EditText
         android:id="@+id/param_text"
-        android:layout_marginStart="20dp"
         android:layout_width="match_parent"
-        android:hint="当前动作无需指定参数"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:hint="当前动作无需指定参数" />
+
 </LinearLayout>

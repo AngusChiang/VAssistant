@@ -1,15 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:gravity="center"
+    android:layout_height="50dp"
     android:clickable="false"
-    android:layout_height="50dp">
+    android:gravity="center">
 
     <ImageView
         android:id="@+id/image_view"
         android:layout_width="match_parent"
-        android:src="@drawable/ic_twotone_graphic_eq"
-        android:background="?android:selectableItemBackgroundBorderless"
         android:layout_height="45dp"
-        android:padding="5dp" />
+        android:background="?android:selectableItemBackgroundBorderless"
+        android:padding="5dp"
+        android:src="@drawable/ic_twotone_graphic_eq"
+        android:tint="?attr/primary_text_color" />
 </LinearLayout>

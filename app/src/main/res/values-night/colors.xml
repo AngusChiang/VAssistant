@@ -3,4 +3,7 @@
 
     <color name="bg_splash">@color/app_dark_background</color>
 
+    <color name="primary_text">#d5d5d5</color>
+
+
 </resources>

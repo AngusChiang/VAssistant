@@ -725,7 +725,7 @@ object MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
             } else {
                 //防抖动
                 val now = SystemClock.uptimeMillis()
-                if (now - lastStartRecog > 3000) {
+                if (now - lastStartRecog > 2000) {
                     lastStartRecog = now
                 } else {
                     Vog.d("switchRecog 防抖动")

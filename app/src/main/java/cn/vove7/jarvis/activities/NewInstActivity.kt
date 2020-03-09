@@ -9,7 +9,6 @@ import android.os.Bundle
 import android.view.KeyEvent
 import android.view.View
 import android.widget.*
-import androidx.appcompat.widget.Toolbar
 import cn.vove7.bottomdialog.BottomDialog
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.app.GlobalLog
@@ -42,6 +41,7 @@ import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.customview.customView
 import com.afollestad.materialdialogs.input.input
 import kotlinx.android.synthetic.main.activity_new_inst.*
+import thereisnospon.codeview.CodeViewTheme
 import java.io.File
 import java.util.*
 
@@ -76,9 +76,9 @@ class NewInstActivity : ReturnableActivity(), View.OnClickListener {
     private var scriptType: String? = null
 
     override val layoutRes: Int
-        get() =R.layout.activity_new_inst
+        get() = R.layout.activity_new_inst
 
-            override fun onCreate(savedInstanceState: Bundle?) {
+    override fun onCreate(savedInstanceState: Bundle?) {
         enterTime = System.currentTimeMillis()
         super.onCreate(savedInstanceState)
 
@@ -98,6 +98,10 @@ class NewInstActivity : ReturnableActivity(), View.OnClickListener {
         test_regex.setOnClickListener(this)
         regAdapter = RegListAdapter(this, regs)
         regex_str_list.adapter = regAdapter
+        if (isDarkTheme) {
+            code_view.setBackgroundColor(0)
+            code_view.setTheme(CodeViewTheme.DARK)
+        }
     }
 
 
@@ -343,7 +347,9 @@ class NewInstActivity : ReturnableActivity(), View.OnClickListener {
                 scriptText = editNode.action?.actionScript
                 scriptType = editNode.action.scriptType
             }
-            selScriptDialog = MaterialDialog(this).noAutoDismiss()
+            selScriptDialog = MaterialDialog(this)
+                    .title(text = "脚本代码")
+                    .noAutoDismiss()
                     .customView(view = dView, scrollable = true)
                     .positiveButton(R.string.text_confirm) { d ->
                         scriptText = scriptTextView.text.toString()

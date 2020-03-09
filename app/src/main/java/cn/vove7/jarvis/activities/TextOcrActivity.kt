@@ -7,7 +7,6 @@ import android.view.KeyEvent
 import android.view.View
 import android.widget.CheckedTextView
 import android.widget.RelativeLayout
-import androidx.appcompat.app.AppCompatActivity
 import cn.vove7.bottomdialog.BottomDialog
 import cn.vove7.common.app.AppConfig
 import cn.vove7.common.app.GlobalApp
@@ -19,7 +18,6 @@ import cn.vove7.common.utils.runOnUi
 import cn.vove7.common.utils.startActivity
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.activities.base.BaseActivity
-import cn.vove7.jarvis.lifecycle.LifecycleScope
 import cn.vove7.jarvis.tools.Tutorials
 import cn.vove7.jarvis.tools.baiduaip.BaiduAipHelper
 import cn.vove7.jarvis.tools.baiduaip.model.TextOcrItem
@@ -40,13 +38,14 @@ import java.util.*
  * @author 11324
  * 2019/3/11
  */
-class TextOcrActivity : AppCompatActivity() {
-
-    private val lifecycleScope by lazy {
-        LifecycleScope(lifecycle)
-    }
+class TextOcrActivity : BaseActivity() {
+    override val darkTheme: Int
+        get() = R.style.TextOcr_Dark
 
     private val wordItems = mutableListOf<Model>()
+
+    override val layoutRes: Int
+        get() = R.layout.activity_text_ocr
 
     companion object {
         fun start(act: Context, items: ArrayList<TextOcrItem>, bundle: Bundle? = null) {
@@ -61,7 +60,6 @@ class TextOcrActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_text_ocr)
         window.setWindowAnimations(R.style.fade)
         window.decorView.systemUiVisibility = window.decorView.systemUiVisibility or View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR
 

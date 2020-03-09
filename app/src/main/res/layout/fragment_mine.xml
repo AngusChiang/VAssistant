@@ -136,7 +136,7 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="20dp"
         android:src="@drawable/ripple_voice_on_assist"
-        app:backgroundTint="?attr/app_background"
+        app:backgroundTint="?attr/app_foreground"
         app:elevation="1dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"

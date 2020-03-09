@@ -417,30 +417,25 @@ class SettingsActivity : ReturnableActivity() {
     )
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        if (resultCode == Activity.RESULT_OK) {//选择文件回调
-            when (requestCode) {
-                1 -> {
-                    val uri = data?.data
-                    if (uri != null) {
-                        try {
-                            val path = UriUtils.getPathFromUri(this, uri)
-                            when {
-                                path == null -> GlobalApp.toastError("路径获取失败")
-                                path.endsWith(".bin") -> setPathAndReload(path)
-                                else -> GlobalApp.toastInfo("请选择.bin文件")
-                            }
-                        } catch (e: Exception) {
-                            GlobalLog.err(e)
-                            GlobalApp.toastError("设置失败")
-                        }
-                    } else {
-                        GlobalApp.toastError(getString(R.string.text_open_failed))
+        if (resultCode == Activity.RESULT_OK && requestCode == 1) {//选择文件回调
+            val uri = data?.data
+            if (uri != null) {
+                try {
+                    val path = UriUtils.getPathFromUri(this, uri)
+                    when {
+                        path == null -> GlobalApp.toastError("路径获取失败")
+                        path.endsWith(".bin") -> setPathAndReload(path)
+                        else -> GlobalApp.toastInfo("请选择.bin文件")
                     }
+                } catch (e: Exception) {
+                    GlobalLog.err(e)
+                    GlobalApp.toastError("设置失败, 请尝试使用其他文件管理器选择文件")
                 }
-                else -> {
-                    super.onActivityResult(requestCode, resultCode, data)
-                }
+            } else {
+                GlobalApp.toastError(getString(R.string.text_open_failed))
             }
+        } else {
+            super.onActivityResult(requestCode, resultCode, data)
         }
     }
 

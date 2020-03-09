@@ -98,12 +98,12 @@ open class MyStyle : Bootstrap() {
     init {
         this.addRule("body", "line-height: 1.6", "padding: 5px")
 
-        this.addRule("h1", "font-size: 28px")
-        this.addRule("h2", "font-size: 24px")
-        this.addRule("h3", "font-size: 18px")
-        this.addRule("h4", "font-size: 16px")
-        this.addRule("h5", "font-size: 14px")
-        this.addRule("h6", "font-size: 14px")
+        this.addRule("h1", "font-size: 28px", "color: #00a95a")
+        this.addRule("h2", "font-size: 24px", "color: #00a95a")
+        this.addRule("h3", "font-size: 18px", "color: #00a95a")
+        this.addRule("h4", "font-size: 16px", "color: #00a95a")
+        this.addRule("h5", "font-size: 14px", "color: #00a95a")
+        this.addRule("h6", "font-size: 14px", "color: #00a95a")
         this.addRule(
                 "pre",
                 "position: relative",

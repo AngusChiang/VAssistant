@@ -1,6 +1,5 @@
 package cn.vove7.jarvis.activities.screenassistant
 
-import android.app.AlertDialog
 import android.app.Dialog
 import android.content.Intent
 import android.graphics.Bitmap
@@ -26,6 +25,8 @@ import cn.vove7.jarvis.tools.baiduaip.BaiduAipHelper
 import cn.vove7.jarvis.view.bottomsheet.AssistSessionGridController
 import cn.vove7.jarvis.view.dialog.ImageClassifyResultDialog
 import cn.vove7.vtp.log.Vog
+import com.afollestad.materialdialogs.MaterialDialog
+import com.afollestad.materialdialogs.callbacks.onDismiss
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import kotlinx.android.synthetic.main.dialog_assist.*
 import kotlinx.coroutines.Dispatchers
@@ -67,6 +68,9 @@ class ScreenAssistActivity : BaseActivity() {
      */
     private lateinit var screenPath: String
     private lateinit var bottomController: AssistSessionGridController
+
+    override val darkTheme: Int
+        get() = R.style.ScreenAssist_Dark
 
     companion object {
 
@@ -435,67 +439,65 @@ class ScreenAssistActivity : BaseActivity() {
             return
         }
 
-        AlertDialog.Builder(this).setTitle("识别结果")
-                .setMessage(result)
-                .setPositiveButton("复制") { _, _ -> SystemBridge.setClipText(result) }
-                .setNegativeButton("分享") { _, _ -> SystemBridge.shareText(result) }
-                .apply {
-                    setOnDismissListener {
-                        finishIfNotShowing()
+        MaterialDialog(this).show {
+            title(text = "识别结果")
+            message(text = result)
+            positiveButton(text = "复制") { SystemBridge.setClipText(result) }
+            negativeButton(text = "分享") { SystemBridge.shareText(result) }
+            onDismiss {
+                finishIfNotShowing()
+            }
+            when {
+                result.startsWith("http", ignoreCase = true)
+                        || result.matches(".*?://.*".toRegex()) -> {
+                    neutralButton(text = "访问") {
+                        finish()
+                        SystemBridge.openUrl(result.substring(0, 5).toLowerCase(Locale.ROOT) // 某些HTTP://
+                                + result.substring(5))
                     }
-                    when {
-                        result.startsWith("http", ignoreCase = true)
-                                || result.matches(".*?://.*".toRegex()) -> {
-                            setNeutralButton("访问") { _, _ ->
-                                finish()
-                                SystemBridge.openUrl(result.substring(0, 5).toLowerCase() // 某些HTTP://
-                                        + result.substring(5))
-                            }
-                        }
-                        TextHelper.isEmail(result) -> {
-                            setNeutralButton("发邮件") { _, _ ->
-                                finish()
-                                SystemBridge.sendEmail(result)
-                            }
-                        }
-                        result.startsWith("market:", ignoreCase = true) -> {
-                            setNeutralButton("打开应用市场") { _, _ ->
-                                finish()
-                                val intent = Intent(Intent.ACTION_VIEW)
-                                intent.data = Uri.parse(result)
-                                //跳转酷市场
-                                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                                startActivity(intent)
-                            }
-                        }
-                        result.startsWith("smsto:", ignoreCase = true) -> {
-                            setNeutralButton("发送短信") { _, _ ->
-                                val ss = result.split(':')
-                                val p = try {
-                                    ss[1]
-                                } catch (e: Exception) {
-                                    GlobalApp.toastError("未发现手机号")
-                                    return@setNeutralButton
-                                }
-                                finish()
-                                val content = try {
-                                    ss[2]
-                                } catch (e: Exception) {
-                                    ""
-                                }
-                                SystemBridge.sendSMS(p, content)
-                            }
-                        }
-                        result.startsWith("tel:", ignoreCase = true) -> {
-                            setNeutralButton("拨号") { _, _ ->
-                                finish()
-                                SystemBridge.call(result.substring(4))
-                            }
-                        }
-                    }
-                    show()
                 }
-
+                TextHelper.isEmail(result) -> {
+                    neutralButton(text = "发邮件") {
+                        finish()
+                        SystemBridge.sendEmail(result)
+                    }
+                }
+                result.startsWith("market:", ignoreCase = true) -> {
+                    neutralButton(text = "打开应用市场") {
+                        finish()
+                        val intent = Intent(Intent.ACTION_VIEW)
+                        intent.data = Uri.parse(result)
+                        //跳转酷市场
+                        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                        startActivity(intent)
+                    }
+                }
+                result.startsWith("smsto:", ignoreCase = true) -> {
+                    neutralButton(text = "发送短信") {
+                        val ss = result.split(':')
+                        val p = try {
+                            ss[1]
+                        } catch (e: Exception) {
+                            GlobalApp.toastError("未发现手机号")
+                            return@neutralButton
+                        }
+                        finish()
+                        val content = try {
+                            ss[2]
+                        } catch (e: Exception) {
+                            ""
+                        }
+                        SystemBridge.sendSMS(p, content)
+                    }
+                }
+                result.startsWith("tel:", ignoreCase = true) -> {
+                    neutralButton(text = "拨号") {
+                        finish()
+                        SystemBridge.call(result.substring(4))
+                    }
+                }
+            }
+        }
     }
 
     /**
