@@ -85,7 +85,7 @@ abstract class FloatyPanel(width: Int, height: Int) : AbFloatWindow(
         showText(voiceText)
     }
 
-    private var isHiding = false
+    var isHiding = false
 
     override fun onRemove() {
         isHiding = true

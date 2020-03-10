@@ -73,7 +73,7 @@ class DefaultPanel : FloatyPanel(
                         .createCircularReveal(animationBody, width / 2, 0, 0f, width.toFloat())
                         .apply {
                             interpolator = AccelerateInterpolator()
-                            duration = 400
+                            duration = 300
                             start()
                         }
             }
@@ -92,7 +92,11 @@ class DefaultPanel : FloatyPanel(
             }
             else -> AnimationUtils.loadAnimation(context, R.anim.pop_fade_out).apply {
                 listener {
-                    onEnd { superRemove() }
+                    onEnd {
+                        if (isHiding) {
+                            superRemove()
+                        }
+                    }
                 }
                 runInCatch {
                     animationBody.startAnimation(this)
@@ -109,7 +113,11 @@ class DefaultPanel : FloatyPanel(
                         duration = 300
                         interpolator = AccelerateInterpolator()
                         listener {
-                            onEnd { superRemove() }
+                            onEnd {
+                                if (isHiding) {
+                                    superRemove()
+                                }
+                            }
                         }
                         start()
                     }
