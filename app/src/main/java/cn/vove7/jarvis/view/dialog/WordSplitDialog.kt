@@ -1,11 +1,13 @@
 package cn.vove7.jarvis.view.dialog
 
+import androidx.core.content.ContextCompat
 import cn.vove7.bottomdialog.BottomDialog
 import cn.vove7.bottomdialog.builder.buttons
 import cn.vove7.bottomdialog.builder.withCloseIcon
 import cn.vove7.bottomdialog.extension.awesomeHeader
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.bridges.SystemBridge
+import cn.vove7.common.utils.spanColor
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.activities.base.BaseActivity
 import cn.vove7.jarvis.view.dialog.contentbuilder.WordSplitBuilder
@@ -34,7 +36,7 @@ class WordSplitDialog(
         content(builder)
 
         buttons {
-            positiveButton(text = "快速搜索") {
+            positiveButton(text = "快速搜索".spanColor(ContextCompat.getColor(context, R.color.google_green))) {
                 val st = builder.getCheckedText()
                 if (st.isEmpty()) {
                     GlobalApp.toastWarning(R.string.text_select_nothing)

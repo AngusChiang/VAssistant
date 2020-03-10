@@ -2,6 +2,7 @@ package cn.vove7.jarvis.view.dialog
 
 import android.widget.PopupMenu
 import android.widget.TextView
+import androidx.core.content.ContextCompat
 import cn.vove7.bottomdialog.BottomDialog
 import cn.vove7.bottomdialog.builder.ButtonsBuilder
 import cn.vove7.bottomdialog.builder.buttons
@@ -11,10 +12,7 @@ import cn.vove7.bottomdialog.extension.awesomeHeader
 import cn.vove7.common.app.AppConfig
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.bridges.SystemBridge
-import cn.vove7.common.utils.StorageHelper
-import cn.vove7.common.utils.broadcastImageFile
-import cn.vove7.common.utils.content
-import cn.vove7.common.utils.runOnUi
+import cn.vove7.common.utils.*
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.activities.base.BaseActivity
 import cn.vove7.jarvis.tools.DataCollector
@@ -53,7 +51,7 @@ class TextOperationDialog(
         buttons {
 
             content(cv)
-            positiveButton(text = "复制") {
+            positiveButton(text = "复制".spanColor(ContextCompat.getColor(context, R.color.google_green))) {
                 SystemBridge.setClipText(opText)
                 GlobalApp.toastInfo(R.string.text_copied)
             }

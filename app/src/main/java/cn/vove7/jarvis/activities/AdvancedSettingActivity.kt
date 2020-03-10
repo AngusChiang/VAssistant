@@ -15,6 +15,7 @@ import cn.vove7.common.net.ApiUrls
 import cn.vove7.common.net.WrapperNetHelper
 import cn.vove7.common.net.model.LastDateInfo
 import cn.vove7.common.utils.startActivity
+import cn.vove7.common.utils.times
 import cn.vove7.jarvis.BuildConfig
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.activities.base.ReturnableActivity
@@ -34,6 +35,7 @@ import cn.vove7.jarvis.view.IntentItem
 import cn.vove7.jarvis.view.SwitchItem
 import cn.vove7.jarvis.view.custom.SettingGroupItem
 import cn.vove7.jarvis.view.dialog.ProgressDialog
+import cn.vove7.jarvis.view.dialog.TextOperationDialog
 import cn.vove7.vtp.app.AppHelper
 import cn.vove7.vtp.log.Vog
 import cn.vove7.vtp.sharedpreference.SpHelper
@@ -226,6 +228,9 @@ class AdvancedSettingActivity : ReturnableActivity() {
                         },
                         IntentItem(title = "若琪测试") {
                             MainService.homeControlSystem?.test()
+                        },
+                        IntentItem(title = "根本操作对话框") {
+                            TextOperationDialog(this, TextOperationDialog.TextModel("123" * 50))
                         }
                 )
                 ))
