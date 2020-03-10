@@ -13,13 +13,11 @@
         android:layout_height="wrap_content"
         android:indeterminate="true" />
 
-    <cn.vove7.jarvis.view.custom.WarpLinearLayout
+    <cn.vove7.jarvis.view.custom.SlideFlexboxLayout
         android:id="@+id/words_content"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:paddingStart="12dp"
         android:paddingEnd="12dp"
-        app:align="left"
-        app:horizontal_Space="4dp"
-        app:vertical_Space="4dp" />
+        app:flexWrap="wrap" />
 </LinearLayout>

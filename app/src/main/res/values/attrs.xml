@@ -1,15 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <declare-styleable name="WarpLinearLayout">
-        <attr name="align" format="enum"><!--对齐方式 !-->
-            <enum name="right" value="0" />
-            <enum name="left" value="1" />
-            <enum name="center" value="2" />
-        </attr>
-        <attr name="horizontal_Space" format="dimension" />
-        <attr name="vertical_Space" format="dimension" />
-        <attr name="isFull" format="boolean" />
-    </declare-styleable>
     <declare-styleable name="WaveView">
         <attr name="waveColor" format="color|reference" />
     </declare-styleable>

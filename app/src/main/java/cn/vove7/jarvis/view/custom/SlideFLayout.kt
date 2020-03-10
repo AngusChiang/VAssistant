@@ -6,6 +6,7 @@ import android.util.AttributeSet
 import android.view.MotionEvent
 import android.widget.FrameLayout
 import cn.vove7.slide_picker.SlideDelegate
+import cn.vove7.slide_picker.toggleSelected
 import kotlin.math.sqrt
 
 /**
@@ -23,7 +24,7 @@ class SlideFLayout @JvmOverloads constructor(
             if (target != null) {
                 hasResult = true
             }
-            target?.toggle()
+            target?.toggleSelected()
         }
     }
 

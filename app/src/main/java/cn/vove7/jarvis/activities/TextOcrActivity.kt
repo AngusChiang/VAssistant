@@ -7,6 +7,7 @@ import android.view.KeyEvent
 import android.view.View
 import android.widget.CheckedTextView
 import android.widget.RelativeLayout
+import android.widget.TextView
 import cn.vove7.bottomdialog.BottomDialog
 import cn.vove7.common.app.AppConfig
 import cn.vove7.common.app.GlobalApp
@@ -117,7 +118,7 @@ class TextOcrActivity : BaseActivity() {
 
 
     private val onItemClick: (Model) -> Unit = { model ->
-        if (model.textView?.isChecked == true && wordItems.none { it.textView?.isChecked == true && it != model }) {
+        if (model.textView?.isSelected == true && wordItems.none { it.textView?.isSelected == true && it != model }) {
             editDialog(model.item.text, model.item.subText)
         }
     }
@@ -135,7 +136,7 @@ class TextOcrActivity : BaseActivity() {
             }
             val top = t - statusbarHeight
 
-            CheckedTextView(this).apply {
+            TextView(this).apply {
                 setBackgroundResource(R.drawable.bg_screen_text_high_light_no_radius)
                 Vog.d("buildContent ---> $item")
                 gravity = Gravity.CENTER
@@ -161,7 +162,7 @@ class TextOcrActivity : BaseActivity() {
         }
         floatEditIcon.setOnLongClickListener {
             wordItems.forEach {
-                it.textView?.isChecked = false
+                it.textView?.isSelected = false
             }
             true
         }
@@ -170,7 +171,7 @@ class TextOcrActivity : BaseActivity() {
         }
         rootContent.onTouchUp = { hasResult ->
             if (hasResult) {//一个时 弹出编辑
-                wordItems.find { it.textView?.isChecked ?: false }?.also {
+                wordItems.find { it.textView?.isSelected ?: false }?.also {
                     onItemClick(it)
                 }
             }
@@ -216,7 +217,7 @@ class TextOcrActivity : BaseActivity() {
                         val res = r.transResult
                         it.item.subText = res
                         withMain {
-                            it.textView?.isChecked = true
+                            it.textView?.isSelected = true
                         }
                     } else {
                         it.item.subText = "翻译失败"
@@ -240,7 +241,7 @@ class TextOcrActivity : BaseActivity() {
     private val checkedText
         get() = buildString {
             wordItems.forEach {
-                if (it.textView?.isChecked == true) {
+                if (it.textView?.isSelected == true) {
                     appendln(it.item.text)
                 }
             }
@@ -277,12 +278,12 @@ class TextOcrActivity : BaseActivity() {
     var d: BottomDialog? = null
 
     private fun editDialog(text: CharSequence, sub: String? = null) {
-        d = TextOperationDialog(this, lifecycleScope, TextOperationDialog.TextModel(text, sub)).bottomDialog
+        d = TextOperationDialog(this, TextOperationDialog.TextModel(text, sub)).bottomDialog
     }
 
     class Model(
             val item: TextOcrItem,
-            var textView: CheckedTextView? = null
+            var textView: TextView? = null
     )
 
 }

@@ -1,7 +1,5 @@
 package cn.vove7.jarvis.view.dialog
 
-import android.app.Activity
-import android.view.Gravity
 import android.widget.PopupMenu
 import android.widget.TextView
 import cn.vove7.bottomdialog.BottomDialog
@@ -18,12 +16,12 @@ import cn.vove7.common.utils.broadcastImageFile
 import cn.vove7.common.utils.content
 import cn.vove7.common.utils.runOnUi
 import cn.vove7.jarvis.R
+import cn.vove7.jarvis.activities.base.BaseActivity
 import cn.vove7.jarvis.tools.DataCollector
 import cn.vove7.jarvis.tools.QRTools
 import cn.vove7.jarvis.tools.baiduaip.BaiduAipHelper
 import cn.vove7.jarvis.view.dialog.contentbuilder.ImageContentBuilder
 import cn.vove7.jarvis.view.dialog.contentbuilder.WrappedTextContentBuilder
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import java.io.File
 
@@ -35,10 +33,12 @@ import java.io.File
  * @author Vove
  * 2019/6/7
  */
-class TextOperationDialog(val activity: Activity, scope: CoroutineScope, val textModel: TextModel) {
+class TextOperationDialog(
+        val activity: BaseActivity,
+        val textModel: TextModel
+) {
 
-    val lifeCycleScope = scope
-
+    val lifeCycleScope = activity.lifecycleScope
     //默认已换行
     private var wraped = true
 
@@ -147,8 +147,8 @@ class TextOperationDialog(val activity: Activity, scope: CoroutineScope, val tex
                                 SystemBridge.shareText(editorView.content())
                             }
                             neutralButton(text = "完成") {
-                                TextOperationDialog(activity,
-                                        lifeCycleScope,
+                                TextOperationDialog(
+                                        activity,
                                         TextModel(editorView.content())
                                 )
                                 dismiss()
