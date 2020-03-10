@@ -33,7 +33,7 @@ abstract class DyBCReceiver : BroadcastReceiver() {
         }
         open = true
         GlobalApp.APP.apply {
-            if (receiverType == TYPE_LOCAL) {
+            if (receiverType == TYPE_GLOBAL) {
                 val intent = registerReceiver(this@DyBCReceiver, intentFilter)
                 if (intent != null) onReceive(this, intent)//注册时即通知
             } else {
