@@ -2,9 +2,9 @@ package cn.vove7.jarvis.view.floatwindows
 
 import android.content.Context
 import android.graphics.PixelFormat
-import android.graphics.Point
 import android.os.Build
 import android.view.*
+import cn.vove7.common.bridges.SystemBridge
 import cn.vove7.common.utils.runOnUi
 import cn.vove7.jarvis.R
 import cn.vove7.vtp.log.Vog
@@ -33,16 +33,21 @@ abstract class AbFloatWindow(
 
     val aniBodyInit get() = ::animationBody.isInitialized
 
-    private val rootView: ViewGroup get() = LayoutInflater.from(context).inflate(R.layout.float_panel_root, null) as ViewGroup
+    private val themeInflater: LayoutInflater get() = LayoutInflater.from(ContextThemeWrapper(context,
+            if (SystemBridge.isDarkMode) R.style.DarkTheme
+            else R.style.AppTheme
+    ))
+
+    private val rootView: ViewGroup
+        get() = themeInflater.inflate(R.layout.float_panel_root, null) as ViewGroup
 
     private val newView: View
         get() {
             val contentView = rootView
-            return LayoutInflater.from(context)
-                    .inflate(this.layoutResId(), contentView).also {
-                        animationBody = contentView.getChildAt(0)
-                        onCreateView(it)
-                    }
+            return themeInflater.inflate(this.layoutResId(), contentView).also {
+                animationBody = contentView.getChildAt(0)
+                onCreateView(it)
+            }
         }
 
     open fun onCreateView(view: View) {}
