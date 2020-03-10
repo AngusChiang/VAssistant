@@ -10,6 +10,7 @@ import cn.vove7.jarvis.App
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.view.dialog.contentbuilder.MarkdownContentBuilder
 import cn.vove7.jarvis.view.dialog.contentbuilder.markdownContent
+import cn.vove7.jarvis.view.positiveButtonWithColor
 import cn.vove7.vtp.sharedpreference.SpHelper
 
 /**
@@ -44,7 +45,7 @@ class AppUpdateDialog(
                         sp.set("no_update_ver_name", ver)
                         it.dismiss()
                     }
-                    positiveButton("用酷安下载") {
+                    positiveButtonWithColor("用酷安下载") {
                         AppConfig.openCoolapk(context)
                         it.dismiss()
                     }

@@ -24,6 +24,7 @@ import cn.vove7.jarvis.adapters.SimpleListAdapter
 import cn.vove7.jarvis.fragments.SimpleListFragment
 import cn.vove7.jarvis.tools.DialogUtil
 import cn.vove7.jarvis.view.dialog.AdEditorDialog
+import cn.vove7.jarvis.view.positiveButtonWithColor
 import cn.vove7.vtp.log.Vog
 
 /**
@@ -75,9 +76,9 @@ class AppAdListActivity : OneFragmentActivity() {
 
                                     editDialog.show(item.extra)
                                 }
-                                positiveButton(getString(R.string.text_share)) {
+                                positiveButtonWithColor(getString(R.string.text_share)) {
                                     if (!AppConfig.checkLogin()) {
-                                        return@positiveButton
+                                        return@positiveButtonWithColor
                                     }
                                     share(data)
                                 }

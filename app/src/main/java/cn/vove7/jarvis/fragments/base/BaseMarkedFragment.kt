@@ -24,6 +24,7 @@ import cn.vove7.jarvis.adapters.SimpleListAdapter
 import cn.vove7.jarvis.fragments.SimpleListFragment
 import cn.vove7.jarvis.tools.DataUpdator
 import cn.vove7.jarvis.tools.DialogUtil
+import cn.vove7.jarvis.view.positiveButtonWithColor
 import cn.vove7.vtp.log.Vog
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.customview.customView
@@ -189,7 +190,7 @@ abstract class BaseMarkedFragment : SimpleListFragment<MarkedData>(), OnSyncMark
                         negativeButton(getString(R.string.text_share)) {
                             share(data)
                         }
-                        positiveButton(getString(R.string.text_edit)) {
+                        positiveButtonWithColor(getString(R.string.text_edit)) {
                             onEdit(item.extra)
                         }
                         neutralButton(getString(R.string.text_delete)) {

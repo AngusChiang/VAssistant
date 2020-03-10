@@ -28,6 +28,7 @@ import cn.vove7.jarvis.tools.Tutorials
 import cn.vove7.jarvis.view.dialog.contentbuilder.MarkdownContentBuilder
 import cn.vove7.jarvis.view.dialog.contentbuilder.SmoothTextBuilder
 import cn.vove7.jarvis.view.dialog.contentbuilder.markdownContent
+import cn.vove7.jarvis.view.positiveButtonWithColor
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.customview.customView
 import com.google.android.material.textfield.TextInputLayout
@@ -192,7 +193,7 @@ class HelpActivity : ReturnableActivity() {
                     })
 
                     buttons {
-                        positiveButton(text = "复制") {
+                        positiveButtonWithColor("复制") {
                             SystemBridge.setClipText(GlobalLog.toString())
                             GlobalApp.toastInfo(R.string.text_copied)
                         }

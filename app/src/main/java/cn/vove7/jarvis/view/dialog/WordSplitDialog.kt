@@ -11,6 +11,7 @@ import cn.vove7.common.utils.spanColor
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.activities.base.BaseActivity
 import cn.vove7.jarvis.view.dialog.contentbuilder.WordSplitBuilder
+import cn.vove7.jarvis.view.positiveButtonWithColor
 
 /**
  * # WordSplitDialog
@@ -36,11 +37,11 @@ class WordSplitDialog(
         content(builder)
 
         buttons {
-            positiveButton(text = "快速搜索".spanColor(ContextCompat.getColor(context, R.color.google_green))) {
+            positiveButtonWithColor("快速搜索") {
                 val st = builder.getCheckedText()
                 if (st.isEmpty()) {
                     GlobalApp.toastWarning(R.string.text_select_nothing)
-                    return@positiveButton
+                    return@positiveButtonWithColor
                 }
                 SystemBridge.quickSearch(st)
             }

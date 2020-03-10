@@ -11,6 +11,7 @@ import cn.vove7.jarvis.App
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.view.dialog.contentbuilder.MarkdownContentBuilder
 import cn.vove7.jarvis.view.dialog.contentbuilder.markdownContent
+import cn.vove7.jarvis.view.positiveButtonWithColor
 import java.util.*
 
 /**
@@ -33,7 +34,7 @@ class UpdateLogDialog(context: Activity, onDismiss: (() -> Unit)? = null) {
                         UserInfoDialog.recharge(context)
                     }
                 }
-                positiveButton("新用户必读") {
+                positiveButtonWithColor("新用户必读") {
                     it.dismiss()
                     BottomDialog.builder(context) {
                         awesomeHeader(context.getString(R.string.using_help))

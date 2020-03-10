@@ -20,6 +20,7 @@ import cn.vove7.jarvis.tools.QRTools
 import cn.vove7.jarvis.tools.baiduaip.BaiduAipHelper
 import cn.vove7.jarvis.view.dialog.contentbuilder.ImageContentBuilder
 import cn.vove7.jarvis.view.dialog.contentbuilder.WrappedTextContentBuilder
+import cn.vove7.jarvis.view.positiveButtonWithColor
 import kotlinx.coroutines.launch
 import java.io.File
 
@@ -51,7 +52,7 @@ class TextOperationDialog(
         buttons {
 
             content(cv)
-            positiveButton(text = "复制".spanColor(ContextCompat.getColor(context, R.color.google_green))) {
+            positiveButtonWithColor("复制") {
                 SystemBridge.setClipText(opText)
                 GlobalApp.toastInfo(R.string.text_copied)
             }
@@ -193,7 +194,7 @@ class TextOperationDialog(
                 }
             }
             buttons {
-                positiveButton("分享") {
+                positiveButtonWithColor("分享") {
                     it.dismiss()
                     SystemBridge.shareImage(path)
                 }
