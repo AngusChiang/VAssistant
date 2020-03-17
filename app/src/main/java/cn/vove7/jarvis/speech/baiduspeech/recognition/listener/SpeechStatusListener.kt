@@ -45,7 +45,7 @@ class SpeechStatusListener(private val handler: Handler) : StatusRecogListener()
 
     override fun onAsrPartialResult(results: Array<String>?, recogResult: RecogResult) {
         super.onAsrPartialResult(results, recogResult)
-        val tmp = results?.get(0) ?: ""
+        val tmp = (results?.get(0) ?: "").trimEnd(',', '，', '。', '.')
         rtmp = tmp
         handler.sendMessage(SpeechMessage.buildMessage(CODE_VOICE_TEMP, tmp))
     }
