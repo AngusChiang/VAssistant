@@ -83,8 +83,8 @@ public class FileSaveListener extends MessageListener {
      * @param progress    如合成“百度语音问题”这6个字， progress肯定是从0开始，到6结束。 但progress无法保证和合成到第几个字对应。
      */
     @Override
-    public void onSynthesizeDataArrived(String utteranceId, byte[] data, int progress) {
-        super.onSynthesizeDataArrived(utteranceId, data, progress);
+    public void onSynthesizeDataArrived(String utteranceId, byte[] data, int progress, int i) {
+        super.onSynthesizeDataArrived(utteranceId, data, progress, i);
         Log.i(TAG, "合成进度回调, progress：" + progress + ";序列号:" + utteranceId);
         try {
             ttsFileBufferedOutputStream.write(data);

@@ -37,7 +37,7 @@ class BaiduSpeechRecogService(event: RecogEvent) : SpeechRecogService(event) {
     /**
      * 本Activity中是否需要调用离线命令词功能。根据此参数，判断是否需要调用SDK的ASR_KWS_LOAD_ENGINE事件
      */
-    override var enableOffline = true
+    override var enableOffline = !AppConfig.recogCompatibleMode
 
     init {
         if (enableOffline) {
@@ -54,7 +54,7 @@ class BaiduSpeechRecogService(event: RecogEvent) : SpeechRecogService(event) {
             VAD to if(!AppConfig.recogCompatibleMode) VAD_TOUCH else VAD_DNN,
             DISABLE_PUNCTUATION to false,//标点符号
             ACCEPT_AUDIO_VOLUME to true,
-            PID to 1536,
+            PID to 1537,
             NLU to "enable"
     ).also {
         if (enableOffline) {

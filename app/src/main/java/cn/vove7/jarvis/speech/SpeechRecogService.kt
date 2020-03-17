@@ -18,6 +18,7 @@ import cn.vove7.jarvis.BuildConfig
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.receivers.PowerEventReceiver
 import cn.vove7.jarvis.receivers.ScreenStatusListener
+import cn.vove7.jarvis.receivers.UtilEventReceiver
 import cn.vove7.jarvis.services.ForegroundService
 import cn.vove7.jarvis.services.MainService
 import cn.vove7.jarvis.view.statusbar.StatusAnimation
@@ -176,7 +177,7 @@ abstract class SpeechRecogService(val event: RecogEvent) : SpeechRecogI {
             if (AppConfig.voiceWakeup) {
                 wakeupStatusAni.show(
                         R.drawable.ic_unhearing, "语音唤醒已自动休眠(点击再次开启)",
-                        Intent(AppBus.ACTION_START_WAKEUP)
+                        UtilEventReceiver.getIntent(AppBus.ACTION_START_WAKEUP)
                 )
             }
             doStopWakeUp()//不通知

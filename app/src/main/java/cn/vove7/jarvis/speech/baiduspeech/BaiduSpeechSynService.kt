@@ -281,7 +281,7 @@ class BaiduSyncLis(val service: SpeechSynService, val event: SyntheEvent) : Spee
         Vog.v("onSynthesizeStart 准备开始合成,序列号:$p0")
     }
 
-    override fun onSynthesizeDataArrived(p0: String?, p1: ByteArray?, p2: Int) {
+    override fun onSynthesizeDataArrived(p0: String?, p1: ByteArray?, p2: Int, p3: Int) {
         Vog.v("onSpeechProgressChanged $p2 合成进度回调, progress：$p0")
     }
 

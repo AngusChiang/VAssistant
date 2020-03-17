@@ -32,7 +32,7 @@ public class MessageListener implements SpeechSynthesizerListener {
      *                    progress肯定是从0开始，到6结束。 但progress无法和合成到第几个字对应。
      */
     @Override
-    public void onSynthesizeDataArrived(String utteranceId, byte[] bytes, int progress) {
+    public void onSynthesizeDataArrived(String utteranceId, byte[] bytes, int progress, int i) {
         //  Log.i(TAG, "合成进度回调, progress：" + progress + ";序列号:" + utteranceId );
     }
 
