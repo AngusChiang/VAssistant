@@ -18,6 +18,7 @@ import cn.vove7.common.utils.spanColor
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.activities.base.VoiceAssistActivity
 import cn.vove7.jarvis.activities.screenassistant.ScreenAssistActivity
+import cn.vove7.jarvis.receivers.UtilEventReceiver
 import cn.vove7.jarvis.tools.debugserver.RemoteDebugServer
 import cn.vove7.vtp.notification.ChannelBuilder
 
@@ -75,13 +76,13 @@ class ForegroundService : Service() {
             if (MainService.wakeupOpen) {
                 addAction(0, "关闭语音唤醒".spanColor(googleRed),
                         PendingIntent.getBroadcast(this@ForegroundService,
-                                0, Intent(AppBus.ACTION_STOP_WAKEUP), 0)
+                                0, UtilEventReceiver.getIntent(AppBus.ACTION_STOP_WAKEUP), 0)
                 )
             }
             if (!RemoteDebugServer.stopped) {
                 addAction(0, "关闭调试".spanColor(googleRed),
-                        PendingIntent.getBroadcast(this@ForegroundService,
-                                0, Intent(AppBus.ACTION_STOP_DEBUG_SERVER), 0)
+                PendingIntent.getBroadcast(this@ForegroundService,
+                        0, UtilEventReceiver.getIntent(AppBus.ACTION_STOP_DEBUG_SERVER), 0)
                 )
             }
             priority = NotificationCompat.PRIORITY_MAX

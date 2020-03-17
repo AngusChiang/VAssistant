@@ -54,7 +54,7 @@ class DataSyncWork(context: Context, workerParams: WorkerParameters) : Worker(co
                     GlobalLog.log("数据同步完成")
                     AppNotification.broadcastNotification(1234, "指令数据已更新",
                             "点击查看更新内容",
-                            Intent(UtilEventReceiver.INST_DATA_SYNC_FINISH).apply {
+                            UtilEventReceiver.getIntent(UtilEventReceiver.INST_DATA_SYNC_FINISH).apply {
                                 putExtra("content", result.result)
                             }
                     )
@@ -72,7 +72,7 @@ class DataSyncWork(context: Context, workerParams: WorkerParameters) : Worker(co
             AppNotification.broadcastNotification(
                     123, "发现新版本 ${hasUpdate.first}",
                     "查看更新日志",
-                    (Intent(UtilEventReceiver.APP_HAS_UPDATE).apply {
+                    (UtilEventReceiver.getIntent(UtilEventReceiver.APP_HAS_UPDATE).apply {
                         putExtra("version", hasUpdate.first)
                         putExtra("log", hasUpdate.second)
                     })

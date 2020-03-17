@@ -110,7 +110,7 @@ object DataUpdator {
                 if(result.hasUpdate) {
                     AppNotification.broadcastNotification(1234, "指令数据已更新",
                             "点击查看更新内容",
-                            Intent(UtilEventReceiver.INST_DATA_SYNC_FINISH).apply {
+                            UtilEventReceiver.getIntent(UtilEventReceiver.INST_DATA_SYNC_FINISH).apply {
                                 putExtra("content", result.result)
                             }
                     )

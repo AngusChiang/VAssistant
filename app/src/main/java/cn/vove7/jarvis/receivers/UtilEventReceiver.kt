@@ -12,6 +12,7 @@ import cn.vove7.common.appbus.AppBus
 import cn.vove7.common.appbus.AppBus.ACTION_START_WAKEUP
 import cn.vove7.common.appbus.AppBus.ACTION_STOP_DEBUG_SERVER
 import cn.vove7.common.appbus.AppBus.ACTION_STOP_WAKEUP
+import cn.vove7.common.utils.contains
 import cn.vove7.jarvis.services.MainService
 import cn.vove7.jarvis.tools.AppLogic
 import cn.vove7.jarvis.view.dialog.AppUpdateDialog
@@ -27,7 +28,7 @@ import org.greenrobot.eventbus.Subscribe
 object UtilEventReceiver : DyBCReceiver() {
 
     override val receiverType: Int
-        get() = TYPE_LOCAL
+        get() = TYPE_GLOBAL
 
     override fun onStart() {
         AppBus.reg(this)
@@ -44,6 +45,12 @@ object UtilEventReceiver : DyBCReceiver() {
 
     override fun onReceive(context: Context?, intent: Intent?) {
         val action = intent?.action ?: return
+
+        if (intent.contains("from")) {
+            if (intent.getStringExtra("from") != GlobalApp.APP.packageName) {
+                return
+            }
+        }
 
         when (action) {
             APP_HAS_UPDATE -> {
@@ -82,6 +89,12 @@ object UtilEventReceiver : DyBCReceiver() {
                 MainService.loadHomeSystem()
             }
         }
+    }
+
+    fun getIntent(action: String): Intent {
+        val intent = Intent(action)
+        intent.putExtra("from", GlobalApp.APP.packageName)
+        return intent
     }
 
     const val APP_HAS_UPDATE = "app_has_update"
