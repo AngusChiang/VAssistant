@@ -123,7 +123,7 @@ class VoiceAssistActivity : Activity() {
             else -> {
                 try {
                     val id = action?.toLongOrNull() ?: return
-                    runActionById(id)
+                    runActionById(id, null)
                 } catch (e: Exception) {
                     e.log()
                 }
@@ -141,14 +141,15 @@ class VoiceAssistActivity : Activity() {
             }
             "inst" -> {//vassistant://run_inst/id
                 val id = uri.getQueryParameter("id")?.toLongOrNull() ?: return false
-                runActionById(id)
+                val cmd = uri.getQueryParameter("cmd")
+                runActionById(id, cmd)
                 return true
             }
         }
         return false
     }
 
-    private fun runActionById(actionId: Long) {
+    private fun runActionById(actionId: Long, cmd: String?) {
         val node = DAO.daoSession.actionNodeDao.load(actionId)
         if (node != null) {
             val que = PriorityQueue<Action>()
@@ -161,7 +162,7 @@ class VoiceAssistActivity : Activity() {
             }
             que.add(node.action)
             node.action.param = null
-            AppBus.post(que)
+            MainService.runActionQue(cmd ?: "", que)
         } else {
             GlobalApp.toastError("指令不存在")
         }
