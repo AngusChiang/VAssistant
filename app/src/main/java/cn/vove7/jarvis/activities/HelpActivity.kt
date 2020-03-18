@@ -75,43 +75,6 @@ class HelpActivity : ReturnableActivity() {
     }
 
 
-    //TODO
-    private fun showFeedbackDialog() {
-        MaterialDialog(this)
-                .title(R.string.text_feedback)
-                .customView(R.layout.dialog_feedback)
-                .cancelOnTouchOutside(false)
-                .noAutoDismiss()
-                .positiveButton(R.string.text_send) { d ->
-                    val bar = d.findViewById<View>(R.id.loading_bar)
-                    if (bar.visibility == View.VISIBLE) return@positiveButton
-
-                    val title = getOrSetEmptyErr(d.findViewById(R.id.title_text))
-                        ?: return@positiveButton
-
-                    val content = getOrSetEmptyErr(d.findViewById(R.id.desc_text))
-                        ?: return@positiveButton
-
-                    bar.visibility = View.VISIBLE
-                    val f = UserFeedback(title, content)
-                    WrapperNetHelper.postJson<Any>(ApiUrls.NEW_USER_FEEDBACK, f) {
-                        success { _, b ->
-                            bar.visibility = View.INVISIBLE
-                            if (b.isOk()) {
-                                GlobalApp.toastInfo("已收到您的反馈，感谢支持")
-                                d.dismiss()
-                            } else {
-                                GlobalApp.toastError(R.string.text_net_err)
-                            }
-                        }
-                        fail { _, e ->
-                            GlobalApp.toastError(e.message ?: "err")
-                        }
-                    }
-                }.negativeButton { it.cancel() }
-                .show()
-    }
-
     private fun getOrSetEmptyErr(it: TextInputLayout): String? {
         val s = it.editText?.text.toString()
         if (s.trim() == "") {
@@ -170,9 +133,6 @@ class HelpActivity : ReturnableActivity() {
                 } else {
                     SystemBridge.openUrl(ApiUrls.QQ_GROUP_1)
                 }
-            },
-            IconTitleEntity(R.drawable.ic_feedback_black_24dp, R.string.text_feedback) {
-                showFeedbackDialog()
             },
             IconTitleEntity(R.drawable.ic_bug_report_24dp, titleId = R.string.text_browse_log) {
                 var text = GlobalLog.colorHtml()
