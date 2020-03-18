@@ -26,6 +26,7 @@ import cn.vove7.jarvis.activities.base.VoiceAssistActivity
 import cn.vove7.jarvis.activities.base.VoiceAssistActivity.Companion.SET_ASSIST_APP
 import cn.vove7.jarvis.activities.base.VoiceAssistActivity.Companion.SWITCH_DEBUG_MODE
 import cn.vove7.jarvis.activities.base.VoiceAssistActivity.Companion.SWITCH_VOICE_WAKEUP
+import kotlin.random.Random
 
 
 /**
@@ -204,19 +205,20 @@ object ShortcutUtil {
             add2Icon: Boolean = false,
             dr: Drawable? = null) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1) {
-            val info = ShortcutInfo.Builder(context, "${actionNode.id}")
+            val uri = Uri.parse(
+                    "vassistant://inst?id=${actionNode.id}" +
+                            (if (cmd.isNullOrBlank()) "" else "&cmd=$cmd")
+            )
+            val info = ShortcutInfo.Builder(context, Random.nextInt().toString())
                     .setIcon(
                             dr?.let {
                                 Icon.createWithBitmap(Bitmap.createBitmap(it.toBitmap()))
                             } ?: Icon.createWithResource(context, R.drawable.ic_play_arrow)
                     )
                     .setShortLabel(cmd ?: actionNode.actionTitle) // 短标签名
-                    .setLongLabel(cmd ?: actionNode.actionTitle)  //长标签名
-                    .setIntent(Intent("",
-                            Uri.parse("vassistant://inst?id=${actionNode.id}" +
-                                    if (cmd.isNullOrBlank()) "" else "&cmd=$cmd"
-                            )
-                            , context, VoiceAssistActivity::class.java))  //action
+                    .setLongLabel((cmd?.let { "$it\n" } ?: "") + actionNode.actionTitle)  //长标签名
+                    .setIntent(Intent("android.intent.action.VIEW", uri,
+                            context, VoiceAssistActivity::class.java))  //action
                     .setDisabledMessage(getString(R.string.text_not_enable)) //disable后提示
                     .setRank(0) //位置
                     .build()

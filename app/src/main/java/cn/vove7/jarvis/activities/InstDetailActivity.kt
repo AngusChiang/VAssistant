@@ -403,18 +403,18 @@ class InstDetailActivity : BaseActivity() {
                         } else null
                     }
                     MaterialDialog(this).show {
+                        var cmd: String? = null
                         title(R.string.text_add_shortcut_to_launcher)
-                        message(text = "此操作需要7.1+\n8.0+系统可添加至桌面快捷图标")
-                        input(hint = "语音指令（例：打开QQ）",allowEmpty = true, waitForPositiveButton = true) { _, s ->
-                            ShortcutUtil.addActionShortcut(node,
-                                    if (s.isBlank()) null else s.toString(),
-                                    false, ic
-                            )
+                        message(text = "此操作需要7.1+\n8.0+系统可添加至桌面快捷图标\n下面语音指令将注入到指令(可不输入)")
+                        input(hint = "语音指令（例：打开QQ）", allowEmpty = true, waitForPositiveButton = false) { _, s ->
+                            cmd = if (s.isBlank()) null else s.toString()
                         }
-                        positiveButton()
+                        positiveButton {
+                            ShortcutUtil.addActionShortcut(node, cmd, false, ic)
+                        }
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                             neutralButton(text = "同时添加进图标shortcut") {
-                                ShortcutUtil.addActionShortcut(node, null, true, ic)
+                                ShortcutUtil.addActionShortcut(node, cmd, true, ic)
                             }
                         }
                     }
