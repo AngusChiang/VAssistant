@@ -162,6 +162,16 @@ class VoiceAssistActivity : Activity() {
             }
             que.add(node.action)
             node.action.param = null
+            if (cmd != null) {
+                node.regs.any {
+                    val args = it.regex.match(cmd)
+                    val resolved = args != null
+                    if (resolved) {
+                        node.action.param = args
+                    }
+                    resolved
+                }
+            }
             MainService.runActionQue(cmd ?: "", que)
         } else {
             GlobalApp.toastError("指令不存在")

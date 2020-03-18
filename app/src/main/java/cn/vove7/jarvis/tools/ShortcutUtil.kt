@@ -198,7 +198,11 @@ object ShortcutUtil {
      * @param actionNode ActionNode
      * @param add2Icon Boolean
      */
-    fun addActionShortcut(actionNode: ActionNode, add2Icon: Boolean = false, dr: Drawable? = null) {
+    fun addActionShortcut(
+            actionNode: ActionNode,
+            cmd: String?,
+            add2Icon: Boolean = false,
+            dr: Drawable? = null) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1) {
             val info = ShortcutInfo.Builder(context, "${actionNode.id}")
                     .setIcon(
@@ -206,9 +210,12 @@ object ShortcutUtil {
                                 Icon.createWithBitmap(Bitmap.createBitmap(it.toBitmap()))
                             } ?: Icon.createWithResource(context, R.drawable.ic_play_arrow)
                     )
-                    .setShortLabel(actionNode.actionTitle ?: "无标题") // 短标签名
-                    .setLongLabel(actionNode.actionTitle ?: "无标题")  //长标签名
-                    .setIntent(Intent("", Uri.parse("vassistant://inst?id=${actionNode.id}")
+                    .setShortLabel(cmd ?: actionNode.actionTitle) // 短标签名
+                    .setLongLabel(cmd ?: actionNode.actionTitle)  //长标签名
+                    .setIntent(Intent("",
+                            Uri.parse("vassistant://inst?id=${actionNode.id}" +
+                                    if (cmd.isNullOrBlank()) "" else "&cmd=$cmd"
+                            )
                             , context, VoiceAssistActivity::class.java))  //action
                     .setDisabledMessage(getString(R.string.text_not_enable)) //disable后提示
                     .setRank(0) //位置

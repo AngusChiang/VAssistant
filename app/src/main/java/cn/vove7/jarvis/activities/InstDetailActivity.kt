@@ -376,7 +376,7 @@ class InstDetailActivity : BaseActivity() {
                     //重要信息
                     MaterialDialog(this).show {
                         title(text = "设为全局指令")
-                        message(text = "此操作会复制此指令(包括跟随操作)至全局。")
+                        message(text = "此操作会复制此指令至全局。")
                         positiveButton(R.string.text_continue) {
                             doCopy2Global(false)
                         }
@@ -402,18 +402,22 @@ class InstDetailActivity : BaseActivity() {
                             AppInfo(node.actionScope.packageName).icon
                         } else null
                     }
-                    MaterialDialog(this).title(R.string.text_add_shortcut_to_launcher)
-                            .message(text = "注意：只能添加没有参数的指令，或者在运行时可以询问参数值指令，否则无法正常执行\n" +
-                                    "此操作需要7.1+\n8.0+系统可添加至桌面快捷图标")
-                            .positiveButton {
-                                ShortcutUtil.addActionShortcut(node, dr = ic)
-                            }.show {
-                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                                    neutralButton(text = "同时添加进图标shortcut") {
-                                        ShortcutUtil.addActionShortcut(node, true, ic)
-                                    }
-                                }
+                    MaterialDialog(this).show {
+                        title(R.string.text_add_shortcut_to_launcher)
+                        message(text = "此操作需要7.1+\n8.0+系统可添加至桌面快捷图标")
+                        input(hint = "语音指令（例：打开QQ）",allowEmpty = true, waitForPositiveButton = true) { _, s ->
+                            ShortcutUtil.addActionShortcut(node,
+                                    if (s.isBlank()) null else s.toString(),
+                                    false, ic
+                            )
+                        }
+                        positiveButton()
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                            neutralButton(text = "同时添加进图标shortcut") {
+                                ShortcutUtil.addActionShortcut(node, null, true, ic)
                             }
+                        }
+                    }
                 }
             }
             return@setOnMenuItemClickListener true
