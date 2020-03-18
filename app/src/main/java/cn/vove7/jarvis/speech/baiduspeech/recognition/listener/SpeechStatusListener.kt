@@ -43,9 +43,15 @@ class SpeechStatusListener(private val handler: Handler) : StatusRecogListener()
         handler.sendMessage(SpeechMessage.buildMessage(CODE_VOICE_READY))
     }
 
+    private val trimReg by lazy { "[，。]".toRegex() }
+
+    private fun String.trimResult(): String {
+        return replace(trimReg, "")
+    }
+
     override fun onAsrPartialResult(results: Array<String>?, recogResult: RecogResult) {
         super.onAsrPartialResult(results, recogResult)
-        val tmp = (results?.get(0) ?: "").trimEnd(',', '，', '。', '.')
+        val tmp = (results?.get(0) ?: "").trimResult()
         rtmp = tmp
         handler.sendMessage(SpeechMessage.buildMessage(CODE_VOICE_TEMP, tmp))
     }
@@ -53,7 +59,7 @@ class SpeechStatusListener(private val handler: Handler) : StatusRecogListener()
     override fun onAsrFinalResult(results: Array<String>?, recogResult: RecogResult) {
         super.onAsrFinalResult(results, recogResult)
         isSuccess = true
-        val tmp = results?.get(0) ?: ""
+        val tmp = (results?.get(0) ?: "").trimResult()
         handler.sendMessage(SpeechMessage.buildMessage(CODE_VOICE_RESULT, tmp))
     }
 
