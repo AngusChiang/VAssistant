@@ -21,6 +21,11 @@ class ExecuteQueueAdapter(context: Context, execQueue: MutableList<ActionNode>)
     : BaseListAdapter<ExecuteQueueAdapter.VHolder, ActionNode>(context, execQueue) {
     override fun layoutId(position: Int): Int = R.layout.item_of_exec_queue
 
+    private val ets = Array(execQueue.size) { "" }
+
+    val allParams: List<Map<String, String>>
+        get() = ets.map { parseLineParam(it) }
+
     private val ActionNode.regParamSet: Set<String>
         get() {
             val set = mutableSetOf<String>()
@@ -36,29 +41,22 @@ class ExecuteQueueAdapter(context: Context, execQueue: MutableList<ActionNode>)
         holder.descText.text = item.actionTitle
         if (item.actionTitle.startsWith("打开App:")) {
             holder.paramText.isEnabled = false
+            holder.paramText.hint = "无需参数"
+            holder.paramText.text = null
         } else {
             val pset = item.regParamSet
             if (pset.isEmpty()) {
                 holder.paramText.isEnabled = false
             } else {
-                holder.paramText.setText(pset.joinToString(":\n", postfix = if (pset.isEmpty()) "" else ":"))
+                holder.paramText.setText(pset.joinToString(":\n",
+                        postfix = if (pset.isEmpty()) "" else ":"))
                 holder.paramText.addTextChangedListener(object : TextWatcher {
                     override fun afterTextChanged(s: Editable?) {
+                        ets[pos] = s.toString()
                     }
 
-                    override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
-                    }
-
-                    //TODO 输入后解析
-                    override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                        val action = item.action
-                        action.param = try {
-                            parseLineParam(s.toString())
-                        } catch (e: Exception) {
-                            null
-                        }
-                    }
-
+                    override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+                    override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
                 })
             }
         }

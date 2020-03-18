@@ -604,30 +604,35 @@ class InstDetailActivity : BaseActivity() {
 
         // .. -> it.parent -> it
         var p: ActionNode? = node
-        val execQueue = mutableListOf<ActionNode>()
+        val execList = mutableListOf<ActionNode>()
         while (p != null) {
             p.action.param = null
-            execQueue.add(0, p)
+            execList.add(0, p)
             p = p.parent
         }
-        if (execQueue[0].autoLaunchApp && ActionNode.belongInApp(execQueue[0].actionScopeType)) {
-            val pkg = execQueue[0].actionScope.packageName
+        if (execList[0].autoLaunchApp && ActionNode.belongInApp(execList[0].actionScopeType)) {
+            val pkg = execList[0].actionScope.packageName
             val appName = AdvanAppHelper.getAppInfo(pkg)?.name
-            execQueue.add(0, ActionNode("打开App: $appName",
+            execList.add(0, ActionNode("打开App: $appName",
                     Action("system.openAppByPkg('$pkg',true)", Action.SCRIPT_TYPE_LUA)))
-
         }
-        val d = DialogWithList(this, ExecuteQueueAdapter(this, execQueue))
+        val execAdapter = ExecuteQueueAdapter(this, execList)
+        val d = DialogWithList(this, execAdapter)
                 .setButton(DialogInterface.BUTTON_POSITIVE, R.string.text_run, View.OnClickListener { v ->
                     val que = PriorityQueue<Action>()
-                    execQueue.withIndex().forEach {
-                        it.value.action.priority = it.index
-                        que.add(it.value.action)
+                    kotlin.runCatching {
+                        execAdapter.allParams
+                    }.onSuccess { ps ->
+                        execList.forEachIndexed { index, actionNode ->
+                            actionNode.action.priority = index
+                            actionNode.action.param = ps[index]
+                            que.add(actionNode.action)
+                        }
+                        MainService.runActionQue("RUN: ${node.actionTitle}", que)
+                    }.onFailure {
+                        it.log()
+                        GlobalApp.toastError("参数解析失败，请检查")
                     }
-                    //TODO 输入指令
-                    MainService.runActionQue("RUN: ${node.actionTitle}", que)
-                    //防止以DEBUG方式运行
-//                    AppBus.post(que)
                 })
                 .setButton(DialogInterface.BUTTON_NEGATIVE, R.string.text_cancel, View.OnClickListener { v -> })
         d.setWidth(0.9)

@@ -10,6 +10,7 @@ import cn.vove7.common.accessibility.viewnode.ViewNode
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.appbus.AppBus
+import cn.vove7.common.appbus.model.ExecutorStatus
 import cn.vove7.common.bridges.*
 import cn.vove7.common.bridges.ShowDialogEvent.Companion.WHICH_SINGLE
 import cn.vove7.common.datamanager.DAO
@@ -171,6 +172,7 @@ open class ExecutorImpl(
         thread = thread(start = true, name = "脚本线程：$cmdWords", isDaemon = true, priority = Thread.MAX_PRIORITY) {
             var er = EXEC_CODE_FAILED
             try {
+                AppBus.post(ExecutorStatus.begin(cmdWords))
                 LooperHelper.prepareIfNeeded()
                 running = true
                 userInterrupt = false
@@ -182,6 +184,7 @@ open class ExecutorImpl(
                 currentAction = null
             } finally {
                 if (sync) waiter.setAndNotify(er)
+                else AppBus.post(ExecutorStatus.finish(er))
             }
             Looper.myLooper()?.quitSafely()
         }
@@ -230,7 +233,7 @@ open class ExecutorImpl(
         return if (userInterrupt) EXEC_CODE_INTERRUPT else EXEC_CODE_SUCCESS
     }
 
-    override fun runScript(script: String, type:String, argMap: Map<String, Any?>?): Pair<Int, String?> {
+    override fun runScript(script: String, type: String, argMap: Map<String, Any?>?): Pair<Int, String?> {
         Vog.d("runScript arg : $argMap\n$script")
         return when (type) {
             SCRIPT_TYPE_LUA -> {

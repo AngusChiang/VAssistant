@@ -30,6 +30,9 @@ import cn.vove7.common.appbus.AppBus.ACTION_STOP_VOICE_WAKEUP_WITHOUT_NOTIFY
 import cn.vove7.common.appbus.AppBus.ACTION_STOP_WAKEUP
 import cn.vove7.common.appbus.AppBus.ACTION_STOP_WAKEUP_TIMER
 import cn.vove7.common.appbus.AppBus.ACTION_STOP_WAKEUP_WITHOUT_SWITCH
+import cn.vove7.common.appbus.model.ExecutorStatus
+import cn.vove7.common.appbus.model.ExecutorStatus.Companion.ON_EXECUTE_FINISHED
+import cn.vove7.common.appbus.model.ExecutorStatus.Companion.ON_EXECUTE_START
 import cn.vove7.common.bridges.ChoiceData
 import cn.vove7.common.bridges.ServiceBridge
 import cn.vove7.common.bridges.ShowDialogEvent
@@ -437,6 +440,15 @@ object MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
         floatyPanel.hideImmediately()
     }
 
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    fun onExecutorStatus(es: ExecutorStatus) {
+        when (es.what) {
+            ON_EXECUTE_START -> onExecuteStart(es.data as? String? ?: "")
+            ON_EXECUTE_FINISHED -> onExecuteFinished(es.data as? Int? ?: 0)
+        }
+    }
+
     private fun onExecuteStart(tag: String) {//
         Vog.d("开始执行 -> $tag")
         executeAnimation.begin()
@@ -469,6 +481,7 @@ object MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
     //from executor 线程
     private fun onExecuteFailed() {//错误信息
         GlobalApp.toastError("执行失败")
+        executeAnimation.failedAndHideDelay()
         floatyPanel.hideImmediately()
     }
 
@@ -520,7 +533,7 @@ object MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
     fun runAction(ac: Action) {
         val q = PriorityQueue<Action>()
         q.add(ac)
-        cExecutor.execQueue(CExecutorI.DEBUG_SCRIPT, q, false)
+        runActionQue(CExecutorI.DEBUG_SCRIPT, q)
     }
 
     fun getScreenText(): List<TextOcrItem>? {
