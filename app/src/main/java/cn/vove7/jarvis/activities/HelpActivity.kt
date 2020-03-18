@@ -25,7 +25,6 @@ import cn.vove7.jarvis.adapters.IconTitleEntity
 import cn.vove7.jarvis.adapters.IconTitleListAdapter
 import cn.vove7.jarvis.tools.ItemWrap
 import cn.vove7.jarvis.tools.Tutorials
-import cn.vove7.jarvis.view.dialog.contentbuilder.MarkdownContentBuilder
 import cn.vove7.jarvis.view.dialog.contentbuilder.SmoothTextBuilder
 import cn.vove7.jarvis.view.dialog.contentbuilder.markdownContent
 import cn.vove7.jarvis.view.positiveButtonWithColor
@@ -126,7 +125,7 @@ class HelpActivity : ReturnableActivity() {
     private fun getData(): List<IconTitleEntity> = listOf(
             IconTitleEntity(R.drawable.ic_help, R.string.using_help) {
                 BottomDialog.builder(this) {
-                    awesomeHeader(getString(R.string.using_help))
+                    awesomeHeader("新用户必读")
                     markdownContent {
                         loadMarkdownFromAsset("files/introduction.md")
                     }
