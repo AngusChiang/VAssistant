@@ -7,6 +7,7 @@ import android.view.View
 import android.widget.EditText
 import android.widget.TextView
 import cn.vove7.common.datamanager.parse.statusmap.ActionNode
+import cn.vove7.common.utils.regParamSet
 import cn.vove7.jarvis.R
 import cn.vove7.smartkey.tool.Vog
 import cn.vove7.vtp.easyadapter.BaseListAdapter
@@ -25,17 +26,6 @@ class ExecuteQueueAdapter(context: Context, execQueue: MutableList<ActionNode>)
 
     val allParams: List<Map<String, String>>
         get() = ets.map { parseLineParam(it) }
-
-    private val ActionNode.regParamSet: Set<String>
-        get() {
-            val set = mutableSetOf<String>()
-            @Suppress("RegExpRedundantEscape")//运行时解析错误
-            val reg = "@\\{#?([^}.]+)\\}".toRegex()
-            regs?.map { it.regStr }?.forEach { s ->
-                reg.findAll(s).map { it.groupValues[1] }.forEach { set.add(it) }
-            }
-            return set
-        }
 
     override fun onBindView(holder: VHolder, pos: Int, item: ActionNode) {
         holder.descText.text = item.actionTitle

@@ -32,6 +32,7 @@ import cn.vove7.common.net.ApiUrls
 import cn.vove7.common.net.WrapperNetHelper
 import cn.vove7.common.utils.RegUtils
 import cn.vove7.common.utils.TextHelper
+import cn.vove7.common.utils.regParamSet
 import cn.vove7.executorengine.parse.ParseEngine
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.activities.base.BaseActivity
@@ -405,9 +406,16 @@ class InstDetailActivity : BaseActivity() {
                     MaterialDialog(this).show {
                         var cmd: String? = null
                         title(R.string.text_add_shortcut_to_launcher)
-                        message(text = "此操作需要7.1+\n8.0+系统可添加至桌面快捷图标\n下面语音指令将注入到指令(可不输入)")
-                        input(hint = "语音指令（例：打开QQ）", allowEmpty = true, waitForPositiveButton = false) { _, s ->
-                            cmd = if (s.isBlank()) null else s.toString()
+
+                        val ps = node.regParamSet
+
+                        message(text = "此操作需要7.1+\n8.0+系统可添加至桌面快捷图标" +
+                                if (ps.isNotEmpty()) "下面语音指令将注入到指令(可不输入)" else "")
+
+                        if (ps.isNotEmpty()) {
+                            input(hint = "语音指令（例：打开QQ）", allowEmpty = true, waitForPositiveButton = false) { _, s ->
+                                cmd = if (s.isBlank()) null else s.toString()
+                            }
                         }
                         positiveButton {
                             ShortcutUtil.addActionShortcut(node, cmd, false, ic)

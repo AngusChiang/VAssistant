@@ -23,6 +23,7 @@ import cn.vove7.common.BuildConfig
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.app.log
+import cn.vove7.common.datamanager.parse.statusmap.ActionNode
 import cn.vove7.common.view.editor.MultiSpan
 import cn.vove7.vtp.app.AppInfo
 import cn.vove7.vtp.log.Vog
@@ -627,3 +628,15 @@ fun Drawable.toBitmap(): Bitmap {
     draw(canvas);
     return bitmap
 }
+
+
+
+val ActionNode.regParamSet: Set<String> get() {
+        val set = mutableSetOf<String>()
+        @Suppress("RegExpRedundantEscape")//运行时解析错误
+        val reg = "@\\{#?([^}.]+)\\}".toRegex()
+        regs?.map { it.regStr }?.forEach { s ->
+            reg.findAll(s).map { it.groupValues[1] }.forEach { set.add(it) }
+        }
+        return set
+    }
