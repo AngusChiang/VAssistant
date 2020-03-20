@@ -30,7 +30,7 @@ class RokidHomeSystem : ISmartHomeSystem() {
     )
     private val defaultRoomList = setOf(
             "客厅", "茶室", "餐厅",
-            "厨房", "主卧", "卧室", "次卧",
+            "厨房", "主卧", "卧室", "次卧", "仓库",
             "衣帽间", "书房", "影视厅", "一楼",
             "二楼", "三楼", "车库", "门厅", "办公室",
             "地下室", "((#楼)?楼梯间)", "((#楼)?过道)", "地下室"
@@ -135,7 +135,7 @@ class RokidHomeSystem : ISmartHomeSystem() {
         val devReg = getDevReg
         val roomReg = getRoomReg
 
-        val mm = "(帮我)?(打开|开启|启动|关闭|关掉)$roomReg?的?$devReg%".toParamRegex().match(command)
+        val mm = "(帮我)?(打开|开启|启动|关闭|关掉|开|关)$roomReg?的?$devReg%".toParamRegex().match(command)
 
         finishWord = configs["finishWord"] ?: "若琪指令发送成功"
         if (mm != null) {
