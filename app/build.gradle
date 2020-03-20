@@ -11,7 +11,7 @@ android {
         minSdkVersion 21
         targetSdkVersion 28
         def subVersion = 0
-        versionName "2.0.6.1"
+        versionName "2.0.7"
         def vc = Integer.parseInt(versionName.replace(".", "")) * 10
         if (vc < 10000) {
             vc *= 10

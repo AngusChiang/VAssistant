@@ -128,7 +128,7 @@ public class UserInfo implements Serializable {
     }
 
     public static boolean isLogin() {
-        return isLogin;
+        return isLogin && INSTANCE != null;
     }
 
     public static Date getVipEndDate() {
