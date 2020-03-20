@@ -58,6 +58,7 @@ class App : GlobalApp() {
             enableAutoDarkTheme = true
             darkTheme = R.style.BottomDialog_Dark
         }
+        WorkManager.getInstance(this).cancelAllWork()
     }
 
     private fun startMainServices() {
@@ -107,7 +108,6 @@ class InitCp : ContentProvider() {
             }
 
             val wm = WorkManager.getInstance(GlobalApp.APP)
-            wm.cancelAllWork()
             wm.enqueue(DataSyncWork.getRequest())
 
             ShortcutUtil.initShortcut()
