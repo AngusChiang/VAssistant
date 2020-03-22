@@ -66,6 +66,8 @@
             </intent-filter>
             <intent-filter>
 
+                <action android:name="android.media.action.STILL_IMAGE_CAMERA" />
+
                 <!-- 一加按键设置(搜索助手) 触发辅助应用 -->
                 <action android:name="android.intent.action.ASSIST" />
                 <action android:name="android.search.action.GLOBAL_SEARCH" />
@@ -432,8 +434,11 @@
     <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
     <uses-permission android:name="android.permission.BLUETOOTH" />
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
+
+    <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.INSTALL_SHORTCUT" />
     <uses-permission android:name="android.permission.UNINSTALL_SHORTCUT" />

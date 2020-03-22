@@ -55,7 +55,9 @@ class VoiceAssistActivity : Activity() {
                 Vog.d("onCreate ---> ASSIST wakeup")
                 MainService.switchRecog()
             }
-            Intent.ACTION_ASSIST, "android.intent.action.VOICE_ASSIST" -> {//一加长按HOME键
+            Intent.ACTION_ASSIST,
+            "android.media.action.STILL_IMAGE_CAMERA",
+            "android.intent.action.VOICE_ASSIST" -> {//一加长按HOME键
                 when (AppConfig.homeFun) {
                     0 -> startActivity(ScreenAssistActivity.createIntent())
                     1 -> MainService.switchRecog()
