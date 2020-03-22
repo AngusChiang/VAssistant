@@ -1,17 +1,42 @@
 package cn.vove7.jarvis.shs
 
+import android.app.Activity
+import android.content.Context
+import android.util.TypedValue
+import android.widget.PopupMenu
+import cn.vove7.bottomdialog.BottomDialog
+import cn.vove7.bottomdialog.extension.awesomeHeader
 import cn.vove7.common.app.AppConfig
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.bridges.HttpBridge
 import cn.vove7.common.bridges.SettingsBridge
+import cn.vove7.common.bridges.SystemBridge
 import cn.vove7.common.net.tool.base64
 import cn.vove7.common.utils.anyIn
+import cn.vove7.common.utils.content
 import cn.vove7.common.utils.runInCatch
+import cn.vove7.jarvis.R
+import cn.vove7.jarvis.plugins.PluginConfig
 import cn.vove7.jarvis.services.MainService
+import cn.vove7.jarvis.view.CheckBoxItem
+import cn.vove7.jarvis.view.IntentItem
+import cn.vove7.jarvis.view.SettingChildItem
+import cn.vove7.jarvis.view.dialog.TextEditorDialog
+import cn.vove7.jarvis.view.dialog.contentbuilder.markdownContent
+import cn.vove7.jarvis.view.dialog.editorView
+import cn.vove7.jarvis.work.RokidSendLocTAsk
 import cn.vove7.paramregex.toParamRegex
 import cn.vove7.vtp.log.Vog
 import cn.vove7.vtp.net.NetHelper
+import cn.vove7.vtp.runtimepermission.PermissionUtils
+import com.afollestad.materialdialogs.WhichButton
+import com.afollestad.materialdialogs.actions.getActionButton
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+
 
 /**
  * # RokidHomeSystem
@@ -20,6 +45,7 @@ import cn.vove7.vtp.net.NetHelper
  * 2019/8/18
  */
 class RokidHomeSystem : ISmartHomeSystem() {
+    override val name: String = "若琪"
 
     private val defaultDeviceList = setOf(
             "灯", "电灯", "筒灯", "大灯", "吊灯", "产品灯",
@@ -65,6 +91,9 @@ class RokidHomeSystem : ISmartHomeSystem() {
             parseConfig(config)
             pointDeviceList.clear()
             loadDataFromRemote()
+            if (PluginConfig.rokidInTimeSendLocation) {
+                startSendLocTask(6000)
+            }
         }
     }
 
@@ -122,7 +151,7 @@ class RokidHomeSystem : ISmartHomeSystem() {
         }
     }
 
-    private val roomSensorsProperty = "(温度|湿度|亮度|音量|暂停|开始|播放|(换|上|下)一首|)"
+    private val roomSensorsProperty = "(温度|湿度|亮度|音量|暂停|开始|播放|(换|上|下)一首)"
 
     private lateinit var finishWord: String
 
@@ -324,6 +353,114 @@ class RokidHomeSystem : ISmartHomeSystem() {
             GlobalApp.toastSuccess("测试通过")
         } else {
             GlobalApp.toastError("未通过测试")
+        }
+    }
+
+    override fun getSettingItems(context: Context): Array<SettingChildItem> = arrayOf(
+            IntentItem(title = "参数配置") {
+                val s = AppConfig.homeSystem
+                if (s == null) {
+                    GlobalApp.toastInfo("请先选择您的家居系统")
+                    return@IntentItem
+                }
+                TextEditorDialog(context, AppConfig.homeSystemConfig
+                    ?: templateConfig(s)) {
+                    noAutoDismiss()
+                    title(text = "参数配置")
+                    editorView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13f)
+                    positiveButton(text = "保存") {
+                        val text = editorView.content()
+                        AppConfig.homeSystemConfig = text
+                        //重新解析配置，并保存到对应的指令存储中
+                        MainService.homeControlSystem?.apply {
+                            init()
+                            saveInstConfig()
+                        }
+                        GlobalApp.toastSuccess("保存完成")
+                        it.dismiss()
+                    }
+                    neutralButton(text = "选择模板") {
+                        PopupMenu(context, it.getActionButton(WhichButton.NEUTRAL)).apply {
+                            menu.add(0, 0, 0, "Rokid(若琪)")
+                            setOnMenuItemClickListener { i ->
+                                editorView.setText(templateConfig(i.itemId))
+                                true
+                            }
+                            show()
+                        }
+                    }
+                    negativeButton { it.dismiss() }
+                }
+            },
+            IntentItem(title = "查看信息") {
+                if (AppConfig.homeSystem == null) {
+                    GlobalApp.toastInfo("请先选择您的家居系统")
+                    return@IntentItem
+                }
+                BottomDialog.builder(context as Activity) {
+                    awesomeHeader("信息")
+                    markdownContent {
+                        loadMarkdown(MainService.homeControlSystem?.summary()
+                            ?: "")
+                    }
+                }
+            },
+            CheckBoxItem(
+                    title = "实时位置服务",
+                    keyId = R.string.key_rokid_send_loc,
+                    summary = "远程地址请在参数配置中设置[realTimeLocUrl]"
+            ) { _, b ->
+                if (b) {
+                    if (!PermissionUtils.isAllGranted(context, arrayOf("android.permission.ACCESS_COARSE_LOCATION",
+                                    "android.permission.ACCESS_FINE_LOCATION"))) {
+                        GlobalApp.toastInfo("请先开启定位权限")
+                        return@CheckBoxItem false
+                    }
+                    startSendLocTask()
+                } else {
+                    stopSendLocTask()
+                }
+                true
+            },
+            IntentItem(title = "设置家庭地址", summary = PluginConfig.rokidHomeLoc?.let { "${it.first}, ${it.second}" }
+                ?: "设置当前位置为家庭地址") {
+                GlobalScope.launch {
+                    GlobalApp.toastInfo("正在获取位置...")
+                    val loc = SystemBridge.location()
+                    if (loc == null) {
+                        GlobalApp.toastInfo("位置获取失败")
+                        return@launch
+                    } else {
+                        PluginConfig.rokidHomeLoc = loc.longitude to loc.latitude
+                    }
+                    withContext(Dispatchers.Main) {
+                        kotlin.runCatching {
+                            it.summary = PluginConfig.rokidHomeLoc?.let { "${it.first}, ${it.second}" }
+                        }
+                    }
+                    GlobalApp.toastSuccess("设置完成")
+                }
+
+            }
+    )
+
+
+    private val sendLocTask by lazy {
+        RokidSendLocTAsk { configs }
+    }
+
+    private fun startSendLocTask(delay: Long = 3000) {
+        stopSendLocTask()
+        GlobalLog.log("若琪：启动位置发送服务")
+        GlobalApp.toastInfo("若琪：启动位置发送服务")
+        sendLocTask.nextTask(delay)
+    }
+
+    private fun stopSendLocTask() = sendLocTask.stop()
+
+    fun callSendLocTask() {
+        if(PluginConfig.rokidInTimeSendLocation) {
+            sendLocTask.run()
         }
     }
 

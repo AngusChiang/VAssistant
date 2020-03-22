@@ -15,10 +15,12 @@ import android.widget.CheckedTextView
 import android.widget.Switch
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
 import cn.vove7.admin_manager.AdminReceiver
 import cn.vove7.common.accessibility.AccessibilityApi
 import cn.vove7.common.app.AppPermission
 import cn.vove7.common.app.GlobalApp
+import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.app.log
 import cn.vove7.common.bridges.InputMethodBridge
 import cn.vove7.common.bridges.RootHelper
@@ -56,6 +58,14 @@ class PermissionManagerActivity : OneFragmentActivity() {
         }
     }
 
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode == 100) {
+            GlobalLog.log(permissions.joinToString("\n"))
+            GlobalLog.log(grantResults.joinToString("\n"))
+        }
+    }
+
     class ManageFragment : SimpleListFragment<PermissionStatus>() {
         lateinit var pActivity: Activity
 
@@ -66,7 +76,6 @@ class PermissionManagerActivity : OneFragmentActivity() {
                 return m
             }
         }
-
 
         override fun initView(contentView: View) {
             adapter = buildAdapter()
@@ -81,7 +90,7 @@ class PermissionManagerActivity : OneFragmentActivity() {
             val headerSwitch = v.findViewById<Switch>(R.id.header_switch)
             headerTitle.text = "一键申请"
             headerSwitch.visibility = View.GONE
-            v.setOnClickListener { PermissionUtils.autoRequestPermission(pActivity, allPerStr) }
+            v.setOnClickListener { ActivityCompat.requestPermissions(pActivity, allPerStr, 100) }
             setHeader(v)
         }
 
@@ -131,13 +140,6 @@ class PermissionManagerActivity : OneFragmentActivity() {
         override fun onResume() {
             super.onResume()
             refreshStatus()
-        }
-
-        override fun onRequestPermissionsResult(requestCode: Int, perm: Array<out String>, grantResults: IntArray) {
-            if (PermissionUtils.isAllGranted(grantResults)) {
-                permissions[requestCode].isOpen = true
-                adapter.notifyDataSetChanged()
-            }
         }
 
         val permissions by lazy {
@@ -222,7 +224,10 @@ class PermissionManagerActivity : OneFragmentActivity() {
                     PermissionStatus(arrayOf("android.permission.READ_PHONE_STATE"), "读取设备状态", ""),
                     PermissionStatus(arrayOf("android.permission.WRITE_EXTERNAL_STORAGE"), "写SD卡", ""),
                     PermissionStatus(arrayOf("android.permission.FLASHLIGHT"), "闪光灯", "打开闪光灯"),
-                    PermissionStatus(arrayOf("android.permission.ACCESS_COARSE_LOCATION", "android.permission.ACCESS_FINE_LOCATION"), "位置信息", "不使用此类指令可不开启"),
+                    PermissionStatus(arrayOf(
+                            "android.permission.ACCESS_COARSE_LOCATION",
+                            "android.permission.ACCESS_FINE_LOCATION"
+                    ), "位置信息", "不使用此类指令可不开启"),
 //                        PermissionStatus(arrayOf("android.permission.BLUETOOTH", "android.permission.BLUETOOTH_ADMIN"),
 //                                "蓝牙", "打开蓝牙"),
                     PermissionStatus(arrayOf("android.permission.CAMERA"), "相机", "打开闪光灯"),
@@ -277,8 +282,7 @@ class PermissionManagerActivity : OneFragmentActivity() {
             var isOpen: Boolean = false,
             val clickAction: (PermissionStatus, Activity) -> Unit = a@{ it, act ->
                 if (it.isOpen) return@a
-                PermissionUtils.autoRequestPermission(act,
-                        it.permissionString, 100)
+                ActivityCompat.requestPermissions(act, it.permissionString, 100)
             }
     ) {
         companion object {

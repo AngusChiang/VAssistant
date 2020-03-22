@@ -27,10 +27,17 @@ import cn.vove7.common.datamanager.parse.statusmap.ActionNode
 import cn.vove7.common.view.editor.MultiSpan
 import cn.vove7.vtp.app.AppInfo
 import cn.vove7.vtp.log.Vog
+import cn.vove7.vtp.net.GsonHelper
+import cn.vove7.vtp.net.NetHelper
+import cn.vove7.vtp.net.WrappedRequestCallback
+import okhttp3.*
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.RequestBody.Companion.toRequestBody
 import java.io.File
 import java.io.Serializable
 import java.text.SimpleDateFormat
 import java.util.*
+import java.util.concurrent.TimeUnit
 
 
 /**
@@ -58,9 +65,7 @@ fun runOnUi(action: () -> Unit) {
 }
 
 inline fun runInCatch(log: Boolean = false, block: () -> Unit) {
-    try {
-        block.invoke()
-    } catch (e: Throwable) {
+    runCatching(block).onFailure { e ->
         if (log) e.log()
         else e.printStackTrace()
     }
@@ -630,8 +635,8 @@ fun Drawable.toBitmap(): Bitmap {
 }
 
 
-
-val ActionNode.regParamSet: Set<String> get() {
+val ActionNode.regParamSet: Set<String>
+    get() {
         val set = mutableSetOf<String>()
         @Suppress("RegExpRedundantEscape")//运行时解析错误
         val reg = "@\\{#?([^}.]+)\\}".toRegex()
@@ -640,3 +645,36 @@ val ActionNode.regParamSet: Set<String> get() {
         }
         return set
     }
+
+
+/**
+ * 网络post请求 内容格式为json
+ * @param url String
+ * @param model Any? 请求体
+ * @param requestCode Int
+ * @param callback WrappedRequestCallback<T>.()
+ */
+inline fun <reified T> NetHelper.putJson(
+        url: String, model: Any? = null, requestCode: Int = 0,
+        headers: Map<String, String>? = null,
+        callback: WrappedRequestCallback<T>.() -> Unit
+): Call {
+    val client = OkHttpClient.Builder()
+            .readTimeout(timeout, TimeUnit.SECONDS).build()
+
+    val json = GsonHelper.toJson(model)
+    val requestBody = json.toRequestBody("application/json; charset=utf-8".toMediaTypeOrNull())
+
+    Vog.d("put ($url)\n$json  \n$headers")
+    val request = Request.Builder().url(url)
+            .put(requestBody)
+            .apply {
+                headers?.forEach {
+                    addHeader(it.key, it.value)
+                }
+            }
+            .build()
+    val call = client.newCall(request)
+    call(url, call, requestCode, callback)
+    return call
+}

@@ -183,7 +183,7 @@ class SettingItemHelper(
                 setBasic()
             }.show {
                 positiveButton()
-                if((settingItem as InputItem).clearable) {
+                if ((settingItem as InputItem).clearable) {
                     neutralButton(text = "清空") {
                         if (settingItem.keyId != null) {
                             this@SettingItemHelper.config.set(settingItem.keyId, null)
@@ -229,12 +229,20 @@ class SettingItemHelper(
                 holder.tileArea.background = null
             }
         }
+        var lock = false
         if (item.keyId != null) {
             val b = config.settings.getBoolean(GlobalApp.getString(item.keyId), item.defaultValue.invoke() as Boolean)
             holder.compoundWight.isChecked = b
             holder.compoundWight.setOnCheckedChangeListener { _, isChecked ->
+                if (lock) {
+                    return@setOnCheckedChangeListener
+                }
                 if ((item.callback as CallbackOnSet<Boolean>?)?.invoke(ItemOperation(this), isChecked) != false) {
                     config.set(item.keyId, isChecked)
+                } else {
+                    lock = true
+                    holder.compoundWight.toggle()
+                    lock = false
                 }
             }
         } else {//withoutSp

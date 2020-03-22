@@ -2,13 +2,12 @@ package cn.vove7.common.app
 
 import android.app.ActivityManager
 import android.app.Application
+import android.app.Service
 import android.content.Context
-import android.content.Intent
-import androidx.multidex.MultiDex
 import android.util.Log
 import android.widget.Toast
+import androidx.multidex.MultiDex
 import cn.vove7.common.BuildConfig
-import cn.vove7.common.bridges.ServiceBridge
 import cn.vove7.common.helper.ToastyHelper
 import cn.vove7.common.helper.ToastyHelper.TYPE_ERROR
 import cn.vove7.common.helper.ToastyHelper.TYPE_INFO
@@ -54,6 +53,8 @@ open class GlobalApp : Application() {
         lateinit var APP: Application
         val GApp: GlobalApp
             get() = APP as GlobalApp
+
+        lateinit var ForeService: Service
 
         fun getString(id: Int): String = APP.getString(id)
 

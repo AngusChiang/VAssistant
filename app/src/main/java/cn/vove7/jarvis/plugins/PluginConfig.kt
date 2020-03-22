@@ -5,6 +5,7 @@ import cn.vove7.smartkey.AConfig
 import cn.vove7.smartkey.android.noCacheKey
 import cn.vove7.smartkey.annotation.Config
 import cn.vove7.smartkey.key.noCacheKey
+import cn.vove7.smartkey.key.smartKey
 
 /**
  * # PluginConfig
@@ -23,4 +24,7 @@ object PluginConfig : AConfig() {
     var smartKillAd by noCacheKey(false, keyId = R.string.key_smart_find_and_kill_ad) // 跳过自动识别未标记的广告
     var isToastWhenRemoveAd by noCacheKey(true, keyId = R.string.key_show_toast_when_remove_ad)
 
+    var rokidInTimeSendLocation by noCacheKey(false, R.string.key_rokid_send_loc)
+
+    var rokidHomeLoc :Pair<Double, Double>? by smartKey(null, "rokid_home_loc")
 }

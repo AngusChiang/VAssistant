@@ -14,9 +14,11 @@ import cn.vove7.common.appbus.AppBus.ACTION_STOP_DEBUG_SERVER
 import cn.vove7.common.appbus.AppBus.ACTION_STOP_WAKEUP
 import cn.vove7.common.utils.contains
 import cn.vove7.jarvis.services.MainService
+import cn.vove7.jarvis.shs.RokidHomeSystem
 import cn.vove7.jarvis.tools.AppLogic
 import cn.vove7.jarvis.view.dialog.AppUpdateDialog
 import cn.vove7.jarvis.view.dialog.contentbuilder.WrappedTextContentBuilder
+import cn.vove7.jarvis.work.RokidSendLocTAsk
 import org.greenrobot.eventbus.Subscribe
 
 /**
@@ -38,6 +40,7 @@ object UtilEventReceiver : DyBCReceiver() {
         get() = IntentFilter().apply {
             addAction(APP_HAS_UPDATE)
             addAction(INST_DATA_SYNC_FINISH)
+            addAction(ROKID_SEND_LOC)
             addAction(ACTION_START_WAKEUP)
             addAction(ACTION_STOP_WAKEUP)
             addAction(ACTION_STOP_DEBUG_SERVER)
@@ -66,6 +69,12 @@ object UtilEventReceiver : DyBCReceiver() {
                     awesomeHeader("指令数据更新日志")
                     content(WrappedTextContentBuilder(content))
                     oneButton("确定")
+                }
+            }
+            ROKID_SEND_LOC -> {
+                val hc = MainService.homeControlSystem
+                if(hc is RokidHomeSystem){
+                    hc.callSendLocTask()
                 }
             }
             else -> {
@@ -99,4 +108,5 @@ object UtilEventReceiver : DyBCReceiver() {
 
     const val APP_HAS_UPDATE = "app_has_update"
     const val INST_DATA_SYNC_FINISH = "inst_data_sync_finish"
+    const val ROKID_SEND_LOC = "ROKID_SEND_LOC"
 }

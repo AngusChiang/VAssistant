@@ -10,7 +10,6 @@ import android.app.SearchManager
 import android.bluetooth.BluetoothAdapter
 import android.content.*
 import android.content.Context.WIFI_SERVICE
-import android.content.pm.PackageManager
 import android.content.pm.PackageManager.MATCH_DEFAULT_ONLY
 import android.content.res.Configuration
 import android.graphics.Bitmap
@@ -35,7 +34,6 @@ import android.util.DisplayMetrics
 import android.view.KeyEvent
 import android.view.WindowManager
 import androidx.annotation.RequiresApi
-import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import cn.vove7.common.R
 import cn.vove7.common.accessibility.AccessibilityApi
@@ -764,33 +762,32 @@ object SystemBridge : SystemOperation {
 
     }
 
-    //TODO 测试
+    @SuppressLint("MissingPermission")
     override fun location(): Location? {
-        if (ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+        if (!PermissionUtils.isAllGranted(context, arrayOf(
+                        Manifest.permission.ACCESS_COARSE_LOCATION,
+                        Manifest.permission.ACCESS_FINE_LOCATION
+                ))) {
+
             AppBus.post(RequestPermission("位置权限"))
             return null
         }
-
         val serviceString = Context.LOCATION_SERVICE// 获取的是位置服务
-        val locationManager = context.getSystemService(serviceString) as LocationManager
-        val providers = locationManager.getProviders(true)
-        val locationProvider: String = LocationManager.NETWORK_PROVIDER
-        if (!providers.contains(LocationManager.NETWORK_PROVIDER)) {
-            GlobalApp.toastInfo("无法获取位置信息")
-            GlobalLog.log("未打开位置设置")
-            Vog.d("location ---> 没有可用的位置提供器")
-            return null
-        }
-        prepareIfNeeded()
+        val lm = GlobalApp.ForeService.getSystemService(serviceString) as LocationManager
+
+        val ht = HandlerThread("location")
+        ht.start()
+        val handler = Handler(ht.looper)
         val result = ResultBox<Location?>()
-        var block = Runnable {}
-        val handler = Handler()
+
+        val block = arrayOf(Runnable { })
 
         val loLis = object : LocationListener {
+            @SuppressLint("MissingPermission")
             override fun onLocationChanged(location: Location?) {
                 Vog.d("onLocationChanged ---> $location")
-                handler.removeCallbacks(block)
-                locationManager.removeUpdates(this)
+                handler.removeCallbacks(block[0])
+                lm.removeUpdates(this)
                 result.setAndNotify(location)
             }
 
@@ -803,15 +800,60 @@ object SystemBridge : SystemOperation {
             override fun onProviderDisabled(provider: String?) {
             }
         }
-        block = Runnable {
-            locationManager.removeUpdates(loLis)
-            GlobalLog.log("location ---> 获取位置超时,使用上次位置")
-            result.setAndNotify(locationManager.getLastKnownLocation(locationProvider))
+
+        locationInternal(lm, LocationManager.GPS_PROVIDER, ht.looper, block, handler, loLis, result)
+
+        return try {
+            result.blockedGet(false)
+        } catch (e: InterruptedException) {
+            lm.removeUpdates(loLis)
+            throw e
+        } finally {
+            ht.quitSafely()
         }
-        val looper = Looper.myLooper()
-        locationManager.requestLocationUpdates(locationProvider, 500L, 0f, loLis, looper)
-        handler.postDelayed(block, 5000)//等待5秒
-        return result.blockedGet(false)
+
+    }
+
+    @SuppressLint("MissingPermission")
+    private fun locationInternal(
+            lm: LocationManager,
+            lp: String,
+            looper: Looper,
+            block: Array<Runnable>,
+            handler: Handler,
+            loLis: LocationListener,
+            result: ResultBox<Location?>
+    ) {
+        Vog.d("定位设备：$lp")
+        if (!lm.isProviderEnabled(lp)) {
+            GlobalApp.toastInfo("位置服务未开启")
+            GlobalLog.log("位置服务未开启")
+            if (lp == LocationManager.NETWORK_PROVIDER) {
+                runInCatch {
+                    context.startActivity(Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS))
+                }
+            } else {
+                locationInternal(lm, LocationManager.NETWORK_PROVIDER, looper, block, handler, loLis, result)
+            }
+            return
+        }
+
+        lm.requestLocationUpdates(lp, 500L, 0f, loLis, looper)
+
+        block[0] = Runnable {
+            if (lp == LocationManager.NETWORK_PROVIDER) {
+                Vog.d("location ---> 获取位置超时,使用上次位置")
+                result.setAndNotify(lm.getLastKnownLocation(LocationManager.GPS_PROVIDER)
+                    ?: lm.getLastKnownLocation(LocationManager.NETWORK_PROVIDER)
+                )
+                lm.removeUpdates(loLis)
+            } else {
+                Vog.d("location ---> gps 获取位置超时,使用网络定位")
+                lm.removeUpdates(loLis)
+                locationInternal(lm, LocationManager.NETWORK_PROVIDER, looper, block, handler, loLis, result)
+            }
+        }
+        handler.postDelayed(block[0], 10000)//等待10秒
     }
 
     private fun quitLoop() {

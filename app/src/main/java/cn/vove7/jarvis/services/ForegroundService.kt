@@ -93,8 +93,14 @@ class ForegroundService : Service() {
             setContentText(buildContent())
         }.build()
 
+
+    private val statusList by lazy {
+        mutableListOf<CharSequence>()
+    }
+
     private fun buildContent(): CharSequence {
-        val status = mutableListOf<CharSequence>()
+        val status = statusList
+        status.clear()
 
         if (!RemoteDebugServer.stopped) {
             status += "远程调试"
@@ -120,6 +126,7 @@ class ForegroundService : Service() {
 
     override fun onCreate() {
         super.onCreate()
+        GlobalApp.ForeService = this
         GlobalLog.log("开启前台服务")
         startForeground(1111, foreNotification)
     }

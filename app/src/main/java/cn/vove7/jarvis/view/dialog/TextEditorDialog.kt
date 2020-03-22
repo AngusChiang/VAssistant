@@ -1,6 +1,6 @@
 package cn.vove7.jarvis.view.dialog
 
-import android.app.Activity
+import android.content.Context
 import android.widget.EditText
 import cn.vove7.jarvis.R
 import com.afollestad.materialdialogs.MaterialDialog
@@ -14,7 +14,7 @@ import kotlinx.android.synthetic.main.edit_view.view.*
  * @author 11324
  * 2019/3/12
  */
-class TextEditorDialog(val context: Activity, val text: String?, builder: MaterialDialog.() -> Unit) {
+class TextEditorDialog(val context: Context, val text: String?, builder: MaterialDialog.() -> Unit) {
 
     init {
         MaterialDialog(context).show {

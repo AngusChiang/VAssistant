@@ -177,7 +177,7 @@ dependencies {
     implementation project(':admin-manager')
 
     implementation "com.github.infotech-group:android-drawable-dsl:0.3.0"
-    def work_version = "2.3.2"
+    def work_version = "2.3.3"
     implementation "androidx.work:work-runtime-ktx:$work_version"
 
     implementation 'com.gitee.Vove:ScaffoldAndroid:a564fd346d'

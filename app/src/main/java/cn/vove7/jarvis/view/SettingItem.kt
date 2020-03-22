@@ -224,10 +224,10 @@ class SingleChoiceItem(
 class IntentItem(titleId: Int? = null,
                  title: String? = null,
                  summary: String? = null,
-                 onClick: () -> Unit)
+                 onClick: (ItemOperation) -> Unit)
     : SettingChildItem(titleId, title, summary, itemType = TYPE_INTENT,
-        defaultValue = { Any() }, callback = { _, _ ->
-    onClick.invoke()
+        defaultValue = { Any() }, callback = { i, _ ->
+    onClick.invoke(i)
     true
 })
 

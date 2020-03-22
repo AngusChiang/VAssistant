@@ -196,6 +196,8 @@
     <string name="key_wakeup_screen_when_vw" translatable="false">key_wakeup_screen_when_vw</string>
     <string name="key_device_name" translatable="false">device_name</string>
 
+    <string name="key_rokid_send_loc" translatable="false">rokid_send_loc</string>
+
 
 
 </resources>

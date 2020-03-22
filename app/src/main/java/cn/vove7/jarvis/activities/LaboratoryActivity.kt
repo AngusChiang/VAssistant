@@ -183,39 +183,17 @@ class LaboratoryActivity : ReturnableActivity() {
                             MainService.loadHomeSystem(data?.first)
                             true
                         },
-                        IntentItem(title = "参数配置") {
-                            val s = AppConfig.homeSystem
-                            if (s == null) {
-                                GlobalApp.toastInfo("请先选择您的家居系统")
-                                return@IntentItem
-                            }
-                            TextEditorDialog(this, AppConfig.homeSystemConfig
-                                ?: ISmartHomeSystem.templateConfig(s)) {
-                                noAutoDismiss()
-                                title(text = "参数配置")
-                                editorView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13f)
-                                positiveButton(text = "保存") {
-                                    val text = editorView.content()
-                                    AppConfig.homeSystemConfig = text
-                                    //重新解析配置，并保存到对应的指令存储中
-                                    MainService.homeControlSystem?.apply {
-                                        init()
-                                        saveInstConfig()
-                                    }
-                                    GlobalApp.toastSuccess("保存完成")
-                                    it.dismiss()
+                        IntentItem(title = "系统设置") {
+                            val hs = MainService.homeControlSystem
+                            if (hs != null) {
+                                val settings = hs.getSettingItems(this)
+                                if (settings.isNotEmpty()) {
+                                    showExtensionSettings(hs.name + "设置", settings.toMutableList())
+                                } else {
+                                    GlobalApp.toastInfo("该家居系统无设置")
                                 }
-                                neutralButton(text = "选择模板") {
-                                    PopupMenu(this@LaboratoryActivity, it.getActionButton(WhichButton.NEUTRAL)).apply {
-                                        menu.add(0, 0, 0, "Rokid(若琪)")
-                                        setOnMenuItemClickListener { i ->
-                                            editorView.setText(ISmartHomeSystem.templateConfig(i.itemId))
-                                            true
-                                        }
-                                        show()
-                                    }
-                                }
-                                negativeButton { it.dismiss() }
+                            } else {
+                                GlobalApp.toastInfo("请选择家居系统")
                             }
                         },
                         IntentItem(title = "自定义短语", summary = "自定义发送到家居控制系统的短语") {
@@ -230,19 +208,6 @@ class LaboratoryActivity : ReturnableActivity() {
                                     GlobalApp.toastSuccess("保存完成")
                                 }
                                 negativeButton()
-                            }
-                        },
-                        IntentItem(title = "查看信息") {
-                            if (AppConfig.homeSystem == null) {
-                                GlobalApp.toastInfo("请先选择您的家居系统")
-                                return@IntentItem
-                            }
-                            BottomDialog.builder(this) {
-                                awesomeHeader("信息")
-                                markdownContent {
-                                    loadMarkdown(MainService.homeControlSystem?.summary()
-                                        ?: "")
-                                }
                             }
                         }
                 )),
@@ -270,7 +235,7 @@ class LaboratoryActivity : ReturnableActivity() {
                         }
 
                 )),
-                SettingGroupItem(R.color.yellow_700, titleS = "语音唤醒", childItems = listOf(
+                SettingGroupItem(R.color.deep_purple_600, titleS = "语音唤醒", childItems = listOf(
                         SwitchItem(title = "自动释放麦克风", summary = "在已授予麦克风权限的其他App内自动关闭语音唤醒\n需要无障碍",/*设为系统应用后无效*/
                                 keyId = R.string.key_fix_voice_micro, defaultValue = AppConfig.fixVoiceMicro) { _, b ->
                             if (b /* TODO && !AppConfig.IS_SYS_APP*/) {
