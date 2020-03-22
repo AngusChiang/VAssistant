@@ -131,9 +131,10 @@
         <item name="popupTheme">@style/PopMenu.Dark</item>
         <item name="android:popupMenuStyle">@style/PopMenu.Dark</item>
         <item name="popupMenuStyle">@style/PopMenu.Dark</item>
-
         <item name="bd_bg_color">@color/app_dark_foreground</item>
         <item name="android:textColorPrimary">#fff</item>
+        <item name="popupMenuBackground">@color/app_dark_foreground</item>
+        <item name="android:popupBackground">@color/app_dark_foreground</item>
     </style>
 
     <style name="ScreenAssist.Dark" parent="ScreenAssist">
@@ -148,6 +149,7 @@
 
         <item name="md_background_color">@color/app_dark_background</item>
         <item name="md_color_content">@color/primary_text</item>
+
         <item name="popupTheme">@style/PopMenu.Dark</item>
         <item name="android:popupMenuStyle">@style/PopMenu.Dark</item>
         <item name="popupMenuStyle">@style/PopMenu.Dark</item>
