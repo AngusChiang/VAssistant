@@ -1,10 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
-<br.tiagohm.markdownview.MarkdownView
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<ViewSwitcher xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/view_switcher"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/markdown_view"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    app:escapeHtml="false">
+    android:layout_height="match_parent">
 
-</br.tiagohm.markdownview.MarkdownView>
+    <ProgressBar
+        android:id="@+id/loading_bar"
+        android:layout_width="wrap_content"
+        android:layout_gravity="center"
+        android:indeterminate="true"
+        android:layout_height="wrap_content" />
+
+    <br.tiagohm.markdownview.MarkdownView
+        android:id="@+id/markdown_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:escapeHtml="false" />
+</ViewSwitcher>

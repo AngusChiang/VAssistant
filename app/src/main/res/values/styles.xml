@@ -57,7 +57,7 @@
     </style>
 
     <style name="BottomDialog.Dark" parent="BottomDialog">
-        <item name="bd_bg_color">@color/app_dark_foreground</item>
+        <item name="bd_bg_color">@color/app_dark_background</item>
         <item name="android:textColorPrimary">#fff</item>
     </style>
 
@@ -131,10 +131,10 @@
         <item name="popupTheme">@style/PopMenu.Dark</item>
         <item name="android:popupMenuStyle">@style/PopMenu.Dark</item>
         <item name="popupMenuStyle">@style/PopMenu.Dark</item>
-        <item name="bd_bg_color">@color/app_dark_foreground</item>
+        <item name="bd_bg_color">@color/app_dark_background</item>
         <item name="android:textColorPrimary">#fff</item>
-        <item name="popupMenuBackground">@color/app_dark_foreground</item>
-        <item name="android:popupBackground">@color/app_dark_foreground</item>
+        <item name="popupMenuBackground">@color/app_dark_background</item>
+        <item name="android:popupBackground">@color/app_dark_background</item>
     </style>
 
     <style name="ScreenAssist.Dark" parent="ScreenAssist">
@@ -153,10 +153,10 @@
         <item name="popupTheme">@style/PopMenu.Dark</item>
         <item name="android:popupMenuStyle">@style/PopMenu.Dark</item>
         <item name="popupMenuStyle">@style/PopMenu.Dark</item>
-        <item name="bd_bg_color">@color/app_dark_foreground</item>
+        <item name="bd_bg_color">@color/app_dark_background</item>
         <item name="android:textColorPrimary">#fff</item>
-        <item name="popupMenuBackground">@color/app_dark_foreground</item>
-        <item name="android:popupBackground">@color/app_dark_foreground</item>
+        <item name="popupMenuBackground">@color/app_dark_background</item>
+        <item name="android:popupBackground">@color/app_dark_background</item>
     </style>
 
     <style name="PopMenu.Dark" parent="ThemeOverlay.AppCompat.Dark">

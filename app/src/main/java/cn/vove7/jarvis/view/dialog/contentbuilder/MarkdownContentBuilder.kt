@@ -2,12 +2,15 @@ package cn.vove7.jarvis.view.dialog.contentbuilder
 
 import android.graphics.Color
 import android.view.View
+import android.view.animation.AnimationUtils
 import br.tiagohm.markdownview.MarkdownView
 import br.tiagohm.markdownview.css.styles.Bootstrap
+import cn.daqinjia.android.common.ext.invisible
 import cn.vove7.bottomdialog.builder.BottomDialogBuilder
 import cn.vove7.bottomdialog.interfaces.ContentBuilder
 import cn.vove7.common.bridges.SystemBridge
-import cn.vove7.jarvis.App
+import cn.vove7.common.utils.fadeIn
+import cn.vove7.common.utils.fadeOut
 import cn.vove7.jarvis.R
 import kotlinx.android.synthetic.main.dialog_markdown_view.view.*
 import java.io.File
@@ -35,13 +38,32 @@ class MarkdownContentBuilder(
 
     override fun init(view: View) {
         mdView = view.markdown_view
+        mdView.invisible()
+        val vs = view.view_switcher
+        vs.inAnimation = AnimationUtils.loadAnimation(view.context, android.R.anim.fade_in)
+        vs.outAnimation = AnimationUtils.loadAnimation(view.context, android.R.anim.fade_out)
+        vs.displayedChild = 0
+
+        mdView.setLoadListener(object : MarkdownView.LoadListener {
+            override fun onLoadComplete() {
+                vs.displayedChild = 1
+                mdView.postInvalidate()
+                dialog.findViewById<View>(R.id.content).postInvalidate()
+            }
+
+            override fun onStartLoading() {}
+        })
         if (isDarkMode) {
             //防止白色背景闪屏
-            mdView.setBackgroundColor(Color.parseColor("#212121"))
+            mdView.setBackgroundColor(Color.parseColor("#1A1A1A"))
         }
         mdView.addStyleSheet(
                 if (isDarkMode) MyDarkStyle() else MyStyle()
         )
+    }
+
+    override fun onAfterShow() {
+        updateContent(1)
     }
 
     var source: Any? = null
@@ -68,6 +90,9 @@ class MarkdownContentBuilder(
     }
 
     override fun updateContent(type: Int, data: Any?) {
+        if (type == -1) {
+            return
+        }
         when (sourceType) {
             1 -> mdView.loadMarkdownFromAsset(source as String)
             2 -> mdView.loadMarkdownFromFile(source as File)
@@ -79,7 +104,7 @@ class MarkdownContentBuilder(
 
 class MyDarkStyle : MyStyle() {
     init {
-        this.addRule("body", "background: #212121","color: #eee")
+        this.addRule("body", "background: #1A1A1A", "color: #eee")
         this.addRule("img", "opacity: 0.7")
         this.addRule("pre", "background: #f6f8fab0")
         this.addRule("code", "background: #444242")

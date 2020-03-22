@@ -158,7 +158,7 @@ dependencies {
 
     implementation 'com.github.QuadFlask:colorpicker:0.0.15'
     implementation 'com.github.Vove7:CodeView:1.0.2'
-    implementation 'com.github.Vove7:BottomDialog:2.2.0'
+    implementation 'com.github.Vove7:BottomDialog:2.2.1'
 
     implementation 'com.github.Vove7:SlidePickerView:1.0.2'
 
@@ -170,7 +170,7 @@ dependencies {
     implementation 'com.github.Vove7:recycler-fast-scroll:0.3.3'
 
     implementation 'com.king.zxing:zxing-lite:1.1.1'
-    implementation 'com.github.tiagohm.MarkdownView:library:0.19.0'
+    implementation 'com.github.Vove7.MarkdownView:library:0.20.1'
     implementation 'org.nanohttpd:nanohttpd:2.3.1'
 
     implementation project(path: ':speechLib')
