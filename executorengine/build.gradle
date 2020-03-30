@@ -30,7 +30,7 @@ dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     testImplementation 'junit:junit:4.12'
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
-    implementation 'androidx.appcompat:appcompat:1.0.0'
+    implementation "androidx.appcompat:appcompat:$androidx_version"
     androidTestImplementation 'androidx.test.ext:junit:1.1.1'
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     implementation "com.github.Vove7:VTP:$vtp_version"
