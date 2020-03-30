@@ -25,7 +25,7 @@ import cn.vove7.jarvis.view.SettingChildItem
 import cn.vove7.jarvis.view.dialog.TextEditorDialog
 import cn.vove7.jarvis.view.dialog.contentbuilder.markdownContent
 import cn.vove7.jarvis.view.dialog.editorView
-import cn.vove7.jarvis.work.RokidSendLocTAsk
+import cn.vove7.jarvis.work.RokidSendLocTask
 import cn.vove7.paramregex.toParamRegex
 import cn.vove7.vtp.log.Vog
 import cn.vove7.vtp.net.NetHelper
@@ -446,7 +446,7 @@ class RokidHomeSystem : ISmartHomeSystem() {
 
 
     private val sendLocTask by lazy {
-        RokidSendLocTAsk { configs }
+        RokidSendLocTask { configs }
     }
 
     private fun startSendLocTask(delay: Long = 3000) {

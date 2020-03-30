@@ -27,7 +27,7 @@ import kotlin.math.*
  * @property alarmManager AlarmManager
  * @constructor
  */
-class RokidSendLocTAsk(val configs: () -> Map<String, String>) : Runnable {
+class RokidSendLocTask(val configs: () -> Map<String, String>) : Runnable {
 
     private val alarmManager get() = GlobalApp.APP.getSystemService(Context.ALARM_SERVICE) as AlarmManager
 

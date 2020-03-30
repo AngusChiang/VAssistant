@@ -18,7 +18,6 @@ import cn.vove7.jarvis.shs.RokidHomeSystem
 import cn.vove7.jarvis.tools.AppLogic
 import cn.vove7.jarvis.view.dialog.AppUpdateDialog
 import cn.vove7.jarvis.view.dialog.contentbuilder.WrappedTextContentBuilder
-import cn.vove7.jarvis.work.RokidSendLocTAsk
 import org.greenrobot.eventbus.Subscribe
 
 /**
