@@ -3,7 +3,6 @@ package cn.vove7.jarvis.work
 import android.app.AlarmManager
 import android.app.PendingIntent
 import android.content.Context
-import android.location.Location
 import android.os.Build
 import android.os.SystemClock
 import cn.vove7.common.app.GlobalApp
@@ -127,7 +126,7 @@ class RokidSendLocTAsk(val configs: () -> Map<String, String>) : Runnable {
                 val data = mapOf(
                         "invokeScenes" to true,
                         "name" to "user0gps",
-                        "value" to "{${loc.longitude},${loc.latitude}}"
+                        "value" to """{"gps":[{"basic":{"lat":"${loc.latitude}","lon":"${loc.longitude}"}}]}"""
                 )
                 val headers = mapOf(
                         "Authorization" to "Basic " + ("${configs["username"]}:${configs["pass"]}".base64)
