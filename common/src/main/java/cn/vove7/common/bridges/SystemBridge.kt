@@ -976,7 +976,9 @@ object SystemBridge : SystemOperation {
     fun screen2File(p: String): File? {
         val screenBitmap = screenShotWithRelease()
         return if (screenBitmap != null) {
-            bitmap2File(screenBitmap, p)
+            bitmap2File(screenBitmap, p).also {
+                it?.broadcastImageFile()
+            }
         } else null
     }
 
