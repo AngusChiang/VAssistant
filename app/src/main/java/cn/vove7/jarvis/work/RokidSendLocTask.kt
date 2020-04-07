@@ -43,19 +43,21 @@ class RokidSendLocTask(val configs: () -> Map<String, String>) : Runnable {
         Vog.d("离家距离：${disKm}Km")
 
         return when {
+            disKm < 0.1 -> 2.minuteInMillis
+            disKm < 0.3 -> 2.minuteInMillis
             disKm < 1.2 -> {
-                5 * 60 * 1000L
+                5.minuteInMillis
             }
             //1km 2.5min
             //10km 25min
             disKm < 10 -> {
-                ((disKm / 2) * 2.5 * 60 * 1000L).toLong()
+                ((disKm / 2) * 2.5).minuteInMillis
             }
             disKm in 20..40 -> {
-                30 * 60 * 1000L
+                30.minuteInMillis
             }
             else -> {
-                50 * 60 * 1000L
+                50.minuteInMillis
             }
         }.also {
             Vog.d("下次发送间隔： ${it / 1000 / 60}min")
@@ -105,6 +107,9 @@ class RokidSendLocTask(val configs: () -> Map<String, String>) : Runnable {
         alarmManager.cancel(pendingIntent)
     }
 
+    private val Int.minuteInMillis: Long get() = this * 60 * 1000L
+    private val Double.minuteInMillis: Long get() = (this * 60 * 1000L).toLong()
+
     override fun run() {
         GlobalScope.launch {
             val configs = configs()
@@ -120,7 +125,7 @@ class RokidSendLocTask(val configs: () -> Map<String, String>) : Runnable {
                 SystemBridge.location()
             }.onSuccess { loc ->
                 if (loc == null) {//位置失败
-                    nextTask(5 * 60 * 1000)
+                    nextTask(5.minuteInMillis)
                     return@launch
                 }
                 val data = mapOf(
@@ -137,7 +142,7 @@ class RokidSendLocTask(val configs: () -> Map<String, String>) : Runnable {
                         nextTask(lastTaskDelayTime)
                     }
                     fail { _, e ->
-                        nextTask(lastTaskDelayTime / 2)
+                        nextTask(5.minuteInMillis)
                     }
                 }
             }.onFailure {
