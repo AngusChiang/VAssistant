@@ -112,10 +112,12 @@ object MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
      * 正常语音模式
      */
     const val MODE_VOICE = 858
+
     /**
      * 执行期间获取"语音参数"
      */
     const val MODE_GET_PARAM = 72
+
     /**
      * 确认对话框语音模式
      */
@@ -547,7 +549,7 @@ object MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
         }
         DataCollector.buriedPoint("sa_3")
 
-        return ScreenTextFinder().findAll().map {
+        return ScreenTextFinder().findAll().mapNotNull {
             val rect = it.bounds
             val points = listOf(
                     Point(rect.left, rect.top),
@@ -555,9 +557,10 @@ object MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
                     Point(rect.right, rect.bottom),
                     Point(rect.left, rect.bottom)
             )
-            TextOcrItem(
-                    it.text ?: it.desc() ?: "", points, 1.0
-            )
+            val t = it.text ?: it.desc()
+            return@mapNotNull if (t.isNullOrBlank()) {
+                null
+            } else TextOcrItem(t, points, 1.0)
         }
     }
 
@@ -1036,6 +1039,7 @@ object MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
     private var isContinousDialogue = false
 
     private var parseJob: Job? = null
+
     /**
      * 解析指令
      */
