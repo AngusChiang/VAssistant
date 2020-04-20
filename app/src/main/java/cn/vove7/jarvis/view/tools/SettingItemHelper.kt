@@ -138,6 +138,9 @@ class SettingItemHelper(
 
         setBasic {
             val cpv = ColorPickerView(context)
+            cpv.addOnColorChangedListener { color ->
+                item.onChange?.invoke(color)
+            }
             cpv.setPadding(10.dp.px, 0, 10.dp.px, 0)
             MaterialDialog(context).title(text = settingItem.title()).show {
                 customView(view = cpv)
@@ -380,7 +383,7 @@ class SettingItemHelper(
         }
 
         setBasic {
-            val vv = buildNumberPickerView((item as NumberPickerItem).range, old)
+            val vv = buildNumberPickerView(context, (item as NumberPickerItem).range, old)
             MaterialDialog(context).title(text = item.title())
                     .customView(null, vv.first)
                     .positiveButton {
@@ -413,22 +416,26 @@ class SettingItemHelper(
         }
     }
 
-    /**
-     *
-     * @param range Pair<Int, Int>
-     * @param i Int
-     * @return Pair<View, DiscreteSeekBar>
-     */
-    private fun buildNumberPickerView(range: Pair<Int, Int>, i: Int): Pair<View, DiscreteSeekBar> {
-        val view = LayoutInflater.from(context).inflate(R.layout.dialog_num_picker, null)
-        view.findViewById<TextView>(R.id.min_value_view).text = range.first.toString()
-        view.findViewById<TextView>(R.id.max_value_view).text = range.second.toString()
-        val sb = view.findViewById<DiscreteSeekBar>(R.id.seekbar)
-        sb.min = range.first
-        sb.max = range.second
-        sb.progress = i
+    companion object {
 
-        return Pair(view, sb)
+        /**
+         *
+         * @param range Pair<Int, Int>
+         * @param i Int
+         * @return Pair<View, DiscreteSeekBar>
+         */
+        fun buildNumberPickerView(context: Context, range: Pair<Int, Int>, i: Int): Pair<View, DiscreteSeekBar> {
+            val view = LayoutInflater.from(context).inflate(R.layout.dialog_num_picker, null)
+            view.findViewById<TextView>(R.id.min_value_view).text = range.first.toString()
+            view.findViewById<TextView>(R.id.max_value_view).text = range.second.toString()
+            val sb = view.findViewById<DiscreteSeekBar>(R.id.seekbar)
+            sb.min = range.first
+            sb.max = range.second
+            sb.progress = i
+
+            return Pair(view, sb)
+        }
+
     }
 
     open class ChildItemHolder(v: View) : BaseListAdapter.ViewHolder(v) {

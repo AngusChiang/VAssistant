@@ -187,6 +187,7 @@ object MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
             1 -> OldFloatPanel()
             2 -> CustomPanel()
             3 -> GooglePanel()
+            4 -> AlignPanel()
             else -> DefaultPanel()
         }
     }

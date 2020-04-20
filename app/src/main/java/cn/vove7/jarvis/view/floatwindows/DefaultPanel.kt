@@ -155,7 +155,7 @@ class DefaultPanel : FloatyPanel(
                         onDialogDismiss = { hide() },
                         onChange = {
                             if (!isShowing) {
-                                show("设置圆角")
+                                show("设置背景色")
                             } else runInCatch {
                                 animationBody.background = buildBackground(bgColor = it)
                             }
@@ -168,7 +168,7 @@ class DefaultPanel : FloatyPanel(
                         onDialogDismiss = { hide() },
                         onChange = {
                             if (!isShowing) {
-                                show("设置圆角")
+                                show("设置文字颜色")
                             } else runInCatch {
                                 animationBody.background = buildBackground(textColor = it)
                             }

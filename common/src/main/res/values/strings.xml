@@ -37,6 +37,7 @@
         <item>简洁</item>
         <item>样式B</item>
         <item>Google 助手</item>
+        <item>侧边依靠</item>
     </string-array>
 
     <string-array name="list_home_funs" translatable="false">
@@ -188,6 +189,11 @@
     <string name="key_default_fp_radius" translatable="false">default_fp_radius</string>
     <string name="key_default_fp_color" translatable="false">default_fp_color</string>
     <string name="key_default_fp_text_color" translatable="false">default_fp_text_color</string>
+
+    <string name="key_align_fp_bg_color" translatable="false">align_fp_bg_color</string>
+    <string name="key_align_fp_orientation" translatable="false">align_fp_orientation</string>
+    <string name="key_align_fp_text_color" translatable="false">align_fp_text_color</string>
+    <string name="key_align_fp_vertical" translatable="false">align_fp_vertical</string>
 
 
     <string name="key_recog_compatible_mode" translatable="false">recog_compatible_mode</string>

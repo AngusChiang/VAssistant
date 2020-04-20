@@ -30,8 +30,10 @@ import cn.vove7.vtp.log.Vog
 import cn.vove7.vtp.net.GsonHelper
 import cn.vove7.vtp.net.NetHelper
 import cn.vove7.vtp.net.WrappedRequestCallback
-import okhttp3.*
+import okhttp3.Call
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.OkHttpClient
+import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
 import java.io.File
 import java.io.Serializable
@@ -404,7 +406,7 @@ fun Animator.listener(lis: AnimatorListener.() -> Unit) {
  *
  * @receiver Animation
  */
-fun Animation.listener(lis: AnimationListener.() -> Unit) {
+fun Animation.listener(lis: AnimationListener.() -> Unit): Animation {
     val al = AnimationListener()
     lis.invoke(al)
     setAnimationListener(object : Animation.AnimationListener {
@@ -420,6 +422,7 @@ fun Animation.listener(lis: AnimationListener.() -> Unit) {
             al._onStart?.invoke()
         }
     })
+    return this
 }
 
 class AnimatorListener : AnimationListener() {
@@ -638,6 +641,7 @@ fun Drawable.toBitmap(): Bitmap {
 val ActionNode.regParamSet: Set<String>
     get() {
         val set = mutableSetOf<String>()
+
         @Suppress("RegExpRedundantEscape")//运行时解析错误
         val reg = "@\\{#?([^}.]+)\\}".toRegex()
         regs?.map { it.regStr }?.forEach { s ->
