@@ -26,6 +26,6 @@ class WrappedTextContentBuilder(init: CharSequence?) : ContentBuilder() {
     }
 
     override fun updateContent(type: Int, data: Any?) {
-        textView.text = text
+        textView.setText(text)
     }
 }

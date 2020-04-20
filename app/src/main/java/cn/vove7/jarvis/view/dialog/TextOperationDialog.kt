@@ -2,17 +2,15 @@ package cn.vove7.jarvis.view.dialog
 
 import android.widget.PopupMenu
 import android.widget.TextView
-import androidx.core.content.ContextCompat
 import cn.vove7.bottomdialog.BottomDialog
-import cn.vove7.bottomdialog.builder.ButtonsBuilder
-import cn.vove7.bottomdialog.builder.buttons
-import cn.vove7.bottomdialog.builder.title
-import cn.vove7.bottomdialog.builder.withCloseIcon
+import cn.vove7.bottomdialog.builder.*
 import cn.vove7.bottomdialog.extension.awesomeHeader
 import cn.vove7.common.app.AppConfig
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.bridges.SystemBridge
-import cn.vove7.common.utils.*
+import cn.vove7.common.utils.StorageHelper
+import cn.vove7.common.utils.broadcastImageFile
+import cn.vove7.common.utils.runOnUi
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.activities.base.BaseActivity
 import cn.vove7.jarvis.tools.DataCollector
@@ -21,7 +19,9 @@ import cn.vove7.jarvis.tools.baiduaip.BaiduAipHelper
 import cn.vove7.jarvis.view.dialog.contentbuilder.ImageContentBuilder
 import cn.vove7.jarvis.view.dialog.contentbuilder.WrappedTextContentBuilder
 import cn.vove7.jarvis.view.positiveButtonWithColor
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.io.File
 
 /**
@@ -38,28 +38,25 @@ class TextOperationDialog(
 ) {
 
     val lifeCycleScope = activity.lifecycleScope
+
     //默认已换行
     private var wraped = true
 
-    private val cv = WrappedTextContentBuilder("")
-
-    //待操作文字
-    private var opText = textModel.text.toString()
+    private val cv = WrappedTextContentBuilder(textModel.text)
 
     val bottomDialog = BottomDialog.builder(activity) {
         awesomeHeader("文字操作")
         peekHeightProportion = 0.6f
+        content(cv)
         buttons {
-
-            content(cv)
             positiveButtonWithColor("复制") {
-                SystemBridge.setClipText(opText)
+                SystemBridge.setClipText(getOpText())
                 GlobalApp.toastInfo(R.string.text_copied)
             }
 
             neutralButton(text = "分词") {
                 DataCollector.buriedPoint("to_split_words")
-                WordSplitDialog(this@TextOperationDialog.activity, opText)
+                WordSplitDialog(this@TextOperationDialog.activity, getOpText())
                 it.dismiss()
             }
             negativeButton(text = "更多") {
@@ -69,14 +66,13 @@ class TextOperationDialog(
 
     }
 
+    //待操作文字
+    private fun getOpText(): String = (bottomDialog.contentBuilder as WrappedTextContentBuilder).textView.text.toString()
+
     init {
         bottomDialog.updateContent<WrappedTextContentBuilder> {
             textView.apply {
                 appendln(textModel.text)
-                textModel.subText?.also {
-                    appendlnRed("\n翻译结果：")
-                    appendln(it)
-                }
             }
         }
     }
@@ -85,17 +81,32 @@ class TextOperationDialog(
     private fun translate() {
         DataCollector.buriedPoint("to_trans")
         AppConfig.haveTranslatePermission() ?: return
-        lifeCycleScope.launch {
-            bottomDialog.updateContent<WrappedTextContentBuilder> {
-                textView.apply {
-                    appendlnGreen("\n翻译中...")
-                    val r = BaiduAipHelper.translate(opText, to = AppConfig.translateLang)
-                    if (r != null) {
+        val dialog = BottomDialog.builder(activity) {
+            title(round = true, title = "翻译")
+            message(textModel.subText ?: "", true)
+            buttons {
+                positiveButton("复制") {
+                    it.updateContent<MessageContentBuilder> {
+                        SystemBridge.setClipText(text)
+                        GlobalApp.toastInfo(R.string.text_copied)
+                    }
+                }
+                negativeButton("关闭") { it.dismiss() }
+            }
+        }
+        if (textModel.subText != null) {
+            return
+        }
+        lifeCycleScope.launch(Dispatchers.IO) {
+            val r = BaiduAipHelper.translate(getOpText(), to = AppConfig.translateLang)
+            withContext(Dispatchers.Main) {
+                dialog.updateContent<MessageContentBuilder> {
+                    text = if (r != null) {
                         textModel.subText = r.transResult
-                        set(textModel.text)
-                        appendlnRed("\n翻译结果：")
-                        appendln(textModel.subText)
-                    } else appendlnRed("翻译失败")
+                        r.transResult
+                    } else {
+                        "翻译失败"
+                    }
                 }
             }
         }
@@ -111,66 +122,37 @@ class TextOperationDialog(
                 menu.add("自动换行")
             }
             menu.add("分享")
-            menu.add("编辑")
             menu.add("搜索")
-            if (textModel.subText != null) {
-                menu.add("复制翻译")
-            } else {
-                menu.add("翻译")
-            }
+            menu.add("翻译")
             menu.add("生成二维码")
             setOnMenuItemClickListener {
                 when (it.title) {
                     "取消换行" -> {
                         wraped = false
                         bottomDialog.updateContent<WrappedTextContentBuilder> {
-                            opText = textModel.text.lines().joinToString("")
-                            text = opText
+                            textModel.text = getOpText()
+                            text = textModel.text.lines().joinToString("")
                         }
                     }
                     "自动换行" -> {
                         wraped = true
                         bottomDialog.updateContent<WrappedTextContentBuilder> {
-                            opText = textModel.text.toString()
-                            text = opText
+                            text = textModel.text.toString()
                         }
                     }
-                    "分享" -> SystemBridge.shareText(opText)
-                    "编辑" -> {
-                        TextEditorDialog(activity, opText) {
-                            title(text = "编辑")
-                            positiveButton(text = "复制") {
-                                SystemBridge.setClipText(editorView.content())
-                            }
-                            negativeButton(text = "分享") {
-                                SystemBridge.shareText(editorView.content())
-                            }
-                            neutralButton(text = "完成") {
-                                TextOperationDialog(
-                                        activity,
-                                        TextModel(editorView.content())
-                                )
-                                dismiss()
-                            }
-                        }
-                        bottomDialog.dismiss()
-                    }
+                    "分享" -> SystemBridge.shareText(getOpText())
                     "翻译" -> translate()
-                    "复制翻译" -> {
-                        SystemBridge.setClipText(textModel.subText)
-                        GlobalApp.toastInfo(R.string.text_copied)
-                    }
                     "搜索" -> {
                         DataCollector.buriedPoint("to_search")
-                        SystemBridge.quickSearch(opText)
+                        SystemBridge.quickSearch(getOpText())
                     }
                     "生成二维码" -> {
                         DataCollector.buriedPoint("to_gen_qr")
-                        QRTools.encode(opText) { path, e ->
+                        QRTools.encode(getOpText()) { path, e ->
                             if (path != null) {
                                 bottomDialog.dismiss()
                                 runOnUi {
-                                    showQrDialog(opText, path)
+                                    showQrDialog(getOpText(), path)
                                 }
                             } else {
                                 GlobalApp.toastError("生成失败\n${e?.message}")
@@ -215,7 +197,7 @@ class TextOperationDialog(
     }
 
     class TextModel(
-            val text: CharSequence,
+            var text: CharSequence,
             var subText: String? = null
     )
 }

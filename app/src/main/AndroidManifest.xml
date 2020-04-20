@@ -210,6 +210,7 @@
             android:exported="true"
             android:label="屏幕助手-文字识别"
             android:launchMode="singleInstance"
+            android:windowSoftInputMode="adjustResize"
             android:theme="@style/TextOcr">
             <intent-filter>
                 <action android:name="${applicationId}.SCREEN_OCR" />

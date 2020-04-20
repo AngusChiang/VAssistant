@@ -26,7 +26,7 @@ class BottomDialogWithText(context: Context, title: String, val sourceText: Stri
         }
         textView.apply {
             setPadding(35, 20, 35, 20)
-            text = sourceText
+            setText(sourceText)
             selectable(true)
             setTextColor(context.resources.getColor(R.color.primary_text))
             textSize = 15f
