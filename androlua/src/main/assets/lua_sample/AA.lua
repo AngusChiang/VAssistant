@@ -1,5 +1,7 @@
 
-
+if runtime.DEBUG then
+    argMap['s']='调试标志'
+end
 print(argMap)
 print(argMap['k'])
 
