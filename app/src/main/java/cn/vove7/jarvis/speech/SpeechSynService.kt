@@ -67,7 +67,7 @@ abstract class SpeechSynService(val event: SyntheEvent) {
     }
 
 
-    fun speak(text: String?) {
+    fun speak(text: String?, showPanel: Boolean = true) {
         if (speaking) {
             stop(false)
         }
@@ -77,7 +77,7 @@ abstract class SpeechSynService(val event: SyntheEvent) {
             return
         }
         speakingText = text
-        event.onStart(text)//检测后台音乐
+        event.onStart(text, showPanel)//检测后台音乐
         doSpeak(text)
     }
 

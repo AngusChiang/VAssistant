@@ -190,6 +190,8 @@ object AppConfig : BaseConfig {
 
     var devMode by noCacheKey(BuildConfig.DEBUG, keyId = R.string.key_dev_mode)
 
+    var hsaReadAloudTip by smartKey(false)
+
     //fixme 连接手表也为true
     val isBlueToothConnect: Boolean
         get() {

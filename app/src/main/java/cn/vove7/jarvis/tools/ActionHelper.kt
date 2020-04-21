@@ -63,7 +63,7 @@ object ActionHelper {
         intent.putExtra("LauncherUI.From.Scaner.Shortcut", true)
         app.startActivity(intent.clearTask())
 
-        text("扫二维码 / 条码 / 小程序码").parent!!.children[2].click()
+        text("扫二维码 / 条码 / 小程序码").waitFor(10000)?.parent!!.children[2].click()
         delay(800)
         type("RecyclerView").children[1].click()
     }

@@ -5,17 +5,18 @@ import android.app.AlertDialog
 import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
+import android.os.Bundle
 import android.os.Handler
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
-import android.text.SpannableStringBuilder
 import android.view.*
 import android.view.inputmethod.InputMethodManager
 import android.widget.TextView
+import androidx.recyclerview.widget.LinearLayoutManager
 import cn.vove7.androlua.luabridge.LuaUtil
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.appbus.AppBus
+import cn.vove7.common.appbus.model.ExecutorStatus
+import cn.vove7.common.appbus.model.ExecutorStatus.Companion.ON_EXECUTE_FINISHED
 import cn.vove7.common.bridges.SystemBridge
 import cn.vove7.common.datamanager.parse.model.Action
 import cn.vove7.common.executor.OnPrint
@@ -30,6 +31,8 @@ import cn.vove7.vtp.log.Vog
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.input.input
 import kotlinx.android.synthetic.main.editor_tool_bar.*
+import org.greenrobot.eventbus.Subscribe
+import org.greenrobot.eventbus.ThreadMode
 
 
 /**
@@ -46,6 +49,15 @@ abstract class CodeEditorActivity : BaseActivity() {
 
     var openFile: String? = null
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        AppBus.reg(this)
+    }
+
+    override fun onDestroy() {
+        AppBus.unreg(this)
+        super.onDestroy()
+    }
 
     abstract val testFiles: Array<String>
     abstract val assetFolder: String
@@ -58,11 +70,15 @@ abstract class CodeEditorActivity : BaseActivity() {
                 OnPrint.ERROR -> Pair(R.color.red_500, "ERROR: ")
                 OnPrint.WARN -> Pair(R.color.orange_700, "WARN: ")
                 OnPrint.INFO -> Pair(R.color.orange_700, "INFO: ")
-                else -> Pair(R.color.default_text_color, "")
+                else -> Pair(null, "")
             }
 
-            val i = pair.second.spanColor(color(pair.first))
-            val v = (output ?: "").spanColor(pair.first)
+            val (i: CharSequence, v: CharSequence) = if (pair.first == null) {
+                (pair.second to output) as Pair<CharSequence, CharSequence>
+            } else {
+                (pair.second.spanColor(color(pair.first!!)) to (output
+                    ?: "").spanColor(pair.first!!))
+            }
             synchronized(logList) {
                 logList.add(i)
                 logList.add(v)
@@ -153,7 +169,7 @@ abstract class CodeEditorActivity : BaseActivity() {
         } else super.onBackPressed()
     }
 
-    private val logList = mutableListOf<SpannableStringBuilder>()
+    private val logList = mutableListOf<CharSequence>()
 
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
         when (item?.itemId) {
@@ -240,6 +256,13 @@ abstract class CodeEditorActivity : BaseActivity() {
         }
 
         return super.onOptionsItemSelected(item)
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    fun onExecutorStatus(es: ExecutorStatus) {
+        when (es.what) {
+            ON_EXECUTE_FINISHED -> showLog()
+        }
     }
 
     var logDialog: ProgressTextDialog? = null

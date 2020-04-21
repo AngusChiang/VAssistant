@@ -31,14 +31,17 @@ abstract class ViewFinder(var node: AccessibilityNodeInfo?) {
      */
     fun waitFor(m: Long = 30000): ViewNode? {
         if (!AccessibilityApi.isBaseServiceOn) return null
-
-        val t = if (m < 0) 30000 else m
+        val t = when {
+            m in 0..30000 -> m
+            m < 0 -> 0
+            else -> 30000
+        }
         val beginTime = System.currentTimeMillis()
         var sc = 0
         val ct = Thread.currentThread()
         Vog.d("搜索线程 ---> $ct ${ct.hashCode()}")
         val endTime = beginTime + t
-        while (System.currentTimeMillis()  < endTime &&
+        while (System.currentTimeMillis() < endTime &&
                 !ct.isInterrupted) {
             val node = findFirst()
             if (node != null) {
@@ -96,12 +99,12 @@ abstract class ViewFinder(var node: AccessibilityNodeInfo?) {
             return null
         }
         (0 until node.childCount).forEach { index ->
-            if(BuildConfig.DEBUG) {
+            if (BuildConfig.DEBUG) {
                 Vog.v("traverseAllNode ${node.className} $index/${node.childCount}")
             }
             val childNode = node.getChild(index)
             if (childNode != null) {
-                if(BuildConfig.DEBUG) {
+                if (BuildConfig.DEBUG) {
                     Vog.v("child[$index]: ${childNode.text}")
                 }
                 if (!includeInvisible && !childNode.isVisibleToUser) {

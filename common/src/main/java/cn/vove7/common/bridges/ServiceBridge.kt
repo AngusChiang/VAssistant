@@ -32,7 +32,11 @@ interface ServiceBridge {
      */
     fun showAlert(title: String?, msg: String?)
 
-    fun speak(text: String?)
+    fun speak(text: String?) {
+        speak(text, true)
+    }
+
+    fun speak(text: String?, showPanel: Boolean)
     fun speakWithCallback(text: String?, call: SpeakCallback)
     fun removeFloat()
 

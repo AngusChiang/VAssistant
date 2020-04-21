@@ -5,7 +5,6 @@ import android.os.Bundle
 import android.view.Gravity
 import android.view.KeyEvent
 import android.view.View
-import android.widget.CheckedTextView
 import android.widget.RelativeLayout
 import android.widget.TextView
 import cn.vove7.bottomdialog.BottomDialog
@@ -161,8 +160,9 @@ class TextOcrActivity : BaseActivity() {
             editCheckedText()
         }
         floatEditIcon.setOnLongClickListener {
+            val allStatus = wordItems.all { it.textView?.isSelected == false }
             wordItems.forEach {
-                it.textView?.isSelected = false
+                it.textView?.isSelected = allStatus
             }
             true
         }

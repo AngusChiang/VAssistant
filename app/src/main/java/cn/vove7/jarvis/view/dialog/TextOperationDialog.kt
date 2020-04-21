@@ -2,6 +2,7 @@ package cn.vove7.jarvis.view.dialog
 
 import android.widget.PopupMenu
 import android.widget.TextView
+import cn.daqinjia.ui_design.Toast
 import cn.vove7.bottomdialog.BottomDialog
 import cn.vove7.bottomdialog.builder.*
 import cn.vove7.bottomdialog.extension.awesomeHeader
@@ -13,6 +14,7 @@ import cn.vove7.common.utils.broadcastImageFile
 import cn.vove7.common.utils.runOnUi
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.activities.base.BaseActivity
+import cn.vove7.jarvis.services.MainService
 import cn.vove7.jarvis.tools.DataCollector
 import cn.vove7.jarvis.tools.QRTools
 import cn.vove7.jarvis.tools.baiduaip.BaiduAipHelper
@@ -37,14 +39,21 @@ class TextOperationDialog(
         val textModel: TextModel
 ) {
 
-    val lifeCycleScope = activity.lifecycleScope
+    private val lifeCycleScope = activity.lifecycleScope
 
     //默认已换行
-    private var wraped = true
+    private var wrapped = true
+
+    private var readAloud = false
 
     private val cv = WrappedTextContentBuilder(textModel.text)
 
     val bottomDialog = BottomDialog.builder(activity) {
+        onDismiss {
+            if (readAloud && MainService.speaking) {
+                MainService.speechSynService?.stop(true)
+            }
+        }
         awesomeHeader("文字操作")
         peekHeightProportion = 0.6f
         content(cv)
@@ -69,21 +78,12 @@ class TextOperationDialog(
     //待操作文字
     private fun getOpText(): String = (bottomDialog.contentBuilder as WrappedTextContentBuilder).textView.text.toString()
 
-    init {
-        bottomDialog.updateContent<WrappedTextContentBuilder> {
-            textView.apply {
-                appendln(textModel.text)
-            }
-        }
-    }
-
-
     private fun translate() {
         DataCollector.buriedPoint("to_trans")
         AppConfig.haveTranslatePermission() ?: return
         val dialog = BottomDialog.builder(activity) {
             title(round = true, title = "翻译")
-            message(textModel.subText ?: "", true)
+            message(textModel.subText ?: "翻译中...", true)
             buttons {
                 positiveButton("复制") {
                     it.updateContent<MessageContentBuilder> {
@@ -116,35 +116,39 @@ class TextOperationDialog(
         var b: TextView? = null
         bottomDialog.updateFooter<ButtonsBuilder> { b = buttonNegative }
         PopupMenu(activity, b).apply {
-            if (wraped) {
+            if (wrapped) {
                 menu.add("取消换行")
             } else {
                 menu.add("自动换行")
             }
             menu.add("分享")
-            menu.add("搜索")
+            menu.add("朗读")
             menu.add("翻译")
             menu.add("生成二维码")
             setOnMenuItemClickListener {
                 when (it.title) {
                     "取消换行" -> {
-                        wraped = false
+                        wrapped = false
                         bottomDialog.updateContent<WrappedTextContentBuilder> {
                             textModel.text = getOpText()
                             text = textModel.text.lines().joinToString("")
                         }
                     }
                     "自动换行" -> {
-                        wraped = true
+                        wrapped = true
                         bottomDialog.updateContent<WrappedTextContentBuilder> {
                             text = textModel.text.toString()
                         }
                     }
                     "分享" -> SystemBridge.shareText(getOpText())
                     "翻译" -> translate()
-                    "搜索" -> {
-                        DataCollector.buriedPoint("to_search")
-                        SystemBridge.quickSearch(getOpText())
+                    "朗读" -> {
+                        if (AppConfig.hsaReadAloudTip) {
+                            AppConfig.hsaReadAloudTip = true
+                            GlobalApp.toastInfo("关闭对话框后将停止朗读", Toast.LENGTH_LONG)
+                        }
+                        readAloud = true
+                        MainService.speak(getOpText(), false)
                     }
                     "生成二维码" -> {
                         DataCollector.buriedPoint("to_gen_qr")

@@ -1,19 +1,15 @@
 package cn.vove7.jarvis.view.dialog
 
 import android.content.Context
-import android.graphics.Typeface
+import android.graphics.Color
 import android.os.Handler
-import android.os.Looper
-import android.os.Message
-import androidx.annotation.ColorRes
-import android.text.SpannableStringBuilder
 import android.text.method.LinkMovementMethod
 import android.text.util.Linkify
 import android.view.View
-import android.widget.TextView
+import androidx.annotation.ColorRes
+import cn.vove7.common.bridges.SystemBridge
 import cn.vove7.common.utils.color
 import cn.vove7.common.utils.spanColor
-import cn.vove7.common.view.editor.MultiSpan
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.tools.noAutoScroll
 import cn.vove7.jarvis.view.custom.WrappedTextView
@@ -29,7 +25,15 @@ open class ProgressTextDialog(context: Context, title: String? = null,
                               cancelable: Boolean = true, noAutoDismiss: Boolean = false,
                               autoScroll: Boolean = false, var autoLink: Boolean = false)
     : CustomizableDialog(context, title, cancelable, noAutoDismiss) {
-    val textView by lazy { WrappedTextView(context) }
+    private val textView by lazy {
+        WrappedTextView(context).also {
+            it.isEditable = false
+            it.background = null
+            if (SystemBridge.isDarkMode) {
+                it.setTextColor(Color.WHITE)
+            }
+        }
+    }
 
     init {
         show()
@@ -51,8 +55,6 @@ open class ProgressTextDialog(context: Context, title: String? = null,
             textView.movementMethod = LinkMovementMethod.getInstance()
         }
         selectable(true)
-
-        textView.setTextColor(context.resources.getColor(R.color.primary_text))
         return textView
     }
 
@@ -79,6 +81,7 @@ open class ProgressTextDialog(context: Context, title: String? = null,
         appendlnColor(s, R.color.red_900)
         return this
     }
+
     fun append(s: Any): ProgressTextDialog {
         textView.mappend(s)
         return this
@@ -89,7 +92,7 @@ open class ProgressTextDialog(context: Context, title: String? = null,
         return this
     }
 
-    private fun appendlnColor(s: String,@ColorRes color: Int): ProgressTextDialog {
+    private fun appendlnColor(s: String, @ColorRes color: Int): ProgressTextDialog {
         val ss = s.spanColor(context.color(color))
         appendln(ss)
         return this

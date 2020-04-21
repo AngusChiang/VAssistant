@@ -421,9 +421,10 @@ object MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
     }
 
     private var speakSync = false
-    override fun speak(text: String?) {
+
+    override fun speak(text: String?, showPanel: Boolean) {
         speakSync = false
-        speechSynService?.speak(text)
+        speechSynService?.speak(text, showPanel)
     }
 
     private val speakCallbacks = mutableListOf<SpeakCallback>()
@@ -1249,9 +1250,11 @@ object MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
             isSpeakingResWord = false
         }
 
-        override fun onStart(text: String?) {
+        override fun onStart(text: String?, showPanel: Boolean) {
             Vog.d("onSynData 开始")
-            floatyPanel.showTextResult(text ?: "")
+            if (showPanel) {
+                floatyPanel.showTextResult(text ?: "")
+            }
             stopLastingRecogTemp()
             checkMusic()
         }

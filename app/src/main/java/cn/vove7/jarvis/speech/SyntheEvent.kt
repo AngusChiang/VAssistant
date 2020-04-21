@@ -14,6 +14,6 @@ interface SyntheEvent {
     fun onFinish(text: String?)
 
     fun onUserInterrupt(text: String?)
-    fun onStart(text: String?)
+    fun onStart(text: String?, showPanel: Boolean)
     //检测音乐播放，在合成前
 }
