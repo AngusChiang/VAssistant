@@ -143,12 +143,12 @@ class TextOperationDialog(
                     "分享" -> SystemBridge.shareText(getOpText())
                     "翻译" -> translate()
                     "朗读" -> {
-                        if (AppConfig.hsaReadAloudTip) {
+                        if (!AppConfig.hsaReadAloudTip) {
                             AppConfig.hsaReadAloudTip = true
                             GlobalApp.toastInfo("关闭对话框后将停止朗读", Toast.LENGTH_LONG)
                         }
                         readAloud = true
-                        MainService.speak(getOpText(), false)
+                        MainService.speak(getOpText().lines().joinToString("。\n"), false)
                     }
                     "生成二维码" -> {
                         DataCollector.buriedPoint("to_gen_qr")
