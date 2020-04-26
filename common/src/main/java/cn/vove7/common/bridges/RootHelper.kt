@@ -98,24 +98,17 @@ object RootHelper {
         return result
     }
 
-    @Synchronized
-    fun openSelfAccessService(): Boolean {
-//        AccessibilityApi.openServiceSelf()
-        return openAppAccessService(GlobalApp.APP.packageName,
-                "cn.vove7.jarvis.services.MyAccessibilityService")
-    }
-
     fun openAppAccessService(pkg: String, serviceName: String): Boolean {
-        if (!RootHelper.hasRoot()) return false
+        if (!hasRoot()) return false
         Vog.d("openAppAccessService ---> $serviceName")
         //同时不关闭其他
-        try {
+        return try {
             execWithSu(buildList("$pkg/$serviceName"))
-            return true
+            true
         } catch (e: Exception) {
             GlobalLog.err(e.message)
             GlobalApp.toastError("无障碍自动开启失败")
-            return false
+            false
         } finally {
             Vog.d("openAppAccessService ---> 申请结束")
         }

@@ -69,7 +69,11 @@ fun openAccessibilityServiceAuto() {
     } else */
     if (AppConfig.autoOpenAS) {
         GlobalLog.log("自启打开无障碍服务")
-        AccessibilityApi.openServiceSelf()
+        AccessibilityApi.openServiceSelf(0)
+    }
+    if (AppConfig.autoOpenAAS) {
+        GlobalLog.log("自启打开高级无障碍服务")
+        AccessibilityApi.openServiceSelf(1)
     }
 }
 

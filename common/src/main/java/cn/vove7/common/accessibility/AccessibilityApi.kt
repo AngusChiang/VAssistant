@@ -92,6 +92,7 @@ abstract class AccessibilityApi : AccessibilityService() {
     companion object {
         //无障碍基础服务
         var accessibilityService: AccessibilityApi? = null
+
         //无障碍高级服务 执行手势等操作 fixme 开启后部分机型掉帧
         var gestureService: AccessibilityApi? = null
 
@@ -111,11 +112,11 @@ abstract class AccessibilityApi : AccessibilityService() {
         @JvmStatic
         @Throws(NeedAccessibilityException::class)
         fun waitAccessibility(waitMillis: Long = 30000): Boolean {
-            if (AccessibilityApi.isBaseServiceOn) return true
+            if (isBaseServiceOn) return true
             else AppBus.post(RequestPermission("无障碍服务"))
 
             return whileWaitTime(if (waitMillis > 30000) 30000 else waitMillis) {
-                if (AccessibilityApi.isBaseServiceOn)
+                if (isBaseServiceOn)
                     true
                 else {
                     sleep(500)
@@ -135,15 +136,21 @@ abstract class AccessibilityApi : AccessibilityService() {
         /**
          * @return 是否成功
          */
-        fun openServiceSelf(): Boolean {
+        fun openServiceSelf(what: Int): Boolean {
             if (isBaseServiceOn) return true
+
+            val service = if (what == 0) {
+                "cn.vove7.jarvis.services.MyAccessibilityService"
+            } else {
+                "cn.vove7.jarvis.services.GestureService"
+            }
 
             val (s, b) = when {
                 RootHelper.hasRoot() -> {
-                    "使用Root权限" to RootHelper.openSelfAccessService()
+                    "使用Root权限" to RootHelper.openAppAccessService(GlobalApp.APP.packageName, service)
                 }
                 canWriteSecureSettings() -> {
-                    "使用WRITE_SECURE_SETTINGS权限" to openServiceBySettings()
+                    "使用WRITE_SECURE_SETTINGS权限" to openServiceBySettings(service)
                 }
                 else -> {
                     "无任何权限" to false
@@ -164,12 +171,11 @@ abstract class AccessibilityApi : AccessibilityService() {
          * 执行开启无障碍,需要系统App权限
          * @return Boolean
          */
-        private fun openServiceBySettings(): Boolean {
+        private fun openServiceBySettings(serviceName: String): Boolean {
             val context = GlobalApp.APP
             var enabledServicesSetting = Settings.Secure.getString(
                     context.contentResolver, Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES) ?: ""
-            val selfComponentName = ComponentName(context.packageName,
-                    "cn.vove7.jarvis.services.MyAccessibilityService")
+            val selfComponentName = ComponentName(context.packageName, serviceName)
             val flattenToString = selfComponentName.flattenToString()
 
             if (!enabledServicesSetting.contains(flattenToString)) {
@@ -207,6 +213,7 @@ abstract class AccessibilityApi : AccessibilityService() {
         }
 
         const val ON_APP_CHANGED = 1
+
         /**
          * 分发事件
          * @param what Int
@@ -218,7 +225,7 @@ abstract class AccessibilityApi : AccessibilityService() {
             when (what) {
                 ON_APP_CHANGED -> {
                     Vog.d("dispatchPluginsEvent ---> ON_APP_CHANGED")
-                    if(pluginsServices.isNotEmpty()) {
+                    if (pluginsServices.isNotEmpty()) {
                         launch {
                             pluginsServices.forEach {
                                 it.onAppChanged(data as ActionScope)

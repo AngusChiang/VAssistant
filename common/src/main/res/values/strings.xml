@@ -132,6 +132,7 @@
     <string name="key_dev_mode" translatable="false">dev_mode</string>
 
     <string name="key_auto_open_as_with_root" translatable="false">auto_open_as_with_root</string>
+    <string name="key_auto_open_aas_with_root" translatable="false">auto_open_aas_with_root</string>
     <string name="key_auto_set_assistant_app" translatable="false">auto_set_assistant_app</string>
     <string name="key_volume_wakeup_when_screen_off" translatable="false">volume_wakeup_when_screen_off</string>
     <string name="key_auto_sleep_wakeup_duration" translatable="false">auto_sleep_wakeup_duration</string>
