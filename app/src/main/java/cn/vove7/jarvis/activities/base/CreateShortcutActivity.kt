@@ -1,7 +1,10 @@
 package cn.vove7.jarvis.activities.base
 
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
+import android.content.pm.ShortcutManager
+import android.net.Uri
 import android.os.Bundle
 import android.speech.RecognizerIntent
 import cn.vove7.jarvis.R
@@ -15,6 +18,7 @@ import cn.vove7.jarvis.activities.base.VoiceAssistActivity.Companion.SWITCH_VOIC
 import cn.vove7.jarvis.activities.base.VoiceAssistActivity.Companion.WAKEUP_SCREEN_ASSIST
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.callbacks.onDismiss
+import com.afollestad.materialdialogs.input.input
 import com.afollestad.materialdialogs.list.listItems
 
 /**
@@ -23,11 +27,13 @@ import com.afollestad.materialdialogs.list.listItems
  * @author Vove
  * 2018/11/13
  */
+@Suppress("DEPRECATION")
 class CreateShortcutActivity : Activity() {
 
     val dialog: MaterialDialog by lazy {
         MaterialDialog(this)
                 .title(text = "选择快捷方式")
+                .cancelOnTouchOutside(false)
                 .listItems(items = listOf(
                         getString(R.string.shortcut_wakeup),
                         getString(R.string.text_switch_voice_wp),
@@ -37,7 +43,8 @@ class CreateShortcutActivity : Activity() {
                         "二维码识别",
                         "屏幕识别",
                         "屏幕分享",
-                        "文字识别"
+                        "文字识别",
+                        "语音指令"
 //                        "语音搜索"
                 ), waitForPositiveButton = false) { d, i, t ->
                     val text = t.toString()
@@ -51,19 +58,40 @@ class CreateShortcutActivity : Activity() {
                         6 -> create(SCREEN_ASSIST_SPOT_SCREEN, text)
                         7 -> create(SCREEN_ASSIST_SCREEN_SHARE, text)
                         8 -> create(SCREEN_ASSIST_SCREEN_OCR, text)
+                        9 -> showInputVoiceText()
 //                        3 -> createWebSearch()
                     }
                     d.dismiss()
                 }
                 .negativeButton()
-                .onDismiss {
-                    finishAndRemoveTask()
-                }
+
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         dialog.show()
+    }
+
+    private fun showInputVoiceText() {
+        MaterialDialog(this).show {
+            title(text = "输入语音快捷指令")
+            input(hint = "支付宝乘车码", waitForPositiveButton = true) { _, t ->
+                val sIntent = Intent()
+                sIntent.data = Uri.parse("vassistant://run?cmd=$t")
+                val intent = Intent()
+                intent.putExtra(Intent.EXTRA_SHORTCUT_NAME, t.toString())
+                intent.putExtra(Intent.EXTRA_SHORTCUT_INTENT, sIntent)
+                val iconResource = Intent.ShortcutIconResource
+                        .fromContext(this@CreateShortcutActivity, R.mipmap.ic_launcher_vassist)
+                intent.putExtra(Intent.EXTRA_SHORTCUT_ICON_RESOURCE, iconResource)
+                setResult(RESULT_OK, intent)
+            }
+            positiveButton()
+            negativeButton()
+            onDismiss {
+                finishAndRemoveTask()
+            }
+        }
     }
 
 
@@ -75,6 +103,7 @@ class CreateShortcutActivity : Activity() {
                 .fromContext(this, R.mipmap.ic_launcher_vassist)
         intent.putExtra(Intent.EXTRA_SHORTCUT_ICON_RESOURCE, iconResource)
         setResult(RESULT_OK, intent)
+        finishAndRemoveTask()
     }
 
     private fun create(action: String, text: String) {
@@ -87,6 +116,7 @@ class CreateShortcutActivity : Activity() {
                 .fromContext(this, R.mipmap.ic_launcher_vassist)
         intent.putExtra(Intent.EXTRA_SHORTCUT_ICON_RESOURCE, iconResource)
         setResult(RESULT_OK, intent)
+        finishAndRemoveTask()
     }
 
 }
