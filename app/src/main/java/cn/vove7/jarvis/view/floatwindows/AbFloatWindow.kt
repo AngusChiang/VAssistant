@@ -33,10 +33,11 @@ abstract class AbFloatWindow(
 
     val aniBodyInit get() = ::animationBody.isInitialized
 
-    private val themeInflater: LayoutInflater get() = LayoutInflater.from(ContextThemeWrapper(context,
-            if (SystemBridge.isDarkMode) R.style.DarkTheme
-            else R.style.AppTheme
-    ))
+    private val themeInflater: LayoutInflater
+        get() = LayoutInflater.from(ContextThemeWrapper(context,
+                if (SystemBridge.isDarkMode) R.style.DarkTheme
+                else R.style.AppTheme
+        ))
 
     private val rootView: ViewGroup
         get() = themeInflater.inflate(R.layout.float_panel_root, null) as ViewGroup
@@ -82,6 +83,8 @@ abstract class AbFloatWindow(
         get() =
             Build.VERSION.SDK_INT < Build.VERSION_CODES.M || PermissionUtils.canDrawOverlays(context)
 
+    open val postAfterShow = false
+
     open fun show() {
         if (!hasOverlayPermission) {
             Vog.d("show ---> 无悬浮窗")
@@ -91,10 +94,12 @@ abstract class AbFloatWindow(
                 if (!isShowing) {
                     try {
                         contentView = newView
-                        windowManager.addView(contentView, winParams)
-                        contentView?.post {
+                        if (postAfterShow) {
+                            contentView?.post { afterShow() }
+                        } else {
                             afterShow()
                         }
+                        windowManager.addView(contentView, winParams)
                     } catch (e: Exception) {
                         e.printStackTrace()
                     }

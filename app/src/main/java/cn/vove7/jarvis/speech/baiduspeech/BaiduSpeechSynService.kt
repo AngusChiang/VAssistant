@@ -170,6 +170,7 @@ class BaiduSpeechSynService(event: SyntheEvent) : SpeechSynService(event) {
      * @param type Int
      */
     override fun setAudioStream(type: Int) {
+        Vog.d("setAudioStream $type")
         mSpeechSynthesizer.setAudioStreamType(type)
     }
 
@@ -258,7 +259,6 @@ class BaiduSpeechSynService(event: SyntheEvent) : SpeechSynService(event) {
 
     companion object {
         private var isInited = false
-        private const val INIT = 1
 
         const val VOICE_FEMALE = "0"
         const val VOICE_MALE = "1"

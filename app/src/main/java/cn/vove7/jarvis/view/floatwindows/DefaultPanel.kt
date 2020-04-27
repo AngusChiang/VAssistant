@@ -30,6 +30,9 @@ class DefaultPanel : FloatyPanel(
     override fun layoutResId(): Int = R.layout.float_panel_default
     override fun onCreateView(view: View) {
         super.onCreateView(view)
+        if (postAfterShow) {
+            animationBody.alpha = 0f
+        }
         animationBody.background = buildBackground()
     }
 
@@ -65,12 +68,15 @@ class DefaultPanel : FloatyPanel(
         contentView?.listening_ani?.gone()
     }
 
+    override val postAfterShow: Boolean
+        get() = FloatPanelConfig.defaultPanelAnimation == 1
+
     override fun showEnterAnimation() = runInCatch {
         val width = contentView?.width ?: screenWidth
         when (FloatPanelConfig.defaultPanelAnimation) {
             1 -> {//揭露动画
-                ViewAnimationUtils
-                        .createCircularReveal(animationBody, width / 2, 0, 0f, width.toFloat())
+                animationBody.alpha = 1f
+                ViewAnimationUtils.createCircularReveal(animationBody, width / 2, 0, 0f, width.toFloat())
                         .apply {
                             interpolator = AccelerateInterpolator()
                             duration = 300
@@ -78,7 +84,10 @@ class DefaultPanel : FloatyPanel(
                         }
             }
             else -> {//默认
-                animationBody.startAnimation(AnimationUtils.loadAnimation(context, R.anim.pop_fade_in))
+                animationBody.startAnimation(AnimationUtils.loadAnimation(context, R.anim.pop_fade_in).also {
+                    it.fillBefore = true
+                    it.isFillEnabled = true
+                })
             }
         }
     }
@@ -115,6 +124,7 @@ class DefaultPanel : FloatyPanel(
                         listener {
                             onEnd {
                                 if (isHiding) {
+                                    contentView?.alpha = 0f
                                     superRemove()
                                 }
                             }
@@ -139,11 +149,12 @@ class DefaultPanel : FloatyPanel(
                         keyId = R.string.key_default_fp_radius,
                         defaultValue = { FloatPanelConfig.defaultPanelRadius },
                         range = 0..50,
+                        onDialogShow = {
+                            show("设置圆角")
+                        },
                         onDialogDismiss = { hide() },
                         onChange = {
-                            if (!isShowing) {
-                                show("设置圆角")
-                            } else runInCatch {
+                            runInCatch {
                                 animationBody.background = buildBackground(radius = it)
                             }
                         }
@@ -152,11 +163,12 @@ class DefaultPanel : FloatyPanel(
                         title = "背景颜色",
                         keyId = R.string.key_default_fp_color,
                         defaultValue = FloatPanelConfig.defaultPanelColor,
+                        onDialogShow = {
+                            show("设置背景色")
+                        },
                         onDialogDismiss = { hide() },
                         onChange = {
-                            if (!isShowing) {
-                                show("设置背景色")
-                            } else runInCatch {
+                            runInCatch {
                                 animationBody.background = buildBackground(bgColor = it)
                             }
                         }
@@ -165,11 +177,12 @@ class DefaultPanel : FloatyPanel(
                         title = "文字颜色",
                         keyId = R.string.key_default_fp_text_color,
                         defaultValue = FloatPanelConfig.defaultTextColor,
+                        onDialogShow = {
+                            show("设置文字颜色")
+                        },
                         onDialogDismiss = { hide() },
                         onChange = {
-                            if (!isShowing) {
-                                show("设置文字颜色")
-                            } else runInCatch {
+                            runInCatch {
                                 animationBody.background = buildBackground(textColor = it)
                             }
                         }

@@ -13,7 +13,7 @@ import java.io.InputStream
  * Baidu语音识别输入
  * @property mAudioRecord AudioRecord
  */
-@Suppress("unused")
+@Deprecated("unused")
 class MicInputStream : InputStream() {
     private lateinit var mAudioRecord: AudioRecord
 

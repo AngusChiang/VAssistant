@@ -510,6 +510,8 @@ fun View.fadeIn(duration: Long = 500) {
     animation?.cancel()
     visibility = View.VISIBLE
     startAnimation(AlphaAnimation(0f, 1f).apply {
+        fillBefore = true
+        isFillEnabled = true
         setDuration(duration)
     })
 }
@@ -520,6 +522,8 @@ fun View.fadeOut(
         end: Function0<Unit>? = null
 ) {
     startAnimation(AlphaAnimation(1f, 0f).apply {
+        fillAfter = true
+        isFillEnabled = true
         this.duration = duration
         setAnimationListener(object : Animation.AnimationListener {
             override fun onAnimationRepeat(animation: Animation?) {}

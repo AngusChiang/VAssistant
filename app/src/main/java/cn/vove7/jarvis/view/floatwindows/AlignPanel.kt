@@ -40,19 +40,16 @@ class AlignPanel : FloatyPanel(
 
     override fun onCreateView(view: View) {
         val lp = (animationBody.layoutParams as ViewGroup.MarginLayoutParams)
-        val dp5 = 5.dp.px
         if (FloatPanelConfig.alignOrientation == 0) {
-            animationBody.setPadding(dp5, 0, 0, 0)
+            animationBody.setPadding(FloatPanelConfig.alignLeftPadding.dp.px, 0, 0, 0)
             lp.marginEnd = 10.dp.px
         } else {
-            animationBody.setPadding(0, 0, dp5, 0)
+            animationBody.setPadding(0, 0, FloatPanelConfig.alignLeftPadding.dp.px, 0)
             lp.marginStart = 10.dp.px
         }
         animationBody.layoutParams = lp
         animationBody.addOnLayoutChangeListener { _, _, top, _, bottom, _, oldTop, oldRight, oldBottom ->
-            if (oldBottom - oldTop != bottom - top) {
-                animationBody.background = buildBackground()
-            }
+            animationBody.background = buildBackground()
         }
     }
 
@@ -82,14 +79,20 @@ class AlignPanel : FloatyPanel(
         animationBody.startAnimation(AnimationUtils.loadAnimation(context,
                 if (FloatPanelConfig.alignOrientation == 0) R.anim.pop_fade_in_left_to_right
                 else R.anim.pop_fade_in_right_to_left
-        ))
+        ).also {
+            it.fillBefore = true
+            it.isFillEnabled = true
+        })
     }
 
     override fun showExitAnimation() {
         val ani = AnimationUtils.loadAnimation(context,
                 if (FloatPanelConfig.alignOrientation == 0) R.anim.pop_fade_out_right_to_left
                 else R.anim.pop_fade_out_left_to_right
-        ).listener {
+        ).also {
+            it.fillAfter = true
+            it.isFillEnabled = true
+        }.listener {
             onEnd {
                 if (isHiding) {
                     superRemove()
@@ -142,11 +145,12 @@ class AlignPanel : FloatyPanel(
                         title = "背景颜色",
                         keyId = R.string.key_align_fp_bg_color,
                         defaultValue = FloatPanelConfig.alignBgColor,
+                        onDialogShow = {
+                            show("设置背景色")
+                        },
                         onDialogDismiss = { hide() },
                         onChange = {
-                            if (!isShowing) {
-                                show("设置背景色")
-                            } else runInCatch {
+                            runInCatch {
                                 animationBody.background = buildBackground(bgColor = it)
                             }
                         }
@@ -155,12 +159,34 @@ class AlignPanel : FloatyPanel(
                         title = "文字颜色",
                         keyId = R.string.key_align_fp_text_color,
                         defaultValue = FloatPanelConfig.alignTextColor,
+                        onDialogShow = {
+                            show("设置文字颜色")
+                        },
                         onDialogDismiss = { hide() },
                         onChange = {
-                            if (!isShowing) {
-                                show("设置文字颜色")
-                            } else runInCatch {
+                            runInCatch {
                                 animationBody.background = buildBackground(textColor = it)
+                            }
+                        }
+                ),
+                NumberPickerItem(
+                        title = "边距",
+                        keyId = R.string.key_align_fp_left_padding,
+                        range = 5 to 20,
+                        defaultValue = { FloatPanelConfig.alignLeftPadding },
+                        onDialogShow = { show("设置边距") },
+                        onDialogDismiss = { hide() },
+                        onChange = {
+                            runInCatch {
+                                val lp = (animationBody.layoutParams as ViewGroup.MarginLayoutParams)
+                                if (FloatPanelConfig.alignOrientation == 0) {
+                                    animationBody.setPadding(it.dp.px, 0, 0, 0)
+                                    lp.marginEnd = 10.dp.px
+                                } else {
+                                    animationBody.setPadding(0, 0, it.dp.px, 0)
+                                    lp.marginStart = 10.dp.px
+                                }
+                                animationBody.layoutParams = lp
                             }
                         }
                 )

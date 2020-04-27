@@ -159,6 +159,7 @@ class SettingItemHelper(
                 onDismiss {
                     item.onDialogDismiss?.invoke()
                 }
+                item.onDialogShow?.invoke()
             }
         }
     }
@@ -398,6 +399,7 @@ class SettingItemHelper(
                     .onDismiss { (item as ItemDialogAction).onDialogDismiss?.invoke() }
                     .negativeButton()
                     .show()
+            item.onDialogShow?.invoke()
 
             vv.second.setOnProgressChangeListener(object : DiscreteSeekBar.OnProgressChangeListener {
                 override fun onProgressChanged(seekBar: DiscreteSeekBar?, value: Int, fromUser: Boolean) {

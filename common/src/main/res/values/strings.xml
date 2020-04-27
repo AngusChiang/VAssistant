@@ -195,9 +195,8 @@
     <string name="key_align_fp_orientation" translatable="false">align_fp_orientation</string>
     <string name="key_align_fp_text_color" translatable="false">align_fp_text_color</string>
     <string name="key_align_fp_vertical" translatable="false">align_fp_vertical</string>
+    <string name="key_align_fp_left_padding" translatable="false">align_fp_left_padding</string>
 
-
-    <string name="key_recog_compatible_mode" translatable="false">recog_compatible_mode</string>
 
     <string name="key_connective_service" translatable="false">connective_service</string>
     <string name="key_wakeup_screen_when_vw" translatable="false">key_wakeup_screen_when_vw</string>

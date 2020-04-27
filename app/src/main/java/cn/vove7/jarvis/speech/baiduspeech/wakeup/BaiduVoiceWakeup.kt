@@ -1,6 +1,8 @@
 package cn.vove7.jarvis.speech.baiduspeech.wakeup
 
 import android.content.Context
+import android.media.AudioManager
+import android.media.MediaRecorder
 import cn.vove7.androlua.luabridge.LuaUtil
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.jarvis.speech.WakeupI
@@ -51,10 +53,8 @@ class BaiduVoiceWakeup(private val eventListener: EventListener) : WakeupI() {
         initIfNeed()
         val params = HashMap<String, Any?>()
 
-        if (!AppConfig.recogCompatibleMode) {
-            params[SpeechConstant.IN_FILE] = "#cn.vove7.jarvis.speech.baiduspeech.MicInputStream.instance()"
-        }
         params[SpeechConstant.WP_WORDS_FILE] = AppConfig.wakeUpFilePath
+        params[SpeechConstant.AUDIO_SOURCE] = MediaRecorder.AudioSource.VOICE_RECOGNITION
         params[SpeechConstant.APP_ID] = appId
         params[SpeechConstant.APP_KEY] = appKey
         params[SpeechConstant.SECRET] = secretKey

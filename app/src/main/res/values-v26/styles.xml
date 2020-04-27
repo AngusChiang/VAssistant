@@ -6,7 +6,7 @@
         <item name="colorPrimary">@color/p_green</item>
         <item name="colorPrimaryDark">@color/p_green_dark</item>
         <item name="colorAccent">@color/google_green</item>
-        <item name="android:navigationBarColor">@color/p_green</item>
+        <item name="android:navigationBarColor">@color/bg_splash</item>
 
         <!--<item name="md_color_title">@color/google_blue</item>-->
         <!--<item name="md_color_content">@color/your_color</item>-->
@@ -23,6 +23,12 @@
         <item name="popupMenuStyle">@style/ThemeOverlay.AppCompat.Light</item>
         <item name="popupTheme">@style/ThemeOverlay.AppCompat.Light</item>
         <item name="secondary_text_color">@color/secondary_text</item>
+    </style>
+
+    <style name="Main" parent="NoActionBar">
+        <item name="android:windowBackground">@drawable/bg_splash</item>
+        <item name="android:statusBarColor">@color/bg_splash</item>
+        <item name="android:navigationBarColor">@color/bg_splash</item>
     </style>
 
     <style name="EditTextStyle" parent="@style/Widget.AppCompat.EditText">

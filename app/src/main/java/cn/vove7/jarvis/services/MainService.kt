@@ -743,7 +743,7 @@ object MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
             } else {
                 //防抖动
                 val now = SystemClock.uptimeMillis()
-                if (now - lastStartRecog > 2000) {
+                if (now - lastStartRecog > 1000) {
                     lastStartRecog = now
                 } else {
                     Vog.d("switchRecog 防抖动")
@@ -1121,7 +1121,7 @@ object MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
             WrapperNetHelper.cloudParse(result) {
                 runFromCloud(result, it)
             }
-        } else if (chat) {//聊天
+        } else if (chat && AppConfig.openChatSystem) {//聊天
             doChat(result)
         } else {
             onCommandParseFailed(result)

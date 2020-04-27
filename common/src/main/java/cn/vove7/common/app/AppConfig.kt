@@ -67,8 +67,6 @@ object AppConfig : BaseConfig {
 
     val voiceControlDialog by noCacheKey(true, keyId = R.string.key_voice_control_dialog)
 
-    val recogCompatibleMode by noCacheKey(false, R.string.key_recog_compatible_mode)
-
     //语音唤醒
     var voiceWakeup by noCacheKey(false, keyId = R.string.key_open_voice_wakeup)
 

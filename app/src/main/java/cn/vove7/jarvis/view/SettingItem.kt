@@ -1,7 +1,7 @@
 package cn.vove7.jarvis.view
 
-import androidx.annotation.ArrayRes
 import android.widget.CompoundButton
+import androidx.annotation.ArrayRes
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.jarvis.view.tools.SettingItemHelper
 
@@ -16,6 +16,7 @@ const val TYPE_CHECK_BOX = 1
 const val TYPE_SWITCH = 2
 const val TYPE_INPUT = 3
 const val TYPE_SINGLE = 4
+
 @Deprecated("unused")
 const val TYPE_MULTI = 5
 const val TYPE_NUMBER = 6
@@ -147,6 +148,7 @@ class SwitchItem(
 
 interface ItemDialogAction {
     val onDialogDismiss: Function0<Unit>?
+    val onDialogShow: Function0<Unit>?
 }
 
 interface ItemChangeListener<T> {
@@ -157,6 +159,7 @@ class NumberPickerItem : SettingChildItem, ItemDialogAction, ItemChangeListener<
     val range: Pair<Int, Int>
     override val onChange: Function1<Int, Unit>?
     override val onDialogDismiss: Function0<Unit>?
+    override val onDialogShow: (() -> Unit)?
 
     constructor(
             titleId: Int? = null,
@@ -167,11 +170,13 @@ class NumberPickerItem : SettingChildItem, ItemDialogAction, ItemChangeListener<
             range: Pair<Int, Int>,
             onChange: Function1<Int, Unit>? = null,
             onDialogDismiss: Function0<Unit>? = null,
+            onDialogShow: Function0<Unit>? = null,
             callback: CallbackOnSet<Int>? = null
     ) : super(titleId, title, summary, TYPE_NUMBER, keyId, defaultValue,
             callback = callback) {
         this.onChange = onChange
         this.range = range
+        this.onDialogShow = onDialogShow
         this.onDialogDismiss = onDialogDismiss
     }
 
@@ -183,11 +188,13 @@ class NumberPickerItem : SettingChildItem, ItemDialogAction, ItemChangeListener<
             defaultValue: () -> Int,
             range: IntRange,
             onChange: Function1<Int, Unit>? = null,
+            onDialogShow: Function0<Unit>? = null,
             onDialogDismiss: Function0<Unit>? = null,
             callback: CallbackOnSet<Int>? = null
     ) : super(titleId, title, summary, TYPE_NUMBER, keyId, defaultValue, callback = callback) {
         this.onChange = onChange
         this.range = range.first to range.last
+        this.onDialogShow = onDialogShow
         this.onDialogDismiss = onDialogDismiss
     }
 }
@@ -198,6 +205,7 @@ class ColorPickerItem(
         keyId: Int? = null,
         defaultValue: Int,
         override val onChange: Function1<Int, Unit>? = null,
+        override val onDialogShow: Function0<Unit>? = null,
         override val onDialogDismiss: Function0<Unit>? = null,
         callback: CallbackOnSet<Int>? = null
 ) : SettingChildItem(titleId, title, null, TYPE_COLOR, keyId, { defaultValue }, callback = callback),
@@ -236,7 +244,7 @@ class InputItem(titleId: Int? = null,
                 summary: String? = null,
                 keyId: Int? = null,
                 defaultValue: () -> String = { "" },
-                val clearable:Boolean = true,
+                val clearable: Boolean = true,
                 callback: CallbackOnSet<String>? = null)
     : SettingChildItem(titleId, title, summary, itemType = TYPE_INPUT, keyId = keyId,
         defaultValue = defaultValue, callback = callback)

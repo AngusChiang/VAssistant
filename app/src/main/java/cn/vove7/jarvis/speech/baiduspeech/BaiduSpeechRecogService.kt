@@ -1,5 +1,6 @@
 package cn.vove7.jarvis.speech.baiduspeech
 
+import android.media.MediaRecorder
 import cn.vove7.common.app.AppConfig
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.utils.runInCatch
@@ -37,7 +38,7 @@ class BaiduSpeechRecogService(event: RecogEvent) : SpeechRecogService(event) {
     /**
      * 本Activity中是否需要调用离线命令词功能。根据此参数，判断是否需要调用SDK的ASR_KWS_LOAD_ENGINE事件
      */
-    override var enableOffline = !AppConfig.recogCompatibleMode
+    override var enableOffline = true
 
     init {
         if (enableOffline) {
@@ -49,21 +50,22 @@ class BaiduSpeechRecogService(event: RecogEvent) : SpeechRecogService(event) {
         }
     }
 
-    private fun recogParams(silent: Boolean) = mutableMapOf(
+    private fun recogParams(silent: Boolean) = mutableMapOf<String, Any>(
             ACCEPT_AUDIO_DATA to false,
-            VAD to if(!AppConfig.recogCompatibleMode) VAD_TOUCH else VAD_DNN,
+            VAD to VAD_TOUCH,
             DISABLE_PUNCTUATION to false,//标点符号
             ACCEPT_AUDIO_VOLUME to true,
             PID to 1537,
+            AUDIO_SOURCE to MediaRecorder.AudioSource.VOICE_RECOGNITION,
             NLU to "enable"
     ).also {
         if (enableOffline) {
             it[DECODER] = 2
             it[ASR_OFFLINE_ENGINE_GRAMMER_FILE_PATH] = "assets:///bd/baidu_speech_grammar.bsg"
         }
-        if (!AppConfig.recogCompatibleMode) {
-            it[IN_FILE] = "#cn.vove7.jarvis.speech.baiduspeech.MicInputStream.instance()"
-        }
+//        if (!AppConfig.recogCompatibleMode) {
+//            it[IN_FILE] = "#cn.vove7.jarvis.speech.baiduspeech.MicInputStream.instance()"
+//        }
         //从指定时间开始识别，可以 - 指定ms 识别之前的内容
         val voiceRecogFeedback = AppConfig.voiceRecogFeedback
         if (!AppConfig.openResponseWord && !voiceRecogFeedback)//唤醒即识别 音效和响应词关闭时开启

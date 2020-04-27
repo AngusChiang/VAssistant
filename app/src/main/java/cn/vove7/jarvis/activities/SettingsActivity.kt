@@ -107,12 +107,6 @@ class SettingsActivity : ReturnableActivity() {
                             summary = "使用语言命令控制对话框",
                             keyId = R.string.key_voice_control_dialog,
                             defaultValue = true
-                    ),
-                    CheckBoxItem(
-                            title = "兼容模式",
-                            summary = "语音识别无法正常使用时请开启",
-                            keyId = R.string.key_recog_compatible_mode,
-                            defaultValue = AppConfig.recogCompatibleMode
                     )
             )),
             SettingGroupItem(R.color.cyan_500, titleS = "语音唤醒", childItems = listOf(

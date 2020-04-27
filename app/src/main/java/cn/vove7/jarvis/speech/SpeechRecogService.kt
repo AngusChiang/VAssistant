@@ -295,9 +295,7 @@ abstract class SpeechRecogService(val event: RecogEvent) : SpeechRecogI {
                     tempResult = null
                     event.onRecogReady(isSilent)
                     startSCO()
-                    if (!AppConfig.recogCompatibleMode) {
-                        stopRecogHandler.postDelayed(stopRecogAction, 5000)
-                    }
+                    stopRecogHandler.postDelayed(stopRecogAction, 5000)
                 }
                 SpeechConst.CODE_VOICE_TEMP -> {//中间结果
                     val res = msg.data.getString("data") ?: return

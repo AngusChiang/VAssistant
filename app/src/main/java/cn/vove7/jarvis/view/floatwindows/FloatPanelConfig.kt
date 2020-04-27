@@ -25,6 +25,7 @@ object FloatPanelConfig : AConfig() {
 
     val alignOrientation: Int by noCacheKey(0, R.string.key_align_fp_orientation)
     val alignTextColor: Int by noCacheKey("#ffffff".asColor, R.string.key_align_fp_text_color)
-    var alignVertical:Float by smartKey(0.06f, R.string.key_align_fp_vertical)
+    var alignVertical: Float by smartKey(0.06f, R.string.key_align_fp_vertical)
+    var alignLeftPadding: Int by smartKey(5, R.string.key_align_fp_left_padding)
 
 }
