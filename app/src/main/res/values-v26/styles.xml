@@ -34,4 +34,12 @@
     <style name="EditTextStyle" parent="@style/Widget.AppCompat.EditText">
         <item name="android:importantForAutofill">noExcludeDescendants</item>
     </style>
+
+    <style name="BottomDialog.Dark" parent="BottomDialog">
+        <item name="bd_bg_color">@color/app_dark_background</item>
+        <item name="bd_nav_color">@color/app_dark_background</item>
+        <item name="android:textColorPrimary">#fff</item>
+        <item name="android:navigationBarColor">@color/app_dark_background</item>
+    </style>
+
 </resources>
