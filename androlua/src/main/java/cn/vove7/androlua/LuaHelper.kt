@@ -8,6 +8,7 @@ import cn.vove7.androlua.luautils.LuaGcable
 import cn.vove7.androlua.luautils.LuaManagerI
 import cn.vove7.androlua.luautils.LuaPrinter
 import cn.vove7.common.MessageException
+import cn.vove7.common.NeedAccessibilityException
 import cn.vove7.common.NotSupportException
 import cn.vove7.common.ScriptEngineBridges
 import cn.vove7.common.app.GlobalApp
@@ -242,6 +243,8 @@ class LuaHelper : LuaManagerI, ScriptEngine {
             return InterruptedException(e)
         } else if (e.contains("cn.vove7.common.NotSupportException")) {
             return NotSupportException()
+        } else if (e.contains("cn.vove7.common.NeedAccessibilityException")) {
+            return NeedAccessibilityException()
         }
         return MessageException(e)
     }

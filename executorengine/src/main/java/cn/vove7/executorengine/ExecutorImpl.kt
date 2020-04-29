@@ -43,6 +43,7 @@ import cn.vove7.executorengine.model.ActionParseResult
 import cn.vove7.executorengine.parse.OpenAppAction
 import cn.vove7.executorengine.parse.ParseEngine
 import cn.vove7.vtp.log.Vog
+import cn.vove7.vtp.runtimepermission.PermissionUtils
 import java.io.Closeable
 import java.util.*
 import kotlin.concurrent.thread
@@ -95,7 +96,8 @@ open class ExecutorImpl(
 
     override fun requireAccessibility() {
         if (accessApi == null) {
-            AppBus.post(RequestPermission("无障碍服务"))
+            PermissionUtils.gotoAccessibilitySetting(context)
+            GlobalApp.toastError("此操作需要VAssist基础服务，请开启后继续", 1)
             throw NeedAccessibilityException()
         }
     }
