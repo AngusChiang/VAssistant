@@ -158,7 +158,7 @@ class MainActivity : BaseActivity() {
         }
     }
 
-    class GoHomeReceiver(val onGo: (reason: String) -> Unit) : BroadcastReceiver() {
+    class GoHomeReceiver(val onGo: (reason: String?) -> Unit) : BroadcastReceiver() {
         fun start(context: Context) {
             val itf = IntentFilter(Intent.ACTION_CLOSE_SYSTEM_DIALOGS)
             context.registerReceiver(this, itf)
