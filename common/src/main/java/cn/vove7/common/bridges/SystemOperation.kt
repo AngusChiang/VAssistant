@@ -122,6 +122,7 @@ interface SystemOperation {
     fun mediaPre()
     fun volumeMute()
     fun volumeUnmute()
+
     /**
      * 勿扰模式
      */
@@ -137,10 +138,15 @@ interface SystemOperation {
 
     //最大音量
     val musicMaxVolume: Int
+
     //当前音量
     val musicCurrentVolume: Int
 
-    fun vibrate(millis: Long): Boolean
+    fun vibrate(millis: Long): Boolean {
+        return vibrate(millis, -1)
+    }
+
+    fun vibrate(millis: Long, effect: Int): Boolean
     fun vibrate(arr: Array<Long>): Boolean
 
     fun openBluetooth(): Boolean

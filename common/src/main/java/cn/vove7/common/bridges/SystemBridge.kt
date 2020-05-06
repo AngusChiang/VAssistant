@@ -545,12 +545,12 @@ object SystemBridge : SystemOperation {
         return am.isMusicActive
     }
 
-    override fun vibrate(millis: Long): Boolean {
+    override fun vibrate(millis: Long, effect: Int): Boolean {
 
         val vibrateMan = context.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
         if (vibrateMan.hasVibrator()) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                vibrateMan.vibrate(VibrationEffect.createOneShot(millis, VibrationEffect.DEFAULT_AMPLITUDE))
+                vibrateMan.vibrate(VibrationEffect.createOneShot(millis, effect))
             } else {
                 vibrateMan.vibrate(millis)
             }

@@ -59,6 +59,8 @@ object AppConfig : BaseConfig {
     var speechEngineType: Int by noCacheKey(0, keyId = R.string.key_speech_engine_type)
 
     var vibrateWhenStartRecog by noCacheKey(true, keyId = R.string.key_vibrate_reco_begin)
+    var vibrateEffectStartRecog by noCacheKey(50, keyId = R.string.key_vibrate_reco_effect)
+
     var isAdBlockService by noCacheKey(false, keyId = R.string.key_open_ad_block)
 
     var isLongPressKeyWakeUp by noCacheKey(true, keyId = R.string.key_long_press_volume_up_wake_up)

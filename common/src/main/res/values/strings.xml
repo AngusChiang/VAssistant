@@ -164,6 +164,7 @@
 
     <string name="key_show_toast_when_remove_ad" translatable="false">show_toast_when_remove_ad</string>
     <string name="key_vibrate_reco_begin" translatable="false">vibrate_reco_begin</string>
+    <string name="key_vibrate_reco_effect" translatable="false">vibrate_reco_effect</string>
     <string name="key_voice_syn_model" translatable="false">voice_syn_model</string>
     <string name="key_open_ad_block" translatable="false">open_ad_block</string>
     <string name="key_ad_wait_secs" translatable="false">ad_wait_secs</string>

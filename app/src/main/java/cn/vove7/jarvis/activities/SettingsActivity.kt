@@ -265,7 +265,16 @@ class SettingsActivity : ReturnableActivity() {
                     CheckBoxItem(
                             R.string.text_vibrate_reco_begin,
                             keyId = R.string.key_vibrate_reco_begin,
-                            defaultValue = true
+                            defaultValue = AppConfig.vibrateWhenStartRecog
+                    ),
+                    NumberPickerItem(
+                            title = "震动效果",
+                            range = 20..100,
+                            defaultValue = { AppConfig.vibrateEffectStartRecog },
+                            keyId = R.string.key_vibrate_reco_effect,
+                            onChange = {
+                                SystemBridge.vibrate(it.toLong())
+                            }
                     )
 //                    CheckBoxItem(title = "执行失败", keyId = R.string.key_exec_failed_voice_feedback,
 //                            summary = "失败时的语音反馈",

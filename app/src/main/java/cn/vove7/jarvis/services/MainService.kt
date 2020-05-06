@@ -911,7 +911,7 @@ object MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
             }
             //震动
             if (AppConfig.vibrateWhenStartRecog || voiceMode != MODE_VOICE) {//询问参数时，震动
-                SystemBridge.vibrate(80L)
+                SystemBridge.vibrate(AppConfig.vibrateEffectStartRecog.toLong())
             }
             floatyPanel.showUserWord("开始聆听")
             Vog.d("onPreStartRecog ---> 开始识别")
