@@ -7,6 +7,7 @@ import android.database.Cursor
 import android.net.Uri
 import android.os.Build
 import androidx.work.WorkManager
+import cn.daqinjia.android.common.ext.delayRun
 import cn.daqinjia.android.scaffold.ui.base.ScaffoldActivity
 import cn.vove7.bottomdialog.builder.BottomDialogBuilder
 import cn.vove7.common.activities.RunnableActivity.Companion.runInShellActivity
@@ -14,7 +15,6 @@ import cn.vove7.common.app.AppConfig
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.appbus.AppBus
 import cn.vove7.common.helper.AdvanAppHelper
-import cn.vove7.common.utils.CoroutineExt.launch
 import cn.vove7.common.utils.runOnNewHandlerThread
 import cn.vove7.common.utils.runWithClock
 import cn.vove7.jarvis.plugins.PowerListener
@@ -27,6 +27,7 @@ import cn.vove7.jarvis.services.MainService
 import cn.vove7.jarvis.tools.*
 import cn.vove7.jarvis.tools.debugserver.ConnectiveService
 import cn.vove7.jarvis.work.DataSyncWork
+import cn.vove7.quantumclock.QuantumClock
 import cn.vove7.smartkey.android.AndroidSettings
 import cn.vove7.vtp.log.Vog
 import org.greenrobot.eventbus.Subscribe
@@ -43,9 +44,6 @@ class App : GlobalApp() {
         }
         AndroidSettings.init(this)
         CrashHandler.install()
-        runWithClock("加载配置") {
-            AppLogic.onLaunch()
-        }
         AppBus.reg(this)
 
         startMainServices()
@@ -59,6 +57,9 @@ class App : GlobalApp() {
             darkTheme = R.style.BottomDialog_Dark
         }
         WorkManager.getInstance(this).cancelAllWork()
+        QuantumClock.sync().invokeOnCompletion {
+            AppLogic.onLaunch()
+        }
     }
 
     private fun startMainServices() {
@@ -98,13 +99,11 @@ class App : GlobalApp() {
 class InitCp : ContentProvider() {
 
     override fun onCreate(): Boolean {
-        runOnNewHandlerThread(name = "延时启动", delay = 2000) {
-            launch {
-                openAccessibilityServiceAuto()
-                setAssistantAppAuto()
-                if (AppConfig.connectiveService) {
-                    ConnectiveService.start()
-                }
+        delayRun(2000) {
+            openAccessibilityServiceAuto()
+            setAssistantAppAuto()
+            if (AppConfig.connectiveService) {
+                ConnectiveService.start()
             }
 
             val wm = WorkManager.getInstance(GlobalApp.APP)

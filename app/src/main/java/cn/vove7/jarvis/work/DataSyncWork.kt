@@ -1,7 +1,6 @@
 package cn.vove7.jarvis.work
 
 import android.content.Context
-import android.content.Intent
 import androidx.work.*
 import cn.vove7.common.app.AppConfig
 import cn.vove7.common.app.GlobalApp
@@ -9,6 +8,9 @@ import cn.vove7.common.app.GlobalLog
 import cn.vove7.jarvis.receivers.UtilEventReceiver
 import cn.vove7.jarvis.tools.AppNotification
 import cn.vove7.jarvis.tools.DataUpdator
+import cn.vove7.quantumclock.QuantumClock
+import cn.vove7.vtp.log.Vog
+import kotlinx.coroutines.runBlocking
 import java.util.*
 import java.util.concurrent.TimeUnit
 
@@ -33,6 +35,13 @@ class DataSyncWork(context: Context, workerParams: WorkerParameters) : Worker(co
                 )
                 .addTag("DataSyncWork")
                 .build()
+
+        fun startOnce() {
+            WorkManager.getInstance(GlobalApp.APP)
+                    .enqueue(OneTimeWorkRequest.Builder(DataSyncWork::class.java)
+                            .build()
+                    )
+        }
     }
 
     override fun doWork(): Result {
@@ -62,6 +71,13 @@ class DataSyncWork(context: Context, workerParams: WorkerParameters) : Worker(co
                     GlobalLog.log("暂未更新")
                 }
             }
+        }
+        runBlocking {
+            val job = QuantumClock.sync()
+            job.invokeOnCompletion { e ->
+                Vog.d("时间同步 ${QuantumClock.nowDate} $e")
+            }
+            job.join()
         }
         return Result.success()
     }

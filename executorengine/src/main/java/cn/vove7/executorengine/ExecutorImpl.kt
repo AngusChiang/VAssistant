@@ -42,6 +42,7 @@ import cn.vove7.common.view.notifier.ActivityShowListener
 import cn.vove7.executorengine.model.ActionParseResult
 import cn.vove7.executorengine.parse.OpenAppAction
 import cn.vove7.executorengine.parse.ParseEngine
+import cn.vove7.quantumclock.QuantumClock
 import cn.vove7.vtp.log.Vog
 import cn.vove7.vtp.runtimepermission.PermissionUtils
 import java.io.Closeable
@@ -517,13 +518,13 @@ open class ExecutorImpl(
     override fun waitForUnlock(millis: Long): Boolean {
         val mm = if (millis < 0) 30000 else millis
         synchronized(lock) {
-            val begin = System.currentTimeMillis() // 开始等待时间
+            val begin = QuantumClock.currentTimeMillis // 开始等待时间
             Vog.d("执行器-等待 time: $mm   begin: $begin")
 
             //等待结果
             try {
                 lock.wait(mm)
-                val end = System.currentTimeMillis()
+                val end = QuantumClock.currentTimeMillis
                 Vog.d("执行器-解锁")
                 if (end - begin >= mm) {//自动超时 终止执行
                     Vog.d("等待超时")

@@ -21,6 +21,7 @@ import cn.vove7.jarvis.tools.baiduaip.BaiduAipHelper
 import cn.vove7.jarvis.view.dialog.contentbuilder.ImageContentBuilder
 import cn.vove7.jarvis.view.dialog.contentbuilder.WrappedTextContentBuilder
 import cn.vove7.jarvis.view.positiveButtonWithColor
+import cn.vove7.quantumclock.QuantumClock
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -185,7 +186,7 @@ class TextOperationDialog(
                     SystemBridge.shareImage(path)
                 }
                 negativeButton("保存") {
-                    val targetFile = File(StorageHelper.picturesPath, System.currentTimeMillis().toString() + ".jpg")
+                    val targetFile = File(StorageHelper.picturesPath, QuantumClock.currentTimeMillis.toString() + ".jpg")
                     try {
                         File(path).copyTo(targetFile, true)
                         it.dismiss()

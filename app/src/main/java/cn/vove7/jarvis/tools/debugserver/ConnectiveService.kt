@@ -7,6 +7,7 @@ import cn.vove7.common.bridges.SystemBridge
 import cn.vove7.common.datamanager.parse.model.Action
 import cn.vove7.common.net.tool.SecureHelper
 import cn.vove7.jarvis.services.MainService
+import cn.vove7.quantumclock.QuantumClock
 import cn.vove7.vtp.log.Vog
 import fi.iki.elonen.NanoHTTPD
 import java.net.URLDecoder
@@ -73,7 +74,7 @@ class ConnectiveService : NanoHTTPD(8001) {
         val ts = session.headers["ts"] ?: return refuse
 
         //验证时间
-        if (abs(ts.toLong() - System.currentTimeMillis()) > 10000) {
+        if (abs(ts.toLong() - QuantumClock.currentTimeMillis) > 10000) {
             return refuse
         }
 

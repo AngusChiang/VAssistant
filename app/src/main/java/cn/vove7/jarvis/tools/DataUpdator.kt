@@ -1,6 +1,5 @@
 package cn.vove7.jarvis.tools
 
-import android.content.Intent
 import android.graphics.Color
 import android.text.SpannableStringBuilder
 import androidx.core.content.ContextCompat
@@ -24,6 +23,7 @@ import cn.vove7.executorengine.parse.ParseEngine
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.plugins.AdKillerService
 import cn.vove7.jarvis.receivers.UtilEventReceiver
+import cn.vove7.quantumclock.QuantumClock
 import cn.vove7.vtp.sharedpreference.SpHelper
 
 /**
@@ -222,7 +222,7 @@ object DataUpdator {
                     if (list != null) {
                         DaoHelper.updateGlobalInst(list, onUpdate).also {
                             if (it) {
-                                SpHelper(GlobalApp.APP).set(R.string.key_last_sync_global_date, System.currentTimeMillis())
+                                SpHelper(GlobalApp.APP).set(R.string.key_last_sync_global_date, QuantumClock.currentTimeMillis)
                                 DAO.clear()
                                 ParseEngine.updateGlobal()
                                 back.invoke(true)
@@ -262,7 +262,7 @@ object DataUpdator {
                         DaoHelper.updateInAppInst(list, onUpdate).also {
                             if (it) {
                                 SpHelper(GlobalApp.APP).set(R.string.key_last_sync_in_app_date,
-                                        System.currentTimeMillis())
+                                        QuantumClock.currentTimeMillis)
                                 DAO.clear()
                                 ParseEngine.updateInApp()
                                 back.invoke(true)
@@ -279,7 +279,7 @@ object DataUpdator {
                 } else {
                     if (bean.code == 1) {
                         SpHelper(GlobalApp.APP).set(R.string.key_last_sync_in_app_date,
-                                System.currentTimeMillis())
+                                QuantumClock.currentTimeMillis)
                         back.invoke(true)
                     } else {
                         GlobalApp.toastError(bean.message)
@@ -307,7 +307,7 @@ object DataUpdator {
             success { _, bean ->
                 if (bean.isOk()) {
                     DaoHelper.updateMarkedData(onUpdate, types, bean.data ?: emptyList())
-                    SpHelper(GlobalApp.APP).set(lastKeyId, System.currentTimeMillis())
+                    SpHelper(GlobalApp.APP).set(lastKeyId, QuantumClock.currentTimeMillis)
                     DAO.clear()
                     back.invoke(true)
                 } else {
@@ -335,7 +335,7 @@ object DataUpdator {
                 if (bean.isOk()) {
                     //
                     DaoHelper.updateAppAdInfo(bean.data ?: emptyList(), onUpdate)
-                    SpHelper(GlobalApp.APP).set(R.string.key_last_sync_marked_ad_date, System.currentTimeMillis())
+                    SpHelper(GlobalApp.APP).set(R.string.key_last_sync_marked_ad_date, QuantumClock.currentTimeMillis)
                     AdKillerService.update()
                     DAO.clear()
                     back.invoke(true)

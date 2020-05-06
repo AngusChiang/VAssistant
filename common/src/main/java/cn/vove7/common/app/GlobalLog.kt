@@ -1,8 +1,9 @@
 package cn.vove7.common.app
 
-import android.util.Log
-import cn.vove7.common.BuildConfig
+import cn.daqinjia.android.common.Logger.logi
+import cn.daqinjia.android.common.loge
 import cn.vove7.common.utils.StorageHelper
+import cn.vove7.quantumclock.QuantumClock
 import java.io.BufferedWriter
 import java.io.File
 import java.io.FileWriter
@@ -20,7 +21,8 @@ object GlobalLog {
 
     private val logList = mutableListOf<LogInfo>()
     fun log(msg: String?) {
-        write(LEVEL_INFO, msg)
+        logi(1) { msg }
+        logList.add(LogInfo(LEVEL_INFO, msg ?: ""))
     }
 
     fun err(e: Throwable) {
@@ -42,12 +44,14 @@ object GlobalLog {
             e1.printStackTrace()
             e.message + "\n[[[[[[${e1.message}]]]]]]"
         }
-        write(LEVEL_ERROR, msg)
+        msg.loge(1)
+        logList.add(LogInfo(LEVEL_ERROR, msg))
     }
 
 
     fun err(msg: String?) {
-        write(LEVEL_ERROR, msg)
+        msg.loge(1)
+        logList.add(LogInfo(LEVEL_ERROR, msg ?: ""))
     }
 
     fun clear() {
@@ -59,58 +63,6 @@ object GlobalLog {
     private fun clearIfNeed() {
         if (logList.size > 500)
             clear()
-    }
-
-    private fun write(level: Int, msg: String?) {
-        synchronized<Unit>(logList) {
-            clearIfNeed()
-            val pre by lazy {
-                findCaller(3)?.let {
-                    (it.methodName + "(" + it.fileName +
-                            ":" + it.lineNumber + ")")
-
-                } ?: "find caller unsuccessfully"
-            }
-            val text = if (BuildConfig.DEBUG) "$pre  >>  $msg"
-            else "$msg"
-            logList.add(LogInfo(level, text))
-
-            if (!BuildConfig.DEBUG) return
-            try {
-                when (level) {
-                    LEVEL_INFO -> {
-                        Log.i("VOG", text)
-                    }
-                    LEVEL_ERROR -> {
-                        Log.e("VOG", text)
-                    }
-                }
-            } catch (e: Throwable) {
-                println(text)
-            }
-        }
-    }
-
-    private fun findCaller(upDepth: Int): StackTraceElement? {
-        // 获取堆栈信息
-        val callStack = Thread.currentThread().stackTrace
-        // 最原始被调用的堆栈信息
-        // 日志类名称
-        val logClassName = GlobalLog::class.java.name
-        // 循环遍历到日志类标识
-        var i = 0
-        val len = callStack.size
-        while (i < len) {
-            if (logClassName == callStack[i].className)
-                break
-            i++
-        }
-        return try {
-            callStack[i + upDepth]
-        } catch (e: Exception) {
-            e.printStackTrace()
-            null
-        }
     }
 
     override fun toString(): String {
@@ -139,7 +91,7 @@ object GlobalLog {
     class LogInfo(
             val level: Int,
             val msg: String,
-            val date: Date = Date()
+            val date: Date = QuantumClock.nowDate
     ) {
         override fun toString(): String {
             val l = when (level) {

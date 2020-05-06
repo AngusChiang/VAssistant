@@ -8,6 +8,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import cn.vove7.common.appbus.AppBus;
+import cn.vove7.quantumclock.QuantumClock;
 
 /**
  * # UserInfo
@@ -35,7 +36,7 @@ public class UserInfo implements Serializable {
         INSTANCE = this;
         if (!isLogin()) {
             isLogin = true;
-            AppBus.INSTANCE.post(AppBus.EVENT_USER_INIT);
+            AppBus.post(AppBus.EVENT_USER_INIT);
         }
     }
 
@@ -109,7 +110,7 @@ public class UserInfo implements Serializable {
 
     public static boolean isVip() {
         return INSTANCE != null && (INSTANCE.vipEndDate != null &&
-                INSTANCE.vipEndDate.getTime() > System.currentTimeMillis());
+                INSTANCE.vipEndDate.getTime() > QuantumClock.INSTANCE.getCurrentTimeMillis());
     }
 
     public static boolean isPermanentVip() {

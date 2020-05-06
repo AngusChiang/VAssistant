@@ -17,6 +17,7 @@ import cn.vove7.common.net.model.ResponseMessage
 import cn.vove7.common.net.tool.SecureHelper
 import cn.vove7.common.utils.LooperHelper
 import cn.vove7.common.utils.CoroutineExt
+import cn.vove7.quantumclock.QuantumClock
 import cn.vove7.vtp.log.Vog
 import cn.vove7.vtp.net.GsonHelper
 import cn.vove7.vtp.net.NetHelper
@@ -69,7 +70,7 @@ object WrapperNetHelper {
             crossinline callback: WrappedRequestCallback<ResponseMessage<T>>.() -> Unit
     ) {
         val reqModel = BaseRequestModel(model, arg1)
-        val ts = (System.currentTimeMillis() / 1000)
+        val ts = (QuantumClock.currentTimeMillis / 1000)
         val reqJson = GsonHelper.toJson(reqModel)
         val sign = SecureHelper.signData(reqJson, ts)
         val headers = mapOf(

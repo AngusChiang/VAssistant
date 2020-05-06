@@ -7,6 +7,7 @@ import android.content.Context
 import android.util.Log
 import android.widget.Toast
 import androidx.multidex.MultiDex
+import cn.daqinjia.android.common.loge
 import cn.vove7.common.BuildConfig
 import cn.vove7.common.helper.ToastyHelper
 import cn.vove7.common.helper.ToastyHelper.TYPE_ERROR
@@ -14,6 +15,7 @@ import cn.vove7.common.helper.ToastyHelper.TYPE_INFO
 import cn.vove7.common.helper.ToastyHelper.TYPE_SUCCESS
 import cn.vove7.common.helper.ToastyHelper.TYPE_WARNING
 import cn.vove7.common.utils.runInCatch
+import cn.vove7.quantumclock.QuantumClock
 import cn.vove7.vtp.app.AppInfo
 import cn.vove7.vtp.log.Vog
 import cn.vove7.vtp.net.NetHelper
@@ -29,7 +31,7 @@ import es.dmoral.toasty.Toasty
 open class GlobalApp : Application() {
 
     override fun onCreate() {
-        launchTime = System.currentTimeMillis()
+        launchTime = QuantumClock.currentTimeMillis
         super.onCreate()
         AppInfo.attachApplication(this)
         if (!BuildConfig.DEBUG) {
@@ -95,6 +97,7 @@ open class GlobalApp : Application() {
         @JvmStatic
         @JvmOverloads
         fun toastError(msg: String?, duration: Int = Toast.LENGTH_SHORT) {
+            msg.loge(1)
             ToastyHelper.toast(TYPE_ERROR, "$msg", duration)
         }
 

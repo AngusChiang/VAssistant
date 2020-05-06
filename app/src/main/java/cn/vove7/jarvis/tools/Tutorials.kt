@@ -3,9 +3,9 @@ package cn.vove7.jarvis.tools
 import android.app.Activity
 import android.content.Context
 import android.graphics.Typeface
-import androidx.annotation.DrawableRes
 import android.view.View
 import android.widget.TextView
+import androidx.annotation.DrawableRes
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.utils.boundsInScreen
 import cn.vove7.jarvis.R
@@ -24,20 +24,25 @@ import com.getkeepsafe.taptargetview.TapTargetView
  */
 object Tutorials {
     var debug = false // 必现引导
+
     //首页登陆
     const val T_LOGIN = "t_login"
+
     //帮助页
     const val h_t_1 = "h_t_1"
     const val h_t_2 = "h_t_2"
     const val h_t_3 = "h_t_3"
     const val h_t_4 = "h_t_4"
     const val h_t_5 = "h_t_5"
+
     //高级页
     const val t_inst_man = "t_inst_man"
     const val t_mark_man = "t_mark_man"
+
     //设置页
     const val t_settings_set_assist = "t_settings_set_assist"
-    private val _sp: SpHelper  get() = SpHelper(GlobalApp.APP, "tutorials")
+    private val _sp: SpHelper get() = SpHelper(GlobalApp.APP, "tutorials")
+
     //指令详情页
     const val t_inst_detail_desc = "t_inst_detail_desc"
     const val t_inst_detail_exp = "t_inst_detail_exp"
@@ -47,6 +52,15 @@ object Tutorials {
     const val screen_assistant_qrcode = "screen_assistant_qrcode"
     const val screen_assistant_spot = "screen_assistant_spot"
     const val screen_assistant_ocr = "screen_assistant_ocr2"
+    const val hide_on_recent = "hide_on_recent"
+
+    val tipsHideRecent: Boolean
+        get() {
+            val sp = _sp
+            val b = sp.getBoolean(hide_on_recent, true)
+            sp.set(hide_on_recent, false)
+            return b
+        }
 
     val context: Context
         get() = GlobalApp.APP
@@ -175,6 +189,7 @@ object Tutorials {
                 , screen_assistant_qrcode
                 , screen_assistant_spot
                 , screen_assistant_ocr
+                , hide_on_recent
         ).forEach {
             sp.removeKey(it)
         }

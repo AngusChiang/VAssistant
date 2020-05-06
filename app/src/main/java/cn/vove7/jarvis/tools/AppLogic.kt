@@ -21,7 +21,9 @@ object AppLogic {
 
     //启动初始化逻辑
     fun onLaunch() {
-        checkUserInfo()
+        if (initUserInfo()) {
+            checkUserInfo()
+        }
     }
 
     private val context get() = GlobalApp.APP
@@ -29,7 +31,7 @@ object AppLogic {
     /**
      * checkUserInfo完reload
      */
-    private fun checkUserInfo() {
+    private fun initUserInfo(): Boolean {
         //用户信息
         val ssp = SecuritySharedPreference(context, "xka", Context.MODE_PRIVATE)
         val key = context.getString(R.string.key_login_info)
@@ -39,11 +41,7 @@ object AppLogic {
                         UserInfo::class.java)
                 Vog.d("init user info ---> $info")
                 info.success()//设置登陆后，读取配置  null 抛出空指针
-                WrapperNetHelper.postJson<Any>(ApiUrls.VERIFY_TOKEN) {
-                    success { _, responseMessage ->
-                        responseMessage.isOk()
-                    }
-                }
+                return true
             } catch (e: Exception) {
                 GlobalLog.err(e)
                 GlobalApp.toastError("用户信息提取失败，请重新登陆")
@@ -51,6 +49,15 @@ object AppLogic {
             }
         } else {
             Vog.d("init ---> not login")
+        }
+        return false
+    }
+
+    private fun checkUserInfo() {
+        WrapperNetHelper.postJson<Any>(ApiUrls.VERIFY_TOKEN) {
+            success { _, responseMessage ->
+                responseMessage.isOk()
+            }
         }
     }
 

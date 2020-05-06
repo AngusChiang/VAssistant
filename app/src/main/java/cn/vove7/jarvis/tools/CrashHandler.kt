@@ -13,6 +13,7 @@ import cn.vove7.common.utils.TextHelper
 import cn.vove7.common.utils.TextPrinter
 import cn.vove7.common.utils.formatNow
 import cn.vove7.jarvis.BuildConfig
+import cn.vove7.quantumclock.QuantumClock
 import cn.vove7.vtp.system.DeviceInfo
 import cn.vove7.vtp.system.SystemHelper
 import com.wanjian.cockroach.Cockroach
@@ -86,6 +87,6 @@ fun DeviceInfo.string(): String {
         append("sdkInt: ").appendln(sdkInt)
         append("androidVersion: ").appendln(androidVersion)
         append("ABI  : ").appendln(TextHelper.arr2String(Build.SUPPORTED_ABIS))
-        append("运行时间：" + (System.currentTimeMillis() - GlobalApp.launchTime) / 1000 + "s")
+        append("运行时间：" + (QuantumClock.currentTimeMillis - GlobalApp.launchTime) / 1000 + "s")
     }
 }

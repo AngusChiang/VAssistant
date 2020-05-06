@@ -55,6 +55,7 @@ import cn.vove7.common.net.tool.SecureHelper
 import cn.vove7.common.utils.*
 import cn.vove7.common.view.ScreenshotActivity
 import cn.vove7.common.view.finder.ViewFindBuilder
+import cn.vove7.quantumclock.QuantumClock
 import cn.vove7.vtp.app.AppHelper
 import cn.vove7.vtp.app.AppInfo
 import cn.vove7.vtp.calendar.CalendarAccount
@@ -1452,7 +1453,7 @@ object SystemBridge : SystemOperation {
      */
     @JvmOverloads
     fun sendScript2RemoteDevice(ip2name: List<Pair<String, String>>, script: String, type: String, toast: Boolean = true) {
-        val ts = System.currentTimeMillis()
+        val ts = QuantumClock.currentTimeMillis
 
         //todo url 长度限制
         val ps = mapOf(
@@ -1498,7 +1499,7 @@ object SystemBridge : SystemOperation {
      */
     @JvmOverloads
     fun sendCommand2RemoteDevice(ip2name: List<Pair<String, String>>, cmd: String, toast: Boolean = true) {
-        val ts = System.currentTimeMillis()
+        val ts = QuantumClock.currentTimeMillis
         val ps = mapOf(
                 "action" to "command",
                 "command" to cmd,

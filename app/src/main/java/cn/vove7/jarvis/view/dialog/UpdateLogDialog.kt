@@ -12,6 +12,7 @@ import cn.vove7.jarvis.R
 import cn.vove7.jarvis.view.dialog.contentbuilder.MarkdownContentBuilder
 import cn.vove7.jarvis.view.dialog.contentbuilder.markdownContent
 import cn.vove7.jarvis.view.positiveButtonWithColor
+import cn.vove7.quantumclock.QuantumClock
 import java.util.*
 
 /**
@@ -29,7 +30,7 @@ class UpdateLogDialog(context: Activity, onDismiss: (() -> Unit)? = null) {
                 loadMarkdownFromAsset("files/update_log.md")
             }
             buttons {
-                if (UserInfo.getVipEndDate() ?: Date(0) < Calendar.getInstance().also { it.add(Calendar.DAY_OF_YEAR, 7) }.time) {
+                if (UserInfo.getVipEndDate() ?: Date(0) < QuantumClock.nowCalendar.also { it.add(Calendar.DAY_OF_YEAR, 7) }.time) {
                     neutralButton("支持一下".spanColor(ContextCompat.getColor(context, R.color.google_green))) {
                         UserInfoDialog.recharge(context)
                     }

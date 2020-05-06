@@ -1,23 +1,18 @@
 package cn.vove7.jarvis.activities
 
-import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import android.view.View
 import android.view.Window
-import cn.daqinjia.android.scaffold.ui.base.ScaffoldActivity
 import cn.vove7.common.app.AppConfig
-import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.model.UserInfo
 import cn.vove7.jarvis.BuildConfig
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.activities.base.BaseActivity
-import cn.vove7.jarvis.receivers.UtilEventReceiver
-import cn.vove7.jarvis.tools.AppNotification
-import cn.vove7.jarvis.tools.DataUpdator
 import cn.vove7.jarvis.tools.Tutorials
 import cn.vove7.jarvis.tools.debugserver.RemoteDebugServer
 import cn.vove7.jarvis.view.dialog.UpdateLogDialog
+import cn.vove7.jarvis.work.DataSyncWork
 import cn.vove7.vtp.log.Vog
 import cn.vove7.vtp.runtimepermission.PermissionUtils
 import com.afollestad.materialdialogs.MaterialDialog
@@ -45,20 +40,12 @@ class MainActivity : BaseActivity() {
         super.onCreate(savedInstanceState)
         requestPermission()
         checkDebug()
+        syncDataOnFirstIn()
+    }
+
+    private fun syncDataOnFirstIn() {
         if (AppConfig.FIRST_IN) {
-            DataUpdator.checkUpdate { result ->
-                if (result.hasUpdate) {
-                    GlobalLog.log("数据同步完成")
-                    AppNotification.broadcastNotification(1234, "指令数据已更新",
-                            "点击查看更新内容",
-                            Intent(UtilEventReceiver.INST_DATA_SYNC_FINISH).apply {
-                                putExtra("content", result.result)
-                            }
-                    )
-                } else {
-                    GlobalLog.log("暂未更新")
-                }
-            }
+            DataSyncWork.startOnce()
         }
     }
 
@@ -79,19 +66,23 @@ class MainActivity : BaseActivity() {
         }
     }
 
-
     override fun onResume() {
         super.onResume()
-        val now = System.currentTimeMillis()
-
         if (!firstIn) {
             //检查数据更新
-            if (now - lastCheck > 120000) {
-                showTutorials()
-                lastCheck = now
-            }
-        } else
+            showTutorials()
+        } else {
             firstIn = false
+        }
+    }
+
+    private fun showTipRecent() {
+        MaterialDialog(this).show {
+            title(text = "如何从最近任务隐藏？")
+            cancelable(false)
+            message(text = "在主页通过按返回键（侧边返回）到桌面即可隐藏卡片，为加强后台能力，可在本页面进入最近任务将本App上锁。")
+            positiveButton(text = "我知道了，不再提示")
+        }
     }
 
     companion object {
@@ -105,8 +96,6 @@ class MainActivity : BaseActivity() {
         var showUpdate = true//显示更新日志
 
         private var firstIn = true
-
-        private var lastCheck = 0L
 
     }
 
@@ -137,7 +126,6 @@ class MainActivity : BaseActivity() {
     }
 
     private fun showDataUpdateLog() {
-        lastCheck = System.currentTimeMillis()
         if (AppConfig.FIRST_LAUNCH_NEW_VERSION && showUpdate && !BuildConfig.DEBUG) {
             UpdateLogDialog(this) {
                 Vog.d("检查数据更新")

@@ -180,7 +180,6 @@ dependencies {
     def work_version = "2.3.3"
     implementation "androidx.work:work-runtime-ktx:$work_version"
 
-    implementation 'com.gitee.Vove:ScaffoldAndroid:a564fd346d'
     implementation 'com.google.android:flexbox:2.0.0'
 
 }

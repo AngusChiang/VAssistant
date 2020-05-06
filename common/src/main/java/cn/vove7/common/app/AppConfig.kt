@@ -234,17 +234,13 @@ object AppConfig : BaseConfig {
             , AudioManager.STREAM_NOTIFICATION
     )
 
+
     val currentStreamType: Int
         get() {
             val i = synStreamIndex.let { if (it in 0..2) it else 0 }
             Vog.d("currentStreamIndex ---> $i")
             return streamTypeArray[i]
         }
-
-    /**
-     * 当前合成通道音量
-     */
-    val currentStreamVolume get() = SystemBridge.getVolumeByType(currentStreamType)
 
     /**
      * 改变sp存储路径
@@ -268,36 +264,11 @@ object AppConfig : BaseConfig {
 
     private val context get() = GlobalApp.APP
 
-    var lastCheckTime = 0L
-    /**
-     * 发送请求，验证时间
-     */
-    fun checkDate() = launch {
-        if (System.currentTimeMillis() - lastCheckTime > 600000) {
-            if (UserInfo.isLogin()) {
-                lastCheckTime = System.currentTimeMillis()
-                WrapperNetHelper.postJson<Any>(ApiUrls.CHECK_USER_DATE) { }
-            }
-        }
-    }
-
     fun checkLogin(): Boolean {
         return if (!UserInfo.isLogin()) {
             GlobalApp.toastInfo(R.string.text_please_login_first)
             false
         } else true
-    }
-
-    fun checkUser(): Boolean {
-        checkDate()
-        if (!UserInfo.isLogin()) {
-            GlobalApp.toastInfo(R.string.text_please_login_first)
-            return false
-        } else if (!UserInfo.isVip()) {
-            GlobalApp.toastWarning(R.string.text_need_vip)
-            return false
-        }
-        return true
     }
 
     //适配单选 存储String/Int

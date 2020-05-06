@@ -25,6 +25,7 @@ import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.app.log
 import cn.vove7.common.datamanager.parse.statusmap.ActionNode
 import cn.vove7.common.view.editor.MultiSpan
+import cn.vove7.quantumclock.QuantumClock
 import cn.vove7.vtp.app.AppInfo
 import cn.vove7.vtp.log.Vog
 import cn.vove7.vtp.net.GsonHelper
@@ -96,14 +97,14 @@ fun runOnNewHandlerThread(
  * @return T
  */
 fun <T> whileWaitTime(waitMillis: Long, run: () -> T?): T? {
-    val begin = System.currentTimeMillis()
+    val begin = QuantumClock.currentTimeMillis
     val ct = Thread.currentThread()
     do {
         run.invoke()?.also {
             //if 耗时操作
             return it
         }
-    } while (System.currentTimeMillis() - begin < waitMillis && !ct.isInterrupted)
+    } while (QuantumClock.currentTimeMillis - begin < waitMillis && !ct.isInterrupted)
     return null
 }
 

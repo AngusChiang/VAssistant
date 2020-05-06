@@ -44,7 +44,7 @@ class MineFragment : androidx.fragment.app.Fragment() {
     fun onEvent(code: String) {
         Vog.d("onEvent ---> $code")
         when (code) {
-            AppBus.EVENT_FORCE_OFFLINE, AppBus.EVENT_LOGOUT -> {
+            AppBus.EVENT_USER_INIT, AppBus.EVENT_FORCE_OFFLINE, AppBus.EVENT_LOGOUT -> {
                 loadUserInfo()
             }
             AppBus.EVENT_REFRESH_USER_INFO -> {
