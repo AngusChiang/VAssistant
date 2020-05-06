@@ -75,7 +75,7 @@ class DataSyncWork(context: Context, workerParams: WorkerParameters) : Worker(co
         runBlocking {
             val job = QuantumClock.sync()
             job.invokeOnCompletion { e ->
-                Vog.d("时间同步 ${QuantumClock.nowDate} $e")
+                GlobalLog.log("时间同步完成 ${QuantumClock.nowDate} $e")
             }
             job.join()
         }
