@@ -1,9 +1,14 @@
 package cn.vove7.jarvis.activities
 
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
 import android.os.Build
 import android.os.Bundle
 import android.view.View
 import android.view.Window
+import cn.daqinjia.android.common.logd
 import cn.vove7.common.app.AppConfig
 import cn.vove7.common.model.UserInfo
 import cn.vove7.jarvis.BuildConfig
@@ -16,6 +21,7 @@ import cn.vove7.jarvis.work.DataSyncWork
 import cn.vove7.vtp.log.Vog
 import cn.vove7.vtp.runtimepermission.PermissionUtils
 import com.afollestad.materialdialogs.MaterialDialog
+import com.afollestad.materialdialogs.callbacks.onDismiss
 import kotlinx.android.synthetic.main.fragment_mine.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -35,16 +41,30 @@ class MainActivity : BaseActivity() {
         finishAndRemoveTask()
     }
 
+    private val homeReceiver by lazy {
+        GoHomeReceiver {
+            if(Tutorials.tipsHideRecent) {
+                tipsRecentDialog.show()
+            }
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         requestWindowFeature(Window.FEATURE_NO_TITLE)
         super.onCreate(savedInstanceState)
         requestPermission()
         checkDebug()
         syncDataOnFirstIn()
+        homeReceiver.start(this)
+    }
+
+    override fun onDestroy() {
+        homeReceiver.stop(this)
+        super.onDestroy()
     }
 
     private fun syncDataOnFirstIn() {
-        if (AppConfig.FIRST_IN) {
+        if (AppConfig.FIRST_IN && firstIn) {
             DataSyncWork.startOnce()
         }
     }
@@ -56,13 +76,11 @@ class MainActivity : BaseActivity() {
     }
 
     override fun initView() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if (!isDarkTheme) {
-                window.decorView.systemUiVisibility =
-                    View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN or
-                            View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
-                window.statusBarColor = resources!!.getColor(R.color.app_background, theme)
-            }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && !isDarkTheme) {
+            window.decorView.systemUiVisibility =
+                View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN or
+                        View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
+            window.statusBarColor = resources!!.getColor(R.color.app_background, theme)
         }
     }
 
@@ -76,8 +94,8 @@ class MainActivity : BaseActivity() {
         }
     }
 
-    private fun showTipRecent() {
-        MaterialDialog(this).show {
+    private val tipsRecentDialog by lazy {
+        MaterialDialog(this).apply {
             title(text = "如何从最近任务隐藏？")
             cancelable(false)
             message(text = "在主页通过按返回键（侧边返回）到桌面即可隐藏卡片，为加强后台能力，可在本页面进入最近任务将本App上锁。")
@@ -138,6 +156,31 @@ class MainActivity : BaseActivity() {
                 showTutorials()
             }
         }
+    }
+
+    class GoHomeReceiver(val onGo: (reason: String) -> Unit) : BroadcastReceiver() {
+        fun start(context: Context) {
+            val itf = IntentFilter(Intent.ACTION_CLOSE_SYSTEM_DIALOGS)
+            context.registerReceiver(this, itf)
+        }
+
+        fun stop(context: Context) {
+            context.unregisterReceiver(this)
+        }
+
+        override fun onReceive(context: Context?, intent: Intent?) {
+            if (intent?.action == Intent.ACTION_CLOSE_SYSTEM_DIALOGS) {
+                val reason = intent.getStringExtra("reason")
+                reason.logd()
+                onGo(reason)
+            }
+        }
+
+        private val SYSTEM_DIALOG_REASON_RECENT_APPS = "recentapps" //home键旁边的最近程序列表键
+        private val SYSTEM_DIALOG_REASON_HOME_KEY = "homekey" //按下home键
+        private val SYSTEM_DIALOG_REASON_LOCK = "lock" //锁屏键
+        private val SYSTEM_DIALOG_REASON_DREAM = "dream" //锁屏键
+        private val SYSTEM_DIALOG_REASON_ASSIST = "assist" //某些三星手机的程序列表键
     }
 
 }
