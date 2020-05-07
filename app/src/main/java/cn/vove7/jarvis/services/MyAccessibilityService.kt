@@ -10,9 +10,14 @@ import android.os.Build
 import android.os.Handler
 import android.view.KeyEvent
 import android.view.KeyEvent.*
+import android.view.View
 import android.view.ViewGroup
 import android.view.accessibility.AccessibilityEvent
+import android.view.accessibility.AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED
+import android.view.accessibility.AccessibilityEvent.eventTypeToString
 import android.view.accessibility.AccessibilityNodeInfo
+import cn.daqinjia.android.common.logd
+import cn.daqinjia.android.common.logv
 import cn.vove7.common.accessibility.AccessibilityApi
 import cn.vove7.common.app.AppConfig
 import cn.vove7.common.app.GlobalLog
@@ -22,7 +27,6 @@ import cn.vove7.common.bridges.SystemBridge
 import cn.vove7.common.helper.AdvanAppHelper
 import cn.vove7.common.utils.CoroutineExt.launch
 import cn.vove7.common.utils.StubbornFlag
-import cn.vove7.common.utils.isInputMethod
 import cn.vove7.common.utils.runInCatch
 import cn.vove7.jarvis.BuildConfig
 import cn.vove7.jarvis.activities.screenassistant.ScreenAssistActivity
@@ -101,6 +105,12 @@ class MyAccessibilityService : AccessibilityApi() {
         }
     }
 
+    private fun pageIsView(pageName: String): Boolean = try {
+        Class.forName(pageName) is View
+    } catch (e: ClassNotFoundException) {
+        false
+    }
+
 
     /**
      * 更新当前[currentScope]
@@ -110,15 +120,16 @@ class MyAccessibilityService : AccessibilityApi() {
     private fun updateCurrentApp(pkg: String, pageName: String) {
         synchronized(MyAccessibilityService::class.java) {
             if (currentScope.packageName == pkg && pageName == currentActivity) return
-            AdvanAppHelper.getAppInfo(pkg).also {
+            currentAppInfo = AdvanAppHelper.getAppInfo(pkg).let {
                 // 系统界面??
-                currentAppInfo = try {//todo 防止阻塞
+                try {//todo 防止阻塞
                     //过滤输入法、非activity
                     if (
                             it == null ||
-                            (pkg != packageName && it.isInputMethod(this)) ||
-                            pageName.startsWith("android.widget")
-//                            !it.activities().contains(activityName)
+                            pageName.startsWith("android.widget") ||
+                            pageName.startsWith("android.view") ||
+                            pageName.startsWith("android.inputmethodservice") ||
+                            pageIsView(pageName)
                     ) {
                         return
                     } else it
@@ -131,7 +142,7 @@ class MyAccessibilityService : AccessibilityApi() {
             Vog.v("updateCurrentPage ---> $pageName")
             currentScope.activity = pageName
             currentScope.packageName = pkg
-            Vog.d(currentScope.toString())
+            Vog.e(currentScope.toString())
             dispatchPluginsEvent(ON_APP_CHANGED, currentScope)//发送事件
         }
     }
@@ -144,16 +155,18 @@ class MyAccessibilityService : AccessibilityApi() {
         val eventType = event.eventType
 
         if (BuildConfig.DEBUG) runInCatch {
-            Vog.v("class :$currentAppInfo - $currentActivity ${event.className} \n" +
-                    AccessibilityEvent.eventTypeToString(eventType))
+            event.logv()
+            ("""currentAppInfo: $currentAppInfo
+currentActivity: $currentActivity 
+eventType: ${eventTypeToString(eventType)}
+event: pkg: ${event.packageName} cls: ${event.className}""").logd()
         }
         when (eventType) {
-            AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED -> {
+            TYPE_WINDOW_STATE_CHANGED -> {
                 //界面切换
                 val classNameStr = event.className
                 val pkg = event.packageName as String?
-                Vog.v("WINDOW_STATE_CHANGED ---> $classNameStr $pkg")
-                if (classNameStr != null && pkg != null) {
+                if (!classNameStr.isNullOrBlank() && pkg != null) {
                     launch {
                         updateCurrentApp(pkg, classNameStr.toString())
                     }
@@ -232,6 +245,7 @@ class MyAccessibilityService : AccessibilityApi() {
 
 
     var keyListener: ((event: KeyEvent) -> Unit)? = null
+
     /**
      * 按键监听
      * 熄屏时无法监听
