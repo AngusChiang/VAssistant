@@ -401,17 +401,29 @@ object SystemBridge : SystemOperation {
         val kdn = KeyEvent(KeyEvent.ACTION_DOWN, keyCode)
         val kup = KeyEvent(KeyEvent.ACTION_UP, keyCode)
 
-        //一个一个发送
+        //当前活跃 media_button_receiver
+        val currentActiveApp = Settings.Secure.getString(context.contentResolver, "media_button_receiver")
 
-        GlobalApp.APP.packageManager.queryBroadcastReceivers(intent, 0).map {
-            ComponentName(it.activityInfo.packageName, it.activityInfo.name)
-        }.forEach { cn ->
-            Vog.d("sendMediaKey to $cn")
+        kotlin.runCatching {
+            val cn = if (currentActiveApp.isNullOrBlank()) {
+                null
+            } else {
+                currentActiveApp.let {
+                    it.split(',')[0].let { pc ->
+                        val (p, c) = pc.split('/')
+                        ComponentName(p, c)
+                    }
+                }
+            }
+            Vog.d("sendMediaKey $kdn to $cn")
             intent.putExtra(Intent.EXTRA_KEY_EVENT, kdn)
             intent.component = cn
             GlobalApp.APP.sendBroadcast(intent)
             intent.putExtra(Intent.EXTRA_KEY_EVENT, kup)
             GlobalApp.APP.sendBroadcast(intent)
+        }.onFailure {
+            GlobalApp.toastError("指令发送失败")
+            GlobalLog.err("当前媒体解析失败：$currentActiveApp \n${it.message}")
         }
     }
 
@@ -906,6 +918,7 @@ object SystemBridge : SystemOperation {
     }
 
     var screenData: Intent? = null
+
     @SuppressLint("StaticFieldLeak")
     var cap: ScreenCapturer? = null
 
@@ -1426,7 +1439,8 @@ object SystemBridge : SystemOperation {
      * @return List<String>
      */
     fun scanVassistHostsInLAN(): List<Pair<String, String>> = runBlocking {
-        val localIp = getLocalIpAddress() ?: return@runBlocking emptyList<Pair<String, String>>()
+        val localIp = getLocalIpAddress()
+            ?: return@runBlocking emptyList<Pair<String, String>>()
 
         val sd = localIp.lastIndexOf('.')
         val n = localIp.substring(sd + 1).toInt()

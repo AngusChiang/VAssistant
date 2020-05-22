@@ -159,7 +159,7 @@ class MyAccessibilityService : AccessibilityApi() {
             ("""currentAppInfo: $currentAppInfo
 currentActivity: $currentActivity 
 eventType: ${eventTypeToString(eventType)}
-event: pkg: ${event.packageName} cls: ${event.className}""").logd()
+event: pkg: ${event.packageName} cls: ${event.className}""").logv()
         }
         when (eventType) {
             TYPE_WINDOW_STATE_CHANGED -> {
