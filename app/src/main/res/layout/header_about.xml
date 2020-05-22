@@ -12,7 +12,7 @@
     <ImageView
         android:layout_width="127dp"
         android:layout_height="127dp"
-        android:src="@mipmap/icon_large"
+        android:src="@drawable/icon_large"
         android:textSize="20sp" />
 
     <LinearLayout

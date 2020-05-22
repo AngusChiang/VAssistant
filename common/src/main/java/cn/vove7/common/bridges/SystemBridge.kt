@@ -396,8 +396,28 @@ object SystemBridge : SystemOperation {
      * @param keyCode Int
      */
     private fun sendMediaKey(keyCode: Int) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            sendMediaKeyOnN(keyCode)
+        } else {
+            sendMediaKeyUnderN(keyCode)
+        }
+    }
+
+    private fun sendMediaKeyUnderN(keyCode: Int) {
         val intent = Intent(Intent.ACTION_MEDIA_BUTTON)
-        intent.addFlags(Intent.FLAG_RECEIVER_FOREGROUND)
+        val kdn = KeyEvent(KeyEvent.ACTION_DOWN, keyCode)
+        val kup = KeyEvent(KeyEvent.ACTION_UP, keyCode)
+
+        GlobalApp.APP.packageManager.queryBroadcastReceivers(intent, 0).map {
+            ComponentName(it.activityInfo.packageName, it.activityInfo.name)
+        }.forEach { cn ->
+            Vog.d("sendMediaKey to $cn")
+            sendMediaKey2Component(intent, kdn, kup, cn)
+        }
+    }
+
+    private fun sendMediaKeyOnN(keyCode: Int) {
+        val intent = Intent(Intent.ACTION_MEDIA_BUTTON)
         val kdn = KeyEvent(KeyEvent.ACTION_DOWN, keyCode)
         val kup = KeyEvent(KeyEvent.ACTION_UP, keyCode)
 
@@ -415,16 +435,20 @@ object SystemBridge : SystemOperation {
                     }
                 }
             }
-            Vog.d("sendMediaKey $kdn to $cn")
-            intent.putExtra(Intent.EXTRA_KEY_EVENT, kdn)
-            intent.component = cn
-            GlobalApp.APP.sendBroadcast(intent)
-            intent.putExtra(Intent.EXTRA_KEY_EVENT, kup)
-            GlobalApp.APP.sendBroadcast(intent)
+            sendMediaKey2Component(intent, kdn, kup, cn)
         }.onFailure {
             GlobalApp.toastError("指令发送失败")
             GlobalLog.err("当前媒体解析失败：$currentActiveApp \n${it.message}")
         }
+    }
+
+    private fun sendMediaKey2Component(intent: Intent, kdn: KeyEvent, kup: KeyEvent, cn: ComponentName?) {
+        Vog.d("sendMediaKey $kdn to $cn")
+        intent.putExtra(Intent.EXTRA_KEY_EVENT, kdn)
+        intent.component = cn
+        GlobalApp.APP.sendBroadcast(intent)
+        intent.putExtra(Intent.EXTRA_KEY_EVENT, kup)
+        GlobalApp.APP.sendBroadcast(intent)
     }
 
     override fun mediaResume() {
