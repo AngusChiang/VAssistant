@@ -59,9 +59,8 @@ class LoginDialog(val context: Context, initEmail: String? = null,
         loginBtn.setOnClickListener {
             userAccountView.error = ""
             userPassView.error = ""
-//            val params = TreeMap<String, String>()
             val loginInfo = UserInfo()
-            val loginId = userAccountView.editText?.text.toString()
+            val loginId = userAccountView.editText?.text?.toString()?.trim()
             val userPass = userPassView.editText?.text.toString()
             if (TextUtils.isEmpty(loginId)) {
                 userAccountView.error = GlobalApp.getString(R.string.text_not_empty)

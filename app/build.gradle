@@ -11,7 +11,7 @@ android {
         minSdkVersion 21
         targetSdkVersion 28
         def subVersion = 2
-        versionName "2.0.9"
+        versionName "2.0.9.1"
         def vc = Integer.parseInt(versionName.replace(".", "")) * 10
         if (vc < 10000) {
             vc *= 10
@@ -151,14 +151,14 @@ dependencies {
     implementation project(path: ':common')
     implementation project(path: ':androlua')
     implementation project(path: ':rhino-android')
-    implementation 'com.afollestad.material-dialogs:core:3.1.1'
-    implementation 'com.afollestad.material-dialogs:input:3.1.1'
+    implementation 'com.afollestad.material-dialogs:core:3.3.0'
+    implementation 'com.afollestad.material-dialogs:color:3.3.0'
+    implementation 'com.afollestad.material-dialogs:input:3.3.0'
     implementation 'org.adw.library:discrete-seekbar:1.0.1'
     implementation 'com.github.didikee:AndroidDonate:0.1.0'
 
-    implementation 'com.github.QuadFlask:colorpicker:0.0.15'
     implementation 'com.github.Vove7:CodeView:1.0.2'
-    implementation 'com.github.Vove7:BottomDialog:2.2.4'
+    implementation 'com.github.Vove7:BottomDialog:2.2.5'
 
     implementation 'com.github.Vove7:SlidePickerView:1.0.2'
 

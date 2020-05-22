@@ -104,11 +104,11 @@ object GlobalLog {
 
         fun colorfulHtml(): String {
             val l = when (level) {
-                LEVEL_INFO -> "INFO"
-                LEVEL_ERROR -> "ERRO"
+                LEVEL_INFO -> "info"
+                LEVEL_ERROR -> "erro"
                 else -> ""
             }
-            return "<div class='${l.toLowerCase()}'><xmp>${format.format(date)} $l -> $msg</xmp></div>\n"
+            return "<div class='$l'><xmp>${format.format(date)} -> $msg</xmp></div>\n"
         }
 
         companion object {

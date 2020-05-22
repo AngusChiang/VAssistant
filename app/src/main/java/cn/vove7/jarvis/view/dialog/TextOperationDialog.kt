@@ -82,9 +82,12 @@ class TextOperationDialog(
     private fun translate() {
         DataCollector.buriedPoint("to_trans")
         AppConfig.haveTranslatePermission() ?: return
+
+        val needT = textModel.subText == null || textModel.text != getOpText()
+
         val dialog = BottomDialog.builder(activity) {
             title(round = true, title = "翻译")
-            message(textModel.subText ?: "翻译中...", true)
+            message(if (!needT) textModel.subText ?: "" else "翻译中...", true)
             buttons {
                 positiveButton("复制") {
                     it.updateContent<MessageContentBuilder> {
@@ -95,7 +98,7 @@ class TextOperationDialog(
                 negativeButton("关闭") { it.dismiss() }
             }
         }
-        if (textModel.subText != null) {
+        if (!needT) {
             return
         }
         lifeCycleScope.launch(Dispatchers.IO) {

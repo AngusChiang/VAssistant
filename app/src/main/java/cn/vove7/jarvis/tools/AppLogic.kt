@@ -56,7 +56,7 @@ object AppLogic {
     private fun checkUserInfo() {
         WrapperNetHelper.postJson<Any>(ApiUrls.VERIFY_TOKEN) {
             success { _, responseMessage ->
-                responseMessage.isOk()
+                responseMessage.isOk(true)
             }
         }
     }

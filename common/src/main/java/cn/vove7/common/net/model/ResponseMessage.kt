@@ -1,7 +1,7 @@
 package cn.vove7.common.net.model
 
-import cn.vove7.common.app.AppConfig
 import cn.vove7.common.app.GlobalApp
+import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.appbus.AppBus
 import cn.vove7.common.appbus.AppBus.EVENT_FORCE_OFFLINE
 
@@ -18,12 +18,17 @@ open class ResponseMessage<T> {
     var err: String? = null
     val data: T? = null
 
-    fun isOk(): Boolean {
-        if (tokenIsOutdate()||isInvalid()) {
+    fun isOk(check: Boolean = false): Boolean {
+        if (check && tokenIsOutdate() || isInvalid()) {
+            GlobalLog.err(this.toString())
             GlobalApp.toastError(message)
             AppBus.post(EVENT_FORCE_OFFLINE)
         }
-        return code == CODE_OK
+        return (code == CODE_OK).also { ok ->
+            if (!ok && !check) {
+                GlobalLog.err(this.toString())
+            }
+        }
     }
 
     fun isInvalid(): Boolean {

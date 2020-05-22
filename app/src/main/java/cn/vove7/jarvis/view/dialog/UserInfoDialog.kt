@@ -192,7 +192,7 @@ class UserInfoDialog(val context: Activity, val onUpdate: () -> Unit) {
         WrapperNetHelper.postJson<UserInfo>(ApiUrls.GET_USER_INFO) {
             success { _, bean ->
                 if (exit) return@success
-                if (bean.isOk()) {
+                if (bean.isOk(true)) {
                     try {
                         val userInfo = bean.data!!
                         AppLogic.onLogin(userInfo)

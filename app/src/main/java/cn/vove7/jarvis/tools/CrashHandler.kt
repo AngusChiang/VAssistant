@@ -38,7 +38,7 @@ object CrashHandler : Cockroach.ExceptionHandler {
     override fun handlerException(thread: Thread?, throwable: Throwable?) {
         throwable ?: return
         GlobalApp.toastError("发生异常，可将[帮助/日志]发送进行反馈")
-        GlobalLog.log("发生异常 at $thread")
+        GlobalLog.err("发生异常 at $thread")
         GlobalLog.err(throwable)
         handler(throwable)
     }

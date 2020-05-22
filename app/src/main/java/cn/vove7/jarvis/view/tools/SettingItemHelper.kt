@@ -17,11 +17,14 @@ import cn.vove7.smartkey.android.set
 import cn.vove7.vtp.easyadapter.BaseListAdapter
 import cn.vove7.vtp.log.Vog
 import com.afollestad.materialdialogs.MaterialDialog
+import com.afollestad.materialdialogs.WhichButton
+import com.afollestad.materialdialogs.actions.getActionButton
 import com.afollestad.materialdialogs.callbacks.onDismiss
+import com.afollestad.materialdialogs.color.ColorPalette
+import com.afollestad.materialdialogs.color.colorChooser
 import com.afollestad.materialdialogs.customview.customView
 import com.afollestad.materialdialogs.input.input
 import com.afollestad.materialdialogs.list.listItemsSingleChoice
-import com.flask.colorpicker.ColorPickerView
 import com.russhwolf.settings.contains
 import org.adw.library.widgets.discreteseekbar.DiscreteSeekBar
 
@@ -137,25 +140,36 @@ class SettingItemHelper(
         item.summary = sum()
 
         setBasic {
-            val cpv = ColorPickerView(context)
-            cpv.addOnColorChangedListener { color ->
-                item.onChange?.invoke(color)
-            }
-            cpv.setPadding(10.dp.px, 0, 10.dp.px, 0)
+            var selectedColor = color
             MaterialDialog(context).title(text = settingItem.title()).show {
-                customView(view = cpv)
+//                val cs = ColorPalette.PrimarySub + ColorPalette.AccentSub
+//                val ps = cs.fold(mutableListOf<Int>()) { list, arr -> arr.toCollection(list);list }
+
+                colorChooser(
+                        ColorPalette.Primary + ColorPalette.Accent,
+                        ColorPalette.PrimarySub + ColorPalette.AccentSub,
+//                        ps.toIntArray(),
+                        initialSelection = color,
+                        allowCustomArgb = true, showAlphaSelector = true,
+                        waitForPositiveButton = false
+                ) { _, color ->
+                    getActionButton(WhichButton.POSITIVE).isEnabled = true
+                    item.onChange?.invoke(color)
+                    selectedColor = color
+                }
                 positiveButton {
-                    color = cpv.selectedColor
+                    color = selectedColor
                     if ((item.callback as CallbackOnSet<Int>?)?.invoke(ItemOperation(this@SettingItemHelper), color
                                 ?: 0) != false) {
                         item.summary = sum()
                         if (item.keyId != null) {
-                            this@SettingItemHelper.config.set(item.keyId, color)
+                            this@SettingItemHelper.config.set(item.keyId, selectedColor)
                         }
                         setBasic()
                     }
                 }
-                positiveButton()
+                getActionButton(WhichButton.POSITIVE).isEnabled = false
+                negativeButton()
                 onDismiss {
                     item.onDialogDismiss?.invoke()
                 }
