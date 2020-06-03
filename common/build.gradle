@@ -81,8 +81,8 @@ dependencies {
     api 'top.zibin:Luban:1.1.8'//鲁班 压缩图片
     api 'org.jsoup:jsoup:1.11.3'
 
-    api 'com.github.Vove7.SmartKey:smartkey-android:6.1.2'
-    api 'com.github.Vove7:ParamRegexNdk:1.0.6'
+//    api 'com.gitee.Vove7.SmartKey:smartkey-android:6.2.0'
+    api 'com.github.Vove7:ParamRegexNdk:1.0.7'
 
     api 'com.github.Vove7:QuantumClock:0.1.1'
     api 'com.gitee.Vove:ScaffoldAndroid:a564fd346d'
