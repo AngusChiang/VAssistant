@@ -25,12 +25,15 @@ import cn.vove7.common.app.log
 import cn.vove7.common.bridges.InputMethodBridge
 import cn.vove7.common.bridges.RootHelper
 import cn.vove7.common.bridges.SystemBridge
+import cn.vove7.common.utils.gotoAccessibilitySetting2
 import cn.vove7.common.utils.runOnUi
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.activities.PermissionManagerActivity.PermissionStatus.Companion.allPerStr
 import cn.vove7.jarvis.activities.base.OneFragmentActivity
 import cn.vove7.jarvis.adapters.RecAdapterWithFooter
 import cn.vove7.jarvis.fragments.SimpleListFragment
+import cn.vove7.jarvis.services.GestureService
+import cn.vove7.jarvis.services.MyAccessibilityService
 import cn.vove7.vtp.runtimepermission.PermissionUtils
 import kotlin.concurrent.thread
 
@@ -145,7 +148,8 @@ class PermissionManagerActivity : OneFragmentActivity() {
         val permissions by lazy {
             val openASAction: (PermissionStatus, Activity) -> Unit = { it, act ->
                 try {
-                    PermissionUtils.gotoAccessibilitySetting(act)
+                    PermissionUtils.gotoAccessibilitySetting2(act, if (it.permissionName == "基础无障碍服务")
+                        MyAccessibilityService::class.java else GestureService::class.java)
                 } catch (e: ActivityNotFoundException) {
                     GlobalApp.toastError("跳转失败，请自行开启")
                 }
@@ -173,7 +177,7 @@ class PermissionManagerActivity : OneFragmentActivity() {
 //                                            toast.showShort("跳转失败，请手动开启")
                                 try {
                                     SystemBridge.openAppDetail(context?.packageName
-                                        ?: "")
+                                            ?: "")
                                 } catch (e: Exception) {
                                     GlobalApp.toastError("跳转失败，请到应用详情手动开启")
                                 }

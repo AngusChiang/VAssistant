@@ -15,8 +15,6 @@ import cn.vove7.common.appbus.AppBus
 import cn.vove7.common.bridges.HttpBridge
 import cn.vove7.common.bridges.SystemBridge
 import cn.vove7.common.model.UserInfo
-import cn.vove7.common.net.ApiUrls
-import cn.vove7.common.net.WrapperNetHelper
 import cn.vove7.common.utils.CoroutineExt.launch
 import cn.vove7.common.utils.CoroutineExt.withMain
 import cn.vove7.common.utils.StorageHelper
@@ -182,10 +180,11 @@ object AppConfig : BaseConfig {
         }
 
     val voiceRecogEffect by noCacheKey(false, keyId = R.string.key_voice_recog_feedback)
+    val voiceRecogWhenBt by noCacheKey(false, keyId = R.string.key_voice_recog_feedback_bt)
 
     //语音识别提示音
     val voiceRecogFeedback
-        get() = voiceRecogEffect || isBlueToothConnect
+        get() = voiceRecogEffect || (voiceRecogWhenBt && isBlueToothConnect)
 
     var notifyWpOnScreenOff by noCacheKey(true, keyId = R.string.key_notify_wp_on_screen_off)
 

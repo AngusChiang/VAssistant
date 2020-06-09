@@ -97,7 +97,7 @@ open class ExecutorImpl(
 
     override fun requireAccessibility() {
         if (accessApi == null) {
-            PermissionUtils.gotoAccessibilitySetting(context)
+            PermissionUtils.gotoAccessibilitySetting2(context, Class.forName("cn.vove7.jarvis.services.MyAccessibilityService"))
             GlobalApp.toastError("此操作需要VAssist基础服务，请开启后继续", 1)
             throw NeedAccessibilityException()
         }

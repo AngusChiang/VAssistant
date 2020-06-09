@@ -3,6 +3,7 @@ package cn.vove7.common.utils
 import android.Manifest
 import android.animation.Animator
 import android.app.Activity
+import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -10,6 +11,7 @@ import android.graphics.*
 import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.*
+import android.provider.Settings
 import android.text.SpannableStringBuilder
 import android.util.DisplayMetrics
 import android.view.View
@@ -31,6 +33,7 @@ import cn.vove7.vtp.log.Vog
 import cn.vove7.vtp.net.GsonHelper
 import cn.vove7.vtp.net.NetHelper
 import cn.vove7.vtp.net.WrappedRequestCallback
+import cn.vove7.vtp.runtimepermission.PermissionUtils
 import okhttp3.Call
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.OkHttpClient
@@ -686,4 +689,19 @@ inline fun <reified T> NetHelper.putJson(
     val call = client.newCall(request)
     call(url, call, requestCode, callback)
     return call
+}
+
+fun PermissionUtils.gotoAccessibilitySetting2(context: Context, cls: Class<*>) {
+    val intent = Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS)
+    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+    intent.putComponent(context.packageName, cls)
+    context.startActivity(intent)
+}
+
+private fun Intent.putComponent(pkg: String, cls: Class<*>) {
+    val cs = ComponentName(pkg, cls.name).flattenToString()
+    val bundle = Bundle()
+    bundle.putString(":settings:fragment_args_key", cs)
+    putExtra(":settings:fragment_args_key", cs)
+    putExtra(":settings:show_fragment_args", bundle)
 }

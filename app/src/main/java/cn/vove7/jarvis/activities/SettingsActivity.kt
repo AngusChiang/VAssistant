@@ -275,6 +275,10 @@ class SettingsActivity : ReturnableActivity() {
                             onChange = {
                                 SystemBridge.vibrate(it.toLong())
                             }
+                    ),
+                    CheckBoxItem(title = "连接蓝牙时播放提示音", keyId = R.string.key_voice_recog_feedback_bt,
+                            summary = "即使关闭提示音",
+                            defaultValue = AppConfig.voiceRecogWhenBt
                     )
 //                    CheckBoxItem(title = "执行失败", keyId = R.string.key_exec_failed_voice_feedback,
 //                            summary = "失败时的语音反馈",

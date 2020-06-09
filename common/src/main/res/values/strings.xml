@@ -103,6 +103,7 @@
     <string name="key_use_assist_service" translatable="false">use_assist_service</string>
     <string name="key_exec_failed_voice_feedback" translatable="false">exec_failed_voice_feedback</string>
     <string name="key_voice_recog_feedback" translatable="false">voice_recog_feedback</string>
+    <string name="key_voice_recog_feedback_bt" translatable="false">voice_recog_feedback_bt</string>
     <string name="key_exec_succ_feedback" translatable="false">exec_succ_feedback</string>
     <string name="key_user_wakeup_word" translatable="false">user_wakeup_word</string>
     <string name="key_fix_voice_micro" translatable="false">fix_voice_micro</string>
