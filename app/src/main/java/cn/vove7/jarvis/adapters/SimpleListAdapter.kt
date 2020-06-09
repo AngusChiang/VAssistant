@@ -11,15 +11,16 @@ import android.widget.TextView
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.fragments.AwesomeItem
 import cn.vove7.vtp.log.Vog
+import com.bumptech.glide.Glide
+import kotlinx.android.synthetic.main.item_normal_icon_title.view.*
 import java.io.Serializable
 import java.text.Collator
 
 open class SimpleListAdapter<T>(
-        private val dataset: MutableList<ListViewModel<T>> ,
+        private val dataset: MutableList<ListViewModel<T>>,
         val itemClickListener: OnItemClickListener<T>? = null,
         val checkable: Boolean = false
-)
-    : RecAdapterWithFooter<SimpleListAdapter.VHolder, ListViewModel<T>>() {
+) : RecAdapterWithFooter<SimpleListAdapter.VHolder, ListViewModel<T>>() {
 
     private val holders = SparseArray<VHolder>()
     override fun itemCount(): Int = dataset.size
@@ -31,11 +32,19 @@ open class SimpleListAdapter<T>(
         holders.put(position, holder)
         holder.title?.text = item.title
 
-        if (item.icon != null) {
-            holder.icon?.visibility = View.VISIBLE
-            holder.icon?.setImageDrawable(item.icon)
-        } else
-            holder.icon!!.visibility = View.INVISIBLE
+        when {
+            item.icon != null -> {
+                holder.icon?.visibility = View.VISIBLE
+                holder.icon?.setImageDrawable(item.icon)
+            }
+            item.iconUrl != null -> {
+                holder.icon?.visibility = View.VISIBLE
+                Glide.with(holder.icon!!).load(item.iconUrl).into(holder.icon!!)
+            }
+            else -> {
+                holder.icon?.visibility = View.INVISIBLE
+            }
+        }
         if (item.subTitle != null) {
             holder.subtitle?.visibility = View.VISIBLE
             holder.subtitle?.text = item.subTitle
@@ -86,24 +95,14 @@ open class SimpleListAdapter<T>(
         return VHolder(view)
     }
 
-    class VHolder(v: View, adapter: RecAdapterWithFooter<RecAdapterWithFooter.RecViewHolder, *>? = null)
-        : RecAdapterWithFooter.RecViewHolder(v, adapter) {
-        var icon: ImageView? = null
-        var title: TextView? = null
-        var subtitle: TextView? = null
-        var checkBox: CheckBox? = null
-
-        init {
-            if (adapter == null) {
-                icon = v.findViewById(R.id.icon)
-                title = v.findViewById(R.id.title)
-                subtitle = v.findViewById(R.id.sub_title)
-                checkBox = v.findViewById(R.id.check_box)
-            }
-        }
+    class VHolder(v: View, adapter: RecAdapterWithFooter<RecViewHolder, *>? = null)
+        : RecViewHolder(v, adapter) {
+        val icon: ImageView = v.icon
+        val title: TextView = v.title
+        val subtitle: TextView = v.sub_title
+        val checkBox: CheckBox = v.check_box
 
     }
-
     interface OnItemClickListener<T> {
         fun onClick(holder: VHolder?, pos: Int, item: ListViewModel<T>)
         fun onLongClick(holder: VHolder?, pos: Int, item: ListViewModel<T>): Boolean = false
@@ -117,7 +116,8 @@ class ListViewModel<T>(
         val subTitle: String? = null,
         var icon: Drawable? = null,
         val extra: T,
-        var checked: Boolean = false
+        var checked: Boolean = false,
+        var iconUrl: String? = null
 ) : Serializable, Comparable<ListViewModel<T>> {
 
     companion object {
