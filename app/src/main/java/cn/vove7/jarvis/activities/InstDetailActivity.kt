@@ -1,5 +1,6 @@
 package cn.vove7.jarvis.activities
 
+import android.animation.ValueAnimator
 import android.app.Activity
 import android.content.Context
 import android.content.DialogInterface
@@ -8,8 +9,10 @@ import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.text.InputType
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.AccelerateDecelerateInterpolator
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.TextView
@@ -87,6 +90,67 @@ class InstDetailActivity : BaseActivity() {
         refresh()
         toolbar.setNavigationOnClickListener { finish() }
         load = true
+        initScrollListener()
+    }
+
+    private fun initScrollListener() {
+        var barHeight = 0
+
+        collapsing_coll.post {
+            barHeight = collapsing_coll.height
+        }
+
+        var startY = 0f
+        var hasBounce = false
+        content_container.setOnTouchListener { v, e ->
+            when (e.action) {
+                MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
+                    if (!hasBounce) {
+                        return@setOnTouchListener false
+                    }
+                    hasBounce = false
+                    val dy = e.rawY - startY
+                    startY = 0F
+                    ValueAnimator.ofFloat(dy, 0f).apply {
+                        interpolator = AccelerateDecelerateInterpolator()
+                        duration = 200
+                        addUpdateListener {
+                            updateScale(it.animatedValue as Float, barHeight)
+                        }
+                        start()
+                    }
+                    return@setOnTouchListener true
+                }
+                MotionEvent.ACTION_MOVE -> {
+                    if (v.scrollY == 0) {
+                        if (startY == 0f) {
+                            startY = e.rawY
+                            if (collapsing_coll.height != barHeight) {
+                                return@setOnTouchListener content_container.onTouchEvent(e)
+                            }
+                        }
+                        val dy = e.rawY - startY
+                        if (dy > 0) {//下拉
+                            hasBounce = true
+                            updateScale(dy, barHeight)
+                            return@setOnTouchListener true
+                        } else {
+                            return@setOnTouchListener content_container.onTouchEvent(e)
+                        }
+                    }
+                }
+            }
+
+            return@setOnTouchListener false
+        }
+    }
+
+    private fun updateScale(offset: Float, barHeight: Int) {
+        collapsing_coll.layoutParams = collapsing_coll.layoutParams.also {
+            it.height = (barHeight + offset * 0.2).toInt()
+        }
+        toolbar_img.scaleX = 1 + offset / 10000
+        toolbar_img.scaleY = 1 + offset / 10000
     }
 
     fun refresh() {
@@ -173,7 +237,7 @@ class InstDetailActivity : BaseActivity() {
             instructions_text.text = node.desc?.instructions ?: "无"
             examples_text.text = node.desc?.example ?: "无"
             regs_text.text = TextHelper.arr2String(node.regs?.toTypedArray()
-                ?: arrayOf<Any>(), "\n")
+                    ?: arrayOf<Any>(), "\n")
             version_text.text = node.versionCode.toString()
 
             view_code.setOnClickListener {
