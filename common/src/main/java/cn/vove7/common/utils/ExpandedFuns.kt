@@ -15,6 +15,7 @@ import android.provider.Settings
 import android.text.SpannableStringBuilder
 import android.util.DisplayMetrics
 import android.view.View
+import android.view.ViewParent
 import android.view.animation.AlphaAnimation
 import android.view.animation.Animation
 import android.view.inputmethod.InputMethodManager
@@ -704,4 +705,13 @@ private fun Intent.putComponent(pkg: String, cls: Class<*>) {
     bundle.putString(":settings:fragment_args_key", cs)
     putExtra(":settings:fragment_args_key", cs)
     putExtra(":settings:show_fragment_args", bundle)
+}
+
+fun View.findFirstParentWith(predicate: (ViewParent) -> Boolean): ViewParent? {
+    var p = parent
+    while (p != null) {
+        if (predicate(p)) return p
+        p = p.parent
+    }
+    return null
 }

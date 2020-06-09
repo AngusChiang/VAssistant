@@ -11,7 +11,7 @@ android {
         minSdkVersion 21
         targetSdkVersion 28
         def subVersion = 0
-        versionName "2.0.9.2"
+        versionName "2.0.9.3"
         def vc = Integer.parseInt(versionName.replace(".", "")) * 10
         if (vc < 10000) {
             vc *= 10
@@ -160,7 +160,7 @@ dependencies {
     implementation 'com.github.didikee:AndroidDonate:0.1.0'
 
     implementation 'com.github.Vove7:CodeView:1.0.2'
-    implementation 'com.github.Vove7:BottomDialog:2.2.6'
+    implementation 'com.github.Vove7:BottomDialog:2.2.7'
 
     implementation 'com.github.Vove7:SlidePickerView:1.0.2'
 

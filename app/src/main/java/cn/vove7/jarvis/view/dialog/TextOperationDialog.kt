@@ -158,8 +158,8 @@ class TextOperationDialog(
                         DataCollector.buriedPoint("to_gen_qr")
                         QRTools.encode(getOpText()) { path, e ->
                             if (path != null) {
-                                bottomDialog.dismiss()
                                 runOnUi {
+                                    bottomDialog.dismiss()
                                     showQrDialog(getOpText(), path)
                                 }
                             } else {

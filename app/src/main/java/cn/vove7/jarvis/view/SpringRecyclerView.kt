@@ -1,90 +1,35 @@
-/*
- *     This file is part of Lawnchair Launcher.
- *
- *     Lawnchair Launcher is free software: you can redistribute it and/or modify
- *     it under the terms of the GNU General Public License as published by
- *     the Free Software Foundation, either version 3 of the License, or
- *     (at your option) any later version.
- *
- *     Lawnchair Launcher is distributed in the hope that it will be useful,
- *     but WITHOUT ANY WARRANTY; without even the implied warranty of
- *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *     GNU General Public License for more details.
- *
- *     You should have received a copy of the GNU General Public License
- *     along with Lawnchair Launcher.  If not, see <https://www.gnu.org/licenses/>.
- */
-
 package cn.vove7.jarvis.view
 
 import android.content.Context
-import android.graphics.Canvas
-import android.graphics.Color
-import android.graphics.PorterDuff
-import android.graphics.drawable.Drawable
 import android.util.AttributeSet
-import androidx.annotation.Keep
+import android.view.MotionEvent
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import cn.vove7.jarvis.view.tools.SpringEffectHelper
+import cn.vove7.jarvis.view.tools.TranslationXPropertyCompat
+import cn.vove7.jarvis.view.tools.TranslationYPropertyCompat
 
 class SpringRecyclerView @JvmOverloads constructor(
         context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
 ) : RecyclerView(context, attrs, defStyleAttr) {
 
-    private val springManager = SpringEdgeEffect.Manager(this)
+    private val lm get() = layoutManager as LinearLayoutManager
 
-    private val scrollBarColor by lazy {
-        Color.RED
+    private val springHelper by lazy {
+        SpringEffectHelper(
+                this, ::isBottom, ::isTop,
+                { super.onTouchEvent(it) },
+                if (lm.orientation == VERTICAL) TranslationYPropertyCompat()
+                else TranslationXPropertyCompat()
+        )
     }
 
-    open var shouldTranslateSelf = true
+    private val isTop get() = if (lm.orientation == VERTICAL) !canScrollVertically(-1) else !canScrollHorizontally(-1)
 
-    var isTopFadingEdgeEnabled = true
+    private val isBottom get() = if (lm.orientation == VERTICAL) !canScrollVertically(1) else !canScrollHorizontally(1)
 
-    init {
-        edgeEffectFactory = springManager.createFactory()
+    override fun onTouchEvent(e: MotionEvent): Boolean {
+        return springHelper.onTouch(e)
     }
 
-    override fun draw(canvas: Canvas) {
-        springManager.withSpring(canvas, shouldTranslateSelf) {
-            super.draw(canvas)
-            false
-        }
-    }
-
-    override fun dispatchDraw(canvas: Canvas) {
-        springManager.withSpring(canvas, !shouldTranslateSelf) {
-            super.dispatchDraw(canvas)
-            false
-        }
-    }
-
-    override fun getTopFadingEdgeStrength(): Float {
-        return if (isTopFadingEdgeEnabled) super.getTopFadingEdgeStrength() else 0f
-    }
-
-    /**
-     * Called by Android [android.view.View.onDrawScrollBars]
-     */
-    @Keep
-    fun onDrawHorizontalScrollBar(canvas: Canvas, scrollBar: Drawable, l: Int, t: Int, r: Int, b: Int) {
-        springManager.withSpringNegative(canvas, shouldTranslateSelf) {
-            scrollBar.setColorFilter(scrollBarColor, PorterDuff.Mode.SRC_ATOP)
-            scrollBar.setBounds(l, t, r, b)
-            scrollBar.draw(canvas)
-            false
-        }
-    }
-
-    /**
-     * Called by Android [android.view.View.onDrawScrollBars]
-     */
-    @Keep
-    fun onDrawVerticalScrollBar(canvas: Canvas, scrollBar: Drawable, l: Int, t: Int, r: Int, b: Int) {
-        springManager.withSpringNegative(canvas, shouldTranslateSelf) {
-            scrollBar.setColorFilter(scrollBarColor, PorterDuff.Mode.SRC_ATOP)
-            scrollBar.setBounds(l, t, r, b)
-            scrollBar.draw(canvas)
-            false
-        }
-    }
 }

@@ -61,14 +61,6 @@ class PermissionManagerActivity : OneFragmentActivity() {
         }
     }
 
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        if (requestCode == 100) {
-            GlobalLog.log(permissions.joinToString("\n"))
-            GlobalLog.log(grantResults.joinToString("\n"))
-        }
-    }
-
     class ManageFragment : SimpleListFragment<PermissionStatus>() {
         lateinit var pActivity: Activity
 

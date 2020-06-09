@@ -29,7 +29,7 @@
             app:cardCornerRadius="5dp"
             app:cardElevation="2dp">
 
-            <cn.vove7.vtp.view.listview.WrapContentListView xmlns:tools="http://schemas.android.com/tools"
+            <cn.vove7.jarvis.view.SpringWrapContentListView xmlns:tools="http://schemas.android.com/tools"
                 android:id="@+id/list_view"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

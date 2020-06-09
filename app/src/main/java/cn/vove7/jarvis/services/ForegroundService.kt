@@ -14,6 +14,7 @@ import androidx.core.content.ContextCompat
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.appbus.AppBus
+import cn.vove7.common.utils.runInCatch
 import cn.vove7.common.utils.spanColor
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.activities.base.VoiceAssistActivity
@@ -35,7 +36,9 @@ class ForegroundService : Service() {
         fun refreshTitle() {
             val i = Intent(GlobalApp.APP, ForegroundService::class.java)
             i.action = "REFRESH_TITLE"
-            GlobalApp.APP.startService(i)
+            runInCatch(log = true) {
+                GlobalApp.APP.startService(i)
+            }
         }
     }
 

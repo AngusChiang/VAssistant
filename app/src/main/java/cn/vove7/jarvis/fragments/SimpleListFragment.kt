@@ -3,9 +3,12 @@ package cn.vove7.jarvis.fragments
 import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.os.Handler
-import android.view.*
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import android.widget.*
 import androidx.annotation.LayoutRes
+import androidx.recyclerview.widget.LinearLayoutManager
 import cn.vove7.common.interfaces.Searchable
 import cn.vove7.common.utils.runOnUi
 import cn.vove7.jarvis.R
@@ -19,7 +22,6 @@ import cn.vove7.vtp.log.Vog
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.pluscubed.recyclerfastscroll.RecyclerFastScroller
 import kotlinx.android.synthetic.main.fragment_base_list.*
-import kotlinx.android.synthetic.main.fragment_base_list.view.*
 
 /**
  * # SimpleListFragment
@@ -146,9 +148,8 @@ abstract class SimpleListFragment<DataType> : androidx.fragment.app.Fragment(), 
     }
 
     private fun afterSet() {
-        if (layManager != null && !layManager!!.isAttachedToWindow) {
-            recyclerView.layoutManager = layManager
-        } else recyclerView.layoutManager = androidx.recyclerview.widget.LinearLayoutManager(context)
+        recyclerView.layoutManager = if (layManager?.isAttachedToWindow == false) layManager
+        else LinearLayoutManager(context)
 
         recyclerView.adapter = adapter
         netErrViewContainer.addView(
@@ -172,10 +173,7 @@ abstract class SimpleListFragment<DataType> : androidx.fragment.app.Fragment(), 
         netErrViewContainer = f(R.id.net_error_layout)
         progressBar = f(R.id.progress_bar)
         progressBar.visibility = showBar
-        swipeRefreshLayout.setOnRefreshListener {
-            //下拉刷新
-            refresh()
-        }
+        swipeRefreshLayout.setOnRefreshListener(::refresh)
         recyclerView.addOnScrollListener(object : androidx.recyclerview.widget.RecyclerView.OnScrollListener() {
             //上拉加载
             override fun onScrolled(recyclerView: androidx.recyclerview.widget.RecyclerView, dx: Int, dy: Int) {
@@ -196,7 +194,7 @@ abstract class SimpleListFragment<DataType> : androidx.fragment.app.Fragment(), 
     /**
      * 全部加载
      */
-    fun setAllLoad() {
+    fun setAllLoaded() {
         allLoadFlag = true
         adapter.setFooter(RecAdapterWithFooter.STATUS_ALL_LOAD)
     }
@@ -276,7 +274,7 @@ abstract class SimpleListFragment<DataType> : androidx.fragment.app.Fragment(), 
             stopRefreshing()
             notifyDataSetChanged()
             if (allLoad) {
-                setAllLoad()
+                setAllLoaded()
             } else
                 adapter.hideFooterView()
         }
