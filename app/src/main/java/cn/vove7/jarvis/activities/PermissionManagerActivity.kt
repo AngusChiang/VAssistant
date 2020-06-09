@@ -87,6 +87,11 @@ class PermissionManagerActivity : OneFragmentActivity() {
             buildHeader()
         }
 
+        override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+            super.onViewCreated(view, savedInstanceState)
+            refreshable = false
+        }
+
         private fun buildHeader() {
             val v = layoutInflater.inflate(R.layout.list_header_with_switch, null, false)
             val headerTitle = v.findViewById<TextView>(R.id.header_title)

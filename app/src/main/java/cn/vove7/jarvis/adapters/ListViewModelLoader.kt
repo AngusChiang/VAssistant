@@ -33,12 +33,20 @@ interface ListViewModelLoader<DataType> {
 
     fun onLoadData(pageIndex: Int)
 
+    fun clearDataSet() {
+        synchronized(dataSet) {
+            dataSet.clear()
+        }
+    }
     /**
      * 通知数据加载完成 ，
      * @param list List<DataType>
      * @param allLoad Boolean 是否加载全部，默认根据当前页数据量和pageSizeLimit比较
      */
     fun notifyLoadSuccess(list: Collection<DataType>, allLoad: Boolean = list.size < pageSizeLimit) {
+        if (pageIndex == 0) {
+            clearDataSet()
+        }
         synchronized(dataSet) {
             dataSet.addAll(transData(list))
         }

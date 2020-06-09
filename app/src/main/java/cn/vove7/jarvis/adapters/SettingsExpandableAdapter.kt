@@ -78,6 +78,8 @@ class SettingsExpandableAdapter(
             return View(parent?.context).also {
                 it.background = null
                 it.isEnabled = false
+                it.isClickable = false
+                it.setOnClickListener(null)
                 it.layoutParams = ViewGroup.LayoutParams(-1, 5.dp.px)
             }
         }

@@ -6,7 +6,6 @@ import android.os.Handler
 import android.view.*
 import android.widget.*
 import androidx.annotation.LayoutRes
-import androidx.lifecycle.Lifecycle
 import cn.vove7.common.interfaces.Searchable
 import cn.vove7.common.utils.runOnUi
 import cn.vove7.jarvis.R
@@ -16,11 +15,11 @@ import cn.vove7.jarvis.adapters.RecAdapterWithFooter
 import cn.vove7.jarvis.adapters.SimpleListAdapter
 import cn.vove7.jarvis.lifecycle.LifeCycleScopeDelegate
 import cn.vove7.jarvis.lifecycle.LifecycleScope
-import cn.vove7.jarvis.view.RecyclerViewWithContextMenu
 import cn.vove7.vtp.log.Vog
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.pluscubed.recyclerfastscroll.RecyclerFastScroller
-import kotlinx.coroutines.CoroutineScope
+import kotlinx.android.synthetic.main.fragment_base_list.*
+import kotlinx.android.synthetic.main.fragment_base_list.view.*
 
 /**
  * # SimpleListFragment
@@ -39,11 +38,11 @@ abstract class SimpleListFragment<DataType> : androidx.fragment.app.Fragment(), 
         LifecycleScope(lifecycle)
     }
 
-    open fun clearDataSet() {
-        synchronized(dataSet) {
-            dataSet.clear()
+    var refreshable: Boolean = true
+        set(value) {
+            field = value
+            swipe_refresh.isEnabled = value
         }
-    }
 
     fun search(text: String) {
         when {
@@ -65,39 +64,6 @@ abstract class SimpleListFragment<DataType> : androidx.fragment.app.Fragment(), 
     open fun initView(contentView: View) {
         adapter = SimpleListAdapter(dataSet, itemClickListener, itemCheckable)
     }
-
-    override fun onContextItemSelected(item: MenuItem): Boolean {
-        val p = (item?.menuInfo as RecyclerViewWithContextMenu
-        .RecyclerViewContextInfo?)?.position ?: -1
-        return if (p in 0 until dataSet.size)
-            onItemPopupMenu(item, p, dataSet[p])
-        else false
-    }
-
-    override fun onCreateContextMenu(menu: ContextMenu, v: View, menuInfo: ContextMenu.ContextMenuInfo?) {
-        val p = (menuInfo as RecyclerViewWithContextMenu
-        .RecyclerViewContextInfo?)?.position ?: -1
-        if (p in 0 until dataSet.size)
-            onCreatePopupMenu(menu, p, dataSet[p])
-    }
-
-    /**
-     * 构建item弹出菜单
-     * @param menu ContextMenu?
-     * @param pos Int
-     * @param viewItem ListViewModel<DataType>
-     */
-    open fun onCreatePopupMenu(menu: ContextMenu, pos: Int, viewItem: ListViewModel<DataType>) {}
-
-
-    /**
-     * item长按弹出菜单
-     * @param item MenuItem?
-     * @param pos Int
-     * @param viewItem ListViewModel<DataType>?
-     * @return Boolean
-     */
-    open fun onItemPopupMenu(item: MenuItem?, pos: Int, viewItem: ListViewModel<DataType>): Boolean = false
 
     private lateinit var contentView: View
     lateinit var progressBar: ProgressBar
@@ -267,10 +233,6 @@ abstract class SimpleListFragment<DataType> : androidx.fragment.app.Fragment(), 
         adapter.animationsLocked = false
         pageIndex = 0
         adapter.hideFooterView()
-        if (pageIndex == 0) {
-            clearDataSet()
-            notifyDataSetChanged()
-        }
         onLoadData(0)
     }
 
