@@ -1293,7 +1293,7 @@ object SystemBridge : SystemOperation {
         openAppDetail(pkg)
         if (!AccessibilityApi.isBaseServiceOn) {
             AppBus.post(RequestPermission("基础无障碍服务"))
-            return false
+            return true
         }
 
         val s = ViewFindBuilder()
@@ -1309,7 +1309,7 @@ object SystemBridge : SystemOperation {
                     .waitFor(600)?.tryClick() ?: false
         } else {
             GlobalApp.toastInfo("应用未运行")
-            false
+            true
         }
         GlobalActionExecutor.home()
         return b
