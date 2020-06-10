@@ -21,6 +21,7 @@ import cn.vove7.common.net.WrapperNetHelper
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.adapters.ListViewModel
 import cn.vove7.jarvis.adapters.SimpleListAdapter
+import cn.vove7.jarvis.fragments.MarkedAppFragment
 import cn.vove7.jarvis.fragments.SimpleListFragment
 import cn.vove7.jarvis.tools.DataUpdator
 import cn.vove7.jarvis.tools.DialogUtil
@@ -72,6 +73,12 @@ abstract class BaseMarkedFragment : SimpleListFragment<MarkedData>(), OnSyncMark
                     if (phone == "") {
                         valueText.error = getString(R.string.text_not_empty)
                         return@positiveButton
+                    }
+                    if (this is MarkedAppFragment) {
+                        if (key == reg) {
+                            regexText.error = "App正则与应用名相同，不需要再标记"
+                            return@positiveButton
+                        }
                     }
                     try {
                         if (editData != null) {

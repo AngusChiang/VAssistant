@@ -25,6 +25,7 @@ class SelectAppDialog {
             }
             val dialog = BottomDialog.builder(context, false) {
                 toolbar {
+                    round = true
                     title = "选择应用"
                 }
                 content(contentBuilder)
