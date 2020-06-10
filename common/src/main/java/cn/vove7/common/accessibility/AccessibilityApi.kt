@@ -11,17 +11,17 @@ import cn.vove7.common.accessibility.component.AccPluginService
 import cn.vove7.common.accessibility.viewnode.ViewNode
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.app.GlobalLog
-import cn.vove7.common.appbus.AppBus
 import cn.vove7.common.bridges.RootHelper
 import cn.vove7.common.datamanager.parse.model.ActionScope
-import cn.vove7.common.model.RequestPermission
 import cn.vove7.common.utils.CoroutineExt.launch
+import cn.vove7.common.utils.gotoAccessibilitySetting2
 import cn.vove7.common.utils.whileWaitTime
 import cn.vove7.vtp.app.AppInfo
 import cn.vove7.vtp.log.Vog
 import cn.vove7.vtp.runtimepermission.PermissionUtils
 import java.lang.Thread.sleep
 import java.util.concurrent.ConcurrentSkipListSet
+import kotlin.math.min
 
 /**
  *
@@ -47,22 +47,10 @@ abstract class AccessibilityApi : AccessibilityService() {
         }
 
     val rootViewNode: ViewNode?
-        get() =
-            rootInWindow.let {
-                if (it == null) null
-                else ViewNode(it)
-            }
-//
-//    override fun getRootViewNode(): ViewNode? {
-//        val root = rootInWindow
-//        return if (root == null) null
-//        else ViewNode(root)
-//    }
+        get() = rootInWindow?.let { ViewNode(it) }
 
     val currentFocusedEditor: ViewNode?
-        get() = findFocus(FOCUS_INPUT).let {
-            if (it == null) null else ViewNode(it)
-        }
+        get() = findFocus(FOCUS_INPUT)?.let { ViewNode(it) }
 
     /**
      * 禁用软键盘，并且无法手动弹出
@@ -113,9 +101,9 @@ abstract class AccessibilityApi : AccessibilityService() {
         @Throws(NeedAccessibilityException::class)
         fun waitAccessibility(waitMillis: Long = 30000): Boolean {
             if (isBaseServiceOn) return true
-            else AppBus.post(RequestPermission("无障碍服务"))
+            else PermissionUtils.gotoAccessibilitySetting2(GlobalApp.APP, Class.forName("cn.vove7.jarvis.services.MyAccessibilityService"))
 
-            return whileWaitTime(if (waitMillis > 30000) 30000 else waitMillis) {
+            return whileWaitTime(min(30000, waitMillis)) {
                 if (isBaseServiceOn)
                     true
                 else {
@@ -127,7 +115,7 @@ abstract class AccessibilityApi : AccessibilityService() {
 
         fun requireAccessibility() {
             if (!isBaseServiceOn) {
-                AppBus.post(RequestPermission("无障碍服务"))
+                PermissionUtils.gotoAccessibilitySetting2(GlobalApp.APP, Class.forName("cn.vove7.jarvis.services.MyAccessibilityService"))
                 throw NeedAccessibilityException()
             }
         }
