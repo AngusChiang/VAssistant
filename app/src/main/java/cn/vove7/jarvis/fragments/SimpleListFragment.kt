@@ -21,7 +21,7 @@ import cn.vove7.jarvis.lifecycle.LifecycleScope
 import cn.vove7.vtp.log.Vog
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.pluscubed.recyclerfastscroll.RecyclerFastScroller
-import kotlinx.android.synthetic.main.fragment_base_list.*
+import kotlinx.android.synthetic.main.fragment_base_list.view.*
 
 /**
  * # SimpleListFragment
@@ -43,7 +43,9 @@ abstract class SimpleListFragment<DataType> : androidx.fragment.app.Fragment(), 
     var refreshable: Boolean = true
         set(value) {
             field = value
-            swipe_refresh.isEnabled = value
+            if (::contentView.isInitialized) {
+                contentView.swipe_refresh?.isEnabled = value
+            }
         }
 
     fun search(text: String) {
@@ -65,6 +67,7 @@ abstract class SimpleListFragment<DataType> : androidx.fragment.app.Fragment(), 
 
     open fun initView(contentView: View) {
         adapter = SimpleListAdapter(dataSet, itemClickListener, itemCheckable)
+        refreshable = refreshable
     }
 
     private lateinit var contentView: View

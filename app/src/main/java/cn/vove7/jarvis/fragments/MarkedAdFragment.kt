@@ -1,12 +1,14 @@
 package cn.vove7.jarvis.fragments
 
 import android.content.Intent
+import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.bridges.SystemBridge
 import cn.vove7.common.datamanager.DAO
 import cn.vove7.common.model.UserInfo
-import cn.vove7.common.utils.CoroutineExt.launch
 import cn.vove7.jarvis.activities.AppAdListActivity
 import cn.vove7.jarvis.adapters.ListViewModel
 import cn.vove7.jarvis.adapters.SimpleListAdapter
@@ -28,7 +30,13 @@ class MarkedAdFragment : SimpleListFragment<String>(), OnSyncMarked {
     /**
      * 所有ad pkg
      */
-    val adAddPkgs = arrayListOf<String>()
+    private val adAddPkgs = arrayListOf<String>()
+
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        refreshable = false
+        updateAdApp()
+        return super.onCreateView(inflater, container, savedInstanceState)
+    }
 
     private fun updateAdApp() {
         maps.clear()
@@ -44,11 +52,6 @@ class MarkedAdFragment : SimpleListFragment<String>(), OnSyncMarked {
             }
         }
         adAddPkgs.addAll(l.toList())
-    }
-
-    override fun clearDataSet() {
-        super.clearDataSet()
-        updateAdApp()
     }
 
     override val itemClickListener = object : SimpleListAdapter.OnItemClickListener<String> {

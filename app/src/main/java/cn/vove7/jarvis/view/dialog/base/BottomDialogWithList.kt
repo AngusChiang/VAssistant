@@ -24,10 +24,10 @@ abstract class BottomDialogWithList<T>(context: Context, title: String)
     private val listAdapter by lazy { SimpleListAdapter(dataSet, this) }
     override var pageIndex: Int = 0
 
-    private val recyclerView: androidx.recyclerview.widget.RecyclerView by lazy {
+    private val recyclerView: RecyclerView by lazy {
         myView.recycler_view.apply {
             myView.fast_scroller.attachRecyclerView(this)
-            layoutManager = androidx.recyclerview.widget.LinearLayoutManager(context)
+            layoutManager = LinearLayoutManager(context)
             this.adapter = listAdapter
         }
     }
