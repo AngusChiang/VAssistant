@@ -11,6 +11,8 @@ import android.text.SpannableStringBuilder
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
+import cn.vove7.common.activities.RunnableActivity
+import cn.vove7.common.app.AppConfig
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.appbus.AppBus
@@ -21,6 +23,8 @@ import cn.vove7.jarvis.activities.base.VoiceAssistActivity
 import cn.vove7.jarvis.activities.screenassistant.ScreenAssistActivity
 import cn.vove7.jarvis.receivers.UtilEventReceiver
 import cn.vove7.jarvis.tools.debugserver.RemoteDebugServer
+import cn.vove7.jarvis.tools.fixApplicationNewTask
+import cn.vove7.vtp.log.Vog
 import cn.vove7.vtp.notification.ChannelBuilder
 
 /**
@@ -144,6 +148,13 @@ class ForegroundService : Service() {
     override fun onDestroy() {
         stopForeground(true)
         super.onDestroy()
+        GlobalApp.ForeService = null
+    }
+
+    override fun startActivity(intent: Intent?) {
+        intent?.fixApplicationNewTask()?.let {
+            super.startActivity(it)
+        }
     }
 
     override fun onBind(intent: Intent?): IBinder? = null

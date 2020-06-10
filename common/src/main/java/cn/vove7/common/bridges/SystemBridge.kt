@@ -4,7 +4,6 @@ package cn.vove7.common.bridges
 
 import android.Manifest
 import android.annotation.SuppressLint
-import android.app.Application
 import android.app.NotificationManager
 import android.app.SearchManager
 import android.bluetooth.BluetoothAdapter
@@ -81,7 +80,7 @@ import kotlin.concurrent.thread
 
 @Suppress("unused", "MemberVisibilityCanBePrivate")
 object SystemBridge : SystemOperation {
-    private val context: Application
+    private val context: Context
         get() = GlobalApp.APP
 
     override fun openAppDetail(pkg: String): Boolean {
@@ -92,7 +91,7 @@ object SystemBridge : SystemOperation {
             val uri = Uri.fromParts("package", pkg, null)
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             intent.data = uri
-            context.baseContext.startActivity(intent)
+            context.startActivity(intent)
             true
         } catch (e: Exception) {
             GlobalLog.err(e)
@@ -124,7 +123,6 @@ object SystemBridge : SystemOperation {
             if (launchIntent == null) {
                 throw Exception("启动失败 未找到此App: $pkg")
             } else {
-                launchIntent.newDoc()
                 if (clearTask) {
                     launchIntent.clearTask()
                 }
@@ -171,7 +169,7 @@ object SystemBridge : SystemOperation {
     }
 
     override fun getPkgByWord(appWord: String): String? =
-        getPkgByName(appWord)
+            getPkgByName(appWord)
 
 
     // Open App 启动对应首页Activity
@@ -810,7 +808,10 @@ object SystemBridge : SystemOperation {
             return null
         }
         val serviceString = Context.LOCATION_SERVICE// 获取的是位置服务
-        val lm = GlobalApp.ForeService.getSystemService(serviceString) as LocationManager
+
+        val lm = (if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) GlobalApp.ForeService else GlobalApp.APP)?.let {
+            it.getSystemService(serviceString) as LocationManager
+        } ?: throw Exception("前台服务未启动，无法获取位置信息")
 
         val ht = HandlerThread("location")
         ht.start()
@@ -881,7 +882,7 @@ object SystemBridge : SystemOperation {
             if (lp == LocationManager.NETWORK_PROVIDER) {
                 Vog.d("location ---> 获取位置超时,使用上次位置")
                 result.setAndNotify(lm.getLastKnownLocation(LocationManager.GPS_PROVIDER)
-                    ?: lm.getLastKnownLocation(LocationManager.NETWORK_PROVIDER)
+                        ?: lm.getLastKnownLocation(LocationManager.NETWORK_PROVIDER)
                 )
                 lm.removeUpdates(loLis)
             } else {
@@ -1176,7 +1177,7 @@ object SystemBridge : SystemOperation {
         get() {
             val filter = IntentFilter(Intent.ACTION_BATTERY_CHANGED)
             val intent = context.registerReceiver(null, filter)
-                ?: return -1
+                    ?: return -1
 
             val level = intent.getIntExtra(BatteryManager.EXTRA_LEVEL, 100) //电量的刻度
             val maxLevel = intent.getIntExtra(BatteryManager.EXTRA_SCALE, 100) //最大
@@ -1464,7 +1465,7 @@ object SystemBridge : SystemOperation {
      */
     fun scanVassistHostsInLAN(): List<Pair<String, String>> = runBlocking {
         val localIp = getLocalIpAddress()
-            ?: return@runBlocking emptyList<Pair<String, String>>()
+                ?: return@runBlocking emptyList<Pair<String, String>>()
 
         val sd = localIp.lastIndexOf('.')
         val n = localIp.substring(sd + 1).toInt()

@@ -231,6 +231,9 @@ class AdvancedSettingActivity : ReturnableActivity() {
                         },
                         IntentItem(title = "根本操作对话框") {
                             TextOperationDialog(this, TextOperationDialog.TextModel("123" * 50))
+                        },
+                        IntentItem(title = "释放内存") {
+                            GlobalApp.GApp.onTrimMemory(0)
                         }
                 )
                 ))

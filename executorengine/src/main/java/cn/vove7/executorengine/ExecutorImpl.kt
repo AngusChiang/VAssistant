@@ -2,6 +2,7 @@ package cn.vove7.executorengine
 
 import android.content.Context
 import android.os.Looper
+import android.os.SystemClock
 import androidx.annotation.CallSuper
 import cn.vove7.common.NeedAccessibilityException
 import cn.vove7.common.NotSupportException
@@ -141,7 +142,7 @@ open class ExecutorImpl(
         get() = accessApi?.currentScope
 
     override fun isGlobal(): Boolean =
-        globalScopeType.contains(actionScope)
+            globalScopeType.contains(actionScope)
 
     override val currentActivity: String?
         get() {
@@ -174,6 +175,7 @@ open class ExecutorImpl(
         if (!sync) waiter.setAndNotify(EXEC_CODE_NOT_FINISH)
         thread = thread(start = true, name = "脚本线程：$cmdWords", isDaemon = true, priority = Thread.MAX_PRIORITY) {
             var er = EXEC_CODE_FAILED
+            var startTime = SystemClock.elapsedRealtime()
             try {
                 AppBus.post(ExecutorStatus.begin(cmdWords))
                 LooperHelper.prepareIfNeeded()
@@ -189,6 +191,8 @@ open class ExecutorImpl(
                 if (sync) waiter.setAndNotify(er)
                 else AppBus.post(ExecutorStatus.finish(er))
             }
+            var endTime = SystemClock.elapsedRealtime()
+            Vog.d("指令[$cmdWords] 用时: ${(endTime - startTime)}ms")
             Looper.myLooper()?.quitSafely()
         }
         return waiter.blockedGet(true) ?: EXEC_CODE_FAILED
@@ -332,8 +336,8 @@ open class ExecutorImpl(
      */
     override fun smartClose(data: String): Boolean {
         val pkg =
-            if (RegUtils.isPackage(data)) data
-            else SystemBridge.getPkgByWord(data)
+                if (RegUtils.isPackage(data)) data
+                else SystemBridge.getPkgByWord(data)
         return if (pkg != null) {
             SystemBridge.killApp(pkg)
 //            onLuaExec(CloseAppScript, arrayOf(pkg)).isSuccess//强制停止App

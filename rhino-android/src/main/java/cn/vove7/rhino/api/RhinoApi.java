@@ -52,7 +52,7 @@ public class RhinoApi extends AbsApi {
             String file = Context.toString(arg);
             try {
                 Log.d("RhinoApi :", "loadAsset  ----> " + file);
-                Reader reader = new InputStreamReader(GlobalApp.APP.getAssets().open(file));
+                Reader reader = new InputStreamReader(GlobalApp.getAPP().getAssets().open(file));
                 cx.evaluateReader(thisObj, reader, "load_" + file, 1, null);
             } catch (Exception ex) {
                 onException(ex);

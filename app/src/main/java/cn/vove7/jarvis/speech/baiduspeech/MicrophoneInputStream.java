@@ -39,7 +39,7 @@ public class MicrophoneInputStream extends InputStream {
     private static final String TAG = "MicrophoneInputStream";
 
     private final Object lock = new Object();
-    private AudioManager mAudioManager = (AudioManager) GlobalApp.APP.getSystemService(Context.AUDIO_SERVICE);
+    private AudioManager mAudioManager = (AudioManager) GlobalApp.getAPP().getSystemService(Context.AUDIO_SERVICE);
 
     public MicrophoneInputStream() {
     }
@@ -191,10 +191,10 @@ public class MicrophoneInputStream extends InputStream {
 
     private void initBlueToothHeadset() {
         BluetoothAdapter adapter;
-        BluetoothManager bm = (BluetoothManager) GlobalApp.APP.getSystemService(Context.BLUETOOTH_SERVICE);
+        BluetoothManager bm = (BluetoothManager) GlobalApp.getAPP().getSystemService(Context.BLUETOOTH_SERVICE);
         adapter = bm.getAdapter();
 
-        adapter.getProfileProxy(GlobalApp.APP, blueHeadsetListener, BluetoothProfile.HEADSET);
+        adapter.getProfileProxy(GlobalApp.getAPP(), blueHeadsetListener, BluetoothProfile.HEADSET);
     }
 
     private void initSCO() {
@@ -205,14 +205,14 @@ public class MicrophoneInputStream extends InputStream {
         //newintent.addAction(BluetoothHeadset.ACTION_CONNECTION_STATE_CHANGED);
         //app.registerReceiver(mSCOHeadsetAudioState, newintent);
 
-        AudioManager mAudioManager = (AudioManager) GlobalApp.APP.getSystemService(Context.AUDIO_SERVICE);
+        AudioManager mAudioManager = (AudioManager) GlobalApp.getAPP().getSystemService(Context.AUDIO_SERVICE);
         mAudioManager.setBluetoothScoOn(true);
         mAudioManager.startBluetoothSco();
 
     }
 
     private void closeSCO() {
-        AudioManager mAudioManager = (AudioManager) GlobalApp.APP.getSystemService(Context.AUDIO_SERVICE);
+        AudioManager mAudioManager = (AudioManager) GlobalApp.getAPP().getSystemService(Context.AUDIO_SERVICE);
         mAudioManager.setBluetoothScoOn(false);
         mAudioManager.stopBluetoothSco();
     }
@@ -226,7 +226,7 @@ public class MicrophoneInputStream extends InputStream {
             if (state == AudioManager.SCO_AUDIO_STATE_CONNECTED) {
                 Log.i("SCO", "SCO_AUDIO_STATE_CONNECTED");
                 lock.notify();
-                GlobalApp.APP.unregisterReceiver(this);
+                GlobalApp.getAPP().unregisterReceiver(this);
             } else if (state == AudioManager.SCO_AUDIO_STATE_DISCONNECTED) {
                 Log.i("SCO  ", "SCO_AUDIO_STATE_DISCONNECTED");
             }

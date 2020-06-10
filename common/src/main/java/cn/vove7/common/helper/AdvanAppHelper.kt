@@ -12,6 +12,8 @@ import cn.vove7.vtp.app.AppHelper
 import cn.vove7.vtp.app.AppInfo
 import cn.vove7.vtp.log.Vog
 import cn.vove7.vtp.text.TextHelper
+import cn.vove7.vtp.weaklazy.WeakLazy
+import kotlin.reflect.jvm.isAccessible
 
 /**
  * # AdvanAppHelper
@@ -161,6 +163,15 @@ object AdvanAppHelper {
             return
         } ?: return
         ALL_APP_LIST[pkg] = appInfo
+    }
+
+    fun trimMem() {
+        ALL_APP_LIST.forEach { (t, u) ->
+            u::icon.let {
+                it.isAccessible = true
+                (it.getDelegate() as WeakLazy<*>).clearWeakValue()
+            }
+        }
     }
 
 }

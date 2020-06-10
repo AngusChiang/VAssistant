@@ -34,7 +34,7 @@ public class LuaDexLoader {
     private String odexDir;
 
     public LuaDexLoader(Context context) {
-        Application app = GlobalApp.APP;//.Companion.getInstance();
+        Context app = GlobalApp.getAPP();//.Companion.getInstance();
         mContext = context;
         luaDir = app.getFilesDir().getAbsolutePath();
         //localDir = app.getLocalDir();
@@ -95,7 +95,7 @@ public class LuaDexLoader {
                     path += ".jar";
                 else
                     throw new LuaException(path + " not found");
-            dex = new LuaDexClassLoader(path, odexDir, GlobalApp.APP.getApplicationInfo().nativeLibraryDir, mContext.getClassLoader());
+            dex = new LuaDexClassLoader(path, odexDir, GlobalApp.getAPP().getApplicationInfo().nativeLibraryDir, mContext.getClassLoader());
             dexCache.put(name, dex);
         }
 

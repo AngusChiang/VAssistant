@@ -51,12 +51,15 @@ open class GlobalApp : Application() {
     companion object {
         var launchTime: Long = 0
 
-        //        var toastHandler: ColorfulToast.ToastHandler? = null
-        lateinit var APP: Application
-        val GApp: GlobalApp
-            get() = APP as GlobalApp
+        private lateinit var _APP: Application
 
-        lateinit var ForeService: Service
+        @JvmStatic
+        val APP: Context get() = ForeService ?: _APP
+
+        val GApp: GlobalApp
+            get() = _APP as GlobalApp
+
+        var ForeService: Service? = null
 
         fun getString(id: Int): String = APP.getString(id)
 
@@ -135,7 +138,7 @@ open class GlobalApp : Application() {
         }
 
     override fun attachBaseContext(base: Context?) {
-        APP = this
+        _APP = this
         super.attachBaseContext(base)
         try {
             MultiDex.install(base)

@@ -10,13 +10,11 @@ import androidx.work.WorkManager
 import cn.daqinjia.android.common.ext.delayRun
 import cn.daqinjia.android.scaffold.ui.base.ScaffoldActivity
 import cn.vove7.bottomdialog.builder.BottomDialogBuilder
-import cn.vove7.common.activities.RunnableActivity.Companion.runInShellActivity
 import cn.vove7.common.app.AppConfig
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.appbus.AppBus
 import cn.vove7.common.helper.AdvanAppHelper
 import cn.vove7.common.utils.runOnNewHandlerThread
-import cn.vove7.common.utils.runWithClock
 import cn.vove7.jarvis.plugins.PowerListener
 import cn.vove7.jarvis.receivers.AppInstallReceiver
 import cn.vove7.jarvis.receivers.PowerEventReceiver
@@ -77,23 +75,15 @@ class App : GlobalApp() {
 
     //供脚本api
     override fun startActivity(intent: Intent?) {
-        //防止在外部无法打开其他应用
-        val component = intent?.component
-        val isVApp = component?.className?.let {
-            kotlin.runCatching { Class.forName(it) }.isSuccess
-        } ?: false
-        Vog.d("isVApp $isVApp")
-        if (!isVApp && AppConfig.openAppCompat) {
-            runInShellActivity {
-                it.startActivity(intent)
-                it.finish()
-            }
-        } else {
-            intent?.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-            super.startActivity(intent)
+        intent?.fixApplicationNewTask()?.let {
+            super.startActivity(it)
         }
     }
 
+    override fun onTrimMemory(level: Int) {
+        super.onTrimMemory(level)
+        AdvanAppHelper.trimMem()
+    }
 }
 
 class InitCp : ContentProvider() {

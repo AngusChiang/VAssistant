@@ -146,7 +146,7 @@ class RokidSendLocTask(val configs: () -> Map<String, String>) : Runnable {
                     }
                 }
             }.onFailure {
-                GlobalLog.err("获取位置失败")
+                GlobalLog.err("获取位置失败 $it")
                 nextTask(lastTaskDelayTime / 2)
                 return@launch
             }
