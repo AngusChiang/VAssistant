@@ -5,7 +5,6 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.os.BatteryManager
 import cn.vove7.common.app.AppConfig
-import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.appbus.AppBus
 import cn.vove7.common.bridges.SystemBridge
 import cn.vove7.jarvis.plugins.VoiceWakeupStrategy
@@ -105,6 +104,7 @@ object PowerEventReceiver : DyBCReceiver(), OnPowerEvent {
             //关闭定时器
             AppBus.post(AppBus.ACTION_STOP_WAKEUP_TIMER)
         }
+        MainService.homeControlSystem?.onPowerCharging()
     }
 
     override fun onDischarging() {

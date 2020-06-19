@@ -24,6 +24,10 @@ abstract class ISmartHomeSystem {
         loadUserCommand()
     }
 
+    open fun onPowerCharging() {
+
+    }
+
     abstract fun isSupport(command: String): Boolean
     abstract fun doAction(command: String)
 

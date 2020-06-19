@@ -449,6 +449,12 @@ class RokidHomeSystem : ISmartHomeSystem() {
         RokidSendLocTask { configs }
     }
 
+    override fun onPowerCharging() {
+        if (PluginConfig.rokidInTimeSendLocation) {
+            startSendLocTask(3000)
+        }
+    }
+
     private fun startSendLocTask(delay: Long = 3000) {
         stopSendLocTask()
         GlobalLog.log("若琪：启动位置发送服务")
