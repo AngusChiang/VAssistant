@@ -26,6 +26,7 @@ import cn.vove7.smartkey.annotation.Config
 import cn.vove7.smartkey.key.get
 import cn.vove7.smartkey.key.set
 import cn.vove7.smartkey.key.smartKey
+import cn.vove7.smartkey.key.smartKeyMap
 import cn.vove7.vtp.log.Vog
 import cn.vove7.vtp.sharedpreference.SpHelper
 import com.russhwolf.settings.Settings
@@ -145,6 +146,7 @@ object AppConfig : BaseConfig {
 
     var homeSystem: Int? by noCacheKey(null, R.string.key_home_system)
     var homeSystemConfig: String? by noCacheKey(null, keyId = R.string.key_home_system_config, encrypt = true)
+
     //用户自定义短语
     var homeSystemUserCommand: String? by noCacheKey(null, keyId = R.string.key_home_system_user_command, encrypt = true)
 
@@ -202,8 +204,8 @@ object AppConfig : BaseConfig {
             return (
                     BluetoothProfile.STATE_CONNECTED == adapter?.getProfileConnectionState(BluetoothProfile.HEADSET)
                     ).also {
-                Vog.d("蓝牙连接：$it")
-            }
+                        Vog.d("蓝牙连接：$it")
+                    }
 
         }
 
@@ -324,7 +326,7 @@ object AppConfig : BaseConfig {
         } ?: def
     }
 
-    private var remoteConfig by smartKey<Map<String, String>?>(null, key = "remote_config")
+    private var remoteConfig by smartKeyMap<String, String>(key = "remote_config")
 
     fun fetchNetConfig() = launch {
         val configStr = HttpBridge.get("https://gitee.com/Vove/Config/raw/master/V-Assistant.properties")
@@ -352,7 +354,7 @@ object AppConfig : BaseConfig {
 
     }
 
-    private fun String.prop2Map(): Map<String, String> {
+    private fun String.prop2Map(): MutableMap<String, String> {
         return mutableMapOf<String, String>().apply {
             lineSequence().forEach {
                 val (k, v) = it.split('=')
@@ -547,6 +549,7 @@ object AppConfig : BaseConfig {
             if (it < 0) versionCode else it
         }
     }
+
     //第一次进入App
     val FIRST_IN: Boolean
         get() {
@@ -556,6 +559,7 @@ object AppConfig : BaseConfig {
             }
             return !_is
         }
+
     //新版本第一次启动
     val FIRST_LAUNCH_NEW_VERSION by lazy {
         val sp = SpHelper(GlobalApp.APP)

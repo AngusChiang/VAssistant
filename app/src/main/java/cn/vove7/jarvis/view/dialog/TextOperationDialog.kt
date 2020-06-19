@@ -2,7 +2,7 @@ package cn.vove7.jarvis.view.dialog
 
 import android.widget.PopupMenu
 import android.widget.TextView
-import cn.daqinjia.ui_design.Toast
+import android.widget.Toast
 import cn.vove7.bottomdialog.BottomDialog
 import cn.vove7.bottomdialog.builder.*
 import cn.vove7.bottomdialog.extension.awesomeHeader
@@ -135,7 +135,7 @@ class TextOperationDialog(
                         wrapped = false
                         bottomDialog.updateContent<WrappedTextContentBuilder> {
                             textModel.text = getOpText()
-                            text = textModel.text.lines().joinToString("")
+                            text = textModel.text.lines().joinToString(" ")
                         }
                     }
                     "自动换行" -> {

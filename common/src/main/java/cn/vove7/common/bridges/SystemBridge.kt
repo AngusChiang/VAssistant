@@ -965,8 +965,8 @@ object SystemBridge : SystemOperation {
             context.startActivity(capIntent)
 
             val sd = resultBox.blockedGet(false) ?: return null
-            if (sd.second || SystemClock.uptimeMillis() - beginCap > 1000) {
-                sleep(500)
+            if (sd.second || SystemClock.uptimeMillis() - beginCap > 600) {
+                sleep(700)
             }
             sd.first ?: return null
         } else {

@@ -210,8 +210,9 @@
             android:exported="true"
             android:label="屏幕助手-文字识别"
             android:launchMode="singleInstance"
-            android:windowSoftInputMode="adjustResize"
-            android:theme="@style/TextOcr">
+            android:resizeableActivity="false"
+            android:theme="@style/TextOcr"
+            android:windowSoftInputMode="adjustResize">
             <intent-filter>
                 <action android:name="${applicationId}.SCREEN_OCR" />
                 <category android:name="android.intent.category.DEFAULT" />
@@ -224,8 +225,8 @@
             android:theme="@style/ScreenPicker" />
         <activity
             android:name=".activities.ScreenPickerActivity"
-            android:exported="true"
             android:excludeFromRecents="true"
+            android:exported="true"
             android:label="屏幕助手-文字提取"
             android:launchMode="singleInstance"
             android:theme="@style/ScreenPicker" />
