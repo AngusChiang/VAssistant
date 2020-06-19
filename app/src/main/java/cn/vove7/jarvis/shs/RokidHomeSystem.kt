@@ -16,12 +16,14 @@ import cn.vove7.common.net.tool.base64
 import cn.vove7.common.utils.anyIn
 import cn.vove7.common.utils.content
 import cn.vove7.common.utils.runInCatch
+import cn.vove7.common.utils.runOnUi
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.plugins.PluginConfig
 import cn.vove7.jarvis.services.MainService
 import cn.vove7.jarvis.view.CheckBoxItem
 import cn.vove7.jarvis.view.IntentItem
 import cn.vove7.jarvis.view.SettingChildItem
+import cn.vove7.jarvis.view.dialog.LoadingDialog
 import cn.vove7.jarvis.view.dialog.TextEditorDialog
 import cn.vove7.jarvis.view.dialog.contentbuilder.markdownContent
 import cn.vove7.jarvis.view.dialog.editorView
@@ -30,8 +32,11 @@ import cn.vove7.paramregex.toParamRegex
 import cn.vove7.vtp.log.Vog
 import cn.vove7.vtp.net.NetHelper
 import cn.vove7.vtp.runtimepermission.PermissionUtils
+import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.WhichButton
 import com.afollestad.materialdialogs.actions.getActionButton
+import com.afollestad.materialdialogs.input.input
+import com.afollestad.materialdialogs.list.listItems
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -186,8 +191,8 @@ class RokidHomeSystem : ISmartHomeSystem() {
                         //智能场景
                         || smartEnv(command)
                 ).also {
-            Vog.d("若琪 $command isSupport: $it")
-        }
+                    Vog.d("若琪 $command isSupport: $it")
+                }
     }
 
     private fun smartEnv(command: String): Boolean {
@@ -364,7 +369,7 @@ class RokidHomeSystem : ISmartHomeSystem() {
                     return@IntentItem
                 }
                 TextEditorDialog(context, AppConfig.homeSystemConfig
-                    ?: templateConfig(s)) {
+                        ?: templateConfig(s)) {
                     noAutoDismiss()
                     title(text = "参数配置")
                     editorView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13f)
@@ -401,7 +406,7 @@ class RokidHomeSystem : ISmartHomeSystem() {
                     awesomeHeader("信息")
                     markdownContent {
                         loadMarkdown(MainService.homeControlSystem?.summary()
-                            ?: "")
+                                ?: "")
                     }
                 }
             },
@@ -423,24 +428,53 @@ class RokidHomeSystem : ISmartHomeSystem() {
                 true
             },
             IntentItem(title = "设置家庭地址", summary = PluginConfig.rokidHomeLoc?.let { "${it.first}, ${it.second}" }
-                ?: "设置当前位置为家庭地址") {
-                GlobalScope.launch {
-                    GlobalApp.toastInfo("正在获取位置...")
-                    val loc = SystemBridge.location()
-                    if (loc == null) {
-                        GlobalApp.toastInfo("位置获取失败")
-                        return@launch
-                    } else {
-                        PluginConfig.rokidHomeLoc = loc.longitude to loc.latitude
-                    }
-                    withContext(Dispatchers.Main) {
-                        kotlin.runCatching {
-                            it.summary = PluginConfig.rokidHomeLoc?.let { "${it.first}, ${it.second}" }
+                    ?: "设置当前位置为家庭地址") {
+                MaterialDialog(context).show {
+                    listItems(items = listOf("自动获取", "手动输入")) { _, index, _ ->
+                        if (index == 0) {
+                            val loadingDialog = LoadingDialog(context, "正在获取位置...")
+                            loadingDialog.show()
+                            GlobalScope.launch {
+                                val loc = SystemBridge.location()
+                                if (loc == null) {
+                                    GlobalApp.toastInfo("位置获取失败")
+                                    return@launch
+                                } else {
+                                    PluginConfig.rokidHomeLoc = loc.longitude to loc.latitude
+                                }
+                                withContext(Dispatchers.Main) {
+                                    kotlin.runCatching {
+                                        it.summary = PluginConfig.rokidHomeLoc?.let { "${it.first}, ${it.second}" }
+                                    }
+                                }
+                                GlobalApp.toastSuccess("设置完成")
+                            }.invokeOnCompletion {
+                                runOnUi {
+                                    loadingDialog.dismiss()
+                                }
+                            }
+
+                        } else if (index == 1) {
+                            MaterialDialog(context).show {
+                                positiveButton()
+                                title(R.string.position_of_home)
+                                input(
+                                        prefill = PluginConfig.rokidHomeLoc?.let { "${it.first},${it.second}" },
+                                        hint = "120.123442232,156.4553232"
+                                ) { _, s ->
+                                    try {
+                                        val (j, w) = s.split("[,，]".toRegex()).map { it.trim().toDouble() }
+                                        PluginConfig.rokidHomeLoc = j to w
+                                        GlobalApp.toastSuccess("设置完成")
+                                        it.summary = PluginConfig.rokidHomeLoc?.let { "${it.first}, ${it.second}" }
+                                    } catch (e: Throwable) {
+                                        GlobalApp.toastError("输入格式错误")
+                                    }
+                                }
+                            }
                         }
                     }
-                    GlobalApp.toastSuccess("设置完成")
                 }
-
             }
     )
 
@@ -465,7 +499,7 @@ class RokidHomeSystem : ISmartHomeSystem() {
     private fun stopSendLocTask() = sendLocTask.stop()
 
     fun callSendLocTask() {
-        if(PluginConfig.rokidInTimeSendLocation) {
+        if (PluginConfig.rokidInTimeSendLocation) {
             sendLocTask.run()
         }
     }
