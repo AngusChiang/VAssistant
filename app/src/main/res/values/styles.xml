@@ -114,6 +114,7 @@
         <item name="android:windowEnterAnimation">@anim/fade_in_bottom</item>
         <item name="android:windowExitAnimation">@anim/fade_out_bottom</item>
         <item name="bd_bg_color">@color/app_foreground</item>
+        <item name="bd_bar_radius">20dp</item>
     </style>
 
     <style name="TextOcr.Dark" parent="TextOcr">
