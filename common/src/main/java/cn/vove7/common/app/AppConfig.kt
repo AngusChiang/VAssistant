@@ -546,7 +546,7 @@ object AppConfig : BaseConfig {
     val PRE_VERSION_CODE by lazy {
         val sp = SpHelper(GlobalApp.APP)
         sp.getLong("v_code").let {
-            if (it < 0) versionCode else it
+            if (it < 0) 0 else it
         }
     }
 

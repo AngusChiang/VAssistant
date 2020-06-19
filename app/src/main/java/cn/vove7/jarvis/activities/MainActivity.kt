@@ -144,7 +144,7 @@ class MainActivity : BaseActivity() {
     }
 
     private fun showDataUpdateLog() {
-        if (AppConfig.FIRST_LAUNCH_NEW_VERSION && showUpdate && !BuildConfig.DEBUG) {
+        if (AppConfig.FIRST_LAUNCH_NEW_VERSION && showUpdate) {
             UpdateLogDialog(this) {
                 Vog.d("检查数据更新")
                 showTutorials()
