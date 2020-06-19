@@ -136,6 +136,7 @@ class RokidSendLocTask(val configs: () -> Map<String, String>) : Runnable {
                 val headers = mapOf(
                         "Authorization" to "Basic " + ("${configs["username"]}:${configs["pass"]}".base64)
                 )
+                GlobalLog.log("Rokid发送位置：$loc")
                 NetHelper.putJson<String>(url, data, headers = headers) {
                     success { _, any ->
                         lastTaskDelayTime = calNextDelayTime(loc.longitude, loc.latitude)
@@ -146,7 +147,7 @@ class RokidSendLocTask(val configs: () -> Map<String, String>) : Runnable {
                     }
                 }
             }.onFailure {
-                GlobalLog.err("获取位置失败 $it")
+                GlobalLog.err("Rokid获取位置失败 $it")
                 nextTask(lastTaskDelayTime / 2)
                 return@launch
             }
