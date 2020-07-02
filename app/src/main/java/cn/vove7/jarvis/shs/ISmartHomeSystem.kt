@@ -78,6 +78,8 @@ abstract class ISmartHomeSystem {
         }
     }
 
+    open fun onDataSync() {}
+
     abstract fun getSettingItems(context: Context): Array<SettingChildItem>
 
     companion object {
@@ -98,7 +100,7 @@ abstract class ISmartHomeSystem {
                     "https://homebase.rokid.com/trigger/with/j1WW9-f0sR" else ""}
                     #设备序列号
                     deviceId=${rokidSettings?.getString("rokid_device_id")
-                    ?: if (BuildConfig.DEBUG) "0201021716000353" else ""}
+                        ?: if (BuildConfig.DEBUG) "0201021716000353" else ""}
                     #后台管理地址，用于获取房间列表和设备列表
                     adminUrl=${if (BuildConfig.DEBUG) "http://baduxiyang.oicp.net:9001" else ""}
                     #后台管理登录名

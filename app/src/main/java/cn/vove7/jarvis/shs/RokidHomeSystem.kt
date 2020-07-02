@@ -13,10 +13,7 @@ import cn.vove7.common.bridges.HttpBridge
 import cn.vove7.common.bridges.SettingsBridge
 import cn.vove7.common.bridges.SystemBridge
 import cn.vove7.common.net.tool.base64
-import cn.vove7.common.utils.anyIn
-import cn.vove7.common.utils.content
-import cn.vove7.common.utils.runInCatch
-import cn.vove7.common.utils.runOnUi
+import cn.vove7.common.utils.*
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.plugins.PluginConfig
 import cn.vove7.jarvis.services.MainService
@@ -29,6 +26,7 @@ import cn.vove7.jarvis.view.dialog.contentbuilder.markdownContent
 import cn.vove7.jarvis.view.dialog.editorView
 import cn.vove7.jarvis.work.RokidSendLocTask
 import cn.vove7.paramregex.toParamRegex
+import cn.vove7.quantumclock.QuantumClock
 import cn.vove7.vtp.log.Vog
 import cn.vove7.vtp.net.NetHelper
 import cn.vove7.vtp.runtimepermission.PermissionUtils
@@ -41,6 +39,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.util.*
 
 
 /**
@@ -489,11 +488,25 @@ class RokidHomeSystem : ISmartHomeSystem() {
         }
     }
 
+    override fun onDataSync() {
+        if (!PluginConfig.rokidInTimeSendLocation) {
+            return
+        }
+        if (QuantumClock.currentTimeMillis - sendLocTask.lastSendTime > sendLocTask.lastTaskDelayTime) {
+            GlobalLog.log("若琪：位置服务超时发送\n上次发送： ${Date(sendLocTask.lastSendTime).format()} ")
+            startSendLocTask(0)
+        }
+    }
+
     private fun startSendLocTask(delay: Long = 3000) {
         stopSendLocTask()
         GlobalLog.log("若琪：启动位置发送服务")
         GlobalApp.toastInfo("若琪：启动位置发送服务")
-        sendLocTask.nextTask(delay)
+        if (delay == 0L) {
+            sendLocTask.run()
+        } else {
+            sendLocTask.nextTask(delay)
+        }
     }
 
     private fun stopSendLocTask() = sendLocTask.stop()

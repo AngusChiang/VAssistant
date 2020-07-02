@@ -157,7 +157,9 @@ fun prettyMillisTime(millis: Long): String = buildString {
     append("${t}s")
 }
 
-fun formatNow(pat: String = "yyyy-MM-dd HH:mm:ss"): String = SimpleDateFormat(pat, Locale.getDefault()).format(Date())
+fun formatNow(pat: String = "yyyy-MM-dd HH:mm:ss"): String = QuantumClock.nowDate.format(pat)
+
+fun Date.format(pat: String = "yyyy-MM-dd HH:mm:ss"): String = SimpleDateFormat(pat, Locale.getDefault()).format(this)
 
 fun Context.startActivityOnNewTask(intent: Intent) {
     intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)

@@ -13,6 +13,7 @@ import cn.vove7.common.utils.putJson
 import cn.vove7.jarvis.plugins.PluginConfig
 import cn.vove7.jarvis.receivers.UtilEventReceiver
 import cn.vove7.jarvis.receivers.UtilEventReceiver.ROKID_SEND_LOC
+import cn.vove7.quantumclock.QuantumClock
 import cn.vove7.vtp.log.Vog
 import cn.vove7.vtp.net.NetHelper
 import kotlinx.coroutines.GlobalScope
@@ -32,7 +33,10 @@ class RokidSendLocTask(val configs: () -> Map<String, String>) : Runnable {
     private val alarmManager get() = GlobalApp.APP.getSystemService(Context.ALARM_SERVICE) as AlarmManager
 
     //上次发送间隔 30 min
-    private var lastTaskDelayTime = 30 * 60 * 1000L
+    var lastTaskDelayTime = 30 * 60 * 1000L
+
+    //上次发送时间
+    var lastSendTime = 0L
 
     private fun calNextDelayTime(longitude: Double, latitude: Double): Long {
         val homeLoc = PluginConfig.rokidHomeLoc ?: return lastTaskDelayTime
@@ -43,21 +47,17 @@ class RokidSendLocTask(val configs: () -> Map<String, String>) : Runnable {
         Vog.d("离家距离：${disKm}Km")
 
         return when {
-            disKm < 0.1 -> 2.minuteInMillis
-            disKm < 0.3 -> 2.minuteInMillis
-            disKm < 1.2 -> {
-                5.minuteInMillis
-            }
-            //1km 2.5min
+            disKm <= 0.1 -> 2.minuteInMillis
+            disKm <= 0.3 -> 2.minuteInMillis
+            disKm <= 1 -> 3.minuteInMillis
+            //2km 2.5min
             //10km 25min
-            disKm < 10 -> {
-                ((disKm / 2) * 2.5).minuteInMillis
-            }
-            disKm in 20..40 -> {
-                30.minuteInMillis
+            disKm <= 10 -> (disKm * 17.0 / 9 + 1).minuteInMillis
+            disKm in 10..40 -> {
+                25.minuteInMillis
             }
             else -> {
-                50.minuteInMillis
+                30.minuteInMillis
             }
         }.also {
             Vog.d("下次发送间隔： ${it / 1000 / 60}min")
@@ -117,6 +117,7 @@ class RokidSendLocTask(val configs: () -> Map<String, String>) : Runnable {
             val url = configs["realTimeLocUrl"]
             if (url.isNullOrBlank()) {
                 GlobalApp.toastError("若琪实时位置任务无法启动，请先在配置中设置realTimeLocUrl参数", 1)
+                GlobalLog.err("若琪实时位置任务无法启动，请先在配置中设置realTimeLocUrl参数")
                 PluginConfig.rokidInTimeSendLocation = false
                 return@launch
             }
@@ -136,14 +137,16 @@ class RokidSendLocTask(val configs: () -> Map<String, String>) : Runnable {
                 val headers = mapOf(
                         "Authorization" to "Basic " + ("${configs["username"]}:${configs["pass"]}".base64)
                 )
-                GlobalLog.log("Rokid发送位置：$loc")
                 NetHelper.putJson<String>(url, data, headers = headers) {
-                    success { _, any ->
+                    success { _, _ ->
+                        lastSendTime = QuantumClock.currentTimeMillis
                         lastTaskDelayTime = calNextDelayTime(loc.longitude, loc.latitude)
                         nextTask(lastTaskDelayTime)
+                        GlobalLog.log("Rokid发送位置成功：$loc\n下次发送间隔：${lastTaskDelayTime / 60000}min")
                     }
                     fail { _, e ->
                         nextTask(5.minuteInMillis)
+                        GlobalLog.err("Rokid发送位置失败：$e")
                     }
                 }
             }.onFailure {

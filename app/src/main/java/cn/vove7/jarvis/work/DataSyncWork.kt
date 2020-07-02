@@ -6,6 +6,7 @@ import cn.vove7.common.app.AppConfig
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.app.GlobalLog
 import cn.vove7.jarvis.receivers.UtilEventReceiver
+import cn.vove7.jarvis.services.MainService
 import cn.vove7.jarvis.tools.AppNotification
 import cn.vove7.jarvis.tools.DataUpdator
 import cn.vove7.quantumclock.QuantumClock
@@ -79,6 +80,9 @@ class DataSyncWork(context: Context, workerParams: WorkerParameters) : Worker(co
             }
             job.join()
         }
+        // 某些定时操作检查
+        MainService.homeControlSystem?.onDataSync()
+
         return Result.success()
     }
 
