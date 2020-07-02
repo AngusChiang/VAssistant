@@ -28,7 +28,7 @@ import kotlin.math.*
  * @property alarmManager AlarmManager
  * @constructor
  */
-class RokidSendLocTask(val configs: () -> Map<String, String>) : Runnable {
+class RokidSendLocTask(val configGeter: () -> Map<String, String>) : Runnable {
 
     private val alarmManager get() = GlobalApp.APP.getSystemService(Context.ALARM_SERVICE) as AlarmManager
 
@@ -112,7 +112,7 @@ class RokidSendLocTask(val configs: () -> Map<String, String>) : Runnable {
 
     override fun run() {
         GlobalScope.launch {
-            val configs = configs()
+            val configs = configGeter()
 
             val url = configs["realTimeLocUrl"]
             if (url.isNullOrBlank()) {
