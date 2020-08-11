@@ -295,6 +295,7 @@ abstract class SpeechRecogService(val event: RecogEvent) : SpeechRecogI {
                     tempResult = null
                     event.onRecogReady(isSilent)
                     startSCO()
+                    stopRecogHandler.removeCallbacks(stopRecogAction)
                     stopRecogHandler.postDelayed(stopRecogAction, 5000)
                 }
                 SpeechConst.CODE_VOICE_TEMP -> {//中间结果
@@ -338,6 +339,10 @@ abstract class SpeechRecogService(val event: RecogEvent) : SpeechRecogI {
 
 
     private fun startSCO() {
+        if (!AppConfig.btSupport) {
+            Vog.d("SCO: 未开启蓝牙适配")
+            return
+        }
         Vog.d("startSCO")
         runInCatch {
             audioManager.apply {
@@ -349,6 +354,10 @@ abstract class SpeechRecogService(val event: RecogEvent) : SpeechRecogI {
     }
 
     fun closeSCO() {
+        if (!AppConfig.btSupport) {
+            Vog.d("SCO: 未开启蓝牙适配")
+            return
+        }
         Vog.d("关闭SCO")
         runInCatch {
             audioManager.isBluetoothScoOn = false

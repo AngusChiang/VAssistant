@@ -14,6 +14,7 @@ import cn.vove7.jarvis.R
 import cn.vove7.jarvis.view.*
 import cn.vove7.smartkey.BaseConfig
 import cn.vove7.smartkey.android.set
+import cn.vove7.common.utils.set
 import cn.vove7.vtp.easyadapter.BaseListAdapter
 import cn.vove7.vtp.log.Vog
 import com.afollestad.materialdialogs.MaterialDialog
@@ -163,7 +164,7 @@ class SettingItemHelper(
                                 ?: 0) != false) {
                         item.summary = sum()
                         if (item.keyId != null) {
-                            this@SettingItemHelper.config.set(item.keyId, selectedColor)
+                            this@SettingItemHelper.config[item.keyId] = selectedColor
                         }
                         setBasic()
                     }
@@ -204,7 +205,7 @@ class SettingItemHelper(
                 if ((settingItem as InputItem).clearable) {
                     neutralButton(text = "清空") {
                         if (settingItem.keyId != null) {
-                            this@SettingItemHelper.config.set(settingItem.keyId, null)
+                            this@SettingItemHelper.config[settingItem.keyId] = null
                         }
                         settingItem.summary = backSummary
                         setBasic()
@@ -256,7 +257,7 @@ class SettingItemHelper(
                     return@setOnCheckedChangeListener
                 }
                 if ((item.callback as CallbackOnSet<Boolean>?)?.invoke(ItemOperation(this), isChecked) != false) {
-                    config.set(item.keyId, isChecked)
+                    config[item.keyId] = isChecked
                 } else {
                     lock = true
                     holder.compoundWight.toggle()
@@ -324,11 +325,11 @@ class SettingItemHelper(
             if ((item.callback as CallbackOnSet<Pair<Int, String>?>?)?.invoke(ItemOperation(this), pair) != false) {
                 if (item.keyId != null) {
                     try {
-                        config.set(item.keyId, pair?.first)
+                        config[item.keyId] = pair?.first
                     } catch (e: Exception) {
                         val key = item.key!!
                         config.settings.remove(key)
-                        config.set(key, pair?.first)
+                        config[key] =  pair?.first
                     }
                 }
                 item.summary = pair?.second ?: ds
@@ -405,7 +406,7 @@ class SettingItemHelper(
                         if ((item.callback as CallbackOnSet<Int>?)?.invoke(ItemOperation(this), old) != false) {
                             item.summary = old.toString()
                             if (item.keyId != null) {
-                                config.set(item.keyId, old)
+                                config[item.keyId] = old
                             }
                             setBasic()
                         }

@@ -9,8 +9,8 @@ import org.greenrobot.greendao.identityscope.IdentityScopeType;
 import org.greenrobot.greendao.internal.DaoConfig;
 
 import cn.vove7.common.datamanager.AppAdInfo;
-import cn.vove7.common.datamanager.executor.entity.MarkedData;
 import cn.vove7.common.datamanager.InstSettings;
+import cn.vove7.common.datamanager.executor.entity.MarkedData;
 import cn.vove7.common.datamanager.parse.model.Action;
 import cn.vove7.common.datamanager.parse.model.ActionDesc;
 import cn.vove7.common.datamanager.parse.model.ActionScope;
@@ -18,8 +18,8 @@ import cn.vove7.common.datamanager.parse.statusmap.ActionNode;
 import cn.vove7.common.datamanager.parse.statusmap.Reg;
 
 import cn.vove7.common.datamanager.greendao.AppAdInfoDao;
-import cn.vove7.common.datamanager.greendao.MarkedDataDao;
 import cn.vove7.common.datamanager.greendao.InstSettingsDao;
+import cn.vove7.common.datamanager.greendao.MarkedDataDao;
 import cn.vove7.common.datamanager.greendao.ActionDao;
 import cn.vove7.common.datamanager.greendao.ActionDescDao;
 import cn.vove7.common.datamanager.greendao.ActionScopeDao;
@@ -36,8 +36,8 @@ import cn.vove7.common.datamanager.greendao.RegDao;
 public class DaoSession extends AbstractDaoSession {
 
     private final DaoConfig appAdInfoDaoConfig;
-    private final DaoConfig markedDataDaoConfig;
     private final DaoConfig instSettingsDaoConfig;
+    private final DaoConfig markedDataDaoConfig;
     private final DaoConfig actionDaoConfig;
     private final DaoConfig actionDescDaoConfig;
     private final DaoConfig actionScopeDaoConfig;
@@ -45,8 +45,8 @@ public class DaoSession extends AbstractDaoSession {
     private final DaoConfig regDaoConfig;
 
     private final AppAdInfoDao appAdInfoDao;
-    private final MarkedDataDao markedDataDao;
     private final InstSettingsDao instSettingsDao;
+    private final MarkedDataDao markedDataDao;
     private final ActionDao actionDao;
     private final ActionDescDao actionDescDao;
     private final ActionScopeDao actionScopeDao;
@@ -60,11 +60,11 @@ public class DaoSession extends AbstractDaoSession {
         appAdInfoDaoConfig = daoConfigMap.get(AppAdInfoDao.class).clone();
         appAdInfoDaoConfig.initIdentityScope(type);
 
-        markedDataDaoConfig = daoConfigMap.get(MarkedDataDao.class).clone();
-        markedDataDaoConfig.initIdentityScope(type);
-
         instSettingsDaoConfig = daoConfigMap.get(InstSettingsDao.class).clone();
         instSettingsDaoConfig.initIdentityScope(type);
+
+        markedDataDaoConfig = daoConfigMap.get(MarkedDataDao.class).clone();
+        markedDataDaoConfig.initIdentityScope(type);
 
         actionDaoConfig = daoConfigMap.get(ActionDao.class).clone();
         actionDaoConfig.initIdentityScope(type);
@@ -82,8 +82,8 @@ public class DaoSession extends AbstractDaoSession {
         regDaoConfig.initIdentityScope(type);
 
         appAdInfoDao = new AppAdInfoDao(appAdInfoDaoConfig, this);
-        markedDataDao = new MarkedDataDao(markedDataDaoConfig, this);
         instSettingsDao = new InstSettingsDao(instSettingsDaoConfig, this);
+        markedDataDao = new MarkedDataDao(markedDataDaoConfig, this);
         actionDao = new ActionDao(actionDaoConfig, this);
         actionDescDao = new ActionDescDao(actionDescDaoConfig, this);
         actionScopeDao = new ActionScopeDao(actionScopeDaoConfig, this);
@@ -91,8 +91,8 @@ public class DaoSession extends AbstractDaoSession {
         regDao = new RegDao(regDaoConfig, this);
 
         registerDao(AppAdInfo.class, appAdInfoDao);
-        registerDao(MarkedData.class, markedDataDao);
         registerDao(InstSettings.class, instSettingsDao);
+        registerDao(MarkedData.class, markedDataDao);
         registerDao(Action.class, actionDao);
         registerDao(ActionDesc.class, actionDescDao);
         registerDao(ActionScope.class, actionScopeDao);
@@ -102,8 +102,8 @@ public class DaoSession extends AbstractDaoSession {
     
     public void clear() {
         appAdInfoDaoConfig.clearIdentityScope();
-        markedDataDaoConfig.clearIdentityScope();
         instSettingsDaoConfig.clearIdentityScope();
+        markedDataDaoConfig.clearIdentityScope();
         actionDaoConfig.clearIdentityScope();
         actionDescDaoConfig.clearIdentityScope();
         actionScopeDaoConfig.clearIdentityScope();
@@ -115,12 +115,12 @@ public class DaoSession extends AbstractDaoSession {
         return appAdInfoDao;
     }
 
-    public MarkedDataDao getMarkedDataDao() {
-        return markedDataDao;
-    }
-
     public InstSettingsDao getInstSettingsDao() {
         return instSettingsDao;
+    }
+
+    public MarkedDataDao getMarkedDataDao() {
+        return markedDataDao;
     }
 
     public ActionDao getActionDao() {

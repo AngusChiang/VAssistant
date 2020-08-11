@@ -107,6 +107,12 @@ class SettingsActivity : ReturnableActivity() {
                             summary = "使用语言命令控制对话框",
                             keyId = R.string.key_voice_control_dialog,
                             defaultValue = true
+                    ),
+                    CheckBoxItem(
+                            title="蓝牙设备支持",
+                            summary = "可能某些蓝牙设备无效",
+                            keyId = R.string.key_bt_support,
+                            defaultValue = true
                     )
             )),
             SettingGroupItem(R.color.cyan_500, titleS = "语音唤醒", childItems = listOf(

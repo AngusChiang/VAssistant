@@ -22,10 +22,10 @@ import cn.vove7.common.utils.secure.SecuritySharedPreference
 import cn.vove7.smartkey.BaseConfig
 import cn.vove7.smartkey.android.AndroidSettings
 import cn.vove7.smartkey.android.noCacheKey
+import cn.vove7.smartkey.android.smartKey
 import cn.vove7.smartkey.annotation.Config
 import cn.vove7.smartkey.key.get
 import cn.vove7.smartkey.key.set
-import cn.vove7.smartkey.key.smartKey
 import cn.vove7.smartkey.key.smartKeyMap
 import cn.vove7.vtp.log.Vog
 import cn.vove7.vtp.sharedpreference.SpHelper
@@ -64,7 +64,7 @@ object AppConfig : BaseConfig {
 
     var isLongPressKeyWakeUp by noCacheKey(true, keyId = R.string.key_long_press_volume_up_wake_up)
 
-    var wakeupKeys by smartKey(intArrayOf(), "wakeupKeys")
+    var wakeupKeys by smartKey(intArrayOf())
 
     val voiceControlDialog by noCacheKey(true, keyId = R.string.key_voice_control_dialog)
 
@@ -104,6 +104,7 @@ object AppConfig : BaseConfig {
                 R.string.key_stream_of_syn_output,
                 R.array.list_stream_syn_output, 0
         )
+    val btSupport by smartKey(true, keyId = R.string.key_bt_support)
 
     //音量长按延迟
     var volumeKeyDelayUp by noCacheKey(400, keyId = R.string.key_long_key_press_delay)

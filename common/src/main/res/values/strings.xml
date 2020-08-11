@@ -205,7 +205,7 @@
     <string name="key_device_name" translatable="false">device_name</string>
 
     <string name="key_rokid_send_loc" translatable="false">rokid_send_loc</string>
-
+    <string name="key_bt_support">bt_support</string>
 
 
 </resources>

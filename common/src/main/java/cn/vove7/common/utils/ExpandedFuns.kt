@@ -21,6 +21,7 @@ import android.view.animation.Animation
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import androidx.annotation.ColorRes
+import androidx.annotation.StringRes
 import androidx.core.app.ActivityCompat
 import cn.vove7.common.BuildConfig
 import cn.vove7.common.app.GlobalApp
@@ -29,6 +30,9 @@ import cn.vove7.common.app.log
 import cn.vove7.common.datamanager.parse.statusmap.ActionNode
 import cn.vove7.common.view.editor.MultiSpan
 import cn.vove7.quantumclock.QuantumClock
+import cn.vove7.smartkey.BaseConfig
+import cn.vove7.smartkey.android.AndroidSettings
+import cn.vove7.smartkey.key.set
 import cn.vove7.vtp.app.AppInfo
 import cn.vove7.vtp.log.Vog
 import cn.vove7.vtp.net.GsonHelper
@@ -716,4 +720,21 @@ fun View.findFirstParentWith(predicate: (ViewParent) -> Boolean): ViewParent? {
         p = p.parent
     }
     return null
+}
+
+
+operator fun BaseConfig.set(
+        @StringRes keyId: Int,
+        encrypt: Boolean = false,
+        value: Any?
+) {
+    set(AndroidSettings.s(keyId), encrypt, value)
+}
+
+fun BaseConfig.set(
+        @StringRes keyId: Int,
+        value: Any?,
+        encrypt: Boolean = false
+) {
+    set(AndroidSettings.s(keyId), value, encrypt)
 }

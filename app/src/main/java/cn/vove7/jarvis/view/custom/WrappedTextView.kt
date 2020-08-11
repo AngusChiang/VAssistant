@@ -20,10 +20,9 @@ import cn.vove7.jarvis.R
  * @author Administrator
  * 2018/12/19
  */
-class WrappedTextView : androidx.appcompat.widget.AppCompatEditText {
-    constructor(context: Context?) : super(context)
-    constructor(context: Context?, attrs: AttributeSet?) : super(context, attrs)
-    constructor(context: Context?, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr)
+class WrappedTextView @JvmOverloads constructor(
+        context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = androidx.appcompat.R.attr.editTextStyle
+) : androidx.appcompat.widget.AppCompatEditText(context, attrs, defStyleAttr) {
 
     var isEditable = false
         set(value) {
