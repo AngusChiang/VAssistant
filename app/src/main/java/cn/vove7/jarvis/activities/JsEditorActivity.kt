@@ -20,7 +20,7 @@ class JsEditorActivity : CodeEditorActivity() {
         findViewById<TextProcessor>(R.id.editor)
     }
     override val testFiles: Array<String> by lazy {
-        assets.list("js_sample")
+        assets.list("js_sample") ?: emptyArray()
     }
     override val symbols: List<Symbol>
         get() = jsSymbols

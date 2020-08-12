@@ -198,7 +198,7 @@ event: pkg: ${event.packageName} cls: ${event.className}""").logv()
 
     private fun isPar(className: String): Boolean {
         return try {
-            val cls = Class.forName(className as String?) as Class
+            val cls = Class.forName(className)
             val co = cls.getDeclaredConstructor(Context::class.java)
             co.isAccessible = true
             co.newInstance(this) is ViewGroup

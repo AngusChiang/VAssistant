@@ -4,14 +4,14 @@ apply plugin: 'kotlin-android-extensions'
 apply plugin: 'org.greenrobot.greendao'
 
 android {
-    compileSdkVersion 28
+    compileSdkVersion 29
 
     defaultConfig {
         applicationId "cn.vove7.vassistant"
         minSdkVersion 21
-        targetSdkVersion 28
-        def subVersion = 2
-        versionName "2.1.0"
+        targetSdkVersion 29
+        def subVersion = 0
+        versionName "2.1.1"
         def vc = Integer.parseInt(versionName.replace(".", "")) * 10
         if (vc < 10000) {
             vc *= 10
@@ -27,11 +27,6 @@ android {
         resValue "string", "base_acc_service_label", "V Assist基础服务"
         resValue "string", "gesture_acc_service_label", "V Assist高级服务（7.0+可用）"
 
-        manifestPlaceholders = [
-                JPUSH_PKGNAME: "cn.vove7.vassistant",
-                JPUSH_APPKEY : "f4b11a8374fbc79c3746a068", //JPush 上注册的包名对应的 Appkey.
-                JPUSH_CHANNEL: "default", //暂时填写默认值即可.
-        ]
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -49,7 +44,7 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
 
             ndk {
-                abiFilters "x86"
+                abiFilters "armeabi-v7a", "x86"
             }
         }
         debug {

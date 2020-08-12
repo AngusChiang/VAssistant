@@ -29,9 +29,9 @@ open class BaseChoiceDialog<V : BaseListAdapter.ViewHolder>
             }
         }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            dialog.window.setType(WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY)
+            dialog.window?.setType(WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY)
         } else {
-            dialog.window.setType(WindowManager.LayoutParams.TYPE_SYSTEM_ALERT)
+            dialog.window?.setType(WindowManager.LayoutParams.TYPE_SYSTEM_ALERT)
         }
         dialog.setTitle(title)
         return dialog

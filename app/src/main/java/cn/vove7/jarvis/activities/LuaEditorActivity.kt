@@ -14,7 +14,7 @@ class LuaEditorActivity : CodeEditorActivity() {
             by lazy { findViewById<LuaEditor>(R.id.editor) }
     override val assetFolder: String = "lua_sample/"
     override val testFiles: Array<String> by lazy {
-        assets.list("lua_sample")
+        assets.list("lua_sample") ?: emptyArray()
     }
     override val scriptType: String = Action.SCRIPT_TYPE_LUA
     override val symbols: List<Symbol>

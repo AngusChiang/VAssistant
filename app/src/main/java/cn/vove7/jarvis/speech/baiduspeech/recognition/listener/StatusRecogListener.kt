@@ -57,13 +57,12 @@ open class StatusRecogListener : IRecogListener, SpeechConst {
     }
 
     override fun onAsrAudio(data: ByteArray?, offset: Int, length: Int) {
-        var data = data
-        if (offset != 0 || data?.size != length) {
+        data ?: return
+        if (offset != 0 || data.size != length) {
             val actualData = ByteArray(length)
             System.arraycopy(data, 0, actualData, 0, length)
-            data = actualData
+            Vog.i("音频数据回调, length:" + actualData.size)
         }
-        Vog.i("音频数据回调, length:" + data.size)
     }
 
     override fun onAsrExit() {

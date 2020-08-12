@@ -196,7 +196,7 @@ class SettingItemHelper(
                 if ((settingItem.callback as CallbackOnSet<String>?)?.invoke(ItemOperation(this), s) != false) {
                     settingItem.summary = s
                     settingItem.keyId?.also {
-                        config.set(settingItem.keyId, s)
+                        config[settingItem.keyId] = s
                     }
                 }
                 setBasic()

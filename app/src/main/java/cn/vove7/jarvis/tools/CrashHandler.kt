@@ -2,7 +2,6 @@ package cn.vove7.jarvis.tools
 
 import android.content.Context
 import android.os.Build
-import android.os.Environment
 import cn.vove7.common.app.AppConfig
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.app.GlobalLog
@@ -46,7 +45,7 @@ object CrashHandler : Cockroach.ExceptionHandler {
     private fun handler(e: Throwable) {
         val headerInfo = SystemHelper.getDeviceInfo(context).string()
 //        val log = GlobalLog.toString()
-        val errFile = Environment.getExternalStorageDirectory().absolutePath + "/crash.log"
+        val errFile = File(GlobalApp.APP.getExternalFilesDir(null), "/crash.log")
         try {
             val info = TextPrinter().apply {
                 println(headerInfo)
@@ -55,7 +54,7 @@ object CrashHandler : Cockroach.ExceptionHandler {
             }.toString()
 
             try {//输出和sd卡
-                File(errFile).writeText(info)
+                errFile.writeText(info)
             } catch (e: Exception) {
                 e.printStackTrace()
             }
