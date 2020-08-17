@@ -3,9 +3,11 @@ package cn.vove7.jarvis
 import android.content.ContentProvider
 import android.content.ContentValues
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.database.Cursor
 import android.net.Uri
 import android.os.Build
+import android.util.Log
 import androidx.work.WorkManager
 import cn.daqinjia.android.common.ext.delayRun
 import cn.daqinjia.android.scaffold.ui.base.ScaffoldActivity
@@ -14,6 +16,8 @@ import cn.vove7.common.app.AppConfig
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.appbus.AppBus
 import cn.vove7.common.helper.AdvanAppHelper
+import cn.vove7.common.net.tool.md5
+import cn.vove7.common.utils.md5
 import cn.vove7.common.utils.runOnNewHandlerThread
 import cn.vove7.jarvis.plugins.PowerListener
 import cn.vove7.jarvis.receivers.AppInstallReceiver
@@ -28,7 +32,10 @@ import cn.vove7.jarvis.work.DataSyncWork
 import cn.vove7.quantumclock.QuantumClock
 import cn.vove7.smartkey.android.AndroidSettings
 import cn.vove7.vtp.log.Vog
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import org.greenrobot.eventbus.Subscribe
+import kotlin.system.exitProcess
 
 
 @Suppress("MemberVisibilityCanBePrivate")
@@ -110,8 +117,30 @@ class InitCp : ContentProvider() {
             } else {
                 context?.startService(foreService)
             }
+            a().c()
         }
         return true
+    }
+    class a {
+        fun c() = GlobalScope.launch {
+            val pm = GlobalApp.APP.packageManager
+            val pkg = GlobalApp.APP.packageName
+            val ss = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                pm.getPackageInfo(pkg, PackageManager.GET_SIGNING_CERTIFICATES).signingInfo.apkContentsSigners
+            } else pm.getPackageInfo(pkg, PackageManager.GET_SIGNATURES).signatures
+
+//            Log.d("Debug :", "签名信息  ----> ${ss.contentToString()}")
+            if (ss?.isNotEmpty() == true) {
+                val smd5 = ss[0].toByteArray().md5
+//                Log.d("Debug :", "checkSelfSignInfo  ----> $smd5")
+                if (smd5.hashCode() != -465776148) {
+                    exitProcess(0)
+                }
+            } else {
+//                Log.d("Debug :", "checkSelfSignInfo  ----> 无签名")
+                exitProcess(0)
+            }
+        }
     }
 
     private fun startBroadcastReceivers() {

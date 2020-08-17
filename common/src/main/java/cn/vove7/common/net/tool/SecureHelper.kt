@@ -47,7 +47,7 @@ object SecureHelper {
         return MD5(bu.toString())
     }
 
-    private fun toHex(bytes: ByteArray): String {
+    fun toHex(bytes: ByteArray): String {
         val ret = StringBuilder(bytes.size * 2)
         for (aByte in bytes) {
             ret.append(HEX_DIGITS[(aByte.toInt() shr 4) and 0x0f])

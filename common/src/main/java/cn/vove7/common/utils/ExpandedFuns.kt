@@ -28,11 +28,11 @@ import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.app.log
 import cn.vove7.common.datamanager.parse.statusmap.ActionNode
+import cn.vove7.common.net.tool.SecureHelper
 import cn.vove7.common.view.editor.MultiSpan
 import cn.vove7.quantumclock.QuantumClock
 import cn.vove7.smartkey.BaseConfig
 import cn.vove7.smartkey.android.AndroidSettings
-import cn.vove7.smartkey.key.set
 import cn.vove7.vtp.app.AppInfo
 import cn.vove7.vtp.log.Vog
 import cn.vove7.vtp.net.GsonHelper
@@ -46,9 +46,19 @@ import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
 import java.io.File
 import java.io.Serializable
+import java.security.MessageDigest
 import java.text.SimpleDateFormat
 import java.util.*
 import java.util.concurrent.TimeUnit
+import kotlin.collections.Map
+import kotlin.collections.Set
+import kotlin.collections.forEach
+import kotlin.collections.hashMapOf
+import kotlin.collections.map
+import kotlin.collections.mutableListOf
+import kotlin.collections.mutableSetOf
+import kotlin.collections.set
+import kotlin.collections.toTypedArray
 
 
 /**
@@ -738,3 +748,16 @@ fun BaseConfig.set(
 ) {
     set(AndroidSettings.s(keyId), value, encrypt)
 }
+
+
+val ByteArray.md5: String
+    get() {
+        try {
+            val md = MessageDigest.getInstance("MD5")
+            val bytes = md.digest(this)
+            return SecureHelper.toHex(bytes)
+        } catch (e: Exception) {
+            GlobalLog.err(e)
+            throw RuntimeException(e)
+        }
+    }

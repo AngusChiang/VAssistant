@@ -3,6 +3,13 @@ apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 apply plugin: 'org.greenrobot.greendao'
 
+def localProperties = new Properties()
+def localPropertiesFile = rootProject.file('local.properties')
+if (localPropertiesFile.exists()) {
+    localPropertiesFile.withReader('UTF-8') { reader ->
+        localProperties.load(reader)
+    }
+}
 android {
     compileSdkVersion 30
 
@@ -29,6 +36,16 @@ android {
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
+    signingConfigs {
+        release {
+            storeFile file(localProperties.getProperty('keyPath'))
+            keyAlias = localProperties.getProperty('keyAlias')
+            keyPassword localProperties.getProperty('keyPassword')
+            storePassword localProperties.getProperty('storePassword')
+            v1SigningEnabled true
+            v2SigningEnabled true
+        }
+    }
 
     buildTypes {
         release {
@@ -38,6 +55,7 @@ android {
             ndk {
                 abiFilters "armeabi-v7a"
             }
+            signingConfig signingConfigs.release
         }
         release_x86 {
             minifyEnabled false
@@ -59,28 +77,14 @@ android {
 
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
 
-            manifestPlaceholders = [
-                    JPUSH_PKGNAME: "cn.vove7.vassistant.debug",
-                    JPUSH_APPKEY : "2a428d87054dcc8b9fd45a30", //JPush 上注册的包名对应的 Appkey.
-                    JPUSH_CHANNEL: "default", //暂时填写默认值即可.da
-            ]
             ndk {//排除其他 abi
                 abiFilters "armeabi-v7a", "x86"
             }
+            signingConfig signingConfigs.release
         }
 //        beta {
 //            versionNameSuffix = '-beta'
 //        }
-    }
-    signingConfigs {
-        debug {
-            v1SigningEnabled true
-            v2SigningEnabled true
-        }
-        release {
-            v1SigningEnabled true
-            v2SigningEnabled true
-        }
     }
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
