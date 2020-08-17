@@ -12,10 +12,10 @@ import java.io.File
  * 2018/11/24
  */
 object StorageHelper {
-    val sdPath get() = Environment.getExternalStorageDirectory().absolutePath
+    val extPath get() = GlobalApp.APP.getExternalFilesDir(null)!!.absolutePath
 
     val storePath: String
-        get() = "$sdPath/V Assist".also { createDir(it) }
+        get() = extPath.also { createDir(it) }
 
     val cacheDir: String get() = GlobalApp.APP.cacheDir.absolutePath
 
@@ -31,7 +31,7 @@ object StorageHelper {
 
     val logPath: String get() = "$storePath/log".also { createDir(it) }
 
-    val picturesPath: String get() = "$sdPath/Pictures".also { createDir(it) }
+    val picturesPath: String get() = "${Environment.getExternalStorageDirectory().absolutePath}/Pictures".also { createDir(it) }
 
     val screenshotsPath: String get() = "$picturesPath/Screenshots".also { createDir(it) }
 

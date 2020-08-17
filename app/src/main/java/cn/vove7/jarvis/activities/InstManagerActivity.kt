@@ -43,18 +43,18 @@ class InstManagerActivity : BaseActivityWithViewPager() {
         return true
     }
 
-    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when {
-            item?.itemId == R.id.menu_item_sync -> {//同步
+            item.itemId == R.id.menu_item_sync -> {//同步
                 val p = view_pager.currentItem
                 val f = fragments[p] as OnSyncInst
                 f.onSync()
                 return true
             }
-            item?.title == "新建指令教程" -> {
+            item.title == "新建指令教程" -> {
                 SystemBridge.openUrl("https://vove.gitee.io/2019/01/29/Customize_Instruction_Regex/")
             }
-            item?.title == "从剪切板导入" -> {
+            item.title == "从剪切板导入" -> {
                 if (!UserInfo.isLogin()) {
                     GlobalApp.toastInfo("请登录后操作")
                     return true

@@ -26,7 +26,9 @@ class SearchActionHelper(searchMenuItem: MenuItem, val lis: (String) -> Unit) {
 
             override fun onQueryTextChange(newText: String): Boolean {
                 Vog.d("onQueryTextChange ----> $newText")
-                handler.removeCallbacks(sR)
+                sR?.also {
+                    handler.removeCallbacks(it)
+                }
                 if (first && newText == "") {
                     first = false
                     return true
@@ -34,8 +36,9 @@ class SearchActionHelper(searchMenuItem: MenuItem, val lis: (String) -> Unit) {
                 val nt = newText.trim()
                 sR = Runnable {
                     lis.invoke(nt)
+                }.also {
+                    handler.postDelayed(it, 200)
                 }
-                handler.postDelayed(sR, 200)
                 return true
             }
         })

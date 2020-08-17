@@ -56,8 +56,8 @@ object UtilEventReceiver : DyBCReceiver() {
 
         when (action) {
             APP_HAS_UPDATE -> {
-                val ver = intent.getStringExtra("version")
-                val log = intent.getStringExtra("log")
+                val ver = intent.getStringExtra("version") ?: return
+                val log = intent.getStringExtra("log") ?: return
 
                 BottomDialogActivity.builder(GlobalApp.APP,
                         AppUpdateDialog.getBuildAction(ver, log))
@@ -72,7 +72,7 @@ object UtilEventReceiver : DyBCReceiver() {
             }
             ROKID_SEND_LOC -> {
                 val hc = MainService.homeControlSystem
-                if(hc is RokidHomeSystem){
+                if (hc is RokidHomeSystem) {
                     hc.callSendLocTask()
                 }
             }

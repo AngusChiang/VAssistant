@@ -4,22 +4,13 @@ import android.app.assist.AssistContent
 import android.app.assist.AssistStructure
 import android.content.Context
 import android.content.Intent
-import android.media.MediaScannerConnection
 import android.os.Build
 import android.os.Bundle
 import androidx.annotation.RequiresApi
-import android.util.Log
-
+import cn.vove7.vtp.log.Vog
 import org.json.JSONArray
 import org.json.JSONException
 import org.json.JSONObject
-
-import java.io.File
-import java.io.FileOutputStream
-import java.io.OutputStreamWriter
-import java.io.PrintWriter
-
-import cn.vove7.vtp.log.Vog
 
 @RequiresApi(api = Build.VERSION_CODES.M)
 internal class AssistScreenContentDumpThread(
@@ -125,8 +116,8 @@ internal class AssistScreenContentDumpThread(
         json.put("elevation", wrap(node.elevation))
         json.put("enabled", wrap(node.isEnabled))
 
-        if (node.extras != null) {
-            json.put("extras", dumpBundle(node.extras, JSONObject()))
+        node.extras?.also {
+            json.put("extras", dumpBundle(it, JSONObject()))
         }
 
         json.put("focusable", wrap(node.isFocusable))

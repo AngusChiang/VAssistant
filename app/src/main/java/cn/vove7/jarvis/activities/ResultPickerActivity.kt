@@ -19,8 +19,8 @@ class ResultPickerActivity : Activity() {
                 finish()
                 return
             } else {
-                ResultDisplayDialog(this@ResultPickerActivity, getStringExtra("title"),
-                        getBundleExtra("data").getSerializable("items")
+                ResultDisplayDialog(this@ResultPickerActivity, getStringExtra("title") ?: "",
+                        getBundleExtra("data")!!.getSerializable("items")
                                 as ArrayList<UrlItem>).apply {
                     setOnDismissListener {
                         finish()

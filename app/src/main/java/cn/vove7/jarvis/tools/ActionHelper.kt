@@ -25,7 +25,7 @@ import java.util.*
  */
 object ActionHelper {
     private val createTmpFile
-        get() = File(Environment.getExternalStorageDirectory(),
+        get() = File(GlobalApp.APP.externalCacheDir,
                 "tmp${Random().nextInt(100)}.png")
 
     /**

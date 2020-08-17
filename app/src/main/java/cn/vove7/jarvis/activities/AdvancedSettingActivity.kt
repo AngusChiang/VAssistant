@@ -261,7 +261,7 @@ class AdvancedSettingActivity : ReturnableActivity() {
                     if (resultCode == Activity.RESULT_OK && data != null) {
                         try {
                             val result = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS)
-                            GlobalApp.toastInfo(result[0])
+                            GlobalApp.toastInfo(result?.get(0) ?:"失败")
                         } catch (e: Exception) {
                             GlobalApp.toastError(e.message ?: "e")
                         }

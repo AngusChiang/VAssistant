@@ -171,8 +171,8 @@ abstract class CodeEditorActivity : BaseActivity() {
 
     private val logList = mutableListOf<CharSequence>()
 
-    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
-        when (item?.itemId) {
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
             R.id.menu_code_run -> {
                 clearLog()
                 val ac = Action(editorText, scriptType)

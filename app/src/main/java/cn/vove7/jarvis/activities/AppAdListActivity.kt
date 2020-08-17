@@ -42,7 +42,7 @@ class AppAdListActivity : OneFragmentActivity() {
 
     override fun beforeSetViewPager() {
         val f = AppAdListFragment.newInstance(
-                intent.getStringExtra("pkg"))
+                intent.getStringExtra("pkg")!!)
         fragments = arrayOf(f)
     }
 

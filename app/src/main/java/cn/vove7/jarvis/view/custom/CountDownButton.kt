@@ -4,7 +4,7 @@ import android.content.Context
 import android.os.Handler
 import android.os.Message
 import android.util.AttributeSet
-import android.widget.Button
+import androidx.appcompat.widget.AppCompatButton
 import cn.vove7.vtp.log.Vog
 
 /**
@@ -16,14 +16,14 @@ import cn.vove7.vtp.log.Vog
 
 typealias OnFinish = () -> Unit
 
-class CountDownButton : Button {
-    constructor(context: Context?)
+class CountDownButton : AppCompatButton {
+    constructor(context: Context)
             : super(context)
 
-    constructor(context: Context?, attrs: AttributeSet?)
+    constructor(context: Context, attrs: AttributeSet?)
             : super(context, attrs)
 
-    constructor(context: Context?, attrs: AttributeSet?, defStyleAttr: Int)
+    constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int)
             : super(context, attrs, defStyleAttr)
 
     private var preText: String? = null
@@ -78,8 +78,8 @@ class CountDownButton : Button {
 
         }
 
-        override fun handleMessage(msg: Message?) {
-            when (msg?.what) {
+        override fun handleMessage(msg: Message) {
+            when (msg.what) {
                 0 -> {//begin
                     currentCount = msg.obj as Int
                     btn.text = String.format(s, currentCount--)

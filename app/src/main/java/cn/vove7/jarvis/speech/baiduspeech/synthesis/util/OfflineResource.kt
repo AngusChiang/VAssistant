@@ -15,7 +15,7 @@ import java.io.File
 
 class OfflineResource(private val voiceType: String) {
 
-    private var destPath: String = StorageHelper.sdPath + "/baiduTTS"
+    private var destPath: String = StorageHelper.extPath + "/baiduTTS"
 
     /**
      * 离线文件 bd_etts_text.dat 位置

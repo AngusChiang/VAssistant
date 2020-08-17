@@ -215,7 +215,7 @@ class ScreenAssistActivity : BaseActivity() {
     private fun handlerScreen() {
         intent?.apply {
             if (hasExtra("path")) {
-                screenPath = getStringExtra("path")
+                screenPath = getStringExtra("path")!!
                 showProgressBar = false
                 afterHandleScreen()
             } else {

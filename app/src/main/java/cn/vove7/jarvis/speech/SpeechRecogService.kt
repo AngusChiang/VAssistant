@@ -279,8 +279,8 @@ abstract class SpeechRecogService(val event: RecogEvent) : SpeechRecogI {
      * @constructor
      */
     inner class RecogHandler(looper: Looper) : Handler(looper) {
-        override fun handleMessage(msg: Message?) {
-            when (msg?.what) {
+        override fun handleMessage(msg: Message) {
+            when (msg.what) {
                 SpeechConst.CODE_WAKEUP_SUCCESS -> {//唤醒
                     val word = msg.data.getString("data")
                     Vog.d("handleMessage ---> 唤醒 -> $word")

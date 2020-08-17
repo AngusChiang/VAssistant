@@ -8,6 +8,7 @@ import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.model.UserInfo
 import cn.vove7.common.net.ApiUrls
 import cn.vove7.common.net.WrapperNetHelper
+import cn.vove7.common.utils.StorageHelper
 import cn.vove7.common.utils.TextHelper
 import cn.vove7.common.utils.TextPrinter
 import cn.vove7.common.utils.formatNow
@@ -44,13 +45,11 @@ object CrashHandler : Cockroach.ExceptionHandler {
 
     private fun handler(e: Throwable) {
         val headerInfo = SystemHelper.getDeviceInfo(context).string()
-//        val log = GlobalLog.toString()
-        val errFile = File(GlobalApp.APP.getExternalFilesDir(null), "/crash.log")
+        val errFile = File(StorageHelper.extPath, "crash.log")
         try {
             val info = TextPrinter().apply {
                 println(headerInfo)
                 e.printStackTrace(this)
-//                println(log)
             }.toString()
 
             try {//输出和sd卡

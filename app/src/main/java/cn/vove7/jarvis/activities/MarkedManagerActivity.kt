@@ -34,8 +34,8 @@ class MarkedManagerActivity : BaseActivityWithViewPager() {
         return true
     }
 
-    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
-        when (item?.itemId) {
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
             R.id.menu_item_sync -> {//同步
                 val p = view_pager.currentItem
                 val f = fragments[p] as OnSyncMarked

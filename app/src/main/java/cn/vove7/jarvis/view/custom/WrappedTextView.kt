@@ -80,9 +80,9 @@ class WrappedTextView @JvmOverloads constructor(
     }
 
     class UiHandler(private val textView: TextView, loop: Looper) : Handler(loop) {
-        override fun handleMessage(msg: Message?) {
-            val data = msg?.obj
-            when (msg?.what) {
+        override fun handleMessage(msg: Message) {
+            val data = msg.obj
+            when (msg.what) {
                 APPEND -> {
                     when (data) {
                         is CharSequence -> textView.append(data)

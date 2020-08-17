@@ -51,7 +51,7 @@ class CodeViewActivity : ReturnableActivity() {
             title = it.getStringExtra("title") +
                     "(" + it.getStringExtra("type") + ")"
 
-            code = it.getStringExtra("code")
+            code = it.getStringExtra("code") ?: ""
         } ?: run {
             finish()
             return
@@ -69,8 +69,8 @@ class CodeViewActivity : ReturnableActivity() {
         return true
     }
 
-    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
-        if (item?.title == "复制") {
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        if (item.title == "复制") {
             SystemBridge.setClipText(code)
             GlobalApp.toastInfo("已复制")
             return true
