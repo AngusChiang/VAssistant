@@ -4,10 +4,11 @@ package cn.vove7.jarvis.speech
  * 语音合成事件
  */
 interface SyntheEvent {
-    fun onError(text: String?)
+    fun onError(text: String?, msg: String?)
 
     fun onPause(text: String?) {}
     fun onResume(text: String?) {}
+
     /**
      * speaking is false
      */

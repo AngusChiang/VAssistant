@@ -3,8 +3,8 @@ package cn.vove7.jarvis.speech
 import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager
-import androidx.core.app.ActivityCompat
 import android.util.Pair
+import androidx.core.app.ActivityCompat
 import cn.vove7.common.app.AppConfig
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.utils.runOnNewHandlerThread
@@ -22,6 +22,7 @@ abstract class SpeechSynService(val event: SyntheEvent) {
             init()
         }
     }
+
     val context: Context get() = GlobalApp.APP
 
     var speaking: Boolean = false
@@ -73,7 +74,7 @@ abstract class SpeechSynService(val event: SyntheEvent) {
         }
         speaking = true//标志放此
         if (text == null) {
-            event.onError(text)
+            event.onError(text, "文本空")
             return
         }
         speakingText = text

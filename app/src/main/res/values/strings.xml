@@ -25,11 +25,6 @@
         <item>普通男声</item>
         <item>度逍遥</item>
         <item>度丫丫</item>
-        <item>度博文</item>
-        <item>度小童</item>
-        <item>度小萌</item>
-        <item>度米朵</item>
-        <item>度小娇</item>
     </string-array>
     <string name="default_voice_model" translatable="false">0</string>
     <string-array name="voice_model_values" translatable="false">

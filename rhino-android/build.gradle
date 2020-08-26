@@ -24,6 +24,8 @@ android {
         release_x86 {
 
         }
+        release_ndk_all {
+        }
     }
     compileOptions {
         sourceCompatibility = '1.8'

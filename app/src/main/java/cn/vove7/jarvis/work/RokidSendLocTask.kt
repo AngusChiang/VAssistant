@@ -52,8 +52,8 @@ class RokidSendLocTask(val configGeter: () -> Map<String, String>) : Runnable {
             disKm <= 1 -> 3.minuteInMillis
             //2km 2.5min
             //10km 25min
-            disKm <= 10 -> (disKm * 17.0 / 9 + 1).minuteInMillis
-            disKm in 10..40 -> {
+            disKm <= 10.0 -> (disKm * 17.0 / 9 + 1).minuteInMillis
+            disKm in 10.0..40.0 -> {
                 25.minuteInMillis
             }
             else -> {

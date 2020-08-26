@@ -65,6 +65,14 @@ android {
                 abiFilters "armeabi-v7a", "x86"
             }
         }
+        release_ndk_all {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+
+            ndk {
+                abiFilters "armeabi-v7a", "x86", "arm64-v8a"
+            }
+        }
         debug {
             minifyEnabled false
             applicationIdSuffix ".debug"

@@ -1230,8 +1230,9 @@ object MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
          * 1000 + text.len * 500
          * @param text String?
          */
-        override fun onError(text: String?) {
+        override fun onError(text: String?, msg: String?) {
             thread {
+                GlobalApp.toastError("语音合成失败: $msg")
                 sleep(((text?.length ?: 0) * 100).toLong())
                 notifySpeakFinish(text, true)
                 resumeMusicIf()

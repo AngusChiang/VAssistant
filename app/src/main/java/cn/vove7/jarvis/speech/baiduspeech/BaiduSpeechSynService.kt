@@ -71,7 +71,8 @@ class BaiduSpeechSynService(event: SyntheEvent) : SpeechSynService(event) {
         val sp = SpHelper(context)
 
         val i = try {
-            context.resources.getStringArray(R.array.voice_model_entities).indexOf(sp.getString(R.string.key_voice_syn_model) ?: return null)
+            context.resources.getStringArray(R.array.voice_model_entities).indexOf(sp.getString(R.string.key_voice_syn_model)
+                ?: return null)
         } catch (e: ClassCastException) {
             sp.getInt(R.string.key_voice_syn_model)
         }
@@ -306,7 +307,7 @@ class BaiduSyncLis(val service: SpeechSynService, val event: SyntheEvent) : Spee
     override fun onError(p0: String?, p1: SpeechError?) {
         val e = "错误发生：${p1?.description} ，错误编码: ${p1?.code} 序列号: $p0 "
         service.speaking = false
-        event.onError(p0 ?: "")
+        event.onError(p0 ?: "", p1?.description)
         GlobalLog.err(e)
         Vog.d(e)
     }

@@ -21,6 +21,8 @@ android {
         release_x86 {
 
         }
+        release_ndk_all {
+        }
         debug {
             buildConfigField "String", "CONFIG_NAME", '"cn.vove7.vassistant.debug_preferences"'
         }
