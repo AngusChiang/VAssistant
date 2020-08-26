@@ -14,11 +14,10 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.accessibility.AccessibilityEvent
 import android.view.accessibility.AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED
-import android.view.accessibility.AccessibilityEvent.eventTypeToString
 import android.view.accessibility.AccessibilityNodeInfo
-import cn.daqinjia.android.common.logd
 import cn.daqinjia.android.common.logv
 import cn.vove7.common.accessibility.AccessibilityApi
+import cn.vove7.common.accessibility.viewnode.ViewNode
 import cn.vove7.common.app.AppConfig
 import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.appbus.AppBus
@@ -155,11 +154,13 @@ class MyAccessibilityService : AccessibilityApi() {
         val eventType = event.eventType
 
         if (BuildConfig.DEBUG) runInCatch {
-            event.logv()
+//            event.logv()
             ("""currentAppInfo: $currentAppInfo
 currentActivity: $currentActivity 
-eventType: ${eventTypeToString(eventType)}
-event: pkg: ${event.packageName} cls: ${event.className}""").logv()
+event: $event
+event: pkg: ${event.packageName} cls: ${event.className}
+source: ${event.source?.let { ViewNode(it) }}
+""").logv()
         }
         when (eventType) {
             TYPE_WINDOW_STATE_CHANGED -> {
