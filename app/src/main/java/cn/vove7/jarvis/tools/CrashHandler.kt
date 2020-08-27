@@ -14,9 +14,11 @@ import cn.vove7.common.utils.TextPrinter
 import cn.vove7.common.utils.formatNow
 import cn.vove7.jarvis.BuildConfig
 import cn.vove7.quantumclock.QuantumClock
+import cn.vove7.vtp.log.Vog
 import cn.vove7.vtp.system.DeviceInfo
 import cn.vove7.vtp.system.SystemHelper
 import com.wanjian.cockroach.Cockroach
+import com.wanjian.cockroach.ExceptionHandler
 import java.io.File
 
 /**
@@ -25,22 +27,34 @@ import java.io.File
  * @author Administrator
  * 9/25/2018
  */
-object CrashHandler : Cockroach.ExceptionHandler {
+object CrashHandler : ExceptionHandler() {
 
     fun install() {
-        Cockroach.install(this)
+        Cockroach.install(GlobalApp.APP, this)
     }
 
     val context: Context by lazy {
         GlobalApp.APP
     }
 
-    override fun handlerException(thread: Thread?, throwable: Throwable?) {
+    override fun onUncaughtExceptionHappened(thread: Thread?, throwable: Throwable?) {
         throwable ?: return
         GlobalApp.toastError("发生异常，可将[帮助/日志]发送进行反馈")
-        GlobalLog.err("发生异常 at $thread")
+        GlobalLog.err("onUncaughtExceptionHappened at ${Thread.currentThread()}")
         GlobalLog.err(throwable)
         handler(throwable)
+    }
+
+    override fun onBandageExceptionHappened(throwable: Throwable?) {
+        throwable ?: return
+        GlobalApp.toastError("发生异常，可将[帮助/日志]发送进行反馈")
+        GlobalLog.err("发生异常 at ${Thread.currentThread()}")
+        GlobalLog.err(throwable)
+        handler(throwable)
+    }
+
+    override fun onEnterSafeMode() {
+        Vog.d("onEnterSafeMode")
     }
 
     private fun handler(e: Throwable) {

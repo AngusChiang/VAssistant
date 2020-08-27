@@ -159,6 +159,7 @@
 # kt 反射属性字段
 -keep class cn.vove7.vtp.app.AppInfo { *; }
 -keep class cn.vove7.vtp.system.DeviceInfo { *; }
+-keep class cn.vove7.vtp.system.ScreenInfo { *; }
 
 
 -keep class cn.vove7.common.datamanager.greendao.** { *; }

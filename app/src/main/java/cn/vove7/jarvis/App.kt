@@ -49,7 +49,6 @@ class App : GlobalApp() {
         }
         AndroidSettings.init(this)
         CrashHandler.install()
-//        AppBus.reg(this)
 
         startMainServices()
         ScaffoldActivity.apply {
@@ -69,15 +68,6 @@ class App : GlobalApp() {
 
     private fun startMainServices() {
         MainService.start()
-    }
-
-    @Subscribe
-    fun onUserEvent(event: String) {
-//        if (event == AppBus.EVENT_USER_INIT) {
-//            JPushInterface.setAlias(this, 0, UserInfo.getUserId().toString())
-//        } else if (event == AppBus.EVENT_LOGOUT) {
-//            JPushInterface.deleteAlias(this, 0)
-//        }
     }
 
     //供脚本api
@@ -128,16 +118,12 @@ class InitCp : ContentProvider() {
             val ss = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
                 pm.getPackageInfo(pkg, PackageManager.GET_SIGNING_CERTIFICATES).signingInfo.apkContentsSigners
             } else pm.getPackageInfo(pkg, PackageManager.GET_SIGNATURES).signatures
-
-//            Log.d("Debug :", "签名信息  ----> ${ss.contentToString()}")
             if (ss?.isNotEmpty() == true) {
                 val smd5 = ss[0].toByteArray().md5
-//                Log.d("Debug :", "checkSelfSignInfo  ----> $smd5")
                 if (smd5.hashCode() != -465776148) {
                     exitProcess(0)
                 }
             } else {
-//                Log.d("Debug :", "checkSelfSignInfo  ----> 无签名")
                 exitProcess(0)
             }
         }

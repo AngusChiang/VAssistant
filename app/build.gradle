@@ -17,7 +17,7 @@ android {
         applicationId "cn.vove7.vassistant"
         minSdkVersion 21
         targetSdkVersion 30
-        def subVersion = 0
+        def subVersion = 1
         versionName "2.1.1"
         def vc = Integer.parseInt(versionName.replace(".", "")) * 10
         if (vc < 10000) {
@@ -119,9 +119,11 @@ android {
     //配置打包apk路径及文件名
     android.applicationVariants.all { variant ->
         variant.outputs.all { output ->
-//            def type = "-" + buildType.name
-            def filename = "../../apks/vassist-v${versionCode}.apk"
-            outputFileName = filename
+            if (buildType.name != "debug") {
+                def filename = "../../apks/vassist-v${versionCode}-${buildType.name}.apk"
+                println("${buildType.name} -> $filename")
+                outputFileName = filename
+            }
         }
     }
 
@@ -173,7 +175,7 @@ dependencies {
 
     implementation 'com.github.Vove7:SlidePickerView:1.0.2'
 
-    implementation 'com.github.android-notes:Cockroach:0.0.5'
+    implementation 'com.github.SJJ-dot:Cockroach:2.0.1'
 
     implementation 'com.github.KeepSafe:TapTargetView:1.13.0'
     implementation 'com.github.bumptech.glide:glide:4.10.0'
@@ -188,7 +190,7 @@ dependencies {
     implementation project(':admin-manager')
 
     implementation "com.github.infotech-group:android-drawable-dsl:0.3.0"
-    def work_version = "2.3.3"
+    def work_version = "2.4.0"
     implementation "androidx.work:work-runtime-ktx:$work_version"
 
     implementation 'com.google.android:flexbox:2.0.0'
