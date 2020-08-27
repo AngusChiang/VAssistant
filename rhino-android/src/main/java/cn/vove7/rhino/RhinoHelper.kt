@@ -1,12 +1,10 @@
 package cn.vove7.rhino
 
-import android.os.Looper
 import cn.vove7.common.ScriptEngineBridges
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.interfaces.ScriptEngine
 import cn.vove7.rhino.api.RhinoApi
 import cn.vove7.rhino.api.RhinoApi.quit
-import cn.vove7.rhino.common.AndroidContextFactory
 import cn.vove7.rhino.common.GcCollector
 import cn.vove7.rhino.common.MapScriptable
 import cn.vove7.rhino.common.RhinoAndroidHelper
@@ -14,7 +12,6 @@ import cn.vove7.vtp.log.Vog
 import org.mozilla.javascript.*
 import org.mozilla.javascript.tools.SourceReader
 import org.mozilla.javascript.tools.shell.Global
-import java.io.File
 import java.io.FileNotFoundException
 import java.io.IOException
 import java.io.UnsupportedEncodingException
@@ -110,6 +107,7 @@ class RhinoHelper : ScriptableObject, ScriptEngine {
     }
 
     private fun setMap(map: Map<String, *>?) {
+        setArgs(arrayOf(map))
         global.defineProperty("argMap", MapScriptable(map), DONTENUM)
     }
 
@@ -137,11 +135,11 @@ class RhinoHelper : ScriptableObject, ScriptEngine {
                 RhinoApi.doLog("强行终止")
                 throw e
             } else {
-                RhinoApi.doLog(e.message)
+                RhinoApi.doLog(e.toString())
                 throw e
             }
         } catch (t: Throwable) {
-            RhinoApi.doLog(t.message)
+            RhinoApi.doLog(t.toString())
             throw t
         }
 

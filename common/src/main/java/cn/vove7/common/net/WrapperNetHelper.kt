@@ -65,6 +65,10 @@ object WrapperNetHelper {
         }
     }
 
+    fun postJson2String(url: String, model: Any? = null, requestCode: Int = -1, arg1: String? = null,
+                        callback: WrappedRequestCallback<ResponseMessage<String>>.() -> Unit
+    ) = postJson(url, model, requestCode, arg1, callback)
+
     inline fun <reified T> postJson(
             url: String, model: Any? = null, requestCode: Int = -1, arg1: String? = null,
             crossinline callback: WrappedRequestCallback<ResponseMessage<T>>.() -> Unit

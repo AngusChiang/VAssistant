@@ -36,6 +36,7 @@ import androidx.annotation.RequiresApi
 import androidx.core.content.FileProvider
 import cn.vove7.common.R
 import cn.vove7.common.accessibility.AccessibilityApi
+import cn.vove7.common.app.AppConfig
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.app.log
@@ -48,8 +49,10 @@ import cn.vove7.common.helper.AdvanContactHelper
 import cn.vove7.common.model.LocationInfo
 import cn.vove7.common.model.RequestPermission
 import cn.vove7.common.model.ResultBox
+import cn.vove7.common.model.UserInfo
 import cn.vove7.common.net.ApiUrls
-import cn.vove7.common.net.WrapperNetHelper
+import cn.vove7.common.net.model.BaseRequestModel
+import cn.vove7.common.net.model.ResponseMessage
 import cn.vove7.common.net.tool.SecureHelper
 import cn.vove7.common.utils.*
 import cn.vove7.common.view.ScreenshotActivity
@@ -169,7 +172,7 @@ object SystemBridge : SystemOperation {
     }
 
     override fun getPkgByWord(appWord: String): String? =
-            getPkgByName(appWord)
+        getPkgByName(appWord)
 
 
     // Open App 启动对应首页Activity
@@ -709,10 +712,7 @@ object SystemBridge : SystemOperation {
                     override fun onFailed(reason: Int) {
                         super.onFailed(reason)
                         GlobalLog.err("失败：" + arrayOf(
-                                0, ERROR_NO_CHANNEL
-                                , ERROR_GENERIC
-                                , ERROR_INCOMPATIBLE_MODE
-                                , ERROR_TETHERING_DISALLOWED)[reason])
+                                0, ERROR_NO_CHANNEL, ERROR_GENERIC, ERROR_INCOMPATIBLE_MODE, ERROR_TETHERING_DISALLOWED)[reason])
                         Vog.d("onFailed ---> ")
                     }
                 }, Handler())
@@ -882,7 +882,7 @@ object SystemBridge : SystemOperation {
             if (lp == LocationManager.NETWORK_PROVIDER) {
                 Vog.d("location ---> 获取位置超时,使用上次位置")
                 result.setAndNotify(lm.getLastKnownLocation(LocationManager.GPS_PROVIDER)
-                        ?: lm.getLastKnownLocation(LocationManager.NETWORK_PROVIDER)
+                    ?: lm.getLastKnownLocation(LocationManager.NETWORK_PROVIDER)
                 )
                 lm.removeUpdates(loLis)
             } else {
@@ -917,19 +917,19 @@ object SystemBridge : SystemOperation {
     }
 
     override fun getNetAddress(): String? {
-        val r = ResultBox<String?>()
-        WrapperNetHelper.postJson<String>(ApiUrls.GET_IP) {
-            success { _, b ->
-                if (b.isOk()) {
-                    r.setAndNotify(b.data)
-                } else r.setAndNotify(null)
-            }
-            fail { _, e ->
-                e.log()
-                r.setAndNotify(null)
-            }
-        }
-        return r.blockedGet(false)
+        val reqModel = BaseRequestModel(null, null)
+        val ts = (QuantumClock.currentTimeMillis / 1000)
+        val reqJson = GsonHelper.toJson(reqModel)
+        val sign = SecureHelper.signData(reqJson, ts)
+        val headers = mapOf(
+                "versionCode" to "${AppConfig.versionCode}",
+                "timestamp" to ts.toString(),
+                "token" to (UserInfo.getUserToken() ?: ""),
+                "sign" to sign
+        )
+        val data = HttpBridge.postJson(ApiUrls.GET_IP, reqJson, headers)
+        val b = GsonHelper.fromJson<ResponseMessage<String>>(data)
+        return b?.data
     }
 
     /**
@@ -1177,7 +1177,7 @@ object SystemBridge : SystemOperation {
         get() {
             val filter = IntentFilter(Intent.ACTION_BATTERY_CHANGED)
             val intent = context.registerReceiver(null, filter)
-                    ?: return -1
+                ?: return -1
 
             val level = intent.getIntExtra(BatteryManager.EXTRA_LEVEL, 100) //电量的刻度
             val maxLevel = intent.getIntExtra(BatteryManager.EXTRA_SCALE, 100) //最大
@@ -1465,7 +1465,7 @@ object SystemBridge : SystemOperation {
      */
     fun scanVassistHostsInLAN(): List<Pair<String, String>> = runBlocking {
         val localIp = getLocalIpAddress()
-                ?: return@runBlocking emptyList<Pair<String, String>>()
+            ?: return@runBlocking emptyList<Pair<String, String>>()
 
         val sd = localIp.lastIndexOf('.')
         val n = localIp.substring(sd + 1).toInt()

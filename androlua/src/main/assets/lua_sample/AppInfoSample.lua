@@ -5,7 +5,7 @@
 --
 
 
-appQQ = getAppInfo('com.tencent.mobileqq')
+appQQ = system.getAppInfo('com.tencent.mobileqq')
 if (appQQ) then
     print(appQQ)
     print(appQQ.name) -- getName()

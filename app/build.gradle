@@ -49,7 +49,7 @@ android {
 
     buildTypes {
         release {
-            minifyEnabled false
+            minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
 
             ndk {
@@ -58,23 +58,24 @@ android {
             signingConfig signingConfigs.release
         }
         release_x86 {
-            minifyEnabled false
+            minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
 
             ndk {
                 abiFilters "armeabi-v7a", "x86"
             }
+            signingConfig signingConfigs.release
         }
         release_ndk_all {
-            minifyEnabled false
+            minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
 
             ndk {
                 abiFilters "armeabi-v7a", "x86", "arm64-v8a"
             }
+            signingConfig signingConfigs.release
         }
         debug {
-            minifyEnabled false
             applicationIdSuffix ".debug"
             versionNameSuffix = '1'
             jniDebuggable = false
@@ -83,6 +84,7 @@ android {
             resValue "string", "base_acc_service_label", "V Assist基础DEBUG"
             resValue "string", "gesture_acc_service_label", "V Assist高级DEBUG"
 
+            minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
 
             ndk {//排除其他 abi

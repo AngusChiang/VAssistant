@@ -1,5 +1,7 @@
 package cn.vove7.common
 
+import androidx.annotation.Keep
+
 /**
  * @author 17719
  * 脚本Api
@@ -14,6 +16,7 @@ class ScriptEngineBridges(vararg apis: Pair<String, Any>) {
         apis[k] = v
     }
 
+    @Keep
     fun get(k: String): Any? = apis[k]
 
 }

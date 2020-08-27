@@ -1,31 +1,181 @@
-    # Add project specific ProGuard rules here.
-# You can control the set of applied configuration files using the
-# proguardFiles setting in build.gradle.
-#
-# For more details, see
-#   http://developer.android.com/guide/developing/tools/proguard.html
 
-# If your project uses WebView with JS, uncomment the following
-# and specify the fully qualified class name to the JavaScript interface
-# class:
-#-keepclassmembers class fqcn.of.javascript.interface.for.webview {
-#   public *;
-#}
+#####方法名等混淆指定配置
+-obfuscationdictionary ../proguard_keywords.txt
+#####类名混淆指定配置
+-classobfuscationdictionary ../proguard_keywords.txt
+#####包名混淆指定配置
+-packageobfuscationdictionary ../proguard_keywords.txt
 
-# Uncomment this to preserve the line number information for
-# debugging stack traces.
-#-keepattributes SourceFile,LineNumberTable
+-optimizationpasses 5
 
-# If you keep the line number information, uncomment this to
-# hide the original source file name.
-#-renamesourcefileattribute SourceFile
--assumenosideeffects class cn.vove7.vtp.log.Vog {
+# 混淆时不使用大小写混合，混淆后的类名为小写
+-dontusemixedcaseclassnames
 
-public ... v(...);
-public ... i(...);
-public ... w(...);
-public ... d(...);
-public ... e(...);
-public ... a(...);
 
+# LoggerKt.logd$default
+# 指定不去忽略非公共的库的类
+-dontskipnonpubliclibraryclasses
+
+# 指定不去忽略非公共的库的类的成员
+-dontskipnonpubliclibraryclassmembers
+# 不做预校验，preverify是proguard的4个步骤之一
+# Android不需要preverify，去掉这一步可加快混淆速度
+
+
+# 有了verbose这句话，混淆后就会生成映射文件
+# 包含有类名->混淆后类名的映射关系
+# 然后使用printmapping指定映射文件的名称
+-verbose
+-printmapping proguardMapping.txt
+
+# 指定混淆时采用的算法，后面的参数是一个过滤器
+# 这个过滤器是谷歌推荐的算法，一般不改变
+-optimizations !code/simplification/arithmetic,!field/*,!class/merging/*
+
+# 保护代码中的Annotation不被混淆，这在JSON实体映射时非常重要，比如fastJson
+-keepattributes *Annotation*
+
+# 避免混淆泛型，这在JSON实体映射时非常重要，比如fastJson
+-keepattributes Signature
+
+#抛出异常时保留代码行号，在异常分析中可以方便定位
+-keepattributes SourceFile,LineNumberTable
+-dontskipnonpubliclibraryclasses
+#用于告诉ProGuard，不要跳过对非公开类的处理。默认情况下是跳过的，因为程序中不会引用它们，有些情况下人们编写的代码与类库中的类在同一个包下，并且对包中内容加以引用，此时需要加入此条声明。
+
+-dontusemixedcaseclassnames
+#，这个是给Microsoft Windows用户的，因为ProGuard假定使用的操作系统是能区分两个只是大小写不同的文件名，但是Microsoft Windows不是这样的操作系统，所以必须为ProGuard指定-dontusemixedcaseclassnames选项
+# 枚举类不能被混淆
+-keepclassmembers enum * {
+    public static **[] values();
+    public static ** valueOf(java.lang.String);
 }
+# 保留Parcelable序列化的类不能被混淆
+-keep class * implements android.os.Parcelable{
+    public static final android.os.Parcelable$Creator *;
+}
+
+# 对R文件下的所有类及其方法，都不能被混淆
+-keepclassmembers class **.R$* {
+    *;
+}
+# 移除android 所有log
+-assumenosideeffects class cn.daqinjia.android.common.LoggerKt{
+    public static *** logv(...);
+    public static *** log(...);
+    public static *** logd(...);
+    public static *** loge(...);
+    public static *** logi(...);
+    public static *** logw(...);
+}
+
+-assumenosideeffects class cn.vove7.vtp.log.Vog {
+    public static *** v(...);
+    public static *** i(...);
+    public static *** w(...);
+    public static *** d(...);
+    public static *** e(...);
+    public static *** a(...);
+}
+
+-keep class com.google.android.material.* {*;}
+-keep class androidx.** {*;}
+-keep interface androidx.** {*;}
+
+-keep public class * extends androidx.**
+-dontnote com.google.android.material.**
+-dontwarn androidx.**
+
+-flattenpackagehierarchy
+#-allowaccessmodification
+-keepattributes Exceptions,InnerClasses,Signature,LineNumberTable
+-dontskipnonpubliclibraryclassmembers
+-ignorewarnings
+
+
+#kotlin
+-keep class kotlin.** { *; }
+-keep class kotlin.Metadata { *; }
+-dontwarn kotlin.**
+-keepclassmembers class **$WhenMappings {
+    <fields>;
+}
+
+-keepclassmembers class kotlin.Metadata {
+    public <methods>;
+}
+
+-assumenosideeffects class kotlin.jvm.internal.Intrinsics {
+    static void checkParameterIsNotNull(java.lang.Object, java.lang.String);
+}
+
+-keepclasseswithmembernames class * {
+    native <methods>;
+}
+-keep class **.R$* {*;}
+-keepclassmembers enum * { *;}
+-keep class * extends java.lang.Exception
+
+#Gson
+-keepattributes Exceptions,InnerClasses,Signature,Deprecated,
+                SourceFile,LineNumberTable,*Annotation*,EnclosingMethod
+-keep class com.google.gson.** {*;}
+-keepclassmembers public class com.google.gson.** {public private protected *;}
+
+-keepclassmembers class * {
+    @com.google.gson.annotations.SerializedName <fields>;
+}
+
+-keep class cn.vove7.smartkey.** { *; }
+-keep class com.baidu.** { *; }
+-keep class com.luajava.** { *; }
+
+-keepattributes *Annotation*
+-keepclassmembers class ** {
+    @org.greenrobot.eventbus.Subscribe <methods>;
+}
+-keep enum org.greenrobot.eventbus.ThreadMode { *; }
+
+
+-keep class cn.vove7.common.bridges.** { *; }
+-keepclassmembers public class cn.vove7.common.bridges.**
+-keep class cn.vove7.common.net.model.** { *; }
+-keep class cn.vove7.common.app.AppConfigKt { *; }
+-keep class cn.vove7.common.app.AppConfig { *; }
+-keep class cn.vove7.common.view.finder.** { *; }
+-keepclassmembers public class cn.vove7.common.view.finder.**
+
+-keep class cn.vove7.common.model.** { *; }
+-keep class cn.vove7.common.accessibility.** { *; }
+-keep class cn.vove7.common.appbus.AppBus { *; }
+-keep class cn.vove7.vtp.text.TextTransHelper { *; }
+-keep class cn.vove7.vtp.sharedpreference.SpHelper { *; }
+-keep class cn.vove7.common.utils.TextHelper { *; }
+-keep class cn.vove7.common.utils.TextDateParser { *; }
+-keep class cn.vove7.vtp.builder.BundleBuilder { *; }
+-keep class cn.vove7.executorengine.ExecutorImpl { *; }
+-keep interface cn.vove7.common.executor.CExecutorI { *; }
+
+# kt 反射属性字段
+-keep class cn.vove7.vtp.app.AppInfo { *; }
+-keep class cn.vove7.vtp.system.DeviceInfo { *; }
+
+
+-keep class cn.vove7.common.datamanager.greendao.** { *; }
+-keep class cn.vove7.androlua.** { *; }
+-keep class cn.vove7.rhino.** { *; }
+-keep class cn.vove7.common.accessibility.viewnode.** { *; }
+
+-keep class org.mozilla.** { *; }
+-keep class org.json.** { *; }
+-keepclassmembers class org.mozilla.** {
+    private <methods>;
+}
+
+-keepclassmembers class cn.vove7.executorengine.exector.ExecutorEngine
+
+-keep class okhttp3.* {*;}
+
+-keep @org.greenrobot.greendao.annotation.Entity class * { *; }
+
+-keep class * extends org.greenrobot.greendao.AbstractDao { *; }

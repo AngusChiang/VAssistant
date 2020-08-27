@@ -74,7 +74,7 @@ waitForVoiceParam = function(s){
 // 等待界面 pkg , activity  millis
 // return boolean
 waitForApp = function(pkg, activity, millis){
-    if(millis == undefined) millis = -1
+    if(millis == undefined) millis = 5000
     log(activity)
     log(millis)
     return executor.waitForApp(pkg, activity, millis)
@@ -85,7 +85,7 @@ waitForApp = function(pkg, activity, millis){
 // return ViewNode? , null if AccessibilityService is not running
  
 waitForId = function(id, millis){
-    if(millis == undefined) millis = -1
+    if(millis == undefined) millis = 3000
     return executor.waitForViewId(id, millis)
 }
 
@@ -94,7 +94,7 @@ waitForId = function(id, millis){
 // return ViewNode? , null if AccessibilityService is not running
  
 waitForDesc=function(desc,millis){
-    if(millis == undefined) millis = -1
+    if(millis == undefined) millis = 3000
     return executor.waitForDesc(desc, millis)
 }
 
@@ -102,7 +102,7 @@ waitForDesc=function(desc,millis){
 // return ViewNode? , null if AccessibilityService is not running
  
 waitForText = function(text, millis){
-    if(millis == undefined) millis = -1
+    if(millis == undefined) millis = 3000
     return executor.waitForText(text, millis)
 }
 

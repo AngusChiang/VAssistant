@@ -49,7 +49,7 @@ class App : GlobalApp() {
         }
         AndroidSettings.init(this)
         CrashHandler.install()
-        AppBus.reg(this)
+//        AppBus.reg(this)
 
         startMainServices()
         ScaffoldActivity.apply {

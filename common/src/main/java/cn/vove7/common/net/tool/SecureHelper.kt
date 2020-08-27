@@ -12,11 +12,14 @@ import java.security.MessageDigest
  * Time: 14:56
  */
 object SecureHelper {
-    private val SECRET_KEY = "vove777"
+    private val SECRET_KEY = "Nzc3ZXZvdg=="
 
     private val HEX_DIGITS = "0123456789ABCDEF".toCharArray()
 
-    fun signData(body: String?, time: Long?, key: String = SECRET_KEY): String {
+    fun signData(
+            body: String?, time: Long?,
+            key: String = base64Decoder(SECRET_KEY).reversed()
+    ): String {
         val content = (body ?: "") + time
         val md5 = MD5(content + key)
         Vog.d("加密：$content\n$md5")

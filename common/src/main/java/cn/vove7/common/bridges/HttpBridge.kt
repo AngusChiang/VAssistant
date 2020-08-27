@@ -65,15 +65,25 @@ object HttpBridge {
     }
 
     fun postJson(url: String, json: String?): String? {
+        return postJson(url, json, null)
+    }
+
+    fun postJson(url: String, json: String?, headers: Map<String, String>? = null): String? {
         runInCatch {
             Vog.d("get ---> $url \n$json")
         }
         val client = OkHttpClient.Builder()
                 .readTimeout(timeout, TimeUnit.SECONDS).build()
-        val requestBody = (json ?: "").toRequestBody("application/json; charset=utf-8".toMediaTypeOrNull())
+        val requestBody = (json
+            ?: "").toRequestBody("application/json; charset=utf-8".toMediaTypeOrNull())
 
         val request = Request.Builder().url(url)
                 .post(requestBody)
+                .apply {
+                    headers?.forEach { (t, u) ->
+                        addHeader(t, u)
+                    }
+                }
                 .build()
         val call = client.newCall(request)
         return call(call)

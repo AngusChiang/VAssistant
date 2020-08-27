@@ -15,5 +15,5 @@ print('isGlobal: ',runtime.isGlobal())//未指定 -1
 print('size of args :',args.length)
 // 输出
 args.forEach(function(v,i) {
-    print(i, v, typeof(v))
+    print(i, v)
 })

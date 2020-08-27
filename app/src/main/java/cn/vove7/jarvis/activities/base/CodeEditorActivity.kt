@@ -27,7 +27,6 @@ import cn.vove7.jarvis.R
 import cn.vove7.jarvis.tools.UriUtils
 import cn.vove7.jarvis.view.EditorFunsHelper
 import cn.vove7.jarvis.view.dialog.ProgressTextDialog
-import cn.vove7.vtp.log.Vog
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.input.input
 import kotlinx.android.synthetic.main.editor_tool_bar.*
@@ -134,7 +133,6 @@ abstract class CodeEditorActivity : BaseActivity() {
 
     private val gloLis = ViewTreeObserver.OnGlobalLayoutListener {
         val heightDiff = activityRootView.rootView.height - activityRootView.height
-        Vog.d("initView ---> $heightDiff")
         if (heightDiff > 500) {
             functions_grid.visibility = View.GONE
         }
@@ -199,6 +197,9 @@ abstract class CodeEditorActivity : BaseActivity() {
                             runArgs = charSequence.toString()
                             GlobalApp.toastInfo("参数已设置")
                         }.positiveButton()
+                        .negativeButton(text = "清空") {
+                            runArgs = null
+                        }
                         .show()
             }
 

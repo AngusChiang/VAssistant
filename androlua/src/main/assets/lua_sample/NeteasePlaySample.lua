@@ -12,7 +12,7 @@ search = ViewFinder().desc({ '搜索', 'Search' }).await()
 search.tryClick()
 
 s = ViewFinder().id('search_src_text').await()
-s.setText(args[1])
+s.setText(argMap['song'])
 
 bounds = s.getBounds() --(154, 87 - 1055, 185)[1920x1080]
 x = (bounds.left + bounds.right) / 2

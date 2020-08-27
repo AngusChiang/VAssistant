@@ -81,7 +81,7 @@ end
 function waitForApp(pkg, ...)
     local ps = { ... }
     local activity
-    local millis = -1
+    local millis = 5000
     if (#ps == 1) then
         if (type(ps[1]) == 'string') then
             activity = ps[1]
@@ -103,7 +103,7 @@ end
  ]]
 function waitForId(id, ...)
     local ps = { ... }
-    local millis = -1
+    local millis = 3000
     if (#ps == 1) then
         millis = ps[1]
     end
@@ -116,7 +116,7 @@ end
  ]]
 function waitForDesc(desc, ...)
     local ps = { ... }
-    local millis = -1
+    local millis = 3000
     if (#ps == 1) then
         millis = ps[1]
     end
@@ -128,7 +128,7 @@ end
  ]]
 function waitForText(text, ...)
     local ps = { ... }
-    local millis = -1
+    local millis = 3000
     if (#ps == 1) then
         millis = ps[1]
     end

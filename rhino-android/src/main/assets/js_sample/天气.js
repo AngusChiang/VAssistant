@@ -10,10 +10,10 @@ function outData(weatherData) {
     // if (command.indexOf('今天') != -1)
     //     data = weatherData.forecast[0]
     // else
-    var isYesToday = false
+    var isYesterday = false
     if (command.indexOf('昨天') != -1) {
         data = weatherData.yesterday
-        isYesToday = true
+        isYesterday = true
     } else if (command.indexOf('明天') != -1)
         data = weatherData.forecast[1]
     else if (command.indexOf('大后天') != -1)
@@ -23,7 +23,7 @@ function outData(weatherData) {
     else
         data = weatherData.forecast[0]
     var wt;
-    if (isYesToday) {
+    if (isYesterday) {
         wt = data.date + ',' + data.type + ',' + data.low + ' - ' + data.high
             + ', ' + data.fx + data.fl.replace('<![CDATA[','').replace(']]>','')
     } else
