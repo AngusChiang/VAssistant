@@ -115,7 +115,13 @@ class SettingsActivity : ReturnableActivity() {
                             summary = "可能某些蓝牙设备无效",
                             keyId = R.string.key_bt_support,
                             defaultValue = true
-                    )
+                    ),
+                    CheckBoxItem(
+                            title = "离线支持",
+                            summary = "在出现10012错误时请关闭",
+                            keyId = R.string.key_baidu_enable_offline,
+                            defaultValue = true
+                    ),
             )),
             SettingGroupItem(R.color.cyan_500, titleS = "语音唤醒", childItems = listOf(
                     SwitchItem(

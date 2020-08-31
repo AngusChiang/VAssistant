@@ -48,6 +48,8 @@ object AppConfig : BaseConfig {
 
     val wakeupScreenWhenVw by noCacheKey(true, R.string.key_wakeup_screen_when_vw)
 
+    val enableOffline by smartKey(true, R.string.key_baidu_enable_offline)
+
     //api 修改
     @JvmStatic
     var connectiveService by noCacheKey(false, R.string.key_connective_service)

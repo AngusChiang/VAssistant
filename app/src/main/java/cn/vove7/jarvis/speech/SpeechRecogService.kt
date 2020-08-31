@@ -47,7 +47,8 @@ abstract class SpeechRecogService(val event: RecogEvent) : SpeechRecogI {
             by lazy { WakeupStatusAnimation() }
     private val audioManager: AudioManager
         get() = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
-    abstract var enableOffline: Boolean
+
+    abstract val enableOffline: Boolean
 
     var isListening = false
 

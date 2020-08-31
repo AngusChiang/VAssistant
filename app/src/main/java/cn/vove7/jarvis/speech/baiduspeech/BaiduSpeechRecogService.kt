@@ -38,7 +38,7 @@ class BaiduSpeechRecogService(event: RecogEvent) : SpeechRecogService(event) {
     /**
      * 本Activity中是否需要调用离线命令词功能。根据此参数，判断是否需要调用SDK的ASR_KWS_LOAD_ENGINE事件
      */
-    override var enableOffline = true
+    override val enableOffline get() = AppConfig.enableOffline
 
     init {
         if (enableOffline) {

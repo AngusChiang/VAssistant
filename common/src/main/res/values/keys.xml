@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="key_resume_bkg_music" translatable="false">resume_bkg_music</string>
+    <string name="key_reco_when_wakeup_assist" translatable="false">reco_when_wakeup_assist</string>
+    <string name="key_use_assist_service" translatable="false">use_assist_service</string>
+    <string name="key_exec_failed_voice_feedback" translatable="false">exec_failed_voice_feedback</string>
+    <string name="key_voice_recog_feedback" translatable="false">voice_recog_feedback</string>
+    <string name="key_voice_recog_feedback_bt" translatable="false">voice_recog_feedback_bt</string>
+    <string name="key_exec_succ_feedback" translatable="false">exec_succ_feedback</string>
+    <string name="key_user_wakeup_word" translatable="false">user_wakeup_word</string>
+    <string name="key_fix_voice_micro" translatable="false">fix_voice_micro</string>
+    <string name="key_close_wakeup_notification" translatable="false">close_wakeup_notification</string>
+    <string name="key_remove_ad_power_saving_mode" translatable="false">remove_ad_power_saving_mode</string>
+    <string name="key_accessibility_service_power_saving_mode" translatable="false">accessibility_service_power_saving_mode</string>
+    <string name="key_translate_languages" translatable="false">translate_languages</string>
+    <string name="key_lasting_voice_command" translatable="false">lasting_voice_command</string>
+    <string name="key_auto_check_plugin_update" translatable="false">auto_check_plugin_update</string>
+    <string name="key_smart_find_and_kill_ad" translatable="false">smart_find_and_kill_ad</string>
+    <string name="key_float_voice_align" translatable="false">float_voice_align</string>
+    <string name="key_voice_recog_compatible_mode" translatable="false">voice_recog_compatible_mode</string>
+    <string name="key_text_ocr_key" translatable="false">text_ocr_key</string>
+    <string name="key_chat_str" translatable="false">chat_str</string>
+
+    <string name="key_open_chat_system" translatable="false">open_chat_system</string>
+    <string name="key_show_access_nav_button" translatable="false">show_access_nav_button</string>
+    <string name="key_open_voice_wakeup_if_auto_sleep" translatable="false">open_voice_wakeup_if_auto_sleep</string>
+    <string name="key_continuous_dialogue" translatable="false">continuous_dialogue</string>
+    <string name="key_chat_system_type" translatable="false">chat_system_type</string>
+    <string name="key_home_fun" translatable="false">home_fun</string>
+    <string name="key_home_system_config" translatable="false">home_system_config</string>
+    <string name="key_home_system_user_command" translatable="false">home_system_user_command</string>
+    <string name="key_home_system" translatable="false">home_system</string>
+    <string name="key_panel_style" translatable="false">panel_style</string>
+    <string name="key_notify_wp_on_screen_off" translatable="false">notify_wp_on_screen_off</string>
+    <string name="key_dev_mode" translatable="false">dev_mode</string>
+
+    <string name="key_auto_open_as_with_root" translatable="false">auto_open_as_with_root</string>
+    <string name="key_auto_open_aas_with_root" translatable="false">auto_open_aas_with_root</string>
+    <string name="key_auto_set_assistant_app" translatable="false">auto_set_assistant_app</string>
+    <string name="key_volume_wakeup_when_screen_off" translatable="false">volume_wakeup_when_screen_off</string>
+    <string name="key_auto_sleep_wakeup_duration" translatable="false">auto_sleep_wakeup_duration</string>
+
+    <string name="key_open_response_word" translatable="false">open_response_word</string>
+    <string name="key_response_word" translatable="false">response_word</string>
+    <string name="key_speak_response_word_on_voice_wakeup" translatable="false">speak_response_word_on_voice_wakeup</string>
+    <string name="key_stream_of_syn_output" translatable="false">stream_of_syn_output</string>
+
+    <string name="key_auto_open_voice_wakeup_charging" translatable="false">auto_open_voice_wakeup_charging</string>
+    <string name="key_use_smartopen_if_parse_failed" translatable="false">use_smartopen_if_parse_failed</string>
+    <string name="key_cloud_service_parse" translatable="false">cloud_service_parse</string>
+    <string name="key_only_cloud_service_parse" translatable="false">only_cloud_service_parse</string>
+    <string name="key_wakeup_file_path" translatable="false">wakeup_file_path</string>
+
+    <string name="key_user_exp_plan" translatable="false">user_exp_plan</string>
+    <string name="key_last_sync_global_date" translatable="false">last_sync_global_date</string>
+    <string name="key_last_sync_in_app_date" translatable="false">last_sync_in_app_date</string>
+    <string name="key_last_sync_marked_contact_date" translatable="false">last_sync_marked_contact_date</string>
+    <string name="key_last_sync_marked_app_date" translatable="false">last_sync_marked_app_date</string>
+    <string name="key_last_sync_marked_open_date" translatable="false">last_sync_marked_open_date</string>
+    <string name="key_last_sync_marked_ad_date" translatable="false">last_sync_marked_ad_date</string>
+
+    <string name="key_login_info" translatable="false">login_info</string>
+    <string name="key_long_key_press_delay" translatable="false">long_key_press_delay</string>
+    <string name="key_wakeup_with_headsethook" translatable="false">wakeup_with_headsethook</string>
+    <string name="key_show_prompt_inapp_as_global_dialog" translatable="false">show_prompt_inapp_as_global_dialog</string>
+    <string name="key_long_press_volume_up_wake_up" translatable="false">long_press_volume_up_wake_up</string>
+
+    <string name="key_show_toast_when_remove_ad" translatable="false">show_toast_when_remove_ad</string>
+    <string name="key_vibrate_reco_begin" translatable="false">vibrate_reco_begin</string>
+    <string name="key_vibrate_reco_effect" translatable="false">vibrate_reco_effect</string>
+    <string name="key_voice_syn_model" translatable="false">voice_syn_model</string>
+    <string name="key_open_ad_block" translatable="false">open_ad_block</string>
+    <string name="key_ad_wait_secs" translatable="false">ad_wait_secs</string>
+    <string name="key_voice_control_dialog" translatable="false">voice_control_dialog</string>
+    <string name="key_open_voice_wakeup" translatable="false">open_voice_wakeup</string>
+    <string name="key_voice_syn_speed" translatable="false">voice_syn_speed</string>
+    <string name="key_voice_syn_volume" translatable="false">voice_syn_volume</string>
+
+
+    <string name="key_speech_engine_type" translatable="false">speech_engine_type</string>
+    <string name="key_open_app_compat" translatable="false">open_app_compat</string>
+    <string name="key_xunfei_speech_key" translatable="false">xunfei_speech_key</string>
+    <string name="key_recog_wait_duration" translatable="false">recog_wait_duration</string>
+
+    <string name="key_extension_power_indicator" translatable="false">extension_power_indicator</string>
+
+
+    <string name="key_full_power_hint_text" translatable="false">full_power_hint_text</string>
+    <string name="key_low_power_hint_text" translatable="false">low_power_hint_text</string>
+    <string name="key_charging_hint_text" translatable="false">charging_hint_text</string>
+
+
+    <string name="key_default_fp_animation" translatable="false">default_fp_animation</string>
+    <string name="key_default_fp_radius" translatable="false">default_fp_radius</string>
+    <string name="key_default_fp_color" translatable="false">default_fp_color</string>
+    <string name="key_default_fp_text_color" translatable="false">default_fp_text_color</string>
+
+    <string name="key_align_fp_bg_color" translatable="false">align_fp_bg_color</string>
+    <string name="key_align_fp_orientation" translatable="false">align_fp_orientation</string>
+    <string name="key_align_fp_text_color" translatable="false">align_fp_text_color</string>
+    <string name="key_align_fp_vertical" translatable="false">align_fp_vertical</string>
+    <string name="key_align_fp_left_padding" translatable="false">align_fp_left_padding</string>
+
+
+    <string name="key_connective_service" translatable="false">connective_service</string>
+    <string name="key_wakeup_screen_when_vw" translatable="false">key_wakeup_screen_when_vw</string>
+    <string name="key_device_name" translatable="false">device_name</string>
+
+    <string name="key_rokid_send_loc" translatable="false">rokid_send_loc</string>
+    <string name="key_bt_support" translatable="false">bt_support</string>
+    <string name="key_baidu_enable_offline" translatable="false">baidu_enable_offline</string>
+
+</resources>
