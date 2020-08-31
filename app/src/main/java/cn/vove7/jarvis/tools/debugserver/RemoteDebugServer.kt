@@ -205,7 +205,7 @@ object RemoteDebugServer : Runnable {
         launch {
             val action: RemoteAction
             try {
-                action = Gson().fromJson<RemoteAction>(actionJson, RemoteAction::class.java)
+                action = Gson().fromJson(actionJson, RemoteAction::class.java)
             } catch (e: Exception) {
                 GlobalLog.err(e)
                 print.onPrint(0, "发生错误${e.message}")

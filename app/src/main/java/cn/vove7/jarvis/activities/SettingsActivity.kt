@@ -537,9 +537,13 @@ class SettingsActivity : ReturnableActivity() {
     }
 
     private fun setPathAndReload(path: String) {
-        val userFile = File(filesDir, "user_wakeup.bin")
-        File(path).copyTo(userFile, true)
-        AppConfig.wakeUpFilePath = userFile.absolutePath
+        AppConfig.wakeUpFilePath = if (!path.startsWith("asset")) {
+            val userFile = File(filesDir, "user_wakeup.bin")
+            File(path).copyTo(userFile, true)
+            userFile.absolutePath
+        } else {
+            path
+        }
         if (AppConfig.voiceWakeup) {
             GlobalApp.toastInfo("正在重载配置")
             Handler().postDelayed({
