@@ -70,12 +70,12 @@
 }
 
 -assumenosideeffects class cn.vove7.vtp.log.Vog {
-    public static *** v(...);
-    public static *** i(...);
-    public static *** w(...);
-    public static *** d(...);
-    public static *** e(...);
-    public static *** a(...);
+    public *** v(...);
+    public *** i(...);
+    public *** w(...);
+    public *** d(...);
+    public *** e(...);
+    public *** a(...);
 }
 
 -keep class com.google.android.material.* {*;}
