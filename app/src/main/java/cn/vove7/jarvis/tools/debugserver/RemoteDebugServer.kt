@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.Handler
 import android.os.Looper
 import android.widget.Toast
+import androidx.annotation.Keep
 import cn.vove7.androlua.LuaHelper
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.app.GlobalLog
@@ -265,9 +266,14 @@ object RemoteDebugServer : Runnable {
     }
 }
 
+@Keep
 class RemoteAction(
+        @Keep
         val action: String,
+        @Keep
         val type: String?,
+        @Keep
         val text: String?,
+        @Keep
         val extra: String?
 )

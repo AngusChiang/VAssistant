@@ -1,5 +1,6 @@
 package cn.vove7.jarvis.chat
 
+import androidx.annotation.Keep
 import cn.vove7.common.app.AppConfig
 import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.bridges.HttpBridge
@@ -107,8 +108,11 @@ class Location {
 class InputText(var text: String)
 class InputImage(var url: String)
 
+@Keep
 class ResponseData : ChatResultBuilder {
+    @Keep
     var intent: Inten? = null
+    @Keep
     var results: List<Results>? = null
     fun parseError(): String? {
         hashMapOf(
@@ -164,10 +168,15 @@ class ResponseData : ChatResultBuilder {
 }
 
 
+@Keep
 class Results {
+    @Keep
     var groupType: Int = 0
+    @Keep
     var resultType: String? = null
+    @Keep
     var values: Values? = null
+    @Keep
     var emotion: Emotion? = null
 
     companion object {
@@ -177,27 +186,41 @@ class Results {
     }
 }
 
+@Keep
 class Emotion {
 //robotEmotion
     //userEmotion
 }
 
+@Keep
 class Values {
+    @Keep
     var text: String? = null
+    @Keep
     var news: Array<New> = arrayOf()
+    @Keep
     var url: String? = null
 
+    @Keep
     class New {
+        @Keep
         var name: String = ""
+        @Keep
         var icon: String = ""
+        @Keep
         var info: String? = null
+        @Keep
         var source: String? = null
+        @Keep
         var detailurl: String = ""
     }
 }
-
+@Keep
 class Inten {
+    @Keep
     var code: Int = 0
+    @Keep
     var intentName: String? = null
+    @Keep
     var actionName: String? = null
 }
