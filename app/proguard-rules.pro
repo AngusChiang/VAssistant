@@ -61,12 +61,20 @@
 }
 # 移除android 所有log
 -assumenosideeffects class cn.daqinjia.android.common.LoggerKt{
-    public static *** logv(...);
-    public static *** log(...);
-    public static *** logd(...);
-    public static *** loge(...);
-    public static *** logi(...);
-    public static *** logw(...);
+    public static *** logv$default(...);
+    public static *** log$default(...);
+    public static *** logd$default(...);
+    public static *** loge$default(...);
+    public static *** logi$default(...);
+    public static *** logw$default(...);
+}
+-assumenosideeffects class cn.daqinjia.android.common.Logger {
+    public *** logv(...);
+    public *** log(...);
+    public *** logd(...);
+    public *** loge(...);
+    public *** logi(...);
+    public *** logw(...);
 }
 
 -assumenosideeffects class cn.vove7.vtp.log.Vog {
