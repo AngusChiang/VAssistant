@@ -2,6 +2,7 @@ package cn.vove7.jarvis.work
 
 import android.content.Context
 import androidx.work.*
+import cn.daqinjia.android.common.logi
 import cn.vove7.common.app.AppConfig
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.app.GlobalLog
@@ -10,7 +11,6 @@ import cn.vove7.jarvis.services.MainService
 import cn.vove7.jarvis.tools.AppNotification
 import cn.vove7.jarvis.tools.DataUpdator
 import cn.vove7.quantumclock.QuantumClock
-import cn.vove7.vtp.log.Vog
 import kotlinx.coroutines.runBlocking
 import java.util.*
 import java.util.concurrent.TimeUnit
@@ -27,7 +27,7 @@ class DataSyncWork(context: Context, workerParams: WorkerParameters) : Worker(co
     companion object {
         fun getRequest(): WorkRequest = PeriodicWorkRequest
                 .Builder(DataSyncWork::class.java,
-                        AppConfig.netConfig("dataSyncInterval", 30L), TimeUnit.MINUTES)
+                        AppConfig.netConfig("dataSyncInterval", 60L), TimeUnit.MINUTES)
                 .setConstraints(
                         Constraints.Builder()
                                 .setRequiresBatteryNotLow(true)
@@ -53,7 +53,7 @@ class DataSyncWork(context: Context, workerParams: WorkerParameters) : Worker(co
             return Result.success()
         }
 
-        GlobalLog.log("数据同步")
+        ("数据同步").logi()
         AppConfig.fetchNetConfig()
         AppConfig.checkAppUpdate(GlobalApp.APP, false, onUpdate)
 
@@ -69,14 +69,17 @@ class DataSyncWork(context: Context, workerParams: WorkerParameters) : Worker(co
                             }
                     )
                 } else {
-                    GlobalLog.log("暂未更新")
+                    ("暂未更新").logi()
                 }
             }
         }
         runBlocking {
             val job = QuantumClock.sync()
             job.invokeOnCompletion { e ->
-                GlobalLog.log("时间同步完成 ${QuantumClock.nowDate} $e")
+                if (e != null) {
+                    GlobalLog.err(e)
+                }
+                ("时间同步完成 ${QuantumClock.nowDate} $e").logi()
             }
             job.join()
         }
