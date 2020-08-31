@@ -10,6 +10,7 @@ import android.os.Handler
 import android.view.KeyEvent
 import android.view.View
 import android.widget.TextView
+import cn.daqinjia.android.common.logi
 import cn.vove7.common.accessibility.AccessibilityApi
 import cn.vove7.common.app.AppConfig
 import cn.vove7.common.app.GlobalApp
@@ -33,6 +34,7 @@ import com.afollestad.materialdialogs.callbacks.onCancel
 import com.afollestad.materialdialogs.callbacks.onDismiss
 import com.afollestad.materialdialogs.customview.customView
 import kotlinx.android.synthetic.main.activity_expandable_settings.*
+import java.io.File
 
 /**
  *
@@ -109,7 +111,7 @@ class SettingsActivity : ReturnableActivity() {
                             defaultValue = true
                     ),
                     CheckBoxItem(
-                            title="蓝牙设备支持",
+                            title = "蓝牙设备支持",
                             summary = "可能某些蓝牙设备无效",
                             keyId = R.string.key_bt_support,
                             defaultValue = true
@@ -150,8 +152,7 @@ class SettingsActivity : ReturnableActivity() {
                             summary = "息屏时弹出语音唤醒关闭通知",
                             defaultValue = AppConfig.notifyWpOnScreenOff,
                             keyId = R.string.key_notify_wp_on_screen_off
-                    )
-                    ,
+                    ),
                     CheckBoxItem(
                             title = "亮屏开启唤醒",
                             summary = "自动休眠后，开屏自动打开语音唤醒",
@@ -447,6 +448,7 @@ class SettingsActivity : ReturnableActivity() {
         if (resultCode == Activity.RESULT_OK && requestCode == 1) {//选择文件回调
             val uri = data?.data
             if (uri != null) {
+                uri.logi()
                 try {
                     val path = UriUtils.getPathFromUri(this, uri)
                     when {
@@ -530,7 +532,9 @@ class SettingsActivity : ReturnableActivity() {
     }
 
     private fun setPathAndReload(path: String) {
-        AppConfig.wakeUpFilePath = path
+        val userFile = File(filesDir, "user_wakeup.bin")
+        File(path).copyTo(userFile, true)
+        AppConfig.wakeUpFilePath = userFile.absolutePath
         if (AppConfig.voiceWakeup) {
             GlobalApp.toastInfo("正在重载配置")
             Handler().postDelayed({
