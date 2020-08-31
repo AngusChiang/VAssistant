@@ -51,14 +51,13 @@ class SettingsActivity : ReturnableActivity() {
         val expandableListView = expand_list
         expandableListView.setAdapter(SettingsExpandableAdapter(this, initData(), expandableListView))
 
-        try {
-            expandableListView?.post {
+        expandableListView?.post {
+            kotlin.runCatching {
                 expandableListView.apply {
                     expandGroup(0)
                     expandGroup(2)
                 }
             }
-        } catch (e: Exception) {
         }
     }
 
