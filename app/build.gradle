@@ -12,6 +12,10 @@ if (localPropertiesFile.exists()) {
     }
 }
 android {
+    lintOptions {
+        checkReleaseBuilds false
+        abortOnError false
+    }
     compileSdkVersion 29
 
     defaultConfig {
