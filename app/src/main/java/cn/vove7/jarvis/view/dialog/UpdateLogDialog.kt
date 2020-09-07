@@ -7,9 +7,7 @@ import cn.vove7.bottomdialog.builder.buttons
 import cn.vove7.bottomdialog.extension.awesomeHeader
 import cn.vove7.common.model.UserInfo
 import cn.vove7.common.utils.spanColor
-import cn.vove7.jarvis.App
 import cn.vove7.jarvis.R
-import cn.vove7.jarvis.view.dialog.contentbuilder.MarkdownContentBuilder
 import cn.vove7.jarvis.view.dialog.contentbuilder.markdownContent
 import cn.vove7.jarvis.view.positiveButtonWithColor
 import cn.vove7.quantumclock.QuantumClock

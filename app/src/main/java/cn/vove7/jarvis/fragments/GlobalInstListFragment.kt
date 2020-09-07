@@ -19,6 +19,8 @@ import cn.vove7.jarvis.activities.OnSyncInst
 import cn.vove7.jarvis.adapters.ListViewModel
 import cn.vove7.jarvis.adapters.SimpleListAdapter
 import cn.vove7.jarvis.tools.DataUpdator
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 /**
  *
@@ -41,14 +43,9 @@ class GlobalInstListFragment : SimpleListFragment<ActionNode>(), OnSyncInst {
                 override fun onClick(holder: SimpleListAdapter.VHolder?, pos: Int, item: ListViewModel<ActionNode>) {
                     //显示详情
                     val node = item.extra
-
                     val intent = Intent(context, InstDetailActivity::class.java)
                     intent.putExtra("nodeId", node.id)
                     startActivityForResult(intent, 1)
-//                InstDetailFragment(node) {
-//                    ParseEngine.updateGlobal()
-//                    refresh()
-//                }.show(activity?.supportFragmentManager, "inst_detail")
                 }
             }
 
@@ -68,11 +65,15 @@ class GlobalInstListFragment : SimpleListFragment<ActionNode>(), OnSyncInst {
         }
         showProgressBar()
 
-        DataUpdator.syncGlobalInst {
-            hideProgressBar()
-            if (it) {
+        launchIO {
+            if(DataUpdator.syncGlobalInst()){
                 GlobalApp.toastSuccess("同步完成")
-                refresh()
+                withContext(Dispatchers.Main) {
+                    refresh()
+                }
+            }
+            withContext(Dispatchers.Main){
+                hideProgressBar()
             }
         }
     }

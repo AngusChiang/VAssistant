@@ -1,5 +1,6 @@
-package cn.vove7.jarvis
+package cn.vove7.jarvis.app
 
+import android.app.Activity
 import android.content.ContentProvider
 import android.content.ContentValues
 import android.content.Intent
@@ -7,18 +8,18 @@ import android.content.pm.PackageManager
 import android.database.Cursor
 import android.net.Uri
 import android.os.Build
-import android.util.Log
 import androidx.work.WorkManager
 import cn.daqinjia.android.common.ext.delayRun
+import cn.daqinjia.android.scaffold.app.ActivityManager
+import cn.daqinjia.android.scaffold.app.ActivityStatus
 import cn.daqinjia.android.scaffold.ui.base.ScaffoldActivity
 import cn.vove7.bottomdialog.builder.BottomDialogBuilder
 import cn.vove7.common.app.AppConfig
 import cn.vove7.common.app.GlobalApp
-import cn.vove7.common.appbus.AppBus
 import cn.vove7.common.helper.AdvanAppHelper
-import cn.vove7.common.net.tool.md5
 import cn.vove7.common.utils.md5
 import cn.vove7.common.utils.runOnNewHandlerThread
+import cn.vove7.jarvis.R
 import cn.vove7.jarvis.plugins.PowerListener
 import cn.vove7.jarvis.receivers.AppInstallReceiver
 import cn.vove7.jarvis.receivers.PowerEventReceiver
@@ -32,9 +33,9 @@ import cn.vove7.jarvis.work.DataSyncWork
 import cn.vove7.quantumclock.QuantumClock
 import cn.vove7.smartkey.android.AndroidSettings
 import cn.vove7.vtp.log.Vog
+import cn.vove7.vtp.weaklazy.weakLazy
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import org.greenrobot.eventbus.Subscribe
 import kotlin.system.exitProcess
 
 
@@ -42,13 +43,13 @@ import kotlin.system.exitProcess
 class App : GlobalApp() {
 
     override fun onCreate() {
+        CrashHandler.install()
         super.onCreate()
         if (!isMainProcess) {
             Vog.d("非主进程")
             return
         }
         AndroidSettings.init(this)
-        CrashHandler.install()
 
         startMainServices()
         ScaffoldActivity.apply {
@@ -111,6 +112,7 @@ class InitCp : ContentProvider() {
         }
         return true
     }
+
     class a {
         fun c() = GlobalScope.launch {
             val pm = GlobalApp.APP.packageManager

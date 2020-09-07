@@ -6,9 +6,6 @@ import cn.vove7.bottomdialog.builder.BottomDialogBuilder
 import cn.vove7.bottomdialog.builder.buttons
 import cn.vove7.bottomdialog.extension.awesomeHeader
 import cn.vove7.common.app.AppConfig
-import cn.vove7.jarvis.App
-import cn.vove7.jarvis.R
-import cn.vove7.jarvis.view.dialog.contentbuilder.MarkdownContentBuilder
 import cn.vove7.jarvis.view.dialog.contentbuilder.markdownContent
 import cn.vove7.jarvis.view.positiveButtonWithColor
 import cn.vove7.vtp.sharedpreference.SpHelper

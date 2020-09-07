@@ -1,19 +1,22 @@
 package cn.vove7.jarvis.view.dialog
 
 import android.content.Context
-import com.google.android.material.textfield.TextInputLayout
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.app.log
 import cn.vove7.common.model.UserInfo
-import cn.vove7.common.net.ApiUrls
-import cn.vove7.common.net.WrapperNetHelper
 import cn.vove7.common.net.tool.SecureHelper
 import cn.vove7.common.utils.TextHelper
 import cn.vove7.jarvis.R
+import cn.vove7.jarvis.app.AppApi
 import cn.vove7.jarvis.tools.AppLogic
 import cn.vove7.jarvis.view.checkEmpty
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.customview.customView
+import com.google.android.material.textfield.TextInputLayout
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 /**
  * # ModifyUserMailDialog
@@ -53,31 +56,36 @@ class ModifyUserMailDialog(val context: Context, val onUpdate: () -> Unit) {
         }
 
         pass = SecureHelper.MD5(pass)
-
         //包装信息
-        val info = UserInfo().apply { setUserId(UserInfo.getUserId());userPass = pass; setEmail(newMailAddress) }
-
+        val info = UserInfo().apply {
+            setUserId(UserInfo.getUserId())
+            userPass = pass
+            setEmail(newMailAddress)
+        }
         val p = ProgressDialog(context)
-        WrapperNetHelper.postJson<Any>(ApiUrls.MODIFY_MAIL, info) {
-            success { _, b ->
-                if (b.isOk()) {
-                    GlobalApp.toastSuccess(R.string.text_modify_succ)
-                    val newInfo = UserInfo.INSTANCE.apply {
-                        setEmail(newMailAddress)
+        GlobalScope.launch(Dispatchers.IO) {
+            kotlin.runCatching {
+                AppApi.modifyMail(info)
+            }.onSuccess { b ->
+                withContext(Dispatchers.Main) {
+                    if (b.isOk()) {
+                        GlobalApp.toastSuccess(R.string.text_modify_succ)
+                        val newInfo = UserInfo.INSTANCE.apply {
+                            setEmail(newMailAddress)
+                        }
+                        AppLogic.onLogin(newInfo)
+                        onUpdate.invoke()
+                        dialog.dismiss()
+                    } else {
+                        GlobalApp.toastError(b.message)
                     }
-                    AppLogic.onLogin(newInfo)
-                    onUpdate.invoke()
-                    dialog.dismiss()
-                } else {
-                    GlobalApp.toastError(b.message)
                 }
-            }
-            fail { _, e ->
+            }.onFailure { e ->
                 e.log()
                 GlobalApp.toastError(e.message
                     ?: context.getString(R.string.text_modify_failed))
             }
-            end {
+            withContext(Dispatchers.Main) {
                 p.dismiss()
             }
         }

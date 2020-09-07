@@ -6,6 +6,7 @@ import android.app.Dialog
 import android.content.DialogInterface
 import android.content.Intent
 import android.os.SystemClock
+import cn.vove7.common.BuildConfig
 import cn.vove7.common.MessageException
 import cn.vove7.common.accessibility.AccessibilityApi
 import cn.vove7.common.app.AppConfig
@@ -51,7 +52,7 @@ import cn.vove7.common.interfaces.SpeakCallback
 import cn.vove7.common.model.RequestPermission
 import cn.vove7.common.model.UserInfo
 import cn.vove7.common.model.VoiceRecogResult
-import cn.vove7.common.net.WrapperNetHelper
+import cn.vove7.common.net.model.RequestParseModel
 import cn.vove7.common.utils.*
 import cn.vove7.common.utils.CoroutineExt.launch
 import cn.vove7.common.utils.RegUtils.checkCancel
@@ -64,6 +65,7 @@ import cn.vove7.executorengine.parse.ParseEngine
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.activities.PermissionManagerActivity
 import cn.vove7.jarvis.activities.TextOcrActivity
+import cn.vove7.jarvis.app.AppApi
 import cn.vove7.jarvis.chat.ChatSystem
 import cn.vove7.jarvis.chat.TulingChatSystem
 import cn.vove7.jarvis.receivers.ScreenStatusListener
@@ -86,10 +88,7 @@ import cn.vove7.jarvis.view.statusbar.ExecuteAnimation
 import cn.vove7.jarvis.view.statusbar.ListeningAnimation
 import cn.vove7.jarvis.view.statusbar.ParseAnimation
 import cn.vove7.vtp.log.Vog
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.SubscriberExceptionEvent
 import org.greenrobot.eventbus.ThreadMode
@@ -1033,10 +1032,16 @@ object MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
         }
     }
 
-    @Subscribe(threadMode = ThreadMode.BACKGROUND)
-    fun upHis(his: CommandHistory) {
-        WrapperNetHelper.uploadUserCommandHistory(his)
+    @Subscribe
+    fun uploadUserCommandHistory(his: CommandHistory) {
+        if (BuildConfig.DEBUG || !AppConfig.userExpPlan) return
+        GlobalScope.launch(Dispatchers.IO) {
+            kotlin.runCatching {
+                AppApi.uploadCmdHistory(his)
+            }
+        }
     }
+
 
     private var isContinousDialogue = false
 
@@ -1118,8 +1123,12 @@ object MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
         //云解析
         if (needCloud && AppConfig.cloudServiceParseIfLocalFailed) {
             Vog.d("onParseCommand ---> 失败云解析")
-            WrapperNetHelper.cloudParse(result) {
-                runFromCloud(result, it)
+            kotlin.runCatching {
+                AppApi.couldParse(RequestParseModel(result, AccessibilityApi.accessibilityService?.currentScope))
+            }.onSuccessMain {
+                if (it.isOk()) {
+                    runFromCloud(result, it.data)
+                }
             }
         } else if (chat && AppConfig.openChatSystem) {//聊天
             doChat(result)
@@ -1198,7 +1207,7 @@ object MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
      * @param cmd String
      */
     private fun onCommandParseFailed(cmd: String) {
-        WrapperNetHelper.uploadUserCommandHistory(CommandHistory(UserInfo.getUserId(), cmd, null))
+        uploadUserCommandHistory(CommandHistory(UserInfo.getUserId(), cmd, null))
         floatyPanel.showAndHideDelay("解析失败")
         parseAnimation.failedAndHideDelay()
     }

@@ -51,7 +51,6 @@ import cn.vove7.common.model.RequestPermission
 import cn.vove7.common.model.ResultBox
 import cn.vove7.common.model.UserInfo
 import cn.vove7.common.net.ApiUrls
-import cn.vove7.common.net.model.BaseRequestModel
 import cn.vove7.common.net.model.ResponseMessage
 import cn.vove7.common.net.tool.SecureHelper
 import cn.vove7.common.utils.*
@@ -917,9 +916,8 @@ object SystemBridge : SystemOperation {
     }
 
     override fun getNetAddress(): String? {
-        val reqModel = BaseRequestModel(null, null)
         val ts = (QuantumClock.currentTimeMillis / 1000)
-        val reqJson = GsonHelper.toJson(reqModel)
+        val reqJson = "{}"
         val sign = SecureHelper.signData(reqJson, ts)
         val headers = mapOf(
                 "versionCode" to "${AppConfig.versionCode}",
@@ -927,7 +925,7 @@ object SystemBridge : SystemOperation {
                 "token" to (UserInfo.getUserToken() ?: ""),
                 "sign" to sign
         )
-        val data = HttpBridge.postJson(ApiUrls.GET_IP, reqJson, headers)
+        val data = HttpBridge.postJson(ApiUrls.SERVER_IP + ApiUrls.GET_IP, reqJson, headers)
         val b = GsonHelper.fromJson<ResponseMessage<String>>(data)
         return b?.data
     }

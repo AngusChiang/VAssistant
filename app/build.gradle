@@ -18,7 +18,7 @@ android {
         applicationId "cn.vove7.vassistant"
         minSdkVersion 21
         targetSdkVersion 29
-        def subVersion = 0
+        def subVersion = 1
         versionName "2.1.2"
         def vc = Integer.parseInt(versionName.replace(".", "")) * 10
         if (vc < 10000) {
@@ -85,11 +85,39 @@ android {
             resValue "string", "base_acc_service_label", "V Assist基础DEBUG"
             resValue "string", "gesture_acc_service_label", "V Assist高级DEBUG"
 
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            ndk {//排除其他 abi
+                abiFilters "armeabi-v7a"
+            }
+            signingConfig signingConfigs.release
+        }
+        debug_x86 {
+            applicationIdSuffix ".debug"
+            versionNameSuffix = '1'
+            jniDebuggable = false
+            debuggable = true
+            resValue "string", "app_name", "V Assistant-debug"
+            resValue "string", "base_acc_service_label", "V Assist基础DEBUG"
+            resValue "string", "gesture_acc_service_label", "V Assist高级DEBUG"
 
             ndk {//排除其他 abi
                 abiFilters "armeabi-v7a", "x86"
+            }
+            signingConfig signingConfigs.release
+        }
+        debugWithMinify {
+            applicationIdSuffix ".debug"
+            versionNameSuffix = '1'
+            jniDebuggable = false
+            debuggable = true
+            resValue "string", "app_name", "V Assistant-debug"
+            resValue "string", "base_acc_service_label", "V Assist基础DEBUG"
+            resValue "string", "gesture_acc_service_label", "V Assist高级DEBUG"
+
+            minifyEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules-debug.pro'
+
+            ndk {//排除其他 abi
+                abiFilters "armeabi-v7a"
             }
             signingConfig signingConfigs.release
         }
@@ -175,7 +203,9 @@ andResGuard {
     /**
      * 可选： 如果不设置则会默认覆盖assemble输出的apk
      **/
-    finalApkBackupPath = "${project.rootDir}/final.apk"
+    def date = new Date().format("[MM-dd]")
+    println(date)
+    finalApkBackupPath = "${project.rootDir}/apks/v-assist-${date}.apk"
 
     /**
      * 可选: 指定v1签名时生成jar文件的摘要算法
@@ -184,17 +214,17 @@ andResGuard {
     // digestalg = "SHA-256"
 }
 dependencies {
-    androidTestImplementation 'androidx.test.ext:junit:1.1.1'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.2'
     implementation fileTree(include: ['*.jar'], dir: 'libs')
-    androidTestImplementation('androidx.test.espresso:espresso-core:3.2.0')
+    androidTestImplementation('androidx.test.espresso:espresso-core:3.3.0')
 
     implementation "androidx.appcompat:appcompat:$androidx_version"
-    implementation "androidx.constraintlayout:constraintlayout:1.1.3"
+    implementation "androidx.constraintlayout:constraintlayout:2.0.1"
     implementation 'androidx.dynamicanimation:dynamicanimation:1.0.0'
 
-    implementation 'com.google.android.material:material:1.1.0'
+    implementation 'com.google.android.material:material:1.2.0'
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
-    testImplementation 'junit:junit:4.12'
+    testImplementation 'junit:junit:4.13'
     implementation 'androidx.cardview:cardview:1.0.0'
     implementation 'androidx.palette:palette:1.0.0'
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"

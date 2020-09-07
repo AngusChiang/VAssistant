@@ -1,5 +1,7 @@
 package cn.vove7.common.datamanager.history;
 
+import androidx.annotation.Keep;
+
 import com.google.gson.annotations.Expose;
 
 import java.util.Date;
@@ -8,15 +10,21 @@ import java.util.Date;
  * Created by 17719247306 on 2018/9/11
  */
 
+@Keep
 public class CommandHistory {
+    @Keep
     @Expose
     private Long userId;
 
+    @Keep
     private Date requestTime;
 
+    @Keep
     private String command;
 
+    @Keep
     private String result;
+    @Keep
     private String tagId; //todo
 
     public CommandHistory(Long userId, Date requestTime, String command, String result, String tagId) {

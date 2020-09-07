@@ -6,19 +6,20 @@ import cn.vove7.common.app.AppConfig
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.model.UserInfo
-import cn.vove7.common.net.ApiUrls
-import cn.vove7.common.net.WrapperNetHelper
 import cn.vove7.common.utils.StorageHelper
 import cn.vove7.common.utils.TextHelper
 import cn.vove7.common.utils.TextPrinter
 import cn.vove7.common.utils.formatNow
 import cn.vove7.jarvis.BuildConfig
+import cn.vove7.jarvis.app.AppApi
 import cn.vove7.quantumclock.QuantumClock
 import cn.vove7.vtp.log.Vog
 import cn.vove7.vtp.system.DeviceInfo
 import cn.vove7.vtp.system.SystemHelper
 import com.wanjian.cockroach.Cockroach
 import com.wanjian.cockroach.ExceptionHandler
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import java.io.File
 
 /**
@@ -71,12 +72,22 @@ object CrashHandler : ExceptionHandler() {
             } catch (e: Exception) {
                 e.printStackTrace()
             }
-            if (!BuildConfig.DEBUG)
-                WrapperNetHelper.postJson<Any>(ApiUrls.CRASH_HANDLER, info) {}
+            if (!BuildConfig.DEBUG) {
+                GlobalScope.launch {
+                    kotlin.runCatching {
+                        AppApi.postCrashInfo(info)
+                    }
+                }
+            }
+
         } catch (e1: Exception) {//文件读写
-            if (!BuildConfig.DEBUG)
-                WrapperNetHelper.postJson<Any>(ApiUrls.CRASH_HANDLER,
-                        headerInfo + e.message + "crash上传失败${e1.message}") {}
+            if (!BuildConfig.DEBUG) {
+                GlobalScope.launch {
+                    kotlin.runCatching {
+                        AppApi.postCrashInfo(headerInfo + e.message + "crash上传失败${e1.message}")
+                    }
+                }
+            }
         }
     }
 }

@@ -6,10 +6,13 @@ import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.model.UserInfo
 import cn.vove7.common.net.ApiUrls
-import cn.vove7.common.net.WrapperNetHelper
 import cn.vove7.common.utils.secure.SecuritySharedPreference
+import cn.vove7.jarvis.app.AppApi
 import cn.vove7.vtp.log.Vog
 import com.google.gson.Gson
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 
 /**
  * # Logic
@@ -54,9 +57,11 @@ object AppLogic {
     }
 
     private fun checkUserInfo() {
-        WrapperNetHelper.postJson<Any>(ApiUrls.VERIFY_TOKEN) {
-            success { _, responseMessage ->
-                responseMessage.isOk(true)
+        GlobalScope.launch(Dispatchers.IO) {
+            kotlin.runCatching {
+                AppApi.verifyToken()
+            }.onSuccess {
+                it.isOk(true)
             }
         }
     }

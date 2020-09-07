@@ -40,7 +40,7 @@ interface LifeCycleScopeDelegate {
             block: suspend CoroutineScope.() -> Unit
     ): Job = lifecycleScope.launch(context, start, block)
 
-    fun launchIo(
+    fun launchIO(
             start: CoroutineStart = CoroutineStart.DEFAULT,
             block: suspend CoroutineScope.() -> Unit
     ) {

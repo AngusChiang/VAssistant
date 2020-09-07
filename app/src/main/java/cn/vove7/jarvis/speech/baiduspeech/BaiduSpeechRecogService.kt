@@ -1,6 +1,7 @@
 package cn.vove7.jarvis.speech.baiduspeech
 
 import android.media.MediaRecorder
+import androidx.annotation.Keep
 import cn.vove7.common.app.AppConfig
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.utils.runInCatch
@@ -115,10 +116,13 @@ class BaiduSpeechRecogService(event: RecogEvent) : SpeechRecogService(event) {
         wakeupI.stop()
     }
 
+    @Keep
     class OffWord(//离线词
             @SerializedName("contact_name")
-            val contactName: Array<String>
-            , @SerializedName("appname")
+            @Keep
+            val contactName: Array<String>,
+            @SerializedName("appname")
+            @Keep
             val appName: Array<String>
     ) {
         override fun toString(): String {

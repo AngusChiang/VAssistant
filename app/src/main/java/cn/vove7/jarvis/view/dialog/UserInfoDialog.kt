@@ -15,14 +15,19 @@ import cn.vove7.common.bridges.SystemBridge
 import cn.vove7.common.model.UserInfo
 import cn.vove7.common.model.VipPrice
 import cn.vove7.common.net.ApiUrls
-import cn.vove7.common.net.WrapperNetHelper
+import cn.vove7.common.utils.onFailureMain
+import cn.vove7.common.utils.onSuccessMain
 import cn.vove7.jarvis.R
+import cn.vove7.jarvis.app.AppApi
 import cn.vove7.jarvis.tools.AppLogic
 import cn.vove7.jarvis.tools.openQQChat
 import cn.vove7.jarvis.tools.pay.PurchaseHelper
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.customview.customView
 import com.afollestad.materialdialogs.input.input
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -72,25 +77,28 @@ class UserInfoDialog(val context: Activity, val onUpdate: () -> Unit) {
                     .noAutoDismiss()
                     .input(prefill = UserInfo.getUserName()) { materialDialog, s ->
                         val p = ProgressDialog(context)
-                        WrapperNetHelper.postJson<String>(ApiUrls.MODIFY_NAME, s.toString()) {
-                            success { _, b ->
-                                p.dismiss()
-                                if (b.isOk()) {
-                                    UserInfo.INSTANCE.setUserName(s.toString())
-                                    GlobalApp.toastSuccess(R.string.text_modify_succ)
-                                    Handler().postDelayed({
-                                        onUpdate.invoke()
-                                    }, 1000)
-                                    materialDialog.dismiss()
-                                } else {
-                                    GlobalApp.toastError(b.message)
+                        GlobalScope.launch(Dispatchers.IO) {
+                            kotlin.runCatching {
+                                AppApi.modifyName(s.toString())
+                            }.apply {
+                                onSuccessMain { b ->
+                                    p.dismiss()
+                                    if (b.isOk()) {
+                                        UserInfo.INSTANCE.setUserName(s.toString())
+                                        GlobalApp.toastSuccess(R.string.text_modify_succ)
+                                        Handler().postDelayed({
+                                            onUpdate.invoke()
+                                        }, 1000)
+                                        materialDialog.dismiss()
+                                    } else {
+                                        GlobalApp.toastError(b.message)
+                                    }
                                 }
-                            }
-                            fail { _, e ->
-                                p.dismiss()
-                                GlobalApp.toastError(e.message
-                                    ?: GlobalApp.getString(R.string.text_modify_failed))
-
+                                onFailureMain { e ->
+                                    p.dismiss()
+                                    GlobalApp.toastError(e.message
+                                        ?: GlobalApp.getString(R.string.text_modify_failed))
+                                }
                             }
                         }
                     }.show()
@@ -104,19 +112,22 @@ class UserInfoDialog(val context: Activity, val onUpdate: () -> Unit) {
         fun recharge(context: Activity) {
             val pd = ProgressDialog(context)
             Handler().postDelayed({
-                WrapperNetHelper.postJson<List<VipPrice>>(ApiUrls.GET_PRICES) {
-                    success { _, bean ->
-                        pd.dismiss()
-                        if (bean.isOk()) {
-                            showReChargeDialog(context, bean.data!!)
-                        } else GlobalApp.toastError(R.string.text_failed_to_get_data)
-                    }
-                    fail { _, e ->
-                        pd.dismiss()
-                        GlobalApp.toastError(R.string.text_failed_to_get_data)
+                GlobalScope.launch(Dispatchers.IO) {
+                    kotlin.runCatching {
+                        AppApi.getVipPrices()
+                    }.apply {
+                        onSuccessMain { bean ->
+                            pd.dismiss()
+                            if (bean.isOk()) {
+                                showReChargeDialog(context, bean.data!!)
+                            } else GlobalApp.toastError(R.string.text_failed_to_get_data)
+                        }
+                        onFailureMain { e ->
+                            pd.dismiss()
+                            GlobalApp.toastError(R.string.text_failed_to_get_data)
+                        }
                     }
                 }
-
             }, 500)
         }
 
@@ -162,36 +173,40 @@ class UserInfoDialog(val context: Activity, val onUpdate: () -> Unit) {
                     .show()
         }
 
-        private fun useCode(context:Context, s: String?) {
+        private fun useCode(context: Context, s: String) {
             val pd = ProgressDialog(context)
-            WrapperNetHelper.postJson<String>(ApiUrls.ACTIVATE_VIP, arg1 = s) {
-                success { _, bean ->
-                    pd.dismiss()
-                    if (bean.isOk()) {
-                        AppBus.post(AppBus.EVENT_REFRESH_USER_INFO)
-                        GlobalApp.toastSuccess("${bean.data}", Toast.LENGTH_LONG)
-                    } else {
-                        GlobalApp.toastInfo(bean.message)
+            GlobalScope.launch(Dispatchers.IO) {
+                kotlin.runCatching { AppApi.activateVip(s) }.apply {
+                    onSuccessMain { bean ->
+                        pd.dismiss()
+                        if (bean.isOk()) {
+                            AppBus.post(AppBus.EVENT_REFRESH_USER_INFO)
+                            GlobalApp.toastSuccess("${bean.data}", Toast.LENGTH_LONG)
+                        } else {
+                            GlobalApp.toastInfo(bean.message)
+                        }
                     }
-                }
-                fail { _, e ->
-                    pd.dismiss()
-                    e.log()
-                    GlobalApp.toastError(R.string.text_net_err)
+                    onFailureMain { e ->
+                        pd.dismiss()
+                        e.log()
+                        GlobalApp.toastError(R.string.text_net_err)
+                    }
                 }
             }
         }
-
     }
 
     var exit = false
+
     /**
      * 获取数据
      */
-    private fun loadInfo() {
-        WrapperNetHelper.postJson<UserInfo>(ApiUrls.GET_USER_INFO) {
-            success { _, bean ->
-                if (exit) return@success
+    private fun loadInfo() = GlobalScope.launch(Dispatchers.IO) {
+        kotlin.runCatching {
+            AppApi.getUserInfo()
+        }.apply {
+            onSuccessMain { bean ->
+                if (exit) return@onSuccessMain
                 if (bean.isOk(true)) {
                     try {
                         val userInfo = bean.data!!
@@ -201,13 +216,12 @@ class UserInfoDialog(val context: Activity, val onUpdate: () -> Unit) {
                     } catch (e: Exception) {
                         GlobalApp.toastError(R.string.text_error_occurred)
                         GlobalLog.err(e)
-                        return@success
                     }
                 }
             }
-            fail { _, e ->
+            onFailure { e ->
                 e.log()
-                if (exit) return@fail
+                if (exit) return@onFailure
                 GlobalApp.toastError(R.string.text_failed_to_get_user_info)
             }
         }

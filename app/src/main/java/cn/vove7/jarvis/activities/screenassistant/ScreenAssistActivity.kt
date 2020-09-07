@@ -550,7 +550,7 @@ class ScreenAssistActivity : BaseActivity() {
         }
 
         showProgressBar = true
-        launchIo {
+        launchIO {
             val r = BaiduAipHelper.imageClassify(UtilBridge.compressImage(screenPath))
             withContext(Dispatchers.Main) {
                 showProgressBar = false

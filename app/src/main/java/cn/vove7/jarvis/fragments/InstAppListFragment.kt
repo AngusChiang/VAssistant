@@ -7,7 +7,6 @@ import cn.vove7.common.datamanager.DAO
 import cn.vove7.common.datamanager.parse.model.ActionScope
 import cn.vove7.common.datamanager.parse.statusmap.ActionNode.NODE_SCOPE_IN_APP
 import cn.vove7.common.model.UserInfo
-import cn.vove7.common.utils.CoroutineExt.launch
 import cn.vove7.jarvis.activities.InAppInstActivity
 import cn.vove7.jarvis.activities.NewInstActivity
 import cn.vove7.jarvis.activities.OnSyncInst
@@ -16,6 +15,8 @@ import cn.vove7.jarvis.adapters.ListViewModel
 import cn.vove7.common.app.AppConfig
 import cn.vove7.jarvis.tools.DataUpdator
 import cn.vove7.vtp.app.AppHelper
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 /**
  * # InstAppListFragment
@@ -49,11 +50,15 @@ class InstAppListFragment : SimpleListFragment<ActionScope>(), OnSyncInst {
             return
         }
         showProgressBar()
-        DataUpdator.syncInAppInst {
-            hideProgressBar()
-            if (it) {
+        launchIO {
+            if(DataUpdator.syncInAppInst()){
                 GlobalApp.toastSuccess("同步完成")
-                refresh()
+                withContext(Dispatchers.Main) {
+                    refresh()
+                }
+            }
+            withContext(Dispatchers.Main){
+                hideProgressBar()
             }
         }
     }

@@ -16,11 +16,10 @@ import cn.vove7.common.datamanager.DAO
 import cn.vove7.common.datamanager.executor.entity.MarkedData
 import cn.vove7.common.datamanager.parse.DataFrom
 import cn.vove7.common.model.UserInfo
-import cn.vove7.common.net.ApiUrls
-import cn.vove7.common.net.WrapperNetHelper
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.adapters.ListViewModel
 import cn.vove7.jarvis.adapters.SimpleListAdapter
+import cn.vove7.jarvis.app.AppApi
 import cn.vove7.jarvis.fragments.MarkedAppFragment
 import cn.vove7.jarvis.fragments.SimpleListFragment
 import cn.vove7.jarvis.tools.DataUpdator
@@ -30,6 +29,8 @@ import cn.vove7.vtp.log.Vog
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.customview.customView
 import com.google.android.material.textfield.TextInputLayout
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 /**
  * # BaseMarkedFragment
@@ -149,6 +150,7 @@ abstract class BaseMarkedFragment : SimpleListFragment<MarkedData>(), OnSyncMark
     var editData: MarkedData? = null
 
     open val showSel = true
+
     /**
      * 编辑or新建
      * @param data MarkedData?
@@ -216,18 +218,17 @@ abstract class BaseMarkedFragment : SimpleListFragment<MarkedData>(), OnSyncMark
         }
     }
 
-    private fun deleteShare(tagId: String) {
-        WrapperNetHelper.postJson<Any>(ApiUrls.DELETE_SHARE_MARKED, tagId) {
-            success { _, bean ->
-                if (bean.isOk()) {
-                    Vog.d("云端删除成功")
-                } else
-                    Vog.d("云端删除失败")
-            }
-            fail { _, e ->
-                e.printStackTrace()
+    private fun deleteShare(tagId: String) = launchIO {
+        kotlin.runCatching {
+            AppApi.deleteShareMarked(tagId)
+        }.onSuccess { bean ->
+            if (bean.isOk()) {
+                Vog.d("云端删除成功")
+            } else
                 Vog.d("云端删除失败")
-            }
+        }.onFailure { e ->
+            GlobalLog.err(e)
+            Vog.d("云端删除失败")
         }
     }
 
@@ -240,8 +241,10 @@ abstract class BaseMarkedFragment : SimpleListFragment<MarkedData>(), OnSyncMark
             GlobalApp.toastInfo(R.string.text_please_login_first)
             return
         }
-        WrapperNetHelper.postJson<String>(ApiUrls.SHARE_MARKED, data) {
-            success { _, bean ->
+        launchIO {
+            kotlin.runCatching {
+                AppApi.shareMarked(data)
+            }.onSuccess { bean ->
                 if (bean.isOk()) {
                     //return tagId
                     val tag = bean.data
@@ -255,8 +258,7 @@ abstract class BaseMarkedFragment : SimpleListFragment<MarkedData>(), OnSyncMark
                 } else {
                     GlobalApp.toastInfo(bean.message)
                 }
-            }
-            fail { _, e ->
+            }.onFailure { e ->
                 GlobalApp.toastError(e.message ?: "error")
             }
         }
@@ -268,12 +270,16 @@ abstract class BaseMarkedFragment : SimpleListFragment<MarkedData>(), OnSyncMark
             return
         }
         showProgressBar()
-        DataUpdator.syncMarkedData(null, types, lastKeyId) {
-            if (it) {
-                GlobalApp.toastSuccess("同步完成")
-                refresh()
+        launchIO {
+            if (DataUpdator.syncMarkedData(null, types, lastKeyId)) {
+                withContext(Dispatchers.Main) {
+                    GlobalApp.toastSuccess("同步完成")
+                    refresh()
+                }
             }
-            hideProgressBar()
+            withContext(Dispatchers.Main) {
+                hideProgressBar()
+            }
         }
     }
 

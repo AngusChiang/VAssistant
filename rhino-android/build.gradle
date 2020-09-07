@@ -26,6 +26,7 @@ android {
         }
         release_ndk_all {
         }
+        debugWithMinify {}
     }
     compileOptions {
         sourceCompatibility = '1.8'

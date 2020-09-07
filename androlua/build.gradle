@@ -23,6 +23,7 @@ android {
         debug {
             jniDebuggable = false
         }
+        debugWithMinify {}
     }
 //    externalNativeBuild {
 //        ndkBuild {

@@ -11,14 +11,11 @@ import android.widget.TextView
 import androidx.cardview.widget.CardView
 import cn.vove7.common.appbus.AppBus
 import cn.vove7.common.model.UserInfo
-import cn.vove7.common.net.ApiUrls
-import cn.vove7.common.net.WrapperNetHelper
-import cn.vove7.common.utils.color
-import cn.vove7.common.utils.gone
-import cn.vove7.common.utils.onClick
-import cn.vove7.common.utils.show
+import cn.vove7.common.utils.*
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.activities.*
+import cn.vove7.jarvis.app.AppApi
+import cn.vove7.jarvis.lifecycle.LifecycleScope
 import cn.vove7.jarvis.services.MainService
 import cn.vove7.jarvis.tools.AppLogic
 import cn.vove7.jarvis.view.dialog.LoginDialog
@@ -27,6 +24,7 @@ import cn.vove7.vtp.easyadapter.BaseListAdapter
 import cn.vove7.vtp.log.Vog
 import kotlinx.android.synthetic.main.fragment_mine.*
 import kotlinx.android.synthetic.main.fragment_mine.view.*
+import kotlinx.coroutines.launch
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
 
@@ -53,17 +51,14 @@ class MineFragment : androidx.fragment.app.Fragment() {
         }
     }
 
-    private fun refreshUserInfo() {
-        WrapperNetHelper.postJson<UserInfo>(ApiUrls.GET_USER_INFO) {
-            success { _, bean ->
-                if (bean.isOk()) {
-                    try {
-                        val userInfo = bean.data!!
-                        AppLogic.onLogin(userInfo)
-                        loadUserInfo()
-                    } catch (e: Exception) {
-                        return@success
-                    }
+    private fun refreshUserInfo() = LifecycleScope(lifecycle).launch {
+        kotlin.runCatching {
+            AppApi.getUserInfo()
+        }.onSuccessMain { bean ->
+            if (bean.isOk()) {
+                bean.data?.also {
+                    AppLogic.onLogin(it)
+                    loadUserInfo()
                 }
             }
         }
@@ -175,16 +170,5 @@ class MineFragment : androidx.fragment.app.Fragment() {
         val clickBody: View = v.findViewById(R.id.click_body)
 
         val textView: TextView = v.findViewById(R.id.text)
-    }
-
-
-    companion object {
-
-        @JvmStatic
-        fun newInstance() = MineFragment().apply {
-            //            arguments = Bundle().apply {
-//
-//            }
-        }
     }
 }

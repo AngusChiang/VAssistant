@@ -7,6 +7,8 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.CompoundButton
 import android.widget.TextView
+import cn.daqinjia.android.common.ext.gone
+import cn.daqinjia.android.common.ext.show
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.utils.onClick
 import cn.vove7.common.utils.spanColor
@@ -244,8 +246,10 @@ class SettingItemHelper(
         (item as CompoundItem).apply {
             if (onTileAreaClick != null) {
                 holder.tileArea.onClick(onTileAreaClick)
+                holder.compoundSplitView.show()
             } else {
                 holder.tileArea.background = null
+                holder.compoundSplitView.gone()
             }
         }
         var lock = false
@@ -468,6 +472,7 @@ class SettingItemHelper(
     open class CompoundItemHolder(
             v: View,
             val compoundWight: CompoundButton,
-            val tileArea: View = v.findViewById(R.id.tile_area)
+            val tileArea: View = v.findViewById(R.id.tile_area),
+            val compoundSplitView :View = v.findViewById(R.id.compound_split_view)
     ) : ChildItemHolder(v)
 }

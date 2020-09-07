@@ -1,6 +1,7 @@
 package cn.vove7.jarvis.chat
 
 import android.widget.ImageView
+import androidx.annotation.Keep
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.appbus.AppBus
 import cn.vove7.common.datamanager.history.CommandHistory
@@ -43,7 +44,7 @@ interface ChatSystem {
     }
 
     //耗时操作
-    fun chatWithText(s: String): ChatResult?
+    suspend fun chatWithText(s: String): ChatResult?
 }
 
 interface ChatResultBuilder {
@@ -63,16 +64,22 @@ interface ChatResultBuilder {
 }
 
 data class ChatResult(
+        @Keep
         val word: String,
+        @Keep
         val resultUrls: ArrayList<UrlItem> //title url
-
 )
 
 data class UrlItem(
+        @Keep
         override val title: String,
+        @Keep
         val iconUrl: String? = null,
+        @Keep
         val url: String,
+        @Keep
         val info: String? = null,
+        @Keep
         val source: String? = null
 ) : AwesomeItem, Serializable {
     override val subTitle: String?

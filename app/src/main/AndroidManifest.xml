@@ -5,7 +5,7 @@
 
     <!-- 语音识别 -->
     <application
-        android:name=".App"
+        android:name=".app.App"
         android:allowBackup="false"
         android:hasFragileUserData="true"
         android:icon="@mipmap/ic_launcher_vassist"
@@ -20,7 +20,7 @@
         tools:replace="android:allowBackup">
 
         <provider
-            android:name=".InitCp"
+            android:name=".app.InitCp"
             android:authorities="${applicationId}.init"
             android:exported="false" />
         <uses-library

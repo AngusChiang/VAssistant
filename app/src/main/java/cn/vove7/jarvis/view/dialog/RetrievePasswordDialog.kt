@@ -1,7 +1,6 @@
 package cn.vove7.jarvis.view.dialog
 
 import android.content.Context
-import com.google.android.material.textfield.TextInputLayout
 import android.text.TextUtils
 import android.view.LayoutInflater
 import android.view.View
@@ -10,16 +9,22 @@ import android.widget.ProgressBar
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.app.log
 import cn.vove7.common.model.UserInfo
-import cn.vove7.common.net.ApiUrls
-import cn.vove7.common.net.WrapperNetHelper
 import cn.vove7.common.net.tool.SecureHelper
 import cn.vove7.common.utils.TextHelper
+import cn.vove7.common.utils.onFailureMain
+import cn.vove7.common.utils.onSuccessMain
 import cn.vove7.jarvis.BuildConfig
 import cn.vove7.jarvis.R
+import cn.vove7.jarvis.app.AppApi
 import cn.vove7.jarvis.view.custom.CountDownButton
 import cn.vove7.vtp.log.Vog
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.customview.customView
+import com.google.android.material.textfield.TextInputLayout
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 /**
  * # RetrievePasswordDialog
@@ -68,21 +73,26 @@ class RetrievePasswordDialog(context: Context) {
                 loadBar.visibility = View.VISIBLE
 //                val p = NetParamsBuilder.of(Pair("emailAdd", userEmail)).sign()
 
-                WrapperNetHelper.postJson<String>(ApiUrls.SEND_RET_PASS_EMAIL_VER_CODE, model = userEmail, arg1 = "check") {
-                    success { _, bean ->
-                        loadBar.visibility = View.INVISIBLE
-                        if (bean.isOk()) {
-                            GlobalApp.toastSuccess(bean.data ?: "null")
-                            startDown(countDownSecs)
-                        } else {
-                            this@apply.isEnabled = true
-                            GlobalApp.toastError(bean.message)
+                GlobalScope.launch(Dispatchers.IO) {
+                    kotlin.runCatching {
+                        AppApi.sendResetPassCode(userEmail, "check")
+                    }.onSuccess { bean ->
+                        withContext(Dispatchers.Main) {
+                            loadBar.visibility = View.INVISIBLE
+                            if (bean.isOk()) {
+                                GlobalApp.toastSuccess(bean.data ?: "null")
+                                startDown(countDownSecs)
+                            } else {
+                                this@apply.isEnabled = true
+                                GlobalApp.toastError(bean.message)
+                            }
                         }
-                    }
-                    fail { _, e ->
+                    }.onFailure { e ->
                         e.log()
-                        this@apply.isEnabled = true
-                        GlobalApp.toastError("出错 ${e.message}")
+                        withContext(Dispatchers.Main) {
+                            this@apply.isEnabled = true
+                            GlobalApp.toastError("出错 ${e.message}")
+                        }
                     }
                 }
             }
@@ -129,26 +139,31 @@ class RetrievePasswordDialog(context: Context) {
             }
 
             loadBar.visibility = View.VISIBLE
-            //post
-            WrapperNetHelper.postJson<String>(ApiUrls.RET_PASS_BY_EMAIL, model = userInfo, arg1 = verCode) {
-                success { _, bean ->
-                    //泛型
-                    Vog.d("onResponse ---> $bean")
-                    loadBar.visibility = View.INVISIBLE
-                    if (bean.isOk()) {
-                        GlobalApp.toastInfo(bean.data ?: "网络错误")
-                        dialog.dismiss()
-                    } else {
-                        GlobalApp.toastError(bean.message)
+
+            GlobalScope.launch(Dispatchers.IO) {
+                kotlin.runCatching {
+                    AppApi.resetPassByEmailCode(userInfo, verCode)
+                }.apply {
+                    onSuccessMain { bean ->
+                        //泛型
+                        Vog.d("onResponse ---> $bean")
+                        loadBar.visibility = View.INVISIBLE
+                        if (bean.isOk()) {
+                            GlobalApp.toastInfo(bean.data ?: "网络错误")
+                            dialog.dismiss()
+                        } else {
+                            GlobalApp.toastError(bean.message)
+                        }
                     }
-                }
-                fail { _, e ->
-                    loadBar.visibility = View.INVISIBLE
-                    e.log()
-                    GlobalApp.toastError("出错 ${e.message}")
+                    onFailureMain { e ->
+                        loadBar.visibility = View.INVISIBLE
+                        e.log()
+                        GlobalApp.toastError("出错 ${e.message}")
+                    }
                 }
             }
         }
-        dialog.customView(view = view, scrollable = true).title(R.string.text_retrieve_password).show()
+        dialog.customView(view = view, scrollable = true)
+                .title(R.string.text_retrieve_password).show()
     }
 }

@@ -1,7 +1,6 @@
 package cn.vove7.jarvis.view.dialog
 
 import android.content.Context
-import com.google.android.material.textfield.TextInputLayout
 import android.text.TextUtils
 import android.view.LayoutInflater
 import android.view.View
@@ -11,16 +10,20 @@ import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.app.log
 import cn.vove7.common.model.UserInfo
-import cn.vove7.common.net.ApiUrls
-import cn.vove7.common.net.WrapperNetHelper
 import cn.vove7.common.net.tool.SecureHelper
 import cn.vove7.common.utils.TextHelper
 import cn.vove7.common.utils.inVisibility
 import cn.vove7.jarvis.R
+import cn.vove7.jarvis.app.AppApi
 import cn.vove7.jarvis.tools.AppLogic
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.customview.customView
+import com.google.android.material.textfield.TextInputLayout
 import kotlinx.android.synthetic.main.dialog_login.view.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 /**
  * # LoginDialog
@@ -33,7 +36,7 @@ typealias OnLoginSuccess = () -> Unit
 class LoginDialog(val context: Context, initEmail: String? = null,
                   initPas: String? = null, val r: OnLoginSuccess) {
     val dialog: MaterialDialog = MaterialDialog(context).positiveButton(R.string.text_sign_up) {
-        SignupDialog(context, r)
+        SignUpDialog(context, r)
     }.neutralButton(R.string.text_retrieve_password) {
         RetrievePasswordDialog(context)
     }
@@ -78,30 +81,32 @@ class LoginDialog(val context: Context, initEmail: String? = null,
             loginInfo.userPass = SecureHelper.MD5(userPass)
 
             loadBar.visibility = View.VISIBLE
-            //post
-            WrapperNetHelper.postJson<UserInfo>(ApiUrls.LOGIN, loginInfo) {
-                success { _, bean ->
-                    if (bean.isOk()) {
-                        try {
-                            val userInfo = bean.data!!
-                            AppLogic.onLogin(userInfo)
-                        } catch (e: Exception) {
-                            GlobalApp.toastInfo(R.string.text_error_occurred)
-                            GlobalLog.err(e.message)
-                            return@success
+            GlobalScope.launch(Dispatchers.IO) {
+                kotlin.runCatching {
+                    AppApi.login(loginInfo)
+                }.onSuccess { bean ->
+                    withContext(Dispatchers.Main) {
+                        if (bean.isOk()) {
+                            try {
+                                val userInfo = bean.data!!
+                                AppLogic.onLogin(userInfo)
+                            } catch (e: Exception) {
+                                GlobalApp.toastInfo(R.string.text_error_occurred)
+                                GlobalLog.err(e.message)
+                                return@withContext
+                            }
+                            GlobalApp.toastSuccess("登录成功")
+                            r.invoke()
+                            dialog.dismiss()
+                        } else {
+                            GlobalApp.toastInfo(bean.message)
                         }
-                        GlobalApp.toastSuccess("登录成功")
-                        r.invoke()
-                        dialog.dismiss()
-                    } else {
-                        GlobalApp.toastInfo(bean.message)
                     }
-                }
-                fail { _, e ->
+                }.onFailure { e ->
                     e.log()
                     GlobalApp.toastError("出错${e.message}")
                 }
-                end {
+                withContext(Dispatchers.Main) {
                     loadBar.inVisibility()
                 }
             }

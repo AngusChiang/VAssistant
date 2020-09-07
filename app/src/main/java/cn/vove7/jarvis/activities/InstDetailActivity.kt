@@ -31,8 +31,6 @@ import cn.vove7.common.datamanager.parse.model.ActionDesc
 import cn.vove7.common.datamanager.parse.statusmap.ActionNode
 import cn.vove7.common.helper.AdvanAppHelper
 import cn.vove7.common.model.UserInfo
-import cn.vove7.common.net.ApiUrls
-import cn.vove7.common.net.WrapperNetHelper
 import cn.vove7.common.utils.RegUtils
 import cn.vove7.common.utils.TextHelper
 import cn.vove7.executorengine.parse.ParseEngine
@@ -40,6 +38,7 @@ import cn.vove7.jarvis.R
 import cn.vove7.jarvis.activities.base.BaseActivity
 import cn.vove7.jarvis.adapters.ExecuteQueueAdapter
 import cn.vove7.jarvis.adapters.InstSettingListAdapter
+import cn.vove7.jarvis.app.AppApi
 import cn.vove7.jarvis.services.MainService
 import cn.vove7.jarvis.tools.ItemWrap
 import cn.vove7.jarvis.tools.ShortcutUtil
@@ -56,6 +55,8 @@ import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.customview.customView
 import com.afollestad.materialdialogs.input.input
 import kotlinx.android.synthetic.main.activity_inst_detail.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import java.util.*
 
 /**
@@ -199,14 +200,10 @@ class InstDetailActivity : BaseActivity() {
     private fun startTutorials() {
         Handler().postDelayed({
             Tutorials.oneStep(this, list = arrayOf(
-                    ItemWrap(Tutorials.t_inst_detail_desc, label_instructions, "指令描述", "可以根据描述了解用途")
-                    , ItemWrap(Tutorials.t_inst_detail_exp, label_examples, "指令示例", "根据示例，理解指令的“说法”")
-                    , ItemWrap(Tutorials.t_inst_detail_regex, label_regex, "指令正则式", "正则式是该指令能匹配到用户说的命令\n基本格式有：\n" +
+                    ItemWrap(Tutorials.t_inst_detail_desc, label_instructions, "指令描述", "可以根据描述了解用途"), ItemWrap(Tutorials.t_inst_detail_exp, label_examples, "指令示例", "根据示例，理解指令的“说法”"), ItemWrap(Tutorials.t_inst_detail_regex, label_regex, "指令正则式", "正则式是该指令能匹配到用户说的命令\n基本格式有：\n" +
                     "1. (用|打开|启动|开启)% ----- 可匹配：'用xxx'、'打开xxx'、'启动xxx'...等命令\n" +
                     "2. 大+点声   -------------------  可匹配 大大大点声 ('大'个数大于0)\n" +
-                    "3. (播放)?下一[首|曲]  -------- (播放)?代表‘播放’可加可不加，[首|曲]代表可以是曲也可以是首,就可匹配:播放下一曲，下一曲，下一首...等命令\n")
-                    , ItemWrap(Tutorials.t_inst_detail_run, (toolbar.getChildAt(1) as ViewGroup).getChildAt(0), "运行"
-                    , "这里可以直接运行指令中的脚本")
+                    "3. (播放)?下一[首|曲]  -------- (播放)?代表‘播放’可加可不加，[首|曲]代表可以是曲也可以是首,就可匹配:播放下一曲，下一曲，下一首...等命令\n"), ItemWrap(Tutorials.t_inst_detail_run, (toolbar.getChildAt(1) as ViewGroup).getChildAt(0), "运行", "这里可以直接运行指令中的脚本")
             ))
         }, 1000)
     }
@@ -237,7 +234,7 @@ class InstDetailActivity : BaseActivity() {
             instructions_text.text = node.desc?.instructions ?: "无"
             examples_text.text = node.desc?.example ?: "无"
             regs_text.text = TextHelper.arr2String(node.regs?.toTypedArray()
-                    ?: arrayOf<Any>(), "\n")
+                ?: arrayOf<Any>(), "\n")
             version_text.text = node.versionCode.toString()
 
             view_code.setOnClickListener {
@@ -354,19 +351,24 @@ class InstDetailActivity : BaseActivity() {
                                 val p = ProgressDialog(this)
                                 val nodeId = node.id
                                 if (node.tagId != null) {
-                                    WrapperNetHelper.postJson<Any>(ApiUrls.DELETE_SHARE_INST, node.tagId) {
-                                        success { _, bean ->
-                                            if (bean.isOk()) {
-                                                GlobalLog.log("云端删除成功$node")
-                                                delLocalNode()
-                                            } else {
-                                                GlobalApp.toastError("云端删除失败$node ${bean.message} 请联系开发者")
+                                    launchIO {
+                                        kotlin.runCatching {
+                                            AppApi.deleteSharedInst(node.tagId)
+                                        }.onSuccess { bean ->
+                                            withContext(Dispatchers.Main) {
+                                                if (bean.isOk()) {
+                                                    GlobalLog.log("云端删除成功$node")
+                                                    delLocalNode()
+                                                } else {
+                                                    GlobalApp.toastError("云端删除失败$node ${bean.message} 请联系开发者")
+                                                }
+                                                p.dismiss()
                                             }
-                                            p.dismiss()
-                                        }
-                                        fail { _, e ->
-                                            GlobalLog.log("云端删除失败$node ${e.message}")
-                                            p.dismiss()
+                                        }.onFailure { e ->
+                                            withContext(Dispatchers.Main) {
+                                                GlobalLog.log("云端删除失败$node ${e.message}")
+                                                p.dismiss()
+                                            }
                                         }
                                     }
                                 } else {
@@ -385,18 +387,6 @@ class InstDetailActivity : BaseActivity() {
                             .negativeButton(R.string.text_cancel)
                             .show()
                 }
-//                R.id.menu_add_follow -> {// 选择: 从已有(inApp Global)关联parentId，或者新建
-//
-//                    MaterialDialog(this).listItems(items = listOf(
-//                            getString(R.string.text_new),
-//                            getString(R.string.text_sel_from_existing)
-//                    ), waitForPositiveButton = false) { _, i, s ->
-//                        when (i) {
-//                            0 -> addFollowFromNew()
-//                            1 -> GlobalApp.toastInfo(R.string.text_coming_soon)//todo
-//                        }
-//                    }.show()
-//                }
                 R.id.menu_run -> {
                     showRunDialog()
                 }
@@ -605,62 +595,52 @@ class InstDetailActivity : BaseActivity() {
     /**
      * 更新返回版本号
      */
-    private fun upgrade() {
-        WrapperNetHelper.postJson<Int>(ApiUrls.UPGRADE_INST, node) {
-            success { _, bean ->
-                if (bean.isOk()) {
-                    GlobalApp.toastSuccess(R.string.text_share_success)
-                    //sign tag
-                    val s = bean.data ?: -1
-                    if (s < 0) {
-                        return@success
-                    }
-                    launch {
-                        //更新 tagId
-                        node.versionCode = s
-                        Vog.d("new ver---> $s")
-                        node.update()
-                    }
-                } else {
-                    GlobalApp.toastInfo(bean.message)
+    private fun upgrade() = launchIO {
+        kotlin.runCatching {
+            AppApi.upgradeInst(node)
+        }.onSuccess { bean ->
+            if (bean.isOk()) {
+                GlobalApp.toastSuccess(R.string.text_share_success)
+                //sign tag
+                val s = bean.data ?: -1
+                if (s < 0) {
+                    return@onSuccess
                 }
+                launch {
+                    //更新 tagId
+                    node.versionCode = s
+                    Vog.d("new ver---> $s")
+                    node.update()
+                }
+            } else {
+                GlobalApp.toastInfo(bean.message)
             }
-            fail { _, e ->
-                GlobalLog.err(e)
-                GlobalApp.toastError(R.string.text_net_err)
-            }
+        }.onFailure { e ->
+            GlobalLog.err(e)
+            GlobalApp.toastError(R.string.text_net_err)
         }
     }
 
     /**
      * 首次分享返回tag
      */
-    private fun firstShare() {
-        WrapperNetHelper.postJson<String>(ApiUrls.SHARE_INST, node) {
-            success { _, bean ->
-                if (bean.isOk()) {
-                    GlobalApp.toastSuccess(R.string.text_share_success)
-                    //sign tag
-                    val s = bean.data
-                    launch {
-                        //更新 tagId
-                        Vog.d("share new tag---> $s")
-                        node.from = DataFrom.FROM_SHARED
-                        node.tagId = s
-                        node.update()
-//                        node.follows.forEach { child ->
-////                            child.parentTagId = s
-//                            child.update()
-//                        }
-                    }
-                } else {
-                    GlobalApp.toastInfo(bean.message)
-                }
+    private fun firstShare() = launchIO {
+        kotlin.runCatching {
+            AppApi.shareInst(node)
+        }.onSuccess { bean ->
+            if (bean.isOk()) {
+                GlobalApp.toastSuccess(R.string.text_share_success)
+                //sign tag
+                val s = bean.data
+                //更新 tagId
+                Vog.d("share new tag---> $s")
+                node.from = DataFrom.FROM_SHARED
+                node.tagId = s
+                node.update()
             }
-            fail { _, e ->
-                e.log()
-                GlobalApp.toastError(R.string.text_net_err)
-            }
+        }.onFailure { e ->
+            e.log()
+            GlobalApp.toastError(R.string.text_net_err)
         }
     }
 

@@ -15,8 +15,6 @@ import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.bridges.SystemBridge
 import cn.vove7.common.net.ApiUrls
-import cn.vove7.common.net.WrapperNetHelper
-import cn.vove7.common.net.model.UserFeedback
 import cn.vove7.common.utils.span
 import cn.vove7.jarvis.BuildConfig
 import cn.vove7.jarvis.R
@@ -65,11 +63,11 @@ class HelpActivity : ReturnableActivity() {
     private fun startTutorials() {
         list_view.post {
             Tutorials.oneStep(this, list = arrayOf(
-                    ItemWrap(Tutorials.h_t_1, adapter.holders[0]?.titleView, getString(R.string.text_user_manual), "自定义指令、脚本Api、远程调试都在这里")
-                    , ItemWrap(Tutorials.h_t_2, adapter.holders[1]?.titleView, getString(R.string.text_hot_key_desc), "快速了解快捷键操作")
-                    , ItemWrap(Tutorials.h_t_5, adapter.holders[2]?.titleView, getString(R.string.text_faq), "遇到问题可先查看常见问题再进行反馈")
-                    , ItemWrap(Tutorials.h_t_3, adapter.holders[4]?.titleView, getString(R.string.text_feedback), "在这里进行反馈与建议，或者加入QQ群")
-                    , ItemWrap(Tutorials.h_t_4, adapter.holders[5]?.titleView, getString(R.string.text_browse_log), "当出现问题时，或非预想结果时可提供日志给作者")
+                    ItemWrap(Tutorials.h_t_1, adapter.holders[0]?.titleView, getString(R.string.text_user_manual), "自定义指令、脚本Api、远程调试都在这里"),
+                    ItemWrap(Tutorials.h_t_2, adapter.holders[1]?.titleView, getString(R.string.text_hot_key_desc), "快速了解快捷键操作"),
+                    ItemWrap(Tutorials.h_t_5, adapter.holders[2]?.titleView, getString(R.string.text_faq), "遇到问题可先查看常见问题再进行反馈"),
+                    ItemWrap(Tutorials.h_t_3, adapter.holders[4]?.titleView, getString(R.string.text_feedback), "在这里进行反馈与建议，或者加入QQ群"),
+                    ItemWrap(Tutorials.h_t_4, adapter.holders[5]?.titleView, getString(R.string.text_browse_log), "当出现问题时，或非预想结果时可提供日志给作者"),
             ))
         }
     }

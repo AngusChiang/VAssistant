@@ -1,6 +1,7 @@
 package cn.vove7.jarvis.activities
 
 import android.app.Activity
+import android.content.ComponentCallbacks2
 import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
@@ -12,7 +13,6 @@ import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.bridges.SystemBridge
 import cn.vove7.common.model.UserInfo
 import cn.vove7.common.net.ApiUrls
-import cn.vove7.common.net.WrapperNetHelper
 import cn.vove7.common.net.model.LastDateInfo
 import cn.vove7.common.utils.startActivity
 import cn.vove7.common.utils.times
@@ -24,6 +24,8 @@ import cn.vove7.jarvis.activities.screenassistant.ScreenOcrActivity
 import cn.vove7.jarvis.activities.screenassistant.ScreenShareActivity
 import cn.vove7.jarvis.activities.screenassistant.SpotScreenActivity
 import cn.vove7.jarvis.adapters.SettingsExpandableAdapter
+import cn.vove7.jarvis.app.AppApi
+import cn.vove7.jarvis.chat.TulingChatSystem
 import cn.vove7.jarvis.receivers.PowerEventReceiver
 import cn.vove7.jarvis.services.MainService
 import cn.vove7.jarvis.tools.*
@@ -43,6 +45,8 @@ import cn.vove7.vtp.view.span.ColourTextClickableSpan
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.customview.customView
 import kotlinx.android.synthetic.main.activity_expandable_settings.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*
@@ -87,8 +91,7 @@ class AdvancedSettingActivity : ReturnableActivity() {
     private fun startTutorials() {
         Handler().postDelayed({
             Tutorials.oneStep(this, list = arrayOf(
-                    ItemWrap(Tutorials.t_inst_man, adapter.childHolders[0][0]?.titleView, "指令管理", "这里查看支持的指令和指令管理")
-                    , ItemWrap(Tutorials.t_mark_man, adapter.childHolders[0][1]?.titleView, "标记管理", "这里查看标记的数据和管理")
+                    ItemWrap(Tutorials.t_inst_man, adapter.childHolders[0][0]?.titleView, "指令管理", "这里查看支持的指令和指令管理"), ItemWrap(Tutorials.t_mark_man, adapter.childHolders[0][1]?.titleView, "标记管理", "这里查看标记的数据和管理")
             ))
         }, 1000)
     }
@@ -233,8 +236,19 @@ class AdvancedSettingActivity : ReturnableActivity() {
                             TextOperationDialog(this, TextOperationDialog.TextModel("123" * 50))
                         },
                         IntentItem(title = "释放内存") {
-                            GlobalApp.GApp.onTrimMemory(0)
-                        }
+                            GlobalApp.GApp.onTrimMemory(ComponentCallbacks2.TRIM_MEMORY_BACKGROUND)
+                        },
+                        IntentItem(title = "图灵对话测试") {
+                            launch {
+                                val res = TulingChatSystem().chatWithText("今天天气")
+                                withContext(Dispatchers.Main.immediate) {
+                                    GlobalApp.toastInfo(res.toString())
+                                }
+                            }
+                        },
+                        IntentItem(title = "对话测试") {
+                            MainService.parseCommand("1+1")
+                        },
                 )
                 ))
             }
@@ -261,7 +275,7 @@ class AdvancedSettingActivity : ReturnableActivity() {
                     if (resultCode == Activity.RESULT_OK && data != null) {
                         try {
                             val result = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS)
-                            GlobalApp.toastInfo(result?.get(0) ?:"失败")
+                            GlobalApp.toastInfo(result?.get(0) ?: "失败")
                         } catch (e: Exception) {
                             GlobalApp.toastError(e.message ?: "e")
                         }
@@ -272,30 +286,32 @@ class AdvancedSettingActivity : ReturnableActivity() {
         super.onActivityResult(requestCode, resultCode, data)
     }
 
-    private fun getLastInfo(back: (LastDateInfo?) -> Unit) {
-        WrapperNetHelper.postJson<LastDateInfo>(ApiUrls.GET_LAST_DATA_DATE) {
-            success { _, b ->
-                if (b.isOk()) {
-                    back.invoke(b.data)
-                } else {
-                    back.invoke(null)
-                }
-            }
-            fail { _, e ->
-                GlobalLog.err(e)
+    private fun getLastInfo(back: suspend (LastDateInfo?) -> Unit) = launchIO {
+        kotlin.runCatching {
+            AppApi.getLastDataInfo()
+        }.onSuccess { b ->
+            if (b.isOk()) {
+                back.invoke(b.data)
+            } else {
                 back.invoke(null)
             }
+        }.onFailure { e ->
+            GlobalLog.err(e)
+            back.invoke(null)
         }
     }
+
 
     private fun showLastDataDate() {
         val p = ProgressDialog(this)
         getLastInfo {
-            p.dismiss()
-            if (it != null) {
-                statistic(it)
-            } else {
-                GlobalApp.toastError("获取失败")
+            withContext(Dispatchers.Main) {
+                p.dismiss()
+                if (it != null) {
+                    statistic(it)
+                } else {
+                    GlobalApp.toastError("获取失败")
+                }
             }
         }
     }

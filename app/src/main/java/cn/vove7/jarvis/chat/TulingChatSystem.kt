@@ -18,7 +18,7 @@ import com.google.gson.Gson
  */
 class TulingChatSystem : ChatSystem {
 
-    override fun chatWithText(s: String): ChatResult? {
+    override suspend fun chatWithText(s: String): ChatResult? {
         val data = RequestData.withText(s)
         val res = HttpBridge.postJson(url, Gson().toJson(data))
         if (res != null) {
@@ -40,7 +40,7 @@ class TulingChatSystem : ChatSystem {
         return null
     }
 
-    private fun autoProcess(result: ChatResult): ChatResult? {
+    private suspend fun autoProcess(result: ChatResult): ChatResult? {
         if (result.word == "请问你想查询哪个城市") {
             val li = SystemBridge.locationInfo()
             if (li != null) {
@@ -55,12 +55,18 @@ class TulingChatSystem : ChatSystem {
     }
 }
 
+@Keep
 class RequestData {
     /**
      * 输入类型:0-文本(默认)、1-图片、2-音频
      */
+    @Keep
     var reqType: Int = 0
+
+    @Keep
     var perception = Perception()
+
+    @Keep
     var userInfo = UserI()
 
     companion object {
@@ -73,21 +79,30 @@ class RequestData {
     }
 }
 
+@Keep
 class UserI {
+    @Keep
     val apiKey = {
         AppConfig.chatStr ?: UserInfo.getUserId().let {
             if (BuildConfig.DEBUG || it in 1..999 || UserInfo.isVip()) "0c830192e98e4b29977c281304c6ba3d"
             else "89658c8238384de39cee1ecb529cb81f"
         }
     }.invoke()
+    @Keep
     val userId = UserInfo.getEmail()?.let {
         it.substring(0, it.indexOf('@'))
     } ?: "guest"
 }
 
+@Keep
 class Perception {
+    @Keep
     var inputText: InputText? = null
+
+    @Keep
     var inputImage: InputImage? = null
+
+    @Keep
     var selfInfo: SelfInfo? = null
     fun setText(s: String) {
         if (inputText == null)
@@ -95,23 +110,41 @@ class Perception {
     }
 }
 
+@Keep
 class SelfInfo {
+    @Keep
     var location: Location? = null
 }
 
+@Keep
 class Location {
+    @Keep
     var city: String? = null
+
+    @Keep
     var province: String? = null
+
+    @Keep
     var street: String? = null
 }
 
-class InputText(var text: String)
-class InputImage(var url: String)
+@Keep
+class InputText(
+        @Keep
+        var text: String
+)
+
+@Keep
+class InputImage(
+        @Keep
+        var url: String
+)
 
 @Keep
 class ResponseData : ChatResultBuilder {
     @Keep
     var intent: Inten? = null
+
     @Keep
     var results: List<Results>? = null
     fun parseError(): String? {
@@ -132,7 +165,7 @@ class ResponseData : ChatResultBuilder {
 //                Pair(4600, "输入内容为空"),
                 Pair(4602, "输入文本内容超长上限150"),
                 Pair(7002, "上传信息失败"),
-                Pair(8008, "服务器错误"))[intent?.code ?: "0"]?.also {
+                Pair(8008, "服务器错误"))[intent?.code ?: 0]?.also {
             GlobalLog.err(it)
             return it
         }
@@ -172,10 +205,13 @@ class ResponseData : ChatResultBuilder {
 class Results {
     @Keep
     var groupType: Int = 0
+
     @Keep
     var resultType: String? = null
+
     @Keep
     var values: Values? = null
+
     @Keep
     var emotion: Emotion? = null
 
@@ -196,8 +232,10 @@ class Emotion {
 class Values {
     @Keep
     var text: String? = null
+
     @Keep
     var news: Array<New> = arrayOf()
+
     @Keep
     var url: String? = null
 
@@ -205,22 +243,29 @@ class Values {
     class New {
         @Keep
         var name: String = ""
+
         @Keep
         var icon: String = ""
+
         @Keep
         var info: String? = null
+
         @Keep
         var source: String? = null
+
         @Keep
         var detailurl: String = ""
     }
 }
+
 @Keep
 class Inten {
     @Keep
     var code: Int = 0
+
     @Keep
     var intentName: String? = null
+
     @Keep
     var actionName: String? = null
 }

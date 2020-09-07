@@ -25,7 +25,7 @@ object HttpBridge {
     }
 
     fun get(url: String, headers: Map<String, Any>?): String? {
-        println("get ---> $url $headers")
+        Vog.d("get ---> $url $headers")
         val client = OkHttpClient.Builder()
                 .readTimeout(timeout, TimeUnit.SECONDS).build()
         val request = Request.Builder().url(url)
@@ -124,7 +124,6 @@ object HttpBridge {
         val result = ResultBox<String?>()
         call.enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
-                e.printStackTrace()
                 GlobalLog.err("请求失败: " + e.message)
                 result.setAndNotify(null)
             }
@@ -133,7 +132,7 @@ object HttpBridge {
             override fun onResponse(call: Call, response: Response) {//响应成功更新UI
                 if (response.isSuccessful) {
                     val s = response.body?.string()
-                    println("onResponse ---> http bridge $s")
+                    Vog.d("onResponse ---> http bridge $s")
                     result.setAndNotify(s)
                 } else {
                     GlobalLog.err("网络错误：" + response.message)
@@ -145,9 +144,4 @@ object HttpBridge {
     }
 
 }
-
-interface OnResponse {
-    fun onResult(status: Int, content: String?)
-}
-
 

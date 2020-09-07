@@ -9,27 +9,28 @@ import android.widget.ProgressBar
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.app.log
 import cn.vove7.common.model.UserInfo
-import cn.vove7.common.net.ApiUrls
-import cn.vove7.common.net.WrapperNetHelper
 import cn.vove7.common.net.tool.SecureHelper
-import cn.vove7.common.utils.TextHelper
-import cn.vove7.common.utils.gone
-import cn.vove7.common.utils.onClick
+import cn.vove7.common.utils.*
 import cn.vove7.jarvis.R
+import cn.vove7.jarvis.app.AppApi
 import cn.vove7.jarvis.tools.DataCollector
 import cn.vove7.vtp.log.Vog
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.customview.customView
 import kotlinx.android.synthetic.main.dialog_sign_up.view.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 /**
- * # SignupDialog
+ * # SignUpDialog
  *
  * @author Administrator
  * 2018/9/14
  */
 
-class SignupDialog(context: Context, val r: OnLoginSuccess) {
+class SignUpDialog(context: Context, val r: OnLoginSuccess) {
     val dialog: MaterialDialog = MaterialDialog(context)
     private val lastBit = 6
 
@@ -43,6 +44,7 @@ class SignupDialog(context: Context, val r: OnLoginSuccess) {
             by lazy { view.ver_code_view }
     private val signUpBtn: Button by lazy { view.dialog_signup_btn }
     private val loadBar: ProgressBar by lazy { view.loading_bar }
+
     //    val countDownSecs = 30
     val view: View by lazy { LayoutInflater.from(context).inflate(R.layout.dialog_sign_up, null) }
 
@@ -86,32 +88,37 @@ class SignupDialog(context: Context, val r: OnLoginSuccess) {
             loadBar.visibility = View.VISIBLE
             //post
             signUpBtn.isClickable = false
-            WrapperNetHelper.postJson<String>(ApiUrls.REGISTER_BY_EMAIL, model = userInfo) {
-                success { _, bean ->
-                    //泛型
-                    Vog.d("onResponse ---> $bean")
-                    loadBar.visibility = View.INVISIBLE
-                    if (bean.isOk()) {
-                        GlobalApp.toastInfo(bean.data ?: "null")
-                        DataCollector.onUserRegister()
-                        LoginDialog(context, userEmail, userPass, r)
-                        dialog.dismiss()
-                    } else {
-                        GlobalApp.toastInfo(bean.message)
+            GlobalScope.launch(Dispatchers.IO) {
+                kotlin.runCatching {
+                    AppApi.registerByEmail(userInfo)
+                }.apply {
+                    onSuccessMain { bean ->
+                        //泛型
+                        Vog.d("onResponse ---> $bean")
+                        loadBar.visibility = View.INVISIBLE
+                        if (bean.isOk()) {
+                            GlobalApp.toastInfo(bean.data ?: "null")
+                            DataCollector.onUserRegister()
+                            LoginDialog(context, userEmail, userPass, r)
+                            dialog.dismiss()
+                        } else {
+                            GlobalApp.toastInfo(bean.message)
+                        }
                     }
-                }
-                fail { _, e ->
-                    loadBar.visibility = View.INVISIBLE
-                    e.log()
-                    GlobalApp.toastError("出错")
-                }
-                end {
-                    signUpBtn.isClickable = true
+                    onFailureMain { e ->
+                        loadBar.visibility = View.INVISIBLE
+                        e.log()
+                        GlobalApp.toastError("出错")
+                    }
+                    withContext(Dispatchers.Main) {
+                        signUpBtn.isClickable = true
+                    }
                 }
             }
         }
-        dialog.customView(view = view, scrollable = true).title(R.string.text_sign_up).show()
+        dialog.customView(view = view, scrollable = true)
+                .title(R.string.text_sign_up)
+                .show()
         dialog.findViewById<View>(R.id.get_ver_layout).gone()
     }
-
 }

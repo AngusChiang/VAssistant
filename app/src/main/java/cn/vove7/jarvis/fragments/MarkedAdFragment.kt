@@ -5,20 +5,22 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import cn.vove7.common.app.AppConfig
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.bridges.SystemBridge
 import cn.vove7.common.datamanager.DAO
 import cn.vove7.common.model.UserInfo
 import cn.vove7.jarvis.activities.AppAdListActivity
+import cn.vove7.jarvis.activities.base.BaseActivity
 import cn.vove7.jarvis.adapters.ListViewModel
 import cn.vove7.jarvis.adapters.SimpleListAdapter
 import cn.vove7.jarvis.fragments.base.OnSyncMarked
 import cn.vove7.jarvis.plugins.AdKillerService
-import cn.vove7.common.app.AppConfig
-import cn.vove7.jarvis.activities.base.BaseActivity
 import cn.vove7.jarvis.tools.DataUpdator
 import cn.vove7.jarvis.view.dialog.AdEditorDialog
 import cn.vove7.vtp.log.Vog
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 /**
  * # MarkedAdFragment
@@ -83,12 +85,15 @@ class MarkedAdFragment : SimpleListFragment<String>(), OnSyncMarked {
             return
         }
         showProgressBar()
-
-        DataUpdator.syncMarkedAd {
-            hideProgressBar()
-            if (it) {
-                refresh()
+        launchIO {
+            if (DataUpdator.syncMarkedAd()) {
+                withContext(Dispatchers.Main) {
+                    refresh()
+                }
                 GlobalApp.toastSuccess("同步完成")
+            }
+            withContext(Dispatchers.Main) {
+                hideProgressBar()
             }
         }
     }

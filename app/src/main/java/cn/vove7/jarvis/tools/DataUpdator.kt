@@ -5,26 +5,23 @@ import android.text.SpannableStringBuilder
 import androidx.core.content.ContextCompat
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.app.GlobalLog
-import cn.vove7.common.datamanager.AppAdInfo
 import cn.vove7.common.datamanager.DAO
 import cn.vove7.common.datamanager.DaoHelper
 import cn.vove7.common.datamanager.OnUpdate
 import cn.vove7.common.datamanager.executor.entity.MarkedData
-import cn.vove7.common.datamanager.parse.statusmap.ActionNode
 import cn.vove7.common.helper.AdvanAppHelper
-import cn.vove7.common.model.ResultBox
-import cn.vove7.common.net.ApiUrls
-import cn.vove7.common.net.WrapperNetHelper
 import cn.vove7.common.net.model.LastDateInfo
 import cn.vove7.common.utils.CoroutineExt.launch
-import cn.vove7.common.utils.TextHelper
 import cn.vove7.common.utils.spanColor
 import cn.vove7.executorengine.parse.ParseEngine
 import cn.vove7.jarvis.R
+import cn.vove7.jarvis.app.AppApi
 import cn.vove7.jarvis.plugins.AdKillerService
 import cn.vove7.jarvis.receivers.UtilEventReceiver
 import cn.vove7.quantumclock.QuantumClock
 import cn.vove7.vtp.sharedpreference.SpHelper
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 
 /**
  * # DataUpdator
@@ -46,24 +43,24 @@ object DataUpdator {
     /**
      * 指令检查更新
      */
-    fun checkUpdate(back: (result: UpdateResult) -> Unit) {
-        WrapperNetHelper.postJson<LastDateInfo>(ApiUrls.GET_LAST_DATA_DATE) {
-            success { _, b ->
-                val it = b.data
-                if (b.isOk() && it != null) {
-                    val v = check(it)
-                    if (v.first.isNotEmpty()) {
-                        notifyUpdate(v.first, back)
-                    } else {
-                        back.invoke(UpdateResult.noUpdate())
-                    }
-                }
-                fail { _, e ->
-                    GlobalLog.log("检查数据更新失败")
-                    GlobalLog.err(e)
+    fun checkUpdate(back: (result: UpdateResult) -> Unit) = GlobalScope.launch {
+        kotlin.runCatching {
+            AppApi.getLastDataInfo()
+        }.onSuccess { b ->
+            val it = b.data
+            if (b.isOk() && it != null) {
+                val v = check(it)
+                if (v.first.isNotEmpty()) {
+                    notifyUpdate(v.first, back)
+                } else {
                     back.invoke(UpdateResult.noUpdate())
                 }
             }
+        }.onFailure { e ->
+            GlobalLog.log("检查数据更新失败")
+            GlobalLog.err(e)
+            back.invoke(UpdateResult.noUpdate())
+
         }
     }
 
@@ -107,7 +104,7 @@ object DataUpdator {
     fun oneKeyUpdate(
             types: List<Int>,
             back: ((UpdateResult) -> Unit)? = { result ->
-                if(result.hasUpdate) {
+                if (result.hasUpdate) {
                     AppNotification.broadcastNotification(1234, "指令数据已更新",
                             "点击查看更新内容",
                             UtilEventReceiver.getIntent(UtilEventReceiver.INST_DATA_SYNC_FINISH).apply {
@@ -120,15 +117,11 @@ object DataUpdator {
         val hasUpdate = true
         val builder = SpannableStringBuilder()
         types.forEach {
-            val result = ResultBox<Boolean>()
             val updater = Updater(builder)
             when (it) {
                 0 -> {
                     builder.appendlnGreen("正在获取：全局指令")
-                    syncGlobalInst(updater) { b ->
-                        result.setAndNotify(b)
-                    }
-                    if (result.blockedGet() == true) {
+                    if (syncGlobalInst(updater)) {
                         builder.appendlnGreen("成功")
                     } else {
                         builder.appendln("失败,可至帮助进行反馈".spanColor(Color.RED))
@@ -136,8 +129,7 @@ object DataUpdator {
                 }
                 1 -> {
                     builder.appendlnGreen("正在获取：应用内指令")
-                    syncInAppInst(updater) { b -> result.setAndNotify(b) }
-                    if (result.blockedGet() == true) {
+                    if (syncInAppInst(updater)) {
                         builder.appendlnGreen("成功")
                     } else {
                         builder.appendlnRed("失败,可至帮助进行反馈")
@@ -145,10 +137,7 @@ object DataUpdator {
                 }
                 2, 3, 4 -> {//marked data
                     builder.appendlnGreen("正在获取：" + arrayOf("标记联系人", "标记应用", "标记功能")[it - 2])
-                    syncMarkedData(updater, getTypes(it), markedLastKeyId[it - 2]) { b ->
-                        result.setAndNotify(b)
-                    }
-                    if (result.blockedGet() == true) {
+                    if (syncMarkedData(updater, getTypes(it), markedLastKeyId[it - 2])) {
                         builder.appendlnGreen("成功")
                     } else {
                         builder.appendlnRed("失败,可至帮助进行反馈")
@@ -156,8 +145,7 @@ object DataUpdator {
                 }
                 5 -> {//ad
                     builder.appendlnGreen("正在获取：标记广告")
-                    syncMarkedAd(updater) { b -> result.setAndNotify(b) }
-                    if (result.blockedGet() == true) {
+                    if (syncMarkedAd(updater)) {
                         builder.appendlnGreen("成功")
                     } else {
                         builder.appendlnRed("失败,可至帮助进行反馈")
@@ -214,84 +202,74 @@ object DataUpdator {
      * 同步全局命令
      * @param back (Boolean) -> Unit
      */
-    fun syncGlobalInst(onUpdate: OnUpdate? = null, back: (Boolean) -> Unit) {
-        WrapperNetHelper.postJson<List<ActionNode>>(ApiUrls.SYNC_GLOBAL_INST) {
-            success { _, bean ->
-                if (bean.isOk()) {
-                    val list = bean.data
-                    if (list != null) {
-                        DaoHelper.updateGlobalInst(list, onUpdate).also {
-                            if (it) {
-                                SpHelper(GlobalApp.APP).set(R.string.key_last_sync_global_date, QuantumClock.currentTimeMillis)
-                                DAO.clear()
-                                ParseEngine.updateGlobal()
-                                back.invoke(true)
-                            } else {
-                                back.invoke(false)
-                            }
+    suspend fun syncGlobalInst(onUpdate: OnUpdate? = null): Boolean {
+
+        return kotlin.runCatching {
+            AppApi.syncGlobalInst()
+        }.fold(onSuccess = { bean ->
+            if (bean.isOk()) {
+                val list = bean.data
+                if (list != null) {
+                    DaoHelper.updateGlobalInst(list, onUpdate).also {
+                        if (it) {
+                            SpHelper(GlobalApp.APP).set(R.string.key_last_sync_global_date, QuantumClock.currentTimeMillis)
+                            DAO.clear()
+                            ParseEngine.updateGlobal()
+                            return@fold true
+                        } else {
+                            return@fold false
                         }
-                    } else {
-                        GlobalLog.err("code: GI57")
-                        GlobalApp.toastError(R.string.text_error_occurred)
-                        back.invoke(false)
                     }
                 } else {
-                    GlobalApp.toastError(R.string.text_net_err)
-                    back.invoke(false)
+                    GlobalLog.err("code: GI57")
+                    GlobalApp.toastError(R.string.text_error_occurred)
+                    false
                 }
-            }
-            fail { _, e ->
-                GlobalLog.err(e)
+            } else {
                 GlobalApp.toastError(R.string.text_net_err)
-                back.invoke(false)
+                false
             }
-        }
+
+        }, onFailure = { e ->
+            GlobalLog.err(e)
+            GlobalApp.toastError(R.string.text_net_err)
+            false
+        })
     }
 
     /**
      * 同步App内指令
      * @param back (Boolean)->Unit
      */
-    fun syncInAppInst(onUpdate: OnUpdate? = null, back: (Boolean) -> Unit) {
-        WrapperNetHelper.postJson<List<ActionNode>>(ApiUrls.SYNC_IN_APP_INST,
-                AdvanAppHelper.getPkgList()) {
-            success { _, bean ->
-                if (bean.isOk()) {
-                    val list = bean.data
-                    if (list != null) {
-                        DaoHelper.updateInAppInst(list, onUpdate).also {
-                            if (it) {
-                                SpHelper(GlobalApp.APP).set(R.string.key_last_sync_in_app_date,
-                                        QuantumClock.currentTimeMillis)
-                                DAO.clear()
-                                ParseEngine.updateInApp()
-                                back.invoke(true)
-                            } else {
-                                GlobalApp.toastError("同步失败")
-                                back.invoke(false)
-                            }
+    suspend fun syncInAppInst(onUpdate: OnUpdate? = null): Boolean {
+        return kotlin.runCatching {
+            AppApi.syncInAppInst()
+        }.fold(onSuccess = { bean ->
+            if (bean.isOk()) {
+                val list = bean.data
+                if (list != null) {
+                    DaoHelper.updateInAppInst(list, onUpdate).also {
+                        if (it) {
+                            SpHelper(GlobalApp.APP).set(R.string.key_last_sync_in_app_date,
+                                    QuantumClock.currentTimeMillis)
+                            DAO.clear()
+                            ParseEngine.updateInApp()
+                            return@fold true
+                        } else {
+                            GlobalApp.toastError("同步失败")
+                            return@fold false
                         }
-                    } else {
-                        GlobalLog.err("code: GI57")
-                        GlobalApp.toastError(R.string.text_error_occurred)
-                        back.invoke(false)
                     }
                 } else {
-                    if (bean.code == 1) {
-                        SpHelper(GlobalApp.APP).set(R.string.key_last_sync_in_app_date,
-                                QuantumClock.currentTimeMillis)
-                        back.invoke(true)
-                    } else {
-                        GlobalApp.toastError(bean.message)
-                        back.invoke(false)
-                    }
+                    GlobalLog.err("code: GI57")
+                    GlobalApp.toastError(R.string.text_error_occurred)
+                    return@fold false
                 }
-            }
-            fail { _, e ->
-                GlobalLog.err(e)
-                back.invoke(false)
-            }
-        }
+            } else return@fold false
+        }, onFailure = { e ->
+            GlobalLog.err(e)
+            false
+        })
     }
 
     /**
@@ -300,56 +278,53 @@ object DataUpdator {
      * @param lastKeyId Int
      * @param back (Boolean) -> Unit
      */
-    fun syncMarkedData(onUpdate: OnUpdate? = null, types: Array<String>, lastKeyId: Int, back: (Boolean) -> Unit) {
-        val syncData = TextHelper.arr2String(types)
-
-        WrapperNetHelper.postJson<List<MarkedData>>(ApiUrls.SYNC_MARKED, syncData) {
-            success { _, bean ->
-                if (bean.isOk()) {
-                    DaoHelper.updateMarkedData(onUpdate, types, bean.data ?: emptyList())
-                    SpHelper(GlobalApp.APP).set(lastKeyId, QuantumClock.currentTimeMillis)
-                    DAO.clear()
-                    back.invoke(true)
-                } else {
-                    GlobalApp.toastError(bean.message)
-                    back.invoke(false)
-                }
+    suspend fun syncMarkedData(
+            onUpdate: OnUpdate? = null,
+            types: Array<String>,
+            lastKeyId: Int
+    ): Boolean {
+        val syncData = types.joinToString(",")
+        return kotlin.runCatching {
+            AppApi.syncMarkedData(syncData)
+        }.fold(onSuccess = { bean ->
+            return@fold if (bean.isOk()) {
+                DaoHelper.updateMarkedData(onUpdate, types, bean.data ?: emptyList())
+                SpHelper(GlobalApp.APP).set(lastKeyId, QuantumClock.currentTimeMillis)
+                DAO.clear()
+                true
+            } else {
+                GlobalApp.toastError(bean.message)
+                false
             }
-            fail { _, e ->
-                GlobalLog.err(e)
-                back.invoke(false)
-            }
-        }
+        }, onFailure = { e ->
+            GlobalLog.err(e)
+            false
+        })
     }
 
     /**
      * 同步标记广告
      * @param back (Boolean) -> Unit
      */
-    fun syncMarkedAd(onUpdate: OnUpdate? = null, back: (Boolean) -> Unit) {
-
+    suspend fun syncMarkedAd(onUpdate: OnUpdate? = null): Boolean = kotlin.runCatching {
         val syncPkgs = AdvanAppHelper.getPkgList()
-
-        WrapperNetHelper.postJson<List<AppAdInfo>>(ApiUrls.SYNC_APP_AD, syncPkgs) {
-            success { _, bean ->
-                if (bean.isOk()) {
-                    //
-                    DaoHelper.updateAppAdInfo(bean.data ?: emptyList(), onUpdate)
-                    SpHelper(GlobalApp.APP).set(R.string.key_last_sync_marked_ad_date, QuantumClock.currentTimeMillis)
-                    AdKillerService.update()
-                    DAO.clear()
-                    back.invoke(true)
-                } else {
-                    GlobalApp.toastInfo(bean.message)
-                    back.invoke(false)
-                }
-            }
-            fail { _, e ->
-                GlobalLog.err(e)
-                GlobalApp.toastInfo(e.message ?: "")
-                back.invoke(false)
-            }
+        AppApi.syncMarkedAd(syncPkgs)
+    }.fold(onSuccess = { bean ->
+        if (bean.isOk()) {
+            //
+            DaoHelper.updateAppAdInfo(bean.data ?: emptyList(), onUpdate)
+            SpHelper(GlobalApp.APP).set(R.string.key_last_sync_marked_ad_date, QuantumClock.currentTimeMillis)
+            AdKillerService.update()
+            DAO.clear()
+            return@fold true
+        } else {
+            GlobalApp.toastInfo(bean.message)
+            return@fold false
         }
-    }
-
+    }, onFailure =
+    { e ->
+        GlobalLog.err(e)
+        GlobalApp.toastInfo(e.message ?: "")
+        false
+    })
 }

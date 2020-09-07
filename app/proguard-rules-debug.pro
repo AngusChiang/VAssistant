@@ -12,12 +12,6 @@
 -dontusemixedcaseclassnames
 
 
-# LoggerKt.logd$default
-# 指定不去忽略非公共的库的类
--dontskipnonpubliclibraryclasses
-
-# 指定不去忽略非公共的库的类的成员
--dontskipnonpubliclibraryclassmembers
 # 不做预校验，preverify是proguard的4个步骤之一
 # Android不需要preverify，去掉这一步可加快混淆速度
 
@@ -50,40 +44,6 @@
 # 对R文件下的所有类及其方法，都不能被混淆
 -keepclassmembers class **.R$* {
     *;
-}
-# 移除android 所有log
--assumenosideeffects class cn.daqinjia.android.common.LoggerKt{
-    public static *** logv$default(...);
-    public static *** log$default(...);
-    public static *** logd$default(...);
-    public static *** loge$default(...);
-    public static *** logi$default(...);
-    public static *** logw$default(...);
-    public static *** logv(...);
-    public static *** log(...);
-    public static *** logd(...);
-    public static *** loge(...);
-    public static *** logi(...);
-    public static *** logw(...);
-}
--assumenosideeffects class cn.daqinjia.android.common.Logger {
-    public *** logv(...);
-    public *** log(...);
-    public *** logd(...);
-    public *** loge(...);
-    public *** logi(...);
-    public *** logw(...);
-}
-
--assumenosideeffects class cn.vove7.vtp.log.Vog {
-    public static cn.vove7.vtp.log.Vog INSTANCE;
-    public *** v(...);
-    public *** i(...);
-    public *** w(...);
-    public *** d(...);
-    public *** e(...);
-    public *** a(...);
-    public *** wtf(...);
 }
 
 -keep class com.google.android.material.* {*;}
@@ -164,7 +124,7 @@
 -keep class cn.vove7.vtp.app.AppInfo { *; }
 -keep class cn.vove7.vtp.system.DeviceInfo { *; }
 -keep class cn.vove7.vtp.system.ScreenInfo { *; }
--keep class cn.vove7.vtp.net.* {*;}
+-keep class cn.vove7.vtp.net.** {*;}
 
 
 -keep class cn.vove7.common.datamanager.greendao.** { *; }
@@ -183,3 +143,7 @@
 -keep @org.greenrobot.greendao.annotation.Entity class * { *; }
 
 -keep class * extends org.greenrobot.greendao.AbstractDao { *; }
+
+
+# debug
+-keepattributes SourceFile

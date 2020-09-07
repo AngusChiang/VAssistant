@@ -14,13 +14,12 @@ import cn.vove7.common.datamanager.AppAdInfo
 import cn.vove7.common.datamanager.DAO
 import cn.vove7.common.datamanager.greendao.AppAdInfoDao
 import cn.vove7.common.datamanager.parse.DataFrom
-import cn.vove7.common.net.ApiUrls
-import cn.vove7.common.net.WrapperNetHelper
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.activities.base.BaseActivity
 import cn.vove7.jarvis.activities.base.OneFragmentActivity
 import cn.vove7.jarvis.adapters.ListViewModel
 import cn.vove7.jarvis.adapters.SimpleListAdapter
+import cn.vove7.jarvis.app.AppApi
 import cn.vove7.jarvis.fragments.SimpleListFragment
 import cn.vove7.jarvis.tools.DialogUtil
 import cn.vove7.jarvis.view.dialog.AdEditorDialog
@@ -98,6 +97,7 @@ class AppAdListActivity : OneFragmentActivity() {
                     }
                 }
             }
+
         override var floatClickListener: View.OnClickListener? = View.OnClickListener {
             if (!AppConfig.checkLogin()) {
                 return@OnClickListener
@@ -114,42 +114,39 @@ class AppAdListActivity : OneFragmentActivity() {
             }
         }
 
-        fun share(adInfo: AppAdInfo) {
-            WrapperNetHelper.postJson<String>(ApiUrls.SHARE_APP_AD_INFO, adInfo) {
-                success { _, bean ->
-                    if (bean.isOk()) {
-                        //return tagId
-                        val tag = bean.data
-                        if (tag != null) {
-                            adInfo.from = DataFrom.FROM_SHARED
-                            adInfo.tagId = tag
-                            DAO.daoSession.appAdInfoDao.update(adInfo)
-                        }
-                        GlobalApp.toastSuccess(bean.message)
-                    } else {
-                        GlobalApp.toastInfo(bean.message)
+        fun share(adInfo: AppAdInfo) = launchIO {
+            kotlin.runCatching {
+                AppApi.shareAppAdInfo(adInfo)
+            }.onSuccess { bean ->
+                if (bean.isOk()) {
+                    //return tagId
+                    val tag = bean.data
+                    if (tag != null) {
+                        adInfo.from = DataFrom.FROM_SHARED
+                        adInfo.tagId = tag
+                        DAO.daoSession.appAdInfoDao.update(adInfo)
                     }
+                    GlobalApp.toastSuccess(bean.message)
+                } else {
+                    GlobalApp.toastInfo(bean.message)
                 }
-                fail { _, e ->
-                    GlobalLog.err(e)
-                    GlobalApp.toastError(R.string.text_error_occurred)
-                }
+            }.onFailure { e ->
+                GlobalLog.err(e)
+                GlobalApp.toastError(R.string.text_error_occurred)
             }
-
         }
 
-        fun delRemoteShare(tag: String) {
-            WrapperNetHelper.postJson<Any>(ApiUrls.DELETE_SHARE_APP_AD, tag) {
-                success { _, bean ->
-                    if (bean.isOk()) {
-                        Vog.d("云端删除成功")
-                    } else
-                        Vog.d("云端删除失败")
-                }
-                fail { _, e ->
-                    GlobalLog.err(e)
+        fun delRemoteShare(tag: String) = launchIO {
+            kotlin.runCatching {
+                AppApi.deleteAdAppInfo(tag)
+            }.onSuccess { bean ->
+                if (bean.isOk()) {
+                    Vog.d("云端删除成功")
+                } else
                     Vog.d("云端删除失败")
-                }
+            }.onFailure { e ->
+                GlobalLog.err(e)
+                Vog.d("云端删除失败")
             }
         }
 

@@ -25,6 +25,7 @@ android {
         }
         release_ndk_all {
         }
+        debugWithMinify {}
     }
 
 }
