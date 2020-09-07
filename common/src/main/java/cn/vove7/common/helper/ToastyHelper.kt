@@ -1,7 +1,10 @@
 package cn.vove7.common.helper
 
 import android.content.Context
+import android.widget.Toast
+import cn.daqinjia.android.scaffold.app.ActivityManager
 import cn.vove7.common.app.GlobalApp
+import cn.vove7.common.utils.isForeground
 import cn.vove7.common.utils.runOnUi
 import es.dmoral.toasty.Toasty
 
@@ -18,9 +21,13 @@ object ToastyHelper {
                 .apply()
     }
 
-    val app: Context get() = GlobalApp.APP
+    inline val app: Context get() = GlobalApp.APP
     fun toast(type: Int, msg: String, duration: Int) {
         runOnUi {
+            if (!ActivityManager.isForeground) {
+                Toast.makeText(app, msg, duration).show()
+                return@runOnUi
+            }
             when (type) {
                 TYPE_INFO -> {
                     Toasty.info(app, msg, duration, false).show()

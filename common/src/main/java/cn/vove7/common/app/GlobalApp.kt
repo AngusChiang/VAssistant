@@ -8,6 +8,7 @@ import android.util.Log
 import android.widget.Toast
 import androidx.multidex.MultiDex
 import cn.daqinjia.android.common.loge
+import cn.daqinjia.android.scaffold.app.ScaffoldApp
 import cn.vove7.common.BuildConfig
 import cn.vove7.common.helper.ToastyHelper
 import cn.vove7.common.helper.ToastyHelper.TYPE_ERROR
@@ -28,7 +29,7 @@ import es.dmoral.toasty.Toasty
  * 2018/8/8
  */
 
-open class GlobalApp : Application() {
+open class GlobalApp : ScaffoldApp() {
 
     override fun onCreate() {
         launchTime = QuantumClock.currentTimeMillis
@@ -54,7 +55,7 @@ open class GlobalApp : Application() {
         private lateinit var _APP: Application
 
         @JvmStatic
-        val APP: Context get() = ForeService ?: _APP
+        val APP: Context get() = _APP
 
         val GApp: GlobalApp
             get() = _APP as GlobalApp

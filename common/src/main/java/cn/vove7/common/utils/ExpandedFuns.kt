@@ -23,6 +23,8 @@ import android.widget.EditText
 import androidx.annotation.ColorRes
 import androidx.annotation.StringRes
 import androidx.core.app.ActivityCompat
+import cn.daqinjia.android.scaffold.app.ActivityManager
+import cn.daqinjia.android.scaffold.app.ActivityStatus
 import cn.vove7.common.BuildConfig
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.app.GlobalLog
@@ -39,6 +41,9 @@ import cn.vove7.vtp.net.GsonHelper
 import cn.vove7.vtp.net.NetHelper
 import cn.vove7.vtp.net.WrappedRequestCallback
 import cn.vove7.vtp.runtimepermission.PermissionUtils
+import cn.vove7.vtp.weaklazy.weakLazy
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import okhttp3.Call
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.OkHttpClient
@@ -50,15 +55,7 @@ import java.security.MessageDigest
 import java.text.SimpleDateFormat
 import java.util.*
 import java.util.concurrent.TimeUnit
-import kotlin.collections.Map
-import kotlin.collections.Set
-import kotlin.collections.forEach
-import kotlin.collections.hashMapOf
-import kotlin.collections.map
-import kotlin.collections.mutableListOf
-import kotlin.collections.mutableSetOf
 import kotlin.collections.set
-import kotlin.collections.toTypedArray
 
 
 /**
@@ -760,4 +757,28 @@ val ByteArray.md5: String
             GlobalLog.err(e)
             throw RuntimeException(e)
         }
+    }
+
+suspend inline fun <T> Result<T>.onFailureMain(crossinline action: suspend (exception: Throwable) -> Unit) {
+    exceptionOrNull()?.let {
+        withContext(Dispatchers.Main) { action(it) }
+    }
+}
+
+suspend inline fun <T> Result<T>.onSuccessMain(crossinline action: suspend (value: T) -> Unit) {
+    if (isSuccess) withContext(Dispatchers.Main) {
+        action(getOrThrow())
+    }
+}
+
+
+val activities by weakLazy {
+    val f = ActivityManager::class.java.getDeclaredField("activities")
+    f.isAccessible = true
+    f.get(ActivityManager) as HashMap<Activity, ActivityStatus>
+}
+
+val ActivityManager.isForeground: Boolean
+    get() = activities.any { (_, s) ->
+        s != ActivityStatus.SHOWING
     }
