@@ -51,6 +51,7 @@ import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
 import java.io.File
 import java.io.Serializable
+import java.lang.reflect.Field
 import java.security.MessageDigest
 import java.text.SimpleDateFormat
 import java.util.*
@@ -771,14 +772,16 @@ suspend inline fun <T> Result<T>.onSuccessMain(crossinline action: suspend (valu
     }
 }
 
+@Suppress("UNCHECKED_CAST", "EXTENSION_SHADOWED_BY_MEMBER")
+fun <T> Field.get(obj: Any? = null): T = get(obj) as T
 
 val activities by weakLazy {
     val f = ActivityManager::class.java.getDeclaredField("activities")
     f.isAccessible = true
-    f.get(ActivityManager) as HashMap<Activity, ActivityStatus>
+    f.get<HashMap<Activity, ActivityStatus>>(ActivityManager)
 }
 
 val ActivityManager.isForeground: Boolean
     get() = activities.any { (_, s) ->
-        s != ActivityStatus.SHOWING
+        s == ActivityStatus.SHOWING || s == ActivityStatus.PAUSED
     }
