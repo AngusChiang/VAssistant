@@ -1,5 +1,6 @@
 package cn.vove7.jarvis.app
 
+import android.util.Log
 import cn.vove7.common.datamanager.AppAdInfo
 import cn.vove7.common.datamanager.executor.entity.MarkedData
 import cn.vove7.common.datamanager.history.CommandHistory
@@ -13,7 +14,6 @@ import cn.vove7.common.net.model.RequestParseModel
 import cn.vove7.common.net.model.ResponseMessage
 import cn.vove7.jarvis.BuildConfig
 import cn.vove7.jarvis.tools.BodySignInterceptor
-import cn.vove7.vtp.log.Vog
 import com.google.gson.GsonBuilder
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -103,7 +103,7 @@ interface AppApi {
     suspend fun syncGlobalInst(): ResponseMessage<List<ActionNode>>
 
     @POST(ApiUrls.SYNC_IN_APP_INST)
-    suspend fun syncInAppInst(): ResponseMessage<List<ActionNode>>
+    suspend fun syncInAppInst(@Body pkgs: List<String>): ResponseMessage<List<ActionNode>>
 
     @POST(ApiUrls.SYNC_MARKED)
     suspend fun syncMarkedData(@Body types: String): ResponseMessage<List<MarkedData>>
@@ -143,7 +143,7 @@ fun newHttpClient(): OkHttpClient = OkHttpClient.Builder().apply {
 
     if (BuildConfig.DEBUG) {
         addInterceptor(
-                HttpLoggingInterceptor { Vog.d(it) }.setLevel(
+                HttpLoggingInterceptor { Log.d("HTTP", it) }.setLevel(
                         HttpLoggingInterceptor.Level.BODY
                 )
         )

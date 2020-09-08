@@ -527,7 +527,9 @@ class ScreenAssistActivity : BaseActivity() {
                 }
                 if (oneJob?.isCancelled == false) {
                     TextOcrActivity.start(this@ScreenAssistActivity, results, intent.extras)
-                    bottomController.hideBottom()
+                    runOnUi {
+                        bottomController.hideBottom()
+                    }
                 }
             } catch (e: Exception) {
                 e.printStackTrace()
