@@ -128,6 +128,7 @@
 
 
 -keep class cn.vove7.common.datamanager.greendao.** { *; }
+-keep class cn.vove7.common.datamanager.parse.** { *; }
 -keep class cn.vove7.common.datamanager.history.CommandHistory { *; }
 -keep class cn.vove7.androlua.** { *; }
 -keep class cn.vove7.rhino.** { *; }
