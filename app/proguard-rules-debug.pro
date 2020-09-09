@@ -136,6 +136,7 @@
 
 -keep class org.mozilla.** { *; }
 -keep class org.json.** { *; }
+-keep class org.apache.** { *; }
 
 -keepclassmembers class cn.vove7.executorengine.exector.ExecutorEngine
 

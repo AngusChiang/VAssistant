@@ -11,6 +11,7 @@ import cn.vove7.common.utils.spanColor
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.activities.base.BaseActivity
 import cn.vove7.jarvis.view.dialog.contentbuilder.WordSplitBuilder
+import cn.vove7.jarvis.view.dp
 import cn.vove7.jarvis.view.positiveButtonWithColor
 
 /**
@@ -30,6 +31,7 @@ class WordSplitDialog(
 
     val d = BottomDialog.builder(context) {
         val builder = WordSplitBuilder(context.lifecycleScope, rawWords)
+        peekHeight = 450.dp.px
 
         cancelable(false)
         withCloseIcon()

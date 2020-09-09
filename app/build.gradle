@@ -226,7 +226,7 @@ dependencies {
     implementation "androidx.constraintlayout:constraintlayout:2.0.1"
     implementation 'androidx.dynamicanimation:dynamicanimation:1.0.0'
 
-    implementation 'com.google.android.material:material:1.2.0'
+    implementation 'com.google.android.material:material:1.2.1'
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
     testImplementation 'junit:junit:4.13'
     implementation 'androidx.cardview:cardview:1.0.0'
@@ -243,7 +243,7 @@ dependencies {
     implementation 'com.github.didikee:AndroidDonate:0.1.0'
 
     implementation 'com.github.Vove7:CodeView:1.0.2'
-    implementation 'com.github.Vove7:BottomDialog:2.2.7'
+    implementation 'com.github.Vove7:BottomDialog:2.2.8'
 
     implementation 'com.github.Vove7:SlidePickerView:1.0.2'
 

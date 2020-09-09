@@ -24,6 +24,7 @@ import cn.vove7.jarvis.tools.*
 import cn.vove7.jarvis.tools.baiduaip.BaiduAipHelper
 import cn.vove7.jarvis.view.bottomsheet.AssistSessionGridController
 import cn.vove7.jarvis.view.dialog.ImageClassifyResultDialog
+import cn.vove7.jarvis.view.dialog.TextOperationDialog
 import cn.vove7.vtp.log.Vog
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.callbacks.onDismiss
@@ -494,6 +495,11 @@ class ScreenAssistActivity : BaseActivity() {
                     neutralButton(text = "拨号") {
                         finish()
                         SystemBridge.call(result.substring(4))
+                    }
+                }
+                else -> {
+                    neutralButton(text = "文本操作") {
+                        TextOperationDialog(this@ScreenAssistActivity, TextOperationDialog.TextModel(result))
                     }
                 }
             }
