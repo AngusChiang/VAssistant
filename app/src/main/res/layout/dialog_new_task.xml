@@ -24,7 +24,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
-        android:text="任务类型" />
+        android:text="任务类型"
+        android:textColor="?attr/colorPrimary" />
 
     <RadioGroup
         android:id="@+id/timed_type_radio"
@@ -59,16 +60,13 @@
         android:layout_height="wrap_content"
         android:text="选择时间" />
 
-    <TextView
-        android:id="@+id/time_summary_text"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
 
     <TextView
         style="@style/TextAppearance.AppCompat.Caption"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="动作类型" />
+        android:text="动作类型"
+        android:textColor="?attr/colorPrimary" />
 
     <RadioGroup
         android:id="@+id/exec_type_radio"
@@ -102,7 +100,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
-        android:text="动作内容" />
+        android:text="动作内容"
+        android:textColor="?attr/colorPrimary" />
 
     <EditText
         android:id="@+id/exec_body_text"
@@ -110,6 +109,7 @@
         android:layout_height="wrap_content"
         android:background="@color/gray"
         android:hint="语音指令/脚本文本"
+        android:maxHeight="500dp"
         android:padding="10dp"
         android:textColor="#fff" />
 

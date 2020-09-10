@@ -147,7 +147,7 @@ class TimedTaskManagerActivity : OneFragmentActivity() {
             MaterialDialog(requireActivity(), BottomSheet()).show {
                 title(text = if (task == null) "新建定时任务" else "编辑任务")
                 cancelable(false)
-                customView(view = binding.root)
+                customView(view = binding.root, scrollable = true)
                 task?.apply {
                     binding.taskNameText.setText(name)
                     binding.timedTypeRadio.check(when (this) {
