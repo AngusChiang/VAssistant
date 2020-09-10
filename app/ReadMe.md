@@ -66,4 +66,19 @@
 - 中文转拼音 https://www.cnblogs.com/itred/p/4060695.html
 - 
 
-# 
+# 定时任务
+
+使用 AlarmManager 准确 
+
+- 指定时间执行一次 
+- 间隔循环执行 每过x时间
+- 定点执行 每天x时间
+
+WorkManager
+
+存储使用数据库
+
+
+测试  新建任务 任务持久化；
+任务取消
+任务

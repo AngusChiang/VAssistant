@@ -2,7 +2,6 @@ package cn.vove7.jarvis.activities
 
 import android.os.Bundle
 import android.util.TypedValue
-import android.widget.PopupMenu
 import cn.vove7.bottomdialog.BottomDialog
 import cn.vove7.bottomdialog.builder.title
 import cn.vove7.bottomdialog.extension.awesomeHeader
@@ -11,6 +10,7 @@ import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.bridges.SystemBridge
 import cn.vove7.common.model.UserInfo
 import cn.vove7.common.utils.content
+import cn.vove7.common.utils.startActivity
 import cn.vove7.jarvis.BuildConfig
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.activities.base.ReturnableActivity
@@ -20,7 +20,6 @@ import cn.vove7.jarvis.plugins.PluginConfig
 import cn.vove7.jarvis.plugins.PowerListener
 import cn.vove7.jarvis.plugins.VoiceWakeupStrategy
 import cn.vove7.jarvis.services.MainService
-import cn.vove7.jarvis.shs.ISmartHomeSystem
 import cn.vove7.jarvis.tools.debugserver.ConnectiveService
 import cn.vove7.jarvis.view.*
 import cn.vove7.jarvis.view.custom.SettingGroupItem
@@ -29,8 +28,6 @@ import cn.vove7.jarvis.view.dialog.contentbuilder.SettingItemBuilder
 import cn.vove7.jarvis.view.dialog.contentbuilder.markdownContent
 import cn.vove7.jarvis.view.dialog.editorView
 import cn.vove7.vtp.extend.buildList
-import com.afollestad.materialdialogs.WhichButton
-import com.afollestad.materialdialogs.actions.getActionButton
 import kotlinx.android.synthetic.main.activity_expandable_settings.*
 import kotlinx.coroutines.delay
 
@@ -61,8 +58,9 @@ class LaboratoryActivity : ReturnableActivity() {
     }
 
     private val groupItems: List<SettingGroupItem> by lazy {
-        listOf(
-                SettingGroupItem(R.color.indigo_700, "扩展管理", childItems = listOf(
+        listOf(SettingGroupItem(
+                R.color.indigo_700, "扩展",
+                childItems = listOf(
                         CheckBoxItem(title = "电源提醒", keyId = R.string.key_extension_power_indicator, onTileAreaClick = {
                             showExtensionSettings("电源提醒", mutableListOf(
                                     InputItem(
@@ -98,8 +96,7 @@ class LaboratoryActivity : ReturnableActivity() {
                                                     defaultValue = { PluginConfig.adWaitSecs }),
                                             CheckBoxItem(title = "智能识别广告", summary = "[应用切换]时识别未标记的广告页并清除\n有效时间1.5s\n可能会增加耗电",
                                                     keyId = R.string.key_smart_find_and_kill_ad, defaultValue = PluginConfig.smartKillAd),
-                                            CheckBoxItem(R.string.text_show_toast_when_remove_ad, summary = getString(R.string.text_show_toast_when_remove_ad_summary)
-                                                    , keyId = R.string.key_show_toast_when_remove_ad, defaultValue = true)
+                                            CheckBoxItem(R.string.text_show_toast_when_remove_ad, summary = getString(R.string.text_show_toast_when_remove_ad_summary), keyId = R.string.key_show_toast_when_remove_ad, defaultValue = true)
                                     ))
                                 }
                         ) { _, it ->
@@ -108,8 +105,12 @@ class LaboratoryActivity : ReturnableActivity() {
                                 false -> AdKillerService.unregister()
                             }
                             return@CheckBoxItem true
+                        },
+                        IntentItem(title = "定时任务", summary = "定时执行语音指令或脚本") {
+                            startActivity<TimedTaskManagerActivity>()
                         }
-                )),
+                ),
+        ),
                 SettingGroupItem(R.color.google_red, titleS = "屏幕助手", childItems = listOf(
                         SwitchItem(title = "助手模式", summary = "设为默认语音辅助应用后\n通过唤醒用系统语音助手触发\n可捕捉屏幕内容进行快捷操作\n关闭后只能使快速唤醒", keyId = R.string.key_use_assist_service,
                                 defaultValue = AppConfig.useAssistService),

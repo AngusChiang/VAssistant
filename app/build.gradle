@@ -3,6 +3,7 @@ apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 apply plugin: 'org.greenrobot.greendao'
 apply plugin: 'AndResGuard'
+apply plugin: 'kotlin-kapt'
 
 def localProperties = new Properties()
 def localPropertiesFile = rootProject.file('local.properties')
@@ -52,6 +53,9 @@ android {
         }
     }
 
+    viewBinding {
+        enabled = true
+    }
     buildTypes {
         release {
             minifyEnabled true
@@ -236,9 +240,13 @@ dependencies {
     implementation project(path: ':common')
     implementation project(path: ':androlua')
     implementation project(path: ':rhino-android')
+
     implementation 'com.afollestad.material-dialogs:core:3.3.0'
     implementation 'com.afollestad.material-dialogs:color:3.3.0'
     implementation 'com.afollestad.material-dialogs:input:3.3.0'
+    implementation 'com.afollestad.material-dialogs:bottomsheets:3.3.0'
+    implementation 'com.afollestad.material-dialogs:datetime:3.3.0'
+
     implementation 'org.adw.library:discrete-seekbar:1.0.1'
     implementation 'com.github.didikee:AndroidDonate:0.1.0'
 

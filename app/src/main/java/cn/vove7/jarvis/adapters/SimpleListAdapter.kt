@@ -22,34 +22,32 @@ open class SimpleListAdapter<T>(
         val checkable: Boolean = false
 ) : RecAdapterWithFooter<SimpleListAdapter.VHolder, ListViewModel<T>>() {
 
-    private val holders = SparseArray<VHolder>()
     override fun itemCount(): Int = dataset.size
     override fun getItem(pos: Int): ListViewModel<T>? {
         return dataset[pos]
     }
 
     override fun onBindView(holder: VHolder, position: Int, item: ListViewModel<T>) {
-        holders.put(position, holder)
-        holder.title?.text = item.title
+        holder.title.text = item.title
 
         when {
             item.icon != null -> {
-                holder.icon?.visibility = View.VISIBLE
-                holder.icon?.setImageDrawable(item.icon)
+                holder.icon.visibility = View.VISIBLE
+                holder.icon.setImageDrawable(item.icon)
             }
             item.iconUrl != null -> {
-                holder.icon?.visibility = View.VISIBLE
-                Glide.with(holder.icon!!).load(item.iconUrl).into(holder.icon!!)
+                holder.icon.visibility = View.VISIBLE
+                Glide.with(holder.icon).load(item.iconUrl).into(holder.icon)
             }
             else -> {
-                holder.icon?.visibility = View.INVISIBLE
+                holder.icon.visibility = View.INVISIBLE
             }
         }
         if (item.subTitle != null) {
-            holder.subtitle?.visibility = View.VISIBLE
-            holder.subtitle?.text = item.subTitle
+            holder.subtitle.visibility = View.VISIBLE
+            holder.subtitle.text = item.subTitle
         } else
-            holder.subtitle?.visibility = View.GONE
+            holder.subtitle.visibility = View.GONE
         holder.itemView.setOnClickListener {
             itemClickListener?.onClick(holder, position, item)
         }
@@ -57,18 +55,19 @@ open class SimpleListAdapter<T>(
             itemClickListener?.onLongClick(holder, position, item) == true
         }
         if (checkable) {
-            holder.checkBox?.visibility = View.VISIBLE
-            holder.checkBox?.isChecked = item.checked
-            holder.checkBox?.setOnCheckedChangeListener { b, isChecked ->
+            holder.checkBox.visibility = View.VISIBLE
+            holder.checkBox.isChecked = item.checked
+            holder.checkBox.setOnCheckedChangeListener { b, isChecked ->
                 if (b.isPressed) {//手动按时才执行
                     Vog.d("OnCheckedChangeListener ---> $position ${item.title} $isChecked")
                     item.checked = isChecked//更新状态
                     itemClickListener?.onItemCheckedStatusChanged(holder, item, isChecked)
+                    notifyItemChanged(holder.adapterPosition)
                 }
             }
         } else {
-            holder.checkBox?.visibility = View.GONE
-            holder.checkBox?.setOnCheckedChangeListener(null)
+            holder.checkBox.visibility = View.GONE
+            holder.checkBox.setOnCheckedChangeListener(null)
         }
 
         //背景色
@@ -76,7 +75,7 @@ open class SimpleListAdapter<T>(
             if (it is AwesomeItem) {
                 if (it.bgColor != null)
                     holder.itemView.setBackgroundColor(it.bgColor!!)
-                it.onLoadDrawable(holder.icon!!)
+                it.onLoadDrawable(holder.icon)
             }
         }
     }

@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:paddingLeft="?attr/dialogPreferredPadding"
+    android:paddingRight="?attr/dialogPreferredPadding">
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="显示标题">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/task_name_text"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+    </com.google.android.material.textfield.TextInputLayout>
+
+
+    <TextView
+        style="@style/TextAppearance.AppCompat.Caption"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:text="任务类型" />
+
+    <RadioGroup
+        android:id="@+id/timed_type_radio"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <RadioButton
+            android:id="@+id/timed_type_once"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:checked="true"
+            android:text="一次" />
+
+        <RadioButton
+            android:id="@+id/timed_type_day"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="每天" />
+
+        <RadioButton
+            android:id="@+id/timed_type_interval"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="间隔执行" />
+
+    </RadioGroup>
+
+    <Button
+        android:id="@+id/select_time"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="选择时间" />
+
+    <TextView
+        android:id="@+id/time_summary_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+    <TextView
+        style="@style/TextAppearance.AppCompat.Caption"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="动作类型" />
+
+    <RadioGroup
+        android:id="@+id/exec_type_radio"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <RadioButton
+            android:id="@+id/exec_type_cmd"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:checked="true"
+            android:text="语音指令" />
+
+        <RadioButton
+            android:id="@+id/exec_type_lua"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Lua脚本" />
+
+        <RadioButton
+            android:id="@+id/exec_type_js"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Js脚本" />
+
+    </RadioGroup>
+
+    <TextView
+        style="@style/TextAppearance.AppCompat.Caption"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:text="动作内容" />
+
+    <EditText
+        android:id="@+id/exec_body_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/gray"
+        android:hint="语音指令/脚本文本"
+        android:padding="10dp"
+        android:textColor="#fff" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:text="动作内容 例:\n语音指令：关机\nLua/Js脚本：toast('定时任务')" />
+</LinearLayout>

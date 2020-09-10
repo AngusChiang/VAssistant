@@ -22,6 +22,7 @@ import cn.vove7.vtp.log.Vog
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.pluscubed.recyclerfastscroll.RecyclerFastScroller
 import kotlinx.android.synthetic.main.fragment_base_list.view.*
+import java.util.stream.Collectors
 
 /**
  * # SimpleListFragment
@@ -34,7 +35,7 @@ abstract class SimpleListFragment<DataType> : androidx.fragment.app.Fragment(), 
     override var sortData: Boolean = false
     open val itemClickListener: SimpleListAdapter.OnItemClickListener<DataType>? = null
     override val pageSizeLimit: Int = 50
-    override val dataSet: MutableList<ListViewModel<DataType>> = mutableListOf()
+    override val dataSet:  MutableList<ListViewModel<DataType>> = mutableListOf()
 
     override val lifecycleScope by lazy {
         LifecycleScope(lifecycle)
@@ -83,6 +84,8 @@ abstract class SimpleListFragment<DataType> : androidx.fragment.app.Fragment(), 
     var allLoadFlag = false//全部加载标志
 
     lateinit var floatButton: FloatingActionButton
+
+    //null则隐藏按钮
     open var floatClickListener: View.OnClickListener? = null
 
     /**

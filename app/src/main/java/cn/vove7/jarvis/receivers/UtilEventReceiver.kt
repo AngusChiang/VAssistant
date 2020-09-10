@@ -8,6 +8,7 @@ import cn.vove7.bottomdialog.builder.oneButton
 import cn.vove7.bottomdialog.extension.awesomeHeader
 import cn.vove7.common.app.AppConfig
 import cn.vove7.common.app.GlobalApp
+import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.appbus.AppBus
 import cn.vove7.common.appbus.AppBus.ACTION_START_WAKEUP
 import cn.vove7.common.appbus.AppBus.ACTION_STOP_DEBUG_SERVER
@@ -16,6 +17,7 @@ import cn.vove7.common.utils.contains
 import cn.vove7.jarvis.services.MainService
 import cn.vove7.jarvis.shs.RokidHomeSystem
 import cn.vove7.jarvis.tools.AppLogic
+import cn.vove7.jarvis.tools.timedtask.TimedTaskManager
 import cn.vove7.jarvis.view.dialog.AppUpdateDialog
 import cn.vove7.jarvis.view.dialog.contentbuilder.WrappedTextContentBuilder
 import org.greenrobot.eventbus.Subscribe
@@ -40,6 +42,7 @@ object UtilEventReceiver : DyBCReceiver() {
             addAction(APP_HAS_UPDATE)
             addAction(INST_DATA_SYNC_FINISH)
             addAction(ROKID_SEND_LOC)
+            addAction(TIMED_TASK)
             addAction(ACTION_START_WAKEUP)
             addAction(ACTION_STOP_WAKEUP)
             addAction(ACTION_STOP_DEBUG_SERVER)
@@ -76,6 +79,14 @@ object UtilEventReceiver : DyBCReceiver() {
                     hc.callSendLocTask()
                 }
             }
+            TIMED_TASK -> {
+                val taskId = intent.getStringExtra("task_id")
+                if (taskId != null) {
+                    TimedTaskManager.runTask(taskId)
+                } else {
+                    GlobalLog.err("获取任务失败")
+                }
+            }
             else -> {
                 //广播转EventBus
                 AppBus.post(action)
@@ -108,4 +119,5 @@ object UtilEventReceiver : DyBCReceiver() {
     const val APP_HAS_UPDATE = "app_has_update"
     const val INST_DATA_SYNC_FINISH = "inst_data_sync_finish"
     const val ROKID_SEND_LOC = "ROKID_SEND_LOC"
+    const val TIMED_TASK = "TIMED_TASK"
 }

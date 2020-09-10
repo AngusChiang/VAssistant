@@ -29,6 +29,7 @@ import cn.vove7.jarvis.services.ForegroundService
 import cn.vove7.jarvis.services.MainService
 import cn.vove7.jarvis.tools.*
 import cn.vove7.jarvis.tools.debugserver.ConnectiveService
+import cn.vove7.jarvis.tools.timedtask.TimedTaskManager
 import cn.vove7.jarvis.work.DataSyncWork
 import cn.vove7.quantumclock.QuantumClock
 import cn.vove7.smartkey.android.AndroidSettings
@@ -109,6 +110,7 @@ class InitCp : ContentProvider() {
                 context?.startService(foreService)
             }
             a().c()
+            TimedTaskManager.init()
         }
         return true
     }

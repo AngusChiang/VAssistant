@@ -61,7 +61,7 @@ object AppNotification {
             id: Int,
             title: String,
             content: String,
-            broadcastIntent: Intent,
+            broadcastIntent: Intent?,
             iconId: Int = R.mipmap.ic_launcher_vassist
     ) {
         notificationHelper.showNotification(

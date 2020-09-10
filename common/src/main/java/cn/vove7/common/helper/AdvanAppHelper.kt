@@ -165,7 +165,7 @@ object AdvanAppHelper {
         ALL_APP_LIST[pkg] = appInfo
     }
 
-    fun trimMem() {
+    fun trimMem() = synchronized(ALL_APP_LIST) {
         ALL_APP_LIST.forEach { (t, u) ->
             u::icon.let {
                 it.isAccessible = true

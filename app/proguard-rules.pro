@@ -173,6 +173,7 @@
 -keep class cn.vove7.androlua.** { *; }
 -keep class cn.vove7.rhino.** { *; }
 -keep class cn.vove7.common.accessibility.viewnode.** { *; }
+-keep class cn.vove7.jarvis.tools.timedtask.** { *; }
 
 -keep class org.mozilla.** { *; }
 -keep class org.json.** { *; }

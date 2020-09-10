@@ -265,6 +265,9 @@
             android:label="屏幕助手-文字识别"
             android:launchMode="singleInstance"
             android:theme="@style/ScreenPicker" />
+        <activity
+            android:name=".activities.TimedTaskManagerActivity"
+            android:label="定时任务" />
 
         <meta-data
             android:name="com.baidu.speech.APP_ID"
