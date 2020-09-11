@@ -2,6 +2,7 @@ package cn.vove7.jarvis.fragments
 
 import android.content.Intent
 import android.view.View
+import cn.vove7.common.app.AppConfig
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.datamanager.DAO
 import cn.vove7.common.datamanager.parse.model.ActionScope
@@ -10,9 +11,8 @@ import cn.vove7.common.model.UserInfo
 import cn.vove7.jarvis.activities.InAppInstActivity
 import cn.vove7.jarvis.activities.NewInstActivity
 import cn.vove7.jarvis.activities.OnSyncInst
-import cn.vove7.jarvis.adapters.SimpleListAdapter
 import cn.vove7.jarvis.adapters.ListViewModel
-import cn.vove7.common.app.AppConfig
+import cn.vove7.jarvis.adapters.SimpleListAdapter
 import cn.vove7.jarvis.tools.DataUpdator
 import cn.vove7.vtp.app.AppHelper
 import kotlinx.coroutines.Dispatchers
@@ -51,13 +51,13 @@ class InstAppListFragment : SimpleListFragment<ActionScope>(), OnSyncInst {
         }
         showProgressBar()
         launchIO {
-            if(DataUpdator.syncInAppInst()){
+            if (DataUpdator.syncInAppInst()) {
                 GlobalApp.toastSuccess("同步完成")
                 withContext(Dispatchers.Main) {
                     refresh()
                 }
             }
-            withContext(Dispatchers.Main){
+            withContext(Dispatchers.Main) {
                 hideProgressBar()
             }
         }
@@ -74,10 +74,10 @@ class InstAppListFragment : SimpleListFragment<ActionScope>(), OnSyncInst {
     }
 
     override fun unification(it: ActionScope): ListViewModel<ActionScope>? {
-        if (pkgSet.contains(it.packageName))
+        if (it.packageName == null || pkgSet.contains(it.packageName))
             return null
         val app = AppHelper.getAppInfo(GlobalApp.APP, "", it.packageName)
-        val node=if (app != null) {
+        val node = if (app != null) {
             // TODO 优化
             val c = InAppInstListFragment.getInstList(it.packageName).size
             ListViewModel(app.name, icon = app.icon,
