@@ -107,7 +107,7 @@ public class TaskerIntent extends Intent {
             case AccessBlocked:
                 return "Tasker AccessBlocked";
             case NotEnabled:
-                return "Tasker 未启用";
+                return "Tasker 未在后台运行";
             case NotInstalled:
                 return "未安装 Tasker";
             case NoPermission:
