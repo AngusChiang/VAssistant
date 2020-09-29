@@ -15,12 +15,13 @@ class TranslateResult {
     val results: Array<Result>? = null
     val haveResult get() = results != null && results.isNotEmpty()
 
-    val transResult
-        get() = buildString {
+    val transResult by lazy {
+        buildString {
             results?.forEach {
-                appendln(it.dst)
+                appendLine(it.dst)
             }
         }
+    }
 
     class Result {
         val src: String? = null
