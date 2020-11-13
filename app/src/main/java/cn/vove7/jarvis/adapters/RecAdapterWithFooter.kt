@@ -19,7 +19,7 @@ import cn.vove7.vtp.log.Vog
  * Created by 17719 on 2018/8/13
  */
 abstract class RecAdapterWithFooter<V : RecAdapterWithFooter.RecViewHolder,DataType>
-    : androidx.recyclerview.widget.RecyclerView.Adapter<RecAdapterWithFooter.RecViewHolder>() {
+    : RecyclerView.Adapter<RecAdapterWithFooter.RecViewHolder>() {
 
     override fun getItemCount(): Int {
         return itemCount() + 1
@@ -28,7 +28,7 @@ abstract class RecAdapterWithFooter<V : RecAdapterWithFooter.RecViewHolder,DataT
     abstract fun getItem(pos: Int): DataType?
 
     abstract fun itemCount(): Int
-    override fun onBindViewHolder(holder: RecAdapterWithFooter.RecViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: RecViewHolder, position: Int) {
         when (getItemViewType(position)) {
             TYPE_ITEM -> {
                 try {
@@ -123,7 +123,7 @@ abstract class RecAdapterWithFooter<V : RecAdapterWithFooter.RecViewHolder,DataT
         }
     }
 
-    open class RecViewHolder(view: View, adapter: RecAdapterWithFooter<RecViewHolder,*>?) : androidx.recyclerview.widget.RecyclerView.ViewHolder(view) {
+    open class RecViewHolder(view: View, adapter: RecAdapterWithFooter<RecViewHolder,*>?) : RecyclerView.ViewHolder(view) {
         init {
             if (adapter != null) {
                 adapter.footerView = view

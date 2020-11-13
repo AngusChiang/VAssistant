@@ -1,5 +1,8 @@
 package cn.vove7.jarvis.activities
 
+import android.animation.Animator
+import android.animation.AnimatorListenerAdapter
+import android.animation.ValueAnimator
 import android.app.Activity
 import android.app.admin.DevicePolicyManager
 import android.content.ActivityNotFoundException
@@ -9,18 +12,17 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
+import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import android.widget.CheckedTextView
-import android.widget.Switch
-import android.widget.TextView
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
+import cn.daqinjia.android.common.ext.delayRun
 import cn.vove7.admin_manager.AdminReceiver
 import cn.vove7.common.accessibility.AccessibilityApi
 import cn.vove7.common.app.AppPermission
 import cn.vove7.common.app.GlobalApp
-import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.app.log
 import cn.vove7.common.bridges.InputMethodBridge
 import cn.vove7.common.bridges.RootHelper
@@ -35,6 +37,10 @@ import cn.vove7.jarvis.fragments.SimpleListFragment
 import cn.vove7.jarvis.services.GestureService
 import cn.vove7.jarvis.services.MyAccessibilityService
 import cn.vove7.vtp.runtimepermission.PermissionUtils
+import com.catchingnow.icebox.sdk_client.IceBox
+import kotlinx.android.synthetic.main.list_header_with_switch.view.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import kotlin.concurrent.thread
 
 
@@ -42,14 +48,13 @@ import kotlin.concurrent.thread
  * 权限管理
  */
 class PermissionManagerActivity : OneFragmentActivity() {
-    override var fragments: Array<androidx.fragment.app.Fragment> = arrayOf(ManageFragment.newIns(this))
+    override var fragments: Array<androidx.fragment.app.Fragment> = arrayOf(ManageFragment.newIns())
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         //执行时消息
         if (intent.hasExtra("pName")) {
-            GlobalApp.toastWarning(String.format(getString(R.string.text_operation_need_permission)
-                    , intent.getStringExtra("pName")))
+            GlobalApp.toastWarning(String.format(getString(R.string.text_operation_need_permission), intent.getStringExtra("pName")))
         }
     }
 
@@ -62,14 +67,13 @@ class PermissionManagerActivity : OneFragmentActivity() {
     }
 
     class ManageFragment : SimpleListFragment<PermissionStatus>() {
-        lateinit var pActivity: Activity
+        var i = 0
+        override var floatClickListener: View.OnClickListener? = View.OnClickListener {
+            highLight(i++)
+        }
 
         companion object {
-            fun newIns(act: AppCompatActivity): ManageFragment {
-                val m = ManageFragment()
-                m.pActivity = act
-                return m
-            }
+            fun newIns(): ManageFragment = ManageFragment()
         }
 
         override fun initView(contentView: View) {
@@ -77,6 +81,22 @@ class PermissionManagerActivity : OneFragmentActivity() {
             refreshStatus()
             recyclerView.isVerticalScrollBarEnabled = false
             buildHeader()
+
+            val pn = activity?.intent?.getStringExtra("pName")?.let { pn ->
+                permissions.indexOfFirst { it.permissionName == pn }
+            }
+            if (pn != null) {
+                highLight(pn)
+            }
+        }
+
+        private fun highLight(index: Int) {
+            recyclerView.scrollToPosition(index)
+            delayRun(500) {
+                runOnUi {
+                    adapter.notifyItemChanged(index, "")
+                }
+            }
         }
 
         override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -86,11 +106,11 @@ class PermissionManagerActivity : OneFragmentActivity() {
 
         private fun buildHeader() {
             val v = layoutInflater.inflate(R.layout.list_header_with_switch, null, false)
-            val headerTitle = v.findViewById<TextView>(R.id.header_title)
-            val headerSwitch = v.findViewById<Switch>(R.id.header_switch)
+            val headerTitle = v.header_title
+            val headerSwitch = v.header_switch
             headerTitle.text = "一键申请"
             headerSwitch.visibility = View.GONE
-            v.setOnClickListener { ActivityCompat.requestPermissions(pActivity, allPerStr, 100) }
+            v.setOnClickListener { ActivityCompat.requestPermissions(requireActivity(), allPerStr, 100) }
             setHeader(v)
         }
 
@@ -114,6 +134,30 @@ class PermissionManagerActivity : OneFragmentActivity() {
                     return Holder(view)
                 }
 
+                override fun onBindViewHolder(holder: RecViewHolder, position: Int, payloads: MutableList<Any>) {
+                    if(payloads.isEmpty()) {
+                        super.onBindViewHolder(holder, position, payloads)
+                        return
+                    }
+                    val itemView = holder.itemView
+                    val bgColor = ContextCompat.getColor(requireContext(), R.color.light_green_500) and 0x00ffffff
+                    val bg = holder.itemView.background
+                    ValueAnimator.ofInt(0x00, 0xef, 0x00).apply {
+                        repeatCount = 2
+                        duration = 500
+                        addUpdateListener {
+                            val a = it.animatedValue as Int
+                            itemView.setBackgroundColor((a shl 24) or bgColor)
+                        }
+                        addListener(object : AnimatorListenerAdapter() {
+                            override fun onAnimationEnd(animation: Animator?) {
+                                itemView.background = bg
+                            }
+                        })
+
+                    }.start()
+                }
+
                 override fun onBindView(holder: Holder, position: Int, item: PermissionStatus) {
                     holder.title.text = item.permissionName
                     if (item.desc == "") {
@@ -130,7 +174,7 @@ class PermissionManagerActivity : OneFragmentActivity() {
                         holder.open.text = getString(R.string.text_to_open)
                     }
                     holder.itemView.setOnClickListener {
-                        item.clickAction(item, pActivity)
+                        item.clickAction(item, requireActivity())
                     }
                 }
             }
@@ -174,7 +218,7 @@ class PermissionManagerActivity : OneFragmentActivity() {
 //                                            toast.showShort("跳转失败，请手动开启")
                                 try {
                                     SystemBridge.openAppDetail(context?.packageName
-                                            ?: "")
+                                        ?: "")
                                 } catch (e: Exception) {
                                     GlobalApp.toastError("跳转失败，请到应用详情手动开启")
                                 }
@@ -218,6 +262,7 @@ class PermissionManagerActivity : OneFragmentActivity() {
                         }
                     },
                     PermissionStatus(arrayOf("android.permission.READ_CONTACTS"), "联系人", "用于检索联系人，拨号指令"),
+                    PermissionStatus(arrayOf(IceBox.SDK_PERMISSION), "冰箱", "用于启动和冻结冰箱管理的应用"),
                     PermissionStatus(arrayOf("android.permission.CALL_PHONE"), "电话", "用于拨打电话"),
                     PermissionStatus(arrayOf("android.permission.RECORD_AUDIO"), "录音", "用于语音识别"),
                     PermissionStatus(arrayOf("android.permission.ACCESS_NETWORK_STATE"), "获取网络状态", "用于获取网络状态"),

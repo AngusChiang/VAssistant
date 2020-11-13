@@ -9,6 +9,7 @@ import android.app.SearchManager
 import android.bluetooth.BluetoothAdapter
 import android.content.*
 import android.content.Context.WIFI_SERVICE
+import android.content.pm.PackageManager
 import android.content.pm.PackageManager.MATCH_DEFAULT_ONLY
 import android.content.res.Configuration
 import android.graphics.Bitmap
@@ -33,6 +34,7 @@ import android.util.DisplayMetrics
 import android.view.KeyEvent
 import android.view.WindowManager
 import androidx.annotation.RequiresApi
+import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import cn.vove7.common.R
 import cn.vove7.common.accessibility.AccessibilityApi
@@ -67,6 +69,7 @@ import cn.vove7.vtp.net.GsonHelper
 import cn.vove7.vtp.runtimepermission.PermissionUtils
 import cn.vove7.vtp.system.DeviceInfo
 import cn.vove7.vtp.system.SystemHelper
+import com.catchingnow.icebox.sdk_client.IceBox
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
@@ -120,6 +123,14 @@ object SystemBridge : SystemOperation {
 
     override fun openAppByPkg(pkg: String, clearTask: Boolean): Boolean {
         return try {
+            if (IceBox.getAppEnabledSetting(context, pkg) != 0) {
+                if (ContextCompat.checkSelfPermission(context, IceBox.SDK_PERMISSION) != PackageManager.PERMISSION_GRANTED) {
+                    AppBus.post(RequestPermission("冰箱"))
+                    return false
+                }
+                IceBox.setAppEnabledSettings(context, true, pkg)
+                Vog.d("冰箱解冻：$pkg")
+            }
             val launchIntent = context.packageManager
                     .getLaunchIntentForPackage(pkg)
             if (launchIntent == null) {
@@ -162,7 +173,7 @@ object SystemBridge : SystemOperation {
      * @return String?
      */
     override fun getPkgByName(appWord: String, excludeUnstartable: Boolean): String? {
-        val list = AdvanAppHelper.matchPkgByName(appWord)
+        val list = AdvanAppHelper.matchPkgByName(appWord, excludeUnstartable)
         return if (list.isNotEmpty()) {
             list[0].data.packageName.also {
                 Vog.i("应用：$appWord -> $it")

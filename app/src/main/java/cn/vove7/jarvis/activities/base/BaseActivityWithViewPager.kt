@@ -53,7 +53,7 @@ abstract class BaseActivityWithViewPager : BaseActivity() {
      */
     open fun beforeSetViewPager() {}
 
-    abstract var fragments: Array<androidx.fragment.app.Fragment>
+    abstract val fragments: Array<androidx.fragment.app.Fragment>
 
     abstract var titles: Array<String>
 

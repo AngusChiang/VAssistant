@@ -327,6 +327,7 @@
             android:name=".services.AssistSessionService"
             android:permission="android.permission.BIND_VOICE_INTERACTION">
             <intent-filter>
+                <action android:name="android.intent.action.ASSIST" />
                 <action android:name="android.service.voice.VoiceInteractionService" />
             </intent-filter>
 

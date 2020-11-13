@@ -32,7 +32,7 @@ interface SystemOperation {
      * @param appWord String App名/别名
      * @return String? 包名
      */
-    fun getPkgByName(appWord: String, excludeUnstartable: Boolean = true): String?
+    fun getPkgByName(appWord: String, excludeUnstartable: Boolean = false): String?
 
     /**
      * 同getPkgBName

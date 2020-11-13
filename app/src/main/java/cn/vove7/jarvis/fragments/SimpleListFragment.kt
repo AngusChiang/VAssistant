@@ -22,6 +22,7 @@ import cn.vove7.vtp.log.Vog
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.pluscubed.recyclerfastscroll.RecyclerFastScroller
 import kotlinx.android.synthetic.main.fragment_base_list.view.*
+import kotlinx.android.synthetic.main.list_header_with_switch.view.*
 import java.util.stream.Collectors
 
 /**
@@ -293,8 +294,8 @@ abstract class SimpleListFragment<DataType> : androidx.fragment.app.Fragment(), 
 
     fun buildHeader(title: String, switchChecked: Boolean = false, lis: CompoundButton.OnCheckedChangeListener? = null) {
         val v = layoutInflater.inflate(R.layout.list_header_with_switch, null, false)
-        val headerTitle = v.findViewById<TextView>(R.id.header_title)
-        val headerSwitch = v.findViewById<Switch>(R.id.header_switch)
+        val headerTitle = v.header_title
+        val headerSwitch = v.header_switch
         headerTitle.text = title
         headerSwitch.isChecked = switchChecked
         headerSwitch.setOnCheckedChangeListener(lis)

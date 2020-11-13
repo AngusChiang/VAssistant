@@ -88,6 +88,7 @@ dependencies {
     api 'com.github.Vove7:QuantumClock:0.1.1'
     api 'com.gitee.Vove.ScaffoldAndroid:scaffold:f267c4d566'
 
+    api 'com.catchingnow.icebox:SDK:1.0.5'
 
     api files('libs/RootShell.aar')
 }
