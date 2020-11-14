@@ -229,7 +229,7 @@ object InputMethodBridge : InputOperation {
     private fun setByAccessibility() {
         Vog.d("使用无障碍服务 切换输入法")
         if (!AccessibilityApi.isBaseServiceOn) {
-            AppBus.post(RequestPermission("无障碍服务"))
+            AppBus.post(RequestPermission("基础无障碍服务"))
             throw NeedAccessibilityException()
         }
         val countDownLatch = CountDownLatch(1)

@@ -545,7 +545,7 @@ object MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
             return null
         }
         if (!AccessibilityApi.isBaseServiceOn) {
-            AppBus.post(RequestPermission("无障碍服务"))
+            AppBus.post(RequestPermission("基础无障碍服务"))
             return null
         }
         DataCollector.buriedPoint("sa_3")

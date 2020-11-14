@@ -714,7 +714,7 @@ open class ExecutorImpl(
     override fun checkAccessibilityService(jump: Boolean): Boolean {
         return if (!AccessibilityApi.isBaseServiceOn) {
             if (jump) {
-                AppBus.post(RequestPermission("无障碍服务"))
+                AppBus.post(RequestPermission("基础无障碍服务"))
             }
             false
         } else true

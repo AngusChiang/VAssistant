@@ -86,6 +86,7 @@ class TextOperationDialog(
         val needT = textModel.subText == null || textModel.text != getOpText()
 
         val dialog = BottomDialog.builder(activity) {
+            peekHeightProportion = 0.6f
             title(round = true, title = "翻译")
             message(if (!needT) textModel.subText ?: "" else "翻译中...", true)
             buttons {
