@@ -3,6 +3,7 @@ package cn.vove7.common.net.tool
 import android.util.Base64
 import cn.vove7.common.app.GlobalLog
 import cn.vove7.vtp.log.Vog
+import io.michaelrocks.paranoid.Obfuscate
 import java.security.MessageDigest
 
 /**
@@ -11,6 +12,7 @@ import java.security.MessageDigest
  * Date: 2018/7/11
  * Time: 14:56
  */
+@Obfuscate
 object SecureHelper {
     private val SECRET_KEY = "Nzc3ZXZvdg=="
 

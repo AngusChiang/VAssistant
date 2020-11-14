@@ -12,13 +12,12 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
-import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import android.widget.CheckedTextView
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import cn.daqinjia.android.common.ext.delayRun
+import androidx.recyclerview.widget.LinearLayoutManager
 import cn.vove7.admin_manager.AdminReceiver
 import cn.vove7.common.accessibility.AccessibilityApi
 import cn.vove7.common.app.AppPermission
@@ -28,6 +27,7 @@ import cn.vove7.common.bridges.InputMethodBridge
 import cn.vove7.common.bridges.RootHelper
 import cn.vove7.common.bridges.SystemBridge
 import cn.vove7.common.utils.gotoAccessibilitySetting2
+import cn.vove7.common.utils.postDelayed
 import cn.vove7.common.utils.runOnUi
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.activities.PermissionManagerActivity.PermissionStatus.Companion.allPerStr
@@ -39,8 +39,6 @@ import cn.vove7.jarvis.services.MyAccessibilityService
 import cn.vove7.vtp.runtimepermission.PermissionUtils
 import com.catchingnow.icebox.sdk_client.IceBox
 import kotlinx.android.synthetic.main.list_header_with_switch.view.*
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import kotlin.concurrent.thread
 
 
@@ -91,9 +89,10 @@ class PermissionManagerActivity : OneFragmentActivity() {
         }
 
         private fun highLight(index: Int) {
-            recyclerView.scrollToPosition(index)
-            delayRun(500) {
-                runOnUi {
+            recyclerView.postDelayed(100) {
+                (recyclerView.layoutManager as LinearLayoutManager)
+                        .scrollToPositionWithOffset(index, 0)
+                recyclerView.postDelayed(500) {
                     adapter.notifyItemChanged(index, "")
                 }
             }
@@ -135,7 +134,7 @@ class PermissionManagerActivity : OneFragmentActivity() {
                 }
 
                 override fun onBindViewHolder(holder: RecViewHolder, position: Int, payloads: MutableList<Any>) {
-                    if(payloads.isEmpty()) {
+                    if (payloads.isEmpty()) {
                         super.onBindViewHolder(holder, position, payloads)
                         return
                     }

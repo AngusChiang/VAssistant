@@ -123,7 +123,8 @@ object SystemBridge : SystemOperation {
 
     override fun openAppByPkg(pkg: String, clearTask: Boolean): Boolean {
         return try {
-            if (IceBox.getAppEnabledSetting(context, pkg) != 0) {
+            if (IceBox.queryWorkMode(context) != IceBox.WorkMode.MODE_NOT_AVAILABLE &&
+                    IceBox.getAppEnabledSetting(context, pkg) != 0) {
                 if (ContextCompat.checkSelfPermission(context, IceBox.SDK_PERMISSION) != PackageManager.PERMISSION_GRANTED) {
                     AppBus.post(RequestPermission("冰箱"))
                     return false
@@ -755,7 +756,7 @@ object SystemBridge : SystemOperation {
         return try {
             val cm = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
             val mClipData = ClipData.newPlainText("", text)
-            cm.primaryClip = mClipData
+            cm.setPrimaryClip(mClipData)
             true
         } catch (e: Throwable) {
             GlobalApp.toastError("复制失败：" + e.message)

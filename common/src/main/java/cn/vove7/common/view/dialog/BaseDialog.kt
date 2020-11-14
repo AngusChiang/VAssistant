@@ -49,7 +49,7 @@ open class BaseDialog(context: Context) : Dialog(context), DialogInterface {
 
     var gravity: Int = Gravity.CENTER
 
-    var title: String = ""
+    var title: String? = ""
     var iconDrawable: Drawable? = null
     var bodyView: View? = null
 
@@ -69,12 +69,12 @@ open class BaseDialog(context: Context) : Dialog(context), DialogInterface {
         bodyView = layoutInflater.inflate(layoutResID, null)
     }
 
-    override fun setContentView(view: View?, params: ViewGroup.LayoutParams?) {
+    override fun setContentView(view: View, params: ViewGroup.LayoutParams?) {
         bodyView = view
     }
 
 
-    override fun setContentView(view: View?) {
+    override fun setContentView(view: View) {
         bodyView = view
     }
 
@@ -82,7 +82,7 @@ open class BaseDialog(context: Context) : Dialog(context), DialogInterface {
         setTitle(context.getString(stringId))
     }
 
-    override fun setTitle(title: CharSequence) {
+    override fun setTitle(title: CharSequence?) {
         this.title = title.toString()
     }
 

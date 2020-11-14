@@ -39,6 +39,7 @@ abstract class TimedTask(
         }
 
     companion object {
+        private const val serialVersionUID = 871426140395642268L
         const val TYPE_COMMAND = 0
         const val TYPE_SCRIPT_LUA = 1
         const val TYPE_SCRIPT_JS = 2

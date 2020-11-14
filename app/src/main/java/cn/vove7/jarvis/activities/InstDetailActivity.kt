@@ -637,6 +637,8 @@ class InstDetailActivity : BaseActivity() {
                 node.from = DataFrom.FROM_SHARED
                 node.tagId = s
                 node.update()
+            } else {
+                GlobalApp.toastError(bean.message)
             }
         }.onFailure { e ->
             e.log()

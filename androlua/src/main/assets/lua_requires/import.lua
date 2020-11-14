@@ -33,9 +33,9 @@ table.insert(package.searchers, libsloader)
 
 
 local function massage_classname(classname)
-    if classname:find('_') then
-        classname = classname:gsub('_', '$')
-    end
+--     if classname:find('_') then
+--         classname = classname:gsub('_', '$')
+--     end
     return classname
 end
 

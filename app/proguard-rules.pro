@@ -167,9 +167,7 @@
 -keep class cn.vove7.vtp.net.* {*;}
 
 
--keep class cn.vove7.common.datamanager.greendao.** { *; }
--keep class cn.vove7.common.datamanager.parse.** { *; }
--keep class cn.vove7.common.datamanager.history.CommandHistory { *; }
+-keep class cn.vove7.common.datamanager.** { *; }
 -keep class cn.vove7.androlua.** { *; }
 -keep class cn.vove7.rhino.** { *; }
 -keep class cn.vove7.common.accessibility.viewnode.** { *; }
@@ -178,6 +176,7 @@
 -keep class org.mozilla.** { *; }
 -keep class org.json.** { *; }
 -keep class org.apache.** { *; }
+-keep class com.catchingnow.icebox.** { *; }
 
 -keepclassmembers class cn.vove7.executorengine.exector.ExecutorEngine
 

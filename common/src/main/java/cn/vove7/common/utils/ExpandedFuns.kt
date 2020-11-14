@@ -785,3 +785,7 @@ val ActivityManager.isForeground: Boolean
     get() = activities.any { (_, s) ->
         s == ActivityStatus.SHOWING || s == ActivityStatus.PAUSED
     }
+
+fun View.postDelayed(delayMillis: Long, action: Runnable): Boolean {
+    return postDelayed(action, delayMillis)
+}

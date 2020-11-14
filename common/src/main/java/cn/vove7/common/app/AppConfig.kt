@@ -291,7 +291,7 @@ object AppConfig : BaseConfig {
         }
     }
 
-
+    @JvmStatic
     val versionName: String
         get() {
             return GlobalApp.APP.let {
@@ -300,6 +300,7 @@ object AppConfig : BaseConfig {
             }
         }
 
+    @JvmStatic
     val versionCode: Long
         get() {
             return GlobalApp.APP.packageManager.getPackageInfo(

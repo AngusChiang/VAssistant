@@ -1,6 +1,5 @@
 package cn.vove7.jarvis.app
 
-import android.app.Activity
 import android.content.ContentProvider
 import android.content.ContentValues
 import android.content.Intent
@@ -10,8 +9,6 @@ import android.net.Uri
 import android.os.Build
 import androidx.work.WorkManager
 import cn.daqinjia.android.common.ext.delayRun
-import cn.daqinjia.android.scaffold.app.ActivityManager
-import cn.daqinjia.android.scaffold.app.ActivityStatus
 import cn.daqinjia.android.scaffold.ui.base.ScaffoldActivity
 import cn.vove7.bottomdialog.builder.BottomDialogBuilder
 import cn.vove7.common.app.AppConfig
@@ -34,7 +31,6 @@ import cn.vove7.jarvis.work.DataSyncWork
 import cn.vove7.quantumclock.QuantumClock
 import cn.vove7.smartkey.android.AndroidSettings
 import cn.vove7.vtp.log.Vog
-import cn.vove7.vtp.weaklazy.weakLazy
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlin.system.exitProcess
