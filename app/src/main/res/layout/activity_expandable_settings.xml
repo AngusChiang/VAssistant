@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<cn.vove7.jarvis.view.SpringExpandableListView xmlns:android="http://schemas.android.com/apk/res/android"
+<ExpandableListView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/expand_list"
     android:layout_width="match_parent"
@@ -12,4 +12,4 @@
     android:scrollbars="none"
     tools:listitem="@layout/item_of_settings_group">
 
-</cn.vove7.jarvis.view.SpringExpandableListView>
+</ExpandableListView>
