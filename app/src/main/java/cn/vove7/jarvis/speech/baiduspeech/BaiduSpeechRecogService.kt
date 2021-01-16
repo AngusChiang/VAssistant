@@ -56,7 +56,7 @@ class BaiduSpeechRecogService(event: RecogEvent) : SpeechRecogService(event) {
             VAD to VAD_TOUCH,
             DISABLE_PUNCTUATION to false,//标点符号
             ACCEPT_AUDIO_VOLUME to true,
-            PID to 1537,
+            PID to 1536,
             AUDIO_SOURCE to MediaRecorder.AudioSource.VOICE_RECOGNITION,
             NLU to "enable"
     ).also {
