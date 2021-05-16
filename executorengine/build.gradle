@@ -3,10 +3,10 @@ apply plugin: 'kotlin-android'
 apply plugin: 'org.greenrobot.greendao'
 
 android {
-    compileSdkVersion 28
+    compileSdkVersion 30
     defaultConfig {
         minSdkVersion 21
-        targetSdkVersion 28
+        targetSdkVersion 30
         versionCode 1
         versionName "1.0"
 
@@ -31,12 +31,10 @@ android {
 
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
-    testImplementation 'junit:junit:4.12'
+    testImplementation 'junit:junit:4.13.2'
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
     implementation "androidx.appcompat:appcompat:$androidx_version"
-    androidTestImplementation 'androidx.test.ext:junit:1.1.1'
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
-    implementation "com.github.Vove7:VTP:$vtp_version"
+    androidTestImplementation 'androidx.test.ext:junit:1.1.2'
     implementation project(':common')
     implementation project(':androlua')
     implementation project(path: ':rhino-android')

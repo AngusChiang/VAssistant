@@ -69,7 +69,7 @@ class MarkedAdFragment : SimpleListFragment<String>(), OnSyncMarked {
         if (!AppConfig.checkLogin()) {
             return@OnClickListener
         }
-        AdEditorDialog(activity as BaseActivity) {
+        AdEditorDialog(activity as BaseActivity<*>) {
             refresh()
             AdKillerService.update()
         }.show()

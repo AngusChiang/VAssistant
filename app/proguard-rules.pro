@@ -141,6 +141,7 @@
 -keep enum org.greenrobot.eventbus.ThreadMode { *; }
 
 
+-keep class cn.vove7.jarvis.databinding.** { *; }
 -keep class cn.vove7.common.bridges.** { *; }
 -keepclassmembers public class cn.vove7.common.bridges.**
 -keep class cn.vove7.common.net.model.** { *; }

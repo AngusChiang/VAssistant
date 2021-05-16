@@ -36,7 +36,7 @@ import java.io.File
  * 2019/6/7
  */
 class TextOperationDialog(
-        val activity: BaseActivity,
+        val activity: BaseActivity<*>,
         val textModel: TextModel
 ) {
 

@@ -11,11 +11,11 @@ import cn.vove7.common.utils.listener
 import cn.vove7.common.utils.runInCatch
 import cn.vove7.common.utils.show
 import cn.vove7.jarvis.R
+import cn.vove7.jarvis.databinding.FloatPanelDefaultBinding
 import cn.vove7.jarvis.view.*
 import group.infotech.drawable.dsl.corners
 import group.infotech.drawable.dsl.shapeDrawable
 import group.infotech.drawable.dsl.solidColor
-import kotlinx.android.synthetic.main.float_panel_default.view.*
 
 /**
  * # DefaultPanel
@@ -23,11 +23,11 @@ import kotlinx.android.synthetic.main.float_panel_default.view.*
  * @author Vove
  * 2019/10/22
  */
-class DefaultPanel : FloatyPanel(
+class DefaultPanel : FloatyPanel<FloatPanelDefaultBinding>(
         WindowManager.LayoutParams.MATCH_PARENT,
         WindowManager.LayoutParams.WRAP_CONTENT
 ) {
-    override fun layoutResId(): Int = R.layout.float_panel_default
+
     override fun onCreateView(view: View) {
         super.onCreateView(view)
         if (postAfterShow) {
@@ -49,23 +49,25 @@ class DefaultPanel : FloatyPanel(
             bottomLeft = radius.dp.pxf
             bottomRight = radius.dp.pxf
         }
-        animationBody.voice_text.setTextColor(textColor)
-        animationBody.listening_ani.setColor(textColor)
+        viewBinding?.voiceText?.setTextColor(textColor)
+        viewBinding?.listeningAni?.setColor(textColor)
     }
 
     override fun showListeningAni() {
-        if (contentView?.listening_ani?.isShown == true) return
-        contentView?.parse_ani?.gone()
-        contentView?.listening_ani?.show()
+        val vb = viewBinding ?: return
+        if (vb.listeningAni.isShown) return
+        vb.parseAni.gone()
+        vb.listeningAni.show()
     }
 
     override fun showParseAni() {
-        if (contentView?.parse_ani?.isShown == true) return
-        contentView?.parse_ani?.apply {
+        val vb = viewBinding ?: return
+        if (vb.parseAni.isShown) return
+        vb.parseAni.apply {
             (drawable as? AnimationDrawable)?.start()
             show()
         }
-        contentView?.listening_ani?.gone()
+        vb.listeningAni.gone()
     }
 
     override val postAfterShow: Boolean

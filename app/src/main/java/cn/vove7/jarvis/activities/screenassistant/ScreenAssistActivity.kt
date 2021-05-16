@@ -19,6 +19,7 @@ import cn.vove7.common.utils.*
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.activities.TextOcrActivity
 import cn.vove7.jarvis.activities.base.BaseActivity
+import cn.vove7.jarvis.databinding.DialogAssistBinding
 import cn.vove7.jarvis.services.MainService
 import cn.vove7.jarvis.tools.*
 import cn.vove7.jarvis.tools.baiduaip.BaiduAipHelper
@@ -29,7 +30,6 @@ import cn.vove7.vtp.log.Vog
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.callbacks.onDismiss
 import com.google.android.material.bottomsheet.BottomSheetBehavior
-import kotlinx.android.synthetic.main.dialog_assist.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -62,7 +62,7 @@ val Bitmap.navBarIsLight: Boolean
         return r + b + g > 450
     }
 
-class ScreenAssistActivity : BaseActivity() {
+class ScreenAssistActivity : BaseActivity<DialogAssistBinding>() {
 
     /**
      * 截图文件在下次进入删除
@@ -85,9 +85,6 @@ class ScreenAssistActivity : BaseActivity() {
         }
     }
 
-    override val layoutRes: Int
-        get() = R.layout.dialog_assist
-
     private val isReady: Boolean
         get() = !showProgressBar
 
@@ -95,8 +92,8 @@ class ScreenAssistActivity : BaseActivity() {
         set(value) {
             field = value
             runOnUi {
-                if (value) progress_bar.visibility = View.VISIBLE
-                else progress_bar.visibility = View.INVISIBLE
+                if (value) viewBinding.progressBar.show()
+                else viewBinding.progressBar.visibility = View.INVISIBLE
             }
         }
 
@@ -133,7 +130,7 @@ class ScreenAssistActivity : BaseActivity() {
         DataCollector.buriedPoint("sa_0")
 
         showProgressBar = true
-        bottomController = AssistSessionGridController(this, bottom_sheet, itemClick, ::onLongClick)
+        bottomController = AssistSessionGridController(this, viewBinding.bottomSheet, itemClick, ::onLongClick)
         bottomController.initView()
         bottomController.hideBottom()
         bottomController.bottomView.visibility = View.GONE
@@ -151,16 +148,16 @@ class ScreenAssistActivity : BaseActivity() {
             })
         }
 
-        voice_btn.setOnClickListener {
+        viewBinding.voiceBtn.setOnClickListener {
             MainService.switchRecog()
             bottomController.hideBottom()
         }
         handlerScreen()
 
-        root.setOnClickListener {
+        viewBinding.root.setOnClickListener {
             onBackPressed()
         }
-        val p = root.parent
+        val p = viewBinding.root.parent
         if (p is View) {
             p.setOnClickListener {
                 onBackPressed()

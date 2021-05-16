@@ -1,5 +1,6 @@
 package cn.vove7.androlua.luautils
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Typeface
 import android.util.AttributeSet
@@ -55,7 +56,9 @@ class LuaEditor(private val mContext: Context, attrs: AttributeSet)
         setNavigationMethod(YoyoNavigationMethod(this))
         val array = mContext.theme.obtainStyledAttributes(intArrayOf(android.R.attr.colorBackground, android.R.attr.textColorPrimary, android.R.attr.textColorHighlight))
         val backgroundColor = array.getColor(0, 0xFF00FF)
+        @SuppressLint("ResourceType")
         val textColor = array.getColor(1, 0xFF00FF)
+        @SuppressLint("ResourceType")
         val textColorHighlight = array.getColor(2, 0xFF00FF)
         array.recycle()
         setTextColor(textColor)

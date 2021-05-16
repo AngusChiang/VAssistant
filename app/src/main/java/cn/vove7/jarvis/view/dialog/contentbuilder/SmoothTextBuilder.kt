@@ -5,7 +5,6 @@ import cn.vove7.bottomdialog.interfaces.ContentBuilder
 import cn.vove7.bottomdialog.util.listenToUpdate
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.view.custom.scmoothtextview.TextWebView
-import kotlinx.android.synthetic.main.dialog_content_text_web_view.view.*
 
 /**
  * # SmoothTextBuilder
@@ -24,7 +23,7 @@ class SmoothTextBuilder : ContentBuilder() {
     lateinit var textWebView: TextWebView
 
     override fun init(view: View) {
-        textWebView = view.text_web_view
+        textWebView = view.findViewById(R.id.text_web_view)
     }
 
     override fun updateContent(type: Int, data: Any?) {

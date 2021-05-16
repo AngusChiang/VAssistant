@@ -16,7 +16,6 @@ import cn.vove7.jarvis.R
 import cn.vove7.jarvis.tools.baiduaip.BaiduAipHelper
 import cn.vove7.jarvis.view.custom.SlideFlexboxLayout
 import com.google.android.flexbox.FlexboxLayout
-import kotlinx.android.synthetic.main.dialog_pick_text.view.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
@@ -75,8 +74,8 @@ class WordSplitBuilder(
     }
 
     override fun init(view: View) {
-        loadingBar = view.loading_bar
-        content = view.words_content
+        loadingBar = view.findViewById(R.id.loading_bar)
+        content = view.findViewById(R.id.words_content)
 
         if (loading) loadingBar.fadeIn()
         else loadingBar.fadeOut()

@@ -69,7 +69,7 @@ object GlobalLog {
         return buildString {
             synchronized(logList) {
                 logList.forEach {
-                    appendln(it.toString())
+                    appendLine(it.toString())
                 }
             }
         }
@@ -79,7 +79,7 @@ object GlobalLog {
         return buildString {
             synchronized(logList) {
                 logList.forEach {
-                    appendln(it.colorfulHtml())
+                    appendLine(it.colorfulHtml())
                 }
             }
         }

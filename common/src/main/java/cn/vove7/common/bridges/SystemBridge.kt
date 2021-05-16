@@ -1,4 +1,4 @@
-@file:Suppress("unused")
+@file:Suppress("unused", "DEPRECATION")
 
 package cn.vove7.common.bridges
 
@@ -10,7 +10,6 @@ import android.bluetooth.BluetoothAdapter
 import android.content.*
 import android.content.Context.WIFI_SERVICE
 import android.content.pm.PackageManager
-import android.content.pm.PackageManager.MATCH_DEFAULT_ONLY
 import android.content.res.Configuration
 import android.graphics.Bitmap
 import android.hardware.Camera
@@ -63,7 +62,6 @@ import cn.vove7.vtp.app.AppHelper
 import cn.vove7.vtp.app.AppInfo
 import cn.vove7.vtp.calendar.CalendarAccount
 import cn.vove7.vtp.calendar.CalendarHelper
-import cn.vove7.vtp.extend.buildList
 import cn.vove7.vtp.log.Vog
 import cn.vove7.vtp.net.GsonHelper
 import cn.vove7.vtp.runtimepermission.PermissionUtils
@@ -292,7 +290,7 @@ object SystemBridge : SystemOperation {
     @RequiresApi(Build.VERSION_CODES.M)
     private fun switchFlashlightAboveL(on: Boolean) {
         //获取CameraManager
-        val mCameraManager = context.getSystemService(Context.CAMERA_SERVICE) as CameraManager;
+        val mCameraManager = context.getSystemService(Context.CAMERA_SERVICE) as CameraManager
         //获取当前手机所有摄像头设备ID
         val ids = mCameraManager.cameraIdList
         var r = false
@@ -385,7 +383,7 @@ object SystemBridge : SystemOperation {
     @Suppress("DEPRECATION")
     fun requestMusicFocus() {
         Vog.d("暂停音乐")
-        val mAm = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager;
+        val mAm = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
         val result = mAm.requestAudioFocus(null, AudioManager.STREAM_MUSIC,
                 AudioManager.AUDIOFOCUS_GAIN_TRANSIENT)
         if (result == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
@@ -415,6 +413,7 @@ object SystemBridge : SystemOperation {
         }
     }
 
+    @SuppressLint("QueryPermissionsNeeded")
     private fun sendMediaKeyUnderN(keyCode: Int) {
         val intent = Intent(Intent.ACTION_MEDIA_BUTTON)
         val kdn = KeyEvent(KeyEvent.ACTION_DOWN, keyCode)
@@ -509,9 +508,9 @@ object SystemBridge : SystemOperation {
         val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
         try {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && !notificationManager.isNotificationPolicyAccessGranted()) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && !notificationManager.isNotificationPolicyAccessGranted) {
                 GlobalApp.toastInfo("请先授予权限")
-                val intent = Intent(android.provider.Settings.ACTION_NOTIFICATION_POLICY_ACCESS_SETTINGS);
+                val intent = Intent(Settings.ACTION_NOTIFICATION_POLICY_ACCESS_SETTINGS)
                 context.startActivity(intent)
             } else {
                 mAudioManager.ringerMode = mode
@@ -600,6 +599,7 @@ object SystemBridge : SystemOperation {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 vibrateMan.vibrate(VibrationEffect.createOneShot(millis, effect))
             } else {
+                @Suppress("DEPRECATION")
                 vibrateMan.vibrate(millis)
             }
         }
@@ -615,6 +615,7 @@ object SystemBridge : SystemOperation {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 vibrateMan.vibrate(VibrationEffect.createWaveform(l, -1))
             } else {
+                @Suppress("DEPRECATION")
                 vibrateMan.vibrate(l, -1)
             }
         }
@@ -638,9 +639,9 @@ object SystemBridge : SystemOperation {
 
     private fun switchWifi(on: Boolean): Boolean {
         return try {
-            val wifiMan = context.applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
-            wifiMan.isWifiEnabled = on
-            true
+            val wifiMan = context.applicationContext.getSystemService(WIFI_SERVICE) as WifiManager
+            @Suppress("DEPRECATION")
+            return wifiMan.setWifiEnabled(on)
         } catch (e: Exception) {
             GlobalLog.err(e)
             false
@@ -662,11 +663,12 @@ object SystemBridge : SystemOperation {
 
     val isWifiEnable: Boolean
         get() {
-            val wifiManager = context.applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
+            val wifiManager = context.applicationContext.getSystemService(WIFI_SERVICE) as WifiManager
             return wifiManager.isWifiEnabled
         }
 
     /* 开启/关闭热点 */
+    @Suppress("DEPRECATION")
     private fun setWifiApEnabled(enabled: Boolean): Boolean {
         // 因为wifi和热点不能同时打开，所以打开热点的时候需要关闭wifi
         closeWifi()
@@ -677,7 +679,7 @@ object SystemBridge : SystemOperation {
             return true
         }
         val wifiManager = context.applicationContext
-                .getSystemService(Context.WIFI_SERVICE) as WifiManager
+                .getSystemService(WIFI_SERVICE) as WifiManager
 
 //        val ap: WifiConfiguration? = null
         return try {
@@ -704,7 +706,7 @@ object SystemBridge : SystemOperation {
      */
     @RequiresApi(Build.VERSION_CODES.O)
     private fun setWifiApEnabledForAndroidO(isEnable: Boolean) {
-        val manager = context.applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
+        val manager = context.applicationContext.getSystemService(WIFI_SERVICE) as WifiManager
         //cancelLocalOnlyHotspotRequest 是关闭热点
         //打开热
         try {
@@ -726,7 +728,7 @@ object SystemBridge : SystemOperation {
                                 0, ERROR_NO_CHANNEL, ERROR_GENERIC, ERROR_INCOMPATIBLE_MODE, ERROR_TETHERING_DISALLOWED)[reason])
                         Vog.d("onFailed ---> ")
                     }
-                }, Handler())
+                }, Handler(Looper.getMainLooper()))
             } else {
                 GlobalApp.toastInfo("不支持关闭热点")
             }
@@ -833,7 +835,7 @@ object SystemBridge : SystemOperation {
 
         val loLis = object : LocationListener {
             @SuppressLint("MissingPermission")
-            override fun onLocationChanged(location: Location?) {
+            override fun onLocationChanged(location: Location) {
                 Vog.d("onLocationChanged ---> $location")
                 handler.removeCallbacks(block[0])
                 lm.removeUpdates(this)
@@ -843,10 +845,10 @@ object SystemBridge : SystemOperation {
             override fun onStatusChanged(provider: String?, status: Int, extras: Bundle?) {
             }
 
-            override fun onProviderEnabled(provider: String?) {
+            override fun onProviderEnabled(provider: String) {
             }
 
-            override fun onProviderDisabled(provider: String?) {
+            override fun onProviderDisabled(provider: String) {
             }
         }
 
@@ -1084,10 +1086,10 @@ object SystemBridge : SystemOperation {
         if (days != null) intent.putIntegerArrayListExtra(AlarmClock.EXTRA_DAYS, ArrayList(days.toList()))
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         return try {
-            if (intent.resolveActivity(context.packageManager) != null) {
+            try {
                 context.startActivity(intent)
                 true
-            } else {
+            } catch (e: ActivityNotFoundException) {
                 GlobalApp.toastInfo("未找到时钟App")
                 false
             }
@@ -1155,9 +1157,9 @@ object SystemBridge : SystemOperation {
         val intent = Intent(Intent.ACTION_WEB_SEARCH)
         intent.putExtra(SearchManager.QUERY, s)
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-        if (context.packageManager.resolveActivity(intent, MATCH_DEFAULT_ONLY) != null) {
+        try {
             context.startActivity(intent)
-        } else {
+        } catch (e: ActivityNotFoundException) {
             GlobalApp.toastError("无可用应用")
         }
     }
@@ -1194,23 +1196,22 @@ object SystemBridge : SystemOperation {
             return level * 100 / maxLevel
         }
 
-    override val isCharging: Boolean
-        get() = {
-            val filter = IntentFilter(Intent.ACTION_BATTERY_CHANGED)
-            val intent = context.registerReceiver(null, filter)
+    override val isCharging: Boolean = run {
+        val filter = IntentFilter(Intent.ACTION_BATTERY_CHANGED)
+        val intent = context.registerReceiver(null, filter)
 
-            val i = intent?.getIntExtra(BatteryManager.EXTRA_STATUS,
-                    BatteryManager.BATTERY_STATUS_UNKNOWN) == BatteryManager.BATTERY_STATUS_CHARGING
-            Vog.d("isCharging ---> $i")
-            i
-        }.invoke()
+        val i = intent?.getIntExtra(BatteryManager.EXTRA_STATUS,
+                BatteryManager.BATTERY_STATUS_UNKNOWN) == BatteryManager.BATTERY_STATUS_CHARGING
+        Vog.d("isCharging ---> $i")
+        i
+    }
 
     @Suppress("DEPRECATION")
     override val simCount: Int
         get() {
             val telecomManager = context.getSystemService(Context.TELECOM_SERVICE) as TelecomManager?
             return if (telecomManager != null) {
-                if (context.checkPermission(android.Manifest.permission.READ_PHONE_STATE)
+                if (context.checkPermission(Manifest.permission.READ_PHONE_STATE)
                         && Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                     telecomManager.callCapablePhoneAccounts.size
                 } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP_MR1) {
@@ -1273,7 +1274,7 @@ object SystemBridge : SystemOperation {
      * 你不能以编程的方式启用NFC。用户只能通过设置或用键件按钮手动的启用。
      * @param enable Boolean
      */
-    @Suppress("unused")
+    @Suppress("unused", "UNUSED_PARAMETER")
     private fun switchNFC(enable: Boolean) {
         val nfcManager = context.getSystemService(Context.NFC_SERVICE) as NfcManager?
 
@@ -1314,7 +1315,7 @@ object SystemBridge : SystemOperation {
         val b = if (s?.tryClick() == true) {
             ViewFindBuilder().equalsText("确定", "OK")
                     .waitFor(600)?.let {
-                        Thread.sleep(200)
+                        sleep(200)
                         it.tryClick()
                     } ?: ViewFindBuilder().containsText("强行停止", "force stop")
                     .waitFor(600)?.tryClick() ?: false
@@ -1445,7 +1446,11 @@ object SystemBridge : SystemOperation {
     val screenHW: Pair<Int, Int>
         get() {
             val m = DisplayMetrics()
-            (context.getSystemService(Context.WINDOW_SERVICE) as WindowManager).defaultDisplay.getRealMetrics(m)
+            @Suppress("DEPRECATION")
+            context.display?.getRealMetrics(m)
+                ?: (context.getSystemService(Context.WINDOW_SERVICE) as WindowManager)
+                        .defaultDisplay.getRealMetrics(m)
+
             return m.heightPixels to m.widthPixels
         }
 
@@ -1495,7 +1500,7 @@ object SystemBridge : SystemOperation {
     }
 
     /**
-     * 发送脚本到 [BusServer]
+     * 发送脚本到 `BusServer`
      * @param ip2name List<Pair<String, String>>
      * @param script String
      * @param type String
@@ -1527,21 +1532,24 @@ object SystemBridge : SystemOperation {
         return URLEncoder.encode(entries.joinToString("&") { it.key + "=" + it.value }, "utf-8")
     }
 
-    private fun _send2Bus(ip2name: List<Pair<String, String>>, ps: String, hs: Map<String, String>): List<String> = buildList {
-        ip2name.forEach { (ip, name) ->
-            val res = HttpBridge.get("http://$ip:8001/api?$ps", hs)
-            this += if (res != null) {
-                GlobalLog.log("远程指令[成功]：$ip $name")
-                "$name 发送成功"
-            } else {
-                GlobalLog.err("远程指令[失败]：$ip $name")
-                "$name 发送失败"
-            }
+    @Suppress("FunctionName")
+    private fun _send2Bus(
+            ip2name: List<Pair<String, String>>,
+            ps: String,
+            hs: Map<String, String>
+    ): List<String> = ip2name.map { (ip, name) ->
+        val res = HttpBridge.get("http://$ip:8001/api?$ps", hs)
+        if (res != null) {
+            GlobalLog.log("远程指令[成功]：$ip $name")
+            "$name 发送成功"
+        } else {
+            GlobalLog.err("远程指令[失败]：$ip $name")
+            "$name 发送失败"
         }
     }
 
     /**
-     * 发送指令 [BusServer]
+     * 发送指令 `BusServer`
      * @param ip2name List<Pair<String, String>>
      * @param cmd String
      * @param toast Boolean

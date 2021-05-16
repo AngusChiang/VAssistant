@@ -33,12 +33,13 @@ import cn.vove7.jarvis.R
 import cn.vove7.jarvis.activities.PermissionManagerActivity.PermissionStatus.Companion.allPerStr
 import cn.vove7.jarvis.activities.base.OneFragmentActivity
 import cn.vove7.jarvis.adapters.RecAdapterWithFooter
+import cn.vove7.jarvis.databinding.FragmentBaseListBinding
+import cn.vove7.jarvis.databinding.ListHeaderWithSwitchBinding
 import cn.vove7.jarvis.fragments.SimpleListFragment
 import cn.vove7.jarvis.services.GestureService
 import cn.vove7.jarvis.services.MyAccessibilityService
 import cn.vove7.vtp.runtimepermission.PermissionUtils
 import com.catchingnow.icebox.sdk_client.IceBox
-import kotlinx.android.synthetic.main.list_header_with_switch.view.*
 import kotlin.concurrent.thread
 
 
@@ -74,7 +75,7 @@ class PermissionManagerActivity : OneFragmentActivity() {
             fun newIns(): ManageFragment = ManageFragment()
         }
 
-        override fun initView(contentView: View) {
+        override fun initView(contentView: FragmentBaseListBinding) {
             adapter = buildAdapter()
             refreshStatus()
             recyclerView.isVerticalScrollBarEnabled = false
@@ -104,13 +105,13 @@ class PermissionManagerActivity : OneFragmentActivity() {
         }
 
         private fun buildHeader() {
-            val v = layoutInflater.inflate(R.layout.list_header_with_switch, null, false)
-            val headerTitle = v.header_title
-            val headerSwitch = v.header_switch
+            val vb = ListHeaderWithSwitchBinding.inflate(layoutInflater)
+            val headerTitle = vb.headerTitle
+            val headerSwitch = vb.headerSwitch
             headerTitle.text = "一键申请"
             headerSwitch.visibility = View.GONE
-            v.setOnClickListener { ActivityCompat.requestPermissions(requireActivity(), allPerStr, 100) }
-            setHeader(v)
+            vb.root.setOnClickListener { ActivityCompat.requestPermissions(requireActivity(), allPerStr, 100) }
+            setHeader(vb.root)
         }
 
         override fun onLoadData(pageIndex: Int) {

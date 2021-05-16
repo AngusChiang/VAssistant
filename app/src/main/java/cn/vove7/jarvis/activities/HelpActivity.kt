@@ -6,7 +6,9 @@ import android.graphics.Typeface
 import android.net.Uri
 import android.os.Bundle
 import android.os.Environment
-import android.view.View
+import android.view.LayoutInflater
+import android.view.ViewGroup
+import android.widget.ListView
 import android.widget.TextView
 import cn.vove7.bottomdialog.BottomDialog
 import cn.vove7.bottomdialog.builder.buttons
@@ -21,6 +23,7 @@ import cn.vove7.jarvis.R
 import cn.vove7.jarvis.activities.base.ReturnableActivity
 import cn.vove7.jarvis.adapters.IconTitleEntity
 import cn.vove7.jarvis.adapters.IconTitleListAdapter
+import cn.vove7.jarvis.databinding.ActivityAbcHeaderBinding
 import cn.vove7.jarvis.tools.ItemWrap
 import cn.vove7.jarvis.tools.Tutorials
 import cn.vove7.jarvis.view.dialog.contentbuilder.SmoothTextBuilder
@@ -29,7 +32,6 @@ import cn.vove7.jarvis.view.positiveButtonWithColor
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.customview.customView
 import com.google.android.material.textfield.TextInputLayout
-import kotlinx.android.synthetic.main.activity_abc_header.*
 import java.io.File
 
 /**
@@ -38,19 +40,18 @@ import java.io.File
  * @author Administrator
  * 9/23/2018
  */
-class HelpActivity : ReturnableActivity() {
-    override val layoutRes: Int
-        get() = R.layout.activity_abc_header
+class HelpActivity : ReturnableActivity<ActivityAbcHeaderBinding>() {
+
     override val darkTheme: Int
         get() = R.style.DarkTheme
     lateinit var adapter: IconTitleListAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        header_content.addView(layoutInflater.inflate(R.layout.header_help, null))
+        viewBinding.headerContent.addView(layoutInflater.inflate(R.layout.header_help, null))
 
-        list_view.adapter = IconTitleListAdapter(this, getData()).also { adapter = it }
-        list_view.setOnItemLongClickListener { parent, view, position, id ->
+        viewBinding.listView.adapter = IconTitleListAdapter(this, getData()).also { adapter = it }
+        viewBinding.listView.setOnItemLongClickListener { _, _, position, _ ->
             if (position == 5) {
                 GlobalLog.export2Sd()
                 return@setOnItemLongClickListener true
@@ -61,7 +62,7 @@ class HelpActivity : ReturnableActivity() {
     }
 
     private fun startTutorials() {
-        list_view.post {
+        viewBinding.listView.post {
             Tutorials.oneStep(this, list = arrayOf(
                     ItemWrap(Tutorials.h_t_1, adapter.holders[0]?.titleView, getString(R.string.text_user_manual), "自定义指令、脚本Api、远程调试都在这里"),
                     ItemWrap(Tutorials.h_t_2, adapter.holders[1]?.titleView, getString(R.string.text_hot_key_desc), "快速了解快捷键操作"),

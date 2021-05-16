@@ -1,23 +1,26 @@
 package cn.vove7.jarvis.activities
 
 import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.ViewGroup
 import cn.vove7.common.datamanager.parse.model.Action
 import cn.vove7.common.interfaces.CodeEditorOperation
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.activities.base.CodeEditorActivity
+import cn.vove7.jarvis.databinding.ActivityJsCodeEditorBinding
 import cn.vove7.rhino.api.RhinoApi
 import cn.vove7.rhino.processor.TextProcessor
 import cn.vove7.rhino.processor.language.MyJsLanguageWithApi
 import cn.vove7.rhino.processor.widget.FastScrollerView
 import cn.vove7.rhino.processor.widget.GutterView
 
-class JsEditorActivity : CodeEditorActivity() {
+class JsEditorActivity : CodeEditorActivity<ActivityJsCodeEditorBinding>() {
 
     override val assetFolder: String = "js_sample/"
     override val scriptType: String = Action.SCRIPT_TYPE_JS
 
     override val codeEditor: CodeEditorOperation by lazy {
-        findViewById<TextProcessor>(R.id.editor)
+        viewBinding.editor
     }
     override val testFiles: Array<String> by lazy {
         assets.list("js_sample") ?: emptyArray()
@@ -29,13 +32,10 @@ class JsEditorActivity : CodeEditorActivity() {
         RhinoApi.regPrint(print)
     }
 
-    override val layoutRes: Int
-        get() = R.layout.activity_js_code_editor
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val mEditor = findViewById<TextProcessor>(R.id.editor)
+        val mEditor = viewBinding.editor
         mEditor.language = MyJsLanguageWithApi()
         mEditor.init()
 

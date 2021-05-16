@@ -6,7 +6,6 @@ import cn.vove7.bottomdialog.interfaces.ContentBuilder
 import cn.vove7.jarvis.R
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
-import kotlinx.android.synthetic.main.content_image.view.*
 import java.io.File
 
 /**
@@ -23,7 +22,7 @@ class ImageContentBuilder : ContentBuilder() {
     lateinit var imageView: ImageView
 
     override fun init(view: View) {
-        imageView = view.image_view
+        imageView = view.findViewById(R.id.image_view)
         onInit?.invoke()
     }
 

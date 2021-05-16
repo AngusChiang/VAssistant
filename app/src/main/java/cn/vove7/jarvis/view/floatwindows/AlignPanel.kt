@@ -1,15 +1,19 @@
 package cn.vove7.jarvis.view.floatwindows
 
 import android.graphics.drawable.Drawable
+import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
 import android.view.animation.AnimationUtils
+import android.widget.TextView
 import cn.vove7.common.bridges.SystemBridge
 import cn.vove7.common.utils.listener
 import cn.vove7.common.utils.runInCatch
 import cn.vove7.jarvis.R
+import cn.vove7.jarvis.databinding.FloatPanelAlignBinding
 import cn.vove7.jarvis.view.*
+import cn.vove7.jarvis.view.animation.WaveView
 import cn.vove7.jarvis.view.tools.SettingItemHelper
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.callbacks.onDismiss
@@ -17,7 +21,6 @@ import com.afollestad.materialdialogs.customview.customView
 import group.infotech.drawable.dsl.corners
 import group.infotech.drawable.dsl.shapeDrawable
 import group.infotech.drawable.dsl.solidColor
-import kotlinx.android.synthetic.main.float_panel_align.view.*
 import org.adw.library.widgets.discreteseekbar.DiscreteSeekBar
 
 /**
@@ -26,7 +29,7 @@ import org.adw.library.widgets.discreteseekbar.DiscreteSeekBar
  * @author Vove
  * 2020/4/20
  */
-class AlignPanel : FloatyPanel(
+class AlignPanel : FloatyPanel<FloatPanelAlignBinding>(
         WindowManager.LayoutParams.WRAP_CONTENT,
         WindowManager.LayoutParams.WRAP_CONTENT
 ) {
@@ -35,8 +38,6 @@ class AlignPanel : FloatyPanel(
 
     override val posX: Int
         get() = if (FloatPanelConfig.alignOrientation == 0) 0 else SystemBridge.screenWidth
-
-    override fun layoutResId(): Int = R.layout.float_panel_align
 
     override fun onCreateView(view: View) {
         val lp = (animationBody.layoutParams as ViewGroup.MarginLayoutParams)
@@ -59,8 +60,8 @@ class AlignPanel : FloatyPanel(
             textColor: Int = FloatPanelConfig.alignTextColor
 
     ): Drawable = shapeDrawable {
-        animationBody.voice_text.setTextColor(textColor)
-        animationBody.listening_ani.setColor(textColor)
+        animationBody.findViewById<TextView>(R.id.voice_text)?.setTextColor(textColor)
+        animationBody.findViewById<WaveView>(R.id.listening_ani)?.setColor(textColor)
 
         solidColor = bgColor
         corners {

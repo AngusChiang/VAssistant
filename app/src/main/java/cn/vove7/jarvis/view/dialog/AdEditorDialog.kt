@@ -28,7 +28,7 @@ import com.afollestad.materialdialogs.customview.customView
  * @author Administrator
  * 9/22/2018
  */
-class AdEditorDialog(val context: BaseActivity, val onUpdate: () -> Unit) {
+class AdEditorDialog(val context: BaseActivity<*>, val onUpdate: () -> Unit) {
 
     private fun clearErr() {
         showNameText.error = ""

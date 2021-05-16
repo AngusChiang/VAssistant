@@ -1,5 +1,6 @@
 package cn.vove7.jarvis.activities
 
+import android.annotation.SuppressLint
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -14,6 +15,8 @@ import cn.vove7.common.model.UserInfo
 import cn.vove7.jarvis.BuildConfig
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.activities.base.BaseActivity
+import cn.vove7.jarvis.databinding.ActivityMainBinding
+import cn.vove7.jarvis.databinding.ActivityRealMainBinding
 import cn.vove7.jarvis.tools.Tutorials
 import cn.vove7.jarvis.tools.debugserver.RemoteDebugServer
 import cn.vove7.jarvis.view.dialog.UpdateLogDialog
@@ -21,8 +24,6 @@ import cn.vove7.jarvis.work.DataSyncWork
 import cn.vove7.vtp.log.Vog
 import cn.vove7.vtp.runtimepermission.PermissionUtils
 import com.afollestad.materialdialogs.MaterialDialog
-import com.afollestad.materialdialogs.callbacks.onDismiss
-import kotlinx.android.synthetic.main.fragment_mine.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 
@@ -32,10 +33,7 @@ import kotlinx.coroutines.delay
  * 初始化流程
  *
  */
-class MainActivity : BaseActivity() {
-
-    override val layoutRes: Int
-        get() = R.layout.activity_real_main
+class MainActivity : BaseActivity<ActivityRealMainBinding>() {
 
     override fun onBackPressed() {
         finishAndRemoveTask()
@@ -137,8 +135,8 @@ class MainActivity : BaseActivity() {
 
     private fun showTutorials() {
         if (!UserInfo.isLogin()) {
-            text_login?.post {
-                Tutorials.showForView(this, Tutorials.T_LOGIN, text_login,
+            findViewById<View>(R.id.text_login)?.post {
+                Tutorials.showForView(this, Tutorials.T_LOGIN, findViewById(R.id.text_login),
                         "新用户注册", getString(R.string.desc_new_account))
             }
         }

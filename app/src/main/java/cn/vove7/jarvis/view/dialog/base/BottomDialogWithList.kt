@@ -10,7 +10,7 @@ import cn.vove7.jarvis.R
 import cn.vove7.jarvis.adapters.ListViewModelLoader
 import cn.vove7.jarvis.adapters.ListViewModel
 import cn.vove7.jarvis.adapters.SimpleListAdapter
-import kotlinx.android.synthetic.main.dialog_list_view.view.*
+import cn.vove7.jarvis.databinding.DialogListViewBinding
 
 /**
  * # BottomDialogWithList
@@ -25,8 +25,8 @@ abstract class BottomDialogWithList<T>(context: Context, title: String)
     override var pageIndex: Int = 0
 
     private val recyclerView: RecyclerView by lazy {
-        myView.recycler_view.apply {
-            myView.fast_scroller.attachRecyclerView(this)
+        myView.recyclerView.apply {
+            myView.fastScroller.attachRecyclerView(this)
             layoutManager = LinearLayoutManager(context)
             this.adapter = listAdapter
         }
@@ -47,8 +47,9 @@ abstract class BottomDialogWithList<T>(context: Context, title: String)
     }
 
 
-    private val myView by lazy { layoutInflater.inflate(R.layout.dialog_list_view, null) }
-    override fun onCreateContentView(parent: View): View = myView
+    private val myView by lazy { DialogListViewBinding.inflate(layoutInflater) }
+
+    override fun onCreateContentView(parent: View): View = myView.root
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 

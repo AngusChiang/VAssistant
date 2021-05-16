@@ -12,7 +12,6 @@ import cn.vove7.jarvis.R
 import cn.vove7.jarvis.fragments.AwesomeItem
 import cn.vove7.vtp.log.Vog
 import com.bumptech.glide.Glide
-import kotlinx.android.synthetic.main.item_normal_icon_title.view.*
 import java.io.Serializable
 import java.text.Collator
 
@@ -96,10 +95,10 @@ open class SimpleListAdapter<T>(
 
     class VHolder(v: View, adapter: RecAdapterWithFooter<RecViewHolder, *>? = null)
         : RecViewHolder(v, adapter) {
-        val icon: ImageView = v.icon
-        val title: TextView = v.title
-        val subtitle: TextView = v.sub_title
-        val checkBox: CheckBox = v.check_box
+        val icon: ImageView = v.findViewById(R.id.icon)
+        val title: TextView = v.findViewById(R.id.title)
+        val subtitle: TextView = v.findViewById(R.id.sub_title)
+        val checkBox: CheckBox = v.findViewById(R.id.check_box)
 
     }
     interface OnItemClickListener<T> {

@@ -9,12 +9,15 @@ import android.view.ViewGroup
 import android.widget.ListView
 import android.widget.TextView
 import androidx.cardview.widget.CardView
+import androidx.fragment.app.Fragment
+import androidx.viewbinding.ViewBinding
 import cn.vove7.common.appbus.AppBus
 import cn.vove7.common.model.UserInfo
 import cn.vove7.common.utils.*
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.activities.*
 import cn.vove7.jarvis.app.AppApi
+import cn.vove7.jarvis.databinding.FragmentMineBinding
 import cn.vove7.jarvis.lifecycle.LifecycleScope
 import cn.vove7.jarvis.services.MainService
 import cn.vove7.jarvis.tools.AppLogic
@@ -22,13 +25,11 @@ import cn.vove7.jarvis.view.dialog.LoginDialog
 import cn.vove7.jarvis.view.dialog.UserInfoDialog
 import cn.vove7.vtp.easyadapter.BaseListAdapter
 import cn.vove7.vtp.log.Vog
-import kotlinx.android.synthetic.main.fragment_mine.*
-import kotlinx.android.synthetic.main.fragment_mine.view.*
 import kotlinx.coroutines.launch
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
 
-class MineFragment : androidx.fragment.app.Fragment() {
+class MineFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -36,7 +37,6 @@ class MineFragment : androidx.fragment.app.Fragment() {
 
         }
     }
-
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     fun onEvent(code: String) {
@@ -64,13 +64,14 @@ class MineFragment : androidx.fragment.app.Fragment() {
         }
     }
 
-    lateinit var listView: ListView
+    lateinit var viewBinding: FragmentMineBinding
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
-        val view = inflater.inflate(R.layout.fragment_mine, container, false)
+        viewBinding = FragmentMineBinding.inflate(inflater, container, false)
         AppBus.reg(this)
 
-        view.top_panel.onClick {
+        viewBinding.topPanel.onClick {
             if (UserInfo.isLogin()) {
                 UserInfoDialog(activity!!) {
                     loadUserInfo()
@@ -81,10 +82,9 @@ class MineFragment : androidx.fragment.app.Fragment() {
                 }
             }
         }
-        view.fab.onClick(MainService::switchRecog)
+        viewBinding.fab.onClick(MainService::switchRecog)
 
-        listView = view.findViewById(R.id.list_view)
-        listView.adapter = object : BaseListAdapter<ItemHolder, Pair<Int, Int>>(context!!, listOf(
+        viewBinding.listView.adapter = object : BaseListAdapter<ItemHolder, Pair<Int, Int>>(context!!, listOf(
                 Pair(R.color.google_blue, R.string.text_settings),
                 Pair(R.color.google_red, R.string.text_advanced_features),
                 Pair(cn.vove7.vtp.R.color.brown_800, R.string.text_laboratory),
@@ -104,8 +104,8 @@ class MineFragment : androidx.fragment.app.Fragment() {
 
             override fun onCreateViewHolder(view: View): ItemHolder = ItemHolder(view)
         }
-        listView.onItemClickListener = null
-        return view
+        viewBinding.listView.onItemClickListener = null
+        return viewBinding.root
     }
 
 
@@ -121,26 +121,26 @@ class MineFragment : androidx.fragment.app.Fragment() {
 
     private fun loadUserInfo() {
         if (UserInfo.isLogin()) {
-            login_lay.visibility = View.GONE
-            user_info_lay.visibility = View.VISIBLE
-            user_name_text.text = UserInfo.getUserName()
-            user_vip_text.text = when {
+            viewBinding.loginLay.visibility = View.GONE
+            viewBinding.userInfoLay.visibility = View.VISIBLE
+            viewBinding.userNameText.text = UserInfo.getUserName()
+            viewBinding.userVipText.text = when {
                 UserInfo.isPermanentVip() -> {
-                    red_heard.show()
+                    viewBinding.redHeard.show()
                     "永久会员"
                 }
                 UserInfo.isVip() -> {
-                    red_heard.show()
+                    viewBinding.redHeard.show()
                     "会员用户"
                 }
                 else -> {
-                    red_heard.gone()
+                    viewBinding.redHeard.gone()
                     ""
                 }
             }
         } else {
-            login_lay.visibility = View.VISIBLE
-            user_info_lay.visibility = View.GONE
+            viewBinding.loginLay.show()
+            viewBinding.userInfoLay.gone()
         }
     }
 

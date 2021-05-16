@@ -19,7 +19,7 @@ import cn.vove7.vtp.app.AppInfo
 class SelectAppDialog {
 
     companion object {
-        fun get(context: BaseActivity, onSel: (AppInfo) -> Unit): BottomDialog {
+        fun get(context: BaseActivity<*>, onSel: (AppInfo) -> Unit): BottomDialog {
             val contentBuilder = AppListBuilder(true, context.lifecycleScope) { _, _, item, _ ->
                 onSel(item)
             }

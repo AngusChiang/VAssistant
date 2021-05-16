@@ -10,7 +10,9 @@ import android.view.ViewAnimationUtils
 import android.view.animation.AccelerateDecelerateInterpolator
 import android.widget.TextView
 import cn.vove7.common.appbus.AppBus
+import cn.vove7.common.utils.gone
 import cn.vove7.jarvis.R
+import cn.vove7.jarvis.databinding.ActivityVoiceBinding
 import cn.vove7.jarvis.speech.VoiceData
 import cn.vove7.jarvis.speech.SpeechConst.Companion.CODE_VOICE_ERR
 import cn.vove7.jarvis.speech.SpeechConst.Companion.CODE_VOICE_TEMP
@@ -18,7 +20,6 @@ import cn.vove7.jarvis.speech.SpeechConst.Companion.CODE_VOICE_VOL
 import cn.vove7.vtp.log.Vog
 import cn.vove7.vtp.runtimepermission.PermissionUtils
 import cn.vove7.vtp.toast.Voast
-import kotlinx.android.synthetic.main.activity_voice.*
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
 
@@ -40,14 +41,17 @@ class VoiceTestActivity : Activity() {
             "android.permission.READ_PHONE_STATE",
             "android.permission.WRITE_EXTERNAL_STORAGE"
     )
-    lateinit var logText: TextView
+
+    val viewBinding by lazy {
+        ActivityVoiceBinding.inflate(layoutInflater)
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        setContentView(R.layout.activity_voice)
-        logText = findViewById(R.id.log)
+        setContentView(viewBinding.root)
         PermissionUtils.autoRequestPermission(this, requirePermission, 9)
-        voice_bkg.visibility = View.GONE
+        viewBinding.voiceBkg.gone()
     }
 
 
@@ -74,20 +78,20 @@ class VoiceTestActivity : Activity() {
     fun showResult(data: VoiceData) {
         when (data.what) {
             CODE_VOICE_TEMP -> {
-                result_text.text = data.data
-                logText.append(data.data + "\n")
+                findViewById<TextView>(R.id.result_text).text = data.data
+                viewBinding.log.append(data.data + "\n")
             }
             CODE_VOICE_VOL -> {
                 handle.sendMessage(handle.obtainMessage(0, data.volumePercent, 0))
             }
             CODE_VOICE_ERR -> {
-                logText.append("识别失败\n")
+                viewBinding.log.append("识别失败\n")
             }
         }
     }
 
     private val handle = Handler {
-        volume_per.progress = it.arg1
+        viewBinding.volumePer.progress = it.arg1
         updateCircle(op, it.arg1)
         return@Handler true
     }
@@ -107,14 +111,14 @@ class VoiceTestActivity : Activity() {
             return
         }
         end = false
-        val oldR = (op.toFloat() / 100) * voice_bkg.width / 2
-        val newR = (np.toFloat() / 100) * voice_bkg.width / 2
+        val oldR = (op.toFloat() / 100) * viewBinding.voiceBkg.width / 2
+        val newR = (np.toFloat() / 100) * viewBinding.voiceBkg.width / 2
         Vog.d("$oldR -> $newR")
-        voice_bkg.visibility = View.VISIBLE
+        viewBinding.voiceBkg.visibility = View.VISIBLE
 //        c?.cancel()
         c = ViewAnimationUtils.createCircularReveal(
-                voice_bkg, voice_bkg.width / 2,
-                voice_bkg.height / 2, oldR, newR
+                viewBinding.voiceBkg, viewBinding.voiceBkg.width / 2,
+                viewBinding.voiceBkg.height / 2, oldR, newR
         )
         c!!.addListener(object : AnimatorListenerAdapter() {
             override fun onAnimationEnd(animation: Animator?) {

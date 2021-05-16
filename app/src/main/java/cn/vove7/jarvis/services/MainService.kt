@@ -1,5 +1,6 @@
 package cn.vove7.jarvis.services
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.AlertDialog
 import android.app.Dialog
@@ -96,6 +97,7 @@ import java.lang.Thread.sleep
 import java.util.*
 import java.util.concurrent.CountDownLatch
 import kotlin.concurrent.thread
+import kotlin.coroutines.coroutineContext
 
 
 /**
@@ -130,6 +132,7 @@ object MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
     /**
      * 语音事件数据类型
      */
+    @SuppressLint("StaticFieldLeak")
     val context = GlobalApp.APP
 
     private lateinit var floatyPanel: IFloatyPanel
@@ -147,7 +150,7 @@ object MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
 
     private lateinit var chatSystem: ChatSystem
 
-    //启动过慢  lateinit 导致未初始化异常
+    //启动过慢  lazy init 导致未初始化异常
     var speechRecogService: SpeechRecogService? = null
     var speechSynService: SpeechSynService? = null
     var homeControlSystem: ISmartHomeSystem? = null
@@ -1078,7 +1081,7 @@ object MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
             var lastPosition = 0
 
             do {
-                delay(1)
+
                 val parseResult: ActionParseResult = ParseEngine
                         .parseAction(result, AccessibilityApi.currentScope, smartOpen, onClick, lastPosition)
                 lastPosition = parseResult.lastGlobalPosition

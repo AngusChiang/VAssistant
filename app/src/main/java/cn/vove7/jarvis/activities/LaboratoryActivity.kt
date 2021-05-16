@@ -2,6 +2,8 @@ package cn.vove7.jarvis.activities
 
 import android.os.Bundle
 import android.util.TypedValue
+import android.view.LayoutInflater
+import android.view.ViewGroup
 import cn.vove7.bottomdialog.BottomDialog
 import cn.vove7.bottomdialog.builder.title
 import cn.vove7.bottomdialog.extension.awesomeHeader
@@ -15,6 +17,7 @@ import cn.vove7.jarvis.BuildConfig
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.activities.base.ReturnableActivity
 import cn.vove7.jarvis.adapters.SettingsExpandableAdapter
+import cn.vove7.jarvis.databinding.ActivityExpandableSettingsBinding
 import cn.vove7.jarvis.plugins.AdKillerService
 import cn.vove7.jarvis.plugins.PluginConfig
 import cn.vove7.jarvis.plugins.PowerListener
@@ -28,7 +31,6 @@ import cn.vove7.jarvis.view.dialog.contentbuilder.SettingItemBuilder
 import cn.vove7.jarvis.view.dialog.contentbuilder.markdownContent
 import cn.vove7.jarvis.view.dialog.editorView
 import cn.vove7.vtp.extend.buildList
-import kotlinx.android.synthetic.main.activity_expandable_settings.*
 import kotlinx.coroutines.delay
 
 /**
@@ -37,19 +39,17 @@ import kotlinx.coroutines.delay
  * @author Administrator
  * 9/24/2018
  */
-class LaboratoryActivity : ReturnableActivity() {
-    override val layoutRes: Int
-        get() = R.layout.activity_expandable_settings
+class LaboratoryActivity : ReturnableActivity<ActivityExpandableSettingsBinding>() {
     override val darkTheme: Int
         get() = R.style.DarkTheme
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val expandableListView = expand_list
+        val expandableListView = viewBinding.expandList
         val adapter = SettingsExpandableAdapter(this, groupItems, expandableListView)
         expandableListView.setAdapter(adapter)
 
-        expandableListView?.post {
+        expandableListView.post {
             expandableListView.apply {
                 expandGroup(0)
                 expandGroup(2)

@@ -8,13 +8,11 @@ import cn.vove7.common.utils.gone
 import cn.vove7.common.utils.runOnUi
 import cn.vove7.common.utils.show
 import cn.vove7.jarvis.R
+import cn.vove7.jarvis.databinding.FloatPanelCustomBinding
 import cn.vove7.jarvis.view.SettingChildItem
-import kotlinx.android.synthetic.main.float_panel_default.view.*
 
 
-class CustomPanel : FloatyPanel(-1, -2) {
-
-    override fun layoutResId(): Int = R.layout.float_panel_custom
+class CustomPanel : FloatyPanel<FloatPanelCustomBinding>(-1, -2) {
 
     override fun onCreateView(view: View) {
         animationBody.layoutParams = (animationBody.layoutParams as LinearLayout.LayoutParams).also {
@@ -23,18 +21,20 @@ class CustomPanel : FloatyPanel(-1, -2) {
     }
 
     override fun showListeningAni() {
-        if (contentView?.listening_ani?.isShown == true) return
-        contentView?.parse_ani?.gone()
-        contentView?.listening_ani?.show()
+        val vb = viewBinding ?: return
+        if (vb.listeningAni.isShown) return
+        vb.parseAni.gone()
+        vb.listeningAni.show()
     }
 
     override fun showParseAni() {
-        if (contentView?.parse_ani?.isShown == true) return
-        contentView?.parse_ani?.apply {
+        val vb = viewBinding ?: return
+        if (vb.parseAni.isShown) return
+        vb.parseAni.apply {
             (drawable as? AnimationDrawable)?.start()
             show()
         }
-        contentView?.listening_ani?.gone()
+        vb.listeningAni.gone()
     }
 
     override fun showTextResult(result: String) {

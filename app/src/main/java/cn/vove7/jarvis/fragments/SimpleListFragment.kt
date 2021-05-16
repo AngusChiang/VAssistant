@@ -8,7 +8,9 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.*
 import androidx.annotation.LayoutRes
+import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import cn.vove7.common.interfaces.Searchable
 import cn.vove7.common.utils.runOnUi
 import cn.vove7.jarvis.R
@@ -16,13 +18,13 @@ import cn.vove7.jarvis.adapters.ListViewModel
 import cn.vove7.jarvis.adapters.ListViewModelLoader
 import cn.vove7.jarvis.adapters.RecAdapterWithFooter
 import cn.vove7.jarvis.adapters.SimpleListAdapter
+import cn.vove7.jarvis.databinding.FragmentBaseListBinding
+import cn.vove7.jarvis.databinding.ListHeaderWithSwitchBinding
 import cn.vove7.jarvis.lifecycle.LifeCycleScopeDelegate
 import cn.vove7.jarvis.lifecycle.LifecycleScope
 import cn.vove7.vtp.log.Vog
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.pluscubed.recyclerfastscroll.RecyclerFastScroller
-import kotlinx.android.synthetic.main.fragment_base_list.view.*
-import kotlinx.android.synthetic.main.list_header_with_switch.view.*
 import java.util.stream.Collectors
 
 /**
@@ -32,7 +34,8 @@ import java.util.stream.Collectors
  * @author 17719247306
  * 2018/8/18
  */
-abstract class SimpleListFragment<DataType> : androidx.fragment.app.Fragment(), LifeCycleScopeDelegate, ListViewModelLoader<DataType> {
+abstract class SimpleListFragment<DataType> :
+        Fragment(), LifeCycleScopeDelegate, ListViewModelLoader<DataType> {
     override var sortData: Boolean = false
     open val itemClickListener: SimpleListAdapter.OnItemClickListener<DataType>? = null
     override val pageSizeLimit: Int = 50
@@ -46,7 +49,7 @@ abstract class SimpleListFragment<DataType> : androidx.fragment.app.Fragment(), 
         set(value) {
             field = value
             if (::contentView.isInitialized) {
-                contentView.swipe_refresh?.isEnabled = value
+                contentView.swipeRefresh.isEnabled = value
             }
         }
 
@@ -67,16 +70,16 @@ abstract class SimpleListFragment<DataType> : androidx.fragment.app.Fragment(), 
         changeViewOnLoadDone(true)
     }
 
-    open fun initView(contentView: View) {
+    open fun initView(contentView: FragmentBaseListBinding) {
         adapter = SimpleListAdapter(dataSet, itemClickListener, itemCheckable)
         refreshable = refreshable
     }
 
-    private lateinit var contentView: View
+    private lateinit var contentView: FragmentBaseListBinding
     lateinit var progressBar: ProgressBar
     protected lateinit var netErrViewContainer: ViewGroup
     private var netErrView: View? = null
-    private lateinit var swipeRefreshLayout: androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+    private lateinit var swipeRefreshLayout: SwipeRefreshLayout
 
     open val itemCheckable: Boolean = false
 
@@ -98,12 +101,12 @@ abstract class SimpleListFragment<DataType> : androidx.fragment.app.Fragment(), 
     var layManager: androidx.recyclerview.widget.RecyclerView.LayoutManager? = null
     lateinit var adapter: RecAdapterWithFooter<*, *>
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        contentView = inflater.inflate(R.layout.fragment_base_list, container, false)
+        contentView = FragmentBaseListBinding.inflate(inflater,container,false)
         initSelfView()
         initView(contentView)
         afterSet()
         refresh()
-        return contentView
+        return contentView.root
     }
 
     //    var viewCreate = false
@@ -138,7 +141,8 @@ abstract class SimpleListFragment<DataType> : androidx.fragment.app.Fragment(), 
         addHeader(v)
     }
 
-    val float_header by lazy { contentView.findViewById<androidx.cardview.widget.CardView>(R.id.float_header) }
+    val float_header by lazy { contentView.floatHeader }
+
     fun setHeader(v: View) {
         float_header.removeAllViews()
         float_header.addView(v)
@@ -172,13 +176,13 @@ abstract class SimpleListFragment<DataType> : androidx.fragment.app.Fragment(), 
     }
 
     private fun initSelfView() {
-        recyclerView = f(R.id.recycle_view)
-        fastScroller = f(R.id.fast_scroller)
+        recyclerView = contentView.recycleView
+        fastScroller = contentView.fastScroller
         fastScroller.attachRecyclerView(recyclerView)
-        floatButton = f(R.id.fab)
-        swipeRefreshLayout = f(R.id.swipe_refresh)
-        netErrViewContainer = f(R.id.net_error_layout)
-        progressBar = f(R.id.progress_bar)
+        floatButton = contentView.fab
+        swipeRefreshLayout = contentView.swipeRefresh
+        netErrViewContainer = contentView.netErrorLayout
+        progressBar = contentView.progressBar
         progressBar.visibility = showBar
         swipeRefreshLayout.setOnRefreshListener(::refresh)
         recyclerView.addOnScrollListener(object : androidx.recyclerview.widget.RecyclerView.OnScrollListener() {
@@ -188,7 +192,7 @@ abstract class SimpleListFragment<DataType> : androidx.fragment.app.Fragment(), 
                 if (!allLoadFlag && isSlideToBottom() && !swipeRefreshLayout.isRefreshing) {//上拉加载,
                     if (pageIndex != 0)
                         adapter.setFooter(RecAdapterWithFooter.STATUS_LOADING)
-                    Handler().postDelayed({
+                    contentView.root.postDelayed({
                         if (isSlideToBottom()) {
                             loadMore()
                         }
@@ -293,21 +297,19 @@ abstract class SimpleListFragment<DataType> : androidx.fragment.app.Fragment(), 
     }
 
     fun buildHeader(title: String, switchChecked: Boolean = false, lis: CompoundButton.OnCheckedChangeListener? = null) {
-        val v = layoutInflater.inflate(R.layout.list_header_with_switch, null, false)
-        val headerTitle = v.header_title
-        val headerSwitch = v.header_switch
+        val vb = ListHeaderWithSwitchBinding.inflate(layoutInflater)
+        val headerTitle = vb.headerTitle
+        val headerSwitch = vb.headerSwitch
         headerTitle.text = title
         headerSwitch.isChecked = switchChecked
         headerSwitch.setOnCheckedChangeListener(lis)
-        v.setOnClickListener { headerSwitch.toggle() }
-        setHeader(v)
+        vb.root.setOnClickListener { headerSwitch.toggle() }
+        setHeader(vb.root)
     }
 
     private val defaultErrView: View
         get() = LayoutInflater.from(context)
                 .inflate(R.layout.net_error_layout, null, false)
-
-    private fun <V : View> f(id: Int): V = contentView.findViewById(id) as V
 
     fun showProgressBar() {
         showBar = View.VISIBLE

@@ -17,7 +17,6 @@ import cn.vove7.jarvis.fragments.InstAppListFragment
 import cn.vove7.jarvis.fragments.SimpleListFragment
 import cn.vove7.jarvis.tools.SearchActionHelper
 import cn.vove7.vtp.net.GsonHelper
-import kotlinx.android.synthetic.main.activity_base_view_pager.*
 
 /**
  * 命令管理
@@ -46,7 +45,7 @@ class InstManagerActivity : BaseActivityWithViewPager() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when {
             item.itemId == R.id.menu_item_sync -> {//同步
-                val p = view_pager.currentItem
+                val p = viewBinding.viewPager.currentItem
                 val f = fragments[p] as OnSyncInst
                 f.onSync()
                 return true

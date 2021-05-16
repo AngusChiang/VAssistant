@@ -6,6 +6,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import android.speech.RecognizerIntent
+import android.widget.ExpandableListView
 import android.widget.TextView
 import cn.vove7.common.app.AppConfig
 import cn.vove7.common.app.GlobalApp
@@ -26,6 +27,7 @@ import cn.vove7.jarvis.activities.screenassistant.SpotScreenActivity
 import cn.vove7.jarvis.adapters.SettingsExpandableAdapter
 import cn.vove7.jarvis.app.AppApi
 import cn.vove7.jarvis.chat.TulingChatSystem
+import cn.vove7.jarvis.databinding.ActivityExpandableSettingsBinding
 import cn.vove7.jarvis.receivers.PowerEventReceiver
 import cn.vove7.jarvis.services.MainService
 import cn.vove7.jarvis.tools.*
@@ -44,7 +46,6 @@ import cn.vove7.vtp.sharedpreference.SpHelper
 import cn.vove7.vtp.view.span.ColourTextClickableSpan
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.customview.customView
-import kotlinx.android.synthetic.main.activity_expandable_settings.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.File
@@ -57,15 +58,13 @@ import java.util.*
  * @author 17719247306
  * 2018/9/10
  */
-class AdvancedSettingActivity : ReturnableActivity() {
-    override val layoutRes: Int
-        get() = R.layout.activity_expandable_settings
+class AdvancedSettingActivity : ReturnableActivity<ActivityExpandableSettingsBinding>() {
     override val darkTheme: Int
         get() = R.style.DarkTheme
     lateinit var adapter: SettingsExpandableAdapter
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val expandableListView = expand_list
+        val expandableListView = viewBinding.expandList
         adapter = SettingsExpandableAdapter(this, groupItems, expandableListView)
 
         expandableListView?.setAdapter(adapter)

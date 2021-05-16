@@ -1,11 +1,14 @@
 package cn.vove7.jarvis.activities.base
 
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
+import android.view.ViewGroup
+import androidx.fragment.app.FragmentPagerAdapter
 import cn.vove7.jarvis.R
+import cn.vove7.jarvis.databinding.ActivityBaseViewPagerBinding
 import cn.vove7.vtp.log.Vog
-import kotlinx.android.synthetic.main.activity_base_view_pager.*
 
 /**
  * # BaseActivityWithViewPager
@@ -13,13 +16,12 @@ import kotlinx.android.synthetic.main.activity_base_view_pager.*
  * @author 17719
  * 2018/8/14
  */
-abstract class BaseActivityWithViewPager : BaseActivity() {
-    override val layoutRes: Int
-        get() = R.layout.activity_base_view_pager
+abstract class BaseActivityWithViewPager : BaseActivity<ActivityBaseViewPagerBinding>() {
+
     lateinit var fragmentAdapter: FragmentAdapter
 
     val currentFragment: androidx.fragment.app.Fragment
-        get() = fragments[view_pager.currentItem]
+        get() = fragments[viewBinding.viewPager.currentItem]
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -30,12 +32,12 @@ abstract class BaseActivityWithViewPager : BaseActivity() {
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         FragmentAdapter(supportFragmentManager).also {
             fragmentAdapter = it
-            view_pager.adapter = it
+            viewBinding.viewPager.adapter = it
         }
         if (fragments.size == 1)
-            tab_layout.visibility = View.GONE
+            viewBinding.tabLayout.visibility = View.GONE
         else
-            tab_layout.setupWithViewPager(view_pager)
+            viewBinding.tabLayout.setupWithViewPager(viewBinding.viewPager)
         if (titleInit != null) {
             this.title = titleInit
         }
@@ -66,7 +68,7 @@ abstract class BaseActivityWithViewPager : BaseActivity() {
         return super.onOptionsItemSelected(item)
     }
 
-    inner class FragmentAdapter(fm: androidx.fragment.app.FragmentManager) : androidx.fragment.app.FragmentPagerAdapter(fm) {
+    inner class FragmentAdapter(fm: androidx.fragment.app.FragmentManager) : FragmentPagerAdapter(fm, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT) {
 
         override fun getItem(position: Int): androidx.fragment.app.Fragment = fragments[position]
 

@@ -10,7 +10,6 @@ import cn.vove7.jarvis.activities.base.BaseActivityWithViewPager
 import cn.vove7.jarvis.fragments.*
 import cn.vove7.jarvis.fragments.base.OnSyncMarked
 import cn.vove7.jarvis.tools.SearchActionHelper
-import kotlinx.android.synthetic.main.activity_base_view_pager.*
 
 /**
  * # MarkedManagerActivity
@@ -37,7 +36,7 @@ class MarkedManagerActivity : BaseActivityWithViewPager() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.menu_item_sync -> {//同步
-                val p = view_pager.currentItem
+                val p = viewBinding.viewPager.currentItem
                 val f = fragments[p] as OnSyncMarked
                 f.onSync(indexTypes[p])
                 return true

@@ -18,6 +18,7 @@ import cn.vove7.common.utils.runOnUi
 import cn.vove7.common.utils.startActivity
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.activities.base.BaseActivity
+import cn.vove7.jarvis.databinding.ActivityTextOcrBinding
 import cn.vove7.jarvis.tools.Tutorials
 import cn.vove7.jarvis.tools.baiduaip.BaiduAipHelper
 import cn.vove7.jarvis.tools.baiduaip.model.TextOcrItem
@@ -25,7 +26,6 @@ import cn.vove7.jarvis.view.dialog.TextOperationDialog
 import cn.vove7.jarvis.view.dp
 import cn.vove7.vtp.asset.AssetHelper
 import cn.vove7.vtp.log.Vog
-import kotlinx.android.synthetic.main.activity_text_ocr.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.joinAll
@@ -38,14 +38,11 @@ import java.util.*
  * @author 11324
  * 2019/3/11
  */
-class TextOcrActivity : BaseActivity() {
+class TextOcrActivity : BaseActivity<ActivityTextOcrBinding>() {
     override val darkTheme: Int
         get() = R.style.TextOcr_Dark
 
     private val wordItems = mutableListOf<Model>()
-
-    override val layoutRes: Int
-        get() = R.layout.activity_text_ocr
 
     companion object {
         fun start(act: Context, items: ArrayList<TextOcrItem>, bundle: Bundle? = null) {
@@ -123,7 +120,7 @@ class TextOcrActivity : BaseActivity() {
     }
 
     private fun buildContent() {
-        loading_layout.gone()
+       viewBinding.loadingLayout.gone()
         val framePx = 1.5f.dp.px
         wordItems.forEach { model ->
             val item = model.item
@@ -151,38 +148,38 @@ class TextOcrActivity : BaseActivity() {
                 rotationY = 0.5f
                 rotation = rotationAngle
                 model.textView = this
-                rootContent.addView(this)
+                viewBinding.rootContent.addView(this)
             }
 
         }
 
-        floatEditIcon.setOnClickListener {
+        viewBinding.floatEditIcon.setOnClickListener {
             editCheckedText()
         }
-        floatEditIcon.setOnLongClickListener {
+        viewBinding.floatEditIcon.setOnLongClickListener {
             val allStatus = wordItems.all { it.textView?.isSelected == false }
             wordItems.forEach {
                 it.textView?.isSelected = allStatus
             }
             true
         }
-        rootContent.onStartMove = {
-            floatEditIcon.gone()
+        viewBinding.rootContent.onStartMove = {
+            viewBinding.floatEditIcon.gone()
         }
-        rootContent.onTouchUp = { hasResult ->
+        viewBinding.rootContent.onTouchUp = { hasResult ->
             if (hasResult) {//一个时 弹出编辑
                 wordItems.find { it.textView?.isSelected ?: false }?.also {
                     onItemClick(it)
                 }
             }
-            if (floatEditIcon.isOrWillBeHidden) {
-                floatEditIcon.fadeIn(200)
+            if (viewBinding.floatEditIcon.isOrWillBeHidden) {
+                viewBinding.floatEditIcon.fadeIn(200)
             }
         }
         if (intent.hasExtra("t")) {
             translateAll()
         } else {
-            Tutorials.showForView(this, Tutorials.screen_assistant_ocr, floatEditIcon, "", AssetHelper.getStrFromAsset(this, "files/ocr_help.md"))
+            Tutorials.showForView(this, Tutorials.screen_assistant_ocr, viewBinding.floatEditIcon, "", AssetHelper.getStrFromAsset(this, "files/ocr_help.md"))
         }
     }
 

@@ -1,6 +1,7 @@
 package cn.vove7.jarvis.view.dialog.contentbuilder
 
 import android.view.View
+import android.widget.TextView
 import cn.vove7.bottomdialog.builder.BindView
 import cn.vove7.bottomdialog.builder.ListAdapterBuilder
 import cn.vove7.bottomdialog.builder.OnItemClick
@@ -9,7 +10,6 @@ import cn.vove7.common.helper.AdvanAppHelper
 import cn.vove7.common.utils.gone
 import cn.vove7.jarvis.R
 import cn.vove7.vtp.app.AppInfo
-import kotlinx.android.synthetic.main.item_normal_icon_title.view.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -41,9 +41,9 @@ class AppListBuilder(
 
     override val bindView: BindView<AppInfo>
         get() = { view, item ->
-            view.icon.gone()
-            view.title.text = item.name
-            view.sub_title.text = item.packageName
+            view.findViewById<View>(R.id.icon).gone()
+            view.findViewById<TextView>(R.id.title).text = item.name
+            view.findViewById<TextView>(R.id.sub_title).text = item.packageName
         }
 
     fun filter(text: String) {

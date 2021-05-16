@@ -29,13 +29,13 @@ class AdminReceiver : DeviceAdminReceiver() {
     }
 
 
-    override fun onEnabled(context: Context?, intent: Intent?) {
+    override fun onEnabled(context: Context, intent: Intent) {
         GlobalLog.log("设备管理器权限开启")
         instance = this
 
     }
 
-    override fun onDisabled(context: Context?, intent: Intent?) {
+    override fun onDisabled(context: Context, intent: Intent) {
         super.onDisabled(context, intent)
         GlobalLog.log("设备管理器权限关闭")
         instance = null

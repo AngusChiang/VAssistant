@@ -4,7 +4,9 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.MenuItem
 import android.view.View
+import android.view.ViewGroup
 import android.widget.ImageView
+import android.widget.ListView
 import android.widget.TextView
 import android.widget.Toast
 import cn.vove7.common.app.AppConfig
@@ -14,6 +16,8 @@ import cn.vove7.jarvis.R
 import cn.vove7.jarvis.activities.base.BaseActivity
 import cn.vove7.jarvis.adapters.IconTitleEntity
 import cn.vove7.jarvis.adapters.IconTitleListAdapter
+import cn.vove7.jarvis.databinding.ActivityAbcHeaderBinding
+import cn.vove7.jarvis.databinding.HeaderAboutBinding
 import cn.vove7.jarvis.tools.openQQChat
 import cn.vove7.jarvis.view.dialog.AppUpdateDialog
 import cn.vove7.jarvis.view.dialog.ProgressDialog
@@ -22,8 +26,6 @@ import cn.vove7.vtp.easyadapter.BaseListAdapter
 import cn.vove7.vtp.sharedpreference.SpHelper
 import cn.vove7.vtp.system.SystemHelper
 import cn.vove7.vtp.system.SystemHelper.APP_STORE_COLL_APK
-import kotlinx.android.synthetic.main.activity_abc_header.*
-import kotlinx.android.synthetic.main.header_about.*
 
 
 /**
@@ -32,9 +34,7 @@ import kotlinx.android.synthetic.main.header_about.*
  * @author Administrator
  * 9/23/2018
  */
-class AboutActivity : BaseActivity() {
-    override val layoutRes: Int
-        get() = R.layout.activity_abc_header
+class AboutActivity : BaseActivity<ActivityAbcHeaderBinding>() {
     override val darkTheme: Int
         get() = R.style.DarkTheme
 
@@ -44,9 +44,10 @@ class AboutActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        header_content.addView(layoutInflater.inflate(R.layout.header_about, null))
+        val headerVB = HeaderAboutBinding.inflate(layoutInflater)
+        viewBinding.headerContent.addView(headerVB.root)
 
-        root.setOnClickListener {
+        viewBinding.root.setOnClickListener {
             val now = System.currentTimeMillis()
             if (now - clickTime > 1000) {//开始点击
                 clickTime = now
@@ -57,9 +58,9 @@ class AboutActivity : BaseActivity() {
                 enterDevMode()
             }
         }
-        ver_name_view.text = AppConfig.versionName
+        headerVB.verNameView.text = AppConfig.versionName
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        list_view.adapter = IconTitleListAdapter(this, getData())
+        viewBinding.listView.adapter = IconTitleListAdapter(this, getData())
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {

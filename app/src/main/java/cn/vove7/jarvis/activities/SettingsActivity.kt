@@ -20,6 +20,7 @@ import cn.vove7.common.bridges.SystemBridge
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.activities.base.ReturnableActivity
 import cn.vove7.jarvis.adapters.SettingsExpandableAdapter
+import cn.vove7.jarvis.databinding.ActivityExpandableSettingsBinding
 import cn.vove7.jarvis.receivers.PowerEventReceiver
 import cn.vove7.jarvis.services.MainService
 import cn.vove7.jarvis.services.MyAccessibilityService
@@ -33,25 +34,22 @@ import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.callbacks.onCancel
 import com.afollestad.materialdialogs.callbacks.onDismiss
 import com.afollestad.materialdialogs.customview.customView
-import kotlinx.android.synthetic.main.activity_expandable_settings.*
 import java.io.File
 
 /**
  *
  */
-class SettingsActivity : ReturnableActivity() {
-    override val layoutRes: Int
-        get() = R.layout.activity_expandable_settings
+class SettingsActivity : ReturnableActivity<ActivityExpandableSettingsBinding>() {
     override val darkTheme: Int
         get() = R.style.DarkTheme
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val expandableListView = expand_list
+        val expandableListView = viewBinding.expandList
         expandableListView.setAdapter(SettingsExpandableAdapter(this, initData(), expandableListView))
 
-        expandableListView?.post {
+        expandableListView.post {
             kotlin.runCatching {
                 expandableListView.apply {
                     expandGroup(0)

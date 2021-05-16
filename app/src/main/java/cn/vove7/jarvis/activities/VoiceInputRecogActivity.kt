@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.speech.RecognizerIntent
 import android.speech.RecognizerIntent.ACTION_WEB_SEARCH
+import androidx.viewbinding.ViewBinding
 import cn.vove7.common.appbus.AppBus
 import cn.vove7.common.bridges.SystemBridge
 import cn.vove7.common.model.VoiceRecogResult
@@ -19,10 +20,7 @@ import java.util.*
  * @author 11324
  * 2019/1/20
  */
-class VoiceInputRecogActivity : BaseActivity() {
-    //    lateinit var vi: VoiceInteractor
-    override val layoutRes: Int
-        get() = 0
+class VoiceInputRecogActivity : BaseActivity<ViewBinding>() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         try {

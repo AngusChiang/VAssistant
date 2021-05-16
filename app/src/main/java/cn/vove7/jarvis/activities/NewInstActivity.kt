@@ -7,7 +7,9 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.KeyEvent
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import android.widget.*
 import cn.vove7.bottomdialog.BottomDialog
 import cn.vove7.common.app.GlobalApp
@@ -27,11 +29,14 @@ import cn.vove7.common.helper.AdvanAppHelper
 import cn.vove7.common.model.UserInfo
 import cn.vove7.common.net.ApiUrls
 import cn.vove7.common.utils.get
+import cn.vove7.common.utils.gone
+import cn.vove7.common.utils.show
 import cn.vove7.executorengine.model.ActionParseResult
 import cn.vove7.executorengine.parse.ParseEngine
 import cn.vove7.jarvis.BuildConfig
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.activities.base.ReturnableActivity
+import cn.vove7.jarvis.databinding.ActivityNewInstBinding
 import cn.vove7.jarvis.tools.UriUtils.getPathFromUri
 import cn.vove7.jarvis.view.dialog.SelectAppDialog
 import cn.vove7.vtp.easyadapter.BaseListAdapter
@@ -40,7 +45,6 @@ import cn.vove7.vtp.view.span.ColourTextClickableSpan
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.customview.customView
 import com.afollestad.materialdialogs.input.input
-import kotlinx.android.synthetic.main.activity_new_inst.*
 import thereisnospon.codeview.CodeViewTheme
 import java.io.File
 import java.util.*
@@ -52,7 +56,7 @@ import java.util.*
  * @author 17719247306
  * 2018/8/19
  */
-class NewInstActivity : ReturnableActivity(), View.OnClickListener {
+class NewInstActivity : ReturnableActivity<ActivityNewInstBinding>(), View.OnClickListener {
     var pkg: String? = null
     var parentId: Long? = null//上级命令MapNodeId
     private var instType: Int = NODE_SCOPE_GLOBAL
@@ -70,13 +74,10 @@ class NewInstActivity : ReturnableActivity(), View.OnClickListener {
     private var scriptText: String? = null
         set(value) {
             field = value
-            code_view.showCode(value ?: "")
+            viewBinding.codeView.showCode(value ?: "")
         }
 
     private var scriptType: String? = null
-
-    override val layoutRes: Int
-        get() = R.layout.activity_new_inst
 
     override fun onCreate(savedInstanceState: Bundle?) {
         enterTime = System.currentTimeMillis()
@@ -92,15 +93,15 @@ class NewInstActivity : ReturnableActivity(), View.OnClickListener {
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         initData()
 
-        fab.setOnClickListener(this)
-        btn_set_script.setOnClickListener(this)
-        add_regex.setOnClickListener(this)
-        test_regex.setOnClickListener(this)
+        viewBinding.fab.setOnClickListener(this)
+        viewBinding.btnSetScript.setOnClickListener(this)
+        viewBinding.addRegex.setOnClickListener(this)
+        viewBinding.testRegex.setOnClickListener(this)
         regAdapter = RegListAdapter(this, regs)
-        regex_str_list.adapter = regAdapter
+        viewBinding.regexStrList.adapter = regAdapter
         if (isDarkTheme) {
-            code_view.setBackgroundColor(0)
-            code_view.setTheme(CodeViewTheme.DARK)
+            viewBinding.codeView.setBackgroundColor(0)
+            viewBinding.codeView.setTheme(CodeViewTheme.DARK)
         }
     }
 
@@ -121,13 +122,12 @@ class NewInstActivity : ReturnableActivity(), View.OnClickListener {
 
                 scriptType = action.scriptType
                 scriptText = action.actionScript
-                activity_name.setText(actionScope?.activity)
-                desc_text.setText(actionTitle)
+                viewBinding.activityName.setText(actionScope?.activity)
+                viewBinding.descText.setText(actionTitle)
                 regsWithoutCache?.forEach {
                     this@NewInstActivity.regs.add(it.regStr)
                 }
-                check_box_auto_launch_app.isChecked = autoLaunchApp
-
+                viewBinding.checkBoxAutoLaunchApp.isChecked = autoLaunchApp
             }
         } else {// 来自RemoteDebugServer
             if (intent.hasExtra("remote_script")) {
@@ -140,27 +140,27 @@ class NewInstActivity : ReturnableActivity(), View.OnClickListener {
         instType = intent.getIntExtra("type", NODE_SCOPE_GLOBAL)
         when (instType) {
             NODE_SCOPE_GLOBAL -> {//隐藏sel App
-                sel_app.visibility = View.GONE
+                viewBinding.selApp.gone()
             }
             NODE_SCOPE_IN_APP -> {
-                btn_sel_app.setOnClickListener(this)
+                viewBinding.btnSelApp.setOnClickListener(this)
                 pkg = intent.getStringExtra("pkg")
                 if (pkg != null) {
                     val app = AdvanAppHelper.getAppInfo(pkg!!)
                     if (app != null) {
-                        btn_sel_app.text = app.name
+                        viewBinding.btnSelApp.text = app.name
                     }
                 }
             }
             0 -> {//新建
-                sel_app.visibility = View.GONE
+                viewBinding.selApp.gone()
                 if (!isReedit) {//add follow
                     parentId = intent.getLongExtra("nodeId", 0)
                     parentNode = DAO.daoSession.actionNodeDao.queryBuilder()
                             .where(ActionNodeDao.Properties.Id.eq(parentId)).unique()
 
-                    parent_lay.visibility = View.VISIBLE
-                    parent_title.text = intent.getStringExtra("parent_title")
+                    viewBinding.parentLay.show()
+                    viewBinding.parentTitle.text = intent.getStringExtra("parent_title")
                 }
             }
             else -> {
@@ -189,9 +189,9 @@ class NewInstActivity : ReturnableActivity(), View.OnClickListener {
     private fun save() {
         val inApp = ActionNode.belongInApp(instType)
 
-        val desc = desc_text.text.toString().trim()
+        val desc = viewBinding.descText.text.toString().trim()
         if (desc == "") {//descTitle
-            desc_input_lay.error = getString(R.string.text_not_empty)
+            viewBinding.descInputLay.error = getString(R.string.text_not_empty)
             return
         }
         if ((scriptText ?: "") == "") {//script
@@ -211,7 +211,7 @@ class NewInstActivity : ReturnableActivity(), View.OnClickListener {
         }
 
         var activityName: String? = null
-        activity_name.text.toString().trim().let {
+        viewBinding.activityName.text.toString().trim().let {
             activityName = if (it == "") {
                 null
             } else it
@@ -219,7 +219,7 @@ class NewInstActivity : ReturnableActivity(), View.OnClickListener {
         if (isReedit) {//保存编辑
             if (inApp) {//更新scope
                 editNode.setScopeId(DaoHelper.getActionScopeId(ActionScope(pkg, activityName)))
-                editNode.autoLaunchApp = check_box_auto_launch_app.isChecked
+                editNode.autoLaunchApp = viewBinding.checkBoxAutoLaunchApp.isChecked
             }
             val ac = editNode.action!!
             ac.scriptType = scriptType
@@ -250,7 +250,7 @@ class NewInstActivity : ReturnableActivity(), View.OnClickListener {
             if (inApp) {
                 val scope = ActionScope(pkg, activityName)
                 newNode.actionScope = scope
-                newNode.autoLaunchApp = check_box_auto_launch_app.isChecked
+                newNode.autoLaunchApp = viewBinding.checkBoxAutoLaunchApp.isChecked
             }
 
             val action = Action(scriptText, scriptType)
@@ -283,17 +283,17 @@ class NewInstActivity : ReturnableActivity(), View.OnClickListener {
 
     private val selAppDialog: BottomDialog by lazy {
         SelectAppDialog.get(this) {
-            btn_sel_app.text = it.name
+            viewBinding.btnSelApp.text = it.name
             pkg = it.packageName
         }
     }
 
     override fun onClick(v: View?) {
-        when (v?.id) {
-            R.id.btn_sel_app -> {
+        when (v) {
+            viewBinding.btnSelApp -> {
                 selAppDialog.show()
             }
-            fab.id -> {
+            viewBinding.fab -> {
                 //check save insert
                 try {
                     save()
@@ -302,13 +302,13 @@ class NewInstActivity : ReturnableActivity(), View.OnClickListener {
                     GlobalApp.toastError(getString(R.string.text_error_occurred) + e.message)
                 }
             }
-            add_regex.id -> {
+            viewBinding.addRegex -> {
                 showInputRegDialog()
             }
-            btn_set_script.id -> {
+            viewBinding.btnSetScript -> {
                 showSelScriptDialog()
             }
-            test_regex.id -> {
+            viewBinding.testRegex -> {
                 //模拟
                 if (regs.isEmpty()) {
                     GlobalApp.toastError(getString(R.string.text_enter_at_last_one_regex))
@@ -491,7 +491,7 @@ class NewInstActivity : ReturnableActivity(), View.OnClickListener {
     private fun wrapTestNode(): ActionNode {
         val testId = Int.MAX_VALUE.toLong()
 
-        val testNode = ActionNode(desc_text.text.toString(), testId, -1L, instType, parentId
+        val testNode = ActionNode(viewBinding.descText.text.toString(), testId, -1L, instType, parentId
             ?: 0)
         testNode.follows = emptyList()
         testNode.regs = wrapRegs()

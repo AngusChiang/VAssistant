@@ -9,7 +9,6 @@ import cn.vove7.common.app.GlobalApp
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.adapters.ListViewModel
 import cn.vove7.vtp.easyadapter.BaseListAdapter
-import kotlinx.android.synthetic.main.dialog_assist.view.*
 
 /**
  * # AssistSessionGridController
@@ -22,7 +21,7 @@ class AssistSessionGridController(
         val click: (Int) -> Unit, val onLongClick: (item: SessionFunItem, v: View) -> Boolean)
     : BottomSheetController(context, bottomView) {
 
-    private val gridView: GridView by lazy { bottomView.fun_grid }
+    private val gridView: GridView by lazy { bottomView.findViewById(R.id.fun_grid) }
 
     fun initView() {
         gridView.numColumns = items.size

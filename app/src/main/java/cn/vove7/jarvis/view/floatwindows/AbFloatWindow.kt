@@ -4,11 +4,13 @@ import android.content.Context
 import android.graphics.PixelFormat
 import android.os.Build
 import android.view.*
+import androidx.viewbinding.ViewBinding
 import cn.vove7.common.bridges.SystemBridge
 import cn.vove7.common.utils.runOnUi
 import cn.vove7.jarvis.R
 import cn.vove7.vtp.log.Vog
 import cn.vove7.vtp.runtimepermission.PermissionUtils
+import java.lang.reflect.ParameterizedType
 
 /**
  * 悬浮窗
@@ -16,7 +18,7 @@ import cn.vove7.vtp.runtimepermission.PermissionUtils
  *
  * Created by Vove on 2018/7/1
  */
-abstract class AbFloatWindow(
+abstract class AbFloatWindow<T : ViewBinding>(
         val context: Context,
         val width: Int,
         val height: Int
@@ -30,6 +32,8 @@ abstract class AbFloatWindow(
 
     private val winParams get() = buildLayoutParams()
     lateinit var animationBody: View
+
+    var viewBinding: T? = null
 
     val aniBodyInit get() = ::animationBody.isInitialized
 
@@ -45,11 +49,28 @@ abstract class AbFloatWindow(
     private val newView: View
         get() {
             val contentView = rootView
-            return themeInflater.inflate(this.layoutResId(), contentView).also {
+            viewBinding = buildView(LayoutInflater.from(context), contentView)
+            viewBinding!!.root.also {
                 animationBody = contentView.getChildAt(0)
                 onCreateView(it)
             }
+            return contentView
         }
+
+    private fun buildView(inflater: LayoutInflater, parent: ViewGroup): T {
+        val parameterizedType = this.javaClass.genericSuperclass as ParameterizedType
+        val vbType = parameterizedType.actualTypeArguments[0] as Class<*>
+
+        if (vbType == ViewBinding::class.java) {
+            throw RuntimeException("ViewBinding type is $vbType")
+        }
+
+        return vbType.getDeclaredMethod("inflate",
+                LayoutInflater::class.java,
+                ViewGroup::class.java,
+                Boolean::class.java
+        ).invoke(null, inflater, parent, true) as T
+    }
 
     open fun onCreateView(view: View) {}
 
@@ -70,11 +91,6 @@ abstract class AbFloatWindow(
         Vog.d("状态栏高度 ---> $statusBarHeight1")
         statusBarHeight1
     }
-
-    /**
-     * 布局Id
-     */
-    abstract fun layoutResId(): Int
 
     open fun afterShow() {}
 
@@ -129,6 +145,7 @@ abstract class AbFloatWindow(
         try {
             contentView?.also { windowManager.removeView(it) }
             contentView = null
+            viewBinding = null
         } catch (e: Exception) {
             e.printStackTrace()
         }

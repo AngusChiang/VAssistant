@@ -1,6 +1,6 @@
 package cn.vove7.jarvis.activities.base
 
-import cn.daqinjia.android.scaffold.ui.base.NoBindingActivity
+import androidx.viewbinding.ViewBinding
 import cn.daqinjia.android.scaffold.ui.base.ScaffoldActivity
 import cn.vove7.jarvis.lifecycle.LifeCycleScopeDelegate
 import cn.vove7.jarvis.lifecycle.LifecycleScope
@@ -13,7 +13,8 @@ import cn.vove7.jarvis.tools.DataCollector
  * @author Vove
  * 2019/6/12
  */
-abstract class BaseActivity : NoBindingActivity(), LifeCycleScopeDelegate {
+abstract class BaseActivity<T : ViewBinding> :
+        ScaffoldActivity2<T>(), LifeCycleScopeDelegate {
     override val needToolbar: Boolean
         get() = false
 

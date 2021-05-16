@@ -53,7 +53,7 @@ class AppAdListActivity : OneFragmentActivity() {
         lateinit var pkg: String
 
         val editDialog: AdEditorDialog by lazy {
-            AdEditorDialog(activity as BaseActivity) {
+            AdEditorDialog(activity as BaseActivity<*>) {
                 refresh()
             }
         }

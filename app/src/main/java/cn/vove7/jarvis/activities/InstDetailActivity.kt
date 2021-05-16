@@ -1,13 +1,13 @@
 package cn.vove7.jarvis.activities
 
 import android.animation.ValueAnimator
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
-import android.os.Handler
 import android.text.InputType
 import android.view.MotionEvent
 import android.view.View
@@ -16,6 +16,7 @@ import android.view.animation.AccelerateDecelerateInterpolator
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.TextView
+import cn.daqinjia.android.common.ext.isShow
 import cn.vove7.common.app.AppConfig
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.app.GlobalLog
@@ -39,6 +40,7 @@ import cn.vove7.jarvis.activities.base.BaseActivity
 import cn.vove7.jarvis.adapters.ExecuteQueueAdapter
 import cn.vove7.jarvis.adapters.InstSettingListAdapter
 import cn.vove7.jarvis.app.AppApi
+import cn.vove7.jarvis.databinding.ActivityInstDetailBinding
 import cn.vove7.jarvis.services.MainService
 import cn.vove7.jarvis.tools.ItemWrap
 import cn.vove7.jarvis.tools.ShortcutUtil
@@ -47,14 +49,11 @@ import cn.vove7.jarvis.view.dialog.ProgressDialog
 import cn.vove7.vtp.app.AppInfo
 import cn.vove7.vtp.dialog.DialogWithList
 import cn.vove7.vtp.easyadapter.BaseListAdapter
-import cn.vove7.vtp.extend.gone
-import cn.vove7.vtp.extend.show
 import cn.vove7.vtp.log.Vog
 import cn.vove7.vtp.net.toJson
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.customview.customView
 import com.afollestad.materialdialogs.input.input
-import kotlinx.android.synthetic.main.activity_inst_detail.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.util.*
@@ -65,7 +64,7 @@ import java.util.*
  * @author Administrator
  * 2018/10/3
  */
-class InstDetailActivity : BaseActivity() {
+class InstDetailActivity : BaseActivity<ActivityInstDetailBinding>() {
 
     companion object {
         fun start(context: Context, nodeId: Long) {
@@ -74,9 +73,6 @@ class InstDetailActivity : BaseActivity() {
             context.startActivity(intent)
         }
     }
-
-    override val layoutRes: Int
-        get() = R.layout.activity_inst_detail
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -94,16 +90,17 @@ class InstDetailActivity : BaseActivity() {
         initScrollListener()
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     private fun initScrollListener() {
         var barHeight = 0
 
-        collapsing_coll.post {
-            barHeight = collapsing_coll.height
+        viewBinding.collapsingColl.post {
+            barHeight = viewBinding.collapsingColl.height
         }
 
         var startY = 0f
         var hasBounce = false
-        content_container.setOnTouchListener { v, e ->
+        viewBinding.contentContainer.setOnTouchListener { v, e ->
             when (e.action) {
                 MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
                     if (!hasBounce) {
@@ -126,8 +123,8 @@ class InstDetailActivity : BaseActivity() {
                     if (v.scrollY == 0) {
                         if (startY == 0f) {
                             startY = e.rawY
-                            if (collapsing_coll.height != barHeight) {
-                                return@setOnTouchListener content_container.onTouchEvent(e)
+                            if (viewBinding.collapsingColl.height != barHeight) {
+                                return@setOnTouchListener viewBinding.contentContainer.onTouchEvent(e)
                             }
                         }
                         val dy = e.rawY - startY
@@ -136,7 +133,7 @@ class InstDetailActivity : BaseActivity() {
                             updateScale(dy, barHeight)
                             return@setOnTouchListener true
                         } else {
-                            return@setOnTouchListener content_container.onTouchEvent(e)
+                            return@setOnTouchListener viewBinding.contentContainer.onTouchEvent(e)
                         }
                     }
                 }
@@ -147,11 +144,11 @@ class InstDetailActivity : BaseActivity() {
     }
 
     private fun updateScale(offset: Float, barHeight: Int) {
-        collapsing_coll.layoutParams = collapsing_coll.layoutParams.also {
+        viewBinding.collapsingColl.layoutParams = viewBinding.collapsingColl.layoutParams.also {
             it.height = (barHeight + offset * 0.2).toInt()
         }
-        toolbar_img.scaleX = 1 + offset / 10000
-        toolbar_img.scaleY = 1 + offset / 10000
+        viewBinding.toolbarImg.scaleX = 1 + offset / 10000
+        viewBinding.toolbarImg.scaleY = 1 + offset / 10000
     }
 
     fun refresh() {
@@ -170,7 +167,7 @@ class InstDetailActivity : BaseActivity() {
 
     var title: String? = null
         set(value) {
-            collapsing_coll.title = value
+            viewBinding.collapsingColl.title = value
             field = value
         }
 
@@ -198,12 +195,14 @@ class InstDetailActivity : BaseActivity() {
     }
 
     private fun startTutorials() {
-        Handler().postDelayed({
+        viewBinding.root.postDelayed({
             Tutorials.oneStep(this, list = arrayOf(
-                    ItemWrap(Tutorials.t_inst_detail_desc, label_instructions, "指令描述", "可以根据描述了解用途"), ItemWrap(Tutorials.t_inst_detail_exp, label_examples, "指令示例", "根据示例，理解指令的“说法”"), ItemWrap(Tutorials.t_inst_detail_regex, label_regex, "指令正则式", "正则式是该指令能匹配到用户说的命令\n基本格式有：\n" +
-                    "1. (用|打开|启动|开启)% ----- 可匹配：'用xxx'、'打开xxx'、'启动xxx'...等命令\n" +
-                    "2. 大+点声   -------------------  可匹配 大大大点声 ('大'个数大于0)\n" +
-                    "3. (播放)?下一[首|曲]  -------- (播放)?代表‘播放’可加可不加，[首|曲]代表可以是曲也可以是首,就可匹配:播放下一曲，下一曲，下一首...等命令\n"), ItemWrap(Tutorials.t_inst_detail_run, (toolbar.getChildAt(1) as ViewGroup).getChildAt(0), "运行", "这里可以直接运行指令中的脚本")
+                    ItemWrap(Tutorials.t_inst_detail_desc, viewBinding.labelInstructions, "指令描述", "可以根据描述了解用途"),
+                    ItemWrap(Tutorials.t_inst_detail_exp, viewBinding.labelExamples, "指令示例", "根据示例，理解指令的“说法”"),
+                    ItemWrap(Tutorials.t_inst_detail_regex, viewBinding.labelRegex, "指令正则式", "正则式是该指令能匹配到用户说的命令\n基本格式有：\n" +
+                            "1. (用|打开|启动|开启)% ----- 可匹配：'用xxx'、'打开xxx'、'启动xxx'...等命令\n" +
+                            "2. 大+点声   -------------------  可匹配 大大大点声 ('大'个数大于0)\n" +
+                            "3. (播放)?下一[首|曲]  -------- (播放)?代表‘播放’可加可不加，[首|曲]代表可以是曲也可以是首,就可匹配:播放下一曲，下一曲，下一首...等命令\n"), ItemWrap(Tutorials.t_inst_detail_run, (toolbar.getChildAt(1) as ViewGroup).getChildAt(0), "运行", "这里可以直接运行指令中的脚本")
             ))
         }, 1000)
     }
@@ -226,35 +225,31 @@ class InstDetailActivity : BaseActivity() {
         }
         toolbar.menu.findItem(R.id.menu_as_global).isVisible = node.belongInApp()
 
-        Handler().post {
+        viewBinding.root.post {
             //标题
             title = node.actionTitle
             //content
             node.assembly()
-            instructions_text.text = node.desc?.instructions ?: "无"
-            examples_text.text = node.desc?.example ?: "无"
-            regs_text.text = TextHelper.arr2String(node.regs?.toTypedArray()
+            viewBinding.instructionsText.text = node.desc?.instructions ?: "无"
+            viewBinding.examplesText.text = node.desc?.example ?: "无"
+            viewBinding.regsText.text = TextHelper.arr2String(node.regs?.toTypedArray()
                 ?: arrayOf<Any>(), "\n")
-            version_text.text = node.versionCode.toString()
+            viewBinding.versionText.text = node.versionCode.toString()
 
-            view_code.setOnClickListener {
+            viewBinding.viewCode.setOnClickListener {
                 CodeViewActivity.viewCode(this@InstDetailActivity,
                         title ?: "", node.action?.actionScript ?: "",
                         node.action?.scriptType ?: "")
             }
-            view_code.setOnLongClickListener {
+            viewBinding.viewCode.setOnLongClickListener {
                 SystemBridge.setClipText(node.action?.actionScript ?: "")
                 GlobalApp.toastInfo(R.string.text_copied)
                 true
             }
-            script_type_text.text = node.action?.scriptType
+            viewBinding.scriptTypeText.text = node.action?.scriptType
         }
-        if (ActionNode.belongInApp(node.actionScopeType) && node.autoLaunchApp) {
-            auto_launch_app_flag.show()
-        } else {
-            auto_launch_app_flag.gone()
-        }
-        Handler().post {
+        viewBinding.autoLaunchAppFlag.isShow = ActionNode.belongInApp(node.actionScopeType) && node.autoLaunchApp
+        viewBinding.root.post {
             if (node.action != null) {
                 val settingsHeader = RegUtils.getRegisterSettingsTextAndName(node.action.actionScript)
                 if (settingsHeader != null) {
@@ -285,7 +280,7 @@ class InstDetailActivity : BaseActivity() {
 
     private fun initFollows() {
         if (node.follows != null) {
-            follow_list.adapter = object : BaseListAdapter<VHolder, ActionNode>(this, node.follows) {
+            viewBinding.followList.adapter = object : BaseListAdapter<VHolder, ActionNode>(this, node.follows) {
                 override fun layoutId(position: Int): Int = R.layout.item_normal_icon_title
 
                 override fun onBindView(holder: VHolder, pos: Int, item: ActionNode) {

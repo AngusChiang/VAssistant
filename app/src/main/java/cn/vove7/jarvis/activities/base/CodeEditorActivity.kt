@@ -6,11 +6,12 @@ import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.os.Handler
 import android.view.*
 import android.view.inputmethod.InputMethodManager
-import android.widget.TextView
+import android.widget.GridView
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import androidx.viewbinding.ViewBinding
 import cn.vove7.androlua.luabridge.LuaUtil
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.app.GlobalLog
@@ -24,12 +25,12 @@ import cn.vove7.common.interfaces.CodeEditorOperation
 import cn.vove7.common.utils.color
 import cn.vove7.common.utils.spanColor
 import cn.vove7.jarvis.R
+import cn.vove7.jarvis.databinding.ItemOfSymbolsBinding
 import cn.vove7.jarvis.tools.UriUtils
 import cn.vove7.jarvis.view.EditorFunsHelper
 import cn.vove7.jarvis.view.dialog.ProgressTextDialog
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.input.input
-import kotlinx.android.synthetic.main.editor_tool_bar.*
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
 
@@ -40,7 +41,7 @@ import org.greenrobot.eventbus.ThreadMode
  * @author Administrator
  * 2018/10/9
  */
-abstract class CodeEditorActivity : BaseActivity() {
+abstract class CodeEditorActivity<T : ViewBinding> : BaseActivity<T>() {
 
     abstract val codeEditor: CodeEditorOperation
     override val darkTheme: Int
@@ -62,6 +63,14 @@ abstract class CodeEditorActivity : BaseActivity() {
     abstract val assetFolder: String
 
     abstract val scriptType: String
+
+    private val symbol_line by lazy {
+        findViewById<RecyclerView>(R.id.symbol_line)
+    }
+
+    private val functions_grid by lazy {
+        findViewById<GridView>(R.id.functions_grid)
+    }
 
     inner class MyPrinter : OnPrint {
         override fun onPrint(l: Int, output: String?) {
@@ -110,13 +119,13 @@ abstract class CodeEditorActivity : BaseActivity() {
     }
 
     override fun initView() {
-        toggle_functions.setOnClickListener {
+        findViewById<View>(R.id.toggle_functions).setOnClickListener {
             if (functions_grid.visibility == View.GONE) {
                 functions_grid.visibility = View.VISIBLE
                 functions_grid.animate().setDuration(1000).alpha(1f).alphaBy(0f).start()
                 activityRootView.viewTreeObserver.removeOnGlobalLayoutListener(gloLis)
                 hideInputMethod()
-                Handler().postDelayed({
+                it.postDelayed({
                     activityRootView.viewTreeObserver.addOnGlobalLayoutListener(gloLis)
                 }, 100)
             } else {
@@ -125,7 +134,7 @@ abstract class CodeEditorActivity : BaseActivity() {
             }
             functions_grid.animate().setDuration(1000).start()
         }
-        EditorFunsHelper(this, supportFragmentManager, func_pager, tab_lay) {
+        EditorFunsHelper(this, supportFragmentManager, findViewById(R.id.func_pager), findViewById(R.id.tab_lay)) {
             codeEditor.insert(it)
         }
         activityRootView.viewTreeObserver.addOnGlobalLayoutListener(gloLis)
@@ -140,7 +149,7 @@ abstract class CodeEditorActivity : BaseActivity() {
     private val activityRootView: View by lazy { findViewById<View>(R.id.root) }
 
     private fun initEditorToolbar() {
-        symbol_line.layoutManager = androidx.recyclerview.widget.LinearLayoutManager(this, androidx.recyclerview.widget.LinearLayoutManager.HORIZONTAL, false)
+        symbol_line.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
         symbol_line.adapter = SymbolsAdapter(this, codeEditor, symbols)
     }
 
@@ -349,15 +358,14 @@ abstract class CodeEditorActivity : BaseActivity() {
     class SymbolsAdapter(val c: Context, val editor: CodeEditorOperation, val symbols: List<Symbol>)
         : androidx.recyclerview.widget.RecyclerView.Adapter<V>() {
         override fun onCreateViewHolder(p0: ViewGroup, p1: Int): V {
-            val v = LayoutInflater.from(c).inflate(R.layout.item_of_symbols, null)
-            return V(v)
+            return V(ItemOfSymbolsBinding.inflate(LayoutInflater.from(c)))
         }
 
         override fun getItemCount(): Int = symbols.size
 
 
         override fun onBindViewHolder(p0: V, p1: Int) {
-            (p0.textView as TextView).apply {
+            (p0.textView).apply {
                 text = symbols[p1].show
                 setOnClickListener {
                     editor.insert(symbols[p1].fillText)
@@ -366,8 +374,8 @@ abstract class CodeEditorActivity : BaseActivity() {
         }
     }
 
-    class V(v: View) : androidx.recyclerview.widget.RecyclerView.ViewHolder(v) {
-        val textView = v
+    class V(v: ItemOfSymbolsBinding) : RecyclerView.ViewHolder(v.root) {
+        val textView = v.root
     }
 
     companion object {

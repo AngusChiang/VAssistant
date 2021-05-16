@@ -4,6 +4,7 @@ import android.os.Handler
 import android.os.Looper
 import android.view.View
 import android.widget.TextView
+import androidx.viewbinding.ViewBinding
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.appbus.AppBus
 import cn.vove7.common.bridges.SystemBridge
@@ -24,7 +25,7 @@ import cn.vove7.vtp.log.Vog
  * @author 17719247306
  * 2018/9/9
  */
-abstract class FloatyPanel(width: Int, height: Int) : AbFloatWindow(
+abstract class FloatyPanel<T : ViewBinding>(width: Int, height: Int) : AbFloatWindow<T>(
         GlobalApp.APP, width, height
 ) {
 
@@ -89,7 +90,7 @@ abstract class FloatyPanel(width: Int, height: Int) : AbFloatWindow(
 
     override fun onRemove() {
         isHiding = true
-        if(aniBodyInit) {
+        if (aniBodyInit) {
             showExitAnimation()
         } else {
             superRemove()

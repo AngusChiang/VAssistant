@@ -5,7 +5,6 @@ import cn.vove7.bottomdialog.interfaces.ContentBuilder
 import cn.vove7.bottomdialog.util.listenToUpdate
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.view.custom.WrappedTextView
-import kotlinx.android.synthetic.main.wrapped_text_view.view.*
 
 /**
  * # TextContentBuilder
@@ -22,7 +21,7 @@ class WrappedTextContentBuilder(init: CharSequence?) : ContentBuilder() {
     lateinit var textView: WrappedTextView
 
     override fun init(view: View) {
-        textView = view.text_view
+        textView = view.findViewById(R.id.text_view)
     }
 
     override fun updateContent(type: Int, data: Any?) {

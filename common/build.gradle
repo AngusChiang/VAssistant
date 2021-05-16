@@ -4,10 +4,10 @@ apply plugin: 'org.greenrobot.greendao'
 apply plugin: 'io.michaelrocks.paranoid'
 
 android {
-    compileSdkVersion 29
+    compileSdkVersion 30
     defaultConfig {
         minSdkVersion 21
-        targetSdkVersion 29
+        targetSdkVersion 30
         versionCode 1
         versionName "1.0"
 
@@ -63,15 +63,15 @@ dependencies {
     api fileTree(include: ['*.jar'], dir: 'libs')
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
 
-    api 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.3.4'
-    api 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.7'
+    api 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.3.9'
+    api 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.9'
 
     api "androidx.appcompat:appcompat:$androidx_version"
     api 'org.greenrobot:eventbus:3.1.1'
     api "org.greenrobot:greendao:$greendao_version"
-    api "androidx.annotation:annotation:1.1.0"
+    api "androidx.annotation:annotation:1.2.0"
     api 'androidx.multidex:multidex:2.0.1'
-    api 'com.squareup.okhttp3:okhttp:4.8.0'
+    api 'com.squareup.okhttp3:okhttp:4.9.0'
     api "com.github.Vove7:VTP:$vtp_version"
     // core
     api 'com.liulishuo.okdownload:okdownload:1.0.5'
@@ -81,7 +81,7 @@ dependencies {
     api 'com.liulishuo.okdownload:okhttp:1.0.5'
     api 'com.github.GrenderG:Toasty:1.4.1'
     api 'top.zibin:Luban:1.1.8'//鲁班 压缩图片
-    api 'org.jsoup:jsoup:1.11.3'
+    api 'org.jsoup:jsoup:1.13.1'
 
     api 'com.github.Vove7.SmartKey:smartkey-android:6.3.1'
     api 'com.github.Vove7:ParamRegexNdk:1.0.7'
@@ -89,7 +89,7 @@ dependencies {
     api 'com.github.Vove7:QuantumClock:0.1.1'
     api 'com.gitee.Vove.ScaffoldAndroid:scaffold:f267c4d566'
 
-    api 'com.catchingnow.icebox:SDK:1.0.5'
+    api 'com.github.heruoxin:IceBox-SDK:55dd857d74'
 
     api files('libs/RootShell.aar')
 }

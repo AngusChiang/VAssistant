@@ -2,11 +2,13 @@ package cn.vove7.jarvis.fragments
 
 import android.content.Intent
 import android.view.View
+import cn.daqinjia.android.common.logi
 import cn.vove7.common.app.AppConfig
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.datamanager.DAO
 import cn.vove7.common.datamanager.parse.model.ActionScope
 import cn.vove7.common.datamanager.parse.statusmap.ActionNode.NODE_SCOPE_IN_APP
+import cn.vove7.common.helper.AdvanAppHelper.ALL_APP_LIST
 import cn.vove7.common.model.UserInfo
 import cn.vove7.jarvis.activities.InAppInstActivity
 import cn.vove7.jarvis.activities.NewInstActivity
@@ -15,6 +17,7 @@ import cn.vove7.jarvis.adapters.ListViewModel
 import cn.vove7.jarvis.adapters.SimpleListAdapter
 import cn.vove7.jarvis.tools.DataUpdator
 import cn.vove7.vtp.app.AppHelper
+import cn.vove7.vtp.log.Vog
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -76,7 +79,7 @@ class InstAppListFragment : SimpleListFragment<ActionScope>(), OnSyncInst {
     override fun unification(it: ActionScope): ListViewModel<ActionScope>? {
         if (it.packageName == null || pkgSet.contains(it.packageName))
             return null
-        val app = AppHelper.getAppInfo(GlobalApp.APP, "", it.packageName)
+        val app = ALL_APP_LIST[it.packageName]
         val node = if (app != null) {
             // TODO 优化
             val c = InAppInstListFragment.getInstList(it.packageName).size

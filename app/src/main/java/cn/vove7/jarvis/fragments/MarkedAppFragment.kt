@@ -41,7 +41,7 @@ class MarkedAppFragment : BaseMarkedFragment() {
     override val lastKeyId: Int = R.string.key_last_sync_marked_app_date
 
     val d by lazy {
-        SelectAppDialog.get(activity as BaseActivity) {
+        SelectAppDialog.get(activity as BaseActivity<*>) {
             setValue(it.packageName)
             if (getKey() != "") {
                 setKey(it.name ?: "")

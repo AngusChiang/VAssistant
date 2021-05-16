@@ -3,6 +3,7 @@ package cn.vove7.jarvis.view.dialog.contentbuilder
 import android.graphics.Color
 import android.view.View
 import android.view.animation.AnimationUtils
+import android.widget.ViewSwitcher
 import br.tiagohm.markdownview.MarkdownView
 import br.tiagohm.markdownview.css.styles.Bootstrap
 import cn.daqinjia.android.common.ext.invisible
@@ -12,7 +13,6 @@ import cn.vove7.common.bridges.SystemBridge
 import cn.vove7.common.utils.fadeIn
 import cn.vove7.common.utils.fadeOut
 import cn.vove7.jarvis.R
-import kotlinx.android.synthetic.main.dialog_markdown_view.view.*
 import java.io.File
 
 
@@ -37,9 +37,9 @@ class MarkdownContentBuilder(
     lateinit var mdView: MarkdownView
 
     override fun init(view: View) {
-        mdView = view.markdown_view
+        mdView = view.findViewById(R.id.markdown_view)
         mdView.invisible()
-        val vs = view.view_switcher
+        val vs = view.findViewById<ViewSwitcher>(R.id.view_switcher)
         vs.inAnimation = AnimationUtils.loadAnimation(view.context, android.R.anim.fade_in)
         vs.outAnimation = AnimationUtils.loadAnimation(view.context, android.R.anim.fade_out)
         vs.displayedChild = 0

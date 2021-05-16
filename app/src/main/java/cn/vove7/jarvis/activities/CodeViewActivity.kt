@@ -10,7 +10,8 @@ import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.bridges.SystemBridge
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.activities.base.ReturnableActivity
-import kotlinx.android.synthetic.main.activity_ciew_code.*
+import cn.vove7.jarvis.databinding.ActivityCiewCodeBinding
+import thereisnospon.codeview.CodeView
 import thereisnospon.codeview.CodeViewTheme
 
 /**
@@ -19,12 +20,9 @@ import thereisnospon.codeview.CodeViewTheme
  * @author Vove
  * 2019/6/30
  */
-class CodeViewActivity : ReturnableActivity() {
+class CodeViewActivity : ReturnableActivity<ActivityCiewCodeBinding>() {
 
     lateinit var code: String
-
-    override val layoutRes: Int
-        get() = R.layout.activity_ciew_code
 
     override val darkTheme: Int
         get() = R.style.DarkTheme
@@ -58,10 +56,10 @@ class CodeViewActivity : ReturnableActivity() {
         }
 
         if (isDarkTheme) {
-            code_view.setBackgroundColor(0)
-            code_view.setTheme(CodeViewTheme.DARK)
+            viewBinding.codeView.setBackgroundColor(0)
+            viewBinding.codeView.setTheme(CodeViewTheme.DARK)
         }
-        code_view.showCode(code)
+        viewBinding.codeView.showCode(code)
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {

@@ -13,11 +13,11 @@ import cn.vove7.common.net.tool.SecureHelper
 import cn.vove7.common.utils.*
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.app.AppApi
+import cn.vove7.jarvis.databinding.DialogSignUpBinding
 import cn.vove7.jarvis.tools.DataCollector
 import cn.vove7.vtp.log.Vog
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.customview.customView
-import kotlinx.android.synthetic.main.dialog_sign_up.view.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -34,19 +34,17 @@ class SignUpDialog(context: Context, val r: OnLoginSuccess) {
     val dialog: MaterialDialog = MaterialDialog(context)
     private val lastBit = 6
 
-    private val userEmailView
-            by lazy { view.user_email_view }
-    private val userPassView
-            by lazy { view.user_pass_view }
-    private val confirmPassView
-            by lazy { view.confirm_pass_view }
-    private val verCodeView
-            by lazy { view.ver_code_view }
-    private val signUpBtn: Button by lazy { view.dialog_signup_btn }
-    private val loadBar: ProgressBar by lazy { view.loading_bar }
+    private inline val userEmailView get() = viewBinding.userEmailView
+    private inline val userPassView get() = viewBinding.userPassView
+    private inline val confirmPassView get() = viewBinding.confirmPassView
+    private inline val verCodeView get() = viewBinding.verCodeView
+    private inline val signUpBtn get() = viewBinding.dialogSignupBtn
+    private inline val loadBar get() = viewBinding.loadingBar
 
     //    val countDownSecs = 30
-    val view: View by lazy { LayoutInflater.from(context).inflate(R.layout.dialog_sign_up, null) }
+    val viewBinding by lazy {
+        DialogSignUpBinding.inflate(LayoutInflater.from(context))
+    }
 
     init {
         signUpBtn.onClick {
@@ -116,7 +114,7 @@ class SignUpDialog(context: Context, val r: OnLoginSuccess) {
                 }
             }
         }
-        dialog.customView(view = view, scrollable = true)
+        dialog.customView(view = viewBinding.root, scrollable = true)
                 .title(R.string.text_sign_up)
                 .show()
         dialog.findViewById<View>(R.id.get_ver_layout).gone()

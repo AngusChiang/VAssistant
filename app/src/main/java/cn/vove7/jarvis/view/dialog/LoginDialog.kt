@@ -4,8 +4,6 @@ import android.content.Context
 import android.text.TextUtils
 import android.view.LayoutInflater
 import android.view.View
-import android.widget.Button
-import android.widget.ProgressBar
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.app.log
@@ -15,11 +13,10 @@ import cn.vove7.common.utils.TextHelper
 import cn.vove7.common.utils.inVisibility
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.app.AppApi
+import cn.vove7.jarvis.databinding.DialogLoginBinding
 import cn.vove7.jarvis.tools.AppLogic
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.customview.customView
-import com.google.android.material.textfield.TextInputLayout
-import kotlinx.android.synthetic.main.dialog_login.view.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -35,22 +32,21 @@ typealias OnLoginSuccess = () -> Unit
 
 class LoginDialog(val context: Context, initEmail: String? = null,
                   initPas: String? = null, val r: OnLoginSuccess) {
+    @Suppress("DEPRECATION")
     val dialog: MaterialDialog = MaterialDialog(context).positiveButton(R.string.text_sign_up) {
         SignUpDialog(context, r)
     }.neutralButton(R.string.text_retrieve_password) {
         RetrievePasswordDialog(context)
     }
 
-    private val userAccountView: TextInputLayout
-            by lazy { view.user_account_view }
-    private val userPassView: TextInputLayout
-            by lazy { view.user_pass_view }
-    private val loginBtn: Button
-            by lazy { view.dialog_login_btn }
-    private val loadBar: ProgressBar
-            by lazy { view.loading_bar }
+    private inline val userAccountView get() = viewBinding.userAccountView
+    private inline val userPassView get() = viewBinding.userPassView
+    private inline val loginBtn get() = viewBinding.dialogLoginBtn
+    private inline val loadBar get() = viewBinding.loadingBar
 
-    private val view: View by lazy { LayoutInflater.from(context).inflate(R.layout.dialog_login, null) }
+    private val viewBinding by lazy {
+        DialogLoginBinding.inflate(LayoutInflater.from(context))
+    }
 
     init {
 
@@ -111,7 +107,7 @@ class LoginDialog(val context: Context, initEmail: String? = null,
                 }
             }
         }
-        dialog.customView(view = view, scrollable = true)
+        dialog.customView(view = viewBinding.root, scrollable = true)
                 .title(R.string.text_login).show()
     }
 

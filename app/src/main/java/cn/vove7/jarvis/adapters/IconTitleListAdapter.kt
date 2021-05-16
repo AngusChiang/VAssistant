@@ -41,10 +41,3 @@ class IconTitleListAdapter(context: Context, dataset: List<IconTitleEntity>)
         return AboutActivity.VH(view)
     }
 }
-
-class IconTitleEntity(
-        val iconId: Int? = null,
-        val titleId: Int,
-        val summaryId: Int? = null,
-        val onclick: Function0<Unit>
-)
