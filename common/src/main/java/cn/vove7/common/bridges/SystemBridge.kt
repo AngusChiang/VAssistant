@@ -20,6 +20,7 @@ import android.location.LocationListener
 import android.location.LocationManager
 import android.media.AudioManager
 import android.media.Image
+import android.media.session.MediaSessionManager
 import android.net.Uri
 import android.net.wifi.WifiConfiguration
 import android.net.wifi.WifiManager
@@ -345,10 +346,10 @@ object SystemBridge : SystemOperation {
      */
     override fun getAppInfo(s: String): AppInfo? {
         return if (RegUtils.isPackage(s)) {
-            AppHelper.getAppInfo(context, "", s)
+            AdvanAppHelper.ALL_APP_LIST[s]
         } else {
             val pkg = getPkgByWord(s)
-            AppHelper.getAppInfo(context, s, pkg ?: s)
+            AdvanAppHelper.ALL_APP_LIST[pkg]
         }
     }
 
@@ -1442,15 +1443,22 @@ object SystemBridge : SystemOperation {
                     Settings.System.SCREEN_BRIGHTNESS_MODE, v)
         }
 
+    val displayMetrics
+        get() = DisplayMetrics().also {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                @Suppress("DEPRECATION")
+                context.display?.getRealMetrics(it)
+                    ?: (context.getSystemService(Context.WINDOW_SERVICE) as WindowManager)
+                            .defaultDisplay.getRealMetrics(it)
+            } else {
+                (context.getSystemService(Context.WINDOW_SERVICE) as WindowManager)
+                        .defaultDisplay.getRealMetrics(it)
+            }
+        }
 
     val screenHW: Pair<Int, Int>
         get() {
-            val m = DisplayMetrics()
-            @Suppress("DEPRECATION")
-            context.display?.getRealMetrics(m)
-                ?: (context.getSystemService(Context.WINDOW_SERVICE) as WindowManager)
-                        .defaultDisplay.getRealMetrics(m)
-
+            val m = displayMetrics
             return m.heightPixels to m.widthPixels
         }
 

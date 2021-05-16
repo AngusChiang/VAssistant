@@ -1,6 +1,5 @@
 package cn.vove7.jarvis.services
 
-import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.AlertDialog
 import android.app.Dialog
@@ -132,8 +131,7 @@ object MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
     /**
      * 语音事件数据类型
      */
-    @SuppressLint("StaticFieldLeak")
-    val context = GlobalApp.APP
+    val context get() = GlobalApp.APP
 
     private lateinit var floatyPanel: IFloatyPanel
 
@@ -1081,12 +1079,12 @@ object MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
             var lastPosition = 0
 
             do {
-
+                ensureActive()
                 val parseResult: ActionParseResult = ParseEngine
                         .parseAction(result, AccessibilityApi.currentScope, smartOpen, onClick, lastPosition)
                 lastPosition = parseResult.lastGlobalPosition
                 Vog.d("onParseCommand lastGlobalPosition: ${parseResult.msg} $lastPosition")
-                delay(1)
+                ensureActive()
                 if (parseResult.isSuccess) {//actionQueue == null 指smartOpen, onClick 操作成功
                     val actionQueue = parseResult.actionQueue
                     if (actionQueue != null) {

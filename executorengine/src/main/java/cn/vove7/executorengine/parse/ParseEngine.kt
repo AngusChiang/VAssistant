@@ -13,6 +13,7 @@ import cn.vove7.common.datamanager.parse.statusmap.ActionNode.NODE_SCOPE_IN_APP
 import cn.vove7.common.utils.CoroutineExt.launch
 import cn.vove7.executorengine.model.ActionParseResult
 import cn.vove7.vtp.log.Vog
+import kotlinx.coroutines.*
 import java.util.*
 import kotlin.reflect.KProperty
 
@@ -149,17 +150,21 @@ object ParseEngine {
      * 用于判断是否加前缀%
      * @return  Pair<String?, PriorityQueue<Action> 匹配的actionTitle 运行队列
      */
-    fun matchAppAction(cmd: String, matchScope: ActionScope, isFollow: Boolean = false): ActionNode? {
-
+    fun matchAppAction(cmd: String, matchScope: ActionScope, isFollow: Boolean = false): ActionNode? = runBlocking {
         AppActionNodes.filter {
             //筛选当前App  根据pkg
             val sc = it.actionScope
             sc?.eqPkg(matchScope) == true
-        }.forEach {
-            val r = regSearch(cmd, it, isFollow)
-            if (r) return it
+        }.map {
+            async {
+                ensureActive()
+                val r = regSearch(cmd, it, isFollow)
+                ensureActive()
+                if (r) it else null
+            }
+        }.awaitAll().filterNotNull().let {
+            if (it.isEmpty()) null else it.first()
         }
-        return null
     }
 
     /**
@@ -245,17 +250,21 @@ object ParseEngine {
      * 一级匹配
      * 全局不存在follows
      */
-    private fun globalActionMatch(cmd: String, lastLocation: Int): ActionParseResult {
-        if (lastLocation < 0) return ActionParseResult(false)
-        GlobalActionNodes.subList(lastLocation, GlobalActionNodes.size).forEachIndexed { index, it ->
-            val r = regSearch(cmd, it, false)
-            if (r) {
-                val actionQueue = PriorityQueue<Action>()
-                actionQueue.add(it.action)
-                return ActionParseResult(true, actionQueue, it.actionTitle, lastGlobalPosition = index + 1)
+    private fun globalActionMatch(cmd: String, lastLocation: Int): ActionParseResult = runBlocking {
+        if (lastLocation < 0) return@runBlocking ActionParseResult(false)
+
+        GlobalActionNodes.subList(lastLocation, GlobalActionNodes.size).mapIndexed { index, it ->
+            async {
+                val r = regSearch(cmd, it, false)
+                if (r) {
+                    val actionQueue = PriorityQueue<Action>()
+                    actionQueue.add(it.action)
+                    ActionParseResult(true, actionQueue, it.actionTitle, lastGlobalPosition = index + 1)
+                } else null
             }
+        }.awaitAll().filterNotNull().let {
+            if (it.isEmpty()) ActionParseResult(false) else it[0]
         }
-        return ActionParseResult(false)
     }
 
     /**
@@ -277,8 +286,7 @@ class OpenAppAction(val pkg: String) {
     val PRE_OPEN = "system.openAppByPkg('%s',true)\n"
 
     operator fun getValue(thisRef: Any?, property: KProperty<*>): Action {
-        return Action(-999, String.format(PRE_OPEN, pkg)
-                , Action.SCRIPT_TYPE_LUA)
+        return Action(-999, String.format(PRE_OPEN, pkg), Action.SCRIPT_TYPE_LUA)
     }
 }
 

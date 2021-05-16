@@ -75,12 +75,6 @@
         tools:ignore="QueryAllPackagesPermission" />
     <uses-permission android:name="net.dinglisch.android.tasker.PERMISSION_RUN_TASKS" />
 
-    <queries>
-        <intent>
-            <action android:name="android.intent.action.MEDIA_BUTTON"/>
-        </intent>
-    </queries>
-
     <!-- 语音识别 -->
     <application
         android:name=".app.App"

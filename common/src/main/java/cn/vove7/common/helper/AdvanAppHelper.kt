@@ -156,13 +156,13 @@ object AdvanAppHelper {
      * @param pkg String
      */
     fun addNewApp(pkg: String) {
-        val appInfo = try {
-            AppHelper.getAppInfo(context, "", pkg)
+        try {
+            context.packageManager.getApplicationInfo(pkg, 0)
         } catch (e: Exception) {
             GlobalLog.err(e)
             return
-        } ?: return
-        ALL_APP_LIST[pkg] = appInfo
+        }
+        ALL_APP_LIST[pkg] = AppInfo(pkg)
     }
 
     fun trimMem() = synchronized(ALL_APP_LIST) {
