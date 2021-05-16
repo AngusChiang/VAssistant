@@ -9,6 +9,7 @@ import android.os.Bundle
 import android.view.*
 import android.view.inputmethod.InputMethodManager
 import android.widget.GridView
+import android.widget.LinearLayout
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewbinding.ViewBinding
@@ -69,7 +70,7 @@ abstract class CodeEditorActivity<T : ViewBinding> : BaseActivity<T>() {
     }
 
     private val functions_grid by lazy {
-        findViewById<GridView>(R.id.functions_grid)
+        findViewById<LinearLayout>(R.id.functions_grid)
     }
 
     inner class MyPrinter : OnPrint {
