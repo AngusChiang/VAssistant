@@ -20,7 +20,6 @@ import android.location.LocationListener
 import android.location.LocationManager
 import android.media.AudioManager
 import android.media.Image
-import android.media.session.MediaSessionManager
 import android.net.Uri
 import android.net.wifi.WifiConfiguration
 import android.net.wifi.WifiManager
@@ -59,7 +58,6 @@ import cn.vove7.common.utils.*
 import cn.vove7.common.view.ScreenshotActivity
 import cn.vove7.common.view.finder.ViewFindBuilder
 import cn.vove7.quantumclock.QuantumClock
-import cn.vove7.vtp.app.AppHelper
 import cn.vove7.vtp.app.AppInfo
 import cn.vove7.vtp.calendar.CalendarAccount
 import cn.vove7.vtp.calendar.CalendarHelper
@@ -432,6 +430,7 @@ object SystemBridge : SystemOperation {
         val intent = Intent(Intent.ACTION_MEDIA_BUTTON)
         val kdn = KeyEvent(KeyEvent.ACTION_DOWN, keyCode)
         val kup = KeyEvent(KeyEvent.ACTION_UP, keyCode)
+
 
         //当前活跃 media_button_receiver
         val currentActiveApp = Settings.Secure.getString(context.contentResolver, "media_button_receiver")
