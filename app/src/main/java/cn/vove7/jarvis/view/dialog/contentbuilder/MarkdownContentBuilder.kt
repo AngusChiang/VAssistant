@@ -40,8 +40,8 @@ class MarkdownContentBuilder(
         mdView = view.findViewById(R.id.markdown_view)
         mdView.invisible()
         val vs = view.findViewById<ViewSwitcher>(R.id.view_switcher)
-        vs.inAnimation = AnimationUtils.loadAnimation(view.context, android.R.anim.fade_in)
-        vs.outAnimation = AnimationUtils.loadAnimation(view.context, android.R.anim.fade_out)
+        vs.inAnimation = AnimationUtils.loadAnimation(view.context, R.anim.pop_fade_in)
+        vs.outAnimation = AnimationUtils.loadAnimation(view.context, R.anim.pop_fade_out)
         vs.displayedChild = 0
 
         mdView.setLoadListener(object : MarkdownView.LoadListener {

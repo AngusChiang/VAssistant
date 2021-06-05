@@ -4,7 +4,10 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import cn.vove7.common.helper.AdvanAppHelper
+import cn.vove7.jarvis.tools.DataUpdator
 import cn.vove7.vtp.log.Vog
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 
 /**
  * App安装卸载广播监听
@@ -27,6 +30,7 @@ object AppInstallReceiver : DyBCReceiver() {
         Vog.d("$pkg")
         if (intent.action == Intent.ACTION_PACKAGE_ADDED) {
             AdvanAppHelper.addNewApp(pkg)
+            syncAppInst(pkg)
         }
         if (intent.action == Intent.ACTION_PACKAGE_REMOVED) {
             AdvanAppHelper.removeAppCache(pkg)
@@ -34,6 +38,10 @@ object AppInstallReceiver : DyBCReceiver() {
         if (intent.action == Intent.ACTION_PACKAGE_REPLACED) {
         }
 
+    }
+
+    private fun syncAppInst(pkg: String) =GlobalScope.launch {
+        DataUpdator.syncInAppInst(null, listOf(pkg))
     }
 
 }

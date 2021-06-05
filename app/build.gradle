@@ -94,9 +94,9 @@ android {
             resValue "string", "base_acc_service_label", "V Assist基础DEBUG"
             resValue "string", "gesture_acc_service_label", "V Assist高级DEBUG"
 
-            ndk {//排除其他 abi
-                abiFilters "armeabi-v7a"
-            }
+//            ndk {//排除其他 abi
+//                abiFilters "armeabi-v7a"
+//            }
             signingConfig signingConfigs.release
         }
         debugWithMinify {

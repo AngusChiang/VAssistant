@@ -1444,15 +1444,8 @@ object SystemBridge : SystemOperation {
 
     val displayMetrics
         get() = DisplayMetrics().also {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                @Suppress("DEPRECATION")
-                context.display?.getRealMetrics(it)
-                    ?: (context.getSystemService(Context.WINDOW_SERVICE) as WindowManager)
-                            .defaultDisplay.getRealMetrics(it)
-            } else {
                 (context.getSystemService(Context.WINDOW_SERVICE) as WindowManager)
                         .defaultDisplay.getRealMetrics(it)
-            }
         }
 
     val screenHW: Pair<Int, Int>

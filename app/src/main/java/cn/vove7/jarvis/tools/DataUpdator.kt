@@ -241,9 +241,12 @@ object DataUpdator {
      * 同步App内指令
      * @param back (Boolean)->Unit
      */
-    suspend fun syncInAppInst(onUpdate: OnUpdate? = null): Boolean {
+    suspend fun syncInAppInst(
+            onUpdate: OnUpdate? = null,
+            appPkgs: List<String> = AdvanAppHelper.getPkgList()
+    ): Boolean {
         return kotlin.runCatching {
-            AppApi.syncInAppInst(AdvanAppHelper.getPkgList())
+            AppApi.syncInAppInst(appPkgs)
         }.fold(onSuccess = { bean ->
             if (bean.isOk()) {
                 val list = bean.data
