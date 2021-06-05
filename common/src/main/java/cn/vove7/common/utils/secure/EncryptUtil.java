@@ -14,11 +14,14 @@ import java.security.NoSuchAlgorithmException;
 import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
 
+import io.michaelrocks.paranoid.Obfuscate;
+
 /**
  * AES加密解密工具
  * @author Max
  * 2016年11月25日15:25:17
  */
+@Obfuscate
 public class EncryptUtil {
 
     private String key;

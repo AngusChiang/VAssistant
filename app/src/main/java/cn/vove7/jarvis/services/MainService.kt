@@ -96,7 +96,6 @@ import java.lang.Thread.sleep
 import java.util.*
 import java.util.concurrent.CountDownLatch
 import kotlin.concurrent.thread
-import kotlin.coroutines.coroutineContext
 
 
 /**
@@ -546,8 +545,13 @@ object MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
             return null
         }
         if (!AccessibilityApi.isBaseServiceOn) {
-            AppBus.post(RequestPermission("基础无障碍服务"))
-            return null
+            kotlin.runCatching {
+                AccessibilityApi.waitAccessibility(2000)
+            }
+            if (!AccessibilityApi.isBaseServiceOn) {
+                AppBus.post(RequestPermission("基础无障碍服务"))
+                return null
+            }
         }
         DataCollector.buriedPoint("sa_3")
 

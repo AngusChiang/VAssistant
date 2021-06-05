@@ -29,6 +29,7 @@ import cn.vove7.jarvis.tools.debugserver.ConnectiveService
 import cn.vove7.jarvis.tools.timedtask.TimedTaskManager
 import cn.vove7.jarvis.work.DataSyncWork
 import cn.vove7.quantumclock.QuantumClock
+import cn.vove7.quantumclock.synchers.TaoBaoSyncher
 import cn.vove7.smartkey.android.AndroidSettings
 import cn.vove7.vtp.log.Vog
 import kotlinx.coroutines.GlobalScope
@@ -59,9 +60,7 @@ class App : GlobalApp() {
             darkTheme = R.style.BottomDialog_Dark
         }
         WorkManager.getInstance(this).cancelAllWork()
-        QuantumClock.sync().invokeOnCompletion {
-            AppLogic.onLaunch()
-        }
+
     }
 
     private fun startMainServices() {
@@ -85,6 +84,15 @@ class InitCp : ContentProvider() {
 
     override fun onCreate(): Boolean {
         delayRun(2000) {
+
+            QuantumClock.apply {
+                removeSyncer(TaoBaoSyncher)
+                addSyncer(MyTimeSyncher)
+                sync().invokeOnCompletion {
+                    AppLogic.onLaunch()
+                }
+            }
+
             openAccessibilityServiceAuto()
             setAssistantAppAuto()
             if (AppConfig.connectiveService) {

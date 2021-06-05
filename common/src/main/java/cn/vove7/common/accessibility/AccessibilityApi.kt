@@ -6,6 +6,7 @@ import android.os.Build
 import android.provider.Settings
 import android.view.accessibility.AccessibilityNodeInfo
 import androidx.core.view.accessibility.AccessibilityNodeInfoCompat.FOCUS_INPUT
+import cn.daqinjia.android.common.ext.delayRun
 import cn.vove7.common.NeedAccessibilityException
 import cn.vove7.common.accessibility.component.AccPluginService
 import cn.vove7.common.accessibility.viewnode.ViewNode
@@ -17,6 +18,7 @@ import cn.vove7.common.utils.CoroutineExt.launch
 import cn.vove7.common.utils.gotoAccessibilitySetting2
 import cn.vove7.common.utils.whileWaitTime
 import cn.vove7.vtp.app.AppInfo
+import cn.vove7.vtp.extend.runOnUi
 import cn.vove7.vtp.log.Vog
 import cn.vove7.vtp.runtimepermission.PermissionUtils
 import java.lang.Thread.sleep
@@ -101,7 +103,9 @@ abstract class AccessibilityApi : AccessibilityService() {
         @Throws(NeedAccessibilityException::class)
         fun waitAccessibility(waitMillis: Long = 30000): Boolean {
             if (isBaseServiceOn) return true
-            else PermissionUtils.gotoAccessibilitySetting2(GlobalApp.APP, Class.forName("cn.vove7.jarvis.services.MyAccessibilityService"))
+            else if (RootHelper.isRoot() || canWriteSecureSettings()) {
+                autoOpenService(0, false)
+            } else PermissionUtils.gotoAccessibilitySetting2(GlobalApp.APP, Class.forName("cn.vove7.jarvis.services.MyAccessibilityService"))
 
             return whileWaitTime(min(30000, waitMillis)) {
                 if (isBaseServiceOn)
@@ -115,8 +119,32 @@ abstract class AccessibilityApi : AccessibilityService() {
 
         fun requireAccessibility() {
             if (!isBaseServiceOn) {
-                PermissionUtils.gotoAccessibilitySetting2(GlobalApp.APP, Class.forName("cn.vove7.jarvis.services.MyAccessibilityService"))
-                throw NeedAccessibilityException()
+                if (RootHelper.isRoot() || canWriteSecureSettings()) {
+                    autoOpenService(0, true)
+                } else {
+                    PermissionUtils.gotoAccessibilitySetting2(GlobalApp.APP, Class.forName("cn.vove7.jarvis.services.MyAccessibilityService"))
+                    throw NeedAccessibilityException()
+                }
+            }
+        }
+
+        private fun autoOpenService(what: Int = 0, checkAfter: Boolean) {
+            if (RootHelper.isRoot() || canWriteSecureSettings()) {
+                openServiceSelf(what)
+                if (checkAfter) {
+                    delayRun(3000) {
+                        if (!isBaseServiceOn) {
+                            runOnUi {
+                                val service = if (what == 0) {
+                                    "cn.vove7.jarvis.services.MyAccessibilityService"
+                                } else {
+                                    "cn.vove7.jarvis.services.GestureService"
+                                }
+                                PermissionUtils.gotoAccessibilitySetting2(GlobalApp.APP, Class.forName(service))
+                            }
+                        }
+                    }
+                }
             }
         }
 
