@@ -1,3 +1,10 @@
+### 2.1.8
+
+- 修复Android 11文字识别出错
+- 更改文字提取选取样式
+- 支持即时同步新安装应用的应用内指令
+- `waitAccessibility/requireAccessibility` 支持自动启动无障碍服务（前提：具有root或WRITE_SECURE_SETTINGS权限）
+
 ### 2.1.7
 
 - 优化应用内指令加载速度
