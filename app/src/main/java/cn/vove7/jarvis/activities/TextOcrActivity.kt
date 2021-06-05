@@ -112,16 +112,16 @@ class TextOcrActivity : BaseActivity<ActivityTextOcrBinding>() {
         System.gc()
     }
 
-
+    private var lastCheckedCount = 0
     private val onItemClick: (Model) -> Unit = { model ->
-        if (model.textView?.isSelected == true && wordItems.none { it.textView?.isSelected == true && it != model }) {
+        if (lastCheckedCount == 0 && model.textView?.isSelected == true && wordItems.none { it.textView?.isSelected == true && it != model }) {
             editDialog(model.item.text, model.item.subText)
         }
     }
 
     private fun buildContent() {
-       viewBinding.loadingLayout.gone()
-        val framePx = 1.5f.dp.px
+        viewBinding.loadingLayout.gone()
+        val framePx = 0f.dp.px
         wordItems.forEach { model ->
             val item = model.item
 
@@ -144,9 +144,11 @@ class TextOcrActivity : BaseActivity<ActivityTextOcrBinding>() {
                 layoutParams = RelativeLayout.LayoutParams(w + 2 * framePx, h + 2 * framePx).also {
                     it.setMargins(left - framePx / 2, top - framePx / 2, 0, 0)
                 }
-                rotationX = 0.5f
-                rotationY = 0.5f
-                rotation = rotationAngle
+                if (rotationAngle != 0.0f) {
+                    rotationX = 0.5f
+                    rotationY = 0.5f
+                    rotation = rotationAngle
+                }
                 model.textView = this
                 viewBinding.rootContent.addView(this)
             }
@@ -172,6 +174,7 @@ class TextOcrActivity : BaseActivity<ActivityTextOcrBinding>() {
                     onItemClick(it)
                 }
             }
+            lastCheckedCount = wordItems.count { it.textView?.isSelected == true }
             if (viewBinding.floatEditIcon.isOrWillBeHidden) {
                 viewBinding.floatEditIcon.fadeIn(200)
             }
