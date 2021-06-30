@@ -7,8 +7,8 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.CompoundButton
 import android.widget.TextView
-import cn.daqinjia.android.common.ext.gone
-import cn.daqinjia.android.common.ext.show
+import cn.vove7.android.common.ext.gone
+import cn.vove7.android.common.ext.show
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.utils.onClick
 import cn.vove7.common.utils.spanColor
@@ -16,7 +16,6 @@ import cn.vove7.jarvis.R
 import cn.vove7.jarvis.view.*
 import cn.vove7.smartkey.BaseConfig
 import cn.vove7.smartkey.android.set
-import cn.vove7.common.utils.set
 import cn.vove7.vtp.easyadapter.BaseListAdapter
 import cn.vove7.vtp.log.Vog
 import com.afollestad.materialdialogs.MaterialDialog

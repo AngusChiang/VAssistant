@@ -2,7 +2,7 @@ package cn.vove7.jarvis.work
 
 import android.content.Context
 import androidx.work.*
-import cn.daqinjia.android.common.logi
+import cn.vove7.android.common.logi
 import cn.vove7.common.app.AppConfig
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.app.GlobalLog

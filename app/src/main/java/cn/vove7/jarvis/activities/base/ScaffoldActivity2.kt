@@ -5,7 +5,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.ViewDataBinding
 import androidx.viewbinding.ViewBinding
-import cn.daqinjia.android.scaffold.ui.base.ScaffoldActivity
+import cn.vove7.android.scaffold.ui.base.ScaffoldActivity
 import java.lang.reflect.ParameterizedType
 
 /**
@@ -17,8 +17,6 @@ import java.lang.reflect.ParameterizedType
 abstract class ScaffoldActivity2<T : ViewBinding> : ScaffoldActivity<ViewDataBinding>() {
 
     lateinit var viewBinding: T
-
-    final override val layoutRes: Int = 0
 
     @Suppress("UNCHECKED_CAST")
     fun buildViewBinding(

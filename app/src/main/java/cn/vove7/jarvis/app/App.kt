@@ -8,8 +8,8 @@ import android.database.Cursor
 import android.net.Uri
 import android.os.Build
 import androidx.work.WorkManager
-import cn.daqinjia.android.common.ext.delayRun
-import cn.daqinjia.android.scaffold.ui.base.ScaffoldActivity
+import cn.vove7.android.common.ext.delayRun
+import cn.vove7.android.scaffold.ui.base.ScaffoldActivity
 import cn.vove7.bottomdialog.builder.BottomDialogBuilder
 import cn.vove7.common.app.AppConfig
 import cn.vove7.common.app.GlobalApp

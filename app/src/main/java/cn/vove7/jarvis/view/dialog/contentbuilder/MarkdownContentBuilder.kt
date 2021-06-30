@@ -6,7 +6,7 @@ import android.view.animation.AnimationUtils
 import android.widget.ViewSwitcher
 import br.tiagohm.markdownview.MarkdownView
 import br.tiagohm.markdownview.css.styles.Bootstrap
-import cn.daqinjia.android.common.ext.invisible
+import cn.vove7.android.common.ext.invisible
 import cn.vove7.bottomdialog.builder.BottomDialogBuilder
 import cn.vove7.bottomdialog.interfaces.ContentBuilder
 import cn.vove7.common.bridges.SystemBridge

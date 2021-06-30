@@ -23,8 +23,8 @@ import android.widget.EditText
 import androidx.annotation.ColorRes
 import androidx.annotation.StringRes
 import androidx.core.app.ActivityCompat
-import cn.daqinjia.android.scaffold.app.ActivityManager
-import cn.daqinjia.android.scaffold.app.ActivityStatus
+import cn.vove7.android.scaffold.app.ActivityManager
+import cn.vove7.android.scaffold.app.ActivityStatus
 import cn.vove7.common.BuildConfig
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.app.GlobalLog

@@ -18,6 +18,7 @@ import cn.vove7.jarvis.R
 import cn.vove7.jarvis.activities.*
 import cn.vove7.jarvis.app.AppApi
 import cn.vove7.jarvis.databinding.FragmentMineBinding
+import cn.vove7.jarvis.debug.MediaControllerActivity
 import cn.vove7.jarvis.lifecycle.LifecycleScope
 import cn.vove7.jarvis.services.MainService
 import cn.vove7.jarvis.tools.AppLogic
@@ -81,6 +82,10 @@ class MineFragment : Fragment() {
                     loadUserInfo()
                 }
             }
+        }
+        viewBinding.fab.setOnLongClickListener {
+            startActivity(Intent(context, MediaControllerActivity::class.java))
+            true
         }
         viewBinding.fab.onClick(MainService::switchRecog)
 

@@ -2,7 +2,7 @@ package cn.vove7.common.helper
 
 import android.content.Context
 import android.widget.Toast
-import cn.daqinjia.android.scaffold.app.ActivityManager
+import cn.vove7.android.scaffold.app.ActivityManager
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.utils.isForeground
 import cn.vove7.common.utils.runOnUi

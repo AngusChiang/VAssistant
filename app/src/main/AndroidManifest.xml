@@ -7,6 +7,8 @@
         android:name="android.permission.INTERACT_ACROSS_USERS_FULL"
         android:protectionLevel="signature" />
 
+    <uses-permission android:name="android.permission.MEDIA_CONTENT_CONTROL" />
+
     <uses-feature android:name="android.hardware.camera" />
     <uses-feature android:name="android.hardware.autofocus" />
     <uses-feature

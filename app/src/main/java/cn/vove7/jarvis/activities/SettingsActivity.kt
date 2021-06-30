@@ -10,7 +10,7 @@ import android.os.Handler
 import android.view.KeyEvent
 import android.view.View
 import android.widget.TextView
-import cn.daqinjia.android.common.logi
+import cn.vove7.android.common.logi
 import cn.vove7.common.accessibility.AccessibilityApi
 import cn.vove7.common.app.AppConfig
 import cn.vove7.common.app.GlobalApp

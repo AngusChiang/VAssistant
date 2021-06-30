@@ -16,7 +16,7 @@ import android.view.animation.AccelerateDecelerateInterpolator
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.TextView
-import cn.daqinjia.android.common.ext.isShow
+import cn.vove7.android.common.ext.isShow
 import cn.vove7.common.app.AppConfig
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.app.GlobalLog

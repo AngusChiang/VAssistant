@@ -6,7 +6,7 @@ import android.os.Build
 import android.provider.Settings
 import android.view.accessibility.AccessibilityNodeInfo
 import androidx.core.view.accessibility.AccessibilityNodeInfoCompat.FOCUS_INPUT
-import cn.daqinjia.android.common.ext.delayRun
+import cn.vove7.android.common.ext.delayRun
 import cn.vove7.common.NeedAccessibilityException
 import cn.vove7.common.accessibility.component.AccPluginService
 import cn.vove7.common.accessibility.viewnode.ViewNode

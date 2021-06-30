@@ -7,8 +7,8 @@ import android.content.Context
 import android.util.Log
 import android.widget.Toast
 import androidx.multidex.MultiDex
-import cn.daqinjia.android.common.loge
-import cn.daqinjia.android.scaffold.app.ScaffoldApp
+import cn.vove7.android.common.loge
+import cn.vove7.android.scaffold.app.ScaffoldApp
 import cn.vove7.common.BuildConfig
 import cn.vove7.common.helper.ToastyHelper
 import cn.vove7.common.helper.ToastyHelper.TYPE_ERROR

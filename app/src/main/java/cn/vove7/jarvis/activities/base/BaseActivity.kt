@@ -1,7 +1,7 @@
 package cn.vove7.jarvis.activities.base
 
 import androidx.viewbinding.ViewBinding
-import cn.daqinjia.android.scaffold.ui.base.ScaffoldActivity
+import cn.vove7.android.scaffold.ui.base.ScaffoldActivity
 import cn.vove7.jarvis.lifecycle.LifeCycleScopeDelegate
 import cn.vove7.jarvis.lifecycle.LifecycleScope
 import cn.vove7.jarvis.tools.DataCollector

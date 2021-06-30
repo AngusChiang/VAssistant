@@ -1,7 +1,7 @@
 package cn.vove7.common.app
 
-import cn.daqinjia.android.common.Logger.logi
-import cn.daqinjia.android.common.loge
+import cn.vove7.android.common.Logger.logi
+import cn.vove7.android.common.loge
 import cn.vove7.common.utils.StorageHelper
 import cn.vove7.quantumclock.QuantumClock
 import java.io.BufferedWriter

@@ -15,7 +15,7 @@ import android.view.ViewGroup
 import android.view.accessibility.AccessibilityEvent
 import android.view.accessibility.AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED
 import android.view.accessibility.AccessibilityNodeInfo
-import cn.daqinjia.android.common.logv
+import cn.vove7.android.common.logv
 import cn.vove7.common.accessibility.AccessibilityApi
 import cn.vove7.common.accessibility.viewnode.ViewNode
 import cn.vove7.common.app.AppConfig

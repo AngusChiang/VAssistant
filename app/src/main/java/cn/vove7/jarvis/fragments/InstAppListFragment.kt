@@ -2,7 +2,7 @@ package cn.vove7.jarvis.fragments
 
 import android.content.Intent
 import android.view.View
-import cn.daqinjia.android.common.logi
+import cn.vove7.android.common.logi
 import cn.vove7.common.app.AppConfig
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.datamanager.DAO

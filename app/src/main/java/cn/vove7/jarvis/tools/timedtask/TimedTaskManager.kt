@@ -1,7 +1,7 @@
 package cn.vove7.jarvis.tools.timedtask
 
-import cn.daqinjia.android.common.loge
-import cn.daqinjia.android.common.logi
+import cn.vove7.android.common.loge
+import cn.vove7.android.common.logi
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.app.GlobalLog
 import java.io.*

@@ -40,8 +40,8 @@ object AppInstallReceiver : DyBCReceiver() {
 
     }
 
-    private fun syncAppInst(pkg: String) =GlobalScope.launch {
-        DataUpdator.syncInAppInst(null, listOf(pkg))
+    private fun syncAppInst(pkg: String) = GlobalScope.launch {
+        DataUpdator.syncInAppInst()
     }
 
 }

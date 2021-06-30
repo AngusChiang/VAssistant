@@ -52,7 +52,7 @@
     *;
 }
 # 移除android 所有log
--assumenosideeffects class cn.daqinjia.android.common.LoggerKt{
+-assumenosideeffects class cn.vove7.android.common.LoggerKt{
     public static *** logv$default(...);
     public static *** log$default(...);
     public static *** logd$default(...);
@@ -66,7 +66,7 @@
     public static *** logi(...);
     public static *** logw(...);
 }
--assumenosideeffects class cn.daqinjia.android.common.Logger {
+-assumenosideeffects class cn.vove7.android.common.Logger {
     public *** logv(...);
     public *** log(...);
     public *** logd(...);

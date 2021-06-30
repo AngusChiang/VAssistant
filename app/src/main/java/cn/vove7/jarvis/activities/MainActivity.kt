@@ -9,7 +9,7 @@ import android.os.Build
 import android.os.Bundle
 import android.view.View
 import android.view.Window
-import cn.daqinjia.android.common.logd
+import cn.vove7.android.common.logd
 import cn.vove7.common.app.AppConfig
 import cn.vove7.common.model.UserInfo
 import cn.vove7.jarvis.BuildConfig
