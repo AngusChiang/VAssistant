@@ -18,7 +18,7 @@ import android.widget.CheckedTextView
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
-import cn.vove7.admin_manager.AdminReceiver
+import cn.vove7.jarvis.receivers.AdminReceiver
 import cn.vove7.common.accessibility.AccessibilityApi
 import cn.vove7.common.app.AppPermission
 import cn.vove7.common.app.GlobalApp

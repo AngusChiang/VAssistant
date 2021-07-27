@@ -57,7 +57,9 @@ object AppConfig : BaseConfig {
 
     val panelStyle: Int by noCacheKey(0, R.string.key_panel_style)
     var openAppCompat by noCacheKey(false, keyId = R.string.key_open_app_compat)
-    var speechEngineType: Int by noCacheKey(0, keyId = R.string.key_speech_engine_type)
+
+    var speechRecogType: Int by noCacheKey(0, keyId = R.string.key_speech_recog_type)
+    var speechSynType: Int by noCacheKey(0, keyId = R.string.key_speech_syn_type)
 
     var vibrateWhenStartRecog by noCacheKey(true, keyId = R.string.key_vibrate_reco_begin)
     var vibrateEffectStartRecog by noCacheKey(50, keyId = R.string.key_vibrate_reco_effect)

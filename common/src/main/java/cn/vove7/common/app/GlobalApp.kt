@@ -4,6 +4,7 @@ import android.app.ActivityManager
 import android.app.Application
 import android.app.Service
 import android.content.Context
+import android.content.Intent
 import android.util.Log
 import android.widget.Toast
 import androidx.multidex.MultiDex
@@ -55,7 +56,8 @@ open class GlobalApp : ScaffoldApp() {
         private lateinit var _APP: Application
 
         @JvmStatic
-        val APP: Context get() = _APP
+        val APP: Context
+            get() = _APP
 
         val GApp: GlobalApp
             get() = _APP as GlobalApp
@@ -146,6 +148,18 @@ open class GlobalApp : ScaffoldApp() {
         } catch (e: Exception) {
             GlobalLog.err(e)
         }
+    }
+
+    fun startActivity(cls: Class<*>) {
+        startActivity(Intent(this, cls))
+    }
+
+    fun startActivityByAction(action: String?) {
+        startActivity(Intent(action))
+    }
+
+    fun startActivity(action: String?) {
+        startActivityByAction(action)
     }
 
 }

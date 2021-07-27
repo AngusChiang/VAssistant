@@ -9,6 +9,7 @@ import android.os.Bundle
 import android.os.Handler
 import android.view.KeyEvent
 import android.view.View
+import android.widget.BaseAdapter
 import android.widget.TextView
 import cn.vove7.android.common.logi
 import cn.vove7.common.accessibility.AccessibilityApi
@@ -17,6 +18,7 @@ import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.appbus.AppBus
 import cn.vove7.common.bridges.SystemBridge
+import cn.vove7.common.utils.runOnUiDelay
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.activities.base.ReturnableActivity
 import cn.vove7.jarvis.adapters.SettingsExpandableAdapter
@@ -34,6 +36,8 @@ import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.callbacks.onCancel
 import com.afollestad.materialdialogs.callbacks.onDismiss
 import com.afollestad.materialdialogs.customview.customView
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import java.io.File
 
 /**
@@ -47,7 +51,9 @@ class SettingsActivity : ReturnableActivity<ActivityExpandableSettingsBinding>()
         super.onCreate(savedInstanceState)
 
         val expandableListView = viewBinding.expandList
-        expandableListView.setAdapter(SettingsExpandableAdapter(this, initData(), expandableListView))
+        expandableListView.setAdapter(SettingsExpandableAdapter(this, initData {
+            expandableListView.adapter as BaseAdapter
+        }, expandableListView))
 
         expandableListView.post {
             kotlin.runCatching {
@@ -71,7 +77,7 @@ class SettingsActivity : ReturnableActivity<ActivityExpandableSettingsBinding>()
 
     }
 
-    private fun initData(): List<SettingGroupItem> = listOf(
+    private fun initData(getAdapter: () -> BaseAdapter): List<SettingGroupItem> = listOf(
             SettingGroupItem(R.color.indigo_700, titleS = "语音识别", childItems = listOf(
 //                    SingleChoiceItem(title = "语音引擎", summary = "语音识别/唤醒/合成引擎\n切换后，若需设置语音合成，请重新进入此页面",
 //                            keyId = cn.vove7.common.R.string.key_speech_engine_type,
@@ -319,12 +325,27 @@ class SettingsActivity : ReturnableActivity<ActivityExpandableSettingsBinding>()
                     )
             )),
             SettingGroupItem(R.color.google_yellow, "语音合成", childItems = listOf(
+                    SingleChoiceItem(title = "语音合成引擎", summary = "语音合成引擎",
+                            keyId = cn.vove7.common.R.string.key_speech_syn_type,
+                            entityArrId = R.array.list_speech_syn_engine,
+                            defaultValue = AppConfig.speechSynType) { o, it ->
+                        it ?: return@SingleChoiceItem false
+                        GlobalApp.toastInfo("切换语音引擎...")
+                        GlobalScope.launch {
+                            MainService.loadSpeechService(synType = it.first, notify = true)
+                        }
+                        runOnUiDelay(800) {
+                            getAdapter().notifyDataSetChanged()
+                        }
+                        true
+                    },
                     SingleChoiceItem(
                             R.string.text_sound_model,
                             summary = "在线声音模型",
                             keyId = R.string.key_voice_syn_model,
                             defaultValue = 0,
-                            entityArrId = R.array.voice_model_entities
+                            entityArrId = R.array.voice_model_entities,
+                            enabled = { AppConfig.speechSynType == 0 }
                     ) { h, i ->
                         AppBus.postDelay(AppBus.ACTION_RELOAD_SYN_CONF, 500)
                         return@SingleChoiceItem true
@@ -334,7 +355,8 @@ class SettingsActivity : ReturnableActivity<ActivityExpandableSettingsBinding>()
                             keyId = R.string.key_voice_syn_speed,
                             defaultValue =
                             { 5 },
-                            range = 1 to 9
+                            range = 1 to 9,
+                            enabled = { AppConfig.speechSynType == 0 }
                     ) { h, i ->
                         AppBus.post(AppBus.ACTION_RELOAD_SYN_CONF)
                         return@NumberPickerItem true
@@ -344,14 +366,19 @@ class SettingsActivity : ReturnableActivity<ActivityExpandableSettingsBinding>()
                             summary = "选择音量跟随\n可能重启App生效",
                             keyId = R.string.key_stream_of_syn_output,
                             entityArrId = R.array.list_stream_syn_output,
-                            defaultValue = 0
+                            defaultValue = 0,
+                            enabled = { AppConfig.speechSynType == 0 }
                     ) { _, b ->
                         AppBus.postDelay(AppBus.ACTION_RELOAD_SYN_CONF, 500)
 //                        MainService.speechSynService?.reloadStreamType()
                         return@SingleChoiceItem true
                     },
                     IntentItem(title = "试听") {
-                        MainService.speak("百度语音：基于业界领先的深度神经网络技术。")
+                        MainService.speak(
+                                if (AppConfig.speechSynType == 0)
+                                    "百度语音：基于业界领先的深度神经网络技术。"
+                                else "语音合成测试"
+                        )
                     }
             )),
             SettingGroupItem(R.color.google_red, titleS = "悬浮面板", childItems = listOf(

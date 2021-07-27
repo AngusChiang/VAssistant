@@ -73,7 +73,7 @@ import cn.vove7.jarvis.shs.ISmartHomeSystem
 import cn.vove7.jarvis.speech.*
 import cn.vove7.jarvis.speech.baiduspeech.BaiduSpeechRecogService
 import cn.vove7.jarvis.speech.baiduspeech.BaiduSpeechSynService
-import cn.vove7.jarvis.tools.AppLogic
+import cn.vove7.jarvis.speech.sys.SysSynService
 import cn.vove7.jarvis.tools.DataCollector
 import cn.vove7.jarvis.tools.baiduaip.model.Point
 import cn.vove7.jarvis.tools.baiduaip.model.TextOcrItem
@@ -200,26 +200,22 @@ object MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
     /**
      * 加载语音识别/合成服务
      */
-    fun loadSpeechService(type: Int? = null, notify: Boolean = false) {
-        val st = if (type == 1 && !AppLogic.canXunfei()) 0
-        else type ?: AppConfig.speechEngineType
-
+    fun loadSpeechService(
+            recogType: Int = AppConfig.speechRecogType,
+            synType: Int = AppConfig.speechSynType,
+            notify: Boolean = false) {
         val loaded = releaseSpeechService()
-
-        when (st) {
-            0 -> {//百度
-                speechRecogService = BaiduSpeechRecogService(RecogEventListener())
-                speechSynService = BaiduSpeechSynService(SynthesisEventListener())
-            }
-//            1 -> {//讯飞
-//                speechRecogService = XunfeiSpeechRecogService(RecogEventListener())
-//                speechSynService = XunfeiSpeechSynService(SynthesisEventListener())
-//            }
-            else -> {
-                speechRecogService = BaiduSpeechRecogService(RecogEventListener())
-                speechSynService = BaiduSpeechSynService(SynthesisEventListener())
-            }
+        speechRecogService = when (recogType) {
+            //百度
+            0 -> BaiduSpeechRecogService(RecogEventListener())
+            else -> BaiduSpeechRecogService(RecogEventListener())
         }
+        speechSynService = when (synType) {
+            0 -> BaiduSpeechSynService(SynthesisEventListener())
+            1 -> SysSynService(SynthesisEventListener())
+            else -> BaiduSpeechSynService(SynthesisEventListener())
+        }
+
         if (loaded && notify) {
             GlobalApp.toastInfo("重载语音引擎完成")
         }

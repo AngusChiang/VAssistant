@@ -4,7 +4,9 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
 import android.os.Build
+import android.os.Bundle
 import android.service.voice.VoiceInteractionSession
+import android.view.WindowManager
 import androidx.annotation.RequiresApi
 import cn.vove7.common.bridges.UtilBridge
 import cn.vove7.common.utils.newTask
@@ -21,6 +23,15 @@ import java.util.*
  */
 @RequiresApi(api = Build.VERSION_CODES.M)
 class AssistSession(context: Context) : VoiceInteractionSession(context) {
+
+    init {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            val lp = window.window!!.attributes
+            lp.layoutInDisplayCutoutMode = WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES
+            window.window!!.attributes = lp
+        }
+    }
+
     override fun onHandleScreenshot(screenshot: Bitmap?) {
         Vog.d("onHandleScreenshot ---> screenshot: ${screenshot != null}")
         if (screenshot == null) {

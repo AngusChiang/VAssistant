@@ -87,6 +87,10 @@ interface VApi {
                 "simCount", "contacts", "saveMarkedContact()", "saveMarkedApp()",
                 "enableNfc()", "disableNfc()", "screenBrightness", "screenBrightnessMode"
         )
+        val utilsApiFunction = arrayOf(
+                "parseJson()", "runTask(taskName)", "runAppCommand(pkg, cmd)", "throw()",
+                "scanCode()"
+        )
         val appFunctions = arrayOf(
                 "startActivity()", "getSystemService()"
         )
@@ -294,6 +298,13 @@ interface VApi {
                 "screenBrightness" to "屏幕亮度值\n范围：0～255\nsystem.screenBrightness = 125",
                 "screenBrightnessMode" to "亮度调节模式\n1：自动调节\n0：手动调节"
 
+        )
+        val utilsApiMap = hashMapOf(
+                "parseJson()" to "解析json字符串，返回 Map",
+                "runTask(taskName)" to "执行Tasker任务",
+                "runAppCommand(pkg, cmd)" to "执行App内指令",
+                "throw()" to "抛出异常",
+                "scanCode()" to "扫描条形码/二维码，返回识别结果"
         )
         val executorMap = hashMapOf(
                 Pair("interrupt()", "终止执行"),

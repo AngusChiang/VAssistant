@@ -357,7 +357,7 @@ abstract class CodeEditorActivity<T : ViewBinding> : BaseActivity<T>() {
         get() = codeEditor.getEditorContent() ?: ""
 
     class SymbolsAdapter(val c: Context, val editor: CodeEditorOperation, val symbols: List<Symbol>)
-        : androidx.recyclerview.widget.RecyclerView.Adapter<V>() {
+        : RecyclerView.Adapter<V>() {
         override fun onCreateViewHolder(p0: ViewGroup, p1: Int): V {
             return V(ItemOfSymbolsBinding.inflate(LayoutInflater.from(c)))
         }

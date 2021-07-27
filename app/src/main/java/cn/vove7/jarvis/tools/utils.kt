@@ -1,6 +1,8 @@
 package cn.vove7.jarvis.tools
 
 import android.app.Activity
+import android.content.Context
+import android.content.ContextWrapper
 import android.content.Intent
 import android.net.Uri
 import android.provider.Settings
@@ -13,6 +15,7 @@ import cn.vove7.common.bridges.RootHelper
 import cn.vove7.common.bridges.UtilBridge
 import cn.vove7.common.utils.activityShot
 import cn.vove7.common.utils.newTask
+import cn.vove7.jarvis.BuildConfig
 import cn.vove7.jarvis.services.AssistSessionService
 import cn.vove7.vtp.log.Vog
 import java.io.DataOutputStream
@@ -137,3 +140,19 @@ fun isWirelessDebugEnable(): Boolean {
         return false
     }
 }
+
+inline fun onDebug(action: () -> Unit) {
+    if (BuildConfig.DEBUG) action()
+}
+
+
+/**
+ * ContextWrapper 转 Activity
+ */
+val Context.asActivity: Activity?
+    get() =
+        when (this) {
+            is Activity -> this
+            is ContextWrapper -> this.baseContext.asActivity
+            else -> null
+        }

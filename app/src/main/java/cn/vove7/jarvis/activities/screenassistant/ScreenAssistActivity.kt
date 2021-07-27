@@ -11,6 +11,7 @@ import android.view.Gravity
 import android.view.View
 import android.view.animation.AlphaAnimation
 import android.widget.PopupMenu
+import cn.vove7.android.common.ext.invisible
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.appbus.AppBus
 import cn.vove7.common.bridges.SystemBridge
@@ -93,12 +94,12 @@ class ScreenAssistActivity : BaseActivity<DialogAssistBinding>() {
             field = value
             runOnUi {
                 if (value) viewBinding.progressBar.show()
-                else viewBinding.progressBar.visibility = View.INVISIBLE
+                else viewBinding.progressBar.invisible()
             }
         }
 
     private fun hideNavBar() = runOnUi {
-        window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY or View.SYSTEM_UI_FLAG_HIDE_NAVIGATION or window.decorView.systemUiVisibility
+//        window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY or View.SYSTEM_UI_FLAG_HIDE_NAVIGATION or window.decorView.systemUiVisibility
     }
 
     private fun setStatusBarLight() = runOnUi {
@@ -495,7 +496,7 @@ class ScreenAssistActivity : BaseActivity<DialogAssistBinding>() {
                     }
                 }
                 else -> {
-                    neutralButton(text = "文本操作") {
+                    neutralButton(text = "编辑") {
                         TextOperationDialog(this@ScreenAssistActivity, TextOperationDialog.TextModel(result))
                     }
                 }

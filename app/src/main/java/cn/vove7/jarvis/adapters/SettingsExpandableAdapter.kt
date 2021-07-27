@@ -91,12 +91,15 @@ class SettingsExpandableAdapter(
             view = childHolders[groupPosition][childPosition]?.itemView
         } catch (e: ArrayIndexOutOfBoundsException) {
         }
-
         if (view == null) {
             val c = getChild(groupPosition, childPosition)
-            val holder = SettingItemHelper(context, c, AppConfig).fill()
+            val helper = SettingItemHelper(context, c, AppConfig)
+            val holder = helper.fill()
             childHolders[groupPosition][childPosition] = holder
             view = holder.itemView
+            view.tag = helper
+        } else {
+            (view.tag as SettingItemHelper).setBasic()
         }
 
         return view

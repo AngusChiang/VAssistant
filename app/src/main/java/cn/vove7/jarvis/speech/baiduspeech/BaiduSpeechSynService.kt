@@ -26,7 +26,7 @@ class BaiduSpeechSynService(event: SyntheEvent) : SpeechSynService(event) {
 
     private lateinit var mSpeechSynthesizer: SpeechSynthesizer
 
-    override var enableOffline: Boolean =
+    var enableOffline: Boolean =
         File("${StorageHelper.extPath}/baiduTTS", "bd_etts_text.dat")
                 .exists()
 

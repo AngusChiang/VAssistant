@@ -1,4 +1,4 @@
-package cn.vove7.admin_manager
+package cn.vove7.jarvis.receivers
 
 import android.app.admin.DeviceAdminReceiver
 import android.app.admin.DevicePolicyManager
@@ -7,7 +7,6 @@ import android.content.Context
 import android.content.Intent
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.app.GlobalLog
-import cn.vove7.vtp.log.Vog
 
 
 /**

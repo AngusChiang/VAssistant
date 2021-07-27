@@ -82,12 +82,4 @@ object AppLogic {
         UserInfo.logout()
     }
 
-    /**
-     * 是否可以使用讯飞
-     * @return Boolean
-     */
-    fun canXunfei(): Boolean {
-        return UserInfo.isPermanentVip()
-    }
-
 }

@@ -220,7 +220,7 @@ class SettingItemHelper(
     /**
      * @param lis View.OnClickListener
      */
-    private fun setBasic(lis: OnClick? = null) {
+    fun setBasic(lis: OnClick? = null) {
         holder.titleView.text = settingItem.title()
         if (settingItem.summary == null) {
             holder.summaryView.visibility = View.GONE
@@ -233,6 +233,7 @@ class SettingItemHelper(
             holder.itemView.setOnClickListener {
                 lis.invoke()
             }
+        holder.itemView.isEnabled = settingItem.enabled()
     }
 
     /**

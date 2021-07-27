@@ -99,10 +99,6 @@ object UtilEventReceiver : DyBCReceiver() {
         when (event) {
             AppBus.EVENT_LOGOUT, AppBus.EVENT_FORCE_OFFLINE -> {
                 AppLogic.onLogout()
-                if (AppConfig.speechEngineType == 1) {
-                    AppConfig.speechEngineType = 0
-                    MainService.loadSpeechService(0)
-                }
             }
             AppBus.ACTION_RELOAD_HOME_SYSTEM -> {
                 MainService.loadHomeSystem()

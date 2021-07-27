@@ -83,6 +83,10 @@ fun runOnUi(action: () -> Unit) {
     }
 }
 
+fun runOnUiDelay(delay: Long, action: () -> Unit) {
+    Handler(Looper.getMainLooper()).postDelayed(action, delay)
+}
+
 inline fun runInCatch(log: Boolean = false, block: () -> Unit) {
     runCatching(block).onFailure { e ->
         if (log) e.log()

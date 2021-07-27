@@ -1,19 +1,22 @@
 package cn.vove7.common.bridges
 
+import android.content.Intent
 import android.graphics.Bitmap
+import android.os.Looper
 import cn.vove7.common.MessageException
 import cn.vove7.common.annotation.ScriptApi
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.app.GlobalLog
-import cn.vove7.common.appbus.AppBus
-import cn.vove7.common.datamanager.DaoHelper
+import cn.vove7.common.model.ResultBox
+import cn.vove7.common.utils.runOnUi
 import cn.vove7.common.utils.tasker.TaskerIntent
+import com.google.gson.Gson
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
-import com.google.gson.JsonParser
 import top.zibin.luban.Luban
 import java.io.File
 import java.io.FileOutputStream
+import java.io.Serializable
 import java.util.*
 import kotlin.collections.HashMap
 
@@ -26,7 +29,7 @@ import kotlin.collections.HashMap
  */
 object UtilBridge {
 
-    fun compressImage(file: String): File = UtilBridge.compressImage(File(file))
+    fun compressImage(file: String): File = compressImage(File(file))
 
     /**
      * 压缩图片，使用Luban
@@ -65,9 +68,7 @@ object UtilBridge {
      */
     fun parseJson(json: String?): Map<String, Any?>? {
         json ?: return null
-        val jobj = JsonParser().parse(json).asJsonObject
-
-        return toMap(jobj)
+        return toMap(Gson().fromJson(json, JsonObject::class.java))
     }
 
     /**
@@ -153,5 +154,31 @@ object UtilBridge {
     @JvmStatic
     fun `throw`(msg: String?) {
         throw MessageException(msg)
+    }
+
+    @JvmStatic
+    private var qrBox: ResultBox<String?>? = null
+
+    //非主线程调用
+    fun scanCode(): String? = try {
+        if (Looper.myLooper() == Looper.getMainLooper())
+            `throw`("请在非主线程调用")
+        val intent = Intent(GlobalApp.APP.packageName + ".qr")
+        intent.putExtra("callback", QrCallback())
+        val box = ResultBox<String?>()
+        qrBox = box
+        runOnUi {
+            GlobalApp.APP.startActivity(intent)
+        }
+        box.blockedGet(false)
+    } finally {
+        qrBox = null
+    }
+
+    class QrCallback : Serializable {
+        fun onResult(result: String?) {
+            qrBox?.setAndNotify(result)
+            qrBox = null
+        }
     }
 }

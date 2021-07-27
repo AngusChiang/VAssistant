@@ -1,9 +1,7 @@
 package cn.vove7.jarvis.activities.base
 
 import android.app.Activity
-import android.content.Context
 import android.content.Intent
-import android.content.pm.ShortcutManager
 import android.net.Uri
 import android.os.Bundle
 import android.speech.RecognizerIntent
@@ -44,7 +42,8 @@ class CreateShortcutActivity : Activity() {
                         "屏幕识别",
                         "屏幕分享",
                         "文字识别",
-                        "语音指令"
+                        "语音指令",
+                        "扫一扫",
 //                        "语音搜索"
                 ), waitForPositiveButton = false) { d, i, t ->
                     val text = t.toString()
@@ -59,6 +58,7 @@ class CreateShortcutActivity : Activity() {
                         7 -> create(SCREEN_ASSIST_SCREEN_SHARE, text)
                         8 -> create(SCREEN_ASSIST_SCREEN_OCR, text)
                         9 -> showInputVoiceText()
+                        10 -> createRawAction("$packageName.qr2", text)
 //                        3 -> createWebSearch()
                     }
                     d.dismiss()
@@ -109,6 +109,18 @@ class CreateShortcutActivity : Activity() {
     private fun create(action: String, text: String) {
         val sIntent = Intent(this, VoiceAssistActivity::class.java)
         sIntent.action = action
+        val intent = Intent()
+        intent.putExtra(Intent.EXTRA_SHORTCUT_NAME, text)
+        intent.putExtra(Intent.EXTRA_SHORTCUT_INTENT, sIntent)
+        val iconResource = Intent.ShortcutIconResource
+                .fromContext(this, R.mipmap.ic_launcher_vassist)
+        intent.putExtra(Intent.EXTRA_SHORTCUT_ICON_RESOURCE, iconResource)
+        setResult(RESULT_OK, intent)
+        finishAndRemoveTask()
+    }
+
+    private fun createRawAction(action: String, text: String) {
+        val sIntent = Intent(action)
         val intent = Intent()
         intent.putExtra(Intent.EXTRA_SHORTCUT_NAME, text)
         intent.putExtra(Intent.EXTRA_SHORTCUT_INTENT, sIntent)

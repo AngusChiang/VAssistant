@@ -50,6 +50,10 @@
         <item>百度语音</item>
         <item>讯飞语音</item>
     </string-array>
+    <string-array name="list_speech_syn_engine" translatable="false">
+        <item>百度语音</item>
+        <item>系统TTS</item>
+    </string-array>
 
     <string-array name="list_float_voice_align" translatable="false">
         <item>居中</item>

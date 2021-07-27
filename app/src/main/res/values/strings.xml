@@ -282,4 +282,6 @@
     <string name="text_mail_help">发送后请在收件箱中查看邮件，注意查看邮件是否被收进[垃圾箱]，若无法收到，可使用QQ与我联系，谢谢:)</string>
     <string name="using_help">Using help</string>
     <string name="position_of_home">家位置经纬度</string>
+    <string name="admin_desc">开启设备管理器，可以加强后台能力\n*卸载之前请关闭此功能</string>
+
 </resources>

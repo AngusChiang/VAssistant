@@ -10,8 +10,6 @@ import cn.vove7.android.common.ext.invisible
 import cn.vove7.bottomdialog.builder.BottomDialogBuilder
 import cn.vove7.bottomdialog.interfaces.ContentBuilder
 import cn.vove7.common.bridges.SystemBridge
-import cn.vove7.common.utils.fadeIn
-import cn.vove7.common.utils.fadeOut
 import cn.vove7.jarvis.R
 import java.io.File
 
@@ -46,8 +44,10 @@ class MarkdownContentBuilder(
 
         mdView.setLoadListener(object : MarkdownView.LoadListener {
             override fun onLoadComplete() {
-                vs.displayedChild = 1
                 mdView.postInvalidate()
+                mdView.postDelayed({
+                    vs.displayedChild = 1
+                }, 50)
                 dialog.findViewById<View>(R.id.content).postInvalidate()
             }
 

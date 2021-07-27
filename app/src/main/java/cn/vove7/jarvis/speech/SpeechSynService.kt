@@ -27,8 +27,6 @@ abstract class SpeechSynService(val event: SyntheEvent) {
 
     var speaking: Boolean = false
 
-    abstract val enableOffline: Boolean
-
     var speakingText: String? = null
 
     abstract fun release()

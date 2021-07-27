@@ -19,6 +19,8 @@ import cn.vove7.common.interfaces.VApi.Companion.runtimeFunctions
 import cn.vove7.common.interfaces.VApi.Companion.runtimeMap
 import cn.vove7.common.interfaces.VApi.Companion.systemFunMap
 import cn.vove7.common.interfaces.VApi.Companion.systemFuncs
+import cn.vove7.common.interfaces.VApi.Companion.utilsApiFunction
+import cn.vove7.common.interfaces.VApi.Companion.utilsApiMap
 import cn.vove7.jarvis.R
 import com.google.android.material.tabs.TabLayout
 
@@ -140,6 +142,11 @@ class EditorFunsHelper(
                         it.add(ApiFunction(f, systemFunMap[f] ?: f))
                     }
                 }, insertPre = "system."),
+                ApiCategory("杂项", mutableListOf<ApiFunction>().also {
+                    utilsApiFunction.forEach { f ->
+                        it.add(ApiFunction(f, utilsApiMap[f] ?: f))
+                    }
+                }, insertPre = "utils."),
                 ApiCategory("存储", listOf(//指令设置
                         ApiFunction("settings", "插入指令存储代码",
                                 insertText = "\nsettings = {\n" +
@@ -203,7 +210,7 @@ class CateFrag : androidx.fragment.app.Fragment() {
         val v = inflater.inflate(R.layout.item_api_category_rev, null)
         v.findViewById<androidx.recyclerview.widget.RecyclerView>(R.id.rev).apply {
             layoutManager = androidx.recyclerview.widget.GridLayoutManager(context, 3)
-            adapter = GridAdapter(activity!!, functions, onClick)
+            adapter = GridAdapter(requireActivity(), functions, onClick)
         }
         return v
     }

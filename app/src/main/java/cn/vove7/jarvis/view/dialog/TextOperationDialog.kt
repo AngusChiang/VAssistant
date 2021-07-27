@@ -3,6 +3,7 @@ package cn.vove7.jarvis.view.dialog
 import android.widget.PopupMenu
 import android.widget.TextView
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import cn.vove7.bottomdialog.BottomDialog
 import cn.vove7.bottomdialog.builder.*
 import cn.vove7.bottomdialog.extension.awesomeHeader
@@ -13,7 +14,7 @@ import cn.vove7.common.utils.StorageHelper
 import cn.vove7.common.utils.broadcastImageFile
 import cn.vove7.common.utils.runOnUi
 import cn.vove7.jarvis.R
-import cn.vove7.jarvis.activities.base.BaseActivity
+import cn.vove7.jarvis.lifecycle.LifecycleScope
 import cn.vove7.jarvis.services.MainService
 import cn.vove7.jarvis.tools.DataCollector
 import cn.vove7.jarvis.tools.QRTools
@@ -36,11 +37,11 @@ import java.io.File
  * 2019/6/7
  */
 class TextOperationDialog(
-        val activity: BaseActivity<*>,
+        val activity: AppCompatActivity,
         val textModel: TextModel
 ) {
 
-    private val lifeCycleScope = activity.lifecycleScope
+    private val lifeCycleScope = LifecycleScope(activity.lifecycle)
 
     //默认已换行
     private var wrapped = true
@@ -181,7 +182,7 @@ class TextOperationDialog(
             withCloseIcon()
             content(ImageContentBuilder()) {
                 init {
-                    loadFile(File(path))
+                    loadFile(File(path), content)
                 }
             }
             buttons {

@@ -1,5 +1,6 @@
 package cn.vove7.jarvis.view.dialog
 
+import androidx.appcompat.app.AppCompatActivity
 import cn.vove7.bottomdialog.BottomDialog
 import cn.vove7.bottomdialog.builder.buttons
 import cn.vove7.bottomdialog.builder.withCloseIcon
@@ -8,6 +9,7 @@ import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.bridges.SystemBridge
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.activities.base.BaseActivity
+import cn.vove7.jarvis.lifecycle.LifecycleScope
 import cn.vove7.jarvis.view.dialog.contentbuilder.WordSplitBuilder
 import cn.vove7.jarvis.view.dp
 import cn.vove7.jarvis.view.positiveButtonWithColor
@@ -19,7 +21,7 @@ import cn.vove7.jarvis.view.positiveButtonWithColor
  * 2018/10/28
  */
 class WordSplitDialog(
-        context: BaseActivity<*>,
+        context: AppCompatActivity,
         val rawWords: String
 ) {
 
@@ -28,7 +30,7 @@ class WordSplitDialog(
     }
 
     val d = BottomDialog.builder(context) {
-        val builder = WordSplitBuilder(context.lifecycleScope, rawWords)
+        val builder = WordSplitBuilder(LifecycleScope(context.lifecycle), rawWords)
         peekHeight = 450.dp.px
 
         cancelable(false)

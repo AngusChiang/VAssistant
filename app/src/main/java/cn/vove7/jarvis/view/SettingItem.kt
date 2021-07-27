@@ -94,7 +94,8 @@ open class SettingChildItem(
         val keyId: Int? = null,
         val defaultValue: (() -> Any?),
         val callback: CallbackOnSet<*>? = null,
-        val allowClear: Boolean = false
+        val allowClear: Boolean = false,
+        val enabled: () -> Boolean = { true }
 ) {
     fun title(): String {
         if (titleId != null)
@@ -171,9 +172,10 @@ class NumberPickerItem : SettingChildItem, ItemDialogAction, ItemChangeListener<
             onChange: Function1<Int, Unit>? = null,
             onDialogDismiss: Function0<Unit>? = null,
             onDialogShow: Function0<Unit>? = null,
+            enabled: () -> Boolean = { true },
             callback: CallbackOnSet<Int>? = null
     ) : super(titleId, title, summary, TYPE_NUMBER, keyId, defaultValue,
-            callback = callback) {
+            enabled = enabled,callback = callback) {
         this.onChange = onChange
         this.range = range
         this.onDialogShow = onDialogShow
@@ -220,9 +222,10 @@ class SingleChoiceItem(
         @ArrayRes val entityArrId: Int? = null,
         val items: List<String>? = null,
         allowClear: Boolean = false,
+        enabled: () -> Boolean = { true },
         callback: CallbackOnSet<Pair<Int, String>?>? = null
 ) : SettingChildItem(titleId, title, summary, TYPE_SINGLE, keyId, { defaultValue },
-        callback = callback, allowClear = allowClear) {
+        callback = callback, enabled = enabled, allowClear = allowClear) {
     val choiceItems
         get() = entityArrId?.let {
             GlobalApp.APP.resources.getStringArray(it).toList()
