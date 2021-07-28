@@ -9,7 +9,6 @@ import android.os.Build
 import android.os.Bundle
 import android.view.Gravity
 import android.view.View
-import android.view.animation.AlphaAnimation
 import android.widget.PopupMenu
 import cn.vove7.android.common.ext.invisible
 import cn.vove7.common.app.GlobalApp
@@ -122,12 +121,12 @@ class ScreenAssistActivity : BaseActivity<DialogAssistBinding>() {
         super.onCreate(savedInstanceState)
         window.setWindowAnimations(R.style.ScreenAssist)
         //from 屏幕助手
-        if ("light" in intent) {
-            hideNavBar()
-            if (intent["light", false]) {
-                setStatusBarLight()
-            }
-        }
+//        if ("light" in intent) {
+//            hideNavBar()
+//            if (intent["light", false]) {
+//                setStatusBarLight()
+//            }
+//        }
         DataCollector.buriedPoint("sa_0")
 
         showProgressBar = true
@@ -136,18 +135,20 @@ class ScreenAssistActivity : BaseActivity<DialogAssistBinding>() {
         bottomController.hideBottom()
         bottomController.bottomView.visibility = View.GONE
 
-        bottomController.bottomView.post {
-            bottomController.behavior.addBottomSheetCallback(object : BottomSheetBehavior.BottomSheetCallback() {
-                override fun onStateChanged(p0: View, p1: Int) {
-                    if (p1 == BottomSheetBehavior.STATE_HIDDEN) {
-                        Vog.d("onStateChanged ---> 隐藏")
-                        finish()
-                    }
+        bottomController.behavior.addBottomSheetCallback(object : BottomSheetBehavior.BottomSheetCallback() {
+            override fun onStateChanged(p0: View, p1: Int) {
+                if (p1 == BottomSheetBehavior.STATE_HIDDEN) {
+                    Vog.d("onStateChanged ---> 隐藏")
+                    finish()
                 }
+            }
 
-                override fun onSlide(p0: View, p1: Float) {}
-            })
-        }
+            override fun onSlide(p0: View, p1: Float) {
+                val c = Color.argb((0x50 * (1 + p1)).toInt(), 0, 0, 0)
+                window.statusBarColor = c
+                viewBinding.root.setBackgroundColor(c)
+            }
+        })
 
         viewBinding.voiceBtn.setOnClickListener {
             MainService.switchRecog()
@@ -179,11 +180,9 @@ class ScreenAssistActivity : BaseActivity<DialogAssistBinding>() {
     private fun showView() = runOnUi {
         if (!bottomController.isBottomSheetShowing) {
             bottomController.bottomView.visibility = View.VISIBLE
-            bottomController.expandSheet()
-
-            val animation = AlphaAnimation(0f, 1f)
-            animation.duration = 300
-            bottomController.bottomView.startAnimation(animation)
+            bottomController.bottomView.post {
+                bottomController.expandSheet()
+            }
             bottomController.bottomView.post {
                 Tutorials.oneStep(this, arrayOf(
                         ItemWrap(Tutorials.screen_assistant_spot, bottomController.bottomView.findViewWithTag("屏幕识别"), "长按更多功能", "淘宝商品识别"),
