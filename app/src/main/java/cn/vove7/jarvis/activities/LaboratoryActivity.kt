@@ -2,8 +2,6 @@ package cn.vove7.jarvis.activities
 
 import android.os.Bundle
 import android.util.TypedValue
-import android.view.LayoutInflater
-import android.view.ViewGroup
 import cn.vove7.bottomdialog.BottomDialog
 import cn.vove7.bottomdialog.builder.title
 import cn.vove7.bottomdialog.extension.awesomeHeader
@@ -18,10 +16,7 @@ import cn.vove7.jarvis.R
 import cn.vove7.jarvis.activities.base.ReturnableActivity
 import cn.vove7.jarvis.adapters.SettingsExpandableAdapter
 import cn.vove7.jarvis.databinding.ActivityExpandableSettingsBinding
-import cn.vove7.jarvis.plugins.AdKillerService
-import cn.vove7.jarvis.plugins.PluginConfig
-import cn.vove7.jarvis.plugins.PowerListener
-import cn.vove7.jarvis.plugins.VoiceWakeupStrategy
+import cn.vove7.jarvis.plugins.*
 import cn.vove7.jarvis.services.MainService
 import cn.vove7.jarvis.tools.debugserver.ConnectiveService
 import cn.vove7.jarvis.view.*
@@ -108,7 +103,17 @@ class LaboratoryActivity : ReturnableActivity<ActivityExpandableSettingsBinding>
                         },
                         IntentItem(title = "定时任务", summary = "定时执行语音指令或脚本") {
                             startActivity<TimedTaskManagerActivity>()
-                        }
+                        },
+                        CheckBoxItem(
+                                title = "地铁WiFi",
+                                summary = "自动登录地铁WiFi",
+                                keyId = R.string.key_auto_login_metro_wlan,
+                                defaultValue = AppConfig.autoLoginMetroWlan,
+                        ) { _, d ->
+                            if (d) MetroWlanListener.start()
+                            else MetroWlanListener.stop()
+                            return@CheckBoxItem true
+                        },
                 ),
         ),
                 SettingGroupItem(R.color.google_red, titleS = "屏幕助手", childItems = listOf(

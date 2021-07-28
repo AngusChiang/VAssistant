@@ -66,6 +66,8 @@ object AppConfig : BaseConfig {
 
     var isAdBlockService by noCacheKey(false, keyId = R.string.key_open_ad_block)
 
+    var autoLoginMetroWlan by noCacheKey(false, keyId = R.string.key_auto_login_metro_wlan)
+
     var isLongPressKeyWakeUp by noCacheKey(true, keyId = R.string.key_long_press_volume_up_wake_up)
 
     var wakeupKeys by smartKey(intArrayOf())

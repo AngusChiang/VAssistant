@@ -17,6 +17,7 @@ import cn.vove7.common.helper.AdvanAppHelper
 import cn.vove7.common.utils.md5
 import cn.vove7.common.utils.runOnNewHandlerThread
 import cn.vove7.jarvis.R
+import cn.vove7.jarvis.plugins.MetroWlanListener
 import cn.vove7.jarvis.plugins.PowerListener
 import cn.vove7.jarvis.receivers.AppInstallReceiver
 import cn.vove7.jarvis.receivers.PowerEventReceiver
@@ -150,6 +151,9 @@ class InitCp : ContentProvider() {
     private fun launchExtension() {
         if (AppConfig.extPowerIndicator) {
             PowerListener.start()
+        }
+        if(AppConfig.autoLoginMetroWlan) {
+            MetroWlanListener.start()
         }
     }
 

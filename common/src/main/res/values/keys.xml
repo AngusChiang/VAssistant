@@ -71,6 +71,7 @@
     <string name="key_vibrate_reco_effect" translatable="false">vibrate_reco_effect</string>
     <string name="key_voice_syn_model" translatable="false">voice_syn_model</string>
     <string name="key_open_ad_block" translatable="false">open_ad_block</string>
+    <string name="key_auto_login_metro_wlan" translatable="false">auto_login_metro_wlan</string>
     <string name="key_ad_wait_secs" translatable="false">ad_wait_secs</string>
     <string name="key_voice_control_dialog" translatable="false">voice_control_dialog</string>
     <string name="key_open_voice_wakeup" translatable="false">open_voice_wakeup</string>
