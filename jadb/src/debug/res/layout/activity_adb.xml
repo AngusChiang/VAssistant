@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <EditText
+            android:id="@+id/host_et"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:text="localhost"
+            android:layout_height="wrap_content" />
+
+        <Button
+            android:id="@+id/connect_btn"
+            android:text="Connect"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+
+        <EditText
+            android:id="@+id/cmd_et"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:text="cd /sdcard &amp;&amp; ls"
+            android:layout_height="wrap_content" />
+
+        <Button
+            android:id="@+id/run_btn"
+            android:text="Run"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+    </LinearLayout>
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <EditText
+            android:id="@+id/open_et"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:text="tcpip:1"
+            android:layout_height="wrap_content" />
+
+        <Button
+            android:id="@+id/open_btn"
+            android:text="Open"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/log_view"
+        android:gravity="bottom"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+</LinearLayout>

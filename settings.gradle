@@ -1,1 +1,2 @@
 include ':app', ':executorengine', ':androlua', ':common', ':rhino-android', ':speechLib'
+include ':jadb'

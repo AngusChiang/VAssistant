@@ -7,6 +7,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.fragment.app.FragmentManager
+import androidx.fragment.app.FragmentPagerAdapter
 import cn.vove7.bottomdialog.BottomDialog
 import cn.vove7.bottomdialog.builder.message
 import cn.vove7.bottomdialog.builder.title
@@ -34,7 +36,7 @@ typealias OnClick = (String) -> Unit
 
 class EditorFunsHelper(
         val c: Context,
-        fm: androidx.fragment.app.FragmentManager,
+        fm: FragmentManager,
         val pager: androidx.viewpager.widget.ViewPager,
         val tabLay: TabLayout,
         val onClick: OnClick
@@ -163,7 +165,9 @@ class EditorFunsHelper(
                 ApiCategory("安卓Runtime", listOf(//指令设置
                         ApiFunction("exec(cmd)", "执行终端命令，返回String"),
                         ApiFunction("hasRoot()", "获取设备是否Root，返回Boolean"),
-                        ApiFunction("execWithSu(cmd)", "执行root命令，返回String")
+                        ApiFunction("execWithSu(cmd)", "执行root命令，返回String"),
+                        ApiFunction("execWithAdb(cmd)", "使用adb执行shell, `cmd实际为为adb shell \${cmd}`\n示例:\n- 1. 发送Home按键事件：`input keyevent 3`\n2. 发送点击事件：`input tap 500 500`\n3. 发送文本：`input text hello`"),
+                        ApiFunction("adbEnable()", "返回adb服务是否可用(boolean)，参考[权限管理/ADB服务]"),
                 ), insertPre = "shell."),
                 ApiCategory("其他", listOf(//指令设置
                         ApiFunction("toPinyin()", "将text文本中的中文转换为拼音，\n参数：(text [,onlyFirstLetter])\nonlyFirstLetter是否只需要首字母")
@@ -180,8 +184,8 @@ class EditorFunsHelper(
     }
 }
 
-class FunsFragmentAdapter(fm: androidx.fragment.app.FragmentManager, val c: Context, val apis: List<ApiCategory>, val onClick: OnClick)
-    : androidx.fragment.app.FragmentPagerAdapter(fm) {
+class FunsFragmentAdapter(fm: FragmentManager, val c: Context, val apis: List<ApiCategory>, val onClick: OnClick)
+    : FragmentPagerAdapter(fm, FragmentPagerAdapter.BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT) {
 
     override fun getItem(p0: Int): androidx.fragment.app.Fragment {
         return CateFrag.newInstance(apis[p0].functions, onClick)

@@ -11,7 +11,7 @@ import cn.vove7.common.app.AppConfig
 import cn.vove7.common.app.AppPermission
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.app.GlobalLog
-import cn.vove7.common.bridges.RootHelper
+import cn.vove7.common.bridges.ShellHelper
 import cn.vove7.common.bridges.UtilBridge
 import cn.vove7.common.utils.activityShot
 import cn.vove7.common.utils.newTask
@@ -104,16 +104,16 @@ fun setAssistantApp() {
         Settings.Secure.putString(cr, "assistant", name)
         Settings.Secure.putString(cr, "voice_interaction_service", name)
 
-    } else if (RootHelper.hasRoot(100)) {
+    } else if (ShellHelper.hasRoot(100)) {
         GlobalLog.log("设为助手应用[ROOT]")
-        RootHelper.execWithSu("settings put secure assistant $name")
-        RootHelper.execWithSu("settings put secure voice_interaction_service $name")
+        ShellHelper.execWithSu("settings put secure assistant $name")
+        ShellHelper.execWithSu("settings put secure voice_interaction_service $name")
     }
 }
 
 fun wirelessDebug(en: Boolean) {
     try {
-        RootHelper.execWithSu("setprop service.adb.tcp.port ${if (en) "5555" else "-1"}\n" +
+        ShellHelper.execWithSu("setprop service.adb.tcp.port ${if (en) "5555" else "-1"}\n" +
                 "stop adbd\n" +
                 "start adbd")
     } catch (e: Exception) {

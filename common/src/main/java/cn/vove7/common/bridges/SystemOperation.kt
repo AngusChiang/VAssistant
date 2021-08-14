@@ -311,4 +311,7 @@ interface SystemOperation {
     fun sendCommand2OtherDevices(cmd: String?)
     val deviceName: String
 
+    fun isAdbEnabled(): Boolean
+
+    fun isWirelessAdbEnabled(): Boolean
 }

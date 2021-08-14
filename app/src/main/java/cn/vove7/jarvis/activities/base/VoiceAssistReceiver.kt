@@ -12,7 +12,7 @@ import cn.vove7.common.app.AppPermission
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.app.log
 import cn.vove7.common.appbus.AppBus
-import cn.vove7.common.bridges.RootHelper
+import cn.vove7.common.bridges.ShellHelper
 import cn.vove7.common.datamanager.DAO
 import cn.vove7.common.datamanager.parse.model.Action
 import cn.vove7.common.utils.runInCatch
@@ -73,7 +73,7 @@ class VoiceAssistActivity : Activity() {
             }
             SET_ASSIST_APP ->
                 thread(isDaemon = true) {
-                    if (AppPermission.canWriteSecureSettings || RootHelper.hasRoot(100)) {
+                    if (AppPermission.canWriteSecureSettings || ShellHelper.hasRoot(100)) {
                         try {
                             setAssistantApp()
                             GlobalApp.toastSuccess("设置完成")

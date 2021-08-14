@@ -8,8 +8,6 @@ android {
     defaultConfig {
         minSdkVersion 21
         targetSdkVersion 30
-        versionCode 1
-        versionName "1.0"
 
         multiDexEnabled true
         buildConfigField "String", "CONFIG_NAME", '"cn.vove7.vassistant_preferences"'
@@ -62,6 +60,7 @@ task makeJar(type: Jar) {
 dependencies {
     api fileTree(include: ['*.jar'], dir: 'libs')
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+    implementation project(":jadb")
 
     api 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.5.0'
     api 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.0'
@@ -81,7 +80,7 @@ dependencies {
     api 'com.liulishuo.okdownload:okhttp:1.0.5'
     api 'com.github.GrenderG:Toasty:1.4.1'
     api 'top.zibin:Luban:1.1.8'//鲁班 压缩图片
-    api 'org.jsoup:jsoup:1.13.1'
+    api 'org.jsoup:jsoup:1.14.1'
 
     api 'com.github.Vove7.SmartKey:smartkey-android:6.3.3'
     api 'com.github.Vove7:ParamRegexNdk:1.0.7'

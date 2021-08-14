@@ -37,7 +37,7 @@ class ScreenshotActivity : Activity() {
             //自动点击
             if (Build.VERSION.SDK_INT >= 29 && AccessibilityApi.isBaseServiceOn) {
                 launch {
-                    clickAuto = text("立即开始", "start now")
+                    clickAuto = text("立即开始", "允许", "start now")
                             .waitFor(1000)?.tryClick() ?: false
                 }
             }

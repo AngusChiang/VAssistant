@@ -208,6 +208,7 @@
         3.根据当前界面响应指令\n
         4.麦克风占用问题
     </string>
+    <string name="wireless_adb_desc">开启后支持通过adb来控制手机（执行手势，发送按键..）</string>
     <string name="text_update_log">更新日志</string>
     <string name="text_set_priority">设置优先级</string>
     <string name="desc_new_account">新用户将获得7天高级用户免费体验资格</string>

@@ -2,18 +2,25 @@ package cn.vove7.common.bridges
 
 import android.accessibilityservice.AccessibilityServiceInfo
 import android.content.Context
+import android.util.Log
 import android.view.accessibility.AccessibilityManager
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.app.GlobalLog
+import cn.vove7.common.model.ResultBox
+import cn.vove7.jarvis.jadb.JAdb
 import cn.vove7.vtp.log.Vog
 import com.stericson.RootShell.RootShell
 import java.io.DataInputStream
 import java.io.DataOutputStream
+import kotlin.concurrent.thread
 
 /**
  *
  */
-object RootHelper {
+@Suppress("unused")
+object ShellHelper {
+
+    private var _jadb: JAdb? = null
 
     /**
      * 判断即是否授予root权限
@@ -124,11 +131,75 @@ object RootHelper {
                     ?.forEach {
                         append(":${it.id}")
                     }
-            appendln()
-            appendln("settings put secure accessibility_enabled 1")
+            appendLine()
+            appendLine("settings put secure accessibility_enabled 1")
         }.also {
             Vog.d("buildList ---> $it")
         }
+    }
+
+    fun adbEnable() = SystemBridge.isWirelessAdbEnabled()
+
+    fun execWithAdb(cmd: String?): String? {
+        val jadb = _jadb ?: JAdb().also {
+            _jadb = it
+            it.onCloseListener = {
+                _jadb = null
+            }
+            it.connect(GlobalApp.APP)
+        }
+
+        fun String.isEnd(): Boolean {
+            if (jadb.shellHeader == null) {
+                if (this.matches(".*:/.*[$#][ ]*".toRegex())) {
+                    return true
+                }
+            } else {
+                if (this.matches(jadb.shellHeader!!
+                                .replace("/ $", ".*\\$")
+                                .replace("/ #", ".*#")
+                                .toRegex())) {
+                    return true
+                }
+            }
+            return false
+        }
+
+        val box = ResultBox<String>()
+        val t = thread {//异步读取 防止异常超时
+            val tt = Thread.currentThread()
+            val stream = jadb.execOnShell(cmd ?: " ")
+            val sb = StringBuilder()
+            var f = true
+            while (!tt.isInterrupted) {
+                try {
+                    val s = stream.read()
+                    if (f && !String(s).isEnd()) {
+                        f = false
+                        continue
+                    }
+                    sb.append(String(s))
+                } catch (e: Throwable) {
+                    box.setAndNotify(sb.toString())
+                    break
+                }
+                val lastLine = sb.toString().lines().last()
+                if (lastLine.isEnd()) {
+                    Log.d("ADB", "raw out: $sb")
+                    sb.deleteRange((sb.length - lastLine.length - 1).coerceAtLeast(0), sb.length)
+                    box.setAndNotify(sb.toString())
+                    break
+                }
+            }
+        }
+        return box.blockedGet(false, 30000).also {
+            t.interrupt()
+        }
+    }
+
+    fun release() {
+        _jadb?.close()
+        _jadb = null
     }
 
 }

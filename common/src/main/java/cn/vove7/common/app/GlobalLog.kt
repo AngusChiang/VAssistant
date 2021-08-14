@@ -4,6 +4,7 @@ import cn.vove7.android.common.Logger.logi
 import cn.vove7.android.common.loge
 import cn.vove7.common.utils.StorageHelper
 import cn.vove7.quantumclock.QuantumClock
+import org.greenrobot.eventbus.Subscribe
 import java.io.BufferedWriter
 import java.io.File
 import java.io.FileWriter
@@ -136,6 +137,11 @@ object GlobalLog {
                 "${it.methodName}(${it.fileName}:${it.lineNumber})"
             }
     )
+
+    @Subscribe
+    fun onPostError(e:Throwable) {
+        err(e)
+    }
 
 }
 

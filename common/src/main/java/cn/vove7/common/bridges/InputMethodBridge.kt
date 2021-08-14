@@ -202,9 +202,9 @@ object InputMethodBridge : InputOperation {
             AppPermission.canWriteSecureSettings -> {
                 setByWriteSecureSettings()
             }
-            RootHelper.hasRoot(500) -> {
+            ShellHelper.hasRoot(500) -> {
                 Vog.d("使用Root权限 切换输入法")
-                RootHelper.execWithSu("settings put secure default_input_method ${app.packageName}/${AssistInputService::class.java.name}")
+                ShellHelper.execWithSu("settings put secure default_input_method ${app.packageName}/${AssistInputService::class.java.name}")
             }
             else -> setByAccessibility()
         }
@@ -275,7 +275,7 @@ object InputMethodBridge : InputOperation {
         }
         when {
             AppPermission.canWriteSecureSettings -> restoreByWriteSecureSettings(sim)
-            RootHelper.hasRoot(500) -> RootHelper.execWithSu("settings put secure default_input_method $sim")
+            ShellHelper.hasRoot(500) -> ShellHelper.execWithSu("settings put secure default_input_method $sim")
             else -> restoreByAccessibility(sim)
         }
         storeIm = null

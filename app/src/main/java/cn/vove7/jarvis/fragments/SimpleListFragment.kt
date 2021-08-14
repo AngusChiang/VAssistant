@@ -3,6 +3,7 @@ package cn.vove7.jarvis.fragments
 import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.os.Handler
+import android.os.Looper
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -261,7 +262,7 @@ abstract class SimpleListFragment<DataType> :
     }
 
     fun stopRefreshing() {
-        Handler().postDelayed({
+        Handler(Looper.getMainLooper()).postDelayed({
             swipeRefreshLayout.isRefreshing = false
         }, 500)
     }

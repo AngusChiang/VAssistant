@@ -13,6 +13,8 @@ import cn.vove7.android.scaffold.ui.base.ScaffoldActivity
 import cn.vove7.bottomdialog.builder.BottomDialogBuilder
 import cn.vove7.common.app.AppConfig
 import cn.vove7.common.app.GlobalApp
+import cn.vove7.common.app.GlobalLog
+import cn.vove7.common.appbus.AppBus
 import cn.vove7.common.helper.AdvanAppHelper
 import cn.vove7.common.utils.md5
 import cn.vove7.common.utils.runOnNewHandlerThread
@@ -85,7 +87,7 @@ class InitCp : ContentProvider() {
 
     override fun onCreate(): Boolean {
         delayRun(2000) {
-
+            AppBus.reg(GlobalLog)
             QuantumClock.apply {
                 removeSyncer(TaoBaoSyncher)
                 addSyncer(MyTimeSyncher)

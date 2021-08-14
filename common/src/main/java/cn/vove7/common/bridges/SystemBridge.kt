@@ -358,7 +358,11 @@ object SystemBridge : SystemOperation {
     @Throws()
     override fun sendKey(keyCode: Int) {
         try {
-            RootHelper.execWithSu("input keyevent $keyCode")
+            if (ShellHelper.hasRoot(5)) {
+                ShellHelper.execWithSu("input keyevent $keyCode")
+            } else if (isWirelessAdbEnabled()) {
+
+            }
         } catch (e: Exception) {
             GlobalLog.err(e)
         }
@@ -1289,13 +1293,13 @@ object SystemBridge : SystemOperation {
      * @param pkg String
      */
     override fun killApp(pkg: String): Boolean {
-        return if (RootHelper.hasRoot()) {
+        return if (ShellHelper.hasRoot()) {
             killAppByRoot(pkg)
         } else killAppByAS(pkg)
     }
 
     private fun killAppByRoot(pkg: String): Boolean {
-        RootHelper.execWithSu("am force-stop $pkg")
+        ShellHelper.execWithSu("am force-stop $pkg")
         val name = AdvanAppHelper.getAppInfo(pkg)?.name ?: pkg
         GlobalApp.toastInfo("已关闭：$name")
         return true
@@ -1444,8 +1448,8 @@ object SystemBridge : SystemOperation {
 
     val displayMetrics
         get() = DisplayMetrics().also {
-                (context.getSystemService(Context.WINDOW_SERVICE) as WindowManager)
-                        .defaultDisplay.getRealMetrics(it)
+            (context.getSystemService(Context.WINDOW_SERVICE) as WindowManager)
+                    .defaultDisplay.getRealMetrics(it)
         }
 
     val screenHW: Pair<Int, Int>
@@ -1596,4 +1600,22 @@ object SystemBridge : SystemOperation {
         get() = (GlobalApp.APP.resources!!.configuration.uiMode
                 and Configuration.UI_MODE_NIGHT_MASK) ==
                 Configuration.UI_MODE_NIGHT_YES
+
+    override fun isAdbEnabled(): Boolean {
+        val p2 = Runtime.getRuntime().exec("getprop init.svc.adbd")
+        return (String(p2.inputStream.readBytes()).trimEnd() == "running").also {
+            p2.destroy()
+        }
+    }
+
+
+    override fun isWirelessAdbEnabled(): Boolean = try {
+        val p = Runtime.getRuntime().exec("getprop service.adb.tcp.port")
+        val t = String(p.inputStream.readBytes())
+        t.trimEnd() == "5555" && isAdbEnabled()
+    } catch (e: Throwable) {
+        GlobalLog.err(e)
+        false
+    }
+
 }

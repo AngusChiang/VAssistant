@@ -267,6 +267,7 @@
         3.根据当前界面响应指令\n
         4.麦克风占用问题
     </string>
+    <string name="wireless_adb_desc">开启后支持通过adb来控制手机（执行手势，发送按键..）</string>
     <string name="desc_gesc_accessibility" translatable="false">
         全局操作依赖服务 7.0+\n
         用于屏幕点击，执行手势\n

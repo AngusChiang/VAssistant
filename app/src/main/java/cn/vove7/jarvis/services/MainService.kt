@@ -279,7 +279,7 @@ object MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
                 }
             } catch (e: Exception) {
                 GlobalLog.err(e)
-                onRequestPermission(RequestPermission("悬浮窗权限"))
+                onRequestPermission(RequestPermission("悬浮窗"))
                 throw MessageException("无悬浮窗权限")
             }
         }

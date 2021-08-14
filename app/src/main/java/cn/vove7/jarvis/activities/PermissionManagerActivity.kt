@@ -18,17 +18,20 @@ import android.widget.CheckedTextView
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
-import cn.vove7.jarvis.receivers.AdminReceiver
+import cn.vove7.bottomdialog.BottomDialog
+import cn.vove7.bottomdialog.builder.buttons
+import cn.vove7.bottomdialog.extension.awesomeHeader
 import cn.vove7.common.accessibility.AccessibilityApi
 import cn.vove7.common.app.AppPermission
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.app.log
 import cn.vove7.common.bridges.InputMethodBridge
-import cn.vove7.common.bridges.RootHelper
+import cn.vove7.common.bridges.ShellHelper
 import cn.vove7.common.bridges.SystemBridge
 import cn.vove7.common.utils.gotoAccessibilitySetting2
 import cn.vove7.common.utils.postDelayed
 import cn.vove7.common.utils.runOnUi
+import cn.vove7.common.utils.spanColor
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.activities.PermissionManagerActivity.PermissionStatus.Companion.allPerStr
 import cn.vove7.jarvis.activities.base.OneFragmentActivity
@@ -36,10 +39,15 @@ import cn.vove7.jarvis.adapters.RecAdapterWithFooter
 import cn.vove7.jarvis.databinding.FragmentBaseListBinding
 import cn.vove7.jarvis.databinding.ListHeaderWithSwitchBinding
 import cn.vove7.jarvis.fragments.SimpleListFragment
+import cn.vove7.jarvis.receivers.AdminReceiver
 import cn.vove7.jarvis.services.GestureService
 import cn.vove7.jarvis.services.MyAccessibilityService
+import cn.vove7.jarvis.view.dialog.contentbuilder.markdownContent
 import cn.vove7.vtp.runtimepermission.PermissionUtils
+import com.afollestad.materialdialogs.MaterialDialog
+import com.afollestad.materialdialogs.callbacks.onDismiss
 import com.catchingnow.icebox.sdk_client.IceBox
+import java.lang.Thread.sleep
 import kotlin.concurrent.thread
 
 
@@ -180,11 +188,67 @@ class PermissionManagerActivity : OneFragmentActivity() {
             }
         }
 
+        private fun openADB(ps: PermissionStatus, act: Activity) {
+            BottomDialog.builder(requireActivity()) {
+                awesomeHeader("无线ADB指南")
+
+                markdownContent {
+                    loadMarkdownFromUrl("https://gitee.com/v-assistant/static-files/raw/master/wireless_adb.md")
+                }
+                buttons {
+                    if (!isWirelessAdbEnabled()) {
+                        positiveButton("进入监听状态".spanColor(R.color.google_blue)) {
+                            it.dismiss()
+                            waitWirelessAdb()
+                        }
+                    } else {
+                        positiveButton("当前已开启".spanColor(R.color.google_green)) {
+                            it.dismiss()
+                        }
+                    }
+                    neutralButton("复制此文档连接") {
+                        SystemBridge.setClipText("https://gitee.com/v-assistant/static-files/blob/master/wireless_adb.md")
+                        GlobalApp.toastSuccess("已复制")
+                    }
+                }
+            }
+        }
+
+        private fun waitWirelessAdb() {
+            MaterialDialog(requireActivity()).show {
+                title(text = "等待开启ADB无线调试...")
+                cancelable(false)
+                message(text = "waiting...")
+                val t = thread {
+                    while (!isWirelessAdbEnabled()) {
+                        try {
+                            sleep(600)
+                        } catch (e: InterruptedException) {
+                            return@thread
+                        }
+                    }
+                    runOnUi {
+                        message(text = "开启成功！\n请断开数据线，点击下方[完成]")
+                        positiveButton(text = "完成") {
+                            AppPermission.autoOpenWriteSecureWithAdb()
+                            it.dismiss()
+                            refreshStatus()
+                        }
+                    }
+                }
+                positiveButton(text = "取消") { t.interrupt() }
+                onDismiss {
+                    t.interrupt()
+                }
+            }
+        }
 
         override fun onResume() {
             super.onResume()
             refreshStatus()
         }
+
+        private fun isWirelessAdbEnabled() = SystemBridge.isWirelessAdbEnabled()
 
         val permissions by lazy {
             val openASAction: (PermissionStatus, Activity) -> Unit = { it, act ->
@@ -196,24 +260,26 @@ class PermissionManagerActivity : OneFragmentActivity() {
                 }
             }
             listOf(
-                    PermissionStatus(arrayOf("android.permission.BIND_DEVICE_ADMIN"), "设备管理器", getString(cn.vove7.jarvis.R.string.admin_desc)) r@{ it, act ->
+                    PermissionStatus(arrayOf("android.permission.BIND_DEVICE_ADMIN"), "设备管理器", getString(R.string.admin_desc)) r@{ it, act ->
                         if (it.isOpen) return@r
                         val mComponentName = ComponentName(act, AdminReceiver::class.java)
                         val intent = Intent(DevicePolicyManager.ACTION_ADD_DEVICE_ADMIN)
                         intent.putExtra(DevicePolicyManager.EXTRA_DEVICE_ADMIN, mComponentName)
                         try {
-                            startActivityForResult(intent, 99)
+                            startActivity(intent)
                         } catch (e: Exception) {
                             e.log()
                             GlobalApp.toastError("跳转失败，请手动进入[设置/安全/设备管理器]开启", 1)
                         }
                     },
+
+                    PermissionStatus(arrayOf("ADB"), "无线ADB服务", getString(R.string.wireless_adb_desc), clickAction = ::openADB, isOpen = isWirelessAdbEnabled()),
                     PermissionStatus(arrayOf("ACCESSIBILITY_SERVICE"), "基础无障碍服务", getString(R.string.desc_accessibility), clickAction = openASAction),
                     PermissionStatus(arrayOf("ACCESSIBILITY_SERVICE2"), "高级无障碍服务（执行手势 Android7.0+）", getString(R.string.desc_gesc_accessibility), clickAction = openASAction),
                     PermissionStatus(arrayOf("android.permission.SYSTEM_ALERT_WINDOW"), "悬浮窗", "显示全局对话框、语音面板") { _, _ ->
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                             try {
-                                PermissionUtils.requestDrawOverlays(activity!!, 0)
+                                PermissionUtils.requestDrawOverlays(requireActivity(), 0)
                             } catch (e: Exception) {
 //                                            toast.showShort("跳转失败，请手动开启")
                                 try {
@@ -228,7 +294,7 @@ class PermissionManagerActivity : OneFragmentActivity() {
                     PermissionStatus(arrayOf("android.permission.WRITE_SETTINGS"), "修改系统设置", "用于调节屏幕亮度") r@{ it, app ->
                         if (it.isOpen || Build.VERSION.SDK_INT < Build.VERSION_CODES.M) return@r
                         val intent = Intent(Settings.ACTION_MANAGE_WRITE_SETTINGS)
-                        intent.setData(Uri.parse("package:" + app.packageName))
+                        intent.data = Uri.parse("package:" + app.packageName)
                         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                         try {
                             app.startActivity(intent)
@@ -252,7 +318,7 @@ class PermissionManagerActivity : OneFragmentActivity() {
                         if (!it.isOpen) {
                             launch {
                                 //防止阻塞主线程
-                                RootHelper.hasRoot()
+                                ShellHelper.hasRoot()
                             }
                         }
                     },
@@ -293,10 +359,11 @@ class PermissionManagerActivity : OneFragmentActivity() {
                     it.permissionName == "Root" -> false.also { _ ->
                         //异步获取root权限
                         thread {
-                            it.isOpen = RootHelper.hasRoot()
+                            it.isOpen = ShellHelper.hasRoot()
                             runOnUi { adapter.notifyDataSetChanged() }
                         }
                     }
+                    it.permissionName == "无线ADB服务" -> isWirelessAdbEnabled()
                     it.permissionName == "输入法" -> InputMethodBridge.isEnable
                     it.permissionName == "WRITE_SECURE_SETTINGS" -> AppPermission.canWriteSecureSettings
                     it.permissionName == "修改系统设置" -> if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {

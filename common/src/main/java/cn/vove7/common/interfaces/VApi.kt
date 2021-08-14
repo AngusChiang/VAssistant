@@ -38,7 +38,7 @@ interface VApi {
         val httpFunctions = arrayOf("get()", "post()", "postJson()", "getAsPc()")
 
         val androRuntimeFuncs = arrayOf(
-                "hasRoot()", "exec()", "execWithSu()"
+                "hasRoot()", "exec()", "execWithSu()", "adbEnable()", "execWithdb()"
         )
         val finderFuns = arrayOf(
                 "ViewFinder()", "waitFor()", "depths()",
@@ -55,8 +55,7 @@ interface VApi {
                 "toast()", "toastLong()", "back()", "home()", "powerDialog()", "quickSettings()",
                 "recents()", "notificationBar()",
                 "setScreenSize()", "swipe()", "click()", "longClick()",
-                "gesture()", "scrollDown()", "scrollUp()", "screenShot()"
-                , "notifyFailed()",
+                "gesture()", "scrollDown()", "scrollUp()", "screenShot()", "notifyFailed()",
                 "waitForApp()", "waitForId()",
                 "waitForDesc()", "requireAccessibility()"
         )

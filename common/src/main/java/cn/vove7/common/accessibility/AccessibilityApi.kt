@@ -12,7 +12,7 @@ import cn.vove7.common.accessibility.component.AccPluginService
 import cn.vove7.common.accessibility.viewnode.ViewNode
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.app.GlobalLog
-import cn.vove7.common.bridges.RootHelper
+import cn.vove7.common.bridges.ShellHelper
 import cn.vove7.common.datamanager.parse.model.ActionScope
 import cn.vove7.common.utils.CoroutineExt.launch
 import cn.vove7.common.utils.gotoAccessibilitySetting2
@@ -103,7 +103,7 @@ abstract class AccessibilityApi : AccessibilityService() {
         @Throws(NeedAccessibilityException::class)
         fun waitAccessibility(waitMillis: Long = 30000): Boolean {
             if (isBaseServiceOn) return true
-            else if (RootHelper.isRoot() || canWriteSecureSettings()) {
+            else if (ShellHelper.isRoot() || canWriteSecureSettings()) {
                 autoOpenService(0, false)
             } else PermissionUtils.gotoAccessibilitySetting2(GlobalApp.APP, Class.forName("cn.vove7.jarvis.services.MyAccessibilityService"))
 
@@ -119,7 +119,7 @@ abstract class AccessibilityApi : AccessibilityService() {
 
         fun requireAccessibility() {
             if (!isBaseServiceOn) {
-                if (RootHelper.isRoot() || canWriteSecureSettings()) {
+                if (ShellHelper.isRoot() || canWriteSecureSettings()) {
                     autoOpenService(0, true)
                 } else {
                     PermissionUtils.gotoAccessibilitySetting2(GlobalApp.APP, Class.forName("cn.vove7.jarvis.services.MyAccessibilityService"))
@@ -129,7 +129,7 @@ abstract class AccessibilityApi : AccessibilityService() {
         }
 
         private fun autoOpenService(what: Int = 0, checkAfter: Boolean) {
-            if (RootHelper.isRoot() || canWriteSecureSettings()) {
+            if (ShellHelper.isRoot() || canWriteSecureSettings()) {
                 openServiceSelf(what)
                 if (checkAfter) {
                     delayRun(3000) {
@@ -162,8 +162,8 @@ abstract class AccessibilityApi : AccessibilityService() {
             }
 
             val (s, b) = when {
-                RootHelper.hasRoot() -> {
-                    "使用Root权限" to RootHelper.openAppAccessService(GlobalApp.APP.packageName, service)
+                ShellHelper.hasRoot() -> {
+                    "使用Root权限" to ShellHelper.openAppAccessService(GlobalApp.APP.packageName, service)
                 }
                 canWriteSecureSettings() -> {
                     "使用WRITE_SECURE_SETTINGS权限" to openServiceBySettings(service)

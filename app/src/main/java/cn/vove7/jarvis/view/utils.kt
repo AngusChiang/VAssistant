@@ -1,17 +1,9 @@
 package cn.vove7.jarvis.view
 
 import com.google.android.material.textfield.TextInputLayout
-import cn.vove7.common.accessibility.AccessibilityApi
 import cn.vove7.common.app.GlobalApp
-import cn.vove7.common.bridges.RootHelper
 import cn.vove7.jarvis.R
-import cn.vove7.common.app.AppConfig
-import cn.vove7.common.app.GlobalLog
-import cn.vove7.vtp.log.Vog
 import cn.vove7.vtp.view.DisplayUtils.*
-import java.io.DataOutputStream
-import java.io.IOException
-import java.io.InputStreamReader
 
 /**
  * # Utils

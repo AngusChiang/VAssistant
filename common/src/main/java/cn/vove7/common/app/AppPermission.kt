@@ -1,6 +1,9 @@
 package cn.vove7.common.app
 
+import cn.vove7.jarvis.jadb.JAdb
 import cn.vove7.vtp.runtimepermission.PermissionUtils
+import java.lang.Thread.sleep
+import kotlin.concurrent.thread
 
 /**
  * # AppPermission
@@ -13,4 +16,25 @@ object AppPermission {
         get() = PermissionUtils.isAllGranted(GlobalApp.APP,
                 arrayOf("android.permission.WRITE_SECURE_SETTINGS"))
 
+
+    fun autoOpenWriteSecureWithAdb() {
+        if (canWriteSecureSettings) {
+            return
+        }
+
+        thread {
+            kotlin.runCatching {
+                val jadb = JAdb()
+                jadb.connect(GlobalApp.APP)
+
+                jadb.execOnShell(" pm grant ${GlobalApp.APP.packageName} android.permission.WRITE_SECURE_SETTINGS")
+                sleep(1000)
+                jadb.close()
+                GlobalLog.log("adb WRITE_SECURE_SETTINGS: $canWriteSecureSettings")
+            }.onFailure {
+                GlobalLog.err(it)
+            }
+        }
+
+    }
 }
