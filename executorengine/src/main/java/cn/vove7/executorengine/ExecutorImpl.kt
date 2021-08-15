@@ -139,7 +139,7 @@ open class ExecutorImpl(
     override var actionScope: Int? = null
 
     override val currentApp: ActionScope?
-        get() = accessApi?.currentScope
+        get() = SystemBridge.currentScope()
 
     override fun isGlobal(): Boolean =
             globalScopeType.contains(actionScope)

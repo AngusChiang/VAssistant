@@ -4,6 +4,7 @@ import android.content.Intent
 import android.graphics.Bitmap
 import android.location.Location
 import cn.vove7.common.annotation.ScriptApiClass
+import cn.vove7.common.datamanager.parse.model.ActionScope
 import cn.vove7.common.model.LocationInfo
 import cn.vove7.vtp.app.AppInfo
 import cn.vove7.vtp.system.DeviceInfo
@@ -164,7 +165,7 @@ interface SystemOperation {
     fun sendEmail(to: String, subject: String? = null, content: String? = null)
 
     fun lockScreen(): Boolean
-    fun screenShot(): Bitmap?
+    fun screenShot(savePath: String): File?
     fun screen2File(): File?
 
     /**
@@ -314,4 +315,8 @@ interface SystemOperation {
     fun isAdbEnabled(): Boolean
 
     fun isWirelessAdbEnabled(): Boolean
+
+    fun currentApp(): AppInfo?
+
+    fun currentScope(): ActionScope?
 }

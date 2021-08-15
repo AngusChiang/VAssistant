@@ -3,6 +3,7 @@ package cn.vove7.common.app
 import cn.vove7.android.common.Logger.logi
 import cn.vove7.android.common.loge
 import cn.vove7.common.utils.StorageHelper
+import cn.vove7.common.utils.errMessage
 import cn.vove7.quantumclock.QuantumClock
 import org.greenrobot.eventbus.Subscribe
 import java.io.BufferedWriter
@@ -144,6 +145,9 @@ object GlobalLog {
     }
 
 }
+
+
+fun<T> Result<T>.withthFailLog() = onFailure { GlobalLog.err(it) }
 
 
 fun Throwable.log() {

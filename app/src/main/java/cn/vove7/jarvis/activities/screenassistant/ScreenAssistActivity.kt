@@ -12,6 +12,7 @@ import android.view.View
 import android.widget.PopupMenu
 import cn.vove7.android.common.ext.invisible
 import cn.vove7.common.app.GlobalApp
+import cn.vove7.common.app.withthFailLog
 import cn.vove7.common.appbus.AppBus
 import cn.vove7.common.bridges.SystemBridge
 import cn.vove7.common.bridges.UtilBridge
@@ -194,7 +195,7 @@ class ScreenAssistActivity : BaseActivity<DialogAssistBinding>() {
 
 
     private val cachePath
-        get() = cacheDir.absolutePath +
+        get() = (externalCacheDir ?: getExternalFilesDir(null))!!.absolutePath +
                 "/screen-${Random().nextInt(999)}.png"
 
     private fun afterHandleScreen() {
@@ -220,16 +221,11 @@ class ScreenAssistActivity : BaseActivity<DialogAssistBinding>() {
                 val isDelay = getBooleanExtra("delay", false)
                 launch {
                     delay(if (isDelay) 1000 else 0)
-                    val path = SystemBridge.screenShot()?.let {
+                    val path = SystemBridge.screenShot(cachePath)?.let {
                         //截完图显示面板
-                        if (it.statusBarIsLight) {
-                            setStatusBarLight()
-                        }
                         hideNavBar()
                         showView()
-                        val p = UtilBridge.bitmap2File(it, cachePath)?.absolutePath
-                        it.recycle()
-                        p
+                        it.absolutePath
                     }
                     SystemBridge.release()
                     if (path == null) {

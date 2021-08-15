@@ -35,6 +35,7 @@ import android.view.WindowManager
 import androidx.annotation.RequiresApi
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
+import cn.vove7.android.common.logi
 import cn.vove7.common.R
 import cn.vove7.common.accessibility.AccessibilityApi
 import cn.vove7.common.app.AppConfig
@@ -45,6 +46,7 @@ import cn.vove7.common.appbus.AppBus
 import cn.vove7.common.bridges.UtilBridge.bitmap2File
 import cn.vove7.common.datamanager.DAO
 import cn.vove7.common.datamanager.executor.entity.MarkedData
+import cn.vove7.common.datamanager.parse.model.ActionScope
 import cn.vove7.common.helper.AdvanAppHelper
 import cn.vove7.common.helper.AdvanContactHelper
 import cn.vove7.common.model.LocationInfo
@@ -120,7 +122,7 @@ object SystemBridge : SystemOperation {
 
     override fun openAppByPkg(pkg: String, clearTask: Boolean): Boolean {
         return try {
-            if (IceBox.queryWorkMode(context) != IceBox.WorkMode.MODE_NOT_AVAILABLE &&
+            if (hasInstall(IceBox.PACKAGE_NAME) && IceBox.queryWorkMode(context) != IceBox.WorkMode.MODE_NOT_AVAILABLE &&
                     IceBox.getAppEnabledSetting(context, pkg) != 0) {
                 if (ContextCompat.checkSelfPermission(context, IceBox.SDK_PERMISSION) != PackageManager.PERMISSION_GRANTED) {
                     AppBus.post(RequestPermission("冰箱"))
@@ -409,6 +411,10 @@ object SystemBridge : SystemOperation {
      * @param keyCode Int
      */
     private fun sendMediaKey(keyCode: Int) {
+        if (ShellHelper.hasRootOrAdb()) {
+            ShellHelper.execAuto("input keyevent $keyCode")
+            return
+        }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             sendMediaKeyOnN(keyCode)
         } else {
@@ -631,7 +637,6 @@ object SystemBridge : SystemOperation {
     override fun closeBluetooth(): Boolean = opBT(false)
 
     private fun opBT(enable: Boolean): Boolean {
-
         val mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter()
         return if (enable) mBluetoothAdapter.enable() //开启
         else mBluetoothAdapter.disable() //关闭
@@ -642,6 +647,11 @@ object SystemBridge : SystemOperation {
     }
 
     private fun switchWifi(on: Boolean): Boolean {
+        if (ShellHelper.hasRootOrAdb()) {
+            ShellHelper.execAuto("svc wifi " + (if (on) "enable" else "disable"))
+            return true
+        }
+
         return try {
             val wifiMan = context.applicationContext.getSystemService(WIFI_SERVICE) as WifiManager
             @Suppress("DEPRECATION")
@@ -963,14 +973,20 @@ object SystemBridge : SystemOperation {
     @SuppressLint("StaticFieldLeak")
     var cap: ScreenCapturer? = null
 
-    fun screenShotWithRelease(): Bitmap? {
-        return screenShot().also {
+    fun screenShotWithRelease(savePath: String): File? {
+        return screenShot(savePath).also {
             release()
         }
     }
 
-    override fun screenShot(): Bitmap? {
-        Vog.d("screenShot ---> 请求截屏")
+    override fun screenShot(savePath: String): File? {
+        Vog.d("screenShot ---> 请求截屏 $savePath")
+
+        if (ShellHelper.hasRootOrAdb()) {
+            ShellHelper.execAuto("screencap -p $savePath", false)
+            return File(savePath)
+        }
+
         val data = screenData
         val intent = if (data == null) {
             //出现授权窗口，延迟截图
@@ -998,16 +1014,15 @@ object SystemBridge : SystemOperation {
                 Vog.d("screenShot ---> $it")
                 val bm = processImg(it)
                 it.close()
-                bm
+                bitmap2File(bm, savePath)
             }
-            //
         } catch (e: Exception) {
             e.log()
             null
         }
     }
 
-    private fun processImg(image: Image): Bitmap? {
+    private fun processImg(image: Image): Bitmap {
         val width = image.width
         val height = image.height
         val planes = image.planes
@@ -1028,14 +1043,7 @@ object SystemBridge : SystemOperation {
         return screen2File(tmpPath)
     }
 
-    fun screen2File(p: String): File? {
-        val screenBitmap = screenShotWithRelease()
-        return if (screenBitmap != null) {
-            bitmap2File(screenBitmap, p).also {
-                it?.broadcastImageFile()
-            }
-        } else null
-    }
+    fun screen2File(p: String): File? = screenShotWithRelease(p)
 
     override fun shareText(content: String?) {
         try {
@@ -1132,6 +1140,10 @@ object SystemBridge : SystemOperation {
 
     @Suppress("DEPRECATION")
     override fun screenOn() {
+        if (ShellHelper.hasRootOrAdb()) {
+            ShellHelper.execAuto("input keyevent ${KeyEvent.KEYCODE_WAKEUP}")
+            return
+        }
         thread {
             val pm = context.getSystemService(Context.POWER_SERVICE) as PowerManager
             if (!pm.isInteractive) {
@@ -1152,6 +1164,10 @@ object SystemBridge : SystemOperation {
 
     //发送电源按键
     override fun screenOff() {
+        if (ShellHelper.hasRootOrAdb()) {
+            ShellHelper.execAuto("input keyevent ${KeyEvent.KEYCODE_SLEEP}")
+            return
+        }
         if (AccessibilityApi.isBaseServiceOn && Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
             GlobalActionExecutor.lockScreen()
         } else sendKey(26)
@@ -1280,6 +1296,10 @@ object SystemBridge : SystemOperation {
      */
     @Suppress("unused", "UNUSED_PARAMETER")
     private fun switchNFC(enable: Boolean) {
+        if (ShellHelper.hasRootOrAdb()) {
+            ShellHelper.execAuto("svc nfc " + (if (enable) "enable" else "disable"))
+            return
+        }
         val nfcManager = context.getSystemService(Context.NFC_SERVICE) as NfcManager?
 
         if (nfcManager == null || nfcManager.defaultAdapter == null) {
@@ -1293,13 +1313,13 @@ object SystemBridge : SystemOperation {
      * @param pkg String
      */
     override fun killApp(pkg: String): Boolean {
-        return if (ShellHelper.hasRoot()) {
-            killAppByRoot(pkg)
+        return if (ShellHelper.hasRootOrAdb()) {
+            killAppByShell(pkg)
         } else killAppByAS(pkg)
     }
 
-    private fun killAppByRoot(pkg: String): Boolean {
-        ShellHelper.execWithSu("am force-stop $pkg")
+    private fun killAppByShell(pkg: String): Boolean {
+        ShellHelper.execAuto("am force-stop $pkg")
         val name = AdvanAppHelper.getAppInfo(pkg)?.name ?: pkg
         GlobalApp.toastInfo("已关闭：$name")
         return true
@@ -1618,4 +1638,33 @@ object SystemBridge : SystemOperation {
         false
     }
 
+    override fun currentApp(): AppInfo? {
+        if (AccessibilityApi.isBaseServiceOn) {
+            return AccessibilityApi.accessibilityService?.currentAppInfo
+        }
+        if (ShellHelper.hasRootOrAdb()) {
+            currentScope()?.also {
+                return AppInfo(it.packageName)
+            }
+        }
+        return null
+    }
+
+    override fun currentScope(): ActionScope? {
+        if (AccessibilityApi.isBaseServiceOn) {
+            AccessibilityApi.currentScope?.also {
+                return it
+            }
+        }
+
+        if (ShellHelper.hasRootOrAdb()) {
+            val ret = ShellHelper.execWithAdb("dumpsys window | grep mCurrentFocus=Window")
+                ?: return null
+            "dumpsys window: $ret".logi()
+            val reg = "([\\S]+)/([\\S]+)".toRegex()
+            val matchRet = reg.find(ret) ?: return null
+            return ActionScope(matchRet.groupValues[1], matchRet.groupValues[2])
+        }
+        return null
+    }
 }

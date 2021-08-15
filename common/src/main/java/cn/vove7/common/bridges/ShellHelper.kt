@@ -31,6 +31,7 @@ object ShellHelper {
     @JvmStatic
     fun hasRoot(timeOut: Int = 5000): Boolean = RootShell.isAccessGiven(timeOut, 0)
 
+    fun hasRootOrAdb() = hasRoot() || SystemBridge.isWirelessAdbEnabled()
 
     /**
      * 执行无root命令
@@ -64,7 +65,8 @@ object ShellHelper {
      * @return String 结果
      */
     @Throws
-    fun execWithSu(cmd: String): String? {
+    @JvmOverloads
+    fun execWithSu(cmd: String, waitResult: Boolean = true): String? {
         GlobalLog.log("execWithSu ---> $cmd")
         val result = StringBuilder()
         val p = Runtime.getRuntime().exec("su")// 经过Root处理的android系统即有su命令
@@ -74,8 +76,10 @@ object ShellHelper {
                 dos.flush()
                 dos.writeBytes("exit\n")
                 dos.flush()
-                while ((dis.readLine().also { result.appendln(it) }) != null);
-                p.waitFor()
+                if (waitResult) {
+                    while ((dis.readLine().also { result.appendln(it) }) != null);
+                    p.waitFor()
+                }
             }
         }
         return result.toString().also {
@@ -140,7 +144,15 @@ object ShellHelper {
 
     fun adbEnable() = SystemBridge.isWirelessAdbEnabled()
 
-    fun execWithAdb(cmd: String?): String? {
+    @JvmOverloads
+    fun execAuto(cmd: String, waitResult: Boolean = true) = when {
+        hasRoot() -> execWithSu(cmd, waitResult)
+        SystemBridge.isWirelessAdbEnabled() -> execWithAdb(cmd, waitResult)
+        else -> throw RuntimeException("no root or adb permission")
+    }
+
+    @JvmOverloads
+    fun execWithAdb(cmd: String?, waitResult: Boolean = true, timeout: Int = 6000): String? {
         val jadb = _jadb ?: JAdb().also {
             _jadb = it
             it.onCloseListener = {
@@ -165,10 +177,14 @@ object ShellHelper {
             return false
         }
 
+        val stream = jadb.execOnShell(cmd ?: " ")
+        if (!waitResult) {
+            stream.close()
+            return null
+        }
         val box = ResultBox<String>()
         val t = thread {//异步读取 防止异常超时
             val tt = Thread.currentThread()
-            val stream = jadb.execOnShell(cmd ?: " ")
             val sb = StringBuilder()
             var f = true
             while (!tt.isInterrupted) {
@@ -192,7 +208,7 @@ object ShellHelper {
                 }
             }
         }
-        return box.blockedGet(false, 30000).also {
+        return box.blockedGet(false, timeout.toLong()).also {
             t.interrupt()
         }
     }

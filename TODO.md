@@ -4,14 +4,16 @@ todo
 adb 控制
 
 - 媒体音乐
-- 屏幕亮度
+
+[comment]: <> (- 屏幕亮度)
 - 息屏 亮屏
-- nfc wifi bluetooth
+- nfc wifi
+  授权完成 弹出请求？
+[comment]: <> (- adb 截屏（屏幕助手）)
+
 - 手势
-- adb 截屏（屏幕助手）
 - 获取控件
 
-授权完成 弹出请求？
 
 添加api
 

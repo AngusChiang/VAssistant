@@ -57,6 +57,13 @@ object AdvanAppHelper {
      */
     fun matchPkgByName(name: String, excludeUnstartable: Boolean = true): List<MatchedData<AppInfo>> {
         val matchList = mutableListOf<MatchedData<AppInfo>>()
+        if (name == "你自己") {
+            matchList.add(MatchedData(1f, AppInfo(context.packageName)))
+        } else if (name == "当前应用") {
+            SystemBridge.currentApp()?.also {
+                matchList.add(MatchedData(1f, it))
+            }
+        }
         //匹配别名
         MARKED_APP_PKG.forEach {
             val rate = if (it.rawRegex.matches(name)) {
@@ -72,7 +79,7 @@ object AdvanAppHelper {
         }
         synchronized(ALL_APP_LIST) {
             ALL_APP_LIST.values.forEach eachApp@{
-                if (excludeUnstartable && !it.startable) return@eachApp
+                if (excludeUnstartable || !it.startable) return@eachApp
                 val rate = try {
                     val appName = it.name ?: ""
                     if (appName.startsWith(name, ignoreCase = true)) {//计算概率
@@ -80,7 +87,7 @@ object AdvanAppHelper {
                             Vog.d("matchPkgByName startsWith ---> $f")
                         }
                     } else {
-                        TextHelper.compareSimilarityWithPinyin(AdvanAppHelper.context, name,
+                        TextHelper.compareSimilarityWithPinyin(context, name,
                                 appName, replaceNumberWithPinyin = true).also { f ->
                             Vog.v("matchAppName 拼音匹配 $name ${it.name} $f")
                         }
