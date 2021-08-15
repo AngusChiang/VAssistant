@@ -6,6 +6,7 @@ import java.nio.ByteOrder;
 
 /**
  * This class provides an abstraction for the ADB message format.
+ *
  * @author Cameron Gutman
  */
 public class AdbMessage {
@@ -13,10 +14,11 @@ public class AdbMessage {
 
     private byte[] payload;
 
-    private AdbMessage() {}
+    private AdbMessage() {
+    }
 
     // sets the fields in the command header
-    public AdbMessage (int command, int arg0, int arg1, byte[] data) {
+    public AdbMessage(int command, int arg0, int arg1, byte[] data) {
         mMessageBuffer = ByteBuffer.allocate(AdbProtocol.ADB_HEADER_LENGTH).order(ByteOrder.LITTLE_ENDIAN);
         mMessageBuffer.putInt(0, command);
         mMessageBuffer.putInt(4, arg0);
@@ -36,6 +38,7 @@ public class AdbMessage {
     /**
      * Read and parse an ADB message from the supplied input stream.
      * This message is NOT validated.
+     *
      * @param in InputStream object to read data from
      * @return An AdbMessage object represented the message read
      * @throws IOException If the stream fails while reading
@@ -44,12 +47,12 @@ public class AdbMessage {
         AdbMessage msg = new AdbMessage();
         ByteBuffer packet = ByteBuffer.allocate(AdbProtocol.ADB_HEADER_LENGTH).order(ByteOrder.LITTLE_ENDIAN);
 
-		/* Read the header first */
+        /* Read the header first */
         in.readx(packet.array(), AdbProtocol.ADB_HEADER_LENGTH);
 
         msg.mMessageBuffer = packet;
 
-		/* If there's a payload supplied, read that too */
+        /* If there's a payload supplied, read that too */
         if (msg.getPayloadLength() != 0) {
             msg.setPayload(new byte[msg.getPayloadLength()]);
             in.readx(msg.getPayload(), msg.getPayloadLength());
@@ -60,52 +63,63 @@ public class AdbMessage {
 
     /**
      * This function performs a checksum on the ADB payload data.
+     *
      * @param payload Payload to checksum
      * @return The checksum of the payload
      */
-    public static int checksum(byte[] payload)
-    {
+    public static int checksum(byte[] payload) {
         int checksum = 0;
 
-        for (byte b : payload)
-        {
-			/* We have to manually "unsign" these bytes because Java sucks */
+        for (byte b : payload) {
+            /* We have to manually "unsign" these bytes because Java sucks */
             if (b >= 0)
                 checksum += b;
             else
-                checksum += b+256;
+                checksum += b + 256;
         }
 
         return checksum;
     }
 
 
-    /** The command field of the message */
+    /**
+     * The command field of the message
+     */
     public int getCommand() {
         return mMessageBuffer.getInt(0);
     }
 
-    /** The arg0 field of the message */
+    /**
+     * The arg0 field of the message
+     */
     public int getArg0() {
         return mMessageBuffer.getInt(4);
     }
 
-    /** The arg1 field of the message */
+    /**
+     * The arg1 field of the message
+     */
     public int getArg1() {
         return mMessageBuffer.getInt(8);
     }
 
-    /** The payload length field of the message */
+    /**
+     * The payload length field of the message
+     */
     public int getPayloadLength() {
         return mMessageBuffer.getInt(12);
     }
 
-    /** The checksum field of the message */
+    /**
+     * The checksum field of the message
+     */
     public int getChecksum() {
         return mMessageBuffer.getInt(16);
     }
 
-    /** The magic field of the message */
+    /**
+     * The magic field of the message
+     */
     public int getMagic() {
         return mMessageBuffer.getInt(20);
     }
@@ -114,12 +128,24 @@ public class AdbMessage {
         return mMessageBuffer.array();
     }
 
-    /** The payload of the message */
+    /**
+     * The payload of the message
+     */
     public byte[] getPayload() {
         return payload;
     }
 
     public void setPayload(byte[] payload) {
         this.payload = payload;
+    }
+
+    @Override
+    public String toString() {
+        return "cmd=0x" + Integer.toString(getCommand(), 16) +
+                ", arg0:" + getArg0() +
+                ", arg1:" + getArg1() +
+                ", len:" + getPayloadLength() +
+                ", checksum:" + getChecksum() +
+                ", magic:" + getMagic();
     }
 }

@@ -638,6 +638,11 @@ fun String.spanColor(color: Int): SpannableStringBuilder {
     return MultiSpan(this, color = color).build()
 }
 
+operator fun SpannableStringBuilder.plus(o: CharSequence): SpannableStringBuilder {
+    append(o)
+    return this
+}
+
 /**
  * 计算图片文件尺寸
  * @receiver File

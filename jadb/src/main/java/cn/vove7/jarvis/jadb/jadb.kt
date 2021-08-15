@@ -1,11 +1,11 @@
 package cn.vove7.jarvis.jadb
 
 import android.content.Context
+import android.os.Looper
 import android.util.Base64
 import android.util.Log
 import androidx.annotation.Keep
 import org.greenrobot.eventbus.EventBus
-
 import java.io.File
 import java.net.Socket
 import kotlin.concurrent.thread
@@ -34,28 +34,30 @@ class JAdb(
         private set
 
     fun connect(context: Context): Boolean {
+        if (Looper.myLooper() == Looper.getMainLooper()) {
+            throw RuntimeException("不可运行于主线程")
+        }
         if (connected) {
             return connected
         }
-        val t = thread {
-            val (priFile, pubFile) = copyKeyPair(context)
-            val ab = AdbCrypto.loadAdbKeyPair(this, priFile, pubFile)
-            try {
-                ac = AdbConnection.create(TcpChannel(Socket(host, port)), ab)
-                ac!!.setOnCloseListener {
-                    connected = false
-                    onCloseListener?.invoke()
-                }
-                ac!!.connect()
-                connected = true
-            } catch (e: Throwable) {
-                EventBus.getDefault().post(e)
+
+        val (priFile, pubFile) = copyKeyPair(context)
+        val ab = AdbCrypto.loadAdbKeyPair(this, priFile, pubFile)
+        try {
+            ac = AdbConnection.create(TcpChannel(Socket(host, port)), ab)
+            ac!!.setOnCloseListener {
+                connected = false
+                onCloseListener?.invoke()
             }
+            ac!!.connect(6000)
+            connected = true
+        } catch (e: Throwable) {
+            if (e !is InterruptedException)
+                EventBus.getDefault().post(e)
+            ac?.close()
+            ac = null
         }
-        t.join(10000)
-        if (t.isAlive) {
-            t.interrupt()
-        }
+
         return connected
     }
 

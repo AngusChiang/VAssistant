@@ -1,5 +1,7 @@
 package cn.vove7.jarvis.jadb;
 
+import android.util.Log;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -10,7 +12,9 @@ import java.net.Socket;
  */
 public class TcpChannel implements AdbChannel {
 
-    /** The underlying socket that this class uses to communicate with the target device. */
+    /**
+     * The underlying socket that this class uses to communicate with the target device.
+     */
     private Socket socket;
 
     /**
@@ -46,6 +50,8 @@ public class TcpChannel implements AdbChannel {
 
     @Override
     public void writex(AdbMessage message) throws IOException {
+        if (BuildConfig.DEBUG)
+            Log.d("AdbMessage", "write: " + message.toString());
         writex(message.getMessage());
         if (message.getPayload() != null) {
             writex(message.getPayload());

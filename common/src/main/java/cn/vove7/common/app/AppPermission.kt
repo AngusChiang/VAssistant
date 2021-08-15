@@ -17,16 +17,12 @@ object AppPermission {
                 arrayOf("android.permission.WRITE_SECURE_SETTINGS"))
 
 
-    fun autoOpenWriteSecureWithAdb() {
+    fun autoOpenWriteSecureWithAdb(jadb:JAdb) {
         if (canWriteSecureSettings) {
             return
         }
-
         thread {
             kotlin.runCatching {
-                val jadb = JAdb()
-                jadb.connect(GlobalApp.APP)
-
                 jadb.execOnShell(" pm grant ${GlobalApp.APP.packageName} android.permission.WRITE_SECURE_SETTINGS")
                 sleep(1000)
                 jadb.close()

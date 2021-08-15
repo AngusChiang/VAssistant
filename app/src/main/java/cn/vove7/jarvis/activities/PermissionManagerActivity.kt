@@ -3,6 +3,7 @@ package cn.vove7.jarvis.activities
 import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
 import android.animation.ValueAnimator
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.admin.DevicePolicyManager
 import android.content.ActivityNotFoundException
@@ -17,6 +18,7 @@ import android.view.ViewGroup
 import android.widget.CheckedTextView
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.core.content.res.ResourcesCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import cn.vove7.bottomdialog.BottomDialog
 import cn.vove7.bottomdialog.builder.buttons
@@ -28,10 +30,7 @@ import cn.vove7.common.app.log
 import cn.vove7.common.bridges.InputMethodBridge
 import cn.vove7.common.bridges.ShellHelper
 import cn.vove7.common.bridges.SystemBridge
-import cn.vove7.common.utils.gotoAccessibilitySetting2
-import cn.vove7.common.utils.postDelayed
-import cn.vove7.common.utils.runOnUi
-import cn.vove7.common.utils.spanColor
+import cn.vove7.common.utils.*
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.activities.PermissionManagerActivity.PermissionStatus.Companion.allPerStr
 import cn.vove7.jarvis.activities.base.OneFragmentActivity
@@ -39,12 +38,15 @@ import cn.vove7.jarvis.adapters.RecAdapterWithFooter
 import cn.vove7.jarvis.databinding.FragmentBaseListBinding
 import cn.vove7.jarvis.databinding.ListHeaderWithSwitchBinding
 import cn.vove7.jarvis.fragments.SimpleListFragment
+import cn.vove7.jarvis.jadb.JAdb
 import cn.vove7.jarvis.receivers.AdminReceiver
 import cn.vove7.jarvis.services.GestureService
 import cn.vove7.jarvis.services.MyAccessibilityService
 import cn.vove7.jarvis.view.dialog.contentbuilder.markdownContent
 import cn.vove7.vtp.runtimepermission.PermissionUtils
 import com.afollestad.materialdialogs.MaterialDialog
+import com.afollestad.materialdialogs.WhichButton
+import com.afollestad.materialdialogs.actions.getActionButton
 import com.afollestad.materialdialogs.callbacks.onDismiss
 import com.catchingnow.icebox.sdk_client.IceBox
 import java.lang.Thread.sleep
@@ -202,7 +204,8 @@ class PermissionManagerActivity : OneFragmentActivity() {
                             waitWirelessAdb()
                         }
                     } else {
-                        positiveButton("当前已开启".spanColor(R.color.google_green)) {
+                        positiveButton("测试连接".spanColor(R.color.google_green)) {
+                            testAdbConnect()
                             it.dismiss()
                         }
                     }
@@ -210,6 +213,58 @@ class PermissionManagerActivity : OneFragmentActivity() {
                         SystemBridge.setClipText("https://gitee.com/v-assistant/static-files/blob/master/wireless_adb.md")
                         GlobalApp.toastSuccess("已复制")
                     }
+                }
+            }
+        }
+
+        @SuppressLint("CheckResult")
+        private fun testAdbConnect() {
+            MaterialDialog(requireActivity()).show {
+                title(text = "测试ADB连接")
+                noAutoDismiss()
+                val gr = ResourcesCompat.getColor(resources, R.color.google_green, null)
+                message(text = "请在稍后弹出的请求框中勾选[始终允许]，".span("[始终允许]", color = gr)
+                        + "并点击[确定]按钮".span("[确定]", color = gr) + "\n点击下方[开始测试]进入授权"
+                        .span("[开始测试]", color = gr)
+                )
+                cancelable(false)
+                fun notifyResult(e: Throwable?) = runOnUi {
+                    if (!this.isShowing) return@runOnUi
+                    getActionButton(WhichButton.NEGATIVE).text = "重新测试"
+                    getActionButton(WhichButton.NEGATIVE).show()
+                    val c = if (e == null) R.color.google_green else R.color.google_red
+                    message(text = (if (e == null) "测试通过" else "测试未通过：\n${e.message}\n*若点击[确认]后提示此消息，请重新测试。")
+                            .spanColor(ResourcesCompat.getColor(resources, c, null)))
+                    positiveButton(text = if (e == null) "完成" else "取消")
+                }
+
+                var t: Thread? = null
+                fun startTest(dialog: MaterialDialog) {
+                    message(text = "请在稍后弹出的请求框中勾选[始终允许]，".span("[始终允许]", color = gr)
+                            + "并点击[确定]按钮".span("[确定]", color = gr))
+                    dialog.getActionButton(WhichButton.NEGATIVE).gone()
+                    t = thread {
+                        val jadb = JAdb()
+                        kotlin.runCatching {
+                            if (jadb.connect(requireContext())) {
+                                if (!AppPermission.canWriteSecureSettings) {
+                                    AppPermission.autoOpenWriteSecureWithAdb(jadb)
+                                }
+                                notifyResult(null)
+                            } else {
+                                notifyResult(Exception("请确保已同意授权"))
+                            }
+                            jadb.close()
+                        }.onFailure {
+                            jadb.close()
+                            notifyResult(it)
+                        }
+                    }
+                }
+                negativeButton(text = "开始测试", click = ::startTest)
+                positiveButton(text = "取消") {
+                    it.dismiss()
+                    t?.interrupt()
                 }
             }
         }
@@ -228,10 +283,10 @@ class PermissionManagerActivity : OneFragmentActivity() {
                         }
                     }
                     runOnUi {
-                        message(text = "开启成功！\n请断开数据线，点击下方[完成]")
-                        positiveButton(text = "完成") {
-                            AppPermission.autoOpenWriteSecureWithAdb()
+                        message(text = "开启成功！\n请断开数据线，点击下方[测试连接]")
+                        positiveButton(text = "测试连接") {
                             it.dismiss()
+                            testAdbConnect()
                             refreshStatus()
                         }
                     }

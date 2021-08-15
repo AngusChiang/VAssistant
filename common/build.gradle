@@ -90,5 +90,4 @@ dependencies {
 
     api 'com.github.heruoxin:IceBox-SDK:55dd857d74'
 
-    api files('libs/RootShell.aar')
 }

@@ -1,5 +1,7 @@
 package cn.vove7.jarvis.jadb;
 
+import android.util.Log;
+
 import java.io.Closeable;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -104,6 +106,10 @@ public class AdbConnection implements Closeable {
                     if (!AdbProtocol.validateMessage(msg))
                         continue;
 
+                    if(BuildConfig.DEBUG) {
+                        Log.d("AdbMessage", "got msg:" + msg.toString());
+                    }
+
                     switch (msg.getCommand()) {
                         /* Stream-oriented commands */
                         case AdbProtocol.CMD_OKAY:
@@ -183,9 +189,7 @@ public class AdbConnection implements Closeable {
                 } catch (Exception e) {
                     /* The cleanup is taken care of by a combination of this thread
                      * and close() */
-                    if (e.getMessage() != null && !e.getMessage().contains("closed")) {
-                        e.printStackTrace();
-                    }
+                    e.printStackTrace();
                     break;
                 }
             }
@@ -236,7 +240,7 @@ public class AdbConnection implements Closeable {
      * @throws IOException          If the socket fails while connecting
      * @throws InterruptedException If we are unable to wait for the connection to finish
      */
-    public void connect() throws IOException, InterruptedException {
+    public void connect(long timeout) throws IOException, InterruptedException {
         if (connected)
             throw new IllegalStateException("Already connected");
 
@@ -250,7 +254,7 @@ public class AdbConnection implements Closeable {
         /* Wait for the connection to go live */
         synchronized (this) {
             if (!connected)
-                wait();
+                wait(timeout);
 
             if (!connected) {
                 throw new IOException("Connection failed");
