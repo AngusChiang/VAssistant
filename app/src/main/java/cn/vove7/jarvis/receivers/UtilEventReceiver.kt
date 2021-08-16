@@ -12,6 +12,7 @@ import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.appbus.AppBus
 import cn.vove7.common.appbus.AppBus.ACTION_START_WAKEUP
 import cn.vove7.common.appbus.AppBus.ACTION_STOP_DEBUG_SERVER
+import cn.vove7.common.appbus.AppBus.ACTION_STOP_EXEC
 import cn.vove7.common.appbus.AppBus.ACTION_STOP_WAKEUP
 import cn.vove7.common.utils.contains
 import cn.vove7.jarvis.services.MainService
@@ -46,6 +47,7 @@ object UtilEventReceiver : DyBCReceiver() {
             addAction(ACTION_START_WAKEUP)
             addAction(ACTION_STOP_WAKEUP)
             addAction(ACTION_STOP_DEBUG_SERVER)
+            addAction(ACTION_STOP_EXEC)
         }
 
     override fun onReceive(context: Context?, intent: Intent?) {

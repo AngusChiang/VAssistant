@@ -64,7 +64,7 @@
     <string name="text_add_follow_action">添加跟随操作</string>
     <string name="text_parent_action">上级操作</string>
     <string name="text_tooltips_select_script_type">选择脚本类型</string>
-    <string name="text_executing">执行中</string>
+    <string name="text_executing">执行中(点击停止)</string>
     <string name="text_parsing">解析中</string>
     <string name="text_listening">聆听中</string>
     <string name="text_run">执行</string>

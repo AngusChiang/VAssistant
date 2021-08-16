@@ -2,17 +2,18 @@ package cn.vove7.jarvis.view.statusbar
 
 import android.app.Notification
 import android.app.NotificationManager
+import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.provider.Settings
+import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.app.GlobalLog
 import cn.vove7.jarvis.R
 import cn.vove7.vtp.log.Vog
 import cn.vove7.vtp.notification.ChannelBuilder
-import cn.vove7.vtp.notification.NotificationHelper
 import cn.vove7.vtp.notification.NotificationIcons
 import java.lang.Thread.sleep
 import kotlin.concurrent.thread
@@ -27,10 +28,13 @@ abstract class StatusAnimation {
     open val importLevel: Int = NotificationManagerCompat.IMPORTANCE_LOW
     open val alert: Boolean = false
     open val nId = 127
+
+    private val channelId get() = "StatusBarIcon${if (alert) "_alert" else ""}"
+
     private val channel
         get() =
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                ChannelBuilder.with("StatusBarIcon${if (alert) "_alert" else ""}",
+                ChannelBuilder.with(channelId,
                         "状态栏动画${if (alert) "_alert" else ""}", importLevel).build().apply {
                     Vog.d("alert ---> $alert")
                     if (alert) {
@@ -49,7 +53,7 @@ abstract class StatusAnimation {
     open var successId = -1
     open val finishId: Int? = null
 
-    private val notifier by lazy { NotificationHelper(GlobalApp.APP, channel, alert) }
+    private val notifier by lazy { NotificationHelper(GlobalApp.APP, channelId, channel) }
 
     fun begin() {
         hideThread?.interrupt()
@@ -67,11 +71,15 @@ abstract class StatusAnimation {
     fun show(c: String) {
         Vog.d("show ---> $c")
         try {
-            notifier.showNotification(nId, title, c, NotificationIcons(beginAniId))
+            notifier.showNotification(nId, title, c, NotificationIcons(beginAniId)) {
+                onShowNtf(c, this)
+            }
         } catch (e: Exception) {
             GlobalLog.err(e)
         }
     }
+
+    open fun onShowNtf(c: String, builder: NotificationCompat.Builder) {}
 
     fun showAndHideDelay(msg: String, delay: Long = 1500) {
         show(msg)
@@ -99,7 +107,12 @@ abstract class StatusAnimation {
     }
 
     fun show(iconRes: Int, msg: String, intent: Intent? = null) {
-        notifier.showNotification(nId, title, msg, NotificationIcons(iconRes), intent)
+        notifier.showNotification(nId, title, msg, NotificationIcons(iconRes)) {
+            if (intent != null) {
+                val i = PendingIntent.getBroadcast(GlobalApp.APP, 1, intent, PendingIntent.FLAG_CANCEL_CURRENT)
+                setContentIntent(i)
+            }
+        }
     }
 
     open fun finish() {
