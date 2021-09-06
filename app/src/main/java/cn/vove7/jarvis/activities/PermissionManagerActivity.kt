@@ -6,20 +6,23 @@ import android.animation.ValueAnimator
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.admin.DevicePolicyManager
-import android.content.ActivityNotFoundException
 import android.content.ComponentName
 import android.content.Intent
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
+import android.text.InputType
 import android.view.View
 import android.view.ViewGroup
 import android.widget.CheckedTextView
+import androidx.annotation.RequiresApi
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
+import androidx.lifecycle.MutableLiveData
 import androidx.recyclerview.widget.LinearLayoutManager
+import cn.vove7.android.common.ext.delayRun
 import cn.vove7.bottomdialog.BottomDialog
 import cn.vove7.bottomdialog.builder.buttons
 import cn.vove7.bottomdialog.extension.awesomeHeader
@@ -31,6 +34,9 @@ import cn.vove7.common.bridges.InputMethodBridge
 import cn.vove7.common.bridges.ShellHelper
 import cn.vove7.common.bridges.SystemBridge
 import cn.vove7.common.utils.*
+import cn.vove7.jadb.AdbClient
+import cn.vove7.jadb.AdbMdns
+import cn.vove7.jadb.AdbPairingClient
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.activities.PermissionManagerActivity.PermissionStatus.Companion.allPerStr
 import cn.vove7.jarvis.activities.base.OneFragmentActivity
@@ -38,18 +44,21 @@ import cn.vove7.jarvis.adapters.RecAdapterWithFooter
 import cn.vove7.jarvis.databinding.FragmentBaseListBinding
 import cn.vove7.jarvis.databinding.ListHeaderWithSwitchBinding
 import cn.vove7.jarvis.fragments.SimpleListFragment
-import cn.vove7.jarvis.jadb.JAdb
 import cn.vove7.jarvis.receivers.AdminReceiver
 import cn.vove7.jarvis.services.GestureService
 import cn.vove7.jarvis.services.MyAccessibilityService
 import cn.vove7.jarvis.view.dialog.contentbuilder.markdownContent
+import cn.vove7.vtp.extend.disable
 import cn.vove7.vtp.runtimepermission.PermissionUtils
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.WhichButton
 import com.afollestad.materialdialogs.actions.getActionButton
 import com.afollestad.materialdialogs.callbacks.onDismiss
+import com.afollestad.materialdialogs.input.getInputLayout
+import com.afollestad.materialdialogs.input.input
 import com.catchingnow.icebox.sdk_client.IceBox
 import java.lang.Thread.sleep
+import java.net.Inet4Address
 import kotlin.concurrent.thread
 
 
@@ -102,7 +111,7 @@ class PermissionManagerActivity : OneFragmentActivity() {
         private fun highLight(index: Int) {
             recyclerView.postDelayed(100) {
                 (recyclerView.layoutManager as LinearLayoutManager)
-                        .scrollToPositionWithOffset(index, 0)
+                    .scrollToPositionWithOffset(index, 0)
                 recyclerView.postDelayed(500) {
                     adapter.notifyItemChanged(index, "")
                 }
@@ -224,8 +233,8 @@ class PermissionManagerActivity : OneFragmentActivity() {
                 noAutoDismiss()
                 val gr = ResourcesCompat.getColor(resources, R.color.google_green, null)
                 message(text = "请在稍后弹出的请求框中勾选[始终允许]，".span("[始终允许]", color = gr)
-                        + "并点击[确定]按钮".span("[确定]", color = gr) + "\n点击下方[开始测试]进入授权"
-                        .span("[开始测试]", color = gr)
+                    + "并点击[确定]按钮".span("[确定]", color = gr) + "\n点击下方[开始测试]进入授权"
+                    .span("[开始测试]", color = gr)
                 )
                 cancelable(false)
                 fun notifyResult(e: Throwable?) = runOnUi {
@@ -234,28 +243,26 @@ class PermissionManagerActivity : OneFragmentActivity() {
                     getActionButton(WhichButton.NEGATIVE).show()
                     val c = if (e == null) R.color.google_green else R.color.google_red
                     message(text = (if (e == null) "测试通过" else "测试未通过：\n${e.message}\n*若点击[确认]后提示此消息，请重新测试。")
-                            .spanColor(ResourcesCompat.getColor(resources, c, null)))
+                        .spanColor(ResourcesCompat.getColor(resources, c, null)))
                     positiveButton(text = if (e == null) "完成" else "取消")
                 }
 
                 var t: Thread? = null
                 fun startTest(dialog: MaterialDialog) {
                     message(text = "请在稍后弹出的请求框中勾选[始终允许]，".span("[始终允许]", color = gr)
-                            + "并点击[确定]按钮".span("[确定]", color = gr))
+                        + "并点击[确定]按钮".span("[确定]", color = gr))
                     dialog.getActionButton(WhichButton.NEGATIVE).gone()
                     t = thread {
-                        val jadb = JAdb()
+                        val jadb = AdbClient(requireContext())
                         kotlin.runCatching {
-                            if (jadb.connect(requireContext())) {
-                                if (!AppPermission.canWriteSecureSettings) {
-                                    AppPermission.autoOpenWriteSecureWithAdb(jadb)
-                                }
-                                notifyResult(null)
-                            } else {
-                                notifyResult(Exception("请确保已同意授权"))
+                            jadb.connect()
+                            if (!AppPermission.canWriteSecureSettings) {
+                                AppPermission.autoOpenWriteSecureWithAdb(jadb)
                             }
+                            notifyResult(null)
                             jadb.close()
                         }.onFailure {
+                            notifyResult(Exception("请确保已同意授权"))
                             jadb.close()
                             notifyResult(it)
                         }
@@ -266,6 +273,53 @@ class PermissionManagerActivity : OneFragmentActivity() {
                     it.dismiss()
                     t?.interrupt()
                 }
+            }
+        }
+
+        @SuppressLint("CheckResult")
+        @RequiresApi(Build.VERSION_CODES.R)
+        private fun waitAdbPair() = MaterialDialog(requireContext()).show {
+            title(text = "无线ADB配对")
+            val mwm = requireActivity().isInMultiWindowMode
+
+            message(text = if (mwm) "正在搜索配对端口..." else "请先进入分屏状态，再进入此页")
+
+            if (mwm) {
+                val pairPort = MutableLiveData(0)
+                val mdns = AdbMdns(requireContext(), AdbMdns.TLS_PAIRING, pairPort)
+
+                pairPort.observe(requireActivity()) { port ->
+                    if (port in 1024..65535) {
+                        message(text = "发现端口 $port, 请输入配对码进行连接")
+                        input(hint = "配对码", inputType = InputType.TYPE_CLASS_NUMBER) { d, s ->
+                            doAdbPair(port, s.toString().trim(), this)
+                            getInputLayout().disable()
+                        }
+                        positiveButton(text = "连接")
+                        mdns.stop()
+                    }
+                }
+                onDismiss {
+                    mdns.stop()
+                }
+            }
+        }
+
+        @RequiresApi(Build.VERSION_CODES.R)
+        private fun doAdbPair(port: Int, code: String, dialog: MaterialDialog) = thread {
+
+            val pairClient = AdbPairingClient(requireContext(),
+                Inet4Address.getLoopbackAddress().hostName,
+                port, code
+            )
+            kotlin.runCatching {
+                if (pairClient.start()) {// 配对成功，连接 tcpip5555
+
+                } else {
+                    error("配对失败，请确认配对码正确")
+                }
+            }.onFailure {
+                //失败
             }
         }
 
@@ -291,6 +345,11 @@ class PermissionManagerActivity : OneFragmentActivity() {
                         }
                     }
                 }
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                    neutralButton(text = "无线配对") {
+                        waitAdbPair()
+                    }
+                }
                 positiveButton(text = "取消") { t.interrupt() }
                 onDismiss {
                     t.interrupt()
@@ -305,103 +364,139 @@ class PermissionManagerActivity : OneFragmentActivity() {
 
         private fun isWirelessAdbEnabled() = SystemBridge.isWirelessAdbEnabled()
 
-        val permissions by lazy {
-            val openASAction: (PermissionStatus, Activity) -> Unit = { it, act ->
-                try {
-                    PermissionUtils.gotoAccessibilitySetting2(act, if (it.permissionName == "基础无障碍服务")
-                        MyAccessibilityService::class.java else GestureService::class.java)
-                } catch (e: ActivityNotFoundException) {
-                    GlobalApp.toastError("跳转失败，请自行开启")
-                }
-            }
-            listOf(
-                    PermissionStatus(arrayOf("android.permission.BIND_DEVICE_ADMIN"), "设备管理器", getString(R.string.admin_desc)) r@{ it, act ->
-                        if (it.isOpen) return@r
-                        val mComponentName = ComponentName(act, AdminReceiver::class.java)
-                        val intent = Intent(DevicePolicyManager.ACTION_ADD_DEVICE_ADMIN)
-                        intent.putExtra(DevicePolicyManager.EXTRA_DEVICE_ADMIN, mComponentName)
-                        try {
-                            startActivity(intent)
-                        } catch (e: Exception) {
-                            e.log()
-                            GlobalApp.toastError("跳转失败，请手动进入[设置/安全/设备管理器]开启", 1)
-                        }
-                    },
+        private fun openASAction(it: PermissionStatus, act: Activity) {
+            val base = it.permissionName == "基础无障碍服务"
+            if (!it.isOpen) {
+                launch {
+                    if (AccessibilityApi.autoOpenService(
+                            if (base) AccessibilityApi.WHICH_SERVICE_BASE
+                            else AccessibilityApi.WHICH_SERVICE_GESTURE,
+                            checkAfter = true, failByUser = true
+                        )
+                    ) {
+                        GlobalApp.toastInfo("自动开启成功")
+                        refreshStatus()
+                    } else {
+                        GlobalApp.toastInfo("自动开启失败，请手动开启")
+                    }
 
-                    PermissionStatus(arrayOf("ADB"), "无线ADB服务", getString(R.string.wireless_adb_desc), clickAction = ::openADB, isOpen = isWirelessAdbEnabled()),
-                    PermissionStatus(arrayOf("ACCESSIBILITY_SERVICE"), "基础无障碍服务", getString(R.string.desc_accessibility), clickAction = openASAction),
-                    PermissionStatus(arrayOf("ACCESSIBILITY_SERVICE2"), "高级无障碍服务（执行手势 Android7.0+）", getString(R.string.desc_gesc_accessibility), clickAction = openASAction),
-                    PermissionStatus(arrayOf("android.permission.SYSTEM_ALERT_WINDOW"), "悬浮窗", "显示全局对话框、语音面板") { _, _ ->
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                            try {
-                                PermissionUtils.requestDrawOverlays(requireActivity(), 0)
-                            } catch (e: Exception) {
-//                                            toast.showShort("跳转失败，请手动开启")
-                                try {
-                                    SystemBridge.openAppDetail(context?.packageName
-                                        ?: "")
-                                } catch (e: Exception) {
-                                    GlobalApp.toastError("跳转失败，请到应用详情手动开启")
-                                }
+                }
+            } else {
+                PermissionUtils.gotoAccessibilitySetting2(act, if (base)
+                    MyAccessibilityService::class.java else GestureService::class.java)
+            }
+        }
+
+        val permissions: List<PermissionStatus> by lazy {
+            mutableListOf(
+                PermissionStatus(arrayOf("android.permission.BIND_DEVICE_ADMIN"), "设备管理器", getString(R.string.admin_desc)) r@{ it, act ->
+                    if (it.isOpen) {
+                        val s = SystemBridge.startActivity("com.android.settings", "com.android.settings.DeviceAdminSettings") ||
+                            SystemBridge.startActivity("com.android.settings", "com.android.settings.Settings\$DeviceAdminSettingsActivity")
+                        if (!s) {
+                            GlobalApp.toastWarning("跳转设备管理设置失败，请手动在设置中搜索改设置")
+                            delayRun(2000) {
+                                startActivity(Intent(Settings.ACTION_SETTINGS))
                             }
                         }
-                    },
-                    PermissionStatus(arrayOf("android.permission.WRITE_SETTINGS"), "修改系统设置", "用于调节屏幕亮度") r@{ it, app ->
-                        if (it.isOpen || Build.VERSION.SDK_INT < Build.VERSION_CODES.M) return@r
-                        val intent = Intent(Settings.ACTION_MANAGE_WRITE_SETTINGS)
-                        intent.data = Uri.parse("package:" + app.packageName)
-                        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                        return@r
+                    }
+                    val mComponentName = ComponentName(act, AdminReceiver::class.java)
+                    val intent = Intent(DevicePolicyManager.ACTION_ADD_DEVICE_ADMIN)
+                    intent.putExtra(DevicePolicyManager.EXTRA_DEVICE_ADMIN, mComponentName)
+                    try {
+                        startActivity(intent)
+                    } catch (e: Exception) {
+                        e.log()
+                        GlobalApp.toastError("跳转失败，请手动进入[设置/安全/设备管理器]开启", 1)
+                    }
+                },
+                PermissionStatus(
+                    arrayOf("ADB"),
+                    "无线ADB服务", getString(R.string.wireless_adb_desc),
+                    clickAction = ::openADB,
+                    isOpen = isWirelessAdbEnabled()
+                ),
+                PermissionStatus(
+                    arrayOf("ACCESSIBILITY_SERVICE"),
+                    "基础无障碍服务",
+                    getString(R.string.desc_accessibility),
+                    clickAction = ::openASAction),
+                PermissionStatus(arrayOf("ACCESSIBILITY_SERVICE2"), "高级无障碍服务（执行手势 Android7.0+）", getString(R.string.desc_gesc_accessibility), clickAction = ::openASAction),
+                PermissionStatus(arrayOf("android.permission.SYSTEM_ALERT_WINDOW"), "悬浮窗", "显示全局对话框、语音面板") { _, _ ->
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                         try {
-                            app.startActivity(intent)
+                            PermissionUtils.requestDrawOverlays(requireActivity(), 0)
                         } catch (e: Exception) {
-                            SystemBridge.openAppDetail(app.packageName)
+//                                            toast.showShort("跳转失败，请手动开启")
+                            try {
+                                SystemBridge.openAppDetail(context?.packageName
+                                    ?: "")
+                            } catch (e: Exception) {
+                                GlobalApp.toastError("跳转失败，请到应用详情手动开启")
+                            }
                         }
-                    },
-                    PermissionStatus(arrayOf(), "输入法", """用于更强大的编辑操作
+                    }
+                },
+                PermissionStatus(arrayOf("android.permission.WRITE_SETTINGS"), "修改系统设置", "用于调节屏幕亮度") r@{ it, app ->
+                    if (it.isOpen || Build.VERSION.SDK_INT < Build.VERSION_CODES.M) return@r
+                    val intent = Intent(Settings.ACTION_MANAGE_WRITE_SETTINGS)
+                    intent.data = Uri.parse("package:" + app.packageName)
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                    try {
+                        app.startActivity(intent)
+                    } catch (e: Exception) {
+                        SystemBridge.openAppDetail(app.packageName)
+                    }
+                },
+                PermissionStatus(arrayOf(), "输入法", """用于更强大的编辑操作
                             |提示；在执行编辑框操作时，会自动切换内置输入法进行操作，结束后会恢复原输入法。
                             |自动切换输入法支持三种方式：
                             |1. 无障碍服务（可见的切换步骤）
                             |2. Root权限（推荐）
                             |3. WRITE_SECURE_SETTINGS权限（推荐，开启方法，见[常见问题]）
                             |由于每次询问Root权限申请过慢，请预先授权。""".trimMargin()
-                    ) { it, app ->
-                        if (!it.isOpen) {
-                            startActivity(Intent(Settings.ACTION_INPUT_METHOD_SETTINGS))
+                ) { it, _ ->
+                    if (!it.isOpen) {
+                        startActivity(Intent(Settings.ACTION_INPUT_METHOD_SETTINGS))
+                    }
+                },
+                PermissionStatus(arrayOf(), "Root", "自动切换输入法、开启无障碍服务\n授予Root权限时，请将打开Magisk Manager后台运行（若使用Msgisk管理授权）") { it, _ ->
+                    if (!it.isOpen) {
+                        launch {
+                            //防止阻塞主线程
+                            ShellHelper.hasRoot()
                         }
-                    },
-                    PermissionStatus(arrayOf(), "Root", "自动切换输入法、开启无障碍服务\n授予Root权限时，请将打开Magisk Manager后台运行（若使用Msgisk管理授权）") { it, _ ->
-                        if (!it.isOpen) {
-                            launch {
-                                //防止阻塞主线程
-                                ShellHelper.hasRoot()
-                            }
-                        }
-                    },
-                    PermissionStatus(arrayOf(), "WRITE_SECURE_SETTINGS", "自动切换输入法、开启无障碍服务\nroot和此权限有一即可") { it, _ ->
-                        if (!it.isOpen) {
-                            SystemBridge.openUrl("https://vove.gitee.io/2019/07/02/OOO/")
-                        }
-                    },
-                    PermissionStatus(arrayOf("android.permission.READ_CONTACTS"), "联系人", "用于检索联系人，拨号指令"),
-                    PermissionStatus(arrayOf(IceBox.SDK_PERMISSION), "冰箱", "用于启动和冻结冰箱管理的应用"),
-                    PermissionStatus(arrayOf("android.permission.CALL_PHONE"), "电话", "用于拨打电话"),
-                    PermissionStatus(arrayOf("android.permission.RECORD_AUDIO"), "录音", "用于语音识别"),
-                    PermissionStatus(arrayOf("android.permission.ACCESS_NETWORK_STATE"), "获取网络状态", "用于获取网络状态"),
-                    PermissionStatus(arrayOf("android.permission.INTERNET"), "网络", ""),
-                    PermissionStatus(arrayOf("android.permission.READ_PHONE_STATE"), "读取设备状态", ""),
-                    PermissionStatus(arrayOf("android.permission.WRITE_EXTERNAL_STORAGE"), "写SD卡", ""),
-                    PermissionStatus(arrayOf("android.permission.FLASHLIGHT"), "闪光灯", "打开闪光灯"),
-                    PermissionStatus(arrayOf(
-                            "android.permission.ACCESS_COARSE_LOCATION",
-                            "android.permission.ACCESS_FINE_LOCATION"
-                    ), "位置信息", "不使用此类指令可不开启"),
+                    }
+                },
+                PermissionStatus(arrayOf(), "WRITE_SECURE_SETTINGS", "自动切换输入法、开启无障碍服务\nroot和此权限有一即可") { it, _ ->
+                    if (!it.isOpen) {
+                        SystemBridge.openUrl("https://vove.gitee.io/2019/07/02/OOO/")
+                    }
+                },
+                PermissionStatus(arrayOf("android.permission.READ_CONTACTS"), "联系人", "用于检索联系人，拨号指令"),
+                PermissionStatus(arrayOf("android.permission.CALL_PHONE"), "电话", "用于拨打电话"),
+                PermissionStatus(arrayOf("android.permission.RECORD_AUDIO"), "录音", "用于语音识别"),
+                PermissionStatus(arrayOf("android.permission.ACCESS_NETWORK_STATE"), "获取网络状态", "用于获取网络状态"),
+                PermissionStatus(arrayOf("android.permission.INTERNET"), "网络", ""),
+                PermissionStatus(arrayOf("android.permission.READ_PHONE_STATE"), "读取设备状态", ""),
+                PermissionStatus(arrayOf("android.permission.WRITE_EXTERNAL_STORAGE"), "写SD卡", ""),
+                PermissionStatus(arrayOf("android.permission.FLASHLIGHT"), "闪光灯", "打开闪光灯"),
+                PermissionStatus(arrayOf(
+                    "android.permission.ACCESS_COARSE_LOCATION",
+                    "android.permission.ACCESS_FINE_LOCATION"
+                ), "位置信息", "不使用此类指令可不开启"),
 //                        PermissionStatus(arrayOf("android.permission.BLUETOOTH", "android.permission.BLUETOOTH_ADMIN"),
 //                                "蓝牙", "打开蓝牙"),
-                    PermissionStatus(arrayOf("android.permission.CAMERA"), "相机", "打开闪光灯"),
-                    PermissionStatus(arrayOf("android.permission.READ_PHONE_STATE"), "读取设备状态", "个别机型需要"),
-                    PermissionStatus(arrayOf("android.permission.WRITE_CALENDAR",
-                            "android.permission.READ_CALENDAR"), "日历", "读写日历")
-            )
+                PermissionStatus(arrayOf("android.permission.CAMERA"), "相机", "打开闪光灯"),
+                PermissionStatus(arrayOf("android.permission.READ_PHONE_STATE"), "读取设备状态", "个别机型需要"),
+                PermissionStatus(arrayOf("android.permission.WRITE_CALENDAR",
+                    "android.permission.READ_CALENDAR"), "日历", "管理日历事件")
+            ).apply {
+                if (SystemBridge.hasInstall(IceBox.PACKAGE_NAME)) {
+                    this+=(PermissionStatus(arrayOf(IceBox.SDK_PERMISSION), "冰箱", "用于启动和冻结冰箱管理的应用"))
+                }
+            }
         }
 
         /**
@@ -424,12 +519,17 @@ class PermissionManagerActivity : OneFragmentActivity() {
                     it.permissionName == "修改系统设置" -> if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                         Settings.System.canWrite(context)
                     } else true
-                    it.permissionName == "设备管理器" -> AdminReceiver.isActive()
+                    it.permissionName == "设备管理器" -> {
+                        AdminReceiver.isActive().also { acted ->
+                            it.desc = getString(R.string.admin_desc) +
+                                (if (acted) "\n点击跳转设备管理设置" else "")
+                        }
+                    }
                     it.permissionName == "悬浮窗" -> Build.VERSION.SDK_INT < Build.VERSION_CODES.M || PermissionUtils.canDrawOverlays(context)
                     it.permissionString[0] == "ACCESSIBILITY_SERVICE" ->
                         AccessibilityApi.isBaseServiceOn
                     it.permissionString[0] == "ACCESSIBILITY_SERVICE2" ->
-                        AccessibilityApi.isAdvanServiceOn
+                        AccessibilityApi.isGestureServiceOn
                     else -> PermissionUtils.isAllGranted(context, it.permissionString)
                 }
             }
@@ -444,34 +544,33 @@ class PermissionManagerActivity : OneFragmentActivity() {
     }
 
     class PermissionStatus(
-            val permissionString: Array<String>,
-            val permissionName: String,
-            val desc: String,
-            var isOpen: Boolean = false,
-            val clickAction: (PermissionStatus, Activity) -> Unit = a@{ it, act ->
-                if (it.isOpen) return@a
-                ActivityCompat.requestPermissions(act, it.permissionString, 100)
-            }
+        val permissionString: Array<String>,
+        val permissionName: String,
+        var desc: String,
+        var isOpen: Boolean = false,
+        val clickAction: (PermissionStatus, Activity) -> Unit = a@{ it, act ->
+            if (it.isOpen) return@a
+            ActivityCompat.requestPermissions(act, it.permissionString, 100)
+        }
     ) {
         companion object {
             val allPerStr = arrayOf(
-                    "android.permission.BIND_ACCESSIBILITY_SERVICE",
-                    "android.permission.SYSTEM_ALERT_WINDOW",
-                    "android.permission.READ_CONTACTS",
-                    "android.permission.CALL_PHONE",
-                    "android.permission.RECORD_AUDIO",
-                    "android.permission.ACCESS_NETWORK_STATE",
-                    "android.permission.INTERNET",
-                    "android.permission.READ_PHONE_STATE",
-                    "android.permission.WRITE_EXTERNAL_STORAGE",
-                    "android.permission.FLASHLIGHT",
-                    "android.permission.ACCESS_COARSE_LOCATION",
-                    "android.permission.ACCESS_FINE_LOCATION",
-                    "android.permission.CAMERA",
-                    "android.permission.WRITE_CALENDAR",
-                    "android.permission.READ_CALENDAR"
+                "android.permission.BIND_ACCESSIBILITY_SERVICE",
+                "android.permission.SYSTEM_ALERT_WINDOW",
+                "android.permission.READ_CONTACTS",
+                "android.permission.CALL_PHONE",
+                "android.permission.RECORD_AUDIO",
+                "android.permission.ACCESS_NETWORK_STATE",
+                "android.permission.INTERNET",
+                "android.permission.READ_PHONE_STATE",
+                "android.permission.WRITE_EXTERNAL_STORAGE",
+                "android.permission.FLASHLIGHT",
+                "android.permission.ACCESS_COARSE_LOCATION",
+                "android.permission.ACCESS_FINE_LOCATION",
+                "android.permission.CAMERA",
+                "android.permission.WRITE_CALENDAR",
+                "android.permission.READ_CALENDAR"
             )
-
         }
 
     }

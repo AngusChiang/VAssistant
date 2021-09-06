@@ -542,10 +542,9 @@ object MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
         }
         if (!AccessibilityApi.isBaseServiceOn) {
             kotlin.runCatching {
-                AccessibilityApi.waitAccessibility(2000)
+                AccessibilityApi.requireAccessibility(0, 2000)
             }
             if (!AccessibilityApi.isBaseServiceOn) {
-                AppBus.post(RequestPermission("基础无障碍服务"))
                 return null
             }
         }
@@ -578,7 +577,7 @@ object MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
             GlobalApp.toastWarning("引擎未就绪")
             return
         }
-        thread(priority = Thread.MAX_PRIORITY) {
+        launch {
             when (order) {
                 ACTION_STOP_EXEC -> {
                     speechRecogService?.cancelRecog()
@@ -613,7 +612,7 @@ object MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
                 }
                 //文字提取 需要无遮挡
                 ACTION_BEGIN_SCREEN_PICKER -> {
-                    val list = getScreenText() ?: return@thread
+                    val list = getScreenText() ?: return@launch
 
                     if (list.isEmpty()) {
                         GlobalApp.toastInfo("未提取到任何内容")
@@ -622,7 +621,7 @@ object MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
                     }
                 }
                 ACTION_BEGIN_SCREEN_PICKER_TRANSLATE -> {
-                    val list = getScreenText() ?: return@thread
+                    val list = getScreenText() ?: return@launch
 
                     if (list.isEmpty()) {
                         GlobalApp.toastInfo("未提取到任何内容")

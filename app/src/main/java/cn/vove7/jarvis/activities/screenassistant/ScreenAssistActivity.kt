@@ -12,7 +12,6 @@ import android.view.View
 import android.widget.PopupMenu
 import cn.vove7.android.common.ext.invisible
 import cn.vove7.common.app.GlobalApp
-import cn.vove7.common.app.withthFailLog
 import cn.vove7.common.appbus.AppBus
 import cn.vove7.common.bridges.SystemBridge
 import cn.vove7.common.bridges.UtilBridge

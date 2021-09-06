@@ -60,7 +60,7 @@ object AdKillerService : AbsAccPluginService() {
 
     private fun onSkipAd(node: ViewNode) {
         var clickResult = node.tryClick()
-        if (!clickResult && AccessibilityApi.isAdvanServiceOn) {
+        if (!clickResult && AccessibilityApi.isGestureServiceOn) {
             Vog.d("onSkipAd ---> 发现广告点击失败 使用globalClick")
             clickResult = node.globalClick()
         }

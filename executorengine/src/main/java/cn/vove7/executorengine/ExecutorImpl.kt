@@ -4,7 +4,6 @@ import android.content.Context
 import android.os.Looper
 import android.os.SystemClock
 import androidx.annotation.CallSuper
-import cn.vove7.common.NeedAccessibilityException
 import cn.vove7.common.NotSupportException
 import cn.vove7.common.accessibility.AccessibilityApi
 import cn.vove7.common.accessibility.viewnode.ViewNode
@@ -45,7 +44,6 @@ import cn.vove7.executorengine.parse.OpenAppAction
 import cn.vove7.executorengine.parse.ParseEngine
 import cn.vove7.quantumclock.QuantumClock
 import cn.vove7.vtp.log.Vog
-import cn.vove7.vtp.runtimepermission.PermissionUtils
 import java.io.Closeable
 import java.util.*
 import kotlin.concurrent.thread
@@ -96,20 +94,16 @@ open class ExecutorImpl(
             userInterrupted = value
         }
 
-    override fun requireAccessibility() {
-        if (accessApi == null) {
-            PermissionUtils.gotoAccessibilitySetting2(context, Class.forName("cn.vove7.jarvis.services.MyAccessibilityService"))
-            GlobalApp.toastError("此操作需要VAssist基础服务，请开启后继续", 1)
-            throw NeedAccessibilityException()
-        }
+    override fun requireAccessibility(which: Int) {
+        AccessibilityApi.requireAccessibility(which)
     }
 
     fun waitAccessibility(): Boolean {
         return waitAccessibility(30000)
     }
 
-    override fun waitAccessibility(waitMillis: Long): Boolean {
-        return AccessibilityApi.waitAccessibility(waitMillis)
+    override fun waitAccessibility(which: Int, waitMillis: Long): Boolean {
+        return AccessibilityApi.waitAccessibility(which, waitMillis)
     }
 
     /**
@@ -175,7 +169,7 @@ open class ExecutorImpl(
         if (!sync) waiter.setAndNotify(EXEC_CODE_NOT_FINISH)
         thread = thread(start = true, name = "脚本线程：$cmdWords", isDaemon = true, priority = Thread.MAX_PRIORITY) {
             var er = EXEC_CODE_FAILED
-            var startTime = SystemClock.elapsedRealtime()
+            val startTime = SystemClock.elapsedRealtime()
             try {
                 AppBus.post(ExecutorStatus.begin(cmdWords))
                 LooperHelper.prepareIfNeeded()
@@ -191,7 +185,7 @@ open class ExecutorImpl(
                 if (sync) waiter.setAndNotify(er)
                 else AppBus.post(ExecutorStatus.finish(er))
             }
-            var endTime = SystemClock.elapsedRealtime()
+            val endTime = SystemClock.elapsedRealtime()
             Vog.d("指令[$cmdWords] 用时: ${(endTime - startTime)}ms")
             Looper.myLooper()?.quitSafely()
         }
@@ -221,7 +215,7 @@ open class ExecutorImpl(
         while (currentQueue.isNotEmpty()) {
             currentActionIndex++
             if (!userInterrupt) {
-                currentQueue.poll().apply {
+                currentQueue.poll()?.apply {
                     currentAction = this
 
                     actionScope = this.actionScopeType
@@ -230,7 +224,7 @@ open class ExecutorImpl(
                     if (r.first != EXEC_CODE_SUCCESS) {
                         return r.first
                     }
-                }
+                } ?: GlobalLog.err("currentQueue.poll nothing ${currentQueue.size}")
             } else {
                 Vog.i("pollActionQueue 终止")
                 currentQueue.clear()
@@ -279,6 +273,7 @@ open class ExecutorImpl(
         SystemBridge.release()
         ShellHelper.release()
         InputMethodBridge.restore()
+        GlobalActionExecutor.release()
     }
 
     /**

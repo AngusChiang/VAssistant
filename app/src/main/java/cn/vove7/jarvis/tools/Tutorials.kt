@@ -6,6 +6,7 @@ import android.graphics.Typeface
 import android.view.View
 import android.widget.TextView
 import androidx.annotation.DrawableRes
+import androidx.core.content.ContextCompat
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.utils.boundsInScreen
 import cn.vove7.jarvis.R
@@ -147,7 +148,7 @@ object Tutorials {
             cancelable(false)                  // Whether tapping outside the outer circle dismisses the view
             tintTarget(true)                   // Whether to tint the target view's color
             transparentTarget(true)           // Specify whether the target is transparent (displays the content underneath)
-            if (iconId != null) icon(context.resources.getDrawable(iconId))                     // Specify a custom drawable to draw as the target
+            if (iconId != null) icon(ContextCompat.getDrawable(context, iconId))                     // Specify a custom drawable to draw as the target
             targetRadius(60) // Specify the target radius (in dp)
         }
     }
@@ -169,7 +170,7 @@ object Tutorials {
             cancelable(false)                  // Whether tapping outside the outer circle dismisses the view
             tintTarget(true)                   // Whether to tint the target view's color
             transparentTarget(true)           // Specify whether the target is transparent (displays the content underneath)
-            if (iconId != null) icon(context.resources.getDrawable(iconId))                     // Specify a custom drawable to draw as the target
+            if (iconId != null) icon(ContextCompat.getDrawable(context, iconId))                     // Specify a custom drawable to draw as the target
             targetRadius(60) // Specify the target radius (in dp)
         }
     }

@@ -1,14 +1,14 @@
 package cn.vove7.common.interfaces.api
 
-import android.accessibilityservice.GestureDescription
-import android.os.Build
-import androidx.annotation.RequiresApi
+import android.util.Pair
+import android.widget.Toast
 import cn.vove7.common.annotation.ScriptApi
 import cn.vove7.common.annotation.ScriptApiClass
 import cn.vove7.common.annotation.ScriptApiParamDesc
-import android.util.Pair
+import cn.vove7.common.app.GlobalApp
+import cn.vove7.common.utils.ScreenAdapter
 
-@ScriptApiClass("无障碍操作","accessibility")
+@ScriptApiClass("无障碍操作", "accessibility")
 interface GlobalActionExecutorI {
 
     @ScriptApi("模拟直线滑动手势")
@@ -19,11 +19,24 @@ interface GlobalActionExecutorI {
 
     fun longClick(x: Int, y: Int): Boolean
 
-    fun scrollDown(): Boolean
+    fun click(x: Int, y: Int): Boolean {
+        return press(x, y, 30)
+    }
 
-    fun click(x: Int, y: Int): Boolean
+    fun scrollUp(): Boolean {
+        val mtop = (ScreenAdapter.relHeight * 0.1).toInt()
+        val mBottom = (ScreenAdapter.relHeight * 0.85).toInt()
+        val xCenter = (ScreenAdapter.relWidth * 0.5).toInt()
 
-    fun scrollUp(): Boolean
+        return swipe(xCenter, mBottom, xCenter, mtop, 400)
+    }
+
+    fun scrollDown(): Boolean {
+        val mtop = (ScreenAdapter.relHeight * 0.15).toInt()
+        val mBottom = (ScreenAdapter.relHeight * 0.9).toInt()
+        val xCenter = (ScreenAdapter.relWidth * 0.5).toInt()
+        return swipe(xCenter, mtop, xCenter, mBottom, 400)
+    }
 
     fun back(): Boolean
 
@@ -34,6 +47,7 @@ interface GlobalActionExecutorI {
     fun notificationBar(): Boolean
 
     fun quickSettings(): Boolean
+
     /**
      * 无障碍锁屏
      * @return Boolean
@@ -46,7 +60,9 @@ interface GlobalActionExecutorI {
     fun screenShot(): Boolean
 
     fun recents(): Boolean
+
     fun splitScreen(): Boolean
+
     /**
      * 单手势同步
      * @param start Long
@@ -54,15 +70,14 @@ interface GlobalActionExecutorI {
      * @param points Array<Pair<Int, Int>>
      * @return Boolean
      */
-    @RequiresApi(api = Build.VERSION_CODES.N)
-    fun gesture(start: Long, duration: Long, points: Array<Pair<Int, Int>>): Boolean
+    fun gesture(duration: Long, points: Array<Pair<Int, Int>>): Boolean
 
     /**
      * 多手势同步
      * @param duration Long
      * @param ppss Array<Array<Pair<Int, Int>>>
      */
-    fun gestures(duration: Long, ppss: Array<Array<Pair<Int, Int>>>)
+    fun gestures(duration: Long, ppss: Array<Array<Pair<Int, Int>>>): Boolean
 
     /**
      * 单手势异步
@@ -70,27 +85,26 @@ interface GlobalActionExecutorI {
      * @param duration Long
      * @param points Array<Pair<Int, Int>>
      */
-    @RequiresApi(api = Build.VERSION_CODES.N)
-    fun gestureAsync(start: Long, duration: Long, points: Array<Pair<Int, Int>>)
+    fun gestureAsync(start: Long, duration: Long, points: Array<Pair<Int, Int>>): Boolean
 
     /**
      * 多手势异步
      * @param duration Long
      * @param ppss Array<Array<Pair<Int, Int>>>
      */
-    fun gesturesAsync(duration: Long, ppss: Array<Array<Pair<Int, Int>>>)
-
-    @RequiresApi(api = Build.VERSION_CODES.N)
-    fun playGestures(strokeList: List<GestureDescription.StrokeDescription>): Boolean
-
-    @RequiresApi(api = Build.VERSION_CODES.N)
-    fun doGesturesAsync(strokeList: List<GestureDescription.StrokeDescription>)
-
+    fun gesturesAsync(duration: Long, ppss: Array<Array<Pair<Int, Int>>>): Boolean
 
     /**
      * 通知
      */
-    fun toast(msg: String?)
-    fun toastLong(msg: String?)
+    fun toast(msg: String?) {
+        GlobalApp.toastInfo(msg ?: "null")
+    }
+
+    fun toastLong(msg: String?) {
+        GlobalApp.toastInfo(msg ?: "null", Toast.LENGTH_LONG)
+    }
+
+    fun release() {}
 }
 

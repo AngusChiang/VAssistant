@@ -35,18 +35,18 @@ object ScreenStatusListener : DyBCReceiver(), ScreenEvent {
 
         when (intent?.action) {
             Intent.ACTION_SCREEN_ON -> {
-                Vog.d("亮屏")
+                Vog.v("亮屏")
                 screenOn = true
                 event.onScreenOn()
             }
             Intent.ACTION_SCREEN_OFF -> {
-                Vog.d("灭屏")
+                Vog.v("灭屏")
                 screenOn = false
                 screenlock = true
                 event.onScreenOff()
             }
             Intent.ACTION_USER_PRESENT -> {
-                Vog.d("解锁")
+                Vog.v("解锁")
                 screenlock = false
                 event.onUnlock()
             }

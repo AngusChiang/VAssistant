@@ -6,7 +6,6 @@ import android.os.Build
 import android.provider.Settings
 import android.view.accessibility.AccessibilityNodeInfo
 import androidx.core.view.accessibility.AccessibilityNodeInfoCompat.FOCUS_INPUT
-import cn.vove7.android.common.ext.delayRun
 import cn.vove7.common.NeedAccessibilityException
 import cn.vove7.common.accessibility.component.AccPluginService
 import cn.vove7.common.accessibility.viewnode.ViewNode
@@ -80,17 +79,33 @@ abstract class AccessibilityApi : AccessibilityService() {
         protected set
 
     companion object {
+        const val WHICH_SERVICE_BASE = 0
+        const val WHICH_SERVICE_GESTURE = 1
+
         //无障碍基础服务
         var accessibilityService: AccessibilityApi? = null
 
-        //无障碍高级服务 执行手势等操作 fixme 开启后部分机型掉帧
+        //无障碍高级服务 执行手势等操作
         var gestureService: AccessibilityApi? = null
 
         val currentScope get() = accessibilityService?.currentScope
 
         val isBaseServiceOn: Boolean
             get() = (accessibilityService != null)
-        val isAdvanServiceOn: Boolean get() = gestureService != null
+        val isGestureServiceOn: Boolean get() = gestureService != null
+
+        @JvmStatic
+        fun isServiceEnable(which: Int): Boolean =
+            if (which == WHICH_SERVICE_BASE) isBaseServiceOn
+            else isGestureServiceOn
+
+        fun serviceCls(which: Int): Class<*> {
+            return Class.forName(if (which == WHICH_SERVICE_BASE) {
+                "cn.vove7.jarvis.services.MyAccessibilityService"
+            } else {
+                "cn.vove7.jarvis.services.GestureService"
+            })
+        }
 
         /**
          * 等待无障碍开启，最长等待30s
@@ -101,78 +116,98 @@ abstract class AccessibilityApi : AccessibilityService() {
         @JvmOverloads
         @JvmStatic
         @Throws(NeedAccessibilityException::class)
-        fun waitAccessibility(waitMillis: Long = 30000): Boolean {
-            if (isBaseServiceOn) return true
-            else if (ShellHelper.isRoot() || canWriteSecureSettings()) {
-                autoOpenService(0, false)
-            } else PermissionUtils.gotoAccessibilitySetting2(GlobalApp.APP, Class.forName("cn.vove7.jarvis.services.MyAccessibilityService"))
-
-            return whileWaitTime(min(30000, waitMillis)) {
-                if (isBaseServiceOn)
-                    true
-                else {
-                    sleep(500)
-                    null
-                }
-            } ?: throw NeedAccessibilityException()
+        fun waitAccessibility(which: Int = WHICH_SERVICE_BASE, waitMillis: Long = 30000): Boolean {
+            requireAccessibility(which, waitMillis)
+            return true
         }
 
-        fun requireAccessibility() {
-            if (!isBaseServiceOn) {
-                if (ShellHelper.isRoot() || canWriteSecureSettings()) {
-                    autoOpenService(0, true)
+        fun requireGestureService(): AccessibilityApi {
+            return requireAccessibility(WHICH_SERVICE_GESTURE)
+        }
+
+        @JvmStatic
+        @JvmOverloads
+        fun requireAccessibility(which: Int = WHICH_SERVICE_BASE, waitMillis: Long = 30000): AccessibilityApi {
+            if (!isServiceEnable(which)) {
+                if (ShellHelper.hasRootOrAdb() || canWriteSecureSettings()) {
+                    autoOpenService(which, true)
                 } else {
-                    PermissionUtils.gotoAccessibilitySetting2(GlobalApp.APP, Class.forName("cn.vove7.jarvis.services.MyAccessibilityService"))
-                    throw NeedAccessibilityException()
+                    GlobalApp.toastInfo("请手动开启无障碍服务")
+                    PermissionUtils.gotoAccessibilitySetting2(GlobalApp.APP, serviceCls(which))
+                    whileWaitTime(min(30000, waitMillis)) {
+                        if (isServiceEnable(which)) true
+                        else {
+                            sleep(500)
+                            null
+                        }
+                    } ?: throw NeedAccessibilityException(which)
                 }
+            }
+            if (isServiceEnable(which)) {
+                return if (which == WHICH_SERVICE_BASE)
+                    accessibilityService!!
+                else gestureService!!
+            } else {
+                throw NeedAccessibilityException(which)
             }
         }
 
-        private fun autoOpenService(what: Int = 0, checkAfter: Boolean) {
-            if (ShellHelper.isRoot() || canWriteSecureSettings()) {
-                openServiceSelf(what)
+        @JvmStatic
+        @JvmOverloads
+        fun autoOpenService(
+            which: Int = WHICH_SERVICE_BASE,
+            checkAfter: Boolean,
+            failByUser: Boolean = false
+        ): Boolean {
+            if (ShellHelper.hasRootOrAdb() || canWriteSecureSettings()) {
+                openServiceSelf(which)
                 if (checkAfter) {
-                    delayRun(3000) {
-                        if (!isBaseServiceOn) {
-                            runOnUi {
-                                val service = if (what == 0) {
-                                    "cn.vove7.jarvis.services.MyAccessibilityService"
-                                } else {
-                                    "cn.vove7.jarvis.services.GestureService"
-                                }
-                                PermissionUtils.gotoAccessibilitySetting2(GlobalApp.APP, Class.forName(service))
+                    val b = whileWaitTime(2000) {
+                        if (isServiceEnable(which)) true
+                        else {
+                            sleep(500)
+                            null
+                        }
+                    }
+                    return if (b == true) {
+                        true
+                    } else {
+                        runOnUi {
+                            if (failByUser) {
+                                val service = serviceCls(which)
+                                PermissionUtils.gotoAccessibilitySetting2(GlobalApp.APP, service)
                             }
                         }
+                        false
                     }
                 }
             }
+            return false
         }
-
 
         /**
          * @return 是否成功
          */
-        fun openServiceSelf(what: Int): Boolean {
-            if (isBaseServiceOn) return true
+        fun openServiceSelf(which: Int): Boolean {
+            val serviceEnabled =
+                if (which == WHICH_SERVICE_BASE) isBaseServiceOn
+                else isGestureServiceOn
+            if (serviceEnabled) return true
 
-            val service = if (what == 0) {
-                "cn.vove7.jarvis.services.MyAccessibilityService"
-            } else {
-                "cn.vove7.jarvis.services.GestureService"
-            }
+            val service = serviceCls(which).name
 
             val (s, b) = when {
-                ShellHelper.hasRoot() -> {
-                    "使用Root权限" to ShellHelper.openAppAccessService(GlobalApp.APP.packageName, service)
-                }
                 canWriteSecureSettings() -> {
                     "使用WRITE_SECURE_SETTINGS权限" to openServiceBySettings(service)
+                }
+                ShellHelper.hasRootOrAdb() -> {
+                    "使用Root权限" to ShellHelper.openAppAccessService(GlobalApp.APP.packageName, service)
                 }
                 else -> {
                     "无任何权限" to false
                 }
             }
-            val msg = "$s 无障碍开启${if (b) "成功" else "失败"}"
+            val msg = "$s 无障碍开启${if (b) "成功" else "失败"} $service"
             if (b) GlobalLog.log(msg)
             else GlobalLog.err(msg)
             return b
@@ -180,7 +215,7 @@ abstract class AccessibilityApi : AccessibilityService() {
 
         private fun canWriteSecureSettings(): Boolean {
             return PermissionUtils.isAllGranted(GlobalApp.APP,
-                    arrayOf("android.permission.WRITE_SECURE_SETTINGS"))
+                arrayOf("android.permission.WRITE_SECURE_SETTINGS"))
         }
 
         /**
@@ -190,7 +225,7 @@ abstract class AccessibilityApi : AccessibilityService() {
         private fun openServiceBySettings(serviceName: String): Boolean {
             val context = GlobalApp.APP
             var enabledServicesSetting = Settings.Secure.getString(
-                    context.contentResolver, Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES) ?: ""
+                context.contentResolver, Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES) ?: ""
             val selfComponentName = ComponentName(context.packageName, serviceName)
             val flattenToString = selfComponentName.flattenToString()
 
@@ -199,9 +234,9 @@ abstract class AccessibilityApi : AccessibilityService() {
             }
             return try {
                 Settings.Secure.putString(context.contentResolver,
-                        Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES, enabledServicesSetting)
+                    Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES, enabledServicesSetting)
                 Settings.Secure.putInt(context.contentResolver,
-                        Settings.Secure.ACCESSIBILITY_ENABLED, 1)
+                    Settings.Secure.ACCESSIBILITY_ENABLED, 1)
                 true
             } catch (e: Throwable) {
                 false

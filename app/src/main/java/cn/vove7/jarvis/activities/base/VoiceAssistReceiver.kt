@@ -73,7 +73,7 @@ class VoiceAssistActivity : Activity() {
             }
             SET_ASSIST_APP ->
                 thread(isDaemon = true) {
-                    if (AppPermission.canWriteSecureSettings || ShellHelper.hasRoot(100)) {
+                    if (AppPermission.canWriteSecureSettings || ShellHelper.hasRootOrAdb()) {
                         try {
                             setAssistantApp()
                             GlobalApp.toastSuccess("设置完成")

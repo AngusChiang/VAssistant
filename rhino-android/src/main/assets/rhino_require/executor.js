@@ -13,8 +13,11 @@ notifyFailed = function(s){
 accessibility = function(){
     return executor.checkAccessibilityService(true)
 }
-requireAccessibility = function(){
-    executor.requireAccessibility()
+requireAccessibility = function(which){
+    if(which)
+        executor.requireAccessibility(which)
+    else
+        executor.requireAccessibility()
 }
 waitAccessibility = function(m) {
     if(m)

@@ -66,17 +66,13 @@ fun openQQChat(qq: String) {
 fun openAccessibilityServiceAuto() {
     Vog.d("打开无障碍")
     if (AccessibilityApi.isBaseServiceOn) return
-    /*if (AppConfig.IS_SYS_APP) {
-        Vog.d("", "openAccessibilityService ---> 打开无障碍 as SYS_APP")
-        AccessibilityApi.openServiceSelf()
-    } else */
     if (AppConfig.autoOpenAS) {
         GlobalLog.log("自启打开无障碍服务")
-        AccessibilityApi.openServiceSelf(0)
+        AccessibilityApi.openServiceSelf(AccessibilityApi.WHICH_SERVICE_BASE)
     }
     if (AppConfig.autoOpenAAS) {
         GlobalLog.log("自启打开高级无障碍服务")
-        AccessibilityApi.openServiceSelf(1)
+        AccessibilityApi.openServiceSelf(AccessibilityApi.WHICH_SERVICE_GESTURE)
     }
 }
 
@@ -104,10 +100,10 @@ fun setAssistantApp() {
         Settings.Secure.putString(cr, "assistant", name)
         Settings.Secure.putString(cr, "voice_interaction_service", name)
 
-    } else if (ShellHelper.hasRoot(100)) {
+    } else if (ShellHelper.hasRootOrAdb()) {
         GlobalLog.log("设为助手应用[ROOT]")
-        ShellHelper.execWithSu("settings put secure assistant $name")
-        ShellHelper.execWithSu("settings put secure voice_interaction_service $name")
+        ShellHelper.execAuto("settings put secure assistant $name")
+        ShellHelper.execAuto("settings put secure voice_interaction_service $name")
     }
 }
 

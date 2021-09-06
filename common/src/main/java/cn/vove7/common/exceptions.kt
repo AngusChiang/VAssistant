@@ -1,5 +1,6 @@
 package cn.vove7.common
 
+import cn.vove7.common.accessibility.AccessibilityApi
 import cn.vove7.common.view.finder.ViewFinder
 
 /**
@@ -25,7 +26,9 @@ class MessageException(msg: String?) : Exception(msg)
  * 无障碍服务未运行异常
  * @constructor
  */
-class NeedAccessibilityException : RuntimeException("无障碍服务未运行")
+class NeedAccessibilityException(val which: Int = AccessibilityApi.WHICH_SERVICE_BASE)
+    : RuntimeException((if (which == AccessibilityApi.WHICH_SERVICE_BASE) "[基础]" else "[高级]") +
+    "无障碍服务未运行")
 
 /**
  * 指令不支持的操作

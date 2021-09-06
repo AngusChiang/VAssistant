@@ -16,6 +16,7 @@ import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.appbus.AppBus
 import cn.vove7.common.helper.AdvanAppHelper
+import cn.vove7.common.helper.ConnectiveNsdHelper
 import cn.vove7.common.utils.md5
 import cn.vove7.common.utils.runOnNewHandlerThread
 import cn.vove7.jarvis.R
@@ -37,6 +38,7 @@ import cn.vove7.smartkey.android.AndroidSettings
 import cn.vove7.vtp.log.Vog
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import org.lsposed.hiddenapibypass.HiddenApiBypass
 import kotlin.system.exitProcess
 
 
@@ -44,6 +46,9 @@ import kotlin.system.exitProcess
 class App : GlobalApp() {
 
     override fun onCreate() {
+        if (Build.VERSION.SDK_INT >= 28) {
+            HiddenApiBypass.setHiddenApiExemptions("L")
+        }
         CrashHandler.install()
         super.onCreate()
         if (!isMainProcess) {
@@ -109,15 +114,12 @@ class InitCp : ContentProvider() {
             AdvanAppHelper.getPkgList()
             startBroadcastReceivers()
             launchExtension()
-
-            val foreService = Intent(context, ForegroundService::class.java)
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                context?.startForegroundService(foreService)
-            } else {
-                context?.startService(foreService)
-            }
+            ForegroundService.start(context!!)
             a().c()
             TimedTaskManager.init()
+            delayRun(5000) {
+                ConnectiveNsdHelper.start()
+            }
         }
         return true
     }

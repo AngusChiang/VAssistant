@@ -1,18 +1,20 @@
 package cn.vove7.common.bridges
 
 import android.accessibilityservice.AccessibilityServiceInfo
+import android.annotation.SuppressLint
 import android.content.Context
-import android.util.Log
 import android.view.accessibility.AccessibilityManager
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.model.ResultBox
-import cn.vove7.jarvis.jadb.JAdb
+import cn.vove7.jadb.AdbClient
+import cn.vove7.jadb.AdbCrypto
 import cn.vove7.vtp.log.Vog
 import com.stericson.RootShell.RootShell
-import java.io.DataInputStream
+import java.io.BufferedReader
 import java.io.DataOutputStream
-import kotlin.concurrent.thread
+import java.io.InputStreamReader
+import java.net.Inet4Address
 
 /**
  *
@@ -20,7 +22,10 @@ import kotlin.concurrent.thread
 @Suppress("unused")
 object ShellHelper {
 
-    private var _jadb: JAdb? = null
+    @SuppressLint("StaticFieldLeak")
+    private var _adbClient: AdbClient? = null
+
+    private var rooted = false
 
     /**
      * 判断即是否授予root权限
@@ -29,9 +34,12 @@ object ShellHelper {
     fun isRoot(): Boolean = hasRoot(100)
 
     @JvmStatic
-    fun hasRoot(timeOut: Int = 5000): Boolean = RootShell.isAccessGiven(timeOut, 0)
+    fun hasRoot(timeOut: Int = 5000): Boolean = run {
+        if (!rooted) rooted = RootShell.isAccessGiven(timeOut, 0)
+        rooted
+    }
 
-    fun hasRootOrAdb() = hasRoot() || SystemBridge.isWirelessAdbEnabled()
+    fun hasRootOrAdb() = hasRoot(500) || SystemBridge.isWirelessAdbEnabled()
 
     /**
      * 执行无root命令
@@ -44,11 +52,11 @@ object ShellHelper {
         try {
             val p = Runtime.getRuntime().exec(cmd)
             DataOutputStream(p.outputStream).use { dos ->
-                DataInputStream(p.inputStream).use { dis ->
+                BufferedReader(InputStreamReader(p.inputStream)).use { dis ->
                     dos.flush()
                     dos.writeBytes("exit\n")
                     dos.flush()
-                    while ((dis.readLine().also { result.appendln(it) }) != null);
+                    while ((dis.readLine().also { result.appendLine(it) }) != null);
                     p.waitFor()
                 }
             }
@@ -66,18 +74,18 @@ object ShellHelper {
      */
     @Throws
     @JvmOverloads
-    fun execWithSu(cmd: String, waitResult: Boolean = true): String? {
+    fun execWithSu(cmd: String, waitResult: Boolean = true): String {
         GlobalLog.log("execWithSu ---> $cmd")
         val result = StringBuilder()
         val p = Runtime.getRuntime().exec("su")// 经过Root处理的android系统即有su命令
         DataOutputStream(p.outputStream).use { dos ->
-            DataInputStream(p.inputStream).use { dis ->
+            BufferedReader(InputStreamReader(p.inputStream)).use { dis ->
                 dos.writeBytes(cmd + "\n")
                 dos.flush()
                 dos.writeBytes("exit\n")
                 dos.flush()
                 if (waitResult) {
-                    while ((dis.readLine().also { result.appendln(it) }) != null);
+                    while ((dis.readLine().also { result.appendLine(it) }) != null);
                     p.waitFor()
                 }
             }
@@ -110,11 +118,10 @@ object ShellHelper {
     }
 
     fun openAppAccessService(pkg: String, serviceName: String): Boolean {
-        if (!hasRoot()) return false
         Vog.d("openAppAccessService ---> $serviceName")
         //同时不关闭其他
         return try {
-            execWithSu(buildList("$pkg/$serviceName"))
+            execAuto(buildList("$pkg/$serviceName"))
             true
         } catch (e: Exception) {
             GlobalLog.err(e.message)
@@ -132,9 +139,9 @@ object ShellHelper {
             append(s)
             val am = GlobalApp.APP.getSystemService(Context.ACCESSIBILITY_SERVICE) as AccessibilityManager
             am.getEnabledAccessibilityServiceList(AccessibilityServiceInfo.FEEDBACK_GENERIC)
-                    ?.forEach {
-                        append(":${it.id}")
-                    }
+                ?.forEach {
+                    append(":${it.id}")
+                }
             appendLine()
             appendLine("settings put secure accessibility_enabled 1")
         }.also {
@@ -152,70 +159,37 @@ object ShellHelper {
     }
 
     @JvmOverloads
-    fun execWithAdb(cmd: String?, waitResult: Boolean = true, timeout: Int = 6000): String? {
-        val jadb = _jadb ?: JAdb().also {
-            _jadb = it
-            it.onCloseListener = {
-                _jadb = null
-            }
-            it.connect(GlobalApp.APP)
+    fun execWithAdb(cmd: String?, waitResult: Boolean = true, close: Boolean = waitResult, timeout: Int = 6000): String? {
+        val jadb = _adbClient ?: AdbClient(
+            GlobalApp.APP,
+            Inet4Address.getLoopbackAddress().hostName,
+            SystemBridge.adbPort(),
+            adbCrypto = AdbCrypto.get(GlobalApp.APP),
+            name = "VAssistant"
+        ).also {
+            _adbClient = it
+            it.connect()
         }
 
-        fun String.isEnd(): Boolean {
-            if (jadb.shellHeader == null) {
-                if (this.matches(".*:/.*[$#][ ]*".toRegex())) {
-                    return true
-                }
-            } else {
-                if (this.matches(jadb.shellHeader!!
-                                .replace("/ $", ".*\\$")
-                                .replace("/ #", ".*#")
-                                .toRegex())) {
-                    return true
-                }
-            }
-            return false
-        }
-
-        val stream = jadb.execOnShell(cmd ?: " ")
+        val stream = jadb.shellCommand(cmd ?: " ")
         if (!waitResult) {
-            stream.close()
+            if (close) {
+                stream.close()
+            }
             return null
         }
         val box = ResultBox<String>()
-        val t = thread {//异步读取 防止异常超时
-            val tt = Thread.currentThread()
-            val sb = StringBuilder()
-            var f = true
-            while (!tt.isInterrupted) {
-                try {
-                    val s = stream.read()
-                    if (f && !String(s).isEnd()) {
-                        f = false
-                        continue
-                    }
-                    sb.append(String(s))
-                } catch (e: Throwable) {
-                    box.setAndNotify(sb.toString())
-                    break
-                }
-                val lastLine = sb.toString().lines().last()
-                if (lastLine.isEnd()) {
-                    Log.d("ADB", "raw out: $sb")
-                    sb.deleteRange((sb.length - lastLine.length - 1).coerceAtLeast(0), sb.length)
-                    box.setAndNotify(sb.toString())
-                    break
-                }
-            }
+        stream.onClose {
+            box.setAndNotify(String(data))
         }
         return box.blockedGet(false, timeout.toLong()).also {
-            t.interrupt()
+            stream.onClose(null)
         }
     }
 
     fun release() {
-        _jadb?.close()
-        _jadb = null
+        _adbClient?.close()
+        _adbClient = null
     }
 
 }

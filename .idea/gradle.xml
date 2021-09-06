@@ -8,14 +8,18 @@
         <option name="distributionType" value="DEFAULT_WRAPPED" />
         <option name="externalProjectPath" value="$PROJECT_DIR$" />
         <option name="gradleHome" value="/usr/local/Cellar/gradle/6.7.1/libexec" />
+        <option name="gradleJvm" value="Embedded JDK" />
         <option name="modules">
           <set>
+            <option value="$USER_HOME$/AndroidStudioProjects/ScrcpyLib/common" />
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/androlua" />
             <option value="$PROJECT_DIR$/app" />
             <option value="$PROJECT_DIR$/common" />
             <option value="$PROJECT_DIR$/executorengine" />
             <option value="$PROJECT_DIR$/jadb" />
+            <option value="$PROJECT_DIR$/jadb/hidden-api-common" />
+            <option value="$PROJECT_DIR$/jadb/hidden-api-common-bridge" />
             <option value="$PROJECT_DIR$/rhino-android" />
             <option value="$PROJECT_DIR$/speechLib" />
           </set>

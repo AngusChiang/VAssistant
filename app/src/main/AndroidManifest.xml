@@ -362,16 +362,6 @@
             </intent-filter>
         </activity>
 
-        <meta-data
-            android:name="com.baidu.speech.APP_ID"
-            android:value="10922901" />
-        <meta-data
-            android:name="com.baidu.speech.API_KEY"
-            android:value="xwzlOfIIysRN7IDdcjA823ZS" />
-        <meta-data
-            android:name="com.baidu.speech.SECRET_KEY"
-            android:value="d9ef661698c5d8cd45978aa55e600e03" />
-
         <!--屏幕助手-->
         <provider
             android:name="androidx.core.content.FileProvider"

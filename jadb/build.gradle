@@ -4,16 +4,22 @@ plugins {
 }
 
 android {
-    compileSdk 30
+    compileSdkVersion 30
 
     defaultConfig {
-        minSdk 16
-        targetSdk 30
+        minSdkVersion 21
+        targetSdkVersion 30
         versionCode 1
         versionName "1.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles "consumer-rules.pro"
+
+        externalNativeBuild {
+            cmake {
+                arguments '-DANDROID_STL=none'
+            }
+        }
     }
 
     buildTypes {
@@ -29,11 +35,31 @@ android {
     kotlinOptions {
         jvmTarget = '1.8'
     }
+    externalNativeBuild {
+        cmake {
+            path 'src/main/cpp/CMakeLists.txt'
+        }
+    }
+
+    buildFeatures {
+        prefab true
+        viewBinding true
+    }
 }
 
 dependencies {
-    implementation 'androidx.core:core-ktx:1.6.0'
-    implementation 'org.greenrobot:eventbus:3.1.1'
 
-    debugImplementation 'androidx.appcompat:appcompat:1.3.1'
+    implementation 'androidx.core:core-ktx:1.6.0'
+    implementation 'androidx.appcompat:appcompat:1.3.1'
+    implementation 'com.google.android.material:material:1.4.0'
+    testImplementation 'junit:junit:4.+'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.3'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
+
+    api project(":jadb:hidden-api-common-bridge")
+
+    implementation 'io.github.vvb2060.ndk:boringssl:2.1'
+    implementation 'dev.rikka.ndk.thirdparty:cxx:1.1.0'
+    implementation 'org.bouncycastle:bcpkix-jdk15on:1.68'
+    api 'org.lsposed.hiddenapibypass:hiddenapibypass:2.0'
 }

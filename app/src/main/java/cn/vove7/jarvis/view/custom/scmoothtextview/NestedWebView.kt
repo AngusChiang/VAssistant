@@ -34,7 +34,7 @@ open class NestedWebView : WebView, NestedScrollingChild {
         Vog.d("$y\n$ev")
         val returnValue: Boolean
         val event = MotionEvent.obtain(ev)
-        val action = MotionEventCompat.getActionMasked(event)
+        val action = event.action
         if (action == MotionEvent.ACTION_DOWN) {
             mNestedOffsetY = 0
         }

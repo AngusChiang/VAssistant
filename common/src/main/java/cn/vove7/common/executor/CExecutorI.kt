@@ -1,6 +1,7 @@
 package cn.vove7.common.executor
 
 import cn.vove7.common.NotSupportException
+import cn.vove7.common.accessibility.AccessibilityApi
 import cn.vove7.common.accessibility.viewnode.ViewNode
 import cn.vove7.common.bridges.ChoiceData
 import cn.vove7.common.datamanager.parse.model.Action
@@ -30,13 +31,16 @@ interface CExecutorI : ActivityShowListener, RuntimeArgs, SpeakCallback {
      * 若未开启，抛出异常终止
      */
     @Throws
-    fun requireAccessibility()
+    fun requireAccessibility() = requireAccessibility(AccessibilityApi.WHICH_SERVICE_BASE)
+
+    fun requireAccessibility(which: Int)
 
     /**
      * 等待无障碍开启
      * @return Boolean 是否开启
      */
-    fun waitAccessibility(waitMillis: Long): Boolean
+    fun waitAccessibility(waitMillis: Long): Boolean = waitAccessibility(0, waitMillis)
+    fun waitAccessibility(which: Int = 0, waitMillis: Long): Boolean
 
     fun execQueue(cmdWords: String, actionQueue: PriorityQueue<Action>, sync: Boolean = true): Int
     fun interrupt()
@@ -62,6 +66,7 @@ interface CExecutorI : ActivityShowListener, RuntimeArgs, SpeakCallback {
     fun waitForSingleChoice(askTitle: String, choiceData: List<ChoiceData>): ChoiceData?
 
     fun onSingleChoiceResult(index: Int, data: ChoiceData?)
+
     //Api使用
     fun singleChoiceDialog(askTitle: String, choiceData: Array<String>): Int?
 //    fun multiChoiceDialog(askTitle: String, choiceData: Array<String>)
@@ -92,6 +97,7 @@ interface CExecutorI : ActivityShowListener, RuntimeArgs, SpeakCallback {
 
     fun smartOpen(data: String): Boolean
     fun smartClose(data: String): Boolean
+
     /**
      * 语音合成
      * 异步
@@ -119,6 +125,7 @@ interface RuntimeArgs {
     var DEBUG: Boolean
     var userInterrupted: Boolean//用户中断
     var command: String?
+
     //Runtime
     var currentActionIndex: Int
     var actionCount: Int

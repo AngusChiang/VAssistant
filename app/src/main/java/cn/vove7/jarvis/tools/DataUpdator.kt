@@ -184,14 +184,13 @@ object DataUpdator {
                 , arrayOf("标记应用", lastDateInfo.markedApp, R.string.key_last_sync_marked_app_date)//4
                 , arrayOf("标记功能", lastDateInfo.markedOpen, R.string.key_last_sync_marked_open_date)//5
                 , arrayOf("标记广告", lastDateInfo.markedAd, R.string.key_last_sync_marked_ad_date) //6
-        ).withIndex().forEach { kv ->
-            val it = kv.value
+        ).forEachIndexed { i, it ->
             val lastDate = it[1] as Long? ?: -1L
             val lastUpdate = sp.getLong(it[2] as Int)
             val isOutDate = lastDate > lastUpdate
             if (isOutDate) {
-                needUpdateTypes.add(kv.index)
-                needUpdateS.appendln(it[0])
+                needUpdateTypes.add(i)
+                needUpdateS.appendLine(it[0])
             }
         }
         return Pair(needUpdateTypes, needUpdateS.toString())

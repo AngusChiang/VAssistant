@@ -38,7 +38,7 @@ interface VApi {
         val httpFunctions = arrayOf("get()", "post()", "postJson()", "getAsPc()")
 
         val androRuntimeFuncs = arrayOf(
-                "hasRoot()", "exec()", "execWithSu()", "adbEnable()", "execWithdb()"
+                "hasRoot()", "exec()", "execWithSu()", "adbEnable()", "execWithAdb()", "execAuto()"
         )
         val finderFuns = arrayOf(
                 "ViewFinder()", "waitFor()", "depths()",

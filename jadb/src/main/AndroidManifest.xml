@@ -1,5 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="cn.vove7.jarvis.jadb">
+<manifest package="cn.vove7.jadb"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <application>
+        <activity android:name=".debug.AdbActivity" />
+        <activity android:name=".debug.AdbPairActivity" />
+        <activity android:name=".debug.AdbShellActivity" />
+        <activity android:name=".debug.Check5555Activity" />
+
+    </application>
 
 </manifest>

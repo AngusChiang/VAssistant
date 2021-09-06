@@ -4,7 +4,6 @@ import cn.vove7.common.app.AppConfig
 import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.bridges.HttpBridge
 import cn.vove7.common.net.tool.SecureHelper
-import cn.vove7.jarvis.tools.BaiduKey
 import cn.vove7.jarvis.tools.baiduaip.model.ImageClassifyResult
 import cn.vove7.jarvis.tools.baiduaip.model.Point
 import cn.vove7.jarvis.tools.baiduaip.model.TextOcrItem
@@ -26,13 +25,18 @@ import java.util.*
  */
 object BaiduAipHelper {
 
+    private const val APP_ID = "10922901"
+    private const val API_KEY = "xwzlOfIIysRN7IDdcjA823ZS"
+    private const val SECRET_KEY = "d9ef661698c5d8cd45978aa55e600e03"
+
+
     /**
      * 分词
      * @param text String
      * @return List<String>?
      */
     fun lexer(text: String): List<String>? {
-        val client = AipNlp(BaiduKey.appId.toString(), BaiduKey.appKey, BaiduKey.sKey)
+        val client = AipNlp(APP_ID, API_KEY, SECRET_KEY)
 
         try {// 可选：设置网络连接参数
             client.setConnectionTimeoutInMillis(5000)
@@ -70,7 +74,7 @@ object BaiduAipHelper {
      * @return ImageClassifyResult?
      */
     fun imageClassify(path: String): ImageClassifyResult? {
-        val client = AipImageClassify(BaiduKey.appId.toString(), BaiduKey.appKey, BaiduKey.sKey)
+        val client = AipImageClassify(APP_ID, API_KEY, SECRET_KEY)
         client.setConnectionTimeoutInMillis(5000)
         client.setSocketTimeoutInMillis(6000)
         val result = client.advancedGeneral(path, hashMapOf(Pair("baike_num", "1")))
@@ -107,7 +111,7 @@ object BaiduAipHelper {
     }
 
 
-    fun ocr(imgFIle: File, minP: Double = 0.7): ArrayList<TextOcrItem> = BaiduAipHelper.ocr(imgFIle.absolutePath, minP)
+    fun ocr(imgFIle: File, minP: Double = 0.7): ArrayList<TextOcrItem> = ocr(imgFIle.absolutePath, minP)
 
     /**
      * 图片文字ocr
@@ -117,7 +121,7 @@ object BaiduAipHelper {
         val ocrStr = AppConfig.textOcrStr
         Vog.d("ocr ---> $ocrStr")
         val baiduOcr = if (ocrStr?.isBlank() != false) {//null or true
-            AipOcr(BaiduKey.appId.toString(), BaiduKey.appKey, BaiduKey.sKey)
+            AipOcr(APP_ID, API_KEY, SECRET_KEY)
         } else {
             try {
                 val kkk = ocrStr.split("#")

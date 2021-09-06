@@ -111,7 +111,7 @@ interface SystemOperation {
      */
     fun openUrl(url: String): Boolean
 
-    fun sendKey(keyCode: Int)
+    fun sendKey(keyCode: Int): Boolean
 
     //Media control
     fun mediaPause()
@@ -315,6 +315,8 @@ interface SystemOperation {
     fun isAdbEnabled(): Boolean
 
     fun isWirelessAdbEnabled(): Boolean
+
+    fun adbPort(): Int
 
     fun currentApp(): AppInfo?
 

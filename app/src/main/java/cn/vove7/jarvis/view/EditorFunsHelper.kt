@@ -167,6 +167,7 @@ class EditorFunsHelper(
                         ApiFunction("hasRoot()", "获取设备是否Root，返回Boolean"),
                         ApiFunction("execWithSu(cmd)", "执行root命令，返回String"),
                         ApiFunction("execWithAdb(cmd)", "使用adb执行shell, `cmd实际为为adb shell \${cmd}`\n示例:\n- 1. 发送Home按键事件：`input keyevent 3`\n2. 发送点击事件：`input tap 500 500`\n3. 发送文本：`input text hello`"),
+                        ApiFunction("execAuto(cmd)", "使用adb或root执行shell"),
                         ApiFunction("adbEnable()", "返回adb服务是否可用(boolean)，参考[权限管理/ADB服务]"),
                 ), insertPre = "shell."),
                 ApiCategory("其他", listOf(//指令设置

@@ -1,7 +1,37 @@
 
 todo
 
+连接方式
+1 root
+2 Android 11 adb pair
+3 PC/Android webadb
+
+控制端服务
+ShellActionExecutor 实现
+网络发现服务
+
 adb 控制
+
+本地 web-ide?
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 - 媒体音乐
 

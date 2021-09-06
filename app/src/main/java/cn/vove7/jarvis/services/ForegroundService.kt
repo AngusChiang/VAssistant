@@ -4,6 +4,7 @@ import android.app.NotificationManager
 import android.app.PendingIntent
 import android.app.Service
 import android.content.ComponentName
+import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.os.IBinder
@@ -11,20 +12,21 @@ import android.text.SpannableStringBuilder
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
-import cn.vove7.common.activities.RunnableActivity
-import cn.vove7.common.app.AppConfig
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.app.GlobalLog
+import cn.vove7.common.app.withFailLog
 import cn.vove7.common.appbus.AppBus
+import cn.vove7.common.bridges.SystemBridge
+import cn.vove7.common.helper.ConnectiveNsdHelper
 import cn.vove7.common.utils.runInCatch
 import cn.vove7.common.utils.spanColor
+import cn.vove7.jarvis.BuildConfig
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.activities.base.VoiceAssistActivity
 import cn.vove7.jarvis.activities.screenassistant.ScreenAssistActivity
 import cn.vove7.jarvis.receivers.UtilEventReceiver
 import cn.vove7.jarvis.tools.debugserver.RemoteDebugServer
 import cn.vove7.jarvis.tools.fixApplicationNewTask
-import cn.vove7.vtp.log.Vog
 import cn.vove7.vtp.notification.ChannelBuilder
 
 /**
@@ -36,6 +38,8 @@ import cn.vove7.vtp.notification.ChannelBuilder
 class ForegroundService : Service() {
 
     companion object {
+        private const val CHANNEL_ID = "foreground_service_2"
+
         @JvmStatic
         fun refreshTitle() {
             val i = Intent(GlobalApp.APP, ForegroundService::class.java)
@@ -44,25 +48,35 @@ class ForegroundService : Service() {
                 GlobalApp.APP.startService(i)
             }
         }
+
+        fun start(context: Context) {
+            val foreService = Intent(context, ForegroundService::class.java)
+            kotlin.runCatching {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    context.startForegroundService(foreService)
+                } else {
+                    context.startService(foreService)
+                }
+            }.withFailLog()
+        }
     }
 
     private val channel
         get() = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            ChannelBuilder.with("foreground_service_2", "前台服务", NotificationManagerCompat.IMPORTANCE_MIN)
-                    .build().apply {
-                        setShowBadge(false)
-                        enableVibration(false)
-                        enableLights(false)
-                    }
+            ChannelBuilder.with(CHANNEL_ID, "前台服务", NotificationManagerCompat.IMPORTANCE_MIN)
+                .build().apply {
+                    setShowBadge(false)
+                    enableVibration(false)
+                    enableLights(false)
+                }
         } else null
 
     private val builder
-        get() = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val c = channel!!
-            getSystemService(NotificationManager::class.java).createNotificationChannel(c)
-            NotificationCompat.Builder(this, c.id)
-        } else {
-            NotificationCompat.Builder(this)
+        get() = NotificationCompat.Builder(this, CHANNEL_ID).also {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                getSystemService(NotificationManager::class.java)
+                    .createNotificationChannel(channel!!)
+            }
         }
 
     private fun getPendingIntent(action: String): PendingIntent {
@@ -82,21 +96,23 @@ class ForegroundService : Service() {
             val googleRed by lazy { ContextCompat.getColor(this@ForegroundService, R.color.google_red) }
             if (MainService.wakeupOpen) {
                 addAction(0, "关闭语音唤醒".spanColor(googleRed),
-                        PendingIntent.getBroadcast(this@ForegroundService,
-                                0, UtilEventReceiver.getIntent(AppBus.ACTION_STOP_WAKEUP), 0)
+                    PendingIntent.getBroadcast(this@ForegroundService,
+                        0, UtilEventReceiver.getIntent(AppBus.ACTION_STOP_WAKEUP), 0)
                 )
             }
             if (!RemoteDebugServer.stopped) {
                 addAction(0, "关闭调试".spanColor(googleRed),
-                PendingIntent.getBroadcast(this@ForegroundService,
+                    PendingIntent.getBroadcast(this@ForegroundService,
                         0, UtilEventReceiver.getIntent(AppBus.ACTION_STOP_DEBUG_SERVER), 0)
                 )
+            } else if(BuildConfig.DEBUG) {
+                addAction(0, "远程调试", getPendingIntent(VoiceAssistActivity.SWITCH_DEBUG_MODE))
             }
             priority = NotificationCompat.PRIORITY_MAX
             setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
             setSmallIcon(R.mipmap.ic_launcher_vassist)
             setOngoing(true)
-            setContentTitle("VAssist前台服务(可长按关闭)")
+            setContentTitle("VAssist前台服务")
             setContentText(buildContent())
         }.build()
 
@@ -110,7 +126,7 @@ class ForegroundService : Service() {
         status.clear()
 
         if (!RemoteDebugServer.stopped) {
-            status += "远程调试"
+            status += "远程调试(${SystemBridge.getLocalIpAddress()})[${RemoteDebugServer.clientCount}]"
         }
 
         if (MainService.wakeupOpen) {
@@ -134,6 +150,7 @@ class ForegroundService : Service() {
     override fun onCreate() {
         super.onCreate()
         GlobalApp.ForeService = this
+        ConnectiveNsdHelper.start()
         GlobalLog.log("开启前台服务")
         startForeground(1111, foreNotification)
     }
@@ -148,7 +165,7 @@ class ForegroundService : Service() {
     override fun onDestroy() {
         stopForeground(true)
         super.onDestroy()
-        GlobalApp.ForeService = null
+        GlobalApp.ForeService = GlobalApp.APP
     }
 
     override fun startActivity(intent: Intent?) {

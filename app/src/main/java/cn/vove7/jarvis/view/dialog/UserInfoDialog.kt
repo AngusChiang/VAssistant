@@ -7,6 +7,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.widget.TextView
 import android.widget.Toast
+import cn.vove7.android.common.ext.delayRun
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.app.log
@@ -111,7 +112,7 @@ class UserInfoDialog(val context: Activity, val onUpdate: () -> Unit) {
 
         fun recharge(context: Activity) {
             val pd = ProgressDialog(context)
-            Handler().postDelayed({
+            delayRun(500) {
                 GlobalScope.launch(Dispatchers.IO) {
                     kotlin.runCatching {
                         AppApi.getVipPrices()
@@ -128,7 +129,7 @@ class UserInfoDialog(val context: Activity, val onUpdate: () -> Unit) {
                         }
                     }
                 }
-            }, 500)
+            }
         }
 
         /**
@@ -140,7 +141,7 @@ class UserInfoDialog(val context: Activity, val onUpdate: () -> Unit) {
 
             ps.withIndex().forEach {
                 bu.append("${it.value.durationText} \t (${it.value.price}元)")
-                if (it.index != ps.size - 1) bu.appendln()
+                if (it.index != ps.size - 1) bu.appendLine()
             }
             val cView = View.inflate(context, R.layout.dialog_recharge, null)
             cView.findViewById<TextView>(R.id.prices_text).text = bu.toString()

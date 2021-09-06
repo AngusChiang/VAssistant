@@ -5,12 +5,14 @@ import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.appbus.AppBus
 import cn.vove7.common.bridges.SystemBridge
 import cn.vove7.common.datamanager.parse.model.Action
+import cn.vove7.common.helper.ConnectiveNsdHelper
 import cn.vove7.common.net.tool.SecureHelper
 import cn.vove7.jarvis.services.MainService
 import cn.vove7.quantumclock.QuantumClock
 import cn.vove7.vtp.log.Vog
 import fi.iki.elonen.NanoHTTPD
 import java.net.URLDecoder
+import java.util.*
 import kotlin.math.abs
 
 /**
@@ -19,11 +21,14 @@ import kotlin.math.abs
  * @author Vove
  * 2020/1/7
  */
-class ConnectiveService : NanoHTTPD(8001) {
+private const val CONNECTIVE_SERVICE_PORT = 8001
+
+class ConnectiveService : NanoHTTPD(CONNECTIVE_SERVICE_PORT) {
 
     companion object {
         const val TYPE_COMMAND = "command"
         const val TYPE_SCRIPT = "script"
+        const val NSD_TYPE = "_vassistant_cs._tcp"
 
         private var ins: ConnectiveService? = null
 
@@ -44,9 +49,16 @@ class ConnectiveService : NanoHTTPD(8001) {
                 GlobalLog.log("互联服务关闭")
                 GlobalApp.toastInfo("互联服务关闭")
             }
+            MdnsManager.unexportService(CONNECTIVE_SERVICE_PORT)
             ins?.stop()
             ins = null
         }
+    }
+
+    override fun start(timeout: Int, daemon: Boolean) {
+        super.start(timeout, daemon)
+        MdnsManager.exportService(CONNECTIVE_SERVICE_PORT, NSD_TYPE,
+                ConnectiveNsdHelper.selfDeviceName)
     }
 
     override fun serve(session: IHTTPSession?): Response {
@@ -64,11 +76,11 @@ class ConnectiveService : NanoHTTPD(8001) {
         }
 
         GlobalLog.log(buildString {
-            appendln("远程指令请求：")
+            appendLine("远程指令请求：")
             session.headers.forEach {
-                appendln(it)
+                appendLine(it)
             }
-            appendln(session.queryParameterString)
+            appendLine(session.queryParameterString)
         })
         val sign = session.headers["sign"] ?: return refuse
         val ts = session.headers["ts"] ?: return refuse

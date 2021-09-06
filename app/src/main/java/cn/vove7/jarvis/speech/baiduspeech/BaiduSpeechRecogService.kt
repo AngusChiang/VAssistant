@@ -15,7 +15,9 @@ import cn.vove7.jarvis.speech.baiduspeech.recognition.recognizer.BaiduRecognizer
 import cn.vove7.jarvis.speech.baiduspeech.wakeup.BaiduVoiceWakeup
 import cn.vove7.jarvis.speech.baiduspeech.wakeup.RecogWakeupListener
 import cn.vove7.jarvis.speech.baiduspeech.wakeup.WakeupEventAdapter
+import cn.vove7.jarvis.tools.BaiduKey
 import cn.vove7.vtp.log.Vog
+import com.baidu.speech.asr.SpeechConstant
 import com.baidu.speech.asr.SpeechConstant.*
 import com.google.gson.Gson
 import com.google.gson.annotations.SerializedName
@@ -56,7 +58,7 @@ class BaiduSpeechRecogService(event: RecogEvent) : SpeechRecogService(event) {
             VAD to VAD_TOUCH,
             DISABLE_PUNCTUATION to false,//标点符号
             ACCEPT_AUDIO_VOLUME to true,
-            PID to 1536,
+            PID to 1537,
             AUDIO_SOURCE to MediaRecorder.AudioSource.VOICE_RECOGNITION,
             NLU to "enable"
     ).also {
@@ -82,6 +84,9 @@ class BaiduSpeechRecogService(event: RecogEvent) : SpeechRecogService(event) {
             it[SOUND_ERROR] = R.raw.recog_failed
             it[SOUND_CANCEL] = R.raw.recog_cancel
         }
+        it[APP_ID] = BaiduKey.appId
+        it[APP_KEY] = BaiduKey.appKey
+        it[SECRET] = BaiduKey.sKey
 
     }
 

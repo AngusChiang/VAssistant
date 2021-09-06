@@ -1,27 +1,10 @@
 package cn.vove7.jarvis.tools
 
-import android.content.pm.PackageManager
-import cn.vove7.common.app.GlobalApp
-import cn.vove7.jarvis.BuildConfig
+import io.michaelrocks.paranoid.Obfuscate
 
+@Obfuscate
 object BaiduKey {
-    val appId: Int
-    val appKey: String
-    val sKey: String
-
-    init {
-        if (!BuildConfig.DEBUG) {
-            val appInfo = GlobalApp.APP.let {
-                it.packageManager.getApplicationInfo(it.packageName,
-                        PackageManager.GET_META_DATA)
-            }
-            appId = appInfo.metaData.getInt("com.baidu.speech.APP_ID")
-            appKey = appInfo.metaData.getString("com.baidu.speech.API_KEY")!!
-            sKey = appInfo.metaData.getString("com.baidu.speech.SECRET_KEY")!!
-        } else {
-            appId = 11389525
-            appKey = "ILdLUepG75UwwQVa0rqiEUVa"
-            sKey = "di6djKXGGELgnCCusiQUlCBYRxXVrr46"
-        }
-    }
+    const val appId = 15590577
+    const val appKey: String = "q2uPyBe6LmWTZlvb0g1dzcHV"
+    const val sKey: String = "y7S7hAI894BB3LF1yHYmvQEus1B6wPvj"
 }

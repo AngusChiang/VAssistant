@@ -39,10 +39,14 @@ object RemoteDebugServer : Runnable {
 
     private var clients: HashMap<Socket, PrintWriter>? = null
 
-    val hasClient :Boolean get() = clients?.isNotEmpty() == true
+    val hasClient: Boolean get() = clients?.isNotEmpty() == true
+
+    val clientCount get() = clients?.size ?: 0
 
     var stopped: Boolean = true
     private const val LISTEN_PORT = 1527
+    const val NSD_TYPE = "_vassistant-rds._tcp"
+
     private var thread: Thread? = null
     private var commandServer: CommandServer? = null
     var handler: Handler? = null
@@ -62,13 +66,13 @@ object RemoteDebugServer : Runnable {
             startAutoSleep()
             run()
         }
-
     }
 
     @Synchronized
     fun stop() {
         stopped = true
         ForegroundService.refreshTitle()
+        MdnsManager.unexportService(LISTEN_PORT)
         launch {
             commandServer?.stop()
             commandServer = null
@@ -101,9 +105,10 @@ object RemoteDebugServer : Runnable {
             stop()
             return
         }
+        MdnsManager.exportService(LISTEN_PORT, NSD_TYPE)
         RhinoApi.regPrint(print)
         LuaHelper.regPrint(print)
-        GlobalApp.toastInfo(GlobalApp.getString(R.string.text_debug_service_starting) / SystemBridge.getLocalIpAddress() , Toast.LENGTH_LONG)
+        GlobalApp.toastInfo(GlobalApp.getString(R.string.text_debug_service_starting) / SystemBridge.getLocalIpAddress(), Toast.LENGTH_LONG)
         server?.use {
             while (!stopped) {
                 try {
@@ -112,7 +117,9 @@ object RemoteDebugServer : Runnable {
                     val inputStream = BufferedReader(InputStreamReader(client.getInputStream(), "UTF-8"))
                     val o = PrintWriter(BufferedWriter(OutputStreamWriter(client.getOutputStream())), true)
                     clients?.put(client, o)
-                    GlobalApp.toastInfo(GlobalApp.getString(R.string.text_establish_connection).format(client.inetAddress ?: "null"))
+                    ForegroundService.refreshTitle()
+                    GlobalApp.toastInfo(GlobalApp.getString(R.string.text_establish_connection).format(client.inetAddress
+                        ?: "null"))
                     print.onPrint(0, "与PC[${client.inetAddress}]建立连接   --来自App")
                     //type -> script -> arg
                     launch {
@@ -189,6 +196,7 @@ object RemoteDebugServer : Runnable {
                 GlobalApp.toastInfo("与${it.inetAddress}断开连接")
             }
             clients?.remove(s)
+            ForegroundService.refreshTitle()
             if (clients?.isEmpty() == true)
                 startAutoSleep()
             p.close()
@@ -268,12 +276,12 @@ object RemoteDebugServer : Runnable {
 
 @Keep
 class RemoteAction(
-        @Keep
-        val action: String,
-        @Keep
-        val type: String?,
-        @Keep
-        val text: String?,
-        @Keep
-        val extra: String?
+    @Keep
+    val action: String,
+    @Keep
+    val type: String?,
+    @Keep
+    val text: String?,
+    @Keep
+    val extra: String?
 )

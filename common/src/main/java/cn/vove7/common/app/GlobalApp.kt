@@ -1,8 +1,8 @@
 package cn.vove7.common.app
 
+import android.annotation.SuppressLint
 import android.app.ActivityManager
 import android.app.Application
-import android.app.Service
 import android.content.Context
 import android.content.Intent
 import android.util.Log
@@ -30,7 +30,12 @@ import es.dmoral.toasty.Toasty
  * 2018/8/8
  */
 
+@Suppress("LeakingThis")
 open class GlobalApp : ScaffoldApp() {
+    init {
+        _APP = this
+        ForeService = _APP
+    }
 
     override fun onCreate() {
         launchTime = QuantumClock.currentTimeMillis
@@ -56,13 +61,13 @@ open class GlobalApp : ScaffoldApp() {
         private lateinit var _APP: Application
 
         @JvmStatic
-        val APP: Context
-            get() = _APP
+        val APP: Context get() = _APP
 
         val GApp: GlobalApp
             get() = _APP as GlobalApp
 
-        var ForeService: Service? = null
+        @SuppressLint("StaticFieldLeak")
+        lateinit var ForeService: Context
 
         fun getString(id: Int): String = APP.getString(id)
 
@@ -141,7 +146,6 @@ open class GlobalApp : ScaffoldApp() {
         }
 
     override fun attachBaseContext(base: Context?) {
-        _APP = this
         super.attachBaseContext(base)
         try {
             MultiDex.install(base)

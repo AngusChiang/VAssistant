@@ -420,7 +420,7 @@ class SettingsActivity : ReturnableActivity<ActivityExpandableSettingsBinding>()
                             defaultValue = AppConfig.autoOpenAAS
                     ) { _, b ->
                         if (b) launch {
-                            if (!AccessibilityApi.isAdvanServiceOn) {
+                            if (!AccessibilityApi.isGestureServiceOn) {
                                 AccessibilityApi.openServiceSelf(1)
                             }
                         }

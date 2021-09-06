@@ -128,7 +128,7 @@ object GlobalLog {
             GlobalApp.toastInfo("日志已导出至${f.absolutePath}")
             clear()
         } catch (e: Exception) {
-            GlobalLog.err(e)
+            err(e)
             GlobalApp.toastError("导出失败，请检查存储读写权限")
         }
     }
@@ -147,7 +147,7 @@ object GlobalLog {
 }
 
 
-fun<T> Result<T>.withthFailLog() = onFailure { GlobalLog.err(it) }
+fun<T> Result<T>.withFailLog() = onFailure { GlobalLog.err(it) }
 
 
 fun Throwable.log() {

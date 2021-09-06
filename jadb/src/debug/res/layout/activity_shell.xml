@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/scroll_view"
+        android:layout_width="match_parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/shell_cmd"
+        android:layout_height="0dp">
+
+        <TextView
+            android:id="@+id/shell_tv"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+    </androidx.core.widget.NestedScrollView>
+
+    <EditText
+        android:id="@+id/shell_cmd"
+        app:layout_constraintEnd_toStartOf="@id/send_btn"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_width="0dp"
+        android:text="pm list package"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_height="wrap_content" />
+
+    <Button
+        android:id="@+id/send_btn"
+        android:layout_width="0dp"
+        android:text="send"
+        app:layout_constraintEnd_toStartOf="@id/interrupt_btn"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_height="wrap_content" />
+
+    <Button
+        android:id="@+id/interrupt_btn"
+        android:layout_width="50dp"
+        android:text="X"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_height="wrap_content"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

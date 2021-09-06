@@ -1,11 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="cn.vove7.jarvis.jadb">
+    package="cn.vove7.jadb">
 
     <application>
 
         <activity
-            android:name=".debug.AdbActivity"
+            android:name="cn.vove7.jadb.debug.AdbActivity"
+            android:exported="true" />
+        <activity
+            android:name="cn.vove7.jadb.debug.Check5555Activity"
+            android:exported="true" />
+        <activity
+            android:name="cn.vove7.jadb.debug.AdbPairActivity"
+            android:exported="true" />
+        <activity
+            android:name="cn.vove7.jadb.debug.AdbShellActivity"
             android:exported="true" />
     </application>
 </manifest>

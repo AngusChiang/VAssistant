@@ -62,8 +62,8 @@ dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
     implementation project(":jadb")
 
-    api 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.5.0'
-    api 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.0'
+    api 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.5.1'
+    api 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.1'
 
     api "androidx.appcompat:appcompat:$androidx_version"
     api 'org.greenrobot:eventbus:3.1.1'
@@ -79,7 +79,7 @@ dependencies {
     // provide okhttp to connect to backend
     api 'com.liulishuo.okdownload:okhttp:1.0.5'
     api 'com.github.GrenderG:Toasty:1.4.1'
-    api 'top.zibin:Luban:1.1.8'//鲁班 压缩图片
+    api 'top.zibin:Luban:1.1.8'
     api 'org.jsoup:jsoup:1.14.1'
 
     api 'com.github.Vove7.SmartKey:smartkey-android:6.3.3'
@@ -90,4 +90,5 @@ dependencies {
 
     api 'com.github.heruoxin:IceBox-SDK:55dd857d74'
 
+    api project(":scrcpy-common")
 }

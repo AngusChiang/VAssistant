@@ -1,6 +1,5 @@
 package cn.vove7.jarvis.activities
 
-import android.annotation.SuppressLint
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -11,12 +10,13 @@ import android.view.View
 import android.view.Window
 import cn.vove7.android.common.logd
 import cn.vove7.common.app.AppConfig
+import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.model.UserInfo
 import cn.vove7.jarvis.BuildConfig
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.activities.base.BaseActivity
-import cn.vove7.jarvis.databinding.ActivityMainBinding
 import cn.vove7.jarvis.databinding.ActivityRealMainBinding
+import cn.vove7.jarvis.services.ForegroundService
 import cn.vove7.jarvis.tools.Tutorials
 import cn.vove7.jarvis.tools.debugserver.RemoteDebugServer
 import cn.vove7.jarvis.view.dialog.UpdateLogDialog
@@ -41,7 +41,7 @@ class MainActivity : BaseActivity<ActivityRealMainBinding>() {
 
     private val homeReceiver by lazy {
         GoHomeReceiver {
-            if(Tutorials.tipsHideRecent) {
+            if (Tutorials.tipsHideRecent) {
                 tipsRecentDialog.show()
             }
         }
@@ -54,6 +54,9 @@ class MainActivity : BaseActivity<ActivityRealMainBinding>() {
         checkDebug()
         syncDataOnFirstIn()
         homeReceiver.start(this)
+        if (GlobalApp.ForeService !is ForegroundService) {
+            ForegroundService.start(this)
+        }
     }
 
     override fun onDestroy() {
@@ -77,8 +80,8 @@ class MainActivity : BaseActivity<ActivityRealMainBinding>() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && !isDarkTheme) {
             window.decorView.systemUiVisibility =
                 View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN or
-                        View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR or
-                        View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR
+                    View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR or
+                    View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR
             window.statusBarColor = resources!!.getColor(R.color.app_background, theme)
         }
     }
@@ -104,10 +107,10 @@ class MainActivity : BaseActivity<ActivityRealMainBinding>() {
 
     companion object {
         val ps = arrayOf(
-                android.Manifest.permission.WRITE_EXTERNAL_STORAGE,
-                android.Manifest.permission.RECORD_AUDIO,
-                android.Manifest.permission.MODIFY_AUDIO_SETTINGS,
-                android.Manifest.permission.READ_PHONE_STATE
+            android.Manifest.permission.WRITE_EXTERNAL_STORAGE,
+            android.Manifest.permission.RECORD_AUDIO,
+            android.Manifest.permission.MODIFY_AUDIO_SETTINGS,
+            android.Manifest.permission.READ_PHONE_STATE
         )
 
         var showUpdate = true//显示更新日志
@@ -119,10 +122,10 @@ class MainActivity : BaseActivity<ActivityRealMainBinding>() {
     private fun requestPermission() {
         if (!PermissionUtils.isAllGranted(this, ps)) {
             MaterialDialog(this)
-                    .title(text = "请先授予必要的权限")
-                    .message(text = "1. 麦克风\n2. 存储权限\n需要其他权限可到权限管理中开启").positiveButton {
-                        PermissionUtils.autoRequestPermission(this, ps)
-                    }.show()
+                .title(text = "请先授予必要的权限")
+                .message(text = "1. 麦克风\n2. 存储权限\n需要其他权限可到权限管理中开启").positiveButton {
+                    PermissionUtils.autoRequestPermission(this, ps)
+                }.show()
         } else {
             showDataUpdateLog()
         }
@@ -137,7 +140,7 @@ class MainActivity : BaseActivity<ActivityRealMainBinding>() {
         if (!UserInfo.isLogin()) {
             findViewById<View>(R.id.text_login)?.post {
                 Tutorials.showForView(this, Tutorials.T_LOGIN, findViewById(R.id.text_login),
-                        "新用户注册", getString(R.string.desc_new_account))
+                    "新用户注册", getString(R.string.desc_new_account))
             }
         }
     }

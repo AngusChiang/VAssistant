@@ -377,27 +377,27 @@ object BackupHelper {
         return buildString {
             data.instList?.also {
                 if (it.isNotEmpty()) {
-                    appendln("指令  数量：${it.size}")
+                    appendLine("指令  数量：${it.size}")
                     it.forEach { i ->
-                        appendln(i?.actionTitle)
+                        appendLine(i?.actionTitle)
                     }
-                    appendln()
+                    appendLine()
                 }
             }
             data.markedDataList?.also {
                 if (it.isNotEmpty()) {
-                    appendln("标记   数量：${it.size}")
+                    appendLine("标记   数量：${it.size}")
                     it.forEach { i ->
-                        appendln(i?.key)
+                        appendLine(i?.key)
                     }
-                    appendln()
+                    appendLine()
                 }
             }
             data.appAdList?.also {
                 if (it.isNotEmpty()) {
-                    appendln("标记广告   数量：${it.size}")
+                    appendLine("标记广告   数量：${it.size}")
                     it.forEach { i ->
-                        appendln(i?.descTitle)
+                        appendLine(i?.descTitle)
                     }
                 }
             }

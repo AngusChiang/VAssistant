@@ -11,7 +11,7 @@ import java.lang.reflect.ParameterizedType
 /**
  * #
  *
- * @author liben
+ * @author Vove
  * @date 2021/5/16
  */
 abstract class ScaffoldActivity2<T : ViewBinding> : ScaffoldActivity<ViewDataBinding>() {
