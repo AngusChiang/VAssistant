@@ -1,9 +1,11 @@
 package cn.vove7.common.bridges
 
+import android.util.Log
 import android.util.Pair
 import android.view.KeyEvent
 import android.view.ViewConfiguration
 import cn.vove7.android.common.ext.delayRun
+import cn.vove7.android.common.loge
 import cn.vove7.android.common.logi
 import cn.vove7.common.app.AppConfig
 import cn.vove7.common.app.GlobalApp
@@ -20,7 +22,9 @@ import com.google.gson.Gson
 import kotlinx.coroutines.Job
 import java.io.*
 import java.lang.Thread.sleep
+import java.net.Inet4Address
 import java.net.InetSocketAddress
+import java.net.ServerSocket
 import java.net.Socket
 import kotlin.concurrent.thread
 
@@ -32,18 +36,21 @@ import kotlin.concurrent.thread
  */
 object AdbActionExecutor : GlobalActionExecutorI {
 
-    private val conn = ScrcpyConnection()
+    @JvmStatic
+    val conn = ScrcpyConnection()
 
     private inline val app get() = GlobalApp.APP
 
     override fun swipe(x1: Int, y1: Int, x2: Int, y2: Int, dur: Int): Boolean {
         return gesture(dur.toLong(), arrayOf(Pair(x1, y1),
-            Pair(x2, y2)))
+                Pair(x2, y2)))
     }
 
     override fun press(x: Int, y: Int, delay: Int): Boolean {
         gesture(delay.toLong(), arrayOf(Pair(x, y)))
-        gestureLock.wait()
+        synchronized(gestureLock) {
+            gestureLock.wait()
+        }
         return true
     }
 
@@ -89,6 +96,7 @@ object AdbActionExecutor : GlobalActionExecutorI {
         ControlMessage.createInjectKeycode(KeyEvent.ACTION_DOWN, key, 0, 0).also {
             conn.send(it)
         }
+        sleep(300)
         ControlMessage.createInjectKeycode(KeyEvent.ACTION_UP, key, 0, 0).also {
             conn.send(it)
         }
@@ -100,11 +108,13 @@ object AdbActionExecutor : GlobalActionExecutorI {
 
     override fun gesture(duration: Long, points: Array<Pair<Int, Int>>): Boolean {
         ControlMessage.createSimpleGesture(
-            listOf(points.map {
-                Point(it.first, it.second)
-            }),
-            duration.toInt()
-        )
+                listOf(points.map {
+                    Point(it.first, it.second)
+                }),
+                duration.toInt()
+        ).also {
+            conn.send(it)
+        }
         synchronized(gestureLock) {
             gestureLock.wait()
         }
@@ -113,13 +123,15 @@ object AdbActionExecutor : GlobalActionExecutorI {
 
     override fun gestures(duration: Long, ppss: Array<Array<Pair<Int, Int>>>): Boolean {
         ControlMessage.createSimpleGesture(
-            ppss.map {
-                it.map { p ->
-                    Point(p.first, p.second)
-                }
-            },
-            duration.toInt()
-        )
+                ppss.map {
+                    it.map { p ->
+                        Point(p.first, p.second)
+                    }
+                },
+                duration.toInt()
+        ).also {
+            conn.send(it)
+        }
         synchronized(gestureLock) {
             gestureLock.wait()
         }
@@ -128,23 +140,27 @@ object AdbActionExecutor : GlobalActionExecutorI {
 
     override fun gestureAsync(start: Long, duration: Long, points: Array<Pair<Int, Int>>): Boolean {
         ControlMessage.createSimpleGesture(
-            listOf(points.map {
-                Point(it.first, it.second)
-            }),
-            duration.toInt()
-        )
+                listOf(points.map {
+                    Point(it.first, it.second)
+                }),
+                duration.toInt()
+        ).also {
+            conn.send(it)
+        }
         return true
     }
 
     override fun gesturesAsync(duration: Long, ppss: Array<Array<Pair<Int, Int>>>): Boolean {
         ControlMessage.createSimpleGesture(
-            ppss.map {
-                it.map { p ->
-                    Point(p.first, p.second)
-                }
-            },
-            duration.toInt()
-        )
+                ppss.map {
+                    it.map { p ->
+                        Point(p.first, p.second)
+                    }
+                },
+                duration.toInt()
+        ).also {
+            conn.send(it)
+        }
         return true
     }
 
@@ -153,7 +169,7 @@ object AdbActionExecutor : GlobalActionExecutorI {
         conn.close()
     }
 
-    internal class ScrcpyConnection(val port: Int = 9999) {
+    class ScrcpyConnection(val port: Int = 9999) {
 
         private var sock: Socket? = null
         private var dataInputStream: BufferedReader? = null
@@ -166,62 +182,71 @@ object AdbActionExecutor : GlobalActionExecutorI {
 
         private var adbClient: AdbClient? = null
 
-        private var delayClosrJob : Job?=null
+        private var delayCloseJob: Job? = null
 
         private fun isScrcpyRunning(): Boolean = try {
-            adbClient != null && shellStream != null && run {
-                Socket("127.0.0.1", port)
-                false
-            }
+            val s = ServerSocket(port, 0, Inet4Address.getByName("localhost"))
+            "$port is not in use $s".logi()
+            s.close()
+            false
         } catch (e: Throwable) {
+            "$port is in use".logi()
             true
         }
 
         fun closeServerDelay() {
-            delayClosrJob = delayRun(10000) {
+            delayCloseJob = delayRun(10000) {
                 shellStream?.interrupt()
                 adbClient?.close()
+                sleep(500)
                 "Scrcpy close ${!isScrcpyRunning()}".logi()
                 adbClient = null
                 shellStream = null
+            }.also {
+                it.invokeOnCompletion {
+                    delayCloseJob = null
+                }
             }
         }
 
         private fun initScrcpyServer() {
             val scrcpyFileName = "vassist-scrcpy-" + AppConfig.versionCode
             val tmpScrcpyFile = File(GlobalApp.APP.getExternalFilesDir(null), scrcpyFileName)
-            if (!tmpScrcpyFile.exists()) {
+            if (BuildConfig.DEBUG || !tmpScrcpyFile.exists()) {
                 app.assets.open("adb/scrcpy").copyTo(tmpScrcpyFile.outputStream())
             }
 
             if (!isScrcpyRunning()) {
+                "not running start scrcpy server".logi()
                 adbClient = AdbClient(GlobalApp.APP).also {
                     it.connect()
-                    val cmd = "CLASSPATH=${tmpScrcpyFile} app_process / com.vove7.scrcpy.Server VERBOSE SocketServer $port"
+                    val cmd = "CLASSPATH=${tmpScrcpyFile} app_process / com.vove7.scrcpy.Server" +
+                            " VERBOSE SocketServer $port"
                     cmd.logi()
                     shellStream = it.shellCommand(cmd)
                     if (BuildConfig.DEBUG) {
                         shellStream?.onData {
-                            "adb data: ${String(it)}".logi()
+                            Log.d("AdbClient", String(it))
                         }
-                    } else {
-                        shellStream?.noStoreOutput()
                     }
+                    shellStream?.noStoreOutput()
                     sleep(800)
                 }
+            } else {
+                "scrcpy already running...".logi()
             }
         }
 
         @Throws
         fun requireConnect() {
-            delayClosrJob?.cancel()
+            delayCloseJob?.cancel()
             if (isConnected) {
                 return
             }
             initScrcpyServer()
 
             val s = Socket()
-            s.connect(InetSocketAddress("127.0.0.1", port))
+            s.connect(InetSocketAddress("127.0.0.1", port), 500)
             sock = s
             dataInputStream = BufferedReader(InputStreamReader(s.inputStream))
             dataOutputStream = BufferedWriter(OutputStreamWriter(s.outputStream))

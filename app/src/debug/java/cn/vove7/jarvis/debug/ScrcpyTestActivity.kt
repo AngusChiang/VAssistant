@@ -7,6 +7,7 @@ import android.widget.ArrayAdapter
 import android.widget.ListView
 import androidx.appcompat.app.AppCompatActivity
 import cn.vove7.common.bridges.AdbActionExecutor
+import java.lang.Thread.sleep
 import kotlin.concurrent.thread
 import kotlin.reflect.KCallable
 import kotlin.reflect.jvm.isAccessible
@@ -52,6 +53,7 @@ class ScrcpyTestActivity : AppCompatActivity() {
 
     private fun testGesture() {
         AdbActionExecutor.home()
+        sleep(1000)
         AdbActionExecutor.gestures(500,
             arrayOf(
                 arrayOf(

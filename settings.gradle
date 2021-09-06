@@ -4,4 +4,4 @@ include ':jadb:hidden-api-common-bridge'
 include ':jadb:hidden-api-common'
 
 include ':scrcpy-common'
-project(":scrcpy-common").setProjectDir(new File("../../../AndroidStudioProjects/ScrcpyLib/common"))
+project(":scrcpy-common").setProjectDir(new File("../Vassist-Scrcpy/common"))
