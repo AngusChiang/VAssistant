@@ -7,6 +7,9 @@ import android.widget.ArrayAdapter
 import android.widget.ListView
 import androidx.appcompat.app.AppCompatActivity
 import cn.vove7.common.bridges.AdbActionExecutor
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import java.lang.Thread.sleep
 import kotlin.concurrent.thread
 import kotlin.reflect.KCallable
@@ -27,7 +30,11 @@ class ScrcpyTestActivity : AppCompatActivity() {
             android.R.id.text1, listOf(
             ::testHomeKey,
             ::testClick0_0,
-            ::testGesture
+            ::testGesture,
+            ::testPerformAcsAction,
+            ::takeScreenshot,
+            ::powerDialog,
+            ::splitScreen,
         ))
         lv.setOnItemClickListener { _, _, position, _ ->
             thread {
@@ -36,6 +43,7 @@ class ScrcpyTestActivity : AppCompatActivity() {
                         it.isAccessible = true
                         it.call()
                     }
+                sleep(800)
                 Log.d("ScrcpyTest", "exec end")
                 AdbActionExecutor.release()
             }
@@ -66,6 +74,26 @@ class ScrcpyTestActivity : AppCompatActivity() {
                 )
             )
         )
+    }
+
+    private fun testPerformAcsAction() = GlobalScope.launch {
+        AdbActionExecutor.notificationBar()
+        delay(1000)
+        AdbActionExecutor.back()
+        delay(1000)
+        AdbActionExecutor.quickSettings()
+    }
+
+    private fun takeScreenshot() {
+        AdbActionExecutor.screenShot()
+    }
+
+    private fun powerDialog() {
+        AdbActionExecutor.powerDialog()
+    }
+
+    private fun splitScreen() {
+        AdbActionExecutor.splitScreen()
     }
 
 }

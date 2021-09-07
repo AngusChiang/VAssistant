@@ -31,6 +31,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@id/pair_code_view" />
+
     <Button
         android:id="@+id/con_btn"
         android:layout_width="wrap_content"
@@ -39,4 +40,11 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@id/pair_btn" />
+
+    <Button
+        app:layout_constraintTop_toBottomOf="@id/con_btn"
+        android:layout_width="match_parent"
+        android:onClick="go2WireAdb"
+        android:text="跳转无线调试"
+        android:layout_height="wrap_content" />
 </androidx.constraintlayout.widget.ConstraintLayout>

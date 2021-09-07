@@ -1,11 +1,12 @@
 package cn.vove7.common.bridges
 
+import android.accessibilityservice.AccessibilityService
+import android.os.Build
 import android.util.Log
 import android.util.Pair
 import android.view.KeyEvent
 import android.view.ViewConfiguration
 import cn.vove7.android.common.ext.delayRun
-import cn.vove7.android.common.loge
 import cn.vove7.android.common.logi
 import cn.vove7.common.app.AppConfig
 import cn.vove7.common.app.GlobalApp
@@ -43,7 +44,7 @@ object AdbActionExecutor : GlobalActionExecutorI {
 
     override fun swipe(x1: Int, y1: Int, x2: Int, y2: Int, dur: Int): Boolean {
         return gesture(dur.toLong(), arrayOf(Pair(x1, y1),
-                Pair(x2, y2)))
+            Pair(x2, y2)))
     }
 
     override fun press(x: Int, y: Int, delay: Int): Boolean {
@@ -73,19 +74,36 @@ object AdbActionExecutor : GlobalActionExecutorI {
     }
 
     override fun powerDialog(): Boolean {
-        return false
+        return performAcsAction(AccessibilityService.GLOBAL_ACTION_POWER_DIALOG)
     }
 
-    override fun notificationBar(): Boolean = false
+    override fun notificationBar(): Boolean {
+        return performAcsAction(AccessibilityService.GLOBAL_ACTION_NOTIFICATIONS)
+    }
 
-    override fun quickSettings(): Boolean = false
+    override fun quickSettings(): Boolean {
+        return performAcsAction(AccessibilityService.GLOBAL_ACTION_QUICK_SETTINGS)
+    }
+
+    private fun performAcsAction(globalAction: Int): Boolean {
+        ControlMessage.performAcsAction(globalAction).also {
+            conn.send(it)
+        }
+        return true
+    }
 
     override fun lockScreen(): Boolean {
         sendKey(KeyEvent.KEYCODE_SLEEP)
         return true
     }
 
-    override fun screenShot(): Boolean = false
+    override fun screenShot(): Boolean {
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            performAcsAction(AccessibilityService.GLOBAL_ACTION_TAKE_SCREENSHOT)
+        } else {
+            return false
+        }
+    }
 
     override fun recents(): Boolean {
         sendKey(KeyEvent.KEYCODE_APP_SWITCH)
@@ -96,22 +114,27 @@ object AdbActionExecutor : GlobalActionExecutorI {
         ControlMessage.createInjectKeycode(KeyEvent.ACTION_DOWN, key, 0, 0).also {
             conn.send(it)
         }
-        sleep(300)
         ControlMessage.createInjectKeycode(KeyEvent.ACTION_UP, key, 0, 0).also {
             conn.send(it)
         }
     }
 
-    override fun splitScreen(): Boolean = false
+    override fun splitScreen(): Boolean {
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            performAcsAction(AccessibilityService.GLOBAL_ACTION_TOGGLE_SPLIT_SCREEN)
+        } else {
+            return false
+        }
+    }
 
     private val gestureLock = Object()
 
     override fun gesture(duration: Long, points: Array<Pair<Int, Int>>): Boolean {
         ControlMessage.createSimpleGesture(
-                listOf(points.map {
-                    Point(it.first, it.second)
-                }),
-                duration.toInt()
+            listOf(points.map {
+                Point(it.first, it.second)
+            }),
+            duration.toInt()
         ).also {
             conn.send(it)
         }
@@ -123,12 +146,12 @@ object AdbActionExecutor : GlobalActionExecutorI {
 
     override fun gestures(duration: Long, ppss: Array<Array<Pair<Int, Int>>>): Boolean {
         ControlMessage.createSimpleGesture(
-                ppss.map {
-                    it.map { p ->
-                        Point(p.first, p.second)
-                    }
-                },
-                duration.toInt()
+            ppss.map {
+                it.map { p ->
+                    Point(p.first, p.second)
+                }
+            },
+            duration.toInt()
         ).also {
             conn.send(it)
         }
@@ -140,10 +163,10 @@ object AdbActionExecutor : GlobalActionExecutorI {
 
     override fun gestureAsync(start: Long, duration: Long, points: Array<Pair<Int, Int>>): Boolean {
         ControlMessage.createSimpleGesture(
-                listOf(points.map {
-                    Point(it.first, it.second)
-                }),
-                duration.toInt()
+            listOf(points.map {
+                Point(it.first, it.second)
+            }),
+            duration.toInt()
         ).also {
             conn.send(it)
         }
@@ -152,12 +175,12 @@ object AdbActionExecutor : GlobalActionExecutorI {
 
     override fun gesturesAsync(duration: Long, ppss: Array<Array<Pair<Int, Int>>>): Boolean {
         ControlMessage.createSimpleGesture(
-                ppss.map {
-                    it.map { p ->
-                        Point(p.first, p.second)
-                    }
-                },
-                duration.toInt()
+            ppss.map {
+                it.map { p ->
+                    Point(p.first, p.second)
+                }
+            },
+            duration.toInt()
         ).also {
             conn.send(it)
         }
@@ -221,14 +244,11 @@ object AdbActionExecutor : GlobalActionExecutorI {
                 adbClient = AdbClient(GlobalApp.APP).also {
                     it.connect()
                     val cmd = "CLASSPATH=${tmpScrcpyFile} app_process / com.vove7.scrcpy.Server" +
-                            " VERBOSE SocketServer $port"
+                        " VERBOSE SocketServer $port ${GlobalApp.APP.packageName}"
                     cmd.logi()
-                    shellStream = it.shellCommand(cmd)
-                    if (BuildConfig.DEBUG) {
-                        shellStream?.onData {
-                            Log.d("AdbClient", String(it))
-                        }
-                    }
+                    shellStream = it.shellCommand(cmd, ondata = if (BuildConfig.DEBUG) {
+                        { Log.d("AdbClient", String(it)) }
+                    } else null)
                     shellStream?.noStoreOutput()
                     sleep(800)
                 }

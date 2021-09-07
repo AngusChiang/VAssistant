@@ -212,7 +212,7 @@ open class AdbClient(
     private fun write(message: AdbMessage) {
         outputStream.write(message.toByteArray())
         outputStream.flush()
-        Log.d(TAG, "write ${message.toStringShort()}")
+//        Log.d(TAG, "write ${message.toStringShort()}")
     }
 
     private fun read(): AdbMessage {

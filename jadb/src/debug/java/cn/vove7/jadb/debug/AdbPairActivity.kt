@@ -1,5 +1,6 @@
 package cn.vove7.jadb.debug
 
+import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
@@ -26,7 +27,6 @@ import kotlin.concurrent.thread
 class AdbPairActivity : AppCompatActivity() {
 
     private val port = MutableLiveData(0)
-
 
     private val con_port = MutableLiveData<Int>()
 
@@ -62,7 +62,7 @@ class AdbPairActivity : AppCompatActivity() {
             val adbMdns = cn.vove7.jadb.AdbMdns(this, cn.vove7.jadb.AdbMdns.TLS_CONNECT, con_port)
             adbMdns.start()
             con_port.observe(this) {
-                if(it !in 1..65534) {
+                if (it !in 1..65534) {
                     return@observe
                 }
                 Log.d("ADB", "con port: $it")
@@ -103,6 +103,13 @@ class AdbPairActivity : AppCompatActivity() {
         val s = c.start()
 
         Log.d("ADBPAIR", "succ: $s")
+    }
+
+    fun go2WireAdb(V: View) {
+        startActivity(Intent("android.settings.APPLICATION_DEVELOPMENT_SETTINGS").also {
+            it.addFlags(Intent.FLAG_ACTIVITY_LAUNCH_ADJACENT)
+            it.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        })
     }
 
     override fun onDestroy() {

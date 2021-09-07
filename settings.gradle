@@ -4,4 +4,12 @@ include ':jadb:hidden-api-common-bridge'
 include ':jadb:hidden-api-common'
 
 include ':scrcpy-common'
-project(":scrcpy-common").setProjectDir(new File("../Vassist-Scrcpy/common"))
+
+def localProperties = new Properties()
+def localPropertiesFile = new File('local.properties')
+if (localPropertiesFile.exists()) {
+    localPropertiesFile.withReader('UTF-8') { reader ->
+        localProperties.load(reader)
+    }
+}
+project(":scrcpy-common").setProjectDir(new File(localProperties.get("scrcpy-lib.dir")))

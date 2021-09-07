@@ -19,10 +19,13 @@ import android.widget.CheckedTextView
 import androidx.annotation.RequiresApi
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.core.content.ContextCompat.getColor
 import androidx.core.content.res.ResourcesCompat
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.MutableLiveData
 import androidx.recyclerview.widget.LinearLayoutManager
 import cn.vove7.android.common.ext.delayRun
+import cn.vove7.android.common.loge
 import cn.vove7.bottomdialog.BottomDialog
 import cn.vove7.bottomdialog.builder.buttons
 import cn.vove7.bottomdialog.extension.awesomeHeader
@@ -35,6 +38,7 @@ import cn.vove7.common.bridges.ShellHelper
 import cn.vove7.common.bridges.SystemBridge
 import cn.vove7.common.utils.*
 import cn.vove7.jadb.AdbClient
+import cn.vove7.jadb.AdbInvalidPairingCodeException
 import cn.vove7.jadb.AdbMdns
 import cn.vove7.jadb.AdbPairingClient
 import cn.vove7.jarvis.R
@@ -49,6 +53,7 @@ import cn.vove7.jarvis.services.GestureService
 import cn.vove7.jarvis.services.MyAccessibilityService
 import cn.vove7.jarvis.view.dialog.contentbuilder.markdownContent
 import cn.vove7.vtp.extend.disable
+import cn.vove7.vtp.extend.enable
 import cn.vove7.vtp.runtimepermission.PermissionUtils
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.WhichButton
@@ -57,6 +62,9 @@ import com.afollestad.materialdialogs.callbacks.onDismiss
 import com.afollestad.materialdialogs.input.getInputLayout
 import com.afollestad.materialdialogs.input.input
 import com.catchingnow.icebox.sdk_client.IceBox
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.lang.Thread.sleep
 import java.net.Inet4Address
 import kotlin.concurrent.thread
@@ -66,7 +74,8 @@ import kotlin.concurrent.thread
  * 权限管理
  */
 class PermissionManagerActivity : OneFragmentActivity() {
-    override var fragments: Array<androidx.fragment.app.Fragment> = arrayOf(ManageFragment.newIns())
+    override var fragments: Array<Fragment> = arrayOf(ManageFragment.newIns())
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -92,6 +101,7 @@ class PermissionManagerActivity : OneFragmentActivity() {
 
         companion object {
             fun newIns(): ManageFragment = ManageFragment()
+            var WAIT_WIRE_ADB = false
         }
 
         override fun initView(contentView: FragmentBaseListBinding) {
@@ -105,6 +115,9 @@ class PermissionManagerActivity : OneFragmentActivity() {
             }
             if (pn != null) {
                 highLight(pn)
+            }
+            if (WAIT_WIRE_ADB && Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                waitAdbPair()
             }
         }
 
@@ -276,13 +289,37 @@ class PermissionManagerActivity : OneFragmentActivity() {
             }
         }
 
+        private fun toDevSettings() {
+            startActivity(Intent("android.settings.APPLICATION_DEVELOPMENT_SETTINGS").also {
+                it.addFlags(Intent.FLAG_ACTIVITY_LAUNCH_ADJACENT)
+                it.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            })
+        }
+
         @SuppressLint("CheckResult")
         @RequiresApi(Build.VERSION_CODES.R)
         private fun waitAdbPair() = MaterialDialog(requireContext()).show {
             title(text = "无线ADB配对")
             val mwm = requireActivity().isInMultiWindowMode
+            cancelable(false)
+            noAutoDismiss()
+            message(text = if (mwm) "正在搜索配对端口..." else "1. 请先进入分屏状态\n" +
+                "2. 进入[开发者选项/无线调试]\n3. 开启无线调试选项\n4. 点击 [使用配对码配对设备]")
+            if (!mwm) {
+                WAIT_WIRE_ADB = true
+            } else {
+                WAIT_WIRE_ADB = false
+                toDevSettings()
+            }
+            if (mwm) {
+                positiveButton(text = "跳转开发者选项") {
+                    runOnUiDelay(100, ::toDevSettings)
+                }
+            }
 
-            message(text = if (mwm) "正在搜索配对端口..." else "请先进入分屏状态，再进入此页")
+            negativeButton(text = "取消") {
+                it.dismiss()
+            }
 
             if (mwm) {
                 val pairPort = MutableLiveData(0)
@@ -291,36 +328,90 @@ class PermissionManagerActivity : OneFragmentActivity() {
                 pairPort.observe(requireActivity()) { port ->
                     if (port in 1024..65535) {
                         message(text = "发现端口 $port, 请输入配对码进行连接")
-                        input(hint = "配对码", inputType = InputType.TYPE_CLASS_NUMBER) { d, s ->
-                            doAdbPair(port, s.toString().trim(), this)
-                            getInputLayout().disable()
+                        try {
+                            getInputLayout().show()
+                        } catch (e: Throwable) {
+                            input(hint = "配对码", inputType = InputType.TYPE_CLASS_NUMBER) { d, s ->
+                                doAdbPair(pairPort.value?:0, s.toString().trim(), this, mdns)
+                                getInputLayout().disable()
+                                getActionButton(WhichButton.POSITIVE).disable()
+                            }
                         }
                         positiveButton(text = "连接")
-                        mdns.stop()
+                    } else {
+                        kotlin.runCatching {
+                            message(text = "正在搜索配对端口...")
+                            getInputLayout().gone()
+                        }
                     }
                 }
-                onDismiss {
-                    mdns.stop()
-                }
+                onDismiss { mdns.stop() }
+                mdns.start()
             }
         }
 
         @RequiresApi(Build.VERSION_CODES.R)
-        private fun doAdbPair(port: Int, code: String, dialog: MaterialDialog) = thread {
-
+        private fun doAdbPair(port: Int, code: String, dialog: MaterialDialog, mdns: AdbMdns) = thread {
             val pairClient = AdbPairingClient(requireContext(),
                 Inet4Address.getLoopbackAddress().hostName,
                 port, code
             )
             kotlin.runCatching {
                 if (pairClient.start()) {// 配对成功，连接 tcpip5555
-
+                    mdns.stop()
+                    runOnUi { enableAdbPort5555(dialog) }
                 } else {
-                    error("配对失败，请确认配对码正确")
+                    error("配对失败，未知错误")
                 }
             }.onFailure {
+                val error = if (it is AdbInvalidPairingCodeException) {
+                    "配对失败，请确认配对码正确"
+                } else it.message ?: ""
+                runOnUi {
+                    dialog.message(text = error.spanColor(getColor(requireContext(), R.color.google_red)))
+                    dialog.getInputLayout().enable()
+                    dialog.getActionButton(WhichButton.POSITIVE).enable()
+                }
                 //失败
             }
+        }
+
+        private fun enableAdbPort5555(dialog: MaterialDialog) {
+            dialog.getInputLayout().gone()
+            dialog.title(text = "请稍等")
+            dialog.message(text = "tcpip 5555...")
+            val conPort = MutableLiveData(0)
+
+            suspend fun showResult(content: String, btnText: String) = withContext(Dispatchers.Main) {
+                dialog.title(text = "无线配对")
+                dialog.message(text = content)
+                dialog.getActionButton(WhichButton.POSITIVE).apply {
+                    text = btnText
+                    setOnClickListener {
+                        dialog.dismiss()
+                    }
+                }.enable()
+            }
+
+            val mdns = AdbMdns(requireContext(), AdbMdns.TLS_CONNECT, conPort)
+            conPort.observe(requireActivity()) { port ->
+                if (port in 1024..65535) {
+                    lifecycleScope.launch(Dispatchers.IO) {
+                        kotlin.runCatching {
+                            val cli = AdbClient(requireContext(), port = port)
+                            cli.connect()
+                            cli.tcpip(5555)
+                        }.onSuccess {
+                            showResult("恭喜！开启完成\nport: ${SystemBridge.adbPort()}", "完成")
+                            refreshStatus()
+                        }.onFailure {
+                            it.loge()
+                            showResult("OH! 开启失败，请重试\n${it}", "退出")
+                        }
+                    }
+                }
+            }
+            mdns.start()
         }
 
         private fun waitWirelessAdb() {
@@ -494,7 +585,7 @@ class PermissionManagerActivity : OneFragmentActivity() {
                     "android.permission.READ_CALENDAR"), "日历", "管理日历事件")
             ).apply {
                 if (SystemBridge.hasInstall(IceBox.PACKAGE_NAME)) {
-                    this+=(PermissionStatus(arrayOf(IceBox.SDK_PERMISSION), "冰箱", "用于启动和冻结冰箱管理的应用"))
+                    this += (PermissionStatus(arrayOf(IceBox.SDK_PERMISSION), "冰箱", "用于启动和冻结冰箱管理的应用"))
                 }
             }
         }
