@@ -20,7 +20,7 @@ class DebugIndexActivity : AppCompatActivity() {
 
     private val acts = listOf(
         QRScanActivity2::class,
-//        MediaControllerActivity::class,
+        MediaControllerActivity::class,
         AdbActivity::class,
         AdbShellActivity::class,
         AdbPairActivity::class,

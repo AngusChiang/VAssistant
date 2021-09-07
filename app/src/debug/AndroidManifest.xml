@@ -2,12 +2,23 @@
     package="cn.vove7.jarvis">
 
     <application>
+
+        <activity
+            android:name=".debug.MediaControllerActivity"
+            android:exported="true" />
+
         <activity
             android:name=".debug.DebugIndexActivity"
             android:exported="true" />
+
+        <activity
+            android:name=".debug.ClickCountActivity"
+            android:exported="true" />
+
         <activity
             android:name=".debug.ScrcpyTestActivity"
             android:exported="true" />
+
     </application>
 
 </manifest>
