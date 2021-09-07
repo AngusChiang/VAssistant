@@ -13,6 +13,7 @@ import android.widget.PopupMenu
 import cn.vove7.android.common.ext.invisible
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.appbus.AppBus
+import cn.vove7.common.bridges.ShellHelper
 import cn.vove7.common.bridges.SystemBridge
 import cn.vove7.common.bridges.UtilBridge
 import cn.vove7.common.utils.*
@@ -220,18 +221,22 @@ class ScreenAssistActivity : BaseActivity<DialogAssistBinding>() {
                 val isDelay = getBooleanExtra("delay", false)
                 launch {
                     delay(if (isDelay) 1000 else 0)
-                    val path = SystemBridge.screenShot(cachePath)?.let {
+                    screenPath = SystemBridge.screenShot(cachePath)?.let {
                         //截完图显示面板
                         hideNavBar()
                         showView()
+                        SystemBridge.release()
                         it.absolutePath
-                    }
-                    SystemBridge.release()
-                    if (path == null) {
+                    } ?: run {
                         GlobalApp.toastError("截图失败")
                         finish()
+                        SystemBridge.release()
                         return@launch
-                    } else screenPath = path
+                    }
+                    if (ShellHelper.hasRootOrAdb()) {
+                        //todo listen exec progress
+                        delay(1000)
+                    }
                     showProgressBar = false
                     afterHandleScreen()
                 }
