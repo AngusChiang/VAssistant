@@ -25,14 +25,8 @@ class AutoExecutor : GlobalActionExecutorI {
         val availableExecutors = mutableListOf<GlobalActionExecutorI>()
 
         fun checkAcs() {
-            if (which == AccessibilityApi.WHICH_SERVICE_BASE) {
-                if (AccessibilityApi.isBaseServiceOn) {
-                    availableExecutors.add(AcsActionExecutor)
-                }
-            } else {
-                if (AccessibilityApi.isGestureServiceOn) {
-                    availableExecutors.add(AcsActionExecutor)
-                }
+            if (AccessibilityApi.isServiceEnable(which)) {
+                availableExecutors.add(AcsActionExecutor)
             }
         }
         checkAcs()
