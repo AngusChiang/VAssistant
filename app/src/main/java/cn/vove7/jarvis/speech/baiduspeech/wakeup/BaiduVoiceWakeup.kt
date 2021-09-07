@@ -1,13 +1,12 @@
 package cn.vove7.jarvis.speech.baiduspeech.wakeup
 
 import android.content.Context
-import android.media.AudioManager
 import android.media.MediaRecorder
 import cn.vove7.androlua.luabridge.LuaUtil
-import cn.vove7.common.app.GlobalApp
-import cn.vove7.jarvis.speech.WakeupI
 import cn.vove7.common.app.AppConfig
-import cn.vove7.jarvis.tools.BaiduKey
+import cn.vove7.common.app.GlobalApp
+import cn.vove7.jarvis.BuildConfig
+import cn.vove7.jarvis.speech.WakeupI
 import cn.vove7.vtp.log.Vog
 import com.baidu.speech.EventListener
 import com.baidu.speech.EventManager
@@ -23,15 +22,17 @@ import org.json.JSONObject
  */
 
 class BaiduVoiceWakeup(private val eventListener: EventListener) : WakeupI() {
+    companion object {
 
-    private var appId: Int = 0
-    private lateinit var appKey: String
-    private lateinit var secretKey: String
-    val context: Context
-        get() = GlobalApp.APP
+        private const val APP_ID = 10922901
+        private const val API_KEY = "xwzlOfIIysRN7IDdcjA823ZS"
+        private const val SECRET_KEY = "d9ef661698c5d8cd45978aa55e600e03"
+
+    }
+
+    val context: Context get() = GlobalApp.APP
 
     private var wp: EventManager? = null
-
 
     init {
         initIfNeed()
@@ -42,11 +43,8 @@ class BaiduVoiceWakeup(private val eventListener: EventListener) : WakeupI() {
         wp = EventManagerFactory.create(context, "wp")
         wp?.registerListener(eventListener)
 
-        appId = BaiduKey.appId
-        appKey = BaiduKey.appKey
-        secretKey = BaiduKey.sKey
         LuaUtil.assetsToSD(context, "bd/WakeUp_xvtx.bin",
-                context.filesDir.absolutePath + "/bd/WakeUp_xvtx.bin")
+            context.filesDir.absolutePath + "/bd/WakeUp_xvtx.bin")
     }
 
     override fun doStart() {
@@ -55,9 +53,15 @@ class BaiduVoiceWakeup(private val eventListener: EventListener) : WakeupI() {
 
         params[SpeechConstant.WP_WORDS_FILE] = AppConfig.wakeUpFilePath
         params[SpeechConstant.AUDIO_SOURCE] = MediaRecorder.AudioSource.VOICE_RECOGNITION
-        params[SpeechConstant.APP_ID] = appId
-        params[SpeechConstant.APP_KEY] = appKey
-        params[SpeechConstant.SECRET] = secretKey
+        if (BuildConfig.DEBUG) {
+            params[SpeechConstant.APP_ID] = 11389525
+            params[SpeechConstant.APP_KEY] = "ILdLUepG75UwwQVa0rqiEUVa"
+            params[SpeechConstant.SECRET] = "di6djKXGGELgnCCusiQUlCBYRxXVrr46"
+        } else {
+            params[SpeechConstant.APP_ID] = APP_ID
+            params[SpeechConstant.APP_KEY] = API_KEY
+            params[SpeechConstant.SECRET] = SECRET_KEY
+        }
 
         // params.put(SpeechConstant.ACCEPT_AUDIO_DATA,true);
         // params.put(SpeechConstant.ACCEPT_AUDIO_VOLUME,true);
