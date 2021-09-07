@@ -3,6 +3,7 @@ package cn.vove7.common.bridges
 import android.util.Pair
 import cn.vove7.common.MessageException
 import cn.vove7.common.accessibility.AccessibilityApi
+import cn.vove7.common.app.AppPermission
 import cn.vove7.common.interfaces.api.GlobalActionExecutorI
 
 /**
@@ -22,20 +23,31 @@ class AutoExecutor : GlobalActionExecutorI {
 
     private fun impls(which: Int) = run {
         val availableExecutors = mutableListOf<GlobalActionExecutorI>()
-        if (which == AccessibilityApi.WHICH_SERVICE_BASE) {
-            if (AccessibilityApi.isBaseServiceOn) {
-                availableExecutors.add(AcsActionExecutor)
-            }
-        } else {
-            if (AccessibilityApi.isGestureServiceOn) {
-                availableExecutors.add(AcsActionExecutor)
+
+        fun checkAcs() {
+            if (which == AccessibilityApi.WHICH_SERVICE_BASE) {
+                if (AccessibilityApi.isBaseServiceOn) {
+                    availableExecutors.add(AcsActionExecutor)
+                }
+            } else {
+                if (AccessibilityApi.isGestureServiceOn) {
+                    availableExecutors.add(AcsActionExecutor)
+                }
             }
         }
+        checkAcs()
         if (SystemBridge.isWirelessAdbEnabled()) {
             availableExecutors.add(AdbActionExecutor)
         }
         if (ShellHelper.isRoot()) {
             availableExecutors.add(RootActionExecutor)
+        }
+
+        if (availableExecutors.isEmpty() && AppPermission.canWriteSecureSettings) {
+            kotlin.runCatching {
+                AccessibilityApi.requireAccessibility(which, jump = false)
+                checkAcs()
+            }
         }
         if (availableExecutors.isEmpty()) {
             throw MessageException("此操作需要高级无障碍服务或root/adb权限")
