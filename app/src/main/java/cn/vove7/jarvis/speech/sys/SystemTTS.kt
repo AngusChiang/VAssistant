@@ -5,11 +5,14 @@ import android.speech.tts.TextToSpeech
 import android.speech.tts.UtteranceProgressListener
 import cn.vove7.android.common.loge
 import cn.vove7.android.common.logi
+import java.lang.Thread.sleep
 import java.util.*
 
 class SystemTTS(val context: Context, val listener: UtteranceProgressListener) {
     //核心播放对象
     private var textToSpeech = TextToSpeech(context.applicationContext, ::init)
+
+    val initLock = Object()
 
     fun reInit() {
         textToSpeech = TextToSpeech(context.applicationContext, ::init)
@@ -37,14 +40,28 @@ class SystemTTS(val context: Context, val listener: UtteranceProgressListener) {
             "SysTTS 初始化失败 $i".loge()
             isSupport = false
         }
+        synchronized(initLock) {
+            initLock.notify()
+        }
     }
 
     fun speak(text: String?): Boolean {
         if (!isSupport) {
             return false
         }
-        return (textToSpeech.speak(text, TextToSpeech.QUEUE_FLUSH, null,
-                TextToSpeech.ACTION_TTS_QUEUE_PROCESSING_COMPLETED) == TextToSpeech.SUCCESS)
+        fun doSpeak() = textToSpeech.speak(text, TextToSpeech.QUEUE_FLUSH, null, TextToSpeech.ACTION_TTS_QUEUE_PROCESSING_COMPLETED)
+        var code = doSpeak()
+        if (code == TextToSpeech.SUCCESS) {
+            return true
+        } else {
+            "tts speak err: $code".loge()
+            reInit()
+            synchronized(initLock) {
+                initLock.wait(3000)
+            }
+            code = doSpeak()
+        }
+        return code == TextToSpeech.SUCCESS
     }
 
     fun stop() {
