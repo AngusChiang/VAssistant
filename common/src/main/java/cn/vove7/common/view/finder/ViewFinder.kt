@@ -2,7 +2,6 @@ package cn.vove7.common.view.finder
 
 import android.view.accessibility.AccessibilityNodeInfo
 import cn.vove7.common.BuildConfig
-import cn.vove7.common.NeedAccessibilityException
 import cn.vove7.common.accessibility.AccessibilityApi
 import cn.vove7.common.accessibility.viewnode.ViewNode
 import cn.vove7.vtp.log.Vog
@@ -13,12 +12,8 @@ import cn.vove7.vtp.log.Vog
 abstract class ViewFinder(var node: AccessibilityNodeInfo?) {
 
     val startNode
-        get() = if (node == null) {//fix 没有指定node的时候，每次startNode重新获取
-            val s = AccessibilityApi.accessibilityService ?: throw NeedAccessibilityException()
-            s.rootInWindow
-        } else {
-            node
-        }
+        get() = node ?: AccessibilityApi
+            .requireAccessibility(jump = false).rootInWindow
 
     open fun findFirst(): ViewNode? {
         return findFirst(false)
@@ -30,7 +25,6 @@ abstract class ViewFinder(var node: AccessibilityNodeInfo?) {
      * @param m Long 时限
      */
     fun waitFor(m: Long = 30000): ViewNode? {
-        if (!AccessibilityApi.isBaseServiceOn) return null
         val t = when {
             m in 0..30000 -> m
             m < 0 -> 0
@@ -42,7 +36,7 @@ abstract class ViewFinder(var node: AccessibilityNodeInfo?) {
         Vog.d("搜索线程 ---> $ct ${ct.hashCode()}")
         val endTime = beginTime + t
         while (System.currentTimeMillis() < endTime &&
-                !ct.isInterrupted) {
+            !ct.isInterrupted) {
             val node = findFirst()
             if (node != null) {
                 Vog.d("waitFor ---> 搜索到 $node")
