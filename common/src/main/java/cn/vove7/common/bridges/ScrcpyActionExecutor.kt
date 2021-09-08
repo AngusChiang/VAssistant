@@ -216,6 +216,7 @@ object ScrcpyActionExecutor : GlobalActionExecutorI {
         }
 
         fun closeServerDelay() {
+            if(!isScrcpyRunning()) return
             delayCloseJob = delayRun(10000) {
                 dataOutputStream?.also {
                     kotlin.runCatching {

@@ -243,14 +243,11 @@
         <activity
             android:name=".activities.LuaEditorActivity"
             android:label="@string/text_lua_editor"
-            android:theme="@style/AppTheme" />
+            android:theme="@style/Theme.Darcula" />
         <activity
             android:name=".activities.JsEditorActivity"
             android:label="@string/text_js_editor"
             android:theme="@style/Theme.Darcula" />
-        <activity
-            android:name=".activities.AccServiceBlackListManagerActivity"
-            android:label="无障碍黑名单" />
         <activity
             android:name=".activities.VoiceInputRecogActivity"
             android:excludeFromRecents="true"
