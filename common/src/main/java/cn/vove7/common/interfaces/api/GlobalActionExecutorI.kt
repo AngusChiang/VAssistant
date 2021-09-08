@@ -81,11 +81,10 @@ interface GlobalActionExecutorI {
 
     /**
      * 单手势异步
-     * @param start Long
      * @param duration Long
      * @param points Array<Pair<Int, Int>>
      */
-    fun gestureAsync(start: Long, duration: Long, points: Array<Pair<Int, Int>>): Boolean
+    fun gestureAsync(duration: Long, points: Array<Pair<Int, Int>>): Boolean
 
     /**
      * 多手势异步

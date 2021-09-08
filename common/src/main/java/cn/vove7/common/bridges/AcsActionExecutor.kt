@@ -105,11 +105,10 @@ object AcsActionExecutor : GlobalActionExecutorI {
 
     /**
      * api 异步手势
-     * @param start Long
      * @param duration Long
      * @param points Array<Pair<Int, Int>>
      */
-    override fun gestureAsync(start: Long, duration: Long, points: Array<Pair<Int, Int>>): Boolean {
+    override fun gestureAsync(duration: Long, points: Array<Pair<Int, Int>>): Boolean {
         val path = pointsToPath(points)
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             doGesturesAsync(listOf(GestureDescription.StrokeDescription(path, 0, duration)))

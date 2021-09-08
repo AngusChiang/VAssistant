@@ -120,8 +120,8 @@ class AutoExecutor : GlobalActionExecutorI {
         return impls(AccessibilityApi.WHICH_SERVICE_GESTURE).any { it.gestures(duration, ppss) }
     }
 
-    override fun gestureAsync(start: Long, duration: Long, points: Array<Pair<Int, Int>>): Boolean {
-        return impls(AccessibilityApi.WHICH_SERVICE_GESTURE).any { it.gestureAsync(start, duration, points) }
+    override fun gestureAsync(duration: Long, points: Array<Pair<Int, Int>>): Boolean {
+        return impls(AccessibilityApi.WHICH_SERVICE_GESTURE).any { it.gestureAsync(duration, points) }
     }
 
     override fun gesturesAsync(duration: Long, ppss: Array<Array<Pair<Int, Int>>>): Boolean {

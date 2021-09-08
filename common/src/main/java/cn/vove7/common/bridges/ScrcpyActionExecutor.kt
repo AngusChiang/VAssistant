@@ -7,12 +7,14 @@ import android.util.Pair
 import android.view.KeyEvent
 import android.view.ViewConfiguration
 import cn.vove7.android.common.ext.delayRun
+import cn.vove7.android.common.loge
 import cn.vove7.android.common.logi
 import cn.vove7.common.app.AppConfig
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.app.withFailLog
 import cn.vove7.common.interfaces.api.GlobalActionExecutorI
+import cn.vove7.common.utils.ScreenAdapter
 import cn.vove7.jadb.AdbClient
 import cn.vove7.jadb.AdbStream
 import cn.vove7.jadb.BuildConfig
@@ -52,10 +54,7 @@ object ScrcpyActionExecutor : GlobalActionExecutorI {
     }
 
     override fun press(x: Int, y: Int, delay: Int): Boolean {
-        gesture(delay.toLong(), arrayOf(Pair(x, y)))
-        synchronized(gestureLock) {
-            gestureLock.wait()
-        }
+        gestureAsync(delay.toLong(), arrayOf(Pair(x, y)))
         return true
     }
 
@@ -135,41 +134,38 @@ object ScrcpyActionExecutor : GlobalActionExecutorI {
 
     override fun gesture(duration: Long, points: Array<Pair<Int, Int>>): Boolean {
         ControlMessage.createSimpleGesture(
-            listOf(points.map {
-                Point(it.first, it.second)
-            }),
+            listOf(points.toPointList()),
             duration.toInt()
         ).also {
             conn.send(it)
         }
         synchronized(gestureLock) {
-            gestureLock.wait()
+            gestureLock.wait(duration + 800)
         }
         return true
+    }
+
+    private fun Array<Pair<Int, Int>>.toPointList() = map {
+        Point(ScreenAdapter.scaleX(it.first).toInt(),
+            ScreenAdapter.scaleY(it.second).toInt())
     }
 
     override fun gestures(duration: Long, ppss: Array<Array<Pair<Int, Int>>>): Boolean {
         ControlMessage.createSimpleGesture(
-            ppss.map {
-                it.map { p ->
-                    Point(p.first, p.second)
-                }
-            },
+            ppss.map { it.toPointList() },
             duration.toInt()
         ).also {
             conn.send(it)
         }
         synchronized(gestureLock) {
-            gestureLock.wait()
+            gestureLock.wait(duration + 800)
         }
         return true
     }
 
-    override fun gestureAsync(start: Long, duration: Long, points: Array<Pair<Int, Int>>): Boolean {
+    override fun gestureAsync(duration: Long, points: Array<Pair<Int, Int>>): Boolean {
         ControlMessage.createSimpleGesture(
-            listOf(points.map {
-                Point(it.first, it.second)
-            }),
+            listOf(points.toPointList()),
             duration.toInt()
         ).also {
             conn.send(it)
@@ -179,11 +175,7 @@ object ScrcpyActionExecutor : GlobalActionExecutorI {
 
     override fun gesturesAsync(duration: Long, ppss: Array<Array<Pair<Int, Int>>>): Boolean {
         ControlMessage.createSimpleGesture(
-            ppss.map {
-                it.map { p ->
-                    Point(p.first, p.second)
-                }
-            },
+            ppss.map { it.toPointList() },
             duration.toInt()
         ).also {
             conn.send(it)
@@ -395,6 +387,7 @@ object ScrcpyActionExecutor : GlobalActionExecutorI {
             }
         }
 
+        @Synchronized
         fun close() {
             kotlin.runCatching {
                 dataInputStream?.close()
@@ -405,9 +398,14 @@ object ScrcpyActionExecutor : GlobalActionExecutorI {
             kotlin.runCatching {
                 sock?.close()
             }.withFailLog()
+            synchronized(gestureLock) {
+                gestureLock.notifyAll()
+            }
+            monitorThread?.interrupt()
             dataInputStream = null
             dataOutputStream = null
             sock = null
+            monitorThread = null
         }
     }
 }
