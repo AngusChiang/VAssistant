@@ -221,11 +221,11 @@ class ScreenAssistActivity : BaseActivity<DialogAssistBinding>() {
                 val isDelay = getBooleanExtra("delay", false)
                 launch {
                     delay(if (isDelay) 1000 else 0)
-                    screenPath = SystemBridge.screenShot(cachePath)?.let {
+                    val (f, box) = SystemBridge.screenShotAsync(cachePath)
+                    screenPath = f?.let {
                         //截完图显示面板
                         hideNavBar()
                         showView()
-                        SystemBridge.release()
                         it.absolutePath
                     } ?: run {
                         GlobalApp.toastError("截图失败")
@@ -233,10 +233,9 @@ class ScreenAssistActivity : BaseActivity<DialogAssistBinding>() {
                         SystemBridge.release()
                         return@launch
                     }
-                    if (ShellHelper.hasRootOrAdb()) {
-                        //todo listen exec progress
-                        delay(1000)
-                    }
+                    box?.blockedGet()
+                    SystemBridge.release()
+                    ShellHelper.release()
                     showProgressBar = false
                     afterHandleScreen()
                 }

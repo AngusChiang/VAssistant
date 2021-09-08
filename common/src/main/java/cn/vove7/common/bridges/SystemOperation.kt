@@ -6,6 +6,7 @@ import android.location.Location
 import cn.vove7.common.annotation.ScriptApiClass
 import cn.vove7.common.datamanager.parse.model.ActionScope
 import cn.vove7.common.model.LocationInfo
+import cn.vove7.common.model.ResultBox
 import cn.vove7.vtp.app.AppInfo
 import cn.vove7.vtp.system.DeviceInfo
 import java.io.File
@@ -165,7 +166,11 @@ interface SystemOperation {
     fun sendEmail(to: String, subject: String? = null, content: String? = null)
 
     fun lockScreen(): Boolean
+
     fun screenShot(savePath: String): File?
+
+    fun screenShotAsync(savePath: String): Pair<File?, ResultBox<*>?>
+
     fun screen2File(): File?
 
     /**

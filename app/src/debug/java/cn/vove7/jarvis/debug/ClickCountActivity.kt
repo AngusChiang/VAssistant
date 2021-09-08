@@ -9,6 +9,7 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import cn.vove7.common.accessibility.AccessibilityApi
 import cn.vove7.common.bridges.GlobalActionExecutor
+import cn.vove7.common.bridges.ScrcpyActionExecutor
 import cn.vove7.common.bridges.ShellHelper
 import java.lang.Thread.sleep
 import kotlin.concurrent.thread
@@ -55,12 +56,12 @@ class ClickCountActivity : AppCompatActivity() {
         }
         t = thread {
             val tt = Thread.currentThread()
-            while (t!=null&&!tt.isInterrupted) {
+            while (t != null && !tt.isInterrupted) {
                 try {
                     if (AccessibilityApi.gestureService != null) {
                         GlobalActionExecutor.click(200, 1000)
                     } else {
-                        ShellHelper.execWithAdb("input tap 200 1000", false, false)
+                        ScrcpyActionExecutor.click(200, 1000)
                         sleep(5)
                     }
                 } catch (e: Throwable) {
@@ -68,6 +69,7 @@ class ClickCountActivity : AppCompatActivity() {
                     break
                 }
             }
+            ScrcpyActionExecutor.release()
             ShellHelper.release()
             t = null
         }

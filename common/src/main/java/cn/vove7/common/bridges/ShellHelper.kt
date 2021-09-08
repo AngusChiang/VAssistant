@@ -15,6 +15,7 @@ import java.io.BufferedReader
 import java.io.DataOutputStream
 import java.io.InputStreamReader
 import java.net.Inet4Address
+import kotlin.concurrent.thread
 
 /**
  *
@@ -74,8 +75,9 @@ object ShellHelper {
      */
     @Throws
     @JvmOverloads
-    fun execWithSu(cmd: String, waitResult: Boolean = true): String {
+    fun execWithSu(cmd: String, waitResult: Boolean = true): ResultBox<String?> {
         GlobalLog.log("execWithSu ---> $cmd")
+        val box = ResultBox<String?>()
         val result = StringBuilder()
         val p = Runtime.getRuntime().exec("su")// 经过Root处理的android系统即有su命令
         DataOutputStream(p.outputStream).use { dos ->
@@ -85,14 +87,17 @@ object ShellHelper {
                 dos.writeBytes("exit\n")
                 dos.flush()
                 if (waitResult) {
-                    while ((dis.readLine().also { result.appendLine(it) }) != null);
-                    p.waitFor()
+                    thread {
+                        while ((dis.readLine().also { result.appendLine(it) }) != null);
+                        p.waitFor()
+                        box.setAndNotify(result.toString())
+                    }
+                } else {
+                    box.setAndNotify(null)
                 }
             }
         }
-        return result.toString().also {
-            GlobalLog.log("exec result -> $it")
-        }
+        return box
     }
 
     /**
@@ -139,9 +144,9 @@ object ShellHelper {
             append(s)
             val am = GlobalApp.APP.getSystemService(Context.ACCESSIBILITY_SERVICE) as AccessibilityManager
             am.getEnabledAccessibilityServiceList(AccessibilityServiceInfo.FEEDBACK_GENERIC)
-                ?.forEach {
-                    append(":${it.id}")
-                }
+                    ?.forEach {
+                        append(":${it.id}")
+                    }
             appendLine()
             appendLine("settings put secure accessibility_enabled 1")
         }.also {
@@ -152,39 +157,42 @@ object ShellHelper {
     fun adbEnable() = SystemBridge.isWirelessAdbEnabled()
 
     @JvmOverloads
-    fun execAuto(cmd: String, waitResult: Boolean = true) = when {
+    fun execAutoAsync(cmd: String, waitResult: Boolean = true): ResultBox<String?> = when {
         hasRoot() -> execWithSu(cmd, waitResult)
         SystemBridge.isWirelessAdbEnabled() -> execWithAdb(cmd, waitResult)
         else -> throw RuntimeException("no root or adb permission")
     }
 
+    fun execAuto(cmd: String, waitResult: Boolean = true): String? =
+        execAutoAsync(cmd, waitResult).blockedGet()
+
     @JvmOverloads
-    fun execWithAdb(cmd: String?, waitResult: Boolean = true, close: Boolean = waitResult, timeout: Int = 6000): String? {
-        val jadb = _adbClient ?: AdbClient(
-            GlobalApp.APP,
-            Inet4Address.getLoopbackAddress().hostName,
-            SystemBridge.adbPort(),
-            adbCrypto = AdbCrypto.get(GlobalApp.APP),
-            name = "VAssistant"
+    fun execWithAdb(
+            cmd: String?,
+            waitResult: Boolean = true
+    ): ResultBox<String?> {
+        val adbClient = _adbClient ?: AdbClient(
+                GlobalApp.APP,
+                Inet4Address.getLoopbackAddress().hostName,
+                SystemBridge.adbPort(),
+                adbCrypto = AdbCrypto.get(GlobalApp.APP),
+                name = "VAssistant"
         ).also {
             _adbClient = it
             it.connect()
         }
 
-        val stream = jadb.shellCommand(cmd ?: " ")
+        val stream = adbClient.shellCommand(cmd ?: " ")
+        val box = ResultBox<String?>()
         if (!waitResult) {
-            if (close) {
-                stream.close()
-            }
-            return null
+            stream.noStoreOutput()
+            box.setAndNotify(null)
+            return box
         }
-        val box = ResultBox<String>()
         stream.onClose {
             box.setAndNotify(String(data))
         }
-        return box.blockedGet(false, timeout.toLong()).also {
-            stream.onClose(null)
-        }
+        return box
     }
 
     fun release() {
