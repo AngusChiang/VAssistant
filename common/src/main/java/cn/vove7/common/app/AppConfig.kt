@@ -232,6 +232,8 @@ object AppConfig : BaseConfig {
 
     var textOcrStr: String? by noCacheKey(null, keyId = R.string.key_text_ocr_key)
 
+    val gestureAdbFirst: Boolean by noCacheKey(false, keyId = R.string.key_gesture_adb_first)
+
     //////////////////扩展//////////////////////
 
     val extPowerIndicator by noCacheKey(false, R.string.key_extension_power_indicator)

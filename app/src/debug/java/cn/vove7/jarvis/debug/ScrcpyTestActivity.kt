@@ -6,7 +6,8 @@ import android.util.Pair
 import android.widget.ArrayAdapter
 import android.widget.ListView
 import androidx.appcompat.app.AppCompatActivity
-import cn.vove7.common.bridges.AdbActionExecutor
+import cn.vove7.common.app.withFailLog
+import cn.vove7.common.bridges.ScrcpyActionExecutor
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -38,31 +39,33 @@ class ScrcpyTestActivity : AppCompatActivity() {
         ))
         lv.setOnItemClickListener { _, _, position, _ ->
             thread {
-                (lv.adapter as ArrayAdapter<KCallable<*>>)
-                    .getItem(position)?.also {
-                        it.isAccessible = true
-                        it.call()
-                    }
+                kotlin.runCatching {
+                    (lv.adapter as ArrayAdapter<KCallable<*>>)
+                        .getItem(position)?.also {
+                            it.isAccessible = true
+                            it.call()
+                        }
+                }.withFailLog()
                 sleep(800)
                 Log.d("ScrcpyTest", "exec end")
-                AdbActionExecutor.release()
+                ScrcpyActionExecutor.release()
             }
         }
         setContentView(lv)
     }
 
     private fun testHomeKey() {
-        AdbActionExecutor.home()
+        ScrcpyActionExecutor.home()
     }
 
     private fun testClick0_0() {
-        AdbActionExecutor.click(0, 0)
+        ScrcpyActionExecutor.click(0, 0)
     }
 
     private fun testGesture() {
-        AdbActionExecutor.home()
+        ScrcpyActionExecutor.home()
         sleep(1000)
-        AdbActionExecutor.gestures(500,
+        ScrcpyActionExecutor.gestures(500,
             arrayOf(
                 arrayOf(
                     Pair(300, 300),
@@ -77,23 +80,23 @@ class ScrcpyTestActivity : AppCompatActivity() {
     }
 
     private fun testPerformAcsAction() = GlobalScope.launch {
-        AdbActionExecutor.notificationBar()
+        ScrcpyActionExecutor.notificationBar()
         delay(1000)
-        AdbActionExecutor.back()
+        ScrcpyActionExecutor.back()
         delay(1000)
-        AdbActionExecutor.quickSettings()
+        ScrcpyActionExecutor.quickSettings()
     }
 
     private fun takeScreenshot() {
-        AdbActionExecutor.screenShot()
+        ScrcpyActionExecutor.screenShot()
     }
 
     private fun powerDialog() {
-        AdbActionExecutor.powerDialog()
+        ScrcpyActionExecutor.powerDialog()
     }
 
     private fun splitScreen() {
-        AdbActionExecutor.splitScreen()
+        ScrcpyActionExecutor.splitScreen()
     }
 
 }

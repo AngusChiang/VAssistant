@@ -30,12 +30,16 @@ import java.net.Socket
 import kotlin.concurrent.thread
 
 /**
- * # ShellActionExecutor
+ * # ScrcpyActionExecutor
  *
  * @author Vove
  * @date 2021/8/16
  */
-object AdbActionExecutor : GlobalActionExecutorI {
+object ScrcpyActionExecutor : GlobalActionExecutorI {
+
+    @JvmStatic
+    val availiable
+        get() = ShellHelper.hasRootOrAdb()
 
     @JvmStatic
     val conn = ScrcpyConnection()
@@ -207,6 +211,8 @@ object AdbActionExecutor : GlobalActionExecutorI {
 
         private var delayCloseJob: Job? = null
 
+        private var suProcess: Process? = null
+
         private fun isScrcpyRunning(): Boolean = try {
             val s = ServerSocket(port, 0, Inet4Address.getByName("localhost"))
             "$port is not in use $s".logi()
@@ -219,12 +225,27 @@ object AdbActionExecutor : GlobalActionExecutorI {
 
         fun closeServerDelay() {
             delayCloseJob = delayRun(10000) {
-                shellStream?.interrupt()
-                adbClient?.close()
+                dataOutputStream?.also {
+                    kotlin.runCatching {
+                        ControlMessage.exit().post(it)
+                    }.withFailLog()
+                }
+                adbClient?.apply {
+                    "destroy adbClient: $adbClient".logi()
+                    shellStream?.interrupt()
+                    close()
+                }
+                suProcess?.apply {
+                    "destroy suProcess: $this".logi()
+                    destroy()
+                    waitFor()
+                    "destroy suProcess: $this ${this.alive()}".logi()
+                }
                 sleep(500)
                 "Scrcpy close ${!isScrcpyRunning()}".logi()
                 adbClient = null
                 shellStream = null
+                suProcess = null
             }.also {
                 it.invokeOnCompletion {
                     delayCloseJob = null
@@ -241,19 +262,82 @@ object AdbActionExecutor : GlobalActionExecutorI {
 
             if (!isScrcpyRunning()) {
                 "not running start scrcpy server".logi()
-                adbClient = AdbClient(GlobalApp.APP).also {
-                    it.connect()
-                    val cmd = "CLASSPATH=${tmpScrcpyFile} app_process / com.vove7.scrcpy.Server" +
-                        " VERBOSE SocketServer $port ${GlobalApp.APP.packageName}"
-                    cmd.logi()
-                    shellStream = it.shellCommand(cmd, ondata = if (BuildConfig.DEBUG) {
-                        { Log.d("AdbClient", String(it)) }
-                    } else null)
-                    shellStream?.noStoreOutput()
-                    sleep(800)
+                val cmd = "CLASSPATH=${tmpScrcpyFile} app_process / com.vove7.scrcpy.Server" +
+                    " VERBOSE SocketServer $port ${GlobalApp.APP.packageName}"
+                cmd.logi()
+                if (ShellHelper.isRoot()) {
+                    initWithRoot(cmd)
+                } else {
+                    initWithAdb(cmd)
                 }
             } else {
                 "scrcpy already running...".logi()
+            }
+        }
+
+        private fun initWithAdb(cmd: String) {
+            "initWithAdb".logi()
+            val lock = Object()
+            adbClient = AdbClient(GlobalApp.APP).also {
+                it.connect()
+                shellStream = it.shellCommand(cmd) {
+                    Log.d("AdbClient", String(it))
+                    val s = shellStream ?: return@shellCommand
+                    if (String(s.data).contains("waiting client connect")) {
+                        synchronized(lock) {
+                            lock.notify()
+                        }
+                        if (!BuildConfig.DEBUG) {
+                            s.onData(null)
+                            s.noStoreOutput()
+                        }
+                    }
+                }
+            }
+            synchronized(lock) {
+                lock.wait(2000)
+            }
+        }
+
+        private fun Process.alive(): Boolean {
+            return try {
+                exitValue()
+                false
+            } catch (e: IllegalThreadStateException) {
+                true
+            }
+        }
+
+        private fun initWithRoot(cmd: String) {
+            "initWithRoot".logi()
+            val p = Runtime.getRuntime().exec("su")
+            val dos = DataOutputStream(p.outputStream)
+            dos.writeBytes(cmd + "\n")
+            dos.flush()
+            suProcess = p
+            sleep(800)
+            val lock = Object()
+            val reader = BufferedReader(InputStreamReader(p.inputStream))
+            thread {
+                while (p.alive()) try {
+                    val s = reader.readLine()
+                    if (s.contains("waiting client connect")) {
+                        synchronized(lock) {
+                            lock.notify()
+                        }
+                        if (!BuildConfig.DEBUG) {
+                            break
+                        }
+                    }
+                    if (BuildConfig.DEBUG) {
+                        Log.d("AdbClient", s)
+                    }
+                } catch (e: Throwable) {
+                    break
+                }
+            }
+            synchronized(lock) {
+                lock.wait(2000)
             }
         }
 

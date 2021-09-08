@@ -3,6 +3,7 @@ package cn.vove7.common.bridges
 import android.util.Pair
 import cn.vove7.common.MessageException
 import cn.vove7.common.accessibility.AccessibilityApi
+import cn.vove7.common.app.AppConfig
 import cn.vove7.common.app.AppPermission
 import cn.vove7.common.interfaces.api.GlobalActionExecutorI
 
@@ -29,12 +30,14 @@ class AutoExecutor : GlobalActionExecutorI {
                 availableExecutors.add(AcsActionExecutor)
             }
         }
-        checkAcs()
-        if (SystemBridge.isWirelessAdbEnabled()) {
-            availableExecutors.add(AdbActionExecutor)
-        }
-        if (ShellHelper.isRoot()) {
-            availableExecutors.add(RootActionExecutor)
+        if (AppConfig.gestureAdbFirst && ScrcpyActionExecutor.availiable) {
+            availableExecutors.add(ScrcpyActionExecutor)
+            checkAcs()
+        } else {
+            checkAcs()
+            if (ScrcpyActionExecutor.availiable) {
+                availableExecutors.add(ScrcpyActionExecutor)
+            }
         }
 
         if (availableExecutors.isEmpty() && AppPermission.canWriteSecureSettings) {
@@ -127,7 +130,6 @@ class AutoExecutor : GlobalActionExecutorI {
 
     override fun release() {
         AcsActionExecutor.release()
-        AdbActionExecutor.release()
-        RootActionExecutor.release()
+        ScrcpyActionExecutor.release()
     }
 }
