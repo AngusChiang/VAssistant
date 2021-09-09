@@ -45,7 +45,6 @@ import cn.vove7.jarvis.R
 import cn.vove7.jarvis.activities.PermissionManagerActivity.PermissionStatus.Companion.allPerStr
 import cn.vove7.jarvis.activities.base.OneFragmentActivity
 import cn.vove7.jarvis.adapters.RecAdapterWithFooter
-import cn.vove7.jarvis.app.App
 import cn.vove7.jarvis.databinding.FragmentBaseListBinding
 import cn.vove7.jarvis.databinding.ListHeaderWithSwitchBinding
 import cn.vove7.jarvis.fragments.SimpleListFragment
@@ -64,6 +63,7 @@ import com.afollestad.materialdialogs.input.getInputLayout
 import com.afollestad.materialdialogs.input.input
 import com.catchingnow.icebox.sdk_client.IceBox
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.lang.Thread.sleep
@@ -292,7 +292,9 @@ class PermissionManagerActivity : OneFragmentActivity() {
 
         private fun toDevSettings() {
             startActivity(Intent("android.settings.APPLICATION_DEVELOPMENT_SETTINGS").also {
-                it.addFlags(Intent.FLAG_ACTIVITY_LAUNCH_ADJACENT)
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                    it.addFlags(Intent.FLAG_ACTIVITY_LAUNCH_ADJACENT)
+                }
                 it.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             })
         }
@@ -380,7 +382,7 @@ class PermissionManagerActivity : OneFragmentActivity() {
         private fun enableAdbPort5555(dialog: MaterialDialog) {
             dialog.getInputLayout().gone()
             dialog.title(text = "请稍等")
-            dialog.message(text = "tcpip 5555...")
+            dialog.message(text = "find connect port...")
             val conPort = MutableLiveData(0)
 
             suspend fun showResult(content: String, btnText: String) = withContext(Dispatchers.Main) {
@@ -397,11 +399,14 @@ class PermissionManagerActivity : OneFragmentActivity() {
             val mdns = AdbMdns(requireContext(), AdbMdns.TLS_CONNECT, conPort)
             conPort.observe(requireActivity()) { port ->
                 if (port in 1024..65535) {
+                    mdns.stop()
+                    dialog.message(text = "tcpip 5555 on $port...")
                     lifecycleScope.launch(Dispatchers.IO) {
                         kotlin.runCatching {
                             val cli = AdbClient(requireContext(), port = port)
                             cli.connect()
                             cli.tcpip(5555)
+                            delay(500)
                         }.onSuccess {
                             showResult("恭喜！开启完成\nport: ${SystemBridge.adbPort()}", "完成")
                             refreshStatus()
@@ -411,6 +416,9 @@ class PermissionManagerActivity : OneFragmentActivity() {
                         }
                     }
                 }
+            }
+            dialog.onDismiss {
+                mdns.stop()
             }
             mdns.start()
         }
@@ -460,12 +468,10 @@ class PermissionManagerActivity : OneFragmentActivity() {
             val base = it.permissionName == "基础无障碍服务"
             if (!it.isOpen) {
                 launch {
-                    if (AccessibilityApi.autoOpenService(
-                            if (base) AccessibilityApi.WHICH_SERVICE_BASE
-                            else AccessibilityApi.WHICH_SERVICE_GESTURE,
-                            checkAfter = true, failByUser = true
-                        )
-                    ) {
+                    val whichService = if (base) AccessibilityApi.WHICH_SERVICE_BASE
+                    else AccessibilityApi.WHICH_SERVICE_GESTURE
+                    if (AccessibilityApi.autoOpenService(whichService,
+                            checkAfter = true, failByUser = true)) {
                         GlobalApp.toastInfo("自动开启成功")
                         refreshStatus()
                     } else {

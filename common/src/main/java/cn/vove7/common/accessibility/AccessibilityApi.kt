@@ -182,6 +182,12 @@ abstract class AccessibilityApi : AccessibilityService() {
                     }
                 }
             }
+            runOnUi {
+                if (failByUser) {
+                    val service = serviceCls(which)
+                    PermissionUtils.gotoAccessibilitySetting2(GlobalApp.APP, service)
+                }
+            }
             return false
         }
 

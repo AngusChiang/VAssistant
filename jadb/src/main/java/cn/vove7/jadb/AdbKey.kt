@@ -49,7 +49,7 @@ class AdbKey(
         fun get(context: Context) = AdbKey(
             PreferenceAdbKeyStore(
                 context.getSharedPreferences(context.packageName + ".adb", Context.MODE_PRIVATE)
-            ), context.applicationInfo.loadLabel(context.packageManager).toString()
+            ), context.packageName
         )
 
         private const val ANDROID_KEYSTORE = "AndroidKeyStore"
