@@ -10,9 +10,10 @@ import java.util.*
 
 class SystemTTS(val context: Context, val listener: UtteranceProgressListener) {
     //核心播放对象
+    private val initLock = Object()
+
     private var textToSpeech = TextToSpeech(context.applicationContext, ::init)
 
-    val initLock = Object()
 
     fun reInit() {
         textToSpeech = TextToSpeech(context.applicationContext, ::init)

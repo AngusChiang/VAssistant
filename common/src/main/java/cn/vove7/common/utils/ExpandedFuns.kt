@@ -20,6 +20,7 @@ import android.view.animation.AlphaAnimation
 import android.view.animation.Animation
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
+import androidx.annotation.ColorInt
 import androidx.annotation.ColorRes
 import androidx.annotation.StringRes
 import androidx.core.app.ActivityCompat
@@ -634,7 +635,7 @@ fun String.spanColor(colorString: String): SpannableStringBuilder {
     return spanColor(colorString.asColor)
 }
 
-fun String.spanColor(color: Int): SpannableStringBuilder {
+fun String.spanColor(@ColorInt color: Int): SpannableStringBuilder {
     return MultiSpan(this, color = color).build()
 }
 

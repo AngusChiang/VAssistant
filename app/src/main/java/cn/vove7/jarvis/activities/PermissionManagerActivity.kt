@@ -45,6 +45,7 @@ import cn.vove7.jarvis.R
 import cn.vove7.jarvis.activities.PermissionManagerActivity.PermissionStatus.Companion.allPerStr
 import cn.vove7.jarvis.activities.base.OneFragmentActivity
 import cn.vove7.jarvis.adapters.RecAdapterWithFooter
+import cn.vove7.jarvis.app.App
 import cn.vove7.jarvis.databinding.FragmentBaseListBinding
 import cn.vove7.jarvis.databinding.ListHeaderWithSwitchBinding
 import cn.vove7.jarvis.fragments.SimpleListFragment
@@ -221,12 +222,12 @@ class PermissionManagerActivity : OneFragmentActivity() {
                 }
                 buttons {
                     if (!isWirelessAdbEnabled()) {
-                        positiveButton("进入监听状态".spanColor(R.color.google_blue)) {
+                        positiveButton("进入监听状态".spanColor(getColor(requireContext(), R.color.google_blue))) {
                             it.dismiss()
                             waitWirelessAdb()
                         }
                     } else {
-                        positiveButton("测试连接".spanColor(R.color.google_green)) {
+                        positiveButton("测试连接".spanColor(getColor(requireContext(), R.color.google_green))) {
                             testAdbConnect()
                             it.dismiss()
                         }
