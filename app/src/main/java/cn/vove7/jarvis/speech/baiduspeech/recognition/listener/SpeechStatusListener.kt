@@ -43,7 +43,7 @@ class SpeechStatusListener(private val handler: Handler) : StatusRecogListener()
         handler.sendMessage(SpeechMessage.buildMessage(CODE_VOICE_READY))
     }
 
-    private val trimReg by lazy { "[，。]".toRegex() }
+    private val trimReg by lazy { "[，。?？]".toRegex() }
 
     private fun String.trimResult(): String {
         return replace(trimReg, "")

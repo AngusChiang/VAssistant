@@ -356,15 +356,8 @@ object SystemBridge : SystemOperation {
 
     @Throws()
     override fun sendKey(keyCode: Int): Boolean {
-        try {
-            if (ShellHelper.hasRootOrAdb()) {
-                ShellHelper.execAuto("input keyevent $keyCode")
-                return true
-            }
-        } catch (e: Exception) {
-            GlobalLog.err(e)
-        }
-        return false
+        ShellHelper.execAuto("input keyevent $keyCode")
+        return true
     }
 
     override fun mediaPause() {
@@ -409,7 +402,7 @@ object SystemBridge : SystemOperation {
      */
     private fun sendMediaKey(keyCode: Int) {
         if (ShellHelper.hasRootOrAdb()) {
-            ShellHelper.execAuto("input keyevent $keyCode")
+            sendKey(keyCode)
             return
         }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {

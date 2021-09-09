@@ -28,10 +28,6 @@
 -verbose
 -printmapping proguardMapping.txt
 
-# 指定混淆时采用的算法，后面的参数是一个过滤器
-# 这个过滤器是谷歌推荐的算法，一般不改变
--optimizations !code/simplification/arithmetic,!field/*,!class/merging/*
-
 -dontskipnonpubliclibraryclasses
 #用于告诉ProGuard，不要跳过对非公开类的处理。默认情况下是跳过的，因为程序中不会引用它们，有些情况下人们编写的代码与类库中的类在同一个包下，并且对包中内容加以引用，此时需要加入此条声明。
 
@@ -47,10 +43,6 @@
     public static final android.os.Parcelable$Creator *;
 }
 
-# 对R文件下的所有类及其方法，都不能被混淆
--keepclassmembers class **.R$* {
-    *;
-}
 # 移除android 所有log
 -assumenosideeffects class cn.vove7.android.common.LoggerKt{
     public static *** logv$default(...);
@@ -75,20 +67,8 @@
     public *** logw(...);
 }
 
--assumenosideeffects class cn.vove7.vtp.log.Vog {
-    public static cn.vove7.vtp.log.Vog INSTANCE;
-    public *** v(...);
-    public *** i(...);
-    public *** w(...);
-    public *** d(...);
-    public *** e(...);
-    public *** a(...);
-    public *** wtf(...);
-}
-
--keep class com.google.android.material.* {*;}
--keep class androidx.** {*;}
--keep interface androidx.** {*;}
+-assumenosideeffects class cn.vove7.vtp.log.Vog {*;}
+-whyareyoukeeping class cn.vove7.vtp.log.Vog{*;}
 
 -dontnote com.google.android.material.**
 -dontwarn androidx.**
@@ -97,34 +77,17 @@
 -ignorewarnings
 
 
-#kotlin
--keep class kotlin.** { *; }
--keep class kotlin.Metadata { *; }
--dontwarn kotlin.**
--keepclassmembers class **$WhenMappings {
-    <fields>;
-}
-
--keepclassmembers class kotlin.Metadata {
-    public <methods>;
-}
-
--assumenosideeffects class kotlin.jvm.internal.Intrinsics {
-    static void checkParameterIsNotNull(java.lang.Object, java.lang.String);
-}
 
 -keepclasseswithmembernames class * {
     native <methods>;
 }
--keep class **.R$* {*;}
 -keepclassmembers enum * { *;}
 -keep class * extends java.lang.Exception
 
 #Gson
 -keepattributes Exceptions,InnerClasses,Signature,Deprecated,
-                LineNumberTable,*Annotation*,EnclosingMethod
+                LineNumberTable,*Annotation*,EnclosingMethodCEx
 -keep class com.google.gson.** {*;}
--keepclassmembers public class com.google.gson.** {public private protected *;}
 
 -keepclassmembers class * {
     @com.google.gson.annotations.SerializedName <fields>;
@@ -133,6 +96,17 @@
 -keep class cn.vove7.smartkey.** { *; }
 -keep class com.baidu.** { *; }
 -keep class com.luajava.** { *; }
+
+# Kotlin 运行时检查；字符串混淆可不开启
+-assumenosideeffects class kotlin.jvm.internal.Intrinsics {
+    public static *** checkNotNull(...);
+    public static *** checkParameterIsNotNull(...);
+    public static *** checkNotNullParameter(...);
+    public static *** checkNotNullExpressionValue(...);
+    public static *** checkReturnedValueIsNotNull(...);
+    public static *** checkExpressionValueIsNotNull(...);
+    public static *** throwUninitializedPropertyAccessException(...);
+}
 
 -keepclassmembers class ** {
     @org.greenrobot.eventbus.Subscribe <methods>;
