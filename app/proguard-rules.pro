@@ -90,7 +90,6 @@
 -keep class androidx.** {*;}
 -keep interface androidx.** {*;}
 
--keep public class * extends androidx.**
 -dontnote com.google.android.material.**
 -dontwarn androidx.**
 

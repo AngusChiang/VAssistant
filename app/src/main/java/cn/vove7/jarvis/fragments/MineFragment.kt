@@ -16,7 +16,6 @@ import cn.vove7.jarvis.R
 import cn.vove7.jarvis.activities.*
 import cn.vove7.jarvis.app.AppApi
 import cn.vove7.jarvis.databinding.FragmentMineBinding
-import cn.vove7.jarvis.debug.DebugIndexActivity
 import cn.vove7.jarvis.lifecycle.LifecycleScope
 import cn.vove7.jarvis.services.MainService
 import cn.vove7.jarvis.tools.AppLogic

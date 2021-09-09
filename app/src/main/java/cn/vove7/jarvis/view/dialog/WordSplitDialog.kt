@@ -7,8 +7,6 @@ import cn.vove7.bottomdialog.builder.withCloseIcon
 import cn.vove7.bottomdialog.extension.awesomeHeader
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.bridges.SystemBridge
-import cn.vove7.jarvis.R
-import cn.vove7.jarvis.activities.base.BaseActivity
 import cn.vove7.jarvis.lifecycle.LifecycleScope
 import cn.vove7.jarvis.view.dialog.contentbuilder.WordSplitBuilder
 import cn.vove7.jarvis.view.dp
@@ -21,8 +19,8 @@ import cn.vove7.jarvis.view.positiveButtonWithColor
  * 2018/10/28
  */
 class WordSplitDialog(
-        context: AppCompatActivity,
-        val rawWords: String
+    context: AppCompatActivity,
+    private val rawWords: String
 ) {
 
     fun dismiss() {
@@ -40,10 +38,9 @@ class WordSplitDialog(
 
         buttons {
             positiveButtonWithColor("快速搜索") {
-                val st = builder.getCheckedText()
+                var st = builder.getCheckedText()
                 if (st.isEmpty()) {
-                    GlobalApp.toastWarning(R.string.text_select_nothing)
-                    return@positiveButtonWithColor
+                    st = rawWords
                 }
                 SystemBridge.quickSearch(st)
             }
@@ -58,10 +55,9 @@ class WordSplitDialog(
                 GlobalApp.toastSuccess("已复制选择内容")
             }
             neutralButton(text = "分享") {
-                val st = builder.getCheckedText()
+                var st = builder.getCheckedText()
                 if (st.isEmpty()) {
-                    GlobalApp.toastWarning(R.string.text_select_nothing)
-                    return@neutralButton
+                    st = rawWords
                 }
                 SystemBridge.shareText(st)
                 it.dismiss()

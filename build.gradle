@@ -7,38 +7,26 @@ buildscript {
     ext.androidx_version = '1.3.1'
 
     repositories {
-//        maven { url'https://maven.aliyun.com/nexus/content/repositories/gradle-plugin' }
-//        maven { url'http://maven.aliyun.com/nexus/content/groups/public/' }
-//        maven { url'http://maven.aliyun.com/nexus/content/repositories/jcenter' }
-//        maven { url 'https://maven.aliyun.com/nexus/content/repositories/google' }
         mavenCentral()
-        //noinspection JcenterRepositoryObsolete,GrDeprecatedAPIUsage
-        jcenter()
         google()
+        jcenter()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:7.0.1'
+        classpath 'com.android.tools.build:gradle:7.0.2'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
         classpath "org.greenrobot:greendao-gradle-plugin:$greendao_version" // greendao
 
-        classpath 'com.tencent.mm:AndResGuard-gradle-plugin:1.2.21'
         classpath 'io.michaelrocks:paranoid-gradle-plugin:0.3.2'
     }
 }
 
 allprojects {
     repositories {
-//        maven{ url'http://maven.aliyun.com/nexus/content/groups/public/' }
-//        maven{ url'http://maven.aliyun.com/nexus/content/repositories/jcenter'}
-//        maven { url 'https://maven.aliyun.com/nexus/content/repositories/google' }
-
         mavenCentral()
-        //noinspection JcenterRepositoryObsolete
-        jcenter()
-        maven { url "https://dl.bintray.com/drummer-aidan/maven/" }
-        maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
         google()
         maven { url 'https://jitpack.io' }
+        maven { url "https://dl.bintray.com/drummer-aidan/maven/" }
+        maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
     }
 }
 

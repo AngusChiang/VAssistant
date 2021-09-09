@@ -231,8 +231,8 @@ class AdvancedSettingActivity : ReturnableActivity<ActivityExpandableSettingsBin
                         IntentItem(title = "若琪测试") {
                             MainService.homeControlSystem?.test()
                         },
-                        IntentItem(title = "根本操作对话框") {
-                            TextOperationDialog(this, TextOperationDialog.TextModel("123" * 50))
+                        IntentItem(title = "文本操作对话框") {
+                            TextOperationDialog(this, TextOperationDialog.TextModel("123 " * 50))
                         },
                         IntentItem(title = "释放内存") {
                             GlobalApp.GApp.onTrimMemory(ComponentCallbacks2.TRIM_MEMORY_BACKGROUND)
