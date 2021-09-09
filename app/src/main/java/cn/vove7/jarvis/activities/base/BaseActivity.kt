@@ -1,5 +1,6 @@
 package cn.vove7.jarvis.activities.base
 
+import androidx.core.view.ViewCompat
 import androidx.viewbinding.ViewBinding
 import cn.vove7.android.scaffold.ui.base.ScaffoldActivity
 import cn.vove7.jarvis.lifecycle.LifeCycleScopeDelegate
@@ -15,6 +16,11 @@ import cn.vove7.jarvis.tools.DataCollector
  */
 abstract class BaseActivity<T : ViewBinding> :
         ScaffoldActivity2<T>(), LifeCycleScopeDelegate {
+
+    val wic by lazy {
+        ViewCompat.getWindowInsetsController(viewBinding.root)
+    }
+
     override val needToolbar: Boolean
         get() = false
 

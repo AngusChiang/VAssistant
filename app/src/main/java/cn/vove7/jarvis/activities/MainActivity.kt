@@ -23,6 +23,7 @@ import cn.vove7.jarvis.view.dialog.UpdateLogDialog
 import cn.vove7.jarvis.work.DataSyncWork
 import cn.vove7.vtp.log.Vog
 import cn.vove7.vtp.runtimepermission.PermissionUtils
+import cn.vove7.vtp.weaklazy.weakLazy
 import com.afollestad.materialdialogs.MaterialDialog
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -78,11 +79,8 @@ class MainActivity : BaseActivity<ActivityRealMainBinding>() {
 
     override fun initView() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && !isDarkTheme) {
-            window.decorView.systemUiVisibility =
-                View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN or
-                    View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR or
-                    View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR
-            window.statusBarColor = resources!!.getColor(R.color.app_background, theme)
+            wic?.isAppearanceLightNavigationBars = true
+            wic?.isAppearanceLightStatusBars = true
         }
     }
 
@@ -96,7 +94,7 @@ class MainActivity : BaseActivity<ActivityRealMainBinding>() {
         }
     }
 
-    private val tipsRecentDialog by lazy {
+    private val tipsRecentDialog by weakLazy {
         MaterialDialog(this).apply {
             title(text = "如何从最近任务隐藏？")
             cancelable(false)
