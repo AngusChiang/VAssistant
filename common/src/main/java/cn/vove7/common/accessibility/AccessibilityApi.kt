@@ -127,7 +127,10 @@ abstract class AccessibilityApi : AccessibilityService() {
 
         @JvmStatic
         @JvmOverloads
-        fun requireAccessibility(which: Int = WHICH_SERVICE_BASE, waitMillis: Long = 30000, jump: Boolean = true): AccessibilityApi {
+        fun requireAccessibility(
+            which: Int = WHICH_SERVICE_BASE, waitMillis: Long = 30000,
+            jump: Boolean = true
+        ): AccessibilityApi {
             if (!isServiceEnable(which)) {
                 if (ShellHelper.hasRootOrAdb() || canWriteSecureSettings()) {
                     autoOpenService(which, true)
@@ -157,7 +160,8 @@ abstract class AccessibilityApi : AccessibilityService() {
         fun autoOpenService(
             which: Int = WHICH_SERVICE_BASE,
             checkAfter: Boolean,
-            failByUser: Boolean = false
+            failByUser: Boolean = false,
+            toast: Boolean = true
         ): Boolean {
             if (ShellHelper.hasRootOrAdb() || canWriteSecureSettings()) {
                 openServiceSelf(which)
@@ -174,6 +178,9 @@ abstract class AccessibilityApi : AccessibilityService() {
                     } else {
                         runOnUi {
                             if (failByUser) {
+                                if(toast) {
+                                    GlobalApp.toastInfo("请手动开启无障碍服务")
+                                }
                                 val service = serviceCls(which)
                                 PermissionUtils.gotoAccessibilitySetting2(GlobalApp.APP, service)
                             }

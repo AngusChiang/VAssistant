@@ -471,7 +471,7 @@ class PermissionManagerActivity : OneFragmentActivity() {
                     val whichService = if (base) AccessibilityApi.WHICH_SERVICE_BASE
                     else AccessibilityApi.WHICH_SERVICE_GESTURE
                     if (AccessibilityApi.autoOpenService(whichService,
-                            checkAfter = true, failByUser = true)) {
+                            checkAfter = true, failByUser = true, toast = false)) {
                         GlobalApp.toastInfo("自动开启成功")
                         refreshStatus()
                     } else {

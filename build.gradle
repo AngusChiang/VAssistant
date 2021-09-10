@@ -16,7 +16,7 @@ buildscript {
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
         classpath "org.greenrobot:greendao-gradle-plugin:$greendao_version" // greendao
 
-        classpath 'io.michaelrocks:paranoid-gradle-plugin:0.3.2'
+        classpath 'io.michaelrocks:paranoid-gradle-plugin:0.3.5'
     }
 }
 

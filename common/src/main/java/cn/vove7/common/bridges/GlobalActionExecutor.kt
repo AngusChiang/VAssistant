@@ -42,7 +42,7 @@ class AutoExecutor : GlobalActionExecutorI {
 
         if (availableExecutors.isEmpty() && AppPermission.canWriteSecureSettings) {
             kotlin.runCatching {
-                AccessibilityApi.requireAccessibility(which, jump = false)
+                AccessibilityApi.requireAccessibility(which, jump = true)
                 checkAcs()
             }
         }

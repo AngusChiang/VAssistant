@@ -13,7 +13,7 @@ abstract class ViewFinder(var node: AccessibilityNodeInfo?) {
 
     val startNode
         get() = node ?: AccessibilityApi
-            .requireAccessibility(jump = false).rootInWindow
+            .requireAccessibility(jump = true).rootInWindow
 
     open fun findFirst(): ViewNode? {
         return findFirst(false)
