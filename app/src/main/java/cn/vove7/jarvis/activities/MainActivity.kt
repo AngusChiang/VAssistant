@@ -8,6 +8,7 @@ import android.os.Build
 import android.os.Bundle
 import android.view.View
 import android.view.Window
+import cn.vove7.android.common.ext.ReflectExt.get
 import cn.vove7.android.common.logd
 import cn.vove7.common.app.AppConfig
 import cn.vove7.common.app.GlobalApp
@@ -51,6 +52,8 @@ class MainActivity : BaseActivity<ActivityRealMainBinding>() {
     override fun onCreate(savedInstanceState: Bundle?) {
         requestWindowFeature(Window.FEATURE_NO_TITLE)
         super.onCreate(savedInstanceState)
+        //防止混淆
+        viewBinding.root["1", 0]
         requestPermission()
         checkDebug()
         syncDataOnFirstIn()

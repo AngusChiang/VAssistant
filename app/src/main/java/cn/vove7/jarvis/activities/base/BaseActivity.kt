@@ -15,7 +15,9 @@ import cn.vove7.jarvis.tools.DataCollector
  * 2019/6/12
  */
 abstract class BaseActivity<T : ViewBinding> :
-        ScaffoldActivity2<T>(), LifeCycleScopeDelegate {
+    ScaffoldActivity<T>(), LifeCycleScopeDelegate {
+
+    val viewBinding get() = binding
 
     val wic by lazy {
         ViewCompat.getWindowInsetsController(viewBinding.root)

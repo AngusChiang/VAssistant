@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<android.inputmethodservice.KeyboardView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/keyboard"
-    android:layout_width="match_parent"
-    android:keyPreviewLayout="@layout/input_preview"
-    android:keyBackground="@color/google_blue"
-    android:layout_alignParentBottom="true"
-    android:layout_height="100dp" />

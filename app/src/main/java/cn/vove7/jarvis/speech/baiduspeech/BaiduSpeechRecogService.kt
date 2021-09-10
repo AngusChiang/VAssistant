@@ -84,7 +84,7 @@ class BaiduSpeechRecogService(event: RecogEvent) : SpeechRecogService(event) {
             it[SOUND_ERROR] = R.raw.recog_failed
             it[SOUND_CANCEL] = R.raw.recog_cancel
         }
-        it[APP_ID] = BaiduKey.appId
+        it[APP_ID] = BaiduKey.appId.toInt()
         it[APP_KEY] = BaiduKey.appKey
         it[SECRET] = BaiduKey.sKey
 

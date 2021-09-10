@@ -12,6 +12,7 @@ import com.baidu.speech.EventListener
 import com.baidu.speech.EventManager
 import com.baidu.speech.EventManagerFactory
 import com.baidu.speech.asr.SpeechConstant
+import io.michaelrocks.paranoid.Obfuscate
 import org.json.JSONObject
 
 /**
@@ -20,7 +21,7 @@ import org.json.JSONObject
  * 唤醒定时关闭，not 充电
  *
  */
-
+@Obfuscate
 class BaiduVoiceWakeup(private val eventListener: EventListener) : WakeupI() {
     companion object {
 

@@ -113,8 +113,16 @@
 }
 -keep enum org.greenrobot.eventbus.ThreadMode { *; }
 
+-keepclassmembers class * extends androidx.databinding.ViewDataBinding {
+    public static <methods>;
+}
 
--keep class cn.vove7.jarvis.databinding.** { *; }
+# viewbinding
+-keepclassmembers class * extends androidx.viewbinding.ViewBinding {
+    public static <methods>;
+}
+#-keep class cn.vove7.jarvis.databinding.ActivityRealMainBinding{*;}
+
 -keep class cn.vove7.common.bridges.** { *; }
 -keepclassmembers public class cn.vove7.common.bridges.**
 -keep class cn.vove7.common.net.model.** { *; }

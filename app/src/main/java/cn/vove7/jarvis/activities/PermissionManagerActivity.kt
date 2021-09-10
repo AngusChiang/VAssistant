@@ -33,7 +33,6 @@ import cn.vove7.common.accessibility.AccessibilityApi
 import cn.vove7.common.app.AppPermission
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.app.log
-import cn.vove7.common.bridges.InputMethodBridge
 import cn.vove7.common.bridges.ShellHelper
 import cn.vove7.common.bridges.SystemBridge
 import cn.vove7.common.utils.*
@@ -335,7 +334,7 @@ class PermissionManagerActivity : OneFragmentActivity() {
                             getInputLayout().show()
                         } catch (e: Throwable) {
                             input(hint = "配对码", inputType = InputType.TYPE_CLASS_NUMBER) { d, s ->
-                                doAdbPair(pairPort.value?:0, s.toString().trim(), this, mdns)
+                                doAdbPair(pairPort.value ?: 0, s.toString().trim(), this, mdns)
                                 getInputLayout().disable()
                                 getActionButton(WhichButton.POSITIVE).disable()
                             }
@@ -385,7 +384,7 @@ class PermissionManagerActivity : OneFragmentActivity() {
             dialog.message(text = "find connect port...")
             val conPort = MutableLiveData(0)
 
-            suspend fun showResult(content: String, btnText: String) = withContext(Dispatchers.Main) {
+            suspend fun showResult(content: String, btnText: String, succ: Boolean) = withContext(Dispatchers.Main) {
                 dialog.title(text = "无线配对")
                 dialog.message(text = content)
                 dialog.getActionButton(WhichButton.POSITIVE).apply {
@@ -394,6 +393,12 @@ class PermissionManagerActivity : OneFragmentActivity() {
                         dialog.dismiss()
                     }
                 }.enable()
+                if (succ) {
+                    dialog.neutralButton(text = "测试连接") {
+                        testAdbConnect()
+                        it.dismiss()
+                    }
+                }
             }
 
             val mdns = AdbMdns(requireContext(), AdbMdns.TLS_CONNECT, conPort)
@@ -411,11 +416,15 @@ class PermissionManagerActivity : OneFragmentActivity() {
                             cli.tcpip(5555)
                             delay(500)
                         }.onSuccess {
-                            showResult("恭喜！开启完成\nport: ${SystemBridge.adbPort()}", "完成")
-                            refreshStatus()
+                            if (SystemBridge.adbPort() == 5555) {
+                                showResult("恭喜！开启完成", "完成", true)
+                                refreshStatus()
+                            } else {
+                                showResult("OH! 开启失败，请重试\nport: ${SystemBridge.adbPort()}", "退出", false)
+                            }
                         }.onFailure {
                             it.loge()
-                            showResult("OH! 开启失败，请重试\n${it}", "退出")
+                            showResult("OH! 开启失败，请重试\n${it}", "退出", false)
                         }
                     }
                 }
@@ -550,18 +559,6 @@ class PermissionManagerActivity : OneFragmentActivity() {
                         SystemBridge.openAppDetail(app.packageName)
                     }
                 },
-                PermissionStatus(arrayOf(), "输入法", """用于更强大的编辑操作
-                            |提示；在执行编辑框操作时，会自动切换内置输入法进行操作，结束后会恢复原输入法。
-                            |自动切换输入法支持三种方式：
-                            |1. 无障碍服务（可见的切换步骤）
-                            |2. Root权限（推荐）
-                            |3. WRITE_SECURE_SETTINGS权限（推荐，开启方法，见[常见问题]）
-                            |由于每次询问Root权限申请过慢，请预先授权。""".trimMargin()
-                ) { it, _ ->
-                    if (!it.isOpen) {
-                        startActivity(Intent(Settings.ACTION_INPUT_METHOD_SETTINGS))
-                    }
-                },
                 PermissionStatus(arrayOf(), "Root", "自动切换输入法、开启无障碍服务\n授予Root权限时，请将打开Magisk Manager后台运行（若使用Msgisk管理授权）") { it, _ ->
                     if (!it.isOpen) {
                         launch {
@@ -570,9 +567,19 @@ class PermissionManagerActivity : OneFragmentActivity() {
                         }
                     }
                 },
-                PermissionStatus(arrayOf(), "WRITE_SECURE_SETTINGS", "自动切换输入法、开启无障碍服务\nroot和此权限有一即可") { it, _ ->
+                PermissionStatus(arrayOf(), "WRITE_SECURE_SETTINGS", "自开启无障碍服务\nroot和此权限有一即可") { it, _ ->
                     if (!it.isOpen) {
-                        SystemBridge.openUrl("https://vove.gitee.io/2019/07/02/OOO/")
+                        lifecycleScope.launch(Dispatchers.IO) {
+                            AppPermission.autoOpenWriteSecure()
+                            if (AppPermission.canWriteSecureSettings) {
+                                GlobalApp.toastSuccess("自动开启完成")
+                                refreshStatus()
+                            } else {
+                                withContext(Dispatchers.Main) {
+                                    SystemBridge.openUrl("https://vove.gitee.io/2019/07/02/OOO/")
+                                }
+                            }
+                        }
                     }
                 },
                 PermissionStatus(arrayOf("android.permission.READ_CONTACTS"), "联系人", "用于检索联系人，拨号指令"),
@@ -615,7 +622,6 @@ class PermissionManagerActivity : OneFragmentActivity() {
                         }
                     }
                     it.permissionName == "无线ADB服务" -> isWirelessAdbEnabled()
-                    it.permissionName == "输入法" -> InputMethodBridge.isEnable
                     it.permissionName == "WRITE_SECURE_SETTINGS" -> AppPermission.canWriteSecureSettings
                     it.permissionName == "修改系统设置" -> if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                         Settings.System.canWrite(context)

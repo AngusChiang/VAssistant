@@ -7,6 +7,7 @@ import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
+import android.os.Looper
 import android.view.KeyEvent
 import android.view.View
 import android.widget.BaseAdapter
@@ -28,7 +29,6 @@ import cn.vove7.jarvis.services.MainService
 import cn.vove7.jarvis.services.MyAccessibilityService
 import cn.vove7.jarvis.tools.ShortcutUtil
 import cn.vove7.jarvis.tools.Tutorials
-import cn.vove7.jarvis.tools.UriUtils
 import cn.vove7.jarvis.tools.checkBoxText
 import cn.vove7.jarvis.view.*
 import cn.vove7.jarvis.view.custom.SettingGroupItem
@@ -478,16 +478,25 @@ class SettingsActivity : ReturnableActivity<ActivityExpandableSettingsBinding>()
     )
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
         if (resultCode == Activity.RESULT_OK && requestCode == 1) {//选择文件回调
             val uri = data?.data
             if (uri != null) {
                 uri.logi()
                 try {
-                    val path = UriUtils.getPathFromUri(this, uri)
-                    when {
-                        path == null -> GlobalApp.toastError("路径获取失败")
-                        path.endsWith(".bin") -> setPathAndReload(path)
-                        else -> GlobalApp.toastInfo("请选择.bin文件")
+                    val fis = contentResolver.openInputStream(uri)
+                    if (fis == null) {
+                        GlobalApp.toastError("文件读取失败")
+                        return
+                    }
+                    val fbs = fis.readBytes()
+                    val li = fbs.lastIndex
+                    if (fbs[li] == 0xf5.toByte() && fbs[li - 1] == 0xf2.toByte()) {
+                        val userFile = File(filesDir, "user_wakeup.bin")
+                        userFile.writeBytes(fbs)
+                        setPathAndReload(userFile.absolutePath)
+                    } else {
+                        GlobalApp.toastError("文件格式错误")
                     }
                 } catch (e: Exception) {
                     GlobalLog.err(e)
@@ -496,8 +505,6 @@ class SettingsActivity : ReturnableActivity<ActivityExpandableSettingsBinding>()
             } else {
                 GlobalApp.toastError(getString(R.string.text_open_failed))
             }
-        } else {
-            super.onActivityResult(requestCode, resultCode, data)
         }
     }
 
@@ -565,16 +572,10 @@ class SettingsActivity : ReturnableActivity<ActivityExpandableSettingsBinding>()
     }
 
     private fun setPathAndReload(path: String) {
-        AppConfig.wakeUpFilePath = if (!path.startsWith("asset")) {
-            val userFile = File(filesDir, "user_wakeup.bin")
-            File(path).copyTo(userFile, true)
-            userFile.absolutePath
-        } else {
-            path
-        }
+        AppConfig.wakeUpFilePath = path
         if (AppConfig.voiceWakeup) {
             GlobalApp.toastInfo("正在重载配置")
-            Handler().postDelayed({
+            Handler(Looper.getMainLooper()).postDelayed({
                 AppBus.post(AppBus.ACTION_STOP_WAKEUP_WITHOUT_SWITCH)
                 Thread.sleep(2000)
                 AppBus.post(AppBus.ACTION_START_WAKEUP_WITHOUT_SWITCH)

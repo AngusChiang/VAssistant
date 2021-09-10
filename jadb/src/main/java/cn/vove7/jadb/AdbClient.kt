@@ -165,9 +165,7 @@ open class AdbClient(
 
     //会导致重启adbd
     fun tcpip(port: Int) {
-        val localId = _localId++
-        write(A_OPEN, localId, 0, "tcpip:$port")
-        //connect reset
+        open("tcpip:$port").awaitClose()
         close()
     }
 

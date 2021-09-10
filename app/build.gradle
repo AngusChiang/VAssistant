@@ -22,8 +22,8 @@ android {
         applicationId "cn.vove7.vassistant"
         minSdkVersion 21
         targetSdkVersion 30
-        def subVersion = 1
-        versionName "2.3.0"
+        def subVersion = 0
+        versionName "2.3.1"
         def vc = Integer.parseInt(versionName.replace(".", "")) * 10
         if (vc < 10000) {
             vc *= 10

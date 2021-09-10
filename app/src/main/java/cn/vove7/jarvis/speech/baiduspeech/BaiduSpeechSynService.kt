@@ -44,7 +44,7 @@ class BaiduSpeechSynService(event: SyntheEvent) : SpeechSynService(event) {
 
     override fun init() {
 
-        val appId: String = BaiduKey.appId.toString()
+        val appId: String = BaiduKey.appId
         val appKey: String = BaiduKey.appKey
         val secretKey: String = BaiduKey.sKey
 

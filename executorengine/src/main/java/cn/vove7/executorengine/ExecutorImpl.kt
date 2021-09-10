@@ -272,7 +272,6 @@ open class ExecutorImpl(
         ScreenAdapter.reSet()
         SystemBridge.release()
         ShellHelper.release()
-        InputMethodBridge.restore()
         GlobalActionExecutor.release()
     }
 
