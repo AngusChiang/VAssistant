@@ -21,17 +21,15 @@ object AppPermission {
         if (canWriteSecureSettings) {
             return
         }
-        thread {
-            kotlin.runCatching {
-                val s = jadb.shellCommand("pm grant ${GlobalApp.APP.packageName} android.permission.WRITE_SECURE_SETTINGS")
-                s.onClose {
-                    "autoOpenWriteSecureWithAdb 执行结束 ${String(data)}".logi()
-                    s.close()
-                }
-                GlobalLog.log("adb WRITE_SECURE_SETTINGS: $canWriteSecureSettings")
-            }.onFailure {
-                GlobalLog.err(it)
+        kotlin.runCatching {
+            val s = jadb.shellCommand("pm grant ${GlobalApp.APP.packageName} android.permission.WRITE_SECURE_SETTINGS")
+            s.onClose {
+                "autoOpenWriteSecureWithAdb 执行结束 ${String(data)}".logi()
+                s.close()
             }
+            GlobalLog.log("adb WRITE_SECURE_SETTINGS: $canWriteSecureSettings")
+        }.onFailure {
+            GlobalLog.err(it)
         }
     }
 }

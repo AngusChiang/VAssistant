@@ -405,6 +405,9 @@ class PermissionManagerActivity : OneFragmentActivity() {
                         kotlin.runCatching {
                             val cli = AdbClient(requireContext(), port = port)
                             cli.connect()
+                            if (!AppPermission.canWriteSecureSettings) {
+                                AppPermission.autoOpenWriteSecureWithAdb(cli)
+                            }
                             cli.tcpip(5555)
                             delay(500)
                         }.onSuccess {
