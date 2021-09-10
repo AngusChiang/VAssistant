@@ -27,8 +27,8 @@ class SystemTTS(val context: Context, val listener: UtteranceProgressListener) {
     private fun init(i: Int) {
         if (i == TextToSpeech.SUCCESS) {
             val result = textToSpeech.setLanguage(Locale.CHINESE)
-            textToSpeech.setPitch(1.0f)
-            textToSpeech.setSpeechRate(1.0f)
+//            textToSpeech.setPitch(1.0f)
+//            textToSpeech.setSpeechRate(1.0f)
             textToSpeech.setOnUtteranceProgressListener(listener)
             if (result == TextToSpeech.LANG_MISSING_DATA || result == TextToSpeech.LANG_NOT_SUPPORTED) {
                 //系统不支持该语言播报
