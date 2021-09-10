@@ -163,6 +163,7 @@ object ShellHelper {
         else -> throw RuntimeException("no root or adb permission")
     }
 
+    @JvmOverloads
     fun execAuto(cmd: String, waitResult: Boolean = true): String? =
         execAutoAsync(cmd, waitResult).blockedGet()
 

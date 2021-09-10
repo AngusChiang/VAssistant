@@ -271,7 +271,7 @@ object ScrcpyActionExecutor : GlobalActionExecutorI {
         private fun initWithAdb(cmd: String) {
             "initWithAdb".logi()
             val lock = Object()
-            adbClient = AdbClient(GlobalApp.APP).also {
+            adbClient = AdbClient(GlobalApp.APP, port = SystemBridge.adbPort()).also {
                 it.connect()
                 shellStream = it.shellCommand(cmd) {
                     Log.d("AdbClient", String(it))

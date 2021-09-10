@@ -266,7 +266,7 @@ class PermissionManagerActivity : OneFragmentActivity() {
                         + "并点击[确定]按钮".span("[确定]", color = gr))
                     dialog.getActionButton(WhichButton.NEGATIVE).gone()
                     t = thread {
-                        val jadb = AdbClient(requireContext())
+                        val jadb = AdbClient(requireContext(), port = SystemBridge.adbPort())
                         kotlin.runCatching {
                             jadb.connect()
                             if (!AppPermission.canWriteSecureSettings) {
