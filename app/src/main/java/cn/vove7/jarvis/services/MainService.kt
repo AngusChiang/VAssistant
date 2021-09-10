@@ -819,8 +819,10 @@ object MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
             "下一首" -> runInCatch { SystemBridge.mediaNext() }
             //打开电灯、关闭电灯、增大亮度、减小亮度
             //打开手电筒、关闭手电筒
-            "打开手电筒", "打开电灯" -> SystemBridge.openFlashlight()
-            "关闭手电筒", "关闭电灯" -> SystemBridge.closeFlashlight()
+            "打开手电筒", "打开电灯",
+            "关闭手电筒", "关闭电灯" -> {
+                //do nothing
+            }
             else -> {//"截屏分享", "文字提取" 等命令
                 onParseCommand(w)
             }
