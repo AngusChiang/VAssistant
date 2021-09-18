@@ -68,7 +68,6 @@
 }
 
 -assumenosideeffects class cn.vove7.vtp.log.Vog {*;}
--whyareyoukeeping class cn.vove7.vtp.log.Vog{*;}
 
 -dontnote com.google.android.material.**
 -dontwarn androidx.**
@@ -167,3 +166,5 @@
 -keep @org.greenrobot.greendao.annotation.Entity class * { *; }
 
 -keep class * extends org.greenrobot.greendao.AbstractDao { *; }
+
+-keep class com.aispeech.** {*;}

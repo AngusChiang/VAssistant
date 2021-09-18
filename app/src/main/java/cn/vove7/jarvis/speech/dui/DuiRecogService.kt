@@ -87,13 +87,13 @@ class DuiRecogService(event: RecogEvent) : SpeechRecogService(event), AIASRListe
         DUILiteSDK.init(DuiFakeContext(GlobalApp.APP), config, object : DUILiteSDK.InitListener {
             override fun success() {
                 "dui auth succ".logi()
+                engine.stop()
             }
 
             override fun error(p0: String?, p1: String?) {
                 GlobalLog.err("dui init error: $p0 $p1")
             }
         })
-        engine.stop()
     }
 
     override val wakeupI: WakeupI by lazy {
