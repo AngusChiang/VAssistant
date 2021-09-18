@@ -7,6 +7,7 @@ import android.media.AudioManager
 import android.os.*
 import androidx.annotation.CallSuper
 import androidx.core.app.ActivityCompat
+import cn.vove7.android.common.logi
 import cn.vove7.common.app.AppConfig
 import cn.vove7.common.app.GlobalApp
 import cn.vove7.common.app.GlobalLog
@@ -335,6 +336,36 @@ abstract class SpeechRecogService(val event: RecogEvent) : SpeechRecogI {
                     event.onFinish()
                 }
             }
+        }
+
+        fun sendReady() {
+            sendMessage(SpeechMessage.buildMessage(SpeechConst.CODE_VOICE_READY))
+        }
+
+        fun sendTemp(tmp:String) {
+            sendMessage(SpeechMessage.buildMessage(SpeechConst.CODE_VOICE_TEMP, tmp))
+        }
+
+        fun sendResult(result: String) {
+            "sendResult $result".logi()
+            sendMessage(SpeechMessage.buildMessage(SpeechConst.CODE_VOICE_RESULT, result))
+        }
+
+        fun sendError(errCode: Int) {
+            sendMessage(SpeechMessage.buildMessage(SpeechConst.CODE_VOICE_ERR, errCode))
+        }
+
+        fun sendVolumePercent(volumePercent: Int) {
+            sendMessage(
+                SpeechMessage.buildMessage(
+                    SpeechConst.CODE_VOICE_VOL,
+                    VoiceData(SpeechConst.CODE_VOICE_VOL, volumePercent = volumePercent)
+                )
+            )
+        }
+
+        fun sendFinished() {
+            sendMessage(SpeechMessage.buildMessage(SpeechConst.STATUS_FINISHED, ""))
         }
     }
 

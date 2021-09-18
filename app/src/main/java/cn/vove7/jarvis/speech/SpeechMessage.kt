@@ -1,4 +1,4 @@
-package cn.vove7.jarvis.speech.baiduspeech.recognition.message
+package cn.vove7.jarvis.speech
 
 import android.os.Bundle
 import android.os.Message
@@ -12,13 +12,13 @@ import java.io.Serializable
 object SpeechMessage {
 
     fun buildMessage(what: Int): Message {
-        val message = Message()
+        val message = Message.obtain()
         message.what = what
         return message
     }
 
     fun buildMessage(what: Int, msg: String): Message {
-        val message = Message()
+        val message = Message.obtain()
         message.what = what
         val data = Bundle()
         data.putString("data", msg)
@@ -26,7 +26,7 @@ object SpeechMessage {
         return message
     }
     fun buildMessage(what: Int, code: Int): Message {
-        val message = Message()
+        val message = Message.obtain()
         message.what = what
         val data = Bundle()
         data.putInt("data", code)
@@ -35,7 +35,7 @@ object SpeechMessage {
     }
 
     fun buildMessage(what: Int, obj: Serializable): Message {
-        val message = Message()
+        val message = Message.obtain()
         message.what = what
         val data = Bundle()
         data.putSerializable("data", obj)

@@ -180,6 +180,7 @@ dependencies {
     implementation project(path: ':jadb')
     implementation project(path: ':androlua')
     implementation project(path: ':rhino-android')
+    implementation project(path: ':dui-speech-lib')
 
     implementation 'com.afollestad.material-dialogs:core:3.3.0'
     implementation 'com.afollestad.material-dialogs:color:3.3.0'
@@ -215,5 +216,8 @@ dependencies {
 
     implementation 'com.github.jenly1314:ZXingLite:2.1.0'
 
-    compileOnly 'com.microsoft.design:fluent-system-icons:1.1.25'
+    compileOnly 'com.microsoft.design:fluent-system-icons:1.1.139'
+
+    implementation 'com.github.tiann:epic:0.11.2@aar'
+    implementation 'me.weishu.exposed:exposed-xposedapi:0.4.5'
 }

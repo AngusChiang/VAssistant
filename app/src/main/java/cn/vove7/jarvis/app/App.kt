@@ -46,8 +46,8 @@ import kotlin.system.exitProcess
 class App : GlobalApp() {
 
     override fun onCreate() {
-        if (Build.VERSION.SDK_INT >= 28) {
-            HiddenApiBypass.setHiddenApiExemptions("L")
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            HiddenApiBypass.addHiddenApiExemptions("L")
         }
         CrashHandler.install()
         super.onCreate()

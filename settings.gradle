@@ -13,3 +13,4 @@ if (localPropertiesFile.exists()) {
     }
 }
 project(":scrcpy-common").setProjectDir(new File(localProperties.get("scrcpy-lib.dir")))
+include ':dui-speech-lib'

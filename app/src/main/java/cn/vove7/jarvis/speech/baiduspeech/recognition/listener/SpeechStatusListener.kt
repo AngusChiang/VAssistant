@@ -1,6 +1,5 @@
 package cn.vove7.jarvis.speech.baiduspeech.recognition.listener
 
-import android.os.Handler
 import cn.vove7.common.app.GlobalLog
 import cn.vove7.common.appbus.AppBus
 import cn.vove7.jarvis.speech.RecogEvent
@@ -10,14 +9,9 @@ import cn.vove7.jarvis.speech.RecogEvent.Companion.CODE_NO_RECORDER_PERMISSION
 import cn.vove7.jarvis.speech.RecogEvent.Companion.CODE_NO_RESULT
 import cn.vove7.jarvis.speech.RecogEvent.Companion.CODE_RECORDER_OPEN_FAIL
 import cn.vove7.jarvis.speech.RecogEvent.Companion.CODE_UNKNOWN
-import cn.vove7.jarvis.speech.SpeechConst.Companion.CODE_VOICE_ERR
-import cn.vove7.jarvis.speech.SpeechConst.Companion.CODE_VOICE_READY
-import cn.vove7.jarvis.speech.SpeechConst.Companion.CODE_VOICE_RESULT
-import cn.vove7.jarvis.speech.SpeechConst.Companion.CODE_VOICE_TEMP
-import cn.vove7.jarvis.speech.SpeechConst.Companion.CODE_VOICE_VOL
 import cn.vove7.jarvis.speech.SpeechConst.Companion.STATUS_FINISHED
-import cn.vove7.jarvis.speech.VoiceData
-import cn.vove7.jarvis.speech.baiduspeech.recognition.message.SpeechMessage
+import cn.vove7.jarvis.speech.SpeechMessage
+import cn.vove7.jarvis.speech.SpeechRecogService
 import cn.vove7.jarvis.speech.baiduspeech.recognition.model.RecogResult
 import cn.vove7.vtp.log.Vog
 import kotlin.math.absoluteValue
@@ -27,7 +21,7 @@ import kotlin.math.absoluteValue
  *
  * Created by Vove on 2018/6/18
  */
-class SpeechStatusListener(private val handler: Handler) : StatusRecogListener() {
+class SpeechStatusListener(private val handler: SpeechRecogService.RecogHandler) : StatusRecogListener() {
 
     var rtmp: String? = null
     var isSuccess = false
@@ -40,7 +34,7 @@ class SpeechStatusListener(private val handler: Handler) : StatusRecogListener()
         super.onAsrReady()
         Vog.d("ready")
         rtmp = null
-        handler.sendMessage(SpeechMessage.buildMessage(CODE_VOICE_READY))
+        handler.sendReady()
     }
 
     private val trimReg by lazy { "[，。?？]".toRegex() }
@@ -53,14 +47,14 @@ class SpeechStatusListener(private val handler: Handler) : StatusRecogListener()
         super.onAsrPartialResult(results, recogResult)
         val tmp = (results?.get(0) ?: "").trimResult()
         rtmp = tmp
-        handler.sendMessage(SpeechMessage.buildMessage(CODE_VOICE_TEMP, tmp))
+        handler.sendTemp(tmp)
     }
 
     override fun onAsrFinalResult(results: Array<String>?, recogResult: RecogResult) {
         super.onAsrFinalResult(results, recogResult)
         isSuccess = true
         val tmp = (results?.get(0) ?: "").trimResult()
-        handler.sendMessage(SpeechMessage.buildMessage(CODE_VOICE_RESULT, tmp))
+        handler.sendResult(tmp)
     }
 
     override fun onAsrFinishError(errorCode: Int, subErrorCode: Int, errorMessage: String?, descMessage: String?,
@@ -93,24 +87,17 @@ class SpeechStatusListener(private val handler: Handler) : StatusRecogListener()
                 CODE_UNKNOWN//"未知错误"
             }
         }
-
-        handler.sendMessage(SpeechMessage.buildMessage(CODE_VOICE_ERR, errCode))
+        handler.sendError(errCode)
     }
 
     override fun onAsrVolume(volumePercent: Int, volume: Int) {
         Vog.v("音量百分比$volumePercent ; 音量$volume")
-        handler.sendMessage(
-                SpeechMessage.buildMessage(
-                        CODE_VOICE_VOL,
-                        VoiceData(CODE_VOICE_VOL, volumePercent = volumePercent)
-                )
-        )
+        handler.sendVolumePercent(volumePercent)
     }
 
     override fun onAsrFinish(recogResult: RecogResult) {
         super.onAsrFinish(recogResult)
-        handler.sendMessage(SpeechMessage.buildMessage(STATUS_FINISHED, ""))
-
+        handler.sendFinished()
     }
 
     override fun onAsrExit() {

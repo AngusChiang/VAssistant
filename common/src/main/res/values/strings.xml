@@ -45,10 +45,9 @@
         <item>语音识别</item>
     </string-array>
 
-
     <string-array name="list_speech_engine" translatable="false">
+        <item>Dui语音</item>
         <item>百度语音</item>
-        <item>讯飞语音</item>
     </string-array>
     <string-array name="list_speech_syn_engine" translatable="false">
         <item>百度语音</item>

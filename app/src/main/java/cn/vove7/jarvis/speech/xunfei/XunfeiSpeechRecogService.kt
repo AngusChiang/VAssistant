@@ -12,7 +12,7 @@
 //import cn.vove7.jarvis.speech.SpeechConst
 //import cn.vove7.jarvis.speech.SpeechRecogService
 //import cn.vove7.jarvis.speech.WakeupI
-//import cn.vove7.jarvis.speech.baiduspeech.recognition.message.SpeechMessage
+//import cn.vove7.jarvis.speech.SpeechMessage
 //import cn.vove7.vtp.log.Vog
 //import com.iflytek.cloud.*
 //import org.json.JSONObject

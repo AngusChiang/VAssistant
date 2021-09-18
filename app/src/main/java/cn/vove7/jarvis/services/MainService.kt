@@ -73,6 +73,7 @@ import cn.vove7.jarvis.shs.ISmartHomeSystem
 import cn.vove7.jarvis.speech.*
 import cn.vove7.jarvis.speech.baiduspeech.BaiduSpeechRecogService
 import cn.vove7.jarvis.speech.baiduspeech.BaiduSpeechSynService
+import cn.vove7.jarvis.speech.dui.DuiRecogService
 import cn.vove7.jarvis.speech.sys.SysSynService
 import cn.vove7.jarvis.tools.DataCollector
 import cn.vove7.jarvis.tools.baiduaip.model.Point
@@ -207,7 +208,8 @@ object MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
         val loaded = releaseSpeechService()
         speechRecogService = when (recogType) {
             //百度
-            0 -> BaiduSpeechRecogService(RecogEventListener())
+            0 -> DuiRecogService(RecogEventListener())
+            1 -> BaiduSpeechRecogService(RecogEventListener())
             else -> BaiduSpeechRecogService(RecogEventListener())
         }
         speechSynService = when (synType) {

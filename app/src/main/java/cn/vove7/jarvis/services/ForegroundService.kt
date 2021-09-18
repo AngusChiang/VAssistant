@@ -113,7 +113,11 @@ class ForegroundService : Service() {
             setSmallIcon(R.mipmap.ic_launcher_vassist)
             setOngoing(true)
             setContentTitle("VAssist前台服务")
-            setContentText(buildContent())
+            buildContent().also{
+                if(it.isNotEmpty()) {
+                    setContentText(it)
+                }
+            }
         }.build()
 
 

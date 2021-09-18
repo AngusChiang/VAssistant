@@ -96,8 +96,8 @@ inline fun runInCatch(log: Boolean = false, block: () -> Unit) {
 }
 
 fun runOnNewHandlerThread(
-        name: String = "anonymous", delay: Long = 0,
-        autoQuit: Boolean = true, run: () -> Unit): HandlerThread {
+    name: String = "anonymous", delay: Long = 0,
+    autoQuit: Boolean = true, run: () -> Unit): HandlerThread {
 
     return HandlerThread(name).apply {
         start()
@@ -246,7 +246,7 @@ fun AppInfo.hasMicroPermission(): Boolean {
     return try {
         val pm = GlobalApp.APP.packageManager
         (PackageManager.PERMISSION_GRANTED ==
-                pm.checkPermission(Manifest.permission.RECORD_AUDIO, packageName)).also {
+            pm.checkPermission(Manifest.permission.RECORD_AUDIO, packageName)).also {
             Vog.d("$name 麦克风权限: $it")
         }
     } catch (e: Exception) {
@@ -379,7 +379,7 @@ fun activityShot(activity: Activity, removeStatusBar: Boolean = false): Bitmap? 
 
     //去除状态栏
     val bm = Bitmap.createBitmap(view.drawingCache, 0,
-            if (removeStatusBar) statusbarHeight else 0, w, h - statusbarHeight)
+        if (removeStatusBar) statusbarHeight else 0, w, h - statusbarHeight)
 
     Vog.d("${bm?.width} x ${bm?.height}")
 
@@ -480,7 +480,7 @@ fun EditText.content(): String = this.text.toString()
 
 fun File.broadcastImageFile() {
     GlobalApp.APP.sendBroadcast(Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE,
-            Uri.fromFile(this)))
+        Uri.fromFile(this)))
 }
 
 fun Activity.finishAndRemoveTaskCompat() {
@@ -541,9 +541,9 @@ fun View.fadeIn(duration: Long = 500) {
 }
 
 fun View.fadeOut(
-        duration: Long = 800,
-        endStatus: Int = View.GONE,
-        end: Function0<Unit>? = null
+    duration: Long = 800,
+    endStatus: Int = View.GONE,
+    end: Function0<Unit>? = null
 ) {
     startAnimation(AlphaAnimation(1f, 0f).apply {
         fillAfter = true
@@ -628,7 +628,7 @@ operator fun String.div(any: Any?): String = format(any)
 fun String.span(selectedString: String = this, fontSize: Int? = null, color: Int? = null,
                 underLine: Boolean = false, typeface: Int? = null): SpannableStringBuilder {
     return MultiSpan(this, selectedString, color = color, fontSize = fontSize,
-            underLine = underLine, typeface = typeface).build()
+        underLine = underLine, typeface = typeface).build()
 }
 
 fun String.spanColor(colorString: String): SpannableStringBuilder {
@@ -692,25 +692,25 @@ val ActionNode.regParamSet: Set<String>
  * @param callback WrappedRequestCallback<T>.()
  */
 inline fun <reified T> NetHelper.putJson(
-        url: String, model: Any? = null, requestCode: Int = 0,
-        headers: Map<String, String>? = null,
-        callback: WrappedRequestCallback<T>.() -> Unit
+    url: String, model: Any? = null, requestCode: Int = 0,
+    headers: Map<String, String>? = null,
+    callback: WrappedRequestCallback<T>.() -> Unit
 ): Call {
     val client = OkHttpClient.Builder()
-            .readTimeout(timeout, TimeUnit.SECONDS).build()
+        .readTimeout(timeout, TimeUnit.SECONDS).build()
 
     val json = GsonHelper.toJson(model)
     val requestBody = json.toRequestBody("application/json; charset=utf-8".toMediaTypeOrNull())
 
     Vog.d("put ($url)\n$json  \n$headers")
     val request = Request.Builder().url(url)
-            .put(requestBody)
-            .apply {
-                headers?.forEach {
-                    addHeader(it.key, it.value)
-                }
+        .put(requestBody)
+        .apply {
+            headers?.forEach {
+                addHeader(it.key, it.value)
             }
-            .build()
+        }
+        .build()
     val call = client.newCall(request)
     call(url, call, requestCode, callback)
     return call
@@ -742,17 +742,17 @@ fun View.findFirstParentWith(predicate: (ViewParent) -> Boolean): ViewParent? {
 
 
 operator fun BaseConfig.set(
-        @StringRes keyId: Int,
-        encrypt: Boolean = false,
-        value: Any?
+    @StringRes keyId: Int,
+    encrypt: Boolean = false,
+    value: Any?
 ) {
     set(AndroidSettings.s(keyId), encrypt, value)
 }
 
 fun BaseConfig.set(
-        @StringRes keyId: Int,
-        value: Any?,
-        encrypt: Boolean = false
+    @StringRes keyId: Int,
+    value: Any?,
+    encrypt: Boolean = false
 ) {
     set(AndroidSettings.s(keyId), value, encrypt)
 }

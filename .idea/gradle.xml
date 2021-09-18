@@ -15,6 +15,7 @@
             <option value="$PROJECT_DIR$/androlua" />
             <option value="$PROJECT_DIR$/app" />
             <option value="$PROJECT_DIR$/common" />
+            <option value="$PROJECT_DIR$/dui-speech-lib" />
             <option value="$PROJECT_DIR$/executorengine" />
             <option value="$PROJECT_DIR$/jadb" />
             <option value="$PROJECT_DIR$/jadb/hidden-api-common" />
