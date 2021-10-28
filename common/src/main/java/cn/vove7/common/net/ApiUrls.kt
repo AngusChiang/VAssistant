@@ -8,7 +8,7 @@ package cn.vove7.common.net
  */
 object ApiUrls {
     private const val DEBUG_SERVER = "http://192.168.137.1:8080/"
-    private const val OFFICIAL_SERVER = "http://vassist.vove7.cn:8080/"
+    private const val OFFICIAL_SERVER = "http://47.96.87.117:8080/"
 
     var SERVER_IP = /*if (BuildConfig.DEBUG) DEBUG_SERVER else*/ OFFICIAL_SERVER
 

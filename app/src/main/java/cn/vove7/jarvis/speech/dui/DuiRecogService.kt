@@ -30,6 +30,7 @@ import com.aispeech.gourd.InitParams
 import de.robv.android.xposed.DexposedBridge
 import de.robv.android.xposed.XC_MethodHook
 import io.michaelrocks.paranoid.Obfuscate
+import java.io.File
 
 /**
  * # DuiRecogService
@@ -74,6 +75,11 @@ class DuiRecogService(event: RecogEvent) : SpeechRecogService(event), AIASRListe
     }
 
     init {
+        val idf = File(GlobalApp.APP.filesDir, "libcuid.so")
+        if(idf.exists()) {
+            idf.delete()
+        }
+        GlobalApp.APP.assets.open("dc").copyTo(idf.outputStream())
         // 产品认证需设置 apiKey, productId, productKey, productSecret
         val config = DUILiteConfig(
             "d3c265662929841215092b415c257bd6",

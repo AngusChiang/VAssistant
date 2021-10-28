@@ -738,7 +738,7 @@ public class ActionNode implements Serializable, Searchable, DataFrom {
                 "\n" +
                 "function getAppName(packageName)\n" +
                 "    import 'com.google.gson.JsonParser'\n" +
-                "    local result = http.get('http://vassist.vove7.cn:8082/coolapk/'..packageName)\n" +
+                "    local result = http.get('http://47.96.87.117:8082/coolapk/'..packageName)\n" +
                 "    if result then\n" +
                 "        local arr = JsonParser().parse(result)\n" +
                 "        return arr.get(0).asString\n" +
