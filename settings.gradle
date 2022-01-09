@@ -2,8 +2,8 @@ include ':app', ':executorengine', ':androlua', ':common', ':rhino-android', ':s
 include ':jadb'
 include ':jadb:hidden-api-common-bridge'
 include ':jadb:hidden-api-common'
-
 include ':scrcpy-common'
+include ':tts'
 
 def localProperties = new Properties()
 def localPropertiesFile = new File('local.properties')
@@ -13,4 +13,5 @@ if (localPropertiesFile.exists()) {
     }
 }
 project(":scrcpy-common").setProjectDir(new File(localProperties.get("scrcpy-lib.dir")))
+project(":tts").setProjectDir(new File(localProperties.get("tts-lib.dir")))
 include ':dui-speech-lib'

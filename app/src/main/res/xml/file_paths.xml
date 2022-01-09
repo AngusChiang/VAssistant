@@ -6,4 +6,11 @@
     <cache-path
         name="cache_file"
         path="/"/>
+
+    <external-path
+        name="files_root"
+        path="Android/data/${applicationId}" />
+    <external-path
+        name="external_files"
+        path="." />
 </paths>

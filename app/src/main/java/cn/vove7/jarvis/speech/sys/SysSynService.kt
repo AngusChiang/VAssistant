@@ -13,7 +13,7 @@ import cn.vove7.jarvis.speech.SyntheEvent
  * @author Vove
  * @date 2021/7/26
  */
-class SysSynService(event: SyntheEvent) : SpeechSynService(event) {
+class SysSynService(event: SyntheEvent, val engine :String? = null) : SpeechSynService(event) {
 
     private lateinit var tts: SystemTTS
 
@@ -41,7 +41,7 @@ class SysSynService(event: SyntheEvent) : SpeechSynService(event) {
     }
 
     override fun init() {
-        tts = SystemTTS(GlobalApp.APP, object : UtteranceProgressListener() {
+        tts = SystemTTS(GlobalApp.APP,engine, object : UtteranceProgressListener() {
             override fun onStart(utteranceId: String?) {
             }
 

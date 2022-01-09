@@ -213,9 +213,9 @@ object MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
             else -> BaiduSpeechRecogService(RecogEventListener())
         }
         speechSynService = when (synType) {
-            0 -> BaiduSpeechSynService(SynthesisEventListener())
+            0 -> SysSynService(SynthesisEventListener(), context.packageName)
             1 -> SysSynService(SynthesisEventListener())
-            else -> BaiduSpeechSynService(SynthesisEventListener())
+            else -> SysSynService(SynthesisEventListener(), context.packageName)
         }
 
         if (loaded && notify) {

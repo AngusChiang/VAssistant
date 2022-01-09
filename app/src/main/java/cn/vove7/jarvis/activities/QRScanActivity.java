@@ -167,6 +167,7 @@ public class QRScanActivity extends CaptureActivity {
     @Override
     public void onBackPressed() {
         notifyResult(null);
+        finishAndRemoveTask();
         super.onBackPressed();
     }
 

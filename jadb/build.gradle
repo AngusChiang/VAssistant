@@ -61,5 +61,5 @@ dependencies {
     implementation 'io.github.vvb2060.ndk:boringssl:2.1'
     implementation 'dev.rikka.ndk.thirdparty:cxx:1.1.0'
     implementation 'org.bouncycastle:bcpkix-jdk15on:1.68'
-    api 'org.lsposed.hiddenapibypass:hiddenapibypass:2.0'
+    api 'org.lsposed.hiddenapibypass:hiddenapibypass:4.2'
 }

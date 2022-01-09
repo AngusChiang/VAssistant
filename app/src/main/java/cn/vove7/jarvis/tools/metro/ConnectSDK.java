@@ -224,8 +224,8 @@ public class ConnectSDK {
         try {
             jSONObject.put("sid", commonParams.getSid());
             jSONObject.put("appkey", commonParams.getAppKey());
-            jSONObject.put("pname", "com.hskj.palmmetro");
-            jSONObject.put("acode", "1.3.2");
+            jSONObject.put("pname", "com.nfyg.hsbb");
+            jSONObject.put("acode", "5.9.2");
             jSONObject.put("bcode", "16");
             jSONObject.put("mcode", Build.SERIAL);
             jSONObject.put("uuid", Build.ID);

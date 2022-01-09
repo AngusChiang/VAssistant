@@ -156,9 +156,15 @@ class DuiRecogService(event: RecogEvent) : SpeechRecogService(event), AIASRListe
                 doCancelRecog()
                 stopRecog(false)
             } else if(parser.eof == 1) {
-                doCancelRecog()
-                stopRecog(false)
-                handler.sendError(CODE_NO_RESULT)
+                if(lastText.length>1) {
+                    handler.sendResult(text)
+                    doCancelRecog()
+                    stopRecog(false)
+                } else {
+                    doCancelRecog()
+                    stopRecog(false)
+                    handler.sendError(CODE_NO_RESULT)
+                }
             }
         }
     }

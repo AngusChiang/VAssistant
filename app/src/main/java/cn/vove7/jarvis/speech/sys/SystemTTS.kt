@@ -5,18 +5,21 @@ import android.speech.tts.TextToSpeech
 import android.speech.tts.UtteranceProgressListener
 import cn.vove7.android.common.loge
 import cn.vove7.android.common.logi
-import java.lang.Thread.sleep
+import me.ag2s.tts.services.Constants.VOICE_SPEED
 import java.util.*
 
-class SystemTTS(val context: Context, val listener: UtteranceProgressListener) {
+class SystemTTS(
+    val context: Context,
+    val engine: String?,
+    val listener: UtteranceProgressListener
+) {
     //核心播放对象
     private val initLock = Object()
 
-    private var textToSpeech = TextToSpeech(context.applicationContext, ::init)
-
+    private var textToSpeech = TextToSpeech(context.applicationContext, ::init, engine)
 
     fun reInit() {
-        textToSpeech = TextToSpeech(context.applicationContext, ::init)
+        textToSpeech = TextToSpeech(context.applicationContext, ::init, engine)
     }
 
     //是否支持
@@ -49,6 +52,10 @@ class SystemTTS(val context: Context, val listener: UtteranceProgressListener) {
     fun speak(text: String?): Boolean {
         if (!isSupport) {
             return false
+        }
+        if (engine != null) {
+            val speed = context.getSharedPreferences("TTS", Context.MODE_PRIVATE).getInt(VOICE_SPEED, 105)
+            textToSpeech.setSpeechRate(speed / 100f)
         }
         fun doSpeak() = textToSpeech.speak(text, TextToSpeech.QUEUE_FLUSH, null, TextToSpeech.ACTION_TTS_QUEUE_PROCESSING_COMPLETED)
         var code = doSpeak()

@@ -39,8 +39,8 @@ object MetroWlanListener : ConnectivityManager.NetworkCallback() {
     private fun login() {
         ConnectSDK.getInstance().onInitialSDK(
                 GlobalApp.APP,
-                CommonParams.Builder("1001001011", "5f08d90700378d7bb0b7f21ce9982af1")
-                        .channel("release").build()
+                CommonParams.Builder("1001001004", "c7de948b1d2afba961e90fa6d90761ec")
+                        .channel("111").build()
         )
 
         ConnectSDK.getInstance().openNet("", "13100034003") {

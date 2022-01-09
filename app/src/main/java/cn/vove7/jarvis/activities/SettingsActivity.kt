@@ -23,6 +23,7 @@ import cn.vove7.common.utils.runOnUiDelay
 import cn.vove7.jarvis.R
 import cn.vove7.jarvis.activities.base.ReturnableActivity
 import cn.vove7.jarvis.adapters.SettingsExpandableAdapter
+import cn.vove7.jarvis.app.App
 import cn.vove7.jarvis.databinding.ActivityExpandableSettingsBinding
 import cn.vove7.jarvis.receivers.PowerEventReceiver
 import cn.vove7.jarvis.services.MainService
@@ -39,6 +40,7 @@ import com.afollestad.materialdialogs.customview.customView
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import me.ag2s.tts.TtsSettingsActivity
 import java.io.File
 
 /**
@@ -335,46 +337,15 @@ class SettingsActivity : ReturnableActivity<ActivityExpandableSettingsBinding>()
                 }
                 true
             },
-            SingleChoiceItem(
-                R.string.text_sound_model,
-                summary = "在线声音模型",
-                keyId = R.string.key_voice_syn_model,
-                defaultValue = 0,
-                entityArrId = R.array.voice_model_entities,
-                enabled = { AppConfig.speechSynType == 0 }
-            ) { h, i ->
-                AppBus.postDelay(AppBus.ACTION_RELOAD_SYN_CONF, 500)
-                return@SingleChoiceItem true
-            },
-            NumberPickerItem(
-                R.string.text_speak_speed,
-                keyId = R.string.key_voice_syn_speed,
-                defaultValue =
-                { 5 },
-                range = 1 to 9,
-                enabled = { AppConfig.speechSynType == 0 }
-            ) { h, i ->
-                AppBus.post(AppBus.ACTION_RELOAD_SYN_CONF)
-                return@NumberPickerItem true
-            },
-            SingleChoiceItem(
-                title = "音量输出",
-                summary = "选择音量跟随\n可能重启App生效",
-                keyId = R.string.key_stream_of_syn_output,
-                entityArrId = R.array.list_stream_syn_output,
-                defaultValue = 0,
-                enabled = { AppConfig.speechSynType == 0 }
-            ) { _, b ->
-                AppBus.postDelay(AppBus.ACTION_RELOAD_SYN_CONF, 500)
-//                        MainService.speechSynService?.reloadStreamType()
-                return@SingleChoiceItem true
+            IntentItem(title = "合成设置") {
+                if (AppConfig.speechSynType == 0) {
+                    startActivity(Intent(this, TtsSettingsActivity::class.java))
+                } else {
+                    GlobalApp.toastInfo("此引擎无设置项")
+                }
             },
             IntentItem(title = "试听") {
-                MainService.speak(
-                    if (AppConfig.speechSynType == 0)
-                        "百度语音：基于业界领先的深度神经网络技术。"
-                    else "语音合成测试"
-                )
+                MainService.speak("这是语音合成示例")
             }
         )),
         SettingGroupItem(R.color.google_red, titleS = "悬浮面板", childItems = listOf(
