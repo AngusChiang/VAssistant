@@ -1148,9 +1148,11 @@ object MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
         var r: ActionParseResult? = null
         if (AppConfig.useSmartOpenIfParseFailed && AccessibilityApi.isBaseServiceOn) {//失败,默认点击
             Vog.d("查找点击 $cmdWord")
-            if (ViewFindBuilder().similaryText(cmdWord).findFirst()?.tryClick() == true)
+            if (ViewFindBuilder().similaryText(cmdWord).findFirst()?.tryClick() == true) {
                 r = ActionParseResult(true, null, "smart点击 $cmdWord")
-
+            } else if(ViewFindBuilder().containsDesc(cmdWord).findFirst()?.tryClick() == true) {
+                r = ActionParseResult(true, null, "smart点击 $cmdWord")
+            }
         }
         r ?: ActionParseResult(false)
     }

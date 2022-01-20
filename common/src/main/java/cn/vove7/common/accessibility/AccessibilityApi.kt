@@ -6,6 +6,7 @@ import android.os.Build
 import android.provider.Settings
 import android.view.accessibility.AccessibilityNodeInfo
 import androidx.core.view.accessibility.AccessibilityNodeInfoCompat.FOCUS_INPUT
+import cn.vove7.android.common.logi
 import cn.vove7.common.NeedAccessibilityException
 import cn.vove7.common.accessibility.component.AccPluginService
 import cn.vove7.common.accessibility.viewnode.ViewNode
@@ -133,7 +134,7 @@ abstract class AccessibilityApi : AccessibilityService() {
         ): AccessibilityApi {
             if (!isServiceEnable(which)) {
                 if (ShellHelper.hasRootOrAdb() || canWriteSecureSettings()) {
-                    autoOpenService(which, true)
+                    autoOpenService(which, true, true)
                 } else if(jump) {
                     GlobalApp.toastInfo("请手动开启无障碍服务")
                     PermissionUtils.gotoAccessibilitySetting2(GlobalApp.APP, serviceCls(which))
@@ -173,13 +174,14 @@ abstract class AccessibilityApi : AccessibilityService() {
                             null
                         }
                     }
+                    "wait acs: $b".logi()
                     return if (b == true) {
                         true
                     } else {
                         runOnUi {
                             if (failByUser) {
                                 if(toast) {
-                                    GlobalApp.toastInfo("请手动开启无障碍服务")
+                                    GlobalApp.toastInfo("自动开启失败, 请手动开启无障碍服务")
                                 }
                                 val service = serviceCls(which)
                                 PermissionUtils.gotoAccessibilitySetting2(GlobalApp.APP, service)

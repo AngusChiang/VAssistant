@@ -48,10 +48,10 @@ open class GlobalApp : ScaffoldApp() {
         }
         NetHelper.timeout = 5
         Toasty.Config.getInstance()
-                .tintIcon(true) // optional (apply textColor also to the icon)
-                .allowQueue(false) // optional (prevents several Toastys from queuing)
-                .setTextSize(14)
-                .apply() // required
+            .tintIcon(true) // optional (apply textColor also to the icon)
+            .allowQueue(false) // optional (prevents several Toastys from queuing)
+            .setTextSize(14)
+            .apply() // required
     }
 
 
@@ -61,7 +61,8 @@ open class GlobalApp : ScaffoldApp() {
         private lateinit var _APP: Application
 
         @JvmStatic
-        val APP: Context get() = _APP
+        val APP: Context
+            get() = if (::ForeService.isInitialized) ForeService else _APP
 
         val GApp: GlobalApp
             get() = _APP as GlobalApp
