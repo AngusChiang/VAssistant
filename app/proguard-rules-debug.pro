@@ -147,6 +147,8 @@
 
 -keep class * extends org.greenrobot.greendao.AbstractDao { *; }
 
+# 脚本使用
+-keep class kotlin.Pair {*;}
 
 # debug
 -keepattributes SourceFile

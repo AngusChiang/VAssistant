@@ -30,7 +30,7 @@ class QRScanActivity2 : QRScanActivity() {
 
     private fun showResult(text: String) {
         MaterialDialog(this).show {
-            title(text = "扫描结果")
+            title(text = "识别结果")
             message(text = text)
             noAutoDismiss()
             negativeButton(text = "复制") {
@@ -39,7 +39,7 @@ class QRScanActivity2 : QRScanActivity() {
             }
             positiveButton(text = "退出") {
                 it.dismiss()
-                finish()
+                finishAndRemoveTask()
             }
             checkText(text)
             onDismiss {

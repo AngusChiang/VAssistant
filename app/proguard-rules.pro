@@ -168,3 +168,6 @@
 -keep class * extends org.greenrobot.greendao.AbstractDao { *; }
 
 -keep class com.aispeech.** {*;}
+
+# 脚本使用
+-keep class kotlin.Pair {*;}
