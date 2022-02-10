@@ -162,7 +162,6 @@ class InstDetailActivity : BaseActivity<ActivityInstDetailBinding>() {
         }
         node = n
         setData()
-        initFollows()
     }
 
     var title: String? = null
@@ -213,7 +212,6 @@ class InstDetailActivity : BaseActivity<ActivityInstDetailBinding>() {
             node.belongSelf() -> {
                 toolbar.menu.findItem(R.id.menu_edit).isVisible = true
                 toolbar.menu.findItem(R.id.menu_share).isVisible = true
-//                toolbar.menu.findItem(R.id.menu_add_follow).isVisible = true
                 toolbar.menu.findItem(R.id.menu_delete).isVisible = true
             }
             else -> {//不允许删除编辑
@@ -275,38 +273,6 @@ class InstDetailActivity : BaseActivity<ActivityInstDetailBinding>() {
                     toolbar.menu.findItem(R.id.menu_settings).isVisible = false
                 }
             }
-        }
-    }
-
-    private fun initFollows() {
-        if (node.follows != null) {
-            viewBinding.followList.adapter = object : BaseListAdapter<VHolder, ActionNode>(this, node.follows) {
-                override fun layoutId(position: Int): Int = R.layout.item_normal_icon_title
-
-                override fun onBindView(holder: VHolder, pos: Int, item: ActionNode) {
-                    holder.title.text = item.actionTitle
-                    holder.icon.visibility = View.GONE
-                    holder.subtitle.visibility = View.VISIBLE
-                    holder.subtitle.apply {
-                        if (item.desc != null) {
-                            text = item.desc.instructions
-                            if (item.follows.isNotEmpty()) {
-                                append("\n跟随 ${item.follows.size}")
-                            }
-                        } else
-                            text = "无介绍"
-                    }
-                    holder.itemView.setOnClickListener {
-                        val intent = Intent(this@InstDetailActivity, InstDetailActivity::class.java)
-                        intent.putExtra("nodeId", item.id)
-                        startActivity(intent)
-                    }
-
-                }
-
-                override fun onCreateViewHolder(view: View): VHolder = VHolder(view)
-            }
-
         }
     }
 
@@ -411,10 +377,7 @@ class InstDetailActivity : BaseActivity<ActivityInstDetailBinding>() {
                 R.id.menu_share -> {
                     if (UserInfo.isLogin().not()) {
                         GlobalApp.toastInfo("请登录")
-                    } else if (node.parentId != null && node.parent.tagId == null) {//检查parent
-                        GlobalApp.toastWarning("请先上传上级操作")
-                    } else
-                        showShareDialog()
+                    } else showShareDialog()
                 }
                 R.id.menu_inst_share -> {
                     if (SystemBridge.setClipText(node.shareData().toJson())) {
@@ -483,38 +446,10 @@ class InstDetailActivity : BaseActivity<ActivityInstDetailBinding>() {
         }
     }
 
-    private fun addFollowFromNew() {
-        if (!AppConfig.checkLogin()) {
-            return
-        }
-        val editIntent = Intent(this, NewInstActivity::class.java)
-        val type = 0 /*when {
-            ActionNode.belongGlobal(node.actionScopeType) -> ActionNode.NODE_SCOPE_GLOBAL
-            ActionNode.belongInApp(node.actionScopeType) -> ActionNode.NODE_SCOPE_IN_APP
-            else -> {
-                GlobalLog.log("maybe error")
-                GlobalApp.toastInfo("maybe error")
-                return
-            }
-        }*/
-        editIntent.putExtra("nodeId", node.id)
-        editIntent.putExtra("type", type)
-        editIntent.putExtra("parent_title", node.actionTitle)
-        val scope = node.actionScope
-        if (scope != null)
-            editIntent.putExtra("pkg", node.actionScope.packageName)
-        editIntent.putExtra("reedit", false)
-        startActivityForResult(editIntent, 10)
-    }
-
     var shareDialog: MaterialDialog? = null
 
     lateinit var p: ProgressDialog
     private fun doCopy2Global(containSub: Boolean) {
-        if (node.parentId != null) {
-            GlobalApp.toastWarning("跟随操作不允许此操作")
-            return
-        }
         p = ProgressDialog(this)
         launch {
             val cloneNode: ActionNode?
@@ -542,8 +477,7 @@ class InstDetailActivity : BaseActivity<ActivityInstDetailBinding>() {
     private fun showShareDialog() {
         //判断首次分享
         val upgrade = node.tagId != null
-        if (node.parentId != null)
-            node.parentTagId = node.parent.tagId
+
         //dialog 说明|示例
         val dView = layoutInflater.inflate(R.layout.dialog_share_inst, null)
         var desc = node.desc
@@ -644,13 +578,8 @@ class InstDetailActivity : BaseActivity<ActivityInstDetailBinding>() {
     private fun showRunDialog() {
 
         // .. -> it.parent -> it
-        var p: ActionNode? = node
         val execList = mutableListOf<ActionNode>()
-        while (p != null) {
-            p.action.param = null
-            execList.add(0, p)
-            p = p.parent
-        }
+        execList.add(0, node)
         if (execList[0].autoLaunchApp && ActionNode.belongInApp(execList[0].actionScopeType)) {
             val pkg = execList[0].actionScope.packageName
             val appName = AdvanAppHelper.getAppInfo(pkg)?.name

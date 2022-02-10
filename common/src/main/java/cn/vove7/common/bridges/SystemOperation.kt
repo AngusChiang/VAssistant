@@ -73,6 +73,11 @@ interface SystemOperation {
      */
     fun openAppByWord(appWord: String): String?
 
+    /**
+     * 冻结应用
+     * 支持 冰箱，小黑屋
+     */
+    fun freezeAll()
 
     /**
      * 拨打电话

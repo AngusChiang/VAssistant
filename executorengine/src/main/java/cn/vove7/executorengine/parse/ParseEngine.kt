@@ -200,51 +200,6 @@ object ParseEngine {
         return false
     }
 
-
-    /**
-     * 指令深度搜索
-     * 沿follows路径搜索
-     */
-    private fun actionDsMatch(actionQueue: PriorityQueue<Action>, node: ActionNode, sufWord: String,
-                              preAction: Action? = null): Boolean {
-        if (sufWord.isEmpty()) return true
-//        println("${i++}. 匹配：$sufWord")
-        node.follows.forEach FollowsForEach@{
-            it?.regs?.forEach RegForEach@{ reg ->
-                val result = reg.followRegex.match(sufWord)
-                if (result != null) {//深搜
-                    node.param = result
-//                    println("--匹配成功")
-                    //匹配成功
-                    if (preAction != null) {//修剪上一个匹配结果参数,第一个%即为上一个参数
-//                        preAction.param?.value?.withIndex()?.forEach f@{ kv ->
-//                            val p = kv.value ?: return@f
-//                            if (result.groupValues[0].startsWith(p)) {//end
-//                                val preParamLen = if (preAction.param == null) 0
-//                                else result.groupValues[1].length
-//                                val thisMatchLen = result.groupValues[0].length
-//                                preAction.param?.value!![kv.index] = p.substring(0, preParamLen)
-//                                val allLen = preAction.matchWord.length
-//                                preAction.matchWord = preAction.matchWord
-//                                        .substring(0, allLen - (thisMatchLen - preParamLen))
-//                                return@RegForEach
-//                            }
-//                        }
-                    }
-                    val itsAction = it.action
-
-                    actionQueue.add(itsAction)
-
-                    //T-ODO
-//                    return if (it.follows.isNotEmpty()) {//不空
-//                        actionDsMatch(actionQueue, it, result.groupValues[result.groupValues.size - 1], itsAction)//递归匹配
-//                    } else true
-                }
-            }
-        }
-        return preAction?.param != null
-    }
-
     /**
      * 全局命令
      * 一级匹配

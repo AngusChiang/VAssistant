@@ -90,12 +90,6 @@ object DaoHelper {
             return
         }
 //        GlobalLog.log("deleteActionNode ---> poll ${p.actionTitle}")
-        //添加follows至队列
-        DAO.daoSession.actionNodeDao.queryBuilder()
-                .where(ActionNodeDao.Properties.ParentId.eq(p.id))
-                .list()?.forEach {
-                    deleteActionNode(it?.id ?: -1L)
-                }
 
         //开始删除
         //Action
@@ -226,15 +220,6 @@ object DaoHelper {
             //更新follows  删除本地  插入
             //a1,b3  a1,c2
             Vog.d("updateGlobalInst 存在---> ${node.actionTitle}")
-
-            oldNode.follows.forEach {
-                //完全删除 old fs
-                deleteActionNode(it.id)
-            }
-            for (ci in node.follows) {//递归 深度
-                ci.parentId = oldNode.id  //node 未更新  更新fs
-                insertNewActionNode(ci, onUpdate)
-            }
         }
     }
 
@@ -297,13 +282,6 @@ object DaoHelper {
             DAO.daoSession.regDao.insert(it)
         }
 
-        //children
-        if (newNode.follows?.isNotEmpty() == true)
-            for (ci in newNode.follows) {//递归 深度
-                Vog.d("insertNewActionNode ---> 检查 child ${ci.actionTitle}")
-                ci.parentId = newNode.id
-                insertNewActionNode(ci)
-            }
         return newNode.id
     }
 
@@ -444,8 +422,7 @@ object DaoHelper {
     fun getLocalInstByType(type: Int): List<ActionNode> {
         return DAO.daoSession.actionNodeDao.queryBuilder()
                 .where(ActionNodeDao.Properties.From.eq(DataFrom.FROM_USER),
-                        ActionNodeDao.Properties.ActionScopeType.eq(type),
-                        ActionNodeDao.Properties.ParentId.isNull)//ParentId.isNull
+                        ActionNodeDao.Properties.ActionScopeType.eq(type))
                 .list().also { l ->
                     //填充
                     l.forEach {
@@ -456,8 +433,7 @@ object DaoHelper {
 
     fun deleteAllUserInst() {
         DAO.daoSession.actionNodeDao.queryBuilder()
-                .where(ActionNodeDao.Properties.From.eq(DataFrom.FROM_USER),
-                        ActionNodeDao.Properties.ParentId.isNull)//
+                .where(ActionNodeDao.Properties.From.eq(DataFrom.FROM_USER))//
                 .list().forEach {
                     deleteActionNode(it.id)
                 }

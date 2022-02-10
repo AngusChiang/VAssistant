@@ -79,7 +79,7 @@ object AdvanAppHelper {
         }
         synchronized(ALL_APP_LIST) {
             ALL_APP_LIST.values.forEach eachApp@{
-                if (excludeUnstartable || !it.startable) return@eachApp
+                if (excludeUnstartable && !it.startable) return@eachApp
                 val rate = try {
                     val appName = it.name ?: ""
                     if (appName.startsWith(name, ignoreCase = true)) {//计算概率

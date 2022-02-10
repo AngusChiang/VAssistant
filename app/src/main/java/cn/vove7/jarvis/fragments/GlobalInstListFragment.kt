@@ -104,9 +104,7 @@ class GlobalInstListFragment : SimpleListFragment<ActionNode>(), OnSyncInst {
     }
 
     override fun unification(data: ActionNode): ListViewModel<ActionNode>? {
-        val fs = data.follows?.size ?: 0
-        return ListViewModel((data).actionTitle, (data.desc?.instructions ?: "无介绍") +
-                (if (fs == 0) "" else "\n跟随 $fs"), extra = data)
+        return ListViewModel((data).actionTitle, (data.desc?.instructions ?: "无介绍"), extra = data)
     }
 
     override fun onLoadData(pageIndex: Int) {

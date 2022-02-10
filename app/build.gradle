@@ -23,7 +23,7 @@ android {
         minSdkVersion 21
         targetSdkVersion 30
         def subVersion = 0
-        versionName "2.3.6"
+        versionName "2.3.7"
         def vc = Integer.parseInt(versionName.replace(".", "")) * 10
         if (vc < 10000) {
             vc *= 10
@@ -224,4 +224,5 @@ dependencies {
     implementation 'com.github.tiann:epic:0.11.2@aar'
     implementation 'me.weishu.exposed:exposed-xposedapi:0.4.5'
     implementation 'com.github.tiann:FreeReflection:3.1.0'
+    implementation 'com.squareup.okhttp3:logging-interceptor:5.0.0-alpha.2'
 }

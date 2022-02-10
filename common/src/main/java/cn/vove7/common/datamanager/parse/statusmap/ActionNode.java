@@ -108,20 +108,6 @@ public class ActionNode implements Serializable, Searchable, DataFrom {
     private Long actionId = -1L;
 
     /**
-     * 后续节点id format: nodeId1,nodeId2,..
-     */
-    //@NotNull
-    //private String follows = "";
-    //
-    @ToMany(referencedJoinProperty = "parentId")
-    private List<ActionNode> follows;
-    private Long parentId;
-
-    @Expose(serialize = false)
-    @ToOne(joinProperty = "parentId")
-    private ActionNode parent;
-
-    /**
      * 运行时操作参数
      */
     //@ToOne(joinProperty = "paramId")
@@ -141,6 +127,7 @@ public class ActionNode implements Serializable, Searchable, DataFrom {
     private Long descId;
 
     @ToOne(joinProperty = "descId")
+    @SerializedName("desc")
     private ActionDesc desc;
 
     private String actionTitle;
@@ -149,15 +136,6 @@ public class ActionNode implements Serializable, Searchable, DataFrom {
     private int versionCode = 0;
 
     private Long publishUserId;//发布者
-
-    /**
-     * 分享时指定parentId
-     * 插入顺序：parent > id > this
-     * 使用队列
-     */
-    @Transient
-    private String parentTagId;//
-
 
     //匹配优先级 bigger优先;
     // 相对于action chain :(全局命令下: 返回主页>返回) (同一界面下)
@@ -209,21 +187,11 @@ public class ActionNode implements Serializable, Searchable, DataFrom {
      */
     @Generated(hash = 1336300321)
     private transient ActionNodeDao myDao;
-    @Generated(hash = 1293412156)
-    private transient Long parent__resolvedKey;
     @Generated(hash = 1157301878)
     private transient Long desc__resolvedKey;
 
-    public Long getParentId() {
-        return parentId;
-    }
-
     public void setRegs(List<Reg> regs) {
         this.regs = regs;
-    }
-
-    public void setParentId(Long parentId) {
-        this.parentId = parentId;
     }
 
     @Keep
@@ -273,7 +241,6 @@ public class ActionNode implements Serializable, Searchable, DataFrom {
         this.actionId = actionId;
         this.actionScopeType = type;
         this.actionTitle = actionTitle;
-        this.parentId = parentId;
     }
 
     @Keep
@@ -320,31 +287,16 @@ public class ActionNode implements Serializable, Searchable, DataFrom {
         this.actionId = actionId;
         this.scopeId = scopeId;
         this.actionTitle = actionTitle;
-        this.parentId = parentId;
         this.priority = priority;
     }
 
-    @Keep
-    public ActionNode(Long id, int actionScopeType, long actionId, long scopeId,
-                      String actionTitle, Long parentId, String from, int priority) {
-        this.id = id;
-        this.actionScopeType = actionScopeType;
-        this.actionId = actionId;
-        this.scopeId = scopeId;
-        this.actionTitle = actionTitle;
-        this.parentId = parentId;
-        this.from = from;
-        this.priority = priority;
-    }
-
-    @Generated(hash = 656437417)
-    public ActionNode(Long id, int actionScopeType, boolean autoLaunchApp, Long actionId, Long parentId, Long scopeId,
-                      Long descId, String actionTitle, String tagId, int versionCode, Long publishUserId, int priority, String from) {
+    @Generated(hash = 1114179883)
+    public ActionNode(Long id, int actionScopeType, boolean autoLaunchApp, Long actionId, Long scopeId, Long descId,
+            String actionTitle, String tagId, int versionCode, Long publishUserId, int priority, String from) {
         this.id = id;
         this.actionScopeType = actionScopeType;
         this.autoLaunchApp = autoLaunchApp;
         this.actionId = actionId;
-        this.parentId = parentId;
         this.scopeId = scopeId;
         this.descId = descId;
         this.actionTitle = actionTitle;
@@ -527,60 +479,18 @@ public class ActionNode implements Serializable, Searchable, DataFrom {
         return regs;
     }
 
-    /**
-     * To-many relationship, resolved on first access (and after set).
-     * Changes to to-many relations are not persisted, make changes to the target entity.
-     */
-    @Keep
-    public List<ActionNode> getFollows() {
-        if (follows == null) {
-            final DaoSession daoSession = this.daoSession;
-            if (daoSession == null) {
-                return null;
-                //throw new DaoException("Entity is detached from DAO context");
-            }
-            ActionNodeDao targetDao = daoSession.getActionNodeDao();
-            List<ActionNode> followsNew = targetDao._queryActionNode_Follows(id);
-            synchronized (this) {
-                if (follows == null) {
-                    follows = followsNew;
-                }
-            }
-        }
-        return follows;
-    }
 
     @Keep
     public void assembly2(boolean needParent) {
         getAction();
         getDesc();
         getRegs();
-        if (needParent)
-            getParent();
-        getFollows();
-        if (follows != null) {//填充
-            for (ActionNode n : follows)
-                n.assembly2(false);
-        }
         getActionScope();
     }
 
     @Keep
     public void assembly() {
         assembly2(true);
-    }
-
-
-    /**
-     * Resets a to-many relationship, making the next get call to query for a fresh result.
-     */
-    @Generated(hash = 880764975)
-    public synchronized void resetFollows() {
-        follows = null;
-    }
-
-    public void setFollows(List<ActionNode> follows) {
-        this.follows = follows;
     }
 
     /**
@@ -636,53 +546,12 @@ public class ActionNode implements Serializable, Searchable, DataFrom {
         isDelete = delete;
     }
 
-    /**
-     * To-one relationship, resolved on first access.
-     */
-    @Generated(hash = 356998130)
-    public ActionNode getParent() {
-        Long __key = this.parentId;
-        if (parent__resolvedKey == null || !parent__resolvedKey.equals(__key)) {
-            final DaoSession daoSession = this.daoSession;
-            if (daoSession == null) {
-                throw new DaoException("Entity is detached from DAO context");
-            }
-            ActionNodeDao targetDao = daoSession.getActionNodeDao();
-            ActionNode parentNew = targetDao.load(__key);
-            synchronized (this) {
-                parent = parentNew;
-                parent__resolvedKey = __key;
-            }
-        }
-        return parent;
-    }
-
-    /**
-     * called by internal mechanisms, do not call yourself.
-     */
-    @Generated(hash = 55088872)
-    public void setParent(ActionNode parent) {
-        synchronized (this) {
-            this.parent = parent;
-            parentId = parent == null ? null : parent.getId();
-            parent__resolvedKey = parentId;
-        }
-    }
-
     public Long getDescId() {
         return descId;
     }
 
     public void setDescId(Long descId) {
         this.descId = descId;
-    }
-
-    public String getParentTagId() {
-        return parentTagId;
-    }
-
-    public void setParentTagId(String parentTagId) {
-        this.parentTagId = parentTagId;
     }
 
     public void setScopeId(Long scopeId) {
@@ -788,8 +657,6 @@ public class ActionNode implements Serializable, Searchable, DataFrom {
         }
 
         newNode.actionScopeType = ActionNode.NODE_SCOPE_GLOBAL;
-        if (containChild)
-            newNode.follows = this.follows;
         return newNode;
     }
 

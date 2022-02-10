@@ -24,7 +24,8 @@ class DebugIndexActivity : AppCompatActivity() {
         AdbActivity::class,
         AdbShellActivity::class,
         AdbPairActivity::class,
-        ScrcpyTestActivity::class
+        ScrcpyTestActivity::class,
+        StopAppTestActivity::class
     )
 
     override fun onCreate(savedInstanceState: Bundle?) {

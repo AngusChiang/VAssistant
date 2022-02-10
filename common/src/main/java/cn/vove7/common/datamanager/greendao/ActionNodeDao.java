@@ -11,13 +11,10 @@ import org.greenrobot.greendao.internal.SqlUtils;
 import org.greenrobot.greendao.internal.DaoConfig;
 import org.greenrobot.greendao.database.Database;
 import org.greenrobot.greendao.database.DatabaseStatement;
-import org.greenrobot.greendao.query.Query;
-import org.greenrobot.greendao.query.QueryBuilder;
 
 import cn.vove7.common.datamanager.parse.model.Action;
 import cn.vove7.common.datamanager.parse.model.ActionDesc;
 import cn.vove7.common.datamanager.parse.model.ActionScope;
-import cn.vove7.common.datamanager.parse.statusmap.ActionNode;
 
 import cn.vove7.common.datamanager.parse.statusmap.ActionNode;
 
@@ -38,20 +35,18 @@ public class ActionNodeDao extends AbstractDao<ActionNode, Long> {
         public final static Property ActionScopeType = new Property(1, int.class, "actionScopeType", false, "ACTION_SCOPE_TYPE");
         public final static Property AutoLaunchApp = new Property(2, boolean.class, "autoLaunchApp", false, "AUTO_LAUNCH_APP");
         public final static Property ActionId = new Property(3, Long.class, "actionId", false, "ACTION_ID");
-        public final static Property ParentId = new Property(4, Long.class, "parentId", false, "PARENT_ID");
-        public final static Property ScopeId = new Property(5, Long.class, "scopeId", false, "SCOPE_ID");
-        public final static Property DescId = new Property(6, Long.class, "descId", false, "DESC_ID");
-        public final static Property ActionTitle = new Property(7, String.class, "actionTitle", false, "ACTION_TITLE");
-        public final static Property TagId = new Property(8, String.class, "tagId", false, "TAG_ID");
-        public final static Property VersionCode = new Property(9, int.class, "versionCode", false, "VERSION_CODE");
-        public final static Property PublishUserId = new Property(10, Long.class, "publishUserId", false, "PUBLISH_USER_ID");
-        public final static Property Priority = new Property(11, int.class, "priority", false, "PRIORITY");
-        public final static Property From = new Property(12, String.class, "from", false, "FROM");
+        public final static Property ScopeId = new Property(4, Long.class, "scopeId", false, "SCOPE_ID");
+        public final static Property DescId = new Property(5, Long.class, "descId", false, "DESC_ID");
+        public final static Property ActionTitle = new Property(6, String.class, "actionTitle", false, "ACTION_TITLE");
+        public final static Property TagId = new Property(7, String.class, "tagId", false, "TAG_ID");
+        public final static Property VersionCode = new Property(8, int.class, "versionCode", false, "VERSION_CODE");
+        public final static Property PublishUserId = new Property(9, Long.class, "publishUserId", false, "PUBLISH_USER_ID");
+        public final static Property Priority = new Property(10, int.class, "priority", false, "PRIORITY");
+        public final static Property From = new Property(11, String.class, "from", false, "FROM");
     }
 
     private DaoSession daoSession;
 
-    private Query<ActionNode> actionNode_FollowsQuery;
 
     public ActionNodeDao(DaoConfig config) {
         super(config);
@@ -70,15 +65,14 @@ public class ActionNodeDao extends AbstractDao<ActionNode, Long> {
                 "\"ACTION_SCOPE_TYPE\" INTEGER NOT NULL ," + // 1: actionScopeType
                 "\"AUTO_LAUNCH_APP\" INTEGER NOT NULL ," + // 2: autoLaunchApp
                 "\"ACTION_ID\" INTEGER," + // 3: actionId
-                "\"PARENT_ID\" INTEGER," + // 4: parentId
-                "\"SCOPE_ID\" INTEGER," + // 5: scopeId
-                "\"DESC_ID\" INTEGER," + // 6: descId
-                "\"ACTION_TITLE\" TEXT," + // 7: actionTitle
-                "\"TAG_ID\" TEXT," + // 8: tagId
-                "\"VERSION_CODE\" INTEGER NOT NULL ," + // 9: versionCode
-                "\"PUBLISH_USER_ID\" INTEGER," + // 10: publishUserId
-                "\"PRIORITY\" INTEGER NOT NULL ," + // 11: priority
-                "\"FROM\" TEXT);"); // 12: from
+                "\"SCOPE_ID\" INTEGER," + // 4: scopeId
+                "\"DESC_ID\" INTEGER," + // 5: descId
+                "\"ACTION_TITLE\" TEXT," + // 6: actionTitle
+                "\"TAG_ID\" TEXT," + // 7: tagId
+                "\"VERSION_CODE\" INTEGER NOT NULL ," + // 8: versionCode
+                "\"PUBLISH_USER_ID\" INTEGER," + // 9: publishUserId
+                "\"PRIORITY\" INTEGER NOT NULL ," + // 10: priority
+                "\"FROM\" TEXT);"); // 11: from
     }
 
     /** Drops the underlying database table. */
@@ -103,41 +97,36 @@ public class ActionNodeDao extends AbstractDao<ActionNode, Long> {
             stmt.bindLong(4, actionId);
         }
  
-        Long parentId = entity.getParentId();
-        if (parentId != null) {
-            stmt.bindLong(5, parentId);
-        }
- 
         Long scopeId = entity.getScopeId();
         if (scopeId != null) {
-            stmt.bindLong(6, scopeId);
+            stmt.bindLong(5, scopeId);
         }
  
         Long descId = entity.getDescId();
         if (descId != null) {
-            stmt.bindLong(7, descId);
+            stmt.bindLong(6, descId);
         }
  
         String actionTitle = entity.getActionTitle();
         if (actionTitle != null) {
-            stmt.bindString(8, actionTitle);
+            stmt.bindString(7, actionTitle);
         }
  
         String tagId = entity.getTagId();
         if (tagId != null) {
-            stmt.bindString(9, tagId);
+            stmt.bindString(8, tagId);
         }
-        stmt.bindLong(10, entity.getVersionCode());
+        stmt.bindLong(9, entity.getVersionCode());
  
         Long publishUserId = entity.getPublishUserId();
         if (publishUserId != null) {
-            stmt.bindLong(11, publishUserId);
+            stmt.bindLong(10, publishUserId);
         }
-        stmt.bindLong(12, entity.getPriority());
+        stmt.bindLong(11, entity.getPriority());
  
         String from = entity.getFrom();
         if (from != null) {
-            stmt.bindString(13, from);
+            stmt.bindString(12, from);
         }
     }
 
@@ -157,41 +146,36 @@ public class ActionNodeDao extends AbstractDao<ActionNode, Long> {
             stmt.bindLong(4, actionId);
         }
  
-        Long parentId = entity.getParentId();
-        if (parentId != null) {
-            stmt.bindLong(5, parentId);
-        }
- 
         Long scopeId = entity.getScopeId();
         if (scopeId != null) {
-            stmt.bindLong(6, scopeId);
+            stmt.bindLong(5, scopeId);
         }
  
         Long descId = entity.getDescId();
         if (descId != null) {
-            stmt.bindLong(7, descId);
+            stmt.bindLong(6, descId);
         }
  
         String actionTitle = entity.getActionTitle();
         if (actionTitle != null) {
-            stmt.bindString(8, actionTitle);
+            stmt.bindString(7, actionTitle);
         }
  
         String tagId = entity.getTagId();
         if (tagId != null) {
-            stmt.bindString(9, tagId);
+            stmt.bindString(8, tagId);
         }
-        stmt.bindLong(10, entity.getVersionCode());
+        stmt.bindLong(9, entity.getVersionCode());
  
         Long publishUserId = entity.getPublishUserId();
         if (publishUserId != null) {
-            stmt.bindLong(11, publishUserId);
+            stmt.bindLong(10, publishUserId);
         }
-        stmt.bindLong(12, entity.getPriority());
+        stmt.bindLong(11, entity.getPriority());
  
         String from = entity.getFrom();
         if (from != null) {
-            stmt.bindString(13, from);
+            stmt.bindString(12, from);
         }
     }
 
@@ -213,15 +197,14 @@ public class ActionNodeDao extends AbstractDao<ActionNode, Long> {
             cursor.getInt(offset + 1), // actionScopeType
             cursor.getShort(offset + 2) != 0, // autoLaunchApp
             cursor.isNull(offset + 3) ? null : cursor.getLong(offset + 3), // actionId
-            cursor.isNull(offset + 4) ? null : cursor.getLong(offset + 4), // parentId
-            cursor.isNull(offset + 5) ? null : cursor.getLong(offset + 5), // scopeId
-            cursor.isNull(offset + 6) ? null : cursor.getLong(offset + 6), // descId
-            cursor.isNull(offset + 7) ? null : cursor.getString(offset + 7), // actionTitle
-            cursor.isNull(offset + 8) ? null : cursor.getString(offset + 8), // tagId
-            cursor.getInt(offset + 9), // versionCode
-            cursor.isNull(offset + 10) ? null : cursor.getLong(offset + 10), // publishUserId
-            cursor.getInt(offset + 11), // priority
-            cursor.isNull(offset + 12) ? null : cursor.getString(offset + 12) // from
+            cursor.isNull(offset + 4) ? null : cursor.getLong(offset + 4), // scopeId
+            cursor.isNull(offset + 5) ? null : cursor.getLong(offset + 5), // descId
+            cursor.isNull(offset + 6) ? null : cursor.getString(offset + 6), // actionTitle
+            cursor.isNull(offset + 7) ? null : cursor.getString(offset + 7), // tagId
+            cursor.getInt(offset + 8), // versionCode
+            cursor.isNull(offset + 9) ? null : cursor.getLong(offset + 9), // publishUserId
+            cursor.getInt(offset + 10), // priority
+            cursor.isNull(offset + 11) ? null : cursor.getString(offset + 11) // from
         );
         return entity;
     }
@@ -232,15 +215,14 @@ public class ActionNodeDao extends AbstractDao<ActionNode, Long> {
         entity.setActionScopeType(cursor.getInt(offset + 1));
         entity.setAutoLaunchApp(cursor.getShort(offset + 2) != 0);
         entity.setActionId(cursor.isNull(offset + 3) ? null : cursor.getLong(offset + 3));
-        entity.setParentId(cursor.isNull(offset + 4) ? null : cursor.getLong(offset + 4));
-        entity.setScopeId(cursor.isNull(offset + 5) ? null : cursor.getLong(offset + 5));
-        entity.setDescId(cursor.isNull(offset + 6) ? null : cursor.getLong(offset + 6));
-        entity.setActionTitle(cursor.isNull(offset + 7) ? null : cursor.getString(offset + 7));
-        entity.setTagId(cursor.isNull(offset + 8) ? null : cursor.getString(offset + 8));
-        entity.setVersionCode(cursor.getInt(offset + 9));
-        entity.setPublishUserId(cursor.isNull(offset + 10) ? null : cursor.getLong(offset + 10));
-        entity.setPriority(cursor.getInt(offset + 11));
-        entity.setFrom(cursor.isNull(offset + 12) ? null : cursor.getString(offset + 12));
+        entity.setScopeId(cursor.isNull(offset + 4) ? null : cursor.getLong(offset + 4));
+        entity.setDescId(cursor.isNull(offset + 5) ? null : cursor.getLong(offset + 5));
+        entity.setActionTitle(cursor.isNull(offset + 6) ? null : cursor.getString(offset + 6));
+        entity.setTagId(cursor.isNull(offset + 7) ? null : cursor.getString(offset + 7));
+        entity.setVersionCode(cursor.getInt(offset + 8));
+        entity.setPublishUserId(cursor.isNull(offset + 9) ? null : cursor.getLong(offset + 9));
+        entity.setPriority(cursor.getInt(offset + 10));
+        entity.setFrom(cursor.isNull(offset + 11) ? null : cursor.getString(offset + 11));
      }
     
     @Override
@@ -268,20 +250,6 @@ public class ActionNodeDao extends AbstractDao<ActionNode, Long> {
         return true;
     }
     
-    /** Internal query to resolve the "follows" to-many relationship of ActionNode. */
-    public List<ActionNode> _queryActionNode_Follows(Long parentId) {
-        synchronized (this) {
-            if (actionNode_FollowsQuery == null) {
-                QueryBuilder<ActionNode> queryBuilder = queryBuilder();
-                queryBuilder.where(Properties.ParentId.eq(null));
-                actionNode_FollowsQuery = queryBuilder.build();
-            }
-        }
-        Query<ActionNode> query = actionNode_FollowsQuery.forCurrentThread();
-        query.setParameter(0, parentId);
-        return query.list();
-    }
-
     private String selectDeep;
 
     protected String getSelectDeep() {
@@ -291,16 +259,13 @@ public class ActionNodeDao extends AbstractDao<ActionNode, Long> {
             builder.append(',');
             SqlUtils.appendColumns(builder, "T0", daoSession.getActionDao().getAllColumns());
             builder.append(',');
-            SqlUtils.appendColumns(builder, "T1", daoSession.getActionNodeDao().getAllColumns());
+            SqlUtils.appendColumns(builder, "T1", daoSession.getActionScopeDao().getAllColumns());
             builder.append(',');
-            SqlUtils.appendColumns(builder, "T2", daoSession.getActionScopeDao().getAllColumns());
-            builder.append(',');
-            SqlUtils.appendColumns(builder, "T3", daoSession.getActionDescDao().getAllColumns());
+            SqlUtils.appendColumns(builder, "T2", daoSession.getActionDescDao().getAllColumns());
             builder.append(" FROM ACTION_NODE T");
             builder.append(" LEFT JOIN ACTION T0 ON T.\"ACTION_ID\"=T0.\"_id\"");
-            builder.append(" LEFT JOIN ACTION_NODE T1 ON T.\"PARENT_ID\"=T1.\"_id\"");
-            builder.append(" LEFT JOIN ACTION_SCOPE T2 ON T.\"SCOPE_ID\"=T2.\"_id\"");
-            builder.append(" LEFT JOIN ACTION_DESC T3 ON T.\"DESC_ID\"=T3.\"_id\"");
+            builder.append(" LEFT JOIN ACTION_SCOPE T1 ON T.\"SCOPE_ID\"=T1.\"_id\"");
+            builder.append(" LEFT JOIN ACTION_DESC T2 ON T.\"DESC_ID\"=T2.\"_id\"");
             builder.append(' ');
             selectDeep = builder.toString();
         }
@@ -314,10 +279,6 @@ public class ActionNodeDao extends AbstractDao<ActionNode, Long> {
         Action action = loadCurrentOther(daoSession.getActionDao(), cursor, offset);
         entity.setAction(action);
         offset += daoSession.getActionDao().getAllColumns().length;
-
-        ActionNode parent = loadCurrentOther(daoSession.getActionNodeDao(), cursor, offset);
-        entity.setParent(parent);
-        offset += daoSession.getActionNodeDao().getAllColumns().length;
 
         ActionScope actionScope = loadCurrentOther(daoSession.getActionScopeDao(), cursor, offset);
         entity.setActionScope(actionScope);

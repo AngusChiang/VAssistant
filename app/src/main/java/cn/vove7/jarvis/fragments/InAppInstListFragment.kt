@@ -119,9 +119,7 @@ class InAppInstListFragment : SimpleListFragment<ActionNode>() {
     }
 
     override fun unification(it: ActionNode): ListViewModel<ActionNode>? {
-        val fs = it.follows?.size ?: 0
-        return ListViewModel((it).actionTitle, (it.desc?.instructions ?: "无介绍") +
-                (if (fs == 0) "" else "\n跟随 $fs"), extra = it)
+        return ListViewModel((it).actionTitle, (it.desc?.instructions ?: "无介绍"), extra = it)
     }
 
     override fun onLoadData(pageIndex: Int) {

@@ -50,6 +50,7 @@ import cn.vove7.common.datamanager.parse.model.ActionScope
 import cn.vove7.common.helper.AdvanAppHelper
 import cn.vove7.common.helper.AdvanContactHelper
 import cn.vove7.common.helper.ConnectiveNsdHelper
+import cn.vove7.common.helper.startable
 import cn.vove7.common.model.LocationInfo
 import cn.vove7.common.model.RequestPermission
 import cn.vove7.common.model.ResultBox
@@ -102,7 +103,7 @@ object SystemBridge : SystemOperation {
 
     override fun getLaunchIntent(pkg: String): Intent? {
         return context.packageManager
-                .getLaunchIntentForPackage(pkg)
+            .getLaunchIntentForPackage(pkg)
     }
 
     override fun getPhoneByName(name: String): String? {
@@ -117,10 +118,34 @@ object SystemBridge : SystemOperation {
         return openAppByPkg(pkg, false)
     }
 
+    //小黑屋
+    fun checkStopApp(pkg: String): Boolean {
+        if (hasInstall("web1n.stopapp")) {
+            return try {
+                val data = Uri.Builder().scheme("web1n.stopapp")
+                    .authority("action")
+                    .appendPath("run_app").appendPath(pkg)
+                    .appendQueryParameter("user", 0.toString()).build()
+                context.startActivity(Intent("android.intent.action.VIEW").setData(data))
+                true
+            } catch (e: Throwable) {
+                GlobalLog.err("小黑屋开启应用失败", e)
+                false
+            }
+        }
+        return false
+    }
+
     override fun openAppByPkg(pkg: String, clearTask: Boolean): Boolean {
         return try {
+            if (!AppInfo(pkg).startable) {
+                if (checkStopApp(pkg)) {
+                    "小黑屋开启成功".logi()
+                    return true
+                }
+            }
             if (hasInstall(IceBox.PACKAGE_NAME) && IceBox.queryWorkMode(context) != IceBox.WorkMode.MODE_NOT_AVAILABLE &&
-                    IceBox.getAppEnabledSetting(context, pkg) != 0) {
+                IceBox.getAppEnabledSetting(context, pkg) != 0) {
                 if (ContextCompat.checkSelfPermission(context, IceBox.SDK_PERMISSION) != PackageManager.PERMISSION_GRANTED) {
                     AppBus.post(RequestPermission("冰箱"))
                     return false
@@ -129,7 +154,7 @@ object SystemBridge : SystemOperation {
                 Vog.d("冰箱解冻：$pkg")
             }
             val launchIntent = context.packageManager
-                    .getLaunchIntentForPackage(pkg)
+                .getLaunchIntentForPackage(pkg)
             if (launchIntent == null) {
                 throw Exception("启动失败 未找到此App: $pkg")
             } else {
@@ -140,13 +165,25 @@ object SystemBridge : SystemOperation {
                 true
             }
         } catch (e: Exception) {
-            GlobalLog.err("打开App{$pkg}失败: " + e.message)
+            GlobalLog.err("打开App{$pkg}失败", e)
             false
         }
     }
 
-    fun openAppByWord(appWord: String, resetTask: Boolean): String? {
+    override fun freezeAll() {
+        if (hasInstall(IceBox.PACKAGE_NAME) && IceBox.queryWorkMode(context) != IceBox.WorkMode.MODE_NOT_AVAILABLE) {
+            IceBox.setAppEnabledSettings(context, false)
+        }
+        if (hasInstall("web1n.stopapp")) {
+            val data = Uri.Builder().scheme("web1n.stopapp")
+                .authority("action")
+                .appendPath("freeze_all")
+                .appendQueryParameter("user", 0.toString()).build()
+            context.startActivity(Intent("android.intent.action.VIEW").setData(data))
+        }
+    }
 
+    fun openAppByWord(appWord: String, resetTask: Boolean): String? {
         val pkg = getPkgByWord(appWord)
         return if (pkg != null) {
             val o = openAppByPkg(pkg, resetTask)
@@ -221,7 +258,7 @@ object SystemBridge : SystemOperation {
                     0
                 } else simId
                 callIntent.putExtra(TelecomManager.EXTRA_PHONE_ACCOUNT_HANDLE,
-                        phoneAccountHandleList[sId])
+                    phoneAccountHandleList[sId])
             } catch (e: Exception) {
                 GlobalLog.err("设置卡id失败" + e.message)
             } catch (e: SecurityException) {
@@ -298,7 +335,7 @@ object SystemBridge : SystemOperation {
             val flashAvailable = c.get(CameraCharacteristics.FLASH_INFO_AVAILABLE)
             val lensFacing = c.get(CameraCharacteristics.LENS_FACING)
             if (flashAvailable != null && flashAvailable && lensFacing != null
-                    && lensFacing == CameraCharacteristics.LENS_FACING_BACK) {
+                && lensFacing == CameraCharacteristics.LENS_FACING_BACK) {
                 //打开或关闭手电筒
                 mCameraManager.setTorchMode(id, on)
                 r = true
@@ -380,7 +417,7 @@ object SystemBridge : SystemOperation {
         Vog.d("暂停音乐")
         val mAm = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
         val result = mAm.requestAudioFocus(null, AudioManager.STREAM_MUSIC,
-                AudioManager.AUDIOFOCUS_GAIN_TRANSIENT)
+            AudioManager.AUDIOFOCUS_GAIN_TRANSIENT)
         if (result == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
             Vog.d("requestMusicFocus ---> successfully")
         } else {
@@ -683,7 +720,7 @@ object SystemBridge : SystemOperation {
             return true
         }
         val wifiManager = context.applicationContext
-                .getSystemService(WIFI_SERVICE) as WifiManager
+            .getSystemService(WIFI_SERVICE) as WifiManager
 
 //        val ap: WifiConfiguration? = null
         return try {
@@ -729,7 +766,7 @@ object SystemBridge : SystemOperation {
                     override fun onFailed(reason: Int) {
                         super.onFailed(reason)
                         GlobalLog.err("失败：" + arrayOf(
-                                0, ERROR_NO_CHANNEL, ERROR_GENERIC, ERROR_INCOMPATIBLE_MODE, ERROR_TETHERING_DISALLOWED)[reason])
+                            0, ERROR_NO_CHANNEL, ERROR_GENERIC, ERROR_INCOMPATIBLE_MODE, ERROR_TETHERING_DISALLOWED)[reason])
                         Vog.d("onFailed ---> ")
                     }
                 }, Handler(Looper.getMainLooper()))
@@ -817,9 +854,9 @@ object SystemBridge : SystemOperation {
     @SuppressLint("MissingPermission")
     override fun location(): Location? {
         if (!PermissionUtils.isAllGranted(context, arrayOf(
-                        Manifest.permission.ACCESS_COARSE_LOCATION,
-                        Manifest.permission.ACCESS_FINE_LOCATION
-                ))) {
+                Manifest.permission.ACCESS_COARSE_LOCATION,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ))) {
 
             AppBus.post(RequestPermission("位置权限"))
             return null
@@ -871,13 +908,13 @@ object SystemBridge : SystemOperation {
 
     @SuppressLint("MissingPermission")
     private fun locationInternal(
-            lm: LocationManager,
-            lp: String,
-            looper: Looper,
-            block: Array<Runnable>,
-            handler: Handler,
-            loLis: LocationListener,
-            result: ResultBox<Location?>
+        lm: LocationManager,
+        lp: String,
+        looper: Looper,
+        block: Array<Runnable>,
+        handler: Handler,
+        loLis: LocationListener,
+        result: ResultBox<Location?>
     ) {
         Vog.d("定位设备：$lp")
         if (!lm.isProviderEnabled(lp)) {
@@ -938,10 +975,10 @@ object SystemBridge : SystemOperation {
         val reqJson = "{}"
         val sign = SecureHelper.signData(reqJson, ts)
         val headers = mapOf(
-                "versionCode" to "${AppConfig.versionCode}",
-                "timestamp" to ts.toString(),
-                "token" to (UserInfo.getUserToken() ?: ""),
-                "sign" to sign
+            "versionCode" to "${AppConfig.versionCode}",
+            "timestamp" to ts.toString(),
+            "token" to (UserInfo.getUserToken() ?: ""),
+            "sign" to sign
         )
         val data = HttpBridge.postJson(ApiUrls.SERVER_IP + ApiUrls.GET_IP, reqJson, headers)
         val b = GsonHelper.fromJson<ResponseMessage<String>>(data)
@@ -955,7 +992,7 @@ object SystemBridge : SystemOperation {
      */
     private fun intToIp(i: Int): String {
         return (i and 0xFF).toString() + "." + ((i shr 8) and 0xFF) +
-                "." + ((i shr 16) and 0xFF) + "." + (i shr 24 and 0xFF)
+            "." + ((i shr 16) and 0xFF) + "." + (i shr 24 and 0xFF)
     }
 
     var screenData: Intent? = null
@@ -1030,7 +1067,7 @@ object SystemBridge : SystemOperation {
         val rowStride = planes[0].rowStride
         val rowPadding = rowStride - pixelStride * width
         var bitmap = Bitmap.createBitmap(width + rowPadding / pixelStride,
-                height, Bitmap.Config.ARGB_8888)
+            height, Bitmap.Config.ARGB_8888)
         bitmap.copyPixelsFromBuffer(buffer)
         bitmap = Bitmap.createBitmap(bitmap, 0, 0, width, height)
         return bitmap
@@ -1089,10 +1126,10 @@ object SystemBridge : SystemOperation {
     override fun createAlarm(message: String?, days: Array<Int>?, hour: Int, minutes: Int, noUi: Boolean): Boolean {
         Vog.d("createAlarm ---> $message ${Arrays.toString(days)} $hour : $minutes")
         val intent = Intent(AlarmClock.ACTION_SET_ALARM)
-                .putExtra(AlarmClock.EXTRA_HOUR, hour)
-                .putExtra(AlarmClock.EXTRA_MINUTES, minutes)
-                .putExtra(AlarmClock.EXTRA_VIBRATE, true)
-                .putExtra(AlarmClock.EXTRA_SKIP_UI, noUi)
+            .putExtra(AlarmClock.EXTRA_HOUR, hour)
+            .putExtra(AlarmClock.EXTRA_MINUTES, minutes)
+            .putExtra(AlarmClock.EXTRA_VIBRATE, true)
+            .putExtra(AlarmClock.EXTRA_SKIP_UI, noUi)
         if (message != null) intent.putExtra(AlarmClock.EXTRA_MESSAGE, message)
         if (days != null) intent.putIntegerArrayListExtra(AlarmClock.EXTRA_DAYS, ArrayList(days.toList()))
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
@@ -1148,8 +1185,8 @@ object SystemBridge : SystemOperation {
             if (!pm.isInteractive) {
                 // 获取PowerManager.WakeLock对象,后面的参数|表示同时传入两个值,最后的是LogCat里用的Tag
                 val wl = pm.newWakeLock(
-                        PowerManager.ACQUIRE_CAUSES_WAKEUP or
-                                PowerManager.SCREEN_BRIGHT_WAKE_LOCK, SystemBridge::class.java.simpleName)
+                    PowerManager.ACQUIRE_CAUSES_WAKEUP or
+                        PowerManager.SCREEN_BRIGHT_WAKE_LOCK, SystemBridge::class.java.simpleName)
                 //点亮屏幕
                 try {
                     wl.acquire(10 * 60 * 1000L /*10 minutes*/)
@@ -1220,7 +1257,7 @@ object SystemBridge : SystemOperation {
         val intent = context.registerReceiver(null, filter)
 
         val i = intent?.getIntExtra(BatteryManager.EXTRA_STATUS,
-                BatteryManager.BATTERY_STATUS_UNKNOWN) == BatteryManager.BATTERY_STATUS_CHARGING
+            BatteryManager.BATTERY_STATUS_UNKNOWN) == BatteryManager.BATTERY_STATUS_CHARGING
         Vog.d("isCharging ---> $i")
         i
     }
@@ -1231,7 +1268,7 @@ object SystemBridge : SystemOperation {
             val telecomManager = context.getSystemService(Context.TELECOM_SERVICE) as TelecomManager?
             return if (telecomManager != null) {
                 if (context.checkPermission(Manifest.permission.READ_PHONE_STATE)
-                        && Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                    && Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                     telecomManager.callCapablePhoneAccounts.size
                 } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP_MR1) {
                     SubscriptionManager.from(context).activeSubscriptionInfoCount
@@ -1332,16 +1369,16 @@ object SystemBridge : SystemOperation {
         }
 
         val s = ViewFindBuilder()
-                .equalsText("强行停止", "force stop")
-                .waitFor(3000)
+            .equalsText("强行停止", "force stop")
+            .waitFor(3000)
 
         val b = if (s?.tryClick() == true) {
             ViewFindBuilder().equalsText("确定", "OK")
-                    .waitFor(600)?.let {
-                        sleep(200)
-                        it.tryClick()
-                    } ?: ViewFindBuilder().containsText("强行停止", "force stop")
-                    .waitFor(600)?.tryClick() ?: false
+                .waitFor(600)?.let {
+                    sleep(200)
+                    it.tryClick()
+                } ?: ViewFindBuilder().containsText("强行停止", "force stop")
+                .waitFor(600)?.tryClick() ?: false
         } else {
             GlobalApp.toastInfo("应用未运行")
             true
@@ -1443,32 +1480,32 @@ object SystemBridge : SystemOperation {
             val contentResolver = GlobalApp.APP.contentResolver
             val defVal = 125
             return Settings.System.getInt(contentResolver,
-                    Settings.System.SCREEN_BRIGHTNESS, defVal)
+                Settings.System.SCREEN_BRIGHTNESS, defVal)
         }
         set(value) {
             val v = if (value < 0) 0 else if (value > 255) 255 else value
             val contentResolver = GlobalApp.APP.contentResolver
             Settings.System.putInt(contentResolver,
-                    Settings.System.SCREEN_BRIGHTNESS, v)
+                Settings.System.SCREEN_BRIGHTNESS, v)
         }
 
     override var screenBrightnessMode: Int
         get() {
             val contentResolver = GlobalApp.APP.contentResolver
             return Settings.System.getInt(contentResolver,
-                    Settings.System.SCREEN_BRIGHTNESS_MODE, 0)
+                Settings.System.SCREEN_BRIGHTNESS_MODE, 0)
         }
         set(value) {
             val v = if (value == 0 || value == 1) value else 0
             val contentResolver = GlobalApp.APP.contentResolver
             Settings.System.putInt(contentResolver,
-                    Settings.System.SCREEN_BRIGHTNESS_MODE, v)
+                Settings.System.SCREEN_BRIGHTNESS_MODE, v)
         }
 
     val displayMetrics
         get() = DisplayMetrics().also {
             (context.getSystemService(Context.WINDOW_SERVICE) as WindowManager)
-                    .defaultDisplay.getRealMetrics(it)
+                .defaultDisplay.getRealMetrics(it)
         }
 
     val screenHW: Pair<Int, Int>
@@ -1519,16 +1556,16 @@ object SystemBridge : SystemOperation {
 
         //todo url 长度限制
         val ps = mapOf(
-                "action" to "script",
-                "script" to script,
-                "type" to type,
-                "from" to deviceName
+            "action" to "script",
+            "script" to script,
+            "type" to type,
+            "from" to deviceName
         ).toQueryString()
 
         @Suppress("SpellCheckingInspection")
         val headers = mapOf(
-                "ts" to ts.toString(),
-                "sign" to SecureHelper.signData(ps, ts, "cssccssc")
+            "ts" to ts.toString(),
+            "sign" to SecureHelper.signData(ps, ts, "cssccssc")
         )
         val result = _send2Bus(ip2name, ps, headers)
         if (toast) {
@@ -1542,9 +1579,9 @@ object SystemBridge : SystemOperation {
 
     @Suppress("FunctionName")
     private fun _send2Bus(
-            ip2name: List<Pair<String, String>>,
-            ps: String,
-            hs: Map<String, String>
+        ip2name: List<Pair<String, String>>,
+        ps: String,
+        hs: Map<String, String>
     ): List<String> = ip2name.map { (ip, name) ->
         val res = HttpBridge.get("http://$ip:8001/api?$ps", hs)
         if (res != null) {
@@ -1566,15 +1603,15 @@ object SystemBridge : SystemOperation {
     fun sendCommand2RemoteDevice(ip2name: List<Pair<String, String>>, cmd: String, toast: Boolean = true) {
         val ts = QuantumClock.currentTimeMillis
         val ps = mapOf(
-                "action" to "command",
-                "command" to cmd,
-                "from" to deviceName
+            "action" to "command",
+            "command" to cmd,
+            "from" to deviceName
         ).toQueryString()
 
         @Suppress("SpellCheckingInspection")
         val headers = mapOf(
-                "ts" to ts.toString(),
-                "sign" to SecureHelper.signData(ps, ts, "cssccssc")
+            "ts" to ts.toString(),
+            "sign" to SecureHelper.signData(ps, ts, "cssccssc")
         )
         val result = _send2Bus(ip2name, ps, headers)
         if (toast) {
@@ -1601,8 +1638,8 @@ object SystemBridge : SystemOperation {
 
     val isDarkMode
         get() = (GlobalApp.APP.resources!!.configuration.uiMode
-                and Configuration.UI_MODE_NIGHT_MASK) ==
-                Configuration.UI_MODE_NIGHT_YES
+            and Configuration.UI_MODE_NIGHT_MASK) ==
+            Configuration.UI_MODE_NIGHT_YES
 
     override fun isAdbEnabled(): Boolean {
         val p2 = Runtime.getRuntime().exec("getprop init.svc.adbd")

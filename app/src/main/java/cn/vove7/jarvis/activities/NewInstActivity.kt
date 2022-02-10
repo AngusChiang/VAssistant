@@ -58,14 +58,14 @@ import java.util.*
  */
 class NewInstActivity : ReturnableActivity<ActivityNewInstBinding>(), View.OnClickListener {
     var pkg: String? = null
-    var parentId: Long? = null//上级命令MapNodeId
+
     private var instType: Int = NODE_SCOPE_GLOBAL
 
     private val editNode: ActionNode by lazy {
         val id = intent.getLongExtra("nodeId", 0L)
         DAO.daoSession.actionNodeDao.queryBuilder().where(ActionNodeDao.Properties.Id.eq(id)).unique()
     }//修改
-    private var parentNode: ActionNode? = null
+
     private val isReedit by lazy { intent["reedit", false] }
 
     private var enterTime = 0L
@@ -155,10 +155,6 @@ class NewInstActivity : ReturnableActivity<ActivityNewInstBinding>(), View.OnCli
             0 -> {//新建
                 viewBinding.selApp.gone()
                 if (!isReedit) {//add follow
-                    parentId = intent.getLongExtra("nodeId", 0)
-                    parentNode = DAO.daoSession.actionNodeDao.queryBuilder()
-                            .where(ActionNodeDao.Properties.Id.eq(parentId)).unique()
-
                     viewBinding.parentLay.show()
                     viewBinding.parentTitle.text = intent.getStringExtra("parent_title")
                 }
@@ -243,10 +239,6 @@ class NewInstActivity : ReturnableActivity<ActivityNewInstBinding>(), View.OnCli
 
         } else {//新发布 构造newNodeIns
             val newNode = ActionNode()
-            if (parentNode != null) {
-                newNode.parentId = parentId
-//                newNode.parentTagId = parentNode?.tagId
-            }
             if (inApp) {
                 val scope = ActionScope(pkg, activityName)
                 newNode.actionScope = scope
@@ -491,16 +483,8 @@ class NewInstActivity : ReturnableActivity<ActivityNewInstBinding>(), View.OnCli
     private fun wrapTestNode(): ActionNode {
         val testId = Int.MAX_VALUE.toLong()
 
-        val testNode = ActionNode(viewBinding.descText.text.toString(), testId, -1L, instType, parentId
-            ?: 0)
-        testNode.follows = emptyList()
+        val testNode = ActionNode(viewBinding.descText.text.toString(), testId, -1L, instType)
         testNode.regs = wrapRegs()
-        if (parentNode != null) {
-            val fs = parentNode!!.follows
-            fs.add(testNode)
-            return parentNode!!
-        }
-
         return testNode
     }
 

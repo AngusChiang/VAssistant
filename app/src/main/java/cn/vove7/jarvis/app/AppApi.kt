@@ -143,7 +143,7 @@ fun newHttpClient(): OkHttpClient = OkHttpClient.Builder().apply {
 
     if (BuildConfig.DEBUG) {
         addInterceptor(
-                HttpLoggingInterceptor { Log.d("HTTP", it) }.setLevel(
+                HttpLoggingInterceptor().setLevel(
                         HttpLoggingInterceptor.Level.BODY
                 )
         )
