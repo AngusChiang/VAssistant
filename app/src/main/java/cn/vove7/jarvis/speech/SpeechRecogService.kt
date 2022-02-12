@@ -1,7 +1,6 @@
 package cn.vove7.jarvis.speech
 
 import android.content.Context
-import android.content.Intent
 import android.content.pm.PackageManager
 import android.media.AudioManager
 import android.os.*
@@ -45,7 +44,7 @@ abstract class SpeechRecogService(val event: RecogEvent) : SpeechRecogI {
             field = v
         }
     private val wakeupStatusAni: StatusAnimation
-            by lazy { WakeupStatusAnimation() }
+        by lazy { WakeupStatusAnimation() }
     private val audioManager: AudioManager
         get() = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
 
@@ -178,8 +177,8 @@ abstract class SpeechRecogService(val event: RecogEvent) : SpeechRecogI {
         if (wakeupI.opened) {
             if (AppConfig.voiceWakeup) {
                 wakeupStatusAni.show(
-                        R.drawable.ic_unhearing, "语音唤醒已自动休眠(点击再次开启)",
-                        UtilEventReceiver.getIntent(AppBus.ACTION_START_WAKEUP)
+                    R.drawable.ic_unhearing, "语音唤醒已自动休眠(点击再次开启)",
+                    UtilEventReceiver.getIntent(AppBus.ACTION_START_WAKEUP)
                 )
             }
             doStopWakeUp()//不通知
@@ -228,7 +227,7 @@ abstract class SpeechRecogService(val event: RecogEvent) : SpeechRecogI {
         val sleepTime = if (BuildConfig.DEBUG) AppConfig.autoSleepWakeupMillis / 60
         else AppConfig.autoSleepWakeupMillis
         wakeupTimerEnd = false
-        Vog.d("休眠定时${sleepTime / 1000}s")
+        GlobalLog.log("休眠定时${sleepTime / 1000}s")
         if (sleepTime <= 0) return //不自动休眠
         wpTimerHandler.postDelayed(stopWakeUpAction, sleepTime)
     }
@@ -239,37 +238,33 @@ abstract class SpeechRecogService(val event: RecogEvent) : SpeechRecogI {
         wpTimerHandler.removeCallbacks(stopWakeUpAction)
     }
 
-    private fun checkRecorderPermission(jump: Boolean = true): Boolean {
-        return (ActivityCompat.checkSelfPermission(context,
-                android.Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED)
-                .also {
-                    if (!it && jump)
-                        AppBus.post(RequestPermission("麦克风权限"))
-                }
-    }
+    private fun checkRecorderPermission(jump: Boolean = true): Boolean = (
+        ActivityCompat.checkSelfPermission(context, android.Manifest.permission.RECORD_AUDIO)
+            == PackageManager.PERMISSION_GRANTED)
+        .also {
+            if (!it && jump) AppBus.post(RequestPermission("麦克风权限"))
+        }
 
-    fun startIfLastingVoice() {//长语音
-        runOnNewHandlerThread(delay = 500) {
-            //            if (SystemBridge.isMediaPlaying()) {
+    fun startIfLastingVoice() = runOnNewHandlerThread(delay = 500) {//长语音
+//            if (SystemBridge.isMediaPlaying()) {
 //                Vog.d("重启长语音： 正在播放音乐")
 //                return@runOnNewHandlerThread
 //            }
-            if (MainService.speaking) {
-                Vog.d("重启长语音：speaking")
-                return@runOnNewHandlerThread
+        if (MainService.speaking) {
+            Vog.d("重启长语音：speaking")
+            return@runOnNewHandlerThread
+        }
+        if (isListening) {
+            Vog.d("重启长语音： 正在识别")
+            return@runOnNewHandlerThread
+        }
+        if (AppConfig.lastingVoiceCommand && !lastingStopped) {
+            if (BuildConfig.DEBUG) {
+                GlobalLog.log("开始长语音")
             }
-            if (isListening) {
-                Vog.d("重启长语音： 正在识别")
-                return@runOnNewHandlerThread
-            }
-            if (AppConfig.lastingVoiceCommand && !lastingStopped) {
-                if (BuildConfig.DEBUG) {
-                    GlobalLog.log("开始长语音")
-                }
-                startRecog(notify = false)
-            } else {
-                Vog.d("重启长语音： 长语音关闭或已停止")
-            }
+            startRecog(notify = false)
+        } else {
+            Vog.d("重启长语音： 长语音关闭或已停止")
         }
     }
 
@@ -342,7 +337,7 @@ abstract class SpeechRecogService(val event: RecogEvent) : SpeechRecogI {
             sendMessage(SpeechMessage.buildMessage(SpeechConst.CODE_VOICE_READY))
         }
 
-        fun sendTemp(tmp:String) {
+        fun sendTemp(tmp: String) {
             sendMessage(SpeechMessage.buildMessage(SpeechConst.CODE_VOICE_TEMP, tmp))
         }
 

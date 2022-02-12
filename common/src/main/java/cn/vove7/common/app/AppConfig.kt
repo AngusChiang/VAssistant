@@ -137,7 +137,7 @@ object AppConfig : BaseConfig {
                 0 -> oneMinute
                 1 -> oneMinute * 5
                 2 -> oneMinute * 10
-                3 -> oneMinute / 30
+                3 -> oneMinute * 30
                 4 -> -1 //不休眠
                 else -> 10 * oneMinute
             }.also {
