@@ -74,9 +74,7 @@ class TextOcrActivity : BaseActivity<ActivityTextOcrBinding>() {
     @Synchronized
     private fun copy(list: List<TextOcrItem>) {
         wordItems.clear()
-        list.forEach { item ->
-            wordItems.add(Model(item))
-        }
+        wordItems.addAll(list.map { Model(it) })
     }
 
     private fun ocrWithScreenShot() {

@@ -281,22 +281,15 @@ source: ${event.source?.let { ViewNode(it) }}
                         else -> super.onKeyEvent(event)
                     }
                 }
-                //耳机
-                KEYCODE_HEADSETHOOK -> {
-                    return when {
-                        MainService.recogIsListening -> {//按下停止聆听
-                            v2 = true
-                            MainService.onCommand(AppBus.ACTION_STOP_RECOG)
-                            true
+                KEYCODE_HEADSETHOOK, KEYCODE_VOLUME_UP, in AppConfig.wakeupKeys -> {
+                    if(event.keyCode == KEYCODE_VOLUME_UP) {
+                        v4?.apply {
+                            //点按后 长按
+                            if ((this + 1000) > System.currentTimeMillis()) {
+                                return super.onKeyEvent(event)
+                            }
                         }
-                        AppConfig.wakeUpWithHeadsetHook -> {//长按耳机中键唤醒
-                            postLongDelay(startupRunner)
-                            true
-                        }
-                        else -> super.onKeyEvent(event)
                     }
-                }
-                in AppConfig.wakeupKeys -> {
                     return when {
                         MainService.recogIsListening -> {//按下停止聆听
                             v2 = true
@@ -304,26 +297,6 @@ source: ${event.source?.let { ViewNode(it) }}
                             true
                         }
                         AppConfig.isLongPressKeyWakeUp -> {//长按自定义键唤醒
-                            postLongDelay(startupRunner)
-                            true
-                        }
-                        else -> super.onKeyEvent(event)
-                    }
-                }
-                KEYCODE_VOLUME_UP -> {
-                    v4?.apply {
-                        //点按后 长按
-                        if ((this + 1000) > System.currentTimeMillis()) {
-                            return super.onKeyEvent(event)
-                        }
-                    }
-                    return when {
-                        MainService.recogIsListening -> {//按下停止聆听
-                            v2 = true
-                            MainService.onCommand(AppBus.ACTION_STOP_RECOG)
-                            true
-                        }
-                        AppConfig.isLongPressKeyWakeUp -> {//长按唤醒
                             postLongDelay(startupRunner)
                             true
                         }

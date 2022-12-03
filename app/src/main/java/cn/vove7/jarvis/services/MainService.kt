@@ -481,9 +481,9 @@ object MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
 
     //from executor 线程
     private fun onExecuteFailed() {//错误信息
-        GlobalApp.toastError("执行失败")
+//        GlobalApp.toastError("执行失败")
+        speak("执行失败")
         executeAnimation.failedAndHideDelay()
-        floatyPanel.hideImmediately()
     }
 
     private fun onExecuteInterrupt() {
@@ -1214,13 +1214,13 @@ object MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
      */
     private fun onCommandParseFailed(cmd: String) {
         uploadUserCommandHistory(CommandHistory(UserInfo.getUserId(), cmd, null))
-        floatyPanel.showAndHideDelay("解析失败")
+        speak("命令解析失败")
         parseAnimation.failedAndHideDelay()
     }
 
     private fun runFromCloud(command: String, actions: List<Action>?): Boolean {
         if (actions == null || actions.isEmpty()) {
-            floatyPanel.showAndHideDelay("解析失败")
+            speak("云端命令解析失败")
             parseAnimation.failedAndHideDelay()
             return false
         }

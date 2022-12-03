@@ -79,6 +79,7 @@ import java.net.Inet4Address
 import java.net.URLEncoder
 import java.util.*
 import kotlin.concurrent.thread
+import kotlin.system.exitProcess
 
 @Suppress("unused", "MemberVisibilityCanBePrivate")
 object SystemBridge : SystemOperation {
@@ -1349,6 +1350,11 @@ object SystemBridge : SystemOperation {
      * @param pkg String
      */
     override fun killApp(pkg: String): Boolean {
+        @Suppress("UNREACHABLE_CODE")
+        if (pkg == context.packageName) {
+            exitProcess(0)
+            return true
+        }
         return if (ShellHelper.hasRootOrAdb()) {
             killAppByShell(pkg)
         } else killAppByAS(pkg)

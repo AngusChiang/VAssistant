@@ -10,8 +10,8 @@
         <option name="gradleJvm" value="Embedded JDK" />
         <option name="modules">
           <set>
-            <option value="$USER_HOME$/AndroidStudioProjects/ScrcpyLib/common" />
-            <option value="$PROJECT_DIR$/../TTS/app" />
+            <option value="$PROJECT_DIR$/../EdgeTTS/app" />
+            <option value="$PROJECT_DIR$/../VAssist-Scrcpy/common" />
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/androlua" />
             <option value="$PROJECT_DIR$/app" />
@@ -25,7 +25,6 @@
             <option value="$PROJECT_DIR$/speechLib" />
           </set>
         </option>
-        <option name="resolveModulePerSourceSet" value="false" />
       </GradleProjectSettings>
     </option>
   </component>

@@ -186,7 +186,7 @@ class ExampleUnitTest {
     }
 
     @Test
-    fun tulingChat() {
+    suspend fun tulingChat() {
         for (s in arrayOf("阿里巴巴股票", "鱼香肉丝怎么做", "今天穿什么衣服")) {
             val a = TulingChatSystem().chatWithText(s)
             System.err.println(a)
