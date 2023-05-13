@@ -17,7 +17,7 @@ import cn.vove7.jarvis.fragments.base.BaseMarkedFragment
 /**
  * # MarkedOpenFragment
  *
- * @author 17719247306
+ * @author Vove
  * 2018/9/7
  */
 class MarkedOpenFragment : BaseMarkedFragment() {

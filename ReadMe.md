@@ -1,5 +1,8 @@
 ![img](https://vove.gitee.io/img/favicon.ico)
 
+**构建请查看 [BUILD.md](BUILD.md)**
+
+
 [在酷安查看](https://www.coolapk.com/apk/cn.vove7.vassistant)
 
 ## 屏幕助手  

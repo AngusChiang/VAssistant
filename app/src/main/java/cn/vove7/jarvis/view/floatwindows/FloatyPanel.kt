@@ -22,7 +22,7 @@ import cn.vove7.vtp.log.Vog
 /**
  * # FloatyPanel
  * 悬浮语音面板
- * @author 17719247306
+ * @author Vove
  * 2018/9/9
  */
 abstract class FloatyPanel<T : ViewBinding>(width: Int, height: Int) : AbFloatWindow<T>(

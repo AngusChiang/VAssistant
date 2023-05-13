@@ -21,7 +21,7 @@ import cn.vove7.common.model.UserInfo;
 import cn.vove7.common.net.tool.SecureHelper;
 
 /**
- * Created by 17719247306 on 2018/9/3
+ * Created by Vove on 2018/9/3
  */
 @Entity
 public class AppAdInfo implements Serializable, Searchable, Signable, DataFrom {

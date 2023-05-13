@@ -8,7 +8,7 @@ import java.util.HashMap;
 import java.util.List;
 
 /**
- * Created by 17719247306.
+ * Created by Vove.
  * Date: 2018/8/26
  */
 public class GcCollector {

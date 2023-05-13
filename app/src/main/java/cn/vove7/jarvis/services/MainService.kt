@@ -6,6 +6,7 @@ import android.app.Dialog
 import android.content.DialogInterface
 import android.content.Intent
 import android.os.SystemClock
+import cn.vove7.android.common.loge
 import cn.vove7.common.BuildConfig
 import cn.vove7.common.MessageException
 import cn.vove7.common.accessibility.AccessibilityApi
@@ -172,13 +173,16 @@ object MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
 
     var speechEngineLoaded = false
 
-    fun init() {
+    fun init() = kotlin.runCatching {
         AppBus.reg(this)
         loadFloatPanel()
         loadChatSystem()
         loadSpeechService()
         speechEngineLoaded = true
         loadHomeSystem()
+    }.onFailure {
+        "service init failed: $it".loge()
+        it.printStackTrace()
     }
 
     fun loadFloatPanel(type: Int = AppConfig.panelStyle) {
@@ -717,14 +721,14 @@ object MainService : ServiceBridge, OnSelectListener, OnMultiSelectListener {
                 GlobalApp.toastWarning("正在启动")
 
                 //在未启动时，等待5s加载完
-                val b = whileWaitTime(5000) {
+                val succ = whileWaitTime(5000) {
                     if (speechEngineLoaded) Unit
                     else {
                         sleep(200)
                         null
                     }
-                }
-                if (b == null) {
+                } != null
+                if (!succ) {
                     GlobalApp.toastWarning("引擎未就绪")
                     return@launch
                 }

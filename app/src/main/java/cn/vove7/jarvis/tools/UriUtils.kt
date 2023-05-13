@@ -19,7 +19,7 @@ fun File.toShareUri(): Uri = if (Build.VERSION.SDK_INT >= 24) {
 /**
  * # UriUtils
  *
- * @author 17719247306
+ * @author Vove
  * 2018/8/23
  */
 object UriUtils {

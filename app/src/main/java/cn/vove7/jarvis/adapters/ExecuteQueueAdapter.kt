@@ -15,7 +15,7 @@ import cn.vove7.vtp.easyadapter.BaseListAdapter
 /**
  * # ExecuteQueueAdapter
  *
- * @author 17719247306
+ * @author Vove
  * 2018/9/8
  */
 class ExecuteQueueAdapter(context: Context, execQueue: MutableList<ActionNode>)

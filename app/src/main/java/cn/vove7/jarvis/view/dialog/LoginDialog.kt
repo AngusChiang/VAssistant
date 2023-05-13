@@ -25,7 +25,7 @@ import kotlinx.coroutines.withContext
 /**
  * # LoginDialog
  *
- * @author 17719247306
+ * @author Vove
  * 2018/9/12
  */
 typealias OnLoginSuccess = () -> Unit

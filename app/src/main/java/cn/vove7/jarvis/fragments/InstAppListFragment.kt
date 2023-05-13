@@ -24,7 +24,7 @@ import kotlinx.coroutines.withContext
 /**
  * # InstAppListFragment
  * App支持列表
- * @author 17719247306
+ * @author Vove
  * 2018/8/18
  */
 class InstAppListFragment : SimpleListFragment<ActionScope>(), OnSyncInst {

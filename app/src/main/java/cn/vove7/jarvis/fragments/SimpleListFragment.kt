@@ -32,7 +32,7 @@ import java.util.stream.Collectors
  * # SimpleListFragment
  * Model 统一显示
  * > with a [SimpleListAdapter] [ListViewModel]
- * @author 17719247306
+ * @author Vove
  * 2018/8/18
  */
 abstract class SimpleListFragment<DataType> :

@@ -22,7 +22,7 @@ import cn.vove7.rhino.common.GcCollector;
 import cn.vove7.vtp.asset.AssetHelper;
 
 /**
- * Created by 17719247306 on 2018/8/28
+ * Created by Vove on 2018/8/28
  */
 public class RhinoApi extends AbsApi {
 

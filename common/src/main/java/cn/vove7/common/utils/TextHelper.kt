@@ -7,7 +7,7 @@ import java.io.File
 /**
  * # TextHelper
  *
- * @author 17719247306
+ * @author Vove
  * 2018/9/12
  */
 object TextHelper {

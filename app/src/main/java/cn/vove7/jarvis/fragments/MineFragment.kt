@@ -38,7 +38,7 @@ class MineFragment : Fragment() {
                 loadUserInfo()
             }
             AppBus.EVENT_REFRESH_USER_INFO -> {
-                refreshUserInfo()
+                // refreshUserInfo()
             }
         }
     }
@@ -63,17 +63,17 @@ class MineFragment : Fragment() {
         viewBinding = FragmentMineBinding.inflate(inflater, container, false)
         AppBus.reg(this)
 
-        viewBinding.topPanel.onClick {
-            if (UserInfo.isLogin()) {
-                UserInfoDialog(requireActivity()) {
-                    loadUserInfo()
-                }
-            } else {
-                LoginDialog(requireContext()) {
-                    loadUserInfo()
-                }
-            }
-        }
+        // viewBinding.topPanel.onClick {
+        //     if (UserInfo.isLogin()) {
+        //         UserInfoDialog(requireActivity()) {
+        //             loadUserInfo()
+        //         }
+        //     } else {
+        //         LoginDialog(requireContext()) {
+        //             loadUserInfo()
+        //         }
+        //     }
+        // }
         onDebug {
             viewBinding.fab.setOnLongClickListener {
                 startActivity(Intent(context, Class.forName("cn.vove7.jarvis.debug.DebugIndexActivity")))
@@ -122,20 +122,20 @@ class MineFragment : Fragment() {
             viewBinding.loginLay.visibility = View.GONE
             viewBinding.userInfoLay.visibility = View.VISIBLE
             viewBinding.userNameText.text = UserInfo.getUserName()
-            viewBinding.userVipText.text = when {
-                UserInfo.isPermanentVip() -> {
-                    viewBinding.redHeard.show()
-                    "永久会员"
-                }
-                UserInfo.isVip() -> {
-                    viewBinding.redHeard.show()
-                    "会员用户"
-                }
-                else -> {
-                    viewBinding.redHeard.gone()
-                    ""
-                }
-            }
+            // viewBinding.userVipText.text = when {
+            //     // UserInfo.isPermanentVip() -> {
+            //     //     viewBinding.redHeard.show()
+            //     //     "永久会员"
+            //     // }
+            //     // UserInfo.isVip() -> {
+            //     //     viewBinding.redHeard.show()
+            //     //     "会员用户"
+            //     // }
+            //     else -> {
+            //         viewBinding.redHeard.gone()
+            //         ""
+            //     }
+            // }
         } else {
             viewBinding.loginLay.show()
             viewBinding.userInfoLay.gone()

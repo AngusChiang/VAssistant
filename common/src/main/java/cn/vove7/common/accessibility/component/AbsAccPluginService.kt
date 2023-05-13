@@ -6,7 +6,7 @@ import cn.vove7.vtp.log.Vog
 /**
  * # AbsAccPluginService
  * 注册方式：MyAccessibilityService.registerPlugin(AbsAccPluginService)
- * @author 17719247306
+ * @author Vove
  * 2018/9/3
  */
 

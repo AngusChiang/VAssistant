@@ -3,7 +3,7 @@ package cn.vove7.common.net
 /**
  * # ApiUrls
  *
- * @author 17719247306
+ * @author Vove
  * 2018/9/11
  */
 object ApiUrls {

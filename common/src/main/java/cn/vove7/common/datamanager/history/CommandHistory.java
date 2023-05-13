@@ -7,7 +7,7 @@ import com.google.gson.annotations.Expose;
 import java.util.Date;
 
 /**
- * Created by 17719247306 on 2018/9/11
+ * Created by Vove on 2018/9/11
  */
 
 @Keep

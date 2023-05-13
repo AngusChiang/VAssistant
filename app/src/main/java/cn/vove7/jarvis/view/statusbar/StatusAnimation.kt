@@ -21,7 +21,7 @@ import kotlin.concurrent.thread
 /**
  * # StatusAnimation
  *
- * @author 17719247306
+ * @author Vove
  * 2018/9/2
  */
 abstract class StatusAnimation {

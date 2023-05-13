@@ -11,7 +11,7 @@ import cn.vove7.jarvis.fragments.WelcomeFragment
 /**
  * # WelcomeActivity
  *
- * @author 17719247306
+ * @author Vove
  * 2018/8/29
  */
 class WelcomeActivity : BaseActivityWithViewPager() {

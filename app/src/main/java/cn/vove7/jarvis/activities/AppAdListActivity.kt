@@ -29,7 +29,7 @@ import cn.vove7.vtp.log.Vog
 /**
  * # AppAdListActivity
  *
- * @author 17719247306
+ * @author Vove
  * 2018/9/7
  */
 class AppAdListActivity : OneFragmentActivity() {

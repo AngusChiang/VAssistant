@@ -10,7 +10,7 @@ import cn.vove7.jarvis.receivers.UtilEventReceiver
 /**
  * # ExecuteAnimation
  *
- * @author 17719247306
+ * @author Vove
  * 2018/9/4
  */
 class ExecuteAnimation : StatusAnimation() {

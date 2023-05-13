@@ -32,7 +32,7 @@ import kotlin.concurrent.thread
  * # VoiceAssistReceiver
  *
  * 助手唤醒 与 桌面Shortcut快捷执行
- * @author 17719247306
+ * @author Vove
  * 2018/9/10
  */
 class VoiceAssistActivity : Activity() {

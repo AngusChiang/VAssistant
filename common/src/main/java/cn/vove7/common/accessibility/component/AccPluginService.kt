@@ -5,7 +5,7 @@ import cn.vove7.common.datamanager.parse.model.ActionScope
 /**
  * # AccPluginService
  * 无障碍 插件服务
- * @author 17719247306
+ * @author Vove
  * 2018/9/3
  */
 interface AccPluginService : Comparable<Any?> {

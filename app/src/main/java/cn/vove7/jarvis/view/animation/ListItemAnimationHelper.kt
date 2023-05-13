@@ -8,7 +8,7 @@ import android.view.animation.DecelerateInterpolator
 /**
  * # ListItemAnimationHelper
  *
- * @author 17719247306
+ * @author Vove
  * 2018/9/11
  */
 class ListItemAnimationHelper(val onlyFirstIn: Boolean, var dy: Float = 50f) {

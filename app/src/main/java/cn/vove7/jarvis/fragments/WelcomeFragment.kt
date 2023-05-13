@@ -12,7 +12,7 @@ import android.view.ViewGroup
 /**
  * # WelcomeFragment
  *
- * @author 17719247306
+ * @author Vove
  * 2018/8/29
  */
 class WelcomeFragment(@LayoutRes val staticLayoutId: Int) : androidx.fragment.app.Fragment() {

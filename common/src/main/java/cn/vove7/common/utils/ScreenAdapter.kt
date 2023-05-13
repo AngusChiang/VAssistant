@@ -7,7 +7,7 @@ import cn.vove7.common.bridges.SystemOperation
 /**
  * # ScreenAdapter
  *
- * @author 17719247306
+ * @author Vove
  * 2018/9/6
  */
 object ScreenAdapter {

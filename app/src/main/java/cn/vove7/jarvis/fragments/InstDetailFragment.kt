@@ -43,7 +43,7 @@
 ///**
 // * # InstDetailFragment
 // * 指令详情BSDialog
-// * @author 17719247306
+// * @author Vove
 // * 2018/8/24
 // */
 //@Deprecated("InstDetailActivity")

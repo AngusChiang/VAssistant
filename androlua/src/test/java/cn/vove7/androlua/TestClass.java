@@ -1,7 +1,7 @@
 package cn.vove7.androlua;
 
 /**
- * @author 17719247306
+ * @author Vove
  * <p>
  * 2018/8/17
  */

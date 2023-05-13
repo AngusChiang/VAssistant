@@ -27,7 +27,7 @@ import kotlin.concurrent.thread
  *  ↓
  * id text -> finder
  *
- * @author 17719247306
+ * @author Vove
  * 2018/9/3
  */
 object AdKillerService : AbsAccPluginService() {

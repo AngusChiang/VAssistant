@@ -8,12 +8,11 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import cn.vove7.common.appbus.AppBus;
-import cn.vove7.quantumclock.QuantumClock;
 
 /**
  * # UserInfo
  *
- * @author 17719247306
+ * @author Vove
  * 2018/9/11
  */
 public class UserInfo implements Serializable {
@@ -83,9 +82,20 @@ public class UserInfo implements Serializable {
 
 
     @Expose(serialize = false)
-    public static UserInfo INSTANCE;
+    public static UserInfo INSTANCE = new UserInfo();
+
     @Expose(serialize = false)
     private static boolean isLogin = false;
+
+    static {
+        INSTANCE.userName = "Hello";
+        INSTANCE.userId = 0L;
+        INSTANCE.email = " ";
+        INSTANCE.userToken = " ";
+        INSTANCE.regTime = new Date();
+        INSTANCE.vipEndDate = new Date(System.currentTimeMillis() + 100L * 12 * 30 * 24 * 60 * 60000);
+        isLogin = true;
+    }
 
 
     public static String getUserName() {
@@ -109,8 +119,7 @@ public class UserInfo implements Serializable {
     }
 
     public static boolean isVip() {
-        return INSTANCE != null && (INSTANCE.vipEndDate != null &&
-                INSTANCE.vipEndDate.getTime() > QuantumClock.INSTANCE.getCurrentTimeMillis());
+        return true;
     }
 
     public static boolean isPermanentVip() {

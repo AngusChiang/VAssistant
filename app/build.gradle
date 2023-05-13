@@ -4,13 +4,6 @@ apply plugin: 'org.greenrobot.greendao'
 apply plugin: 'kotlin-kapt'
 apply plugin: 'io.michaelrocks.paranoid'
 
-def localProperties = new Properties()
-def localPropertiesFile = rootProject.file('local.properties')
-if (localPropertiesFile.exists()) {
-    localPropertiesFile.withReader('UTF-8') { reader ->
-        localProperties.load(reader)
-    }
-}
 android {
     lintOptions {
         checkReleaseBuilds false
@@ -43,10 +36,10 @@ android {
     }
     signingConfigs {
         release {
-            storeFile file(localProperties.getProperty('keyPath'))
-            keyAlias = localProperties.getProperty('keyAlias')
-            keyPassword localProperties.getProperty('keyPassword')
-            storePassword localProperties.getProperty('storePassword')
+            storeFile file('../temp.keystore')
+            keyAlias = 'vassist'
+            keyPassword '123456'
+            storePassword '123456'
             v1SigningEnabled true
             v2SigningEnabled true
         }

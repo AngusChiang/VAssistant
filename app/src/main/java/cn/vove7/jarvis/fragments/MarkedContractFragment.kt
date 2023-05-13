@@ -17,7 +17,7 @@ import cn.vove7.jarvis.view.dialog.SelectContactDialog
 /**
  * # MarkedContractFragment
  *
- * @author 17719247306
+ * @author Vove
  * 2018/9/4
  */
 class MarkedContractFragment : BaseMarkedFragment() {

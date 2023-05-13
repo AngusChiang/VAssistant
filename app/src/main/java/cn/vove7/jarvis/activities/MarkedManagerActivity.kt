@@ -14,7 +14,7 @@ import cn.vove7.jarvis.tools.SearchActionHelper
 /**
  * # MarkedManagerActivity
  *
- * @author 17719247306
+ * @author Vove
  * 2018/9/4
  */
 class MarkedManagerActivity : BaseActivityWithViewPager() {

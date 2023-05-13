@@ -33,7 +33,7 @@ import org.adw.library.widgets.discreteseekbar.DiscreteSeekBar
 /**
  * # SettingItemHelper
  *
- * @author 17719247306
+ * @author Vove
  * 2018/9/10
  */
 typealias OnClick = () -> Unit

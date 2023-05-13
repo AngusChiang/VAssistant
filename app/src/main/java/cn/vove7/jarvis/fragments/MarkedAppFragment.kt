@@ -18,7 +18,7 @@ import cn.vove7.jarvis.view.dialog.SelectAppDialog
 /**
  * # MarkedAppFragment
  *
- * @author 17719247306
+ * @author Vove
  * 2018/9/7
  */
 class MarkedAppFragment : BaseMarkedFragment() {

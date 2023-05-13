@@ -115,31 +115,12 @@ class InitCp : ContentProvider() {
             startBroadcastReceivers()
             launchExtension()
             ForegroundService.start(context!!)
-            a().c()
             TimedTaskManager.init()
             delayRun(5000) {
                 ConnectiveNsdHelper.start()
             }
         }
         return true
-    }
-
-    class a {
-        fun c() = GlobalScope.launch {
-            val pm = GlobalApp.APP.packageManager
-            val pkg = GlobalApp.APP.packageName
-            val ss = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-                pm.getPackageInfo(pkg, PackageManager.GET_SIGNING_CERTIFICATES).signingInfo.apkContentsSigners
-            } else pm.getPackageInfo(pkg, PackageManager.GET_SIGNATURES).signatures
-            if (ss?.isNotEmpty() == true) {
-                val smd5 = ss[0].toByteArray().md5
-                if (smd5.hashCode() != -465776148) {
-                    exitProcess(0)
-                }
-            } else {
-                exitProcess(0)
-            }
-        }
     }
 
     private fun startBroadcastReceivers() {

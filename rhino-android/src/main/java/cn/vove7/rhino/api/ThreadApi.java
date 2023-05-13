@@ -5,7 +5,7 @@ import org.mozilla.javascript.Scriptable;
 import cn.vove7.rhino.common.GcCollector;
 
 /**
- * Created by 17719247306 on 2018/8/28
+ * Created by Vove on 2018/8/28
  */
 public class ThreadApi extends AbsApi {
     @Override

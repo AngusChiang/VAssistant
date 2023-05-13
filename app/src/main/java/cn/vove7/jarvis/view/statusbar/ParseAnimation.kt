@@ -6,7 +6,7 @@ import cn.vove7.jarvis.R
 /**
  * # ParseAnimation
  *
- * @author 17719247306
+ * @author Vove
  * 2018/9/2
  */
 class ParseAnimation : StatusAnimation() {
